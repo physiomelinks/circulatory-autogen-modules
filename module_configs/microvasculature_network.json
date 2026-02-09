@@ -1,65 +1,197 @@
 [
   {
-    "vessel_type":"artery",
-    "BC_type":"vv_micro",
-    "module_format":"cellml",
-    "module_file":"microvasculature_network_modules.cellml",
-    "module_type":"vv_type_micro",
-    "entrance_ports":
-    [
+    "vessel_type": "artery",
+    "BC_type": "vv_micro",
+    "module_format": "cellml",
+    "module_file": "microvasculature_network_modules.cellml",
+    "module_type": "vv_type_micro",
+    "entrance_ports": [
       {
-        "port_type":"flow_port",
-        "variables":["v_in"]
+        "port_type": "flow_port",
+        "variables": [
+          "v_in"
+        ]
       },
       {
-        "port_type":"pressure_port",
-        "variables":["u"]
+        "port_type": "pressure_port",
+        "variables": [
+          "u"
+        ]
       }
     ],
-    "exit_ports":
-    [
+    "exit_ports": [
       {
-        "port_type":"flow_port",
-        "variables":["v_out"]
+        "port_type": "flow_port",
+        "variables": [
+          "v_out"
+        ]
       },
       {
-        "port_type":"pressure_port",
-        "variables":["u_d"]
+        "port_type": "pressure_port",
+        "variables": [
+          "u_d"
+        ]
       }
     ],
-    "general_ports":[
+    "general_ports": [
       {
-        "port_type":"flow_sensor",
-        "variables":["v"]
+        "port_type": "flow_sensor",
+        "variables": [
+          "v"
+        ]
       }
     ],
-    "variables_and_units":
-    [
-      ["u", "J_per_m3", "access", "variable"],
-      ["u_d", "J_per_m3", "access", "variable"],
-      ["v", "m3_per_s", "access", "variable"],
-      ["u_C", "J_per_m3", "access", "variable"],
-      ["u_C_d", "J_per_m3", "access", "variable"],
-      ["q_C", "m3", "access", "variable"],
-      ["q_C_d", "m3", "access", "variable"],
-      ["q_0", "m3", "access", "variable"],
-      ["q", "m3", "access", "variable"],
-      ["E", "J_per_m3", "access", "constant"],
-      ["l", "metre", "no_access", "constant"],
-      ["r_0", "metre", "no_access", "constant"],
-      ["u_0", "J_per_m3", "access", "constant"],
-      ["theta", "dimensionless", "access", "constant"],
-      ["u_ext", "J_per_m3", "access", "constant"],
-      ["beta_g", "dimensionless", "access", "global_constant"],
-      ["rho", "Js2_per_m5", "no_access", "global_constant"],
-      ["mu", "Js_per_m3", "access", "global_constant"],
-      ["g", "m_per_s2", "no_access", "global_constant"],
-      ["a_vessel", "dimensionless", "no_access", "global_constant"],
-      ["b_vessel", "per_m", "no_access", "global_constant"],
-      ["c_vessel", "dimensionless", "no_access", "global_constant"],
-      ["d_vessel", "per_m", "no_access", "global_constant"],
-      ["v_in", "m3_per_s", "access", "boundary_condition"],
-      ["v_out", "m3_per_s", "access", "boundary_condition"]
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u_d",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u_C",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u_C_d",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C_d",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "r_0",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "beta_g",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "mu",
+        "Js_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "g",
+        "m_per_s2",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ]
     ]
   },
   {
@@ -660,6 +792,195 @@
         "m3_per_s",
         "access",
         "boundary_condition"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "artery_Min",
+    "BC_type": "vv_micro",
+    "module_format": "cellml",
+    "module_file": "microvasculature_network_modules.cellml",
+    "module_type": "vv_Min_type_micro",
+    "entrance_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_in_sum"
+        ],
+        "multi_port": "Sum"
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_out"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_d"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u_d",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v_in_sum",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_C",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u_C_d",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C_d",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "mu",
+        "Js_per_m3",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "g",
+        "m_per_s2",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "beta_g",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
       ]
     ]
   },
