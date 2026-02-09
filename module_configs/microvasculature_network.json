@@ -1,6 +1,358 @@
 [
   {
     "vessel_type": "artery",
+    "BC_type": "vp_micro",
+    "module_format": "cellml",
+    "module_file": "microvasculature_network_modules.cellml",
+    "module_type": "vp_type_micro",
+    "entrance_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_in"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "general_ports": [{
+        "port_type": "flow_sensor_port",
+        "variables": [
+          "v"
+        ]
+      }],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "r_0",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "beta_g",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "mu",
+        "Js_per_m3",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "g",
+        "m_per_s2",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "artery",
+    "BC_type": "pv_micro",
+    "module_format": "cellml",
+    "module_file": "microvasculature_network_modules.cellml",
+    "module_type": "pv_type_micro",
+    "general_ports": [
+      {
+        "port_type": "flow_sensor_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_out"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u"
+        ]
+      },
+      {
+        "port_type": "pressure_feedback_port",
+        "variables": [
+          "u"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "beta_g",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "mu",
+        "Js_per_m3",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "g",
+        "m_per_s2",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "artery",
     "BC_type": "vv_micro",
     "module_format": "cellml",
     "module_file": "microvasculature_network_modules.cellml",
