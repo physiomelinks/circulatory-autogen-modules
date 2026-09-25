@@ -181,7 +181,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           {%- else %}<p class="muted" style="margin:0">No ports: this component is self-contained.</p>{% endif %}
           {%- if c.invariants %}
           <h4>Invariants checked</h4>
-          <ul class="issues">{% for inv in c.invariants %}<li><code>{{ inv.expr if inv is mapping else inv }}</code></li>{% endfor %}</ul>
+          <ul class="issues">{% for inv in c.invariants %}<li>{% if inv is mapping and inv.description %}{{ inv.description }}: {% endif %}<code>{{ inv.expr if inv is mapping else inv }}</code></li>{% endfor %}</ul>
           {%- endif %}
         </div>
       </div>

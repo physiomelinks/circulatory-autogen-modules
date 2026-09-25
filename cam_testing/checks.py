@@ -84,6 +84,13 @@ class ComponentModel(object):
         self._helper = None
         self.nominal = {harness.parameter_name(p): p.float_value
                         for p in component.parameters() if not p.is_todo}
+        self._var_of = {harness.parameter_name(p): p.variable_name for p in component.parameters()}
+
+    def param_env(self, overrides=None):
+        '''Parameter values by variable name (e.g. alpha), for invariant expressions.'''
+        values = dict(self.nominal)
+        values.update(overrides or {})
+        return {self._var_of[k]: v for k, v in values.items()}
 
     @property
     def model_path(self):
@@ -115,10 +122,14 @@ class ComponentModel(object):
                                            [self.nominal[k] for k in params])
 
 
-def _check_invariants(spec, t, outputs):
-    '''Returns a list of failed invariant descriptions.'''
+def _check_invariants(spec, t, outputs, params=None):
+    '''
+    Returns a list of failed invariant descriptions. An invariant is a numpy expression of
+    t, the outputs and the component's parameters (by variable name), e.g. "q >= 0".
+    '''
     failures = []
     env = {'np': np, 't': t}
+    env.update(params or {})
     env.update(outputs)
     for inv in spec.get('invariants') or []:
         expr = inv['expr'] if isinstance(inv, dict) else inv
@@ -157,7 +168,7 @@ def run_test(cm):
         fig = plots.plot_outputs(plot_path(cm.component, 'run'), t, outputs, cm.units(),
                                  f'{cm.component.label}: nominal parameters')
         bad = _non_finite(outputs)
-        inv = _check_invariants(cm.spec, t, outputs)
+        inv = _check_invariants(cm.spec, t, outputs, cm.param_env())
         metrics = {'n_time_points': len(t), 'sim_time': float(cm.spec['sim_time']),
                    'final_values': {k: float(v[-1]) for k, v in outputs.items()}}
         if bad or inv:
@@ -216,7 +227,7 @@ def verification_test_BC(cm):
                     runs.append((value, None, None))
                     continue
                 bad = _non_finite(outputs)
-                inv = _check_invariants(spec, t, outputs)
+                inv = _check_invariants(spec, t, outputs, cm.param_env({pname: value}))
                 if bad:
                     failures.append(f'{var}={value:.4g}: non-finite {", ".join(bad)}')
                 failures += [f'{var}={value:.4g}: {m}' for m in inv]

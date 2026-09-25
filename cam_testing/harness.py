@@ -110,7 +110,13 @@ def simulation_helper(model_path, spec, solver_info=None, solver=None, model_typ
 
 
 def run(helper, outputs, params=None):
-    '''Runs the helper (optionally with parameter overrides); returns (t, {var: array}).'''
+    '''
+    Runs the helper from the model's initial state (optionally with parameter overrides);
+    returns (t, {var: array}). Without the reset, a helper continues from the previous run's
+    final state.
+    '''
+    if hasattr(helper, 'reset_states'):
+        helper.reset_states()
     if params:
         names = list(params)
         helper.set_param_vals(names, [params[n] for n in names])

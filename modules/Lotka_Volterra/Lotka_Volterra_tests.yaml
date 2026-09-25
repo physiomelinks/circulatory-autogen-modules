@@ -2,7 +2,7 @@ module: Lotka_Volterra
 reviewed: false
 known_issues: []
 defaults:
-  sim_time: 2.0
+  sim_time: 5.0
   pre_time: 0.0
   dt: 0.01
   solver: CVODE_myokit
@@ -23,7 +23,10 @@ components:
   BC_type: nn
   module_type: Lotka_Volterra
   outputs: [x, y]
-  invariants: []
+  invariants:
+  - {description: populations stay positive, expr: (x > 0) & (y > 0)}
+  - {description: first integral H = δx − γ ln x + βy − α ln y is conserved (relative drift < 1e-4), expr: np.ptp(delta*x
+      - gamma*np.log(x) + beta*y - alpha*np.log(y)) <= 1e-4 * np.max(np.abs(delta*x - gamma*np.log(x) + beta*y - alpha*np.log(y)))}
   validation:
     baseline: {status: pending, reason: validation data not chosen yet}
     calibrate: {status: pending, reason: validation data not chosen yet}
