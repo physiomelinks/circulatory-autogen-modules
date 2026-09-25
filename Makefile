@@ -5,7 +5,7 @@ MODULE_ARGS = $(if $(MODULE),--module $(MODULE),)
 # a local libcuflynx checkout to install instead of the pinned git ref, e.g. LIBCUFLYNX=../circulatory_autogen
 LIBCUFLYNX ?=
 
-.PHONY: setup structure test test-all report site serve clean manifests
+.PHONY: setup structure test test-all report site serve clean manifests ranges
 
 setup:
 	python3 -m venv venv
@@ -34,6 +34,10 @@ site:
 
 serve: site
 	$(PYTHON) -m http.server -d site 8000
+
+# record verified/validated parameter ranges from the latest test results into <name>_parameters.csv
+ranges:
+	$(PYTHON) -m cam_testing.ranges update $(MODULE_ARGS)
 
 manifests:
 	$(PYTHON) tools/build_manifests.py

@@ -43,6 +43,22 @@ Each component (one `vessel_type`/`BC_type` entry of a module config) is generat
 
 A module whose spec has `reviewed: false` still runs in CI, but its failures don't fail the build.
 
+## Parameter ranges
+
+`<name>_parameters.csv` records two ranges for each parameter:
+- **Verified range** (`verified_min`, `verified_max`): the values over which the component ran, stayed finite and kept its invariants in `verification_test_BC`. It is the contiguous span around the nominal value, with each parameter varied on its own and the others held at nominal.
+- **Validated range** (`validated_min`, `validated_max`): the values at which the component matched data in a passing validation test. These come from published parameter intervals and calibrated values.
+
+`make ranges MODULE=<name>` writes both from the latest test results; commit the file afterwards. After that, `verification_test_BC` fails if a later sweep no longer supports a recorded verified range. Sweep ranges are set per parameter in the spec (`bc_sweep.ranges`, linear or `scale: log`). They should cover the validated values.
+
+To check a system model's parameters against the ranges of the modules it uses:
+
+```bash
+python -m cam_testing.ranges check --vessel-array my_vessel_array.csv --parameters my_parameters.csv
+```
+
+This lists each value as inside or outside the verified and validated ranges. It exits non-zero if any value is outside a verified range.
+
 ## Running locally
 
 libcuflynx needs SUNDIALS and MPI. On Ubuntu:
@@ -59,6 +75,7 @@ make setup LIBCUFLYNX=../circulatory_autogen # ...or a local libcuflynx checkout
 make structure                               # static checks
 make test MODULE=diffusion_volume            # V&V tests for one module (make test: all modules)
 make test-all MODULE=diffusion_volume        # including slow calibration
+make ranges MODULE=diffusion_volume          # record verified/validated ranges in the parameters file
 make report MODULE=diffusion_volume          # -> modules/diffusion_volume/diffusion_volume.html
 make serve                                   # build site/ as GitHub Pages serves it; http://localhost:8000
 ```

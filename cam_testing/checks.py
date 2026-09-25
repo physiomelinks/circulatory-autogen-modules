@@ -18,7 +18,7 @@ from dataclasses import asdict, dataclass, field
 
 import numpy as np
 
-from cam_testing import fixed_step, harness, plots
+from cam_testing import fixed_step, harness, plots, ranges
 from cam_testing.library import REPO_ROOT
 
 PASSED, FAILED, SKIPPED, PENDING = 'passed', 'failed', 'skipped', 'pending'
@@ -149,6 +149,7 @@ def _non_finite(outputs):
 
 def _guard(component, test, fn):
     '''Runs a check; any unexpected exception is a failed Result, not a crash.'''
+    plots.TIME_LABEL = component.spec.get('time_label', 'time [s]')
     try:
         return save(component, fn())
     except harness.MissingParameters as e:
@@ -184,10 +185,19 @@ def run_test(cm):
 # ----------------------------------------------------------------------------------------------
 
 def sweep_values(param_name, nominal, sweep_spec):
+    """Values to sweep: bc_sweep.ranges[param] as [min, max] or {min, max, points, scale: log},
+    else bc_sweep.factors times the nominal value."""
     ranges = sweep_spec.get('ranges') or {}
     points = int(sweep_spec.get('points', 5))
     if param_name in ranges:
-        lo, hi = ranges[param_name]
+        r = ranges[param_name]
+        if isinstance(r, dict):
+            lo, hi = float(r['min']), float(r['max'])
+            n = int(r.get('points', points))
+            if r.get('scale') == 'log':
+                return list(np.geomspace(lo, hi, n)), None
+            return list(np.linspace(lo, hi, n)), None
+        lo, hi = r
         return list(np.linspace(float(lo), float(hi), points)), None
     if nominal == 0:
         return [], 'nominal value is 0; set bc_sweep.ranges to sweep it'
@@ -198,26 +208,31 @@ def verification_test_BC(cm):
     def check():
         component, spec = cm.component, cm.spec
         sweep_spec = spec.get('bc_sweep') or {}
-        names = [p.variable_name for p in component.boundary_conditions()]
-        swept_kind = 'boundary conditions'
-        if not names and sweep_spec.get('constants_if_no_bcs', True):
-            # Self-contained components (no ports): sweep their constants instead.
-            names = [p.variable_name for p in component.parameters() if p.kind == 'constant']
-            swept_kind = 'constants (component has no boundary conditions)'
+        # 'all' (default): boundary conditions and every constant, so each parameter gets a
+        # verified range; 'bcs': boundary conditions only.
+        mode = sweep_spec.get('sweep', 'all')
+        bcs = [p.variable_name for p in component.boundary_conditions()]
+        if mode == 'bcs':
+            names, swept_kind = bcs, 'boundary conditions'
+        else:
+            names = bcs + [p.variable_name for p in component.parameters()
+                           if p.kind != 'boundary_condition' and p.variable_name not in bcs]
+            swept_kind = 'boundary conditions and constants' if bcs else 'constants (no boundary conditions)'
+        names = [n for n in names if n not in (sweep_spec.get('exclude') or [])]
         names += [n for n in sweep_spec.get('extra_parameters', []) if n not in names]
         if not names:
             return Result('verification_test_BC', SKIPPED, 'component has no boundary conditions or constants to sweep')
         by_var = {p.variable_name: p for p in component.parameters()}
         plot_output = sweep_spec.get('plot_output') or cm.outputs()[0]
 
-        sweeps, failures, notes, n_runs = {}, [], [], 0
+        sweeps, failures, notes, n_runs, verified = {}, [], [], 0, {}
         for var in names:
             pname = harness.parameter_name(by_var[var])
             values, why_not = sweep_values(var, cm.nominal[pname], sweep_spec)
             if why_not:
                 notes.append(f'{var}: {why_not}')
                 continue
-            runs = []
+            runs, passed = [], []
             for value in values:
                 n_runs += 1
                 try:
@@ -225,6 +240,7 @@ def verification_test_BC(cm):
                 except Exception as e:
                     failures.append(f'{var}={value:.4g}: simulation failed ({type(e).__name__}: {e})')
                     runs.append((value, None, None))
+                    passed.append((value, False))
                     continue
                 bad = _non_finite(outputs)
                 inv = _check_invariants(spec, t, outputs, cm.param_env({pname: value}))
@@ -232,17 +248,44 @@ def verification_test_BC(cm):
                     failures.append(f'{var}={value:.4g}: non-finite {", ".join(bad)}')
                 failures += [f'{var}={value:.4g}: {m}' for m in inv]
                 runs.append((value, t, outputs[plot_output] if not bad else None))
+                passed.append((value, not bad and not inv))
             sweeps[var] = runs
+            verified[var] = ranges.verified_ranges_from_sweep(passed, cm.nominal[pname])
+
+        # The ranges recorded in <name>_parameters.csv must be backed by this run.
+        unsupported = []
+        for p in component.parameters():
+            rec = ranges.recorded_range(p, 'verified')
+            if rec is None:
+                continue
+            got = verified.get(p.variable_name)
+            tol = 1e-9 * max(abs(rec[0]), abs(rec[1]), 1.0)
+            if got is None or rec[0] < got[0] - tol or rec[1] > got[1] + tol:
+                unsupported.append(f'{p.variable_name}: recorded verified range [{rec[0]:.4g}, {rec[1]:.4g}] '
+                                   f'not supported by this sweep ({got})')
 
         figs = []
         if sweeps:
             figs.append(plots.plot_sweep(plot_path(component, 'bc_sweep'), sweeps, plot_output, cm.units(),
                                          f'{component.label}: boundary-condition sweep'))
         metrics = {'swept_kind': swept_kind, 'swept': list(sweeps), 'n_runs': n_runs, 'n_failures': len(failures),
+                   'verified_ranges': verified, 'unsupported_recorded_ranges': unsupported,
                    'sweep_values': {k: [r[0] for r in v] for k, v in sweeps.items()}}
+        if unsupported:
+            return Result('verification_test_BC', FAILED,
+                          f'{len(unsupported)} recorded verified range(s) not supported by the latest sweep '
+                          f'(re-run `make ranges` after checking why)', metrics, figs, unsupported + failures + notes)
         if failures:
-            return Result('verification_test_BC', FAILED, f'{len(failures)} of {n_runs} runs failed',
-                          metrics, figs, failures + notes)
+            # Failures outside the verified span are information, not a defect: the verified
+            # range records where the module works. Only a failure at the nominal value fails.
+            nominal_failures = [v for v, r in verified.items() if r is None]
+            if nominal_failures:
+                return Result('verification_test_BC', FAILED,
+                              f'fails at the nominal value of: {", ".join(nominal_failures)}',
+                              metrics, figs, failures + notes)
+            return Result('verification_test_BC', PASSED,
+                          f'{n_runs} runs over {len(sweeps)} {swept_kind}; {len(failures)} run(s) outside the '
+                          f'verified ranges failed (see ranges)', metrics, figs, failures + notes)
         if not sweeps:
             return Result('verification_test_BC', SKIPPED, 'no boundary condition could be swept', metrics,
                           figs, notes)
@@ -485,63 +528,44 @@ def _validation_status(component, kind, test):
     return None, v
 
 
-def _nrmse(model, data):
-    rng = np.ptp(data)
-    denom = rng if rng > 0 else max(np.max(np.abs(data)), 1e-300)
-    return float(np.sqrt(np.mean((model - data) ** 2)) / denom)
-
-
 def validation_test_baseline(cm):
     '''
     Compare the model with baseline data. Spec (validation.baseline):
         status: active
-        data: validation/<file>.csv        time column + one column per compared output
-        time_column: t
-        variables: {model_output: csv_column}
         source: citation / URL
-        parameters: {variable_name: value}  optional overrides for this experiment
-        sim_time / pre_time / dt: optional
-        metric: nrmse        threshold: 0.1
+        data: validation/<file>.csv        time column + one column per compared output
+        time_column: t        time_offset: 0
+        variables: {model_output: csv_column}
+        parameters: {variable_name: value}  the parameter set the data are compared at
+        sim_time / dt: optional (defaults: data span, spec dt)
+        metric: nrmse | log_rmse        threshold: 0.1
     '''
     def check():
+        from cam_testing.calibrate import load_data, score
         component = cm.component
         early, v = _validation_status(component, 'baseline', 'validation_test_baseline')
         if early:
             return early
-        import csv
-        with open(os.path.join(component.module.dir, v['data'])) as f:
-            rows = list(csv.DictReader(f))
-        tcol = v.get('time_column', 't')
-        t_data = np.array([float(r[tcol]) for r in rows])
-        overrides = {}
+        t_data, data = load_data(component.module.dir, v)
         by_var = {p.variable_name: p for p in component.parameters()}
-        for var, value in (v.get('parameters') or {}).items():
-            overrides[harness.parameter_name(by_var[var])] = float(value)
-        run_spec = dict(cm.spec, **{k: v[k] for k in ('sim_time', 'pre_time', 'dt') if k in v})
-        if run_spec != cm.spec:
-            helper = harness.simulation_helper(cm.model_path, run_spec)
-            t, out = harness.run(helper, list(v['variables']),
-                                 params={'parameters/' + k: val for k, val in overrides.items()})
-        else:
-            t, out = cm.run(overrides)
-            out = {k: out[k] for k in v['variables']} if set(v['variables']) <= set(out) else \
-                harness.run(cm.helper, list(v['variables']))[1]
+        params = {k: float(val) for k, val in (v.get('parameters') or {}).items()}
+        overrides = {'parameters/' + harness.parameter_name(by_var[k]): val for k, val in params.items()}
+        run_spec = dict(cm.spec, pre_time=0.0, sim_time=float(v.get('sim_time', np.max(t_data))),
+                        dt=float(v.get('dt', cm.spec['dt'])))
+        helper = harness.simulation_helper(cm.model_path, run_spec, solver_info={'rtol': 1e-8, 'atol': 1e-10})
+        t, out = harness.run(helper, list(v['variables']), params=overrides)
+        metric = v.get('metric', 'nrmse')
         threshold = float(v.get('threshold', 0.1))
-        errors, model_i, data_d, t_d = {}, {}, {}, {}
-        for model_var, column in v['variables'].items():
-            mask = np.array([r[column] not in ('', None) for r in rows])
-            d = np.array([float(r[column]) for r, m in zip(rows, mask) if m])
-            td = t_data[mask]
-            m_at = np.interp(td, t, out[model_var])
-            errors[model_var] = _nrmse(m_at, d)
-            model_i[model_var], data_d[model_var], t_d[model_var] = out[model_var], d, td
-        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline'), t, model_i, t_d, data_d,
-                                       cm.units(), f'{component.label}: model vs {v.get("source", "data")}')
-        metrics = {'nrmse': errors, 'threshold': threshold, 'source': v.get('source', '')}
+        errors = {var: score(metric, np.interp(t_data, t, out[var]), data[var]) for var in v['variables']}
+        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline'), t, out,
+                                       {k: t_data for k in data}, data, cm.units(),
+                                       f'{component.label}: model vs {v.get("source_short", "data")}')
+        metrics = {metric: errors, 'threshold': threshold, 'source': v.get('source', ''),
+                   'validated_values': params}
         worst = max(errors.values())
         if worst > threshold:
-            return Result('validation_test_baseline', FAILED, f'worst NRMSE {worst:.3f} > {threshold}', metrics, [fig])
-        return Result('validation_test_baseline', PASSED, f'worst NRMSE {worst:.3f} <= {threshold}', metrics, [fig])
+            return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, [fig])
+        return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, [fig])
     return _guard(cm.component, 'validation_test_baseline', check)
 
 

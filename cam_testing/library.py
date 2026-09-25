@@ -58,6 +58,10 @@ class Parameter:
     value: str
     kind: str
     data_reference: str
+    verified_min: str = ''
+    verified_max: str = ''
+    validated_min: str = ''
+    validated_max: str = ''
 
     @property
     def is_todo(self):

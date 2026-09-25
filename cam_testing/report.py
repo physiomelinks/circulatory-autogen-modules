@@ -17,7 +17,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import checks
+from cam_testing import checks, ranges
 from cam_testing.library import REPO_ROOT, load_module, module_names
 from cam_testing.mathml import component_equations, component_variables
 
@@ -110,6 +110,8 @@ def component_context(component):
             'initial': cv[2] if cv else None,
             'value': p.value if p else None, 'todo': bool(p and p.is_todo),
             'reference': p.data_reference if p else '',
+            'verified': ranges.recorded_range(p, 'verified') if p else None,
+            'validated': ranges.recorded_range(p, 'validated') if p else None,
         })
 
     tests = []

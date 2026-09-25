@@ -22,7 +22,8 @@ BLUE_ORDINAL = ['#86b6ef', '#6da7ec', '#5598e7', '#3987e5', '#2a78d6', '#256abf'
                 '#184f95', '#104281', '#0d366b']
 DATA_COLOUR = '#52514e'
 
-plt.rcParams.update({
+STYLE = {
+    'text.usetex': False, 'mathtext.fontset': 'dejavusans',
     'figure.facecolor': SURFACE, 'axes.facecolor': SURFACE, 'savefig.facecolor': SURFACE,
     'axes.edgecolor': GRID, 'axes.labelcolor': TEXT_SECONDARY, 'axes.titlecolor': TEXT_PRIMARY,
     'axes.titlesize': 10, 'axes.labelsize': 9, 'axes.titleweight': 'semibold',
@@ -30,8 +31,20 @@ plt.rcParams.update({
     'xtick.labelsize': 8, 'ytick.labelsize': 8, 'legend.fontsize': 8, 'legend.frameon': False,
     'axes.grid': True, 'grid.color': GRID, 'grid.linewidth': 0.6,
     'axes.spines.top': False, 'axes.spines.right': False, 'lines.linewidth': 1.6,
-    'font.family': 'sans-serif',
-})
+    'font.family': 'sans-serif', 'font.sans-serif': ['DejaVu Sans'],
+}
+TIME_LABEL = 'time [s]'
+
+
+def styled(fn):
+    '''Apply this module's style per figure: libcuflynx changes the global rcParams (usetex).'''
+    import functools
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        with plt.rc_context(STYLE):
+            return fn(*args, **kwargs)
+    return wrapper
 
 
 def _grid(n, width=3.4, height=2.4, max_cols=3):
@@ -59,6 +72,7 @@ def ramp(n):
     return [BLUE_ORDINAL[i] for i in idx]
 
 
+@styled
 def plot_outputs(path, t, outputs, units, title):
     '''One small panel per output variable: single series each, so no legend needed.'''
     names = list(outputs)
@@ -66,12 +80,13 @@ def plot_outputs(path, t, outputs, units, title):
     for ax, name in zip(axes, names):
         ax.plot(t, outputs[name], color=CATEGORICAL[0])
         ax.set_title(name)
-        ax.set_xlabel('time [s]')
+        ax.set_xlabel(TIME_LABEL)
         ax.set_ylabel(units.get(name, ''))
     fig.suptitle(title, color=TEXT_PRIMARY, fontsize=11)
     return _save(fig, path)
 
 
+@styled
 def plot_sweep(path, sweeps, output, units, title):
     '''
     sweeps: {param_name: [(value, t, y or None)]}. One panel per swept parameter; line
@@ -88,7 +103,7 @@ def plot_sweep(path, sweeps, output, units, title):
                 continue
             ax.plot(t, y, color=colour, label=f'{value:.3g}')
         ax.set_title(param)
-        ax.set_xlabel('time [s]')
+        ax.set_xlabel(TIME_LABEL)
         ax.set_ylabel(f'{output} [{units.get(output, "")}]')
         ax.legend(title='value', loc='best', title_fontsize=8)
         if failed:
@@ -98,6 +113,7 @@ def plot_sweep(path, sweeps, output, units, title):
     return _save(fig, path)
 
 
+@styled
 def plot_convergence(path, dts, errors, order, observed, title):
     '''Log-log self-convergence error against step size, with the scheme's ideal slope.'''
     fig, ax = plt.subplots(figsize=(4.6, 3.4), constrained_layout=True)
@@ -115,28 +131,37 @@ def plot_convergence(path, dts, errors, order, observed, title):
     return _save(fig, path)
 
 
+@styled
 def plot_timestep_traces(path, runs, output, units, title):
     '''runs: [(dt, t, y)], coarse -> fine; darker = finer step.'''
     fig, ax = plt.subplots(figsize=(4.6, 3.4), constrained_layout=True)
     for colour, (dt, t, y) in zip(ramp(len(runs)), runs):
         ax.plot(t, y, color=colour, label=f'dt={dt:g}')
-    ax.set_xlabel('time [s]')
+    ax.set_xlabel(TIME_LABEL)
     ax.set_ylabel(f'{output} [{units.get(output, "")}]')
     ax.set_title(title)
     ax.legend(loc='best')
     return _save(fig, path)
 
 
-def plot_model_vs_data(path, t_model, model, t_data, data, units, title):
-    '''One panel per compared variable: model line, data as dots.'''
+@styled
+def plot_model_vs_data(path, t_model, model, t_data, data, units, title, split=None):
+    '''
+    One panel per compared variable: model line, data as dots. ``split`` marks the end of
+    the calibration window; data after it were held out.
+    '''
     names = list(model)
     fig, axes = _grid(len(names))
     for ax, name in zip(axes, names):
+        if split is not None:
+            ax.axvspan(split, max(np.max(t_model), np.max(t_data[name])), color=GRID, alpha=0.6, lw=0)
+            ax.text(split, 0.98, ' held out', transform=ax.get_xaxis_transform(), va='top',
+                    fontsize=8, color=TEXT_SECONDARY)
         ax.plot(t_model, model[name], color=CATEGORICAL[0], label='model')
         ax.plot(t_data[name], data[name], linestyle='none', marker='o', markersize=4,
                 color=DATA_COLOUR, label='data')
         ax.set_title(name)
-        ax.set_xlabel('time [s]')
+        ax.set_xlabel(TIME_LABEL)
         ax.set_ylabel(units.get(name, ''))
         ax.legend(loc='best')
     fig.suptitle(title, color=TEXT_PRIMARY, fontsize=11)

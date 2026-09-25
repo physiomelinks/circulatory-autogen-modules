@@ -196,12 +196,13 @@ KNOWN_ISSUES = {
     'parasympathetic': ['undefined units: milliL'],
 }
 
-PARAMETER_COLUMNS = ['vessel_type', 'BC_type', 'variable_name', 'units', 'value', 'kind', 'data_reference']
+PARAMETER_COLUMNS = ['vessel_type', 'BC_type', 'variable_name', 'units', 'value', 'kind', 'data_reference',
+                     'verified_min', 'verified_max', 'validated_min', 'validated_max']
 
 
 def write_parameters(path, rows):
     with open(path, 'w', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=PARAMETER_COLUMNS)
+        writer = csv.DictWriter(f, fieldnames=PARAMETER_COLUMNS, restval='')
         writer.writeheader()
         writer.writerows(rows)
 
