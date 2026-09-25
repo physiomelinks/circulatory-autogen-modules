@@ -4,6 +4,8 @@ MODULE ?=
 MODULE_ARGS = $(if $(MODULE),--module $(MODULE),)
 # a local libcuflynx checkout to install instead of the pinned git ref, e.g. LIBCUFLYNX=../circulatory_autogen
 LIBCUFLYNX ?=
+# extra pytest arguments, e.g. PYTEST_ARGS=--quick-unreviewed (CI)
+PYTEST_ARGS ?=
 
 .PHONY: setup structure test test-all report site serve clean manifests ranges
 
@@ -20,10 +22,10 @@ structure:
 
 # V&V tests, skipping slow calibration. MODULE=name runs one module (reviewed or not).
 test:
-	$(PYTHON) -m pytest tests/test_modules.py -m "not slow" $(MODULE_ARGS)
+	$(PYTHON) -m pytest tests/test_modules.py -m "not slow" $(MODULE_ARGS) $(PYTEST_ARGS)
 
 test-all:
-	$(PYTHON) -m pytest tests $(MODULE_ARGS)
+	$(PYTHON) -m pytest tests $(MODULE_ARGS) $(PYTEST_ARGS)
 
 report:
 	$(PYTHON) -m cam_testing.report $(MODULE_ARGS)

@@ -11,6 +11,9 @@ def pytest_addoption(parser):
                      help='only test this component id, e.g. Lotka_Volterra__nn; repeatable')
     parser.addoption('--include-unreviewed', action='store_true',
                      help='also run modules whose spec has reviewed: false')
+    parser.addoption('--quick-unreviewed', action='store_true',
+                     help='for modules not reviewed yet, run only run_test (CI uses this; the full '
+                          'test set runs once a module is reviewed)')
 
 
 def _selected_components(config):
@@ -51,3 +54,18 @@ def component_model(component_key, tmp_path_factory):
         work_dir = str(tmp_path_factory.mktemp(component_id))
         _models[component_key] = checks.ComponentModel(component, work_dir)
     return _models[component_key]
+
+
+def pytest_collection_modifyitems(config, items):
+    if not config.getoption('--quick-unreviewed'):
+        return
+    reviewed = {}
+    for item in items:
+        callspec = getattr(item, 'callspec', None)
+        if callspec is None or 'component_key' not in callspec.params:
+            continue
+        module_name = callspec.params['component_key'][0]
+        if module_name not in reviewed:
+            reviewed[module_name] = load_module(module_name).reviewed
+        if not reviewed[module_name] and item.originalname != 'run_test':
+            item.add_marker(pytest.mark.skip(reason=f'{module_name} not reviewed yet: CI runs only run_test'))

@@ -122,6 +122,9 @@ class ComponentModel(object):
                                            [self.nominal[k] for k in params])
 
 
+SAFE_BUILTINS = {'abs': abs, 'max': max, 'min': min, 'len': len, 'float': float}
+
+
 def _check_invariants(spec, t, outputs, params=None):
     '''
     Returns a list of failed invariant descriptions. An invariant is a numpy expression of
@@ -134,7 +137,7 @@ def _check_invariants(spec, t, outputs, params=None):
     for inv in spec.get('invariants') or []:
         expr = inv['expr'] if isinstance(inv, dict) else inv
         try:
-            ok = np.all(eval(expr, {'__builtins__': {}}, env))  # noqa: S307 - expressions come from the repo's own yaml
+            ok = np.all(eval(expr, {'__builtins__': SAFE_BUILTINS}, env))  # noqa: S307 - expressions come from the repo's own yaml
         except Exception as e:
             failures.append(f'{expr}: could not evaluate ({e})')
             continue

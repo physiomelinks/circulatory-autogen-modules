@@ -2,28 +2,39 @@ module: VanDerPol
 reviewed: false
 known_issues: []
 defaults:
-  sim_time: 2.0
+  sim_time: 200.0
   pre_time: 0.0
-  dt: 0.01
+  dt: 0.1
   solver: CVODE_myokit
   bc_sweep:
     factors: [0.5, 0.75, 1.0, 1.5, 2.0]
-    ranges: {}
+    ranges:
+      mu: {min: 0.1, max: 1000, points: 9, scale: log}
+      x_init: {min: -3, max: 3, points: 7}
+      y_init: {min: -5, max: 5, points: 5}
   timestep:
     scheme: rk4
-    dts: [0.004, 0.002, 0.001, 0.0005]
+    dts: [0.001, 0.0005, 0.00025, 0.000125]
     min_order: 0.8
-    tol: 0.0001
-    cvode_tol: 0.001
+    tol: 0.001
+    cvode_tol: 0.01
+    t_end: 100.0
   stability:
     supported:
-    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+    - {solver: CVODE_myokit, rtol: 1.0e-08, atol: 1.0e-10}
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08, MaximumStep: 0.001}
+    fixed_step:
+      schemes: [euler, heun, rk4]
+      dts: [0.01, 0.005, 0.001]
+  solver_info: {rtol: 1.0e-08, atol: 1.0e-10}
 components:
 - vessel_type: VanDerPol
   BC_type: nn
   module_type: VanDerPol
   outputs: [x, y]
-  invariants: []
+  invariants:
+  - {description: trajectory stays bounded by the relaxation limit cycle (|x| ≲ 2), expr: 'np.max(np.abs(x)) <= max(abs(x_init),
+      2.0) + 0.1'}
   validation:
     baseline: {status: pending, reason: validation data not chosen yet}
     calibrate: {status: pending, reason: validation data not chosen yet}

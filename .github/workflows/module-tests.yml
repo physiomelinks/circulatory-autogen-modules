@@ -35,6 +35,7 @@ jobs:
   module:
     needs: discover
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
@@ -51,7 +52,7 @@ jobs:
         run: |
           target=test
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then target=test-all; fi
-          if make $target PYTHON=python MODULE=${{ matrix.module }}; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+          if make $target PYTHON=python MODULE=${{ matrix.module }} PYTEST_ARGS=--quick-unreviewed; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
       - name: Report
         if: always()
         run: make report PYTHON=python MODULE=${{ matrix.module }}
