@@ -1,0 +1,29 @@
+module: control_system
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: pid_control
+  BC_type: nn
+  module_type: pid_control_type
+  outputs: [e_norm, d_e_dt, e_int, f_stim_raw, f_stim]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

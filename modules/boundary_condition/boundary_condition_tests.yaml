@@ -1,0 +1,93 @@
+module: boundary_condition
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: outlet_pressure
+  BC_type: nn_constant
+  module_type: constant_pressure_BC_type
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: inlet_pressure
+  BC_type: nn_constant
+  module_type: constant_pressure_BC_type
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: outlet_flow
+  BC_type: nn_constant
+  module_type: constant_flow_BC_type
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: inlet_flow
+  BC_type: nn_constant
+  module_type: constant_flow_BC_type
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: inlet_flow
+  BC_type: nn_fourier_8
+  module_type: fourier_flow_8_BC_type
+  outputs: [v]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: inlet_flow
+  BC_type: nn_constant_2
+  module_type: constant_flow_2_BC_type
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: lung_vol_generator
+  BC_type: nn
+  module_type: lung_Vol_generator_type
+  outputs: [q_lung_V, q_b]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: CO2_O2_generator
+  BC_type: nn
+  module_type: CO2_O2_generator_type
+  outputs: [C_O2_a, C_CO2_a, dot_C_CO2_a]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: muscle_pressure
+  BC_type: nn_constant
+  module_type: constant_pressure_generator_type
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

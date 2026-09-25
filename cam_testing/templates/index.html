@@ -1,0 +1,54 @@
+{%- macro chip(status, label) -%}<span class="chip {{ status or 'none' }}">{{ label }}</span>{%- endmacro -%}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Circulatory Autogen Modules</title>
+{% include '_style.html' %}
+<style>
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 28px; }
+header { display: grid; gap: 10px; }
+header p { margin: 0; max-width: 70ch; color: var(--ink-2); }
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+td.name a { font-family: var(--font-mono); font-size: 0.86rem; font-weight: 500; }
+td { white-space: nowrap; }
+footer { color: var(--ink-3); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Module library · verification &amp; validation</div>
+    <h1>Circulatory Autogen Modules</h1>
+    <p>Each module is generated component by component with libcuflynx and put through the same tests: run, boundary-condition sweep, timestep convergence, solver stability, and validation against baseline and calibration data.</p>
+    <div class="counts">
+      {{ chip('passed', totals.passed ~ ' passed') }} {{ chip('failed', totals.failed ~ ' failed') }}
+      {{ chip('pending', totals.pending ~ ' pending') }} {{ chip('skipped', totals.skipped ~ ' skipped') }}
+      {%- if totals[None] %} {{ chip(None, totals[None] ~ ' not run') }}{% endif %}
+    </div>
+  </header>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Module</th><th>Components</th><th>Passed</th><th>Failed</th><th>Pending</th><th>Skipped</th><th>Not run</th><th>Known issues</th><th>Status</th></tr></thead>
+      <tbody>
+      {%- for r in rows %}
+        <tr>
+          <td class="name"><a href="{{ r.href }}">{{ r.name }}</a></td>
+          <td class="num">{{ r.n_components }}</td>
+          <td class="num">{{ r.counts.passed }}</td>
+          <td class="num">{% if r.counts.failed %}<strong style="color:var(--fail)">{{ r.counts.failed }}</strong>{% else %}0{% endif %}</td>
+          <td class="num">{{ r.counts.pending }}</td>
+          <td class="num">{{ r.counts.skipped }}</td>
+          <td class="num">{{ r.counts[None] }}</td>
+          <td class="num">{{ r.known_issues }}</td>
+          <td>{{ 'Reviewed' if r.reviewed else 'Not reviewed yet' }}</td>
+        </tr>
+      {%- endfor %}
+      </tbody>
+    </table>
+  </div>
+  <footer>libcuflynx {{ libcuflynx_version }} · generated {{ generated }}</footer>
+</div>
+</body>
+</html>

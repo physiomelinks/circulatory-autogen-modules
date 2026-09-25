@@ -1,0 +1,133 @@
+module: parasympathetic
+reviewed: false
+known_issues: ['undefined units: milliL']
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: lung_stretch_receptor_Gee2023
+  BC_type: nn
+  module_type: lung_stretch_receptor_Gee2023
+  outputs: [f_ls]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: lung_stretch_receptor_with_threshold_OLD
+  BC_type: nn
+  module_type: lung_stretch_receptor_with_threshold
+  outputs: [f_ls, V_lung]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: cardiopulmonary_receptor_Gee2023
+  BC_type: nn
+  module_type: cardiopulmonary_receptor_Gee2023
+  outputs: [f_cp, P_pv_P_thor, P_l]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: sympathetic_afferent_Gee2023
+  BC_type: nn
+  module_type: sympathetic_afferent_Gee2023
+  outputs: [f_ash, f_asp, f_asv]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: sympathetic_efferent_Gee2023
+  BC_type: nn
+  module_type: sympathetic_efferent_Gee2023
+  outputs: [f_esh, f_esp, f_esv]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: peripheral_resistance_effector_Gee2023
+  BC_type: nn
+  module_type: peripheral_resistance_effector_Gee2023
+  outputs: [Delta_Rsp, sigma_Rsp]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: unstressed_volume_effector_Gee2023
+  BC_type: nn
+  module_type: unstressed_volume_effector_Gee2023
+  outputs: [Delta_Vusv, sigma_Vusv]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: NTS_Gee2023
+  BC_type: nn
+  module_type: NTS_Gee2023
+  outputs: [f_NTS_br, f_NTS_ls, f_NTS_cp, f_NTS_ch]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: DMV_Gee2023
+  BC_type: nn
+  module_type: DMV_Gee2023
+  outputs: [f_DMV]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: NA_Gee2023
+  BC_type: nn
+  module_type: NA_Gee2023
+  outputs: [f_NA, f_NTS_output, f_NA_input]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: NActr_Gee2023
+  BC_type: nn
+  module_type: NActr_Gee2023
+  outputs: [f_NActr]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: LCN_Gee2023
+  BC_type: nn
+  module_type: LCN_Gee2023
+  outputs: [f_LCN, f_input_LCN_sum, f_input_LCN]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: PNNA_Gee2023
+  BC_type: nn
+  module_type: PNNA_Gee2023
+  outputs: [f_PNNA, f_PNNA_natural]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: PNDMV_Gee2023
+  BC_type: nn
+  module_type: PNDMV_Gee2023
+  outputs: [f_PNDMV, f_PNDMV_filt]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

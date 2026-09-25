@@ -1,0 +1,94 @@
+module: cell
+reviewed: false
+known_issues: ['undefined units: C_per_M', 'undefined units: J_per_MK', 'undefined units: M_per_m3', 'undefined
+    units: m3_per_M_millis']
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: myocyte_membrane_voltage
+  BC_type: nn
+  module_type: myocyte_membrane_voltage
+  outputs: [Vm]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: sympathetic_neuron_membrane_voltage
+  BC_type: nn
+  module_type: sympathetic_neuron_membrane_voltage
+  outputs: [Vm, Vm_volt]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Ca_dynamics_Paci_2013
+  BC_type: nn
+  module_type: Ca_dynamics_Paci_2013
+  outputs: [Cai, Ca_SR, g, i_up, i_rel, i_leak]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: electric_potentials_Paci_2013
+  BC_type: nn
+  module_type: electric_potentials_Paci_2013
+  outputs: [E_Na, E_K, E_Ks, E_Ca]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Na_dynamics_Paci_2013
+  BC_type: nn
+  module_type: Na_dynamics_Paci_2013
+  outputs: [Nai]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: NE_release_Tao_2011
+  BC_type: nn
+  module_type: NE_release_Tao_2011
+  outputs: [V_Ca, V_1Ca, V_2Ca, V_3Ca, V_4Ca, V_5Ca]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: SN_soma
+  BC_type: nn
+  module_type: SN_soma
+  outputs: [i_Na, i_Na1_6, i_Ca_L, i_Kv2, i_Kv1_5, i_Kv4_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: SN_varicosity
+  BC_type: nn
+  module_type: SN_varicosity
+  outputs: [i_Ca_N, c, c_inf, hc, hc_inf, V_mid_hc]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: SN_axon
+  BC_type: nn
+  module_type: SN_axon
+  outputs: [I, I_channels, V]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

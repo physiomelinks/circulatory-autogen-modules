@@ -1,0 +1,269 @@
+module: ion_channel
+reviewed: false
+known_issues: ['undefined units: C_per_M', 'undefined units: J_per_MK']
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: i_Na_Paci_2013
+  BC_type: nn
+  module_type: i_Na_Paci_2013
+  outputs: [i_Na, TTX_coeff]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Na_m_gate_Paci_2013
+  BC_type: nn
+  module_type: i_Na_m_gate_Paci_2013
+  outputs: [m]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Na_h_gate_Paci_2013
+  BC_type: nn
+  module_type: i_Na_h_gate_Paci_2013
+  outputs: [h]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Na_j_gate_Paci_2013
+  BC_type: nn
+  module_type: i_Na_j_gate_Paci_2013
+  outputs: [j]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_CaL_Paci_2013
+  BC_type: nn
+  module_type: i_CaL_Paci_2013
+  outputs: [i_CaL]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_CaL_d_gate_Paci_2013
+  BC_type: nn
+  module_type: i_CaL_d_gate_Paci_2013
+  outputs: [d]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_CaL_f1_gate_Paci_2013
+  BC_type: nn
+  module_type: i_CaL_f1_gate_Paci_2013
+  outputs: [f1]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_CaL_f2_gate_Paci_2013
+  BC_type: nn
+  module_type: i_CaL_f2_gate_Paci_2013
+  outputs: [f2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_CaL_fCa_gate_Paci_2013
+  BC_type: nn
+  module_type: i_CaL_fCa_gate_Paci_2013
+  outputs: [fCa]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Kr_Paci_2013
+  BC_type: nn
+  module_type: i_Kr_Paci_2013
+  outputs: [i_Kr, E4031_coeff]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Kr_Xr1_gate_Paci_2013
+  BC_type: nn
+  module_type: i_Kr_Xr1_gate_Paci_2013
+  outputs: [Xr1, V_half]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Kr_Xr2_gate_Paci_2013
+  BC_type: nn
+  module_type: i_Kr_Xr2_gate_Paci_2013
+  outputs: [Xr2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Ks_Paci_2013
+  BC_type: nn
+  module_type: i_Ks_Paci_2013
+  outputs: [i_Ks, Chromanol_coeff]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Ks_Xs_gate_Paci_2013
+  BC_type: nn
+  module_type: i_Ks_Xs_gate_Paci_2013
+  outputs: [Xs]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_K1_Paci_2013
+  BC_type: nn
+  module_type: i_K1_Paci_2013
+  outputs: [i_K1]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_f_Paci_2013
+  BC_type: nn
+  module_type: i_f_Paci_2013
+  outputs: [i_f]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_f_Xf_gate_Paci_2013
+  BC_type: nn
+  module_type: i_f_Xf_gate_Paci_2013
+  outputs: [Xf]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_b_Na_Paci_2013
+  BC_type: nn
+  module_type: i_b_Na_Paci_2013
+  outputs: [i_b_Na]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_b_Ca_Paci_2013
+  BC_type: nn
+  module_type: i_b_Ca_Paci_2013
+  outputs: [i_b_Ca]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_NaK_Paci_2013
+  BC_type: nn
+  module_type: i_NaK_Paci_2013
+  outputs: [i_NaK]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_NaCa_Paci_2013
+  BC_type: nn
+  module_type: i_NaCa_Paci_2013
+  outputs: [i_NaCa]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_PCa_Paci_2013
+  BC_type: nn
+  module_type: i_PCa_Paci_2013
+  outputs: [i_PCa]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_to_Paci_2013
+  BC_type: nn
+  module_type: i_to_Paci_2013
+  outputs: [i_to]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_to_q_gate_Paci_2013
+  BC_type: nn
+  module_type: i_to_q_gate_Paci_2013
+  outputs: [q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_to_r_gate_Paci_2013
+  BC_type: nn
+  module_type: i_to_r_gate_Paci_2013
+  outputs: [r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Ca_Tao_2011
+  BC_type: nn
+  module_type: i_Ca_Tao_2011
+  outputs: [i_Ca, c, hc, tau_c, tau_hc]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_Na_Tao_2011
+  BC_type: nn
+  module_type: i_Na_Tao_2011
+  outputs: [i_Na, m, h, tau_m, tau_h]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_KV_Tao_2011
+  BC_type: nn
+  module_type: i_KV_Tao_2011
+  outputs: [i_KV, n, tau_n]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_A_Tao_2011
+  BC_type: nn
+  module_type: i_A_Tao_2011
+  outputs: [i_A, a, ha, tau_a, tau_ha]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_KCa_Tao_2011
+  BC_type: nn
+  module_type: i_KCa_Tao_2011
+  outputs: [i_KCa, kcf, kcs, tau_kcf, tau_kcs]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: i_piezo_Na_Argus_unpublished
+  BC_type: nn
+  module_type: i_piezo_Na_Argus_unpublished
+  outputs: [I_piezo, m_r, m_r_inf, m_V, m_V_inf]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

@@ -1,0 +1,255 @@
+{%- macro chip(status, label=None) -%}
+<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','failed':'Failed','skipped':'Skipped','pending':'Pending'}.get(status, 'Not run') }}</span>
+{%- endmacro -%}
+{%- if standalone is not defined or standalone %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{%- endif %}
+<title>{{ name }} module</title>
+{% include '_style.html' %}
+<style>
+.page { max-width: 1240px; margin: 0 auto; padding-block: 28px 64px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px; }
+@media (max-width: 960px) { .page { grid-template-columns: minmax(0, 1fr); } .toc { display: none; } }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; font-size: 0.84rem; }
+.toc ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
+.toc a { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 4px; color: var(--ink-2); text-decoration: none; }
+.toc a:hover { background: var(--accent-soft); color: var(--ink); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--skip); }
+.dot.failed { background: var(--fail); } .dot.passed { background: var(--pass); } .dot.pending { background: var(--pend); }
+main { display: grid; gap: 40px; min-width: 0; }
+header.module { display: grid; gap: 10px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 0.88rem; }
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.grid-table td:first-child { font-family: var(--font-mono); font-size: 0.8rem; white-space: nowrap; }
+.grid-table td { white-space: nowrap; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; }
+.issues { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.88rem; }
+section.component { display: grid; gap: 22px; padding-top: 28px; border-top: 2px solid var(--rule-strong); scroll-margin-top: 16px; }
+.comp-head { display: grid; gap: 6px; }
+.comp-head .tags { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.85rem; color: var(--ink-2); }
+.equations { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 18px; overflow-x: auto; }
+.equations .eq { padding: 6px 0; border-bottom: 1px dashed var(--rule); overflow-x: auto; }
+.equations .eq:last-child { border-bottom: 0; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 18px; align-items: start; }
+.block { display: grid; gap: 8px; min-width: 0; }
+.tests { display: grid; gap: 14px; }
+.test { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
+.test.failed { border-color: var(--fail); }
+.test-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
+.test .about { font-size: 0.84rem; color: var(--ink-2); max-width: 75ch; margin: 0; }
+.test .message { margin: 0; font-weight: 500; }
+.plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 12px; }
+.plots figure { margin: 0; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
+.plots img { display: block; width: 100%; height: auto; }
+details { font-size: 0.85rem; }
+details summary { cursor: pointer; color: var(--ink-2); }
+details pre { white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.78rem; background: var(--paper); padding: 10px; border-radius: 6px; overflow-x: auto; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px; font-size: 0.84rem; margin: 0; }
+.kv dt { color: var(--ink-3); } .kv dd { margin: 0; font-family: var(--font-mono); font-size: 0.8rem; overflow-wrap: anywhere; }
+tr.supported td:first-child { font-weight: 600; }
+.yes { color: var(--pass); font-weight: 600; } .no { color: var(--fail); font-weight: 600; }
+footer { color: var(--ink-3); font-size: 0.8rem; }
+</style>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" defer></script>
+{%- if standalone is not defined or standalone %}
+</head>
+<body>
+{%- endif %}
+<div class="page">
+  <nav class="toc" aria-label="Components">
+    <div class="eyebrow">Components</div>
+    <ol>
+      {%- for c in components %}
+      {%- set worst = 'failed' if c.tests|selectattr('status','equalto','failed')|list else ('passed' if c.tests|selectattr('status','equalto','passed')|list else ('pending' if c.tests|selectattr('status','equalto','pending')|list else 'skipped')) %}
+      <li><a href="#{{ c.id }}"><span class="dot {{ worst }}"></span><span class="mono">{{ c.label }}</span></a></li>
+      {%- endfor %}
+    </ol>
+  </nav>
+
+  <main>
+    <header class="module">
+      <div class="eyebrow">circulatory-autogen-modules · module</div>
+      <h1>{{ name }}</h1>
+      <div class="meta">
+        <span class="num">{{ components|length }} component{{ '' if components|length == 1 else 's' }}</span>
+        <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
+        <span>libcuflynx {{ libcuflynx_version }}</span>
+        <span>Report generated {{ generated }}</span>
+      </div>
+      <div class="counts">
+        {{ chip('passed', counts.passed ~ ' passed') }}
+        {{ chip('failed', counts.failed ~ ' failed') }}
+        {{ chip('pending', counts.pending ~ ' pending') }}
+        {{ chip('skipped', counts.skipped ~ ' skipped') }}
+        {%- if counts[None] %} {{ chip(None, counts[None] ~ ' not run') }}{% endif %}
+      </div>
+    </header>
+
+    <section class="block" aria-labelledby="overview">
+      <h2 id="overview">Test overview</h2>
+      <div class="table-wrap">
+        <table class="grid-table">
+          <thead><tr><th>Component</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}</tr></thead>
+          <tbody>
+          {%- for c in components %}
+            <tr><td><a href="#{{ c.id }}">{{ c.label }}</a></td>
+            {%- for t in c.tests %}<td><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{{ chip(t.status) }}</a></td>{% endfor %}</tr>
+          {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {%- if structure and (structure.errors or structure.warnings) %}
+    <section class="panel" aria-labelledby="structure">
+      <h2 id="structure">Structural checks</h2>
+      {%- if structure.errors %}
+      <div class="eyebrow">Known issues to fix</div>
+      <ul class="issues">{% for e in structure.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+      {%- endif %}
+      {%- if structure.warnings %}
+      <details><summary>{{ structure.warnings|length }} warning{{ '' if structure.warnings|length == 1 else 's' }} (may be intentional)</summary>
+        <ul class="issues">{% for w in structure.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+      </details>
+      {%- endif %}
+    </section>
+    {%- endif %}
+
+    {%- for c in components %}
+    <section class="component" id="{{ c.id }}" aria-labelledby="{{ c.id }}-h">
+      <div class="comp-head">
+        <div class="eyebrow">Component</div>
+        <h2 id="{{ c.id }}-h">{{ c.label }}</h2>
+        <div class="tags">
+          <span>CellML component <code>{{ c.module_type }}</code></span>
+          <span>vessel_type <code>{{ c.vessel_type }}</code></span>
+          <span>BC_type <code>{{ c.BC_type }}</code></span>
+          {%- if c.format != 'cellml' %}<span class="chip skipped">{{ c.format }}</span>{% endif %}
+        </div>
+        {%- if c.skip %}<p class="muted" style="margin:0">Not tested: {{ c.skip }}</p>{% endif %}
+        {%- if c.todo %}<p class="todo" style="margin:0">{{ c.todo|length }} parameter value{{ '' if c.todo|length == 1 else 's' }} still to set: {{ c.todo|join(', ') }}</p>{% endif %}
+      </div>
+
+      {%- if c.equations %}
+      <div class="block">
+        <h3>Equations</h3>
+        <div class="equations">
+          {%- for eq in c.equations %}<div class="eq">\[ {{ eq }} \]</div>{% endfor %}
+        </div>
+        {%- if c.unsupported %}<p class="muted" style="margin:0">MathML not converted: {{ c.unsupported|join(', ') }}</p>{% endif %}
+      </div>
+      {%- endif %}
+
+      <div class="two">
+        <div class="block">
+          <h3>Variables &amp; parameters</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Units</th><th>Kind</th><th>Value</th><th>Source</th></tr></thead>
+              <tbody>
+              {%- for v in c.variables %}
+                <tr>
+                  <td class="mono">{{ v.name }}</td>
+                  <td class="mono">{{ v.units }}</td>
+                  <td>{{ v.kind|replace('_', ' ') }}</td>
+                  <td class="mono num {{ 'todo' if v.todo }}">{{ v.value if v.value is not none else (('init ' ~ v.initial) if v.initial else '') }}</td>
+                  <td class="muted" style="font-size:0.78rem">{{ v.reference }}</td>
+                </tr>
+              {%- endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="block">
+          <h3>Ports</h3>
+          {%- if c.ports %}
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Side</th><th>Port type</th><th>Variables</th></tr></thead>
+              <tbody>
+              {%- for p in c.ports %}
+                <tr><td>{{ p.side }}</td><td class="mono">{{ p.type }}{% if p.multi %} <span class="muted">(multi: {{ p.multi }})</span>{% endif %}</td><td class="mono">{{ p.variables }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table>
+          </div>
+          {%- else %}<p class="muted" style="margin:0">No ports: this component is self-contained.</p>{% endif %}
+          {%- if c.invariants %}
+          <h4>Invariants checked</h4>
+          <ul class="issues">{% for inv in c.invariants %}<li><code>{{ inv.expr if inv is mapping else inv }}</code></li>{% endfor %}</ul>
+          {%- endif %}
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>Verification &amp; validation</h3>
+        <div class="tests">
+        {%- for t in c.tests %}
+          <article class="test {{ t.status or '' }}" id="{{ c.id }}--{{ t.key }}">
+            <div class="test-head"><h4>{{ t.title }}</h4>{{ chip(t.status) }}</div>
+            <p class="about">{{ t.about }}</p>
+            <p class="message">{{ t.message }}</p>
+
+            {%- if t.key == 'verification_test_timestep' and t.metrics.dts %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>dt [s]</th><th>Difference to next dt</th><th>Observed order</th></tr></thead>
+              <tbody>
+              {%- for i in range(t.metrics.dts|length - 1) %}
+                <tr><td class="mono num">{{ t.metrics.dts[i]|fmt }}</td><td class="mono num">{{ t.metrics.successive_differences[i]|fmt }}</td>
+                <td class="mono num">{{ (t.metrics.observed_orders[i-1]|fmt) if i > 0 else '—' }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:0;font-size:0.84rem">Scheme {{ t.metrics.scheme }} (expected order {{ t.metrics.expected_order }}); finest fixed-step vs tight-tolerance CVODE: <span class="mono">{{ t.metrics.cvode_tight_vs_finest|fmt }}</span>. Differences are max over outputs and time, normalised by each output's magnitude.</p>
+            {%- elif t.key == 'stability_test' and t.metrics.matrix %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Configuration</th><th>Works</th><th>Difference</th><th>Time [s]</th><th>Note</th></tr></thead>
+              <tbody>
+              {%- for r in t.metrics.matrix %}
+                <tr class="{{ 'supported' if r.label in t.metrics.supported }}"><td class="mono">{{ r.label }}{% if r.label in t.metrics.supported %} <span class="muted">· declared</span>{% endif %}</td>
+                <td class="{{ 'yes' if r.works else 'no' }}">{{ 'Yes' if r.works else 'No' }}</td>
+                <td class="mono num">{{ r.difference|fmt }}</td><td class="mono num">{{ r.seconds|fmt }}</td><td class="muted">{{ r.note }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:0;font-size:0.84rem">Works = finishes, finite outputs, and within {{ t.metrics.tol|fmt }} (normalised) of CVODE at rtol 1e-10.</p>
+            {%- elif t.key == 'verification_test_BC' and t.metrics.sweep_values %}
+            <dl class="kv">
+              {%- for k, vals in t.metrics.sweep_values.items() %}<dt>{{ k }}</dt><dd>{{ vals|fmt }}</dd>{% endfor %}
+            </dl>
+            {%- elif t.key == 'run_test' and t.metrics.final_values %}
+            <dl class="kv">
+              {%- for k, v in t.metrics.final_values.items() %}<dt>{{ k }}(t<sub>end</sub>)</dt><dd>{{ v|fmt }}</dd>{% endfor %}
+            </dl>
+            {%- elif t.metrics %}
+            <dl class="kv">{% for k, v in t.metrics.items() %}<dt>{{ k }}</dt><dd>{{ v|fmt }}</dd>{% endfor %}</dl>
+            {%- endif %}
+
+            {%- if t.plots %}
+            <div class="plots">
+              {%- for p in t.plots %}<figure><img src="{{ p }}" alt="{{ t.title }} plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}
+            </div>
+            {%- endif %}
+            {%- if t.details %}
+            <details><summary>{{ t.details|length }} detail{{ '' if t.details|length == 1 else 's' }}</summary><pre>{{ t.details|join('\n') }}</pre></details>
+            {%- endif %}
+            {%- if t.timestamp %}<div class="muted" style="font-size:0.75rem">Run {{ t.timestamp }}</div>{% endif %}
+          </article>
+        {%- endfor %}
+        </div>
+      </div>
+    </section>
+    {%- endfor %}
+
+    <footer>Generated by <code>python -m cam_testing.report</code> from the results of <code>pytest --module {{ name }}</code>.</footer>
+  </main>
+</div>
+{%- if standalone is not defined or standalone %}
+</body>
+</html>
+{%- endif %}

@@ -1,0 +1,13 @@
+name: Install libcuflynx and the test package
+description: System libraries libcuflynx needs, then requirements.txt (libcuflynx + cam_testing)
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq libopenmpi-dev openmpi-bin libsundials-dev build-essential
+    - shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt

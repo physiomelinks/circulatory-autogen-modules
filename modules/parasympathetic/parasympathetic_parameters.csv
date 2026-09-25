@@ -1,0 +1,110 @@
+vessel_type,BC_type,variable_name,units,value,kind,data_reference
+lung_stretch_receptor_Gee2023,nn,tau_lung,second,2,constant,control_parasymp: Gee2023
+lung_stretch_receptor_Gee2023,nn,G_al,per_m3_s,23.291e6,constant,control_parasymp: Gee2023
+lung_stretch_receptor_Gee2023,nn,q_str,m3,0.0,boundary_condition,parasympathetic_model: 0.0
+lung_stretch_receptor_with_threshold_OLD,nn,tau_lung,second,TODO,constant,TODO
+lung_stretch_receptor_with_threshold_OLD,nn,G_al,per_m3_s,TODO,constant,TODO
+lung_stretch_receptor_with_threshold_OLD,nn,q_A,m3,TODO,boundary_condition,TODO
+lung_stretch_receptor_with_threshold_OLD,nn,q_b,m3,TODO,boundary_condition,TODO
+lung_stretch_receptor_with_threshold_OLD,nn,V_lung_stretch_thresh,m3,TODO,constant,TODO
+cardiopulmonary_receptor_Gee2023,nn,tau_cp,second,2,constant,control_parasymp: Gee2023
+cardiopulmonary_receptor_Gee2023,nn,P_l_init,J_per_m3,0,constant,control_parasymp: Gee2023
+cardiopulmonary_receptor_Gee2023,nn,f_maxl,Hz,20,constant,control_parasymp: Gee2023
+cardiopulmonary_receptor_Gee2023,nn,P_tn,J_per_m3,1440,constant,control_parasymp: Gee2023
+cardiopulmonary_receptor_Gee2023,nn,k_l,J_per_m3,190.47809,constant,control_parasymp: Gee2023
+cardiopulmonary_receptor_Gee2023,nn,P_pvn,J_per_m3,500,boundary_condition,parasympathetic_model: user_defined_BC
+cardiopulmonary_receptor_Gee2023,nn,P_mus,J_per_m3,500,boundary_condition,parasympathetic_model: TO_BE_SET_THIS_IS_WRONG
+sympathetic_afferent_Gee2023,nn,f_ls,Hz,TODO,boundary_condition,TODO
+sympathetic_afferent_Gee2023,nn,f_br,Hz,TODO,boundary_condition,TODO
+sympathetic_afferent_Gee2023,nn,f_cp,Hz,TODO,boundary_condition,TODO
+sympathetic_afferent_Gee2023,nn,G_abh,dimensionless,1.0,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_alh,dimensionless,1.541,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_ach,dimensionless,2.0,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_abp,dimensionless,1.0,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_alp,dimensionless,0.33,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_acp,dimensionless,2.5,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_abv,dimensionless,1.0,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_alv,dimensionless,0.0,constant,parasympathetic_model: Gee2023
+sympathetic_afferent_Gee2023,nn,G_acv,dimensionless,0.0,constant,parasympathetic_model: Gee2023
+sympathetic_efferent_Gee2023,nn,f_ash,Hz,TODO,boundary_condition,TODO
+sympathetic_efferent_Gee2023,nn,f_asp,Hz,TODO,boundary_condition,TODO
+sympathetic_efferent_Gee2023,nn,f_asv,Hz,TODO,boundary_condition,TODO
+sympathetic_efferent_Gee2023,nn,f_esinf,Hz,2.1,constant,parasympathetic_model: Gee2023
+sympathetic_efferent_Gee2023,nn,f_es0,Hz,16.11,constant,parasympathetic_model: Gee2023
+sympathetic_efferent_Gee2023,nn,k_es,second,0.0675,constant,parasympathetic_model: Gee2023
+peripheral_resistance_effector_Gee2023,nn,tau_Rsp,second,2.0,constant,parasympathetic_model: Gee2023
+peripheral_resistance_effector_Gee2023,nn,f_esp,Hz,TODO,boundary_condition,TODO
+peripheral_resistance_effector_Gee2023,nn,G_Rsp,Js_per_m6,92.6574e6,constant,parasympathetic_model: Gee2023
+unstressed_volume_effector_Gee2023,nn,tau_Vusv,second,5.0,constant,parasympathetic_model: Gee2023
+unstressed_volume_effector_Gee2023,nn,f_esv,Hz,TODO,boundary_condition,TODO
+unstressed_volume_effector_Gee2023,nn,G_Vusv,m3,-265.4e-6,constant,parasympathetic_model: Gee2023
+NTS_Gee2023,nn,f_ls,Hz,TODO,boundary_condition,TODO
+NTS_Gee2023,nn,f_br,Hz,TODO,boundary_condition,TODO
+NTS_Gee2023,nn,f_cp,Hz,TODO,boundary_condition,TODO
+NTS_Gee2023,nn,f_apc,Hz,3.7,boundary_condition,parasympathetic_model: Magosso2001_changed_from_3.7
+NTS_Gee2023,nn,f_min_br,Hz,0.304,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_max_br,Hz,21.499,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_mid_br,Hz,44.125,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_min_ls,Hz,2.75,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_max_ls,Hz,31.569,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_mid_ls,Hz,0.13,constant,control_parasymp: changed_from_11.126_from_Gee2023
+NTS_Gee2023,nn,f_min_cp,Hz,0.451,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_max_cp,Hz,28.327,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_mid_cp,Hz,20.2,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,f_min_ch,Hz,2.2343941,constant,control_parasymp: identified-11-6-24
+NTS_Gee2023,nn,f_max_ch,Hz,25,constant,control_parasymp: Hand tuned
+NTS_Gee2023,nn,f_mid_ch,Hz,0.05,constant,control_parasymp: Hand tuned
+NTS_Gee2023,nn,k_NTS_br,dimensionless,21,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,k_NTS_ls,dimensionless,2,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,k_NTS_cp,dimensionless,7,constant,control_parasymp: Gee2023
+NTS_Gee2023,nn,k_NTS_ch,dimensionless,1,constant,control_parasymp: Hand tuned
+DMV_Gee2023,nn,f_NTS_ls,Hz,TODO,boundary_condition,TODO
+DMV_Gee2023,nn,f_NTS_cp,Hz,TODO,boundary_condition,TODO
+DMV_Gee2023,nn,f_min_DMV,Hz,2.59,constant,control_parasymp: Gee2023
+DMV_Gee2023,nn,f_max_DMV,Hz,6.66,constant,control_parasymp: Gee2023
+DMV_Gee2023,nn,f_mid_DMV,Hz,42.91,constant,control_parasymp: Gee2023
+DMV_Gee2023,nn,k_DMV,dimensionless,33.5,constant,control_parasymp: Gee2023
+NA_Gee2023,nn,s_floor,dimensionless,0.0,boundary_condition,control_parasymp: NEEDS_TO_BE_COUPLED_TO_LUNG
+NA_Gee2023,nn,f_NTS_ls,Hz,TODO,boundary_condition,TODO
+NA_Gee2023,nn,f_NTS_cp,Hz,TODO,boundary_condition,TODO
+NA_Gee2023,nn,f_NTS_br,Hz,TODO,boundary_condition,TODO
+NA_Gee2023,nn,f_NTS_ch,Hz,TODO,boundary_condition,TODO
+NA_Gee2023,nn,f_min_NA,Hz,4.88,constant,control_parasymp: Gee2023
+NA_Gee2023,nn,f_max_NA,Hz,15.78,constant,control_parasymp: Gee2023
+NA_Gee2023,nn,f_mid_NA,Hz,30,constant,control_parasymp: Gee2023_original59.83
+NA_Gee2023,nn,k_RSA,dimensionless,0.5,constant,control_parasymp: Gee2023
+NA_Gee2023,nn,k_NA,dimensionless,23,constant,control_parasymp: Gee2023
+NActr_Gee2023,nn,f_NA,Hz,TODO,boundary_condition,TODO
+NActr_Gee2023,nn,f_min_NActr,Hz,0.61,constant,control_parasymp: Gee2023
+NActr_Gee2023,nn,f_max_NActr,Hz,11,constant,control_parasymp: Gee2023
+NActr_Gee2023,nn,f_mid_NActr,Hz,12.81,constant,control_parasymp: Gee2023
+NActr_Gee2023,nn,k_NActr,dimensionless,23,constant,control_parasymp: Gee2023
+LCN_Gee2023,nn,f_NActr,Hz,TODO,boundary_condition,TODO
+LCN_Gee2023,nn,f_DMV,Hz,TODO,boundary_condition,TODO
+LCN_Gee2023,nn,f_esh,Hz,TODO,boundary_condition,TODO
+LCN_Gee2023,nn,f_br,Hz,TODO,boundary_condition,TODO
+LCN_Gee2023,nn,f_cp,Hz,TODO,boundary_condition,TODO
+LCN_Gee2023,nn,f_min_LCN,Hz,1.25e+00,constant,control_parasymp: identified-11-6-24
+LCN_Gee2023,nn,f_max_LCN,Hz,3.05e+01,constant,control_parasymp: identified-11-6-24
+LCN_Gee2023,nn,f_mid_LCN,Hz,7.37e+02,constant,control_parasymp: identified-11-6-24
+LCN_Gee2023,nn,k_evEmax_gainLCN,dimensionless,4.47e+00,constant,control_parasymp: identified-11-6-24
+LCN_Gee2023,nn,k_br_gainLCN,dimensionless,2.49e+00,constant,control_parasymp: identified-11-6-24
+LCN_Gee2023,nn,k_esh_gainLCN,dimensionless,5.94e-02,constant,control_parasymp: identified-11-6-24
+LCN_Gee2023,nn,k_cp_gainLCN,dimensionless,6.95e+00,constant,control_parasymp: identified-11-6-24
+LCN_Gee2023,nn,k_LCN,dimensionless,4.32e+00,constant,control_parasymp: identified-11-6-24
+PNNA_Gee2023,nn,f_NA,Hz,TODO,boundary_condition,TODO
+PNNA_Gee2023,nn,f_LCN,Hz,TODO,boundary_condition,TODO
+PNNA_Gee2023,nn,f_min_PNNA,Hz,6.39e-01,constant,control_parasymp: identified-11-6-24
+PNNA_Gee2023,nn,f_max_PNNA,Hz,1.79e+01,constant,control_parasymp: identified-11-6-24
+PNNA_Gee2023,nn,f_mid_PNNA,Hz,1.05e+01,constant,control_parasymp: identified-11-6-24
+PNNA_Gee2023,nn,f_vagal_stim,Hz,0.0,constant,control_parasymp: NEEDS_TO_BE_COUPLED
+PNNA_Gee2023,nn,k_PNNA,dimensionless,1.98e+00,constant,control_parasymp: identified-11-6-24
+PNDMV_Gee2023,nn,f_DMV,Hz,TODO,boundary_condition,TODO
+PNDMV_Gee2023,nn,f_LCN,Hz,TODO,boundary_condition,TODO
+PNDMV_Gee2023,nn,f_NActr,Hz,TODO,boundary_condition,TODO
+PNDMV_Gee2023,nn,f_min_PNDMV,Hz,4.35e+00,constant,control_parasymp: identified-11-6-24
+PNDMV_Gee2023,nn,f_max_PNDMV,Hz,2.82e+01,constant,control_parasymp: identified-11-6-24
+PNDMV_Gee2023,nn,f_mid_PNDMV,Hz,2.84e+01,constant,control_parasymp: identified-11-6-24
+PNDMV_Gee2023,nn,k_PNDMV,dimensionless,2.38e+01,constant,control_parasymp: identified-11-6-24
+PNDMV_Gee2023,nn,tau_PNDMV,second,2.53e+00,constant,control_parasymp: identified-11-6-24
+global,,f_es_min,per_s,2.66,global_constant,parasympathetic_model: Gee2023

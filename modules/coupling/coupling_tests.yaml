@@ -1,0 +1,97 @@
+module: coupling
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: coupler
+  BC_type: pv_0D_1D
+  module_type: pv_0D_1D_coupler_type
+  outputs: [P_t_star, P_s_0D, P_s_star, A_star, q_star, flux]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: imposter_1D
+  BC_type: nn
+  module_type: imposter_1D
+  outputs: [flux]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: FV1D_vessel
+  BC_type: vp
+  module_type: Muller_1d
+  outputs: []
+  invariants: []
+  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: FV1D_vessel
+  BC_type: pv
+  module_type: Muller_1d
+  outputs: []
+  invariants: []
+  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: FV1D_vessel
+  BC_type: vv
+  module_type: Muller_1d
+  outputs: []
+  invariants: []
+  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: FV1D_vessel
+  BC_type: nn
+  module_type: Muller_1d
+  outputs: []
+  invariants: []
+  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: volume_sum
+  BC_type: nn
+  module_type: volume_sum
+  outputs: [q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: volume_sum_2
+  BC_type: nn
+  module_type: volume_sum_2
+  outputs: [q_sum]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: FV1D_volume_sum
+  BC_type: nn
+  module_type: volume_sum_1D
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

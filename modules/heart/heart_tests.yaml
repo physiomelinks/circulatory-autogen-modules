@@ -1,0 +1,85 @@
+module: heart
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: heart
+  BC_type: vp_wCont
+  module_type: heart_simple_wCont
+  outputs: [T_wCont, mt, u_ra, u_rv, u_la, u_lv]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart_ASD
+  BC_type: vp_wCont
+  module_type: heart_simple_wCont_ASD
+  outputs: [T_wCont, mt, u_ra, u_rv, u_la, u_lv]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart_nonstiff
+  BC_type: vp_wCont
+  module_type: heart_nonstiff
+  outputs: [T_wCont, mt, u_ra, u_rv, u_la, u_lv]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart
+  BC_type: vp
+  module_type: heart_simple
+  outputs: [mt, u_ra, u_rv, u_la, u_lv, q_ra]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart
+  BC_type: vp_Ca
+  module_type: heart_Ca_input
+  outputs: [mt, u_ra, u_rv, u_la, u_lv, q_ra]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart_new_valve
+  BC_type: vp
+  module_type: heart_new_valve
+  outputs: [mt, u_ra, u_rv, u_la, u_lv, q_ra]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart_LVprop
+  BC_type: vp
+  module_type: heart_simple_LVprop
+  outputs: [mt, u_ra, u_rv, u_la, u_lv, q_ra]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart
+  BC_type: vp_devel
+  module_type: heart_devel
+  outputs: [mt, u_ra, u_rv, u_la, u_lv, q_ra]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

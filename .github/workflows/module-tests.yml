@@ -1,0 +1,107 @@
+name: Module tests & reports
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 14 * * 1'   # weekly, to catch libcuflynx changes
+  workflow_dispatch:
+
+concurrency:
+  group: module-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.list.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          modules=$(python3 -c "import os, json; print(json.dumps(sorted(d for d in os.listdir('modules') if os.path.isfile(f'modules/{d}/{d}_tests.yaml'))))")
+          echo "modules=$modules" >> "$GITHUB_OUTPUT"
+
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11', cache: pip }
+      - uses: ./.github/actions/setup
+      - run: make structure PYTHON=python
+
+  module:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJSON(needs.discover.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11', cache: pip }
+      - uses: ./.github/actions/setup
+      - name: Structural checks (results feed the report)
+        run: python -m pytest tests/test_structure.py -k "${{ matrix.module }}" || true
+      - name: V&V tests
+        id: tests
+        run: |
+          target=test
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then target=test-all; fi
+          if make $target PYTHON=python MODULE=${{ matrix.module }}; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Report
+        if: always()
+        run: make report PYTHON=python MODULE=${{ matrix.module }}
+      - name: Stage report files
+        if: always()
+        run: |
+          m=${{ matrix.module }}
+          mkdir -p _artifact/modules/$m
+          for f in plots results $m.html; do if [ -e modules/$m/$f ]; then cp -r modules/$m/$f _artifact/modules/$m/; fi; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: module-${{ matrix.module }}
+          path: _artifact/
+          if-no-files-found: ignore
+      - name: Fail if a reviewed module's tests failed
+        if: steps.tests.outputs.ok == 'false'
+        run: |
+          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open('modules/${{ matrix.module }}/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
+          if [ "$reviewed" = "True" ]; then echo "::error::tests failed for reviewed module ${{ matrix.module }}"; exit 1; fi
+          echo "::warning::tests failed for ${{ matrix.module }} (not reviewed yet, so not blocking)"
+
+  site:
+    needs: [module]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11', cache: pip }
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: module-*
+          path: .
+          merge-multiple: true
+      - run: make site PYTHON=python
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+
+  deploy:
+    needs: site
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

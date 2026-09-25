@@ -1,0 +1,45 @@
+module: lung
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: simple_lung_bg
+  BC_type: nn
+  module_type: simple_lung_bond_graph_type
+  outputs: [P_l, P_t, P_b, P_A, P_pl, P_mus]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: lung_bg_Argus_Chase
+  BC_type: nn
+  module_type: lung_bond_graph_Argus_Chase_type
+  outputs: [P_m, P_err_int, P_vent, P_t, P_b, P_A]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: thoracic_cavity
+  BC_type: nn
+  module_type: thoracic_cavity
+  outputs: [P_thor]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

@@ -1,0 +1,113 @@
+vessel_type,BC_type,variable_name,units,value,kind,data_reference
+heart,vp_wCont,Delta_T,second,TODO,boundary_condition,TODO
+heart,vp_wCont,u_intraThor,J_per_m3,0.0,boundary_condition,control_parasymp: TO_BE_COUPLED_TO_RESP
+heart,vp_wCont,u_root,J_per_m3,TODO,boundary_condition,TODO
+heart,vp_wCont,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart,vp_wCont,Delta_E_rv,J_per_m6,TODO,boundary_condition,TODO
+heart,vp_wCont,Delta_E_lv,J_per_m6,TODO,boundary_condition,TODO
+heart,vp_wCont,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_wCont,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_wCont,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,Delta_T,second,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,u_intraThor,J_per_m3,0.0,boundary_condition,control_phys_asd: TO_BE_COUPLED_TO_RESP
+heart_ASD,vp_wCont,u_root,J_per_m3,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,Delta_E_rv,J_per_m6,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,Delta_E_lv,J_per_m6,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart_ASD,vp_wCont,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+heart_nonstiff,vp_wCont,Delta_T,second,0,boundary_condition,3compartment_nonstiff: heart_nonstiff_no_control
+heart_nonstiff,vp_wCont,u_intraThor,J_per_m3,0,boundary_condition,3compartment_nonstiff: heart_nonstiff_no_control
+heart_nonstiff,vp_wCont,u_root,J_per_m3,TODO,boundary_condition,TODO
+heart_nonstiff,vp_wCont,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart_nonstiff,vp_wCont,Delta_E_rv,J_per_m6,0,boundary_condition,3compartment_nonstiff: heart_nonstiff_no_control
+heart_nonstiff,vp_wCont,Delta_E_lv,J_per_m6,0,boundary_condition,3compartment_nonstiff: heart_nonstiff_no_control
+heart_nonstiff,vp_wCont,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart_nonstiff,vp_wCont,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart_nonstiff,vp_wCont,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+heart,vp,u_root,J_per_m3,0.0,boundary_condition,cvs_model_with_arm_hybrid: WONT_BE_USED
+heart,vp,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart,vp,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_Ca,u_root,J_per_m3,TODO,boundary_condition,TODO
+heart,vp_Ca,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart,vp_Ca,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_Ca,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_Ca,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+heart_new_valve,vp,u_root,J_per_m3,TODO,boundary_condition,TODO
+heart_new_valve,vp,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart_new_valve,vp,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart_new_valve,vp,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart_new_valve,vp,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+heart_LVprop,vp,u_root,J_per_m3,TODO,boundary_condition,TODO
+heart_LVprop,vp,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart_LVprop,vp,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart_LVprop,vp,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart_LVprop,vp,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_devel,u_root,J_per_m3,TODO,boundary_condition,TODO
+heart,vp_devel,u_par,J_per_m3,TODO,boundary_condition,TODO
+heart,vp_devel,v_ivc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_devel,v_svc,m3_per_s,TODO,boundary_condition,TODO
+heart,vp_devel,v_pvn,m3_per_s,TODO,boundary_condition,TODO
+global,,rho,Js2_per_m5,1050,global_constant,control_parasymp: known
+global,,T,second,1,global_constant,control_parasymp: defined_by_user
+global,,T_min,second,0.25,global_constant,control_parasymp: defined_by_user
+global,,q_ra_us,m3,4.00e-06,global_constant,control_parasymp: Korakianitis_2006_Table_1
+global,,q_rv_us,m3,1.00e-05,global_constant,control_parasymp: Korakianitis_2006_Table_1
+global,,q_la_us,m3,4.00e-06,global_constant,control_parasymp: Korakianitis_2006_Table_1
+global,,q_lv_us,m3,5.00e-06,global_constant,control_parasymp: Korakianitis_2006_Table_1
+global,,q_ra_init,m3,4.00e-06,global_constant,control_parasymp: Korakianitis_2006_Table_1
+global,,q_rv_init,m3,0.1e-03,global_constant,control_parasymp: Korakianitis_2006_Table_1
+global,,q_la_init,m3,4.00e-06,global_constant,control_parasymp: Korakianitis_2006_Table_1
+global,,q_lv_init,m3,0.1e-03,global_constant,control_parasymp: user_defined
+global,,T_ac,second,0.17,global_constant,control_parasymp: Liang_2009_Table_2
+global,,T_ar,second,0.17,global_constant,control_parasymp: Liang_2009_Table_2
+global,,t_astart,second,0.8,global_constant,control_parasymp: Liang_2009_Table_2
+global,,T_vc,second,0.34,global_constant,control_parasymp: Liang_2009_Table_2
+global,,T_vr,second,0.15,global_constant,control_parasymp: Liang_2009_Table_2
+global,,t_vstart,second,0,global_constant,control_parasymp: Liang_2009_Table_2
+global,,E_ra_A,J_per_m6,8.00e+06,global_constant,control_parasymp: Liang_2009_Table_2
+global,,E_ra_B,J_per_m6,9.33e+06,global_constant,control_parasymp: Liang_2009_Table_2
+global,,E_rv_A,J_per_m6,60e+06,global_constant,control_parasymp: user_defined
+global,,E_rv_B,J_per_m6,0.2e6,global_constant,control_parasymp: user_defined
+global,,E_la_A,J_per_m6,9.33e+06,global_constant,control_parasymp: Liang_2009_Table_2
+global,,E_la_B,J_per_m6,1.20e+07,global_constant,control_parasymp: Liang_2009_Table_2
+global,,E_lv_A,J_per_m6,200e6,global_constant,control_parasymp: user_defined
+global,,E_lv_B,J_per_m6,20e6,global_constant,control_parasymp: user_defined
+global,,K_vo_trv,m3_per_Js,0.3,global_constant,control_parasymp: Mynard_2012
+global,,K_vo_puv,m3_per_Js,0.2,global_constant,control_parasymp: Mynard_2012
+global,,K_vo_miv,m3_per_Js,0.3,global_constant,control_parasymp: Mynard_2012
+global,,K_vo_aov,m3_per_Js,0.12,global_constant,control_parasymp: Mynard_2012
+global,,K_vc_trv,m3_per_Js,0.4,global_constant,control_parasymp: Mynard_2012
+global,,K_vc_puv,m3_per_Js,0.2,global_constant,control_parasymp: Mynard_2012
+global,,K_vc_miv,m3_per_Js,0.4,global_constant,control_parasymp: Mynard_2012
+global,,K_vc_aov,m3_per_Js,0.12,global_constant,control_parasymp: Mynard_2012
+global,,M_rg_trv,dimensionless,0,global_constant,control_parasymp: Mynard_2012
+global,,M_rg_puv,dimensionless,0,global_constant,control_parasymp: Mynard_2012
+global,,M_rg_miv,dimensionless,0,global_constant,control_parasymp: Mynard_2012
+global,,M_rg_aov,dimensionless,0,global_constant,control_parasymp: Mynard_2012
+global,,M_st_trv,dimensionless,1,global_constant,control_parasymp: Mynard_2012
+global,,M_st_puv,dimensionless,1,global_constant,control_parasymp: Mynard_2012
+global,,M_st_miv,dimensionless,1,global_constant,control_parasymp: Mynard_2012
+global,,M_st_aov,dimensionless,1,global_constant,control_parasymp: Mynard_2012
+global,,l_eff,metre,0.02,global_constant,control_parasymp: to_be_identified
+global,,A_nn_trv,m2,0.0008,global_constant,control_parasymp: Mynard_2012
+global,,A_nn_puv,m2,0.00071,global_constant,control_parasymp: Mynard_2012
+global,,A_nn_miv,m2,0.00077,global_constant,control_parasymp: Mynard_2012
+global,,A_nn_aov,m2,0.00068,global_constant,control_parasymp: Mynard_2012
+global,,R_ASD,Js_per_m6,1.00e+07,global_constant,control_phys_asd: ASD_shunt_moderate_assumption
+global,,v_ref_trv,m3_per_s,0.00005,global_constant,3compartment_nonstiff: heart_nonstiff_linearized_valve
+global,,v_ref_puv,m3_per_s,0.00005,global_constant,3compartment_nonstiff: heart_nonstiff_linearized_valve
+global,,v_ref_miv,m3_per_s,0.0001,global_constant,3compartment_nonstiff: heart_nonstiff_linearized_valve
+global,,v_ref_aov,m3_per_s,0.0001,global_constant,3compartment_nonstiff: heart_nonstiff_linearized_valve
+global,,Rmod_valve_trv,dimensionless,TODO,global_constant,TODO
+global,,Rmod_valve_puv,dimensionless,TODO,global_constant,TODO
+global,,Rmod_valve_aov,dimensionless,TODO,global_constant,TODO
+global,,Rmod_valve_miv,dimensionless,TODO,global_constant,TODO
+global,,r_ao,metre,0.0142714778,global_constant,new_valve_p_est: biobeat_measurement
+global,,r_lvot,metre,0.010030084,global_constant,new_valve_p_est: biobeat_measurement
+global,,gamma,dimensionless,0.0269,global_constant,new_valve_p_est: mean_of_population_id_07_09_22_FARGUS
+global,,beta,dimensionless,2,global_constant,new_valve_p_est: user_defined
+global,,A_aov,m2,0.0001720229,global_constant,new_valve_p_est: biobeat_measurement

@@ -1,0 +1,165 @@
+module: control
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: baroreceptor
+  BC_type: nn
+  module_type: baroreceptor_type
+  outputs: [P_baro, f_ab]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: chemoreceptor
+  BC_type: nn
+  module_type: chemoreceptor_type
+  outputs: [S_O2_a, X_O2, phi_stat, phi_CO2_dyn, f_c_stat, f_c_dyn]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: afferent_to_vagal_efferent
+  BC_type: nn
+  module_type: afferent_to_vagal_efferent_type
+  outputs: [f_v]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: afferent_to_respiratory_efferent
+  BC_type: nn
+  module_type: afferent_to_respiratory_efferent_type
+  outputs: [u_c_resp, u_p_resp]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: afferent_to_sympathetic_efferent
+  BC_type: nn
+  module_type: afferent_to_sympathetic_efferent_type
+  outputs: [f_s]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_resistance_effector
+  BC_type: nn
+  module_type: efferent_resistance_effector_Argus_type
+  outputs: [Delta_theta, sigma_theta]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_resistance_effector_Ursino
+  BC_type: nn
+  module_type: efferent_resistance_effector_Ursino_type
+  outputs: [Delta_theta, sigma_theta]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_venous_us_volume_and_compliance_effector
+  BC_type: nn
+  module_type: efferent_venous_us_volume_and_compliance_effector_Argus_type
+  outputs: [Delta_theta_us, sigma_theta_us, Delta_theta_compliance, sigma_theta_compliance]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_respiratory_effector_Gee_Argus_2026
+  BC_type: nn
+  module_type: efferent_respiratory_effector_Gee_Argus_2026_type
+  outputs: [tau_pA, tau_pf, G_cA, G_cf, tau_cA, tau_cf]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_respiratory_effector
+  BC_type: nn
+  module_type: efferent_respiratory_effector_type
+  outputs: [tau_pA, tau_pf, G_cA, G_cf, tau_cA, tau_cf]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_heart_elastance_effector
+  BC_type: nn_lv
+  module_type: efferent_heart_elastance_effector_type
+  outputs: [Delta_theta, sigma_theta]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_heart_elastance_effector
+  BC_type: nn_rv
+  module_type: efferent_heart_elastance_effector_type
+  outputs: [Delta_theta, sigma_theta]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: efferent_heart_period_effector
+  BC_type: nn
+  module_type: efferent_heart_period_effector_type
+  outputs: [Delta_Ts, Delta_Tv, Delta_T, sigma_Ts, sigma_Tv]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: local_flow_control_muscle
+  BC_type: nn
+  module_type: local_flow_control_muscle_type
+  outputs: [x_O2, x_CO2, phi_P_CO2_a, C_O2_p, R_local_multiplier]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: local_flow_control_brain
+  BC_type: nn
+  module_type: local_flow_control_brain_type
+  outputs: [x_O2, x_CO2, phi_P_CO2_a, G_p, R_local_multiplier]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart_effector_Gee2023
+  BC_type: nn_lv
+  module_type: heart_effector_Gee2023
+  outputs: [Delta_Es, sigma_Es, Delta_Ev, sigma_Ev, Delta_Emax]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart_effector_Gee2023
+  BC_type: nn_rv
+  module_type: heart_effector_Gee2023
+  outputs: [Delta_Es, sigma_Es, Delta_Ev, sigma_Ev, Delta_Emax]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: heart_effector_Gee2023_OLD
+  BC_type: nn_rv
+  module_type: heart_effector_Gee2023
+  outputs: [inv_Delta_Es, inv_sigma_Es, inv_Delta_Ev, inv_sigma_Ev, Delta_Emax]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

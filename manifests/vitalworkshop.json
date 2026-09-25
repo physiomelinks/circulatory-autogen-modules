@@ -1,55 +1,60 @@
 {
-  "generatedAt": "2026-02-09T10:00:00Z",
+  "generatedAt": "2026-09-25T02:17:20Z",
   "collections": {
     "modules": [
       {
         "name": "Bond Graph",
         "file": "BG_modules.cellml",
-        "path": "modules/BG_modules.cellml"
+        "path": "modules/BG/BG_modules.cellml"
       },
       {
         "name": "heart",
         "file": "heart_modules.cellml",
-        "path": "modules/heart_modules.cellml"
+        "path": "modules/heart/heart_modules.cellml"
       },
       {
         "name": "microvasculature_network",
         "file": "microvasculature_network_modules.cellml",
-        "path": "modules/microvasculature_network_modules.cellml"
+        "path": "modules/microvasculature_network/microvasculature_network_modules.cellml"
       },
       {
         "name": "templates",
         "file": "template_modules.cellml",
-        "path": "modules/template_modules.cellml"
+        "path": "modules/template/template_modules.cellml"
       }
     ],
     "configs": [
       {
         "name": "Bond Graph",
-        "file": "BG.json",
-        "path": "module_configs/BG.json"
+        "file": "BG_modules_config.json",
+        "path": "modules/BG/BG_modules_config.json"
       },
       {
         "name": "heart",
-        "file": "heart.json",
-        "path": "module_configs/heart.json"
+        "file": "heart_modules_config.json",
+        "path": "modules/heart/heart_modules_config.json"
       },
       {
         "name": "microvasculature_network",
-        "file": "microvasculature_network.json",
-        "path": "module_configs/microvasculature_network.json"
+        "file": "microvasculature_network_modules_config.json",
+        "path": "modules/microvasculature_network/microvasculature_network_modules_config.json"
       }
     ],
     "units": [
       {
-        "name": "general",
-        "file": "units.cellml",
-        "path": "units/units.cellml"
+        "name": "Bond Graph",
+        "file": "BG_units.cellml",
+        "path": "modules/BG/BG_units.cellml"
       },
       {
-        "name": "user",
-        "file": "user_units.cellml",
-        "path": "units/user_units.cellml"
+        "name": "heart",
+        "file": "heart_units.cellml",
+        "path": "modules/heart/heart_units.cellml"
+      },
+      {
+        "name": "microvasculature_network",
+        "file": "microvasculature_network_units.cellml",
+        "path": "modules/microvasculature_network/microvasculature_network_units.cellml"
       }
     ]
   }

@@ -1,0 +1,46 @@
+vessel_type,BC_type,variable_name,units,value,kind,data_reference
+outlet_pressure,nn_constant,P,J_per_m3,666.0,constant,behdad_test1: user_defined
+inlet_pressure,nn_constant,P,J_per_m3,TODO,constant,TODO
+outlet_flow,nn_constant,v,m3_per_s,TODO,constant,TODO
+inlet_flow,nn_constant,v,m3_per_s,83333e-09,constant,behdad_test1: user_defined
+inlet_flow,nn_fourier_8,A_0,m3_per_s,0.0001,constant,test_fft: Alfred_database
+inlet_flow,nn_fourier_8,A_1,m3_per_s,0.001,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,A_2,m3_per_s,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,A_3,m3_per_s,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,A_4,m3_per_s,0.0001,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,A_5,m3_per_s,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,A_6,m3_per_s,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,A_7,m3_per_s,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,A_8,m3_per_s,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_0,dimensionless,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_1,dimensionless,1,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_2,dimensionless,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_3,dimensionless,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_4,dimensionless,-1,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_5,dimensionless,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_6,dimensionless,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_7,dimensionless,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,phi_8,dimensionless,0,constant,test_fft: user_defined
+inlet_flow,nn_fourier_8,P,J_per_m3,100,boundary_condition,test_fft: user_defined
+inlet_flow,nn_constant_2,v_1,m3_per_s,3.1e-06,constant,cerebral_elic: user_defined
+inlet_flow,nn_constant_2,v_2,m3_per_s,3.1e-06,constant,cerebral_elic: user_defined
+lung_vol_generator,nn,phi_lung,radian,TODO,constant,TODO
+lung_vol_generator,nn,T_lung_0,second,TODO,constant,TODO
+lung_vol_generator,nn,q_lung_max,m3,TODO,constant,TODO
+lung_vol_generator,nn,q_lung_baseline,m3,TODO,constant,TODO
+lung_vol_generator,nn,t_start_T_lung,second,TODO,constant,TODO
+lung_vol_generator,nn,t_end_T_lung,second,TODO,constant,TODO
+lung_vol_generator,nn,T_lung_multiplier,dim,TODO,constant,TODO
+lung_vol_generator,nn,q_lung_max_multiplier,dim,TODO,constant,TODO
+lung_vol_generator,nn,t_start_q_lung_amp,second,TODO,constant,TODO
+lung_vol_generator,nn,t_end_q_lung_amp,second,TODO,constant,TODO
+CO2_O2_generator,nn,C_CO2_multiplier,dim,TODO,constant,TODO
+CO2_O2_generator,nn,t_start_C_CO2,second,TODO,constant,TODO
+CO2_O2_generator,nn,t_end_C_CO2,second,TODO,constant,TODO
+CO2_O2_generator,nn,C_O2_multiplier,dim,TODO,constant,TODO
+CO2_O2_generator,nn,t_start_C_O2,second,TODO,constant,TODO
+CO2_O2_generator,nn,t_end_C_O2,second,TODO,constant,TODO
+CO2_O2_generator,nn,C_CO2_a0,dimensionless,TODO,constant,TODO
+CO2_O2_generator,nn,C_O2_a0,dimensionless,TODO,constant,TODO
+muscle_pressure,nn_constant,P,J_per_m3,TODO,constant,TODO
+global,,T,second,1,global_constant,test_fft: biobeat_measurement

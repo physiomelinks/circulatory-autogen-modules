@@ -1,0 +1,405 @@
+module: microvasculature_network
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: artery_Minlet
+  BC_type: pv_micro
+  module_type: pv_Minlet_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole_Minlet
+  BC_type: pv_micro
+  module_type: pv_Minlet_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_Minlet
+  BC_type: pv_micro
+  module_type: pv_Minlet_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule_Minlet
+  BC_type: pv_micro
+  module_type: pv_Minlet_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein_Minlet
+  BC_type: pv_micro
+  module_type: pv_Minlet_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_Nout
+  BC_type: pv_micro
+  module_type: pv_Nout_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole_Nout
+  BC_type: pv_micro
+  module_type: pv_Nout_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_Nout
+  BC_type: pv_micro
+  module_type: pv_Nout_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule_Nout
+  BC_type: pv_micro
+  module_type: pv_Nout_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein_Nout
+  BC_type: pv_micro
+  module_type: pv_Nout_type_micro
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_inlet
+  BC_type: pp_micro
+  module_type: pp_type_micro
+  outputs: [u, v, v_d, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_inlet
+  BC_type: pv_micro
+  module_type: pv_type_micro
+  outputs: [u, v, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_outlet
+  BC_type: vp_micro
+  module_type: vp_type_micro
+  outputs: [u, v, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_outlet
+  BC_type: pp_micro
+  module_type: pp_type_micro
+  outputs: [u, v, v_d, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery
+  BC_type: pp_micro
+  module_type: pp_type_micro
+  outputs: [u, v, v_d, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole
+  BC_type: pp_micro
+  module_type: pp_simple_type
+  outputs: [u, v, v_d, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary
+  BC_type: pp_micro
+  module_type: pp_capillary_type_micro
+  outputs: [u, v, q_C, q, q_us, v_d]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule
+  BC_type: pp_micro
+  module_type: pp_simple_type
+  outputs: [u, v, v_d, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein
+  BC_type: pp_micro
+  module_type: pp_simple_type
+  outputs: [u, v, v_d, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery
+  BC_type: pv_micro
+  module_type: pv_type_micro
+  outputs: [u, v, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole
+  BC_type: pv_micro
+  module_type: pv_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary
+  BC_type: pv_micro
+  module_type: pv_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule
+  BC_type: pv_micro
+  module_type: pv_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein
+  BC_type: pv_micro
+  module_type: pv_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery
+  BC_type: vp_micro
+  module_type: vp_type_micro
+  outputs: [u, v, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole
+  BC_type: vp_micro
+  module_type: vp_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary
+  BC_type: vp_micro
+  module_type: vp_capillary_type_micro
+  outputs: [u, v, q_C, q, q_us, R]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule
+  BC_type: vp_micro
+  module_type: vp_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein
+  BC_type: vp_micro
+  module_type: vp_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery
+  BC_type: vv_micro
+  module_type: vv_type_micro
+  outputs: [u, u_d, v, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole
+  BC_type: vv_micro
+  module_type: vv_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary
+  BC_type: vv_micro
+  module_type: vv_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule
+  BC_type: vv_micro
+  module_type: vv_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein
+  BC_type: vv_micro
+  module_type: vv_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_Min
+  BC_type: vp_micro
+  module_type: vp_Min_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole_Min
+  BC_type: vp_micro
+  module_type: vp_Min_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_Min
+  BC_type: vp_micro
+  module_type: vp_Min_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule_Min
+  BC_type: vp_micro
+  module_type: vp_Min_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein_Min
+  BC_type: vp_micro
+  module_type: vp_Min_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_MinNout
+  BC_type: vv_micro
+  module_type: vv_MinNout_type_micro
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_Min
+  BC_type: vv_micro
+  module_type: vv_Min_type_micro
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_Nout
+  BC_type: vv_micro
+  module_type: vv_Nout_type_micro
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: artery_Noutlet
+  BC_type: vp_micro
+  module_type: vp_Noutlet_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arteriole_Noutlet
+  BC_type: vp_micro
+  module_type: vp_Noutlet_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_Noutlet
+  BC_type: vp_micro
+  module_type: vp_Noutlet_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venule_Noutlet
+  BC_type: vp_micro
+  module_type: vp_Noutlet_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: vein_Noutlet
+  BC_type: vp_micro
+  module_type: vp_Noutlet_type_micro
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: P_outlet
+  BC_type: nn_micro
+  module_type: constant_pressure_BC_type_micro
+  outputs: []
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cam-testing"
+version = "0.1.0"
+description = "Verification, validation and reports for the circulatory-autogen-modules library"
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml",
+    "jinja2",
+    "matplotlib",
+    "numpy",
+    "pytest",
+]
+
+[tool.setuptools]
+packages = ["cam_testing"]
+
+[tool.setuptools.package-data]
+cam_testing = ["templates/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The standard tests keep the names run_test, verification_test_BC, ... rather than test_*.
+python_functions = ["test_*", "run_test", "*_test_*", "stability_test"]
+markers = [
+    "slow: long-running (calibration)",
+    "module_vv: per-module verification & validation tests",
+]
+filterwarnings = ["ignore::DeprecationWarning"]

@@ -1,0 +1,949 @@
+module: BG
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: arterial_simple
+  BC_type: vp
+  module_type: vp_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial_simple
+  BC_type: vp_nonlinear
+  module_type: vp_simple_nonlinear_type
+  outputs: [u, v, q, R_nonlinear]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vp
+  module_type: vp_type
+  outputs: [u, v, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial_simple
+  BC_type: pv
+  module_type: pv_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pv
+  module_type: pv_type
+  outputs: [u, v, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial_simple
+  BC_type: pp
+  module_type: pp_simple_type
+  outputs: [u, v, v_d, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial_simple_novisco
+  BC_type: pp
+  module_type: pp_simple_novisco_type
+  outputs: [u, v, v_d, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pp
+  module_type: pp_type
+  outputs: [u, v, v_d, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial_simple
+  BC_type: vv
+  module_type: vv_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: rigid_vessel
+  BC_type: vv
+  module_type: vv_rigid_type
+  outputs: [u]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vv
+  module_type: vv_type
+  outputs: [u, u_d, v, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp
+  module_type: pp_T_fixed_I_type
+  outputs: [u, u_C, v, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_spec_I
+  module_type: pp_T_spec_I_type
+  outputs: [u, u_C, v, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_RCR_wCont
+  module_type: pp_T_RCR_wCont_type
+  outputs: [u, u_C, v, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_RICRI
+  module_type: pp_T_RICRI_type
+  outputs: [u, u_C, v, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_R1ICR2I
+  module_type: pp_T_R1ICR2I_type
+  outputs: [u, u_C, v, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_RICRI_nonlinear
+  module_type: pp_T_RICRI_nonlinear_type
+  outputs: [u, v, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: single_terminal
+  BC_type: vp_wCont
+  module_type: vp_T_wCont_type
+  outputs: [u, u_C, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: single_terminal
+  BC_type: vp_R1CR2_wCont
+  module_type: vp_T_R1CR2_wCont_type
+  outputs: [u, u_C, v_T, R_T1_wCont, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: single_terminal
+  BC_type: vp_ZCIR_wCont
+  module_type: vp_T_ZCIR_wCont_type
+  outputs: [u, u_C, v_T, q, R_T1_wCont, R_T2_wCont]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: single_terminal
+  BC_type: vp_R1CR2_wI_wCont
+  module_type: vp_T_R1CR2_wI_wCont_type
+  outputs: [u, u_C, v_T, R_T1_wCont, R_T2_wCont, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: single_terminal
+  BC_type: vp_R1CR2_wI
+  module_type: vp_T_R1CR2_wI_type
+  outputs: [u, u_C, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_I
+  module_type: pp_T_type
+  outputs: [u, u_C, v, v_T, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_wCont
+  module_type: pp_T_wCont_type
+  outputs: [u, u_C, v, v_T, R_T_wCont, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_R1CR2_wCont
+  module_type: pp_T_R1CR2_wCont_type
+  outputs: [u, u_C, v, v_T, R_T1_wCont, R_T2_wCont]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_wLocal
+  module_type: pp_T_wCont_type
+  outputs: [u, u_C, v, v_T, R_T_wCont, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal
+  BC_type: pp_wCont_no_local
+  module_type: pp_T_wCont_type
+  outputs: [u, u_C, v, v_T, R_T_wCont, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: pv
+  module_type: pv_split_type
+  outputs: [u, u_C, du_C_dt, v, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction_simple
+  BC_type: pv
+  module_type: pv_split_simple_type
+  outputs: [u, u_C, du_C_dt, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vv
+  module_type: vv_merge_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vp
+  module_type: vp_merge_type
+  outputs: [u, v, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous_merge_junction
+  BC_type: vp_nonlinear
+  module_type: vp_merge_nonlinear_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction_simple
+  BC_type: vp
+  module_type: vp_merge_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous_merge_junction_simple
+  BC_type: vp
+  module_type: vp_merge_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction_simple
+  BC_type: vv
+  module_type: vv_merge_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous_merge_junction_simple
+  BC_type: vv
+  module_type: vv_merge_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: vv
+  module_type: vv_split_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: vv_novisco
+  module_type: vv_split_novisco_type
+  outputs: [u, u_d, u_C, u_C_d, v, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction_simple
+  BC_type: vv
+  module_type: vv_split_simple_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous_split_junction_simple
+  BC_type: vv
+  module_type: vv_split_simple_type
+  outputs: [u, u_d, v, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: 2in2out_junction
+  BC_type: vv
+  module_type: vv_2in2out_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: vp_woCont
+  module_type: vp_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous_novisco
+  BC_type: vp_woCont
+  module_type: vp_simple_novisco_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: vp
+  module_type: vp_ven_simple_type
+  outputs: [u, v, q_C_change, q_C, q, q_us_wCont]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous_novisco
+  BC_type: vp
+  module_type: vp_ven_simple_novisco_type
+  outputs: [u, v, q_C_change, q_C, q, q_us_wCont]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: vp_wCont
+  module_type: vp_ven_simple_type
+  outputs: [u, v, q_C_change, q_C, q, q_us_wCont]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: vp_nonlinear
+  module_type: vp_nonlinear_type
+  outputs: [u, v, q_C, q_0, q, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: pv
+  module_type: pv_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: pp
+  module_type: pp_simple_type
+  outputs: [u, v, v_d, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: pp_nonlinear
+  module_type: pp_nonlinear_type
+  outputs: [u, v, v_d, q_C, q_0, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous
+  BC_type: vv
+  module_type: vv_simple_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: flow_sum_2
+  BC_type: nn
+  module_type: flow_sum_2_type
+  outputs: [v_total]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: terminal2
+  BC_type: pp
+  module_type: W_controller2_type
+  outputs: [u, v, v_T, q_T]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pv_nonlinear_constR
+  module_type: pv_nonlinear_constR_type
+  outputs: [u, v, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pv_nonlinear
+  module_type: pv_nonlinear_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pv_nonlinear_visco
+  module_type: pv_nonlinear_visco_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vp_nonlinear_constR
+  module_type: vp_nonlinear_constR_type
+  outputs: [u, v, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vp_nonlinear
+  module_type: vp_nonlinear_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vp_nonlinear_visco
+  module_type: vp_nonlinear_visco_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pp_nonlinear_constR
+  module_type: pp_nonlinear_constR_type
+  outputs: [u, v, v_d, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pp_nonlinear
+  module_type: pp_nonlinear_type
+  outputs: [u, v, v_d, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: pp_nonlinear_visco
+  module_type: pp_nonlinear_visco_type
+  outputs: [u, v, v_d, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vv_nonlinear_constR
+  module_type: vv_nonlinear_constR_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vv_nonlinear
+  module_type: vv_nonlinear_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: arterial
+  BC_type: vv_nonlinear_visco
+  module_type: vv_nonlinear_visco_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: pv_nonlinear_constR
+  module_type: pv_split_nonlinear_constR_type
+  outputs: [u, du_dt, v, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: pv_nonlinear
+  module_type: pv_split_nonlinear_type
+  outputs: [u, du_dt, v, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: pv_nonlinear_visco
+  module_type: pv_split_nonlinear_visco_type
+  outputs: [u, du_dt, v, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: vv_nonlinear_constR
+  module_type: vv_split_nonlinear_constR_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: vv_nonlinear
+  module_type: vv_split_nonlinear_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: split_junction
+  BC_type: vv_nonlinear_visco
+  module_type: vv_split_nonlinear_visco_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vp_nonlinear_constR
+  module_type: vp_merge_nonlinear_constR_type
+  outputs: [u, v, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vp_nonlinear
+  module_type: vp_merge_nonlinear_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vp_nonlinear_visco
+  module_type: vp_merge_nonlinear_visco_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vv_nonlinear_constR
+  module_type: vv_merge_nonlinear_constR_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vv_nonlinear
+  module_type: vv_merge_nonlinear_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: merge_junction
+  BC_type: vv_nonlinear_visco
+  module_type: vv_merge_nonlinear_visco_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: constriction
+  BC_type: pv
+  module_type: pv_constriction_type
+  outputs: [u, v, R, C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_simple
+  BC_type: vp
+  module_type: vp_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_simple
+  BC_type: pv
+  module_type: pv_simple_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_simple
+  BC_type: pp
+  module_type: pp_simple_type
+  outputs: [u, v, v_d, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_simple
+  BC_type: vv
+  module_type: vv_simple_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_split
+  BC_type: pv
+  module_type: pv_split_capillary_type
+  outputs: [u, v, q_C, q, q_us, R]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary
+  BC_type: pp
+  module_type: pp_capillary_type
+  outputs: [u, v, q_C, q, q_us, v_d]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_merge
+  BC_type: vp
+  module_type: vp_merge_capillary_type
+  outputs: [u, v, q_C, q, q_us, R]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary
+  BC_type: vp
+  module_type: vp_capillary_type
+  outputs: [u, v, q_C, q, q_us, R]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: MinNout_junction
+  BC_type: vv_simple
+  module_type: vv_MinNout_simple_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: MinNout_junction
+  BC_type: vv
+  module_type: vv_MinNout_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: MinNout_junction
+  BC_type: vv_nonlinear_constR
+  module_type: vv_MinNout_nonlinear_constR_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: MinNout_junction
+  BC_type: vv_nonlinear
+  module_type: vv_MinNout_nonlinear_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: MinNout_junction
+  BC_type: vv_nonlinear_visco
+  module_type: vv_MinNout_nonlinear_visco_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vp_simple
+  module_type: vp_Min_simple_type
+  outputs: [u, v, u_C, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vp_simple_novisco
+  module_type: vp_Min_simple_novisco_type
+  outputs: [u, v, u_C, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vp
+  module_type: vp_Min_type
+  outputs: [u, v, u_C, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vp_nonlinear_constR
+  module_type: vp_Min_nonlinear_constR_type
+  outputs: [u, v, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vp_nonlinear
+  module_type: vp_Min_nonlinear_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vp_nonlinear_visco
+  module_type: vp_Min_nonlinear_visco_type
+  outputs: [u, v, q_C, q, q_0, r]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vv_simple
+  module_type: vv_Min_simple_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vv
+  module_type: vv_Min_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vv_nonlinear_constR
+  module_type: vv_Min_nonlinear_constR_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vv_nonlinear
+  module_type: vv_Min_nonlinear_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction
+  BC_type: vv_nonlinear_visco
+  module_type: vv_Min_nonlinear_visco_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: pv_simple
+  module_type: pv_Nout_simple_type
+  outputs: [u, v, u_C, du_C_dt, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: pv
+  module_type: pv_Nout_type
+  outputs: [u, v, u_C, du_C_dt, q_C, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: pv_nonlinear_constR
+  module_type: pv_Nout_nonlinear_constR_type
+  outputs: [u, v, du_dt, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: pv_nonlinear
+  module_type: pv_Nout_nonlinear_type
+  outputs: [u, v, du_dt, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: pv_nonlinear_visco
+  module_type: pv_Nout_nonlinear_visco_type
+  outputs: [u, v, du_dt, q_C, q, q_0]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: vv_simple
+  module_type: vv_Nout_simple_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: vv
+  module_type: vv_Nout_type
+  outputs: [u, v, u_d, u_C, u_C_d, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: vv_nonlinear_constR
+  module_type: vv_Nout_nonlinear_constR_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: vv_nonlinear
+  module_type: vv_Nout_nonlinear_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Nout_junction
+  BC_type: vv_nonlinear_visco
+  module_type: vv_Nout_nonlinear_visco_type
+  outputs: [u, v, u_d, q_C, q_C_d, q_0_2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_simple_vol_ctl_uptake
+  BC_type: vv
+  module_type: vv_simple_vol_ctl_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: capillary_simple_vol_ctl_intake
+  BC_type: vv
+  module_type: vv_simple_vol_ctl_type
+  outputs: [u, u_d, u_C, u_C_d, v, q_C]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: venous_Rctl
+  BC_type: vp_woCont
+  module_type: vp_simple_Rctl_type
+  outputs: [u, v, q_C, q]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: Min_junction_usV_C_ctl
+  BC_type: vp_simple
+  module_type: vp_Min_usV_C_ctl_type
+  outputs: [u, v, u_C, q_C, q, q_us_wCont]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

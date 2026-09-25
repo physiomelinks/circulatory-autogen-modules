@@ -1,0 +1,77 @@
+module: gas_exchange
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: tissue_GE_simple
+  BC_type: nn
+  module_type: tissue_GE_simple_type
+  outputs: [C_CO2_p, C_O2_p, v]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: pulmonary_GE
+  BC_type: nn
+  module_type: pulmonary_GE_type
+  outputs: [C_CO2_p, C_O2_p, C_CO2_p_capped, C_O2_p_capped, C_CO2_v, C_O2_v]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: pulmonary_GE
+  BC_type: nn_5_lobe
+  module_type: pulmonary_GE_5_lobe_type
+  outputs: [C_CO2_p, C_O2_p, C_CO2_p_capped, C_O2_p_capped, C_CO2_v, C_O2_v]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: gas_transport_simple
+  BC_type: nn
+  module_type: gas_transport_simple_type
+  outputs: [C_CO2_out, dot_C_CO2_out, C_O2_out, C_CO2_out_capped, C_O2_out_capped, C_O2_out_extra_ub]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: respiratory_gas_transport
+  BC_type: nn
+  module_type: respiratory_gas_transport_type
+  outputs: [F_CO2_D, F_O2_D, F_CO2_A, F_O2_A, M_CO2, M_O2]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: GE_capillary
+  BC_type: nn
+  module_type: capillary_GE
+  outputs: [C_CO2_c, C_O2_c, C_CO2_v, C_O2_v, P_CO2_c, P_O2_c]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: GE_capillary_merge
+  BC_type: nn
+  module_type: capillary_GE_merge
+  outputs: [C_CO2_a, C_O2_a, C_CO2_c, C_O2_c, C_CO2_v, C_O2_v]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
