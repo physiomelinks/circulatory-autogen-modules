@@ -1,255 +1,255 @@
-vessel_type,BC_type,variable_name,units,value,kind,data_reference
-myocyte_membrane_voltage,nn,Vm_init,volt,TODO,constant,TODO
-myocyte_membrane_voltage,nn,i_CaL,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_K1,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_f,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_Na,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_Kr,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_Ks,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_to,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_PCa,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_NaK,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_NaCa,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_b_Ca,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_b_Na,A_per_F,TODO,boundary_condition,TODO
-myocyte_membrane_voltage,nn,i_stim,A_per_F,TODO,boundary_condition,TODO
-sympathetic_neuron_membrane_voltage,nn,Vm_init,milliV,TODO,constant,TODO
-sympathetic_neuron_membrane_voltage,nn,i_Ca,nanoA,TODO,boundary_condition,TODO
-sympathetic_neuron_membrane_voltage,nn,i_Na,nanoA,TODO,boundary_condition,TODO
-sympathetic_neuron_membrane_voltage,nn,i_A,nanoA,TODO,boundary_condition,TODO
-sympathetic_neuron_membrane_voltage,nn,i_KV,nanoA,TODO,boundary_condition,TODO
-sympathetic_neuron_membrane_voltage,nn,i_KCa,nanoA,TODO,boundary_condition,TODO
-sympathetic_neuron_membrane_voltage,nn,i_stim,nanoA,TODO,boundary_condition,TODO
-sympathetic_neuron_membrane_voltage,nn,C_m,picoF,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,Cai_init,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,Ca_SR_init,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,g_init,dimensionless,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,i_CaL,A_per_F,TODO,boundary_condition,TODO
-Ca_dynamics_Paci_2013,nn,i_PCa,A_per_F,TODO,boundary_condition,TODO
-Ca_dynamics_Paci_2013,nn,i_b_Ca,A_per_F,TODO,boundary_condition,TODO
-Ca_dynamics_Paci_2013,nn,i_NaCa,A_per_F,TODO,boundary_condition,TODO
-Ca_dynamics_Paci_2013,nn,Vm,dimensionless,TODO,boundary_condition,TODO
-Ca_dynamics_Paci_2013,nn,a_rel,millimolar_per_s,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,b_rel,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,c_rel,millimolar_per_s,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,tau_g,second,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,Kup,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,Buf_C,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,Buf_SR,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,Kbuf_C,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,Kbuf_SR,millimolar,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,VmaxUp,millimolar_per_s,TODO,constant,TODO
-Ca_dynamics_Paci_2013,nn,V_leak,per_s,TODO,constant,TODO
-electric_potentials_Paci_2013,nn,Nai,millimolar,TODO,boundary_condition,TODO
-electric_potentials_Paci_2013,nn,Cai,millimolar,TODO,boundary_condition,TODO
-electric_potentials_Paci_2013,nn,PkNa,dimensionless,TODO,constant,TODO
-Na_dynamics_Paci_2013,nn,Nai_init,millimolar,TODO,constant,TODO
-Na_dynamics_Paci_2013,nn,i_Na,A_per_F,TODO,boundary_condition,TODO
-Na_dynamics_Paci_2013,nn,i_b_Na,A_per_F,TODO,boundary_condition,TODO
-Na_dynamics_Paci_2013,nn,i_NaK,A_per_F,TODO,boundary_condition,TODO
-Na_dynamics_Paci_2013,nn,i_NaCa,A_per_F,TODO,boundary_condition,TODO
-NE_release_Tao_2011,nn,i_Ca,nanoA,TODO,boundary_condition,TODO
-NE_release_Tao_2011,nn,K_off,per_s,TODO,constant,TODO
-NE_release_Tao_2011,nn,K_on,m3_per_millimol_s,TODO,constant,TODO
-NE_release_Tao_2011,nn,K_Ca,per_s,TODO,constant,TODO
-NE_release_Tao_2011,nn,b,dimensionless,TODO,constant,TODO
-NE_release_Tao_2011,nn,gamma,m3_per_M_millis,TODO,constant,TODO
-NE_release_Tao_2011,nn,C_m,picoF,TODO,constant,TODO
-NE_release_Tao_2011,nn,V_Z,litre,TODO,constant,TODO
-NE_release_Tao_2011,nn,a,dimensionless,TODO,constant,TODO
-NE_release_Tao_2011,nn,n,dimensionless,TODO,constant,TODO
-NE_release_Tao_2011,nn,V_cleft,litre,TODO,constant,TODO
-NE_release_Tao_2011,nn,P_up,per_millis,TODO,constant,TODO
-SN_soma,nn,V_rest_approx,milliV,-70,constant,SN_simple: Davis2021Thesis_from_traces
-SN_soma,nn,h_BK_min,dimensionless,0.085,constant,SN_simple: Khaliq2003Contribution
-SN_soma,nn,z_BK_coeff,millimolar,0.001,constant,SN_simple: Khaliq2003Contribution
-SN_soma,nn,V_mid_m,milliV,20,constant,SN_simple: Belluzi1991_was_36
-SN_soma,nn,V_mid_h,milliV,40,constant,SN_simple: Belluzi1991_was_53.2
-SN_soma,nn,V_den_m,milliV,6,constant,SN_simple: Belluzi1991_was_7.2
-SN_soma,nn,V_den_h,milliV,4.0,constant,SN_simple: Belluzi1991_was_6.5
-SN_soma,nn,V_mid_m_Na1_6,milliV,36,constant,SN_simple: Belluzi1991_was_36
-SN_soma,nn,V_mid_h_Na1_6,milliV,53.2,constant,SN_simple: Belluzi1991_was_53.2
-SN_soma,nn,V_den_m_Na1_6,milliV,8.0,constant,SN_simple: Belluzi1991_was_7.2
-SN_soma,nn,V_den_h_Na1_6,milliV,8.0,constant,SN_simple: Belluzi1991_was_6.5
-SN_soma,nn,V_mid_c,milliV,8.1,constant,SN_simple: Tau2011_was_8.1
-SN_soma,nn,V_den_c,milliV,5,constant,SN_simple: Tau2011_was_9.85
-SN_soma,nn,V_mid_m_Kv1_5,milliV,6.0,constant,SN_simple: Philipson1991-channelpedia
-SN_soma,nn,V_den_m_Kv1_5,milliV,6.4,constant,SN_simple: Philipson1991-channelpedia
-SN_soma,nn,V_mid_h_Kv1_5,milliV,25.3,constant,SN_simple: Philipson1991-channelpedia
-SN_soma,nn,V_den_h_Kv1_5,milliV,3.5,constant,SN_simple: Philipson1991-channelpedia
-SN_soma,nn,V_mid_m_Kv4_2,milliV,18.8,constant,SN_simple: Bekkers2000-channelpedia
-SN_soma,nn,V_den_m_Kv4_2,milliV,16.6,constant,SN_simple: Bekkers2000-channelpedia
-SN_soma,nn,V_mid_h_Kv4_2,milliV,81.6,constant,SN_simple: Bekkers2000-channelpedia
-SN_soma,nn,V_den_h_Kv4_2,milliV,6.7,constant,SN_simple: Bekkers2000-channelpedia
-SN_soma,nn,V_mid_m_Kv2,milliV,6,constant,SN_simple: Tau2011_was_6
-SN_soma,nn,V_den_m_Kv2,milliV,8,constant,SN_simple: Tau2011_was_8
-SN_soma,nn,V_mid_w,milliV,35,constant,SN_simple: Martin2023_was_35
-SN_soma,nn,Delta_V_mid_w,milliV,0,constant,SN_simple: for_drug_control
-SN_soma,nn,V_den_w,milliV,10,constant,SN_simple: Martin2023_was_10
-SN_soma,nn,V_den_m_BK,milliV,6.2,constant,SN_simple: khaliq2003Contribution
-SN_soma,nn,V_mid_h_BK,milliV,26,constant,SN_simple: khaliq2003Contribution_was_32
-SN_soma,nn,V_den_h_BK,milliV,5.8,constant,SN_simple: khaliq2003Contribution
-SN_soma,nn,k_thresh_m,milliV,0,constant,SN_simple: user_defined_removed_dependence_was_15
-SN_soma,nn,k_thresh_h,milliV,0,constant,SN_simple: user_defined_removed_dependence
-SN_soma,nn,tau_h_min,millis,0.15,constant,SN_simple: user_defined
-SN_soma,nn,tau_h_max,millis,5,constant,SN_simple: user_defined
-SN_soma,nn,tau_h_Na1_6_min,millis,0.15,constant,SN_simple: user_defined
-SN_soma,nn,tau_h_Na1_6_max,millis,300,constant,SN_simple: user_defined
-SN_soma,nn,tau_w_min,millis,30,constant,SN_simple: gupta2016Computational
-SN_soma,nn,tau_c_min,millis,0.2,constant,SN_simple: changed_from_belluzi1991_curves
-SN_soma,nn,tau_c_max,millis,3.0,constant,SN_simple: changed_from_belluzi1991_curves
-SN_soma,nn,tau_hc,millis,20.0,constant,SN_simple: changed_from_belluzi1991_curves
-SN_soma,nn,tau_h_Kv4_2,millis,7.0,constant,SN_simple: was_approx_7
-SN_soma,nn,tau_z_BK,millis,5,constant,SN_simple: khaliq2003Contribution
-SN_soma,nn,tau_m_SK,millis,5,constant,SN_simple: gupta2016Computational
-SN_soma,nn,R_diffSensed,megaOhm,10,constant,SN_simple: user_defined
-SN_soma,nn,C_sensed,picoF,2,constant,SN_simple: user_defined
-SN_soma,nn,p_SK,dimensionless,4,constant,SN_simple: gupta2016Computational
-SN_soma,nn,Cai_init,millimolar,1e-4,constant,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease
-SN_soma,nn,Ca_mid_m_SK,millimolar,3e-4,constant,SN_simple: gupta2016Computational
-SN_soma,nn,B_Ca_init,millimolar,7.95,constant,SN_simple: user_defined
-SN_soma,nn,B_Ca_total,millimolar,8,constant,SN_simple: Matveev2002
-SN_soma,nn,k_bind_Ca,per_millimolar_s,0.1e6,constant,SN_simple: Matveev2002_was_0.5e6
-SN_soma,nn,k_unbind_Ca,per_s,8e3,constant,SN_simple: Matveev2002
-SN_soma,nn,k_bind_Ca_ER,per_millimolar_s,0.5e3,constant,SN_simple: user_defined
-SN_soma,nn,k_unbind_Ca_ER,per_s,8e3,constant,SN_simple: Matveev2002_for_k_unbind_Ca
-SN_soma,nn,Nai_init,millimolar,13,constant,SN_simple: BoronBoulpaep2017_was_15
-SN_soma,nn,Ki_init,millimolar,150,constant,SN_simple: BoronBoulpaep2017
-SN_soma,nn,g_Na,microS,2.3,constant,SN_simple: user_defined
-SN_soma,nn,g_Na_mod,dimensionless,1.0,constant,SN_simple: user_defined
-SN_soma,nn,g_Na1_6,microS,0.5,constant,SN_simple: user_defined
-SN_soma,nn,g_Na1_6_mod,dimensionless,1.0,constant,SN_simple: user_defined
-SN_soma,nn,Cm,picoF,30,constant,SN_simple: Davis2021Transcriptomic
-SN_soma,nn,p_Ca,m3_per_s,4e-14,constant,SN_simple: to_be_identified
-SN_soma,nn,g_Kv1_5,microS,8.8784938860e-02,constant,SN_simple: to_be_identified
-SN_soma,nn,g_Kv4_2,microS,0.1,constant,SN_simple: to_be_identified
-SN_soma,nn,g_Kv2,microS,0.0013333,constant,SN_simple: Davis2021Thesis_fit_to_curve
-SN_soma,nn,g_KCa_BK,microS,0.2,constant,SN_simple: was70microS_per_cm2_inKhaliq2003
-SN_soma,nn,g_KCa_SK,microS,5e-3,constant,SN_simple: to_be_identified
-SN_soma,nn,g_KCa_SK_mod,dimensionless,1.0,constant,SN_simple: to_be_identified
-SN_soma,nn,Vol,m3,2000.0e-18,constant,SN_simple: Wu2012Soma_Approx
-SN_soma,nn,Cao,millimolar,2,constant,SN_simple: Tau2011
-SN_soma,nn,Ko,millimolar,4.5,constant,SN_simple: BoronBoulpaep2017
-SN_soma,nn,Nao,millimolar,145,constant,SN_simple: BoronBoulpaep2017
-SN_soma,nn,g_M,microS,0.00389,constant,SN_simple: Davis2021ThesisCalculatedFromMaxCurrent
-SN_soma,nn,g_M_mod,dimensionless,1.0,constant,SN_simple: can_be_modified_for_retagabine
-SN_soma,nn,g_leak_Na,microS,0.0003,constant,SN_simple: to_be_identified
-SN_soma,nn,g_leak_K,microS,0.0001,constant,SN_simple: to_be_identified
-SN_soma,nn,delta_gM,microS,0.000,constant,SN_simple: to_be_identified
-SN_soma,nn,tau_w_num,millis,1200,constant,SN_simple: Martin2023Modelling_was_400
-SN_soma,nn,cAMP,dimensionless,0.01,constant,SN_simple: user_defined
-SN_soma,nn,I_in,nanoA,0.00,boundary_condition,SN_simple: user_defined
-SN_soma,nn,I_out,nanoA,TODO,boundary_condition,TODO
-SN_soma,nn,k_NaCa,nanoA,300,constant,SN_simple: to_be_identified
-SN_soma,nn,alpha_NaCa,dimensionless,1.2,constant,SN_simple: Paci_2013_decreased_for_SN
-SN_soma,nn,gamma_NaCa,dimensionless,0.35,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_soma,nn,Ksat,dimensionless,0.1,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_soma,nn,KmCa,millimolar,1.38,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_soma,nn,KmNai,millimolar,87.5,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_soma,nn,k_NaK,nanoA,0.4,constant,SN_simple: user_defined
-SN_soma,nn,Nai_mid_NaK,millimolar,40,constant,SN_simple: lindblad1996Model
-SN_soma,nn,Nai_power_NaK,dimensionless,1.5,constant,SN_simple: lindblad1996Model
-SN_soma,nn,Ko_mid_NaK,millimolar,1,constant,SN_simple: lindblad1996Model
-SN_soma,nn,Ca_ER_init,millimolar,0.6,constant,SN_simple: to_be_checked_in_neurons
-SN_soma,nn,K_mf,millimolar,0.1e-3,constant,SN_simple: Shannon2004Mathematical_was_0.246e-3
-SN_soma,nn,K_mr,millimolar,0.5,constant,SN_simple: Shannon2004Mathematical_was_1.7
-SN_soma,nn,k_SERCA,mol_per_s,3e-16,constant,SN_simple: to_be_identified
-SN_soma,nn,H_SERCA,dimensionless,1.787,constant,SN_simple: Shannon2004Mathematical
-SN_soma,nn,k_RyR,m3_per_s,150e-15,constant,SN_simple: to_be_identified
-SN_soma,nn,tau_c_RyR,millis,0.01,constant,SN_simple: user_defined
-SN_soma,nn,tau_hc_RyR,millis,10,constant,SN_simple: user_defined
-SN_soma,nn,Cai_RyR_mid,millimolar,8e-4,constant,SN_simple: user_defined
-SN_soma,nn,Cai_RyR_den,millimolar,1e-4,constant,SN_simple: user_defined
-SN_soma,nn,Ca_ER_RyR_mid,millimolar,0.5,constant,SN_simple: user_defined
-SN_soma,nn,Ca_ER_RyR_den,millimolar,0.03,constant,SN_simple: user_defined
-SN_soma,nn,Ca_ER_RyR_tau_mid,millimolar,0.3,constant,SN_simple: NOT_USED
-SN_soma,nn,Ca_ER_RyR_tau_den,millimolar,0.01,constant,SN_simple: NOT_USED
-SN_soma,nn,c_ER,dimensionless,0.01,constant,SN_simple: user_defined
-SN_soma,nn,c_SL,dimensionless,0.02,constant,SN_simple: user_defined_TO_BE_FOUND
-SN_soma,nn,k_IP3,m3_per_s,0.00,constant,SN_simple: user_defined_was_0.03e-15
-SN_soma,nn,k_leak_Ca,m3_per_s,0.1e-16,constant,SN_simple: user_defined
-SN_soma,nn,h_IP3_init,dimensionless,0.99,constant,SN_simple: user_defined
-SN_soma,nn,IP3,millimolar,200e-6,constant,SN_simple: Li1994Equations_from_plot
-SN_soma,nn,a_2,per_millimolar,200,constant,SN_simple: Li1994Equations
-SN_soma,nn,d_1,millimolar,0.13e-3,constant,SN_simple: Li1994Equations
-SN_soma,nn,d_2,millimolar,1.049e-3,constant,SN_simple: Li1994Equations
-SN_soma,nn,d_3,millimolar,0.943e-3,constant,SN_simple: Li1994Equations
-SN_soma,nn,d_5,millimolar,0.08234e-3,constant,SN_simple: Li1994Equations
-SN_soma,nn,D_Ca,m3_per_s,6e-12,constant,SN_simple: identified_by_hand
-SN_soma,nn,c_ER_pre,dimensionless,0.049,constant,SN_simple: user_defined
-SN_soma,nn,D_Ca_ER,m3_per_s,4.8e-15,constant,SN_simple: need_to_change_for_volume
-SN_varicosity,nn,V,milliV,TODO,boundary_condition,TODO
-SN_varicosity,nn,c_init,dimensionless,0.01,constant,SN_simple: Tau2011
-SN_varicosity,nn,hc_init,dimensionless,0.9,constant,SN_simple: Tau2011
-SN_varicosity,nn,V_mid_c,milliV,8.1,constant,SN_simple: Tau2011_was_8.1
-SN_varicosity,nn,V_den_c,milliV,5,constant,SN_simple: Tau2011_was_9.85
-SN_varicosity,nn,tau_c_min,millis,0.2,constant,SN_simple: changed_from_belluzi1991_curves
-SN_varicosity,nn,tau_c_max,millis,3.0,constant,SN_simple: changed_from_belluzi1991_curves
-SN_varicosity,nn,tau_hc,millis,20.0,constant,SN_simple: changed_from_belluzi1991_curves
-SN_varicosity,nn,Cai_init,millimolar,1e-4,constant,SN_simple: Hagiwara1981
-SN_varicosity,nn,B_Ca_init,millimolar,7.95,constant,SN_simple: user_defined
-SN_varicosity,nn,B_Ca_total,millimolar,8,constant,SN_simple: Matveev2002
-SN_varicosity,nn,k_bind_Ca,per_millimolar_s,0.1e6,constant,SN_simple: Matveev2002_was_0.5e6
-SN_varicosity,nn,k_unbind_Ca,per_s,8e3,constant,SN_simple: Matveev2002
-SN_varicosity,nn,k_bind_Ca_ER,per_millimolar_s,0.5e3,constant,SN_simple: user_defined
-SN_varicosity,nn,k_unbind_Ca_ER,per_s,8e3,constant,SN_simple: Matveev2002_for_k_unbind_Ca
-SN_varicosity,nn,Nai,millimolar,13,constant,SN_simple: BoronBoulpaep2017_was_15
-SN_varicosity,nn,Nao,millimolar,145,constant,SN_simple: BoronBoulpaep2017
-SN_varicosity,nn,NE_init,millimolar,0.0,constant,SN_simple: user_defined
-SN_varicosity,nn,Cai_NE_base,millimolar,1e-4,constant,SN_simple: user_defined
-SN_varicosity,nn,k_NE,per_s,200,constant,SN_simple: user_defined
-SN_varicosity,nn,k_NET,per_s,100,constant,SN_simple: user_defined
-SN_varicosity,nn,g_CaN,microS,1e-5,constant,SN_simple: to_be_identified
-SN_varicosity,nn,Vol,m3,1.0e-18,constant,SN_simple: bennet1998Sympathetic
-SN_varicosity,nn,Cao,millimolar,2,constant,SN_simple: Tau2011
-SN_varicosity,nn,cAMP,dimensionless,0.01,constant,SN_simple: user_defined
-SN_varicosity,nn,k_NaCa,nanoA,0.15,constant,SN_simple: to_be_identified
-SN_varicosity,nn,alpha_NaCa,dimensionless,1.2,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_varicosity,nn,gamma_NaCa,dimensionless,0.35,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_varicosity,nn,Ksat,dimensionless,0.1,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_varicosity,nn,KmCa,millimolar,1.38,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_varicosity,nn,KmNai,millimolar,87.5,constant,SN_simple: Paci_2013_CHECK_FOR_SN
-SN_varicosity,nn,Ca_ER_init,millimolar,0.6,constant,SN_simple: to_be_checked_in_neurons
-SN_varicosity,nn,K_mf,millimolar,0.1e-3,constant,SN_simple: Shannon2004Mathematical_was_0.246e-3
-SN_varicosity,nn,K_mr,millimolar,0.5,constant,SN_simple: Shannon2004Mathematical
-SN_varicosity,nn,k_SERCA,mol_per_s,1.5e-19,constant,SN_simple: to_be_identified
-SN_varicosity,nn,H_SERCA,dimensionless,1.787,constant,SN_simple: Shannon2004Mathematical
-SN_varicosity,nn,tau_c_RyR,millis,0.01,constant,SN_simple: user_defined
-SN_varicosity,nn,tau_hc_RyR,millis,10,constant,SN_simple: user_defined
-SN_varicosity,nn,k_RyR,m3_per_s,75e-18,constant,SN_simple: to_be_identified
-SN_varicosity,nn,Cai_RyR_mid,millimolar,8e-4,constant,SN_simple: user_defined
-SN_varicosity,nn,Cai_RyR_den,millimolar,1e-4,constant,SN_simple: user_defined
-SN_varicosity,nn,Ca_ER_RyR_mid,millimolar,0.5,constant,SN_simple: user_defined
-SN_varicosity,nn,Ca_ER_RyR_den,millimolar,0.03,constant,SN_simple: user_defined
-SN_varicosity,nn,Ca_ER_RyR_tau_mid,millimolar,0.3,constant,SN_simple: NOT_USED
-SN_varicosity,nn,Ca_ER_RyR_tau_den,millimolar,0.01,constant,SN_simple: NOT_USED
-SN_varicosity,nn,k_IP3,m3_per_s,0.0,constant,SN_simple: user_defined
-SN_varicosity,nn,k_leak_Ca,m3_per_s,2e-20,constant,SN_simple: user_defined
-SN_varicosity,nn,h_IP3_init,dimensionless,0.99,constant,SN_simple: user_defined
-SN_varicosity,nn,IP3,millimolar,200e-6,constant,SN_simple: Li1994Equations_from_plot
-SN_varicosity,nn,a_2,per_millimolar,200,constant,SN_simple: Li1994Equations
-SN_varicosity,nn,d_1,millimolar,0.13e-3,constant,SN_simple: Li1994Equations
-SN_varicosity,nn,d_2,millimolar,1.049e-3,constant,SN_simple: Li1994Equations
-SN_varicosity,nn,d_3,millimolar,0.943e-3,constant,SN_simple: Li1994Equations
-SN_varicosity,nn,d_5,millimolar,0.08234e-3,constant,SN_simple: Li1994Equations
-SN_varicosity,nn,c_ER,dimensionless,0.01,constant,SN_simple: Li1994Equations_was_0.185
-SN_varicosity,nn,c_SL,dimensionless,0.02,constant,SN_simple: user_defined_TO_BE_FOUND
-SN_varicosity,nn,D_Ca,m3_per_s,3e-15,constant,SN_simple: identified_by_hand
-SN_varicosity,nn,c_ER_pre,dimensionless,0.049,constant,SN_simple: user_defined
-SN_varicosity,nn,D_Ca_ER,m3_per_s,2.4e-18,constant,SN_simple: need_to_change_for_volume
-SN_axon,nn,channel_ratio,dimensionless,0.5,constant,SN_simple: user_defined
-SN_axon,nn,C,picoF,10.0,constant,SN_simple: to_be_determined
-SN_axon,nn,R,megaOhm,300.0,constant,SN_simple: to_be_determined
-SN_axon,nn,V_in,milliV,TODO,boundary_condition,TODO
-SN_axon,nn,V_rest_approx,milliV,-70,constant,SN_simple: user_defined
-global,,Vc,microm3,TODO,global_constant,TODO
-global,,V_SR,microm3,TODO,global_constant,TODO
-global,,F,C_per_M,96485,global_constant,SN_simple: known
-global,,Cm,farad,TODO,global_constant,TODO
-global,,R,J_per_MK,8.314,global_constant,SN_simple: known
-global,,T,kelvin,310.15,global_constant,SN_simple: Tao2011
-global,,Nao,millimolar,TODO,global_constant,TODO
-global,,Cao,millimolar,TODO,global_constant,TODO
-global,,Ki,millimolar,TODO,global_constant,TODO
-global,,Ko,millimolar,TODO,global_constant,TODO
-global,,N_avo,per_mol,6.02e23,global_constant,SN_simple: known
+vessel_type,BC_type,variable_name,units,value,kind,data_reference,sourced,verified_min,verified_max,validated_min,validated_max
+myocyte_membrane_voltage,nn,Vm_init,volt,TODO,constant,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_CaL,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_K1,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_f,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_Na,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_Kr,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_Ks,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_to,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_PCa,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_NaK,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_NaCa,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_b_Ca,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_b_Na,A_per_F,TODO,boundary_condition,TODO,no,,,,
+myocyte_membrane_voltage,nn,i_stim,A_per_F,TODO,boundary_condition,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,Vm_init,milliV,TODO,constant,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,i_Ca,nanoA,TODO,boundary_condition,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,i_Na,nanoA,TODO,boundary_condition,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,i_A,nanoA,TODO,boundary_condition,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,i_KV,nanoA,TODO,boundary_condition,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,i_KCa,nanoA,TODO,boundary_condition,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,i_stim,nanoA,TODO,boundary_condition,TODO,no,,,,
+sympathetic_neuron_membrane_voltage,nn,C_m,picoF,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Cai_init,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Ca_SR_init,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,g_init,dimensionless,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,i_CaL,A_per_F,TODO,boundary_condition,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,i_PCa,A_per_F,TODO,boundary_condition,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,i_b_Ca,A_per_F,TODO,boundary_condition,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,i_NaCa,A_per_F,TODO,boundary_condition,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Vm,dimensionless,TODO,boundary_condition,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,a_rel,millimolar_per_s,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,b_rel,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,c_rel,millimolar_per_s,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,tau_g,second,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Kup,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Buf_C,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Buf_SR,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Kbuf_C,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,Kbuf_SR,millimolar,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,VmaxUp,millimolar_per_s,TODO,constant,TODO,no,,,,
+Ca_dynamics_Paci_2013,nn,V_leak,per_s,TODO,constant,TODO,no,,,,
+electric_potentials_Paci_2013,nn,Nai,millimolar,TODO,boundary_condition,TODO,no,,,,
+electric_potentials_Paci_2013,nn,Cai,millimolar,TODO,boundary_condition,TODO,no,,,,
+electric_potentials_Paci_2013,nn,PkNa,dimensionless,TODO,constant,TODO,no,,,,
+Na_dynamics_Paci_2013,nn,Nai_init,millimolar,TODO,constant,TODO,no,,,,
+Na_dynamics_Paci_2013,nn,i_Na,A_per_F,TODO,boundary_condition,TODO,no,,,,
+Na_dynamics_Paci_2013,nn,i_b_Na,A_per_F,TODO,boundary_condition,TODO,no,,,,
+Na_dynamics_Paci_2013,nn,i_NaK,A_per_F,TODO,boundary_condition,TODO,no,,,,
+Na_dynamics_Paci_2013,nn,i_NaCa,A_per_F,TODO,boundary_condition,TODO,no,,,,
+NE_release_Tao_2011,nn,i_Ca,nanoA,TODO,boundary_condition,TODO,no,,,,
+NE_release_Tao_2011,nn,K_off,per_s,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,K_on,m3_per_millimol_s,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,K_Ca,per_s,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,b,dimensionless,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,gamma,m3_per_M_millis,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,C_m,picoF,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,V_Z,litre,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,a,dimensionless,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,n,dimensionless,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,V_cleft,litre,TODO,constant,TODO,no,,,,
+NE_release_Tao_2011,nn,P_up,per_millis,TODO,constant,TODO,no,,,,
+SN_soma,nn,V_rest_approx,milliV,-70,constant,SN_simple: Davis2021Thesis_from_traces,yes,,,,
+SN_soma,nn,h_BK_min,dimensionless,0.085,constant,SN_simple: Khaliq2003Contribution,yes,,,,
+SN_soma,nn,z_BK_coeff,millimolar,0.001,constant,SN_simple: Khaliq2003Contribution,yes,,,,
+SN_soma,nn,V_mid_m,milliV,20,constant,SN_simple: Belluzi1991_was_36,yes,,,,
+SN_soma,nn,V_mid_h,milliV,40,constant,SN_simple: Belluzi1991_was_53.2,yes,,,,
+SN_soma,nn,V_den_m,milliV,6,constant,SN_simple: Belluzi1991_was_7.2,yes,,,,
+SN_soma,nn,V_den_h,milliV,4.0,constant,SN_simple: Belluzi1991_was_6.5,yes,,,,
+SN_soma,nn,V_mid_m_Na1_6,milliV,36,constant,SN_simple: Belluzi1991_was_36,yes,,,,
+SN_soma,nn,V_mid_h_Na1_6,milliV,53.2,constant,SN_simple: Belluzi1991_was_53.2,yes,,,,
+SN_soma,nn,V_den_m_Na1_6,milliV,8.0,constant,SN_simple: Belluzi1991_was_7.2,yes,,,,
+SN_soma,nn,V_den_h_Na1_6,milliV,8.0,constant,SN_simple: Belluzi1991_was_6.5,yes,,,,
+SN_soma,nn,V_mid_c,milliV,8.1,constant,SN_simple: Tau2011_was_8.1,yes,,,,
+SN_soma,nn,V_den_c,milliV,5,constant,SN_simple: Tau2011_was_9.85,yes,,,,
+SN_soma,nn,V_mid_m_Kv1_5,milliV,6.0,constant,SN_simple: Philipson1991-channelpedia,yes,,,,
+SN_soma,nn,V_den_m_Kv1_5,milliV,6.4,constant,SN_simple: Philipson1991-channelpedia,yes,,,,
+SN_soma,nn,V_mid_h_Kv1_5,milliV,25.3,constant,SN_simple: Philipson1991-channelpedia,yes,,,,
+SN_soma,nn,V_den_h_Kv1_5,milliV,3.5,constant,SN_simple: Philipson1991-channelpedia,yes,,,,
+SN_soma,nn,V_mid_m_Kv4_2,milliV,18.8,constant,SN_simple: Bekkers2000-channelpedia,yes,,,,
+SN_soma,nn,V_den_m_Kv4_2,milliV,16.6,constant,SN_simple: Bekkers2000-channelpedia,yes,,,,
+SN_soma,nn,V_mid_h_Kv4_2,milliV,81.6,constant,SN_simple: Bekkers2000-channelpedia,yes,,,,
+SN_soma,nn,V_den_h_Kv4_2,milliV,6.7,constant,SN_simple: Bekkers2000-channelpedia,yes,,,,
+SN_soma,nn,V_mid_m_Kv2,milliV,6,constant,SN_simple: Tau2011_was_6,yes,,,,
+SN_soma,nn,V_den_m_Kv2,milliV,8,constant,SN_simple: Tau2011_was_8,yes,,,,
+SN_soma,nn,V_mid_w,milliV,35,constant,SN_simple: Martin2023_was_35,yes,,,,
+SN_soma,nn,Delta_V_mid_w,milliV,0,constant,SN_simple: for_drug_control,yes,,,,
+SN_soma,nn,V_den_w,milliV,10,constant,SN_simple: Martin2023_was_10,yes,,,,
+SN_soma,nn,V_den_m_BK,milliV,6.2,constant,SN_simple: khaliq2003Contribution,yes,,,,
+SN_soma,nn,V_mid_h_BK,milliV,26,constant,SN_simple: khaliq2003Contribution_was_32,yes,,,,
+SN_soma,nn,V_den_h_BK,milliV,5.8,constant,SN_simple: khaliq2003Contribution,yes,,,,
+SN_soma,nn,k_thresh_m,milliV,0,constant,SN_simple: user_defined_removed_dependence_was_15,yes,,,,
+SN_soma,nn,k_thresh_h,milliV,0,constant,SN_simple: user_defined_removed_dependence,yes,,,,
+SN_soma,nn,tau_h_min,millis,0.15,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,tau_h_max,millis,5,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,tau_h_Na1_6_min,millis,0.15,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,tau_h_Na1_6_max,millis,300,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,tau_w_min,millis,30,constant,SN_simple: gupta2016Computational,yes,,,,
+SN_soma,nn,tau_c_min,millis,0.2,constant,SN_simple: changed_from_belluzi1991_curves,yes,,,,
+SN_soma,nn,tau_c_max,millis,3.0,constant,SN_simple: changed_from_belluzi1991_curves,yes,,,,
+SN_soma,nn,tau_hc,millis,20.0,constant,SN_simple: changed_from_belluzi1991_curves,yes,,,,
+SN_soma,nn,tau_h_Kv4_2,millis,7.0,constant,SN_simple: was_approx_7,yes,,,,
+SN_soma,nn,tau_z_BK,millis,5,constant,SN_simple: khaliq2003Contribution,yes,,,,
+SN_soma,nn,tau_m_SK,millis,5,constant,SN_simple: gupta2016Computational,yes,,,,
+SN_soma,nn,R_diffSensed,megaOhm,10,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,C_sensed,picoF,2,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,p_SK,dimensionless,4,constant,SN_simple: gupta2016Computational,yes,,,,
+SN_soma,nn,Cai_init,millimolar,1e-4,constant,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes,,,,
+SN_soma,nn,Ca_mid_m_SK,millimolar,3e-4,constant,SN_simple: gupta2016Computational,yes,,,,
+SN_soma,nn,B_Ca_init,millimolar,7.95,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,B_Ca_total,millimolar,8,constant,SN_simple: Matveev2002,yes,,,,
+SN_soma,nn,k_bind_Ca,per_millimolar_s,0.1e6,constant,SN_simple: Matveev2002_was_0.5e6,yes,,,,
+SN_soma,nn,k_unbind_Ca,per_s,8e3,constant,SN_simple: Matveev2002,yes,,,,
+SN_soma,nn,k_bind_Ca_ER,per_millimolar_s,0.5e3,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,k_unbind_Ca_ER,per_s,8e3,constant,SN_simple: Matveev2002_for_k_unbind_Ca,yes,,,,
+SN_soma,nn,Nai_init,millimolar,13,constant,SN_simple: BoronBoulpaep2017_was_15,yes,,,,
+SN_soma,nn,Ki_init,millimolar,150,constant,SN_simple: BoronBoulpaep2017,yes,,,,
+SN_soma,nn,g_Na,microS,2.3,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,g_Na_mod,dimensionless,1.0,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,g_Na1_6,microS,0.5,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,g_Na1_6_mod,dimensionless,1.0,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,Cm,picoF,30,constant,SN_simple: Davis2021Transcriptomic,yes,,,,
+SN_soma,nn,p_Ca,m3_per_s,4e-14,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,g_Kv1_5,microS,8.8784938860e-02,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,g_Kv4_2,microS,0.1,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,g_Kv2,microS,0.0013333,constant,SN_simple: Davis2021Thesis_fit_to_curve,yes,,,,
+SN_soma,nn,g_KCa_BK,microS,0.2,constant,SN_simple: was70microS_per_cm2_inKhaliq2003,yes,,,,
+SN_soma,nn,g_KCa_SK,microS,5e-3,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,g_KCa_SK_mod,dimensionless,1.0,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,Vol,m3,2000.0e-18,constant,SN_simple: Wu2012Soma_Approx,yes,,,,
+SN_soma,nn,Cao,millimolar,2,constant,SN_simple: Tau2011,yes,,,,
+SN_soma,nn,Ko,millimolar,4.5,constant,SN_simple: BoronBoulpaep2017,yes,,,,
+SN_soma,nn,Nao,millimolar,145,constant,SN_simple: BoronBoulpaep2017,yes,,,,
+SN_soma,nn,g_M,microS,0.00389,constant,SN_simple: Davis2021ThesisCalculatedFromMaxCurrent,yes,,,,
+SN_soma,nn,g_M_mod,dimensionless,1.0,constant,SN_simple: can_be_modified_for_retagabine,yes,,,,
+SN_soma,nn,g_leak_Na,microS,0.0003,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,g_leak_K,microS,0.0001,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,delta_gM,microS,0.000,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,tau_w_num,millis,1200,constant,SN_simple: Martin2023Modelling_was_400,yes,,,,
+SN_soma,nn,cAMP,dimensionless,0.01,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,I_in,nanoA,0.00,boundary_condition,SN_simple: user_defined,no,,,,
+SN_soma,nn,I_out,nanoA,TODO,boundary_condition,TODO,no,,,,
+SN_soma,nn,k_NaCa,nanoA,300,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,alpha_NaCa,dimensionless,1.2,constant,SN_simple: Paci_2013_decreased_for_SN,yes,,,,
+SN_soma,nn,gamma_NaCa,dimensionless,0.35,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_soma,nn,Ksat,dimensionless,0.1,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_soma,nn,KmCa,millimolar,1.38,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_soma,nn,KmNai,millimolar,87.5,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_soma,nn,k_NaK,nanoA,0.4,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,Nai_mid_NaK,millimolar,40,constant,SN_simple: lindblad1996Model,yes,,,,
+SN_soma,nn,Nai_power_NaK,dimensionless,1.5,constant,SN_simple: lindblad1996Model,yes,,,,
+SN_soma,nn,Ko_mid_NaK,millimolar,1,constant,SN_simple: lindblad1996Model,yes,,,,
+SN_soma,nn,Ca_ER_init,millimolar,0.6,constant,SN_simple: to_be_checked_in_neurons,yes,,,,
+SN_soma,nn,K_mf,millimolar,0.1e-3,constant,SN_simple: Shannon2004Mathematical_was_0.246e-3,yes,,,,
+SN_soma,nn,K_mr,millimolar,0.5,constant,SN_simple: Shannon2004Mathematical_was_1.7,yes,,,,
+SN_soma,nn,k_SERCA,mol_per_s,3e-16,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,H_SERCA,dimensionless,1.787,constant,SN_simple: Shannon2004Mathematical,yes,,,,
+SN_soma,nn,k_RyR,m3_per_s,150e-15,constant,SN_simple: to_be_identified,yes,,,,
+SN_soma,nn,tau_c_RyR,millis,0.01,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,tau_hc_RyR,millis,10,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,Cai_RyR_mid,millimolar,8e-4,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,Cai_RyR_den,millimolar,1e-4,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,Ca_ER_RyR_mid,millimolar,0.5,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,Ca_ER_RyR_den,millimolar,0.03,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,Ca_ER_RyR_tau_mid,millimolar,0.3,constant,SN_simple: NOT_USED,yes,,,,
+SN_soma,nn,Ca_ER_RyR_tau_den,millimolar,0.01,constant,SN_simple: NOT_USED,yes,,,,
+SN_soma,nn,c_ER,dimensionless,0.01,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,c_SL,dimensionless,0.02,constant,SN_simple: user_defined_TO_BE_FOUND,yes,,,,
+SN_soma,nn,k_IP3,m3_per_s,0.00,constant,SN_simple: user_defined_was_0.03e-15,yes,,,,
+SN_soma,nn,k_leak_Ca,m3_per_s,0.1e-16,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,h_IP3_init,dimensionless,0.99,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,IP3,millimolar,200e-6,constant,SN_simple: Li1994Equations_from_plot,yes,,,,
+SN_soma,nn,a_2,per_millimolar,200,constant,SN_simple: Li1994Equations,yes,,,,
+SN_soma,nn,d_1,millimolar,0.13e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_soma,nn,d_2,millimolar,1.049e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_soma,nn,d_3,millimolar,0.943e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_soma,nn,d_5,millimolar,0.08234e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_soma,nn,D_Ca,m3_per_s,6e-12,constant,SN_simple: identified_by_hand,yes,,,,
+SN_soma,nn,c_ER_pre,dimensionless,0.049,constant,SN_simple: user_defined,no,,,,
+SN_soma,nn,D_Ca_ER,m3_per_s,4.8e-15,constant,SN_simple: need_to_change_for_volume,yes,,,,
+SN_varicosity,nn,V,milliV,TODO,boundary_condition,TODO,no,,,,
+SN_varicosity,nn,c_init,dimensionless,0.01,constant,SN_simple: Tau2011,yes,,,,
+SN_varicosity,nn,hc_init,dimensionless,0.9,constant,SN_simple: Tau2011,yes,,,,
+SN_varicosity,nn,V_mid_c,milliV,8.1,constant,SN_simple: Tau2011_was_8.1,yes,,,,
+SN_varicosity,nn,V_den_c,milliV,5,constant,SN_simple: Tau2011_was_9.85,yes,,,,
+SN_varicosity,nn,tau_c_min,millis,0.2,constant,SN_simple: changed_from_belluzi1991_curves,yes,,,,
+SN_varicosity,nn,tau_c_max,millis,3.0,constant,SN_simple: changed_from_belluzi1991_curves,yes,,,,
+SN_varicosity,nn,tau_hc,millis,20.0,constant,SN_simple: changed_from_belluzi1991_curves,yes,,,,
+SN_varicosity,nn,Cai_init,millimolar,1e-4,constant,SN_simple: Hagiwara1981,yes,,,,
+SN_varicosity,nn,B_Ca_init,millimolar,7.95,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,B_Ca_total,millimolar,8,constant,SN_simple: Matveev2002,yes,,,,
+SN_varicosity,nn,k_bind_Ca,per_millimolar_s,0.1e6,constant,SN_simple: Matveev2002_was_0.5e6,yes,,,,
+SN_varicosity,nn,k_unbind_Ca,per_s,8e3,constant,SN_simple: Matveev2002,yes,,,,
+SN_varicosity,nn,k_bind_Ca_ER,per_millimolar_s,0.5e3,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,k_unbind_Ca_ER,per_s,8e3,constant,SN_simple: Matveev2002_for_k_unbind_Ca,yes,,,,
+SN_varicosity,nn,Nai,millimolar,13,constant,SN_simple: BoronBoulpaep2017_was_15,yes,,,,
+SN_varicosity,nn,Nao,millimolar,145,constant,SN_simple: BoronBoulpaep2017,yes,,,,
+SN_varicosity,nn,NE_init,millimolar,0.0,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,Cai_NE_base,millimolar,1e-4,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,k_NE,per_s,200,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,k_NET,per_s,100,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,g_CaN,microS,1e-5,constant,SN_simple: to_be_identified,yes,,,,
+SN_varicosity,nn,Vol,m3,1.0e-18,constant,SN_simple: bennet1998Sympathetic,yes,,,,
+SN_varicosity,nn,Cao,millimolar,2,constant,SN_simple: Tau2011,yes,,,,
+SN_varicosity,nn,cAMP,dimensionless,0.01,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,k_NaCa,nanoA,0.15,constant,SN_simple: to_be_identified,yes,,,,
+SN_varicosity,nn,alpha_NaCa,dimensionless,1.2,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_varicosity,nn,gamma_NaCa,dimensionless,0.35,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_varicosity,nn,Ksat,dimensionless,0.1,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_varicosity,nn,KmCa,millimolar,1.38,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_varicosity,nn,KmNai,millimolar,87.5,constant,SN_simple: Paci_2013_CHECK_FOR_SN,yes,,,,
+SN_varicosity,nn,Ca_ER_init,millimolar,0.6,constant,SN_simple: to_be_checked_in_neurons,yes,,,,
+SN_varicosity,nn,K_mf,millimolar,0.1e-3,constant,SN_simple: Shannon2004Mathematical_was_0.246e-3,yes,,,,
+SN_varicosity,nn,K_mr,millimolar,0.5,constant,SN_simple: Shannon2004Mathematical,yes,,,,
+SN_varicosity,nn,k_SERCA,mol_per_s,1.5e-19,constant,SN_simple: to_be_identified,yes,,,,
+SN_varicosity,nn,H_SERCA,dimensionless,1.787,constant,SN_simple: Shannon2004Mathematical,yes,,,,
+SN_varicosity,nn,tau_c_RyR,millis,0.01,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,tau_hc_RyR,millis,10,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,k_RyR,m3_per_s,75e-18,constant,SN_simple: to_be_identified,yes,,,,
+SN_varicosity,nn,Cai_RyR_mid,millimolar,8e-4,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,Cai_RyR_den,millimolar,1e-4,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,Ca_ER_RyR_mid,millimolar,0.5,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,Ca_ER_RyR_den,millimolar,0.03,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,Ca_ER_RyR_tau_mid,millimolar,0.3,constant,SN_simple: NOT_USED,yes,,,,
+SN_varicosity,nn,Ca_ER_RyR_tau_den,millimolar,0.01,constant,SN_simple: NOT_USED,yes,,,,
+SN_varicosity,nn,k_IP3,m3_per_s,0.0,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,k_leak_Ca,m3_per_s,2e-20,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,h_IP3_init,dimensionless,0.99,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,IP3,millimolar,200e-6,constant,SN_simple: Li1994Equations_from_plot,yes,,,,
+SN_varicosity,nn,a_2,per_millimolar,200,constant,SN_simple: Li1994Equations,yes,,,,
+SN_varicosity,nn,d_1,millimolar,0.13e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_varicosity,nn,d_2,millimolar,1.049e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_varicosity,nn,d_3,millimolar,0.943e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_varicosity,nn,d_5,millimolar,0.08234e-3,constant,SN_simple: Li1994Equations,yes,,,,
+SN_varicosity,nn,c_ER,dimensionless,0.01,constant,SN_simple: Li1994Equations_was_0.185,yes,,,,
+SN_varicosity,nn,c_SL,dimensionless,0.02,constant,SN_simple: user_defined_TO_BE_FOUND,yes,,,,
+SN_varicosity,nn,D_Ca,m3_per_s,3e-15,constant,SN_simple: identified_by_hand,yes,,,,
+SN_varicosity,nn,c_ER_pre,dimensionless,0.049,constant,SN_simple: user_defined,no,,,,
+SN_varicosity,nn,D_Ca_ER,m3_per_s,2.4e-18,constant,SN_simple: need_to_change_for_volume,yes,,,,
+SN_axon,nn,channel_ratio,dimensionless,0.5,constant,SN_simple: user_defined,no,,,,
+SN_axon,nn,C,picoF,10.0,constant,SN_simple: to_be_determined,yes,,,,
+SN_axon,nn,R,megaOhm,300.0,constant,SN_simple: to_be_determined,yes,,,,
+SN_axon,nn,V_in,milliV,TODO,boundary_condition,TODO,no,,,,
+SN_axon,nn,V_rest_approx,milliV,-70,constant,SN_simple: user_defined,no,,,,
+global,,Vc,microm3,TODO,global_constant,TODO,no,,,,
+global,,V_SR,microm3,TODO,global_constant,TODO,no,,,,
+global,,F,C_per_M,96485,global_constant,SN_simple: known,no,,,,
+global,,Cm,farad,TODO,global_constant,TODO,no,,,,
+global,,R,J_per_MK,8.314,global_constant,SN_simple: known,no,,,,
+global,,T,kelvin,310.15,global_constant,SN_simple: Tao2011,yes,,,,
+global,,Nao,millimolar,TODO,global_constant,TODO,no,,,,
+global,,Cao,millimolar,TODO,global_constant,TODO,no,,,,
+global,,Ki,millimolar,TODO,global_constant,TODO,no,,,,
+global,,Ko,millimolar,TODO,global_constant,TODO,no,,,,
+global,,N_avo,per_mol,6.02e23,global_constant,SN_simple: known,no,,,,

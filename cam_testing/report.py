@@ -110,6 +110,7 @@ def component_context(component):
             'initial': cv[2] if cv else None,
             'value': p.value if p else None, 'todo': bool(p and p.is_todo),
             'reference': p.data_reference if p else '',
+            'sourced': p.is_sourced if p else None,
             'verified': ranges.recorded_range(p, 'verified') if p else None,
             'validated': ranges.recorded_range(p, 'validated') if p else None,
         })
@@ -139,7 +140,7 @@ def component_context(component):
         'skip': component.spec.get('skip'), 'notes': component.spec.get('notes'),
         'equations': equations, 'unsupported': sorted(unsupported),
         'ports': _ports(component.config), 'variables': variables,
-        'todo': component.todo_parameters(), 'invariants': component.spec.get('invariants') or [],
+        'todo': component.todo_parameters(), 'unsourced': component.unsourced_parameters(), 'invariants': component.spec.get('invariants') or [],
         'validation': component.spec.get('validation') or {},
         'tests': tests,
     }
@@ -180,6 +181,8 @@ def module_context(name):
     components = [component_context(c) for c in module.components()]
     return {
         'name': name, 'reviewed': module.reviewed, 'components': components,
+        'all_sourced': module.all_sourced(),
+        'n_sourced': sum(p.is_sourced for p in module.parameters), 'n_parameters': len(module.parameters),
         'counts': _status_counts(components), 'structure': _structure(module),
         'max_risk': max((c['risk']['failure_probability'] for c in components if c['risk']), default=None),
         'known_issues': module.spec.get('known_issues') or [],
@@ -200,7 +203,9 @@ def build_module(name):
 def build_index(contexts, out_path, module_href):
     rows = [{'name': c['name'], 'href': module_href(c['name']), 'n_components': len(c['components']),
              'counts': c['counts'], 'reviewed': c['reviewed'],
-             'known_issues': len(c['known_issues']), 'max_risk': c.get('max_risk')} for c in contexts]
+             'known_issues': len(c['known_issues']), 'max_risk': c.get('max_risk'),
+             'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters']}
+            for c in contexts]
     totals = {k: sum(r['counts'].get(k, 0) for r in rows) for k in ('passed', 'failed', 'skipped', 'pending', None)}
     html_text = _env().get_template('index.html').render(
         rows=rows, totals=totals, generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),

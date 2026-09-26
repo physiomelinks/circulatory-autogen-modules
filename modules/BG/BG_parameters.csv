@@ -1,1128 +1,1128 @@
-vessel_type,BC_type,variable_name,units,value,kind,data_reference
-arterial_simple,vp,q_0,m3,0,constant,3compartment_extra_ops: user_defined_TO_DO
-arterial_simple,vp,R,Js_per_m6,10664000,constant,3compartment_extra_ops: Blanco_2013_Table_8
-arterial_simple,vp,C,m6_per_J,3.09077E-10,constant,3compartment_extra_ops: to_be_identified
-arterial_simple,vp,I,Js2_per_m6,0.000001,constant,3compartment_extra_ops: Blanco_2013_Table_8
-arterial_simple,vp,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined
-arterial_simple,vp,u_0,J_per_m3,1463,constant,3compartment_extra_ops: Mynard&Smolich_2015_assumedRefOf11mmHg
-arterial_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,vp,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial_simple,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-arterial_simple,vp_nonlinear,q_init,m3,TODO,constant,TODO
-arterial_simple,vp_nonlinear,q_0,m3,TODO,constant,TODO
-arterial_simple,vp_nonlinear,R,Js_per_m6,TODO,constant,TODO
-arterial_simple,vp_nonlinear,K_tube,J_per_m3,TODO,constant,TODO
-arterial_simple,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-arterial_simple,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-arterial_simple,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,vp_nonlinear,I,Js2_per_m6,TODO,constant,TODO
-arterial_simple,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,vp_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vp,E,J_per_m3,1,constant,test_fft: test
-arterial,vp,l,metre,1,constant,test_fft: test
-arterial,vp,r_0,metre,1,constant,test_fft: test
-arterial,vp,u_0,J_per_m3,1,constant,test_fft: test
-arterial,vp,u_ext,J_per_m3,1,boundary_condition,test_fft: test
-arterial,vp,theta,dimensionless,1,constant,test_fft: test
-arterial,vp,u_out,J_per_m3,1,boundary_condition,test_fft: test
-arterial,vp,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial_simple,pv,q_0,m3,TODO,constant,TODO
-arterial_simple,pv,R,Js_per_m6,TODO,constant,TODO
-arterial_simple,pv,C,m6_per_J,TODO,constant,TODO
-arterial_simple,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,pv,u_0,J_per_m3,TODO,constant,TODO
-arterial_simple,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,pv,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial_simple,pv,I,Js2_per_m6,TODO,constant,TODO
-arterial,pv,E,J_per_m3,400000,constant,FinalModel: ADAN_86
-arterial,pv,l,metre,0.0432111,constant,FinalModel: ADAN_86
-arterial,pv,r_0,metre,0.0117401,constant,FinalModel: ADAN_86
-arterial,pv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg
-arterial,pv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen
-arterial,pv,theta,dimensionless,90,constant,FinalModel: defined_by_user
-arterial,pv,u_in,J_per_m3,9332.5666,boundary_condition,aortic_bif_hybrid_V2: WONT_BE_USED
-arterial,pv,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial_simple,pp,q_0,m3,TODO,constant,TODO
-arterial_simple,pp,R,Js_per_m6,TODO,constant,TODO
-arterial_simple,pp,C,m6_per_J,TODO,constant,TODO
-arterial_simple,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,pp,u_0,J_per_m3,TODO,constant,TODO
-arterial_simple,pp,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,pp,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,pp,I,Js2_per_m6,TODO,constant,TODO
-arterial_simple_novisco,pp,q_0,m3,TODO,constant,TODO
-arterial_simple_novisco,pp,R,Js_per_m6,TODO,constant,TODO
-arterial_simple_novisco,pp,Rp,Js_per_m6,TODO,constant,TODO
-arterial_simple_novisco,pp,fracR,dimensionless,TODO,constant,TODO
-arterial_simple_novisco,pp,C,m6_per_J,TODO,constant,TODO
-arterial_simple_novisco,pp,I,Js2_per_m6,TODO,constant,TODO
-arterial_simple_novisco,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple_novisco,pp,u_0,J_per_m3,TODO,constant,TODO
-arterial_simple_novisco,pp,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple_novisco,pp,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp,E,J_per_m3,1600000,constant,FinalModel: ADAN_218
-arterial,pp,l,metre,0.0105951,constant,FinalModel: ADAN_218
-arterial,pp,r_0,metre,0.000965045,constant,FinalModel: ADAN_218
-arterial,pp,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg
-arterial,pp,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen
-arterial,pp,theta,dimensionless,90,constant,FinalModel: defined_by_user
-arterial,pp,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial_simple,vv,q_0,m3,0.00000694,constant,3compartment_extra_ops: Mynard&Smolich_2015
-arterial_simple,vv,R,Js_per_m6,1000000,constant,3compartment_extra_ops: to_be_identified
-arterial_simple,vv,C,m6_per_J,0.000000012028,constant,3compartment_extra_ops: to_be_identified
-arterial_simple,vv,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined
-arterial_simple,vv,I,Js2_per_m6,10000,constant,3compartment_extra_ops: to_be_identified
-arterial_simple,vv,u_0,J_per_m3,13300,constant,3compartment_extra_ops: Mynard&Smolich_2015_assumedRefOf100mmHg
-arterial_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-rigid_vessel,vv,R,Js_per_m6,TODO,constant,TODO
-rigid_vessel,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-rigid_vessel,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv,E,J_per_m3,400000,constant,FinalModel: ADAN_86
-arterial,vv,l,metre,0.014796,constant,FinalModel: ADAN_86
-arterial,vv,r_0,metre,0.0145305,constant,FinalModel: ADAN_86
-arterial,vv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg
-arterial,vv,theta,dimensionless,0,constant,FinalModel: defined_by_user
-arterial,vv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen
-arterial,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-terminal,pp,R_T,Js_per_m6,110000000,constant,3compartment_extra_ops: calculated_from_mean_P_and_v
-terminal,pp,C_T,m6_per_J,0.0000001,constant,3compartment_extra_ops: calculated_from_approx_P_and_q
-terminal,pp,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined
-terminal,pp,u_in,J_per_m3,9332.5666,boundary_condition,aortic_bif_hybrid_V1: WONT_BE_USED
-terminal,pp,u_out,J_per_m3,0,boundary_condition,aortic_bif_hybrid_V1: user_defined
-terminal,pp,q_us,m3,0.00245,constant,3compartment_extra_ops: user_defined_70%Of3.5LVenousTotBloodVolume
-terminal,pp,q_init,m3,0.00245,constant,3compartment_extra_ops: user_defined_70%Of3.5LVenousTotBloodVolume
-terminal,pp_spec_I,R_T,Js_per_m6,110000000,constant,3compartment_nonstiff: calculated_from_mean_P_and_v
-terminal,pp_spec_I,C_T,m6_per_J,0.0000001,constant,3compartment_nonstiff: calculated_from_approx_P_and_q
-terminal,pp_spec_I,I_T,Js2_per_m6,10,constant,3compartment_nonstiff: temp
-terminal,pp_spec_I,u_ext,J_per_m3,0,boundary_condition,3compartment_nonstiff: user_defined
-terminal,pp_spec_I,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_spec_I,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_spec_I,q_us,m3,0.00245,constant,3compartment_nonstiff: user_defined_70%Of3.5LVenousTotBloodVolume
-terminal,pp_spec_I,q_init,m3,0.00245,constant,3compartment_nonstiff: user_defined_70%Of3.5LVenousTotBloodVolume
-terminal,pp_RCR_wCont,R_T,Js_per_m6,TODO,constant,TODO
-terminal,pp_RCR_wCont,C_T,m6_per_J,TODO,constant,TODO
-terminal,pp_RCR_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RCR_wCont,q_us,m3,TODO,constant,TODO
-terminal,pp_RCR_wCont,q_init,m3,TODO,constant,TODO
-terminal,pp_RCR_wCont,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RCR_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RCR_wCont,Delta_R,dimensionless,TODO,boundary_condition,TODO
-terminal,pp_RCR_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO
-terminal,pp_RICRI,R_T,Js_per_m6,TODO,constant,TODO
-terminal,pp_RICRI,frac_R_T_1_of_R_T,dimensionless,TODO,constant,TODO
-terminal,pp_RICRI,C_T,m6_per_J,TODO,constant,TODO
-terminal,pp_RICRI,I_T_1,Js2_per_m6,TODO,constant,TODO
-terminal,pp_RICRI,I_T_2,Js2_per_m6,TODO,constant,TODO
-terminal,pp_RICRI,u_ext,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RICRI,q_us,m3,TODO,constant,TODO
-terminal,pp_RICRI,q_init,m3,TODO,constant,TODO
-terminal,pp_RICRI,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RICRI,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_R1ICR2I,R_T1,Js_per_m6,TODO,constant,TODO
-terminal,pp_R1ICR2I,R_T2,Js_per_m6,TODO,constant,TODO
-terminal,pp_R1ICR2I,C_T,m6_per_J,TODO,constant,TODO
-terminal,pp_R1ICR2I,I_T1,Js2_per_m6,TODO,constant,TODO
-terminal,pp_R1ICR2I,I_T2,Js2_per_m6,TODO,constant,TODO
-terminal,pp_R1ICR2I,u_ext,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_R1ICR2I,q_us,m3,TODO,constant,TODO
-terminal,pp_R1ICR2I,q_init,m3,TODO,constant,TODO
-terminal,pp_R1ICR2I,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_R1ICR2I,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RICRI_nonlinear,R_T,Js_per_m6,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,frac_R_T_1_of_R_T,dimensionless,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,K_tube,J_per_m3,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,I_T_1,Js2_per_m6,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,I_T_2,Js2_per_m6,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RICRI_nonlinear,q_us,m3,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,q_init,m3,TODO,constant,TODO
-terminal,pp_RICRI_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_RICRI_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-single_terminal,vp_wCont,R_T2,Js_per_m6,TODO,constant,TODO
-single_terminal,vp_wCont,C_T,m6_per_J,TODO,constant,TODO
-single_terminal,vp_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO
-single_terminal,vp_wCont,q_init,m3,TODO,constant,TODO
-single_terminal,vp_wCont,q_us,m3,TODO,constant,TODO
-single_terminal,vp_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO
-single_terminal,vp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-single_terminal,vp_wCont,Delta_R,dimensionless,TODO,boundary_condition,TODO
-single_terminal,vp_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wCont,R_T1,Js_per_m6,68123000,constant,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,R_T2,Js_per_m6,3101300000,constant,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,C_T,m6_per_J,3.6664e-10,constant,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,u_ext,J_per_m3,0,boundary_condition,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,q_init,m3,0,constant,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,q_us,m3,0,constant,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,v_in,m3_per_s,0.1,boundary_condition,aortic_bif_1d: WONT_BE_USED
-single_terminal,vp_R1CR2_wCont,u_out,J_per_m3,0,boundary_condition,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,Delta_R,Js_per_m6,0,boundary_condition,aortic_bif_1d: user_defined
-single_terminal,vp_R1CR2_wCont,R_local_multiplier,dimensionless,1,boundary_condition,aortic_bif_1d: user_defined
-single_terminal,vp_ZCIR_wCont,Zc,Js_per_m6,72869803.838006,constant,cvs_model_0d: calculated_from_assumptions
-single_terminal,vp_ZCIR_wCont,R_T,Js_per_m6,1457396076.76012,constant,cvs_model_0d: calculated_from_assumptions
-single_terminal,vp_ZCIR_wCont,C_T,m6_per_J,2.47873591647839E-10,constant,cvs_model_0d: calculated_from_assumptions
-single_terminal,vp_ZCIR_wCont,I_T,Js2_per_m6,0.000001,constant,cvs_model_0d: small_chosen
-single_terminal,vp_ZCIR_wCont,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined
-single_terminal,vp_ZCIR_wCont,q_init,m3,0,constant,cvs_model_0d: user_defined
-single_terminal,vp_ZCIR_wCont,q_us,m3,0,constant,cvs_model_0d: user_defined
-single_terminal,vp_ZCIR_wCont,v_in,m3_per_s,0.0,boundary_condition,cvs_model_with_arm_hybrid: WONT_BE_USED
-single_terminal,vp_ZCIR_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-single_terminal,vp_ZCIR_wCont,Delta_R,Js_per_m6,0,boundary_condition,cvs_model_0d: user_defined
-single_terminal,vp_ZCIR_wCont,R_local_multiplier,dimensionless,1,boundary_condition,cvs_model_0d: user_defined
-single_terminal,vp_R1CR2_wI_wCont,R_T1,Js_per_m6,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI_wCont,R_T2,Js_per_m6,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI_wCont,C_T,m6_per_J,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI_wCont,I_T,Js2_per_m6,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wI_wCont,q_init,m3,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI_wCont,q_us,m3,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wI_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wI_wCont,Delta_R,Js_per_m6,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wI_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wI,R_T1,Js_per_m6,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI,R_T2,Js_per_m6,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI,C_T,m6_per_J,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI,I_T,Js2_per_m6,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI,u_ext,J_per_m3,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wI,q_init,m3,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI,q_us,m3,TODO,constant,TODO
-single_terminal,vp_R1CR2_wI,v_in,m3_per_s,TODO,boundary_condition,TODO
-single_terminal,vp_R1CR2_wI,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_I,R_1_T,Js_per_m6,TODO,constant,TODO
-terminal,pp_I,R_2_T,Js_per_m6,TODO,constant,TODO
-terminal,pp_I,C_T,m6_per_J,TODO,constant,TODO
-terminal,pp_I,I_T,Js2_per_m6,TODO,constant,TODO
-terminal,pp_I,u_ext,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_I,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_I,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_I,q_us,m3,TODO,constant,TODO
-terminal,pp_I,q_init,m3,TODO,constant,TODO
-terminal,pp_wCont,R_T,Js_per_m6,2000000000.0,constant,control_parasymp: calc_from_user_assumptions
-terminal,pp_wCont,C_T,m6_per_J,1.00e-10,constant,control_parasymp: to_be_identified
-terminal,pp_wCont,I_T,Js2_per_m6,1.00e-06,constant,control_parasymp: defined_by_user
-terminal,pp_wCont,q_us,m3,0,constant,control_parasymp: user_defined_TO_DO
-terminal,pp_wCont,q_init,m3,0,constant,control_parasymp: user_defined_TO_DO
-terminal,pp_wCont,Delta_R,dimensionless,0,boundary_condition,control_phys_asd: user_defined
-terminal,pp_wCont,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined
-terminal,pp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_wCont,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_wCont,R_local_multiplier,dimensionless,1,boundary_condition,control_phys_asd: user_defined
-terminal,pp_R1CR2_wCont,R_T1,Js_per_m6,TODO,constant,TODO
-terminal,pp_R1CR2_wCont,R_T2,Js_per_m6,TODO,constant,TODO
-terminal,pp_R1CR2_wCont,C_T,m6_per_J,TODO,constant,TODO
-terminal,pp_R1CR2_wCont,q_us,m3,TODO,constant,TODO
-terminal,pp_R1CR2_wCont,q_init,m3,TODO,constant,TODO
-terminal,pp_R1CR2_wCont,Delta_R,dimensionless,TODO,boundary_condition,TODO
-terminal,pp_R1CR2_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_R1CR2_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_R1CR2_wCont,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_R1CR2_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO
-terminal,pp_wLocal,R_T,Js_per_m6,11999999999.999998,constant,control_parasymp: calc_from_user_assumptions
-terminal,pp_wLocal,C_T,m6_per_J,1.00e-11,constant,control_parasymp: to_be_identified
-terminal,pp_wLocal,I_T,Js2_per_m6,1.00e-06,constant,control_parasymp: defined_by_user
-terminal,pp_wLocal,q_us,m3,0,constant,control_parasymp: user_defined_TO_DO
-terminal,pp_wLocal,q_init,m3,0,constant,control_parasymp: user_defined_TO_DO
-terminal,pp_wLocal,Delta_R,dimensionless,0,boundary_condition,control_parasymp: user_defined
-terminal,pp_wLocal,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined
-terminal,pp_wLocal,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_wLocal,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_wLocal,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO
-terminal,pp_wCont_no_local,R_T,Js_per_m6,260869565.21739125,constant,control_parasymp: calc_from_user_assumptions
-terminal,pp_wCont_no_local,C_T,m6_per_J,4.00e-09,constant,control_parasymp: to_be_identified
-terminal,pp_wCont_no_local,I_T,Js2_per_m6,1.00e-06,constant,control_parasymp: defined_by_user
-terminal,pp_wCont_no_local,q_us,m3,0,constant,control_parasymp: user_defined_TO_DO
-terminal,pp_wCont_no_local,q_init,m3,0,constant,control_parasymp: user_defined_TO_DO
-terminal,pp_wCont_no_local,Delta_R,dimensionless,TODO,boundary_condition,TODO
-terminal,pp_wCont_no_local,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined
-terminal,pp_wCont_no_local,u_out,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_wCont_no_local,u_in,J_per_m3,TODO,boundary_condition,TODO
-terminal,pp_wCont_no_local,R_local_multiplier,dimensionless,1,boundary_condition,control_parasymp: assumed_for_no_local_control
-split_junction,pv,E,J_per_m3,400000,constant,FinalModel: ADAN_86
-split_junction,pv,l,metre,0.014796,constant,FinalModel: ADAN_86
-split_junction,pv,r_0,metre,0.0133364,constant,FinalModel: ADAN_86
-split_junction,pv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg
-split_junction,pv,theta,dimensionless,90,constant,FinalModel: defined_by_user
-split_junction,pv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen
-split_junction,pv,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-split_junction_simple,pv,q_0,m3,TODO,constant,TODO
-split_junction_simple,pv,R,Js_per_m6,TODO,constant,TODO
-split_junction_simple,pv,C,m6_per_J,TODO,constant,TODO
-split_junction_simple,pv,I,Js2_per_m6,TODO,constant,TODO
-split_junction_simple,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction_simple,pv,u_0,J_per_m3,TODO,constant,TODO
-split_junction_simple,pv,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction_simple,pv,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction_simple,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vv,E,J_per_m3,1.60e+06,constant,control_parasymp: ADAN_218
-merge_junction,vv,l,metre,1.15e-03,constant,control_parasymp: ADAN_218
-merge_junction,vv,r_0,metre,9.65e-04,constant,control_parasymp: ADAN_218
-merge_junction,vv,u_0,J_per_m3,10.64e3,constant,control_parasymp: AssumedRefOf80mmHg
-merge_junction,vv,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined
-merge_junction,vv,theta,dimensionless,90,constant,control_parasymp: defined_by_user
-merge_junction,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp,E,J_per_m3,TODO,constant,TODO
-merge_junction,vp,l,metre,TODO,constant,TODO
-merge_junction,vp,r_0,metre,TODO,constant,TODO
-merge_junction,vp,u_0,J_per_m3,TODO,constant,TODO
-merge_junction,vp,theta,dimensionless,TODO,constant,TODO
-merge_junction,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous_merge_junction,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-venous_merge_junction,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-venous_merge_junction,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-venous_merge_junction,vp_nonlinear,l,metre,TODO,constant,TODO
-venous_merge_junction,vp_nonlinear,r_0,metre,TODO,constant,TODO
-venous_merge_junction,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-venous_merge_junction,vp_nonlinear,theta,dimensionless,TODO,constant,TODO
-venous_merge_junction,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous_merge_junction,vp_nonlinear,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-venous_merge_junction,vp_nonlinear,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-venous_merge_junction,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous_merge_junction,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-merge_junction_simple,vp,q_0,m3,TODO,constant,TODO
-merge_junction_simple,vp,R,Js_per_m6,TODO,constant,TODO
-merge_junction_simple,vp,C,m6_per_J,TODO,constant,TODO
-merge_junction_simple,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction_simple,vp,u_0,J_per_m3,TODO,constant,TODO
-merge_junction_simple,vp,I,Js2_per_m6,TODO,constant,TODO
-merge_junction_simple,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction_simple,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vp,q_0,m3,TODO,constant,TODO
-venous_merge_junction_simple,vp,R,Js_per_m6,TODO,constant,TODO
-venous_merge_junction_simple,vp,C,m6_per_J,TODO,constant,TODO
-venous_merge_junction_simple,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vp,u_0,J_per_m3,TODO,constant,TODO
-venous_merge_junction_simple,vp,I,Js2_per_m6,TODO,constant,TODO
-venous_merge_junction_simple,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-merge_junction_simple,vv,q_0,m3,TODO,constant,TODO
-merge_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO
-merge_junction_simple,vv,C,m6_per_J,TODO,constant,TODO
-merge_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction_simple,vv,u_0,J_per_m3,TODO,constant,TODO
-merge_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO
-merge_junction_simple,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction_simple,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vv,q_0,m3,TODO,constant,TODO
-venous_merge_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO
-venous_merge_junction_simple,vv,C,m6_per_J,TODO,constant,TODO
-venous_merge_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vv,u_0,J_per_m3,TODO,constant,TODO
-venous_merge_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO
-venous_merge_junction_simple,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-venous_merge_junction_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv,E,J_per_m3,TODO,constant,TODO
-split_junction,vv,l,metre,TODO,constant,TODO
-split_junction,vv,r_0,metre,TODO,constant,TODO
-split_junction,vv,u_0,J_per_m3,TODO,constant,TODO
-split_junction,vv,theta,dimensionless,TODO,constant,TODO
-split_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_novisco,u_0,J_per_m3,TODO,constant,TODO
-split_junction,vv_novisco,E,J_per_m3,TODO,constant,TODO
-split_junction,vv_novisco,l,metre,TODO,constant,TODO
-split_junction,vv_novisco,r_0,metre,TODO,constant,TODO
-split_junction,vv_novisco,theta,dimensionless,TODO,constant,TODO
-split_junction,vv_novisco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv_novisco,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_novisco,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_novisco,v_in,m3_per_s,TODO,boundary_condition,TODO
-split_junction_simple,vv,q_0,m3,TODO,constant,TODO
-split_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO
-split_junction_simple,vv,C,m6_per_J,TODO,constant,TODO
-split_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction_simple,vv,l,metre,TODO,constant,TODO
-split_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO
-split_junction_simple,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction_simple,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous_split_junction_simple,vv,q_0,m3,TODO,constant,TODO
-venous_split_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO
-venous_split_junction_simple,vv,C,m6_per_J,TODO,constant,TODO
-venous_split_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous_split_junction_simple,vv,u_0,J_per_m3,TODO,constant,TODO
-venous_split_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO
-venous_split_junction_simple,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-venous_split_junction_simple,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-venous_split_junction_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-2in2out_junction,vv,E,J_per_m3,1600000,constant,FinalModel: ADAN_218
-2in2out_junction,vv,l,metre,0.00114668,constant,FinalModel: ADAN_218
-2in2out_junction,vv,r_0,metre,0.000965045,constant,FinalModel: ADAN_218
-2in2out_junction,vv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg
-2in2out_junction,vv,theta,dimensionless,90,constant,FinalModel: defined_by_user
-2in2out_junction,vv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen
-2in2out_junction,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-2in2out_junction,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-2in2out_junction,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-2in2out_junction,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-venous,vp_woCont,q_0,m3,TODO,constant,TODO
-venous,vp_woCont,R,Js_per_m6,TODO,constant,TODO
-venous,vp_woCont,C,m6_per_J,TODO,constant,TODO
-venous,vp_woCont,I,Js2_per_m6,TODO,constant,TODO
-venous,vp_woCont,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous,vp_woCont,u_0,J_per_m3,TODO,constant,TODO
-venous,vp_woCont,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous,vp_woCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous_novisco,vp_woCont,q_0,m3,TODO,constant,TODO
-venous_novisco,vp_woCont,R,Js_per_m6,TODO,constant,TODO
-venous_novisco,vp_woCont,C,m6_per_J,TODO,constant,TODO
-venous_novisco,vp_woCont,I,Js2_per_m6,TODO,constant,TODO
-venous_novisco,vp_woCont,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous_novisco,vp_woCont,u_0,J_per_m3,TODO,constant,TODO
-venous_novisco,vp_woCont,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous_novisco,vp_woCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous,vp,R,Js_per_m6,1333000,constant,3compartment_extra_ops: Blanco_2013_Table_8
-venous,vp,C,m6_per_J,0.0000000060015,constant,3compartment_extra_ops: to_be_identified
-venous,vp,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined
-venous,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous,vp,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous,vp,I,Js2_per_m6,0.000001,constant,3compartment_extra_ops: Blanco_2013_Table_8
-venous,vp,q_C_init,m3,0.0001,constant,3compartment_extra_ops: user_defined
-venous,vp,q_us_0,m3,0,constant,3compartment_extra_ops: user_defined
-venous,vp,Delta_q_us,dimensionless,0,constant,3compartment_extra_ops: user_defined
-venous,vp,Delta_C,dimensionless,0,boundary_condition,3compartment_extra_ops: user_defined
-venous_novisco,vp,R,Js_per_m6,8572918.09858893,constant,cvs_model_0d: calculated_from_assumptions
-venous_novisco,vp,C,m6_per_J,1.21676662404483E-07,constant,cvs_model_0d: calculated_from_assumptions
-venous_novisco,vp,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined
-venous_novisco,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous_novisco,vp,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous_novisco,vp,I,Js2_per_m6,0.0000001,constant,cvs_model_0d: small_chosen
-venous_novisco,vp,q_C_init,m3,0,constant,cvs_model_0d: user_defined_TO_DO
-venous_novisco,vp,q_us_0,m3,0.0002968,constant,cvs_model_0d: calculated_from_assumptions
-venous_novisco,vp,Delta_q_us,dimensionless,0,constant,cvs_model_0d: user_defined
-venous_novisco,vp,Delta_C,dimensionless,0,boundary_condition,cvs_model_0d: user_defined
-venous,vp_wCont,R,Js_per_m6,1.00e-07,constant,control_parasymp: small_chosen
-venous,vp_wCont,C,m6_per_J,2e-6,constant,control_parasymp: to_be_identified
-venous,vp_wCont,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined
-venous,vp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous,vp_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous,vp_wCont,I,Js2_per_m6,1.00e-07,constant,control_parasymp: small_chosen
-venous,vp_wCont,q_C_init,m3,1e-4,constant,control_parasymp: user_defined
-venous,vp_wCont,q_us_0,m3,9.00e-04,constant,control_parasymp: user_defined_TO_BE_FOUND
-venous,vp_wCont,Delta_q_us,dimensionless,TODO,boundary_condition,TODO
-venous,vp_wCont,Delta_C,dimensionless,0,boundary_condition,control_phys_asd: user_defined
-venous,vp_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous,vp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-venous,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-venous,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-venous,vp_nonlinear,l,metre,TODO,constant,TODO
-venous,vp_nonlinear,r_0,metre,TODO,constant,TODO
-venous,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-venous,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous,vp_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous,vp_nonlinear,theta,dimensionless,TODO,constant,TODO
-venous,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-venous,pv,q_0,m3,TODO,constant,TODO
-venous,pv,R,Js_per_m6,TODO,constant,TODO
-venous,pv,C,m6_per_J,TODO,constant,TODO
-venous,pv,I,Js2_per_m6,TODO,constant,TODO
-venous,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous,pv,u_0,J_per_m3,TODO,constant,TODO
-venous,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-venous,pv,v_out,m3_per_s,TODO,boundary_condition,TODO
-venous,pp,q_0,m3,TODO,constant,TODO
-venous,pp,R,Js_per_m6,TODO,constant,TODO
-venous,pp,C,m6_per_J,TODO,constant,TODO
-venous,pp,I,Js2_per_m6,TODO,constant,TODO
-venous,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous,pp,u_0,J_per_m3,TODO,constant,TODO
-venous,pp,u_in,J_per_m3,TODO,boundary_condition,TODO
-venous,pp,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous,pp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-venous,pp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-venous,pp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-venous,pp_nonlinear,l,metre,TODO,constant,TODO
-venous,pp_nonlinear,r_0,metre,TODO,constant,TODO
-venous,pp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-venous,pp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous,pp_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO
-venous,pp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous,pp_nonlinear,theta,dimensionless,TODO,constant,TODO
-venous,pp_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-venous,vv,q_0,m3,TODO,constant,TODO
-venous,vv,R,Js_per_m6,TODO,constant,TODO
-venous,vv,C,m6_per_J,TODO,constant,TODO
-venous,vv,I,Js2_per_m6,TODO,constant,TODO
-venous,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-venous,vv,u_0,J_per_m3,TODO,constant,TODO
-venous,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-venous,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-flow_sum_2,nn,v_1,m3_per_s,TODO,boundary_condition,TODO
-flow_sum_2,nn,v_2,m3_per_s,TODO,boundary_condition,TODO
-terminal2,pp,R_T,Js_per_m6,TODO,constant,TODO
-terminal2,pp,C_T,m6_per_J,TODO,constant,TODO
-arterial,pv_nonlinear_constR,l,metre,TODO,constant,TODO
-arterial,pv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-arterial,pv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-arterial,pv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial,pv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear,l,metre,TODO,constant,TODO
-arterial,pv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear,r_0,metre,TODO,constant,TODO
-arterial,pv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-arterial,pv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear,theta,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial,pv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-arterial,pv_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial,pv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined
-arterial,pv_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user
-arterial,pv_nonlinear_visco,l,metre,0.014796,constant,cvs_model_0d: ADAN_86
-arterial,pv_nonlinear_visco,r_0,metre,0.01508,constant,cvs_model_0d: ADAN_86
-arterial,pv_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg
-arterial,pv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,pv_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known
-arterial,pv_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known
-arterial,pv_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user
-arterial,pv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_constR,l,metre,TODO,constant,TODO
-arterial,vp_nonlinear_constR,r_0,metre,TODO,constant,TODO
-arterial,vp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-arterial,vp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear,l,metre,TODO,constant,TODO
-arterial,vp_nonlinear,r_0,metre,TODO,constant,TODO
-arterial,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-arterial,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear,theta,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_visco,theta,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_visco,l,metre,TODO,constant,TODO
-arterial,vp_nonlinear_visco,r_0,metre,TODO,constant,TODO
-arterial,vp_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO
-arterial,vp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,vp_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO
-arterial,vp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear_constR,l,metre,TODO,constant,TODO
-arterial,pp_nonlinear_constR,r_0,metre,TODO,constant,TODO
-arterial,pp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-arterial,pp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear,l,metre,TODO,constant,TODO
-arterial,pp_nonlinear,r_0,metre,TODO,constant,TODO
-arterial,pp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-arterial,pp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear,theta,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-arterial,pp_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined
-arterial,pp_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user
-arterial,pp_nonlinear_visco,l,metre,0.030339,constant,cvs_model_0d: ADAN_86
-arterial,pp_nonlinear_visco,r_0,metre,0.00436635,constant,cvs_model_0d: ADAN_86
-arterial,pp_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg
-arterial,pp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,pp_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known
-arterial,pp_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known
-arterial,pp_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user
-arterial,pp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear_constR,l,metre,TODO,constant,TODO
-arterial,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-arterial,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-arterial,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-arterial,vv_nonlinear,theta,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear,l,metre,TODO,constant,TODO
-arterial,vv_nonlinear,r_0,metre,TODO,constant,TODO
-arterial,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-arterial,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-arterial,vv_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined
-arterial,vv_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user
-arterial,vv_nonlinear_visco,l,metre,0.0153234,constant,cvs_model_0d: ADAN_86
-arterial,vv_nonlinear_visco,r_0,metre,0.015642,constant,cvs_model_0d: ADAN_86
-arterial,vv_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg
-arterial,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-arterial,vv_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known
-arterial,vv_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known
-arterial,vv_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user
-arterial,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear_constR,l,metre,TODO,constant,TODO
-split_junction,pv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-split_junction,pv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-split_junction,pv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_constR,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_constR,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear,l,metre,TODO,constant,TODO
-split_junction,pv_nonlinear,r_0,metre,TODO,constant,TODO
-split_junction,pv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-split_junction,pv_nonlinear,theta,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-split_junction,pv_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_visco,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_visco,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined
-split_junction,pv_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user
-split_junction,pv_nonlinear_visco,l,metre,0.014796,constant,cvs_model_0d: ADAN_86
-split_junction,pv_nonlinear_visco,r_0,metre,0.0133364,constant,cvs_model_0d: ADAN_86
-split_junction,pv_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg
-split_junction,pv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-split_junction,pv_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known
-split_junction,pv_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known
-split_junction,pv_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user
-split_junction,pv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_constR,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_constR,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-split_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO
-split_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-split_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-split_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear,l,metre,TODO,constant,TODO
-split_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO
-split_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_visco,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_visco,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-split_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO
-split_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_constR,l,metre,TODO,constant,TODO
-merge_junction,vp_nonlinear_constR,r_0,metre,TODO,constant,TODO
-merge_junction,vp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-merge_junction,vp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_constR,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_constR,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear,l,metre,TODO,constant,TODO
-merge_junction,vp_nonlinear,r_0,metre,TODO,constant,TODO
-merge_junction,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-merge_junction,vp_nonlinear,theta,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_visco,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,theta,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,l,metre,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,r_0,metre,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vp_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO
-merge_junction,vp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_constR,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_constR,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-merge_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO
-merge_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-merge_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-merge_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear,l,metre,TODO,constant,TODO
-merge_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO
-merge_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_visco,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-merge_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO
-merge_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-constriction,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-constriction,pv,E,J_per_m3,TODO,constant,TODO
-constriction,pv,l,metre,TODO,constant,TODO
-constriction,pv,r,metre,TODO,constant,TODO
-constriction,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-constriction,pv,v_out,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple,vp,q_0,m3,TODO,constant,TODO
-capillary_simple,vp,R,Js_per_m6,TODO,constant,TODO
-capillary_simple,vp,C,m6_per_J,TODO,constant,TODO
-capillary_simple,vp,I,Js2_per_m6,TODO,constant,TODO
-capillary_simple,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,vp,u_0,J_per_m3,TODO,constant,TODO
-capillary_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,vp,v_in,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple,pv,q_0,m3,TODO,constant,TODO
-capillary_simple,pv,R,Js_per_m6,TODO,constant,TODO
-capillary_simple,pv,C,m6_per_J,TODO,constant,TODO
-capillary_simple,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,pv,u_0,J_per_m3,TODO,constant,TODO
-capillary_simple,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,pv,v_out,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple,pv,I,Js2_per_m6,TODO,constant,TODO
-capillary_simple,pp,q_0,m3,TODO,constant,TODO
-capillary_simple,pp,R,Js_per_m6,TODO,constant,TODO
-capillary_simple,pp,C,m6_per_J,TODO,constant,TODO
-capillary_simple,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,pp,u_0,J_per_m3,TODO,constant,TODO
-capillary_simple,pp,u_in,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,pp,u_out,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,pp,I,Js2_per_m6,TODO,constant,TODO
-capillary_simple,vv,q_0,m3,TODO,constant,TODO
-capillary_simple,vv,R,Js_per_m6,TODO,constant,TODO
-capillary_simple,vv,C,m6_per_J,TODO,constant,TODO
-capillary_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary_simple,vv,I,Js2_per_m6,TODO,constant,TODO
-capillary_simple,vv,u_0,J_per_m3,TODO,constant,TODO
-capillary_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-capillary_split,pv,q_C_init,m3,TODO,constant,TODO
-capillary_split,pv,E,J_per_m3,TODO,constant,TODO
-capillary_split,pv,l,metre,TODO,constant,TODO
-capillary_split,pv,r,metre,TODO,constant,TODO
-capillary_split,pv,v_out_1,m3_per_s,TODO,boundary_condition,TODO
-capillary_split,pv,v_out_2,m3_per_s,TODO,boundary_condition,TODO
-capillary_split,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary_split,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-capillary,pp,q_C_init,m3,TODO,constant,TODO
-capillary,pp,E,J_per_m3,TODO,constant,TODO
-capillary,pp,l,metre,TODO,constant,TODO
-capillary,pp,r,metre,TODO,constant,TODO
-capillary,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary,pp,u_in,J_per_m3,TODO,boundary_condition,TODO
-capillary,pp,u_out,J_per_m3,TODO,boundary_condition,TODO
-capillary_merge,vp,q_C_init,m3,TODO,constant,TODO
-capillary_merge,vp,E,J_per_m3,TODO,constant,TODO
-capillary_merge,vp,l,metre,TODO,constant,TODO
-capillary_merge,vp,r,metre,TODO,constant,TODO
-capillary_merge,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary_merge,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-capillary_merge,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-capillary_merge,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-capillary,vp,q_C_init,m3,TODO,constant,TODO
-capillary,vp,E,J_per_m3,TODO,constant,TODO
-capillary,vp,l,metre,TODO,constant,TODO
-capillary,vp,r,metre,TODO,constant,TODO
-capillary,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-capillary,vp,v_in,m3_per_s,TODO,boundary_condition,TODO
-capillary,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_simple,q_0,m3,TODO,constant,TODO
-MinNout_junction,vv_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_simple,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_simple,u_0,J_per_m3,TODO,constant,TODO
-MinNout_junction,vv_simple,R,Js_per_m6,TODO,constant,TODO
-MinNout_junction,vv_simple,C,m6_per_J,TODO,constant,TODO
-MinNout_junction,vv_simple,I,Js2_per_m6,TODO,constant,TODO
-MinNout_junction,vv,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv,u_0,J_per_m3,TODO,constant,TODO
-MinNout_junction,vv,theta,dimensionless,TODO,constant,TODO
-MinNout_junction,vv,E,J_per_m3,TODO,constant,TODO
-MinNout_junction,vv,l,metre,TODO,constant,TODO
-MinNout_junction,vv,r_0,metre,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_constR,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_constR,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-MinNout_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear,l,metre,TODO,constant,TODO
-MinNout_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO
-MinNout_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_visco,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO
-MinNout_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-MinNout_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-Min_junction,vp_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vp_simple,u_out,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_simple,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vp_simple,q_0,m3,TODO,constant,TODO
-Min_junction,vp_simple,R,Js_per_m6,TODO,constant,TODO
-Min_junction,vp_simple,C,m6_per_J,TODO,constant,TODO
-Min_junction,vp_simple,I,Js2_per_m6,TODO,constant,TODO
-Min_junction,vp_simple_novisco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vp_simple_novisco,u_out,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_simple_novisco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined
-Min_junction,vp_simple_novisco,u_0,J_per_m3,0,constant,cvs_model_0d: user_defined
-Min_junction,vp_simple_novisco,q_0,m3,0.0001484,constant,cvs_model_0d: calculated_from_assumptions
-Min_junction,vp_simple_novisco,R,Js_per_m6,169559.858501986,constant,cvs_model_0d: calculated_from_assumptions
-Min_junction,vp_simple_novisco,C,m6_per_J,1.21676662404483E-07,constant,cvs_model_0d: calculated_from_assumptions
-Min_junction,vp_simple_novisco,I,Js2_per_m6,0.0000001,constant,cvs_model_0d: small_chosen
-Min_junction,vp,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vp,u_out,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vp,theta,dimensionless,TODO,constant,TODO
-Min_junction,vp,E,J_per_m3,TODO,constant,TODO
-Min_junction,vp,l,metre,TODO,constant,TODO
-Min_junction,vp,r_0,metre,TODO,constant,TODO
-Min_junction,vp_nonlinear_constR,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_constR,l,metre,TODO,constant,TODO
-Min_junction,vp_nonlinear_constR,r_0,metre,TODO,constant,TODO
-Min_junction,vp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vp_nonlinear,theta,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear,l,metre,TODO,constant,TODO
-Min_junction,vp_nonlinear,r_0,metre,TODO,constant,TODO
-Min_junction,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,theta,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,l,metre,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,r_0,metre,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO
-Min_junction,vp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-Min_junction,vv_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_simple,v_out,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv_simple,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vv_simple,q_0,m3,TODO,constant,TODO
-Min_junction,vv_simple,R,Js_per_m6,TODO,constant,TODO
-Min_junction,vv_simple,C,m6_per_J,TODO,constant,TODO
-Min_junction,vv_simple,I,Js2_per_m6,TODO,constant,TODO
-Min_junction,vv,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vv,theta,dimensionless,TODO,constant,TODO
-Min_junction,vv,E,J_per_m3,TODO,constant,TODO
-Min_junction,vv,l,metre,TODO,constant,TODO
-Min_junction,vv,r_0,metre,TODO,constant,TODO
-Min_junction,vv_nonlinear_constR,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO
-Min_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-Min_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear,l,metre,TODO,constant,TODO
-Min_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO
-Min_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO
-Min_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Min_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-Nout_junction,pv_simple,u_in,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_simple,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,pv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_simple,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,pv_simple,q_0,m3,TODO,constant,TODO
-Nout_junction,pv_simple,R,Js_per_m6,TODO,constant,TODO
-Nout_junction,pv_simple,C,m6_per_J,TODO,constant,TODO
-Nout_junction,pv_simple,I,Js2_per_m6,TODO,constant,TODO
-Nout_junction,pv,u_in,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,pv,theta,dimensionless,TODO,constant,TODO
-Nout_junction,pv,E,J_per_m3,TODO,constant,TODO
-Nout_junction,pv,l,metre,TODO,constant,TODO
-Nout_junction,pv,r_0,metre,TODO,constant,TODO
-Nout_junction,pv_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear_constR,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,pv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear_constR,l,metre,TODO,constant,TODO
-Nout_junction,pv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-Nout_junction,pv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,pv_nonlinear,theta,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear,l,metre,TODO,constant,TODO
-Nout_junction,pv_nonlinear,r_0,metre,TODO,constant,TODO
-Nout_junction,pv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-Nout_junction,pv_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear_visco,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,generic_junction_test_closed_loop: user_defined
-Nout_junction,pv_nonlinear_visco,u_0,J_per_m3,10600,constant,generic_junction_test_closed_loop: assumedRefOf80mmHg
-Nout_junction,pv_nonlinear_visco,theta,dimensionless,0,constant,generic_junction_test_closed_loop: defined_by_user
-Nout_junction,pv_nonlinear_visco,l,metre,0.014796,constant,generic_junction_test_closed_loop: ADAN_86
-Nout_junction,pv_nonlinear_visco,r_0,metre,0.0133364,constant,generic_junction_test_closed_loop: ADAN_86
-Nout_junction,pv_nonlinear_visco,m_tube,dimensionless,0.5,constant,generic_junction_test_closed_loop: known
-Nout_junction,pv_nonlinear_visco,n_tube,dimensionless,0,constant,generic_junction_test_closed_loop: known
-Nout_junction,pv_nonlinear_visco,I_scale,dimensionless,1,constant,generic_junction_test_closed_loop: defined_by_user
-Nout_junction,pv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,pv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-Nout_junction,vv_simple,v_in,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_simple,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,vv_simple,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,vv_simple,q_0,m3,TODO,constant,TODO
-Nout_junction,vv_simple,R,Js_per_m6,TODO,constant,TODO
-Nout_junction,vv_simple,C,m6_per_J,TODO,constant,TODO
-Nout_junction,vv_simple,I,Js2_per_m6,TODO,constant,TODO
-Nout_junction,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,vv,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,vv,theta,dimensionless,TODO,constant,TODO
-Nout_junction,vv,E,J_per_m3,TODO,constant,TODO
-Nout_junction,vv,l,metre,TODO,constant,TODO
-Nout_junction,vv,r_0,metre,TODO,constant,TODO
-Nout_junction,vv_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear_constR,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO
-Nout_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO
-Nout_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO
-Nout_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear,l,metre,TODO,constant,TODO
-Nout_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO
-Nout_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO
-Nout_junction,vv_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear_visco,v_out_sum,m3_per_s,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,generic_junction_test_open_loop: user_defined
-Nout_junction,vv_nonlinear_visco,u_0,J_per_m3,10000,constant,generic_junction_test_open_loop: Boileau_2015
-Nout_junction,vv_nonlinear_visco,theta,dimensionless,0,constant,generic_junction_test_open_loop: user_defined
-Nout_junction,vv_nonlinear_visco,l,metre,0.074413765495,constant,generic_junction_test_open_loop: Boileau_2015
-Nout_junction,vv_nonlinear_visco,r_0,metre,0.0144512199325,constant,generic_junction_test_open_loop: Boileau_2015
-Nout_junction,vv_nonlinear_visco,m_tube,dimensionless,0.5,constant,generic_junction_test_open_loop: known
-Nout_junction,vv_nonlinear_visco,n_tube,dimensionless,0,constant,generic_junction_test_open_loop: known
-Nout_junction,vv_nonlinear_visco,I_scale,dimensionless,1,constant,generic_junction_test_open_loop: user_defined
-Nout_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO
-Nout_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO
-capillary_simple_vol_ctl_uptake,vv,q_0,m3,TODO,constant,TODO
-capillary_simple_vol_ctl_uptake,vv,R,Js_per_m6,TODO,constant,TODO
-capillary_simple_vol_ctl_uptake,vv,C,m6_per_J,TODO,constant,TODO
-capillary_simple_vol_ctl_uptake,vv,u_ext,J_per_m3,TODO,constant,TODO
-capillary_simple_vol_ctl_uptake,vv,I,Js2_per_m6,TODO,constant,TODO
-capillary_simple_vol_ctl_uptake,vv,u_0,J_per_m3,TODO,constant,TODO
-capillary_simple_vol_ctl_uptake,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple_vol_ctl_uptake,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple_vol_ctl_uptake,vv,blood_ctl_dir,dimensionless,TODO,constant,TODO
-capillary_simple_vol_ctl_intake,vv,q_0,m3,TODO,constant,TODO
-capillary_simple_vol_ctl_intake,vv,R,Js_per_m6,TODO,constant,TODO
-capillary_simple_vol_ctl_intake,vv,C,m6_per_J,TODO,constant,TODO
-capillary_simple_vol_ctl_intake,vv,u_ext,J_per_m3,TODO,constant,TODO
-capillary_simple_vol_ctl_intake,vv,I,Js2_per_m6,TODO,constant,TODO
-capillary_simple_vol_ctl_intake,vv,u_0,J_per_m3,TODO,constant,TODO
-capillary_simple_vol_ctl_intake,vv,v_in,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple_vol_ctl_intake,vv,v_out,m3_per_s,TODO,boundary_condition,TODO
-capillary_simple_vol_ctl_intake,vv,blood_ctl_dir,dimensionless,TODO,constant,TODO
-venous_Rctl,vp_woCont,q_0,m3,TODO,constant,TODO
-venous_Rctl,vp_woCont,R,Js_per_m6,TODO,constant,TODO
-venous_Rctl,vp_woCont,C,m6_per_J,TODO,constant,TODO
-venous_Rctl,vp_woCont,I,Js2_per_m6,TODO,constant,TODO
-venous_Rctl,vp_woCont,u_ext,J_per_m3,TODO,constant,TODO
-venous_Rctl,vp_woCont,u_0,J_per_m3,TODO,constant,TODO
-venous_Rctl,vp_woCont,v_in,m3_per_s,TODO,boundary_condition,TODO
-venous_Rctl,vp_woCont,u_out,J_per_m3,TODO,boundary_condition,TODO
-venous_Rctl,vp_woCont,Delta_R,Js_per_m6,TODO,boundary_condition,TODO
-Min_junction_usV_C_ctl,vp_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO
-Min_junction_usV_C_ctl,vp_simple,u_out,J_per_m3,TODO,boundary_condition,TODO
-Min_junction_usV_C_ctl,vp_simple,u_ext,J_per_m3,TODO,constant,TODO
-Min_junction_usV_C_ctl,vp_simple,u_0,J_per_m3,TODO,constant,TODO
-Min_junction_usV_C_ctl,vp_simple,q_0,m3,TODO,constant,TODO
-Min_junction_usV_C_ctl,vp_simple,R,Js_per_m6,TODO,constant,TODO
-Min_junction_usV_C_ctl,vp_simple,C,m6_per_J,TODO,constant,TODO
-Min_junction_usV_C_ctl,vp_simple,I,Js2_per_m6,TODO,constant,TODO
-Min_junction_usV_C_ctl,vp_simple,Delta_q_us,dimensionless,TODO,boundary_condition,TODO
-Min_junction_usV_C_ctl,vp_simple,Delta_C,dimensionless,TODO,boundary_condition,TODO
-global,,beta_g,dimensionless,1,global_constant,test_fft: test
-global,,rho,Js2_per_m5,1,global_constant,test_fft: test
-global,,mu,Js_per_m3,1,global_constant,test_fft: test
-global,,g,m_per_s2,1,global_constant,test_fft: test
-global,,a_vessel,dimensionless,1,global_constant,test_fft: test
-global,,b_vessel,per_m,1,global_constant,test_fft: test
-global,,c_vessel,dimensionless,1,global_constant,test_fft: test
-global,,d_vessel,per_m,1,global_constant,test_fft: test
-global,,R_flag,dimensionless,1,global_constant,cvs_model_0d: user_defined
+vessel_type,BC_type,variable_name,units,value,kind,data_reference,sourced,verified_min,verified_max,validated_min,validated_max
+arterial_simple,vp,q_0,m3,0,constant,3compartment_extra_ops: user_defined_TO_DO,yes,,,,
+arterial_simple,vp,R,Js_per_m6,10664000,constant,3compartment_extra_ops: Blanco_2013_Table_8,yes,,,,
+arterial_simple,vp,C,m6_per_J,3.09077E-10,constant,3compartment_extra_ops: to_be_identified,yes,,,,
+arterial_simple,vp,I,Js2_per_m6,0.000001,constant,3compartment_extra_ops: Blanco_2013_Table_8,yes,,,,
+arterial_simple,vp,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined,no,,,,
+arterial_simple,vp,u_0,J_per_m3,1463,constant,3compartment_extra_ops: Mynard&Smolich_2015_assumedRefOf11mmHg,yes,,,,
+arterial_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,vp,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,q_init,m3,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,q_0,m3,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,R,Js_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,K_tube,J_per_m3,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,vp_nonlinear,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,vp_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vp,E,J_per_m3,1,constant,test_fft: test,yes,,,,
+arterial,vp,l,metre,1,constant,test_fft: test,yes,,,,
+arterial,vp,r_0,metre,1,constant,test_fft: test,yes,,,,
+arterial,vp,u_0,J_per_m3,1,constant,test_fft: test,yes,,,,
+arterial,vp,u_ext,J_per_m3,1,boundary_condition,test_fft: test,yes,,,,
+arterial,vp,theta,dimensionless,1,constant,test_fft: test,yes,,,,
+arterial,vp,u_out,J_per_m3,1,boundary_condition,test_fft: test,yes,,,,
+arterial,vp,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pv,q_0,m3,TODO,constant,TODO,no,,,,
+arterial_simple,pv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple,pv,C,m6_per_J,TODO,constant,TODO,no,,,,
+arterial_simple,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial_simple,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+arterial,pv,E,J_per_m3,400000,constant,FinalModel: ADAN_86,yes,,,,
+arterial,pv,l,metre,0.0432111,constant,FinalModel: ADAN_86,yes,,,,
+arterial,pv,r_0,metre,0.0117401,constant,FinalModel: ADAN_86,yes,,,,
+arterial,pv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg,yes,,,,
+arterial,pv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen,yes,,,,
+arterial,pv,theta,dimensionless,90,constant,FinalModel: defined_by_user,yes,,,,
+arterial,pv,u_in,J_per_m3,9332.5666,boundary_condition,aortic_bif_hybrid_V2: WONT_BE_USED,yes,,,,
+arterial,pv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pp,q_0,m3,TODO,constant,TODO,no,,,,
+arterial_simple,pp,R,Js_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple,pp,C,m6_per_J,TODO,constant,TODO,no,,,,
+arterial_simple,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial_simple,pp,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,pp,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,q_0,m3,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,R,Js_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,Rp,Js_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,fracR,dimensionless,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,C,m6_per_J,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple_novisco,pp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial_simple_novisco,pp,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple_novisco,pp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp,E,J_per_m3,1600000,constant,FinalModel: ADAN_218,yes,,,,
+arterial,pp,l,metre,0.0105951,constant,FinalModel: ADAN_218,yes,,,,
+arterial,pp,r_0,metre,0.000965045,constant,FinalModel: ADAN_218,yes,,,,
+arterial,pp,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg,yes,,,,
+arterial,pp,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen,yes,,,,
+arterial,pp,theta,dimensionless,90,constant,FinalModel: defined_by_user,yes,,,,
+arterial,pp,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,vv,q_0,m3,0.00000694,constant,3compartment_extra_ops: Mynard&Smolich_2015,yes,,,,
+arterial_simple,vv,R,Js_per_m6,1000000,constant,3compartment_extra_ops: to_be_identified,yes,,,,
+arterial_simple,vv,C,m6_per_J,0.000000012028,constant,3compartment_extra_ops: to_be_identified,yes,,,,
+arterial_simple,vv,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined,no,,,,
+arterial_simple,vv,I,Js2_per_m6,10000,constant,3compartment_extra_ops: to_be_identified,yes,,,,
+arterial_simple,vv,u_0,J_per_m3,13300,constant,3compartment_extra_ops: Mynard&Smolich_2015_assumedRefOf100mmHg,yes,,,,
+arterial_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+rigid_vessel,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+rigid_vessel,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+rigid_vessel,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv,E,J_per_m3,400000,constant,FinalModel: ADAN_86,yes,,,,
+arterial,vv,l,metre,0.014796,constant,FinalModel: ADAN_86,yes,,,,
+arterial,vv,r_0,metre,0.0145305,constant,FinalModel: ADAN_86,yes,,,,
+arterial,vv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg,yes,,,,
+arterial,vv,theta,dimensionless,0,constant,FinalModel: defined_by_user,yes,,,,
+arterial,vv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen,yes,,,,
+arterial,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+terminal,pp,R_T,Js_per_m6,110000000,constant,3compartment_extra_ops: calculated_from_mean_P_and_v,yes,,,,
+terminal,pp,C_T,m6_per_J,0.0000001,constant,3compartment_extra_ops: calculated_from_approx_P_and_q,yes,,,,
+terminal,pp,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined,no,,,,
+terminal,pp,u_in,J_per_m3,9332.5666,boundary_condition,aortic_bif_hybrid_V1: WONT_BE_USED,yes,,,,
+terminal,pp,u_out,J_per_m3,0,boundary_condition,aortic_bif_hybrid_V1: user_defined,no,,,,
+terminal,pp,q_us,m3,0.00245,constant,3compartment_extra_ops: user_defined_70%Of3.5LVenousTotBloodVolume,yes,,,,
+terminal,pp,q_init,m3,0.00245,constant,3compartment_extra_ops: user_defined_70%Of3.5LVenousTotBloodVolume,yes,,,,
+terminal,pp_spec_I,R_T,Js_per_m6,110000000,constant,3compartment_nonstiff: calculated_from_mean_P_and_v,yes,,,,
+terminal,pp_spec_I,C_T,m6_per_J,0.0000001,constant,3compartment_nonstiff: calculated_from_approx_P_and_q,yes,,,,
+terminal,pp_spec_I,I_T,Js2_per_m6,10,constant,3compartment_nonstiff: temp,yes,,,,
+terminal,pp_spec_I,u_ext,J_per_m3,0,boundary_condition,3compartment_nonstiff: user_defined,no,,,,
+terminal,pp_spec_I,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_spec_I,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_spec_I,q_us,m3,0.00245,constant,3compartment_nonstiff: user_defined_70%Of3.5LVenousTotBloodVolume,yes,,,,
+terminal,pp_spec_I,q_init,m3,0.00245,constant,3compartment_nonstiff: user_defined_70%Of3.5LVenousTotBloodVolume,yes,,,,
+terminal,pp_RCR_wCont,R_T,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_RCR_wCont,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+terminal,pp_RCR_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RCR_wCont,q_us,m3,TODO,constant,TODO,no,,,,
+terminal,pp_RCR_wCont,q_init,m3,TODO,constant,TODO,no,,,,
+terminal,pp_RCR_wCont,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RCR_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RCR_wCont,Delta_R,dimensionless,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RCR_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RICRI,R_T,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI,frac_R_T_1_of_R_T,dimensionless,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI,I_T_1,Js2_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI,I_T_2,Js2_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RICRI,q_us,m3,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI,q_init,m3,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RICRI,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_R1ICR2I,R_T1,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_R1ICR2I,R_T2,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_R1ICR2I,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+terminal,pp_R1ICR2I,I_T1,Js2_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_R1ICR2I,I_T2,Js2_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_R1ICR2I,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_R1ICR2I,q_us,m3,TODO,constant,TODO,no,,,,
+terminal,pp_R1ICR2I,q_init,m3,TODO,constant,TODO,no,,,,
+terminal,pp_R1ICR2I,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_R1ICR2I,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,R_T,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,frac_R_T_1_of_R_T,dimensionless,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,K_tube,J_per_m3,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,I_T_1,Js2_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,I_T_2,Js2_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,q_us,m3,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,q_init,m3,TODO,constant,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_RICRI_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_wCont,R_T2,Js_per_m6,TODO,constant,TODO,no,,,,
+single_terminal,vp_wCont,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+single_terminal,vp_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_wCont,q_init,m3,TODO,constant,TODO,no,,,,
+single_terminal,vp_wCont,q_us,m3,TODO,constant,TODO,no,,,,
+single_terminal,vp_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_wCont,Delta_R,dimensionless,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wCont,R_T1,Js_per_m6,68123000,constant,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,R_T2,Js_per_m6,3101300000,constant,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,C_T,m6_per_J,3.6664e-10,constant,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,u_ext,J_per_m3,0,boundary_condition,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,q_init,m3,0,constant,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,q_us,m3,0,constant,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,v_in,m3_per_s,0.1,boundary_condition,aortic_bif_1d: WONT_BE_USED,yes,,,,
+single_terminal,vp_R1CR2_wCont,u_out,J_per_m3,0,boundary_condition,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,Delta_R,Js_per_m6,0,boundary_condition,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wCont,R_local_multiplier,dimensionless,1,boundary_condition,aortic_bif_1d: user_defined,no,,,,
+single_terminal,vp_ZCIR_wCont,Zc,Js_per_m6,72869803.838006,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+single_terminal,vp_ZCIR_wCont,R_T,Js_per_m6,1457396076.76012,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+single_terminal,vp_ZCIR_wCont,C_T,m6_per_J,2.47873591647839E-10,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+single_terminal,vp_ZCIR_wCont,I_T,Js2_per_m6,0.000001,constant,cvs_model_0d: small_chosen,yes,,,,
+single_terminal,vp_ZCIR_wCont,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+single_terminal,vp_ZCIR_wCont,q_init,m3,0,constant,cvs_model_0d: user_defined,no,,,,
+single_terminal,vp_ZCIR_wCont,q_us,m3,0,constant,cvs_model_0d: user_defined,no,,,,
+single_terminal,vp_ZCIR_wCont,v_in,m3_per_s,0.0,boundary_condition,cvs_model_with_arm_hybrid: WONT_BE_USED,yes,,,,
+single_terminal,vp_ZCIR_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_ZCIR_wCont,Delta_R,Js_per_m6,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+single_terminal,vp_ZCIR_wCont,R_local_multiplier,dimensionless,1,boundary_condition,cvs_model_0d: user_defined,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,R_T1,Js_per_m6,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,R_T2,Js_per_m6,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,I_T,Js2_per_m6,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,q_init,m3,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,q_us,m3,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,Delta_R,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wI_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,R_T1,Js_per_m6,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,R_T2,Js_per_m6,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,I_T,Js2_per_m6,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,q_init,m3,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,q_us,m3,TODO,constant,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+single_terminal,vp_R1CR2_wI,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_I,R_1_T,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_I,R_2_T,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_I,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+terminal,pp_I,I_T,Js2_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_I,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_I,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_I,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_I,q_us,m3,TODO,constant,TODO,no,,,,
+terminal,pp_I,q_init,m3,TODO,constant,TODO,no,,,,
+terminal,pp_wCont,R_T,Js_per_m6,2000000000.0,constant,control_parasymp: calc_from_user_assumptions,yes,,,,
+terminal,pp_wCont,C_T,m6_per_J,1.00e-10,constant,control_parasymp: to_be_identified,yes,,,,
+terminal,pp_wCont,I_T,Js2_per_m6,1.00e-06,constant,control_parasymp: defined_by_user,yes,,,,
+terminal,pp_wCont,q_us,m3,0,constant,control_parasymp: user_defined_TO_DO,yes,,,,
+terminal,pp_wCont,q_init,m3,0,constant,control_parasymp: user_defined_TO_DO,yes,,,,
+terminal,pp_wCont,Delta_R,dimensionless,0,boundary_condition,control_phys_asd: user_defined,no,,,,
+terminal,pp_wCont,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined,no,,,,
+terminal,pp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wCont,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wCont,R_local_multiplier,dimensionless,1,boundary_condition,control_phys_asd: user_defined,no,,,,
+terminal,pp_R1CR2_wCont,R_T1,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_R1CR2_wCont,R_T2,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal,pp_R1CR2_wCont,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+terminal,pp_R1CR2_wCont,q_us,m3,TODO,constant,TODO,no,,,,
+terminal,pp_R1CR2_wCont,q_init,m3,TODO,constant,TODO,no,,,,
+terminal,pp_R1CR2_wCont,Delta_R,dimensionless,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_R1CR2_wCont,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_R1CR2_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_R1CR2_wCont,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_R1CR2_wCont,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wLocal,R_T,Js_per_m6,11999999999.999998,constant,control_parasymp: calc_from_user_assumptions,yes,,,,
+terminal,pp_wLocal,C_T,m6_per_J,1.00e-11,constant,control_parasymp: to_be_identified,yes,,,,
+terminal,pp_wLocal,I_T,Js2_per_m6,1.00e-06,constant,control_parasymp: defined_by_user,yes,,,,
+terminal,pp_wLocal,q_us,m3,0,constant,control_parasymp: user_defined_TO_DO,yes,,,,
+terminal,pp_wLocal,q_init,m3,0,constant,control_parasymp: user_defined_TO_DO,yes,,,,
+terminal,pp_wLocal,Delta_R,dimensionless,0,boundary_condition,control_parasymp: user_defined,no,,,,
+terminal,pp_wLocal,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined,no,,,,
+terminal,pp_wLocal,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wLocal,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wLocal,R_local_multiplier,dimensionless,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wCont_no_local,R_T,Js_per_m6,260869565.21739125,constant,control_parasymp: calc_from_user_assumptions,yes,,,,
+terminal,pp_wCont_no_local,C_T,m6_per_J,4.00e-09,constant,control_parasymp: to_be_identified,yes,,,,
+terminal,pp_wCont_no_local,I_T,Js2_per_m6,1.00e-06,constant,control_parasymp: defined_by_user,yes,,,,
+terminal,pp_wCont_no_local,q_us,m3,0,constant,control_parasymp: user_defined_TO_DO,yes,,,,
+terminal,pp_wCont_no_local,q_init,m3,0,constant,control_parasymp: user_defined_TO_DO,yes,,,,
+terminal,pp_wCont_no_local,Delta_R,dimensionless,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wCont_no_local,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined,no,,,,
+terminal,pp_wCont_no_local,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wCont_no_local,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+terminal,pp_wCont_no_local,R_local_multiplier,dimensionless,1,boundary_condition,control_parasymp: assumed_for_no_local_control,yes,,,,
+split_junction,pv,E,J_per_m3,400000,constant,FinalModel: ADAN_86,yes,,,,
+split_junction,pv,l,metre,0.014796,constant,FinalModel: ADAN_86,yes,,,,
+split_junction,pv,r_0,metre,0.0133364,constant,FinalModel: ADAN_86,yes,,,,
+split_junction,pv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg,yes,,,,
+split_junction,pv,theta,dimensionless,90,constant,FinalModel: defined_by_user,yes,,,,
+split_junction,pv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen,yes,,,,
+split_junction,pv,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,pv,q_0,m3,TODO,constant,TODO,no,,,,
+split_junction_simple,pv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+split_junction_simple,pv,C,m6_per_J,TODO,constant,TODO,no,,,,
+split_junction_simple,pv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+split_junction_simple,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,pv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction_simple,pv,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,pv,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv,E,J_per_m3,1.60e+06,constant,control_parasymp: ADAN_218,yes,,,,
+merge_junction,vv,l,metre,1.15e-03,constant,control_parasymp: ADAN_218,yes,,,,
+merge_junction,vv,r_0,metre,9.65e-04,constant,control_parasymp: ADAN_218,yes,,,,
+merge_junction,vv,u_0,J_per_m3,10.64e3,constant,control_parasymp: AssumedRefOf80mmHg,yes,,,,
+merge_junction,vv,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined,no,,,,
+merge_junction,vv,theta,dimensionless,90,constant,control_parasymp: defined_by_user,yes,,,,
+merge_junction,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp,E,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vp,l,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp,r_0,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vp,theta,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction_simple,vp,q_0,m3,TODO,constant,TODO,no,,,,
+merge_junction_simple,vp,R,Js_per_m6,TODO,constant,TODO,no,,,,
+merge_junction_simple,vp,C,m6_per_J,TODO,constant,TODO,no,,,,
+merge_junction_simple,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction_simple,vp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction_simple,vp,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+merge_junction_simple,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction_simple,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vp,q_0,m3,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vp,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vp,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vp,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction_simple,vv,q_0,m3,TODO,constant,TODO,no,,,,
+merge_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+merge_junction_simple,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+merge_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction_simple,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+merge_junction_simple,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction_simple,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vv,q_0,m3,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous_merge_junction_simple,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_merge_junction_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv,E,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,vv,l,metre,TODO,constant,TODO,no,,,,
+split_junction,vv,r_0,metre,TODO,constant,TODO,no,,,,
+split_junction,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,vv,theta,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_novisco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,vv_novisco,E,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,vv_novisco,l,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_novisco,r_0,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_novisco,theta,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_novisco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_novisco,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_novisco,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_novisco,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,vv,q_0,m3,TODO,constant,TODO,no,,,,
+split_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+split_junction_simple,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+split_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,vv,l,metre,TODO,constant,TODO,no,,,,
+split_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+split_junction_simple,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_split_junction_simple,vv,q_0,m3,TODO,constant,TODO,no,,,,
+venous_split_junction_simple,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous_split_junction_simple,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous_split_junction_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_split_junction_simple,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous_split_junction_simple,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous_split_junction_simple,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_split_junction_simple,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_split_junction_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+2in2out_junction,vv,E,J_per_m3,1600000,constant,FinalModel: ADAN_218,yes,,,,
+2in2out_junction,vv,l,metre,0.00114668,constant,FinalModel: ADAN_218,yes,,,,
+2in2out_junction,vv,r_0,metre,0.000965045,constant,FinalModel: ADAN_218,yes,,,,
+2in2out_junction,vv,u_0,J_per_m3,10.64e3,constant,FinalModel: AssumedRefOf80mmHg,yes,,,,
+2in2out_junction,vv,theta,dimensionless,90,constant,FinalModel: defined_by_user,yes,,,,
+2in2out_junction,vv,u_ext,J_per_m3,0,boundary_condition,FinalModel: small_chosen,yes,,,,
+2in2out_junction,vv,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+2in2out_junction,vv,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+2in2out_junction,vv,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+2in2out_junction,vv,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,vp_woCont,q_0,m3,TODO,constant,TODO,no,,,,
+venous,vp_woCont,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous,vp_woCont,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous,vp_woCont,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous,vp_woCont,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp_woCont,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous,vp_woCont,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,vp_woCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_novisco,vp_woCont,q_0,m3,TODO,constant,TODO,no,,,,
+venous_novisco,vp_woCont,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous_novisco,vp_woCont,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous_novisco,vp_woCont,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous_novisco,vp_woCont,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_novisco,vp_woCont,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous_novisco,vp_woCont,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_novisco,vp_woCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp,R,Js_per_m6,1333000,constant,3compartment_extra_ops: Blanco_2013_Table_8,yes,,,,
+venous,vp,C,m6_per_J,0.0000000060015,constant,3compartment_extra_ops: to_be_identified,yes,,,,
+venous,vp,u_ext,J_per_m3,0,boundary_condition,3compartment_extra_ops: user_defined,no,,,,
+venous,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,vp,I,Js2_per_m6,0.000001,constant,3compartment_extra_ops: Blanco_2013_Table_8,yes,,,,
+venous,vp,q_C_init,m3,0.0001,constant,3compartment_extra_ops: user_defined,no,,,,
+venous,vp,q_us_0,m3,0,constant,3compartment_extra_ops: user_defined,no,,,,
+venous,vp,Delta_q_us,dimensionless,0,constant,3compartment_extra_ops: user_defined,no,,,,
+venous,vp,Delta_C,dimensionless,0,boundary_condition,3compartment_extra_ops: user_defined,no,,,,
+venous_novisco,vp,R,Js_per_m6,8572918.09858893,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+venous_novisco,vp,C,m6_per_J,1.21676662404483E-07,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+venous_novisco,vp,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+venous_novisco,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_novisco,vp,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_novisco,vp,I,Js2_per_m6,0.0000001,constant,cvs_model_0d: small_chosen,yes,,,,
+venous_novisco,vp,q_C_init,m3,0,constant,cvs_model_0d: user_defined_TO_DO,yes,,,,
+venous_novisco,vp,q_us_0,m3,0.0002968,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+venous_novisco,vp,Delta_q_us,dimensionless,0,constant,cvs_model_0d: user_defined,no,,,,
+venous_novisco,vp,Delta_C,dimensionless,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+venous,vp_wCont,R,Js_per_m6,1.00e-07,constant,control_parasymp: small_chosen,yes,,,,
+venous,vp_wCont,C,m6_per_J,2e-6,constant,control_parasymp: to_be_identified,yes,,,,
+venous,vp_wCont,u_ext,J_per_m3,0,boundary_condition,control_parasymp: user_defined,no,,,,
+venous,vp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,vp_wCont,I,Js2_per_m6,1.00e-07,constant,control_parasymp: small_chosen,yes,,,,
+venous,vp_wCont,q_C_init,m3,1e-4,constant,control_parasymp: user_defined,no,,,,
+venous,vp_wCont,q_us_0,m3,9.00e-04,constant,control_parasymp: user_defined_TO_BE_FOUND,yes,,,,
+venous,vp_wCont,Delta_q_us,dimensionless,TODO,boundary_condition,TODO,no,,,,
+venous,vp_wCont,Delta_C,dimensionless,0,boundary_condition,control_phys_asd: user_defined,no,,,,
+venous,vp_wCont,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,vp_wCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+venous,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+venous,vp_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+venous,vp_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+venous,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vp_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,vp_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+venous,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+venous,pv,q_0,m3,TODO,constant,TODO,no,,,,
+venous,pv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous,pv,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous,pv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,pp,q_0,m3,TODO,constant,TODO,no,,,,
+venous,pp,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous,pp,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous,pp,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous,pp,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+venous,pp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+venous,pp_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+venous,pp_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+venous,pp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous,pp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pp_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,pp_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+venous,pp_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+venous,vv,q_0,m3,TODO,constant,TODO,no,,,,
+venous,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+flow_sum_2,nn,v_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+flow_sum_2,nn,v_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+terminal2,pp,R_T,Js_per_m6,TODO,constant,TODO,no,,,,
+terminal2,pp,C_T,m6_per_J,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pv_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+arterial,pv_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user,yes,,,,
+arterial,pv_nonlinear_visco,l,metre,0.014796,constant,cvs_model_0d: ADAN_86,yes,,,,
+arterial,pv_nonlinear_visco,r_0,metre,0.01508,constant,cvs_model_0d: ADAN_86,yes,,,,
+arterial,pv_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg,yes,,,,
+arterial,pv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pv_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known,no,,,,
+arterial,pv_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known,no,,,,
+arterial,pv_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user,yes,,,,
+arterial,pv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_visco,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,l,metre,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vp_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,pp_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+arterial,pp_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user,yes,,,,
+arterial,pp_nonlinear_visco,l,metre,0.030339,constant,cvs_model_0d: ADAN_86,yes,,,,
+arterial,pp_nonlinear_visco,r_0,metre,0.00436635,constant,cvs_model_0d: ADAN_86,yes,,,,
+arterial,pp_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg,yes,,,,
+arterial,pp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,pp_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known,no,,,,
+arterial,pp_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known,no,,,,
+arterial,pp_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user,yes,,,,
+arterial,pp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+arterial,vv_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+arterial,vv_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user,yes,,,,
+arterial,vv_nonlinear_visco,l,metre,0.0153234,constant,cvs_model_0d: ADAN_86,yes,,,,
+arterial,vv_nonlinear_visco,r_0,metre,0.015642,constant,cvs_model_0d: ADAN_86,yes,,,,
+arterial,vv_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg,yes,,,,
+arterial,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+arterial,vv_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known,no,,,,
+arterial,vv_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known,no,,,,
+arterial,vv_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user,yes,,,,
+arterial,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_constR,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_constR,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,pv_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_visco,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_visco,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+split_junction,pv_nonlinear_visco,theta,dimensionless,0,constant,cvs_model_0d: defined_by_user,yes,,,,
+split_junction,pv_nonlinear_visco,l,metre,0.014796,constant,cvs_model_0d: ADAN_86,yes,,,,
+split_junction,pv_nonlinear_visco,r_0,metre,0.0133364,constant,cvs_model_0d: ADAN_86,yes,,,,
+split_junction,pv_nonlinear_visco,u_0,J_per_m3,10600,constant,cvs_model_0d: assumedRefOf80mmHg,yes,,,,
+split_junction,pv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,pv_nonlinear_visco,m_tube,dimensionless,0.5,constant,cvs_model_0d: known,no,,,,
+split_junction,pv_nonlinear_visco,n_tube,dimensionless,0,constant,cvs_model_0d: known,no,,,,
+split_junction,pv_nonlinear_visco,I_scale,dimensionless,1,constant,cvs_model_0d: defined_by_user,yes,,,,
+split_junction,pv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_constR,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_constR,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_visco,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_visco,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+split_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+split_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,theta,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,l,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,r_0,metre,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+merge_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+constriction,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+constriction,pv,E,J_per_m3,TODO,constant,TODO,no,,,,
+constriction,pv,l,metre,TODO,constant,TODO,no,,,,
+constriction,pv,r,metre,TODO,constant,TODO,no,,,,
+constriction,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+constriction,pv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,vp,q_0,m3,TODO,constant,TODO,no,,,,
+capillary_simple,vp,R,Js_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,vp,C,m6_per_J,TODO,constant,TODO,no,,,,
+capillary_simple,vp,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,vp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,vp,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,pv,q_0,m3,TODO,constant,TODO,no,,,,
+capillary_simple,pv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,pv,C,m6_per_J,TODO,constant,TODO,no,,,,
+capillary_simple,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,pv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,pv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,pv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,pp,q_0,m3,TODO,constant,TODO,no,,,,
+capillary_simple,pp,R,Js_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,pp,C,m6_per_J,TODO,constant,TODO,no,,,,
+capillary_simple,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,pp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple,pp,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,pp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,pp,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,vv,q_0,m3,TODO,constant,TODO,no,,,,
+capillary_simple,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+capillary_simple,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_split,pv,q_C_init,m3,TODO,constant,TODO,no,,,,
+capillary_split,pv,E,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_split,pv,l,metre,TODO,constant,TODO,no,,,,
+capillary_split,pv,r,metre,TODO,constant,TODO,no,,,,
+capillary_split,pv,v_out_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_split,pv,v_out_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_split,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_split,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary,pp,q_C_init,m3,TODO,constant,TODO,no,,,,
+capillary,pp,E,J_per_m3,TODO,constant,TODO,no,,,,
+capillary,pp,l,metre,TODO,constant,TODO,no,,,,
+capillary,pp,r,metre,TODO,constant,TODO,no,,,,
+capillary,pp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary,pp,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary,pp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_merge,vp,q_C_init,m3,TODO,constant,TODO,no,,,,
+capillary_merge,vp,E,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_merge,vp,l,metre,TODO,constant,TODO,no,,,,
+capillary_merge,vp,r,metre,TODO,constant,TODO,no,,,,
+capillary_merge,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary_merge,vp,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_merge,vp,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_merge,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary,vp,q_C_init,m3,TODO,constant,TODO,no,,,,
+capillary,vp,E,J_per_m3,TODO,constant,TODO,no,,,,
+capillary,vp,l,metre,TODO,constant,TODO,no,,,,
+capillary,vp,r,metre,TODO,constant,TODO,no,,,,
+capillary,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+capillary,vp,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_simple,q_0,m3,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_simple,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_simple,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_simple,R,Js_per_m6,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_simple,C,m6_per_J,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_simple,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+MinNout_junction,vv,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+MinNout_junction,vv,theta,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv,E,J_per_m3,TODO,constant,TODO,no,,,,
+MinNout_junction,vv,l,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv,r_0,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+MinNout_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_simple,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_simple,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vp_simple,q_0,m3,TODO,constant,TODO,no,,,,
+Min_junction,vp_simple,R,Js_per_m6,TODO,constant,TODO,no,,,,
+Min_junction,vp_simple,C,m6_per_J,TODO,constant,TODO,no,,,,
+Min_junction,vp_simple,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+Min_junction,vp_simple_novisco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_simple_novisco,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_simple_novisco,u_ext,J_per_m3,0,boundary_condition,cvs_model_0d: user_defined,no,,,,
+Min_junction,vp_simple_novisco,u_0,J_per_m3,0,constant,cvs_model_0d: user_defined,no,,,,
+Min_junction,vp_simple_novisco,q_0,m3,0.0001484,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+Min_junction,vp_simple_novisco,R,Js_per_m6,169559.858501986,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+Min_junction,vp_simple_novisco,C,m6_per_J,1.21676662404483E-07,constant,cvs_model_0d: calculated_from_assumptions,yes,,,,
+Min_junction,vp_simple_novisco,I,Js2_per_m6,0.0000001,constant,cvs_model_0d: small_chosen,yes,,,,
+Min_junction,vp,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vp,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp,E,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vp,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vp_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_simple,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_simple,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vv_simple,q_0,m3,TODO,constant,TODO,no,,,,
+Min_junction,vv_simple,R,Js_per_m6,TODO,constant,TODO,no,,,,
+Min_junction,vv_simple,C,m6_per_J,TODO,constant,TODO,no,,,,
+Min_junction,vv_simple,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+Min_junction,vv,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vv,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv,E,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vv,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,theta,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,l,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,r_0,metre,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_simple,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_simple,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_simple,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,pv_simple,q_0,m3,TODO,constant,TODO,no,,,,
+Nout_junction,pv_simple,R,Js_per_m6,TODO,constant,TODO,no,,,,
+Nout_junction,pv_simple,C,m6_per_J,TODO,constant,TODO,no,,,,
+Nout_junction,pv_simple,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+Nout_junction,pv,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,pv,theta,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv,E,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,pv,l,metre,TODO,constant,TODO,no,,,,
+Nout_junction,pv,r_0,metre,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,pv_nonlinear_visco,u_in,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear_visco,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,generic_junction_test_closed_loop: user_defined,no,,,,
+Nout_junction,pv_nonlinear_visco,u_0,J_per_m3,10600,constant,generic_junction_test_closed_loop: assumedRefOf80mmHg,yes,,,,
+Nout_junction,pv_nonlinear_visco,theta,dimensionless,0,constant,generic_junction_test_closed_loop: defined_by_user,yes,,,,
+Nout_junction,pv_nonlinear_visco,l,metre,0.014796,constant,generic_junction_test_closed_loop: ADAN_86,yes,,,,
+Nout_junction,pv_nonlinear_visco,r_0,metre,0.0133364,constant,generic_junction_test_closed_loop: ADAN_86,yes,,,,
+Nout_junction,pv_nonlinear_visco,m_tube,dimensionless,0.5,constant,generic_junction_test_closed_loop: known,no,,,,
+Nout_junction,pv_nonlinear_visco,n_tube,dimensionless,0,constant,generic_junction_test_closed_loop: known,no,,,,
+Nout_junction,pv_nonlinear_visco,I_scale,dimensionless,1,constant,generic_junction_test_closed_loop: defined_by_user,yes,,,,
+Nout_junction,pv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,pv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_simple,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_simple,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_simple,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_simple,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,vv_simple,q_0,m3,TODO,constant,TODO,no,,,,
+Nout_junction,vv_simple,R,Js_per_m6,TODO,constant,TODO,no,,,,
+Nout_junction,vv_simple,C,m6_per_J,TODO,constant,TODO,no,,,,
+Nout_junction,vv_simple,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+Nout_junction,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,vv,theta,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv,E,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,vv,l,metre,TODO,constant,TODO,no,,,,
+Nout_junction,vv,r_0,metre,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,theta,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,l,metre,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,r_0,metre,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_constR,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear,u_ext,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear,theta,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear,l,metre,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear,r_0,metre,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear,m_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear,n_tube,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear,I_scale,dimensionless,TODO,constant,TODO,no,,,,
+Nout_junction,vv_nonlinear_visco,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear_visco,v_out_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear_visco,u_ext,J_per_m3,0,boundary_condition,generic_junction_test_open_loop: user_defined,no,,,,
+Nout_junction,vv_nonlinear_visco,u_0,J_per_m3,10000,constant,generic_junction_test_open_loop: Boileau_2015,yes,,,,
+Nout_junction,vv_nonlinear_visco,theta,dimensionless,0,constant,generic_junction_test_open_loop: user_defined,no,,,,
+Nout_junction,vv_nonlinear_visco,l,metre,0.074413765495,constant,generic_junction_test_open_loop: Boileau_2015,yes,,,,
+Nout_junction,vv_nonlinear_visco,r_0,metre,0.0144512199325,constant,generic_junction_test_open_loop: Boileau_2015,yes,,,,
+Nout_junction,vv_nonlinear_visco,m_tube,dimensionless,0.5,constant,generic_junction_test_open_loop: known,no,,,,
+Nout_junction,vv_nonlinear_visco,n_tube,dimensionless,0,constant,generic_junction_test_open_loop: known,no,,,,
+Nout_junction,vv_nonlinear_visco,I_scale,dimensionless,1,constant,generic_junction_test_open_loop: user_defined,no,,,,
+Nout_junction,vv_nonlinear_visco,K_tube,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Nout_junction,vv_nonlinear_visco,K_tube_visco,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,q_0,m3,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,u_ext,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple_vol_ctl_uptake,vv,blood_ctl_dir,dimensionless,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,q_0,m3,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,R,Js_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,C,m6_per_J,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,u_ext,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+capillary_simple_vol_ctl_intake,vv,blood_ctl_dir,dimensionless,TODO,constant,TODO,no,,,,
+venous_Rctl,vp_woCont,q_0,m3,TODO,constant,TODO,no,,,,
+venous_Rctl,vp_woCont,R,Js_per_m6,TODO,constant,TODO,no,,,,
+venous_Rctl,vp_woCont,C,m6_per_J,TODO,constant,TODO,no,,,,
+venous_Rctl,vp_woCont,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+venous_Rctl,vp_woCont,u_ext,J_per_m3,TODO,constant,TODO,no,,,,
+venous_Rctl,vp_woCont,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+venous_Rctl,vp_woCont,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+venous_Rctl,vp_woCont,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+venous_Rctl,vp_woCont,Delta_R,Js_per_m6,TODO,boundary_condition,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,v_in_sum,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,u_out,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,u_ext,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,u_0,J_per_m3,TODO,constant,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,q_0,m3,TODO,constant,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,R,Js_per_m6,TODO,constant,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,C,m6_per_J,TODO,constant,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,I,Js2_per_m6,TODO,constant,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,Delta_q_us,dimensionless,TODO,boundary_condition,TODO,no,,,,
+Min_junction_usV_C_ctl,vp_simple,Delta_C,dimensionless,TODO,boundary_condition,TODO,no,,,,
+global,,beta_g,dimensionless,1,global_constant,test_fft: test,yes,,,,
+global,,rho,Js2_per_m5,1,global_constant,test_fft: test,yes,,,,
+global,,mu,Js_per_m3,1,global_constant,test_fft: test,yes,,,,
+global,,g,m_per_s2,1,global_constant,test_fft: test,yes,,,,
+global,,a_vessel,dimensionless,1,global_constant,test_fft: test,yes,,,,
+global,,b_vessel,per_m,1,global_constant,test_fft: test,yes,,,,
+global,,c_vessel,dimensionless,1,global_constant,test_fft: test,yes,,,,
+global,,d_vessel,per_m,1,global_constant,test_fft: test,yes,,,,
+global,,R_flag,dimensionless,1,global_constant,cvs_model_0d: user_defined,no,,,,

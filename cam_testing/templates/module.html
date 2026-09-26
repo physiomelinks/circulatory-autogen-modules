@@ -49,6 +49,9 @@ details pre { white-space: pre-wrap; font-family: var(--font-mono); font-size: 0
 .kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px; font-size: 0.84rem; margin: 0; }
 .kv dt { color: var(--ink-3); } .kv dd { margin: 0; font-family: var(--font-mono); font-size: 0.8rem; overflow-wrap: anywhere; }
 tr.supported td:first-child { font-weight: 600; }
+.box { display: inline-block; width: 13px; height: 13px; border: 1.5px solid var(--ink-3); border-radius: 3px; vertical-align: -2px; margin-right: 6px; position: relative; }
+.box.on { background: var(--pass); border-color: var(--pass); }
+.box.on::after { content: ""; position: absolute; left: 3.5px; top: 0.5px; width: 3px; height: 7px; border: solid var(--panel); border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .yes { color: var(--pass); font-weight: 600; } .no { color: var(--fail); font-weight: 600; }
 footer { color: var(--ink-3); font-size: 0.8rem; }
 </style>
@@ -78,6 +81,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
       <div class="meta">
         <span class="num">{{ components|length }} component{{ '' if components|length == 1 else 's' }}</span>
         <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
+        <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
         <span>libcuflynx {{ libcuflynx_version }}</span>
         <span>Report generated {{ generated }}</span>
       </div>
@@ -133,6 +137,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         </div>
         {%- if c.notes %}<p style="margin:0;max-width:75ch">{{ c.notes }}</p>{% endif %}
         {%- if c.skip %}<p class="muted" style="margin:0">Not tested: {{ c.skip }}</p>{% endif %}
+        {%- if c.unsourced and not c.todo %}<p class="muted" style="margin:0">Unsourced: {{ c.unsourced|join(', ') }}</p>{% endif %}
         {%- if c.todo %}<p class="todo" style="margin:0">{{ c.todo|length }} parameter value{{ '' if c.todo|length == 1 else 's' }} still to set: {{ c.todo|join(', ') }}</p>{% endif %}
       </div>
 
@@ -152,7 +157,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           <p class="muted" style="margin:0;font-size:0.84rem">Verified range: values (one parameter varied at a time, others nominal) for which the component ran and kept its invariants. Validated range: values at which it matched data. Check a system model with <code>python -m cam_testing.ranges check</code>.</p>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Name</th><th>Units</th><th>Kind</th><th>Value</th><th>Verified range</th><th>Validated range</th><th>Source</th></tr></thead>
+              <thead><tr><th>Name</th><th>Units</th><th>Kind</th><th>Value</th><th>Verified range</th><th>Validated range</th><th>Sourced</th><th>Source</th></tr></thead>
               <tbody>
               {%- for v in c.variables %}
                 <tr>
@@ -162,6 +167,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
                   <td class="mono num {{ 'todo' if v.todo }}">{{ v.value if v.value is not none else (('init ' ~ v.initial) if v.initial else '') }}</td>
                   <td class="mono num">{% if v.verified %}{{ v.verified[0]|fmt }} – {{ v.verified[1]|fmt }}{% endif %}</td>
                   <td class="mono num">{% if v.validated %}{{ v.validated[0]|fmt }} – {{ v.validated[1]|fmt }}{% endif %}</td>
+                  <td>{% if v.sourced is not none %}<span class="box {{ 'on' if v.sourced }}" role="img" aria-label="{{ 'sourced' if v.sourced else 'not sourced' }}"></span>{% endif %}</td>
                   <td class="muted" style="font-size:0.78rem">{{ v.reference }}</td>
                 </tr>
               {%- endfor %}

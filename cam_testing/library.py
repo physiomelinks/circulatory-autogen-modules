@@ -49,6 +49,22 @@ def safe_id(text):
     return re.sub(r'[^A-Za-z0-9_.-]+', '_', text)
 
 
+PARAMETER_COLUMNS = ['vessel_type', 'BC_type', 'variable_name', 'units', 'value', 'kind', 'data_reference',
+                     'sourced', 'verified_min', 'verified_max', 'validated_min', 'validated_max']
+
+# data_reference values that do not cite a source
+UNSOURCED_REFERENCES = {'', 'todo', 'none', 'user_defined', 'unreferenced_placeholder', 'initial_guess',
+                        'rate_constant', 'known', 'cam_testing', 'poor_initial_guess_local_minimum'}
+
+
+def looks_sourced(reference):
+    '''Heuristic for seeding the sourced column: does the reference name a source?'''
+    ref = (reference or '').strip()
+    if ':' in ref:          # "<CA example model>: <reference>" from the importer
+        ref = ref.split(':', 1)[1].strip()
+    return ref.lower() not in UNSOURCED_REFERENCES and not ref.lower().startswith('circulatory_autogen example')
+
+
 @dataclass
 class Parameter:
     vessel_type: str
@@ -58,10 +74,15 @@ class Parameter:
     value: str
     kind: str
     data_reference: str
+    sourced: str = ''
     verified_min: str = ''
     verified_max: str = ''
     validated_min: str = ''
     validated_max: str = ''
+
+    @property
+    def is_sourced(self):
+        return self.sourced.strip().lower() in ('yes', 'true', '1')
 
     @property
     def is_todo(self):
@@ -97,6 +118,9 @@ class Component:
         glob = [p for p in self.module.parameters
                 if p.vessel_type == 'global' and p.variable_name in global_names]
         return own + glob
+
+    def unsourced_parameters(self):
+        return [p.variable_name for p in self.parameters() if not p.is_sourced]
 
     def todo_parameters(self):
         return [p.variable_name for p in self.parameters() if p.is_todo]
@@ -135,6 +159,9 @@ class Module:
     @property
     def validation_dir(self):
         return os.path.join(self.dir, 'validation')
+
+    def all_sourced(self):
+        return all(p.is_sourced for p in self.parameters)
 
     @property
     def reviewed(self):

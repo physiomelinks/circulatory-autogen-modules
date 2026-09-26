@@ -171,7 +171,8 @@ def seed_parameters(config, sources):
                     ref = f"{prefix}: {(row.get('data_reference') or '').strip()}"
                     break
             rows.append({'vessel_type': vessel_type, 'BC_type': bc_type, 'variable_name': var,
-                         'units': units, 'value': value, 'kind': kind, 'data_reference': ref})
+                         'units': units, 'value': value, 'kind': kind, 'data_reference': ref,
+                         'sourced': 'yes' if value != 'TODO' and looks_sourced(ref) else 'no'})
     for var, (units, instances) in globals_seen.items():
         value, ref = 'TODO', 'TODO'
         for prefix, params in instances:
@@ -181,7 +182,8 @@ def seed_parameters(config, sources):
                 ref = f"{prefix}: {(row.get('data_reference') or '').strip()}"
                 break
         rows.append({'vessel_type': 'global', 'BC_type': '', 'variable_name': var, 'units': units,
-                     'value': value, 'kind': 'global_constant', 'data_reference': ref})
+                     'value': value, 'kind': 'global_constant', 'data_reference': ref,
+                     'sourced': 'yes' if value != 'TODO' and looks_sourced(ref) else 'no'})
     return rows
 
 
@@ -196,8 +198,8 @@ KNOWN_ISSUES = {
     'parasympathetic': ['undefined units: milliL'],
 }
 
-PARAMETER_COLUMNS = ['vessel_type', 'BC_type', 'variable_name', 'units', 'value', 'kind', 'data_reference',
-                     'verified_min', 'verified_max', 'validated_min', 'validated_max']
+sys.path.insert(0, REPO_ROOT)
+from cam_testing.library import PARAMETER_COLUMNS, looks_sourced  # noqa: E402
 
 
 def write_parameters(path, rows):

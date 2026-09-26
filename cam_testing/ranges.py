@@ -24,10 +24,9 @@ import os
 import sys
 
 from cam_testing import checks
-from cam_testing.library import Parameter, load_module, module_names
+from cam_testing.library import PARAMETER_COLUMNS, load_module, module_names
 
 RANGE_COLUMNS = ['verified_min', 'verified_max', 'validated_min', 'validated_max']
-PARAMETER_COLUMNS = ['vessel_type', 'BC_type', 'variable_name', 'units', 'value', 'kind', 'data_reference'] + RANGE_COLUMNS
 
 
 def verified_ranges_from_sweep(runs, nominal):
@@ -70,7 +69,8 @@ def validated_ranges(component):
         for var, (lo, hi) in (spec.get('parameter_ranges') or {}).items():
             add(var, float(lo), float(hi))
         for var, val in (r.metrics.get('validated_values') or {}).items():
-            add(var, float(val), float(val))
+            for x in (val if isinstance(val, list) else [val]):
+                add(var, float(x), float(x))
     return spans
 
 

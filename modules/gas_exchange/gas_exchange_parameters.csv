@@ -1,103 +1,103 @@
-vessel_type,BC_type,variable_name,units,value,kind,data_reference
-tissue_GE_simple,nn,C_CO2_a,dimensionless,TODO,boundary_condition,TODO
-tissue_GE_simple,nn,C_O2_a,dimensionless,TODO,boundary_condition,TODO
-tissue_GE_simple,nn,q_0,m3,1.64e-04,constant,control_parasymp: Ursino2001AnIntegratedModel_divided_into_brain_compartments
-tissue_GE_simple,nn,C_CO2_p_init,dimensionless,0.52,constant,control_parasymp: user_defined
-tissue_GE_simple,nn,C_O2_p_init,dimensionless,0.15,constant,control_parasymp: user_defined
-tissue_GE_simple,nn,M_CO2,m3_per_s,1.4400000000000002e-07,constant,control_parasymp: calc_from_user_assumptions
-tissue_GE_simple,nn,M_O2,m3_per_s,-1.8e-07,constant,control_parasymp: calc_from_user_assumptions
-pulmonary_GE,nn,C_CO2_p_init,dimensionless,0.48,constant,control_parasymp: user_defined
-pulmonary_GE,nn,C_O2_p_init,dimensionless,0.20,constant,control_parasymp: user_defined
-pulmonary_GE,nn,C_CO2_a,dimensionless,TODO,boundary_condition,TODO
-pulmonary_GE,nn,C_O2_a,dimensionless,TODO,boundary_condition,TODO
-pulmonary_GE,nn,q_0,m3,2.00e-03,constant,control_parasymp: user_defined
-pulmonary_GE,nn,k_O2,m6_per_Js,1.7e-8,constant,control_parasymp: Albanese2016
-pulmonary_GE,nn,k_CO2,m6_per_Js,4.9e-7,constant,control_parasymp: Albanese2016
-pulmonary_GE,nn,shunt_fraction,dimensionless,0.017,constant,control_parasymp: GuytonAndHall2006
-pulmonary_GE,nn_5_lobe,C_CO2_p_init,dimensionless,TODO,constant,TODO
-pulmonary_GE,nn_5_lobe,C_O2_p_init,dimensionless,TODO,constant,TODO
-pulmonary_GE,nn_5_lobe,C_CO2_a,dimensionless,TODO,boundary_condition,TODO
-pulmonary_GE,nn_5_lobe,C_O2_a,dimensionless,TODO,boundary_condition,TODO
-pulmonary_GE,nn_5_lobe,q_0,m3,TODO,constant,TODO
-pulmonary_GE,nn_5_lobe,k_O2,m6_per_Js,TODO,constant,TODO
-pulmonary_GE,nn_5_lobe,k_CO2,m6_per_Js,TODO,constant,TODO
-pulmonary_GE,nn_5_lobe,shunt_fraction,dimensionless,TODO,constant,TODO
-gas_transport_simple,nn,C_CO2_in,dimensionless,TODO,boundary_condition,TODO
-gas_transport_simple,nn,C_O2_in,dimensionless,TODO,boundary_condition,TODO
-gas_transport_simple,nn,C_CO2_out_init,dimensionless,0.48,constant,control_parasymp: user_defined
-gas_transport_simple,nn,C_O2_out_init,dimensionless,0.20,constant,control_parasymp: user_defined
-gas_transport_simple,nn,q_0,m3,3.00e-04,constant,control_parasymp: user_defined
-respiratory_gas_transport,nn,F_O2_i,dimensionless,0.21,constant,control_parasymp: WestPulmonaryPhysiology2008
-respiratory_gas_transport,nn,F_CO2_i,dimensionless,0.000421,constant,control_parasymp: WestPulmonaryPhysiology2008
-respiratory_gas_transport,nn,K_LOSSES,dimensionless,1,constant,control_parasymp: Changed_from_1.2103_from_WestPulmonaryPhysiology2008
-respiratory_gas_transport,nn,F_CO2_D_init,dimensionless,0.03,constant,control_parasymp: user_defined
-respiratory_gas_transport,nn,F_O2_D_init,dimensionless,0.17,constant,control_parasymp: user_defined
-respiratory_gas_transport,nn,F_CO2_A_init,dimensionless,0.04,constant,control_parasymp: user_defined
-respiratory_gas_transport,nn,F_O2_A_init,dimensionless,0.17,constant,control_parasymp: user_defined
-respiratory_gas_transport,nn,v_ml,m3_per_s,TODO,boundary_condition,TODO
-respiratory_gas_transport,nn,v_bA,m3_per_s,TODO,boundary_condition,TODO
-respiratory_gas_transport,nn,q_D,m3,TODO,boundary_condition,TODO
-respiratory_gas_transport,nn,q_A,m3,TODO,boundary_condition,TODO
-GE_capillary,nn,C_CO2_a,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary,nn,C_O2_a,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary,nn,C_O2_c_init,mol_per_m3,TODO,constant,TODO
-GE_capillary,nn,ub_O2_t,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary,nn,v_in,m3_per_s,TODO,boundary_condition,TODO
-GE_capillary,nn,v_out,m3_per_s,TODO,boundary_condition,TODO
-GE_capillary,nn,perm_O2,m_per_s,TODO,constant,TODO
-GE_capillary,nn,L,metre,TODO,boundary_condition,TODO
-GE_capillary,nn,r,metre,TODO,boundary_condition,TODO
-GE_capillary,nn,V,m3,TODO,boundary_condition,TODO
-GE_capillary,nn,exp_threshold,millimolar,TODO,constant,TODO
-GE_capillary,nn,S_O2,mol_per_m3_per_Pa,TODO,constant,TODO
-GE_capillary,nn,S_CO2,mol_per_m3_per_Pa,TODO,constant,TODO
-GE_capillary,nn,k_1,mmHg,TODO,constant,TODO
-GE_capillary,nn,k_2,mmHg,TODO,constant,TODO
-GE_capillary,nn,a_1,dimensionless,TODO,constant,TODO
-GE_capillary,nn,a_2,dimensionless,TODO,constant,TODO
-GE_capillary,nn,alpha_1,per_mmHg,TODO,constant,TODO
-GE_capillary,nn,alpha_2,per_mmHg,TODO,constant,TODO
-GE_capillary,nn,beta_1,per_mmHg,TODO,constant,TODO
-GE_capillary,nn,beta_2,per_mmHg,TODO,constant,TODO
-GE_capillary,nn,C_O2_sat,mol_per_m3,TODO,constant,TODO
-GE_capillary,nn,C_CO2_sat,mol_per_m3,TODO,constant,TODO
-GE_capillary_merge,nn,C_CO2_a_1,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,C_O2_a_1,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,C_CO2_a_2,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,C_O2_a_2,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,C_O2_c_init,mol_per_m3,TODO,constant,TODO
-GE_capillary_merge,nn,ub_O2_t,mol_per_m3,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,v_in_1,m3_per_s,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,v_in_2,m3_per_s,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,v_out,m3_per_s,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,perm_O2,m_per_s,TODO,constant,TODO
-GE_capillary_merge,nn,L,metre,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,r,metre,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,V,m3,TODO,boundary_condition,TODO
-GE_capillary_merge,nn,exp_threshold,millimolar,TODO,constant,TODO
-GE_capillary_merge,nn,S_O2,mol_per_m3_per_Pa,TODO,constant,TODO
-GE_capillary_merge,nn,S_CO2,mol_per_m3_per_Pa,TODO,constant,TODO
-GE_capillary_merge,nn,k_1,mmHg,TODO,constant,TODO
-GE_capillary_merge,nn,k_2,mmHg,TODO,constant,TODO
-GE_capillary_merge,nn,a_1,dimensionless,TODO,constant,TODO
-GE_capillary_merge,nn,a_2,dimensionless,TODO,constant,TODO
-GE_capillary_merge,nn,alpha_1,per_mmHg,TODO,constant,TODO
-GE_capillary_merge,nn,alpha_2,per_mmHg,TODO,constant,TODO
-GE_capillary_merge,nn,beta_1,per_mmHg,TODO,constant,TODO
-GE_capillary_merge,nn,beta_2,per_mmHg,TODO,constant,TODO
-GE_capillary_merge,nn,C_O2_sat,mol_per_m3,TODO,constant,TODO
-GE_capillary_merge,nn,C_CO2_sat,mol_per_m3,TODO,constant,TODO
-global,,overcap_solubility,J_per_m3,10000000000.0,global_constant,control_parasymp: user_defined_for_numerical_stability
-global,,saturation_cap,dimensionless,0.9999,global_constant,control_parasymp: user_defined_for_numerical_stability
-global,,k_1,J_per_m3,1998.5,global_constant,control_parasymp: Spencer1979
-global,,k_2,J_per_m3,25917.4,global_constant,control_parasymp: Spencer1979
-global,,h_1,dimensionless,0.3836,global_constant,control_parasymp: Spencer1979
-global,,h_2,dimensionless,1.819,global_constant,control_parasymp: Spencer1979
-global,,alpha_1,m3_per_J,2.40e-04,global_constant,control_parasymp: Spencer1979
-global,,alpha_2,m3_per_J,4.19e-04,global_constant,control_parasymp: Spencer1979
-global,,beta_1,m3_per_J,6.21e-05,global_constant,control_parasymp: Spencer1979
-global,,beta_2,m3_per_J,2.44e-04,global_constant,control_parasymp: Spencer1979
-global,,C_O2_sat,dimensionless,0.20448,global_constant,control_parasymp: Spencer1979
-global,,C_CO2_sat,dimensionless,1.9564,global_constant,control_parasymp: Spencer1979
-global,,P_atm,J_per_m3,101300,global_constant,control_parasymp: known
-global,,P_ws,J_per_m3,6266.15,global_constant,control_parasymp: WestPulmonaryPhysiology2008
+vessel_type,BC_type,variable_name,units,value,kind,data_reference,sourced,verified_min,verified_max,validated_min,validated_max
+tissue_GE_simple,nn,C_CO2_a,dimensionless,TODO,boundary_condition,TODO,no,,,,
+tissue_GE_simple,nn,C_O2_a,dimensionless,TODO,boundary_condition,TODO,no,,,,
+tissue_GE_simple,nn,q_0,m3,1.64e-04,constant,control_parasymp: Ursino2001AnIntegratedModel_divided_into_brain_compartments,yes,,,,
+tissue_GE_simple,nn,C_CO2_p_init,dimensionless,0.52,constant,control_parasymp: user_defined,no,,,,
+tissue_GE_simple,nn,C_O2_p_init,dimensionless,0.15,constant,control_parasymp: user_defined,no,,,,
+tissue_GE_simple,nn,M_CO2,m3_per_s,1.4400000000000002e-07,constant,control_parasymp: calc_from_user_assumptions,yes,,,,
+tissue_GE_simple,nn,M_O2,m3_per_s,-1.8e-07,constant,control_parasymp: calc_from_user_assumptions,yes,,,,
+pulmonary_GE,nn,C_CO2_p_init,dimensionless,0.48,constant,control_parasymp: user_defined,no,,,,
+pulmonary_GE,nn,C_O2_p_init,dimensionless,0.20,constant,control_parasymp: user_defined,no,,,,
+pulmonary_GE,nn,C_CO2_a,dimensionless,TODO,boundary_condition,TODO,no,,,,
+pulmonary_GE,nn,C_O2_a,dimensionless,TODO,boundary_condition,TODO,no,,,,
+pulmonary_GE,nn,q_0,m3,2.00e-03,constant,control_parasymp: user_defined,no,,,,
+pulmonary_GE,nn,k_O2,m6_per_Js,1.7e-8,constant,control_parasymp: Albanese2016,yes,,,,
+pulmonary_GE,nn,k_CO2,m6_per_Js,4.9e-7,constant,control_parasymp: Albanese2016,yes,,,,
+pulmonary_GE,nn,shunt_fraction,dimensionless,0.017,constant,control_parasymp: GuytonAndHall2006,yes,,,,
+pulmonary_GE,nn_5_lobe,C_CO2_p_init,dimensionless,TODO,constant,TODO,no,,,,
+pulmonary_GE,nn_5_lobe,C_O2_p_init,dimensionless,TODO,constant,TODO,no,,,,
+pulmonary_GE,nn_5_lobe,C_CO2_a,dimensionless,TODO,boundary_condition,TODO,no,,,,
+pulmonary_GE,nn_5_lobe,C_O2_a,dimensionless,TODO,boundary_condition,TODO,no,,,,
+pulmonary_GE,nn_5_lobe,q_0,m3,TODO,constant,TODO,no,,,,
+pulmonary_GE,nn_5_lobe,k_O2,m6_per_Js,TODO,constant,TODO,no,,,,
+pulmonary_GE,nn_5_lobe,k_CO2,m6_per_Js,TODO,constant,TODO,no,,,,
+pulmonary_GE,nn_5_lobe,shunt_fraction,dimensionless,TODO,constant,TODO,no,,,,
+gas_transport_simple,nn,C_CO2_in,dimensionless,TODO,boundary_condition,TODO,no,,,,
+gas_transport_simple,nn,C_O2_in,dimensionless,TODO,boundary_condition,TODO,no,,,,
+gas_transport_simple,nn,C_CO2_out_init,dimensionless,0.48,constant,control_parasymp: user_defined,no,,,,
+gas_transport_simple,nn,C_O2_out_init,dimensionless,0.20,constant,control_parasymp: user_defined,no,,,,
+gas_transport_simple,nn,q_0,m3,3.00e-04,constant,control_parasymp: user_defined,no,,,,
+respiratory_gas_transport,nn,F_O2_i,dimensionless,0.21,constant,control_parasymp: WestPulmonaryPhysiology2008,yes,,,,
+respiratory_gas_transport,nn,F_CO2_i,dimensionless,0.000421,constant,control_parasymp: WestPulmonaryPhysiology2008,yes,,,,
+respiratory_gas_transport,nn,K_LOSSES,dimensionless,1,constant,control_parasymp: Changed_from_1.2103_from_WestPulmonaryPhysiology2008,yes,,,,
+respiratory_gas_transport,nn,F_CO2_D_init,dimensionless,0.03,constant,control_parasymp: user_defined,no,,,,
+respiratory_gas_transport,nn,F_O2_D_init,dimensionless,0.17,constant,control_parasymp: user_defined,no,,,,
+respiratory_gas_transport,nn,F_CO2_A_init,dimensionless,0.04,constant,control_parasymp: user_defined,no,,,,
+respiratory_gas_transport,nn,F_O2_A_init,dimensionless,0.17,constant,control_parasymp: user_defined,no,,,,
+respiratory_gas_transport,nn,v_ml,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+respiratory_gas_transport,nn,v_bA,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+respiratory_gas_transport,nn,q_D,m3,TODO,boundary_condition,TODO,no,,,,
+respiratory_gas_transport,nn,q_A,m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,C_CO2_a,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,C_O2_a,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,C_O2_c_init,mol_per_m3,TODO,constant,TODO,no,,,,
+GE_capillary,nn,ub_O2_t,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,v_in,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,perm_O2,m_per_s,TODO,constant,TODO,no,,,,
+GE_capillary,nn,L,metre,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,r,metre,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,V,m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary,nn,exp_threshold,millimolar,TODO,constant,TODO,no,,,,
+GE_capillary,nn,S_O2,mol_per_m3_per_Pa,TODO,constant,TODO,no,,,,
+GE_capillary,nn,S_CO2,mol_per_m3_per_Pa,TODO,constant,TODO,no,,,,
+GE_capillary,nn,k_1,mmHg,TODO,constant,TODO,no,,,,
+GE_capillary,nn,k_2,mmHg,TODO,constant,TODO,no,,,,
+GE_capillary,nn,a_1,dimensionless,TODO,constant,TODO,no,,,,
+GE_capillary,nn,a_2,dimensionless,TODO,constant,TODO,no,,,,
+GE_capillary,nn,alpha_1,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary,nn,alpha_2,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary,nn,beta_1,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary,nn,beta_2,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary,nn,C_O2_sat,mol_per_m3,TODO,constant,TODO,no,,,,
+GE_capillary,nn,C_CO2_sat,mol_per_m3,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,C_CO2_a_1,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,C_O2_a_1,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,C_CO2_a_2,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,C_O2_a_2,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,C_O2_c_init,mol_per_m3,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,ub_O2_t,mol_per_m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,v_in_1,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,v_in_2,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,v_out,m3_per_s,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,perm_O2,m_per_s,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,L,metre,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,r,metre,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,V,m3,TODO,boundary_condition,TODO,no,,,,
+GE_capillary_merge,nn,exp_threshold,millimolar,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,S_O2,mol_per_m3_per_Pa,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,S_CO2,mol_per_m3_per_Pa,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,k_1,mmHg,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,k_2,mmHg,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,a_1,dimensionless,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,a_2,dimensionless,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,alpha_1,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,alpha_2,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,beta_1,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,beta_2,per_mmHg,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,C_O2_sat,mol_per_m3,TODO,constant,TODO,no,,,,
+GE_capillary_merge,nn,C_CO2_sat,mol_per_m3,TODO,constant,TODO,no,,,,
+global,,overcap_solubility,J_per_m3,10000000000.0,global_constant,control_parasymp: user_defined_for_numerical_stability,yes,,,,
+global,,saturation_cap,dimensionless,0.9999,global_constant,control_parasymp: user_defined_for_numerical_stability,yes,,,,
+global,,k_1,J_per_m3,1998.5,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,k_2,J_per_m3,25917.4,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,h_1,dimensionless,0.3836,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,h_2,dimensionless,1.819,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,alpha_1,m3_per_J,2.40e-04,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,alpha_2,m3_per_J,4.19e-04,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,beta_1,m3_per_J,6.21e-05,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,beta_2,m3_per_J,2.44e-04,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,C_O2_sat,dimensionless,0.20448,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,C_CO2_sat,dimensionless,1.9564,global_constant,control_parasymp: Spencer1979,yes,,,,
+global,,P_atm,J_per_m3,101300,global_constant,control_parasymp: known,no,,,,
+global,,P_ws,J_per_m3,6266.15,global_constant,control_parasymp: WestPulmonaryPhysiology2008,yes,,,,

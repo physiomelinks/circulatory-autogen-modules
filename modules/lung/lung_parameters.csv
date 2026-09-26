@@ -1,65 +1,65 @@
-vessel_type,BC_type,variable_name,units,value,kind,data_reference
-simple_lung_bg,nn,flag_P_mus_control,dimensionless,1.0,constant,control_parasymp: Albanese2016
-simple_lung_bg,nn,flag_RR_control,dimensionless,1.0,constant,control_parasymp: Albanese2016
-simple_lung_bg,nn,P_mus_min,J_per_m3,-980,constant,control_parasymp: Albanese2016_-980_in_this_formulation_is_-490_in_Albanese
-simple_lung_bg,nn,P_plEE,J_per_m3,-490,constant,control_parasymp: WestPulmonaryPhysiology2008
-simple_lung_bg,nn,q_D_min,m3,1e-05,constant,control_parasymp: user_defined
-simple_lung_bg,nn,q_l_us,m3,3.44e-05,constant,control_parasymp: YasuhiroFukui1972
-simple_lung_bg,nn,q_t_us,m3,6.63e-06,constant,control_parasymp: YasuhiroFukui1972
-simple_lung_bg,nn,q_b_us,m3,1.87e-05,constant,control_parasymp: YasuhiroFukui1972
-simple_lung_bg,nn,q_A_us,m3,1.26e-06,constant,control_parasymp: Bizotto2022
-simple_lung_bg,nn,R_ml,Js_per_m6,250000,constant,control_parasymp: changed_from_100058_from_Rideout1991
-simple_lung_bg,nn,R_lt,Js_per_m6,85000,constant,control_parasymp: changed_from_33016_from_Rideout1991
-simple_lung_bg,nn,R_tb,Js_per_m6,80000,constant,control_parasymp: changed_from_30017_from_Rideout1991
-simple_lung_bg,nn,R_bA,Js_per_m6,22000,constant,control_parasymp: changed_from_8006_from_Rideout1991
-simple_lung_bg,nn,R_plwall,Js_per_m6,10000,constant,control_parasymp: changed_from_1.00e+04_fromRideout1991
-simple_lung_bg,nn,alpha_LR,dimensionless,1.0,constant,control_parasymp: user_defined
-simple_lung_bg,nn,C_l,m6_per_J,1.30e-08,constant,control_parasymp: YasuhiroFukui1972
-simple_lung_bg,nn,C_t,m6_per_J,2.43e-08,constant,control_parasymp: YasuhiroFukui1972
-simple_lung_bg,nn,C_b,m6_per_J,1.34e-06,constant,control_parasymp: YasuhiroFukui1972
-simple_lung_bg,nn,C_A,m6_per_J,2.04e-05,constant,control_parasymp: YasuhiroFukui1972_increased_to_get_approx_3L_volume
-simple_lung_bg,nn,C_pl,m6_per_J,2.50e-06,constant,control_parasymp: user_defined_to_be_identified
-simple_lung_bg,nn,T_resp,second,5,constant,control_parasymp: WestPulmonaryPhysiology2008
-simple_lung_bg,nn,Delta_RR_resp,per_s,0,boundary_condition,control_phys_asd: small_chosen
-simple_lung_bg,nn,Delta_P_mus,J_per_m3,0,boundary_condition,control_phys_asd: small_chosen
-simple_lung_bg,nn,IE_ratio,dimensionless,0.6,constant,control_parasymp: Bizotto2022
-lung_bg_Argus_Chase,nn,flag_P_mus_control,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,flag_RR_control,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,alpha_P_mus,dimensionless,TODO,boundary_condition,TODO
-lung_bg_Argus_Chase,nn,P_d_multiplier,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_1,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_2,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_3,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_4,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_5,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_6,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_7,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_d_8,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,k_w,second,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,q_D_min,m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,q_t_us,m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,q_b_us,m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,q_A_us,m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,frac_R_bA,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,R_tot,Js_per_m6,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,R_plwall,Js_per_m6,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,R_leak,Js_per_m6,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,P_leak_threshold,J_per_m3,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,C_t,m6_per_J,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,C_pl,m6_per_J,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,C_vent,m6_per_J,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,C_m,m6_per_J,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,C_tot,m6_per_J,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,alpha_C_A_to_tot,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,beta_C_insp_to_exp,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,R_tube,Js_per_m6,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,alpha_vent,per_s,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,k_p_vent,per_s,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,k_I_vent,per_s2,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,T_resp,second,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,frac_T_insp,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,frac_T_exp,dimensionless,TODO,constant,TODO
-lung_bg_Argus_Chase,nn,Delta_RR_resp,per_s,TODO,boundary_condition,TODO
-thoracic_cavity,nn,P_pl,J_per_m3,TODO,boundary_condition,TODO
-global,,P_m,J_per_m3,0,global_constant,control_parasymp: known
-global,,P_in,J_per_m3,TODO,global_constant,TODO
+vessel_type,BC_type,variable_name,units,value,kind,data_reference,sourced,verified_min,verified_max,validated_min,validated_max
+simple_lung_bg,nn,flag_P_mus_control,dimensionless,1.0,constant,control_parasymp: Albanese2016,yes,,,,
+simple_lung_bg,nn,flag_RR_control,dimensionless,1.0,constant,control_parasymp: Albanese2016,yes,,,,
+simple_lung_bg,nn,P_mus_min,J_per_m3,-980,constant,control_parasymp: Albanese2016_-980_in_this_formulation_is_-490_in_Albanese,yes,,,,
+simple_lung_bg,nn,P_plEE,J_per_m3,-490,constant,control_parasymp: WestPulmonaryPhysiology2008,yes,,,,
+simple_lung_bg,nn,q_D_min,m3,1e-05,constant,control_parasymp: user_defined,no,,,,
+simple_lung_bg,nn,q_l_us,m3,3.44e-05,constant,control_parasymp: YasuhiroFukui1972,yes,,,,
+simple_lung_bg,nn,q_t_us,m3,6.63e-06,constant,control_parasymp: YasuhiroFukui1972,yes,,,,
+simple_lung_bg,nn,q_b_us,m3,1.87e-05,constant,control_parasymp: YasuhiroFukui1972,yes,,,,
+simple_lung_bg,nn,q_A_us,m3,1.26e-06,constant,control_parasymp: Bizotto2022,yes,,,,
+simple_lung_bg,nn,R_ml,Js_per_m6,250000,constant,control_parasymp: changed_from_100058_from_Rideout1991,yes,,,,
+simple_lung_bg,nn,R_lt,Js_per_m6,85000,constant,control_parasymp: changed_from_33016_from_Rideout1991,yes,,,,
+simple_lung_bg,nn,R_tb,Js_per_m6,80000,constant,control_parasymp: changed_from_30017_from_Rideout1991,yes,,,,
+simple_lung_bg,nn,R_bA,Js_per_m6,22000,constant,control_parasymp: changed_from_8006_from_Rideout1991,yes,,,,
+simple_lung_bg,nn,R_plwall,Js_per_m6,10000,constant,control_parasymp: changed_from_1.00e+04_fromRideout1991,yes,,,,
+simple_lung_bg,nn,alpha_LR,dimensionless,1.0,constant,control_parasymp: user_defined,no,,,,
+simple_lung_bg,nn,C_l,m6_per_J,1.30e-08,constant,control_parasymp: YasuhiroFukui1972,yes,,,,
+simple_lung_bg,nn,C_t,m6_per_J,2.43e-08,constant,control_parasymp: YasuhiroFukui1972,yes,,,,
+simple_lung_bg,nn,C_b,m6_per_J,1.34e-06,constant,control_parasymp: YasuhiroFukui1972,yes,,,,
+simple_lung_bg,nn,C_A,m6_per_J,2.04e-05,constant,control_parasymp: YasuhiroFukui1972_increased_to_get_approx_3L_volume,yes,,,,
+simple_lung_bg,nn,C_pl,m6_per_J,2.50e-06,constant,control_parasymp: user_defined_to_be_identified,yes,,,,
+simple_lung_bg,nn,T_resp,second,5,constant,control_parasymp: WestPulmonaryPhysiology2008,yes,,,,
+simple_lung_bg,nn,Delta_RR_resp,per_s,0,boundary_condition,control_phys_asd: small_chosen,yes,,,,
+simple_lung_bg,nn,Delta_P_mus,J_per_m3,0,boundary_condition,control_phys_asd: small_chosen,yes,,,,
+simple_lung_bg,nn,IE_ratio,dimensionless,0.6,constant,control_parasymp: Bizotto2022,yes,,,,
+lung_bg_Argus_Chase,nn,flag_P_mus_control,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,flag_RR_control,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,alpha_P_mus,dimensionless,TODO,boundary_condition,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_multiplier,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_1,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_2,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_3,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_4,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_5,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_6,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_7,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_d_8,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,k_w,second,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,q_D_min,m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,q_t_us,m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,q_b_us,m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,q_A_us,m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,frac_R_bA,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,R_tot,Js_per_m6,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,R_plwall,Js_per_m6,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,R_leak,Js_per_m6,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,P_leak_threshold,J_per_m3,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,C_t,m6_per_J,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,C_pl,m6_per_J,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,C_vent,m6_per_J,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,C_m,m6_per_J,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,C_tot,m6_per_J,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,alpha_C_A_to_tot,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,beta_C_insp_to_exp,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,R_tube,Js_per_m6,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,alpha_vent,per_s,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,k_p_vent,per_s,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,k_I_vent,per_s2,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,T_resp,second,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,frac_T_insp,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,frac_T_exp,dimensionless,TODO,constant,TODO,no,,,,
+lung_bg_Argus_Chase,nn,Delta_RR_resp,per_s,TODO,boundary_condition,TODO,no,,,,
+thoracic_cavity,nn,P_pl,J_per_m3,TODO,boundary_condition,TODO,no,,,,
+global,,P_m,J_per_m3,0,global_constant,control_parasymp: known,no,,,,
+global,,P_in,J_per_m3,TODO,global_constant,TODO,no,,,,
