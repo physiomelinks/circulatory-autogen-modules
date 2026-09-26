@@ -150,7 +150,7 @@ def _check_invariants(spec, t, outputs, params=None, where='sweep'):
     t, the outputs and the component's parameters (by variable name), e.g. "q >= 0".
     '''
     failures = []
-    env = {'np': np, 't': t}
+    env = {'np': np, 't': t, '__builtins__': SAFE_BUILTINS}
     env.update(INVARIANT_HELPERS)
     env.update(params or {})
     env.update(outputs)
@@ -160,7 +160,8 @@ def _check_invariants(spec, t, outputs, params=None, where='sweep'):
             continue
         expr = inv['expr'] if isinstance(inv, dict) else inv
         try:
-            ok = np.all(eval(expr, {'__builtins__': SAFE_BUILTINS}, env))  # noqa: S307 - expressions come from the repo's own yaml
+            # one namespace, so comprehensions/lambdas in an expression can see the parameters and np
+            ok = np.all(eval(expr, env))  # noqa: S307 - expressions come from the repo's own yaml
         except Exception as e:
             failures.append(f'{expr}: could not evaluate ({e})')
             continue
@@ -209,8 +210,20 @@ def run_test(cm):
                    'final_values': {k: float(v[-1]) for k, v in outputs.items()}}
         if bad:
             return Result('run_test', FAILED, f'non-finite output: {", ".join(bad)}', metrics, [fig])
+        # A component whose outputs never change may be a silent no-op (e.g. parameters that don't
+        # reach the equations); flag it so the invariants/review look at it. Not a failure: an
+        # equilibrium run point is legitimate.
+        flat = [k for k, v in outputs.items() if np.ptp(v) == 0]
+        zero = [k for k in flat if np.all(outputs[k] == 0)]
+        metrics['constant_outputs'] = flat
+        warning = ''
+        if flat and len(flat) == len(outputs):
+            warning = f'; WARNING: every output is constant{" (all zero)" if len(zero) == len(outputs) else ""}'
+        elif zero:
+            warning = f'; note: identically zero: {", ".join(zero)}'
         return Result('run_test', PASSED, f'generated and simulated {cm.spec["sim_time"]} s; '
-                      f'all {len(outputs)} outputs finite', metrics, [fig])
+                      f'all {len(outputs)} outputs finite' + warning, metrics, [fig],
+                      [f'constant outputs: {", ".join(flat)}'] if flat else [])
     return _guard(cm.component, 'run_test', check)
 
 
@@ -261,6 +274,8 @@ def sweep_values(param_name, nominal, sweep_spec):
     points = int(sweep_spec.get('points', 5))
     if param_name in ranges:
         r = ranges[param_name]
+        if isinstance(r, dict) and 'values' in r:
+            return [float(v) for v in r['values']], None      # discrete (e.g. 0/1 flags)
         if isinstance(r, dict):
             lo, hi = float(r['min']), float(r['max'])
             n = int(r.get('points', points))
@@ -294,7 +309,7 @@ def verification_test_BC(cm):
         by_var = {p.variable_name: p for p in component.parameters()}
         plot_output = sweep_spec.get('plot_output') or cm.outputs()[0]
 
-        sweeps, failures, notes, n_runs = {}, [], [], 0
+        sweeps, failures, notes, n_runs, failed_runs = {}, [], [], 0, 0
         for var in names:
             pname = harness.parameter_name(by_var[var])
             values, why_not = sweep_values(var, cm.nominal[pname], sweep_spec)
@@ -307,11 +322,14 @@ def verification_test_BC(cm):
                 try:
                     t, outputs = cm.run({pname: value})
                 except Exception as e:
+                    failed_runs += 1
                     failures.append(f'{var}={value:.4g}: simulation failed ({type(e).__name__}: {e})')
                     runs.append((value, None, None))
                     continue
                 bad = _non_finite(outputs)
                 inv = _check_invariants(spec, t, outputs, cm.param_env({pname: value}))
+                if bad or inv:
+                    failed_runs += 1
                 if bad:
                     failures.append(f'{var}={value:.4g}: non-finite {", ".join(bad)}')
                 failures += [f'{var}={value:.4g}: {m}' for m in inv]
@@ -325,7 +343,7 @@ def verification_test_BC(cm):
         metrics = {'swept_kind': swept_kind, 'swept': list(sweeps), 'n_runs': n_runs, 'n_failures': len(failures),
                    'sweep_values': {k: [r[0] for r in v] for k, v in sweeps.items()}}
         if failures:
-            return Result('verification_test_BC', FAILED, f'{len(failures)} of {n_runs} runs failed',
+            return Result('verification_test_BC', FAILED, f'{failed_runs} of {n_runs} runs failed',
                           metrics, figs, failures + notes)
         if not sweeps:
             return Result('verification_test_BC', SKIPPED, 'no boundary condition could be swept', metrics,

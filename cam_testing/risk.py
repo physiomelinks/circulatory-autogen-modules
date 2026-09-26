@@ -31,6 +31,7 @@ from cam_testing import checks, harness, plots
 from cam_testing.library import load_module, module_names
 
 DEFAULT_SAMPLES = 512
+DISCRETE = {}   # id(ComponentModel) -> {variable: allowed values} for discrete sweep ranges
 N_BINS = 8
 
 
@@ -52,12 +53,17 @@ def parameter_box(cm):
     factors = [float(f) for f in sweep_spec.get('factors', [0.5, 2.0])]
     exclude = set(sweep_spec.get('exclude') or [])
     box = []
+    discrete = DISCRETE.setdefault(id(cm), {})
     for p in cm.component.parameters():
         if p.is_todo or p.variable_name in exclude:
             continue
         pname = harness.parameter_name(p)
         r = ranges.get(p.variable_name)
-        if isinstance(r, dict):
+        if isinstance(r, dict) and 'values' in r:
+            vals = sorted(float(v) for v in r['values'])
+            box.append((p.variable_name, pname, vals[0], vals[-1], False))
+            discrete[p.variable_name] = vals
+        elif isinstance(r, dict):
             box.append((p.variable_name, pname, float(r['min']), float(r['max']), r.get('scale') == 'log'))
         elif r is not None:
             box.append((p.variable_name, pname, float(r[0]), float(r[1]), False))
@@ -121,6 +127,11 @@ def analyse(cm, n_samples=DEFAULT_SAMPLES, seed=0, corner_max=6):
     if not box:
         return None
     x = sample_box(box, n_samples, seed)
+    for j, b in enumerate(box):                      # discrete parameters take their allowed values
+        vals = DISCRETE.get(id(cm), {}).get(b[0])
+        if vals:
+            x[:, j] = np.asarray(vals)[np.clip(np.floor((x[:, j] - b[2]) / max(b[3] - b[2], 1e-300) * len(vals)),
+                                                0, len(vals) - 1).astype(int)]
     failed = np.zeros(len(x), dtype=bool)
     reasons, modes = [], []
     for i, row in enumerate(x):
