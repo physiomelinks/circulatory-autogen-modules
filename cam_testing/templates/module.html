@@ -102,7 +102,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           <tbody>
           {%- for c in components %}
             <tr><td><a href="#{{ c.id }}">{{ c.label }}</a></td>
-            {%- for t in c.tests %}<td><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{{ chip(t.status) }}</a></td>{% endfor %}</tr>
+            {%- for t in c.tests %}<td><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}</tr>
           {%- endfor %}
           </tbody>
         </table>
@@ -228,7 +228,8 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         <div class="tests">
         {%- for t in c.tests %}
           <article class="test {{ t.status or '' }}" id="{{ c.id }}--{{ t.key }}">
-            <div class="test-head"><h4>{{ t.title }}</h4>{{ chip(t.status) }}</div>
+            <div class="test-head"><h4>{{ t.title }}</h4>{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Failed · known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</div>
+            {%- if t.known_issue %}<p class="message" style="color:var(--fail)">Known issue: {{ t.known_issue }}</p>{% endif %}
             <p class="about">{{ t.about }}</p>
             <p class="message">{{ t.message }}</p>
 

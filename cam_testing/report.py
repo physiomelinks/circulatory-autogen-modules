@@ -130,6 +130,7 @@ def component_context(component):
             'message': r.message if r else 'This test has not been run for this component yet.',
             'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
             'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
+            'known_issue': (component.spec.get('expected_failures') or {}).get(test),
         })
     risk_result = risk.load(component)
     return {
@@ -185,7 +186,9 @@ def module_context(name):
         'n_sourced': sum(p.is_sourced for p in module.parameters), 'n_parameters': len(module.parameters),
         'counts': _status_counts(components), 'structure': _structure(module),
         'max_risk': max((c['risk']['failure_probability'] for c in components if c['risk']), default=None),
-        'known_issues': module.spec.get('known_issues') or [],
+        'known_issues': (module.spec.get('known_issues') or [])
+                        + [f'{c.id}: {t}: {why}' for c in module.components()
+                           for t, why in (c.spec.get('expected_failures') or {}).items()],
         'test_keys': checks.TESTS, 'test_short': TEST_SHORT,
         'generated': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
         'libcuflynx_version': _libcuflynx_version(),
