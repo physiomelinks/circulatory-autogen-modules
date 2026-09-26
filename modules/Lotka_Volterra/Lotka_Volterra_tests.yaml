@@ -58,20 +58,10 @@ components:
     calibrate:
       status: active
       source: Hudson's Bay Company lynx/hare pelts 1900-1920 (Hewitt 1921), via Carpenter (2018) Stan case study
-      data: validation/hudson_bay_lynx_hare.csv
-      time_column: Year
-      time_offset: 1900
-      variables: {x: Hare, y: Lynx}
-      calibration_window: [0, 15]
+      obs_data: validation/Lotka_Volterra__nn_calibration_obs_data.json
+      params_for_id: validation/Lotka_Volterra__nn_params_for_id.csv
+      validation_obs_data: validation/Lotka_Volterra__nn_validation_obs_data.json
       prediction_window: [15, 20]
-      noise: {type: relative, value: 0.25}
-      params_for_id:
-      - {param: alpha, min: 0.1, max: 2.0}
-      - {param: beta, min: 0.005, max: 0.1}
-      - {param: gamma, min: 0.1, max: 2.0}
-      - {param: delta, min: 0.005, max: 0.1}
-      - {param: x_init, min: 10, max: 60}
-      - {param: y_init, min: 1, max: 20}
       method: CMA-ES
       optimiser_options: {num_calls_to_function: 4000, cost_convergence: 1.0e-08, max_patience: 60, seed: 1}
       metric: log_rmse
