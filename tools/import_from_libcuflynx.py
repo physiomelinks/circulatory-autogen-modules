@@ -189,12 +189,15 @@ def seed_parameters(config, sources):
 
 # Defects found in the CA modules at import (see tests/test_structure.py); reviewed per module.
 KNOWN_ISSUES = {
+    'open_loop': ['port variable u_a not in variables_and_units', 'port variable v_a not in variables_and_units'],
+    'elic': ['port variable u_in not in variables_and_units', 'port variable u_a not in variables_and_units', 'port variable v_a not in variables_and_units'],
+    'BG': ['port variable u_in not in variables_and_units', 'port variable r not in variables_and_units'],
     'BVC_Kidney': ["variable q_vc_W has kind 'variable '"],
-    'cell': ['undefined units: C_per_M', 'undefined units: J_per_MK', 'undefined units: M_per_m3',
+    'cell': ['port variable d not in variables_and_units', 'undefined units: C_per_M', 'undefined units: J_per_MK', 'undefined units: M_per_m3',
              'undefined units: m3_per_M_millis'],
     'cvs_mvp': ['module_type heart_simplesimple_type_OLD is not a component in the library'],
     'input_stimulation': ['undefined units: V'],
-    'ion_channel': ['undefined units: C_per_M', 'undefined units: J_per_MK'],
+    'ion_channel': ['port variable Cai not in variables_and_units', 'undefined units: C_per_M', 'undefined units: J_per_MK'],
     'parasympathetic': ['undefined units: milliL'],
 }
 

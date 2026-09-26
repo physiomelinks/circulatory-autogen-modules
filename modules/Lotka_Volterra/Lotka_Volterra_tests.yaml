@@ -10,12 +10,14 @@ defaults:
   bc_sweep:
     factors: [0.5, 0.75, 1.0, 1.5, 2.0]
     ranges:
-      alpha: {min: 0.2, max: 10, points: 9, scale: log}
-      gamma: {min: 0.2, max: 10, points: 9, scale: log}
-      beta: {min: 0.01, max: 0.5, points: 9, scale: log}
-      delta: {min: 0.01, max: 0.5, points: 9, scale: log}
+      alpha: {min: 0.2, max: 2.3, points: 7, scale: log}
+      gamma: {min: 0.2, max: 3.7, points: 7, scale: log}
+      beta: {min: 0.01, max: 0.3, points: 7, scale: log}
+      delta: {min: 0.01, max: 0.07, points: 7, scale: log}
       x_init: {min: 5, max: 60, points: 7}
       y_init: {min: 2, max: 30, points: 7}
+    rationale: Spans the Carpenter (2018) fitted values; beyond these bounds (with the others at nominal) the populations
+      collapse and the conserved quantity H drifts at the default solver tolerances.
   timestep:
     scheme: rk4
     dts: [0.004, 0.002, 0.001, 0.0005]

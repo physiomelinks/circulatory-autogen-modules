@@ -81,7 +81,9 @@ def module_problems(name, library_components=None):
         for port in entry.get('entrance_ports', []) + entry.get('exit_ports', []) + entry.get('general_ports', []):
             for var in port['variables']:
                 if var not in names:
-                    warnings.append(f"{key}: port variable {var} not in variables_and_units")
+                    # libcuflynx stops ("the port variable ... is not a variable") as soon as such
+                    # a port is connected, so this is an error even if no model connects it yet
+                    errors.append(f"{key}: port variable {var} not in variables_and_units")
     for unit in sorted(used_units - defined - STANDARD_UNITS - local_units):
         errors.append(f'undefined units: {unit}')
 

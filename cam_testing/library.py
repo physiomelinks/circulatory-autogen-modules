@@ -50,7 +50,7 @@ def safe_id(text):
 
 
 PARAMETER_COLUMNS = ['vessel_type', 'BC_type', 'variable_name', 'units', 'value', 'kind', 'data_reference',
-                     'sourced', 'verified_min', 'verified_max', 'validated_min', 'validated_max']
+                     'sourced']
 
 # data_reference text that does not cite a source (assumptions, tuning, placeholders, TODOs)
 import re as _re
@@ -78,10 +78,6 @@ class Parameter:
     kind: str
     data_reference: str
     sourced: str = ''
-    verified_min: str = ''
-    verified_max: str = ''
-    validated_min: str = ''
-    validated_max: str = ''
 
     @property
     def is_sourced(self):

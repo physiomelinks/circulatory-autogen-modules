@@ -35,7 +35,13 @@ def parameter_name(param):
 
 
 def output_name(variable):
-    return f'{VESSEL}/{variable}'
+    '''"var" is a variable of the component under test; "vessel/var" one of a neighbour in its test network.'''
+    return variable if '/' in variable else f'{VESSEL}/{variable}'
+
+
+def output_key(variable):
+    '''The name an output has in invariant expressions ("vessel/var" -> "vessel__var").'''
+    return variable.replace('/', '__')
 
 
 def _write_resources(component, resources_dir, prefix, overrides):
@@ -153,5 +159,5 @@ def run(helper, outputs, params=None):
         if values.size == 1 and t.size > 1:
             # an output that depends only on constants is logged once: broadcast it over time
             values = np.full(t.shape, values[0])
-        results[var] = values
+        results[output_key(var)] = values
     return t, results

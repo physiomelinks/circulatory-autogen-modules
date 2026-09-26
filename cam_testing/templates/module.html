@@ -155,10 +155,10 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
       <div class="two">
         <div class="block">
           <h3>Variables &amp; parameters</h3>
-          <p class="muted" style="margin:0;font-size:0.84rem">Verified range: values (one parameter varied at a time, others nominal) for which the component ran and kept its invariants. Validated range: values at which it matched data. Check a system model with <code>python -m cam_testing.ranges check</code>.</p>
+          <p class="muted" style="margin:0;font-size:0.84rem">Tested range: the range each parameter is varied over in the boundary-condition sweep and the joint failure-risk analysis. Validated values: the spread of values at which the component matched data in a passing validation test. Check a system model's values, and the failure risk near them, with <code>python -m cam_testing.ranges check</code>.</p>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Name</th><th>Units</th><th>Kind</th><th>Value</th><th>Verified range</th><th>Validated range</th><th>Sourced</th><th>Source</th></tr></thead>
+              <thead><tr><th>Name</th><th>Units</th><th>Kind</th><th>Value</th><th>Tested range</th><th>Validated values</th><th>Sourced</th><th>Source</th></tr></thead>
               <tbody>
               {%- for v in c.variables %}
                 <tr>
@@ -166,7 +166,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
                   <td class="mono">{{ v.units }}</td>
                   <td>{{ v.kind|replace('_', ' ') }}</td>
                   <td class="mono num {{ 'todo' if v.todo }}">{{ v.value if v.value is not none else (('init ' ~ v.initial) if v.initial else '') }}</td>
-                  <td class="mono num">{% if v.verified %}{{ v.verified[0]|fmt }} – {{ v.verified[1]|fmt }}{% endif %}</td>
+                  <td class="mono num">{% if v.tested %}{{ v.tested[0]|fmt }} – {{ v.tested[1]|fmt }}{{ ' (log)' if v.tested[2] }}{% endif %}</td>
                   <td class="mono num">{% if v.validated %}{{ v.validated[0]|fmt }} – {{ v.validated[1]|fmt }}{% endif %}</td>
                   <td>{% if v.sourced is not none %}<span class="box {{ 'on' if v.sourced }}" role="img" aria-label="{{ 'sourced' if v.sourced else 'not sourced' }}"></span>{% endif %}</td>
                   <td class="muted" style="font-size:0.78rem">{{ v.reference }}</td>
@@ -202,7 +202,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         <h3>Failure risk over the joint parameter space</h3>
         <div class="test">
           <p class="message">P(fail) = {{ '%.3f'|format(c.risk.failure_probability) }} (95% interval {{ '%.3f'|format(c.risk.ci[0]) }}–{{ '%.3f'|format(c.risk.ci[1]) }}) over {{ c.risk.n_samples }} Sobol samples of the box below{% if c.risk.upper_bound_if_none_failed %}; none failed, so P(fail) &lt; {{ '%.3f'|format(c.risk.upper_bound_if_none_failed) }} at 95% confidence{% endif %}.</p>
-          <p class="about">All parameters are varied together, which the one-at-a-time verified ranges don't cover. η² is the share of the failure indicator's variance explained by that parameter alone (a first-order Sobol-type index), so it ranks which parameters drive failures. Run on request with <code>make risk MODULE={{ name }}</code>.</p>
+          <p class="about">All parameters are varied together over their tested ranges, which the one-at-a-time sweep doesn't cover. η² is the share of the failure indicator's variance explained by that parameter alone (a first-order Sobol-type index), so it ranks which parameters drive failures. Run on request with <code>make risk MODULE={{ name }}</code>.</p>
           <div class="two">
             <div class="table-wrap"><table>
               <thead><tr><th>Parameter</th><th>Sampled range</th><th>η²</th></tr></thead>
@@ -302,6 +302,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
               </tbody>
             </table></div>
             {%- elif t.key == 'verification_test_BC' and t.metrics.sweep_values %}
+            {%- if c.sweep_rationale %}<p class="about"><strong>Why these ranges:</strong> {{ c.sweep_rationale }}</p>{% endif %}
             <dl class="kv">
               {%- for k, vals in t.metrics.sweep_values.items() %}<dt>{{ k }}</dt><dd>{{ vals|fmt }}</dd>{% endfor %}
             </dl>

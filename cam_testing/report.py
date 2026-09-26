@@ -105,6 +105,7 @@ def component_context(component):
     else:
         cellml_vars = {}
     params = {p.variable_name: p for p in component.parameters()}
+    spread = ranges.validated_spread(component)
     for name, units, access, kind in component.config['variables_and_units']:
         cv = cellml_vars.get(name)
         p = params.get(name)
@@ -114,8 +115,8 @@ def component_context(component):
             'value': p.value if p else None, 'todo': bool(p and p.is_todo),
             'reference': p.data_reference if p else '',
             'sourced': p.is_sourced if p else None,
-            'verified': ranges.recorded_range(p, 'verified') if p else None,
-            'validated': ranges.recorded_range(p, 'validated') if p else None,
+            'tested': ranges.tested_range(component, p) if p else None,
+            'validated': spread.get(name),
         })
 
     tests = []
@@ -151,6 +152,7 @@ def component_context(component):
         'BC_type': component.BC_type, 'module_type': component.module_type,
         'format': component.config.get('module_format', 'cellml'),
         'skip': component.spec.get('skip'), 'notes': component.spec.get('notes'),
+        'sweep_rationale': (component.spec.get('bc_sweep') or {}).get('rationale'),
         'equations': equations, 'unsupported': sorted(unsupported),
         'ports': _ports(component.config), 'variables': variables,
         'todo': component.todo_parameters(), 'unsourced': component.unsourced_parameters(), 'invariants': component.spec.get('invariants') or [],

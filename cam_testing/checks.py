@@ -18,7 +18,7 @@ from dataclasses import asdict, dataclass, field
 
 import numpy as np
 
-from cam_testing import fixed_step, harness, plots, ranges
+from cam_testing import fixed_step, harness, plots
 from cam_testing.library import REPO_ROOT
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
@@ -276,8 +276,7 @@ def verification_test_BC(cm):
     def check():
         component, spec = cm.component, cm.spec
         sweep_spec = spec.get('bc_sweep') or {}
-        # 'all' (default): boundary conditions and every constant, so each parameter gets a
-        # verified range; 'bcs': boundary conditions only.
+        # 'all' (default): boundary conditions and every constant; 'bcs': boundary conditions only.
         mode = sweep_spec.get('sweep', 'all')
         bcs = [p.variable_name for p in component.boundary_conditions()]
         if mode == 'bcs':
@@ -293,14 +292,14 @@ def verification_test_BC(cm):
         by_var = {p.variable_name: p for p in component.parameters()}
         plot_output = sweep_spec.get('plot_output') or cm.outputs()[0]
 
-        sweeps, failures, notes, n_runs, verified = {}, [], [], 0, {}
+        sweeps, failures, notes, n_runs = {}, [], [], 0
         for var in names:
             pname = harness.parameter_name(by_var[var])
             values, why_not = sweep_values(var, cm.nominal[pname], sweep_spec)
             if why_not:
                 notes.append(f'{var}: {why_not}')
                 continue
-            runs, passed = [], []
+            runs = []
             for value in values:
                 n_runs += 1
                 try:
@@ -308,7 +307,6 @@ def verification_test_BC(cm):
                 except Exception as e:
                     failures.append(f'{var}={value:.4g}: simulation failed ({type(e).__name__}: {e})')
                     runs.append((value, None, None))
-                    passed.append((value, False))
                     continue
                 bad = _non_finite(outputs)
                 inv = _check_invariants(spec, t, outputs, cm.param_env({pname: value}))
@@ -316,44 +314,17 @@ def verification_test_BC(cm):
                     failures.append(f'{var}={value:.4g}: non-finite {", ".join(bad)}')
                 failures += [f'{var}={value:.4g}: {m}' for m in inv]
                 runs.append((value, t, outputs[plot_output] if not bad else None))
-                passed.append((value, not bad and not inv))
             sweeps[var] = runs
-            verified[var] = ranges.verified_ranges_from_sweep(passed, cm.nominal[pname])
-
-        # The ranges recorded in <name>_parameters.csv must be backed by this run.
-        unsupported = []
-        for p in component.parameters():
-            rec = ranges.recorded_range(p, 'verified')
-            if rec is None:
-                continue
-            got = verified.get(p.variable_name)
-            tol = 1e-5 * max(abs(rec[0]), abs(rec[1]), 1e-12)   # ranges are stored to 6 significant figures
-            if got is None or rec[0] < got[0] - tol or rec[1] > got[1] + tol:
-                unsupported.append(f'{p.variable_name}: recorded verified range [{rec[0]:.4g}, {rec[1]:.4g}] '
-                                   f'not supported by this sweep ({got})')
 
         figs = []
         if sweeps:
             figs.append(plots.plot_sweep(plot_path(component, 'bc_sweep'), sweeps, plot_output, cm.units(),
                                          f'{component.label}: boundary-condition sweep'))
         metrics = {'swept_kind': swept_kind, 'swept': list(sweeps), 'n_runs': n_runs, 'n_failures': len(failures),
-                   'verified_ranges': verified, 'unsupported_recorded_ranges': unsupported,
                    'sweep_values': {k: [r[0] for r in v] for k, v in sweeps.items()}}
-        if unsupported:
-            return Result('verification_test_BC', FAILED,
-                          f'{len(unsupported)} recorded verified range(s) not supported by the latest sweep '
-                          f'(re-run `make ranges` after checking why)', metrics, figs, unsupported + failures + notes)
         if failures:
-            # Failures outside the verified span are information, not a defect: the verified
-            # range records where the module works. Only a failure at the nominal value fails.
-            nominal_failures = [v for v, r in verified.items() if r is None]
-            if nominal_failures:
-                return Result('verification_test_BC', FAILED,
-                              f'fails at the nominal value of: {", ".join(nominal_failures)}',
-                              metrics, figs, failures + notes)
-            return Result('verification_test_BC', PASSED,
-                          f'{n_runs} runs over {len(sweeps)} {swept_kind}; {len(failures)} run(s) outside the '
-                          f'verified ranges failed (see ranges)', metrics, figs, failures + notes)
+            return Result('verification_test_BC', FAILED, f'{len(failures)} of {n_runs} runs failed',
+                          metrics, figs, failures + notes)
         if not sweeps:
             return Result('verification_test_BC', SKIPPED, 'no boundary condition could be swept', metrics,
                           figs, notes)

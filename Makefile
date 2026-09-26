@@ -7,7 +7,7 @@ LIBCUFLYNX ?=
 # extra pytest arguments, e.g. PYTEST_ARGS=--quick-unreviewed (CI)
 PYTEST_ARGS ?=
 
-.PHONY: setup structure test test-all report site serve clean manifests ranges risk
+.PHONY: setup structure test test-all report site serve clean manifests risk
 
 setup:
 	python3 -m venv venv
@@ -36,15 +36,6 @@ site:
 
 serve: site
 	$(PYTHON) -m http.server -d site 8000
-
-# record verified/validated parameter ranges from the latest test results into <name>_parameters.csv
-# joint failure-risk analysis (Sobol samples, corner plots), on request
-SAMPLES ?= 512
-risk:
-	$(PYTHON) -m cam_testing.risk $(MODULE_ARGS) --samples $(SAMPLES)
-
-ranges:
-	$(PYTHON) -m cam_testing.ranges update $(MODULE_ARGS)
 
 manifests:
 	$(PYTHON) tools/build_manifests.py

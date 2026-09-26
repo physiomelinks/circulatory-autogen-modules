@@ -14,7 +14,7 @@ modules/<name>/
   <name>_modules_config.json    libcuflynx module config (ports, variables_and_units)
   <name>_units.cellml           the units this module uses
   <name>_parameters.csv         nominal values per (vessel_type, BC_type): reference ("<bibkey>; note"),
-                                sourced flag, verified / validated ranges
+                                and sourced flag
   <name>_references.bib         BibTeX entries for the parameter references
   <name>_tests.yaml             test spec: outputs, invariants, sweep ranges, timesteps, solvers, validation
   validation/                   baseline and calibration data
@@ -60,23 +60,23 @@ A module whose spec has `reviewed: false` still runs in CI, but its failures don
 
 ## Parameter ranges
 
-`<name>_parameters.csv` records two ranges for each parameter:
-- **Verified range** (`verified_min`, `verified_max`): the values over which the component ran, stayed finite and kept its invariants in `verification_test_BC`. It is the contiguous span around the nominal value, with each parameter varied on its own and the others held at nominal.
-- **Validated range** (`validated_min`, `validated_max`): the values at which the component matched data in a passing validation test. These come from published parameter intervals and calibrated values.
+Each parameter's **tested range** is set in `<name>_tests.yaml`:
+- `bc_sweep.ranges.<param>` as `[min, max]`, or `{min, max, points, scale: log}`;
+- otherwise `bc_sweep.factors` × the nominal value.
 
-`make ranges MODULE=<name>` writes both from the latest test results; commit the file afterwards. After that, `verification_test_BC` fails if a later sweep no longer supports a recorded verified range. Sweep ranges are set per parameter in the spec (`bc_sweep.ranges`, linear or `scale: log`). They should cover the validated values.
+`verification_test_BC` varies each parameter over its tested range with the others at nominal, and fails if any run fails. `make risk` samples all parameters together over the same ranges. The report shows the tested range and the **validated values** for each parameter; the validated values are the spread of values that matched data in passing validation tests.
 
-To check a system model's parameters against the ranges of the modules it uses:
+To check a system model's parameters against the modules it uses:
 
 ```bash
 python -m cam_testing.ranges check --vessel-array my_vessel_array.csv --parameters my_parameters.csv
 ```
 
-This lists each value as inside or outside the verified and validated ranges. It exits non-zero if any value is outside a verified range.
+This lists each value as inside or outside its tested range and validated spread, and estimates the failure risk near the values from the `make risk` samples. It exits non-zero if any value is outside a tested range.
 
 ## Failure risk over the joint parameter space
 
-The verified ranges vary one parameter at a time, so they don't cover combinations, and they shift when the nominal values shift. `make risk MODULE=<name>` (optionally with `SAMPLES=1024`) samples every parameter together, using a scrambled Sobol sequence over the same box the sweep uses. Each sample counts as a failure if the run errors, an output is non-finite, or an invariant is violated.
+The BC sweep varies one parameter at a time, so it doesn't cover combinations. `make risk MODULE=<name>` (optionally with `SAMPLES=1024`) samples every parameter together, using a scrambled Sobol sequence over the same box the sweep uses. Each sample counts as a failure if the run errors, an output is non-finite, or an invariant is violated.
 
 The analysis reports, for each component:
 - the overall failure probability with a 95% interval; if no sample fails, an upper bound of 3/N;
@@ -103,7 +103,6 @@ make setup LIBCUFLYNX=../circulatory_autogen # ...or a local libcuflynx checkout
 make structure                               # static checks
 make test MODULE=diffusion_volume            # V&V tests for one module (make test: all modules)
 make test-all MODULE=diffusion_volume        # including slow calibration
-make ranges MODULE=diffusion_volume          # record verified/validated ranges in the parameters file
 make risk MODULE=diffusion_volume            # joint failure-risk analysis (on request)
 make report MODULE=diffusion_volume          # -> modules/diffusion_volume/diffusion_volume.html
 make serve                                   # build site/ as GitHub Pages serves it; http://localhost:8000
