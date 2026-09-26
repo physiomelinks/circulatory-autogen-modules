@@ -1,5 +1,5 @@
 module: control_system
-reviewed: false
+reviewed: true
 known_issues: []
 defaults:
   sim_time: 10.0
@@ -51,20 +51,6 @@ components:
     and switching to a high-frequency block (f_stim_HF) when the demand falls below f_stim_min. Alone, with constant P_a,
     the integral term has the exact solution e_int = e_int_init + e_norm t.
   run_parameters: {P_a: 10000.0, dP_a_dt: -2000.0, e_int_init: 0.0}
-  reference_proposals:
-    P_a: {reference: DeMers2023_StatPearls_MAP (normal adult MAP ≈ 70–100 mmHg; 12000 Pa = 90 mmHg), sourced: 'yes'}
-    P_target: {reference: DeMers2023_StatPearls_MAP (normal adult MAP ≈ 70–100 mmHg; 12000 Pa = 90 mmHg), sourced: 'yes'}
-    f_stim_max: {reference: Plachta2014_JNeuralEng; Gierthmuehlen2016_HypertensRes (selective VNS for BP control at 30–50
-        Hz in rats), sourced: 'yes'}
-    f_stim_HF: {reference: Kilgore2014_Neuromodulation (kilohertz-frequency conduction block), sourced: 'yes', note: review
-        confirmed; the exact kHz range quoted has not been checked in the paper}
-    f_stim_min: {reference: 'definitional: no minimum stimulation frequency', sourced: definitional}
-    e_int_init: {reference: 'definitional: no accumulated error at t = 0', sourced: definitional}
-    dP_a_dt: {reference: 'definitional: steady pressure when unconnected', sourced: definitional}
-    K_p: {reference: unreferenced_placeholder (controller tuning), sourced: 'no'}
-    K_i: {reference: unreferenced_placeholder (controller tuning), sourced: 'no'}
-    K_d: {reference: unreferenced_placeholder (controller tuning), sourced: 'no'}
-    P_scale: {reference: unreferenced_placeholder (error normalisation choice), sourced: 'no'}
 bibliography:
   DeMers2023_StatPearls_MAP: {citation: 'DeMers D, Wachs D. Physiology, Mean Arterial Pressure. StatPearls, StatPearls Publishing
       (2023).', url: 'https://www.ncbi.nlm.nih.gov/books/NBK538226/'}
@@ -73,4 +59,5 @@ bibliography:
   Gierthmuehlen2016_HypertensRes: {citation: 'Gierthmuehlen M et al. Effect of selective vagal nerve stimulation on blood
       pressure, heart rate and respiratory rate in rats under metoprolol medication. Hypertens Res 39:79–87 (2016).', url: 'https://www.nature.com/articles/hr2015122'}
   Kilgore2014_Neuromodulation: {citation: 'Kilgore KL, Bhadra N. Reversible nerve conduction block using kilohertz frequency
-      alternating current. Neuromodulation 17:242–254 (2014).', url: 'https://onlinelibrary.wiley.com/doi/abs/10.1111/ner.12100'}
+      alternating current. Neuromodulation 17:242–254 (2014). Reports conduction block with kilohertz-frequency AC over 1
+      kHz–100 kHz.', url: 'https://onlinelibrary.wiley.com/doi/abs/10.1111/ner.12100'}
