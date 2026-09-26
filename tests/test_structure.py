@@ -16,6 +16,7 @@ from collections import defaultdict
 import pytest
 
 from cam_testing.library import MODULES_DIR, REPO_ROOT, load_module, module_names
+from cam_testing import bib
 from cam_testing.mathml import component_names
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
@@ -83,6 +84,17 @@ def module_problems(name, library_components=None):
                     warnings.append(f"{key}: port variable {var} not in variables_and_units")
     for unit in sorted(used_units - defined - STANDARD_UNITS - local_units):
         errors.append(f'undefined units: {unit}')
+
+    # a reviewed module's sourced parameters must cite an entry of its references.bib
+    if module.reviewed:
+        keys = set(bib.read(bib.bib_path(module)))
+        for p in module.parameters:
+            if not p.is_sourced or p.data_reference.lower().startswith('definitional'):
+                continue
+            key = bib.reference_key(p.data_reference)
+            if key not in keys:
+                errors.append(f'{p.vessel_type}/{p.variable_name}: sourced, but its reference '
+                              f'"{p.data_reference[:40]}" is not a key in {module.name}_references.bib')
 
     spec_keys = {(c['vessel_type'], c['BC_type']) for c in module.spec.get('components', [])}
     for entry in module.config:

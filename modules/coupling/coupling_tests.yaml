@@ -27,6 +27,19 @@ components:
   validation:
     baseline: {status: pending, reason: validation data not chosen yet}
     calibrate: {status: pending, reason: validation data not chosen yet}
+  harness:
+    vessel_array:
+    - [0D_vessel, pv, arterial_simple, pressure_in, mod]
+    - [pressure_in, nn_constant, inlet_pressure, '', 0D_vessel]
+    - [mod, pv_0D_1D, coupler, 0D_vessel, constant_1D]
+    - [constant_1D, nn, imposter_1D, mod, '']
+    parameters:
+    - [R_0D_vessel, Js_per_m6, 100000000.0, circulatory_autogen 0D_1D_coupling_test]
+    - [C_0D_vessel, m6_per_J, 1.0e-08, circulatory_autogen 0D_1D_coupling_test]
+    - [I_0D_vessel, Js2_per_m6, 1.0e-06, circulatory_autogen 0D_1D_coupling_test]
+    - [P_pressure_in, J_per_m3, 2000, circulatory_autogen 0D_1D_coupling_test]
+    - [P_t_star_constant_1D, J_per_m3, 1000, circulatory_autogen 0D_1D_coupling_test]
+    - [A_star_constant_1D, m3, 0.001, circulatory_autogen 0D_1D_coupling_test]
 - vessel_type: imposter_1D
   BC_type: nn
   module_type: imposter_1D

@@ -39,11 +39,28 @@ def output_name(variable):
 
 
 def _write_resources(component, resources_dir, prefix, overrides):
+    '''
+    The test network: by default the component alone. A component that only works with
+    neighbours (its inputs are variables another vessel supplies) gives a small network in its
+    spec, in which the component under test is the vessel named "mod":
+
+        harness:
+          vessel_array:            # [name, BC_type, vessel_type, inp_vessels, out_vessels]
+            - [pressure_in, nn_constant, inlet_pressure, '', mod]
+            - [mod, pv_0D_1D, coupler, pressure_in, constant_1D]
+          parameters:              # values for the neighbours' parameters
+            - [P_pressure_in, J_per_m3, 2000, source]
+    '''
     os.makedirs(resources_dir, exist_ok=True)
+    network = (component.spec.get('harness') or {})
+    rows = network.get('vessel_array') or [[VESSEL, component.BC_type, component.vessel_type, '', '']]
+    if not any(r[0] == VESSEL for r in rows):
+        raise ValueError(f'harness.vessel_array must contain the component under test as vessel "{VESSEL}"')
     with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
-        writer.writerow([VESSEL, component.BC_type, component.vessel_type, '', ''])
+        for r in rows:
+            writer.writerow([str(x) for x in r])
 
     params = component.parameters()
     todo = [p.variable_name for p in params if p.is_todo and parameter_name(p) not in overrides]
@@ -52,10 +69,15 @@ def _write_resources(component, resources_dir, prefix, overrides):
     with open(os.path.join(resources_dir, f'{prefix}_parameters.csv'), 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['variable_name', 'units', 'value', 'data_reference'])
+        written = set()
         for p in params:
             name = parameter_name(p)
             value = overrides.get(name, p.value)
             writer.writerow([name, p.units, value, p.data_reference or 'cam_testing'])
+            written.add(name)
+        for name, units, value, *ref in network.get('parameters') or []:
+            if name not in written:
+                writer.writerow([name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
 
 
 def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml'):

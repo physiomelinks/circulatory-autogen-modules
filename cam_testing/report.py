@@ -17,7 +17,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import checks, ranges, risk
+from cam_testing import bib, checks, ranges, risk
 from cam_testing.library import REPO_ROOT, load_module, module_names
 from cam_testing.mathml import component_equations, component_variables
 
@@ -137,9 +137,14 @@ def component_context(component):
         })
     risk_result = risk.load(component)
     proposals = component.spec.get('reference_proposals') or {}
-    references = [{'name': p.variable_name, 'value': p.value, 'units': p.units, 'reference': p.data_reference,
-                   'sourced': p.is_sourced, 'proposal': proposals.get(p.variable_name)}
-                  for p in component.parameters()]
+    bib_keys = set(bib.read(bib.bib_path(module)))
+    references = []
+    for p in component.parameters():
+        key = bib.reference_key(p.data_reference)
+        references.append({'name': p.variable_name, 'value': p.value, 'units': p.units,
+                           'reference': p.data_reference, 'key': key if key in bib_keys else None,
+                           'note': p.data_reference.split(';', 1)[1].strip() if ';' in p.data_reference else '',
+                           'sourced': p.is_sourced, 'proposal': proposals.get(p.variable_name)})
     return {
         'risk': risk_result, 'references': references, 'has_proposals': bool(proposals),
         'id': component.id, 'label': component.label, 'vessel_type': component.vessel_type,
@@ -190,7 +195,9 @@ def module_context(name):
     return {
         'name': name, 'reviewed': module.reviewed, 'components': components,
         'all_sourced': module.all_sourced(),
-        'bibliography': module.spec.get('bibliography') or {},
+        'bibliography': [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f)}
+                         for k, f in bib.read(bib.bib_path(module)).items()],
+        'bib_file': os.path.basename(bib.bib_path(module)),
         'n_sourced': sum(p.is_sourced for p in module.parameters), 'n_parameters': len(module.parameters),
         'counts': _status_counts(components), 'structure': _structure(module),
         'max_risk': max((c['risk']['failure_probability'] for c in components if c['risk']), default=None),

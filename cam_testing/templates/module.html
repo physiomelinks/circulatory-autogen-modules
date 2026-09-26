@@ -232,7 +232,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           <tbody>
           {%- for r in c.references %}
             <tr><td class="mono">{{ r.name }}</td><td class="mono num">{{ r.value }}</td><td class="mono">{{ r.units }}</td>
-            <td>{{ r.reference }}</td>
+            <td>{% if r.key %}<a href="#ref-{{ r.key }}">{{ r.key }}</a>{% if r.note %}; {{ r.note }}{% endif %}{% else %}{{ r.reference }}{% endif %}</td>
             <td><span class="box {{ 'on' if r.sourced }}" role="img" aria-label="{{ 'sourced' if r.sourced else 'not sourced' }}"></span></td>
             {%- if c.has_proposals %}
             <td>{% if r.proposal %}{{ r.proposal.reference }}{% if r.proposal.note %}<br><span class="muted" style="font-size:0.8rem">{{ r.proposal.note }}</span>{% endif %}{% endif %}</td>
@@ -332,9 +332,10 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
     {%- if bibliography %}
     <section class="block" aria-labelledby="bibliography">
       <h2 id="bibliography">References</h2>
+      <p class="muted" style="margin:0;font-size:0.84rem">From <code>{{ bib_file }}</code>.</p>
       <ul class="issues">
-      {%- for key, b in bibliography.items() %}
-        <li><span class="mono">{{ key }}</span>: {{ b.citation }}{% if b.url %} <a href="{{ b.url }}">{{ b.url }}</a>{% endif %}</li>
+      {%- for b in bibliography %}
+        <li id="ref-{{ b.key }}"><span class="mono">{{ b.key }}</span>: {{ b.text }}{% if b.link %} <a href="{{ b.link }}">{{ b.link }}</a>{% endif %}</li>
       {%- endfor %}
       </ul>
     </section>
