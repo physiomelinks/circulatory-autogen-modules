@@ -97,7 +97,13 @@ class ComponentModel(object):
     @property
     def model_path(self):
         if self._model_path is None:
-            self._model_path = harness.generate(self.component, self.work_dir)
+            if getattr(self, '_generation_error', None) is not None:
+                raise self._generation_error          # don't regenerate a model that failed to generate
+            try:
+                self._model_path = harness.generate(self.component, self.work_dir)
+            except harness.GenerationFailed as e:
+                self._generation_error = e
+                raise
         return self._model_path
 
     @property
@@ -160,6 +166,7 @@ def _check_invariants(spec, t, outputs, params=None, where='sweep'):
     env.update(INVARIANT_HELPERS)
     env.update(params or {})
     env.update(outputs)
+    env['param'] = dict(params or {})     # param['x']: the parameter even when an output is also named x
     for inv in spec.get('invariants') or []:
         # applies: all (default) | run -- 'run' invariants hold at the nominal parameters only
         if isinstance(inv, dict) and inv.get('applies', 'all') != 'all' and where not in inv['applies'].split(','):

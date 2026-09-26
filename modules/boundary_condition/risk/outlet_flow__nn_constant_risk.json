@@ -1,0 +1,135 @@
+{
+ "n_samples": 512,
+ "n_failures": 0,
+ "failure_probability": 0.0,
+ "ci": [
+  0.0,
+  0.007447247372061501
+ ],
+ "upper_bound_if_none_failed": 0.005859375,
+ "seed": 0,
+ "box": [
+  {
+   "variable": "v",
+   "min": 0.0,
+   "max": 0.00015,
+   "log": false
+  }
+ ],
+ "failure_modes": {},
+ "ranking": [
+  {
+   "variable": "v",
+   "importance": 0.0
+  }
+ ],
+ "per_parameter": {
+  "v": {
+   "range": [
+    0.0,
+    0.00015
+   ],
+   "log": false,
+   "bins": [
+    {
+     "lo": 0.0,
+     "hi": 1.875e-05,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 1.875e-05,
+     "hi": 3.75e-05,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 3.75e-05,
+     "hi": 5.625e-05,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 5.625e-05,
+     "hi": 7.5e-05,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 7.5e-05,
+     "hi": 9.374999999999999e-05,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 9.374999999999999e-05,
+     "hi": 0.0001125,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 0.0001125,
+     "hi": 0.00013125,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 0.00013125,
+     "hi": 0.00015,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    }
+   ],
+   "importance": 0.0
+  }
+ },
+ "example_failures": [],
+ "classifier": {
+  "kind": "constant",
+  "p_fail": 0.0,
+  "note": "every sample passed"
+ },
+ "plots": [
+  "plots/outlet_flow__nn_constant__risk_marginals.png"
+ ]
+}

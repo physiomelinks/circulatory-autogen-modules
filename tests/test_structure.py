@@ -98,6 +98,14 @@ def module_problems(name, library_components=None):
                 errors.append(f'{p.vessel_type}/{p.variable_name}: sourced, but its reference '
                               f'"{p.data_reference[:40]}" is not a key in {module.name}_references.bib')
 
+    # every identifier used in a component's equations must be one of its declared variables
+    root = ET.parse(module.cellml_path).getroot()
+    for comp in root.iter(f'{{{CELLML_NS}}}component'):
+        declared = {v.get('name') for v in comp.findall(f'{{{CELLML_NS}}}variable')}
+        used = {ci.text.strip() for ci in comp.iter('{http://www.w3.org/1998/Math/MathML}ci') if ci.text}
+        for name in sorted(used - declared):
+            warnings.append(f"component {comp.get('name')}: equations use undeclared variable {name}")
+
     spec_keys = {(c['vessel_type'], c['BC_type']) for c in module.spec.get('components', [])}
     for entry in module.config:
         if (entry['vessel_type'], entry['BC_type']) not in spec_keys:

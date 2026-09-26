@@ -1,0 +1,135 @@
+{
+ "n_samples": 512,
+ "n_failures": 0,
+ "failure_probability": 0.0,
+ "ci": [
+  0.0,
+  0.007447247372061501
+ ],
+ "upper_bound_if_none_failed": 0.005859375,
+ "seed": 0,
+ "box": [
+  {
+   "variable": "P",
+   "min": 0.0,
+   "max": 2000.0,
+   "log": false
+  }
+ ],
+ "failure_modes": {},
+ "ranking": [
+  {
+   "variable": "P",
+   "importance": 0.0
+  }
+ ],
+ "per_parameter": {
+  "P": {
+   "range": [
+    0.0,
+    2000.0
+   ],
+   "log": false,
+   "bins": [
+    {
+     "lo": 0.0,
+     "hi": 250.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 250.0,
+     "hi": 500.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 500.0,
+     "hi": 750.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 750.0,
+     "hi": 1000.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 1000.0,
+     "hi": 1250.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 1250.0,
+     "hi": 1500.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 1500.0,
+     "hi": 1750.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 1750.0,
+     "hi": 2000.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    }
+   ],
+   "importance": 0.0
+  }
+ },
+ "example_failures": [],
+ "classifier": {
+  "kind": "constant",
+  "p_fail": 0.0,
+  "note": "every sample passed"
+ },
+ "plots": [
+  "plots/outlet_pressure__nn_constant__risk_marginals.png"
+ ]
+}
