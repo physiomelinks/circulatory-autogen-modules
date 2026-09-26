@@ -26,6 +26,7 @@ SITE_DIR = os.path.join(REPO_ROOT, 'site')
 
 TEST_TITLES = {
     'run_test': 'Run',
+    'verification_test_invariants': 'Verification: invariants',
     'verification_test_BC': 'Verification: boundary conditions',
     'verification_test_timestep': 'Verification: timestep convergence',
     'stability_test': 'Stability: solvers & settings',
@@ -33,13 +34,15 @@ TEST_TITLES = {
     'validation_test_calibrate': 'Validation: calibrate & predict',
 }
 TEST_SHORT = {
-    'run_test': 'Run', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
+    'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate',
 }
 TEST_ABOUT = {
     'run_test': 'Generates the component alone with libcuflynx (every boundary condition becomes a '
-                'parameter), simulates it at the nominal parameters, and checks every output is finite '
-                'and the invariants hold.',
+                'parameter), simulates it, and checks every output is finite.',
+    'verification_test_invariants': 'Checks the simulation against what the component is supposed to do: '
+                                    'the invariants in its spec (exact solutions, conservation laws, bounds, '
+                                    'delays) evaluated at the run parameters.',
     'verification_test_BC': 'Sweeps each boundary condition (or, for a self-contained component, each '
                             'constant) over a range and checks every run completes, stays finite and '
                             'keeps the invariants.',
@@ -55,7 +58,7 @@ TEST_ABOUT = {
                                  'identification, then checks predictions against held-out data.',
 }
 STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
-                None: 'Not run'}
+                'not_applicable': 'N/A', None: 'Not run'}
 
 
 def _fmt(value):
@@ -122,7 +125,7 @@ def component_context(component):
         if r is None and test.startswith('validation_test_'):
             # not run (e.g. slow tests excluded): a skipped/pending spec still says why
             v = validation_spec.get(test.rsplit('_', 1)[1]) or {}
-            if v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED):
+            if v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED, checks.NOT_APPLICABLE):
                 r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
         tests.append({
             'key': test, 'title': TEST_TITLES[test], 'short': TEST_SHORT[test], 'about': TEST_ABOUT[test],
@@ -133,8 +136,12 @@ def component_context(component):
             'known_issue': (component.spec.get('expected_failures') or {}).get(test),
         })
     risk_result = risk.load(component)
+    proposals = component.spec.get('reference_proposals') or {}
+    references = [{'name': p.variable_name, 'value': p.value, 'units': p.units, 'reference': p.data_reference,
+                   'sourced': p.is_sourced, 'proposal': proposals.get(p.variable_name)}
+                  for p in component.parameters()]
     return {
-        'risk': risk_result,
+        'risk': risk_result, 'references': references, 'has_proposals': bool(proposals),
         'id': component.id, 'label': component.label, 'vessel_type': component.vessel_type,
         'BC_type': component.BC_type, 'module_type': component.module_type,
         'format': component.config.get('module_format', 'cellml'),
@@ -148,7 +155,7 @@ def component_context(component):
 
 
 def _status_counts(components):
-    counts = {'passed': 0, 'failed': 0, 'skipped': 0, 'pending': 0, None: 0}
+    counts = {'passed': 0, 'failed': 0, 'skipped': 0, 'pending': 0, 'not_applicable': 0, None: 0}
     for c in components:
         for t in c['tests']:
             counts[t['status']] = counts.get(t['status'], 0) + 1
@@ -183,6 +190,7 @@ def module_context(name):
     return {
         'name': name, 'reviewed': module.reviewed, 'components': components,
         'all_sourced': module.all_sourced(),
+        'bibliography': module.spec.get('bibliography') or {},
         'n_sourced': sum(p.is_sourced for p in module.parameters), 'n_parameters': len(module.parameters),
         'counts': _status_counts(components), 'structure': _structure(module),
         'max_risk': max((c['risk']['failure_probability'] for c in components if c['risk']), default=None),
@@ -209,7 +217,7 @@ def build_index(contexts, out_path, module_href):
              'known_issues': len(c['known_issues']), 'max_risk': c.get('max_risk'),
              'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters']}
             for c in contexts]
-    totals = {k: sum(r['counts'].get(k, 0) for r in rows) for k in ('passed', 'failed', 'skipped', 'pending', None)}
+    totals = {k: sum(r['counts'].get(k, 0) for r in rows) for k in ('passed', 'failed', 'skipped', 'pending', 'not_applicable', None)}
     html_text = _env().get_template('index.html').render(
         rows=rows, totals=totals, generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
         libcuflynx_version=_libcuflynx_version())

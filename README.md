@@ -32,7 +32,8 @@ Each component (one `vessel_type`/`BC_type` entry of a module config) is generat
 
 | Test | What it checks |
 |---|---|
-| `run_test` | generates and simulates at nominal parameters; outputs finite; invariants hold |
+| `run_test` | generates and simulates the component; every output finite |
+| `verification_test_invariants` | the spec's invariants hold (exact solutions, conservation laws, bounds, delays) |
 | `verification_test_BC` | sweeps each boundary condition (or each constant, for self-contained components) over a range; every run finite and invariants hold |
 | `verification_test_timestep` | fixed-step integration of the generated right-hand side at halved steps converges at the scheme's order, and agrees with CVODE at tight tolerances |
 | `stability_test` | a matrix of solvers, tolerances and timesteps (CVODE, SciPy `solve_ivp`, fixed-step Euler/Heun/RK4); reports which work, and requires the declared-supported ones to work |

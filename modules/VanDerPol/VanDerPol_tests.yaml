@@ -37,9 +37,10 @@ components:
       + 7.014 μ^(−2/3), within 2% (nominal μ only; the next term is ~0.8% at μ = 100)', expr: 'abs(period(t, x) - ((3 - 2*np.log(2))
       + 7.014*mu**(-2/3))) <= 0.02 * ((3 - 2*np.log(2)) + 7.014*mu**(-2/3))', applies: run}
   validation:
-    baseline: {status: skipped, reason: 'mathematical benchmark (relaxation oscillator), no physical system to validate against;
-        the period is checked against the Dorodnitsyn (1947) asymptotic formula as a verification invariant'}
-    calibrate: {status: skipped, reason: 'mathematical benchmark, no physical data'}
+    baseline: {status: not_applicable, reason: mathematical benchmark (relaxation oscillator) with no physiological counterpart;
+        the period is checked against the Dorodnitsyn (1947) asymptotic formula as a verification invariant}
+    calibrate: {status: not_applicable, reason: mathematical benchmark (relaxation oscillator) with no physiological counterpart;
+        the period is checked against the Dorodnitsyn (1947) asymptotic formula as a verification invariant}
   notes: 'Time-scaled stiff form of the Van der Pol oscillator used in the Hairer & Wanner VDPOL benchmark (Solving Ordinary
     Differential Equations II, 1996): dy/dt = μ((1 − x²)y − x), i.e. μ = 1/ε. Rescaling time by √μ gives the textbook equation
     with parameter √μ, so the relaxation period is T ≈ (3 − 2 ln 2) + 7.014 μ^(−2/3) (Dorodnitsyn 1947), about 1.94 at μ =

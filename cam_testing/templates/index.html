@@ -25,6 +25,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
     <div class="counts">
       {{ chip('passed', totals.passed ~ ' passed') }} {{ chip('failed', totals.failed ~ ' failed') }}
       {{ chip('pending', totals.pending ~ ' pending') }} {{ chip('skipped', totals.skipped ~ ' skipped') }}
+      {%- if totals.not_applicable %} {{ chip('not_applicable', totals.not_applicable ~ ' N/A') }}{% endif %}
       {%- if totals[None] %} {{ chip(None, totals[None] ~ ' not run') }}{% endif %}
     </div>
   </header>

@@ -21,9 +21,9 @@ import numpy as np
 from cam_testing import fixed_step, harness, plots, ranges
 from cam_testing.library import REPO_ROOT
 
-PASSED, FAILED, SKIPPED, PENDING = 'passed', 'failed', 'skipped', 'pending'
+PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
 
-TESTS = ['run_test', 'verification_test_BC', 'verification_test_timestep', 'stability_test',
+TESTS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test',
          'validation_test_baseline', 'validation_test_calibrate']
 
 
@@ -187,21 +187,65 @@ def _guard(component, test, fn):
 # run_test
 # ----------------------------------------------------------------------------------------------
 
+def _run_point(cm):
+    """run_parameters from the spec: the operating point for the run and invariant tests
+    (e.g. off-equilibrium boundary conditions so the dynamics are exercised); the library
+    defaults stay as they are."""
+    by_var = {p.variable_name: p for p in cm.component.parameters()}
+    return {harness.parameter_name(by_var[k]): float(v) for k, v in (cm.spec.get('run_parameters') or {}).items()}
+
+
 def run_test(cm):
+    """Generates the component with libcuflynx, simulates it, and checks every output is finite."""
     def check():
-        t, outputs = cm.run()
+        point = _run_point(cm)
+        t, outputs = cm.run(point)
         fig = plots.plot_outputs(plot_path(cm.component, 'run'), t, outputs, cm.units(),
-                                 f'{cm.component.label}: nominal parameters')
+                                 f'{cm.component.label}: ' + ('run parameters' if point else 'nominal parameters'))
         bad = _non_finite(outputs)
-        inv = _check_invariants(cm.spec, t, outputs, cm.param_env(), where='run')
         metrics = {'n_time_points': len(t), 'sim_time': float(cm.spec['sim_time']),
                    'final_values': {k: float(v[-1]) for k, v in outputs.items()}}
-        if bad or inv:
-            msg = '; '.join(([f'non-finite output: {", ".join(bad)}'] if bad else []) + inv)
-            return Result('run_test', FAILED, msg, metrics, [fig], inv)
+        if bad:
+            return Result('run_test', FAILED, f'non-finite output: {", ".join(bad)}', metrics, [fig])
         return Result('run_test', PASSED, f'generated and simulated {cm.spec["sim_time"]} s; '
                       f'all {len(outputs)} outputs finite', metrics, [fig])
     return _guard(cm.component, 'run_test', check)
+
+
+# ----------------------------------------------------------------------------------------------
+# verification_test_invariants
+# ----------------------------------------------------------------------------------------------
+
+def verification_test_invariants(cm):
+    """
+    Checks the simulation against what the component is supposed to do: the spec's
+    invariants (exact solutions, conservation laws, bounds, delays, ...) evaluated on the run
+    at the run parameters. The BC sweep checks the same invariants across parameter ranges.
+    """
+    def check():
+        invariants = cm.spec.get('invariants') or []
+        if not invariants:
+            return Result('verification_test_invariants', SKIPPED, 'no invariants defined in the spec for this component')
+        point = _run_point(cm)
+        t, outputs = cm.run(point)
+        with np.errstate(all='ignore'):
+            failures = _check_invariants(cm.spec, t, outputs, cm.param_env(point), where='run')
+        checked = [inv for inv in invariants
+                   if not (isinstance(inv, dict) and inv.get('applies', 'all') != 'all' and 'run' not in inv['applies'].split(','))]
+        results = []
+        for inv in checked:
+            expr = inv['expr'] if isinstance(inv, dict) else inv
+            desc = (inv.get('description') if isinstance(inv, dict) else None) or expr
+            failed = [f for f in failures if f.startswith(expr)]
+            results.append({'invariant': desc, 'expr': expr, 'holds': not failed, 'note': failed[0][len(expr):].strip(': ') if failed else ''})
+        metrics = {'invariants': results}
+        n_fail = sum(not r['holds'] for r in results)
+        if n_fail:
+            names = '; '.join(r['invariant'] for r in results if not r['holds'])
+            return Result('verification_test_invariants', FAILED, f'{n_fail} of {len(results)} invariants violated: {names}',
+                          metrics, [], failures)
+        return Result('verification_test_invariants', PASSED, f'all {len(results)} invariants hold', metrics)
+    return _guard(cm.component, 'verification_test_invariants', check)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -283,7 +327,7 @@ def verification_test_BC(cm):
             if rec is None:
                 continue
             got = verified.get(p.variable_name)
-            tol = 1e-9 * max(abs(rec[0]), abs(rec[1]), 1.0)
+            tol = 1e-5 * max(abs(rec[0]), abs(rec[1]), 1e-12)   # ranges are stored to 6 significant figures
             if got is None or rec[0] < got[0] - tol or rec[1] > got[1] + tol:
                 unsupported.append(f'{p.variable_name}: recorded verified range [{rec[0]:.4g}, {rec[1]:.4g}] '
                                    f'not supported by this sweep ({got})')
@@ -609,7 +653,7 @@ def stability_test(cm):
 def _validation_status(component, kind, test):
     v = (component.spec.get('validation') or {}).get(kind) or {}
     status = v.get('status', PENDING)
-    if status in (PENDING, SKIPPED):
+    if status in (PENDING, SKIPPED, NOT_APPLICABLE):
         return Result(test, status, v.get('reason', 'no validation data chosen yet')), v
     return None, v
 
@@ -672,6 +716,7 @@ def validation_test_calibrate(cm):
 
 CHECKS = {
     'run_test': run_test,
+    'verification_test_invariants': verification_test_invariants,
     'verification_test_BC': verification_test_BC,
     'verification_test_timestep': verification_test_timestep,
     'stability_test': stability_test,
