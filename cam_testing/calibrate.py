@@ -129,7 +129,8 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
     inp = {
         'model_path': model_path, 'model_type': 'cellml',
         'file_prefix': os.path.splitext(os.path.basename(model_path))[0],
-        'param_id_method': v.get('method', 'CMA-ES'), 'sim_time': cal_end, 'pre_time': 0.0, 'dt': dt,
+        'param_id_method': v.get('method', 'CMA-ES'), 'sim_time': cal_end,
+        'pre_time': float(obs['protocol_info'].get('pre_times', [0.0])[0]), 'dt': dt,
         'solver_info': {'solver': 'CVODE_myokit', 'rtol': 1e-8, 'atol': 1e-10},
         'optimiser_options': dict({'num_calls_to_function': 2000, 'cost_type': 'gaussian_MLE'},
                                   **(v.get('optimiser_options') or {})),
@@ -157,7 +158,8 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end):
     t_end = float(val_obs['protocol_info']['sim_times'][0][-1])
     dts = [float(i['obs_dt']) for i in val_obs['data_items'] if i.get('data_type') == 'series']
     wanted = sorted(set(series) | {op.split('/', 1)[1] for i in constants for op in i['operands']})
-    run_spec = dict(cm.spec, sim_time=t_end, pre_time=0.0, dt=min(dts + [float(cm.spec['dt'])]))
+    pre = float(val_obs['protocol_info'].get('pre_times', [0.0])[0])   # e.g. reach periodic steady state first
+    run_spec = dict(cm.spec, sim_time=t_end, pre_time=pre, dt=min(dts + [float(cm.spec['dt'])]))
     helper = harness.simulation_helper(cm.model_path, run_spec, solver_info={'rtol': 1e-8, 'atol': 1e-10})
     overrides = {'parameters/' + harness.parameter_name(by_var[k]): val for k, val in calibrated.items()}
     tm, out = harness.run(helper, wanted, params=overrides)

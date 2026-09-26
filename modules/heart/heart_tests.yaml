@@ -455,20 +455,53 @@ components:
       itself is consistent.'
   validation:
     baseline:
-      status: pending
-      reason: 'Candidate: normal adult values. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47
-        +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +-
-        24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV
-        Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the
-        harness (last cycle after 20 s): LV EDV 203 ml, ESV 81 ml, SV 122 ml, EF 60 %, RV EDV 247 ml, CO 7.2 l/min, aortic
-        131/76 mmHg, pulmonary artery 70/18 mmHg, mean LA pressure 22 mmHg. These are scalar features of the periodic state;
-        validation_test_baseline only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs
-        from t = 0 with pre_time 0, so max/min features would include the start-up transient (framework need).'
+      status: proposed
+      source: 'Maceira2006LV; Table 8, all subjects (n = 120, 60 men / 60 women, SSFP CMR): EDV 142 +- 21 ml, ESV 47 +- 10
+        ml, SV 95 +- 14 ml, EF 67 +- 4.6 %. Pressures: Table 1 brachial cuff blood pressure, range of the age-decile means
+        of men and women (systolic 115-135, diastolic 68-79 mmHg); brachial, not central aortic, pressure, so the pressure
+        targets are approximate. Checked directly in the scmr.org PDF of the paper. A target passes when |model - mean| <=
+        2 SD, or the model lies in the range.'
+      source_short: Maceira 2006 normal adults
+      pre_time: 20.0
+      sim_time: 5.0
+      targets:
+      - name: LV end-diastolic volume
+        expr: np.max(q_lv)*1e6
+        value: 142
+        std: 21
+        units: ml
+      - name: LV end-systolic volume
+        expr: np.min(q_lv)*1e6
+        value: 47
+        std: 10
+        units: ml
+      - name: LV stroke volume
+        expr: np.ptp(q_lv)*1e6
+        value: 95
+        std: 14
+        units: ml
+      - name: LV ejection fraction
+        expr: 100*np.ptp(q_lv)/np.max(q_lv)
+        value: 67
+        std: 4.6
+        units: '%'
+      - name: aortic systolic pressure (vs brachial cuff)
+        expr: np.max(aortic_root__u)/133.322
+        range:
+        - 115
+        - 135
+        units: mmHg
+      - name: aortic diastolic pressure (vs brachial cuff)
+        expr: np.min(aortic_root__u)/133.322
+        range:
+        - 68
+        - 79
+        units: mmHg
     calibrate:
       status: pending
       reason: 'Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira
-        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes and CO;
-        blocked by the same pre_time limitation.'
+        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate
+        evaluation does not yet honour pre_time (framework need).'
   reference_proposals:
     Delta_T:
       reference: 'definitional; no control input: zero change of the heart period (T_wCont = T)'
@@ -895,8 +928,8 @@ components:
     calibrate:
       status: pending
       reason: 'Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira
-        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes and CO;
-        blocked by the same pre_time limitation.'
+        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate
+        evaluation does not yet honour pre_time (framework need).'
   reference_proposals:
     Delta_T:
       reference: 'definitional; no control input: zero change of the heart period (T_wCont = T)'
@@ -1334,20 +1367,53 @@ components:
       the flow.'
   validation:
     baseline:
-      status: pending
-      reason: 'Candidate: normal adult values. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47
-        +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +-
-        24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV
-        Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the
-        harness (last cycle after 20 s): LV EDV 205 ml, ESV 78 ml, SV 126 ml, EF 62 %, RV EDV 248 ml, CO 7.0 l/min, aortic
-        131/77 mmHg, pulmonary artery 72/16 mmHg, mean LA pressure 21 mmHg. These are scalar features of the periodic state;
-        validation_test_baseline only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs
-        from t = 0 with pre_time 0, so max/min features would include the start-up transient (framework need).'
+      status: proposed
+      source: 'Maceira2006LV; Table 8, all subjects (n = 120, 60 men / 60 women, SSFP CMR): EDV 142 +- 21 ml, ESV 47 +- 10
+        ml, SV 95 +- 14 ml, EF 67 +- 4.6 %. Pressures: Table 1 brachial cuff blood pressure, range of the age-decile means
+        of men and women (systolic 115-135, diastolic 68-79 mmHg); brachial, not central aortic, pressure, so the pressure
+        targets are approximate. Checked directly in the scmr.org PDF of the paper. A target passes when |model - mean| <=
+        2 SD, or the model lies in the range.'
+      source_short: Maceira 2006 normal adults
+      pre_time: 20.0
+      sim_time: 5.0
+      targets:
+      - name: LV end-diastolic volume
+        expr: np.max(q_lv)*1e6
+        value: 142
+        std: 21
+        units: ml
+      - name: LV end-systolic volume
+        expr: np.min(q_lv)*1e6
+        value: 47
+        std: 10
+        units: ml
+      - name: LV stroke volume
+        expr: np.ptp(q_lv)*1e6
+        value: 95
+        std: 14
+        units: ml
+      - name: LV ejection fraction
+        expr: 100*np.ptp(q_lv)/np.max(q_lv)
+        value: 67
+        std: 4.6
+        units: '%'
+      - name: aortic systolic pressure (vs brachial cuff)
+        expr: np.max(aortic_root__u)/133.322
+        range:
+        - 115
+        - 135
+        units: mmHg
+      - name: aortic diastolic pressure (vs brachial cuff)
+        expr: np.min(aortic_root__u)/133.322
+        range:
+        - 68
+        - 79
+        units: mmHg
     calibrate:
       status: pending
       reason: 'Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira
-        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes and CO;
-        blocked by the same pre_time limitation.'
+        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate
+        evaluation does not yet honour pre_time (framework need).'
   reference_proposals:
     Delta_T:
       reference: 'definitional; no control input: zero change of the heart period (T_wCont = T)'
@@ -1766,20 +1832,53 @@ components:
       itself is consistent.'
   validation:
     baseline:
-      status: pending
-      reason: 'Candidate: normal adult values. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47
-        +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +-
-        24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV
-        Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the
-        harness (last cycle after 20 s): LV EDV 203 ml, ESV 81 ml, SV 122 ml, EF 60 %, RV EDV 247 ml, CO 7.2 l/min, aortic
-        131/76 mmHg, pulmonary artery 70/18 mmHg, mean LA pressure 22 mmHg. These are scalar features of the periodic state;
-        validation_test_baseline only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs
-        from t = 0 with pre_time 0, so max/min features would include the start-up transient (framework need).'
+      status: proposed
+      source: 'Maceira2006LV; Table 8, all subjects (n = 120, 60 men / 60 women, SSFP CMR): EDV 142 +- 21 ml, ESV 47 +- 10
+        ml, SV 95 +- 14 ml, EF 67 +- 4.6 %. Pressures: Table 1 brachial cuff blood pressure, range of the age-decile means
+        of men and women (systolic 115-135, diastolic 68-79 mmHg); brachial, not central aortic, pressure, so the pressure
+        targets are approximate. Checked directly in the scmr.org PDF of the paper. A target passes when |model - mean| <=
+        2 SD, or the model lies in the range.'
+      source_short: Maceira 2006 normal adults
+      pre_time: 20.0
+      sim_time: 5.0
+      targets:
+      - name: LV end-diastolic volume
+        expr: np.max(q_lv)*1e6
+        value: 142
+        std: 21
+        units: ml
+      - name: LV end-systolic volume
+        expr: np.min(q_lv)*1e6
+        value: 47
+        std: 10
+        units: ml
+      - name: LV stroke volume
+        expr: np.ptp(q_lv)*1e6
+        value: 95
+        std: 14
+        units: ml
+      - name: LV ejection fraction
+        expr: 100*np.ptp(q_lv)/np.max(q_lv)
+        value: 67
+        std: 4.6
+        units: '%'
+      - name: aortic systolic pressure (vs brachial cuff)
+        expr: np.max(aortic_root__u)/133.322
+        range:
+        - 115
+        - 135
+        units: mmHg
+      - name: aortic diastolic pressure (vs brachial cuff)
+        expr: np.min(aortic_root__u)/133.322
+        range:
+        - 68
+        - 79
+        units: mmHg
     calibrate:
       status: pending
       reason: 'Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira
-        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes and CO;
-        blocked by the same pre_time limitation.'
+        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate
+        evaluation does not yet honour pre_time (framework need).'
   reference_proposals:
     u_root:
       reference: 'definitional; port input: the aortic root pressure (from the aortic_root vessel) is supplied by the connected
@@ -2166,20 +2265,53 @@ components:
       itself is consistent.'
   validation:
     baseline:
-      status: pending
-      reason: 'Candidate: normal adult values. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47
-        +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +-
-        24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV
-        Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the
-        harness (last cycle after 20 s): LV EDV 203 ml, ESV 81 ml, SV 122 ml, EF 60 %, RV EDV 247 ml, CO 7.2 l/min, aortic
-        131/76 mmHg, pulmonary artery 70/18 mmHg, mean LA pressure 22 mmHg. These are scalar features of the periodic state;
-        validation_test_baseline only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs
-        from t = 0 with pre_time 0, so max/min features would include the start-up transient (framework need).'
+      status: proposed
+      source: 'Maceira2006LV; Table 8, all subjects (n = 120, 60 men / 60 women, SSFP CMR): EDV 142 +- 21 ml, ESV 47 +- 10
+        ml, SV 95 +- 14 ml, EF 67 +- 4.6 %. Pressures: Table 1 brachial cuff blood pressure, range of the age-decile means
+        of men and women (systolic 115-135, diastolic 68-79 mmHg); brachial, not central aortic, pressure, so the pressure
+        targets are approximate. Checked directly in the scmr.org PDF of the paper. A target passes when |model - mean| <=
+        2 SD, or the model lies in the range.'
+      source_short: Maceira 2006 normal adults
+      pre_time: 20.0
+      sim_time: 5.0
+      targets:
+      - name: LV end-diastolic volume
+        expr: np.max(q_lv)*1e6
+        value: 142
+        std: 21
+        units: ml
+      - name: LV end-systolic volume
+        expr: np.min(q_lv)*1e6
+        value: 47
+        std: 10
+        units: ml
+      - name: LV stroke volume
+        expr: np.ptp(q_lv)*1e6
+        value: 95
+        std: 14
+        units: ml
+      - name: LV ejection fraction
+        expr: 100*np.ptp(q_lv)/np.max(q_lv)
+        value: 67
+        std: 4.6
+        units: '%'
+      - name: aortic systolic pressure (vs brachial cuff)
+        expr: np.max(aortic_root__u)/133.322
+        range:
+        - 115
+        - 135
+        units: mmHg
+      - name: aortic diastolic pressure (vs brachial cuff)
+        expr: np.min(aortic_root__u)/133.322
+        range:
+        - 68
+        - 79
+        units: mmHg
     calibrate:
       status: pending
       reason: 'Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira
-        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes and CO;
-        blocked by the same pre_time limitation.'
+        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate
+        evaluation does not yet honour pre_time (framework need).'
   reference_proposals:
     u_root:
       reference: 'definitional; port input: the aortic root pressure (from the aortic_root vessel) is supplied by the connected
@@ -2571,21 +2703,54 @@ components:
       placeholder Rmod = 3000 (TODO in the csv) and on the unit issue in proposed_fixes.
   validation:
     baseline:
-      status: pending
-      reason: 'Candidate: normal adult values. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47
-        +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +-
-        24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV
-        Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the
-        harness (last cycle after 20 s): LV EDV 204 ml, ESV 79 ml, SV 125 ml, EF 61 %, RV EDV 257 ml, CO 6.5 l/min, aortic
-        126/67 mmHg, pulmonary artery 69/19 mmHg, mean LA pressure 23 mmHg. These are scalar features of the periodic state;
-        validation_test_baseline only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs
-        from t = 0 with pre_time 0, so max/min features would include the start-up transient (framework need).'
+      status: proposed
+      source: 'Maceira2006LV; Table 8, all subjects (n = 120, 60 men / 60 women, SSFP CMR): EDV 142 +- 21 ml, ESV 47 +- 10
+        ml, SV 95 +- 14 ml, EF 67 +- 4.6 %. Pressures: Table 1 brachial cuff blood pressure, range of the age-decile means
+        of men and women (systolic 115-135, diastolic 68-79 mmHg); brachial, not central aortic, pressure, so the pressure
+        targets are approximate. Checked directly in the scmr.org PDF of the paper. A target passes when |model - mean| <=
+        2 SD, or the model lies in the range.'
+      source_short: Maceira 2006 normal adults
+      pre_time: 20.0
+      sim_time: 5.0
+      targets:
+      - name: LV end-diastolic volume
+        expr: np.max(q_lv)*1e6
+        value: 142
+        std: 21
+        units: ml
+      - name: LV end-systolic volume
+        expr: np.min(q_lv)*1e6
+        value: 47
+        std: 10
+        units: ml
+      - name: LV stroke volume
+        expr: np.ptp(q_lv)*1e6
+        value: 95
+        std: 14
+        units: ml
+      - name: LV ejection fraction
+        expr: 100*np.ptp(q_lv)/np.max(q_lv)
+        value: 67
+        std: 4.6
+        units: '%'
+      - name: aortic systolic pressure (vs brachial cuff)
+        expr: np.max(aortic_root__u)/133.322
+        range:
+        - 115
+        - 135
+        units: mmHg
+      - name: aortic diastolic pressure (vs brachial cuff)
+        expr: np.min(aortic_root__u)/133.322
+        range:
+        - 68
+        - 79
+        units: mmHg
     calibrate:
       status: pending
       reason: 'Candidate: the owner''s BioBeat subject data used for circulatory_autogen new_valve_p_est (Rmod, gamma identification);
         not public, owner to confirm availability. Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop
         blood volume) to the Maceira LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict
-        the RV volumes and CO; blocked by the same pre_time limitation.'
+        the RV volumes; the calibrate evaluation does not yet honour pre_time (framework need).'
   reference_proposals:
     u_root:
       reference: 'definitional; port input: the aortic root pressure (from the aortic_root vessel) is supplied by the connected
@@ -3000,19 +3165,21 @@ components:
   validation:
     baseline:
       status: pending
-      reason: 'Candidate: normal adult values. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47
-        +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +-
-        24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV
-        Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the
-        harness (last cycle after 20 s): LV EDV 116 ml, ESV 49 ml, SV 67 ml, EF 58 %, RV EDV 94 ml, CO 3.9 l/min, aortic 77/46
-        mmHg, pulmonary artery 48/11 mmHg, mean LA pressure 16 mmHg. These are scalar features of the periodic state; validation_test_baseline
-        only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs from t = 0 with pre_time
-        0, so max/min features would include the start-up transient (framework need).'
+      reason: 'heart_simple_LVprop is used by the circulatory_autogen neonatal model, so adult CMR values (Maceira 2006) are
+        not the right target; a neonatal reference set is needed. Candidate: normal adult values. Maceira2006LV Table 8 (all
+        subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47 +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020
+        Table 9: RV EDV 163 +- 27 (men) / 127 +- 24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men)
+        / 4.5 +- 0.9 (women) l/min; Maceira2006LV Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison
+        at the nominal parameters in the harness (last cycle after 20 s): LV EDV 116 ml, ESV 49 ml, SV 67 ml, EF 58 %, RV
+        EDV 94 ml, CO 3.9 l/min, aortic 77/46 mmHg, pulmonary artery 48/11 mmHg, mean LA pressure 16 mmHg. These are scalar
+        features of the periodic state; validation_test_baseline only compares time series from t = 0 (no pre_time) and the
+        calibrate evaluation also runs from t = 0 with pre_time 0, so max/min features would include the start-up transient
+        (framework need).'
     calibrate:
       status: pending
       reason: 'Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira
-        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes and CO;
-        blocked by the same pre_time limitation.'
+        LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate
+        evaluation does not yet honour pre_time (framework need).'
   reference_proposals:
     u_root:
       reference: 'definitional; port input: the aortic root pressure (from the aortic_root vessel) is supplied by the connected
@@ -3700,8 +3867,9 @@ review:
     families). Recorded failures: RK4 self-convergence is non-monotone for all variants (piecewise-smooth valve law). heart_new_valve
     fails the backflow invariant. heart_nonstiff fails the positive-volume invariant and the sweep (q_ra < 0). heart_devel
     does not generate. References proposed for every parameter; the primary parameter tables were paywalled and were checked
-    only through secondary sources. Validation is pending for every variant, with normal CMR values (Maceira 2006, Kawel-Boehm
-    2020) identified and a preliminary comparison given.'
+    only through secondary sources. Validation: proposed Maceira 2006 steady-state baseline targets on five adult variants.
+    The nominal model meets SV, EF and the aortic pressures but misses EDV (203 vs 142 +- 21 ml) and ESV (81 vs 47 +- 10 ml).
+    The rest is pending.'
   questions:
   - 'References (see the table): Liang2009MBEC Table 2 for the timings (T_ac, T_ar, t_astart, T_vr, t_vstart) and atrial elastances;
     Korakianitis2006JBiomech Table 1 for the unstressed volumes; Mynard2015ABME for K_vo/K_vc of the tricuspid and pulmonary
@@ -3721,11 +3889,15 @@ review:
     a zero-flow inlet, and neighbour inertances raised from 1e-6..1e-1 to 1e5 Pa s2/m3 (the CA values made the network, not
     the heart, stiff, with R/I up to 1e13 1/s). Initial volumes (q_*_init) set the closed-loop blood volume, so they are effectively
     parameters: should they be sourced (e.g. from a total blood volume)?'
-  - 'Validation: use the normal adult CMR values as the baseline target (Maceira2006LV Table 8: LVEDV 142 +- 21, ESV 47 +-
-    10, SV 95 +- 14 ml, EF 67 +- 4.6 %; RV and CO from Maceira2006RV / KawelBoehm2020)? This needs a framework feature: scalar
-    features of the periodic state after pre_time (see findings). At the nominal parameters the model gives LVEDV 203 ml,
-    ESV 81 ml, SV 122 ml, EF 60 %, CO 7.2 l/min, aortic 131/77 mmHg, mean LA pressure 22 mmHg, PA 70/18 mmHg, so the elastances
-    and blood volume would need calibrating first.'
+  - 'Validation (proposed, awaiting confirmation): baseline targets from Maceira2006LV Table 8 (verified in the paper PDF):
+    EDV 142 +- 21, ESV 47 +- 10, SV 95 +- 14 ml, EF 67 +- 4.6 %; aortic systolic 115-135 and diastolic 68-79 mmHg (range of
+    the Table 1 brachial cuff decile means; brachial, not central, pressure). They are set on heart vp_wCont, vp, vp_Ca, nonstiff
+    and new_valve, with a pass at 2 SD. At nominal parameters (heart vp) SV 122 ml, EF 60 %, aortic 131/77 mmHg pass, but
+    EDV 203 ml (+2.9 SD) and ESV 81 ml (+3.4 SD) fail: the LV is too large, which fits the user-defined low E_lv_A plus too
+    much blood in the loop (initial volumes). new_valve also misses SV (125 ml) and diastolic pressure (67 mmHg, from aortic
+    regurgitation). Accept these targets? Accept the brachial pressure ranges as a proxy? Next step would be to calibrate
+    E_lv_A, E_lv_B and blood volume (q_lv_init) to them. Kawel-Boehm 2020 (RV volumes, CO) was not added as targets because
+    I could not open its tables to verify.'
   - heart_Ca_input (vp_Ca) has no calcium input and is equation-for-equation heart_simple (identical results). Rename it,
     remove it, or add the intended Ca-driven activation?
   - 'heart_new_valve: what are the intended units and value of Rmod_valve_* (TODO; placeholder 3000 from the CA delay_devel
@@ -3770,13 +3942,15 @@ review:
   - 'BC sweep: the tricuspid annulus area is limited to 4-10 cm2. Above about 10.2 cm2 the RA volume goes negative (min q_ra
     -1.0 ml at 11 cm2): the linear P-V law allows suction (u_ra < 0) and nothing stops the chamber from emptying. The same
     mechanism produces q_ra < 0 in heart_nonstiff.'
+  - 'Baseline targets (Maceira 2006, 2 SD): heart vp / vp_wCont / vp_Ca / nonstiff meet 4 of 6 (SV, EF, aortic systolic and
+    diastolic); EDV (203 ml) and ESV (81 ml) are too high. new_valve meets 2 of 6 (also misses SV 125 ml and diastolic 67
+    mmHg).'
   - 'Nominal haemodynamics (heart vp in the harness): LVEDV 203, ESV 81 ml, EF 60 %, CO 7.2 l/min, aortic 131/77 mmHg, PA
     70/18 mmHg, mean LA pressure 22 mmHg, mean RA 1.3 mmHg. The pulmonary and LA pressures are high, which is consistent with
     the very compliant RV (E_rv_B = 0.2e6) and the user-defined elastances. LVprop: LVEDV 116 ml, CO 3.9 l/min, aortic 77/47
     mmHg (neonatal-scaled use).'
-  - 'Framework needs: (1) a feature-based baseline or calibrate evaluation that honours pre_time (max/min/mean over the last
-    cycles), so steady-state clinical values (EDV/ESV/pressures) can validate the heart; (2) the heart zero-IVC mapping in
-    libcuflynx should use the actual vessel name; (3) the structure test now checks config/CellML units, but not dimensional
-    consistency inside equations, so the heart_new_valve error (A_eff [m2] + eps_m4 [m4]; B in kg m^-5) still passes; (4)
-    the heart harness runs a 20 s pre-time and the sweep is ~200-250 runs, so a full test run of one component takes 15-25
-    min.'
+  - 'Framework needs: (1) the calibrate test still evaluates from t = 0 without pre_time, so calibrating to the steady-state
+    targets needs the same pre_time support as the new baseline targets; (2) the heart zero-IVC mapping in libcuflynx should
+    use the actual vessel name; (3) the structure test now checks config/CellML units, but not dimensional consistency inside
+    equations, so the heart_new_valve error (A_eff [m2] + eps_m4 [m4]; B in kg m^-5) still passes; (4) the heart harness runs
+    a 20 s pre-time and the sweep is ~200-250 runs, so a full test run of one component takes 15-25 min.'

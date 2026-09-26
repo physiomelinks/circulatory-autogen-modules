@@ -1,6 +1,6 @@
 # heart validation candidates
 
-No validation data files have been added yet: every component's validation status is `pending`. The candidates below were identified for the owner to confirm.
+No data files are needed: the proposed baseline uses scalar `targets` in `heart_tests.yaml` (status `proposed`). They are set on heart vp_wCont, vp, vp_Ca, nonstiff and new_valve, and evaluated on the logged 5 s after a 20 s pre_time. Maceira 2006 Tables 1 and 8 were checked directly in the paper PDF (scmr.org). The Kawel-Boehm 2020 and Maceira RV numbers below come from a literature search and were not re-verified, so they are not used as targets.
 
 ## Normal adult values (baseline / calibrate for heart_simple, _wCont, _Ca_input, _LVprop, _nonstiff, _new_valve)
 
@@ -20,9 +20,9 @@ No validation data files have been added yet: every component's validation statu
 
 **How they would be used:** the comparison is of scalar features of the periodic state (max/min of q_lv and q_rv, max/min of aortic_root/u, mean aortic flow), taken after the 20 s pre-time.
 
-**Why they are not set up:** `validation_test_baseline` compares time series from t = 0, and the calibrate evaluation runs with pre_time 0. Both would include the start-up transient, so this needs a framework change first.
+**Targets used:** EDV, ESV, SV and EF from Table 8 (pass at 2 SD). Aortic systolic 115-135 and diastolic 68-79 mmHg: these ranges span the Table 1 age-decile means for men and women, but Table 1 gives brachial cuff pressures, so they are only a proxy for central aortic pressure.
 
-**Preliminary comparison** (nominal parameters, test harness): see the component reasons in `heart_tests.yaml`. For example, heart_simple gives LVEDV 203 ml, ESV 81 ml, EF 60 % and CO 7.2 l/min.
+**Result at nominal parameters** (heart_simple): SV 122 ml, EF 60 % and aortic 131/77 mmHg pass. EDV 203 ml and ESV 81 ml fail. heart_new_valve additionally misses SV (125 ml) and diastolic pressure (67 mmHg).
 
 ## heart_devel / heart_new_valve
 
