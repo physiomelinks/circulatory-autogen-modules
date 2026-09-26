@@ -680,6 +680,8 @@ def validation_test_baseline(cm):
         early, v = _validation_status(component, 'baseline', 'validation_test_baseline')
         if early:
             return early
+        if v.get('targets'):
+            return _baseline_targets(cm, v)
         t_data, data = load_data(component.module.dir, v)
         by_var = {p.variable_name: p for p in component.parameters()}
         params = {k: float(val) for k, val in (v.get('parameters') or {}).items()}
@@ -701,6 +703,59 @@ def validation_test_baseline(cm):
             return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, [fig])
         return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, [fig])
     return _guard(cm.component, 'validation_test_baseline', check)
+
+
+FEATURE_OPS = {
+    'max': np.max, 'min': np.min, 'mean': np.mean, 'final': lambda y: y[-1],
+    'ptp': np.ptp,
+}
+
+
+def _baseline_targets(cm, v):
+    '''
+    Scalar validation targets, e.g. steady-state clinical values, evaluated on the logged run
+    (after pre_time). Spec (validation.baseline):
+        pre_time: 20            sim_time: 5            parameters: {var: value}   (optional)
+        targets:
+          - {name: LV end-diastolic volume, expr: 'np.max(q_lv)*1e6', value: 142, std: 21, units: ml}
+          - {name: aortic systolic pressure, expr: 'np.max(vessel__u)/133.322', range: [100, 140], units: mmHg}
+    Each expr is a numpy expression of t and the outputs (as in invariants). A target passes when
+    |model - value| <= z_threshold * std, or when the model lies within range.
+    '''
+    component = cm.component
+    by_var = {p.variable_name: p for p in component.parameters()}
+    params = {k: float(val) for k, val in (v.get('parameters') or {}).items()}
+    overrides = {'parameters/' + harness.parameter_name(by_var[k]): val for k, val in params.items()}
+    run_spec = dict(cm.spec, **{k: v[k] for k in ('sim_time', 'pre_time', 'dt') if k in v})
+    helper = harness.simulation_helper(cm.model_path, run_spec)
+    t, out = harness.run(helper, cm.outputs(), params=overrides)
+    env = {'np': np, 't': t, '__builtins__': SAFE_BUILTINS}
+    env.update(INVARIANT_HELPERS)
+    env.update(cm.param_env({harness.parameter_name(by_var[k]): val for k, val in params.items()}))
+    env.update(out)
+    z = float(v.get('z_threshold', 2.0))
+    rows, problems = [], []
+    for tg in v['targets']:
+        try:
+            model = float(eval(tg['expr'], env))  # noqa: S307 - expressions come from the repo's own yaml
+        except Exception as e:
+            problems.append(f"{tg['name']}: could not evaluate ({e})")
+            continue
+        if 'range' in tg:
+            lo, hi = map(float, tg['range'])
+            ok = lo <= model <= hi
+            target = f'[{lo:g}, {hi:g}]'
+        else:
+            ok = abs(model - float(tg['value'])) <= z * float(tg['std'])
+            target = f"{float(tg['value']):g} ± {float(tg['std']):g}"
+        rows.append({'name': tg['name'], 'model': model, 'target': target, 'units': tg.get('units', ''), 'ok': ok})
+        if not ok:
+            problems.append(f"{tg['name']}: model {model:.4g} vs {target} {tg.get('units', '')}")
+    metrics = {'targets': rows, 'z_threshold': z, 'source': v.get('source', ''), 'validated_values': params}
+    if problems:
+        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(v["targets"])} targets missed',
+                      metrics, [], problems)
+    return Result('validation_test_baseline', PASSED, f'all {len(rows)} targets met', metrics)
 
 
 def validation_test_calibrate(cm):
