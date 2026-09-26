@@ -120,7 +120,12 @@ class ComponentModel(object):
         '''A copy of the Myokit model with the run_parameters applied (for fixed-step integration).'''
         model = self.helper.model.clone()
         for name, value in _run_point(self).items():
-            model.get('parameters.' + name).set_rhs(value)
+            for comp in ('parameters', 'parameters_global'):
+                if model.has_variable(f'{comp}.{name}'):
+                    model.get(f'{comp}.{name}').set_rhs(value)
+                    break
+            else:
+                raise KeyError(f'run parameter {name} not found in the model')
         return model
 
     def outputs(self):
@@ -215,11 +220,12 @@ def _guard(component, test, fn):
 # ----------------------------------------------------------------------------------------------
 
 def reference_tolerances(cm):
-    '''Tolerances of the tight CVODE reference: rtol 1e-10, atol 1e-4 x the component's atol
-    (capped at 1e-12), so tiny state scales (e.g. microvessel volumes) keep error control.'''
+    '''Tolerances of the tight CVODE reference: rtol 1e-10 and atol min(1e-12, the component's
+    atol), so tiny state scales (e.g. microvessel volumes) keep error control without asking
+    CVODE for an absolute accuracy beyond the component's own.'''
     atol = float((cm.spec.get('solver_info') or {}).get('atol', 1e-8))
     ref = cm.spec.get('reference_solver_info') or {}
-    return {'rtol': float(ref.get('rtol', 1e-10)), 'atol': float(ref.get('atol', min(1e-12, 1e-4 * atol)))}
+    return {'rtol': float(ref.get('rtol', 1e-10)), 'atol': float(ref.get('atol', min(1e-12, atol)))}
 
 
 def _run_point(cm):
