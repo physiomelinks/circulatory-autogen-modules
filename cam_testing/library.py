@@ -78,6 +78,7 @@ class Parameter:
     kind: str
     data_reference: str
     sourced: str = ''
+    proposed: bool = False          # value comes from a review proposal (not in the parameters file yet)
 
     @property
     def is_sourced(self):
@@ -200,5 +201,15 @@ def load_module(name):
     if os.path.isfile(params_path):
         with open(params_path, newline='') as f:
             for row in csv.DictReader(f):
-                parameters.append(Parameter(**{k: (row.get(k) or '').strip() for k in Parameter.__dataclass_fields__}))
+                parameters.append(Parameter(**{k: (row.get(k) or '').strip() for k in PARAMETER_COLUMNS}))
+    # A TODO value with a proposed value in the spec's reference_proposals is used (marked
+    # proposed) so a module prepared for review can be tested before the proposal is applied.
+    for comp in spec.get('components', []):
+        for var, prop in (comp.get('reference_proposals') or {}).items():
+            if not isinstance(prop, dict) or 'value' not in prop:
+                continue
+            for p in parameters:
+                if p.variable_name == var and p.is_todo and (
+                        (p.vessel_type, p.BC_type) == (comp['vessel_type'], comp['BC_type']) or p.vessel_type == 'global'):
+                    p.value, p.proposed = str(prop['value']), True
     return Module(name, module_dir, config, spec, parameters)

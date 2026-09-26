@@ -24,6 +24,7 @@ header.module { display: grid; gap: 10px; }
 .counts { display: flex; flex-wrap: wrap; gap: 8px; }
 .grid-table td:first-child { font-family: var(--font-mono); font-size: 0.8rem; white-space: nowrap; }
 .grid-table td { white-space: nowrap; }
+.panel.review { border: 2px solid var(--pend); }
 .panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; }
 .issues { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.88rem; }
 section.component { display: grid; gap: 22px; padding-top: 28px; border-top: 2px solid var(--rule-strong); scroll-margin-top: 16px; }
@@ -94,6 +95,25 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         {%- if counts[None] %} {{ chip(None, counts[None] ~ ' not run') }}{% endif %}
       </div>
     </header>
+
+    {%- if review and not reviewed %}
+    <section class="panel review" aria-labelledby="review-h">
+      <h2 id="review-h">Awaiting your review</h2>
+      {%- if review.summary %}<p style="margin:0;max-width:80ch">{{ review.summary }}</p>{% endif %}
+      {%- if review.questions %}
+      <div class="eyebrow">Questions</div>
+      <ol class="issues">{% for q in review.questions %}<li>{{ q }}</li>{% endfor %}</ol>
+      {%- endif %}
+      {%- if review.proposed_fixes %}
+      <div class="eyebrow">Proposed fixes to the module (not applied)</div>
+      <ul class="issues">{% for f in review.proposed_fixes %}<li>{{ f }}</li>{% endfor %}</ul>
+      {%- endif %}
+      {%- if review.findings %}
+      <div class="eyebrow">Findings</div>
+      <ul class="issues">{% for f in review.findings %}<li>{{ f }}</li>{% endfor %}</ul>
+      {%- endif %}
+    </section>
+    {%- endif %}
 
     <section class="block" aria-labelledby="overview">
       <h2 id="overview">Test overview</h2>
@@ -236,7 +256,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
             <td>{% if r.key %}<a href="#ref-{{ r.key }}">{{ r.key }}</a>{% if r.note %}; {{ r.note }}{% endif %}{% else %}{{ r.reference }}{% endif %}</td>
             <td><span class="box {{ 'on' if r.sourced }}" role="img" aria-label="{{ 'sourced' if r.sourced else 'not sourced' }}"></span></td>
             {%- if c.has_proposals %}
-            <td>{% if r.proposal %}{{ r.proposal.reference }}{% if r.proposal.note %}<br><span class="muted" style="font-size:0.8rem">{{ r.proposal.note }}</span>{% endif %}{% endif %}</td>
+            <td>{% if r.proposal %}{% set pk = r.proposal.reference.split(';')[0].strip() %}{% if pk in bib_keys %}<a href="#ref-{{ pk }}">{{ pk }}</a>{{ ';' ~ r.proposal.reference.split(';', 1)[1] if ';' in r.proposal.reference }}{% else %}{{ r.proposal.reference }}{% endif %}{% if r.proposal.note %}<br><span class="muted" style="font-size:0.8rem">{{ r.proposal.note }}</span>{% endif %}{% endif %}</td>
             <td>{% if r.proposal %}{{ {'yes':'sourced','no':'unsourced','definitional':'definitional'}.get(r.proposal.sourced, r.proposal.sourced) }}{% endif %}</td>
             {%- endif %}</tr>
           {%- endfor %}
@@ -251,6 +271,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           <article class="test {{ t.status or '' }}" id="{{ c.id }}--{{ t.key }}">
             <div class="test-head"><h4>{{ t.title }}</h4>{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Failed · known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</div>
             {%- if t.known_issue %}<p class="message" style="color:var(--fail)">Known issue: {{ t.known_issue }}</p>{% endif %}
+            {%- if t.proposed_data %}<p class="message" style="color:var(--pend)">Proposed validation data: run for your review, not yet confirmed.</p>{% endif %}
             <p class="about">{{ t.about }}</p>
             <p class="message">{{ t.message }}</p>
 
@@ -334,10 +355,10 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
     {%- if bibliography %}
     <section class="block" aria-labelledby="bibliography">
       <h2 id="bibliography">References</h2>
-      <p class="muted" style="margin:0;font-size:0.84rem">From <code>{{ bib_file }}</code>.</p>
+      <p class="muted" style="margin:0;font-size:0.84rem">From <code>{{ bib_file }}</code>; entries marked proposed come from the <code>_references_proposed.bib</code> awaiting confirmation.</p>
       <ul class="issues">
       {%- for b in bibliography %}
-        <li id="ref-{{ b.key }}"><span class="mono">{{ b.key }}</span>: {{ b.text }}{% if b.link %} <a href="{{ b.link }}">{{ b.link }}</a>{% endif %}</li>
+        <li id="ref-{{ b.key }}"><span class="mono">{{ b.key }}</span>{% if b.proposed %} <span class="chip pending">proposed</span>{% endif %}: {{ b.text }}{% if b.link %} <a href="{{ b.link }}">{{ b.link }}</a>{% endif %}</li>
       {%- endfor %}
       </ul>
     </section>

@@ -112,7 +112,7 @@ def component_context(component):
         variables.append({
             'name': name, 'units': units, 'kind': kind.strip(), 'access': access,
             'initial': cv[2] if cv else None,
-            'value': p.value if p else None, 'todo': bool(p and p.is_todo),
+            'value': (p.value + ' (proposed)' if p.proposed else p.value) if p else None, 'todo': bool(p and (p.is_todo or p.proposed)),
             'reference': p.data_reference if p else '',
             'sourced': p.is_sourced if p else None,
             'tested': ranges.tested_range(component, p) if p else None,
@@ -135,16 +135,18 @@ def component_context(component):
             'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
             'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
             'known_issue': (component.spec.get('expected_failures') or {}).get(test),
+            'proposed_data': test.startswith('validation_test_') and
+                             (validation_spec.get(test.rsplit('_', 1)[1]) or {}).get('status') == checks.PROPOSED,
         })
     risk_result = risk.load(component)
     if risk_result is not None and not all(os.path.isfile(os.path.join(module.dir, p)) for p in risk_result.get('plots', [])):
         risk_result['plots'] = risk.make_plots(component, risk_result)   # e.g. on a fresh clone
     proposals = component.spec.get('reference_proposals') or {}
-    bib_keys = set(bib.read(bib.bib_path(module)))
+    bib_keys = set(bib.read(bib.bib_path(module))) | set(bib.read(bib.proposed_bib_path(module)))
     references = []
     for p in component.parameters():
         key = bib.reference_key(p.data_reference)
-        references.append({'name': p.variable_name, 'value': p.value, 'units': p.units,
+        references.append({'name': p.variable_name, 'value': p.value + (' (proposed)' if p.proposed else ''), 'units': p.units,
                            'reference': p.data_reference, 'key': key if key in bib_keys else None,
                            'note': p.data_reference.split(';', 1)[1].strip() if ';' in p.data_reference else '',
                            'sourced': p.is_sourced, 'proposal': proposals.get(p.variable_name)})
@@ -199,8 +201,12 @@ def module_context(name):
     return {
         'name': name, 'reviewed': module.reviewed, 'components': components,
         'all_sourced': module.all_sourced(),
-        'bibliography': [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f)}
-                         for k, f in bib.read(bib.bib_path(module)).items()],
+        'bibliography': [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f), 'proposed': False}
+                         for k, f in bib.read(bib.bib_path(module)).items()]
+                        + [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f), 'proposed': True}
+                           for k, f in bib.read(bib.proposed_bib_path(module)).items()],
+        'review': module.spec.get('review'),
+        'bib_keys': sorted(set(bib.read(bib.bib_path(module))) | set(bib.read(bib.proposed_bib_path(module)))),
         'bib_file': os.path.basename(bib.bib_path(module)),
         'n_sourced': sum(p.is_sourced for p in module.parameters), 'n_parameters': len(module.parameters),
         'counts': _status_counts(components), 'structure': _structure(module),
@@ -226,7 +232,8 @@ def build_index(contexts, out_path, module_href):
     rows = [{'name': c['name'], 'href': module_href(c['name']), 'n_components': len(c['components']),
              'counts': c['counts'], 'reviewed': c['reviewed'],
              'known_issues': len(c['known_issues']), 'max_risk': c.get('max_risk'),
-             'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters']}
+             'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
+             'ready_for_review': bool(c.get('review')) and not c['reviewed']}
             for c in contexts]
     totals = {k: sum(r['counts'].get(k, 0) for r in rows) for k in ('passed', 'failed', 'skipped', 'pending', 'not_applicable', None)}
     html_text = _env().get_template('index.html').render(

@@ -16,6 +16,11 @@ def bib_path(module):
     return os.path.join(module.dir, f'{module.name}_references.bib')
 
 
+def proposed_bib_path(module):
+    '''Citations proposed for review, not yet confirmed (<name>_references_proposed.bib).'''
+    return os.path.join(module.dir, f'{module.name}_references_proposed.bib')
+
+
 def read(path):
     '''{key: {'type': ..., field: value}} (braces and surrounding quotes removed).'''
     if not os.path.isfile(path):

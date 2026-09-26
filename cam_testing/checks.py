@@ -22,6 +22,8 @@ from cam_testing import fixed_step, harness, plots
 from cam_testing.library import REPO_ROOT
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
+# validation.<kind>.status: 'active' (confirmed data) or 'proposed' (run, but the data awaits confirmation)
+PROPOSED = 'proposed'
 
 TESTS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test',
          'validation_test_baseline', 'validation_test_calibrate']
@@ -313,7 +315,7 @@ def verification_test_BC(cm):
                 if bad:
                     failures.append(f'{var}={value:.4g}: non-finite {", ".join(bad)}')
                 failures += [f'{var}={value:.4g}: {m}' for m in inv]
-                runs.append((value, t, outputs[plot_output] if not bad else None))
+                runs.append((value, t, outputs[harness.output_key(plot_output)] if not bad else None))
             sweeps[var] = runs
 
         figs = []
@@ -383,7 +385,7 @@ def verification_test_timestep(cm):
                                               solver_info={'rtol': 1e-10, 'atol': 1e-12})
         t_cv, cv = harness.run(tight, outputs)
         n = min(len(t_cv), finest.shape[0])
-        cvode_diff = float(np.max(np.abs(np.column_stack([cv[o] for o in outputs])[:n] - finest[:n]) / scale))
+        cvode_diff = float(np.max(np.abs(np.column_stack([cv[harness.output_key(o)] for o in outputs])[:n] - finest[:n]) / scale))
 
         figs = [plots.plot_convergence(plot_path(component, 'timestep_convergence'), dts[:-1], diffs, order,
                                        next((o for o in reversed(observed) if o is not None), None),
@@ -470,14 +472,14 @@ def stability_test(cm):
         base = dict(cm.spec, pre_time=0.0, sim_time=t_end)
 
         def compare(t, out, t_ref, ref, scale):
-            y = np.column_stack([np.interp(t_ref, t, out[o]) for o in outputs])
+            y = np.column_stack([np.interp(t_ref, t, out[harness.output_key(o)]) for o in outputs])
             if not np.all(np.isfinite(y)):
                 return math.inf
             return float(np.max(np.abs(y - ref) / scale))
 
         ref_helper = harness.simulation_helper(cm.model_path, base, solver_info={'rtol': 1e-10, 'atol': 1e-12})
         t_ref, ref_out = harness.run(ref_helper, outputs)
-        ref = np.column_stack([ref_out[o] for o in outputs])
+        ref = np.column_stack([ref_out[harness.output_key(o)] for o in outputs])
         scale = np.maximum(np.max(np.abs(ref), axis=0), np.ptp(ref, axis=0))
         scale[scale == 0] = 1.0
 
@@ -582,7 +584,7 @@ def stability_test(cm):
                         stride = max(1, int(round(out_dt / dt)))
                         idx = np.arange(0, len(t), stride)
                         vals = np.array([observe(t[i], Y[i], qnames) for i in idx], dtype=float)
-                    return t[idx], {o: vals[:, k] for k, o in enumerate(outputs)}
+                    return t[idx], {harness.output_key(o): vals[:, k] for k, o in enumerate(outputs)}
                 refine(f'fixed_step_{scheme}', lambda dt, scheme=scheme: {'solver': f'fixed_step_{scheme}', 'dt': dt},
                        fx_run, float(fs.get('dt_start', (fs.get('dts') or [1e-2])[0])), 2.0, False)
 
