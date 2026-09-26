@@ -1,0 +1,135 @@
+{
+ "n_samples": 512,
+ "n_failures": 0,
+ "failure_probability": 0.0,
+ "ci": [
+  0.0,
+  0.007447247372061501
+ ],
+ "upper_bound_if_none_failed": 0.005859375,
+ "seed": 0,
+ "box": [
+  {
+   "variable": "P_pl",
+   "min": -2000.0,
+   "max": 1000.0,
+   "log": false
+  }
+ ],
+ "failure_modes": {},
+ "ranking": [
+  {
+   "variable": "P_pl",
+   "importance": 0.0
+  }
+ ],
+ "per_parameter": {
+  "P_pl": {
+   "range": [
+    -2000.0,
+    1000.0
+   ],
+   "log": false,
+   "bins": [
+    {
+     "lo": -2000.0,
+     "hi": -1625.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": -1625.0,
+     "hi": -1250.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": -1250.0,
+     "hi": -875.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": -875.0,
+     "hi": -500.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": -500.0,
+     "hi": -125.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": -125.0,
+     "hi": 250.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 250.0,
+     "hi": 625.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    },
+    {
+     "lo": 625.0,
+     "hi": 1000.0,
+     "n": 64,
+     "failures": 0,
+     "risk": 0.0,
+     "ci": [
+      0.0,
+      0.056626022971156334
+     ]
+    }
+   ],
+   "importance": 0.0
+  }
+ },
+ "example_failures": [],
+ "classifier": {
+  "kind": "constant",
+  "p_fail": 0.0,
+  "note": "every sample passed"
+ },
+ "plots": [
+  "plots/thoracic_cavity__nn__risk_marginals.png"
+ ]
+}

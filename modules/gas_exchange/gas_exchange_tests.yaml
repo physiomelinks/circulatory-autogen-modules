@@ -7,71 +7,2637 @@ defaults:
   dt: 0.01
   solver: CVODE_myokit
   bc_sweep:
-    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    factors:
+    - 0.5
+    - 0.75
+    - 1.0
+    - 1.5
+    - 2.0
     ranges: {}
   timestep:
     scheme: rk4
-    dts: [0.004, 0.002, 0.001, 0.0005]
+    dts:
+    - 0.004
+    - 0.002
+    - 0.001
+    - 0.0005
     min_order: 0.8
     tol: 0.0001
     cvode_tol: 0.001
   stability:
     supported:
-    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+    - solver: CVODE_myokit
+      rtol: 1.0e-06
+      atol: 1.0e-08
 components:
 - vessel_type: tissue_GE_simple
   BC_type: nn
   module_type: tissue_GE_simple_type
-  outputs: [C_CO2_p, C_O2_p, v]
-  invariants: []
+  notes: 'Well-mixed tissue/capillary gas compartment of volume q_0: q_0 dC/dt = v (C_a - C) + M for O2 and CO2 (contents in ml gas per ml blood,
+    M in m3/s of gas; M_O2 < 0 is consumption). With constant arterial contents and flow the exact solution is C = C_ss + (C_init - C_ss) exp(-v
+    t / q_0), C_ss = C_a + M/v. libcuflynx special-cases tissue_GE_simple (it must be fed by a terminal vessel), so the harness feeds it from
+    a pp_I terminal used as a steady flow source (v_T -> 4e-6 m3/s within ~20 ms).'
+  sim_time: 150.0
+  dt: 0.05
+  outputs:
+  - C_O2_p
+  - C_CO2_p
+  - term/v_T
+  harness:
+    vessel_array:
+    - - term
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - mod
+      - nn
+      - tissue_GE_simple
+      - term
+      - ''
+    parameters:
+    - - R_1_T_term
+      - Js_per_m6
+      - 50000000.0
+      - harness flow source
+    - - R_2_T_term
+      - Js_per_m6
+      - 50000000.0
+      - harness flow source
+    - - C_T_term
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_term
+      - Js2_per_m6
+      - 250000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_term
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_term
+      - J_per_m3
+      - 400.0
+      - 'harness: gives v_T = 4e-06 m3/s'
+    - - u_out_term
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_term
+      - m3
+      - 0.0
+      - harness
+    - - q_init_term
+      - m3
+      - 2.0000000000000002e-07
+      - 'harness: equilibrium volume'
+  invariants:
+  - description: O2 content matches the exact solution C_ss + (C_init - C_ss) exp(-v t/q_0) (v = settled terminal flow; tolerance 0.2% of the
+      step plus 5e-5 ml/ml for the ~10 ms flow start-up of the harness)
+    expr: np.max(np.abs(C_O2_p - ((C_O2_a + M_O2/term__v_T[-1]) + (C_O2_p_init - (C_O2_a + M_O2/term__v_T[-1]))*np.exp(-term__v_T[-1]*t/q_0))))
+      <= 2e-3*abs(C_O2_p_init - (C_O2_a + M_O2/term__v_T[-1])) + 5e-5
+  - description: CO2 content matches the exact solution
+    expr: np.max(np.abs(C_CO2_p - ((C_CO2_a + M_CO2/term__v_T[-1]) + (C_CO2_p_init - (C_CO2_a + M_CO2/term__v_T[-1]))*np.exp(-term__v_T[-1]*t/q_0))))
+      <= 2e-3*abs(C_CO2_p_init - (C_CO2_a + M_CO2/term__v_T[-1])) + 5e-5
+  - description: 'O2 mass balance: q_0 C changes by the time integral of v (C_a - C) + M_O2 (trapezoid on the logged flow, from t = 0.5 s after
+      the flow start-up)'
+    expr: np.max(np.abs((q_0*C_O2_p - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((term__v_T*(C_O2_a - C_O2_p) + M_O2)[1:] + (term__v_T*(C_O2_a
+      - C_O2_p) + M_O2)[:-1])))))[t >= 0.5] - (q_0*C_O2_p - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((term__v_T*(C_O2_a - C_O2_p) + M_O2)[1:]
+      + (term__v_T*(C_O2_a - C_O2_p) + M_O2)[:-1])))))[t >= 0.5][0])) <= 2e-3*max(np.ptp(q_0*C_O2_p), abs(M_O2)*1e-3)
+  - description: contents stay non-negative
+    expr: np.all(C_O2_p >= 0) & np.all(C_CO2_p >= 0)
+  bc_sweep:
+    ranges:
+      C_O2_a:
+        min: 0.1
+        max: 0.21
+        points: 5
+      C_CO2_a:
+        min: 0.4
+        max: 0.56
+        points: 5
+      q_0:
+        min: 5.0e-05
+        max: 0.0005
+        points: 5
+        scale: log
+      C_O2_p_init:
+        min: 0.05
+        max: 0.21
+        points: 5
+      C_CO2_p_init:
+        min: 0.4
+        max: 0.6
+        points: 5
+      M_O2:
+        min: -3.0e-07
+        max: -2.0e-08
+        points: 5
+      M_CO2:
+        min: 2.0e-08
+        max: 3.0e-07
+        points: 5
+    rationale: 'Arterial contents span hypoxaemic to hyperoxic blood (0.10-0.21 ml/ml O2; 0.40-0.56 ml/ml CO2, Spencer curve at P_CO2 25-60 mmHg);
+      q_0 spans 50-500 ml tissue compartments; M spans 1.2-18 ml/min per compartment. With v = 4e-6 m3/s the lowest steady O2 content in the sweep
+      is 0.10 - 1.8e-7/4e-6 = 0.055 ml/ml, so contents stay positive (the model has no floor: C_O2 would go negative if |M_O2| > v C_O2_a).'
+  timestep:
+    t_end: 20.0
+  reference_proposals:
+    C_CO2_a:
+      reference: 'Spencer1979; test BC: arterial CO2 content at P_O2 = 100, P_CO2 = 40 mmHg from the Spencer curve (21.35 mmol/L) x 22.72 ml/mmol
+        = 0.485 ml/ml'
+      sourced: 'yes'
+      value: 0.485
+    C_O2_a:
+      reference: 'Spencer1979; test BC: arterial O2 content at P_O2 = 100, P_CO2 = 40 mmHg (8.75 mmol/L) x 22.72 ml/mmol = 0.199 ml/ml'
+      sourced: 'yes'
+      value: 0.199
+    q_0:
+      reference: Albanese2014; brain tissue volume 1300 ml (Table 2-7, citing Ursino2001) split over the 8 cerebral GE compartments of the CA
+        parasympathetic model = 162.5 ml; library 164 ml. Ursino 2001 itself not accessed
+      sourced: 'yes'
+    C_CO2_p_init:
+      reference: unreferenced_placeholder; initial condition near mixed-venous CO2 content (Albanese2014 Table 2-12 normal 53 ml/dl)
+      sourced: 'no'
+    C_O2_p_init:
+      reference: unreferenced_placeholder; initial condition = normal mixed-venous O2 content 15 ml/dl (Albanese2014 Table 2-12)
+      sourced: 'no'
+    M_CO2:
+      reference: unreferenced_placeholder; library value 8.64 ml/min (RQ 0.8 of M_O2). Albanese2014 Table 2-7 gives brain CO2 production 39.9
+        ml/min total = 5.0 ml/min per 1/8 of brain
+      sourced: 'no'
+    M_O2:
+      reference: unreferenced_placeholder; library value -10.8 ml/min. Albanese2014 Table 2-7 gives brain O2 consumption 47.5 ml/min (from Ursino
+        & Magosso) = 5.9 ml/min per 1/8 of brain, i.e. ~1.8x smaller
+      sourced: 'no'
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: 'candidate: brain arterio-venous O2 content difference / jugular venous O2 at normal CBF (e.g. Albanese2014 Table 2-7 consumption
+        rates with a cerebral flow) -- needs a flow value per compartment from the owner'
+    calibrate:
+      status: not_applicable
+      reason: two-parameter linear mixing compartment; nothing to identify beyond the steady state that the exact-solution invariants already
+        check
 - vessel_type: pulmonary_GE
   BC_type: nn
   module_type: pulmonary_GE_type
-  outputs: [C_CO2_p, C_O2_p, C_CO2_p_capped, C_O2_p_capped, C_CO2_v, C_O2_v]
-  invariants: []
+  notes: 'Pulmonary capillary gas exchange (after Albanese 2016): well-mixed capillary of volume q_0 fed by v (1 - shunt) of mixed-venous blood,
+    diffusive exchange M = k (P_A - P_p) with the alveoli, capillary partial pressures from the analytic inverse of the Spencer (1979) O2/CO2
+    dissociation curves (Bohr/Haldane coupled), and arterial content = flow-weighted mix of capillary and shunted blood. Albanese assumes instantaneous
+    alveolar-capillary equilibrium; this module adds a finite exchange conductance. Harness: steady pulmonary flow (pp_I terminal, 5 L/min), constant
+    mixed-venous blood (gas_transport_simple held at 15/53 ml/dl), an arterial gas_transport_simple sink (needed: see known config issue), respiratory_gas_transport
+    and the simple_lung_bg lung (library values).'
+  sim_time: 120.0
+  dt: 0.01
+  solver_info:
+    rtol: 1.0e-08
+    atol: 1.0e-10
+  outputs:
+  - C_O2_p
+  - C_CO2_p
+  - C_O2_a
+  - C_CO2_a
+  - P_O2_p
+  - P_CO2_p
+  - M_O2
+  - M_CO2
+  - C_O2_p_extra_ub
+  - ven/C_O2_out
+  - resp/P_O2_A
+  - resp/P_CO2_A
+  - termp/v_T
+  harness:
+    vessel_array:
+    - - termv
+      - pp_I
+      - terminal
+      - ''
+      - ven
+    - - ven
+      - nn
+      - gas_transport_simple
+      - termv
+      - mod
+    - - terma
+      - pp_I
+      - terminal
+      - ''
+      - artg
+    - - artg
+      - nn
+      - gas_transport_simple
+      - terma mod
+      - ''
+    - - termp
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - mod
+      - nn
+      - pulmonary_GE
+      - termp ven
+      - resp artg
+    - - resp
+      - nn
+      - respiratory_gas_transport
+      - mod
+      - lung
+    - - lung
+      - nn
+      - simple_lung_bg
+      - resp
+      - ''
+    parameters:
+    - - R_1_T_termv
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termv
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termv
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termv
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termv
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termv
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_termv
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termv
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termv
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - R_1_T_terma
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_terma
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_terma
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_terma
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_terma
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_terma
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_terma
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_terma
+      - m3
+      - 0.0
+      - harness
+    - - q_init_terma
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - C_CO2_in_ven
+      - dimensionless
+      - 0.53
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_in_ven
+      - dimensionless
+      - 0.15
+      - gas_exchange_parameters.csv (harness value)
+    - - C_CO2_out_init_ven
+      - dimensionless
+      - 0.53
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_out_init_ven
+      - dimensionless
+      - 0.15
+      - gas_exchange_parameters.csv (harness value)
+    - - q_0_ven
+      - m3
+      - 0.0003
+      - gas_exchange_parameters.csv
+    - - C_CO2_in_artg
+      - dimensionless
+      - 0.485
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_in_artg
+      - dimensionless
+      - 0.199
+      - gas_exchange_parameters.csv (harness value)
+    - - C_CO2_out_init_artg
+      - dimensionless
+      - 0.485
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_out_init_artg
+      - dimensionless
+      - 0.199
+      - gas_exchange_parameters.csv (harness value)
+    - - q_0_artg
+      - m3
+      - 0.0003
+      - gas_exchange_parameters.csv
+    - - R_1_T_termp
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termp
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termp
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termp
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termp
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termp
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_termp
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termp
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termp
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - flag_P_mus_control_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - flag_RR_control_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - P_mus_min_lung
+      - J_per_m3
+      - -980.0
+      - lung_parameters.csv (library value)
+    - - P_plEE_lung
+      - J_per_m3
+      - -490.0
+      - lung_parameters.csv (library value)
+    - - q_D_min_lung
+      - m3
+      - 1.0e-05
+      - lung_parameters.csv (library value)
+    - - q_l_us_lung
+      - m3
+      - 3.44e-05
+      - lung_parameters.csv (library value)
+    - - q_t_us_lung
+      - m3
+      - 6.63e-06
+      - lung_parameters.csv (library value)
+    - - q_b_us_lung
+      - m3
+      - 1.87e-05
+      - lung_parameters.csv (library value)
+    - - q_A_us_lung
+      - m3
+      - 1.26e-06
+      - lung_parameters.csv (library value)
+    - - R_ml_lung
+      - Js_per_m6
+      - 250000.0
+      - lung_parameters.csv (library value)
+    - - R_lt_lung
+      - Js_per_m6
+      - 85000.0
+      - lung_parameters.csv (library value)
+    - - R_tb_lung
+      - Js_per_m6
+      - 80000.0
+      - lung_parameters.csv (library value)
+    - - R_bA_lung
+      - Js_per_m6
+      - 22000.0
+      - lung_parameters.csv (library value)
+    - - R_plwall_lung
+      - Js_per_m6
+      - 10000.0
+      - lung_parameters.csv (library value)
+    - - alpha_LR_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - C_l_lung
+      - m6_per_J
+      - 1.3e-08
+      - lung_parameters.csv (library value)
+    - - C_t_lung
+      - m6_per_J
+      - 2.43e-08
+      - lung_parameters.csv (library value)
+    - - C_b_lung
+      - m6_per_J
+      - 1.34e-06
+      - lung_parameters.csv (library value)
+    - - C_A_lung
+      - m6_per_J
+      - 2.04e-05
+      - lung_parameters.csv (library value)
+    - - C_pl_lung
+      - m6_per_J
+      - 2.5e-06
+      - lung_parameters.csv (library value)
+    - - T_resp_lung
+      - second
+      - 5.0
+      - lung_parameters.csv (library value)
+    - - Delta_RR_resp_lung
+      - per_s
+      - 0.0
+      - lung_parameters.csv (library value)
+    - - Delta_P_mus_lung
+      - J_per_m3
+      - 0.0
+      - lung_parameters.csv (library value)
+    - - IE_ratio_lung
+      - dimensionless
+      - 0.6
+      - lung_parameters.csv (library value)
+    - - P_m
+      - J_per_m3
+      - 0.0
+      - lung_parameters.csv global (atmospheric reference)
+    - - F_O2_i_resp
+      - dimensionless
+      - 0.21
+      - gas_exchange_parameters.csv
+    - - F_CO2_i_resp
+      - dimensionless
+      - 0.000421
+      - gas_exchange_parameters.csv
+    - - K_LOSSES_resp
+      - dimensionless
+      - 1.0
+      - gas_exchange_parameters.csv
+    - - F_CO2_D_init_resp
+      - dimensionless
+      - 0.03
+      - gas_exchange_parameters.csv
+    - - F_O2_D_init_resp
+      - dimensionless
+      - 0.17
+      - gas_exchange_parameters.csv
+    - - F_CO2_A_init_resp
+      - dimensionless
+      - 0.04
+      - gas_exchange_parameters.csv
+    - - F_O2_A_init_resp
+      - dimensionless
+      - 0.17
+      - gas_exchange_parameters.csv
+    - - v_ml_resp
+      - m3_per_s
+      - 0.0
+      - gas_exchange_parameters.csv (harness value)
+    - - v_bA_resp
+      - m3_per_s
+      - 0.0
+      - gas_exchange_parameters.csv (harness value)
+    - - q_D_resp
+      - m3
+      - 0.00015
+      - gas_exchange_parameters.csv (harness value)
+    - - q_A_resp
+      - m3
+      - 0.00225
+      - gas_exchange_parameters.csv (harness value)
+    - - P_atm
+      - J_per_m3
+      - 101300.0
+      - gas_exchange_parameters.csv global
+    - - P_ws
+      - J_per_m3
+      - 6266.15
+      - gas_exchange_parameters.csv global
+  invariants:
+  - description: 'Spencer inverse is exact: the forward Spencer curve at (P_O2_p, P_CO2_p) returns C_O2_p (below the cap)'
+    expr: np.max(np.where(C_O2_p_extra_ub == 0, np.abs(C_O2_sat*((P_O2_p)*(1 + beta_1*(P_CO2_p))/(k_1*(1 + alpha_1*(P_CO2_p))))**(1/h_1)/(1 +
+      ((P_O2_p)*(1 + beta_1*(P_CO2_p))/(k_1*(1 + alpha_1*(P_CO2_p))))**(1/h_1)) - C_O2_p), 0)) <= 1e-6*C_O2_sat
+  - description: '... and returns C_CO2_p'
+    expr: np.max(np.where((C_O2_p_extra_ub == 0) & (C_CO2_p < saturation_cap*C_CO2_sat), np.abs(C_CO2_sat*((P_CO2_p)*(1 + beta_2*(P_O2_p))/(k_2*(1
+      + alpha_2*(P_O2_p))))**(1/h_2)/(1 + ((P_CO2_p)*(1 + beta_2*(P_O2_p))/(k_2*(1 + alpha_2*(P_O2_p))))**(1/h_2)) - C_CO2_p), 0)) <= 1e-6*C_CO2_sat
+  - description: arterial content is the exact flow-weighted mix of capillary and shunted venous blood
+    expr: np.max(np.abs(C_O2_a - ((1 - shunt_fraction)*C_O2_p + shunt_fraction*ven__C_O2_out))[t > 0.1]) <= 1e-9
+  - description: Fick flux law M_O2 = k_O2 (P_O2_A - P_O2_p)
+    expr: np.max(np.abs(M_O2 - k_O2*(resp__P_O2_A - P_O2_p))) <= 1e-9*max(1e-12, np.max(np.abs(M_O2)))
+  - description: 'capillary O2 mass balance: q_0 (C(t) - C(0)) = time integral of v_p (C_v - C) + M_O2 (trapezoid; after the 1 s start-up transient)'
+    expr: np.max(np.abs((q_0*(C_O2_p - C_O2_p[0]) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((termp__v_T*(1 - shunt_fraction)*(ven__C_O2_out
+      - C_O2_p) + M_O2)[1:] + (termp__v_T*(1 - shunt_fraction)*(ven__C_O2_out - C_O2_p) + M_O2)[:-1])))))[t >= 1] - (q_0*(C_O2_p - C_O2_p[0])
+      - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((termp__v_T*(1 - shunt_fraction)*(ven__C_O2_out - C_O2_p) + M_O2)[1:] + (termp__v_T*(1
+      - shunt_fraction)*(ven__C_O2_out - C_O2_p) + M_O2)[:-1])))))[t >= 1][0])) <= 5e-3*max(np.ptp(q_0*C_O2_p), 1e-9)
+  - description: 'bounds: C_O2_p >= 0, C_O2_p <= C_O2_sat once the initial condition has washed out (t >= 10 s; C_O2_p_init may exceed a swept
+      C_O2_sat), partial pressures >= 0'
+    expr: np.all(C_O2_p >= 0) & np.all((C_O2_p <= C_O2_sat)[t >= 10]) & np.all(P_O2_p >= 0) & np.all(P_CO2_p >= 0)
+  bc_sweep:
+    sweep: all
+    exclude:
+    - C_CO2_a
+    - C_O2_a
+    ranges:
+      q_0:
+        min: 5.0e-05
+        max: 0.002
+        points: 4
+        scale: log
+      k_O2:
+        min: 2.0e-09
+        max: 5.0e-08
+        points: 4
+        scale: log
+      k_CO2:
+        min: 2.0e-08
+        max: 1.0e-06
+        points: 4
+        scale: log
+      shunt_fraction:
+        min: 0.0
+        max: 0.3
+        points: 4
+      C_O2_p_init:
+        min: 0.1
+        max: 0.2
+        points: 3
+      C_CO2_p_init:
+        min: 0.42
+        max: 0.56
+        points: 3
+      C_O2_sat:
+        min: 0.19
+        max: 0.25
+        points: 3
+      C_CO2_sat:
+        min: 1.6
+        max: 2.4
+        points: 3
+    rationale: 'q_0 from a textbook capillary volume (~75 ml) to the library 2 L; k_O2 from a diffusing-capacity-like 2.6e-9 (D_LO2 ~ 20 ml/min/mmHg)
+      to 3x library; k_CO2 similarly; shunt 0-30% (normal to severe shunt). C_CO2_a/C_O2_a are excluded: they are computed, the config wrongly
+      declares them boundary conditions. C_O2_sat is swept -7%..+22% (Hb ~14-18 g/dl) and C_CO2_sat +-20%; below that the fixed venous input (0.15
+      ml/ml) and initial content (0.20) are inconsistent with the saturation. Other Spencer globals use the default factors.'
+  timestep:
+    t_end: 2.0
+    dts:
+    - 0.00025
+    - 0.000125
+    - 6.25e-05
+    - 3.125e-05
+    tol: 0.01
+  stability:
+    t_end: 10.0
+    supported:
+    - solver: CVODE_myokit
+      rtol: 1.0e-06
+      atol: 1.0e-08
+  run_parameters: {}
+  reference_proposals:
+    k_1:
+      reference: Spencer1979; K1 = 14.99 mmHg as tabulated in Albanese2014 Table 2-6 (Spencer 1979 full text not accessed); 14.99 x 133.322 =
+        1998.5 Pa
+      sourced: 'yes'
+    k_2:
+      reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6); 194.4 x 133.322 = 25917.8 Pa (library 25917.4, 0.002% low)
+      sourced: 'yes'
+    h_1:
+      reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+    h_2:
+      reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+    alpha_1:
+      reference: Spencer1979; alpha1 = 0.03198 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.399e-4 /Pa
+      sourced: 'yes'
+    alpha_2:
+      reference: Spencer1979; alpha2 = 0.05591 /mmHg (Albanese2014 Table 2-6); /133.322 = 4.194e-4 /Pa
+      sourced: 'yes'
+    beta_1:
+      reference: Spencer1979; beta1 = 0.008275 /mmHg (Albanese2014 Table 2-6); /133.322 = 6.207e-5 /Pa
+      sourced: 'yes'
+    beta_2:
+      reference: Spencer1979; beta2 = 0.03255 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.441e-4 /Pa
+      sourced: 'yes'
+    C_O2_sat:
+      reference: Spencer1979; C_sat,O2 = 9 mmol/L (Albanese2014 Table 2-6). Library 0.20448 ml/ml = 9 mmol/L x 22.72 ml/mmol; the STPD molar volume
+        22.41 ml/mmol would give 0.2017 -- conversion factor to confirm
+      sourced: 'yes'
+    C_CO2_sat:
+      reference: Spencer1979; C_sat,CO2 = 86.11 mmol/L (Albanese2014 Table 2-6). Library 1.9564 = 86.11 x 22.72 ml/mmol (same factor as C_O2_sat;
+        22.41 would give 1.930)
+      sourced: 'yes'
+    overcap_solubility:
+      reference: 'unreferenced_placeholder; numerical device: steep linear P_O2 rise (Pa per unit content) above the saturation cap so the inverse
+        curve stays finite'
+      sourced: 'no'
+    saturation_cap:
+      reference: 'unreferenced_placeholder; numerical device: content capped at 0.9999 of saturation before inverting the Spencer curve'
+      sourced: 'no'
+    C_CO2_p_init:
+      reference: unreferenced_placeholder; initial condition (library 0.48 ml/ml, ~arterial CO2 content)
+      sourced: 'no'
+    C_O2_p_init:
+      reference: unreferenced_placeholder; initial condition (library 0.20 ml/ml, ~arterial O2 content)
+      sourced: 'no'
+    C_CO2_a:
+      reference: 'definitional; not a boundary condition: computed by the component (config declares it boundary_condition -- see proposed fix).
+        Value only to fill the TODO'
+      sourced: definitional
+      value: 0.485
+    C_O2_a:
+      reference: 'definitional; not a boundary condition: computed by the component (config declares it boundary_condition -- see proposed fix).
+        Value only to fill the TODO'
+      sourced: definitional
+      value: 0.199
+    q_0:
+      reference: unreferenced_placeholder; library 2 L is ~25x a textbook pulmonary capillary blood volume (~70-100 ml at rest); Albanese uses
+        the pulmonary peripheral volume of the CVS model
+      sourced: 'no'
+    k_O2:
+      reference: 'unreferenced_placeholder; NOT in Albanese 2016 (Albanese2014 eqs A-69/A-70 assume P_capillary = P_alveolar, no conductance).
+        1.7e-8 m6/(J s) = 136 ml/min/mmHg, ~6x a resting D_LO2 of ~20-25 ml/min/mmHg: effectively near-equilibrium'
+      sourced: 'no'
+    k_CO2:
+      reference: unreferenced_placeholder; NOT in Albanese 2016 (instantaneous equilibrium there). 4.9e-7 m6/(J s) = 3900 ml/min/mmHg
+      sourced: 'no'
+    shunt_fraction:
+      reference: Albanese2014; sh = 1.7% (Table 2-6, citing GuytonHall2006)
+      sourced: 'yes'
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: proposed
+      source: Albanese2014 Table 2-12 normal resting values (arterial P_O2 100 mmHg, P_CO2 40 mmHg; mixed venous 15 ml/dl O2, 53 ml/dl CO2 used
+        as the harness venous input)
+      source_short: normal resting blood gases (Albanese 2014 Table 2-12)
+      data: validation/pulmonary_GE_normal_blood_gases.csv
+      time_column: t
+      variables:
+        P_O2_p: P_O2_Pa
+        P_CO2_p: P_CO2_Pa
+      parameters: {}
+      sim_time: 180.0
+      dt: 0.05
+      metric: nrmse
+      threshold: 0.1
+    calibrate:
+      status: pending
+      reason: k_O2/k_CO2 could be identified from alveolar-arterial gradients (e.g. A-a O2 difference ~5-10 mmHg); needs the owner to choose data
 - vessel_type: pulmonary_GE
   BC_type: nn_5_lobe
   module_type: pulmonary_GE_5_lobe_type
-  outputs: [C_CO2_p, C_O2_p, C_CO2_p_capped, C_O2_p_capped, C_CO2_v, C_O2_v]
-  invariants: []
+  notes: 'Five-lobe variant of pulmonary_GE: the capillary flow is the sum of five lobar flow ports (v = v_1 + ... + v_5); otherwise the same
+    equations without the over-cap solubility term. Harness as for pulmonary_GE with five pp_I terminals (1 L/min each).'
+  sim_time: 120.0
+  dt: 0.01
+  solver_info:
+    rtol: 1.0e-08
+    atol: 1.0e-10
+  outputs:
+  - C_O2_p
+  - C_CO2_p
+  - C_O2_a
+  - C_CO2_a
+  - P_O2_p
+  - P_CO2_p
+  - M_O2
+  - M_CO2
+  - ven/C_O2_out
+  - resp/P_O2_A
+  - termp1/v_T
+  - termp2/v_T
+  - termp3/v_T
+  - termp4/v_T
+  - termp5/v_T
+  harness:
+    vessel_array:
+    - - termv
+      - pp_I
+      - terminal
+      - ''
+      - ven
+    - - ven
+      - nn
+      - gas_transport_simple
+      - termv
+      - mod
+    - - terma
+      - pp_I
+      - terminal
+      - ''
+      - artg
+    - - artg
+      - nn
+      - gas_transport_simple
+      - terma mod
+      - ''
+    - - termp1
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - termp2
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - termp3
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - termp4
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - termp5
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - mod
+      - nn_5_lobe
+      - pulmonary_GE
+      - termp1 termp2 termp3 termp4 termp5 ven
+      - resp artg
+    - - resp
+      - nn
+      - respiratory_gas_transport
+      - mod
+      - lung
+    - - lung
+      - nn
+      - simple_lung_bg
+      - resp
+      - ''
+    parameters:
+    - - R_1_T_termv
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termv
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termv
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termv
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termv
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termv
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_termv
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termv
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termv
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - R_1_T_terma
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_terma
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_terma
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_terma
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_terma
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_terma
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_terma
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_terma
+      - m3
+      - 0.0
+      - harness
+    - - q_init_terma
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - C_CO2_in_ven
+      - dimensionless
+      - 0.53
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_in_ven
+      - dimensionless
+      - 0.15
+      - gas_exchange_parameters.csv (harness value)
+    - - C_CO2_out_init_ven
+      - dimensionless
+      - 0.53
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_out_init_ven
+      - dimensionless
+      - 0.15
+      - gas_exchange_parameters.csv (harness value)
+    - - q_0_ven
+      - m3
+      - 0.0003
+      - gas_exchange_parameters.csv
+    - - C_CO2_in_artg
+      - dimensionless
+      - 0.485
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_in_artg
+      - dimensionless
+      - 0.199
+      - gas_exchange_parameters.csv (harness value)
+    - - C_CO2_out_init_artg
+      - dimensionless
+      - 0.485
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_out_init_artg
+      - dimensionless
+      - 0.199
+      - gas_exchange_parameters.csv (harness value)
+    - - q_0_artg
+      - m3
+      - 0.0003
+      - gas_exchange_parameters.csv
+    - - R_1_T_termp1
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termp1
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termp1
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termp1
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termp1
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termp1
+      - J_per_m3
+      - 166.6
+      - 'harness: gives v_T = 1.666e-05 m3/s'
+    - - u_out_termp1
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termp1
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termp1
+      - m3
+      - 8.33e-08
+      - 'harness: equilibrium volume'
+    - - R_1_T_termp2
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termp2
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termp2
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termp2
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termp2
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termp2
+      - J_per_m3
+      - 166.6
+      - 'harness: gives v_T = 1.666e-05 m3/s'
+    - - u_out_termp2
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termp2
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termp2
+      - m3
+      - 8.33e-08
+      - 'harness: equilibrium volume'
+    - - R_1_T_termp3
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termp3
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termp3
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termp3
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termp3
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termp3
+      - J_per_m3
+      - 166.6
+      - 'harness: gives v_T = 1.666e-05 m3/s'
+    - - u_out_termp3
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termp3
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termp3
+      - m3
+      - 8.33e-08
+      - 'harness: equilibrium volume'
+    - - R_1_T_termp4
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termp4
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termp4
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termp4
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termp4
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termp4
+      - J_per_m3
+      - 166.6
+      - 'harness: gives v_T = 1.666e-05 m3/s'
+    - - u_out_termp4
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termp4
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termp4
+      - m3
+      - 8.33e-08
+      - 'harness: equilibrium volume'
+    - - R_1_T_termp5
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termp5
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termp5
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termp5
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termp5
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termp5
+      - J_per_m3
+      - 166.6
+      - 'harness: gives v_T = 1.666e-05 m3/s'
+    - - u_out_termp5
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termp5
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termp5
+      - m3
+      - 8.33e-08
+      - 'harness: equilibrium volume'
+    - - flag_P_mus_control_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - flag_RR_control_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - P_mus_min_lung
+      - J_per_m3
+      - -980.0
+      - lung_parameters.csv (library value)
+    - - P_plEE_lung
+      - J_per_m3
+      - -490.0
+      - lung_parameters.csv (library value)
+    - - q_D_min_lung
+      - m3
+      - 1.0e-05
+      - lung_parameters.csv (library value)
+    - - q_l_us_lung
+      - m3
+      - 3.44e-05
+      - lung_parameters.csv (library value)
+    - - q_t_us_lung
+      - m3
+      - 6.63e-06
+      - lung_parameters.csv (library value)
+    - - q_b_us_lung
+      - m3
+      - 1.87e-05
+      - lung_parameters.csv (library value)
+    - - q_A_us_lung
+      - m3
+      - 1.26e-06
+      - lung_parameters.csv (library value)
+    - - R_ml_lung
+      - Js_per_m6
+      - 250000.0
+      - lung_parameters.csv (library value)
+    - - R_lt_lung
+      - Js_per_m6
+      - 85000.0
+      - lung_parameters.csv (library value)
+    - - R_tb_lung
+      - Js_per_m6
+      - 80000.0
+      - lung_parameters.csv (library value)
+    - - R_bA_lung
+      - Js_per_m6
+      - 22000.0
+      - lung_parameters.csv (library value)
+    - - R_plwall_lung
+      - Js_per_m6
+      - 10000.0
+      - lung_parameters.csv (library value)
+    - - alpha_LR_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - C_l_lung
+      - m6_per_J
+      - 1.3e-08
+      - lung_parameters.csv (library value)
+    - - C_t_lung
+      - m6_per_J
+      - 2.43e-08
+      - lung_parameters.csv (library value)
+    - - C_b_lung
+      - m6_per_J
+      - 1.34e-06
+      - lung_parameters.csv (library value)
+    - - C_A_lung
+      - m6_per_J
+      - 2.04e-05
+      - lung_parameters.csv (library value)
+    - - C_pl_lung
+      - m6_per_J
+      - 2.5e-06
+      - lung_parameters.csv (library value)
+    - - T_resp_lung
+      - second
+      - 5.0
+      - lung_parameters.csv (library value)
+    - - Delta_RR_resp_lung
+      - per_s
+      - 0.0
+      - lung_parameters.csv (library value)
+    - - Delta_P_mus_lung
+      - J_per_m3
+      - 0.0
+      - lung_parameters.csv (library value)
+    - - IE_ratio_lung
+      - dimensionless
+      - 0.6
+      - lung_parameters.csv (library value)
+    - - P_m
+      - J_per_m3
+      - 0.0
+      - lung_parameters.csv global (atmospheric reference)
+    - - F_O2_i_resp
+      - dimensionless
+      - 0.21
+      - gas_exchange_parameters.csv
+    - - F_CO2_i_resp
+      - dimensionless
+      - 0.000421
+      - gas_exchange_parameters.csv
+    - - K_LOSSES_resp
+      - dimensionless
+      - 1.0
+      - gas_exchange_parameters.csv
+    - - F_CO2_D_init_resp
+      - dimensionless
+      - 0.03
+      - gas_exchange_parameters.csv
+    - - F_O2_D_init_resp
+      - dimensionless
+      - 0.17
+      - gas_exchange_parameters.csv
+    - - F_CO2_A_init_resp
+      - dimensionless
+      - 0.04
+      - gas_exchange_parameters.csv
+    - - F_O2_A_init_resp
+      - dimensionless
+      - 0.17
+      - gas_exchange_parameters.csv
+    - - v_ml_resp
+      - m3_per_s
+      - 0.0
+      - gas_exchange_parameters.csv (harness value)
+    - - v_bA_resp
+      - m3_per_s
+      - 0.0
+      - gas_exchange_parameters.csv (harness value)
+    - - q_D_resp
+      - m3
+      - 0.00015
+      - gas_exchange_parameters.csv (harness value)
+    - - q_A_resp
+      - m3
+      - 0.00225
+      - gas_exchange_parameters.csv (harness value)
+    - - overcap_solubility
+      - J_per_m3
+      - 10000000000.0
+      - gas_exchange_parameters.csv global
+    - - saturation_cap
+      - dimensionless
+      - 0.9999
+      - gas_exchange_parameters.csv global
+    - - P_atm
+      - J_per_m3
+      - 101300.0
+      - gas_exchange_parameters.csv global
+    - - P_ws
+      - J_per_m3
+      - 6266.15
+      - gas_exchange_parameters.csv global
+  expected_failures:
+    run_test: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped) without declaring it, and
+      the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library copy (saturation_cap declared public_interface
+      in and added to the config as global_constant) the component generates, runs and all 5 invariants hold.'
+    verification_test_invariants: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped) without
+      declaring it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library copy (saturation_cap
+      declared public_interface in and added to the config as global_constant) the component generates, runs and all 5 invariants hold.'
+    verification_test_BC: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped) without declaring
+      it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library copy (saturation_cap declared
+      public_interface in and added to the config as global_constant) the component generates, runs and all 5 invariants hold.'
+    verification_test_timestep: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped) without
+      declaring it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library copy (saturation_cap
+      declared public_interface in and added to the config as global_constant) the component generates, runs and all 5 invariants hold.'
+    stability_test: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped) without declaring it,
+      and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library copy (saturation_cap declared public_interface
+      in and added to the config as global_constant) the component generates, runs and all 5 invariants hold.'
+  invariants:
+  - description: 'Spencer inverse is exact: forward curve at (P_O2_p, P_CO2_p) returns C_O2_p (below the cap)'
+    expr: np.max(np.where(C_O2_p < saturation_cap*C_O2_sat, np.abs(C_O2_sat*((P_O2_p)*(1 + beta_1*(P_CO2_p))/(k_1*(1 + alpha_1*(P_CO2_p))))**(1/h_1)/(1
+      + ((P_O2_p)*(1 + beta_1*(P_CO2_p))/(k_1*(1 + alpha_1*(P_CO2_p))))**(1/h_1)) - C_O2_p), 0)) <= 1e-6*C_O2_sat
+  - description: arterial content is the exact flow-weighted mix of capillary and shunted venous blood
+    expr: np.max(np.abs(C_O2_a - ((1 - shunt_fraction)*C_O2_p + shunt_fraction*ven__C_O2_out))[t > 0.1]) <= 1e-9
+  - description: Fick flux law M_O2 = k_O2 (P_O2_A - P_O2_p)
+    expr: np.max(np.abs(M_O2 - k_O2*(resp__P_O2_A - P_O2_p))) <= 1e-9*max(1e-12, np.max(np.abs(M_O2)))
+  - description: capillary O2 mass balance with v = sum of the five lobar flows (trapezoid; after the 1 s start-up transient)
+    expr: np.max(np.abs((q_0*(C_O2_p - C_O2_p[0]) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((termp1__v_T + termp2__v_T + termp3__v_T
+      + termp4__v_T + termp5__v_T)*(1 - shunt_fraction)*(ven__C_O2_out - C_O2_p) + M_O2)[1:] + ((termp1__v_T + termp2__v_T + termp3__v_T + termp4__v_T
+      + termp5__v_T)*(1 - shunt_fraction)*(ven__C_O2_out - C_O2_p) + M_O2)[:-1])))))[t >= 1] - (q_0*(C_O2_p - C_O2_p[0]) - np.concatenate(([0.0],
+      np.cumsum(0.5*np.diff(t)*(((termp1__v_T + termp2__v_T + termp3__v_T + termp4__v_T + termp5__v_T)*(1 - shunt_fraction)*(ven__C_O2_out - C_O2_p)
+      + M_O2)[1:] + ((termp1__v_T + termp2__v_T + termp3__v_T + termp4__v_T + termp5__v_T)*(1 - shunt_fraction)*(ven__C_O2_out - C_O2_p) + M_O2)[:-1])))))[t
+      >= 1][0])) <= 5e-3*max(np.ptp(q_0*C_O2_p), 1e-9)
+  - description: 'bounds: C_O2_p >= 0, C_O2_p <= C_O2_sat for t >= 10 s, partial pressures >= 0'
+    expr: np.all(C_O2_p >= 0) & np.all((C_O2_p <= C_O2_sat)[t >= 10]) & np.all(P_O2_p >= 0) & np.all(P_CO2_p >= 0)
+  bc_sweep:
+    exclude:
+    - C_CO2_a
+    - C_O2_a
+    ranges:
+      q_0:
+        min: 5.0e-05
+        max: 0.002
+        points: 4
+        scale: log
+      k_O2:
+        min: 2.0e-09
+        max: 5.0e-08
+        points: 4
+        scale: log
+      k_CO2:
+        min: 2.0e-08
+        max: 1.0e-06
+        points: 4
+        scale: log
+      shunt_fraction:
+        min: 0.0
+        max: 0.3
+        points: 4
+      C_O2_p_init:
+        min: 0.1
+        max: 0.2
+        points: 3
+      C_CO2_p_init:
+        min: 0.42
+        max: 0.56
+        points: 3
+    rationale: 'Same ranges as pulmonary_GE (nn): these are the values the nn variant is proposed with.'
+  timestep:
+    t_end: 2.0
+    dts:
+    - 0.00025
+    - 0.000125
+    - 6.25e-05
+    - 3.125e-05
+    tol: 0.01
+  stability:
+    t_end: 10.0
+    supported:
+    - solver: CVODE_myokit
+      rtol: 1.0e-06
+      atol: 1.0e-08
+  reference_proposals:
+    k_1:
+      reference: Spencer1979; K1 = 14.99 mmHg as tabulated in Albanese2014 Table 2-6 (Spencer 1979 full text not accessed); 14.99 x 133.322 =
+        1998.5 Pa
+      sourced: 'yes'
+    k_2:
+      reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6); 194.4 x 133.322 = 25917.8 Pa (library 25917.4, 0.002% low)
+      sourced: 'yes'
+    h_1:
+      reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+    h_2:
+      reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+    alpha_1:
+      reference: Spencer1979; alpha1 = 0.03198 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.399e-4 /Pa
+      sourced: 'yes'
+    alpha_2:
+      reference: Spencer1979; alpha2 = 0.05591 /mmHg (Albanese2014 Table 2-6); /133.322 = 4.194e-4 /Pa
+      sourced: 'yes'
+    beta_1:
+      reference: Spencer1979; beta1 = 0.008275 /mmHg (Albanese2014 Table 2-6); /133.322 = 6.207e-5 /Pa
+      sourced: 'yes'
+    beta_2:
+      reference: Spencer1979; beta2 = 0.03255 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.441e-4 /Pa
+      sourced: 'yes'
+    C_O2_sat:
+      reference: Spencer1979; C_sat,O2 = 9 mmol/L (Albanese2014 Table 2-6). Library 0.20448 ml/ml = 9 mmol/L x 22.72 ml/mmol; the STPD molar volume
+        22.41 ml/mmol would give 0.2017 -- conversion factor to confirm
+      sourced: 'yes'
+    C_CO2_sat:
+      reference: Spencer1979; C_sat,CO2 = 86.11 mmol/L (Albanese2014 Table 2-6). Library 1.9564 = 86.11 x 22.72 ml/mmol (same factor as C_O2_sat;
+        22.41 would give 1.930)
+      sourced: 'yes'
+    overcap_solubility:
+      reference: 'unreferenced_placeholder; numerical device: steep linear P_O2 rise (Pa per unit content) above the saturation cap so the inverse
+        curve stays finite'
+      sourced: 'no'
+    saturation_cap:
+      reference: 'unreferenced_placeholder; numerical device: content capped at 0.9999 of saturation before inverting the Spencer curve'
+      sourced: 'no'
+    C_CO2_p_init:
+      reference: unreferenced_placeholder; initial condition, same as pulmonary_GE (nn) library value
+      sourced: 'no'
+      value: 0.48
+    C_O2_p_init:
+      reference: unreferenced_placeholder; initial condition, same as pulmonary_GE (nn) library value
+      sourced: 'no'
+      value: 0.2
+    C_CO2_a:
+      reference: definitional; computed by the component (config declares it boundary_condition -- see proposed fix); value only fills the TODO
+      sourced: definitional
+      value: 0.485
+    C_O2_a:
+      reference: definitional; computed by the component (config declares it boundary_condition -- see proposed fix); value only fills the TODO
+      sourced: definitional
+      value: 0.199
+    q_0:
+      reference: unreferenced_placeholder; same as pulmonary_GE (nn) library value 2 L (see the question on q_0 there)
+      sourced: 'no'
+      value: 0.002
+    k_O2:
+      reference: unreferenced_placeholder; same as pulmonary_GE (nn) library value; not in Albanese 2016
+      sourced: 'no'
+      value: 1.7e-08
+    k_CO2:
+      reference: unreferenced_placeholder; same as pulmonary_GE (nn) library value; not in Albanese 2016
+      sourced: 'no'
+      value: 4.9e-07
+    shunt_fraction:
+      reference: Albanese2014; sh = 1.7% (Table 2-6, citing GuytonHall2006)
+      sourced: 'yes'
+      value: 0.017
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: same normal-blood-gas baseline as pulmonary_GE (nn) once lobar flows are chosen; lobar flow split (e.g. from perfusion scintigraphy)
+        to be chosen by the owner
+    calibrate:
+      status: pending
+      reason: as pulmonary_GE (nn)
 - vessel_type: gas_transport_simple
   BC_type: nn
   module_type: gas_transport_simple_type
-  outputs: [C_CO2_out, dot_C_CO2_out, C_O2_out, C_CO2_out_capped, C_O2_out_capped, C_O2_out_extra_ub]
-  invariants: []
+  notes: 'Well-mixed blood gas transport compartment (volume q_0, flow v) without exchange: q_0 dC/dt = v (C_in - C_out), plus output partial
+    pressures from the analytic inverse of the Spencer curves. With constant inflow content and flow, C_out = C_in + (C_init - C_in) exp(-v t/q_0).
+    Harness: pp_I terminal as a steady flow source (5 L/min).'
+  sim_time: 20.0
+  dt: 0.001
+  outputs:
+  - C_O2_out
+  - C_CO2_out
+  - dot_C_CO2_out
+  - P_O2_out
+  - P_CO2_out
+  - C_O2_out_extra_ub
+  - term/v_T
+  harness:
+    vessel_array:
+    - - term
+      - pp_I
+      - terminal
+      - ''
+      - mod
+    - - mod
+      - nn
+      - gas_transport_simple
+      - term
+      - ''
+    parameters:
+    - - R_1_T_term
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_term
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_term
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_term
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_term
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_term
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_term
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_term
+      - m3
+      - 0.0
+      - harness
+    - - q_init_term
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+  invariants:
+  - description: 'O2 content matches the exact washout solution for the logged (time-varying) flow: C = C_in + (C_init - C_in) exp(-int v dt /
+      q_0)'
+    expr: np.max(np.abs(C_O2_out - (C_O2_in + (C_O2_out_init - C_O2_in)*np.exp(-cumint(t, term__v_T)/q_0)))) <= 2e-3*abs(C_O2_out_init - C_O2_in)
+      + 1e-6
+  - description: CO2 content matches the exact first-order washout solution
+    expr: np.max(np.abs(C_CO2_out - (C_CO2_in + (C_CO2_out_init - C_CO2_in)*np.exp(-cumint(t, term__v_T)/q_0)))) <= 2e-3*abs(C_CO2_out_init -
+      C_CO2_in) + 1e-6
+  - description: dot_C_CO2_out = v (C_CO2_in - C_CO2_out)/q_0 (exported derivative)
+    expr: np.max(np.abs(dot_C_CO2_out - term__v_T*(C_CO2_in - C_CO2_out)/q_0)) <= 1e-9 + 1e-6*np.max(np.abs(dot_C_CO2_out))
+  - description: 'Spencer inverse is exact: forward curve at (P_O2_out, P_CO2_out) returns C_O2_out (below 99% of saturation, where the inversion
+      is well conditioned)'
+    expr: np.max(np.where((C_O2_out_extra_ub == 0) & (C_O2_out < 0.99*C_O2_sat), np.abs(C_O2_sat*((P_O2_out)*(1 + beta_1*(P_CO2_out))/(k_1*(1
+      + alpha_1*(P_CO2_out))))**(1/h_1)/(1 + ((P_O2_out)*(1 + beta_1*(P_CO2_out))/(k_1*(1 + alpha_1*(P_CO2_out))))**(1/h_1)) - C_O2_out), 0))
+      <= 1e-6*C_O2_sat
+  - description: '... and returns C_CO2_out'
+    expr: np.max(np.where((C_O2_out_extra_ub == 0) & (C_O2_out < 0.99*C_O2_sat) & (C_CO2_out < 0.99*C_CO2_sat), np.abs(C_CO2_sat*((P_CO2_out)*(1
+      + beta_2*(P_O2_out))/(k_2*(1 + alpha_2*(P_O2_out))))**(1/h_2)/(1 + ((P_CO2_out)*(1 + beta_2*(P_O2_out))/(k_2*(1 + alpha_2*(P_O2_out))))**(1/h_2))
+      - C_CO2_out), 0)) <= 1e-6*C_CO2_sat
+  - description: partial pressures >= 0
+    expr: np.all(P_O2_out >= 0) & np.all(P_CO2_out >= 0)
+  bc_sweep:
+    ranges:
+      C_CO2_in:
+        min: 0.4
+        max: 0.6
+        points: 5
+      C_O2_in:
+        min: 0.02
+        max: 0.21
+        points: 5
+      C_CO2_out_init:
+        min: 0.4
+        max: 0.6
+        points: 3
+      C_O2_out_init:
+        min: 0.02
+        max: 0.21
+        points: 3
+      q_0:
+        min: 5.0e-05
+        max: 0.002
+        points: 4
+        scale: log
+    rationale: Contents from severely hypoxaemic venous blood (0.02 ml/ml, S ~ 10%) to fully saturated arterial blood (0.21 > C_O2_sat = 0.2045,
+      which exercises the over-cap branch), CO2 0.40-0.60 ml/ml; compartment volumes 50 ml - 2 L.
+  timestep:
+    t_end: 10.0
+  reference_proposals:
+    k_1:
+      reference: Spencer1979; K1 = 14.99 mmHg as tabulated in Albanese2014 Table 2-6 (Spencer 1979 full text not accessed); 14.99 x 133.322 =
+        1998.5 Pa
+      sourced: 'yes'
+    k_2:
+      reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6); 194.4 x 133.322 = 25917.8 Pa (library 25917.4, 0.002% low)
+      sourced: 'yes'
+    h_1:
+      reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+    h_2:
+      reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+    alpha_1:
+      reference: Spencer1979; alpha1 = 0.03198 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.399e-4 /Pa
+      sourced: 'yes'
+    alpha_2:
+      reference: Spencer1979; alpha2 = 0.05591 /mmHg (Albanese2014 Table 2-6); /133.322 = 4.194e-4 /Pa
+      sourced: 'yes'
+    beta_1:
+      reference: Spencer1979; beta1 = 0.008275 /mmHg (Albanese2014 Table 2-6); /133.322 = 6.207e-5 /Pa
+      sourced: 'yes'
+    beta_2:
+      reference: Spencer1979; beta2 = 0.03255 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.441e-4 /Pa
+      sourced: 'yes'
+    C_O2_sat:
+      reference: Spencer1979; C_sat,O2 = 9 mmol/L (Albanese2014 Table 2-6). Library 0.20448 ml/ml = 9 mmol/L x 22.72 ml/mmol; the STPD molar volume
+        22.41 ml/mmol would give 0.2017 -- conversion factor to confirm
+      sourced: 'yes'
+    C_CO2_sat:
+      reference: Spencer1979; C_sat,CO2 = 86.11 mmol/L (Albanese2014 Table 2-6). Library 1.9564 = 86.11 x 22.72 ml/mmol (same factor as C_O2_sat;
+        22.41 would give 1.930)
+      sourced: 'yes'
+    overcap_solubility:
+      reference: 'unreferenced_placeholder; numerical device: steep linear P_O2 rise (Pa per unit content) above the saturation cap so the inverse
+        curve stays finite'
+      sourced: 'no'
+    saturation_cap:
+      reference: 'unreferenced_placeholder; numerical device: content capped at 0.9999 of saturation before inverting the Spencer curve'
+      sourced: 'no'
+    C_CO2_in:
+      reference: 'Spencer1979; test BC: arterial CO2 content at P_O2 100, P_CO2 40 mmHg (21.35 mmol/L x 22.72) = 0.485 ml/ml'
+      sourced: 'yes'
+      value: 0.485
+    C_O2_in:
+      reference: 'Spencer1979; test BC: arterial O2 content at P_O2 100, P_CO2 40 mmHg (8.75 mmol/L x 22.72) = 0.199 ml/ml'
+      sourced: 'yes'
+      value: 0.199
+    C_CO2_out_init:
+      reference: unreferenced_placeholder; initial condition (library 0.48)
+      sourced: 'no'
+    C_O2_out_init:
+      reference: unreferenced_placeholder; initial condition (library 0.20)
+      sourced: 'no'
+    q_0:
+      reference: unreferenced_placeholder; library 300 ml transport volume (arterial/venous pool lumped); owner to confirm which pool it represents
+      sourced: 'no'
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: 'candidate: the O2 dissociation curve implied by the P_O2_out(C_O2_out) inverse vs the standard human curve (Severinghaus 1979 eq.
+        1, which fits the standard curve to +-0.0055 saturation; points in validation/severinghaus1979_odc.csv). Offline, Spencer/C_sat at P_CO2
+        = 40 mmHg is within 0.03 saturation of it (max near P_O2 = 20-30 mmHg). Needs a curve (x-y) baseline mode rather than a time series.'
+    calibrate:
+      status: not_applicable
+      reason: linear transport compartment with an algebraic output map; verified against exact solutions
 - vessel_type: respiratory_gas_transport
   BC_type: nn
   module_type: respiratory_gas_transport_type
-  outputs: [F_CO2_D, F_O2_D, F_CO2_A, F_O2_A, M_CO2, M_O2]
-  invariants: []
+  notes: 'Dead-space and alveolar gas fractions (Albanese 2016 eqs A-61..A-64 form): upwinded convective exchange driven by the lung airflows
+    (v_ml at the mouth, v_bA into the alveoli) and removal of the gas taken up by the blood (K_LOSSES x M from pulmonary_GE); alveolar partial
+    pressures P = F (P_atm - P_ws). Harness: the pulmonary_GE network above with this component as mod and the simple_lung_bg lung supplying v_ml,
+    v_bA, q_D, q_A.'
+  sim_time: 60.0
+  dt: 0.005
+  solver_info:
+    rtol: 1.0e-08
+    atol: 1.0e-10
+  outputs:
+  - F_O2_D
+  - F_CO2_D
+  - F_O2_A
+  - F_CO2_A
+  - P_O2_A
+  - P_CO2_A
+  - pge/M_O2
+  - pge/M_CO2
+  - lung/v_ml
+  - lung/v_bA
+  - lung/q_D
+  - lung/q_A
+  harness:
+    vessel_array:
+    - - termv
+      - pp_I
+      - terminal
+      - ''
+      - ven
+    - - ven
+      - nn
+      - gas_transport_simple
+      - termv
+      - pge
+    - - terma
+      - pp_I
+      - terminal
+      - ''
+      - artg
+    - - artg
+      - nn
+      - gas_transport_simple
+      - terma pge
+      - ''
+    - - termp
+      - pp_I
+      - terminal
+      - ''
+      - pge
+    - - pge
+      - nn
+      - pulmonary_GE
+      - termp ven
+      - mod artg
+    - - mod
+      - nn
+      - respiratory_gas_transport
+      - pge
+      - lung
+    - - lung
+      - nn
+      - simple_lung_bg
+      - mod
+      - ''
+    parameters:
+    - - R_1_T_termv
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termv
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termv
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termv
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termv
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termv
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_termv
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termv
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termv
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - R_1_T_terma
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_terma
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_terma
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_terma
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_terma
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_terma
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_terma
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_terma
+      - m3
+      - 0.0
+      - harness
+    - - q_init_terma
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - R_1_T_termp
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - R_2_T_termp
+      - Js_per_m6
+      - 5000000.0
+      - harness flow source
+    - - C_T_termp
+      - m6_per_J
+      - 1.0e-09
+      - harness flow source
+    - - I_T_termp
+      - Js2_per_m6
+      - 25000.0
+      - 'harness: I/R = 5 ms'
+    - - u_ext_termp
+      - J_per_m3
+      - 0.0
+      - harness
+    - - u_in_termp
+      - J_per_m3
+      - 833.0
+      - 'harness: gives v_T = 8.33e-05 m3/s'
+    - - u_out_termp
+      - J_per_m3
+      - 0.0
+      - harness
+    - - q_us_termp
+      - m3
+      - 0.0
+      - harness
+    - - q_init_termp
+      - m3
+      - 4.165e-07
+      - 'harness: equilibrium volume'
+    - - C_CO2_in_ven
+      - dimensionless
+      - 0.53
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_in_ven
+      - dimensionless
+      - 0.15
+      - gas_exchange_parameters.csv (harness value)
+    - - C_CO2_out_init_ven
+      - dimensionless
+      - 0.53
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_out_init_ven
+      - dimensionless
+      - 0.15
+      - gas_exchange_parameters.csv (harness value)
+    - - q_0_ven
+      - m3
+      - 0.0003
+      - gas_exchange_parameters.csv
+    - - C_CO2_in_artg
+      - dimensionless
+      - 0.485
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_in_artg
+      - dimensionless
+      - 0.199
+      - gas_exchange_parameters.csv (harness value)
+    - - C_CO2_out_init_artg
+      - dimensionless
+      - 0.485
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_out_init_artg
+      - dimensionless
+      - 0.199
+      - gas_exchange_parameters.csv (harness value)
+    - - q_0_artg
+      - m3
+      - 0.0003
+      - gas_exchange_parameters.csv
+    - - C_CO2_p_init_pge
+      - dimensionless
+      - 0.48
+      - gas_exchange_parameters.csv
+    - - C_O2_p_init_pge
+      - dimensionless
+      - 0.2
+      - gas_exchange_parameters.csv
+    - - C_CO2_a_pge
+      - dimensionless
+      - 0.485
+      - gas_exchange_parameters.csv (harness value)
+    - - C_O2_a_pge
+      - dimensionless
+      - 0.199
+      - gas_exchange_parameters.csv (harness value)
+    - - q_0_pge
+      - m3
+      - 0.002
+      - gas_exchange_parameters.csv
+    - - k_O2_pge
+      - m6_per_Js
+      - 1.7e-08
+      - gas_exchange_parameters.csv
+    - - k_CO2_pge
+      - m6_per_Js
+      - 4.9e-07
+      - gas_exchange_parameters.csv
+    - - shunt_fraction_pge
+      - dimensionless
+      - 0.017
+      - gas_exchange_parameters.csv
+    - - overcap_solubility
+      - J_per_m3
+      - 10000000000.0
+      - gas_exchange_parameters.csv global
+    - - saturation_cap
+      - dimensionless
+      - 0.9999
+      - gas_exchange_parameters.csv global
+    - - k_1
+      - J_per_m3
+      - 1998.5
+      - gas_exchange_parameters.csv global
+    - - k_2
+      - J_per_m3
+      - 25917.4
+      - gas_exchange_parameters.csv global
+    - - h_1
+      - dimensionless
+      - 0.3836
+      - gas_exchange_parameters.csv global
+    - - h_2
+      - dimensionless
+      - 1.819
+      - gas_exchange_parameters.csv global
+    - - alpha_1
+      - m3_per_J
+      - 0.00024
+      - gas_exchange_parameters.csv global
+    - - alpha_2
+      - m3_per_J
+      - 0.000419
+      - gas_exchange_parameters.csv global
+    - - beta_1
+      - m3_per_J
+      - 6.21e-05
+      - gas_exchange_parameters.csv global
+    - - beta_2
+      - m3_per_J
+      - 0.000244
+      - gas_exchange_parameters.csv global
+    - - C_O2_sat
+      - dimensionless
+      - 0.20448
+      - gas_exchange_parameters.csv global
+    - - C_CO2_sat
+      - dimensionless
+      - 1.9564
+      - gas_exchange_parameters.csv global
+    - - flag_P_mus_control_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - flag_RR_control_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - P_mus_min_lung
+      - J_per_m3
+      - -980.0
+      - lung_parameters.csv (library value)
+    - - P_plEE_lung
+      - J_per_m3
+      - -490.0
+      - lung_parameters.csv (library value)
+    - - q_D_min_lung
+      - m3
+      - 1.0e-05
+      - lung_parameters.csv (library value)
+    - - q_l_us_lung
+      - m3
+      - 3.44e-05
+      - lung_parameters.csv (library value)
+    - - q_t_us_lung
+      - m3
+      - 6.63e-06
+      - lung_parameters.csv (library value)
+    - - q_b_us_lung
+      - m3
+      - 1.87e-05
+      - lung_parameters.csv (library value)
+    - - q_A_us_lung
+      - m3
+      - 1.26e-06
+      - lung_parameters.csv (library value)
+    - - R_ml_lung
+      - Js_per_m6
+      - 250000.0
+      - lung_parameters.csv (library value)
+    - - R_lt_lung
+      - Js_per_m6
+      - 85000.0
+      - lung_parameters.csv (library value)
+    - - R_tb_lung
+      - Js_per_m6
+      - 80000.0
+      - lung_parameters.csv (library value)
+    - - R_bA_lung
+      - Js_per_m6
+      - 22000.0
+      - lung_parameters.csv (library value)
+    - - R_plwall_lung
+      - Js_per_m6
+      - 10000.0
+      - lung_parameters.csv (library value)
+    - - alpha_LR_lung
+      - dimensionless
+      - 1.0
+      - lung_parameters.csv (library value)
+    - - C_l_lung
+      - m6_per_J
+      - 1.3e-08
+      - lung_parameters.csv (library value)
+    - - C_t_lung
+      - m6_per_J
+      - 2.43e-08
+      - lung_parameters.csv (library value)
+    - - C_b_lung
+      - m6_per_J
+      - 1.34e-06
+      - lung_parameters.csv (library value)
+    - - C_A_lung
+      - m6_per_J
+      - 2.04e-05
+      - lung_parameters.csv (library value)
+    - - C_pl_lung
+      - m6_per_J
+      - 2.5e-06
+      - lung_parameters.csv (library value)
+    - - T_resp_lung
+      - second
+      - 5.0
+      - lung_parameters.csv (library value)
+    - - Delta_RR_resp_lung
+      - per_s
+      - 0.0
+      - lung_parameters.csv (library value)
+    - - Delta_P_mus_lung
+      - J_per_m3
+      - 0.0
+      - lung_parameters.csv (library value)
+    - - IE_ratio_lung
+      - dimensionless
+      - 0.6
+      - lung_parameters.csv (library value)
+    - - P_m
+      - J_per_m3
+      - 0.0
+      - lung_parameters.csv global (atmospheric reference)
+  invariants:
+  - description: P_O2_A = F_O2_A (P_atm - P_ws) and P_CO2_A = F_CO2_A (P_atm - P_ws)
+    expr: np.max(np.abs(P_O2_A - F_O2_A*(P_atm - P_ws))) + np.max(np.abs(P_CO2_A - F_CO2_A*(P_atm - P_ws))) <= 1e-6
+  - description: gas fractions in [0, 1] and F_O2 + F_CO2 <= 1
+    expr: np.all((F_O2_A >= 0) & (F_CO2_A >= 0) & (F_O2_D >= 0) & (F_CO2_D >= 0) & (F_O2_A + F_CO2_A <= 1) & (F_O2_D + F_CO2_D <= 1))
+  - description: 'alveolar O2 balance: F_O2_A(t) - F_O2_A(t0) = time integral of [max(v_bA,0)(F_D - F_A) - K M_O2]/q_A (trapezoid, t0 = 5 s after
+      the lung start-up transient)'
+    expr: np.max(np.abs((F_O2_A - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_bA, 0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[1:]
+      + ((np.maximum(lung__v_bA, 0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[:-1])))))[t >= 5] - (F_O2_A - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_bA,
+      0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[1:] + ((np.maximum(lung__v_bA, 0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[:-1])))))[t
+      >= 5][0])) <= 2e-2*np.ptp(F_O2_A[t >= 5]) + 1e-6
+  - description: 'dead-space O2 balance: F_O2_D(t) - F_O2_D(t0) = time integral of [max(v_ml,0)(F_i - F_D) - max(-v_bA,0)(F_D - F_A)]/q_D'
+    expr: np.max(np.abs((F_O2_D - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA,
+      0)*(F_O2_D - F_O2_A))/lung__q_D)[1:] + ((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA, 0)*(F_O2_D - F_O2_A))/lung__q_D)[:-1])))))[t
+      >= 5] - (F_O2_D - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA,
+      0)*(F_O2_D - F_O2_A))/lung__q_D)[1:] + ((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA, 0)*(F_O2_D - F_O2_A))/lung__q_D)[:-1])))))[t
+      >= 5][0])) <= 2e-2*np.ptp(F_O2_D[t >= 5]) + 1e-6
+  - description: 'inspired gas bounds: F_O2_D and F_O2_A never exceed F_O2_i (no O2 source other than inspired air), once the initial fractions
+      have washed out (t >= 30 s). Run point only: with hypoxic inspired air (F_O2_i = 0.12) the 2 L pulmonary capillary pool, initialised at
+      0.20 ml/ml, releases O2 into the alveoli (M_O2 < 0) for longer than 30 s, which is physically correct'
+    expr: np.all((F_O2_D <= F_O2_i + 1e-9)[t >= 30]) & np.all((F_O2_A <= F_O2_i + 1e-9)[t >= 30])
+    applies: run
+  bc_sweep:
+    exclude:
+    - v_ml
+    - v_bA
+    - q_D
+    - q_A
+    ranges:
+      F_O2_i:
+        min: 0.12
+        max: 0.6
+        points: 4
+      F_CO2_i:
+        min: 0.0
+        max: 0.05
+        points: 4
+      K_LOSSES:
+        min: 1.0
+        max: 1.2103
+        points: 2
+      F_CO2_D_init:
+        min: 0.0
+        max: 0.06
+        points: 3
+      F_O2_D_init:
+        min: 0.12
+        max: 0.21
+        points: 3
+      F_CO2_A_init:
+        min: 0.03
+        max: 0.07
+        points: 3
+      F_O2_A_init:
+        min: 0.1
+        max: 0.18
+        points: 3
+    rationale: Inspired O2 from hypoxic (12%) to 60% supplemental O2; inspired CO2 0-5% (hypercapnia challenges); K from the library 1 to the
+      BTPS/STPD factor 1.2103 of Albanese. v_ml, v_bA, q_D, q_A are supplied by the lung in the harness, so their parameter values are unused
+      and not swept.
+  timestep:
+    t_end: 2.0
+    dts:
+    - 0.00025
+    - 0.000125
+    - 6.25e-05
+    - 3.125e-05
+    tol: 0.01
+  stability:
+    t_end: 10.0
+    supported:
+    - solver: CVODE_myokit
+      rtol: 1.0e-06
+      atol: 1.0e-08
+  reference_proposals:
+    P_atm:
+      reference: Albanese2014; P_atm = 760 mmHg (Table 2-6) = 101325 Pa; library 101300 Pa (0.02% low)
+      sourced: 'yes'
+    P_ws:
+      reference: Albanese2014; P_ws = 47 mmHg at 37 C (Table 2-6); 47 x 133.322 = 6266.1 Pa
+      sourced: 'yes'
+    F_O2_i:
+      reference: Albanese2014; F_IO2 = 21.0379% (Table 2-6); library 0.21
+      sourced: 'yes'
+    F_CO2_i:
+      reference: Albanese2014; F_ICO2 = 0.0421% (Table 2-6)
+      sourced: 'yes'
+    K_LOSSES:
+      reference: 'unreferenced_placeholder; Albanese2014 Table 2-6 uses K = 1.2103 (BTPS/STPD factor: (310/273)(760/(760-47)) = 1.2104); library
+        sets 1 without a stated reason'
+      sourced: 'no'
+    F_CO2_D_init:
+      reference: unreferenced_placeholder; initial condition
+      sourced: 'no'
+    F_O2_D_init:
+      reference: unreferenced_placeholder; initial condition
+      sourced: 'no'
+    F_CO2_A_init:
+      reference: unreferenced_placeholder; initial condition
+      sourced: 'no'
+    F_O2_A_init:
+      reference: unreferenced_placeholder; initial condition
+      sourced: 'no'
+    v_ml:
+      reference: unreferenced_placeholder; supplied by the lung module through lung_flow_and_volume_port; value only fills the TODO for standalone
+        use
+      sourced: 'no'
+      value: 0.0
+    v_bA:
+      reference: unreferenced_placeholder; supplied by the lung module; value only fills the TODO
+      sourced: 'no'
+      value: 0.0
+    q_D:
+      reference: Albanese2014; standalone value = larynx+trachea+bronchi unstressed volumes 34.4+6.63+18.7 ml (Table 2-5) ~ 60 ml; supplied by
+        the lung in use
+      sourced: 'yes'
+      value: 6.0e-05
+    q_A:
+      reference: Albanese2014; standalone value = FRC 2.4 L (Table 2-5) minus dead space; supplied by the lung in use
+      sourced: 'yes'
+      value: 0.0023
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: 'candidate: normal alveolar P_O2 104 / P_CO2 40 mmHg and dead-space extremes (Albanese2014 Table 2-12); depends on the lung parameters
+        (see lung review) so set up once those are settled'
+    calibrate:
+      status: pending
+      reason: 'candidate: capnography (end-tidal CO2 waveform) data; owner to choose'
 - vessel_type: GE_capillary
   BC_type: nn
   module_type: capillary_GE
-  outputs: [C_CO2_c, C_O2_c, C_CO2_v, C_O2_v, P_CO2_c, P_O2_c]
-  invariants: []
+  notes: 'Single capillary O2 exchange (author''s model): well-mixed capillary O2 content with inflow/outflow and a permeability flux to tissue,
+    flux = 2 pi r L perm (ub_c - ub_t) on free (dissolved) O2; the venous free O2 is reconstructed from an assumed exponential axial profile whose
+    decay rate solves (1 - exp(-kL))/(kL) = C_0 via a Pade approximation of the Lambert W function; contents <-> pressures via Spencer curves
+    in mmHg. CO2 is passed through (C_CO2_c = C_CO2_a). All inputs are boundary conditions, so it runs alone.'
+  sim_time: 10.0
+  dt: 0.001
+  outputs:
+  - C_O2_c
+  - C_O2_v
+  - C_CO2_v
+  - P_O2_c
+  - P_CO2_c
+  - P_O2_a
+  - P_O2_v
+  - ub_O2_c
+  - ub_O2_a
+  - ub_O2_v
+  - flux_O2_c
+  - C_0
+  - k_xdecay
+  invariants:
+  - description: 'O2 mass balance: V (C_O2_c(t) - C_O2_c(0)) = time integral of v_in C_O2_a - v_out C_O2_v - flux_O2_c (trapezoid)'
+    expr: np.max(np.abs(V*(C_O2_c - C_O2_c[0]) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_in*C_O2_a - v_out*C_O2_v - flux_O2_c)[1:]
+      + (v_in*C_O2_a - v_out*C_O2_v - flux_O2_c)[:-1])))))) <= 2e-3*max(np.max(np.abs(V*(C_O2_c - C_O2_c[0]))), 1e-30) + 1e-24
+  - description: flux law flux_O2_c = 2 pi r L perm_O2 (ub_O2_c - ub_O2_t)
+    expr: np.max(np.abs(flux_O2_c - 2*np.pi*r*L*perm_O2*(ub_O2_c - ub_O2_t))) <= 1e-9*max(np.max(np.abs(flux_O2_c)), 1e-30)
+  - description: 'Spencer inverse is exact: forward curve (mmHg form) at (P_O2_c, P_CO2_c) returns C_O2_c'
+    expr: np.max(np.abs(C_O2_sat*((P_O2_c)*(1 + beta_1*(P_CO2_c))/(k_1*(1 + alpha_1*(P_CO2_c))))**(1/a_1)/(1 + ((P_O2_c)*(1 + beta_1*(P_CO2_c))/(k_1*(1
+      + alpha_1*(P_CO2_c))))**(1/a_1)) - C_O2_c)) <= 1e-6*C_O2_sat
+  - description: free O2 ub = 133.32 P S (mmHg -> Pa)
+    expr: np.max(np.abs(ub_O2_c - 133.32*P_O2_c*S_O2)) <= 1e-9*np.max(np.abs(ub_O2_c))
+  - description: 'Pade Lambert-W: when the exponential branch is active the axial profile mean matches C_0: (1 - exp(-k L))/(k L) = C_0 (Pade
+      error < 1%)'
+    expr: np.all(np.where((ub_O2_c < exp_threshold*ub_O2_a) & (C_0 > 0.05) & (C_0 < 0.95), np.abs((1 - np.exp(-k_xdecay*L))/(k_xdecay*L) - C_0)
+      <= 1e-2*C_0, True))
+  - description: 'physical ordering: at the venous (outlet) end the O2 pressure is not above the capillary mean (P_O2_v <= P_O2_c) after the initial
+      transient'
+    expr: np.all((P_O2_v <= P_O2_c + 1e-6)[t >= 1])
+  - description: venous free O2 lies between tissue and arterial free O2 (while ub_O2_c < ub_O2_a); contents and pressures >= 0
+    expr: np.all(np.where(ub_O2_c < ub_O2_a, (ub_O2_v >= ub_O2_t - 1e-12) & (ub_O2_v <= ub_O2_a + 1e-12), True)) & np.all(C_O2_c >= 0) & np.all(P_O2_c
+      >= 0) & np.all(C_O2_v >= 0)
+  expected_failures:
+    run_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6 and mmHg/mmHg2),
+      so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without declaring it.
+      Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added to the config as global_constant) it generates
+      and runs.'
+    verification_test_invariants: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+      and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without
+      declaring it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added to the config as global_constant)
+      it generates and runs.'
+    verification_test_BC: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6 and
+      mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without declaring
+      it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added to the config as global_constant)
+      it generates and runs.'
+    verification_test_timestep: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+      and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without
+      declaring it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added to the config as global_constant)
+      it generates and runs.'
+    stability_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6 and mmHg/mmHg2),
+      so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without declaring it.
+      Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added to the config as global_constant) it generates
+      and runs.'
+  bc_sweep:
+    ranges:
+      C_O2_a:
+        min: 5.0
+        max: 8.9
+        points: 4
+      C_CO2_a:
+        min: 19.0
+        max: 24.0
+        points: 3
+      ub_O2_t:
+        min: 0.005
+        max: 0.05
+        points: 4
+      perm_O2:
+        min: 2.0e-06
+        max: 0.0001
+        points: 4
+        scale: log
+      C_O2_c_init:
+        min: 4.0
+        max: 8.9
+        points: 3
+      exp_threshold:
+        min: 0.5
+        max: 0.99
+        points: 3
+    rationale: Arterial O2 content 5-8.9 mol/m3 (P_O2 ~ 30-150 mmHg), CO2 19-24 mol/m3, tissue P_O2 ~4-37 mmHg, permeability over 1.5 decades
+      around the placeholder; geometry and flows swept by the default factors (0.5-2x).
+  timestep:
+    t_end: 2.0
+    dts:
+    - 0.0005
+    - 0.00025
+    - 0.000125
+    - 6.25e-05
+  reference_proposals:
+    k_1:
+      reference: Spencer1979; K1 = 14.99 mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 14.99
+    k_2:
+      reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 194.4
+    a_1:
+      reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.3836
+    a_2:
+      reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 1.819
+    alpha_1:
+      reference: Spencer1979; 0.03198 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.03198
+    alpha_2:
+      reference: Spencer1979; 0.05591 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.05591
+    beta_1:
+      reference: Spencer1979; 0.008275 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.008275
+    beta_2:
+      reference: Spencer1979; 0.03255 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.03255
+    C_O2_sat:
+      reference: Spencer1979; 9 mmol/L = 9 mol/m3 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 9.0
+    C_CO2_sat:
+      reference: Spencer1979; 86.11 mmol/L = 86.11 mol/m3 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 86.11
+    S_O2:
+      reference: Albanese2014; O2 solubility 0.003 ml/dl/mmHg (eq. 2-14/A-75) / 22.4 ml/mmol = 1.34e-3 mmol/L/mmHg = 1.00e-5 mol/m3/Pa
+      sourced: 'yes'
+      value: 1.0e-05
+    S_CO2:
+      reference: unreferenced_placeholder; standard plasma CO2 solubility 0.03 mmol/L/mmHg (Henderson-Hasselbalch constant; textbook page not
+        verified) = 2.25e-4 mol/m3/Pa
+      sourced: 'no'
+      value: 0.000225
+    perm_O2:
+      reference: unreferenced_placeholder; order of magnitude chosen so a 1 mm, 3 um-radius capillary extracts ~25% of arterial O2 at 1.4e-14
+        m3/s
+      sourced: 'no'
+      value: 2.0e-05
+    exp_threshold:
+      reference: unreferenced_placeholder; switch between exponential and linear axial profile; declared millimolar but used as a dimensionless
+        ratio (see finding)
+      sourced: 'no'
+      value: 0.9
+    C_O2_c_init:
+      reference: unreferenced_placeholder; initial condition ~ capillary mean content (8 mol/m3 ~ P_O2 60 mmHg)
+      sourced: 'no'
+      value: 8.0
+    ub_O2_t:
+      reference: 'unreferenced_placeholder; tissue free O2 at P_O2 = 20 mmHg: 1.0e-5 mol/m3/Pa x 2666 Pa = 0.027 mol/m3'
+      sourced: 'no'
+      value: 0.027
+    L:
+      reference: unreferenced_placeholder; single capillary length ~1 mm (order of magnitude)
+      sourced: 'no'
+      value: 0.001
+    r:
+      reference: unreferenced_placeholder; capillary radius ~3 um (order of magnitude)
+      sourced: 'no'
+      value: 3.0e-06
+    V:
+      reference: definitional; V = pi r^2 L = 2.83e-14 m3 for the proposed r, L
+      sourced: definitional
+      value: 2.83e-14
+    C_CO2_a:
+      reference: 'Spencer1979; test BC: arterial CO2 content at P_O2 100, P_CO2 40 mmHg = 21.35 mol/m3'
+      sourced: 'yes'
+      value: 21.35
+    C_O2_a:
+      reference: 'Spencer1979; test BC: arterial O2 content at P_O2 100, P_CO2 40 mmHg = 8.75 mol/m3'
+      sourced: 'yes'
+      value: 8.75
+    v_in:
+      reference: unreferenced_placeholder; single-capillary flow ~ 0.5 mm/s x pi (3 um)^2 = 1.4e-14 m3/s (order of magnitude)
+      sourced: 'no'
+      value: 1.4e-14
+    v_out:
+      reference: unreferenced_placeholder; = v_in (rigid capillary)
+      sourced: 'no'
+      value: 1.4e-14
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: 'candidate: capillary O2 extraction/end-capillary P_O2 vs Krogh-cylinder solutions or microvascular P_O2 measurements; owner to
+        choose (model and parameters are the author''s own)'
+    calibrate:
+      status: pending
+      reason: no data chosen
 - vessel_type: GE_capillary_merge
   BC_type: nn
   module_type: capillary_GE_merge
-  outputs: [C_CO2_a, C_O2_a, C_CO2_c, C_O2_c, C_CO2_v, C_O2_v]
-  invariants: []
+  notes: As GE_capillary, with two inflows (v_in = v_in_1 + v_in_2) whose contents are flow-weighted (|v| weights, eps = 1e-28 m3/s guard).
+  sim_time: 10.0
+  dt: 0.001
+  outputs:
+  - C_O2_c
+  - C_O2_v
+  - C_CO2_v
+  - P_O2_c
+  - P_CO2_c
+  - P_O2_a
+  - P_O2_v
+  - ub_O2_c
+  - ub_O2_a
+  - ub_O2_v
+  - flux_O2_c
+  - C_0
+  - k_xdecay
+  invariants:
+  - description: 'O2 mass balance: V (C_O2_c(t) - C_O2_c(0)) = time integral of v_in C_O2_a - v_out C_O2_v - flux_O2_c (trapezoid)'
+    expr: np.max(np.abs(V*(C_O2_c - C_O2_c[0]) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((v_in_1 + v_in_2)*((np.abs(v_in_1)*C_O2_a_1
+      + np.abs(v_in_2)*C_O2_a_2)/(np.abs(v_in_1 + v_in_2) + 1e-28)) - v_out*C_O2_v - flux_O2_c)[1:] + ((v_in_1 + v_in_2)*((np.abs(v_in_1)*C_O2_a_1
+      + np.abs(v_in_2)*C_O2_a_2)/(np.abs(v_in_1 + v_in_2) + 1e-28)) - v_out*C_O2_v - flux_O2_c)[:-1])))))) <= 2e-3*max(np.max(np.abs(V*(C_O2_c
+      - C_O2_c[0]))), 1e-30) + 1e-24
+  - description: flux law flux_O2_c = 2 pi r L perm_O2 (ub_O2_c - ub_O2_t)
+    expr: np.max(np.abs(flux_O2_c - 2*np.pi*r*L*perm_O2*(ub_O2_c - ub_O2_t))) <= 1e-9*max(np.max(np.abs(flux_O2_c)), 1e-30)
+  - description: 'Spencer inverse is exact: forward curve (mmHg form) at (P_O2_c, P_CO2_c) returns C_O2_c'
+    expr: np.max(np.abs(C_O2_sat*((P_O2_c)*(1 + beta_1*(P_CO2_c))/(k_1*(1 + alpha_1*(P_CO2_c))))**(1/a_1)/(1 + ((P_O2_c)*(1 + beta_1*(P_CO2_c))/(k_1*(1
+      + alpha_1*(P_CO2_c))))**(1/a_1)) - C_O2_c)) <= 1e-6*C_O2_sat
+  - description: free O2 ub = 133.32 P S (mmHg -> Pa)
+    expr: np.max(np.abs(ub_O2_c - 133.32*P_O2_c*S_O2)) <= 1e-9*np.max(np.abs(ub_O2_c))
+  - description: 'Pade Lambert-W: when the exponential branch is active the axial profile mean matches C_0: (1 - exp(-k L))/(k L) = C_0 (Pade
+      error < 1%)'
+    expr: np.all(np.where((ub_O2_c < exp_threshold*ub_O2_a) & (C_0 > 0.05) & (C_0 < 0.95), np.abs((1 - np.exp(-k_xdecay*L))/(k_xdecay*L) - C_0)
+      <= 1e-2*C_0, True))
+  - description: 'physical ordering: at the venous (outlet) end the O2 pressure is not above the capillary mean (P_O2_v <= P_O2_c) after the initial
+      transient'
+    expr: np.all((P_O2_v <= P_O2_c + 1e-6)[t >= 1])
+  - description: venous free O2 lies between tissue and arterial free O2 (while ub_O2_c < ub_O2_a); contents and pressures >= 0
+    expr: np.all(np.where(ub_O2_c < ub_O2_a, (ub_O2_v >= ub_O2_t - 1e-12) & (ub_O2_v <= ub_O2_a + 1e-12), True)) & np.all(C_O2_c >= 0) & np.all(P_O2_c
+      >= 0) & np.all(C_O2_v >= 0)
+  expected_failures:
+    run_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6 and mmHg/mmHg2),
+      so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without declaring it,
+      and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy of the library (duplicates removed, saturation_cap
+      declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped equations restored) it generates and runs.'
+    verification_test_invariants: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+      and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without
+      declaring it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy of the library (duplicates
+      removed, saturation_cap declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped equations restored) it generates
+      and runs.'
+    verification_test_BC: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6 and
+      mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without declaring
+      it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy of the library (duplicates removed,
+      saturation_cap declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped equations restored) it generates and runs.'
+    verification_test_timestep: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+      and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without
+      declaring it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy of the library (duplicates
+      removed, saturation_cap declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped equations restored) it generates
+      and runs.'
+    stability_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6 and mmHg/mmHg2),
+      so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap without declaring it,
+      and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy of the library (duplicates removed, saturation_cap
+      declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped equations restored) it generates and runs.'
+  bc_sweep:
+    ranges:
+      ub_O2_t:
+        min: 0.005
+        max: 0.05
+        points: 4
+      perm_O2:
+        min: 2.0e-06
+        max: 0.0001
+        points: 4
+        scale: log
+      C_O2_c_init:
+        min: 4.0
+        max: 8.9
+        points: 3
+      exp_threshold:
+        min: 0.5
+        max: 0.99
+        points: 3
+      C_O2_a_1:
+        min: 5.0
+        max: 8.9
+        points: 4
+      C_O2_a_2:
+        min: 5.0
+        max: 8.9
+        points: 4
+      C_CO2_a_1:
+        min: 19.0
+        max: 24.0
+        points: 3
+      C_CO2_a_2:
+        min: 19.0
+        max: 24.0
+        points: 3
+    rationale: Arterial O2 content 5-8.9 mol/m3 (P_O2 ~ 30-150 mmHg), CO2 19-24 mol/m3, tissue P_O2 ~4-37 mmHg, permeability over 1.5 decades
+      around the placeholder; geometry and flows swept by the default factors (0.5-2x).
+  timestep:
+    t_end: 2.0
+    dts:
+    - 0.0005
+    - 0.00025
+    - 0.000125
+    - 6.25e-05
+  reference_proposals:
+    k_1:
+      reference: Spencer1979; K1 = 14.99 mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 14.99
+    k_2:
+      reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 194.4
+    a_1:
+      reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.3836
+    a_2:
+      reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 1.819
+    alpha_1:
+      reference: Spencer1979; 0.03198 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.03198
+    alpha_2:
+      reference: Spencer1979; 0.05591 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.05591
+    beta_1:
+      reference: Spencer1979; 0.008275 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.008275
+    beta_2:
+      reference: Spencer1979; 0.03255 /mmHg (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 0.03255
+    C_O2_sat:
+      reference: Spencer1979; 9 mmol/L = 9 mol/m3 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 9.0
+    C_CO2_sat:
+      reference: Spencer1979; 86.11 mmol/L = 86.11 mol/m3 (Albanese2014 Table 2-6)
+      sourced: 'yes'
+      value: 86.11
+    S_O2:
+      reference: Albanese2014; O2 solubility 0.003 ml/dl/mmHg (eq. 2-14/A-75) / 22.4 ml/mmol = 1.34e-3 mmol/L/mmHg = 1.00e-5 mol/m3/Pa
+      sourced: 'yes'
+      value: 1.0e-05
+    S_CO2:
+      reference: unreferenced_placeholder; standard plasma CO2 solubility 0.03 mmol/L/mmHg (Henderson-Hasselbalch constant; textbook page not
+        verified) = 2.25e-4 mol/m3/Pa
+      sourced: 'no'
+      value: 0.000225
+    perm_O2:
+      reference: unreferenced_placeholder; order of magnitude chosen so a 1 mm, 3 um-radius capillary extracts ~25% of arterial O2 at 1.4e-14
+        m3/s
+      sourced: 'no'
+      value: 2.0e-05
+    exp_threshold:
+      reference: unreferenced_placeholder; switch between exponential and linear axial profile; declared millimolar but used as a dimensionless
+        ratio (see finding)
+      sourced: 'no'
+      value: 0.9
+    C_O2_c_init:
+      reference: unreferenced_placeholder; initial condition ~ capillary mean content (8 mol/m3 ~ P_O2 60 mmHg)
+      sourced: 'no'
+      value: 8.0
+    ub_O2_t:
+      reference: 'unreferenced_placeholder; tissue free O2 at P_O2 = 20 mmHg: 1.0e-5 mol/m3/Pa x 2666 Pa = 0.027 mol/m3'
+      sourced: 'no'
+      value: 0.027
+    L:
+      reference: unreferenced_placeholder; single capillary length ~1 mm (order of magnitude)
+      sourced: 'no'
+      value: 0.001
+    r:
+      reference: unreferenced_placeholder; capillary radius ~3 um (order of magnitude)
+      sourced: 'no'
+      value: 3.0e-06
+    V:
+      reference: definitional; V = pi r^2 L = 2.83e-14 m3 for the proposed r, L
+      sourced: definitional
+      value: 2.83e-14
+    C_CO2_a_1:
+      reference: 'Spencer1979; test BC: arterial CO2 content 21.35 mol/m3 (P_O2 100, P_CO2 40 mmHg)'
+      sourced: 'yes'
+      value: 21.35
+    C_O2_a_1:
+      reference: 'Spencer1979; test BC: arterial O2 content 8.75 mol/m3'
+      sourced: 'yes'
+      value: 8.75
+    C_CO2_a_2:
+      reference: 'Spencer1979; test BC: CO2 content at P_O2 80, P_CO2 42 mmHg = 21.9 mol/m3 (second inflow slightly less oxygenated)'
+      sourced: 'yes'
+      value: 21.9
+    C_O2_a_2:
+      reference: 'Spencer1979; test BC: O2 content at P_O2 80, P_CO2 42 mmHg = 8.5 mol/m3'
+      sourced: 'yes'
+      value: 8.5
+    v_in_1:
+      reference: unreferenced_placeholder; half of a single-capillary flow
+      sourced: 'no'
+      value: 7.0e-15
+    v_in_2:
+      reference: unreferenced_placeholder; half of a single-capillary flow
+      sourced: 'no'
+      value: 7.0e-15
+    v_out:
+      reference: unreferenced_placeholder; = v_in_1 + v_in_2
+      sourced: 'no'
+      value: 1.4e-14
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: as GE_capillary
+    calibrate:
+      status: pending
+      reason: no data chosen
+review:
+  comment: 'Four components cannot be generated or run alone because of config/CellML defects. (1) pulmonary_GE (nn, nn_5_lobe): the config declares
+    the computed C_CO2_a/C_O2_a as boundary_condition, so an unconnected arterial port overdefines them. (2) pulmonary_GE_5_lobe_type and capillary_GE
+    use the global saturation_cap without declaring it; capillary_GE_merge also uses the undeclared C_O2_a_capped/C_CO2_a_capped, whose equations
+    are commented out. (3) capillary_GE and capillary_GE_merge list d_1..s_2 twice in the config (Pa and mmHg units), so the generated variables
+    are duplicated. In patched copies all of them run. Beyond the defects, the capillary models are physically inconsistent: the venous-end P_O2
+    comes out above the capillary mean, and the Pade Lambert-W is poor near C_0 -> 1. k_O2/k_CO2 are not in Albanese 2016 (instantaneous equilibrium
+    there). pulmonary q_0 = 2 L is ~25x a capillary blood volume. The 22.72 ml/mmol factor behind C_O2_sat/C_CO2_sat and K_LOSSES = 1 (Albanese:
+    1.2103) need confirmation.'
+  summary: 'Seven components: O2/CO2 transport and exchange built on the Spencer (1979) coupled dissociation curves, as used by Albanese et al.
+    (2016). Harness networks were built because libcuflynx special-cases tissue_GE_simple (it must be fed by a terminal) and because pulmonary_GE
+    / respiratory_gas_transport need the lung and blood neighbours. The flow source is a pp_I terminal; the mixed-venous and arterial pools are
+    gas_transport_simple; the lung is simple_lung_bg with library values. Verification uses exact solutions (first-order washout), mass balances
+    integrated on the logged fluxes, exactness of the analytic Spencer inverse (forward curve at the computed pressures returns the content to
+    1e-6), shunt mixing, flux laws and bounds. tissue_GE_simple, gas_transport_simple, pulmonary_GE (nn) and respiratory_gas_transport verify.
+    The Spencer constants match Albanese''s thesis Table 2-6 after unit conversion. The other three components fail to generate (see comment);
+    patched copies run and their results are in the findings. The pulmonary_GE normal-blood-gas baseline is proposed: it fails (P_O2 121 mmHg
+    vs 100) because of the lung parameters.'
+  questions:
+  - Confirm the Spencer1979 constants (k_1, k_2, h_1, h_2, alpha_1/2, beta_1/2 in Pa units; C_O2_sat, C_CO2_sat). Values are as tabulated in Albanese2014
+    Table 2-6; the Spencer full text was not accessed. C_O2_sat = 0.20448 and C_CO2_sat = 1.9564 ml/ml imply 22.72 ml/mmol (9 and 86.11 mmol/L).
+    The STPD molar volume is 22.41 ml/mmol, which would give 0.2017 and 1.930. Where does 22.72 come from?
+  - 'pulmonary_GE: k_O2 = 1.7e-8 and k_CO2 = 4.9e-7 m6/(J s) are attributed to Albanese2016, but Albanese assumes instantaneous alveolar-capillary
+    equilibrium (thesis eqs A-69/A-70) and has no conductance. k_O2 is ~136 ml/min/mmHg, ~6x a resting D_LO2 of ~20-25 ml/min/mmHg. Source? Otherwise
+    mark unreferenced.'
+  - 'pulmonary_GE: q_0 = 2 L (csv user_defined) is ~25x a pulmonary capillary blood volume (~70-100 ml). Intended as a larger pool? It sets the
+    arterial response time (q_0/v = 24 s at 5 L/min).'
+  - 'respiratory_gas_transport: K_LOSSES = 1, while Albanese uses K = 1.2103 (the BTPS/STPD factor). Why the change?'
+  - 'tissue_GE_simple: M_O2 = -10.8 ml/min and M_CO2 = 8.6 ml/min per compartment are "calc_from_user_assumptions". Albanese Table 2-7 gives brain
+    47.5 / 39.9 ml/min total, i.e. 5.9 / 5.0 ml/min per 1/8 of the brain. Which compartment and assumptions are they for?'
+  - 'capillary_GE / capillary_GE_merge (author''s model, all TODO): all values are placeholders (references table). After patching generation,
+    the run shows P_O2 at the venous end (61.8 mmHg) above the capillary mean (35.7 mmHg). C_0 = (C_O2_c - ub_O2_t)/(C_O2_a - ub_O2_t) mixes total
+    content with free O2, and the resulting profile is applied to free O2. Is that intended? And should exp_threshold (declared millimolar) be
+    dimensionless?'
+  - 'Accept the proposed baseline for pulmonary_GE (normal resting blood gases, Albanese2014 Table 2-12: P_aO2 100, P_aCO2 40 mmHg with mixed
+    venous 15/53 ml/dl as input)? It currently fails (nrmse 0.19 for P_O2, 0.06 for P_CO2). The model over-ventilates because of the lung parameters
+    (see lung review): P_AO2 123, P_ACO2 37 mmHg.'
+  - 'Other validation candidates (pending): the O2 dissociation curve from Severinghaus 1979 eq. 1 (validation/severinghaus1979_odc.csv) for the
+    Spencer inverse (offline, within 0.03 saturation, max at 20-30 mmHg; needs an x-y baseline mode); brain a-v O2 difference for tissue_GE_simple;
+    alveolar/dead-space values of Table 2-12 for respiratory_gas_transport. Proceed?'
+  proposed_fixes:
+  - 'gas_exchange_modules_config.json pulmonary_GE (nn and nn_5_lobe): C_CO2_a and C_O2_a kind boundary_condition -> variable (they are computed
+    from capillary/shunt mixing). Evidence: when the exit gas_port is unconnected, libcuflynx makes them parameters and Myokit reports "Overdefined
+    variable C_CO2_a"; the harness has to add an arterial gas_transport_simple sink. In a patched copy the component runs without the sink.'
+  - 'gas_exchange_modules.cellml pulmonary_GE_5_lobe_type and capillary_GE: declare <variable name="saturation_cap" public_interface="in" units="dimensionless"/>,
+    and add ["saturation_cap","dimensionless","access","global_constant"] to their config entries. Evidence: libcellml MATH_CI_VARIABLE_REFERENCE;
+    the structure test warns "equations use undeclared variable saturation_cap". Patched copies generate and run.'
+  - 'gas_exchange_modules.cellml capillary_GE_merge: declare saturation_cap (as above), and restore C_O2_a_capped / C_CO2_a_capped = min(C_sat
+    saturation_cap, C_a) (currently in a comment, with units mol_per_m3, not dimensionless). Note: d_1_a/d_2_a use the uncapped C_O2_a in the
+    numerator and the capped value in the denominator; capillary_GE uses the capped value in both. Evidence: structure warnings for C_O2_a_capped
+    / C_CO2_a_capped / saturation_cap; the patched copy runs.'
+  - 'gas_exchange_modules_config.json capillary_GE and capillary_GE_merge: remove the duplicate d_1, d_2, r_1, r_2 (J_per_m3) and s_1, s_2 (J2_per_m6)
+    entries; the CellML uses mmHg. Evidence: generation fails with libcellml VARIABLE_NAME_UNIQUE ("multiple variables with the name ''s_1''").'
+  - 'capillary_GE / capillary_GE_merge W_pade_approx: the Pade approximation of Lambert W0 is inaccurate near the branch point (alpha -> -1/e,
+    i.e. C_0 -> 1, low extraction). At C_0 = 0.914 it gives kL = 0.298 vs exact 0.183, and the profile mean is 0.865 instead of 0.914. Use a branch-point
+    expansion (W ~ -1 + p - p^2/3, p = sqrt(2(1 + e alpha))) near -1/e, or a Newton step.'
+  - 'pulmonary_GE_type: rename d_C_O2_p_dt, which holds the CO2 derivative (cosmetic). The unused component "temp" in the CellML can be removed.'
+  findings:
+  - 'tissue_GE_simple: O2/CO2 contents match the exact washout solution (tolerance 0.2% of the step + 5e-5 for the harness flow start-up), and
+    the O2 mass balance holds. The 35-run sweep passes after the tolerance fix. RK4 order 4.25. There is no floor: C_O2 would go negative if |M_O2|
+    > v C_O2_a.'
+  - 'pulmonary_GE (nn): the Spencer inverse is exact to 1e-6 of C_sat. The shunt mix is exact, M = k dP holds, and the capillary mass balance
+    holds to 5e-3 of its range; at the default CVODE tolerance (rtol 1e-6, atol 1e-8) it does not (1% error), so solver_info rtol 1e-8 / atol
+    1e-10 is set for the pulmonary and respiratory components. RK4 converges at order 4.2, but the finest difference is 6e-3 because the harness
+    lung has a violent start-up transient (its hard-coded initial volumes). The timestep tol is therefore 1e-2 for these networks.'
+  - 'pulmonary_GE: at t = 0 the terminal flow is 0, so C_O2_a = max((v_p C_p + v_sh C_v)/v, 0) is 0/0 (evaluates to 0 in Myokit). A guard (v +
+    eps, as in the merge component) would avoid NaN in other solvers.'
+  - 'pulmonary_GE_5_lobe (patched copy): runs, and all 5 invariants hold (Spencer inverse exact, shunt mixing, flux law, mass balance with the
+    summed lobar flows, bounds).'
+  - 'capillary_GE / capillary_GE_merge (patched copies): mass balance, flux law, Spencer inverse (mmHg form) and ub = 133.32 P S hold. The Pade-consistency
+    invariant and the physical-ordering invariant (P_O2_v <= P_O2_c) are violated (see questions/fixes). RK4 agrees with CVODE to 4e-9.'
+  - 'respiratory_gas_transport: with F_O2_i = 0.12, alveolar F_O2 stays above inspired for > 30 s, because the oversized (2 L) capillary pool
+    initialised at arterial content unloads O2 into the alveoli. This is physically consistent, so the F_O2 <= F_O2_i bound is checked at the
+    run point only.'
+  - 'gas_transport_simple: content matches the exact washout for the logged flow (C_in + (C_init - C_in) exp(-cumint(v)/q_0)), the exported derivative
+    identity holds, and the Spencer inverse is exact (below 99% of saturation, where the inversion is well conditioned); 80-run sweep; RK4 order
+    4.25. respiratory_gas_transport: P = F (P_atm - P_ws) holds exactly, fractions are bounded, and the alveolar and dead-space O2 balances integrated
+    on the lung flows hold (2% of range: trapezoid on 5 ms output of fast airway flows).'
+  - 'Joint failure risk (256 Sobol samples): tissue_GE_simple 0.0, gas_transport_simple 0.004, respiratory_gas_transport 0.0, pulmonary_GE 0.012
+    (driven by C_CO2_sat/k_O2 corners). pulmonary_GE_5_lobe, GE_capillary and GE_capillary_merge are 1.0 because they do not generate (see fixes).'
+  - 'Structure unit warnings (45): all but the d_1..s_2 duplicates are harmless spelling differences (config mol_per_m3 vs CellML millimolar/mM,
+    which are numerically identical; config Hz vs CellML per_s for dot_C_CO2_out). The config could use the CellML unit names for consistency.
+    The d_1, d_2, r_1, r_2 (J_per_m3) and s_1, s_2 (J2_per_m6) warnings are the real duplicate-entry defect in the proposed fixes.'
+  - The structure test does not detect duplicate variable names within one config entry (capillary d_1..s_2); these are only caught at generation.

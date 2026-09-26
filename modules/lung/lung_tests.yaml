@@ -7,39 +7,601 @@ defaults:
   dt: 0.01
   solver: CVODE_myokit
   bc_sweep:
-    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    factors:
+    - 0.5
+    - 0.75
+    - 1.0
+    - 1.5
+    - 2.0
     ranges: {}
   timestep:
     scheme: rk4
-    dts: [0.004, 0.002, 0.001, 0.0005]
+    dts:
+    - 0.004
+    - 0.002
+    - 0.001
+    - 0.0005
     min_order: 0.8
     tol: 0.0001
     cvode_tol: 0.001
   stability:
     supported:
-    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+    - solver: CVODE_myokit
+      rtol: 1.0e-06
+      atol: 1.0e-08
 components:
 - vessel_type: simple_lung_bg
   BC_type: nn
   module_type: simple_lung_bond_graph_type
-  outputs: [P_l, P_t, P_b, P_A, P_pl, P_mus]
-  invariants: []
+  notes: 'Respiratory mechanics after Albanese et al. (2016) / Rideout-Fukui: series larynx (extrathoracic), trachea, bronchi and alveoli, each
+    a linear compliance with a resistance to the next, the intrathoracic ones referenced to pleural pressure. Differences from Albanese: the chest
+    wall is a pleural compliance C_pl charged through a resistance R_plwall from the muscle pressure generator P_mus (Albanese: P_pl follows P_mus
+    through C_cw directly), and alpha_LR scales all airway resistances. P_mus is the Albanese parabolic/exponential profile (eq. 2-6) offset to
+    P_plEE, with breathing rate and amplitude adjustable by controller inputs Delta_RR_resp / Delta_P_mus. Initial volumes are hard-coded in the
+    CellML (q_l = 10 L, q_t = q_b = 1 L), giving a violent ~50 ms start-up transient.'
+  sim_time: 30.0
+  dt: 0.005
+  outputs:
+  - P_l
+  - P_t
+  - P_b
+  - P_A
+  - P_pl
+  - P_mus
+  - q_l
+  - q_t
+  - q_b
+  - q_A_stressed
+  - q_pl
+  - q_A
+  - q_D
+  - v_ml
+  invariants:
+  - description: P_mus equals the exact Albanese (2016, eq. 2-6) waveform evaluated at t (parabolic inspiration, exponential expiration, tau =
+      T_E/5, period 1/(1/T_resp + flag Delta_RR))
+    expr: np.max(np.abs(P_mus - (np.where((np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp) < ((T_resp/(1 + IE_ratio))*IE_ratio),
+      (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)) - ((P_mus_min + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus,
+      0)))/(((T_resp/(1 + IE_ratio))*IE_ratio)*(T_resp/(1 + IE_ratio)))*(np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp)**2
+      + ((P_mus_min + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)))*T_resp/(((T_resp/(1 + IE_ratio))*IE_ratio)*(T_resp/(1
+      + IE_ratio)))*(np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp), (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus,
+      0)) + ((P_mus_min + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)))/(1 - np.exp(-(T_resp/(1
+      + IE_ratio))/((T_resp/(1 + IE_ratio))/5)))*(np.exp(-((np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp) - ((T_resp/(1
+      + IE_ratio))*IE_ratio))/((T_resp/(1 + IE_ratio))/5)) - np.exp(-(T_resp/(1 + IE_ratio))/((T_resp/(1 + IE_ratio))/5))))))) <= 1e-4*abs((P_mus_min
+      + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0))) + 1e-6
+  - description: 'airway volume balance: q_l + q_t + q_b + q_A_stressed changes by the time integral of the mouth flow v_ml (trapezoid, after
+      the 0.5 s start-up transient)'
+    expr: np.max(np.abs(((q_l + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_ml)[1:] + (v_ml)[:-1])))))[t >=
+      0.5] - ((q_l + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_ml)[1:] + (v_ml)[:-1])))))[t >= 0.5][0]))
+      <= 2e-3*np.ptp((q_l + q_t + q_b + q_A_stressed)[t >= 0.5]) + 1e-9
+  - description: 'thoracic volume balance: q_pl + q_t + q_b + q_A_stressed changes only through the chest-wall flow (P_mus - P_pl)/R_plwall'
+    expr: np.max(np.abs(((q_pl + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((P_mus - P_pl)/R_plwall)[1:] +
+      ((P_mus - P_pl)/R_plwall)[:-1])))))[t >= 0.5] - ((q_pl + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((P_mus
+      - P_pl)/R_plwall)[1:] + ((P_mus - P_pl)/R_plwall)[:-1])))))[t >= 0.5][0])) <= 2e-3*np.ptp((q_pl + q_t + q_b + q_A_stressed)[t >= 0.5]) +
+      1e-9
+  - description: 'constitutive relations: P_A = q_A_stressed/C_A + P_pl, P_pl = q_pl/C_pl, q_A = q_A_stressed + q_A_us'
+    expr: (np.max(np.abs(P_A - (q_A_stressed/C_A + P_pl))) <= 1e-6*np.max(np.abs(P_A)) + 1e-9) & (np.max(np.abs(P_pl - q_pl/C_pl)) <= 1e-6*np.max(np.abs(P_pl))
+      + 1e-9) & (np.max(np.abs(q_A - q_A_stressed - q_A_us)) <= 1e-12)
+  - description: dead space q_D = max(q_l + q_t + q_b + unstressed volumes, q_D_min) and alveolar volume stays positive
+    expr: (np.max(np.abs(q_D - np.maximum(q_l + q_t + q_b + q_l_us + q_t_us + q_b_us, q_D_min))) <= 1e-12) & np.all(q_A > 0)
+  bc_sweep:
+    ranges:
+      Delta_RR_resp:
+        min: -0.08
+        max: 0.3
+        points: 5
+      Delta_P_mus:
+        min: -800
+        max: 300
+        points: 5
+      P_mus_min:
+        min: -2000
+        max: -600
+        points: 5
+      P_plEE:
+        min: -900
+        max: -200
+        points: 5
+      T_resp:
+        min: 2.0
+        max: 8.0
+        points: 5
+      IE_ratio:
+        min: 0.3
+        max: 1.0
+        points: 4
+      flag_P_mus_control:
+        min: 0
+        max: 1
+        points: 2
+      flag_RR_control:
+        min: 0
+        max: 1
+        points: 2
+      q_D_min:
+        min: 0.0
+        max: 0.0001
+        points: 3
+      alpha_LR:
+        min: 0.5
+        max: 3.0
+        points: 4
+    rationale: Breathing rate 7.5-30 /min via T_resp and via the controller input Delta_RR (-0.08..+0.3 /s around 0.2 /s), inspiratory effort
+      1-15 cmH2O (P_mus_min, Delta_P_mus), end-expiratory pleural pressure -9..-2 cmH2O, I:E 0.3-1, airway resistance multiplier 0.5-3 (bronchoconstriction).
+      Compliances, resistances and unstressed volumes use the default 0.5-2x factors.
+  timestep:
+    t_end: 2.0
+    dts:
+    - 0.0005
+    - 0.00025
+    - 0.000125
+    - 6.25e-05
+  reference_proposals:
+    flag_P_mus_control:
+      reference: 'definitional; switch: 1 = muscle-pressure amplitude follows the controller input Delta_P_mus'
+      sourced: definitional
+    flag_RR_control:
+      reference: 'definitional; switch: 1 = rate follows the controller input Delta_RR_resp'
+      sourced: definitional
+    P_mus_min:
+      reference: 'Albanese2014; P_mus,min = -5 cmH2O relative to baseline (Table 2-5, [MODEL], tuned for VT ~ 500 ml); here absolute: P_plEE -
+        490 Pa = -980 Pa'
+      sourced: 'yes'
+    P_plEE:
+      reference: Albanese2014; P_pl,EE = -5 cmH2O = -490 Pa (Table 2-5, citing West2008)
+      sourced: 'yes'
+    q_D_min:
+      reference: unreferenced_placeholder; numerical floor on dead-space volume (10 ml)
+      sourced: 'no'
+    q_l_us:
+      reference: Albanese2014; V_u,l = 34.4 ml (Table 2-5, from Fukui1972) = 3.44e-5 m3
+      sourced: 'yes'
+    q_t_us:
+      reference: Albanese2014; V_u,t = 6.63 ml (Table 2-5, from Fukui1972) = 6.63e-6 m3
+      sourced: 'yes'
+    q_b_us:
+      reference: Albanese2014; V_u,b = 18.7 ml (Table 2-5, from Rideout1991/Fukui1972) = 1.87e-5 m3
+      sourced: 'yes'
+    q_A_us:
+      reference: Albanese2014; V_u,A = 1.263 L (Table 2-5, set so FRC = 2.4 L) = 1.263e-3 m3. LIBRARY VALUE 1.26e-6 m3 IS 1000x TOO SMALL (ml/L
+        slip) -- see proposed fix
+      sourced: 'yes'
+    R_ml:
+      reference: Albanese2014; R_ml = 1.021 cmH2O s/L (Table 2-5, from Rideout1991) = 1.001e5 Pa s/m3 (1 cmH2O s/L = 9.807e4 Pa s/m3). Library
+        2.5e5 is 2.5x larger; the reason for the change is not recorded
+      sourced: 'yes'
+    R_lt:
+      reference: Albanese2014; R_lt = 0.3369 cmH2O s/L = 3.304e4 Pa s/m3. Library 8.5e4 (2.6x)
+      sourced: 'yes'
+    R_tb:
+      reference: Albanese2014; R_tb = 0.3063 cmH2O s/L = 3.004e4 Pa s/m3. Library 8.0e4 (2.7x)
+      sourced: 'yes'
+    R_bA:
+      reference: Albanese2014; R_bA = 0.0817 cmH2O s/L = 8.01e3 Pa s/m3. Library 2.2e4 (2.7x)
+      sourced: 'yes'
+    R_plwall:
+      reference: unreferenced_placeholder; chest-wall resistance is not in Albanese (chest-wall viscous resistance neglected there); library 1e4
+        Pa s/m3
+      sourced: 'no'
+    alpha_LR:
+      reference: definitional; airway-resistance multiplier, 1 = nominal
+      sourced: definitional
+    C_l:
+      reference: Albanese2014; C_l = 0.00127 L/cmH2O (Table 2-5, from Fukui1972) = 1.295e-8 m6/J (1 L/cmH2O = 1.0197e-5 m6/J)
+      sourced: 'yes'
+    C_t:
+      reference: Albanese2014; C_t = 0.00238 L/cmH2O (Table 2-5, from Fukui1972) = 2.427e-8 m6/J
+      sourced: 'yes'
+    C_b:
+      reference: Albanese2014; C_b = 0.0131 L/cmH2O (Table 2-5, from Fukui1972) = 1.336e-7 m6/J. LIBRARY 1.34e-6 IS 10x LARGER (not noted in the
+        csv)
+      sourced: 'yes'
+    C_A:
+      reference: Albanese2014; C_A = 0.2 L/cmH2O (Table 2-5, from Fukui1972) = 2.04e-6 m6/J. Library 2.04e-5 (10x, "to get ~3 L") -- with q_A_us
+        1000x small this gives an end-expiratory lung volume of ~14 L
+      sourced: 'yes'
+    C_pl:
+      reference: Albanese2014; chest-wall compliance C_cw = 0.2445 L/cmH2O (Table 2-5, citing van Meurs) = 2.49e-6 m6/J; library 2.5e-6 matches
+      sourced: 'yes'
+    T_resp:
+      reference: Albanese2014; RR = 12 breaths/min (Table 2-5) -> T = 5 s
+      sourced: 'yes'
+    Delta_RR_resp:
+      reference: definitional; controller input, 0 = no respiratory-rate change
+      sourced: definitional
+    Delta_P_mus:
+      reference: definitional; controller input, 0 = no effort change
+      sourced: definitional
+    IE_ratio:
+      reference: Albanese2014; IE_ratio = 0.6 (Table 2-5, [MODEL])
+      sourced: 'yes'
+    P_m:
+      reference: definitional; mouth (airway opening) pressure = atmospheric = 0 gauge
+      sourced: definitional
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: 'candidate: normal quiet-breathing values used by Albanese to tune the model (Albanese2014 section 2.4.3: FRC 2.4 L, tidal volume
+        ~500 ml at 12 /min, P_pl,EE -5 cmH2O, all citing West2008). With library values the model gives end-expiratory lung volume 14.0 L and
+        VT 0.88 L (with Albanese C_A, C_b, q_A_us: 2.48 L and 0.67 L). Set up as a baseline once the parameter fix is decided.'
+    calibrate:
+      status: pending
+      reason: 'candidate: flow/volume/pleural-pressure traces of healthy quiet breathing (e.g. Mecklenburgh & Mapleson 1998 averaged P_mus/flow,
+        used by Albanese); owner to choose'
 - vessel_type: lung_bg_Argus_Chase
   BC_type: nn
   module_type: lung_bond_graph_Argus_Chase_type
-  outputs: [P_m, P_err_int, P_vent, P_t, P_b, P_A]
-  invariants: []
+  notes: 'Mechanically-ventilated lung (author''s model): ventilator pressure P_vent with a PI(leaky-integral) controller to the set pressure
+    P_in and compliance C_vent, tube resistance R_tube to a mouth compliance C_m (with a pressure-relief leak above P_leak_threshold), then trachea-bronchi-alveoli
+    as in simple_lung_bg with resistances split from R_tot and compliances from C_tot (alveolar compliance switches between inspiration and expiration
+    by beta_C_insp_to_exp). Spontaneous effort P_mus is a quadratic B-spline (8 control points P_d_i on knots k_w apart) scaled by P_d_multiplier
+    and the controller input alpha_P_mus. alpha_LR and q_str are hard-coded to 1. ALL VALUES ARE PROPOSED PLACEHOLDERS so the component can be
+    verified; they are not a calibrated patient.'
+  sim_time: 20.0
+  dt: 0.001
+  solver_info:
+    rtol: 1.0e-08
+    atol: 1.0e-10
+  outputs:
+  - P_m
+  - P_vent
+  - P_err_int
+  - P_t
+  - P_b
+  - P_A
+  - P_pl
+  - P_mus
+  - P_d
+  - q_t
+  - q_b
+  - q_A
+  - q_pl
+  - q_D
+  - v_vm
+  - v_mt
+  - v_leak
+  invariants:
+  - description: 'B-spline effort is a partition of unity inside the spline support: P_d is a convex combination of the control points'
+    expr: np.all((P_d >= min(0, P_d_1, P_d_2, P_d_3, P_d_4, P_d_5, P_d_6, P_d_7, P_d_8) - 1e-9) & (P_d <= max(0, P_d_1, P_d_2, P_d_3, P_d_4, P_d_5,
+      P_d_6, P_d_7, P_d_8) + 1e-9))
+  - description: P_mus = P_d P_d_multiplier alpha (alpha = alpha_P_mus when flag_P_mus_control = 1, else 1)
+    expr: np.max(np.abs(P_mus - P_d*P_d_multiplier*(alpha_P_mus if flag_P_mus_control == 1 else 1.0))) <= 1e-9 + 1e-9*np.max(np.abs(P_mus))
+  - description: 'mouth volume balance: C_m P_m changes by the time integral of v_vm - v_mt - v_leak (after the 0.5 s start-up transient)'
+    expr: np.max(np.abs((C_m*P_m - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_vm - v_mt - v_leak)[1:] + (v_vm - v_mt - v_leak)[:-1])))))[t
+      >= 0.5] - (C_m*P_m - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_vm - v_mt - v_leak)[1:] + (v_vm - v_mt - v_leak)[:-1])))))[t >=
+      0.5][0])) <= 2e-3*max(np.ptp(C_m*P_m[t >= 0.5]), 1e-12) + 1e-12
+  - description: 'airway volume balance: q_t + q_b + q_A changes by the time integral of the mouth-to-trachea flow v_mt (after 0.5 s)'
+    expr: np.max(np.abs(((q_t + q_b + q_A) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_mt)[1:] + (v_mt)[:-1])))))[t >= 0.5] - ((q_t
+      + q_b + q_A) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_mt)[1:] + (v_mt)[:-1])))))[t >= 0.5][0])) <= 2e-3*np.ptp((q_t + q_b +
+      q_A)[t >= 0.5]) + 1e-9
+  - description: leak flow is zero below the threshold and non-negative
+    expr: np.all(v_leak >= 0) & np.all(np.where(P_m < P_leak_threshold, v_leak == 0, True))
+  bc_sweep:
+    ranges:
+      alpha_P_mus:
+        min: 0.0
+        max: 2.0
+        points: 5
+      Delta_RR_resp:
+        min: -0.08
+        max: 0.3
+        points: 5
+      P_in:
+        min: 0
+        max: 2000
+        points: 5
+      flag_P_mus_control:
+        min: 0
+        max: 1
+        points: 2
+      flag_RR_control:
+        min: 0
+        max: 1
+        points: 2
+      beta_C_insp_to_exp:
+        min: 0.7
+        max: 1.3
+        points: 3
+      frac_R_bA:
+        min: 0.05
+        max: 0.5
+        points: 4
+      alpha_C_A_to_tot:
+        min: 0.8
+        max: 0.99
+        points: 3
+      P_d_multiplier:
+        min: 0
+        max: 3
+        points: 4
+    rationale: Set pressure (CPAP/PEEP) 0-20 cmH2O, effort scaling 0-2x (apnoeic to strong effort) and rate -0.08..+0.3 /s, resistance split and
+      compliance fractions over plausible ranges; the rest uses the default 0.5-2x factors around the placeholders.
+  timestep:
+    t_end: 2.0
+    dts:
+    - 0.0005
+    - 0.00025
+    - 0.000125
+    - 6.25e-05
+  stability:
+    supported:
+    - solver: CVODE_myokit
+      rtol: 1.0e-06
+      atol: 1.0e-08
+      MaximumStep: 0.001
+    - solver: CVODE_myokit
+      rtol: 1.0e-08
+      atol: 1.0e-10
+  reference_proposals:
+    flag_P_mus_control:
+      reference: 'definitional; switch: 1 = effort amplitude follows alpha_P_mus'
+      sourced: definitional
+      value: 0
+    flag_RR_control:
+      reference: 'definitional; switch: 1 = rate follows Delta_RR_resp'
+      sourced: definitional
+      value: 0
+    alpha_P_mus:
+      reference: definitional; controller input, 1 = nominal effort
+      sourced: definitional
+      value: 1.0
+    Delta_RR_resp:
+      reference: definitional; controller input, 0 = no rate change
+      sourced: definitional
+      value: 0.0
+    P_d_multiplier:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- effort scale 1
+      sourced: 'no'
+      value: 1.0
+    P_d_1:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- spline control points shape a ~5 cmH2O inspiratory effort in the first ~40% of the cycle
+      sourced: 'no'
+      value: -100.0
+    P_d_2:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- '
+      sourced: 'no'
+      value: -350.0
+    P_d_3:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- '
+      sourced: 'no'
+      value: -490.0
+    P_d_4:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- '
+      sourced: 'no'
+      value: -300.0
+    P_d_5:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- '
+      sourced: 'no'
+      value: -100.0
+    P_d_6:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- '
+      sourced: 'no'
+      value: 0.0
+    P_d_7:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- '
+      sourced: 'no'
+      value: 0.0
+    P_d_8:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- '
+      sourced: 'no'
+      value: 0.0
+    k_w:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- knot spacing T_resp/10 so the 10 knots span one breath
+      sourced: 'no'
+      value: 0.5
+    q_D_min:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- dead-space floor as simple_lung_bg (10 ml)
+      sourced: 'no'
+      value: 1.0e-05
+    q_t_us:
+      reference: Albanese2014; V_u,t = 6.63 ml (Table 2-5) -- borrowed from the adult Albanese model
+      sourced: 'yes'
+      value: 6.63e-06
+    q_b_us:
+      reference: Albanese2014; V_u,b = 18.7 ml (Table 2-5) -- borrowed from the adult Albanese model
+      sourced: 'yes'
+      value: 1.87e-05
+    q_A_us:
+      reference: Albanese2014; V_u,A = 1.263 L (Table 2-5) -- borrowed from the adult Albanese model
+      sourced: 'yes'
+      value: 0.001263
+    frac_R_bA:
+      reference: 'unreferenced_placeholder; component is the author''s (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- fraction of R_tot in the alveolar duct segment (Albanese: 0.0817/1.74 = 0.05 of the airway resistance)'
+      sourced: 'no'
+      value: 0.2
+    R_tot:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- total airway resistance 10 cmH2O s/L (a typical intubated-patient order of magnitude)
+      sourced: 'no'
+      value: 980000.0
+    R_plwall:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- as simple_lung_bg (1e4 Pa s/m3)
+      sourced: 'no'
+      value: 10000.0
+    R_leak:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- relief leak resistance
+      sourced: 'no'
+      value: 1000000.0
+    P_leak_threshold:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- relief pressure 40 cmH2O
+      sourced: 'no'
+      value: 3900.0
+    C_t:
+      reference: Albanese2014; C_t = 0.00238 L/cmH2O (Table 2-5) = 2.43e-8 m6/J -- borrowed
+      sourced: 'yes'
+      value: 2.43e-08
+    C_pl:
+      reference: Albanese2014; chest-wall compliance 0.2445 L/cmH2O = 2.49e-6 m6/J (Table 2-5) -- borrowed
+      sourced: 'yes'
+      value: 2.5e-06
+    C_vent:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- ventilator circuit compliance ~1 ml/cmH2O
+      sourced: 'no'
+      value: 1.0e-08
+    C_m:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- mouth/Y-piece compliance ~1 ml/cmH2O
+      sourced: 'no'
+      value: 1.0e-08
+    C_tot:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- lung compliance 50 ml/cmH2O (typical ventilated adult order of magnitude)
+      sourced: 'no'
+      value: 5.1e-07
+    alpha_C_A_to_tot:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- alveolar share of C_tot
+      sourced: 'no'
+      value: 0.95
+    beta_C_insp_to_exp:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- no inspiration/expiration hysteresis
+      sourced: 'no'
+      value: 1.0
+    R_tube:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- endotracheal tube ~5 cmH2O s/L
+      sourced: 'no'
+      value: 490000.0
+    alpha_vent:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- integral leak 0.1 /s
+      sourced: 'no'
+      value: 0.1
+    k_p_vent:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- ventilator proportional gain 20 /s
+      sourced: 'no'
+      value: 20.0
+    k_I_vent:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- ventilator integral gain 50 /s^2
+      sourced: 'no'
+      value: 50.0
+    T_resp:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- 12 breaths/min as simple_lung_bg
+      sourced: 'no'
+      value: 5.0
+    frac_T_insp:
+      reference: Albanese2014; I:E 0.6 -> T_I/T = 0.375 (Table 2-5)
+      sourced: 'yes'
+      value: 0.375
+    frac_T_exp:
+      reference: Albanese2014; I:E 0.6 -> T_E/T = 0.625 (Table 2-5)
+      sourced: 'yes'
+      value: 0.625
+    P_in:
+      reference: unreferenced_placeholder; component is the author's (Argus/Chase) own mechanical-ventilation lung model with no values in the
+        library -- ventilator set pressure (CPAP/PEEP) 5 cmH2O = 490 Pa
+      sourced: 'no'
+      value: 490.0
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: pending
+      reason: 'candidate: the author''s own ventilated-patient pressure/flow recordings (NAVA/PSV data sets from the Chase group) -- owner to
+        supply'
+    calibrate:
+      status: pending
+      reason: 'candidate: identify R_tot, C_tot and the effort spline from airway pressure/flow of one breath, validate on the next; owner to
+        supply data'
 - vessel_type: thoracic_cavity
   BC_type: nn
   module_type: thoracic_cavity
-  outputs: [P_thor]
-  invariants: []
+  notes: 'Pass-through: exports the pleural pressure P_pl as the thoracic external pressure P_thor for vessels/heart in the chest (multi-port).'
+  sim_time: 1.0
+  dt: 0.01
+  outputs:
+  - P_thor
+  invariants:
+  - description: P_thor = P_pl exactly
+    expr: np.max(np.abs(P_thor - P_pl)) <= 1e-12*max(1.0, abs(P_pl))
+  bc_sweep:
+    ranges:
+      P_pl:
+        min: -2000
+        max: 1000
+        points: 7
+    rationale: Pleural pressure from deep inspiration (-20 cmH2O) to positive-pressure ventilation / forced expiration (+10 cmH2O).
+  reference_proposals:
+    P_pl:
+      reference: Albanese2014; standalone value P_pl,EE = -5 cmH2O = -490 Pa (Table 2-5, citing West2008); supplied by the lung in use
+      sourced: 'yes'
+      value: -490.0
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline:
+      status: not_applicable
+      reason: identity map with no physiology of its own
+    calibrate:
+      status: not_applicable
+      reason: no parameters
+review:
+  comment: 'simple_lung_bg (Albanese 2016 lung mechanics) has two parameter slips that give an unphysiological lung. q_A_us = 1.26e-6 m3 is Albanese''s
+    V_u,A = 1.263 L entered as ml (1000x too small), and C_A and C_b are 10x Albanese''s values. Together they give an end-expiratory lung volume
+    of ~14 L (normal FRC 2.4 L) and a dead space of ~0.96 L. The airway resistances are ~2.5-2.7x Albanese''s with no recorded reason. The hard-coded
+    initial volumes (q_l = 10 L, q_t = q_b = 1 L) cause a violent start-up transient (P_l ~ 7.7e5 Pa). lung_bg_Argus_Chase has no values at all:
+    every value used here is a placeholder, and q_str is hard-coded to 1 m3 (1000 L) on the volume-stretch port.'
+  summary: 'Three components. simple_lung_bg (Albanese/Rideout-Fukui airway mechanics driven by the Albanese muscle-pressure profile) passes every
+    verification test: exact P_mus waveform, two volume-conservation laws (airway and thoracic), constitutive identities, 110-run sweep, RK4 order
+    4.3, solver matrix. Its values were checked against Albanese''s thesis (Table 2-5, the source of the 2016 paper''s parameters). Several library
+    values differ from it (see questions and proposed fixes). lung_bg_Argus_Chase (the author''s ventilated-lung model) had no parameter values.
+    I proposed placeholders so it can be verified: all invariants hold, the sweep passes and RK4 order is 4.7. Its CVODE results are sensitive
+    to the piecewise spline/indicator functions, so the declared supported settings are MaximumStep 1e-3 or rtol 1e-8. thoracic_cavity is an identity
+    map and verifies trivially. Validation is pending for both lungs (candidates below) and not applicable for thoracic_cavity.'
+  questions:
+  - 'simple_lung_bg: confirm the proposed references (Albanese2014 thesis Table 2-5, i.e. the parameter source of Albanese2016; Fukui1972 and
+    Rideout1991 via Albanese) for C_l, C_t, C_pl (= Albanese C_cw 0.2445 L/cmH2O), q_l_us, q_t_us, q_b_us, P_plEE, P_mus_min, T_resp and IE_ratio.
+    All match Albanese after unit conversion. Bizotto2022 (csv source for q_A_us and IE_ratio) could not be identified; I propose Albanese2014
+    instead.'
+  - 'simple_lung_bg: accept the proposed fix for q_A_us, C_A and C_b (below)? The csv note on C_A says "increased to get approx 3L volume", but
+    with q_A_us 1000x small the model''s end-expiratory lung volume is 14.0 L and VT 0.88 L. With Albanese''s C_A, C_b and q_A_us it is 2.48 L,
+    VT 0.67 L, dead space 164 ml.'
+  - 'simple_lung_bg: R_ml, R_lt, R_tb and R_bA are 2.5-2.7x Albanese''s (1.021, 0.3369, 0.3063, 0.0817 cmH2O s/L). The csv says "changed_from_...".
+    What was the reason? Keep the library values, or return to Albanese''s?'
+  - 'simple_lung_bg: R_plwall (chest-wall resistance, 1e4 Pa s/m3) is not in Albanese (who neglects chest-wall viscous resistance). Source, or
+    keep as unreferenced?'
+  - 'simple_lung_bg: the chest wall differs from Albanese. There, P_pl follows P_mus through C_cw (eq. A-53). Here P_pl = q_pl/C_pl is charged
+    through R_plwall from P_mus, which adds a first-order lag of R_plwall C_pl = 25 ms. Intended?'
+  - 'simple_lung_bg: q_str = q_b + C_b (P_plEE + (P_mus_min - P_plEE)/4) (the lung-stretch-receptor input) is an unusual definition: bronchial
+    volume shifted by a quarter of the effort. Please confirm, or give its source.'
+  - 'lung_bg_Argus_Chase: supply the real parameter values (and the paper, if published). All values used here are placeholders chosen only so
+    the component runs (listed in the references table).'
+  - 'lung_bg_Argus_Chase: q_str = 1.0 and alpha_LR = 1.0 are hard-coded in the CellML. q_str goes out on volume_stretch_port, so a stretch receptor
+    would see 1 m3. alpha_LR divides only R_bA, not R_mt/R_tb (simple_lung_bg divides all). Intended?'
+  - 'Validation candidates (pending). simple_lung_bg: steady quiet-breathing targets (FRC 2.4 L, VT ~500 ml at 12 /min, P_pl,EE -5 cmH2O; Albanese
+    section 2.4.3 citing West2008) as a baseline once the q_A_us/C_A decision is made. For calibration, averaged healthy flow/pressure traces
+    (Mecklenburgh & Mapleson 1998, used by Albanese). lung_bg_Argus_Chase: the author''s ventilated-patient pressure/flow data. OK to proceed
+    with these?'
+  proposed_fixes:
+  - 'lung_parameters.csv simple_lung_bg: q_A_us 1.26e-06 -> 1.263e-03 m3 (Albanese V_u,A = 1.263 L); C_A 2.04e-05 -> 2.04e-06 m6/J (0.2 L/cmH2O);
+    C_b 1.34e-06 -> 1.34e-07 m6/J (0.0131 L/cmH2O). Evidence: 60 s runs give end-expiratory lung volume 14.0 L (library) vs 2.48 L (fix), dead
+    space 958 ml vs 164 ml; normal FRC 2.4 L.'
+  - 'lung_modules.cellml simple_lung_bond_graph_type / lung_bond_graph_Argus_Chase_type: initial volumes q_l = 1.0e-2, q_t = q_b = 1.0e-3 m3 are
+    stressed volumes of 10 L / 1 L / 1 L (P_l = 7.7e5 Pa at t = 0). Suggest 0 (all pressures at P_pl,EE as Albanese assumes), or init parameters.
+    All tests pass anyway, but only because they start after the transient or use small steps.'
+  findings:
+  - 'simple_lung_bg: all 5 invariants hold at nominal and over 110 sweep runs. P_mus matches Albanese eq. 2-6 to 1e-4 of its amplitude. Airway
+    volume (q_l+q_t+q_b+q_A) changes exactly by the integral of v_ml. Thoracic volume (q_pl+q_t+q_b+q_A) changes by the integral of the chest-wall
+    flow.'
+  - 'simple_lung_bg timestep: RK4 needs dt <= 1e-3 s (the larynx RC time constant is ~3 ms, and the start-up transient is violent). With dts 5e-4..6.25e-5
+    over 2 s: order 4.28, agreement with CVODE 8.7e-7.'
+  - 'lung_bg_Argus_Chase stability: CVODE rtol 1e-6 without MaximumStep differs from the tight reference by 0.11 (0.93 with MaximumStep 0.01),
+    but works with MaximumStep 1e-3 or rtol 1e-8. The spline indicators use strict inequalities (P_d is exactly 0 at the knots) and the leak is
+    a max(). solve_ivp fails in libcuflynx python generation (NameError eq_func), which is framework, not module.'
+  - 'thoracic_cavity: P_thor = P_pl to round-off over P_pl in [-2000, 1000] Pa; no states (timestep skipped).'
+  - 'Risk: see the risk panel (joint sampling of all parameters within the tested ranges).'

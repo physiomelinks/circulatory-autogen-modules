@@ -29,6 +29,15 @@ STANDARD_UNITS = {
 VARIABLE_KINDS = {'variable', 'constant', 'global_constant', 'boundary_condition'}
 
 
+# unit names that denote the same unit (numerically identical definitions)
+EQUIVALENT_UNITS = [{'Hz', 'per_s', 'per_second'}, {'mol_per_m3', 'millimolar', 'mM'},
+                    {'J_per_m3', 'Pa', 'pascal'}]
+
+
+def same_units(a, b):
+    return a == b or any(a in group and b in group for group in EQUIVALENT_UNITS)
+
+
 def _units_defined(path):
     root = ET.parse(path).getroot()
     return {u.get('name'): u for u in root.iter(f'{{{CELLML_NS}}}units')}
@@ -114,12 +123,15 @@ def module_problems(name, library_components=None):
             continue
         cvars = {v.get('name'): v for v in comp.findall(f'{{{CELLML_NS}}}variable')}
         key = f"{entry['vessel_type']}/{entry['BC_type']}"
+        seen_names = [v[0] for v in entry['variables_and_units']]
+        for name in sorted({n for n in seen_names if seen_names.count(n) > 1}):
+            warnings.append(f'{key}: variable {name} listed more than once in variables_and_units')
         for name, units, *_ in entry['variables_and_units']:
             v = cvars.get(name)
             if v is None:
                 warnings.append(f'{key}: config variable {name} is not in CellML component {entry["module_type"]}')
                 continue
-            if v.get('units') != units:
+            if not same_units(v.get('units'), units):
                 warnings.append(f'{key}: {name} has units {units} in the config but {v.get("units")} in the CellML')
             if not v.get('public_interface'):
                 warnings.append(f'{key}: config variable {name} has no public_interface in the CellML')
