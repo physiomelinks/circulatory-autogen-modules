@@ -99,6 +99,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
     {%- if review and not reviewed %}
     <section class="panel review" aria-labelledby="review-h">
       <h2 id="review-h">Awaiting your review</h2>
+      {%- if review.comment %}<p class="todo" style="margin:0;max-width:80ch"><strong>Potential issues:</strong> {{ review.comment }}</p>{% endif %}
       {%- if review.summary %}<p style="margin:0;max-width:80ch">{{ review.summary }}</p>{% endif %}
       {%- if review.questions %}
       <div class="eyebrow">Questions</div>
