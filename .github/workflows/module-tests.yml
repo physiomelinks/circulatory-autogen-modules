@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: '0 14 * * 1'   # weekly, to catch libcuflynx changes
   workflow_dispatch:
+    inputs:
+      risk:
+        description: 'Also run the joint failure-risk analysis (make risk) for reviewed modules'
+        type: boolean
+        default: false
 
 concurrency:
   group: module-tests-${{ github.ref }}
@@ -53,6 +58,11 @@ jobs:
           target=test
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then target=test-all; fi
           if make $target PYTHON=python MODULE=${{ matrix.module }} PYTEST_ARGS=--quick-unreviewed; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Failure-risk analysis (on request)
+        if: github.event_name == 'workflow_dispatch' && inputs.risk
+        run: |
+          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open('modules/${{ matrix.module }}/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
+          if [ "$reviewed" = "True" ]; then make risk PYTHON=python MODULE=${{ matrix.module }}; fi
       - name: Report
         if: always()
         run: make report PYTHON=python MODULE=${{ matrix.module }}

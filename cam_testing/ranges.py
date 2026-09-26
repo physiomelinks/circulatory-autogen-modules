@@ -141,12 +141,23 @@ def check(vessel_array_path, parameters_path, out=sys.stdout):
         values = {r['variable_name'].strip(): r['value'].strip()
                   for r in csv.DictReader(f, skipinitialspace=True) if r.get('variable_name')}
     index = _module_index()
-    rows, outside, unknown_modules = [], 0, set()
+    from cam_testing import risk
+    rows, outside, unknown_modules, risks = [], 0, set(), []
     for vessel in vessels:
         component = index.get((vessel['vessel_type'], vessel['BC_type']))
         if component is None:
             unknown_modules.add((vessel['vessel_type'], vessel['BC_type']))
             continue
+        vals = {}
+        for p in component.parameters():
+            name = p.variable_name if p.vessel_type == 'global' else f"{p.variable_name}_{vessel['name']}"
+            try:
+                vals[p.variable_name] = float(values[name])
+            except (KeyError, ValueError):
+                pass
+        lr = risk.local_risk(component, vals)
+        if lr is not None:
+            risks.append((vessel['name'], component.module.name, lr))
         for p in component.parameters():
             name = p.variable_name if p.vessel_type == 'global' else f"{p.variable_name}_{vessel['name']}"
             if name not in values:
@@ -171,6 +182,11 @@ def check(vessel_array_path, parameters_path, out=sys.stdout):
     print(f'{"parameter":32s} {"value":>12s}  {"module":24s} {"verified":24s} {"":9s} {"validated":24s}', file=out)
     for name, val, mod, ver, in_ver, vad, in_vad in sorted(rows, key=lambda r: (r[4] is not False, r[0])):
         print(f'{name:32s} {val:12.4g}  {mod:24s} {span(ver):24s} {mark(in_ver):9s} {span(vad):24s} {mark(in_vad)}', file=out)
+    if risks:
+        print('\nestimated failure risk near these values (nearest samples of `make risk`):', file=out)
+        for vname, mod, lr in sorted(risks, key=lambda r: -r[2]['risk']):
+            note = ' (outside the sampled box: extrapolated)' if lr['outside_box'] else ''
+            print(f"  {vname:24s} {mod:24s} {lr['risk']:.2f}  [{lr['ci'][0]:.2f}, {lr['ci'][1]:.2f}] from {lr['k']} samples{note}", file=out)
     if unknown_modules:
         print(f'\nnot in this library: {sorted(unknown_modules)}', file=out)
     print(f'\n{outside} value(s) outside a verified range; {len(rows)} checked', file=out)

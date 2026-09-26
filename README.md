@@ -59,6 +59,19 @@ python -m cam_testing.ranges check --vessel-array my_vessel_array.csv --paramete
 
 This lists each value as inside or outside the verified and validated ranges. It exits non-zero if any value is outside a verified range.
 
+## Failure risk over the joint parameter space
+
+The verified ranges vary one parameter at a time, so they don't cover combinations, and they shift when the nominal values shift. `make risk MODULE=<name>` (optionally with `SAMPLES=1024`) samples every parameter together, using a scrambled Sobol sequence over the same box the sweep uses. Each sample counts as a failure if the run errors, an output is non-finite, or an invariant is violated.
+
+The analysis reports, for each component:
+- the overall failure probability with a 95% interval; if no sample fails, an upper bound of 3/N;
+- a failure-risk curve for each parameter;
+- each parameter's η²: the share of the failure variance it explains on its own, which ranks what drives failures;
+- a breakdown by failure mode;
+- a corner plot of pairwise failure rates.
+
+The module report shows all of this, and the site index lists each module's highest component risk. `ranges check` also estimates the failure risk near a system model's parameter values from the stored samples. On GitHub, run the workflow manually with "risk" ticked to include it in the published reports.
+
 ## Running locally
 
 libcuflynx needs SUNDIALS and MPI. On Ubuntu:
@@ -76,6 +89,7 @@ make structure                               # static checks
 make test MODULE=diffusion_volume            # V&V tests for one module (make test: all modules)
 make test-all MODULE=diffusion_volume        # including slow calibration
 make ranges MODULE=diffusion_volume          # record verified/validated ranges in the parameters file
+make risk MODULE=diffusion_volume            # joint failure-risk analysis (on request)
 make report MODULE=diffusion_volume          # -> modules/diffusion_volume/diffusion_volume.html
 make serve                                   # build site/ as GitHub Pages serves it; http://localhost:8000
 ```

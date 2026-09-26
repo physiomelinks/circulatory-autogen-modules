@@ -4,6 +4,7 @@ Static PNG figures for the module reports (matplotlib, headless).
 Colours follow the reference data-viz palette: categorical slots in fixed order for
 identity, a single-hue blue ramp (ordinal steps 250 -> 700) for parameter sweeps.
 """
+import math
 import os
 
 import matplotlib
@@ -164,5 +165,84 @@ def plot_model_vs_data(path, t_model, model, t_data, data, units, title, split=N
         ax.set_xlabel(TIME_LABEL)
         ax.set_ylabel(units.get(name, ''))
         ax.legend(loc='best')
+    fig.suptitle(title, color=TEXT_PRIMARY, fontsize=11)
+    return _save(fig, path)
+
+
+def _risk_cmap():
+    from matplotlib.colors import LinearSegmentedColormap
+    return LinearSegmentedColormap.from_list('risk', ['#fdf1ea', '#f4a47e', '#eb6834', '#b8461b', '#6e2308'])
+
+
+def _axis_scale(ax, info, which='x'):
+    if info['log']:
+        (ax.set_xscale if which == 'x' else ax.set_yscale)('log')
+
+
+@styled
+def plot_risk_marginals(path, per_param, ranked, overall, title):
+    '''Failure risk vs each parameter (binned), 95% band, most influential first.'''
+    fig, axes = _grid(len(ranked), width=3.2, height=2.3, max_cols=4)
+    for ax, var in zip(axes, ranked):
+        info = per_param[var]
+        bins = info['bins']
+        mids = [math.sqrt(b['lo'] * b['hi']) if info['log'] else 0.5 * (b['lo'] + b['hi']) for b in bins]
+        risk = [b['risk'] for b in bins]
+        lo = [b['ci'][0] for b in bins]
+        hi = [b['ci'][1] for b in bins]
+        ax.fill_between(mids, lo, hi, color=CATEGORICAL[1], alpha=0.18, lw=0)
+        ax.plot(mids, risk, color=CATEGORICAL[1], marker='o', markersize=4)
+        ax.axhline(overall, color=MUTED, lw=1, ls='--')
+        _axis_scale(ax, info)
+        ax.set_ylim(-0.02, 1.02)
+        ax.set_title(f"{var}  (η² = {info['importance']:.2f})")
+        ax.set_ylabel('P(fail)')
+    fig.suptitle(f'{title}\ndashed: overall P(fail) = {overall:.3f}; band: 95% interval', color=TEXT_PRIMARY, fontsize=10)
+    return _save(fig, path)
+
+
+@styled
+def plot_risk_corner(path, x, failed, names, infos, corner_vars, title, n_bins=6):
+    '''Lower triangle: failure rate for each parameter pair; diagonal: 1-D risk.'''
+    idx = {n: i for i, n in enumerate(names)}
+    k = len(corner_vars)
+    fig, axes = plt.subplots(k, k, figsize=(2.3 * k + 1.2, 2.1 * k), squeeze=False, constrained_layout=True)
+    cmap = _risk_cmap()
+    mappable = None
+
+    def edges(info):
+        lo, hi = info['range']
+        return np.geomspace(lo, hi, n_bins + 1) if info['log'] else np.linspace(lo, hi, n_bins + 1)
+    for r, vy in enumerate(corner_vars):
+        for c, vx in enumerate(corner_vars):
+            ax = axes[r][c]
+            if c > r:
+                ax.set_visible(False)
+                continue
+            ix = infos[vx]
+            if r == c:
+                bins = ix['bins']
+                mids = [math.sqrt(b['lo'] * b['hi']) if ix['log'] else 0.5 * (b['lo'] + b['hi']) for b in bins]
+                ax.plot(mids, [b['risk'] for b in bins], color=CATEGORICAL[1], marker='o', markersize=3)
+                ax.set_ylim(-0.02, 1.02)
+                _axis_scale(ax, ix)
+                ax.set_ylabel('P(fail)' if c == 0 else '')
+            else:
+                iy = infos[vy]
+                ex, ey = edges(ix), edges(iy)
+                tot, _, _ = np.histogram2d(x[:, idx[vx]], x[:, idx[vy]], bins=[ex, ey])
+                bad, _, _ = np.histogram2d(x[failed, idx[vx]], x[failed, idx[vy]], bins=[ex, ey])
+                with np.errstate(invalid='ignore', divide='ignore'):
+                    rate = np.where(tot > 0, bad / tot, np.nan)
+                mappable = ax.pcolormesh(ex, ey, rate.T, cmap=cmap, vmin=0, vmax=1, shading='flat')
+                _axis_scale(ax, ix, 'x')
+                _axis_scale(ax, iy, 'y')
+                ax.grid(False)
+                if c == 0:
+                    ax.set_ylabel(vy)
+            if r == k - 1:
+                ax.set_xlabel(vx)
+    if mappable is not None:
+        fig.colorbar(mappable, ax=[a for row in axes for a in row if a.get_visible()], shrink=0.6, label='P(fail)')
     fig.suptitle(title, color=TEXT_PRIMARY, fontsize=11)
     return _save(fig, path)

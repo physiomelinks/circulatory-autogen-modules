@@ -190,6 +190,33 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         </div>
       </div>
 
+      {%- if c.risk %}
+      <div class="block">
+        <h3>Failure risk over the joint parameter space</h3>
+        <div class="test">
+          <p class="message">P(fail) = {{ '%.3f'|format(c.risk.failure_probability) }} (95% interval {{ '%.3f'|format(c.risk.ci[0]) }}–{{ '%.3f'|format(c.risk.ci[1]) }}) over {{ c.risk.n_samples }} Sobol samples of the box below{% if c.risk.upper_bound_if_none_failed %}; none failed, so P(fail) &lt; {{ '%.3f'|format(c.risk.upper_bound_if_none_failed) }} at 95% confidence{% endif %}.</p>
+          <p class="about">All parameters are varied together, which the one-at-a-time verified ranges don't cover. η² is the share of the failure indicator's variance explained by that parameter alone (a first-order Sobol-type index), so it ranks which parameters drive failures. Run on request with <code>make risk MODULE={{ name }}</code>.</p>
+          <div class="two">
+            <div class="table-wrap"><table>
+              <thead><tr><th>Parameter</th><th>Sampled range</th><th>η²</th></tr></thead>
+              <tbody>
+              {%- for rk in c.risk.ranking %}{% set b = (c.risk.box|selectattr('variable','equalto',rk.variable)|list)[0] %}
+                <tr><td class="mono">{{ rk.variable }}</td><td class="mono num">{{ b.min|fmt }} – {{ b.max|fmt }}{{ ' (log)' if b.log }}</td><td class="mono num">{{ '%.3f'|format(rk.importance) }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            {%- if c.risk.failure_modes %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Failure mode</th><th>Samples</th></tr></thead>
+              <tbody>{% for m, n in c.risk.failure_modes.items() %}<tr><td>{{ m }}</td><td class="mono num">{{ n }}</td></tr>{% endfor %}</tbody>
+            </table></div>
+            {%- endif %}
+          </div>
+          <div class="plots">{% for p in c.risk.plots %}<figure><img src="{{ p }}" alt="failure risk plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}</div>
+        </div>
+      </div>
+      {%- endif %}
+
       <div class="block">
         <h3>Verification &amp; validation</h3>
         <div class="tests">

@@ -17,7 +17,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import checks, ranges
+from cam_testing import checks, ranges, risk
 from cam_testing.library import REPO_ROOT, load_module, module_names
 from cam_testing.mathml import component_equations, component_variables
 
@@ -130,7 +130,9 @@ def component_context(component):
             'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
             'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
         })
+    risk_result = risk.load(component)
     return {
+        'risk': risk_result,
         'id': component.id, 'label': component.label, 'vessel_type': component.vessel_type,
         'BC_type': component.BC_type, 'module_type': component.module_type,
         'format': component.config.get('module_format', 'cellml'),
@@ -179,6 +181,7 @@ def module_context(name):
     return {
         'name': name, 'reviewed': module.reviewed, 'components': components,
         'counts': _status_counts(components), 'structure': _structure(module),
+        'max_risk': max((c['risk']['failure_probability'] for c in components if c['risk']), default=None),
         'known_issues': module.spec.get('known_issues') or [],
         'test_keys': checks.TESTS, 'test_short': TEST_SHORT,
         'generated': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
@@ -197,7 +200,7 @@ def build_module(name):
 def build_index(contexts, out_path, module_href):
     rows = [{'name': c['name'], 'href': module_href(c['name']), 'n_components': len(c['components']),
              'counts': c['counts'], 'reviewed': c['reviewed'],
-             'known_issues': len(c['known_issues'])} for c in contexts]
+             'known_issues': len(c['known_issues']), 'max_risk': c.get('max_risk')} for c in contexts]
     totals = {k: sum(r['counts'].get(k, 0) for r in rows) for k in ('passed', 'failed', 'skipped', 'pending', None)}
     html_text = _env().get_template('index.html').render(
         rows=rows, totals=totals, generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
