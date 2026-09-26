@@ -106,6 +106,24 @@ def module_problems(name, library_components=None):
         for name in sorted(used - declared):
             warnings.append(f"component {comp.get('name')}: equations use undeclared variable {name}")
 
+    # config variables must exist in the CellML component with the same units and a public interface
+    comps = {c.get('name'): c for c in root.iter(f'{{{CELLML_NS}}}component')}
+    for entry in module.config:
+        comp = comps.get(entry['module_type'])
+        if comp is None or entry.get('module_format', 'cellml') != 'cellml':
+            continue
+        cvars = {v.get('name'): v for v in comp.findall(f'{{{CELLML_NS}}}variable')}
+        key = f"{entry['vessel_type']}/{entry['BC_type']}"
+        for name, units, *_ in entry['variables_and_units']:
+            v = cvars.get(name)
+            if v is None:
+                warnings.append(f'{key}: config variable {name} is not in CellML component {entry["module_type"]}')
+                continue
+            if v.get('units') != units:
+                warnings.append(f'{key}: {name} has units {units} in the config but {v.get("units")} in the CellML')
+            if not v.get('public_interface'):
+                warnings.append(f'{key}: config variable {name} has no public_interface in the CellML')
+
     spec_keys = {(c['vessel_type'], c['BC_type']) for c in module.spec.get('components', [])}
     for entry in module.config:
         if (entry['vessel_type'], entry['BC_type']) not in spec_keys:
