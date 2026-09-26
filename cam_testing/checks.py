@@ -214,6 +214,14 @@ def _guard(component, test, fn):
 # run_test
 # ----------------------------------------------------------------------------------------------
 
+def reference_tolerances(cm):
+    '''Tolerances of the tight CVODE reference: rtol 1e-10, atol 1e-4 x the component's atol
+    (capped at 1e-12), so tiny state scales (e.g. microvessel volumes) keep error control.'''
+    atol = float((cm.spec.get('solver_info') or {}).get('atol', 1e-8))
+    ref = cm.spec.get('reference_solver_info') or {}
+    return {'rtol': float(ref.get('rtol', 1e-10)), 'atol': float(ref.get('atol', min(1e-12, 1e-4 * atol)))}
+
+
 def _run_point(cm):
     """run_parameters from the spec: the operating point for the run and invariant tests
     (e.g. off-equilibrium boundary conditions so the dynamics are exercised); the library
@@ -424,7 +432,7 @@ def verification_test_timestep(cm):
         # cross-check against libcuflynx's CVODE run with tight tolerances
         with contextlib.redirect_stdout(io.StringIO()):
             tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=0.0),
-                                              solver_info={'rtol': 1e-10, 'atol': 1e-12})
+                                              solver_info=reference_tolerances(cm))
         t_cv, cv = harness.run(tight, outputs, params=cm.run_point_params())
         n = min(len(t_cv), finest.shape[0])
         cvode_diff = float(np.max(np.abs(np.column_stack([cv[harness.output_key(o)] for o in outputs])[:n] - finest[:n]) / scale))
@@ -519,7 +527,7 @@ def stability_test(cm):
                 return math.inf
             return float(np.max(np.abs(y - ref) / scale))
 
-        ref_helper = harness.simulation_helper(cm.model_path, base, solver_info={'rtol': 1e-10, 'atol': 1e-12})
+        ref_helper = harness.simulation_helper(cm.model_path, base, solver_info=reference_tolerances(cm))
         point = cm.run_point_params()         # integrate at the run point, like the run/invariant tests
         t_ref, ref_out = harness.run(ref_helper, outputs, params=point)
         ref = np.column_stack([ref_out[harness.output_key(o)] for o in outputs])

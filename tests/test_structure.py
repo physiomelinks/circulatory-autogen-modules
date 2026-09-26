@@ -123,6 +123,10 @@ def module_problems(name, library_components=None):
             continue
         cvars = {v.get('name'): v for v in comp.findall(f'{{{CELLML_NS}}}variable')}
         key = f"{entry['vessel_type']}/{entry['BC_type']}"
+        declared_cfg = {v[0] for v in entry['variables_and_units']}
+        for name, v in cvars.items():
+            if v.get('public_interface') == 'in' and name not in declared_cfg and name not in ('t', 'time'):
+                warnings.append(f'{key}: CellML input {name} of {entry["module_type"]} is not declared in the config (left unset)')
         seen_names = [v[0] for v in entry['variables_and_units']]
         for name in sorted({n for n in seen_names if seen_names.count(n) > 1}):
             warnings.append(f'{key}: variable {name} listed more than once in variables_and_units')
