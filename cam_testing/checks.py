@@ -112,6 +112,17 @@ class ComponentModel(object):
             self._helper = harness.simulation_helper(self.model_path, self.spec)
         return self._helper
 
+    def run_point_params(self):
+        '''The spec's run_parameters as simulation-helper overrides ({'parameters/<name>': value}).'''
+        return {'parameters/' + k: v for k, v in _run_point(self).items()}
+
+    def point_model(self):
+        '''A copy of the Myokit model with the run_parameters applied (for fixed-step integration).'''
+        model = self.helper.model.clone()
+        for name, value in _run_point(self).items():
+            model.get('parameters.' + name).set_rhs(value)
+        return model
+
     def outputs(self):
         wanted = self.spec.get('outputs') or [v[0] for v in self.component.variables()]
         return list(wanted)
@@ -384,7 +395,7 @@ def verification_test_timestep(cm):
         cvode_tol = float(ts.get('cvode_tol', 1e-3))
         roundoff = float(ts.get('roundoff', 1e-11))
 
-        rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.helper.model)
+        rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.point_model())
         if not state_qnames:
             return Result('verification_test_timestep', SKIPPED, 'component has no state variables (algebraic only)')
 
@@ -414,7 +425,7 @@ def verification_test_timestep(cm):
         with contextlib.redirect_stdout(io.StringIO()):
             tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=0.0),
                                               solver_info={'rtol': 1e-10, 'atol': 1e-12})
-        t_cv, cv = harness.run(tight, outputs)
+        t_cv, cv = harness.run(tight, outputs, params=cm.run_point_params())
         n = min(len(t_cv), finest.shape[0])
         cvode_diff = float(np.max(np.abs(np.column_stack([cv[harness.output_key(o)] for o in outputs])[:n] - finest[:n]) / scale))
 
@@ -509,7 +520,8 @@ def stability_test(cm):
             return float(np.max(np.abs(y - ref) / scale))
 
         ref_helper = harness.simulation_helper(cm.model_path, base, solver_info={'rtol': 1e-10, 'atol': 1e-12})
-        t_ref, ref_out = harness.run(ref_helper, outputs)
+        point = cm.run_point_params()         # integrate at the run point, like the run/invariant tests
+        t_ref, ref_out = harness.run(ref_helper, outputs, params=point)
         ref = np.column_stack([ref_out[harness.output_key(o)] for o in outputs])
         scale = np.maximum(np.max(np.abs(ref), axis=0), np.ptp(ref, axis=0))
         scale[scale == 0] = 1.0
@@ -534,7 +546,7 @@ def stability_test(cm):
 
         # Each solver family is refined (smaller step) until it works, or until the next run
         # is predicted to take longer than the budget: 20 s per state variable by default.
-        rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.helper.model)
+        rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.point_model())
         n_states = max(len(state_qnames), 1)
         budget = float(st.get('time_budget') or 20.0 * n_states)
         min_step = float(st.get('min_step', 1e-7))
@@ -578,7 +590,7 @@ def stability_test(cm):
 
             def cv_run(step, info=info):
                 si = dict(info, **({'MaximumStep': step} if step is not None else {}))
-                return harness.run(harness.simulation_helper(cm.model_path, base, solver_info=si), outputs)
+                return harness.run(harness.simulation_helper(cm.model_path, base, solver_info=si), outputs, params=point)
             family = config_label(cv_cfg(None))
             refine(family, cv_cfg, cv_run, given_step or cv_start, 10.0, given_step is None)
 
@@ -601,7 +613,7 @@ def stability_test(cm):
                 def py_run(step, method=method):
                     si = dict({'method': method}, **({'max_step': step} if step else {}))
                     return harness.run(harness.simulation_helper(py_path, base, solver='solve_ivp', model_type='python',
-                                                                 solver_info=si), outputs)
+                                                                 solver_info=si), outputs, params=point)
                 refine(config_label(py_cfg(None)), py_cfg, py_run, cv_start, 10.0, True)
 
         fs = st.get('fixed_step') or {}
@@ -626,7 +638,8 @@ def stability_test(cm):
             d = dict(declared)
             solver = d.pop('solver')
             if solver == 'CVODE_myokit':
-                record(dict(declared), lambda d=d: harness.run(harness.simulation_helper(cm.model_path, base, solver_info=d), outputs))
+                record(dict(declared), lambda d=d: harness.run(harness.simulation_helper(cm.model_path, base, solver_info=d),
+                                                               outputs, params=point))
 
         supported = st.get('supported') or []
         broken = []
