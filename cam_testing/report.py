@@ -115,8 +115,14 @@ def component_context(component):
         })
 
     tests = []
+    validation_spec = component.spec.get('validation') or {}
     for test in checks.TESTS:
         r = checks.load(component, test)
+        if r is None and test.startswith('validation_test_'):
+            # not run (e.g. slow tests excluded): a skipped/pending spec still says why
+            v = validation_spec.get(test.rsplit('_', 1)[1]) or {}
+            if v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED):
+                r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
         tests.append({
             'key': test, 'title': TEST_TITLES[test], 'short': TEST_SHORT[test], 'about': TEST_ABOUT[test],
             'status': r.status if r else None, 'status_label': STATUS_LABEL[r.status if r else None],
@@ -128,7 +134,7 @@ def component_context(component):
         'id': component.id, 'label': component.label, 'vessel_type': component.vessel_type,
         'BC_type': component.BC_type, 'module_type': component.module_type,
         'format': component.config.get('module_format', 'cellml'),
-        'skip': component.spec.get('skip'),
+        'skip': component.spec.get('skip'), 'notes': component.spec.get('notes'),
         'equations': equations, 'unsupported': sorted(unsupported),
         'ports': _ports(component.config), 'variables': variables,
         'todo': component.todo_parameters(), 'invariants': component.spec.get('invariants') or [],

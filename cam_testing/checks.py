@@ -125,16 +125,37 @@ class ComponentModel(object):
 SAFE_BUILTINS = {'abs': abs, 'max': max, 'min': min, 'len': len, 'float': float}
 
 
-def _check_invariants(spec, t, outputs, params=None):
+def period(t, y, skip=1):
+    '''
+    Mean period of an oscillating trace from its upward crossings of its mid-range level,
+    ignoring the first ``skip`` cycles (transient). NaN when there are too few cycles.
+    '''
+    t, y = np.asarray(t, float), np.asarray(y, float)
+    level = 0.5 * (np.max(y) + np.min(y))
+    up = np.where((y[:-1] < level) & (y[1:] >= level))[0]
+    # linear interpolation of the crossing times
+    tc = t[up] + (level - y[up]) * (t[up + 1] - t[up]) / (y[up + 1] - y[up])
+    tc = tc[skip:]
+    return float(np.mean(np.diff(tc))) if len(tc) >= 2 else float('nan')
+
+
+INVARIANT_HELPERS = {'period': period}
+
+
+def _check_invariants(spec, t, outputs, params=None, where='sweep'):
     '''
     Returns a list of failed invariant descriptions. An invariant is a numpy expression of
     t, the outputs and the component's parameters (by variable name), e.g. "q >= 0".
     '''
     failures = []
     env = {'np': np, 't': t}
+    env.update(INVARIANT_HELPERS)
     env.update(params or {})
     env.update(outputs)
     for inv in spec.get('invariants') or []:
+        # applies: all (default) | run -- 'run' invariants hold at the nominal parameters only
+        if isinstance(inv, dict) and inv.get('applies', 'all') != 'all' and where not in inv['applies'].split(','):
+            continue
         expr = inv['expr'] if isinstance(inv, dict) else inv
         try:
             ok = np.all(eval(expr, {'__builtins__': SAFE_BUILTINS}, env))  # noqa: S307 - expressions come from the repo's own yaml
@@ -172,7 +193,7 @@ def run_test(cm):
         fig = plots.plot_outputs(plot_path(cm.component, 'run'), t, outputs, cm.units(),
                                  f'{cm.component.label}: nominal parameters')
         bad = _non_finite(outputs)
-        inv = _check_invariants(cm.spec, t, outputs, cm.param_env())
+        inv = _check_invariants(cm.spec, t, outputs, cm.param_env(), where='run')
         metrics = {'n_time_points': len(t), 'sim_time': float(cm.spec['sim_time']),
                    'final_values': {k: float(v[-1]) for k, v in outputs.items()}}
         if bad or inv:
@@ -390,10 +411,11 @@ DEFAULT_STABILITY = {
         {'rtol': 1e-4, 'atol': 1e-6},
         {'rtol': 1e-6, 'atol': 1e-8},
         {'rtol': 1e-8, 'atol': 1e-10},
-        {'rtol': 1e-6, 'atol': 1e-8, 'MaximumStep': 1e-3},
     ],
     'solve_ivp': ['RK45', 'BDF', 'LSODA'],
-    'fixed_step': {'schemes': ['euler', 'heun', 'rk4'], 'dts': [1e-2, 1e-3, 1e-4]},
+    'fixed_step': {'schemes': ['euler', 'heun', 'rk4'], 'dt_start': 1e-2},   # halved until it works
+    'max_step_start': 1e-2,             # CVODE / solve_ivp: MaximumStep tried after the unconstrained run, /10 each
+    'time_budget': None,                # seconds per run before refinement stops (default 20 s per state)
     'tol': 1e-2,                        # max normalised difference from the reference to count as working
     # configurations the module is declared to work with; each must pass
     'supported': [{'solver': 'CVODE_myokit', 'rtol': 1e-6, 'atol': 1e-8}],
@@ -429,8 +451,8 @@ def stability_test(cm):
                 st[key] = cm.spec['stability'][key]
         tol = float(st['tol'])
         outputs = cm.outputs()
-        t_end = float(cm.spec['sim_time'])
-        base = dict(cm.spec, pre_time=0.0)
+        t_end = float(st.get('t_end', cm.spec['sim_time']))
+        base = dict(cm.spec, pre_time=0.0, sim_time=t_end)
 
         def compare(t, out, t_ref, ref, scale):
             y = np.column_stack([np.interp(t_ref, t, out[o]) for o in outputs])
@@ -457,13 +479,60 @@ def stability_test(cm):
                 note = '' if works else ('non-finite output' if not np.isfinite(err) else f'difference {err:.1e} > tol')
             except Exception as e:
                 err, works, note = None, False, f'{type(e).__name__}: {str(e)[:200]}'
-            rows.append({'config': cfg, 'label': config_label(cfg), 'works': works, 'difference': err,
-                         'seconds': round(time.perf_counter() - start, 3), 'note': note})
+            row = {'config': cfg, 'label': config_label(cfg), 'works': works, 'difference': err,
+                   'seconds': round(time.perf_counter() - start, 3), 'note': note}
+            rows.append(row)
+            return row
 
+        # Each solver family is refined (smaller step) until it works, or until the next run
+        # is predicted to take longer than the budget: 20 s per state variable by default.
+        rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.helper.model)
+        n_states = max(len(state_qnames), 1)
+        budget = float(st.get('time_budget') or 20.0 * n_states)
+        min_step = float(st.get('min_step', 1e-7))
+        families = []
+
+        def refine(family, make_cfg, run_fn, first_step, factor, try_unconstrained):
+            """Runs make_cfg(step) for step = first_step, first_step/factor, ... (after an
+            unconstrained try when try_unconstrained) until one works or the budget stops it."""
+            steps = ([None] if try_unconstrained else []) + [first_step]
+            last = None
+            stop = ''
+            while True:
+                step = steps.pop(0) if steps else last['step'] / factor
+                if step is not None and step < min_step:
+                    stop = f'reached min_step {min_step:g}'
+                    break
+                if last is not None and last['row']['seconds'] * (factor if last['step'] else 2.0) > budget:
+                    stop = (f'stopped: next run (step {step:g}) predicted over the '
+                            f'{budget:.0f} s budget ({n_states} states x 20 s)')
+                    break
+                row = record(make_cfg(step), lambda step=step: run_fn(step))
+                last = {'step': step, 'row': row}
+                if row['works']:
+                    break
+                if row['seconds'] > budget:
+                    stop = f'stopped: run took {row["seconds"]:.0f} s > {budget:.0f} s budget'
+                    break
+            works_at = last['row']['label'] if last and last['row']['works'] else None
+            families.append({'family': family, 'works_at': works_at, 'stop': '' if works_at else stop})
+
+        cv_start = float(st.get('max_step_start', 1e-2))
         for info in st['cvode']:
-            cfg = dict({'solver': 'CVODE_myokit'}, **info)
-            record(cfg, lambda info=info: harness.run(harness.simulation_helper(cm.model_path, base, solver_info=info),
-                                                      outputs))
+            info = dict(info)
+            given_step = info.pop('MaximumStep', None)
+
+            def cv_cfg(step, info=info):
+                cfg = dict({'solver': 'CVODE_myokit'}, **info)
+                if step is not None:
+                    cfg['MaximumStep'] = step
+                return cfg
+
+            def cv_run(step, info=info):
+                si = dict(info, **({'MaximumStep': step} if step is not None else {}))
+                return harness.run(harness.simulation_helper(cm.model_path, base, solver_info=si), outputs)
+            family = config_label(cv_cfg(None))
+            refine(family, cv_cfg, cv_run, given_step or cv_start, 10.0, given_step is None)
 
         if st['solve_ivp']:
             try:
@@ -473,32 +542,43 @@ def stability_test(cm):
             except Exception as e:
                 py_path, py_error = None, f'python generation failed: {str(e).splitlines()[0][:200]}'
             for method in st['solve_ivp']:
-                cfg = {'solver': 'solve_ivp', 'method': method}
+                def py_cfg(step, method=method):
+                    return dict({'solver': 'solve_ivp', 'method': method}, **({'max_step': step} if step else {}))
                 if py_path is None:
-                    rows.append({'config': cfg, 'label': config_label(cfg), 'works': False, 'difference': None,
-                                 'seconds': 0.0, 'note': py_error})
+                    rows.append({'config': py_cfg(None), 'label': config_label(py_cfg(None)), 'works': False,
+                                 'difference': None, 'seconds': 0.0, 'note': py_error})
+                    families.append({'family': config_label(py_cfg(None)), 'works_at': None, 'stop': py_error})
                     continue
-                record(cfg, lambda method=method: harness.run(
-                    harness.simulation_helper(py_path, base, solver='solve_ivp', model_type='python',
-                                              solver_info={'method': method}), outputs))
+
+                def py_run(step, method=method):
+                    si = dict({'method': method}, **({'max_step': step} if step else {}))
+                    return harness.run(harness.simulation_helper(py_path, base, solver='solve_ivp', model_type='python',
+                                                                 solver_info=si), outputs)
+                refine(config_label(py_cfg(None)), py_cfg, py_run, cv_start, 10.0, True)
 
         fs = st.get('fixed_step') or {}
-        if fs.get('schemes'):
-            rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.helper.model)
+        if fs.get('schemes') and state_qnames:
             qnames = [cm.helper._resolve_name(harness.output_name(o))[1] for o in outputs]
-            if state_qnames:
-                for scheme in fs['schemes']:
-                    for dt in fs['dts']:
-                        cfg = {'solver': f'fixed_step_{scheme}', 'dt': float(dt)}
+            out_dt = float(cm.spec['dt'])
+            for scheme in fs['schemes']:
+                def fx_run(dt, scheme=scheme):
+                    with np.errstate(all='ignore'):
+                        t, Y = fixed_step.integrate(rhs, y0, t_end, dt, scheme)
+                        stride = max(1, int(round(out_dt / dt)))
+                        idx = np.arange(0, len(t), stride)
+                        vals = np.array([observe(t[i], Y[i], qnames) for i in idx], dtype=float)
+                    return t[idx], {o: vals[:, k] for k, o in enumerate(outputs)}
+                refine(f'fixed_step_{scheme}', lambda dt, scheme=scheme: {'solver': f'fixed_step_{scheme}', 'dt': dt},
+                       fx_run, float(fs.get('dt_start', (fs.get('dts') or [1e-2])[0])), 2.0, False)
 
-                        def run_fixed(scheme=scheme, dt=float(dt)):
-                            with np.errstate(all='ignore'):
-                                t, Y = fixed_step.integrate(rhs, y0, t_end, dt, scheme)
-                                stride = max(1, int(round(cm.spec['dt'] / dt)))
-                                idx = np.arange(0, len(t), stride)
-                                vals = np.array([observe(t[i], Y[i], qnames) for i in idx], dtype=float)
-                            return t[idx], {o: vals[:, k] for k, o in enumerate(outputs)}
-                        record(cfg, run_fixed)
+        # declared-supported configurations are always run, even if refinement stopped earlier
+        for declared in st.get('supported') or []:
+            if any(_matches(declared, r['config']) for r in rows):
+                continue
+            d = dict(declared)
+            solver = d.pop('solver')
+            if solver == 'CVODE_myokit':
+                record(dict(declared), lambda d=d: harness.run(harness.simulation_helper(cm.model_path, base, solver_info=d), outputs))
 
         supported = st.get('supported') or []
         broken = []
@@ -509,12 +589,15 @@ def stability_test(cm):
             broken += [f"{r['label']}: declared supported but {r['note']}" for r in matching if not r['works']]
 
         working = [r['label'] for r in rows if r['works']]
-        metrics = {'matrix': rows, 'tol': tol, 'supported': [config_label(d) for d in supported],
+        metrics = {'matrix': rows, 'families': families, 'tol': tol, 'budget_seconds': budget, 't_end': t_end,
+                   'supported': [config_label(d) for d in supported],
                    'n_working': len(working), 'n_configs': len(rows)}
         if broken:
             return Result('stability_test', FAILED, '; '.join(broken), metrics, [], broken)
+        n_fam_ok = sum(1 for f in families if f['works_at'])
         return Result('stability_test', PASSED,
-                      f'{len(working)} of {len(rows)} solver configurations work; all declared-supported ones do',
+                      f'{n_fam_ok} of {len(families)} solver families work at some step '
+                      f'({len(working)} of {len(rows)} configurations tried); all declared-supported ones do',
                       metrics)
     return _guard(cm.component, 'stability_test', check)
 

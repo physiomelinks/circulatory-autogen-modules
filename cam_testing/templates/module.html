@@ -131,6 +131,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           <span>BC_type <code>{{ c.BC_type }}</code></span>
           {%- if c.format != 'cellml' %}<span class="chip skipped">{{ c.format }}</span>{% endif %}
         </div>
+        {%- if c.notes %}<p style="margin:0;max-width:75ch">{{ c.notes }}</p>{% endif %}
         {%- if c.skip %}<p class="muted" style="margin:0">Not tested: {{ c.skip }}</p>{% endif %}
         {%- if c.todo %}<p class="todo" style="margin:0">{{ c.todo|length }} parameter value{{ '' if c.todo|length == 1 else 's' }} still to set: {{ c.todo|join(', ') }}</p>{% endif %}
       </div>
@@ -210,6 +211,20 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
             </table></div>
             <p class="muted" style="margin:0;font-size:0.84rem">Scheme {{ t.metrics.scheme }} (expected order {{ t.metrics.expected_order }}); finest fixed-step vs tight-tolerance CVODE: <span class="mono">{{ t.metrics.cvode_tight_vs_finest|fmt }}</span>. Differences are max over outputs and time, normalised by each output's magnitude.</p>
             {%- elif t.key == 'stability_test' and t.metrics.matrix %}
+            {%- if t.metrics.families %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Solver family</th><th>Works at</th><th>If not</th></tr></thead>
+              <tbody>
+              {%- for f in t.metrics.families %}
+                <tr><td class="mono">{{ f.family }}</td>
+                <td class="mono {{ 'yes' if f.works_at else 'no' }}">{{ f.works_at or 'No setting found' }}</td>
+                <td class="muted">{{ f.stop }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:0;font-size:0.84rem">Each family's step (CVODE MaximumStep and solve_ivp max_step ÷10, fixed-step dt ÷2) is reduced until it works, or until the next run is predicted to exceed {{ t.metrics.budget_seconds|fmt }} s (20 s per state variable). Over t = 0–{{ t.metrics.t_end|fmt }} s.</p>
+            <details><summary>All {{ t.metrics.matrix|length }} runs</summary>
+            {%- endif %}
             <div class="table-wrap"><table>
               <thead><tr><th>Configuration</th><th>Works</th><th>Difference</th><th>Time [s]</th><th>Note</th></tr></thead>
               <tbody>
@@ -220,6 +235,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
               {%- endfor %}
               </tbody>
             </table></div>
+            {%- if t.metrics.families %}</details>{% endif %}
             <p class="muted" style="margin:0;font-size:0.84rem">Works = finishes, finite outputs, and within {{ t.metrics.tol|fmt }} (normalised) of CVODE at rtol 1e-10.</p>
             {%- elif t.key == 'verification_test_BC' and t.metrics.sweep_values %}
             <dl class="kv">

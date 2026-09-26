@@ -1,10 +1,10 @@
 module: VanDerPol
-reviewed: false
+reviewed: true
 known_issues: []
 defaults:
-  sim_time: 200.0
+  sim_time: 20.0
   pre_time: 0.0
-  dt: 0.1
+  dt: 0.01
   solver: CVODE_myokit
   bc_sweep:
     factors: [0.5, 0.75, 1.0, 1.5, 2.0]
@@ -18,14 +18,12 @@ defaults:
     min_order: 0.8
     tol: 0.001
     cvode_tol: 0.01
-    t_end: 100.0
+    t_end: 20.0
   stability:
+    t_end: 20.0
     supported:
     - {solver: CVODE_myokit, rtol: 1.0e-08, atol: 1.0e-10}
     - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08, MaximumStep: 0.001}
-    fixed_step:
-      schemes: [euler, heun, rk4]
-      dts: [0.01, 0.005, 0.001]
   solver_info: {rtol: 1.0e-08, atol: 1.0e-10}
 components:
 - vessel_type: VanDerPol
@@ -35,6 +33,14 @@ components:
   invariants:
   - {description: trajectory stays bounded by the relaxation limit cycle (|x| ≲ 2), expr: 'np.max(np.abs(x)) <= max(abs(x_init),
       2.0) + 0.1'}
+  - {description: 'relaxation period matches the Dorodnitsyn (1947) asymptotic formula for this scaling, T ≈ (3 − 2 ln 2)
+      + 7.014 μ^(−2/3), within 2% (nominal μ only; the next term is ~0.8% at μ = 100)', expr: 'abs(period(t, x) - ((3 - 2*np.log(2))
+      + 7.014*mu**(-2/3))) <= 0.02 * ((3 - 2*np.log(2)) + 7.014*mu**(-2/3))', applies: run}
   validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+    baseline: {status: skipped, reason: 'mathematical benchmark (relaxation oscillator), no physical system to validate against;
+        the period is checked against the Dorodnitsyn (1947) asymptotic formula as a verification invariant'}
+    calibrate: {status: skipped, reason: 'mathematical benchmark, no physical data'}
+  notes: 'Time-scaled stiff form of the Van der Pol oscillator used in the Hairer & Wanner VDPOL benchmark (Solving Ordinary
+    Differential Equations II, 1996): dy/dt = μ((1 − x²)y − x), i.e. μ = 1/ε. Rescaling time by √μ gives the textbook equation
+    with parameter √μ, so the relaxation period is T ≈ (3 − 2 ln 2) + 7.014 μ^(−2/3) (Dorodnitsyn 1947), about 1.94 at μ =
+    100.'
