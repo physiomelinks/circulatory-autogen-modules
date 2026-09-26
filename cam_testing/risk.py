@@ -7,12 +7,16 @@ the sweep uses (bc_sweep.ranges, or bc_sweep.factors x nominal; log scale where 
 so). Every sample is run with the component's solver settings and counts as a failure when the
 run errors, an output is non-finite, or an invariant is violated.
 
-Outputs, per component (modules/<name>/results/<component>/risk_analysis.json + samples .npz):
+Outputs, per component, committed in modules/<name>/risk/ so they are available on any clone:
+  <component>_risk.json          summaries + a fitted failure classifier (coefficients only)
+  <component>_risk_samples.npz   the samples and whether each failed
   - overall failure probability with a 95% interval
   - per-parameter failure-risk curves P(fail | parameter) with 95% intervals
   - a first-order importance of each parameter for failure: the correlation ratio eta^2, the
     fraction of the failure indicator's variance explained by that parameter alone
   - a corner plot of pairwise failure rates (the most important parameters)
+  - a logistic-regression classifier on quadratic features of the unit-box coordinates, giving a
+    smooth P(fail | parameters) anywhere in the box; its 5-fold cross-validated AUC is stored
 
     python -m cam_testing.risk --module Lotka_Volterra [--samples 1024] [--component ID]
 """
@@ -144,19 +148,9 @@ def analyse(cm, n_samples=DEFAULT_SAMPLES, seed=0, corner_max=6):
                           'importance': correlation_ratio(bins, overall)}
     ranked = sorted(per_param, key=lambda v: -per_param[v]['importance'])
 
-    res_dir = os.path.join(component.module.results_dir, component.id)
-    os.makedirs(res_dir, exist_ok=True)
-    np.savez_compressed(os.path.join(res_dir, 'risk_samples.npz'), x=x, failed=failed,
-                        names=np.array([b[0] for b in box]))
+    os.makedirs(risk_dir(component), exist_ok=True)
+    np.savez_compressed(samples_path(component), x=x, failed=failed, names=np.array([b[0] for b in box]))
 
-    figs = []
-    if k:
-        corner_vars = ranked[:corner_max]
-        figs.append(plots.plot_risk_corner(checks.plot_path(component, 'risk_corner'), x, failed,
-                                           [b[0] for b in box], {v: per_param[v] for v in corner_vars},
-                                           corner_vars, f'{component.label}: failure risk'))
-    figs.append(plots.plot_risk_marginals(checks.plot_path(component, 'risk_marginals'), per_param, ranked,
-                                          overall, f'{component.label}: failure risk by parameter'))
     result = {
         'n_samples': n, 'n_failures': k, 'failure_probability': overall, 'ci': wilson(k, n),
         'upper_bound_if_none_failed': (3.0 / n) if k == 0 else None,
@@ -166,49 +160,141 @@ def analyse(cm, n_samples=DEFAULT_SAMPLES, seed=0, corner_max=6):
         'per_parameter': per_param,
         'example_failures': [{'sample': dict(zip([b[0] for b in box], map(float, x[i]))), 'reason': r}
                              for i, r in reasons[:10]],
-        'plots': [os.path.relpath(f, component.module.dir) for f in figs],
+        'classifier': fit_classifier(unit_coords(x, box), failed),
     }
-    with open(os.path.join(res_dir, 'risk_analysis.json'), 'w') as f:
+    result['plots'] = make_plots(component, result, x, failed)
+    with open(result_path(component), 'w') as f:
         json.dump(result, f, indent=1, default=checks._json_default)
     return result
 
 
+def risk_dir(component):
+    return os.path.join(component.module.dir, 'risk')
+
+
+def result_path(component):
+    return os.path.join(risk_dir(component), f'{component.id}_risk.json')
+
+
+def samples_path(component):
+    return os.path.join(risk_dir(component), f'{component.id}_risk_samples.npz')
+
+
+def unit_coords(x, box):
+    """Samples in the box's unit coordinates (log scale where sampled in log)."""
+    u = np.empty_like(np.asarray(x, dtype=float))
+    for j, b in enumerate(box):
+        lo, hi, log = (b[2], b[3], b[4]) if isinstance(b, tuple) else (b['min'], b['max'], b['log'])
+        col = np.asarray(x, dtype=float)[:, j]
+        u[:, j] = (np.log(col) - np.log(lo)) / (np.log(hi) - np.log(lo)) if log else (col - lo) / (hi - lo)
+    return u
+
+
+def _quadratic_powers(d):
+    powers = [[0] * d]
+    for i in range(d):
+        p = [0] * d; p[i] = 1; powers.append(p)
+    for i in range(d):
+        for j in range(i, d):
+            p = [0] * d; p[i] += 1; p[j] += 1; powers.append(p)
+    return powers
+
+
+def _features(u, powers):
+    u = np.atleast_2d(u)
+    return np.column_stack([np.prod(u ** np.array(p), axis=1) for p in powers])
+
+
+def fit_classifier(u, failed):
+    """
+    Logistic regression on quadratic features of the unit coordinates. Stored as plain
+    coefficients so it can be evaluated anywhere without the fitting library.
+    """
+    failed = np.asarray(failed, dtype=int)
+    d = u.shape[1]
+    if failed.min() == failed.max():
+        return {'kind': 'constant', 'p_fail': float(failed.mean()),
+                'note': 'every sample ' + ('failed' if failed[0] else 'passed')}
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import StratifiedKFold, cross_val_score
+    powers = _quadratic_powers(d)
+    X = _features(u, powers)[:, 1:]          # intercept fitted separately
+    model = LogisticRegression(C=10.0, max_iter=5000)
+    n_splits = int(min(5, failed.sum(), (1 - failed).sum()))
+    auc = None
+    if n_splits >= 2:
+        auc = float(np.mean(cross_val_score(model, X, failed, scoring='roc_auc',
+                                            cv=StratifiedKFold(n_splits, shuffle=True, random_state=0))))
+    model.fit(X, failed)
+    return {'kind': 'logistic_quadratic', 'powers': powers[1:], 'coef': model.coef_[0].tolist(),
+            'intercept': float(model.intercept_[0]), 'cv_auc': auc}
+
+
+def predict(classifier, u):
+    """P(fail) at unit coordinates u (n x d) from a stored classifier."""
+    u = np.atleast_2d(u)
+    if classifier['kind'] == 'constant':
+        return np.full(len(u), classifier['p_fail'])
+    z = classifier['intercept'] + _features(u, classifier['powers']) @ np.asarray(classifier['coef'])
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+def make_plots(component, result, x=None, failed=None):
+    """(Re)draws the risk plots into plots/ from the stored results and samples."""
+    if x is None:
+        if not os.path.isfile(samples_path(component)):
+            return []
+        data = np.load(samples_path(component))
+        x, failed = data['x'], data['failed'].astype(bool)
+    names = [b['variable'] for b in result['box']]
+    per_param = result['per_parameter']
+    ranked = [r['variable'] for r in result['ranking']]
+    figs = []
+    if result['n_failures']:
+        corner = ranked[:6]
+        figs.append(plots.plot_risk_corner(checks.plot_path(component, 'risk_corner'), x, failed, names,
+                                           {v: per_param[v] for v in corner}, corner,
+                                           f'{component.label}: failure risk'))
+    figs.append(plots.plot_risk_marginals(checks.plot_path(component, 'risk_marginals'), per_param, ranked,
+                                          result['failure_probability'],
+                                          f'{component.label}: failure risk by parameter'))
+    return [os.path.relpath(f, component.module.dir) for f in figs]
+
+
 def load(component):
-    path = os.path.join(component.module.results_dir, component.id, 'risk_analysis.json')
-    if not os.path.isfile(path):
+    if not os.path.isfile(result_path(component)):
         return None
-    with open(path) as f:
+    with open(result_path(component)) as f:
         return json.load(f)
 
 
 def local_risk(component, values, k=25):
-    '''
-    Failure fraction among the k stored samples nearest to ``values`` ({variable: value}),
-    distance measured in the sampling box's unit coordinates (log where sampled in log).
-    '''
-    res_dir = os.path.join(component.module.results_dir, component.id)
-    path = os.path.join(res_dir, 'risk_samples.npz')
+    """
+    P(fail) at a parameter set ({variable: value}, missing ones at nominal): from the stored
+    classifier, with the failure fraction of the k nearest stored samples alongside.
+    """
     risk = load(component)
-    if risk is None or not os.path.isfile(path):
+    if risk is None:
         return None
-    data = np.load(path)
-    names = list(data['names'])
-    box = {b['variable']: b for b in risk['box']}
-
-    def unit(col, v, name):
-        b = box[name]
-        if b['log']:
-            return (np.log(v) - np.log(b['min'])) / (np.log(b['max']) - np.log(b['min']))
-        return (v - b['min']) / (b['max'] - b['min'])
-    use = [j for j, nme in enumerate(names) if nme in values]
-    if not use:
+    box = risk['box']
+    nominal = {p.variable_name: p.float_value for p in component.parameters() if not p.is_todo}
+    q = np.array([[values.get(b['variable'], nominal.get(b['variable'], np.nan)) for b in box]], dtype=float)
+    if np.isnan(q).any():
         return None
-    X = np.column_stack([unit(j, data['x'][:, j], names[j]) for j in use])
-    q = np.array([unit(j, values[names[j]], names[j]) for j in use])
-    nearest = np.argsort(np.sum((X - q) ** 2, axis=1))[:k]
-    kf = int(data['failed'][nearest].sum())
-    outside = bool(np.any((q < 0) | (q > 1)))
-    return {'risk': kf / len(nearest), 'ci': wilson(kf, len(nearest)), 'k': len(nearest), 'outside_box': outside}
+    uq = unit_coords(q, box)[0]
+    out = {'outside_box': bool(np.any((uq < 0) | (uq > 1)))}
+    if risk.get('classifier'):
+        out['model'] = float(predict(risk['classifier'], uq)[0])
+        out['cv_auc'] = risk['classifier'].get('cv_auc')
+    if os.path.isfile(samples_path(component)):
+        data = np.load(samples_path(component))
+        U = unit_coords(data['x'], box)
+        nearest = np.argsort(np.sum((U - uq) ** 2, axis=1))[:k]
+        kf = int(data['failed'][nearest].sum())
+        out.update({'risk': kf / len(nearest), 'ci': wilson(kf, len(nearest)), 'k': len(nearest)})
+    else:
+        out.update({'risk': out.get('model', float('nan')), 'ci': (float('nan'), float('nan')), 'k': 0})
+    return out
 
 
 def main(argv=None):
@@ -236,8 +322,10 @@ def main(argv=None):
                 continue
             lo, hi = r['ci']
             top = ', '.join(f"{x['variable']} ({x['importance']:.2f})" for x in r['ranking'][:3])
+            auc = r['classifier'].get('cv_auc')
             print(f"{name}/{component.id}: P(fail) = {r['failure_probability']:.3f} [{lo:.3f}, {hi:.3f}] "
-                  f"over {r['n_samples']} samples; most influential: {top}")
+                  f"over {r['n_samples']} samples; most influential: {top}"
+                  + (f"; classifier CV AUC {auc:.2f}" if auc is not None else ''))
 
 
 if __name__ == '__main__':

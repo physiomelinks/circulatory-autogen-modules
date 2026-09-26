@@ -202,6 +202,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         <h3>Failure risk over the joint parameter space</h3>
         <div class="test">
           <p class="message">P(fail) = {{ '%.3f'|format(c.risk.failure_probability) }} (95% interval {{ '%.3f'|format(c.risk.ci[0]) }}–{{ '%.3f'|format(c.risk.ci[1]) }}) over {{ c.risk.n_samples }} Sobol samples of the box below{% if c.risk.upper_bound_if_none_failed %}; none failed, so P(fail) &lt; {{ '%.3f'|format(c.risk.upper_bound_if_none_failed) }} at 95% confidence{% endif %}.</p>
+          {%- if c.risk.classifier %}<p class="about">Stored failure classifier ({{ 'constant: ' ~ c.risk.classifier.note if c.risk.classifier.kind == 'constant' else 'logistic regression on quadratic terms' }}{% if c.risk.classifier.cv_auc %}, 5-fold cross-validated AUC {{ '%.2f'|format(c.risk.classifier.cv_auc) }}{% endif %}) gives P(fail) at any parameter set in the box: <code>python -m cam_testing.ranges check</code>.</p>{% endif %}
           <p class="about">All parameters are varied together over their tested ranges, which the one-at-a-time sweep doesn't cover. η² is the share of the failure indicator's variance explained by that parameter alone (a first-order Sobol-type index), so it ranks which parameters drive failures. Run on request with <code>make risk MODULE={{ name }}</code>.</p>
           <div class="two">
             <div class="table-wrap"><table>

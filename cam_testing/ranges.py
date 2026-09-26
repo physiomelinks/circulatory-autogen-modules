@@ -110,10 +110,13 @@ def check(vessel_array_path, parameters_path, out=sys.stdout):
     for name, val, mod, tr, in_t, va, in_v in sorted(rows, key=lambda r: (r[4] is not False, r[0])):
         print(f'{name:32s} {val:12.4g}  {mod:24s} {span(tr):24s} {mark(in_t):9s} {span(va):24s} {mark(in_v)}', file=out)
     if risks:
-        print('\nestimated failure risk near these values (nearest samples of `make risk`):', file=out)
+        print('\nestimated failure risk at these values (fitted classifier; nearest stored samples):', file=out)
         for vname, mod, lr in sorted(risks, key=lambda r: -r[2]['risk']):
             note = ' (outside the sampled box: extrapolated)' if lr['outside_box'] else ''
-            print(f"  {vname:24s} {mod:24s} {lr['risk']:.2f}  [{lr['ci'][0]:.2f}, {lr['ci'][1]:.2f}] from {lr['k']} samples{note}", file=out)
+            model = (f"model {lr['model']:.2f}" + (f" (CV AUC {lr['cv_auc']:.2f})" if lr.get('cv_auc') else '')
+                     if 'model' in lr else 'no model')
+            print(f"  {vname:24s} {mod:24s} {model};  {lr['k']} nearest samples: {lr['risk']:.2f} "
+                  f"[{lr['ci'][0]:.2f}, {lr['ci'][1]:.2f}]{note}", file=out)
     else:
         print('\nno failure-risk samples found: run `make risk MODULE=<name>` for the modules used', file=out)
     if unknown:

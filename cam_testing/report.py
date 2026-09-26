@@ -137,6 +137,8 @@ def component_context(component):
             'known_issue': (component.spec.get('expected_failures') or {}).get(test),
         })
     risk_result = risk.load(component)
+    if risk_result is not None and not all(os.path.isfile(os.path.join(module.dir, p)) for p in risk_result.get('plots', [])):
+        risk_result['plots'] = risk.make_plots(component, risk_result)   # e.g. on a fresh clone
     proposals = component.spec.get('reference_proposals') or {}
     bib_keys = set(bib.read(bib.bib_path(module)))
     references = []
