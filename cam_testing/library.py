@@ -52,17 +52,20 @@ def safe_id(text):
 PARAMETER_COLUMNS = ['vessel_type', 'BC_type', 'variable_name', 'units', 'value', 'kind', 'data_reference',
                      'sourced', 'verified_min', 'verified_max', 'validated_min', 'validated_max']
 
-# data_reference values that do not cite a source
-UNSOURCED_REFERENCES = {'', 'todo', 'none', 'user_defined', 'unreferenced_placeholder', 'initial_guess',
-                        'rate_constant', 'known', 'cam_testing', 'poor_initial_guess_local_minimum'}
+# data_reference text that does not cite a source (assumptions, tuning, placeholders, TODOs)
+import re as _re
+UNSOURCED_PATTERN = _re.compile(
+    r'(^$|^none$|^test$|^known$|todo|to_do|to_be|user|defined_by|placeholder|prototype|identified|'
+    r'assum|wont_be|not_used|hand.?tuned|tuned|chosen|check|calculated|calc_|from_icu|nonstiff|'
+    r'initial_guess|rate_constant|cam_testing|circulatory_autogen example)', _re.I)
 
 
 def looks_sourced(reference):
-    '''Heuristic for seeding the sourced column: does the reference name a source?'''
+    '''Heuristic for seeding the sourced column: does the reference cite a source?'''
     ref = (reference or '').strip()
-    if ':' in ref:          # "<CA example model>: <reference>" from the importer
-        ref = ref.split(':', 1)[1].strip()
-    return ref.lower() not in UNSOURCED_REFERENCES and not ref.lower().startswith('circulatory_autogen example')
+    if ':' in ref and not ref.lower().startswith('circulatory_autogen'):
+        ref = ref.split(':', 1)[1].strip()   # "<CA example model>: <reference>" from the importer
+    return not UNSOURCED_PATTERN.search(ref)
 
 
 @dataclass

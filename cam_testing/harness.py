@@ -127,6 +127,9 @@ def run(helper, outputs, params=None):
     t = np.asarray(helper.get_time(), dtype=float)
     results = {}
     for var in outputs:
-        values = helper.get_results([[output_name(var)]], flatten=True)[0]
-        results[var] = np.asarray(values, dtype=float).ravel()
+        values = np.asarray(helper.get_results([[output_name(var)]], flatten=True)[0], dtype=float).ravel()
+        if values.size == 1 and t.size > 1:
+            # an output that depends only on constants is logged once: broadcast it over time
+            values = np.full(t.shape, values[0])
+        results[var] = values
     return t, results

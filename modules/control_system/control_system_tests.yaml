@@ -2,19 +2,28 @@ module: control_system
 reviewed: false
 known_issues: []
 defaults:
-  sim_time: 2.0
+  sim_time: 10.0
   pre_time: 0.0
   dt: 0.01
   solver: CVODE_myokit
   bc_sweep:
     factors: [0.5, 0.75, 1.0, 1.5, 2.0]
-    ranges: {}
+    ranges:
+      P_a: {min: 6000, max: 20000, points: 6}
+      dP_a_dt: {min: -100000, max: 100000, points: 5}
+      P_target: {min: 8000, max: 16000, points: 5}
+      K_p: {min: 0.01, max: 1, points: 5, scale: log}
+      K_i: {min: 0.001, max: 0.1, points: 5, scale: log}
+      K_d: {min: 0.002, max: 0.2, points: 5, scale: log}
+      f_stim_min: {min: 0, max: 5, points: 3}
+      e_int_init: {min: -10, max: 10, points: 5}
   timestep:
     scheme: rk4
     dts: [0.004, 0.002, 0.001, 0.0005]
     min_order: 0.8
     tol: 0.0001
     cvode_tol: 0.001
+    t_end: 10.0
   stability:
     supported:
     - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
@@ -22,8 +31,15 @@ components:
 - vessel_type: pid_control
   BC_type: nn
   module_type: pid_control_type
-  outputs: [e_norm, d_e_dt, e_int, f_stim_raw, f_stim]
-  invariants: []
+  outputs: [e_int, f_stim, f_stim_raw, e_norm]
+  invariants:
+  - {description: integral term matches its exact solution e_int = e_int_init + (P_target − P_a)/P_scale · t, expr: 'np.max(np.abs(e_int
+      - (e_int_init + (P_target - P_a)/P_scale*t))) <= 1e-6 * max(1.0, np.max(np.abs(e_int)))'}
+  - {description: 'f_stim is either the block frequency or within [f_stim_min, f_stim_max]', expr: np.all((np.abs(f_stim -
+      f_stim_HF) < 1e-9) | ((f_stim >= f_stim_min - 1e-9) & (f_stim <= f_stim_max + 1e-9)))}
   validation:
     baseline: {status: pending, reason: validation data not chosen yet}
     calibrate: {status: pending, reason: validation data not chosen yet}
+  notes: PID controller from arterial pressure (and its derivative) to a nerve-stimulation frequency, saturating at f_stim_max
+    and switching to a high-frequency block (f_stim_HF) when the demand falls below f_stim_min. Alone, with constant P_a,
+    the integral term has the exact solution e_int = e_int_init + e_norm t.
