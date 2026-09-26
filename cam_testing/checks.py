@@ -141,7 +141,13 @@ def period(t, y, skip=1):
     return float(np.mean(np.diff(tc))) if len(tc) >= 2 else float('nan')
 
 
-INVARIANT_HELPERS = {'period': period}
+def cumint(t, y):
+    '''Cumulative trapezoidal integral of y over t, starting at 0 (for balance invariants).'''
+    t, y = np.asarray(t, float), np.asarray(y, float)
+    return np.concatenate([[0.0], np.cumsum(0.5 * (y[1:] + y[:-1]) * np.diff(t))])
+
+
+INVARIANT_HELPERS = {'period': period, 'cumint': cumint}
 
 
 def _check_invariants(spec, t, outputs, params=None, where='sweep'):

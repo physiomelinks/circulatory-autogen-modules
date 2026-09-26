@@ -1,37 +1,739 @@
 module: BVC_Kidney
 reviewed: false
-known_issues: [variable q_vc_W has kind 'variable ']
+known_issues:
+- variable q_vc_W has kind 'variable '
 defaults:
-  sim_time: 2.0
+  sim_time: 20.0
   pre_time: 0.0
-  dt: 0.01
+  dt: 0.001
   solver: CVODE_myokit
+  solver_info:
+    rtol: 1.0e-08
+    atol: 1.0e-12
   bc_sweep:
-    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
-    ranges: {}
+    factors:
+    - 0.5
+    - 0.75
+    - 1.0
+    - 1.5
+    - 2.0
+    exclude:
+    - q_vc_Na
+    ranges:
+      q_pt_W_init:
+        min: 0.2
+        max: 0.9
+        points: 4
+      L_pt_W:
+        min: 0.6
+        max: 2.0
+        points: 4
+      u_ac_W:
+        min: 0.2
+        max: 8.0
+        points: 5
+        scale: log
+      u_ptEpi_e:
+        min: -0.08
+        max: 0.0
+        points: 5
+      RT:
+        min: 2400
+        max: 2600
+        points: 3
+      k_pt_W:
+        min: 0
+        max: 0.001
+        points: 3
+      k_gl_W:
+        min: 0.5
+        max: 50
+        points: 5
+        scale: log
+      kK_pt_Na:
+        min: 0.1
+        max: 10
+        points: 5
+        scale: log
+      kK_gl_Na:
+        min: 0.1
+        max: 10
+        points: 5
+        scale: log
+      k_ptEpi_NKE:
+        min: 10000.0
+        max: 1000000.0
+        points: 5
+        scale: log
+      v_out2_W:
+        min: 0
+        max: 5.0e-05
+        points: 3
+      v_out2_Na:
+        min: 0
+        max: 5.0e-06
+        points: 3
+    rationale: 'u_ac_W (glomerular capillary pressure, the only swept BC) spans 0.2-8 kPa (source-model 1.8 kPa; physiological
+      glomerular capillary pressure is about 6 kPa); q_pt_W_init and L_pt_W are kept so that q_pt_W < L_pt_W (u_pt_W is singular
+      at L); u_ptEpi_e spans -80..0 mV; RT spans 289-313 K; k_pt_W spans 0 (source value: no tubular water reabsorption) to
+      1e-3 L/s/kPa; the rate constants span two decades around the source values; urine water/Na outflows span 0 to about
+      2x daily output (1.5 L/day = 1.7e-5 L/s; 100 mmol/day = 1.16e-6 mol/s); every other constant is swept 0.5-2x. q_vc_Na
+      is excluded because in the test network it is supplied by BVC_Na_circ (its csv value is unused there).'
   timestep:
     scheme: rk4
-    dts: [0.004, 0.002, 0.001, 0.0005]
+    dts:
+    - 0.004
+    - 0.002
+    - 0.001
+    - 0.0005
     min_order: 0.8
     tol: 0.0001
     cvode_tol: 0.001
+    t_end: 5.0
   stability:
     supported:
-    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+    - solver: CVODE_myokit
+      rtol: 1.0e-06
+      atol: 1.0e-08
 components:
 - vessel_type: BVC_Kidney_right
   BC_type: nn
   module_type: BVC_Kidney_main_type
-  outputs: [u_pt_W, c_pt_Na, C_pt_Na, c_ptEpi_Na, C_ptEpi_Na, u_pt_osmotic]
-  invariants: []
-  validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+  outputs:
+  - q_pt_W
+  - q_pt_Na
+  - q_ptEpi_Na
+  - u_pt_W
+  - c_pt_Na
+  - c_ptEpi_Na
+  - u_pt_osmotic
+  - v_gl_W
+  - v_pt_W
+  - v_pt_Na
+  - v_ptEpi_NKE
+  - v_gl_Na
+  - naCirc/q_vc_Na
+  - peri/q
+  - peri/u
+  invariants:
+  - description: 'closed Na balance of the test network (kidney + Na_circ, other Na_circ inputs zero): q_vc_Na + q_pt_Na +
+      q_ptEpi_Na = initial total - v_out2_Na t (exact; no quadrature)'
+    expr: np.max(np.abs(naCirc__q_vc_Na + q_pt_Na + q_ptEpi_Na - (naCirc__q_vc_Na[0] + q_pt_Na_init + q_ptEpi_Na_init - v_out2_Na*t)))
+      <= 1e-9*(naCirc__q_vc_Na[0] + q_pt_Na_init + q_ptEpi_Na_init)
+  - description: 'tubular water balance: q_pt_W = q_pt_W_init + integral of (v_gl_W - v_pt_W) - v_out2_W t (trapezoid on the
+      output grid; tolerance 1e-5 q_pt_W_init plus the trapezoid error bound dt max|v|/2, which covers initial transients
+      faster than the output step)'
+    expr: np.max(np.abs(q_pt_W - q_pt_W_init - np.concatenate([[0.0], np.cumsum(0.5*((v_gl_W - v_pt_W)[1:] + (v_gl_W - v_pt_W)[:-1])*np.diff(t))])
+      + v_out2_W*t)) <= 1e-5*q_pt_W_init + 0.5*(t[1] - t[0])*np.max(np.abs(v_gl_W - v_pt_W))
+  - description: 'constitutive relations: u_pt_W = E_pt (q_pt_W - U_pt_W)/(L_pt_W - q_pt_W)^2, v_gl_W = k_gl_W (u_ac_W - u_pt_W),
+      v_pt_W = k_pt_W RT (c_vc - c_pt), v_gl_Na = kK_gl_Na (q_vc_Na - q_pt_Na), v_pt_Na = kK_pt_Na (q_pt_Na - q_ptEpi_Na),
+      c = q/V, u_pt_osmotic = RT c_pt_Na (q_vc_W is the neighbour capillary volume peri/q converted m3 -> L)'
+    expr: np.allclose(u_pt_W, E_pt*(q_pt_W - U_pt_W)/(L_pt_W - q_pt_W)**2, rtol=1e-9, atol=1e-12) and np.allclose(v_gl_W,
+      k_gl_W*(u_ac_W - u_pt_W), rtol=1e-6, atol=1e-9*k_gl_W*max(1.0, abs(u_ac_W))) and np.allclose(v_pt_W, k_pt_W*RT*((naCirc__q_vc_Na/(1000*peri__q))
+      - c_pt_Na), rtol=1e-6, atol=1e-15) and np.allclose(v_gl_Na, kK_gl_Na*(naCirc__q_vc_Na - q_pt_Na), rtol=1e-6, atol=1e-12)
+      and np.allclose(v_pt_Na, kK_pt_Na*(q_pt_Na - q_ptEpi_Na), rtol=1e-6, atol=1e-12) and np.allclose(c_pt_Na, q_pt_Na/q_pt_W,
+      rtol=1e-9) and np.allclose(c_ptEpi_Na, q_ptEpi_Na/q_ptEpi_W, rtol=1e-9) and np.allclose(u_pt_osmotic, RT*c_pt_Na, rtol=1e-9)
+  - description: NKE flux equals its closed form 3 k (A^3 B^2 - C^3 D^2 exp(2 F u/RT))/((1+A^3)(1+C^3)(1+B^2)(1+D^2)) with
+      the blood-side volume taken from the neighbour capillary (checks the m3 -> L port conversion)
+    expr: np.allclose(v_ptEpi_NKE, 3*k_ptEpi_NKE*((K_Na*c_ptEpi_Na)**3*(K_K*q_vc_K/(1000*peri__q))**2 - (K_Na*(naCirc__q_vc_Na/(1000*peri__q)))**3*(K_K*q_ptEpi_K/q_ptEpi_W)**2*np.exp(2*F*u_ptEpi_e/RT))/((1
+      + (K_Na*c_ptEpi_Na)**3)*(1 + (K_Na*(naCirc__q_vc_Na/(1000*peri__q)))**3)*(1 + (K_K*q_vc_K/(1000*peri__q))**2)*(1 + (K_K*q_ptEpi_K/q_ptEpi_W)**2)),
+      rtol=1e-6, atol=1e-12)
+  - description: tubular volume stays inside (0, L_pt_W) (u_pt_W is singular at L_pt_W) and Na amounts stay positive
+    expr: np.all(q_pt_W > 0) and np.all(q_pt_W < L_pt_W) and np.all(q_pt_Na > 0) and np.all(q_ptEpi_Na > 0) and np.all(naCirc__q_vc_Na
+      > 0)
+  - description: 'analytic water steady state at the run point (k_pt_W = 0, v_out2_W = 0): u_pt_W -> u_ac_W, i.e. q_pt_W ->
+      the root in (U, L) of u_ac (L - q)^2 = E (q - U)'
+    applies: run
+    expr: abs(q_pt_W[-1] - ((2*u_ac_W*L_pt_W + E_pt) - np.sqrt((2*u_ac_W*L_pt_W + E_pt)**2 - 4*u_ac_W*(u_ac_W*L_pt_W**2 +
+      E_pt*U_pt_W)))/(2*u_ac_W)) < 1e-6 and abs(v_gl_W[-1]) < 1e-9
+  harness:
+    vessel_array:
+    - - pin
+      - nn_constant
+      - inlet_pressure
+      - ''
+      - affA
+    - - affA
+      - pp
+      - arterial_simple
+      - pin
+      - peri
+    - - peri
+      - vv
+      - capillary_simple_vol_ctl_uptake
+      - affA mod
+      - venV mod
+    - - venV
+      - pp
+      - venous
+      - peri
+      - pout
+    - - pout
+      - nn_constant
+      - outlet_pressure
+      - venV
+      - ''
+    - - mod
+      - nn
+      - BVC_Kidney_right
+      - naCirc peri
+      - naCirc peri
+    - - naCirc
+      - nn
+      - BVC_Na_circ
+      - mod
+      - mod
+    parameters:
+    - - P_pin
+      - J_per_m3
+      - 13332
+      - 'harness: 100 mmHg inflow pressure'
+    - - P_pout
+      - J_per_m3
+      - 666
+      - 'harness: 5 mmHg outflow pressure'
+    - - q_0_affA
+      - m3
+      - 3.509840625e-06
+      - circulatory_autogen ANS_CVS_BVC example (lEffArteriol)
+    - - R_affA
+      - Js_per_m6
+      - 352124180.669857
+      - circulatory_autogen ANS_CVS_BVC example (lEffArteriol)
+    - - C_affA
+      - m6_per_J
+      - 1.56375e-09
+      - circulatory_autogen ANS_CVS_BVC example (lEffArteriol)
+    - - u_ext_affA
+      - J_per_m3
+      - 0
+      - harness
+    - - u_0_affA
+      - J_per_m3
+      - 0
+      - harness
+    - - I_affA
+      - Js2_per_m6
+      - 1000000.0
+      - 'harness: inertance raised from the CA example value 1e-7 so the network is not stiff (I/R about 3 ms) and the RK4
+        timestep test can run'
+    - - q_0_peri
+      - m3
+      - 8.0e-05
+      - 'harness: chosen so q_vc_Na/q_vc_W is about 0.14 mol/L (CA example used 2.81e-05)'
+    - - R_peri
+      - Js_per_m6
+      - 100000000.0
+      - circulatory_autogen ANS_CVS_BVC example (lPeritubularC)
+    - - C_peri
+      - m6_per_J
+      - 5.0e-09
+      - circulatory_autogen ANS_CVS_BVC example (lPeritubularC)
+    - - u_ext_peri
+      - J_per_m3
+      - 0
+      - harness
+    - - I_peri
+      - Js2_per_m6
+      - 1000000.0
+      - 'harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)'
+    - - u_0_peri
+      - J_per_m3
+      - 0
+      - harness
+    - - blood_ctl_dir_peri
+      - dimensionless
+      - 1
+      - 'circulatory_autogen ANS_CVS_BVC example: reabsorbed water enters the capillary'
+    - - q_0_venV
+      - m3
+      - 1.938375e-05
+      - circulatory_autogen ANS_CVS_BVC example (lKidneyV)
+    - - R_venV
+      - Js_per_m6
+      - 122477975.885168
+      - circulatory_autogen ANS_CVS_BVC example (lKidneyV)
+    - - C_venV
+      - m6_per_J
+      - 1.0425e-05
+      - circulatory_autogen ANS_CVS_BVC example (lKidneyV)
+    - - u_ext_venV
+      - J_per_m3
+      - 0
+      - harness
+    - - u_0_venV
+      - J_per_m3
+      - 0
+      - harness
+    - - I_venV
+      - Js2_per_m6
+      - 1000000.0
+      - 'harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)'
+    - - q_vc_Na_init_naCirc
+      - mole
+      - 0.0114979848860844
+      - P. Hunter BVC model value (CA_user_volume_control ANS_CVS_BVC_parameters.csv)
+    - - v_giEpi_NKE_naCirc
+      - mol_per_s
+      - 0
+      - 'harness: no GI in this network'
+    - - v_lptEpi_NKE_naCirc
+      - mol_per_s
+      - 0
+      - 'harness: no left kidney in this network'
+    - - v_lgl_Na_naCirc
+      - mol_per_s
+      - 0
+      - 'harness: no left kidney in this network'
+  validation: &id001
+    baseline:
+      status: pending
+      reason: 'Candidate targets: single-kidney GFR (about 60 mL/min), filtered Na load (about 1.5e-4 mol/s per kidney) and
+        proximal fractional Na reabsorption (about 2/3). Not set up: the component has no GFR in L/min terms (k_gl_W only
+        sets the tubular pressure equilibrium, k_pt_W = 0 so no water is reabsorbed) and the source parameters give a glomerular
+        Na flux of about 3.7e-3 mol/s, some 25x physiological, so the parameter set must be re-derived before validation is
+        meaningful.'
+    calibrate:
+      status: pending
+      reason: 'as baseline: needs a physiological re-parameterisation first.'
+  reference_proposals:
+    q_pt_W_init: &id002
+      reference: unreferenced_placeholder; 0.521056165876984 L (proximal tubule water) from P. Hunter's unpublished blood-volume-control
+        parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 0.521056165876984
+    q_pt_Na_init: &id003
+      reference: unreferenced_placeholder; 0.00805209530950799 mol (tubular Na; 15.5 mM) from P. Hunter's unpublished blood-volume-control
+        parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 0.00805209530950799
+    q_ptEpi_Na_init: &id004
+      reference: unreferenced_placeholder; 0.00460774921555305 mol (epithelial Na; 9.2 mM in 0.5 L) from P. Hunter's unpublished
+        blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+        same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+      sourced: 'no'
+      value: 0.00460774921555305
+    u_ptEpi_e: &id005
+      reference: unreferenced_placeholder; -0.04 V (-40 mV) from P. Hunter's unpublished blood-volume-control parameter set
+        (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: -0.04
+    q_vc_K: &id006
+      reference: 'unreferenced_placeholder; 0.03 mol from P. Hunter''s unpublished blood-volume-control parameter set (CA_user_volume_control
+        ANS_CVS_BVC_parameters.csv, data_reference ''Peter_Hunter''; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no
+        publication found that reports it; blood-side K amount; with the blood volumes of these modules (0.08-0.2 L) this
+        is 150-380 mM, far above plasma K (about 4-5 mM): looks swapped with / not comparable to intracellular K'
+      sourced: 'no'
+      value: 0.03
+    q_ptEpi_K: &id007
+      reference: unreferenced_placeholder; 0.012 mol (24 mM in 0.5 L) from P. Hunter's unpublished blood-volume-control parameter
+        set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 0.012
+    v_out2_W: &id008
+      reference: unreferenced_placeholder; 0 L/s (no urine water flow) from P. Hunter's unpublished blood-volume-control parameter
+        set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 0
+    v_out2_Na: &id009
+      reference: unreferenced_placeholder; 1.16e-06 mol/s (Na excretion, about 100 mmol/day per kidney) from P. Hunter's unpublished
+        blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+        same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+      sourced: 'no'
+      value: 1.16e-06
+    u_ac_W: &id010
+      reference: unreferenced_placeholder; 1.835 kPa = u_pt_W at q_pt_W_init with E_pt, U_pt_W, L_pt_W (so v_gl_W is close
+        to 0 at t = 0); in a network supplied by the glomerular capillarys capillary_extracellular_port (physiological glomerular
+        capillary pressure is about 6 kPa)
+      sourced: 'no'
+      value: 1.835
+    q_vc_Na: &id011
+      reference: unreferenced_placeholder; 0.0114979848860844 mol (BVC_Na_circ q_vc_Na_init, P. Hunter); in a network (and
+        in the test network) supplied by BVC_Na_circ
+      sourced: 'no'
+      value: 0.0114979848860844
+    RT: &id012
+      reference: unreferenced_placeholder; 2500 J/mol from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+        ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+        found that reports it; equals R T with R = 8.314462618 J/(mol K) (CODATA2018) at T = 300.7 K; body temperature (310.15
+        K) gives 2578.8 J/mol
+      sourced: 'no'
+      value: 2500
+    F: &id013
+      reference: CODATA2018; Faraday constant F = N_A e = 96485.33212 C/mol (exact in the 2019 SI); the source model used
+        0.965e5
+      sourced: 'yes'
+      value: 96485.33212
+    E_pt: &id014
+      reference: unreferenced_placeholder; 1 J (tubular elastance scale of u = E (q - U)/(L - q)^2) from P. Hunter's unpublished
+        blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+        same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+      sourced: 'no'
+      value: 1
+    U_pt_W: &id015
+      reference: unreferenced_placeholder; 0.1 L (tubular volume at zero pressure) from P. Hunter's unpublished blood-volume-control
+        parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 0.1
+    L_pt_W: &id016
+      reference: unreferenced_placeholder; 1 L (tubular volume limit; u_pt_W is singular there) from P. Hunter's unpublished
+        blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+        same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+      sourced: 'no'
+      value: 1
+    q_ptEpi_W: &id017
+      reference: unreferenced_placeholder; 0.5 L (epithelial water volume) from P. Hunter's unpublished blood-volume-control
+        parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 0.5
+    k_pt_W: &id018
+      reference: 'unreferenced_placeholder; 0 L/(s kPa): no tubular water reabsorption in the source model from P. Hunter''s
+        unpublished blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference
+        ''Peter_Hunter''; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it'
+      sourced: 'no'
+      value: 0
+    k_gl_W: &id019
+      reference: unreferenced_placeholder; 5 L/(s kPa) (glomerular water conductance) from P. Hunter's unpublished blood-volume-control
+        parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 5
+    kK_pt_Na: &id020
+      reference: unreferenced_placeholder; 1 1/s from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+        ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+        found that reports it
+      sourced: 'no'
+      value: 1
+    kK_gl_Na: &id021
+      reference: unreferenced_placeholder; 1 1/s (gives a glomerular Na flux of about 3.5e-3 mol/s per kidney, some 20x the
+        physiological filtered Na load of about 1.5e-4 mol/s per kidney) from P. Hunter's unpublished blood-volume-control
+        parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 1
+    k_ptEpi_NKE: &id022
+      reference: unreferenced_placeholder; 100000 mol/s (NKE rate constant) from P. Hunter's unpublished blood-volume-control
+        parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+        no publication found that reports it
+      sourced: 'no'
+      value: 100000
+    K_Na: &id023
+      reference: unreferenced_placeholder; 1 L/mol from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+        ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+        found that reports it; a Na binding affinity of 1 L/mol (K_d = 1 M) is far weaker than NKE affinities in the literature
+        (intracellular Na K_d of order 10 mM); treat as a lumped, non-physiological constant
+      sourced: 'no'
+      value: 1
+    K_K: &id024
+      reference: unreferenced_placeholder; 1 L/mol from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+        ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+        found that reports it; lumped K binding affinity (K_d = 1 M); see K_Na
+      sourced: 'no'
+      value: 1
+  notes: 'One kidney (glomerulus + proximal tubule + tubular epithelium) of the blood-volume-control system: glomerular water
+    flux v_gl_W = k_gl_W (u_ac_W - u_pt_W) from the glomerular capillary pressure u_ac_W, tubular pressure u_pt_W = E_pt (q_pt_W
+    - U_pt_W)/(L_pt_W - q_pt_W)^2, osmotic reabsorption v_pt_W = k_pt_W RT (c_vc - c_pt) (k_pt_W = 0 in the source), Na filtration
+    v_gl_Na = kK_gl_Na (q_vc_Na - q_pt_Na), tubule-to-epithelium v_pt_Na and a simplified NKE flux to the blood. It cannot
+    run alone: q_vc_W is declared with kind "variable " (known issue), so the test network supplies it: a peritubular capillary
+    (BG capillary_simple_vol_ctl_uptake between an arteriole and a vein with constant 100/5 mmHg pressures, giving q_vc_W
+    (m3 -> L) and receiving v_pt_W) and BVC_Na_circ (closing the Na loop, other inputs zero). u_ac_W stays a BC. The glomerular
+    capillary (capillary_simple_vol_ctl_intake) is NOT in the network because libcuflynx names both L_per_s -> m3_per_s unit
+    converters identically and the model fails to import (framework issue). Exact checks: closed Na balance q_vc_Na + q_pt_Na
+    + q_ptEpi_Na = total - v_out2_Na t, tubular water balance, all constitutive laws, NKE closed form through the port unit
+    conversion, bounds, and the analytic pressure steady state.'
 - vessel_type: BVC_Kidney_left
   BC_type: nn
   module_type: BVC_Kidney_main_type
-  outputs: [u_pt_W, c_pt_Na, C_pt_Na, c_ptEpi_Na, C_ptEpi_Na, u_pt_osmotic]
-  invariants: []
-  validation:
-    baseline: {status: pending, reason: validation data not chosen yet}
-    calibrate: {status: pending, reason: validation data not chosen yet}
+  outputs:
+  - q_pt_W
+  - q_pt_Na
+  - q_ptEpi_Na
+  - u_pt_W
+  - c_pt_Na
+  - c_ptEpi_Na
+  - u_pt_osmotic
+  - v_gl_W
+  - v_pt_W
+  - v_pt_Na
+  - v_ptEpi_NKE
+  - v_gl_Na
+  - naCirc/q_vc_Na
+  - peri/q
+  - peri/u
+  invariants:
+  - description: 'closed Na balance of the test network (kidney + Na_circ, other Na_circ inputs zero): q_vc_Na + q_pt_Na +
+      q_ptEpi_Na = initial total - v_out2_Na t (exact; no quadrature)'
+    expr: np.max(np.abs(naCirc__q_vc_Na + q_pt_Na + q_ptEpi_Na - (naCirc__q_vc_Na[0] + q_pt_Na_init + q_ptEpi_Na_init - v_out2_Na*t)))
+      <= 1e-9*(naCirc__q_vc_Na[0] + q_pt_Na_init + q_ptEpi_Na_init)
+  - description: 'tubular water balance: q_pt_W = q_pt_W_init + integral of (v_gl_W - v_pt_W) - v_out2_W t (trapezoid on the
+      output grid; tolerance 1e-5 q_pt_W_init plus the trapezoid error bound dt max|v|/2, which covers initial transients
+      faster than the output step)'
+    expr: np.max(np.abs(q_pt_W - q_pt_W_init - np.concatenate([[0.0], np.cumsum(0.5*((v_gl_W - v_pt_W)[1:] + (v_gl_W - v_pt_W)[:-1])*np.diff(t))])
+      + v_out2_W*t)) <= 1e-5*q_pt_W_init + 0.5*(t[1] - t[0])*np.max(np.abs(v_gl_W - v_pt_W))
+  - description: 'constitutive relations: u_pt_W = E_pt (q_pt_W - U_pt_W)/(L_pt_W - q_pt_W)^2, v_gl_W = k_gl_W (u_ac_W - u_pt_W),
+      v_pt_W = k_pt_W RT (c_vc - c_pt), v_gl_Na = kK_gl_Na (q_vc_Na - q_pt_Na), v_pt_Na = kK_pt_Na (q_pt_Na - q_ptEpi_Na),
+      c = q/V, u_pt_osmotic = RT c_pt_Na (q_vc_W is the neighbour capillary volume peri/q converted m3 -> L)'
+    expr: np.allclose(u_pt_W, E_pt*(q_pt_W - U_pt_W)/(L_pt_W - q_pt_W)**2, rtol=1e-9, atol=1e-12) and np.allclose(v_gl_W,
+      k_gl_W*(u_ac_W - u_pt_W), rtol=1e-6, atol=1e-9*k_gl_W*max(1.0, abs(u_ac_W))) and np.allclose(v_pt_W, k_pt_W*RT*((naCirc__q_vc_Na/(1000*peri__q))
+      - c_pt_Na), rtol=1e-6, atol=1e-15) and np.allclose(v_gl_Na, kK_gl_Na*(naCirc__q_vc_Na - q_pt_Na), rtol=1e-6, atol=1e-12)
+      and np.allclose(v_pt_Na, kK_pt_Na*(q_pt_Na - q_ptEpi_Na), rtol=1e-6, atol=1e-12) and np.allclose(c_pt_Na, q_pt_Na/q_pt_W,
+      rtol=1e-9) and np.allclose(c_ptEpi_Na, q_ptEpi_Na/q_ptEpi_W, rtol=1e-9) and np.allclose(u_pt_osmotic, RT*c_pt_Na, rtol=1e-9)
+  - description: NKE flux equals its closed form 3 k (A^3 B^2 - C^3 D^2 exp(2 F u/RT))/((1+A^3)(1+C^3)(1+B^2)(1+D^2)) with
+      the blood-side volume taken from the neighbour capillary (checks the m3 -> L port conversion)
+    expr: np.allclose(v_ptEpi_NKE, 3*k_ptEpi_NKE*((K_Na*c_ptEpi_Na)**3*(K_K*q_vc_K/(1000*peri__q))**2 - (K_Na*(naCirc__q_vc_Na/(1000*peri__q)))**3*(K_K*q_ptEpi_K/q_ptEpi_W)**2*np.exp(2*F*u_ptEpi_e/RT))/((1
+      + (K_Na*c_ptEpi_Na)**3)*(1 + (K_Na*(naCirc__q_vc_Na/(1000*peri__q)))**3)*(1 + (K_K*q_vc_K/(1000*peri__q))**2)*(1 + (K_K*q_ptEpi_K/q_ptEpi_W)**2)),
+      rtol=1e-6, atol=1e-12)
+  - description: tubular volume stays inside (0, L_pt_W) (u_pt_W is singular at L_pt_W) and Na amounts stay positive
+    expr: np.all(q_pt_W > 0) and np.all(q_pt_W < L_pt_W) and np.all(q_pt_Na > 0) and np.all(q_ptEpi_Na > 0) and np.all(naCirc__q_vc_Na
+      > 0)
+  - description: 'analytic water steady state at the run point (k_pt_W = 0, v_out2_W = 0): u_pt_W -> u_ac_W, i.e. q_pt_W ->
+      the root in (U, L) of u_ac (L - q)^2 = E (q - U)'
+    applies: run
+    expr: abs(q_pt_W[-1] - ((2*u_ac_W*L_pt_W + E_pt) - np.sqrt((2*u_ac_W*L_pt_W + E_pt)**2 - 4*u_ac_W*(u_ac_W*L_pt_W**2 +
+      E_pt*U_pt_W)))/(2*u_ac_W)) < 1e-6 and abs(v_gl_W[-1]) < 1e-9
+  harness:
+    vessel_array:
+    - - pin
+      - nn_constant
+      - inlet_pressure
+      - ''
+      - affA
+    - - affA
+      - pp
+      - arterial_simple
+      - pin
+      - peri
+    - - peri
+      - vv
+      - capillary_simple_vol_ctl_uptake
+      - affA mod
+      - venV mod
+    - - venV
+      - pp
+      - venous
+      - peri
+      - pout
+    - - pout
+      - nn_constant
+      - outlet_pressure
+      - venV
+      - ''
+    - - mod
+      - nn
+      - BVC_Kidney_left
+      - naCirc peri
+      - naCirc peri
+    - - naCirc
+      - nn
+      - BVC_Na_circ
+      - mod
+      - mod
+    parameters:
+    - - P_pin
+      - J_per_m3
+      - 13332
+      - 'harness: 100 mmHg inflow pressure'
+    - - P_pout
+      - J_per_m3
+      - 666
+      - 'harness: 5 mmHg outflow pressure'
+    - - q_0_affA
+      - m3
+      - 3.509840625e-06
+      - circulatory_autogen ANS_CVS_BVC example (lEffArteriol)
+    - - R_affA
+      - Js_per_m6
+      - 352124180.669857
+      - circulatory_autogen ANS_CVS_BVC example (lEffArteriol)
+    - - C_affA
+      - m6_per_J
+      - 1.56375e-09
+      - circulatory_autogen ANS_CVS_BVC example (lEffArteriol)
+    - - u_ext_affA
+      - J_per_m3
+      - 0
+      - harness
+    - - u_0_affA
+      - J_per_m3
+      - 0
+      - harness
+    - - I_affA
+      - Js2_per_m6
+      - 1000000.0
+      - 'harness: inertance raised from the CA example value 1e-7 so the network is not stiff (I/R about 3 ms) and the RK4
+        timestep test can run'
+    - - q_0_peri
+      - m3
+      - 8.0e-05
+      - 'harness: chosen so q_vc_Na/q_vc_W is about 0.14 mol/L (CA example used 2.81e-05)'
+    - - R_peri
+      - Js_per_m6
+      - 100000000.0
+      - circulatory_autogen ANS_CVS_BVC example (lPeritubularC)
+    - - C_peri
+      - m6_per_J
+      - 5.0e-09
+      - circulatory_autogen ANS_CVS_BVC example (lPeritubularC)
+    - - u_ext_peri
+      - J_per_m3
+      - 0
+      - harness
+    - - I_peri
+      - Js2_per_m6
+      - 1000000.0
+      - 'harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)'
+    - - u_0_peri
+      - J_per_m3
+      - 0
+      - harness
+    - - blood_ctl_dir_peri
+      - dimensionless
+      - 1
+      - 'circulatory_autogen ANS_CVS_BVC example: reabsorbed water enters the capillary'
+    - - q_0_venV
+      - m3
+      - 1.938375e-05
+      - circulatory_autogen ANS_CVS_BVC example (lKidneyV)
+    - - R_venV
+      - Js_per_m6
+      - 122477975.885168
+      - circulatory_autogen ANS_CVS_BVC example (lKidneyV)
+    - - C_venV
+      - m6_per_J
+      - 1.0425e-05
+      - circulatory_autogen ANS_CVS_BVC example (lKidneyV)
+    - - u_ext_venV
+      - J_per_m3
+      - 0
+      - harness
+    - - u_0_venV
+      - J_per_m3
+      - 0
+      - harness
+    - - I_venV
+      - Js2_per_m6
+      - 1000000.0
+      - 'harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)'
+    - - q_vc_Na_init_naCirc
+      - mole
+      - 0.0114979848860844
+      - P. Hunter BVC model value (CA_user_volume_control ANS_CVS_BVC_parameters.csv)
+    - - v_giEpi_NKE_naCirc
+      - mol_per_s
+      - 0
+      - 'harness: no GI in this network'
+    - - v_rptEpi_NKE_naCirc
+      - mol_per_s
+      - 0
+      - 'harness: no right kidney in this network'
+    - - v_rgl_Na_naCirc
+      - mol_per_s
+      - 0
+      - 'harness: no right kidney in this network'
+  validation: *id001
+  reference_proposals:
+    q_pt_W_init: *id002
+    q_pt_Na_init: *id003
+    q_ptEpi_Na_init: *id004
+    u_ptEpi_e: *id005
+    q_vc_K: *id006
+    q_ptEpi_K: *id007
+    v_out2_W: *id008
+    v_out2_Na: *id009
+    u_ac_W: *id010
+    q_vc_Na: *id011
+    RT: *id012
+    F: *id013
+    E_pt: *id014
+    U_pt_W: *id015
+    L_pt_W: *id016
+    q_ptEpi_W: *id017
+    k_pt_W: *id018
+    k_gl_W: *id019
+    kK_pt_Na: *id020
+    kK_gl_Na: *id021
+    k_ptEpi_NKE: *id022
+    K_Na: *id023
+    K_K: *id024
+  notes: 'One kidney (glomerulus + proximal tubule + tubular epithelium) of the blood-volume-control system: glomerular water
+    flux v_gl_W = k_gl_W (u_ac_W - u_pt_W) from the glomerular capillary pressure u_ac_W, tubular pressure u_pt_W = E_pt (q_pt_W
+    - U_pt_W)/(L_pt_W - q_pt_W)^2, osmotic reabsorption v_pt_W = k_pt_W RT (c_vc - c_pt) (k_pt_W = 0 in the source), Na filtration
+    v_gl_Na = kK_gl_Na (q_vc_Na - q_pt_Na), tubule-to-epithelium v_pt_Na and a simplified NKE flux to the blood. It cannot
+    run alone: q_vc_W is declared with kind "variable " (known issue), so the test network supplies it: a peritubular capillary
+    (BG capillary_simple_vol_ctl_uptake between an arteriole and a vein with constant 100/5 mmHg pressures, giving q_vc_W
+    (m3 -> L) and receiving v_pt_W) and BVC_Na_circ (closing the Na loop, other inputs zero). u_ac_W stays a BC. The glomerular
+    capillary (capillary_simple_vol_ctl_intake) is NOT in the network because libcuflynx names both L_per_s -> m3_per_s unit
+    converters identically and the model fails to import (framework issue). Exact checks: closed Na balance q_vc_Na + q_pt_Na
+    + q_ptEpi_Na = total - v_out2_Na t, tubular water balance, all constitutive laws, NKE closed form through the port unit
+    conversion, bounds, and the analytic pressure steady state.'
+review:
+  summary: 'Kidney (glomerulus, proximal tubule, epithelium) of the blood-volume-control system, as left/right components.
+    All 46 parameters were TODO; values proposed from P. Hunter''s unpublished BVC parameter set. The config declares q_vc_W
+    with kind "variable " (trailing space), so the component cannot run alone (libcellml: q_vc_W unset); I tested it in a
+    harness network (peritubular BG capillary + BVC_Na_circ) that supplies q_vc_W, and showed on a patched copy that changing
+    the kind to boundary_condition makes it run standalone. Verification (both components): exact closed Na balance, water
+    balance, constitutive and NKE laws, bounds and the analytic tubular-pressure steady state all hold; BC sweep, RK4 timestep
+    and the solver matrix pass.'
+  comment: 'q_vc_W has kind "variable " (trailing space) so the kidney only runs where a neighbour supplies q_vc_W; GI declares
+    the same input as boundary_condition. Physically: k_pt_W = 0 means no tubular water reabsorption; Na filtration is kK_gl_Na
+    (q_vc_Na - q_pt_Na) (amount difference, not convective with v_gl_W), giving about 3.7e-3 mol/s per kidney, some 25x the
+    physiological filtered load; the NKE law lacks an ATP term and its exp(2Fu/RT) factor looks sign/valence-inverted. The
+    harness uses BG capillary inertances raised to 1e6 (CA example 1e-7) to keep the network non-stiff for the RK4 test.'
+  questions:
+  - 'Approve the config fix for the known issue: q_vc_W kind "variable " -> "boundary_condition" in both BVC_Kidney components
+    (as in BVC_GI), plus a q_vc_W row per component in the parameters csv (proposed 0.0787 L)? Evidence: standalone generation
+    fails now (libcellml: q_vc_W and dependants have unknown type); on a patched copy both components generate and run standalone.'
+  - All values are proposed from P. Hunter's unpublished parameter set (CA_user_volume_control/ANS_CVS_BVC_parameters.csv,
+    data_reference "Peter_Hunter", same values in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml; the modules were added to circulatory_autogen
+    by M. H. Shafieizadegan). I found no publication giving these values (the related bioRxiv preprint Hunter et al. 2026,
+    "The biophysical basis of enterocyte homeostasis", doi 10.64898/2026.01.28.702213, is cellular and does not contain them),
+    so they are marked unreferenced_placeholder. Is there a report/thesis to cite, or should they stay placeholders?
+  - RT = 2500 J/mol (T = 300.7 K) is the source value; keep it, or use body temperature (2578.8 J/mol at 310.15 K)? F is proposed
+    as the exact CODATA value 96485.33212 C/mol (the source used 0.965e5).
+  - 'NKE law (all four modules share it): 3 k (A^3 B^2 - C^3 D^2 exp(2 F u/RT))/((1+A^3)(1+B^2)(1+C^3)(1+D^2)). (a) It has
+    no ATP-hydrolysis term, so it is a gradient-driven exchanger, not a pump: in the source parameters it moves Na out of
+    the epithelium only because blood-side K (q_vc_K/q_vc_W = 0.3-0.4 M) is set far above epithelial K (24 mM), the reverse
+    of physiology (plasma about 4-5 mM, cells about 140 mM); with physiological K it would run backwards. (b) The electrical
+    factor: one pump cycle moves net +1 charge out, so with u = psi_in - psi_out = -40 mV the reverse term would normally
+    carry exp(-F u/RT) (= 4.7), not exp(+2 F u/RT) (= 0.046). Is this a deliberate simplification (and which sign convention
+    does u_*Epi_e use), or should the law be corrected (e.g. to the bond-graph NKE of the Hunter group) before these modules
+    are used?'
+  - 'Na exchange laws use amount differences, not concentrations: v_gi_Na = kK (q_gi_Na - q_giEpi_Na), v_pt_Na = kK (q_pt_Na
+    - q_ptEpi_Na), v_gl_Na = kK (q_vc_Na - q_pt_Na). At steady state this equalises amounts, not concentrations (gut lumen
+    146 mM vs epithelium 8 mM because the volumes are 0.028 vs 0.5 L), and glomerular Na filtration is not tied to the filtered
+    water (a convective v_gl_W c_vc_Na would be expected). Intended?'
+  - 'In a network, c_vc_Na = q_vc_Na/q_vc_W divides the whole-circulation Na (BVC_Na_circ) by the volume of the LOCAL capillary
+    that supplies osmotic_vol_port (intestinal or peritubular), so the GI and each kidney see different blood Na concentrations
+    (source values: 146 mM at the gut, 55 mM at the kidneys for the same q_vc_Na). Should q_vc_W be the circulating (plasma)
+    volume instead?'
+  - 'k_pt_W = 0 (source value): the proximal tubule reabsorbs no water, so the tubular volume just settles at u_pt_W = u_ac_W
+    and there is no glomerulotubular water flow at steady state. Intended for this version?'
+  - 'Accept the harness: peritubular BG capillary (CA ANS_CVS_BVC example values, inertances raised to 1e6, q_0 raised to
+    8e-5 m3 so c_vc is about 0.14 M) + BVC_Na_circ, with u_ac_W kept as a BC because the glomerular capillary cannot be added
+    (libcuflynx duplicate unit-converter bug)?'
+  - 'Validation: pending (see the candidate); accept, or point me to data consistent with this parameterisation?'
+  proposed_fixes:
+  - 'BVC_Kidney_modules_config.json (both components): ["q_vc_W", "litre", "access", "variable "] -> ["q_vc_W", "litre", "access",
+    "boundary_condition"]; add q_vc_W rows (litre, boundary_condition) to BVC_Kidney_parameters.csv. Evidence: tested on a
+    patched copy of the library - both components then generate and run standalone for 20 s.'
+  findings:
+  - 'Run point: tubular water equilibrates within about 0.1 s to u_pt_W = u_ac_W = 1.835 kPa; the Na loop settles to a steady
+    recirculation vc -> tubule -> epithelium -> vc of about 3.7e-3 mol/s per kidney, powered by the fixed K gradient in the
+    NKE law (no ATP term).'
+  - 'Harness network: in the test network the peritubular capillary volume drifts slowly (venous RC time constant about 1200
+    s with the CA example venous compliance), so q_vc_W changes by a few % over 20 s; the invariants use the logged peri/q,
+    so this does not affect them.'
+  - 'libcuflynx: two ports needing the same unit conversion (v_gl_W and v_pt_W, both L_per_s -> m3_per_s) produce two components
+    named unit_converter_L_per_s_to_m3_per_s; the flattened model is rejected (Myokit: component name must be unique; libcellml:
+    v_gl_W missing in the converter). This blocks connecting a kidney to both glomerular and peritubular BG capillaries, i.e.
+    the CA ANS_CVS_BVC network as written.'
+  - 'Joint failure risk (256 samples, each component): P(fail) = 0.04 [0.02, 0.08]; most influential L_pt_W, q_pt_Na_init,
+    q_pt_W_init - joint draws with q_pt_W_init close to or above L_pt_W (singular compliance). Single-parameter sweeps all
+    pass.'
