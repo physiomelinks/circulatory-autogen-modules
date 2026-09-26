@@ -245,6 +245,30 @@ def build_index(contexts, out_path, module_href):
     return out_path
 
 
+def build_review_queue(contexts, out_path, module_href, standalone=True):
+    '''One page listing every module awaiting review: comment, questions, proposed fixes.'''
+    queue, reviewed = [], []
+    for c in contexts:
+        module = load_module(c['name'])
+        if module.reviewed:
+            reviewed.append(c['name'])
+            continue
+        if not module.spec.get('review'):
+            continue
+        queue.append({
+            'name': c['name'], 'href': module_href(c['name']), 'review': module.spec['review'],
+            'n_components': len(c['components']), 'counts': c['counts'], 'n_known': len(c['known_issues']),
+            'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'], 'max_risk': c.get('max_risk'),
+            'n_proposals': sum(len(comp.get('reference_proposals') or {}) for comp in module.spec.get('components', [])),
+        })
+    html_text = _env().get_template('review_queue.html').render(
+        modules=queue, reviewed=reviewed, standalone=standalone,
+        generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'))
+    with open(out_path, 'w') as f:
+        f.write(html_text)
+    return out_path
+
+
 def assemble_site(names, contexts):
     '''site/index.html + site/modules/<name>/{<name>.html, plots/}, as GitHub Pages serves it.'''
     if os.path.isdir(SITE_DIR):
@@ -258,6 +282,7 @@ def assemble_site(names, contexts):
         shutil.copy2(os.path.join(module.dir, f'{name}.html'), dest)
         if os.path.isdir(module.plots_dir):
             shutil.copytree(module.plots_dir, os.path.join(dest, 'plots'))
+    build_review_queue(contexts, os.path.join(SITE_DIR, 'review_queue.html'), lambda n: f'modules/{n}/{n}.html')
     return build_index(contexts, os.path.join(SITE_DIR, 'index.html'), lambda n: f'modules/{n}/{n}.html')
 
 

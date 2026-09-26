@@ -22,6 +22,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
     <div class="eyebrow">Module library · verification &amp; validation</div>
     <h1>Circulatory Autogen Modules</h1>
     <p>Each module is generated component by component with libcuflynx and put through the same tests: run, boundary-condition sweep, timestep convergence, solver stability, and validation against baseline and calibration data.</p>
+    <p><a href="review_queue.html">Review queue</a>: every module awaiting review, with its potential issues, questions and proposed fixes.</p>
     <div class="counts">
       {{ chip('passed', totals.passed ~ ' passed') }} {{ chip('failed', totals.failed ~ ' failed') }}
       {{ chip('pending', totals.pending ~ ' pending') }} {{ chip('skipped', totals.skipped ~ ' skipped') }}

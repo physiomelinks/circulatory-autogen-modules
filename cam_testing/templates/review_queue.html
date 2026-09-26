@@ -1,0 +1,62 @@
+{%- if standalone is not defined or standalone %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{%- endif %}
+<title>Module Review Queue</title>
+{% include '_style.html' %}
+<style>
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 28px; }
+header { display: grid; gap: 10px; }
+header p { margin: 0; max-width: 72ch; color: var(--ink-2); }
+.mod { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; }
+.mod h2 { font-size: 1.25rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.mod .meta { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 0.84rem; color: var(--ink-2); }
+.comment { margin: 0; color: var(--todo); max-width: 80ch; }
+.issues { margin: 0; padding-left: 20px; display: grid; gap: 5px; font-size: 0.9rem; }
+details summary { cursor: pointer; font-weight: 600; font-size: 0.88rem; color: var(--ink-2); }
+.toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.86rem; }
+</style>
+{%- if standalone is not defined or standalone %}
+</head>
+<body>
+{%- endif %}
+<div class="wrap">
+  <header>
+    <div class="eyebrow">circulatory-autogen-modules · review queue</div>
+    <h1>Module review queue</h1>
+    <p>Each module still to review, with its potential-issues note, the questions to answer, and proposed fixes to the module (none applied). Full reports: <code>make serve</code>, then the module pages. After confirming a module's proposals: <code>python -m cam_testing.review apply --module NAME</code>, then set <code>reviewed: true</code>.</p>
+    <p class="muted">{{ modules|length }} modules awaiting review · {{ reviewed|length }} reviewed ({{ reviewed|join(', ') }}) · generated {{ generated }}</p>
+    <nav class="toc" aria-label="Modules">{% for m in modules %}<a href="#{{ m.name }}">{{ m.name }}</a>{% endfor %}</nav>
+  </header>
+  {%- for m in modules %}
+  <section class="mod" id="{{ m.name }}">
+    <h2><a href="{{ m.href }}">{{ m.name }}</a> <span class="muted" style="font-size:0.85rem;font-weight:500">{{ m.n_components }} component{{ '' if m.n_components == 1 else 's' }}</span></h2>
+    <div class="meta">
+      <span>{{ m.counts.passed }} passed</span><span>{{ m.counts.failed }} failed</span>
+      <span>{{ m.n_known }} known issue{{ '' if m.n_known == 1 else 's' }}</span>
+      <span>{{ m.n_sourced }} / {{ m.n_parameters }} parameters sourced</span>
+      <span>{{ m.n_proposals }} reference proposal{{ '' if m.n_proposals == 1 else 's' }}</span>
+      {%- if m.max_risk is not none %}<span>max P(fail) {{ '%.2f'|format(m.max_risk) }}</span>{% endif %}
+    </div>
+    {%- if m.review.comment %}<p class="comment"><strong>Potential issues:</strong> {{ m.review.comment }}</p>{% endif %}
+    {%- if m.review.questions %}
+    <details open><summary>Questions ({{ m.review.questions|length }})</summary>
+      <ol class="issues">{% for q in m.review.questions %}<li>{{ q }}</li>{% endfor %}</ol></details>
+    {%- endif %}
+    {%- if m.review.proposed_fixes %}
+    <details><summary>Proposed fixes ({{ m.review.proposed_fixes|length }})</summary>
+      <ul class="issues">{% for f in m.review.proposed_fixes %}<li>{{ f }}</li>{% endfor %}</ul></details>
+    {%- endif %}
+    {%- if m.review.findings %}
+    <details><summary>Findings ({{ m.review.findings|length }})</summary>
+      <ul class="issues">{% for f in m.review.findings %}<li>{{ f }}</li>{% endfor %}</ul></details>
+    {%- endif %}
+  </section>
+  {%- endfor %}
+</div>
+{%- if standalone is not defined or standalone %}
+</body>
+</html>
+{%- endif %}
