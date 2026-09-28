@@ -427,7 +427,19 @@ def verification_test_timestep(cm):
         finest = runs[-1][2]
         scale = np.maximum(np.max(np.abs(finest), axis=0), np.ptp(finest, axis=0))
         scale[scale == 0] = 1.0
-        diffs = [float(np.max(np.abs(runs[k][2] - runs[k + 1][2]) / scale)) for k in range(len(runs) - 1)]
+        # sawtooth outputs (timestep.wrapped: {output: period}, e.g. a cardiac phase) are compared modulo their
+        # period, so a wrap one step earlier at one step size isn't a difference of a whole period
+        periods = np.array([float((ts.get('wrapped') or {}).get(o, 0.0)) for o in outputs])
+
+        def _diff(a, b):
+            d = np.abs(a - b)
+            w = periods > 0
+            if w.any():
+                d[..., w] = d[..., w] % periods[w]
+                d[..., w] = np.minimum(d[..., w], periods[w] - d[..., w])
+            return d
+
+        diffs = [float(np.max(_diff(runs[k][2], runs[k + 1][2]) / scale)) for k in range(len(runs) - 1)]
         observed = []
         for k in range(len(diffs) - 1):
             if diffs[k + 1] > roundoff and diffs[k] > roundoff:
@@ -441,7 +453,7 @@ def verification_test_timestep(cm):
                                               solver_info=reference_tolerances(cm))
         t_cv, cv = harness.run(tight, outputs, params=cm.run_point_params())
         n = min(len(t_cv), finest.shape[0])
-        cvode_diff = float(np.max(np.abs(np.column_stack([cv[harness.output_key(o)] for o in outputs])[:n] - finest[:n]) / scale))
+        cvode_diff = float(np.max(_diff(np.column_stack([cv[harness.output_key(o)] for o in outputs])[:n], finest[:n]) / scale))
 
         figs = [plots.plot_convergence(plot_path(component, 'timestep_convergence'), dts[:-1], diffs, order,
                                        next((o for o in reversed(observed) if o is not None), None),

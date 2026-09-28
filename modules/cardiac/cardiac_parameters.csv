@@ -1,0 +1,49 @@
+vessel_type,BC_type,variable_name,units,value,kind,data_reference,sourced
+global,,T,second,1,global_constant,circulatory_autogen 3compartment: Liang_2009_Table_2,no
+global,,T_min,second,0.4,global_constant,circulatory_autogen 3compartment: defined_by_user,no
+cardiac_clock,nn_controlled,Delta_T,second,0,boundary_condition,harness test value (definitional for a stand-alone test),no
+chamber,vv,v_in,m3_per_s,1e-4,boundary_condition,harness test value (definitional for a stand-alone test),no
+chamber,vv,v_out,m3_per_s,1e-4,boundary_condition,harness test value (definitional for a stand-alone test),no
+chamber,vv,mt,dimensionless,0.5,boundary_condition,harness test value (definitional for a stand-alone test),no
+chamber,vv,T_eff,second,1,boundary_condition,harness test value (definitional for a stand-alone test),no
+chamber,vv,T_c,second,0.3,constant,circulatory_autogen 3compartment: Liang_2009_Table_2,no
+chamber,vv,T_r,second,0.15,constant,circulatory_autogen 3compartment: Liang_2009_Table_2,no
+chamber,vv,t_start,second,0,constant,circulatory_autogen 3compartment: Liang_2009_Table_2,no
+chamber,vv,E_A,J_per_m6,366575000,constant,circulatory_autogen 3compartment: Liang_2009_Table_2,no
+chamber,vv,E_B,J_per_m6,10664000,constant,circulatory_autogen 3compartment: Liang_2009_Table_2,no
+chamber,vv,Delta_E,J_per_m6,0,boundary_condition,harness test value (definitional for a stand-alone test),no
+chamber,vv,q_us,m3,0.000005,constant,circulatory_autogen 3compartment: Korakianitis_2006_Table_1,no
+chamber,vv,q_init,m3,0.002,constant,circulatory_autogen 3compartment: to_be_identified,no
+chamber,vv,u_ext,J_per_m3,0,boundary_condition,harness test value (definitional for a stand-alone test),no
+valve,pp,u_in,J_per_m3,13332,boundary_condition,harness test value (definitional for a stand-alone test),no
+valve,pp,u_out,J_per_m3,10666,boundary_condition,harness test value (definitional for a stand-alone test),no
+valve,pp,A_nn,m2,0.000314,constant,circulatory_autogen 3compartment: defined_by_user_from_BB128,no
+valve,pp,M_st,dimensionless,1,constant,circulatory_autogen 3compartment: Mynard_2012,no
+valve,pp,M_rg,dimensionless,0,constant,circulatory_autogen 3compartment: Mynard_2012,no
+valve,pp,K_vo,m3_per_Js,0.04,constant,circulatory_autogen 3compartment: to_be_identified,no
+valve,pp,K_vc,m3_per_Js,0.04,constant,circulatory_autogen 3compartment: to_be_identified,no
+global,,l_eff,metre,0.01,global_constant,circulatory_autogen 3compartment: to_be_identified,no
+global,,rho,Js2_per_m5,1050,global_constant,circulatory_autogen 3compartment: known,no
+valve,pp_linear,u_in,J_per_m3,13332,boundary_condition,harness test value (definitional for a stand-alone test),no
+valve,pp_linear,u_out,J_per_m3,10666,boundary_condition,harness test value (definitional for a stand-alone test),no
+valve,pp_linear,A_nn,m2,0.000314,constant,circulatory_autogen 3compartment: defined_by_user_from_BB128,no
+valve,pp_linear,M_st,dimensionless,1,constant,circulatory_autogen 3compartment: Mynard_2012,no
+valve,pp_linear,M_rg,dimensionless,0,constant,circulatory_autogen 3compartment: Mynard_2012,no
+valve,pp_linear,K_vo,m3_per_Js,0.04,constant,circulatory_autogen 3compartment: to_be_identified,no
+valve,pp_linear,K_vc,m3_per_Js,0.04,constant,circulatory_autogen 3compartment: to_be_identified,no
+valve,pp_linear,v_ref,m3_per_s,1e-4,constant,harness test value (definitional for a stand-alone test),no
+valve,pp_rmod,u_in,J_per_m3,13332,boundary_condition,harness test value (definitional for a stand-alone test),no
+valve,pp_rmod,u_out,J_per_m3,10666,boundary_condition,harness test value (definitional for a stand-alone test),no
+valve,pp_rmod,A_nn,m2,0.000314,constant,circulatory_autogen 3compartment: defined_by_user_from_BB128,no
+valve,pp_rmod,M_st,dimensionless,1,constant,circulatory_autogen 3compartment: Mynard_2012,no
+valve,pp_rmod,M_rg,dimensionless,0,constant,circulatory_autogen 3compartment: Mynard_2012,no
+valve,pp_rmod,K_vo,m3_per_Js,0.04,constant,circulatory_autogen 3compartment: to_be_identified,no
+valve,pp_rmod,K_vc,m3_per_Js,0.04,constant,circulatory_autogen 3compartment: to_be_identified,no
+valve,pp_rmod,Rmod_valve,dimensionless,1,constant,harness test value (definitional for a stand-alone test),no
+resistor,pp,u_in,J_per_m3,13332,boundary_condition,harness test value (definitional for a stand-alone test),no
+resistor,pp,u_out,J_per_m3,10666,boundary_condition,harness test value (definitional for a stand-alone test),no
+resistor,pp,R,Js_per_m6,1.00e+07,constant,circulatory_autogen 3compartment: ASD_shunt_moderate_assumption,no
+flow_merge,vp,v_in,m3_per_s,1e-4,boundary_condition,harness test value (definitional for a stand-alone test),no
+flow_merge,vp,u_d,J_per_m3,1000,boundary_condition,harness test value (definitional for a stand-alone test),no
+flow_split,pv,u_in,J_per_m3,13332,boundary_condition,harness test value (definitional for a stand-alone test),no
+flow_split,pv,v_out,m3_per_s,1e-4,boundary_condition,harness test value (definitional for a stand-alone test),no

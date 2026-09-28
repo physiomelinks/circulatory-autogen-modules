@@ -1,0 +1,97 @@
+module: cardiac
+reviewed: false
+known_issues: []
+defaults:
+  sim_time: 2.0
+  pre_time: 0.0
+  dt: 0.01
+  solver: CVODE_myokit
+  bc_sweep:
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
+    ranges: {}
+  timestep:
+    scheme: rk4
+    dts: [0.004, 0.002, 0.001, 0.0005]
+    min_order: 0.8
+    tol: 0.0001
+    cvode_tol: 0.001
+  stability:
+    supported:
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
+components:
+- vessel_type: cardiac_clock
+  BC_type: nn
+  module_type: cardiac_clock_type
+  outputs: [T_eff, s, mt]
+  timestep:
+    wrapped: {mt: 1.0}   # mt is the phase within the beat, a sawtooth in [0, 1)
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: cardiac_clock
+  BC_type: nn_controlled
+  module_type: cardiac_clock_controlled_type
+  outputs: [T_eff, s, mt]
+  timestep:
+    wrapped: {mt: 1.0}   # mt is the phase within the beat, a sawtooth in [0, 1)
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: chamber
+  BC_type: vv
+  module_type: chamber_type
+  outputs: [u, q, e, E_A_eff]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: valve
+  BC_type: pp
+  module_type: valve_type
+  outputs: [v, zeta, A_eff, vel]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: valve
+  BC_type: pp_linear
+  module_type: valve_linear_type
+  outputs: [v, zeta, A_eff, vel, R_lin]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: valve
+  BC_type: pp_rmod
+  module_type: valve_rmod_type
+  outputs: [v, zeta, A_eff, vel]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: resistor
+  BC_type: pp
+  module_type: resistor_type
+  outputs: [v]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: flow_merge
+  BC_type: vp
+  module_type: flow_merge_type
+  outputs: [v_out, u]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}
+- vessel_type: flow_split
+  BC_type: pv
+  module_type: flow_split_type
+  outputs: [v, u]
+  invariants: []
+  validation:
+    baseline: {status: pending, reason: validation data not chosen yet}
+    calibrate: {status: pending, reason: validation data not chosen yet}

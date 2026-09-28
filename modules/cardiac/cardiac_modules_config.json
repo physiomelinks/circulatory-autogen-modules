@@ -1,0 +1,772 @@
+[
+  {
+    "vessel_type": "cardiac_clock",
+    "BC_type": "nn",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "cardiac_clock_type",
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "cardiac_clock_port",
+        "variables": [
+          "mt",
+          "T_eff"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T_eff",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "s",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "mt",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "cardiac_clock",
+    "BC_type": "nn_controlled",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "cardiac_clock_controlled_type",
+    "entrance_ports": [
+      {
+        "port_type": "period_delta_port",
+        "variables": [
+          "Delta_T"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "cardiac_clock_port",
+        "variables": [
+          "mt",
+          "T_eff"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T_min",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Delta_T",
+        "second",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "T_eff",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "s",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "mt",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "chamber",
+    "BC_type": "vv",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "chamber_type",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ]
+      },
+      {
+        "port_type": "cardiac_clock_port",
+        "variables": [
+          "mt",
+          "T_eff"
+        ]
+      },
+      {
+        "port_type": "Elastance_delta_port",
+        "variables": [
+          "Delta_E"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "e",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "mt",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "T_eff",
+        "second",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T_c",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "T_r",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "t_start",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "E_A",
+        "J_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "E_B",
+        "J_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_E",
+        "J_per_m6",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_A_eff",
+        "J_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "q_us",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "valve",
+    "BC_type": "pp",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "valve_type",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "zeta",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "A_eff",
+        "m2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_nn",
+        "m2",
+        "access",
+        "constant"
+      ],
+      [
+        "M_st",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "M_rg",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vo",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vc",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "l_eff",
+        "metre",
+        "access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "access",
+        "global_constant"
+      ],
+      [
+        "vel",
+        "m_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "valve",
+    "BC_type": "pp_linear",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "valve_linear_type",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "zeta",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "A_eff",
+        "m2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_nn",
+        "m2",
+        "access",
+        "constant"
+      ],
+      [
+        "M_st",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "M_rg",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vo",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vc",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "l_eff",
+        "metre",
+        "access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "access",
+        "global_constant"
+      ],
+      [
+        "vel",
+        "m_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_ref",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "R_lin",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "valve",
+    "BC_type": "pp_rmod",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "valve_rmod_type",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "zeta",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "A_eff",
+        "m2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_nn",
+        "m2",
+        "access",
+        "constant"
+      ],
+      [
+        "M_st",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "M_rg",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vo",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vc",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "l_eff",
+        "metre",
+        "access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "access",
+        "global_constant"
+      ],
+      [
+        "vel",
+        "m_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Rmod_valve",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "resistor",
+    "BC_type": "pp",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "resistor_type",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "flow_merge",
+    "BC_type": "vp",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "flow_merge_type",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u_d"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_d",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "vessel_type": "flow_split",
+    "BC_type": "pv",
+    "module_format": "cellml",
+    "module_file": "cardiac_modules.cellml",
+    "module_type": "flow_split_type",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]
