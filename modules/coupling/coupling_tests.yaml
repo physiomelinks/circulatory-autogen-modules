@@ -40,7 +40,7 @@ components:
     - [u_0_vessel0d, J_per_m3, 0, 'harness: zero reference pressure']
     - [u_ext_vessel0d, J_per_m3, 0, 'harness: zero external pressure']
     - [P_t_star_imposter1d, J_per_m3, 1000, harness test value (circulatory_autogen 0D_1D_coupling_test)]
-    - [A_star_imposter1d, m2, 0.001, 'harness test value (circulatory_autogen 0D_1D_coupling_test); an area of 10 cm^2']
+    - [A_star_imposter1d, m2, 0.001, harness test value (circulatory_autogen 0D_1D_coupling_test); an area of 10 cm^2]
   invariants:
   - {description: 'static pressure at the interface is total minus dynamic pressure, P_s* = P_t* − ½ρ(q*/A*)²', expr: 'np.max(np.abs(P_s_star
       - (imposter1d__P_t_star - 0.5*rho*(q_star/imposter1d__A_star)**2))) <= 1e-9*max(1.0, np.max(np.abs(imposter1d__P_t_star)))'}
@@ -160,7 +160,7 @@ components:
 - vessel_type: volume_sum
   BC_type: nn
   module_type: volume_sum
-  outputs: [sum_blood_volume/q_mod_sum, va/q, vb/q, va/v, vb/v, flow_out_a/v, flow_out_b/v]
+  outputs: [q_sum, sum_blood_volume/q_mod_sum, va/q, vb/q, va/v, vb/v, flow_out_a/v, flow_out_b/v]
   harness:
     vessel_array:
     - [p_in_a, nn_constant, inlet_pressure, '', va]
@@ -190,64 +190,19 @@ components:
   invariants:
   - {description: 'the output is exactly the sum of the connected vessels'' volumes, Σq = q_va + q_vb', expr: 'np.max(np.abs(sum_blood_volume__q_mod_sum
       - (va__q + vb__q))) <= 1e-12*max(1e-30, np.max(np.abs(sum_blood_volume__q_mod_sum)))'}
+  - {description: 'q_sum, the total on the exit volume_port, equals the generated sum exactly', expr: 'np.max(np.abs(q_sum
+      - sum_blood_volume__q_mod_sum)) <= 1e-12*max(1e-30, np.max(np.abs(sum_blood_volume__q_mod_sum)))'}
   - {description: 'volume balance: Σq(t) − Σq(0) = ∫(inflows − outflows) dt over both vessels (trapezoidal, < 1e-3 of max
       Σq)', expr: 'np.max(np.abs((sum_blood_volume__q_mod_sum - sum_blood_volume__q_mod_sum[0]) - np.concatenate(([0.0], np.cumsum(0.5*((va__v
       + vb__v - flow_out_a__v - flow_out_b__v)[1:] + (va__v + vb__v - flow_out_a__v - flow_out_b__v)[:-1])*np.diff(t))))))
       <= 1e-3*np.max(np.abs(sum_blood_volume__q_mod_sum))'}
   - {description: 'steady state: Σq → C_a (P_in,a − R v_out,a) + C_b (P_in,b − R v_out,b) = 1e-8 (2000 − 1000) + 1e-8 (1500
       − 200) = 2.3e-5 m^3 (0.1%)', expr: 'abs(sum_blood_volume__q_mod_sum[-1] - 2.3e-5) <= 2.3e-8'}
-  notes: Sums the volumes q of the vessels connected to it (volume_port, multi_port sum); used to track total blood volume.
-    Tested with two independent BG arterial_simple pv vessels, each between a constant pressure inlet and a constant flow
-    outlet, so their volumes change in time. The summed volume is created by libcuflynx in a generated component (sum_blood_volume.q_mod_sum),
-    not as mod/q.
-  validation:
-    baseline: {status: not_applicable, reason: bookkeeping component (sum of volumes); verified exactly.}
-    calibrate: {status: not_applicable, reason: bookkeeping component; nothing to calibrate.}
-  bc_sweep:
-    exclude: [q]
-    rationale: 'Nothing of the component to sweep: q is supplied by the connected vessels (the sum is formed by libcuflynx).
-      The harness vessels have different pressures and outflows so the summed volumes differ and change in time.'
-- vessel_type: volume_sum_2
-  BC_type: nn
-  module_type: volume_sum_2
-  outputs: [q_sum, va/q, vb/q, va/v, vb/v, flow_out_a/v, flow_out_b/v]
-  harness:
-    vessel_array:
-    - [p_in_a, nn_constant, inlet_pressure, '', va]
-    - [va, pv, arterial_simple, p_in_a, flow_out_a mod]
-    - [flow_out_a, nn_constant, outlet_flow, va, '']
-    - [p_in_b, nn_constant, inlet_pressure, '', vb]
-    - [vb, pv, arterial_simple, p_in_b, flow_out_b mod]
-    - [flow_out_b, nn_constant, outlet_flow, vb, '']
-    - [mod, nn, volume_sum_2, va vb, '']
-    parameters:
-    - [P_p_in_a, J_per_m3, 2000, harness test value]
-    - [v_flow_out_a, m3_per_s, 0.0001, harness test value]
-    - [R_va, Js_per_m6, 10000000.0, harness test value]
-    - [C_va, m6_per_J, 1.0e-08, harness test value]
-    - [I_va, Js2_per_m6, 100000.0, harness test value]
-    - [q_0_va, m3, 0, 'harness: zero unstressed volume']
-    - [u_0_va, J_per_m3, 0, 'harness: zero reference pressure']
-    - [u_ext_va, J_per_m3, 0, 'harness: zero external pressure']
-    - [P_p_in_b, J_per_m3, 1500, harness test value]
-    - [v_flow_out_b, m3_per_s, 2.0e-05, harness test value]
-    - [R_vb, Js_per_m6, 10000000.0, harness test value]
-    - [C_vb, m6_per_J, 1.0e-08, harness test value]
-    - [I_vb, Js2_per_m6, 100000.0, harness test value]
-    - [q_0_vb, m3, 0, 'harness: zero unstressed volume']
-    - [u_0_vb, J_per_m3, 0, 'harness: zero reference pressure']
-    - [u_ext_vb, J_per_m3, 0, 'harness: zero external pressure']
-  invariants:
-  - {description: 'the output is exactly the sum of the connected vessels'' volumes, Σq = q_va + q_vb', expr: 'np.max(np.abs(q_sum
-      - (va__q + vb__q))) <= 1e-12*max(1e-30, np.max(np.abs(q_sum)))'}
-  - {description: 'volume balance: Σq(t) − Σq(0) = ∫(inflows − outflows) dt over both vessels (trapezoidal, < 1e-3 of max
-      Σq)', expr: 'np.max(np.abs((q_sum - q_sum[0]) - np.concatenate(([0.0], np.cumsum(0.5*((va__v + vb__v - flow_out_a__v
-      - flow_out_b__v)[1:] + (va__v + vb__v - flow_out_a__v - flow_out_b__v)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(q_sum))'}
-  - {description: 'steady state: Σq → C_a (P_in,a − R v_out,a) + C_b (P_in,b − R v_out,b) = 1e-8 (2000 − 1000) + 1e-8 (1500
-      − 200) = 2.3e-5 m^3 (0.1%)', expr: 'abs(q_sum[-1] - 2.3e-5) <= 2.3e-8'}
-  notes: Like volume_sum, but also exposes the summed volume q_sum on an exit volume_port so another component can use it
-    (q_sum = Σq). Tested with the same two-vessel harness as volume_sum; q is set by the connections (its csv value is only
-    used when nothing is connected).
+  notes: Sums the volumes q of the vessels connected to it (entrance volume_port, multi_port sum); used to track total blood
+    volume. The total is also an output, q_sum = Σq, on an optional exit volume_port so another component can use it (this
+    replaces the former volume_sum_2, folded in 2026-09-29; q stays a variable, so it needs no parameters-file value). Tested
+    with two independent BG arterial_simple pv vessels, each between a constant pressure inlet and a constant flow outlet,
+    so their volumes change in time. libcuflynx forms the sum in a generated component (sum_blood_volume.q_mod_sum).
   validation:
     baseline: {status: not_applicable, reason: bookkeeping component (sum of volumes); verified exactly.}
     calibrate: {status: not_applicable, reason: bookkeeping component; nothing to calibrate.}
@@ -270,3 +225,5 @@ components:
   validation:
     baseline: {status: not_applicable, reason: bookkeeping component; verified exactly.}
     calibrate: {status: not_applicable, reason: bookkeeping component; nothing to calibrate.}
+  expected_failures: {cuflynx_simulate_test: 'placeholder with no equations (it only holds q_sum for a C++ 1D model), so CUFLynx
+      has nothing to simulate and returns no outputs'}

@@ -176,28 +176,6 @@
         }
       ],
       "exit_ports":
-      [],
-      "general_ports":[],
-      "variables_and_units":
-      [
-        ["q", "m3", "access", "variable"]
-      ]
-    },
-    {
-      "vessel_type":"volume_sum_2",
-      "BC_type":"nn",
-      "module_format":"cellml",
-      "module_file": "coupling_modules.cellml",
-      "module_type":"volume_sum_2",
-      "entrance_ports":
-      [
-        {
-          "port_type":"volume_port",
-          "variables":["q"],
-          "multi_port":"sum"
-        }
-      ],
-      "exit_ports":
       [
         {
           "port_type":"volume_port",
@@ -207,7 +185,7 @@
       "general_ports":[],
       "variables_and_units":
       [
-        ["q", "m3", "access", "boundary_condition"],
+        ["q", "m3", "access", "variable"],
         ["q_sum", "m3", "access", "variable"]
       ]
     },
