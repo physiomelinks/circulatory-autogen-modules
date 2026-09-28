@@ -1,7 +1,7 @@
 vessel_type,BC_type,variable_name,units,value,kind,data_reference,sourced
-coupler,pv_0D_1D,I,Js2_per_m6,TODO,constant,TODO,no
-imposter_1D,nn,P_t_star,J_per_m3,TODO,constant,TODO,no
-imposter_1D,nn,A_star,m3,TODO,constant,TODO,no
-volume_sum_2,nn,q,m3,TODO,boundary_condition,TODO,no
-FV1D_volume_sum,nn,q_sum,m3,TODO,boundary_condition,TODO,no
-global,,rho,Js2_per_m5,TODO,global_constant,TODO,no
+coupler,pv_0D_1D,I,Js2_per_m6,100000.0,constant,"unreferenced_placeholder; lumped interface inertance rho l / (pi r^2) for l ~ 5 cm, r ~ 1.25 cm (1050 x 0.05 / 4.9e-4 = 1.07e5 Pa s^2 m^-6); order-of-magnitude only",no
+imposter_1D,nn,P_t_star,J_per_m3,1000,constant,circulatory_autogen; test value from the 0D_1D_coupling_test example (1000 Pa); in use P_t* comes from the 1D model,no
+imposter_1D,nn,A_star,m2,0.001,constant,"circulatory_autogen; test value from the 0D_1D_coupling_test example (1e-3 m^2 = 10 cm^2); in use A* comes from the 1D model",no
+volume_sum_2,nn,q,m3,0,boundary_condition,definitional; the connected vessels supply q; 0 (empty) when nothing is connected,yes
+FV1D_volume_sum,nn,q_sum,m3,0.0005,boundary_condition,"unreferenced_placeholder; placeholder total 1D-network volume (order of 5e-4 m^3 = 0.5 L for the large arteries), only so the component can be run",no
+global,,rho,Js2_per_m5,1050,global_constant,"Trudnowski1974; whole-blood specific gravity 1.0506 at 37 C (n = 25), i.e. 1050.6 kg/m^3 (abstract values read via a search rendering; full text not read). circulatory_autogens 0D_1D_coupling_test used 1040",yes

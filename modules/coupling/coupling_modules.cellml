@@ -7,13 +7,13 @@
         <variable name="I" public_interface="in" units="Js2_per_m6"/>
         <!-- Inputs-->
         <variable name="P_t_star" public_interface="in" units="J_per_m3"/>
-        <variable name="A_star" public_interface="in" units="m3"/>
+        <variable name="A_star" public_interface="in" units="m2"/>
         <variable name="P_s_0D" public_interface="in" units="J_per_m3"/>
         <!-- Latent variables-->
         <variable name="P_s_star" public_interface="out" units="J_per_m3"/>
         <variable initial_value="0.0" name="q_star" public_interface="out" units="m3_per_s"/>
-        <!-- Outputs-->
-        <variable initial_value="0.0" name="flux" public_interface="out" units="m3_per_s"/>
+        <!-- Outputs: flux is the mass accumulated through the interface, flux = integral of rho q* dt -->
+        <variable initial_value="0.0" name="flux" public_interface="out" units="kg"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -50,8 +50,8 @@
                     <divide/>
                     <apply>
                         <minus/>
-                        <ci>P_s_star</ci>
                         <ci>P_s_0D</ci>
+                        <ci>P_s_star</ci>
                     </apply>
                     <ci>I</ci>
                 </apply>
@@ -77,8 +77,8 @@
         <variable name="t" public_interface="in" units="second"/>
         <!-- Inputs-->
         <variable name="P_t_star" private_interface="in" public_interface="out" units="J_per_m3"/>
-        <variable name="A_star" private_interface="in" public_interface="out" units="m3"/>
-        <variable name="flux" public_interface="in" units="m3_per_s"/>
+        <variable name="A_star" private_interface="in" public_interface="out" units="m2"/>
+        <variable name="flux" public_interface="in" units="kg"/>
     </component>
     <component name="volume_sum">
         <variable name="t" public_interface="in" units="second"/>

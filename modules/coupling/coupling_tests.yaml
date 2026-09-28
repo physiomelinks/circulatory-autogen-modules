@@ -1,6 +1,8 @@
 module: coupling
-reviewed: false
-known_issues: []
+reviewed: true
+known_issues: ['FV1D_volume_sum: its volume_ports list no variables, so it can''t be connected from CellML and only holds
+    q_sum.', 'circulatory_autogen''s 0D_1D_coupling_test network names a vessel 0D_vessel, not a valid CellML name (starts
+    with a digit); the harness here uses vessel0d.']
 defaults:
   sim_time: 2.0
   pre_time: 0.0
@@ -38,8 +40,7 @@ components:
     - [u_0_vessel0d, J_per_m3, 0, 'harness: zero reference pressure']
     - [u_ext_vessel0d, J_per_m3, 0, 'harness: zero external pressure']
     - [P_t_star_imposter1d, J_per_m3, 1000, harness test value (circulatory_autogen 0D_1D_coupling_test)]
-    - [A_star_imposter1d, m3, 0.001, 'harness test value (circulatory_autogen 0D_1D_coupling_test); an area of 10 cm^2 (declared
-        m3, see review)']
+    - [A_star_imposter1d, m2, 0.001, 'harness test value (circulatory_autogen 0D_1D_coupling_test); an area of 10 cm^2']
   invariants:
   - {description: 'static pressure at the interface is total minus dynamic pressure, P_s* = P_t* − ½ρ(q*/A*)²', expr: 'np.max(np.abs(P_s_star
       - (imposter1d__P_t_star - 0.5*rho*(q_star/imposter1d__A_star)**2))) <= 1e-9*max(1.0, np.max(np.abs(imposter1d__P_t_star)))'}
@@ -63,38 +64,17 @@ components:
       below ~1e4 the coupler becomes stiff relative to the harness dynamics. rho spans the usual whole-blood density range
       1040-1060 kg m^-3.
   timestep: {t_end: 2.0}
-  notes: '0D-1D coupler: receives the 0D vessel''s static pressure P_s_0D and returns the interface flow q*, receives the
-    1D side''s total pressure P_t* and area A* and returns the accumulated flux. Static pressure at the interface P_s* = P_t*
-    − ½ρ(q*/A*)² (Bernoulli), interface flow driven through a lumped inertance I, and flux = ∫ρq* dt (a mass). Tested in a
-    harness: constant pressure inlet (2000 Pa) → BG arterial_simple pv vessel (R 1e7, C 1e-8, I 1e5) → coupler → imposter_1D
-    (constant P_t* = 1000 Pa, A* = 1e-3). With the momentum equation written as in the CellML (dq*/dt = (P_s* − P_s_0D)/I)
-    the loop is unstable; the correct behaviour (analytic steady state) is encoded in the invariants. The harness R and I
-    differ from circulatory_autogen''s 0D_1D_coupling_test (R 1e8, I 1e-6, which is 1e-14 s L/R and too stiff for the fixed-step
-    test).'
-  reference_proposals:
-    I: {reference: 'unreferenced_placeholder; lumped interface inertance rho l / (pi r^2) for l ~ 5 cm, r ~ 1.25 cm (1050
-        x 0.05 / 4.9e-4 = 1.07e5 Pa s^2 m^-6); order-of-magnitude only', sourced: 'no', value: 100000.0}
-    rho: {reference: 'Trudnowski1974; whole-blood specific gravity 1.0506 at 37 C (n = 25), i.e. 1050.6 kg/m^3 (abstract values
-        read via a search rendering; full text not read). circulatory_autogens 0D_1D_coupling_test used 1040', sourced: 'yes',
-      value: 1050}
+  notes: '0D-1D coupler: receives the 0D vessel''s static pressure P_s_0D and returns the interface flow q*; receives the
+    1D side''s total pressure P_t* and area A* (m2) and returns flux, the mass accumulated through the interface (kg). Static
+    pressure at the interface P_s* = P_t* − ½ρ(q*/A*)² (Bernoulli); flow driven through a lumped interface inertance I: dq*/dt
+    = (P_s_0D − P_s*)/I; flux = ∫ρq* dt. Reviewed 2026-09-29: momentum sign fixed (was (P_s* − P_s_0D)/I, which diverges),
+    A_star declared in m2 (was m3) and flux in kg (was m3_per_s). Tested in a harness: constant pressure inlet (2000 Pa) →
+    BG arterial_simple pv vessel (R 1e7, C 1e-8, I 1e5) → coupler → imposter_1D (P_t* = 1000 Pa, A* = 1e-3 m2); R and I differ
+    from circulatory_autogen''s 0D_1D_coupling_test (R 1e8, I 1e-6: L/R = 1e-14 s, too stiff for the fixed-step test).'
   validation:
     baseline: {status: not_applicable, reason: numerical interface between a 0D and a 1D model with no physiological counterpart
         of its own; verified against the analytic steady state of the harness. Validation belongs to a coupled 0D-1D model.}
     calibrate: {status: not_applicable, reason: numerical interface component; nothing to calibrate against data on its own.}
-  expected_failures: {verification_test_invariants: 'Known issue (momentum-equation sign). Simulated as written the coupler
-      loop diverges: with the harness (P_in 2000 Pa, R 1e7, C 1e-8, I 1e5; P_t* 1000 Pa, A* 1e-3) q* reaches 1.9e-2 m^3/s
-      and P_s* −1.9e5 Pa at t = 2 s (circulatory_autogens own test network: P_s* → −1.9e7 Pa after 10 s), because dq*/dt =
-      (P_s* − P_s_0D)/I accelerates flow towards the higher pressure. In a patched copy with dq*/dt = (P_s_0D − P_s*)/I (and
-      A* in m2) all coupler tests pass: q* = 1.00502e-4 m^3/s, P_s* = 994.70 Pa, matching the analytic steady state R q =
-      ΔP + ½ρ(q/A)² (analytic root 1.00531e-4 m^3/s and P_s* = 994.69 Pa with the dynamic-pressure term, 1e-4 without; 0.03%
-      apart at t = 2 s); CAs network gives q* = 1.00005e-5, P_s* = 999.95 Pa vs analytic 1e-5.', verification_test_BC: 'Known
-      issue (momentum-equation sign): every sweep run diverges and violates the steady-state invariants. Simulated as written
-      the coupler loop diverges: with the harness (P_in 2000 Pa, R 1e7, C 1e-8, I 1e5; P_t* 1000 Pa, A* 1e-3) q* reaches 1.9e-2
-      m^3/s and P_s* −1.9e5 Pa at t = 2 s (circulatory_autogens own test network: P_s* → −1.9e7 Pa after 10 s), because dq*/dt
-      = (P_s* − P_s_0D)/I accelerates flow towards the higher pressure. In a patched copy with dq*/dt = (P_s_0D − P_s*)/I
-      (and A* in m2) all coupler tests pass: q* = 1.00502e-4 m^3/s, P_s* = 994.70 Pa, matching the analytic steady state R
-      q = ΔP + ½ρ(q/A)² (analytic root 1.00531e-4 m^3/s and P_s* = 994.69 Pa with the dynamic-pressure term, 1e-4 without;
-      0.03% apart at t = 2 s); CAs network gives q* = 1.00005e-5, P_s* = 999.95 Pa vs analytic 1e-5.'}
 - vessel_type: imposter_1D
   BC_type: nn
   module_type: imposter_1D
@@ -134,19 +114,9 @@ components:
       harness, not the imposter.
   notes: 'Stand-in for a 1D model at a 0D-1D interface: exposes a constant total pressure P_t* and area A* and receives the
     accumulated flux. Tested as the downstream end of the coupler harness.'
-  reference_proposals:
-    P_t_star: {reference: circulatory_autogen; test value from the 0D_1D_coupling_test example (1000 Pa); in use P_t* comes
-        from the 1D model, sourced: 'no', value: 1000}
-    A_star: {reference: 'circulatory_autogen; test value from the 0D_1D_coupling_test example (1e-3 = an area of 10 cm^2,
-        declared in m3; see proposed fix); in use A* comes from the 1D model', sourced: 'no', value: 0.001}
   validation:
     baseline: {status: not_applicable, reason: test fixture (stand-in for a 1D model) with no physiological counterpart.}
     calibrate: {status: not_applicable, reason: test fixture with no physiological counterpart.}
-  expected_failures: {verification_test_invariants: 'Not an imposter defect: its harness contains the coupler, whose momentum-equation
-      sign makes the loop diverge, so the coupler never reaches the steady state set by the imposters P_t*, A*. Passes in
-      the patched copy (coupler sign fixed).', verification_test_BC: 'Not an imposter defect: the coupler in its harness diverges
-      (momentum-equation sign; CVODE also fails on some runs). In the patched copy all 8 runs pass for P_t* 0-1500 Pa and
-      A* 4-10 cm^2.'}
 - vessel_type: FV1D_vessel
   BC_type: vp
   module_type: Muller_1d
@@ -278,9 +248,6 @@ components:
   notes: Like volume_sum, but also exposes the summed volume q_sum on an exit volume_port so another component can use it
     (q_sum = Σq). Tested with the same two-vessel harness as volume_sum; q is set by the connections (its csv value is only
     used when nothing is connected).
-  reference_proposals:
-    q: {reference: definitional; the connected vessels supply q; 0 (empty) when nothing is connected, sourced: definitional,
-      value: 0}
   validation:
     baseline: {status: not_applicable, reason: bookkeeping component (sum of volumes); verified exactly.}
     calibrate: {status: not_applicable, reason: bookkeeping component; nothing to calibrate.}
@@ -296,9 +263,6 @@ components:
   - {description: 'unconnected, q_sum is the constant boundary value it is given', expr: np.ptp(q_sum) == 0}
   notes: Placeholder that receives the total volume q_sum of a 1D (C++ finite-volume) model; the volume_port has no variables
     in the config, so it cannot be connected from CellML and has no equations. Alone it only holds q_sum.
-  reference_proposals:
-    q_sum: {reference: 'unreferenced_placeholder; placeholder total 1D-network volume (order of 5e-4 m^3 = 0.5 L for the large
-        arteries), only so the component can be run', sourced: 'no', value: 0.0005}
   bc_sweep:
     ranges:
       q_sum: {min: 0.0, max: 0.005, points: 3}
@@ -306,46 +270,3 @@ components:
   validation:
     baseline: {status: not_applicable, reason: bookkeeping component; verified exactly.}
     calibrate: {status: not_applicable, reason: bookkeeping component; nothing to calibrate.}
-review:
-  comment: 'coupler: the momentum equation dq*/dt = (P_s* − P_s_0D)/I has the wrong sign (the loop diverges; fixed sign converges
-    to the analytic steady state). A_star is declared in m3 but is an area (P_s* = P_t* − ½ρ(q/A)² needs m2), and d(flux)/dt
-    = ρ q* makes flux a mass (kg), not m3_per_s. The interface inertance I has no source (order-of-magnitude ρl/A proposed).
-    FV1D (C++) components are untestable here and FV1D_volume_sum has empty ports.'
-  summary: '0D-1D coupling helpers: the pv_0D_1D coupler (Bernoulli static/total pressure conversion plus a lumped interface
-    inertance), the imposter_1D stand-in for a 1D model, volume sums, and four C++ FV1D vessel entries (skipped). Harness
-    networks built for the coupler/imposter (pressure inlet → BG arterial_simple pv → coupler → imposter_1D, non-stiff R 1e7/C
-    1e-8/I 1e5) and for volume_sum/volume_sum_2 (two independent pressure-inlet → vessel → flow-outlet chains summed). Invariants
-    encode the correct behaviour: Bernoulli identity, flux = ∫ρq* dt, analytic steady state (closed-form root), momentum balance;
-    exact sums, volume balance and analytic steady-state volume for the sums. volume sums and FV1D_volume_sum pass everything;
-    coupler/imposter invariant and sweep tests fail because of the coupler sign bug (recorded as expected failures; a patched
-    copy passes all tests).'
-  questions: ['Approve the coupler momentum-sign fix (dq*/dt = (P_s_0D − P_s*)/I)? Evidence in expected_failures: diverges
-      as written; the patched copy passes run/invariants/sweep/timestep/stability and matches the analytic steady state.',
-    'Approve changing A_star to m2 (coupler, imposter_1D config, CellML and units file)? The imposter/test A_star value 1e-3
-      would then be 10 cm^2.', 'flux: d(flux)/dt = ρ q* accumulates mass (kg) but is declared m3_per_s. Is flux meant to be
-      the mass flow rate ρ q* (algebraic, kg/s), the accumulated mass (kg), or the accumulated volume ∫q* dt (m3)? What does
-      the 1D solver read from it?', 'Coupler I (TODO): proposed 1e5 Pa s^2 m^-6 as an order-of-magnitude placeholder (ρ l/A
-      for a 5 cm, r 1.25 cm segment). Is I meant to be the inertance of half the first 1D cell, or of the 0D vessel? A formula-based
-      value would be better than a constant.', 'rho (global, TODO): proposed 1050 kg/m^3 (Trudnowski1974, 1050.6 at 37 C).
-      OK? (CA test used 1040; vessel_properties proposes the same 1050.)', 'The CA test network 0D_1D_coupling_test names
-      a vessel 0D_vessel, which is not a valid CellML name (cannot start with a digit); the harness here uses vessel0d. Rename
-      it in circulatory_autogens resources?', 'The harness uses R 1e7 / I 1e5 instead of CAs R 1e8 / I 1e-6 (I/R = 1e-14 s
-      is too stiff for the fixed-step RK4 test). OK?', 'FV1D_volume_sum has volume_ports with no variables, so it cannot be
-      connected from CellML and only stores q_sum; is it still used (placeholder q_sum proposed 5e-4 m^3)?', 'volume_sum_2:
-      its q (boundary_condition) needs a csv value even though it is always connected; proposed 0 (definitional).']
-  proposed_fixes: ['coupler (pv_0D_1D_coupler_type): momentum equation sign — change dq*/dt = (P_s* − P_s_0D)/I to dq*/dt
-      = (P_s_0D − P_s*)/I (flow from the 0D vessel towards the 1D interface accelerates when the 0D static pressure is higher).
-      Evidence: see coupler expected_failures; patched copy passes all tests.', 'coupler and imposter_1D: declare A_star in
-      m2 (CellML variables, config variables_and_units, coupling_parameters.csv units) and add <units name="m2"> to coupling_units.cellml.
-      Needed for P_s* = P_t* − ½ρ(q*/A*)² to be dimensionally a pressure (the patched copy uses this).', 'coupler: make flux
-      dimensionally consistent — either declare it in kg (accumulated mass, d(flux)/dt = ρ q*) or change the equation to match
-      m3_per_s (e.g. flux = q*, or d(flux)/dt = q* with units m3). Needs the owners intent.']
-  findings: ['Connected inputs are not addressable as mod/<var> in the generated model (they are mapped onto the source component),
-      so outputs refer to neighbours: P_s_0D is vessel0d/u, P_t*/A* are imposter1d/..., and the volume_sum total is libcuflynxs
-      generated sum_blood_volume/q_mod_sum.', 'With the sign fixed, the harness loop is well posed only while the Bernoulli
-      term is small: for A* <= ~2-3 cm^2 at ΔP = 1000 Pa the start-up transient reaches the second, unstable root of R q −
-      ½ρ(q/A)² = ΔP and the simulation fails.', 'FV1D_vessel (C++, 4 entries) are skipped; FV1D_volume_sum only stores its
-      q_sum (no equations, empty ports).', 'The coupler timestep and stability tests pass even as written: the divergence
-      is a smooth exponential, reproduced consistently by RK4 and CVODE.', 'Risk (512 Sobol samples): coupler P(fail) = 1.0
-      and imposter_1D 0.94 (the coupler sign bug; imposter failures concentrate at small A* and high P_t*); FV1D_volume_sum
-      0; volume sums have no parameters to sample.']
