@@ -1,0 +1,15 @@
+name,BC_type,vessel_type,inp_vessels,out_vessels
+pvn,vp,venous,par,la
+par,vp,arterial_simple,puv,pvn
+aortic_root,vv,arterial_simple,aov,systemic_T
+systemic_T,pp,terminal,aortic_root,venous_svc
+venous_svc,vp,venous,systemic_T,ra
+heart_clock,nn,cardiac_clock,,ra rv la lv
+ra,vv,chamber,venous_svc heart_clock,trv
+rv,vv,chamber,trv heart_clock,puv
+la,vv,chamber,pvn heart_clock,miv
+lv,vv,chamber,miv heart_clock,aov
+trv,pp,valve,ra,rv
+puv,pp,valve,rv,par
+miv,pp,valve,la,lv
+aov,pp,valve,lv,aortic_root

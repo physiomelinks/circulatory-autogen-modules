@@ -1,0 +1,100 @@
+model: FinalModel
+category: closed_loop_cvs
+reviewed: false
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+equivalence:
+  reference: reference
+  output_map: {heart/u_ra: ra/u, heart/u_rv: rv/u, heart/u_la: la/u, heart/u_lv: lv/u, heart/q_ra: ra/q, heart/q_rv: rv/q,
+    heart/q_la: la/q, heart/q_lv: lv/q, heart/v_trv: trv/v, heart/v_puv: puv/v, heart/v_miv: miv/v, heart/v_aov: aov/v, heart/zeta_trv: trv/zeta,
+    heart/zeta_puv: puv/zeta, heart/zeta_miv: miv/zeta, heart/zeta_aov: aov/zeta, heart/zeta_trv_pre: trv/zeta_pre, heart/zeta_puv_pre: puv/zeta_pre,
+    heart/zeta_miv_pre: miv/zeta_pre, heart/zeta_aov_pre: aov/zeta_pre, heart/e_a: ra/e, heart/e_v: lv/e, heart/s: heart_clock/s,
+    heart/mt: heart_clock/mt, heart/chi_a: ra/chi, heart/chi_v: lv/chi, heart/v_asd: asd_shunt/v, heart/T_wCont: heart_clock/T_eff,
+    heart/chi_afloor: ra/chi_floor, heart/chi_vfloor: lv/chi_floor, heart/chi_afloor_final: ra/chi_floor_final, heart/chi_vfloor_final: lv/chi_floor_final,
+    heart/R_lin_trv: trv/R_lin, heart/R_lin_puv: puv/R_lin, heart/R_lin_miv: miv/R_lin, heart/R_lin_aov: aov/R_lin, heart/vel_trv: trv/vel,
+    heart/vel_puv: puv/vel, heart/vel_miv: miv/vel, heart/vel_aov: aov/vel, heart/E_lv_A_wCont: lv/E_A_eff, heart/E_rv_A_wCont: rv/E_A_eff,
+    heart/A_eff_trv: trv/A_eff, heart/B_trv: trv/B, heart/L_trv: trv/L, heart/A_eff_puv: puv/A_eff, heart/B_puv: puv/B, heart/L_puv: puv/L,
+    heart/A_eff_miv: miv/A_eff, heart/B_miv: miv/B, heart/L_miv: miv/L, heart/A_eff_aov: aov/A_eff, heart/B_aov: aov/B, heart/L_aov: aov/L,
+    heart/T_ac_wCont: ra/T_c_eff, heart/T_ar_wCont: ra/T_r_eff, heart/T_vc_wCont: lv/T_c_eff, heart/T_vr_wCont: lv/T_r_eff}
+  ignore: {heart/q_heart: sum of the four chambers (no single variable after the split), ascending_aorta_C0/t: time, aortic_arch_C2/t: time,
+    brachiocephalic_trunk_C4/t: time, aortic_arch_C46/t: time, aortic_arch_C64/t: time, aortic_arch_C94/t: time, thoracic_aorta_C96/t: time,
+    thoracic_aorta_C100/t: time, thoracic_aorta_C104/t: time, thoracic_aorta_C108/t: time, thoracic_aorta_C112/t: time, abdominal_aorta_C114/t: time,
+    abdominal_aorta_C136/t: time, abdominal_aorta_C164/t: time, abdominal_aorta_C176/t: time, abdominal_aorta_C188/t: time,
+    abdominal_aorta_C192/t: time, posterior_intercostal_T1_R98_T/t: time, posterior_intercostal_T1_L102_T/t: time, posterior_intercostal_T2_R106_T/t: time,
+    posterior_intercostal_T2_L110_T/t: time, celiac_trunk_C116/t: time, splenic_T2_C118/t: time, left_gastric_T3_C120_T/t: time,
+    splenic_T2_C122/t: time, dorsal_pancreatic_T1_C124_T/t: time, splenic_T2_C126_T/t: time, common_hepatic_C128/t: time,
+    hepatic_artery_proper_C130/t: time, hepatic_artery_proper_left_branch_C132_T/t: time, hepatic_artery_proper_right_branch_C134_T/t: time,
+    superior_mesenteric_T4_C138/t: time, middle_colic_T8_C140_T/t: time, superior_mesenteric_T4_C142/t: time, jejunal_3_T10_C144_T/t: time,
+    superior_mesenteric_T4_C146/t: time, jejunal_6_T11_C148_T/t: time, superior_mesenteric_T4_C150/t: time, ileocolic_T9_C152_T/t: time,
+    superior_mesenteric_T4_C154/t: time, ileal_4_T12_C156_T/t: time, superior_mesenteric_T4_C158/t: time, ileal_6_T13_C160_T/t: time,
+    superior_mesenteric_T4_C162_T/t: time, renal_L166/t: time, renal_anterior_branch_L168/t: time, inferior_segmental_T5_L170_T/t: time,
+    superior_segmental_T4_L172_T/t: time, renal_posterior_branch_T3_L174_T/t: time, renal_R178/t: time, renal_anterior_branch_R180/t: time,
+    superior_segmental_T4_R182_T/t: time, inferior_segmental_T5_R184_T/t: time, renal_posterior_branch_T3_R186_T/t: time,
+    inferior_mesenteric_T5_C190_T/t: time, subclavian_R28/t: time, subclavian_R30/t: time, axillary_R32/t: time, brachial_R34/t: time,
+    ulnar_T2_R36/t: time, common_interosseous_R38/t: time, posterior_interosseous_T3_R40_T/t: time, ulnar_T2_R42_T/t: time,
+    radial_T1_R44_T/t: time, subclavian_L66/t: time, subclavian_L78/t: time, axillary_L80/t: time, brachial_L82/t: time, ulnar_T2_L84/t: time,
+    common_interosseous_L86/t: time, posterior_interosseous_T3_L88_T/t: time, ulnar_T2_L90_T/t: time, radial_T1_L92_T/t: time,
+    common_carotid_R6/t: time, internal_carotid_R8/t: time, external_carotid_T2_R26_T/t: time, common_carotid_L48/t: time,
+    internal_carotid_L50/t: time, external_carotid_T2_L62_T/t: time, anterior_cerebral_L110/t: time, anterior_cerebral_L38/t: time,
+    anterior_cerebral_L42/t: time, anterior_cerebral_R234/t: time, anterior_cerebral_R238/t: time, anterior_cerebral_R46/t: time,
+    anterior_communicating_C44/t: time, basilar_C4/t: time, callosomarginal_L172/t: time, callosomarginal_L176/t: time, callosomarginal_L180/t: time,
+    callosomarginal_L184/t: time, callosomarginal_R240/t: time, callosomarginal_R244/t: time, callosomarginal_R248/t: time,
+    callosomarginal_R252/t: time, internal_carotid_L112/t: time, internal_carotid_R48/t: time, medial_occipital_dorsal_branch_to_corpus_callosum_L28/t: time,
+    medial_occipital_dorsal_branch_to_corpus_callosum_R224/t: time, medial_occipital_L188/t: time, medial_occipital_L192/t: time,
+    medial_occipital_L200/t: time, medial_occipital_L26/t: time, medial_occipital_R222/t: time, medial_occipital_R256/t: time,
+    medial_occipital_R260/t: time, medial_occipital_R268/t: time, middle_cerebral_inferior_terminal_branch_L136/t: time, middle_cerebral_inferior_terminal_branch_L140/t: time,
+    middle_cerebral_inferior_terminal_branch_L144/t: time, middle_cerebral_inferior_terminal_branch_L148/t: time, middle_cerebral_inferior_terminal_branch_L152/t: time,
+    middle_cerebral_inferior_terminal_branch_L160/t: time, middle_cerebral_inferior_terminal_branch_L164/t: time, middle_cerebral_inferior_terminal_branch_R102/t: time,
+    middle_cerebral_inferior_terminal_branch_R74/t: time, middle_cerebral_inferior_terminal_branch_R78/t: time, middle_cerebral_inferior_terminal_branch_R82/t: time,
+    middle_cerebral_inferior_terminal_branch_R86/t: time, middle_cerebral_inferior_terminal_branch_R90/t: time, middle_cerebral_inferior_terminal_branch_R98/t: time,
+    middle_cerebral_L114/t: time, middle_cerebral_L118/t: time, middle_cerebral_R52/t: time, middle_cerebral_R56/t: time,
+    middle_cerebral_superior_terminal_branch_L120/t: time, middle_cerebral_superior_terminal_branch_L124/t: time, middle_cerebral_superior_terminal_branch_L128/t: time,
+    middle_cerebral_superior_terminal_branch_R58/t: time, middle_cerebral_superior_terminal_branch_R62/t: time, middle_cerebral_superior_terminal_branch_R66/t: time,
+    occipital_lateral_L14/t: time, occipital_lateral_L18/t: time, occipital_lateral_L22/t: time, occipital_lateral_R210/t: time,
+    occipital_lateral_R214/t: time, occipital_lateral_R218/t: time, pericallosal_L32/t: time, pericallosal_L36/t: time, pericallosal_R228/t: time,
+    pericallosal_R232/t: time, posterior_cerebral_postcommunicating_part_L12/t: time, posterior_cerebral_postcommunicating_part_R208/t: time,
+    posterior_cerebral_precommunicating_part_L6/t: time, posterior_cerebral_precommunicating_part_R204/t: time, posterior_communicating_L8/t: time,
+    posterior_communicating_R206/t: time, vertebral_L2/t: time, vertebral_R272/t: time, artery_of_precentral_sulcus_T103_R68/t: time,
+    artery_of_precentral_sulcus_T38_L130/t: time, medial_occipital_parieto_occipital_branch_T118_R262/t: time, medial_occipital_parieto_occipital_branch_T54_L194/t: time,
+    middle_cerebral_branch_to_angular_gyrus_T120_R104/t: time, middle_cerebral_branch_to_angular_gyrus_T56_L166/t: time, middle_cerebral_posterior_temporal_branch_T122_R92/t: time,
+    middle_cerebral_posterior_temporal_branch_T58_L154/t: time, lateral_occipital_intermediate_temporal_branch_T47_L20_T/t: time,
+    lateral_occipital_intermediate_temporal_branch_T76_R216_T/t: time, medial_occipital_calcarine_branch_T51_L202_T/t: time,
+    medial_occipital_calcarine_branch_T79_R270_T/t: time, medial_occipital_occipitotemporal_branch_T52_L190_T/t: time, medial_occipital_occipitotemporal_branch_T80_R258_T/t: time,
+    medial_occipital_parietal_branch_T53_L196_T/t: time, medial_occipital_parietal_branch_T81_R264_T/t: time, anterior_choroidal_T34_L116_T/t: time,
+    anterior_choroidal_T98_R54_T/t: time, anterior_parietal_T100_R100_T/t: time, anterior_parietal_T35_L162_T/t: time, artery_of_central_sulcus_T101_R70_T/t: time,
+    artery_of_central_sulcus_T36_L132_T/t: time, artery_of_postcentral_sulcus_T102_R88_T/t: time, artery_of_postcentral_sulcus_T37_L150_T/t: time,
+    artery_of_precentral_sulcus_T103_R72_T/t: time, artery_of_precentral_sulcus_T38_L134_T/t: time, callosomarginal_cingular_branch_T105_R250_T/t: time,
+    callosomarginal_cingular_branch_T40_L182_T/t: time, callosomarginal_intermediomedial_frontal_branch_T106_R242_T/t: time,
+    callosomarginal_intermediomedial_frontal_branch_T41_L174_T/t: time, callosomarginal_paracentral_branch_T107_R254_T/t: time,
+    callosomarginal_paracentral_branch_T42_L186_T/t: time, callosomarginal_posteromedial_frontal_branch_T108_R246_T/t: time,
+    callosomarginal_posteromedial_frontal_branch_T43_L178_T/t: time, distal_medial_striate_T109_R236_T/t: time, distal_medial_striate_T44_L40_T/t: time,
+    lateral_frontobasal_T110_R60_T/t: time, lateral_frontobasal_T45_L122_T/t: time, lateral_occipital_anterior_temporal_branch_T111_R212_T/t: time,
+    lateral_occipital_anterior_temporal_branch_T46_L16_T/t: time, lateral_occipital_posterior_temporal_branch_T112_R220_T/t: time,
+    lateral_occipital_posterior_temporal_branch_T48_L24_T/t: time, medial_occipital_parieto_occipital_branch_T118_R266_T/t: time,
+    medial_occipital_parieto_occipital_branch_T54_L198_T/t: time, middle_cerebral_anterior_temporal_branch_T119_R80_T/t: time,
+    middle_cerebral_anterior_temporal_branch_T55_L142_T/t: time, middle_cerebral_branch_to_angular_gyrus_T120_R108_T/t: time,
+    middle_cerebral_branch_to_angular_gyrus_T56_L170_T/t: time, middle_cerebral_middle_temporal_branch_T121_R84_T/t: time,
+    middle_cerebral_middle_temporal_branch_T57_L146_T/t: time, middle_cerebral_posterior_temporal_branch_T122_R96_T/t: time,
+    middle_cerebral_posterior_temporal_branch_T58_L158_T/t: time, middle_cerebral_posterior_temp_occipital_branch_T123_R94_T/t: time,
+    middle_cerebral_posterior_temp_occipital_branch_T59_L156_T/t: time, pericallosal_parieto_occipital_branch_T124_R226_T/t: time,
+    pericallosal_parieto_occipital_branch_T60_L30_T/t: time, pericallosal_precuneal_branch_T125_R230_T/t: time, pericallosal_precuneal_branch_T61_L34_T/t: time,
+    polar_temporal_T127_R76_T/t: time, polar_temporal_T63_L138_T/t: time, posterior_parietal_T129_R106_T/t: time, posterior_parietal_T64_L168_T/t: time,
+    prefrontal_T130_R64_T/t: time, prefrontal_T65_L126_T/t: time, common_iliac_R216/t: time, internal_iliac_T1_R218_T/t: time,
+    external_iliac_R220/t: time, femoral_R222/t: time, profundus_T2_R224_T/t: time, femoral_R226/t: time, popliteal_R228/t: time,
+    anterior_tibial_T3_R230_T/t: time, popliteal_R232/t: time, tibiofibular_trunk_R234/t: time, posterior_tibial_T4_R236_T/t: time,
+    common_iliac_L194/t: time, internal_iliac_T1_L196_T/t: time, external_iliac_L198/t: time, femoral_L200/t: time, profundus_T2_L202_T/t: time,
+    femoral_L204/t: time, popliteal_L206/t: time, anterior_tibial_T3_L208_T/t: time, popliteal_L210/t: time, tibiofibular_trunk_L212/t: time,
+    posterior_tibial_T4_L214_T/t: time, venous_lb/t: time, venous_ub/t: time, venous_ivc/t: time, venous_svc/t: time, par/t: time,
+    pvn/t: time, heart_clock/t: time, ra/t: time, rv/t: time, la/t: time, lv/t: time, trv/t: time, puv/t: time, miv/t: time,
+    aov/t: time, ra_inflow/t: time, heart/q: sum of the four chambers (no single variable after the split)}
+  wrapped: {heart/mt: 1.0, heart/chi_afloor: 1.0, heart/chi_vfloor: 1.0, heart/chi_afloor_final: 1.0, heart/chi_vfloor_final: 1.0}
+  reciprocal: [heart/L_trv, heart/L_puv, heart/L_miv, heart/L_aov, heart/B_trv, heart/B_puv, heart/B_miv, heart/B_aov]
+  tol: 1.0e-06
+  solver_info: {rtol: 1.0e-12, atol: 1.0e-14}
+invariants: []
+notes: ['the original heart had fewer than two outputs, so circulatory_autogen added par/pvn implicitly; they are explicit
+    here']
+expected_failures: {system_run_test: 'the original doesn''t generate in circulatory_autogen either: Delta_q_us_venous_* is
+    m3 in the parameters file but dimensionless in venous vp''s config', system_equivalence_test: 'the original doesn''t generate
+    in circulatory_autogen either: Delta_q_us_venous_* is m3 in the parameters file but dimensionless in venous vp''s config'}

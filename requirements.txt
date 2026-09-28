@@ -1,4 +1,5 @@
-# libcuflynx needs the module_library_dirs / use_builtin_modules options
-# (physiomelinks/circulatory_autogen, branch feat/external-module-library, until released).
-libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/external-module-library
+# libcuflynx needs module_library_dirs / use_builtin_modules (merged, #521) and the per-variable
+# multi_port list form used by modules/cardiac flow_merge/flow_split
+# (physiomelinks/circulatory_autogen #530, branch feat/multiport-per-variable, until merged and released).
+libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/multiport-per-variable
 -e .
