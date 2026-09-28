@@ -1,0 +1,10 @@
+name,BC_type,vessel_type,inp_vessels,out_vessels
+heart_clock,nn,cardiac_clock,,ra rv la lv
+ra,vv,chamber,@systemic_venous_in heart_clock,trv @volume
+rv,vv,chamber,trv heart_clock,puv @volume
+la,vv,chamber,@pulmonary_venous_in heart_clock,miv @volume
+lv,vv,chamber,miv heart_clock,aov @volume
+trv,pp,valve,ra,rv
+puv,pp,valve,rv,@pulmonary_arterial_out
+miv,pp,valve,la,lv
+aov,pp,valve,lv,@systemic_arterial_out

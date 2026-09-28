@@ -199,7 +199,11 @@ def test_manifest_paths_exist(manifest):
     assert not missing, f'missing: {missing}'
 
 
+# not modules: system models (tests/test_systems.py) and supermodules (tests/test_supermodules.py)
+NON_MODULE_DIRS = {'template', 'system', 'supermodules'}
+
+
 def test_every_module_dir_has_spec():
-    dirs = [d for d in os.listdir(MODULES_DIR) if os.path.isdir(os.path.join(MODULES_DIR, d)) and d != 'template']
+    dirs = [d for d in os.listdir(MODULES_DIR) if os.path.isdir(os.path.join(MODULES_DIR, d)) and d not in NON_MODULE_DIRS]
     missing = [d for d in dirs if not os.path.isfile(os.path.join(MODULES_DIR, d, f'{d}_tests.yaml'))]
     assert not missing

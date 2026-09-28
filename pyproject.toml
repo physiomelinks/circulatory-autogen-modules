@@ -24,7 +24,7 @@ cam_testing = ["templates/*.html"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # The standard tests keep the names run_test, verification_test_BC, ... rather than test_*.
-python_functions = ["test_*", "run_test", "*_test_*", "stability_test", "system_*_test"]
+python_functions = ["test_*", "run_test", "*_test_*", "stability_test", "system_*_test", "supermodule_*_test"]
 markers = [
     "slow: long-running (calibration)",
     "module_vv: per-module verification & validation tests",

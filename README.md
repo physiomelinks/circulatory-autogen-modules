@@ -90,6 +90,33 @@ The results are committed in `modules/<name>/risk/` (`<component>_risk.json` and
 
 The module report shows all of this, regenerating the plots from the committed samples. The site index lists each module's highest component risk. `ranges check` also estimates the failure risk near a system model's parameter values from the stored samples. On GitHub, run the workflow manually with "risk" ticked to include it in the published reports.
 
+## System models and supermodules
+
+`modules/system/<category>/<model>/` holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into `modules/cardiac` clock, chamber and valve vessels. Each directory contains:
+- the vessel array and parameters;
+- the original under `reference/`;
+- a `<model>_system.yaml` spec.
+
+`tests/test_systems.py` checks three things for each model:
+- it runs;
+- it reproduces the original, with every logged output within 1e-6 at the spec's CVODE tolerances;
+- its invariants hold.
+
+Models whose original doesn't generate in circulatory_autogen carry `expected_failures` or `skip` with the reason. `tools/import_systems.py --ca-dir ../circulatory_autogen` re-imports them and never overwrites a spec.
+
+`modules/supermodules/<name>/` is a vessel array of library modules with named interface ports. The `heart` supermodule is the clock, four chambers and four valves, with these ports:
+- `systemic_venous_in` and `pulmonary_venous_in`;
+- `pulmonary_arterial_out` and `systemic_arterial_out`;
+- an optional `volume` port.
+
+A host vessel array uses a supermodule through one row. The host's own vessels list the instance name (`heart`) in their inp/out columns:
+
+```
+heart,supermodule,supermodule:heart,systemic_venous_in:venous_svc pulmonary_venous_in:pvn,pulmonary_arterial_out:par systemic_arterial_out:aortic_root volume:volume_sum
+```
+
+`cam_testing.supermodule.expand` flattens that row into an ordinary vessel array. libcuflynx can't load supermodules yet; later they will be usable as modules themselves. `tests/test_supermodules.py` generates each harness in `<name>_supermodule.yaml` and runs it. The heart harness must reproduce `system/closed_loop_cvs/3compartment` to 1e-9.
+
 ## Running locally
 
 libcuflynx needs SUNDIALS and MPI. On Ubuntu:
