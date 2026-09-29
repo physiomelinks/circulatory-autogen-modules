@@ -12,6 +12,11 @@ on:
         type: boolean
         default: false
 
+env:
+  # PhLynx checkout for the pipeline tests: the branch of physiomelinks/PhLynx#595 (list-form
+  # multi_port, case-insensitive multi_port) until it's merged; then main or a tag.
+  PHLYNX_REF: feat/load-module-library-configs
+
 concurrency:
   group: module-tests-${{ github.ref }}
   cancel-in-progress: true
@@ -58,6 +63,24 @@ jobs:
           target=test
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then target=test-all; fi
           if make $target PYTHON=python MODULE=${{ matrix.module }} PYTEST_ARGS=--quick-unreviewed; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: PhLynx checkout (pipeline tests)
+        uses: actions/checkout@v4
+        with: { repository: physiomelinks/PhLynx, ref: '${{ env.PHLYNX_REF }}', path: _phlynx }
+      - name: CUFLynx (latest Ubuntu release) and pipeline dependencies
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          corepack enable
+          (cd _phlynx && yarn install --immutable)
+          make pipeline-setup
+          gh release download --repo physiomelinks/CUFLynx --pattern 'CUFLynx-linux-x86_64' --dir _cuflynx
+          chmod +x _cuflynx/CUFLynx-linux-x86_64
+          gh release view --repo physiomelinks/CUFLynx --json tagName --jq .tagName
+      - name: PhLynx -> CUFLynx pipeline
+        id: pipeline
+        run: |
+          if make pipeline PYTHON=python MODULE=${{ matrix.module }} PYTEST_ARGS=--quick-unreviewed PHLYNX_DIR=$PWD/_phlynx CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
       - name: Failure-risk analysis (on request)
         if: github.event_name == 'workflow_dispatch' && inputs.risk
         run: |
@@ -79,7 +102,7 @@ jobs:
           path: _artifact/
           if-no-files-found: ignore
       - name: Fail if a reviewed module's tests failed
-        if: steps.tests.outputs.ok == 'false'
+        if: steps.tests.outputs.ok == 'false' || steps.pipeline.outputs.ok == 'false'
         run: |
           reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open('modules/${{ matrix.module }}/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
           if [ "$reviewed" = "True" ]; then echo "::error::tests failed for reviewed module ${{ matrix.module }}"; exit 1; fi

@@ -17,7 +17,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, ranges, risk
+from cam_testing import bib, checks, phlynx, ranges, risk
 from cam_testing.library import REPO_ROOT, load_module, module_names
 from cam_testing.mathml import component_equations, component_variables
 
@@ -32,10 +32,14 @@ TEST_TITLES = {
     'stability_test': 'Stability: solvers & settings',
     'validation_test_baseline': 'Validation: baseline data',
     'validation_test_calibrate': 'Validation: calibrate & predict',
+    'phlynx_export_test': 'PhLynx: build & export',
+    'cuflynx_simulate_test': 'CUFLynx: import & simulate',
+    'phlynx_equivalence_test': 'PhLynx → CUFLynx vs libcuflynx',
 }
 TEST_SHORT = {
     'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate',
+    'phlynx_export_test': 'PhLynx', 'cuflynx_simulate_test': 'CUFLynx', 'phlynx_equivalence_test': 'PhLynx≡',
 }
 TEST_ABOUT = {
     'run_test': 'Generates the component alone with libcuflynx (every boundary condition becomes a '
@@ -56,7 +60,17 @@ TEST_ABOUT = {
     'validation_test_baseline': 'Compares the model with published or experimental baseline data.',
     'validation_test_calibrate': 'Calibrates parameters to one data set with libcuflynx parameter '
                                  'identification, then checks predictions against held-out data.',
+    'phlynx_export_test': 'Builds the component\'s test network in PhLynx (its own code, loaded with this '
+                          'library\'s modules and parameters), checks every connection was made, and exports '
+                          'the .omex PhLynx sends to CUFLynx.',
+    'cuflynx_simulate_test': 'Imports that .omex into a released CUFLynx through its API and simulates it; '
+                             'every output must be finite.',
+    'phlynx_equivalence_test': 'Compares CUFLynx\'s simulation of the PhLynx-built model with libcuflynx\'s '
+                               'model of the same network (outputs matched by instance and variable, '
+                               'normalised difference within 1e-6).',
 }
+# The tests shown for every component: the V&V tests, then the PhLynx -> CUFLynx pipeline
+REPORT_TESTS = checks.TESTS + phlynx.PIPELINE_TESTS
 STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
                 'not_applicable': 'N/A', None: 'Not run'}
 
@@ -121,7 +135,7 @@ def component_context(component):
 
     tests = []
     validation_spec = component.spec.get('validation') or {}
-    for test in checks.TESTS:
+    for test in REPORT_TESTS:
         r = checks.load(component, test)
         if r is None and test.startswith('validation_test_'):
             # not run (e.g. slow tests excluded): a skipped/pending spec still says why
@@ -162,7 +176,16 @@ def component_context(component):
         'todo': component.todo_parameters(), 'unsourced': component.unsourced_parameters(), 'invariants': component.spec.get('invariants') or [],
         'validation': component.spec.get('validation') or {},
         'tests': tests,
+        'phlynx_compatible': _phlynx_compatible(tests),
     }
+
+
+def _phlynx_compatible(tests):
+    '''True when PhLynx builds and exports it, CUFLynx simulates it and it matches libcuflynx; None if not run.'''
+    status = {t['key']: t['status'] for t in tests if t['key'] in phlynx.PIPELINE_TESTS}
+    if all(v is None for v in status.values()):
+        return None
+    return all(v == checks.PASSED for v in status.values())
 
 
 def _status_counts(components):
@@ -214,10 +237,18 @@ def module_context(name):
         'known_issues': (module.spec.get('known_issues') or [])
                         + [f'{c.id}: {t}: {why}' for c in module.components()
                            for t, why in (c.spec.get('expected_failures') or {}).items()],
-        'test_keys': checks.TESTS, 'test_short': TEST_SHORT,
+        'test_keys': REPORT_TESTS, 'test_short': TEST_SHORT,
+        'phlynx': _module_phlynx(components),
         'generated': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
         'libcuflynx_version': _libcuflynx_version(),
     }
+
+
+def _module_phlynx(components):
+    run = [c for c in components if c['phlynx_compatible'] is not None]
+    ok = sum(bool(c['phlynx_compatible']) for c in run)
+    return {'run': len(run), 'compatible': ok, 'total': len(components),
+            'all': bool(run) and len(run) == len(components) and ok == len(components)}
 
 
 def build_module(name):
@@ -233,6 +264,7 @@ def build_index(contexts, out_path, module_href):
              'counts': c['counts'], 'reviewed': c['reviewed'],
              'known_issues': len(c['known_issues']), 'max_risk': c.get('max_risk'),
              'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
+             'phlynx': c['phlynx'],
              'ready_for_review': bool(c.get('review')) and not c['reviewed']}
             for c in contexts]
     totals = {k: sum(r['counts'].get(k, 0) for r in rows) for k in ('passed', 'failed', 'skipped', 'pending', 'not_applicable', None)}

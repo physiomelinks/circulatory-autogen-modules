@@ -83,6 +83,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         <span class="num">{{ components|length }} component{{ '' if components|length == 1 else 's' }}</span>
         <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
         <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
+        <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% elif phlynx.run %}PhLynx / CUFLynx compatible: {{ phlynx.compatible }} of {{ phlynx.total }} components{% else %}PhLynx / CUFLynx: not tested yet{% endif %}</span>
         <span>libcuflynx {{ libcuflynx_version }}</span>
         <span>Report generated {{ generated }}</span>
       </div>
@@ -152,10 +153,11 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         <div class="eyebrow">Component</div>
         <h2 id="{{ c.id }}-h">{{ c.label }}</h2>
         <div class="tags">
-          <span>CellML component <code>{{ c.module_type }}</code></span>
-          <span>vessel_type <code>{{ c.vessel_type }}</code></span>
-          <span>BC_type <code>{{ c.BC_type }}</code></span>
+          <span title="libcuflynx: vessel_type">module_type <code>{{ c.vessel_type }}</code></span>
+          <span title="libcuflynx: BC_type">module_subtype <code>{{ c.BC_type }}</code></span>
+          <span title="the CellML component (libcuflynx: module_type)">component_type <code>{{ c.module_type }}</code></span>
           {%- if c.format != 'cellml' %}<span class="chip skipped">{{ c.format }}</span>{% endif %}
+          <span><span class="box {{ 'on' if c.phlynx_compatible }}" role="img" aria-label="{{ 'PhLynx/CUFLynx compatible' if c.phlynx_compatible else 'not PhLynx/CUFLynx compatible' }}"></span>{{ 'PhLynx / CUFLynx compatible' if c.phlynx_compatible else ('PhLynx / CUFLynx: not tested' if c.phlynx_compatible is none else 'Not PhLynx / CUFLynx compatible') }}</span>
         </div>
         {%- if c.notes %}<p style="margin:0;max-width:75ch">{{ c.notes }}</p>{% endif %}
         {%- if c.skip %}<p class="muted" style="margin:0">Not tested: {{ c.skip }}</p>{% endif %}

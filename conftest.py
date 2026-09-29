@@ -43,6 +43,7 @@ def pytest_generate_tests(metafunc):
 
 
 _models = {}
+QUICK_TESTS = ('run_test', 'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test')
 
 
 @pytest.fixture
@@ -67,5 +68,6 @@ def pytest_collection_modifyitems(config, items):
         module_name = callspec.params['component_key'][0]
         if module_name not in reviewed:
             reviewed[module_name] = load_module(module_name).reviewed
-        if not reviewed[module_name] and item.originalname != 'run_test':
+        # run_test and the (cheap) PhLynx -> CUFLynx pipeline run for every module
+        if not reviewed[module_name] and item.originalname not in QUICK_TESTS:
             item.add_marker(pytest.mark.skip(reason=f'{module_name} not reviewed yet: CI runs only run_test'))
