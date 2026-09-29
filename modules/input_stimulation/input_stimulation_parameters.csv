@@ -1,14 +1,14 @@
 vessel_type,BC_type,variable_name,units,value,kind,data_reference,sourced
-electrical_stim_input_Paci_2013,nn,stim_flag,dimensionless,TODO,constant,TODO,no
-electrical_stim_input_Paci_2013,nn,i_stim_start,second,TODO,constant,TODO,no
-electrical_stim_input_Paci_2013,nn,i_stim_end,second,TODO,constant,TODO,no
-electrical_stim_input_Paci_2013,nn,i_stim_frequency,per_s,TODO,constant,TODO,no
-electrical_stim_input_Paci_2013,nn,i_stim_pulse_duration,second,TODO,constant,TODO,no
-electrical_stim_input_Paci_2013,nn,i_stim_amplitude,ampere,TODO,constant,TODO,no
-i_stim_periodic,nn,stim_flag,dimensionless,TODO,constant,TODO,no
-i_stim_periodic,nn,t_start,second,TODO,constant,TODO,no
-i_stim_periodic,nn,t_end,second,TODO,constant,TODO,no
-i_stim_periodic,nn,period,second,TODO,constant,TODO,no
-i_stim_periodic,nn,pulse_duration,second,TODO,constant,TODO,no
-i_stim_periodic,nn,i_amplitude,nanoA,TODO,constant,TODO,no
-global,,Cm,farad,TODO,global_constant,TODO,no
+electrical_stim_input_Paci_2013,nn,stim_flag,dimensionless,1,constant,"definitional; 1 enables pacing (Paci2013 CellML default is 0, i.e. spontaneous beating)",yes
+electrical_stim_input_Paci_2013,nn,i_stim_start,second,0.0,constant,Paci2013; CellML stim_mode i_stim_Start = 0 s,yes
+electrical_stim_input_Paci_2013,nn,i_stim_end,second,800.0,constant,Paci2013; CellML stim_mode i_stim_End = 800 s,yes
+electrical_stim_input_Paci_2013,nn,i_stim_frequency,per_s,1.0,constant,"Paci2013; CellML stim_mode i_stim_frequency = 60 beats per minute (declared per_second there, with period = 60/f); here in Hz, period = 1/f, so 1 Hz",yes
+electrical_stim_input_Paci_2013,nn,i_stim_pulse_duration,second,0.005,constant,Paci2013; CellML stim_mode i_stim_PulseDuration = 0.005 s,yes
+electrical_stim_input_Paci_2013,nn,i_stim_amplitude,ampere,5.5e-10,constant,Paci2013; CellML stim_mode i_stim_Amplitude = 5.5e-10 A,yes
+i_stim_periodic,nn,stim_flag,dimensionless,1,constant,definitional; 1 enables the pulse train,yes
+i_stim_periodic,nn,t_start,second,0.0,constant,Paci2013; same timing as the Paci stim_mode (i_stim_Start = 0 s),yes
+i_stim_periodic,nn,t_end,second,800.0,constant,Paci2013; same timing as the Paci stim_mode (i_stim_End = 800 s),yes
+i_stim_periodic,nn,period,second,1.0,constant,Paci2013; 1 s pacing period (60/i_stim_frequency with i_stim_frequency = 60),yes
+i_stim_periodic,nn,pulse_duration,second,0.005,constant,Paci2013; i_stim_PulseDuration = 0.005 s,yes
+i_stim_periodic,nn,i_amplitude,nanoA,0.55,constant,Paci2013; i_stim_Amplitude = 5.5e-10 A = 0.55 nA (hiPSC-CM scale; adult myocyte models typically need larger currents),yes
+global,,Cm,farad,9.87109e-11,global_constant,Paci2013; CellML model_parameters Cm = 9.87109e-11 F (ventricular-like hiPSC-CM),yes

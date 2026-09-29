@@ -1,278 +1,104 @@
 module: input_stimulation
 reviewed: false
-known_issues:
-- 'undefined units: V'
+known_issues: []
 defaults:
   sim_time: 3.0
   pre_time: 0.0
   dt: 0.001
   solver: CVODE_myokit
   bc_sweep:
-    factors:
-    - 0.5
-    - 0.75
-    - 1.0
-    - 1.5
-    - 2.0
+    factors: [0.5, 0.75, 1.0, 1.5, 2.0]
     ranges: {}
   timestep:
     scheme: rk4
-    dts:
-    - 0.004
-    - 0.002
-    - 0.001
-    - 0.0005
+    dts: [0.004, 0.002, 0.001, 0.0005]
     min_order: 0.8
     tol: 0.0001
     cvode_tol: 0.001
   stability:
     supported:
-    - solver: CVODE_myokit
-      rtol: 1.0e-06
-      atol: 1.0e-08
+    - {solver: CVODE_myokit, rtol: 1.0e-06, atol: 1.0e-08}
 components:
 - vessel_type: electrical_stim_input_Paci_2013
   BC_type: nn
   module_type: stim_mode_Paci_2013
   sim_time: 3.0
-  outputs:
-  - i_stim_period
-  - i_stim
-  notes: 'Rectangular stimulus current density (A/F) from the Paci et al. (2013) hiPSC-CM CellML stim_mode component: i = stim_flag i_amplitude/Cm
-    during the first pulse_duration of each period between t_start and t_end, period = 60/i_frequency (i_frequency is effectively beats per minute
-    despite its per_s unit). Algebraic, no states. The config names its variables i_stim_start, i_stim_end, i_stim_frequency, i_stim_period, i_stim_pulse_duration,
-    i_stim_amplitude and i_stim, but the CellML component uses t_start, t_end, i_frequency, period (private), i_pulse_duration, i_amplitude and
-    i, so none of the parameters reach the equations and i_stim is identically 0 (see expected_failures).'
+  outputs: [i_stim_period, i_stim]
+  notes: 'Paci et al. (2013) stimulus current density: i_stim = stim_flag i_stim_amplitude/Cm (A/F) during the first i_stim_pulse_duration
+    of each period between i_stim_start and i_stim_end, else 0; i_stim_period = 1/i_stim_frequency, frequency in Hz (the Paci
+    CellML uses beats per minute with period = 60/f; converted on review 2026-09-29). Algebraic, no states. Sign: i_stim =
+    +amplitude/Cm, as in the Paci model, where dVm/dt = -(sum of ionic currents) - i_stim, so a positive amplitude hyperpolarises
+    and pacing uses a negative amplitude (the Myokit port uses -5.5e-10 A). Reviewed 2026-09-29: the CellML variables were
+    renamed to the config names (they did not match, so no parameter reached the equations and i_stim was identically 0).'
   invariants:
-  - description: 'i_stim is the exact rectangular pulse train: stim_flag i_stim_amplitude/Cm while t_start <= t <= t_end and (t - t_start) mod
-      period <= pulse_duration, else 0 (samples within 1e-9 s of an edge excluded)'
-    expr: '(lambda N, i, t, s, e, P, d, a: N.all((N.abs(i - N.where((t >= s) & (t <= e) & (N.mod(t - s, P) <= d), a, 0.0)) <= 1e-9*max(abs(a),
-      1e-300)) | (N.minimum(N.mod(t - s, P), P - N.mod(t - s, P)) < 1e-9) | (N.abs(N.mod(t - s, P) - d) < 1e-9) | (N.abs(t - e) < 1e-9)))(np,
-      i_stim, t, i_stim_start, i_stim_end, 60.0/i_stim_frequency, i_stim_pulse_duration, stim_flag*i_stim_amplitude/Cm)'
-  - description: i_stim_period = 60/i_stim_frequency (i_stim_frequency is in beats per minute, as in the Paci 2013 CellML)
-    expr: np.allclose(i_stim_period, 60.0/i_stim_frequency, rtol=1e-12, atol=0)
+  - {description: 'i_stim is the exact rectangular pulse train: stim_flag i_stim_amplitude/Cm while t_start <= t <= t_end
+      and (t - t_start) mod period <= pulse_duration, else 0 (samples within 1e-9 s of an edge excluded)', expr: '(lambda
+      N, i, t, s, e, P, d, a: N.all((N.abs(i - N.where((t >= s) & (t <= e) & (N.mod(t - s, P) <= d), a, 0.0)) <= 1e-9*max(abs(a),
+      1e-300)) | (N.minimum(N.mod(t - s, P), P - N.mod(t - s, P)) < 1e-9) | (N.abs(N.mod(t - s, P) - d) < 1e-9) | (N.abs(t
+      - e) < 1e-9)))(np, i_stim, t, i_stim_start, i_stim_end, 1.0/i_stim_frequency, i_stim_pulse_duration, stim_flag*i_stim_amplitude/Cm)'}
+  - {description: i_stim_period = 1/i_stim_frequency (Hz), expr: 'np.allclose(i_stim_period, 1.0/i_stim_frequency, rtol=1e-12,
+      atol=0)'}
   bc_sweep:
     ranges:
-      stim_flag:
-        min: 0
-        max: 1
-        points: 2
-      i_stim_start:
-        min: 0.0
-        max: 0.5
-        points: 3
-      i_stim_end:
-        min: 1.0
-        max: 800.0
-        points: 3
-      i_stim_frequency:
-        min: 30
-        max: 180
-        points: 4
-      i_stim_pulse_duration:
-        min: 0.001
-        max: 0.01
-        points: 4
-      i_stim_amplitude:
-        min: 1.0e-10
-        max: 2.0e-09
-        points: 4
-        scale: log
-      Cm:
-        min: 5.0e-11
-        max: 2.0e-10
-        points: 4
-        scale: log
-    rationale: Pacing from 30 to 180 beats/min (0.33-2 s periods), pulses of 1-10 ms, amplitudes 0.1-2 nA and capacitances 50-200 pF bracket the
-      Paci 2013 hiPSC-CM protocol (60 bpm, 5 ms, 0.55 nA, 98.7 pF). t_end = 1 s checks that pacing stops; stim_flag 0 checks the switch.
-  expected_failures:
-    verification_test_invariants: 'config/CellML variable-name mismatch: config variables i_stim_start, i_stim_end, i_stim_frequency, i_stim_pulse_duration,
-      i_stim_amplitude, i_stim_period, i_stim are not the CellML names (t_start, t_end, i_frequency, i_pulse_duration, i_amplitude, period [private],
-      i), so the generated model leaves the inputs unset (myokit: "No value set for i_stim_start ..."), and i_stim and i_stim_period are identically
-      0. Renaming the CellML variables to the config names (and making period public out) in a patched copy gives the exact pulse train (max 5.57
-      A/F = 5.5e-10 A/9.87e-11 F; 18 nonzero samples in 3 s) and i_stim_period = 1 s.'
-    verification_test_BC: 'same config/CellML variable-name mismatch as verification_test_invariants: i_stim is 0 at every sweep point, so the
-      pulse-train invariant fails wherever stim_flag*amplitude != 0'
-  reference_proposals:
-    stim_flag:
-      reference: definitional; 1 enables pacing (Paci2013 CellML default is 0, i.e. spontaneous beating)
-      sourced: definitional
-      value: 1
-    i_stim_start:
-      reference: Paci2013; CellML stim_mode i_stim_Start = 0 s
-      sourced: true
-      value: 0.0
-    i_stim_end:
-      reference: Paci2013; CellML stim_mode i_stim_End = 800 s
-      sourced: true
-      value: 800.0
-    i_stim_frequency:
-      reference: 'Paci2013; CellML stim_mode i_stim_frequency = 60 (declared per_second but used as beats per minute: period = 60/f = 1 s)'
-      sourced: true
-      value: 60.0
-    i_stim_pulse_duration:
-      reference: Paci2013; CellML stim_mode i_stim_PulseDuration = 0.005 s
-      sourced: true
-      value: 0.005
-    i_stim_amplitude:
-      reference: Paci2013; CellML stim_mode i_stim_Amplitude = 5.5e-10 A
-      sourced: true
-      value: 5.5e-10
-    Cm:
-      reference: Paci2013; CellML model_parameters Cm = 9.87109e-11 F (ventricular-like hiPSC-CM)
-      sourced: true
-      value: 9.87109e-11
+      stim_flag: {min: 0, max: 1, points: 2}
+      i_stim_start: {min: 0.0, max: 0.5, points: 3}
+      i_stim_end: {min: 1.0, max: 800.0, points: 3}
+      i_stim_frequency: {min: 0.5, max: 3.0, points: 4}
+      i_stim_pulse_duration: {min: 0.001, max: 0.01, points: 4}
+      i_stim_amplitude: {min: 1.0e-10, max: 2.0e-09, points: 4, scale: log}
+      Cm: {min: 5.0e-11, max: 2.0e-10, points: 4, scale: log}
+    rationale: Pacing from 30 to 180 beats/min (0.33-2 s periods), pulses of 1-10 ms, amplitudes 0.1-2 nA and capacitances
+      50-200 pF bracket the Paci 2013 hiPSC-CM protocol (60 bpm, 5 ms, 0.55 nA, 98.7 pF). t_end = 1 s checks that pacing stops;
+      stim_flag 0 checks the switch.
   validation:
-    baseline:
-      status: not_applicable
-      reason: prescribed stimulus waveform (an input, not a physiological response); verified against its exact analytic pulse train
-    calibrate:
-      status: not_applicable
-      reason: prescribed stimulus waveform (an input, not a physiological response); verified against its exact analytic pulse train
+    baseline: {status: not_applicable, reason: 'prescribed stimulus waveform (an input, not a physiological response); verified
+        against its exact analytic pulse train'}
+    calibrate: {status: not_applicable, reason: 'prescribed stimulus waveform (an input, not a physiological response); verified
+        against its exact analytic pulse train'}
 - vessel_type: voltage_change
   BC_type: nn
   module_type: voltage_change
-  outputs:
-  - Vm
-  notes: Prescribed membrane-voltage ramp Vm = -0.08 + 0.01 t V (from -80 mV at 10 mV/s), a test input for voltage-dependent components (multi_port).
-    No parameters and no states.
+  outputs: [Vm]
+  notes: 'Prescribed membrane-voltage ramp Vm = -0.08 + 0.01 t V (from -80 mV at 10 mV/s), a test input for voltage-dependent
+    components (multi_port). No parameters and no states. Reviewed 2026-09-29: the config unit of Vm was "V" (undefined);
+    now volt, as in the CellML.'
   invariants:
-  - description: Vm is the exact ramp -0.08 V + 0.01 V/s t
-    expr: np.max(np.abs(Vm - (-0.08 + 0.01*t))) <= 1e-12
-  expected_failures:
-    run_test: 'config declares Vm with units "V", which is not defined in input_stimulation_units.cellml or the CellML (the CellML itself uses
-      volt); libcellml: "Model does not contain the units ''V'' required by variable ''Vm'' in component ''mod''", generation returns False. With
-      the config unit changed to "volt" in a patched copy the component generates and Vm = -0.08 + 0.01 t exactly (-0.08 to -0.05 V over 3 s).'
-    verification_test_invariants: 'config declares Vm with units "V", which is not defined in input_stimulation_units.cellml or the CellML (the
-      CellML itself uses volt); libcellml: "Model does not contain the units ''V'' required by variable ''Vm'' in component ''mod''", generation
-      returns False. With the config unit changed to "volt" in a patched copy the component generates and Vm = -0.08 + 0.01 t exactly (-0.08 to
-      -0.05 V over 3 s).'
-    verification_test_timestep: 'config declares Vm with units "V", which is not defined in input_stimulation_units.cellml or the CellML (the
-      CellML itself uses volt); libcellml: "Model does not contain the units ''V'' required by variable ''Vm'' in component ''mod''", generation
-      returns False. With the config unit changed to "volt" in a patched copy the component generates and Vm = -0.08 + 0.01 t exactly (-0.08 to
-      -0.05 V over 3 s).'
-    stability_test: 'config declares Vm with units "V", which is not defined in input_stimulation_units.cellml or the CellML (the CellML itself
-      uses volt); libcellml: "Model does not contain the units ''V'' required by variable ''Vm'' in component ''mod''", generation returns False.
-      With the config unit changed to "volt" in a patched copy the component generates and Vm = -0.08 + 0.01 t exactly (-0.08 to -0.05 V over
-      3 s).'
+  - {description: Vm is the exact ramp -0.08 V + 0.01 V/s t, expr: np.max(np.abs(Vm - (-0.08 + 0.01*t))) <= 1e-12}
   validation:
-    baseline:
-      status: not_applicable
-      reason: prescribed voltage ramp (test input); verified against its exact analytic form
-    calibrate:
-      status: not_applicable
-      reason: prescribed voltage ramp (test input); verified against its exact analytic form
+    baseline: {status: not_applicable, reason: prescribed voltage ramp (test input); verified against its exact analytic form}
+    calibrate: {status: not_applicable, reason: prescribed voltage ramp (test input); verified against its exact analytic
+        form}
 - vessel_type: i_stim_periodic
   BC_type: nn
   module_type: i_stim_periodic
   sim_time: 3.0
-  outputs:
-  - i
-  notes: 'Rectangular stimulus current in nA: i = -stim_flag i_amplitude during the first pulse_duration of each period between t_start and t_end
-    (negative = inward/depolarising in the usual convention). Algebraic, no states.'
+  outputs: [i]
+  notes: 'Rectangular stimulus current in nA: i = -stim_flag i_amplitude during the first pulse_duration of each period between
+    t_start and t_end (negative = inward/depolarising in the usual convention). Algebraic, no states. Sign: i = -stim_flag
+    i_amplitude, so a positive amplitude gives a negative (inward, depolarising in the usual convention) current; the opposite
+    sign to the Paci component. Timing and amplitude reuse the Paci 2013 protocol (no source of its own).'
   invariants:
-  - description: 'i is the exact rectangular pulse train: -stim_flag i_amplitude while t_start <= t <= t_end and (t - t_start) mod period <= pulse_duration,
-      else 0 (samples within 1e-9 s of an edge excluded)'
-    expr: '(lambda N, i, t, s, e, P, d, a: N.all((N.abs(i - N.where((t >= s) & (t <= e) & (N.mod(t - s, P) <= d), a, 0.0)) <= 1e-9*max(abs(a),
-      1e-300)) | (N.minimum(N.mod(t - s, P), P - N.mod(t - s, P)) < 1e-9) | (N.abs(N.mod(t - s, P) - d) < 1e-9) | (N.abs(t - e) < 1e-9)))(np,
-      i, t, t_start, t_end, period, pulse_duration, -stim_flag*i_amplitude)'
-  - description: 'charge per period: over the first two full periods the integral of i equals 2 (-stim_flag i_amplitude pulse_duration) to within
-      one output step of samples (trapezoid)'
-    expr: (t_start + 2*period > t[-1]) or (t_end < t_start + 2*period) or (abs(np.trapz(np.where((t >= t_start) & (t < t_start + 2*period), i,
-      0.0), t) - 2*(-stim_flag*i_amplitude*pulse_duration)) <= 2*stim_flag*abs(i_amplitude)*(t[1] - t[0]) + 1e-15)
+  - {description: 'i is the exact rectangular pulse train: -stim_flag i_amplitude while t_start <= t <= t_end and (t - t_start)
+      mod period <= pulse_duration, else 0 (samples within 1e-9 s of an edge excluded)', expr: '(lambda N, i, t, s, e, P,
+      d, a: N.all((N.abs(i - N.where((t >= s) & (t <= e) & (N.mod(t - s, P) <= d), a, 0.0)) <= 1e-9*max(abs(a), 1e-300)) |
+      (N.minimum(N.mod(t - s, P), P - N.mod(t - s, P)) < 1e-9) | (N.abs(N.mod(t - s, P) - d) < 1e-9) | (N.abs(t - e) < 1e-9)))(np,
+      i, t, t_start, t_end, period, pulse_duration, -stim_flag*i_amplitude)'}
+  - {description: 'charge per period: over the first two full periods the integral of i equals 2 (-stim_flag i_amplitude pulse_duration)
+      to within one output step of samples (trapezoid)', expr: '(t_start + 2*period > t[-1]) or (t_end < t_start + 2*period)
+      or (abs(np.trapz(np.where((t >= t_start) & (t < t_start + 2*period), i, 0.0), t) - 2*(-stim_flag*i_amplitude*pulse_duration))
+      <= 2*stim_flag*abs(i_amplitude)*(t[1] - t[0]) + 1e-15)'}
   bc_sweep:
     ranges:
-      stim_flag:
-        min: 0
-        max: 1
-        points: 2
-      t_start:
-        min: 0.0
-        max: 0.5
-        points: 3
-      t_end:
-        min: 1.0
-        max: 800.0
-        points: 3
-      period:
-        min: 0.33
-        max: 2.0
-        points: 4
-      pulse_duration:
-        min: 0.001
-        max: 0.01
-        points: 4
-      i_amplitude:
-        min: 0.1
-        max: 20.0
-        points: 4
-        scale: log
-    rationale: Periods 0.33-2 s (30-180 beats/min), 1-10 ms pulses and 0.1-20 nA amplitudes cover hiPSC-CM (0.55 nA, Paci 2013) to adult-myocyte-scale
-      stimuli. t_end = 1 s checks that pacing stops; stim_flag 0 checks the switch.
-  reference_proposals:
-    stim_flag:
-      reference: definitional; 1 enables the pulse train
-      sourced: definitional
-      value: 1
-    t_start:
-      reference: Paci2013; same timing as the Paci stim_mode (i_stim_Start = 0 s)
-      sourced: true
-      value: 0.0
-    t_end:
-      reference: Paci2013; same timing as the Paci stim_mode (i_stim_End = 800 s)
-      sourced: true
-      value: 800.0
-    period:
-      reference: Paci2013; 1 s pacing period (60/i_stim_frequency with i_stim_frequency = 60)
-      sourced: true
-      value: 1.0
-    pulse_duration:
-      reference: Paci2013; i_stim_PulseDuration = 0.005 s
-      sourced: true
-      value: 0.005
-    i_amplitude:
-      reference: Paci2013; i_stim_Amplitude = 5.5e-10 A = 0.55 nA (hiPSC-CM scale; adult myocyte models typically need larger currents)
-      sourced: true
-      value: 0.55
+      stim_flag: {min: 0, max: 1, points: 2}
+      t_start: {min: 0.0, max: 0.5, points: 3}
+      t_end: {min: 1.0, max: 800.0, points: 3}
+      period: {min: 0.33, max: 2.0, points: 4}
+      pulse_duration: {min: 0.001, max: 0.01, points: 4}
+      i_amplitude: {min: 0.1, max: 20.0, points: 4, scale: log}
+    rationale: Periods 0.33-2 s (30-180 beats/min), 1-10 ms pulses and 0.1-20 nA amplitudes cover hiPSC-CM (0.55 nA, Paci
+      2013) to adult-myocyte-scale stimuli. t_end = 1 s checks that pacing stops; stim_flag 0 checks the switch.
   validation:
-    baseline:
-      status: not_applicable
-      reason: prescribed stimulus waveform (an input); verified against its exact analytic pulse train
-    calibrate:
-      status: not_applicable
-      reason: prescribed stimulus waveform (an input); verified against its exact analytic pulse train
-review:
-  comment: 'electrical_stim_input_Paci_2013 is silently broken: its config variable names (i_stim_start, i_stim_amplitude, i_stim, ...) differ
-    from the CellML names (t_start, i_amplitude, i, ...; period is private), so no parameter reaches the equations and i_stim is identically 0,
-    yet run_test passes. voltage_change fails generation because the config declares Vm in undefined units "V" (the CellML uses volt). In the
-    Paci component i_frequency is declared per_s but used as beats per minute (period = 60/f), as in the original Paci CellML. The stimulus sign
-    conventions differ: Paci gives +amplitude/Cm, i_stim_periodic gives -amplitude.'
-  summary: 'Three prescribed input waveforms: the Paci et al. (2013) stimulus current density (A/F), a voltage ramp Vm = -0.08 + 0.01 t, and a
-    periodic rectangular current in nA. All are algebraic with exact analytic forms, used as invariants: exact pulse train, period identity, charge
-    per period, and the exact ramp. The proposed values are the Paci 2013 CellML stimulus protocol (checked against the authors'' PMR file). i_stim_periodic
-    passes everything. The Paci component fails its invariants (name mismatch) and voltage_change fails generation (units "V"). Both are recorded
-    as expected failures, and patched copies (CellML names aligned with the config; "V" changed to "volt") pass all run/invariant/BC tests. Timestep
-    tests are skipped (no states). Validation is not_applicable (prescribed inputs).'
-  questions:
-  - 'Approve the fix for electrical_stim_input_Paci_2013: rename the CellML variables to the config names (t_start -> i_stim_start, t_end -> i_stim_end,
-    i_frequency -> i_stim_frequency, i_pulse_duration -> i_stim_pulse_duration, i_amplitude -> i_stim_amplitude, i -> i_stim, period -> i_stim_period
-    with public_interface="out"), or rename the config and csv to the CellML names instead?'
-  - Approve changing the voltage_change config unit "V" to "volt" (or defining V in input_stimulation_units.cellml)?
-  - 'i_stim_frequency: keep the Paci convention (beats per minute declared as per_s, period = 60/f), or change the unit to per_minute or the equation
-    to period = 1/f with f in Hz?'
-  - 'Proposed values: stim_flag = 1 (Paci default 0 = spontaneous), start 0 s, end 800 s, 60 beats/min, 5 ms, 0.55 nA (Paci) and Cm = 98.7109
-    pF; i_stim_periodic reuses the same protocol (0.55 nA, 1 s, 5 ms). Are these right for how you use these components? i_stim_periodic has no
-    source of its own.'
-  - 'Sign convention: Paci i_stim = +stim_flag amplitude/Cm (in the Paci CellML dVm/dt = -(sum i_ion) - i_stim, so a positive amplitude hyperpolarises;
-    the Myokit port uses -5.5e-10 A), while i_stim_periodic = -stim_flag i_amplitude. Which sign should each consumer expect?'
-  proposed_fixes:
-  - 'electrical_stim_input_Paci_2013: align the CellML variable names with the config (see question 1). Evidence: myokit reports "No value set
-    for i_stim_start ..." and i_stim = 0 everywhere. In the patched copy i_stim is the exact pulse train (peak 5.57 A/F = 5.5e-10 A/9.87109e-11
-    F) and i_stim_period = 1 s. Invariants and the 27-run BC sweep pass.'
-  - 'voltage_change: change the config unit of Vm from "V" to "volt". Evidence: libcellml "Model does not contain the units ''V'' required by
-    variable ''Vm''". In the patched copy Vm = -0.08 + 0.01 t exactly.'
-  findings:
-  - Because the Paci output is identically zero, run_test and the stability test pass while the component does nothing. Only the exact pulse-train
-    invariant exposes it.
-  - 'The BC-sweep message for the Paci component reads "52 of 27 runs failed": the failure count seems to count invariant violations rather than
-    runs (framework note).'
+    baseline: {status: not_applicable, reason: prescribed stimulus waveform (an input); verified against its exact analytic
+        pulse train}
+    calibrate: {status: not_applicable, reason: prescribed stimulus waveform (an input); verified against its exact analytic
+        pulse train}

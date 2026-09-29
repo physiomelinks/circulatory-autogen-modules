@@ -7,26 +7,26 @@
         <variable name="t" public_interface="in" units="second"/>
         <variable name="Cm" public_interface="in" units="farad"/>
         <variable name="stim_flag" public_interface="in" units="dimensionless"/>
-        <variable name="i" public_interface="out" units="A_per_F"/>
-        <variable name="t_start" public_interface="in" units="second"/>
-        <variable name="t_end" public_interface="in" units="second"/>
-        <variable name="i_amplitude" public_interface="in" units="ampere"/>
-        <variable name="i_frequency" public_interface="in" units="per_s"/>
-        <variable name="period" units="second"/>
-        <variable name="i_pulse_duration" public_interface="in" units="second"/>
+        <variable name="i_stim" public_interface="out" units="A_per_F"/>
+        <variable name="i_stim_start" public_interface="in" units="second"/>
+        <variable name="i_stim_end" public_interface="in" units="second"/>
+        <variable name="i_stim_amplitude" public_interface="in" units="ampere"/>
+        <variable name="i_stim_frequency" public_interface="in" units="per_s"/>
+        <variable name="i_stim_period" public_interface="out" units="second"/>
+        <variable name="i_stim_pulse_duration" public_interface="in" units="second"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
-                <ci>period</ci>
+                <ci>i_stim_period</ci>
                 <apply>
                     <divide/>
-                    <cn cellml:units="dimensionless">60</cn>
-                    <ci>i_frequency</ci>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <ci>i_stim_frequency</ci>
                 </apply>
             </apply>
             <apply>
                 <eq/>
-                <ci>i</ci>
+                <ci>i_stim</ci>
                 <piecewise>
                     <piece>
                         <apply>
@@ -34,7 +34,7 @@
                             <apply>
                                 <times/>
                                 <ci>stim_flag</ci>
-                                <ci>i_amplitude</ci>
+                                <ci>i_stim_amplitude</ci>
                             </apply>
                             <ci>Cm</ci>
                         </apply>
@@ -43,12 +43,12 @@
                             <apply>
                                 <geq/>
                                 <ci>t</ci>
-                                <ci>t_start</ci>
+                                <ci>i_stim_start</ci>
                             </apply>
                             <apply>
                                 <leq/>
                                 <ci>t</ci>
-                                <ci>t_end</ci>
+                                <ci>i_stim_end</ci>
                             </apply>
                             <apply>
                                 <leq/>
@@ -57,7 +57,7 @@
                                     <apply>
                                         <minus/>
                                         <ci>t</ci>
-                                        <ci>t_start</ci>
+                                        <ci>i_stim_start</ci>
                                     </apply>
                                     <apply>
                                         <times/>
@@ -68,15 +68,15 @@
                                                 <apply>
                                                     <minus/>
                                                     <ci>t</ci>
-                                                    <ci>t_start</ci>
+                                                    <ci>i_stim_start</ci>
                                                 </apply>
-                                                <ci>period</ci>
+                                                <ci>i_stim_period</ci>
                                             </apply>
                                         </apply>
-                                        <ci>period</ci>
+                                        <ci>i_stim_period</ci>
                                     </apply>
                                 </apply>
-                                <ci>i_pulse_duration</ci>
+                                <ci>i_stim_pulse_duration</ci>
                             </apply>
                         </apply>
                     </piece>
