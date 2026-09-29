@@ -1,10 +1,10 @@
 [
   {
-    "vessel_type": "cardiac_clock",
-    "BC_type": "nn",
+    "module_type": "cardiac_clock",
+    "module_subtype": "nn",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "cardiac_clock_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "cardiac_clock_type",
     "entrance_ports": [],
     "exit_ports": [
       {
@@ -45,11 +45,11 @@
     ]
   },
   {
-    "vessel_type": "cardiac_clock",
-    "BC_type": "nn_controlled",
+    "module_type": "cardiac_clock",
+    "module_subtype": "nn_controlled",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "cardiac_clock_controlled_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "cardiac_clock_controlled_type",
     "entrance_ports": [
       {
         "port_type": "period_delta_port",
@@ -109,11 +109,11 @@
     ]
   },
   {
-    "vessel_type": "chamber",
-    "BC_type": "vv",
+    "module_type": "chamber",
+    "module_subtype": "vv",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "chamber_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "chamber_type",
     "entrance_ports": [
       {
         "port_type": "vessel_port",
@@ -270,11 +270,11 @@
     ]
   },
   {
-    "vessel_type": "valve",
-    "BC_type": "pp",
+    "module_type": "valve",
+    "module_subtype": "pp",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "valve_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "valve_type",
     "entrance_ports": [
       {
         "port_type": "vessel_port",
@@ -376,11 +376,11 @@
     ]
   },
   {
-    "vessel_type": "valve",
-    "BC_type": "pp_linear",
+    "module_type": "valve",
+    "module_subtype": "pp_linear",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "valve_linear_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "valve_linear_type",
     "entrance_ports": [
       {
         "port_type": "vessel_port",
@@ -494,11 +494,11 @@
     ]
   },
   {
-    "vessel_type": "valve",
-    "BC_type": "pp_rmod",
+    "module_type": "valve",
+    "module_subtype": "pp_rmod",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "valve_rmod_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "valve_rmod_type",
     "entrance_ports": [
       {
         "port_type": "vessel_port",
@@ -606,11 +606,11 @@
     ]
   },
   {
-    "vessel_type": "resistor",
-    "BC_type": "pp",
+    "module_type": "resistor",
+    "module_subtype": "pp",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "resistor_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "resistor_type",
     "entrance_ports": [
       {
         "port_type": "vessel_port",
@@ -658,11 +658,11 @@
     ]
   },
   {
-    "vessel_type": "flow_merge",
-    "BC_type": "vp",
+    "module_type": "flow_merge",
+    "module_subtype": "vp",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "flow_merge_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "flow_merge_type",
     "entrance_ports": [
       {
         "port_type": "vessel_port",
@@ -714,11 +714,11 @@
     ]
   },
   {
-    "vessel_type": "flow_split",
-    "BC_type": "pv",
+    "module_type": "flow_split",
+    "module_subtype": "pv",
     "module_format": "cellml",
-    "module_file": "cardiac_modules.cellml",
-    "module_type": "flow_split_type",
+    "component_file": "cardiac_modules.cellml",
+    "component_type": "flow_split_type",
     "entrance_ports": [
       {
         "port_type": "vessel_port",

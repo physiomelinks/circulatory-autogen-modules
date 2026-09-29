@@ -29,8 +29,12 @@ import glob
 import json
 import os
 import shutil
+import sys
 
 import yaml
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from cam_testing.library import read_config  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SYSTEM_DIR = os.path.join(REPO, 'modules', 'system')
@@ -90,7 +94,7 @@ LVPROP = {'E_A_rv': ('E_lv_A', 0.8), 'E_A_ra': ('E_lv_A', 0.02), 'E_A_la': ('E_l
 def load_configs():
     configs = {}
     for path in glob.glob(os.path.join(REPO, 'modules', '*', '*_modules_config.json')):
-        for e in json.load(open(path)):
+        for e in read_config(path):   # either config format, as libcuflynx's names
             configs[(e['vessel_type'], e['BC_type'])] = e
     return configs
 

@@ -117,6 +117,25 @@ heart,supermodule,supermodule:heart,systemic_venous_in:venous_svc pulmonary_veno
 
 `cam_testing.supermodule.expand` flattens that row into an ordinary vessel array. libcuflynx can't load supermodules yet; later they will be usable as modules themselves. `tests/test_supermodules.py` generates each harness in `<name>_supermodule.yaml` and runs it. The heart harness must reproduce `system/closed_loop_cvs/3compartment` to 1e-9.
 
+## PhLynx → CUFLynx pipeline
+
+`tests/test_phlynx.py` checks that each component works end to end in the web tooling. Its three tests:
+- `phlynx_export_test`: builds the component's test network in PhLynx, using PhLynx's own code from a checkout, run headlessly under Node and jsdom by `tools/phlynx_bridge/export_omex.mjs`. It loads this library's modules and parameters, checks every connection was made, and exports the `.omex` PhLynx sends to CUFLynx.
+- `cuflynx_simulate_test`: imports that archive into a released CUFLynx binary through its HTTP API (`tools/cuflynx_bridge/simulate_omex.py`) and simulates it.
+- `phlynx_equivalence_test`: compares CUFLynx's run with libcuflynx's model of the same network, within 1e-6 at the output times both runs share.
+
+A component passing all three gets the "PhLynx / CUFLynx compatible" tick in its report.
+
+```
+make pipeline-setup                                  # jsdom for the bridge
+make pipeline MODULE=coupling                        # PHLYNX_DIR=../phlynx, CUFLYNX_BIN=~/software/CUFLynx
+make pipeline PHLYNX_DIR=/path/to/phlynx CUFLYNX_BIN=/path/to/CUFLynx
+```
+
+The tests skip when Node (22.15 or newer), the PhLynx checkout (with `yarn install` done) or the CUFLynx binary isn't available. CI checks out PhLynx at `PHLYNX_REF` and downloads the latest CUFLynx Ubuntu release.
+
+Parameters are applied with PhLynx's own `applyParametersToNodes` (`src/utils/parameters.js`, from PhLynx #595). For an older PhLynx checkout without it, the bridge falls back to a copy of `loadParametersData`.
+
 ## Running locally
 
 libcuflynx needs SUNDIALS and MPI. On Ubuntu:

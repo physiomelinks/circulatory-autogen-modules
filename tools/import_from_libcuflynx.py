@@ -29,6 +29,8 @@ import yaml
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES_DIR = os.path.join(REPO_ROOT, 'modules')
+sys.path.insert(0, REPO_ROOT)
+from cam_testing.library import normalise_config_entry, to_phlynx_entry  # noqa: E402
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
 
@@ -255,12 +257,13 @@ def import_module(name, cellml_src, config_src, unit_blocks, sources, reseed):
     shutil.copyfile(cellml_src, cellml_dest)
 
     with open(config_src) as f:
-        config_text = f.read()
-    config = json.loads(config_text)
-    # The module_file field must name the file as it is in this repo.
-    config_text = re.sub(r'"module_file"\s*:\s*"[^"]*"', f'"module_file": "{name}_modules.cellml"', config_text)
+        config = [normalise_config_entry(e) for e in json.load(f)]
+    # Written in PhLynx's key names (the library's format; libcuflynx reads both), with the
+    # CellML file named as it is in this repo.
     with open(os.path.join(dest, f'{name}_modules_config.json'), 'w') as f:
-        f.write(config_text)
+        json.dump([to_phlynx_entry(dict(e, module_file=f'{name}_modules.cellml')) for e in config], f, indent=2,
+                  ensure_ascii=False)
+        f.write('\n')
 
     needed, missing = units_closure(units_used(cellml_src, config), unit_blocks)
     if missing:

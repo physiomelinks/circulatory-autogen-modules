@@ -187,10 +187,57 @@ class Module:
         raise KeyError(component_id)
 
 
+# Module configs come in two formats: PhLynx's (this library's) and libcuflynx's original.
+# Both are read; code here uses libcuflynx's internal names. module_type means different things in
+# the two, so the format is told by the other keys, never by module_type.
+PHLYNX_KEYS = {'module_type': 'vessel_type', 'module_subtype': 'BC_type',
+               'component_file': 'module_file', 'component_type': 'module_type'}
+LIBCUFLYNX_KEYS = ('vessel_type', 'BC_type', 'module_file', 'module_type')
+
+
+def config_format(entry):
+    phlynx = {'module_subtype', 'component_file', 'component_type'} & set(entry)
+    libcuflynx = {'vessel_type', 'BC_type', 'module_file'} & set(entry)
+    if phlynx and libcuflynx:
+        raise ValueError(f'config entry mixes PhLynx keys {sorted(phlynx)} with libcuflynx keys {sorted(libcuflynx)}')
+    if phlynx:
+        missing = set(PHLYNX_KEYS) - set(entry)
+        if missing:
+            raise ValueError(f'PhLynx-format config entry is missing {sorted(missing)}')
+        return 'phlynx'
+    missing = set(LIBCUFLYNX_KEYS) - set(entry)
+    if missing:
+        raise ValueError(f'config entry is missing {sorted(missing)} (neither PhLynx nor libcuflynx format)')
+    return 'libcuflynx'
+
+
+def normalise_config_entry(entry):
+    '''A config entry in either format -> libcuflynx's names (other keys unchanged).'''
+    if config_format(entry) == 'libcuflynx':
+        return dict(entry)
+    out = {k: v for k, v in entry.items() if k not in PHLYNX_KEYS}
+    out.update({internal: entry[k] for k, internal in PHLYNX_KEYS.items()})
+    return out
+
+
+def to_phlynx_entry(entry):
+    '''A config entry in either format -> PhLynx's key names, in PhLynx's key order.'''
+    e = normalise_config_entry(entry)
+    head = {'module_type': e['vessel_type'], 'module_subtype': e['BC_type'], 'module_format': e.get('module_format'),
+            'component_file': e['module_file'], 'component_type': e['module_type']}
+    if head['module_format'] is None:
+        del head['module_format']
+    return {**head, **{k: v for k, v in e.items() if k not in LIBCUFLYNX_KEYS and k != 'module_format'}}
+
+
+def read_config(path):
+    with open(path) as f:
+        return [normalise_config_entry(e) for e in json.load(f)]
+
+
 def load_module(name):
     module_dir = os.path.join(MODULES_DIR, name)
-    with open(os.path.join(module_dir, f'{name}_modules_config.json')) as f:
-        config = json.load(f)
+    config = read_config(os.path.join(module_dir, f'{name}_modules_config.json'))
     spec_path = os.path.join(module_dir, f'{name}_tests.yaml')
     spec = {}
     if os.path.isfile(spec_path):
