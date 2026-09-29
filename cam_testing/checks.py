@@ -87,6 +87,12 @@ class ComponentModel(object):
         self.nominal = {harness.parameter_name(p): p.float_value
                         for p in component.parameters() if not p.is_todo}
         self._var_of = {harness.parameter_name(p): p.variable_name for p in component.parameters()}
+        # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
+        # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
+        for name, _units, value, *_ref in (self.spec.get('harness') or {}).get('parameters') or []:
+            if name not in self.nominal:
+                self.nominal[name] = float(value)
+                self._var_of[name] = name
 
     def param_env(self, overrides=None):
         '''Parameter values by variable name (e.g. alpha), for invariant expressions.'''
@@ -233,11 +239,76 @@ def _run_point(cm):
     (e.g. off-equilibrium boundary conditions so the dynamics are exercised); the library
     defaults stay as they are."""
     by_var = {p.variable_name: p for p in cm.component.parameters()}
-    return {harness.parameter_name(by_var[k]): float(v) for k, v in (cm.spec.get('run_parameters') or {}).items()}
+    return {(harness.parameter_name(by_var[k]) if k in by_var else k): float(v) for k, v in (cm.spec.get('run_parameters') or {}).items()}
+
+
+CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp): libcuflynx generates the 0D model coupled to it '
+                      '(checked by run_test), but the 1D solver it couples to is not runnable here, so there is no '
+                      'simulation to check')
+
+
+def is_cpp(component):
+    return component.config.get('module_format', 'cellml') == 'cpp'
+
+
+def _cpp_not_applicable(cm, test):
+    return save(cm.component, Result(test, NOT_APPLICABLE, CPP_NOT_APPLICABLE))
+
+
+def cpp_generation_check(cm):
+    '''
+    run_test for a C++ 1D-solver component: its test network (harness) is generated through
+    libcuflynx's C++ 0D-1D path (model_type cpp, couple_to_1d) from this library, and the generated
+    model0d.cc must compile (g++ -fsyntax-only against the SUNDIALS headers).
+    '''
+    import shutil
+    import subprocess
+    from libcuflynx.scripts.script_generate_with_new_architecture import generate_with_new_architecture
+
+    def check():
+        component = cm.component
+        prefix = f'{component.module.name}__{component.id}'
+        work = os.path.join(cm.work_dir, 'cpp')
+        res = os.path.join(work, 'resources')
+        harness._write_resources(component, res, prefix, {})
+        cfg = {'file_prefix': prefix, 'input_param_file': f'{prefix}_parameters.csv', 'model_type': 'cpp',
+               'solver': 'RK4', 'couple_to_1d': True, 'resources_dir': res,
+               'generated_models_dir': os.path.join(work, 'generated_models'),
+               'cpp_generated_models_dir': os.path.join(work, 'cpp_out'), 'cpp_1d_model_config_path': None,
+               'module_library_dirs': [harness.MODULES_DIR], 'use_builtin_modules': False, 'DEBUG': False,
+               'dt': float(cm.spec.get('dt', 1e-3)),
+               'solver_info': {'dt_solver': 1e-4, 'MaximumNumberOfSteps': 5000, 'solver': 'RK4'}}
+        log = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(log):
+                ok = generate_with_new_architecture(False, cfg)
+        except SystemExit as e:
+            ok = False
+            log.write(f'\nlibcuflynx exited ({e.code})')
+        tail = [l for l in log.getvalue().splitlines() if l.strip()][-6:]
+        if not ok:
+            return Result('run_test', FAILED, 'C++ 0D-1D generation failed: ' + (tail[-1] if tail else ''), details=tail)
+        src = os.path.join(cfg['cpp_generated_models_dir'], 'model0d.cc')
+        coupler = [f for f in os.listdir(cfg['cpp_generated_models_dir']) if f.endswith('_coupler1d0d.json')]
+        metrics = {'generated': sorted(os.listdir(cfg['cpp_generated_models_dir'])), 'coupler': coupler}
+        gxx = shutil.which('g++')
+        if not gxx:
+            return Result('run_test', PASSED, 'generated the C++ 0D model and 0D-1D coupler (g++ not available, '
+                          'compilation not checked)', metrics)
+        p = subprocess.run([gxx, '-std=c++17', '-fsyntax-only', src], capture_output=True, text=True)
+        if p.returncode != 0:
+            return Result('run_test', FAILED, 'generated model0d.cc does not compile: '
+                          + (p.stderr.strip().splitlines() or [''])[0][:300], metrics, details=p.stderr.splitlines()[:20])
+        return Result('run_test', PASSED, 'generated the C++ 0D model coupled to the 1D vessel (model0d.cc, '
+                      f'{", ".join(coupler)}) and it compiles; the 1D solver itself is not runnable here', metrics)
+    return _guard(cm.component, 'run_test', check)
 
 
 def run_test(cm):
     """Generates the component with libcuflynx, simulates it, and checks every output is finite."""
+    if is_cpp(cm.component):
+        return cpp_generation_check(cm)
+
     def check():
         point = _run_point(cm)
         t, outputs = cm.run(point)
@@ -270,6 +341,8 @@ def run_test(cm):
 # ----------------------------------------------------------------------------------------------
 
 def verification_test_invariants(cm):
+    if is_cpp(cm.component):
+        return _cpp_not_applicable(cm, 'verification_test_invariants')
     """
     Checks the simulation against what the component is supposed to do: the spec's
     invariants (exact solutions, conservation laws, bounds, delays, ...) evaluated on the run
@@ -328,6 +401,8 @@ def sweep_values(param_name, nominal, sweep_spec):
 
 
 def verification_test_BC(cm):
+    if is_cpp(cm.component):
+        return _cpp_not_applicable(cm, 'verification_test_BC')
     def check():
         component, spec = cm.component, cm.spec
         sweep_spec = spec.get('bc_sweep') or {}
@@ -349,7 +424,11 @@ def verification_test_BC(cm):
 
         sweeps, failures, notes, n_runs, failed_runs = {}, [], [], 0, 0
         for var in names:
-            pname = harness.parameter_name(by_var[var])
+            # a component parameter, or (extra_parameters) one of its test network's, by full name
+            pname = harness.parameter_name(by_var[var]) if var in by_var else var
+            if pname not in cm.nominal:
+                notes.append(f'{var}: not a parameter of the component or its test network')
+                continue
             values, why_not = sweep_values(var, cm.nominal[pname], sweep_spec)
             if why_not:
                 notes.append(f'{var}: {why_not}')
@@ -397,6 +476,8 @@ def verification_test_BC(cm):
 # ----------------------------------------------------------------------------------------------
 
 def verification_test_timestep(cm):
+    if is_cpp(cm.component):
+        return _cpp_not_applicable(cm, 'verification_test_timestep')
     def check():
         component = cm.component
         ts = cm.spec.get('timestep') or {}
@@ -520,6 +601,8 @@ def _matches(declared, cfg):
 
 
 def stability_test(cm):
+    if is_cpp(cm.component):
+        return _cpp_not_applicable(cm, 'stability_test')
     """
     Runs the component with a matrix of solvers and settings and records which work:
     a run "works" when it finishes, every output is finite, and it stays within ``tol``

@@ -44,3 +44,7 @@ CO2_O2_generator,nn,C_CO2_a0,dimensionless,TODO,constant,TODO,no
 CO2_O2_generator,nn,C_O2_a0,dimensionless,TODO,constant,TODO,no
 muscle_pressure,nn_constant,P,J_per_m3,TODO,constant,TODO,no
 global,,T,second,1,global_constant,test_fft: biobeat_measurement,yes
+outlet_flow,nn_constant_flow_port,v,m3_per_s,1e-08,constant,definitional; test-fixture flow (set by the test network that uses it),yes
+outlet_flow,nn_constant_flow_port,P,J_per_m3,0,constant,definitional; unused on a flow_port,yes
+inlet_flow,nn_constant_flow_port,v,m3_per_s,1e-08,constant,definitional; test-fixture flow (set by the test network that uses it),yes
+inlet_flow,nn_constant_flow_port,P,J_per_m3,0,constant,definitional; unused on a flow_port,yes

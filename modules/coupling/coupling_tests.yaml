@@ -122,41 +122,137 @@ components:
   module_type: Muller_1d
   outputs: []
   invariants: []
-  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
   validation:
     baseline: {status: not_applicable, reason: 'C++ 1D finite-volume solver, not a CellML component; validated with the solver
         itself.'}
     calibrate: {status: not_applicable, reason: 'C++ component, not testable here.'}
+  harness:
+    vessel_array:
+    - [mod, vp, FV1D_vessel, '', term]
+    - [term, vp_R1CR2_wCont, single_terminal, mod, '']
+    parameters:
+    - [R_T1_term, Js_per_m6, 68123000.0, library default (module parameters)]
+    - [R_T2_term, Js_per_m6, 3101300000.0, library default (module parameters)]
+    - [C_T_term, m6_per_J, 3.6664e-10, library default (module parameters)]
+    - [u_ext_term, J_per_m3, 0.0, library default (module parameters)]
+    - [q_init_term, m3, 0.0, library default (module parameters)]
+    - [q_us_term, m3, 0.0, library default (module parameters)]
+    - [v_in_term, m3_per_s, 0.1, library default (module parameters)]
+    - [u_out_term, J_per_m3, 0.0, library default (module parameters)]
+    - [Delta_R_term, Js_per_m6, 0.0, library default (module parameters)]
+    - [R_local_multiplier_term, dimensionless, 1.0, library default (module parameters)]
+  notes: 'Marks a vessel as part of the C++ 1D finite-volume (Muller) solver: no CellML equations and no port variables of
+    its own. libcuflynx generates the 0D model coupled to it through the C++ 0D-1D path (model_type cpp, couple_to_1d). Test
+    network: 1D vessel (mod) whose outlet flow feeds a 0D R1-C-R2 terminal (the aortic_bif_1d pattern). run_test generates
+    it from this library and compiles the generated model0d.cc; the simulation tests are not applicable because the 1D solver
+    it couples to is not runnable here (libcuflynx solver1d is in development and circulatory_autogen itself only tests generation).'
 - vessel_type: FV1D_vessel
   BC_type: pv
   module_type: Muller_1d
   outputs: []
   invariants: []
-  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
   validation:
     baseline: {status: not_applicable, reason: 'C++ 1D finite-volume solver, not a CellML component; validated with the solver
         itself.'}
     calibrate: {status: not_applicable, reason: 'C++ component, not testable here.'}
+  harness:
+    vessel_array:
+    - [p_in, nn_constant, inlet_pressure, '', ves]
+    - [ves, pv, arterial_simple, p_in, mod]
+    - [mod, pv, FV1D_vessel, ves, '']
+    parameters:
+    - [P_p_in, J_per_m3, 12399.0, library default (module parameters)]
+    - [q_0_ves, m3, 6.94e-06, library default (module parameters)]
+    - [R_ves, Js_per_m6, 10664000.0, library default (module parameters)]
+    - [C_ves, m6_per_J, 3.09077e-08, library default (module parameters)]
+    - [u_ext_ves, J_per_m3, 0.0, library default (module parameters)]
+    - [u_0_ves, J_per_m3, 0.0, library default (module parameters)]
+    - [u_in_ves, J_per_m3, 13332.2, library default (module parameters)]
+    - [v_out_ves, m3_per_s, 0.0001, library default (module parameters)]
+    - [I_ves, Js2_per_m6, 100000.0, library default (module parameters)]
+  notes: 'Marks a vessel as part of the C++ 1D finite-volume (Muller) solver: no CellML equations and no port variables of
+    its own. libcuflynx generates the 0D model coupled to it through the C++ 0D-1D path (model_type cpp, couple_to_1d). Test
+    network: pressure inlet -> 0D arterial vessel -> 1D vessel (mod): the 0D vessel supplies the 1D inlet. run_test generates
+    it from this library and compiles the generated model0d.cc; the simulation tests are not applicable because the 1D solver
+    it couples to is not runnable here (libcuflynx solver1d is in development and circulatory_autogen itself only tests generation).'
 - vessel_type: FV1D_vessel
   BC_type: vv
   module_type: Muller_1d
   outputs: []
   invariants: []
-  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
   validation:
     baseline: {status: not_applicable, reason: 'C++ 1D finite-volume solver, not a CellML component; validated with the solver
         itself.'}
     calibrate: {status: not_applicable, reason: 'C++ component, not testable here.'}
+  harness:
+    vessel_array:
+    - [f_in, nn_constant, inlet_flow, '', ves]
+    - [ves, vp, arterial_simple, f_in, mod]
+    - [mod, vv, FV1D_vessel, ves, term]
+    - [term, pp_R1CR2_wCont, terminal, mod, p_out]
+    - [p_out, nn_constant, outlet_pressure, term, '']
+    parameters:
+    - [v_f_in, m3_per_s, 8.3333e-05, library default (module parameters)]
+    - [q_0_ves, m3, 0.0, library default (module parameters)]
+    - [R_ves, Js_per_m6, 10664000.0, library default (module parameters)]
+    - [C_ves, m6_per_J, 3.09077e-10, library default (module parameters)]
+    - [I_ves, Js2_per_m6, 1.0e-06, library default (module parameters)]
+    - [u_ext_ves, J_per_m3, 0.0, library default (module parameters)]
+    - [u_0_ves, J_per_m3, 1463.0, library default (module parameters)]
+    - [u_out_ves, J_per_m3, 12665.6, library default (module parameters)]
+    - [v_in_ves, m3_per_s, 0.0001, library default (module parameters)]
+    - [R_T1_term, Js_per_m6, 13000000.0, library default (module parameters)]
+    - [R_T2_term, Js_per_m6, 260870000.0, library default (module parameters)]
+    - [C_T_term, m6_per_J, 4.0e-09, library default (module parameters)]
+    - [q_us_term, m3, 0.0, library default (module parameters)]
+    - [q_init_term, m3, 0.0, library default (module parameters)]
+    - [Delta_R_term, dimensionless, 0.0, library default (module parameters)]
+    - [u_ext_term, J_per_m3, 0.0, library default (module parameters)]
+    - [u_out_term, J_per_m3, 666.61, library default (module parameters)]
+    - [u_in_term, J_per_m3, 13332.2, library default (module parameters)]
+    - [R_local_multiplier_term, dimensionless, 1.0, library default (module parameters)]
+    - [P_p_out, J_per_m3, 666.0, library default (module parameters)]
+  notes: 'Marks a vessel as part of the C++ 1D finite-volume (Muller) solver: no CellML equations and no port variables of
+    its own. libcuflynx generates the 0D model coupled to it through the C++ 0D-1D path (model_type cpp, couple_to_1d). Test
+    network: flow inlet -> 0D vessel -> 1D vessel (mod) -> 0D terminal -> pressure outlet. run_test generates it from this
+    library and compiles the generated model0d.cc; the simulation tests are not applicable because the 1D solver it couples
+    to is not runnable here (libcuflynx solver1d is in development and circulatory_autogen itself only tests generation).'
+  expected_failures: {run_test: 'no valid network found yet: a 1D vessel between two 0D vessels (flow inlet -> 0D vp -> FV1D
+      vv -> terminal pp -> pressure outlet) generates a model libCellML does not analyse as an ODE ("model is not a valid
+      ODE model"). May be the test network rather than the module; needs 0D-1D coupling input.'}
 - vessel_type: FV1D_vessel
   BC_type: nn
   module_type: Muller_1d
   outputs: []
   invariants: []
-  skip: 'module_format cpp: not a CellML component, cannot be tested in isolation'
   validation:
     baseline: {status: not_applicable, reason: 'C++ 1D finite-volume solver, not a CellML component; validated with the solver
         itself.'}
     calibrate: {status: not_applicable, reason: 'C++ component, not testable here.'}
+  harness:
+    vessel_array:
+    - [mod, nn, FV1D_vessel, '', '']
+    - [p_in, nn_constant, inlet_pressure, '', ves]
+    - [ves, pv, arterial_simple, p_in, f_out]
+    - [f_out, nn_constant, outlet_flow, ves, '']
+    parameters:
+    - [P_p_in, J_per_m3, 12399.0, library default (module parameters)]
+    - [q_0_ves, m3, 6.94e-06, library default (module parameters)]
+    - [R_ves, Js_per_m6, 10664000.0, library default (module parameters)]
+    - [C_ves, m6_per_J, 3.09077e-08, library default (module parameters)]
+    - [u_ext_ves, J_per_m3, 0.0, library default (module parameters)]
+    - [u_0_ves, J_per_m3, 0.0, library default (module parameters)]
+    - [u_in_ves, J_per_m3, 13332.2, library default (module parameters)]
+    - [v_out_ves, m3_per_s, 0.0001, library default (module parameters)]
+    - [I_ves, Js2_per_m6, 100000.0, library default (module parameters)]
+    - [v_f_out, m3_per_s, 8.3333e-05, library default (module parameters)]
+  notes: 'Marks a vessel as part of the C++ 1D finite-volume (Muller) solver: no CellML equations and no port variables of
+    its own. libcuflynx generates the 0D model coupled to it through the C++ 0D-1D path (model_type cpp, couple_to_1d). Test
+    network: a 1D vessel (mod) with no 0D neighbour, beside an unrelated 0D vessel. run_test generates it from this library
+    and compiles the generated model0d.cc; the simulation tests are not applicable because the 1D solver it couples to is
+    not runnable here (libcuflynx solver1d is in development and circulatory_autogen itself only tests generation).'
+  expected_failures: {run_test: 'libcuflynx C++ generator bug: with no 0D-1D coupling, the generated model0d.cc uses EXTERNAL,
+      which the generated VariableInfo enum then lacks ("EXTERNAL was not declared in this scope").'}
 - vessel_type: volume_sum
   BC_type: nn
   module_type: volume_sum
