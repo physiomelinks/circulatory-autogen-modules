@@ -104,10 +104,6 @@ The module report shows all of this, regenerating the plots from the committed s
 
 Models whose original doesn't generate in circulatory_autogen carry `expected_failures` or `skip` with the reason. `tools/import_systems.py --ca-dir ../circulatory_autogen` re-imports them and never overwrites a spec.
 
-Some system models are examples built from this library, with no circulatory_autogen original (equivalence `not_applicable`); their invariants check exact solutions instead:
-- `system/diffusion/`: finite-volume diffusion meshes (`tools/build_diffusion_examples.py`).
-- `system/poiseuille/`: straight square channels of `poiseuille_transport` volumes and faces between inlet and outlet reservoirs (`tools/build_poiseuille_examples.py`). They cover steady advection-diffusion, pure diffusion and a sinusoidal inlet pressure that reverses the flow. The invariants check the exact square-duct Poiseuille flow, the exact steady 1D profile and outlet flux, fluid and solute conservation, and the maximum principle. `tests/test_poiseuille_channels.py` also compares each channel with a direct scipy solve of the same equations.
-
 `modules/supermodules/<name>/` is a vessel array of library modules with named interface ports. The `heart` supermodule is the clock, four chambers and four valves, with these ports:
 - `systemic_venous_in` and `pulmonary_venous_in`;
 - `pulmonary_arterial_out` and `systemic_arterial_out`;
