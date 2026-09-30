@@ -32,6 +32,10 @@ Writes (and rewrites on every run):
 Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
 provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
 modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
+
+Pre-versions tool, kept for provenance: it reads and writes the old per-module layout
+(modules/cell/neurons/neurons_modules.cellml ...). Its output was moved into the versions layout by
+tools/restructure_modules.py: the cell/neurons and cell/ion_channels versions and system_models/cellular/SN_simple_*. Edit those files directly now.
 """
 import copy
 import csv
@@ -955,5 +959,13 @@ def main():
           f'{len(omap)} outputs mapped')
 
 
+
+OLD_LAYOUT_SOURCE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                 *'modules/cell/neurons/neurons_modules.cellml'.split('/'))
+
+
 if __name__ == '__main__':
+    if not os.path.isfile(OLD_LAYOUT_SOURCE):
+        sys.exit(f'{os.path.basename(__file__)} is a pre-versions tool: {OLD_LAYOUT_SOURCE} is gone '
+                 '(see its docstring and modules/README.md)')
     main()

@@ -24,9 +24,14 @@ same equations as the original. Re-run after changing the heart module:
 Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
 provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
 modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
+
+Pre-versions tool, kept for provenance: it reads and writes the old per-module layout
+(modules/heart/heart_modules.cellml ...). Its output was moved into the versions layout by
+tools/restructure_modules.py: cardiac/heart version Argus2026_v01 and the cardiac_clock, chamber and valve module_types. Edit those files directly now.
 """
 import copy
 import os
+import sys
 
 from lxml import etree
 
@@ -176,5 +181,13 @@ def main():
     print(f'wrote {os.path.relpath(OUT, REPO)} ({len(comps)} components)')
 
 
+
+OLD_LAYOUT_SOURCE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                 *'modules/heart/heart_modules.cellml'.split('/'))
+
+
 if __name__ == '__main__':
+    if not os.path.isfile(OLD_LAYOUT_SOURCE):
+        sys.exit(f'{os.path.basename(__file__)} is a pre-versions tool: {OLD_LAYOUT_SOURCE} is gone '
+                 '(see its docstring and modules/README.md)')
     main()
