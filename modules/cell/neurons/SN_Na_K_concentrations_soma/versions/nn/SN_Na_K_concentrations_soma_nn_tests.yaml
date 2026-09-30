@@ -2,7 +2,7 @@ module_type: SN_Na_K_concentrations_soma
 version: nn
 reviewed: false
 notes: 'Cytosolic Na and K of the SN soma: Vol dNai/dt = j_Na_total, Vol dKi/dt = j_K_total (the ion fluxes of the channels
-  connected through Na_flux / K_flux), and their Nernst potentials E_Na, E_K. Built by tools/build_sn_modules.py; SN_simple_flat
+  connected through Na_flux / K_flux), and their Nernst potentials E_Na, E_K. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat
   checks that the assembled parts reproduce SN_simple.'
 expected_failures:
   run_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K

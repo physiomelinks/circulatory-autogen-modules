@@ -4,7 +4,7 @@ reviewed: false
 notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. Na/Ca exchanger of the SN soma and varicosity (the same law
   in both; Paci 2013 form), with its Ca flux j_NaCa_Ca = i_NaCa/F and Na flux j_NaCa_Na = -3 i_NaCa/F. In the varicosity Nai
-  is a constant (no Na pool is connected). Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts
+  is a constant (no Na pool is connected). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
   reproduce SN_simple.
 expected_failures:
   run_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K

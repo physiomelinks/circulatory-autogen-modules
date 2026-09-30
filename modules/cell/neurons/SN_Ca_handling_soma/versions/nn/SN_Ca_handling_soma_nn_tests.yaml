@@ -4,7 +4,7 @@ reviewed: false
 notes: Four-compartment Ca of the SN soma (sub-membrane Cai, bulk, pre-ER, ER) with a mobile buffer in the first three, SERCA
   and a leak between bulk and pre-ER, and diffusion. Cai receives j_Ca_in, the sum of the Ca fluxes of the channels connected
   through Ca_flux; the ER loses j_ER_release (IP3R, RyR). Copied verbatim from SN_soma except for those two summed port variables.
-  Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

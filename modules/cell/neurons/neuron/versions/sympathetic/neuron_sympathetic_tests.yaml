@@ -6,4 +6,4 @@ description: 'Sympathetic neuron (SN_simple): an SN_soma supermodule instance "s
   gives the axon V and takes its axial current; the axon sets the varicosity membrane''s potential). A model uses one instance,
   e.g. {"name": "SN", "module_type": "sympathetic_neuron", "module_subtype": "supermodule"}; nested expansion names the parts
   SN_soma_<part>, SN_axon and SN_varicosity_<part>. The soma and varicosity parameters are the soma / varicosity sympathetic
-  versions'' defaults; its default instance holds the axon''s and the globals (SN_simple''s values). Built by tools/build_sn_modules.py.'
+  versions'' defaults; its default instance holds the axon''s and the globals (SN_simple''s values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history).'

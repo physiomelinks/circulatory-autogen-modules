@@ -30,8 +30,7 @@ modules/
           instances/
             <instance>/                                  instance == its obs_data_name
               <instance>_parameters.csv                  variable_name,units,value,data_reference,sourced
-              <instance>_obs_data.json                   calibration data (optional)
-              <instance>_validation_obs_data.json        held-out validation data (optional)
+              <instance>_obs_data.json                   calibration and held-out validation data (optional)
               <instance>_params_for_id.csv               parameters to calibrate, with bounds (optional)
               <instance>_calibrated_parameters.csv       written by calibration (committed)
               <instance>_calibration.json                calibration summary: method, cost, values, date (committed)
@@ -99,8 +98,15 @@ An instance is **a parameter set of a version: only the parameters change, never
 - **Parameters.** `<instance>_parameters.csv` has one row per parameter, without a vessel suffix:
   libcuflynx renames a row `C` to `C_<vessel>` for the record that uses it. A row naming one of the
   version's `global_constant` variables keeps its plain name.
-- **Naming.** An instance is named by its data set: its obs_data files carry
+- **Naming.** An instance is named by its data set: its obs_data carries
   `"obs_data_name": "<instance>"`, which must equal the directory's name.
+- **One data file.** `<instance>_obs_data.json` holds all of an instance's data. Its `data_items`
+  are what calibration fits. Held-out validation data goes in the same file, as `prediction_items`
+  that carry a `value` (with `data_type`, `std`, and `obs_dt` for a series), named
+  `<variable>_validation`; the protocol runs to the end of the held-out data. There is no separate
+  validation file. libcuflynx validates the calibrated model against these items
+  (`validation_results.json`), and CUFLynx shows the result.
+  `python -m cam_testing.calibrate from-csv ... --window 0 15 --validation-window 0 20` makes one.
 - **The default instance.** Every version has `default` (named in the config's `"default_instance"`):
   the values it has unless a model names another instance. The verification tests run at the
   default instance's parameters.
@@ -172,7 +178,7 @@ parameters:
 | Test | Checks |
 |---|---|
 | `validation_test_baseline` | the model at the instance's parameters against its baseline data or scalar targets |
-| `validation_test_calibrate` | calibrates to `<instance>_obs_data.json` with libcuflynx, predicts the held-out `<instance>_validation_obs_data.json`, and writes the calibrated files |
+| `validation_test_calibrate` | calibrates to `<instance>_obs_data.json` with libcuflynx, predicts the held-out data (the obs_data's `prediction_items` that carry a value), and writes the calibrated files |
 
 An instance without obs_data records calibration as **failed**, with the message "no calibration data
 in this instance". It shows that way in the reports. pytest marks it xfail, so CI isn't blocked, and
@@ -216,7 +222,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped` |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget`, `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
-| `validation` | verification_config | per instance, `validation.<instance>.baseline` / `.calibrate`: `status`, `source`, data references relative to the version directory (`data: instances/<i>/<file>.csv`, `obs_data`, `params_for_id`, `validation_obs_data`), variables, targets, metric, threshold, optimiser settings |
+| `validation` | verification_config | per instance, `validation.<instance>.baseline` / `.calibrate`: `status`, `source`, data references relative to the version directory (`data: instances/<i>/<file>.csv`, `obs_data`, `params_for_id`), variables, targets, metric, threshold, optimiser settings |
 | `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance`, `tol`, `solver_info`, `output_map`, `ignore`) |
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |
@@ -239,9 +245,9 @@ What an archive holds, in this order:
 | Member | What it is |
 |---|---|
 | `<module_type>_<version>_<instance>.cellml` | **Master model** (marked in `manifest.xml`): the flattened model of the version's test network (the version alone, or its `harness` network) with this instance's parameters, as libcuflynx generates it. This is what CUFLynx opens and simulates. |
-| `<instance>_obs_data.json` | The instance's calibration data, if it has any (CUFLynx's observations). |
+| `<instance>_obs_data.json` | The instance's data, if it has any (CUFLynx's observations): calibration data, and held-out validation data as `prediction_items`. |
 | `<instance>_params_for_id.csv` | The parameters to identify, if any (CUFLynx's calibration setup). |
-| `<instance>_parameters.csv`, `<instance>_validation_obs_data.json`, raw data files, `SOURCES.md`, `<instance>_calibrated_parameters.csv`, `<instance>_calibration.json` | The instance's own files, unchanged. |
+| `<instance>_parameters.csv`, raw data files, `SOURCES.md`, `<instance>_calibrated_parameters.csv`, `<instance>_calibration.json` | The instance's own files, unchanged. |
 | `<module_type>_<version>_modules.cellml`, `_modules_config.json`, `_units.cellml` | The version's math, unchanged. |
 | `<module_type>_<version>_verification_config.json` | The version's verification settings, in preparation for CUFLynx running them. |
 | `<module_type>_<version>_<instance>_vessel_array.json`, `_model_parameters.csv` | The test network and the parameters file the model was generated from. |

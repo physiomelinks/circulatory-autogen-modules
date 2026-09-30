@@ -6,10 +6,12 @@ The inputs are ordinary libcuflynx files, committed in the instance directory
 (versions/<version>/instances/<instance>/), so the same calibration can be run with libcuflynx
 directly:
 
-    <instance>_obs_data.json              obs_data fitted by CVS0DParamID ("obs_data_name": "<instance>")
+    <instance>_obs_data.json              obs_data ("obs_data_name": "<instance>"): its data_items
+                                          are fitted by CVS0DParamID; its prediction_items that
+                                          carry a value are the held-out data the calibrated
+                                          model is validated against, scored on
+                                          prediction_window (without any, the data_items are)
     <instance>_params_for_id.csv          parameters calibrated, with bounds
-    <instance>_validation_obs_data.json   series over the full span, scored on prediction_window
-                                          (held-out data; without it the obs_data is scored)
 
 and the results are written there too, and committed:
 
@@ -26,7 +28,6 @@ references relative to the version directory, defaulting to the instance's files
     source: citation / URL
     obs_data: instances/<instance>/<instance>_obs_data.json
     params_for_id: instances/<instance>/<instance>_params_for_id.csv
-    validation_obs_data: instances/<instance>/<instance>_validation_obs_data.json
     prediction_window: [15, 20]           model time scored for series predictions (optional)
     initial_parameters: {a: 0.8}          optional optimiser start (default: nominal values)
     starts: [{a: 1}, {a: -1}]             optional: several starts, each calibrated and checked
@@ -43,6 +44,8 @@ The obs_data files for tabular data are made with
     python -m cam_testing.calibrate from-csv --csv instances/<instance>/data.csv --time-column Year \
         --time-offset 1900 --variables x=Hare y=Lynx --window 0 15 --noise relative 0.25 \
         --name <instance> --out instances/<instance>/<instance>_obs_data.json
+and held-out data is added to it as prediction_items with --validation-window (the protocol
+then runs to the end of the held-out data).
 """
 import contextlib
 import copy
@@ -99,6 +102,33 @@ def obs_data_from_series(t, data, window, noise, unit='dimensionless', name=None
     out.update({'protocol_info': {'pre_times': [0.0], 'sim_times': [[float(tw[-1])]], 'params_to_change': {}},
                 'data_items': items, 'prediction_items': []})
     return out
+
+
+def held_out_items(obs):
+    """The prediction_items of an obs_data that carry data (a value): its held-out data."""
+    return [i for i in (obs.get('prediction_items') or []) if i.get('value') is not None]
+
+
+def calibration_end(obs):
+    """Model time the fitted data reaches: the last sample of its series data_items (the
+    protocol's end when it has none). The protocol may run on, to held-out data."""
+    ends = [float(i['obs_dt']) * (len(i['value']) - 1) for i in obs['data_items'] if i.get('data_type') == 'series']
+    return max(ends) if ends else float(obs['protocol_info']['sim_times'][0][-1])
+
+
+def calibration_obs(obs):
+    """The obs_data CVS0DParamID fits: the data_items only, run to calibration_end."""
+    out = copy.deepcopy(obs)
+    out['prediction_items'] = []
+    out['protocol_info']['sim_times'] = [[calibration_end(obs)]]
+    return out
+
+
+def validation_view(obs):
+    """{protocol_info, data_items}: what the calibrated model is scored against: the held-out
+    prediction_items when there are any, else the data_items themselves."""
+    held = held_out_items(obs)
+    return {'protocol_info': obs['protocol_info'], 'data_items': held or obs['data_items']}
 
 
 def series_from_obs_data(obs):
@@ -208,13 +238,10 @@ def run(cm, v, plot_path):
     obs_path = path('obs_data', inst.obs_data_path)
     with open(obs_path) as f:
         obs = json.load(f)
-    val_path = path('validation_obs_data', inst.validation_obs_data_path
-                    if os.path.isfile(inst.validation_obs_data_path) else obs_path)
-    with open(val_path) as f:
-        val_obs = json.load(f)
+    val_obs = validation_view(obs)
     pfi_path = path('params_for_id', inst.params_for_id_path)
     params_for_id = read_params_for_id(pfi_path)
-    cal_end = float(obs['protocol_info']['sim_times'][0][-1])
+    cal_end = calibration_end(obs)
     metric = v.get('metric', 'log_rmse')
     threshold = float(v.get('threshold', 0.5))
     z_threshold = float(v.get('z_threshold', 2.0))
@@ -226,7 +253,7 @@ def run(cm, v, plot_path):
     starts = v.get('starts') or [v.get('initial_parameters') or {}]
     runs, problems, figs = [], [], []
     for n, start_values in enumerate(starts):
-        calibrated, method, cost = _calibrate_once(cm, v, obs, params_for_id, start_values, n)
+        calibrated, method, cost = _calibrate_once(cm, v, calibration_obs(obs), params_for_id, start_values, n)
         tm, out, series, cal_s, pred_s, z_s = _evaluate(cm, v, val_obs, calibrated, cal_end)
         label = ', '.join(f'{k}={val:g}' for k, val in start_values.items()) or 'nominal'
         runs.append({'start': start_values, 'calibrated_parameters': calibrated, 'cost': cost, 'calibration_scores': cal_s,
@@ -258,7 +285,7 @@ def run(cm, v, plot_path):
     for r in runs:
         for k, val in r['calibrated_parameters'].items():
             validated.setdefault(k, []).append(val)
-    files = [os.path.relpath(p, vdir) for p in (obs_path, pfi_path, val_path)]
+    files = [os.path.relpath(p, vdir) for p in (obs_path, pfi_path)]
     metrics = {'metric': metric, 'threshold': threshold, 'method': method, 'source': v.get('source', ''),
                'files': sorted(set(files), key=files.index), 'runs': runs,
                'calibrated_parameters': runs[0]['calibrated_parameters'] if len(runs) == 1 else
@@ -317,14 +344,24 @@ def main(argv=None):
     fc.add_argument('--window', nargs=2, type=float, required=True)
     fc.add_argument('--noise', nargs=2, default=['relative', '0.1'], help='relative|absolute VALUE')
     fc.add_argument('--name', help='obs_data_name (the instance the file belongs to)')
+    fc.add_argument('--validation-window', nargs=2, type=float,
+                    help='also add this window of the data as held-out prediction_items')
     fc.add_argument('--out', required=True)
     args = parser.parse_args(argv)
     spec = {'data': os.path.abspath(args.csv), 'time_column': args.time_column, 'time_offset': args.time_offset,
             'variables': dict(x.split('=', 1) for x in args.variables)}
     t, data = load_data('/', spec)
     obs = obs_data_from_series(t, data, args.window, args.noise, name=args.name)
+    if args.validation_window:
+        held = obs_data_from_series(t, data, args.validation_window, args.noise)
+        obs['protocol_info']['sim_times'] = held['protocol_info']['sim_times']
+        obs['prediction_items'] = [
+            {'data_item_name': f"{i['trace_name_for_plotting']}_validation", 'operands': i['operands'],
+             'unit': i['unit'], 'trace_name_for_plotting': i['trace_name_for_plotting'], 'experiment_idx': 0,
+             'data_type': 'series', 'value': i['value'], 'std': i['std'], 'obs_dt': i['obs_dt']}
+            for i in held['data_items']]
     with open(args.out, 'w') as f:
-        json.dump(obs, f, indent=1)
+        json.dump(obs, f, indent=2)
     print(f'wrote {args.out}')
 
 

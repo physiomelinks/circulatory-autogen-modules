@@ -3,7 +3,7 @@ version: Argus2026_v01
 reviewed: false
 notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. M-type (KCNQ) K current of the SN soma, i_M = g_M_mod g_M w
-  (V - E_K); Delta_V_mid_w shifts the activation for drug studies. Built by tools/build_sn_modules.py; SN_simple_flat checks
+  (V - E_K); Delta_V_mid_w shifts the activation for drug studies. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
   that the assembled parts reproduce SN_simple.
 expected_failures:
   run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K

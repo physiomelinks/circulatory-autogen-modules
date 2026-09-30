@@ -2,7 +2,7 @@ module_type: SN_varicosity_membrane
 version: nn
 reviewed: false
 notes: 'Membrane of the SN varicosity: it has no dynamics of its own (the axon sets its potential), so it passes the axon''s
-  V_in on to the varicosity''s channels as V (V = V_in). Built by tools/build_sn_modules.py; SN_simple_flat checks that the
+  V_in on to the varicosity''s channels as V (V = V_in). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the
   assembled parts reproduce SN_simple.'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version

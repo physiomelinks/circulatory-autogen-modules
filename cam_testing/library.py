@@ -16,8 +16,8 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
             risk/  plots/  results/                       (plots, results generated)
             instances/<instance>/                         instance == obs_data_name
                 <instance>_parameters.csv                 variable_name,units,value,data_reference,sourced
-                <instance>_obs_data.json                  optional, calibration data
-                <instance>_validation_obs_data.json       optional, held-out data
+                <instance>_obs_data.json                  optional: calibration data (data_items) and
+                                                          held-out data (prediction_items with a value)
                 <instance>_params_for_id.csv              optional
                 <instance>_calibrated_parameters.csv      written by calibration (committed)
                 <instance>_calibration.json               written by calibration (committed)
@@ -307,7 +307,7 @@ NESTED_ORDER = {
     'baseline': ('status', 'reason', 'source', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
                  'threshold'),
-    'calibrate': ('status', 'reason', 'note', 'source', 'obs_data', 'params_for_id', 'validation_obs_data',
+    'calibrate': ('status', 'reason', 'note', 'source', 'obs_data', 'params_for_id',
                   'prediction_window', 'initial_parameters', 'starts', 'expected_parameters', 'expected_compare',
                   'expected_rtol', 'z_threshold', 'method', 'optimiser_options', 'do_ad', 'metric', 'threshold'),
 }
@@ -481,10 +481,6 @@ class Instance:
     @property
     def obs_data_path(self):
         return self.path('obs_data.json')
-
-    @property
-    def validation_obs_data_path(self):
-        return self.path('validation_obs_data.json')
 
     @property
     def params_for_id_path(self):

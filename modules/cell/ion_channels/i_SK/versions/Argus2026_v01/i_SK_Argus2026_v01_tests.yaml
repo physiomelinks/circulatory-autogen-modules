@@ -4,7 +4,7 @@ reviewed: false
 notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. SK (small-conductance Ca-activated K) current of the SN soma,
   i_KCa_SK = g_KCa_SK g_KCa_SK_mod m_SK (V - E_K), m_SK a Hill function of the bulk cytosolic Ca (Ca_bulk, as in the original).
-  m_SK starts at its steady state at Cai_init. Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled
+  m_SK starts at its steady state at Cai_init. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled
   parts reproduce SN_simple.
 expected_failures:
   run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K

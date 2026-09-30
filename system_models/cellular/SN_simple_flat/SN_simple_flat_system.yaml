@@ -3,7 +3,7 @@ category: cellular
 reviewed: false
 description: 'SN_simple (sympathetic neuron: soma, axon, varicosity) with SN_soma and SN_varicosity decomposed into their
   ion channels (modules/ion_channel, *_SN) and the neuron-specific membrane, concentration, Ca-handling and NE-release components
-  (modules/cell/neurons), wired explicitly. Built by tools/build_sn_modules.py; the vessel names are those a sympathetic_neuron
+  (modules/cell/neurons), wired explicitly. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); the vessel names are those a sympathetic_neuron
   supermodule instance "SN" expands to (SN_soma_<part>, SN_axon, SN_varicosity_<part>).'
 sim_time: 2.0
 pre_time: 0.0

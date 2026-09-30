@@ -2,7 +2,7 @@ model: SN_simple_supermodules
 category: cellular
 reviewed: false
 description: SN_simple as one record "SN" of the supermodule version cell/neurons/neuron sympathetic, which
-  nests the soma and varicosity sympathetic supermodule versions. Built by tools/build_sn_modules.py.
+  nests the soma and varicosity sympathetic supermodule versions. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history).
 sim_time: 2.0
 pre_time: 0.0
 dt: 0.01

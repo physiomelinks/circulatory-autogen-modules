@@ -209,12 +209,11 @@ def walk_modules():
                 header = next(csv.reader(f), [])
             if [h.strip() for h in header] != LEVELS['instance']['parameters_columns']:
                 problems.append(f'{rel}: {i}_parameters.csv columns are {header}, not {INSTANCE_COLUMNS}')
-        for suffix in ('obs_data.json', 'validation_obs_data.json'):
-            p = os.path.join(d, f'{i}_{suffix}')
-            if os.path.isfile(p):
-                name = json.load(open(p)).get('obs_data_name')
-                if name != i:
-                    problems.append(f'{rel}: {i}_{suffix} has obs_data_name {name!r}; the instance is named by it ({i!r})')
+        p = os.path.join(d, f'{i}_obs_data.json')
+        if os.path.isfile(p):
+            name = json.load(open(p)).get('obs_data_name')
+            if name != i:
+                problems.append(f'{rel}: {i}_obs_data.json has obs_data_name {name!r}; the instance is named by it ({i!r})')
 
     for c in _subdirs(MODULES_DIR):
         p = os.path.join(MODULES_DIR, c)

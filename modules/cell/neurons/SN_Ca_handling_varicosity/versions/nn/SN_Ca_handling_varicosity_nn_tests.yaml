@@ -3,7 +3,7 @@ version: nn
 reviewed: false
 notes: Four-compartment Ca of the SN varicosity, as SN_Ca_handling_soma except that the ER leak j_leak_Ca enters the sub-membrane
   Cai (not the bulk), as in the original SN_varicosity; also gives E_Ca = RT/F ln(Cao/Cai) (sic, no factor 1/2, as in the
-  original). Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  original). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
 expected_failures:
   run_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K
     / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao

@@ -11,7 +11,7 @@ Built by ``python tools/build_instance_omex.py`` (``make omex``); not committed.
                                               instance's parameters, as libcuflynx generates it
   <instance>_obs_data.json                    the instance's calibration data, if it has any
   <instance>_params_for_id.csv                its parameters to identify, if any
-  inputs, unchanged: <instance>_parameters.csv, <instance>_validation_obs_data.json, raw data and
+  inputs, unchanged: <instance>_parameters.csv, raw data and
     SOURCES.md; the version's _modules.cellml, _modules_config.json, _units.cellml and
     _verification_config.json; and the test network the model was generated from
     (<module_type>_<version>_<instance>_vessel_array.json / _model_parameters.csv)
@@ -82,7 +82,6 @@ def members(version, instance, work_dir):
     add(instance.params_for_id_path)
     # the inputs, as they are in the library
     add(instance.parameters_path)
-    add(instance.validation_obs_data_path)
     for p in sorted(os.listdir(instance.dir)):
         full = os.path.join(instance.dir, p)
         if os.path.isfile(full) and not p.endswith('.omex') and p not in {n for n, _, _ in out}:
