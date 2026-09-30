@@ -104,7 +104,11 @@ def cuflynx_instance_omex_test(instance_key, tmp_path_factory):
         problems += [f"{r['cuflynx']} differs from libcuflynx by {r['difference']:.3g}" for r in rows if not r['ok']]
     if problems:
         checks.save(v, checks.Result(name, checks.FAILED, problems[0], metrics, details=problems[1:20]))
-        known = (v.spec.get('expected_failures') or {}).get('cuflynx_instance_omex_test')
+        ef = v.spec.get('expected_failures') or {}
+        known = ef.get('cuflynx_instance_omex_test')
+        if not known and isinstance(built.get(key), Exception) and ef.get('run_test'):
+            # the version's model doesn't generate (a known run_test failure), so there is no archive
+            known = f'run_test known failure: {ef["run_test"]}'
         if known:
             pytest.xfail(f'known issue: {known} ({problems[0]})')
         pytest.fail('\n'.join(problems[:20]), pytrace=False)

@@ -123,6 +123,9 @@ def run(job, binary):
                     res['n_points'] = len(res['time'])
                     res['ok'] = res['n_points'] > 1 and bool(res['outputs'])
                     res['stage'] = 'done'
+                    if not res['ok']:
+                        res['error'] = (f'the run returned {res["n_points"]} time point(s) and '
+                                        f'{len(res["outputs"])} output(s) (asked for {len(outputs)})')
             with open(m['out'], 'w') as f:
                 json.dump(res, f)
             summary.append({k: res.get(k) for k in ('id', 'ok', 'stage', 'error', 'n_points')})

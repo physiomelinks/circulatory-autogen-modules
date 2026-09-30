@@ -50,6 +50,7 @@ SYSTEM_MODELS = os.path.join(REPO, 'system_models')
 # another session's uncommitted work: not moved, not edited
 LEFT_IN_PLACE = ('poiseuille_transport', os.path.join('system', 'poiseuille'))
 TEMPLATE_DEST = os.path.join(REPO, 'manifests', 'template_modules.cellml')
+REVIEWS = os.path.join(REPO, 'reviews')
 
 CELLML_HEAD = ("<?xml version='1.0' encoding='UTF-8'?>\n"
                '<model name="{name}" xmlns="http://www.cellml.org/cellml/1.1#" '
@@ -521,10 +522,9 @@ def build_version(stage, cat, mt, v, info, old, table, library_bibs, all_blocks,
         spec['review'] = copy.deepcopy(old.spec['review'])
         if len(old.config) > 1:
             # one copy of a shared review, in reviews/; the versions point to it
-            rel = f'reviews/{old.name}_review.yaml'
-            os.makedirs(os.path.join(REPO, 'reviews'), exist_ok=True)
-            write_yaml(os.path.join(REPO, rel), spec['review'])
-            spec['review'] = rel
+            os.makedirs(REVIEWS, exist_ok=True)
+            write_yaml(os.path.join(REVIEWS, f'{old.name}_review.yaml'), spec['review'])
+            spec['review'] = f'reviews/{old.name}_review.yaml'
             spec['review_scope'] = (f'The review of the whole {old.name} module ({len(old.config)} entries) before the move to '
                                     'versions; only the parts about this version apply.')
     write_spec(dest, stem, spec)
@@ -700,11 +700,12 @@ def main(argv=None):
     ap.add_argument('--source', help='the old modules/ directory (default: modules/ when it still has the old layout)')
     ap.add_argument('--out', help='write modules/ and system_models/ under this directory instead of the repo (a dry run)')
     args = ap.parse_args(argv)
-    global MODULES, SYSTEM_MODELS, TEMPLATE_DEST
+    global MODULES, SYSTEM_MODELS, TEMPLATE_DEST, REVIEWS
     if args.out:
         MODULES = os.path.join(os.path.abspath(args.out), 'modules')
         SYSTEM_MODELS = os.path.join(os.path.abspath(args.out), 'system_models')
         TEMPLATE_DEST = os.path.join(os.path.abspath(args.out), 'template_modules.cellml')
+        REVIEWS = os.path.join(os.path.abspath(args.out), 'reviews')
         os.makedirs(MODULES, exist_ok=True)
     src = os.path.abspath(args.source or os.path.join(REPO, 'modules'))
     olds = find_old_modules(src)
