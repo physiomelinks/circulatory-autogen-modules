@@ -104,9 +104,15 @@ An instance is **a parameter set of a version: only the parameters change, never
   are what calibration fits. Held-out validation data goes in the same file, as `prediction_items`
   that carry a `value` (with `data_type`, `std`, and `obs_dt` for a series), named
   `<variable>_validation`; the protocol runs to the end of the held-out data. There is no separate
-  validation file. libcuflynx validates the calibrated model against these items
+  validation file. Each held-out series also has scalar held-out features: constant prediction_items
+  with an `operation` (`<variable>_max_validation`, `_min_`, `_mean_`), their value and std taken
+  from the data. They are validated like the series, and they are the prediction items that
+  libcuflynx's sensitivity analysis and emulation can include as features
+  (`include_prediction_items` in `sa_options` / `emulator_settings`; only items with an operation,
+  i.e. a scalar, are used). libcuflynx validates the calibrated model against these items
   (`validation_results.json`), and CUFLynx shows the result.
-  `python -m cam_testing.calibrate from-csv ... --window 0 15 --validation-window 0 20` makes one.
+  `python -m cam_testing.calibrate from-csv ... --window 0 15 --validation-window 0 20` makes one
+  (with the max / min / mean features; `--validation-features` chooses them).
 - **The default instance.** Every version has `default` (named in the config's `"default_instance"`):
   the values it has unless a model names another instance. The verification tests run at the
   default instance's parameters.

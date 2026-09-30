@@ -104,6 +104,35 @@ def obs_data_from_series(t, data, window, noise, unit='dimensionless', name=None
     return out
 
 
+FEATURE_OPERATIONS = ('max', 'min', 'mean')
+
+
+def feature_items(item, operations=FEATURE_OPERATIONS):
+    """Scalar held-out features of a held-out series prediction_item: one constant
+    prediction_item per operation (libcuflynx's max / min / mean over the experiment), its value
+    the operation on the data and its std the data's at that sample (max, min) or propagated
+    (mean: sqrt(sum std^2) / n). They are what SA and emulation can use as features
+    (sa_options / emulator_settings include_prediction_items), and are validated like the series."""
+    values = np.asarray(item['value'], dtype=float)
+    std = np.broadcast_to(np.asarray(item.get('std', 0.0), dtype=float), values.shape)
+    var = item['data_item_name'][:-len('_validation')] if item['data_item_name'].endswith('_validation') \
+        else item['data_item_name']
+    out = []
+    for op in operations:
+        if op == 'mean':
+            value, sd = float(values.mean()), float(np.sqrt(np.sum(std ** 2)) / values.size)
+        else:
+            k = int(np.argmax(values) if op == 'max' else np.argmin(values))
+            value, sd = float(values[k]), float(std[k])
+        out.append({'data_item_name': f'{var}_{op}_validation', 'operands': list(item['operands']),
+                    'operation': op, 'unit': item['unit'],
+                    'trace_name_for_plotting': item.get('trace_name_for_plotting', var),
+                    'item_name_for_plotting': f"{item.get('trace_name_for_plotting', var)} ({op})",
+                    'experiment_idx': item.get('experiment_idx', 0),
+                    'data_type': 'constant', 'value': value, 'std': sd})
+    return out
+
+
 def held_out_items(obs):
     """The prediction_items of an obs_data that carry data (a value): its held-out data."""
     return [i for i in (obs.get('prediction_items') or []) if i.get('value') is not None]
@@ -346,6 +375,9 @@ def main(argv=None):
     fc.add_argument('--name', help='obs_data_name (the instance the file belongs to)')
     fc.add_argument('--validation-window', nargs=2, type=float,
                     help='also add this window of the data as held-out prediction_items')
+    fc.add_argument('--validation-features', nargs='*', default=list(FEATURE_OPERATIONS),
+                    help='scalar features of each held-out series added as prediction_items '
+                         f'(default {" ".join(FEATURE_OPERATIONS)}; none: --validation-features)')
     fc.add_argument('--out', required=True)
     args = parser.parse_args(argv)
     spec = {'data': os.path.abspath(args.csv), 'time_column': args.time_column, 'time_offset': args.time_offset,
@@ -360,6 +392,9 @@ def main(argv=None):
              'unit': i['unit'], 'trace_name_for_plotting': i['trace_name_for_plotting'], 'experiment_idx': 0,
              'data_type': 'series', 'value': i['value'], 'std': i['std'], 'obs_dt': i['obs_dt']}
             for i in held['data_items']]
+        if args.validation_features:
+            obs['prediction_items'] += [f for i in list(obs['prediction_items'])
+                                        for f in feature_items(i, args.validation_features)]
     with open(args.out, 'w') as f:
         json.dump(obs, f, indent=2)
     print(f'wrote {args.out}')

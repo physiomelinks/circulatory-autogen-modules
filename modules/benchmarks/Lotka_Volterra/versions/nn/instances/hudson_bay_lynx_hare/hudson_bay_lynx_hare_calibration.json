@@ -2,7 +2,7 @@
  "instance": "hudson_bay_lynx_hare",
  "version": "Lotka_Volterra/nn",
  "date": "2026-09-30",
- "passed": true,
+ "passed": false,
  "summary": "start nominal -> alpha=0.4357, beta=0.02302, gamma=1.001, delta=0.02944, x_init=35.56, y_init=4.93 (prediction log_rmse 0.395)",
  "method": "CMA-ES",
  "files": [
@@ -38,7 +38,38 @@
     "x": 0.39504568763759834,
     "y": 0.3279529012865185
    },
-   "constant_items": {}
+   "constant_items": {
+    "x_max_validation": {
+     "model": 65.04884652820196,
+     "data": 77.4,
+     "z": 0.6383025050024828
+    },
+    "x_min_validation": {
+     "model": 14.857376346511561,
+     "data": 7.6,
+     "z": 3.8196717613218745
+    },
+    "x_mean_validation": {
+     "model": 34.00828876579861,
+     "data": 34.0809523809524,
+     "z": 0.03331704557633867
+    },
+    "y_max_validation": {
+     "model": 48.0687136331251,
+     "data": 59.4,
+     "z": 0.7630495869949427
+    },
+    "y_min_validation": {
+     "model": 4.914442187371873,
+     "data": 4.0,
+     "z": 0.9144421873718729
+    },
+    "y_mean_validation": {
+     "model": 19.223708278437343,
+     "data": 20.166666666666668,
+     "z": 0.6673155842377421
+    }
+   }
   }
  ],
  "metric": "log_rmse",
