@@ -1,0 +1,9 @@
+[
+ {"name": "pvn", "module_type": "venous", "module_subtype": "vp", "inp_instances": ["par"], "out_instances": ["heart", "volume_sum"]},
+ {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "inp_instances": ["heart"], "out_instances": ["pvn", "volume_sum"]},
+ {"name": "heart", "module_type": "heart_nonstiff", "module_subtype": "vp_wCont", "inp_instances": ["venous_svc", "pvn"], "out_instances": ["aortic_root", "par", "volume_sum"]},
+ {"name": "aortic_root", "module_type": "arterial_simple", "module_subtype": "vv", "inp_instances": ["heart"], "out_instances": ["systemic_T", "volume_sum"]},
+ {"name": "systemic_T", "module_type": "terminal", "module_subtype": "pp_spec_I", "inp_instances": ["aortic_root"], "out_instances": ["venous_svc", "volume_sum"]},
+ {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]},
+ {"name": "volume_sum", "module_type": "volume_sum", "module_subtype": "nn", "inp_instances": ["pvn", "par", "heart", "aortic_root", "systemic_T", "venous_svc"], "out_instances": []}
+]

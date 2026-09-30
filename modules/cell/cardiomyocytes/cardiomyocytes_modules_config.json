@@ -1,0 +1,491 @@
+[
+  {
+    "module_type": "Ca_dynamics_Paci_2013",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "cardiomyocytes_modules.cellml",
+    "component_type": "Ca_dynamics_Paci_2013",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "CaL_current",
+        "variables": [
+          "i_CaL"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "internal_Ca_d_gate_port",
+        "variables": [
+          "Cai",
+          "d"
+        ]
+      },
+      {
+        "port_type": "CaL_current",
+        "variables": [
+          "i_CaL"
+        ]
+      },
+      {
+        "port_type": "PCa_current",
+        "variables": [
+          "i_PCa"
+        ]
+      },
+      {
+        "port_type": "b_Ca_current",
+        "variables": [
+          "i_b_Ca"
+        ]
+      },
+      {
+        "port_type": "NaCa_current",
+        "variables": [
+          "i_NaCa"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ca_SR_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Ca_SR",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "g_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "g",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_CaL",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_PCa",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_b_Ca",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaCa",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_up",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "i_rel",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "i_leak",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Vc",
+        "microm3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V_SR",
+        "microm3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Cm",
+        "farad",
+        "access",
+        "global_constant"
+      ],
+      [
+        "a_rel",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "b_rel",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "c_rel",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_g",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "Kup",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Buf_C",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Buf_SR",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Kbuf_C",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Kbuf_SR",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "VmaxUp",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "V_leak",
+        "per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "module_type": "electric_potentials_Paci_2013",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "cardiomyocytes_modules.cellml",
+    "component_type": "electric_potentials_Paci_2013",
+    "entrance_ports": [
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "E_Ks_potential",
+        "variables": [
+          "E_Ks"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "Ca_potential",
+        "variables": [
+          "E_Ca"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "R",
+        "J_per_MK",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "E_Na",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "E_K",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "E_Ks",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "E_Ca",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Ki",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Ko",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "PkNa",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "module_type": "Na_dynamics_Paci_2013",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "cardiomyocytes_modules.cellml",
+    "component_type": "Na_dynamics_Paci_2013",
+    "entrance_ports": [
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Na_current",
+        "variables": [
+          "i_Na"
+        ]
+      },
+      {
+        "port_type": "b_Na_current",
+        "variables": [
+          "i_b_Na"
+        ]
+      },
+      {
+        "port_type": "NaK_current",
+        "variables": [
+          "i_NaK"
+        ]
+      },
+      {
+        "port_type": "NaCa_current",
+        "variables": [
+          "i_NaCa"
+        ]
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Nai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Cm",
+        "farad",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Vc",
+        "microm3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "i_Na",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_b_Na",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaK",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaCa",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

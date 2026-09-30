@@ -47,4 +47,47 @@
     <units name="nanoA">
         <unit prefix="nano" units="ampere"/>
     </units>
+    <units name="C_per_mol">
+        <unit units="coulomb"/>
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="J_per_mol_K">
+        <unit units="joule"/>
+        <unit exponent="-1" units="mole"/>
+        <unit exponent="-1" units="kelvin"/>
+    </units>
+    <units name="m3_per_s">
+        <unit exponent="3" units="metre"/>
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="millis">
+        <unit prefix="milli" units="second"/>
+    </units>
+    <units name="mol_per_s">
+        <unit units="mole"/>
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="A_per_nanoA">
+        <unit exponent="-1" prefix="nano" units="ampere"/>
+        <unit units="ampere"/>
+    </units>
+    <units name="V_per_milliV">
+        <unit units="volt"/>
+        <unit exponent="-1" units="milliV"/>
+    </units>
+    <units name="mV">
+        <unit prefix="milli" units="volt"/>
+    </units>
+    <units name="millis_per_milliV">
+        <unit exponent="-1" units="milliV"/>
+        <unit units="millis"/>
+    </units>
+    <units name="millis_per_s">
+        <unit prefix="milli" units="second"/>
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="nanoA_per_milliA">
+        <unit prefix="nano" units="ampere"/>
+        <unit exponent="-1" prefix="milli" units="ampere"/>
+    </units>
 </model>

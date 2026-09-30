@@ -17,9 +17,13 @@ parameters, and writes the spec only if there isn't one.
 import csv
 import itertools
 import os
+import sys
 
 import numpy as np
 import yaml
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from cam_testing import vessel_array  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, 'modules', 'system', 'diffusion')
@@ -114,10 +118,7 @@ def write(model, description, cells, faces):
                    [f'd_up_f{k}', 'metre', da, f'example mesh: centre of {a} to the face'],
                    [f'd_down_f{k}', 'metre', db, f'example mesh: centre of {b} to the face'],
                    [f'open_flag_f{k}', 'dimensionless', 1, 'open face']]
-    with open(os.path.join(d, f'{model}_vessel_array.csv'), 'w', newline='') as f:
-        w = csv.writer(f)
-        w.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
-        w.writerows(rows)
+    vessel_array.write_records(os.path.join(d, f'{model}_vessel_array.json'), vessel_array.from_rows(rows))
     with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(['variable_name', 'units', 'value', 'data_reference'])

@@ -1,0 +1,109 @@
+[
+  {
+    "module_type": "heart",
+    "module_subtype": "supermodule",
+    "module_format": "supermodule",
+    "description": "Four-chamber heart built from modules/cardiac: a cardiac clock, one generic chamber per chamber (ra, rv, la, lv) and a Mynard valve between each chamber and its outflow (trv, puv, miv, aov). In a model, each submodule is named <instance>_<submodule> (e.g. heart_ra), and the host vessels that couple to it are given in the instance's per_submodule_inputs / per_submodule_outputs: typically systemic venous return into ra, pulmonary venous return into la, puv and aov out to the pulmonary and systemic arteries, and the chambers' volumes out to a volume_sum. Several inflows into an atrium go through a flow_merge vessel in the host.",
+    "submodules": [
+      {
+        "name": "clock",
+        "module_type": "cardiac_clock",
+        "module_subtype": "nn",
+        "inp_instances": [],
+        "out_instances": [
+          "ra",
+          "rv",
+          "la",
+          "lv"
+        ]
+      },
+      {
+        "name": "ra",
+        "module_type": "chamber",
+        "module_subtype": "vv",
+        "inp_instances": [
+          "clock"
+        ],
+        "out_instances": [
+          "trv"
+        ]
+      },
+      {
+        "name": "rv",
+        "module_type": "chamber",
+        "module_subtype": "vv",
+        "inp_instances": [
+          "trv",
+          "clock"
+        ],
+        "out_instances": [
+          "puv"
+        ]
+      },
+      {
+        "name": "la",
+        "module_type": "chamber",
+        "module_subtype": "vv",
+        "inp_instances": [
+          "clock"
+        ],
+        "out_instances": [
+          "miv"
+        ]
+      },
+      {
+        "name": "lv",
+        "module_type": "chamber",
+        "module_subtype": "vv",
+        "inp_instances": [
+          "miv",
+          "clock"
+        ],
+        "out_instances": [
+          "aov"
+        ]
+      },
+      {
+        "name": "trv",
+        "module_type": "valve",
+        "module_subtype": "pp",
+        "inp_instances": [
+          "ra"
+        ],
+        "out_instances": [
+          "rv"
+        ]
+      },
+      {
+        "name": "puv",
+        "module_type": "valve",
+        "module_subtype": "pp",
+        "inp_instances": [
+          "rv"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "miv",
+        "module_type": "valve",
+        "module_subtype": "pp",
+        "inp_instances": [
+          "la"
+        ],
+        "out_instances": [
+          "lv"
+        ]
+      },
+      {
+        "name": "aov",
+        "module_type": "valve",
+        "module_subtype": "pp",
+        "inp_instances": [
+          "lv"
+        ],
+        "out_instances": []
+      }
+    ],
+    "default_parameters": "heart_parameters.csv"
+  }
+]

@@ -1,0 +1,81 @@
+[
+  {
+    "module_type": "SN_varicosity",
+    "module_subtype": "supermodule",
+    "module_format": "supermodule",
+    "description": "Sympathetic-neuron varicosity (SN_simple's SN_varicosity) built from its parts: a pass-through membrane (the axon sets V), four-compartment Ca handling with E_Ca, N-type Ca channel, NaCa exchanger, IP3R, RyR and NE release. Each submodule becomes <instance>_<submodule> in a model; the membrane takes the axon's potential: per_submodule_inputs {\"membrane\": [\"<axon>\"]}; NE (synaptic_NE) is available from NE.",
+    "submodules": [
+      {
+        "name": "membrane",
+        "module_type": "SN_varicosity_membrane",
+        "module_subtype": "nn",
+        "inp_instances": [],
+        "out_instances": [
+          "i_CaN",
+          "i_NaCa"
+        ]
+      },
+      {
+        "name": "Ca",
+        "module_type": "SN_Ca_handling_varicosity",
+        "module_subtype": "nn",
+        "inp_instances": [],
+        "out_instances": [
+          "i_CaN",
+          "i_NaCa",
+          "IP3R",
+          "RyR",
+          "NE"
+        ]
+      },
+      {
+        "name": "i_CaN",
+        "module_type": "i_CaN_SN",
+        "module_subtype": "nn",
+        "inp_instances": [
+          "membrane",
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_NaCa",
+        "module_type": "i_NaCa_SN",
+        "module_subtype": "nn",
+        "inp_instances": [
+          "membrane",
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "IP3R",
+        "module_type": "IP3R_SN",
+        "module_subtype": "nn",
+        "inp_instances": [
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "RyR",
+        "module_type": "RyR_SN",
+        "module_subtype": "nn",
+        "inp_instances": [
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "NE",
+        "module_type": "SN_NE_release",
+        "module_subtype": "nn",
+        "inp_instances": [
+          "Ca"
+        ],
+        "out_instances": []
+      }
+    ],
+    "default_parameters": "SN_varicosity_parameters.csv"
+  }
+]

@@ -18,7 +18,7 @@ import shutil
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from cam_testing import bib, checks, phlynx, ranges, risk
-from cam_testing.library import REPO_ROOT, load_module, module_names
+from cam_testing.library import REPO_ROOT, load_module, module_names, module_relpath
 from cam_testing.mathml import component_equations, component_variables
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
@@ -307,15 +307,15 @@ def assemble_site(names, contexts):
         shutil.rmtree(SITE_DIR)
     for name in names:
         module = load_module(name)
-        dest = os.path.join(SITE_DIR, 'modules', name)
+        dest = os.path.join(SITE_DIR, 'modules', module_relpath(name))
         os.makedirs(dest, exist_ok=True)
         if not os.path.isfile(os.path.join(module.dir, f'{name}.html')):
             build_module(name)
         shutil.copy2(os.path.join(module.dir, f'{name}.html'), dest)
         if os.path.isdir(module.plots_dir):
             shutil.copytree(module.plots_dir, os.path.join(dest, 'plots'))
-    build_review_queue(contexts, os.path.join(SITE_DIR, 'review_queue.html'), lambda n: f'modules/{n}/{n}.html')
-    return build_index(contexts, os.path.join(SITE_DIR, 'index.html'), lambda n: f'modules/{n}/{n}.html')
+    build_review_queue(contexts, os.path.join(SITE_DIR, 'review_queue.html'), lambda n: f'modules/{module_relpath(n)}/{n}.html')
+    return build_index(contexts, os.path.join(SITE_DIR, 'index.html'), lambda n: f'modules/{module_relpath(n)}/{n}.html')
 
 
 def main(argv=None):

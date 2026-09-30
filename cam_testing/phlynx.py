@@ -24,7 +24,7 @@ import tempfile
 
 import numpy as np
 
-from cam_testing import harness
+from cam_testing import harness, vessel_array
 from cam_testing.library import MODULES_DIR
 
 REPO_DIR = os.path.dirname(MODULES_DIR)
@@ -56,10 +56,9 @@ def cuflynx_bin():
 def library_files():
     '''Every module's CellML, units and config: a harness can use neighbours from other modules.'''
     cellml, units, configs = [], [], []
-    for d in sorted(glob.glob(os.path.join(MODULES_DIR, '*'))):
-        name = os.path.basename(d)
-        if name in ('system', 'supermodules'):
-            continue
+    from cam_testing.library import module_dir, module_names
+    for name in module_names():
+        d = module_dir(name)
         cellml += sorted(glob.glob(os.path.join(d, f'{name}_modules.cellml')))
         units += sorted(glob.glob(os.path.join(d, f'{name}_units.cellml')))
         configs += sorted(glob.glob(os.path.join(d, f'{name}_modules_config.json')))
@@ -76,11 +75,11 @@ def component_job(component, work_dir):
     prefix = f'{component.module.name}__{component.id}'
     res = os.path.join(work_dir, 'resources', component.id)
     harness._write_resources(component, res, prefix, {})
-    rows = _read_csv(os.path.join(res, f'{prefix}_vessel_array.csv'))
-    instances = [{'name': r['name'], 'module_type': r['vessel_type'], 'module_subtype': r['BC_type'],
-                  # space-separated, as PhLynx's instance-array CSV importer gives them
-                  'inp_instances': ' '.join((r['inp_vessels'] or '').split()),
-                  'out_instances': ' '.join((r['out_vessels'] or '').split())} for r in rows]
+    records = vessel_array.read_records(vessel_array.find(res, prefix))
+    # inp/out space-separated, as PhLynx's instance-array importer gives them
+    instances = [{'name': r['name'], 'module_type': r['module_type'], 'module_subtype': r['module_subtype'],
+                  'inp_instances': ' '.join(r.get('inp_instances', [])),
+                  'out_instances': ' '.join(r.get('out_instances', []))} for r in records]
     params = [{k: (v or '') for k, v in r.items()} for r in _read_csv(os.path.join(res, f'{prefix}_parameters.csv'))]
     spec = component.spec
     extra = [harness.output_name(o) for o in (spec.get('outputs') or [])]

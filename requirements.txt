@@ -1,6 +1,6 @@
 # libcuflynx needs module_library_dirs / use_builtin_modules (merged, #521), the per-variable
 # multi_port list form used by modules/cardiac flow_merge/flow_split (#530), and reading this
-# library's PhLynx-format module configs (#533, stacked on #530). Pinned to #533's branch until
-# these are merged and released.
-libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/phlynx-config-schema
+# library's PhLynx-format module configs (#533, stacked on #530), and JSON vessel arrays plus
+# supermodules (#534, stacked on #533). Pinned to #534's branch until these are merged and released.
+libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/json-vessel-arrays-supermodules
 -e .

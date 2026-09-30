@@ -1,0 +1,18 @@
+{
+  "test": "verification_test_invariants",
+  "status": "passed",
+  "message": "all 1 invariants hold",
+  "metrics": {
+    "invariants": [
+      {
+        "invariant": "alone (no channel fluxes connected) the total Ca, free + buffered in all four compartments, is conserved (relative 1e-6)",
+        "expr": "np.max(np.abs(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0])) <= 1e-6*(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]",
+        "holds": true,
+        "note": ""
+      }
+    ]
+  },
+  "plots": [],
+  "details": [],
+  "timestamp": "2026-09-30 03:31 UTC"
+}

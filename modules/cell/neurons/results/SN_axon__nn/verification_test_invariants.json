@@ -1,0 +1,24 @@
+{
+  "test": "verification_test_invariants",
+  "status": "passed",
+  "message": "all 2 invariants hold",
+  "metrics": {
+    "invariants": [
+      {
+        "invariant": "exact RC relaxation: V = V_in + (V_rest_approx - V_in) exp(-t (1 + channel_ratio) 1e6/(R C)) (MOhm, pF, s)",
+        "expr": "np.max(np.abs(V - (V_in + (V_rest_approx - V_in)*np.exp(-t*(1 + channel_ratio)*1e6/(R*C))))) <= 1e-6*max(1.0, np.max(np.abs(V)))",
+        "holds": true,
+        "note": ""
+      },
+      {
+        "invariant": "I = (V_in - V)/R and I_channels = channel_ratio I",
+        "expr": "np.max(np.abs(I - (V_in - V)/R)) + np.max(np.abs(I_channels - channel_ratio*I)) <= 1e-9",
+        "holds": true,
+        "note": ""
+      }
+    ]
+  },
+  "plots": [],
+  "details": [],
+  "timestamp": "2026-09-30 03:31 UTC"
+}

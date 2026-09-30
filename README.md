@@ -70,7 +70,7 @@ Each parameter's **tested range** is set in `<name>_tests.yaml`:
 To check a system model's parameters against the modules it uses:
 
 ```bash
-python -m cam_testing.ranges check --vessel-array my_vessel_array.csv --parameters my_parameters.csv
+python -m cam_testing.ranges check --vessel-array my_vessel_array.json --parameters my_parameters.csv
 ```
 
 This lists each value as inside or outside its tested range and validated spread, and estimates the failure risk near the values from the `make risk` samples. It exits non-zero if any value is outside a tested range.
@@ -104,18 +104,17 @@ The module report shows all of this, regenerating the plots from the committed s
 
 Models whose original doesn't generate in circulatory_autogen carry `expected_failures` or `skip` with the reason. `tools/import_systems.py --ca-dir ../circulatory_autogen` re-imports them and never overwrites a spec.
 
-`modules/supermodules/<name>/` is a vessel array of library modules with named interface ports. The `heart` supermodule is the clock, four chambers and four valves, with these ports:
-- `systemic_venous_in` and `pulmonary_venous_in`;
-- `pulmonary_arterial_out` and `systemic_arterial_out`;
-- an optional `volume` port.
+Vessel arrays are JSON (`<model>_vessel_array.json`): a list of instance records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_vessel_arrays.py` converts CSV files; `cam_testing/vessel_array.py` reads either.
 
-A host vessel array uses a supermodule through one row. The host's own vessels list the instance name (`heart`) in their inp/out columns:
+`modules/supermodules/<name>/` holds a module made of other modules: a `module_format: "supermodule"` config entry in `<name>_modules_config.json` lists its `submodules` (a vessel array of library modules, internal connections only) and its `default_parameters` file. The `heart` supermodule is the cardiac clock, four chambers and four valves. A model uses it through one entry:
 
+```json
+{"name": "heart", "module_type": "heart", "module_subtype": "supermodule",
+ "per_submodule_inputs":  {"ra": ["venous_svc"], "la": ["pvn"]},
+ "per_submodule_outputs": {"puv": ["par"], "aov": ["aortic_root"], "ra": ["volume_sum"], "rv": ["volume_sum"], "la": ["volume_sum"], "lv": ["volume_sum"]}}
 ```
-heart,supermodule,supermodule:heart,systemic_venous_in:venous_svc pulmonary_venous_in:pvn,pulmonary_arterial_out:par systemic_arterial_out:aortic_root volume:volume_sum
-```
 
-`cam_testing.supermodule.expand` flattens that row into an ordinary vessel array. libcuflynx can't load supermodules yet; later they will be usable as modules themselves. `tests/test_supermodules.py` generates each harness in `<name>_supermodule.yaml` and runs it. The heart harness must reproduce `system/closed_loop_cvs/3compartment` to 1e-9.
+The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the entry: each submodule becomes `heart_<submodule>` (`heart_ra`, `heart_aov`, …), the listed host modules are coupled to it, and the default parameters are renamed to match (`E_A_ra` becomes `E_A_heart_ra`), with the model's own values taking precedence. `system/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way. `tests/test_supermodules.py` checks each supermodule's structure and that `3compartment_supermodules` reproduces `3compartment` to 1e-9.
 
 ## PhLynx → CUFLynx pipeline
 

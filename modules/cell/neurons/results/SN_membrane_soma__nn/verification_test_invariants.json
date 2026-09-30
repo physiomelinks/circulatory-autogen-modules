@@ -1,0 +1,18 @@
+{
+  "test": "verification_test_invariants",
+  "status": "passed",
+  "message": "all 1 invariants hold",
+  "metrics": {
+    "invariants": [
+      {
+        "invariant": "charge balance with no channels or axon connected: Cm (V - V0) + C_sensed (V_sensed - V_sensed0) = -1e6 I_in t (pF mV = 1e-15 C, nA s = 1e-9 C)",
+        "expr": "np.max(np.abs(Cm*(V - V[0]) + C_sensed*(V_sensed - V_sensed[0]) + 1e6*I_in*t)) <= 1e-6*max(1e-12, np.max(np.abs(1e6*I_in*t)))",
+        "holds": true,
+        "note": ""
+      }
+    ]
+  },
+  "plots": [],
+  "details": [],
+  "timestamp": "2026-09-30 03:31 UTC"
+}

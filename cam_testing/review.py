@@ -65,7 +65,7 @@ def apply(name, only=None, validation=True):
         if prop is None:
             continue
         r['data_reference'] = prop['reference']
-        r['sourced'] = 'no' if str(prop.get('sourced', 'no')).lower() == 'no' else 'yes'
+        r['sourced'] = 'no' if str(prop.get('sourced', 'no')).strip().lower() in ('no', 'false', '0') else 'yes'
         if 'value' in prop:
             r['value'] = str(prop['value'])
         key = bib.reference_key(prop['reference'])

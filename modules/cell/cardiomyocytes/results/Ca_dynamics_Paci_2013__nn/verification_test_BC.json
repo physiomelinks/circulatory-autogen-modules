@@ -1,0 +1,287 @@
+{
+  "test": "verification_test_BC",
+  "status": "failed",
+  "message": "99 of 99 runs failed",
+  "metrics": {
+    "swept_kind": "boundary conditions and constants",
+    "swept": [
+      "i_CaL",
+      "i_PCa",
+      "i_b_Ca",
+      "i_NaCa",
+      "Vm",
+      "Cai_init",
+      "Ca_SR_init",
+      "g_init",
+      "a_rel",
+      "b_rel",
+      "c_rel",
+      "tau_g",
+      "Kup",
+      "Buf_C",
+      "Buf_SR",
+      "Kbuf_C",
+      "Kbuf_SR",
+      "VmaxUp",
+      "V_leak",
+      "Vc",
+      "V_SR",
+      "F",
+      "Cm"
+    ],
+    "n_runs": 99,
+    "n_failures": 99,
+    "sweep_values": {
+      "i_CaL": [
+        -3.0,
+        -1.5,
+        0.0
+      ],
+      "i_PCa": [
+        0.0,
+        0.2,
+        0.4
+      ],
+      "i_b_Ca": [
+        -0.5,
+        0.0,
+        0.5
+      ],
+      "i_NaCa": [
+        -0.5,
+        0.0,
+        0.5
+      ],
+      "Vm": [
+        -0.1,
+        -0.024999999999999994,
+        0.05
+      ],
+      "Cai_init": [
+        1e-05,
+        0.0001,
+        0.001
+      ],
+      "Ca_SR_init": [
+        0.05,
+        0.525,
+        1.0
+      ],
+      "g_init": [
+        0.0,
+        0.5,
+        1.0
+      ],
+      "a_rel": [
+        8.232,
+        12.347999999999999,
+        16.464,
+        24.695999999999998,
+        32.928
+      ],
+      "b_rel": [
+        0.125,
+        0.1875,
+        0.25,
+        0.375,
+        0.5
+      ],
+      "c_rel": [
+        4.116,
+        6.1739999999999995,
+        8.232,
+        12.347999999999999,
+        16.464
+      ],
+      "tau_g": [
+        0.001,
+        0.0015,
+        0.002,
+        0.003,
+        0.004
+      ],
+      "Kup": [
+        0.000125,
+        0.0001875,
+        0.00025,
+        0.000375,
+        0.0005
+      ],
+      "Buf_C": [
+        0.125,
+        0.1875,
+        0.25,
+        0.375,
+        0.5
+      ],
+      "Buf_SR": [
+        5.0,
+        7.5,
+        10.0,
+        15.0,
+        20.0
+      ],
+      "Kbuf_C": [
+        0.0005,
+        0.00075,
+        0.001,
+        0.0015,
+        0.002
+      ],
+      "Kbuf_SR": [
+        0.15,
+        0.22499999999999998,
+        0.3,
+        0.44999999999999996,
+        0.6
+      ],
+      "VmaxUp": [
+        0.28032,
+        0.42048,
+        0.56064,
+        0.84096,
+        1.12128
+      ],
+      "V_leak": [
+        0.00022222,
+        0.00033333,
+        0.00044444,
+        0.00066666,
+        0.00088888
+      ],
+      "Vc": [
+        4400.0,
+        6600.0,
+        8800.0,
+        13200.0,
+        17600.0
+      ],
+      "V_SR": [
+        291.865,
+        437.7975,
+        583.73,
+        875.595,
+        1167.46
+      ],
+      "F": [
+        48242.5,
+        72363.75,
+        96485.0,
+        144727.5,
+        192970.0
+      ],
+      "Cm": [
+        4.935545e-11,
+        7.4033175e-11,
+        9.87109e-11,
+        1.4806635e-10,
+        1.974218e-10
+      ]
+    }
+  },
+  "plots": [
+    "plots/Ca_dynamics_Paci_2013__nn__bc_sweep.png"
+  ],
+  "details": [
+    "i_CaL=-3: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_CaL=-1.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_CaL=0: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_PCa=0: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_PCa=0.2: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_PCa=0.4: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_b_Ca=-0.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_b_Ca=0: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_b_Ca=0.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_NaCa=-0.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_NaCa=0: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "i_NaCa=0.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vm=-0.1: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vm=-0.025: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vm=0.05: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cai_init=1e-05: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cai_init=0.0001: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cai_init=0.001: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Ca_SR_init=0.05: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Ca_SR_init=0.525: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Ca_SR_init=1: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "g_init=0: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "g_init=0.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "g_init=1: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "a_rel=8.232: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "a_rel=12.35: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "a_rel=16.46: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "a_rel=24.7: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "a_rel=32.93: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "b_rel=0.125: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "b_rel=0.1875: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "b_rel=0.25: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "b_rel=0.375: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "b_rel=0.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "c_rel=4.116: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "c_rel=6.174: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "c_rel=8.232: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "c_rel=12.35: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "c_rel=16.46: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "tau_g=0.001: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "tau_g=0.0015: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "tau_g=0.002: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "tau_g=0.003: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "tau_g=0.004: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kup=0.000125: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kup=0.0001875: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kup=0.00025: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kup=0.000375: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kup=0.0005: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_C=0.125: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_C=0.1875: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_C=0.25: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_C=0.375: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_C=0.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_SR=5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_SR=7.5: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_SR=10: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_SR=15: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Buf_SR=20: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_C=0.0005: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_C=0.00075: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_C=0.001: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_C=0.0015: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_C=0.002: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_SR=0.15: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_SR=0.225: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_SR=0.3: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_SR=0.45: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Kbuf_SR=0.6: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "VmaxUp=0.2803: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "VmaxUp=0.4205: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "VmaxUp=0.5606: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "VmaxUp=0.841: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "VmaxUp=1.121: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_leak=0.0002222: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_leak=0.0003333: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_leak=0.0004444: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_leak=0.0006667: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_leak=0.0008889: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vc=4400: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vc=6600: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vc=8800: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vc=1.32e+04: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Vc=1.76e+04: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_SR=291.9: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_SR=437.8: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_SR=583.7: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_SR=875.6: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "V_SR=1167: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "F=4.824e+04: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "F=7.236e+04: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "F=9.648e+04: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "F=1.447e+05: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "F=1.93e+05: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cm=4.936e-11: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cm=7.403e-11: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cm=9.871e-11: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cm=1.481e-10: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)",
+    "Cm=1.974e-10: simulation failed (GenerationFailed: ValueError: module config entry (heart, supermodule) in /home/farg967/Documents/git_projects/circulatory-autogen-modules/modules/supermodules/heart/heart_modules_config.json is in the PhLynx schema (has ['module_subtype']) but is missing ['component_file', 'component_type']. A PhLynx-schema entry needs module_type, module_subtype, component_file and component_type.\nsim_time not found in inp_data_dict, setting to None so it can be set in protocol_info\n)"
+  ],
+  "timestamp": "2026-09-30 03:04 UTC"
+}

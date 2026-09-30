@@ -1,34 +1,20 @@
 supermodule: heart
-description: >
-  Four-chamber heart built from modules/cardiac: a cardiac clock, one generic chamber per
-  chamber (ra, rv, la, lv) and a Mynard valve between each chamber and its outflow
-  (trv, puv, miv, aov). Default parameters are 3compartment's (Liang 2009, Korakianitis 2006,
-  Mynard 2012).
+description: 'Four-chamber heart: cardiac clock, four generic chambers and four Mynard valves (modules/cardiac). Defined by
+  the module_format "supermodule" entry in heart_modules_config.json; default parameters (3compartment''s: Liang 2009, Korakianitis
+  2006, Mynard 2012) in heart_parameters.csv. A model uses one "heart" entry whose per_submodule_inputs / per_submodule_outputs
+  couple ra, la, puv, aov (and the chambers'' volumes) to the circulation; libcuflynx expands it into heart_clock, heart_ra
+  ... heart_aov.'
 reviewed: false
-# For now a supermodule is a vessel array that libcuflynx can't load directly: a host vessel
-# array uses it through one row `<name>,supermodule,supermodule:heart,<port>:<vessel> ...,<port>:<vessel> ...`
-# and cam_testing.supermodule.expand flattens it into an ordinary vessel array. Later,
-# supermodules will be usable as modules themselves.
-#
-# Interface ports: in the supermodule's vessel array '@<port>' marks where a host vessel connects.
-ports:
-  systemic_venous_in:     {vessels: [ra], side: inp, port_type: vessel_port, description: systemic venous return into the right atrium}
-  pulmonary_venous_in:    {vessels: [la], side: inp, port_type: vessel_port, description: pulmonary venous return into the left atrium}
-  pulmonary_arterial_out: {vessels: [puv], side: out, port_type: vessel_port, description: pulmonary valve outflow}
-  systemic_arterial_out:  {vessels: [aov], side: out, port_type: vessel_port, description: aortic valve outflow}
-  volume:                 {vessels: [ra, rv, la, lv], side: out, port_type: volume_port, optional: true,
-                           description: chamber volumes, e.g. to a volume_sum vessel}
-# Several vessels flowing into one atrium (e.g. IVC and SVC) go through a flow_merge vessel in
-# the host, connected to systemic_venous_in.
 tests:
-  harnesses:
-    - name: heart_3compartment
-      description: the heart closed with 3compartment's circulation; must reproduce the system model exactly
-      vessel_array: harness/heart_3compartment_vessel_array.csv
-      parameters: harness/heart_3compartment_parameters.csv
-      equivalent_to: closed_loop_cvs/3compartment
-      tol: 1.0e-9
-      solver_info: {rtol: 1.0e-10, atol: 1.0e-12}
-      invariants:
-        - description: total blood volume is conserved (relative drift < 1e-6)
-          expr: np.ptp(sum_blood_volume__q_volume_sum_sum) <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))
+  equivalent:
+  - model: closed_loop_cvs/3compartment_supermodules
+    reproduces: closed_loop_cvs/3compartment
+    instance: heart
+    tol: 1.0e-09
+    solver_info:
+      rtol: 1.0e-10
+      atol: 1.0e-12
+globals:
+- T
+- rho
+- l_eff

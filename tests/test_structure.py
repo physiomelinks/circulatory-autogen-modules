@@ -204,6 +204,57 @@ NON_MODULE_DIRS = {'template', 'system', 'supermodules'}
 
 
 def test_every_module_dir_has_spec():
-    dirs = [d for d in os.listdir(MODULES_DIR) if os.path.isdir(os.path.join(MODULES_DIR, d)) and d not in NON_MODULE_DIRS]
-    missing = [d for d in dirs if not os.path.isfile(os.path.join(MODULES_DIR, d, f'{d}_tests.yaml'))]
-    assert not missing
+    # a module directory is any directory with a <name>_modules.cellml (modules may sit in category dirs)
+    cellml = [p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules.cellml'), recursive=True)
+              if os.path.relpath(p, MODULES_DIR).split(os.sep)[0] not in NON_MODULE_DIRS]
+    missing = []
+    for p in cellml:
+        d = os.path.dirname(p)
+        name = os.path.basename(d)
+        if os.path.basename(p) != f'{name}_modules.cellml' or not os.path.isfile(os.path.join(d, f'{name}_tests.yaml')):
+            missing.append(os.path.relpath(p, MODULES_DIR))
+    assert not missing, f'module files not in a <name>/ directory with <name>_tests.yaml: {missing}'
+
+
+# ----------------------------------------------------------------------------------------------
+# JSON files against libcuflynx's schemas (src/libcuflynx/schemas/*.schema.json)
+# ----------------------------------------------------------------------------------------------
+
+def _libcuflynx_schema(name):
+    try:
+        import importlib.resources as ir
+        path = ir.files('libcuflynx').joinpath('schemas', name)
+        return json.loads(path.read_text()) if path.is_file() else None
+    except (ImportError, FileNotFoundError, ModuleNotFoundError):
+        return None
+
+
+VESSEL_ARRAYS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_vessel_array.json'), recursive=True))
+MODULE_CONFIGS = sorted(glob.glob(os.path.join(MODULES_DIR, '**', '*_modules_config.json'), recursive=True))
+
+
+def _validate(path, schema_name):
+    jsonschema = pytest.importorskip('jsonschema')
+    schema = _libcuflynx_schema(schema_name)
+    if schema is None:
+        pytest.skip(f'the installed libcuflynx has no schemas/{schema_name}')
+    with open(path) as f:
+        data = json.load(f)
+    errors = sorted(jsonschema.Draft202012Validator(schema).iter_errors(data), key=lambda e: list(e.path))
+    assert not errors, '\n'.join(f'{list(e.path)}: {e.message}' for e in errors[:20])
+
+
+@pytest.mark.parametrize('path', VESSEL_ARRAYS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
+def test_vessel_array_matches_libcuflynx_schema(path):
+    _validate(path, 'vessel_array.schema.json')
+
+
+@pytest.mark.parametrize('path', MODULE_CONFIGS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
+def test_module_config_matches_libcuflynx_schema(path):
+    _validate(path, 'module_config.schema.json')
+
+
+def test_no_csv_vessel_arrays_left():
+    left = [os.path.relpath(p, MODULES_DIR) for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_vessel_array.csv'), recursive=True)
+            if 'poiseuille' not in p]
+    assert not left, f'CSV vessel arrays left (run tools/convert_vessel_arrays.py): {left[:10]}'

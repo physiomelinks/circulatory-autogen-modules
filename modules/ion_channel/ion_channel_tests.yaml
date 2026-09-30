@@ -3148,6 +3148,781 @@ components:
     calibrate:
       status: pending
       reason: r_50, k_r, tau_r and g could be identified from the same data.
+- vessel_type: i_Na_SN
+  BC_type: nn
+  module_type: i_Na_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [m, h, h_inf, i_Na, j_Na, m_inf, tau_h, tau_m]
+  invariants:
+  - {description: 'the ion flux j_Na = -i_Na/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_Na
+      - 1e-9*(-i_Na/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Na)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((m >= -1e-9) & (m <= 1 + 1e-9)) & np.all((h >= -1e-9)
+      & (h <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. Fast (NaV1.7-like) Na current of the SN soma, i_Na = g_Na
+    g_Na_mod (V - E_Na) m^3 h, with its Na flux j_Na = -i_Na/F into the Na pool. Gates start at their steady state at V_rest_approx.
+    Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_Na1_6_SN
+  BC_type: nn
+  module_type: i_Na1_6_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [m_Na1_6, h_Na1_6, h_Na1_6_inf, i_Na1_6, j_Na1_6, m_Na1_6_inf, tau_h_Na1_6, tau_m_Na1_6]
+  invariants:
+  - {description: 'the ion flux j_Na1_6 = -i_Na1_6/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_Na1_6
+      - 1e-9*(-i_Na1_6/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Na1_6)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((m_Na1_6 >= -1e-9) & (m_Na1_6 <= 1 + 1e-9)) & np.all((h_Na1_6
+      >= -1e-9) & (h_Na1_6 <= 1 + 1e-9))}
+  notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating
+    time constant has epsilon_tau = 0.1 ms added, as in the original. NaV1.6 current of the SN soma, i_Na1_6 = g_Na1_6 g_Na1_6_mod
+    (V - E_Na) m_Na1_6^3 h_Na1_6 (the same law as i_Na_SN). Two features of the original are kept so that SN_simple is reproduced:
+    the gates start at i_Na_SN''s steady state (the original sets m_Na1_6''s initial value to m_init, computed from V_mid_m,
+    V_den_m, V_mid_h, V_den_h, the NaV1.7 values, which are this component''s own parameters here), and its Na flux j_Na1_6
+    = -i_Na1_6/F is computed but has no port, as the original leaves it out of dNai/dt. Built by tools/build_sn_modules.py;
+    SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_CaL_SN
+  BC_type: nn
+  module_type: i_CaL_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [c, hc, V_den_hc, V_mid_hc, c_inf, hc_inf, i_Ca_L, j_Ca_L, tau_c]
+  invariants:
+  - {description: 'the ion flux j_Ca_L = -i_Ca_L/(2*F) (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_Ca_L
+      - 1e-9*(-i_Ca_L/(2*F)))) <= 1e-12*max(1e-30, np.max(np.abs(j_Ca_L)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((c >= -1e-9) & (c <= 1 + 1e-9)) & np.all((hc >= -1e-9)
+      & (hc <= 1 + 1e-9))}
+  notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating
+    time constant has epsilon_tau = 0.1 ms added, as in the original. L-type Ca current of the SN soma: GHK flux with permeability
+    p_Ca (1 + cAMP), gates c^2 hc; Ca flux j_Ca_L = -i_Ca_L/(2F) into the sub-membrane Ca. Built by tools/build_sn_modules.py;
+    SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the
+      defined units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined
+      J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json).
+      Fix: the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of
+      the library this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.',
+    verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the
+      defined units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined
+      J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json).
+      Fix: the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of
+      the library this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.',
+    verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation
+      fails alone: this component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K / C_per_mol,
+      but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this
+      component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_Kv2_SN
+  BC_type: nn
+  module_type: i_Kv2_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [m_Kv2, i_Kv2, j_Kv2, m_Kv2_inf, tau_m_Kv2]
+  invariants:
+  - {description: 'the ion flux j_Kv2 = -i_Kv2/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_Kv2
+      - 1e-9*(-i_Kv2/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Kv2)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((m_Kv2 >= -1e-9) & (m_Kv2 <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. Kv2 delayed-rectifier K current of the SN soma, i_Kv2 = g_Kv2
+    (V - E_K) m_Kv2. Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_Kv1_5_SN
+  BC_type: nn
+  module_type: i_Kv1_5_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [m_Kv1_5, h_Kv1_5, h_Kv1_5_inf, i_Kv1_5, j_Kv1_5, m_Kv1_5_inf, tau_h_Kv1_5, tau_m_Kv1_5]
+  invariants:
+  - {description: 'the ion flux j_Kv1_5 = -i_Kv1_5/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_Kv1_5
+      - 1e-9*(-i_Kv1_5/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Kv1_5)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((m_Kv1_5 >= -1e-9) & (m_Kv1_5 <= 1 + 1e-9)) & np.all((h_Kv1_5
+      >= -1e-9) & (h_Kv1_5 <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. Kv1.5 K current of the SN soma, i_Kv1_5 = g_Kv1_5 m h (V
+    - E_K) (Channelpedia Kv1.5 kinetics). Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts
+    reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_Kv4_2_SN
+  BC_type: nn
+  module_type: i_Kv4_2_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [m_Kv4_2, h_Kv4_2, h_Kv4_2_inf, i_Kv4_2, j_Kv4_2, m_Kv4_2_inf, tau_m_Kv4_2]
+  invariants:
+  - {description: 'the ion flux j_Kv4_2 = -i_Kv4_2/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_Kv4_2
+      - 1e-9*(-i_Kv4_2/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Kv4_2)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((m_Kv4_2 >= -1e-9) & (m_Kv4_2 <= 1 + 1e-9)) & np.all((h_Kv4_2
+      >= -1e-9) & (h_Kv4_2 <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. Kv4.2 A-type K current of the SN soma, i_Kv4_2 = g_Kv4_2
+    m^3 h (V - E_K) (Channelpedia Kv4.2 kinetics). Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled
+    parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_BK_SN
+  BC_type: nn
+  module_type: i_BK_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [m_BK, h_BK, z_BK, V_mid_m_BK, h_BK_inf, i_KCa_BK, j_KCa_BK, m_BK_inf, tau_h_BK, tau_m_BK, z_BK_inf]
+  invariants:
+  - {description: 'the ion flux j_KCa_BK = -i_KCa_BK/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_KCa_BK
+      - 1e-9*(-i_KCa_BK/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_KCa_BK)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((m_BK >= -1e-9) & (m_BK <= 1 + 1e-9)) & np.all((h_BK
+      >= -1e-9) & (h_BK <= 1 + 1e-9)) & np.all((z_BK >= -1e-9) & (z_BK <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. BK (large-conductance Ca-activated K) current of the SN soma,
+    i_KCa_BK = g_KCa_BK m^3 h z (V - E_K), z driven by the sub-membrane Cai (Khaliq 2003 kinetics). z starts at its steady
+    state at Cai_init. Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_SK_SN
+  BC_type: nn
+  module_type: i_SK_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [m_SK, i_KCa_SK, j_KCa_SK, m_SK_inf]
+  invariants:
+  - {description: 'the ion flux j_KCa_SK = -i_KCa_SK/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_KCa_SK
+      - 1e-9*(-i_KCa_SK/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_KCa_SK)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((m_SK >= -1e-9) & (m_SK <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. SK (small-conductance Ca-activated K) current of the SN soma,
+    i_KCa_SK = g_KCa_SK g_KCa_SK_mod m_SK (V - E_K), m_SK a Hill function of the bulk cytosolic Ca (Ca_bulk, as in the original).
+    m_SK starts at its steady state at Cai_init. Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled
+    parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_M_SN
+  BC_type: nn
+  module_type: i_M_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [w, i_M, j_KM, tau_w, w_inf]
+  invariants:
+  - {description: 'the ion flux j_KM = -i_M/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_KM -
+      1e-9*(-i_M/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_KM)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((w >= -1e-9) & (w <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. M-type (KCNQ) K current of the SN soma, i_M = g_M_mod g_M
+    w (V - E_K); Delta_V_mid_w shifts the activation for drug studies. Built by tools/build_sn_modules.py; SN_simple_flat
+    checks that the assembled parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_leak_Na_SN
+  BC_type: nn
+  module_type: i_leak_Na_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [i_leak_Na, j_leak_Na]
+  invariants:
+  - {description: 'the ion flux j_leak_Na = -i_leak_Na/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_leak_Na
+      - 1e-9*(-i_leak_Na/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_leak_Na)))'}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. Na leak of the SN soma, i_leak_Na = g_leak_Na (V - E_Na).
+    Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_leak_K_SN
+  BC_type: nn
+  module_type: i_leak_K_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [i_leak_K, j_leak_K]
+  invariants:
+  - {description: 'the ion flux j_leak_K = -i_leak_K/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_leak_K
+      - 1e-9*(-i_leak_K/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_leak_K)))'}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. K leak of the SN soma, i_leak_K = g_leak_K (V - E_K). Built
+    by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_NaCa_SN
+  BC_type: nn
+  module_type: i_NaCa_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [i_NaCa, j_NaCa_Ca, j_NaCa_Na]
+  invariants:
+  - {description: 'the ion flux j_NaCa_Ca = i_NaCa/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_NaCa_Ca
+      - 1e-9*(i_NaCa/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_NaCa_Ca)))'}
+  - {description: 'the ion flux j_NaCa_Na = -3*i_NaCa/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_NaCa_Na
+      - 1e-9*(-3*i_NaCa/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_NaCa_Na)))'}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. Na/Ca exchanger of the SN soma and varicosity (the same law
+    in both; Paci 2013 form), with its Ca flux j_NaCa_Ca = i_NaCa/F and Na flux j_NaCa_Na = -3 i_NaCa/F. In the varicosity
+    Nai is a constant (no Na pool is connected). Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled
+    parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the
+      defined units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined
+      J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json).
+      Fix: the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of
+      the library this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.',
+    verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the
+      defined units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined
+      J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json).
+      Fix: the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of
+      the library this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.',
+    verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation
+      fails alone: this component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K / C_per_mol,
+      but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this
+      component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: i_NaK_SN
+  BC_type: nn
+  module_type: i_NaK_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [i_NaK, j_NaK_K, j_NaK_Na]
+  invariants:
+  - {description: 'the ion flux j_NaK_Na = -3*i_NaK/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_NaK_Na
+      - 1e-9*(-3*i_NaK/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_NaK_Na)))'}
+  - {description: 'the ion flux j_NaK_K = 2*i_NaK/F (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_NaK_K
+      - 1e-9*(2*i_NaK/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_NaK_K)))'}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. Na/K pump of the SN soma (Lindblad 1996 form), with its fluxes
+    j_NaK_Na = -3 i_NaK/F and j_NaK_K = 2 i_NaK/F. Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled
+    parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
+- vessel_type: IP3R_SN
+  BC_type: nn
+  module_type: IP3R_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [h_IP3, Q_2, h_IP3_inf, j_IP3, m_IP3_inf, tau_hIP3]
+  invariants:
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((h_IP3 >= -1e-9) & (h_IP3 <= 1 + 1e-9))}
+  notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating
+    time constant has epsilon_tau = 0.1 ms added, as in the original. IP3 receptor Ca release from the ER (Li & Rinzel 1994
+    reduced form) of the SN soma and varicosity (the same law in both): j_IP3 = -k_IP3 m_inf^3 h^3 (Cai - Ca_ER), into the
+    sub-membrane Ca and out of the ER. Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts
+    reproduce SN_simple.'
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+- vessel_type: RyR_SN
+  BC_type: nn
+  module_type: RyR_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [c_RyR, hc_RyR, c_RyR_inf, hc_RyR_inf, j_RyR]
+  invariants:
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((c_RyR >= -1e-9) & (c_RyR <= 1 + 1e-9)) & np.all((hc_RyR
+      >= -1e-9) & (hc_RyR <= 1 + 1e-9))}
+  - {description: j_RyR = k_RyR (Ca_ER - Cai) c_RyR^3 hc_RyR^3, expr: 'np.max(np.abs(j_RyR - k_RyR*(Ca_ER - Cai)*c_RyR**3*hc_RyR**3))
+      <= 1e-12*max(1e-30, np.max(np.abs(j_RyR)))'}
+  notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating
+    time constant has epsilon_tau = 0.1 ms added, as in the original. Ryanodine receptor Ca release from the ER of the SN
+    soma and varicosity (the same law in both): j_RyR = k_RyR (Ca_ER - Cai) c^3 hc^3, c activated by Cai and hc by Ca_ER.
+    Built by tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+- vessel_type: i_CaN_SN
+  BC_type: nn
+  module_type: i_CaN_SN
+  sim_time: 0.1
+  dt: 0.0001
+  timestep:
+    scheme: rk4
+    dts: [2.0e-06, 1.0e-06, 5.0e-07, 2.5e-07]
+    t_end: 0.002
+    min_order: 0.8
+    tol: 0.001
+    cvode_tol: 0.01
+  outputs: [c, hc, V_den_hc, V_mid_hc, c_inf, hc_inf, i_Ca_N, j_Ca_N, tau_c]
+  invariants:
+  - {description: 'the ion flux j_Ca_N = -i_Ca_N/(2*F) (mol/s; the current in nA, so the factor 1e-9)', expr: 'np.max(np.abs(j_Ca_N
+      - 1e-9*(-i_Ca_N/(2*F)))) <= 1e-12*max(1e-30, np.max(np.abs(j_Ca_N)))'}
+  - {description: 'every gating variable stays in [0, 1]', expr: np.all((c >= -1e-9) & (c <= 1 + 1e-9)) & np.all((hc >= -1e-9)
+      & (hc <= 1 + 1e-9))}
+  notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+    constant has epsilon_tau = 0.1 ms added, as in the original. N-type Ca current of the SN varicosity, i_Ca_N = g_CaN (V
+    - E_Ca) c^2 hc (the soma's L-type gating with a linear driving force), with its Ca flux j_Ca_N = -i_Ca_N/(2F). Built by
+    tools/build_sn_modules.py; SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  validation:
+    baseline: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+    calibrate: {status: not_applicable, reason: 'a part of the SN_simple sympathetic neuron, whose values are the owner''s
+        hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule).'}
+  expected_failures: {run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+      units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+      / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+      the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+      this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_invariants: 'generation
+      fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the
+      module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components
+      (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying
+      R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant
+      tests pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_BC: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', verification_test_timestep: 'generation fails alone:
+      this component (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s
+      global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx
+      exits: units in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and
+      F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests
+      pass; it generates and reproduces SN_simple in SN_simple_flat.', stability_test: 'generation fails alone: this component
+      (like SN_soma) declares the global F in the defined units J_per_mol_K / C_per_mol, but the module''s global rows in
+      ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao components (libcuflynx exits: units
+      in parameters.csv do not match module_config.json). Fix: the pending review question on unifying R and F to J_per_mol_K
+      / C_per_mol. With that fix applied to a copy of the library this component''s run and invariant tests pass; it generates
+      and reproduces SN_simple in SN_simple_flat.'}
 review:
   comment: 'Most components do not generate as committed: every Paci gate declares Vm ''dimensionless'' in the config but
     ''volt'' in the CellML; the Paci current components keep private_interface=''in'' on their gate inputs (leftover of the

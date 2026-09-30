@@ -22,14 +22,26 @@ CURATED = ['BG', 'heart', 'microvasculature_network', 'template']
 MANIFEST_MODULES = {'index.json': CURATED, 'vitalworkshop.json': CURATED}
 
 
+def _module_dirs():
+    '''name -> path relative to the repo, for every modules/**/<name>/<name>_modules.cellml
+    (modules may be grouped in category directories, e.g. modules/cell/neurons/).'''
+    found = {}
+    for root, dirs, files in os.walk(MODULES_DIR):
+        if os.path.relpath(root, MODULES_DIR).split(os.sep)[0] in ('system', 'supermodules'):
+            dirs[:] = []
+            continue
+        name = os.path.basename(root)
+        if f'{name}_modules.cellml' in files:
+            found[name] = os.path.relpath(root, REPO_ROOT).replace(os.sep, '/')
+    return found
+
+
 def all_module_names():
-    return sorted((d for d in os.listdir(MODULES_DIR)
-                   if os.path.isfile(os.path.join(MODULES_DIR, d, f'{d}_modules.cellml'))),
-                  key=str.lower)
+    return sorted(_module_dirs(), key=str.lower)
 
 
 def _entry(name, filename):
-    path = f'modules/{name}/{filename}'
+    path = f'{_module_dirs().get(name, "modules/" + name)}/{filename}'
     if not os.path.isfile(os.path.join(REPO_ROOT, path)):
         return None
     return {'name': DISPLAY_NAMES.get(name, name), 'file': filename, 'path': path}

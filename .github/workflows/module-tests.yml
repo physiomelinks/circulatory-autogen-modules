@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v4
       - id: list
         run: |
-          modules=$(python3 -c "import os, json; print(json.dumps(sorted(d for d in os.listdir('modules') if os.path.isfile(f'modules/{d}/{d}_tests.yaml'))))")
+          modules=$(python3 -c "import glob, json, os; print(json.dumps(sorted({os.path.basename(os.path.dirname(p)) for p in glob.glob('modules/**/*_tests.yaml', recursive=True) if os.path.basename(p) == os.path.basename(os.path.dirname(p)) + '_tests.yaml' and p.split(os.sep)[1] not in ('system', 'supermodules')})))")
           echo "modules=$modules" >> "$GITHUB_OUTPUT"
 
   structure:
@@ -84,7 +84,7 @@ jobs:
       - name: Failure-risk analysis (on request)
         if: github.event_name == 'workflow_dispatch' && inputs.risk
         run: |
-          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open('modules/${{ matrix.module }}/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
+          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open(__import__('cam_testing.library', fromlist=['x']).module_dir('${{ matrix.module }}') + '/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
           if [ "$reviewed" = "True" ]; then make risk PYTHON=python MODULE=${{ matrix.module }}; fi
       - name: Report
         if: always()
@@ -93,8 +93,9 @@ jobs:
         if: always()
         run: |
           m=${{ matrix.module }}
-          mkdir -p _artifact/modules/$m
-          for f in plots results $m.html; do if [ -e modules/$m/$f ]; then cp -r modules/$m/$f _artifact/modules/$m/; fi; done
+          d=$(python -c "from cam_testing.library import module_relpath; print(module_relpath('$m'))")
+          mkdir -p _artifact/modules/$d
+          for f in plots results $m.html; do if [ -e modules/$d/$f ]; then cp -r modules/$d/$f _artifact/modules/$d/; fi; done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -104,7 +105,7 @@ jobs:
       - name: Fail if a reviewed module's tests failed
         if: steps.tests.outputs.ok == 'false' || steps.pipeline.outputs.ok == 'false'
         run: |
-          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open('modules/${{ matrix.module }}/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
+          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open(__import__('cam_testing.library', fromlist=['x']).module_dir('${{ matrix.module }}') + '/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
           if [ "$reviewed" = "True" ]; then echo "::error::tests failed for reviewed module ${{ matrix.module }}"; exit 1; fi
           echo "::warning::tests failed for ${{ matrix.module }} (not reviewed yet, so not blocking)"
 

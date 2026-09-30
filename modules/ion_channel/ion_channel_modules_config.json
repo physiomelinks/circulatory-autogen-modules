@@ -2411,5 +2411,2259 @@
         "constant"
       ]
     ]
+  },
+  {
+    "module_type": "i_Na_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_Na_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Na"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_Na"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_h",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Na",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Na_mod",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "h",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_Na",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_max",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_h_min",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_m",
+        "millis",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_Na1_6_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_Na1_6_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Na1_6"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_h",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_h_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Na1_6",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Na1_6_mod",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "h_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_Na1_6_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_Na1_6",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Na1_6",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Na1_6_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_Na1_6",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_Na1_6_max",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_h_Na1_6_min",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_m_Na1_6",
+        "millis",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_CaL_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_CaL_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Ca_L"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_Ca_L"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_c",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_hc",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_mid_c",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_hc",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "cAMP",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "c_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_Ca_L",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Ca_L",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "p_Ca",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_c",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_c_max",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_c_min",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_hc",
+        "millis",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_Kv2_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_Kv2_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Kv2"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_Kv2"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_m_Kv2",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m_Kv2",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Kv2",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "i_Kv2",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Kv2",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv2_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv2_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_m_Kv2",
+        "millis",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_Kv1_5_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_Kv1_5_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Kv1_5"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_Kv1_5"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_h_Kv1_5",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m_Kv1_5",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h_Kv1_5",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m_Kv1_5",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Kv1_5",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "h_Kv1_5",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_Kv1_5_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_Kv1_5_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_Kv1_5",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Kv1_5",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv1_5",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv1_5_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv1_5_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_Kv1_5",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_m_Kv1_5",
+        "millis",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_Kv4_2_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_Kv4_2_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Kv4_2"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_Kv4_2"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_h_Kv4_2",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m_Kv4_2",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h_Kv4_2",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m_Kv4_2",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Kv4_2",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "h_Kv4_2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_Kv4_2_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_Kv4_2_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_Kv4_2",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Kv4_2",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv4_2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv4_2_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Kv4_2_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_Kv4_2",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_m_Kv4_2",
+        "millis",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_BK_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_BK_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_KCa_BK"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_KCa_BK"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_h_BK",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m_BK",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h_BK",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m_BK",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_KCa_BK",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "h_BK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_BK_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_BK_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_BK_min",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_KCa_BK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_KCa_BK",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_BK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_BK_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_BK_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_BK",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_m_BK",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_z_BK",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "z_BK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "z_BK_coeff",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "z_BK_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "z_BK_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_SK_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_SK_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "bulk_Ca",
+        "variables": [
+          "Ca_bulk"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_KCa_SK"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_KCa_SK"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Ca_bulk",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Ca_mid_m_SK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_KCa_SK",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "g_KCa_SK_mod",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_KCa_SK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_KCa_SK",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_SK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_SK_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_SK_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "p_SK",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_m_SK",
+        "millis",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_M_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_M_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_M"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_KM"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Delta_V_mid_w",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_w",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_w",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_M",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "g_M_mod",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_M",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_KM",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_w",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_w_min",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_w_num",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "w",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "w_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "w_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_leak_Na_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_leak_Na_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_leak_Na"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_leak_Na"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_leak_Na",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "i_leak_Na",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_leak_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_leak_K_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_leak_K_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_leak_K"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_leak_K"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_leak_K",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "i_leak_K",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_leak_K",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_NaCa_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_NaCa_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_NaCa"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_NaCa_Na"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_NaCa_Ca"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "KmCa",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "KmNai",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ksat",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nao",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "alpha_NaCa",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_NaCa",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_NaCa",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaCa_Ca",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaCa_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_NaCa",
+        "nanoA",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_NaK_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_NaK_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_NaK"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_NaK_Na"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_NaK_K"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Ko",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ko_mid_NaK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nai_mid_NaK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai_power_NaK",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_K",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_NaK",
+        "nanoA",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "module_type": "IP3R_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "IP3R_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "ER_Ca",
+        "variables": [
+          "Ca_ER"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_IP3"
+        ]
+      },
+      {
+        "port_type": "ER_Ca_release",
+        "variables": [
+          "j_IP3"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Ca_ER",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "IP3",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Q_2",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "a_2",
+        "per_millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_1",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_2",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_3",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_5",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "h_IP3",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_IP3_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_IP3_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "j_IP3",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_IP3",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "m_IP3_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_hIP3",
+        "millis",
+        "access",
+        "variable"
+      ]
+    ]
+  },
+  {
+    "module_type": "RyR_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "RyR_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "ER_Ca",
+        "variables": [
+          "Ca_ER"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_RyR"
+        ]
+      },
+      {
+        "port_type": "ER_Ca_release",
+        "variables": [
+          "j_RyR"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Ca_ER",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Ca_ER_RyR_den",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ca_ER_RyR_mid",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai_RyR_den",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai_RyR_mid",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "c_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "c_RyR_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_RyR_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "j_RyR",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_RyR",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_c_RyR",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_hc_RyR",
+        "millis",
+        "access",
+        "constant"
+      ]
+    ]
+  },
+  {
+    "module_type": "i_CaN_SN",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "ion_channel_modules.cellml",
+    "component_type": "i_CaN_SN",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Ca_potential",
+        "variables": [
+          "E_Ca"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Ca_N"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_Ca_N"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_Ca",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_c",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_hc",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_mid_c",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_hc",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "c_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "c_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "g_CaN",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "hc",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_Ca_N",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Ca_N",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_c",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_c_max",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_c_min",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_hc",
+        "millis",
+        "access",
+        "constant"
+      ]
+    ]
   }
 ]

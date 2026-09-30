@@ -3,9 +3,9 @@ Import circulatory_autogen's system models (resources/<model>_vessel_array.csv a
 _parameters.csv, plus obs_data / params_for_id when present) into
 
     modules/system/<category>/<model>/
-        <model>_vessel_array.csv, <model>_parameters.csv   the model, using the module library;
+        <model>_vessel_array.json, <model>_parameters.csv  the model, using the module library;
                                                            a heart is split into clock/chambers/valves
-        reference/<model>_vessel_array.csv, _parameters.csv   circulatory_autogen's original, unchanged,
+        reference/<model>_vessel_array.json, _parameters.csv  circulatory_autogen's original (vessel array as JSON),
                                                            for the equivalence test
         <model>_system.yaml                                test spec (never overwritten)
 
@@ -34,6 +34,7 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from cam_testing import vessel_array  # noqa: E402
 from cam_testing.library import read_config  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,7 +94,7 @@ LVPROP = {'E_A_rv': ('E_lv_A', 0.8), 'E_A_ra': ('E_lv_A', 0.02), 'E_A_la': ('E_l
 
 def load_configs():
     configs = {}
-    for path in glob.glob(os.path.join(REPO, 'modules', '*', '*_modules_config.json')):
+    for path in glob.glob(os.path.join(REPO, 'modules', '**', '*_modules_config.json'), recursive=True):
         for e in read_config(path):   # either config format, as libcuflynx's names
             configs[(e['vessel_type'], e['BC_type'])] = e
     return configs
@@ -347,7 +348,7 @@ def import_model(ca_dir, model, category, configs):
     notes = []
     va = os.path.join(res, f'{model}_vessel_array.csv')
     pa = os.path.join(res, f'{model}_parameters.csv')
-    shutil.copyfile(va, os.path.join(ref_dir, f'{model}_vessel_array.csv'))
+    vessel_array.write_records(os.path.join(ref_dir, f'{model}_vessel_array.json'), vessel_array.read_records(va))
     if os.path.isfile(pa):
         shutil.copyfile(pa, os.path.join(ref_dir, f'{model}_parameters.csv'))
     header, rows = read_rows(va)
@@ -358,7 +359,7 @@ def import_model(ca_dir, model, category, configs):
     wrapped = mapping.pop('__wrapped__', {})
     reciprocal = mapping.pop('__reciprocal__', [])
     ignore.update({f'{r["name"]}/t': 'time' for r in rows})
-    write_rows(os.path.join(dest, f'{model}_vessel_array.csv'), ['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'], rows)
+    vessel_array.write_records(os.path.join(dest, f'{model}_vessel_array.json'), rows)
     if os.path.isfile(pa):
         write_rows(os.path.join(dest, f'{model}_parameters.csv'), ['variable_name', 'units', 'value', 'data_reference'], params)
     for extra in ('obs_data.json', 'params_for_id.csv'):

@@ -13,6 +13,7 @@ import os
 
 import numpy as np
 
+from cam_testing import vessel_array
 from cam_testing.library import MODULES_DIR
 
 # The single vessel's name. Not 'heart': libcuflynx special-cases a vessel called heart.
@@ -62,11 +63,13 @@ def _write_resources(component, resources_dir, prefix, overrides):
     rows = network.get('vessel_array') or [[VESSEL, component.BC_type, component.vessel_type, '', '']]
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.vessel_array must contain the component under test as vessel "{VESSEL}"')
-    with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
-        for r in rows:
-            writer.writerow([str(x) for x in r])
+    vessel_array.write_records(os.path.join(resources_dir, f'{prefix}_vessel_array.json'), vessel_array.from_rows(rows))
+    if not vessel_array.libcuflynx_reads_json():
+        # a libcuflynx without JSON vessel-array support reads the CSV
+        with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
+            writer.writerows([str(x) for x in r] for r in rows)
 
     params = component.parameters()
     todo = [p.variable_name for p in params if p.is_todo and parameter_name(p) not in overrides]

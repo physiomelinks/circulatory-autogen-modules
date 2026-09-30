@@ -1,87 +1,71 @@
 """
-Supermodules (modules/supermodules/<name>/): each harness in the spec closes the supermodule
-with host vessels, is flattened by cam_testing.supermodule.expand, generated and run.
+Supermodules (modules/supermodules/<name>/): a module_format "supermodule" config entry whose
+submodules libcuflynx expands in a model.
 
     pytest tests/test_supermodules.py
 
-  supermodule_structure_test    every internal vessel is a library (vessel_type, BC_type) and
-                                every '@<port>' marker is a declared port
-  supermodule_run_test          each harness generates and runs; outputs finite
-  supermodule_equivalence_test  a harness with equivalent_to reproduces that system model
-  supermodule_invariants_test   the harness invariants hold
+  supermodule_structure_test    every submodule is a library (module_type, module_subtype), internal
+                                connections name sibling submodules, and the default parameters
+                                name submodules (or are globals)
+  supermodule_equivalence_test  each spec.tests.equivalent entry: a system model that uses the
+                                supermodule reproduces a system model with the submodules written
+                                out, output for output (submodule outputs renamed <instance>_<sub>)
 """
-import os
+import csv
 
-import numpy as np
 import pytest
 
-from cam_testing import checks, library, supermodule as sm, system as systems
+from cam_testing import library, supermodule as sm, system as systems
 
 pytestmark = pytest.mark.system_model
 
 SUPERMODULES = sm.supermodules()
-HARNESSES = [pytest.param(s, h, id=f'{s.name}/{h["name"]}')
-             for s in SUPERMODULES for h in ((s.spec.get('tests') or {}).get('harnesses') or [])]
-
-
-def _harness_system(s, h, work_dir):
-    res = os.path.join(work_dir, 'resources')
-    sm.write_model(os.path.join(s.dir, h['vessel_array']), os.path.join(s.dir, h['parameters']), res, h['name'])
-    spec = {'sim_time': h.get('sim_time', 2.0), 'pre_time': h.get('pre_time', 0.0), 'dt': h.get('dt', 0.01),
-            'solver_info': h.get('solver_info') or {}, 'invariants': h.get('invariants') or []}
-    return systems.System(h['name'], 'supermodules', res, spec)
-
-
-def _run(s, h, work_dir):
-    system = _harness_system(s, h, work_dir)
-    path = systems.generate(system, work_dir)
-    return systems.simulate(path, system.spec, system.spec['solver_info'])
+EQUIVALENT = [pytest.param(s, e, id=f'{s.name}/{e["model"]}')
+              for s in SUPERMODULES for e in ((s.spec.get('tests') or {}).get('equivalent') or [])]
 
 
 @pytest.mark.parametrize('s', [pytest.param(s, id=s.name) for s in SUPERMODULES])
 def supermodule_structure_test(s):
     known = {(e['vessel_type'], e['BC_type']) for n in library.module_names() for e in library.load_module(n).config}
-    ports = s.spec.get('ports') or {}
+    # a submodule may itself be a supermodule (nesting)
+    known |= {(o.entry['module_type'], o.entry['module_subtype']) for o in SUPERMODULES}
+    names = set(s.submodule_names)
     problems = []
-    for r in sm.read_vessels(s.path('vessel_array.csv')):
-        if (r['vessel_type'], r['BC_type']) not in known:
-            problems.append(f'{r["name"]}: ({r["vessel_type"]}, {r["BC_type"]}) is not in the module library')
-        for n in (r['inp_vessels'] + ' ' + r['out_vessels']).split():
-            if n.startswith('@') and n[1:] not in ports:
-                problems.append(f'{r["name"]}: {n} is not a declared port')
-    names = {r['name'] for r in sm.read_vessels(s.path('vessel_array.csv'))}
-    for p, d in ports.items():
-        problems += [f'port {p}: {v} is not an internal vessel' for v in d.get('vessels', []) if v not in names]
+    if len(names) != len(s.submodules):
+        problems.append('duplicate submodule names')
+    for sub in s.submodules:
+        rec = library.normalise_config_entry({'module_type': sub['module_type'], 'module_subtype': sub['module_subtype'],
+                                              'component_file': '-', 'component_type': '-'})
+        if (rec['vessel_type'], rec['BC_type']) not in known:
+            problems.append(f'{sub["name"]}: ({sub["module_type"]}, {sub["module_subtype"]}) is not in the module library')
+        for n in sub.get('inp_instances', []) + sub.get('out_instances', []):
+            if n not in names:
+                problems.append(f'{sub["name"]}: {n} is not a submodule (external connections belong in the host\'s '
+                                'per_submodule_inputs / per_submodule_outputs)')
+    if s.defaults_path:
+        with open(s.defaults_path) as f:
+            for row in csv.DictReader(f):
+                var = (row.get('variable_name') or '').strip()
+                owner = next((n for n in sorted(names, key=len, reverse=True) if var.endswith('_' + n)), None)
+                if owner is None and var not in (s.spec.get('globals') or ['T', 'rho', 'l_eff']):
+                    problems.append(f'default parameter {var} names no submodule and is not a declared global')
     assert not problems, '\n'.join(problems)
 
 
-@pytest.mark.parametrize('s, h', HARNESSES)
-def supermodule_run_test(s, h, tmp_path):
-    t, out = _run(s, h, str(tmp_path))
-    bad = [k for k, v in out.items() if not np.all(np.isfinite(v))]
-    assert out and not bad, f'non-finite outputs: {bad[:10]}'
-
-
-@pytest.mark.parametrize('s, h', HARNESSES)
-def supermodule_equivalence_test(s, h, tmp_path):
-    if not h.get('equivalent_to'):
-        pytest.skip('harness has no equivalent_to')
-    target = systems.load_system(h['equivalent_to'])
-    t, new = _run(s, h, str(tmp_path / 'harness'))
-    path = systems.generate(target, str(tmp_path / 'target'))
-    t_ref, ref = systems.simulate(path, target.spec, h.get('solver_info') or {})
-    rows, missing = systems.compare(ref, new, {}, float(h.get('tol', 1e-9)))
+@pytest.mark.parametrize('s, e', EQUIVALENT)
+def supermodule_equivalence_test(s, e, tmp_path):
+    model = systems.load_system(e['model'])
+    target = systems.load_system(e['reproduces'])
+    solver_info = e.get('solver_info') or {'rtol': 1e-10, 'atol': 1e-12}
+    t_ref, ref = systems.simulate(systems.generate(target, str(tmp_path / 'target')), target.spec, solver_info)
+    t_new, new = systems.simulate(systems.generate(model, str(tmp_path / 'model')), model.spec, solver_info)
+    # submodule outputs renamed <instance>_<sub>; an explicit output_map in the spec (for nested
+    # supermodules, or variables that moved between components) takes precedence
+    output_map = {**sm.prefixed_output_map(ref, e.get('instance', s.name), s.submodule_names), **(e.get('output_map') or {})}
+    ignore = e.get('ignore') or {}
+    ref = {k: v for k, v in ref.items() if k not in ignore}
+    rows, missing = systems.compare(ref, new, output_map, float(e.get('tol', 1e-9)))
     bad = [r for r in rows if not r['ok']]
     assert rows and not bad and not missing, (
         f'{len(bad)} of {len(rows)} outputs differ; missing {missing[:10]}\n'
-        + '\n'.join(f"{r['reference']}: {r['difference']:.3g}" for r in bad[:10]))
-
-
-@pytest.mark.parametrize('s, h', HARNESSES)
-def supermodule_invariants_test(s, h, tmp_path):
-    if not h.get('invariants'):
-        pytest.skip('harness has no invariants')
-    t, out = _run(s, h, str(tmp_path))
-    failures = checks._check_invariants({'invariants': h['invariants']}, t,
-                                        {k.replace('/', '__'): v for k, v in out.items()}, {}, where='run')
-    assert not failures, '; '.join(failures)
+        + '\n'.join(f"{r['reference']} -> {r['model']}: {r['difference']:.3g}" for r in bad[:10]))

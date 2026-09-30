@@ -69,8 +69,9 @@ def _module_index():
 def check(vessel_array_path, parameters_path, out=sys.stdout):
     """Returns the number of values outside the tested range."""
     from cam_testing import risk
-    with open(vessel_array_path) as f:
-        vessels = [{k.strip(): (v or '').strip() for k, v in r.items()} for r in csv.DictReader(f, skipinitialspace=True)]
+    from cam_testing import vessel_array
+    vessels = [{'name': r['name'], 'vessel_type': r.get('module_type'), 'BC_type': r.get('module_subtype')}
+               for r in vessel_array.read_records(vessel_array_path)]
     with open(parameters_path) as f:
         values = {r['variable_name'].strip(): r['value'].strip()
                   for r in csv.DictReader(f, skipinitialspace=True) if r.get('variable_name')}

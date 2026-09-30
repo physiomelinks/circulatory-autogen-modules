@@ -1,0 +1,60 @@
+supermodule: sympathetic_neuron
+description: 'Sympathetic neuron (SN_simple): an SN_soma supermodule instance "soma", the SN_axon cable "axon" and an SN_varicosity
+  supermodule instance "varicosity", coupled soma -> axon -> varicosity through the plain axon module (the soma''s membrane
+  gives the axon V and takes its axial current; the axon sets the varicosity membrane''s potential). A model uses one instance,
+  e.g. {"name": "SN", "module_type": "sympathetic_neuron", "module_subtype": "supermodule"}; nested expansion names the parts
+  SN_soma_<part>, SN_axon and SN_varicosity_<part>. The soma and varicosity parameters are the SN_soma / SN_varicosity supermodules''
+  defaults; sympathetic_neuron_parameters.csv holds the axon''s and the globals (SN_simple''s values). Built by tools/build_sn_modules.py.'
+reviewed: false
+tests:
+  equivalent:
+  - model: cellular/SN_simple_supermodules
+    reproduces: cellular/SN_simple
+    instance: SN
+    tol: 1.0e-09
+    solver_info: {rtol: 1.0e-10, atol: 1.0e-12}
+    output_map: {soma_SN/B_Ca_ER_pre: SN_soma_Ca/B_Ca_ER_pre, soma_SN/B_Ca_bulk: SN_soma_Ca/B_Ca_bulk, soma_SN/B_Cai: SN_soma_Ca/B_Cai,
+      soma_SN/CaB_Ca_ER_pre: SN_soma_Ca/CaB_Ca_ER_pre, soma_SN/CaB_Ca_bulk: SN_soma_Ca/CaB_Ca_bulk, soma_SN/CaB_Cai: SN_soma_Ca/CaB_Cai,
+      soma_SN/Ca_ER: SN_soma_Ca/Ca_ER, soma_SN/Ca_ER_pre: SN_soma_Ca/Ca_ER_pre, soma_SN/Ca_bulk: SN_soma_Ca/Ca_bulk, soma_SN/Cai: SN_soma_Ca/Cai,
+      soma_SN/E_K: SN_soma_Na_K/E_K, soma_SN/E_Na: SN_soma_Na_K/E_Na, soma_SN/I_in_delayed: SN_soma_membrane/I_in_delayed,
+      soma_SN/Ki: SN_soma_Na_K/Ki, soma_SN/Nai: SN_soma_Na_K/Nai, soma_SN/V: SN_soma_membrane/V, soma_SN/V_sensed: SN_soma_membrane/V_sensed,
+      soma_SN/c: SN_soma_i_CaL/c, soma_SN/c_RyR: SN_soma_RyR/c_RyR, soma_SN/c_RyR_inf: SN_soma_RyR/c_RyR_inf, soma_SN/c_inf: SN_soma_i_CaL/c_inf,
+      soma_SN/h: SN_soma_i_Na/h, soma_SN/h_BK: SN_soma_i_BK/h_BK, soma_SN/h_BK_inf: SN_soma_i_BK/h_BK_inf, soma_SN/h_IP3: SN_soma_IP3R/h_IP3,
+      soma_SN/h_IP3_inf: SN_soma_IP3R/h_IP3_inf, soma_SN/h_Kv1_5: SN_soma_i_Kv1_5/h_Kv1_5, soma_SN/h_Kv1_5_inf: SN_soma_i_Kv1_5/h_Kv1_5_inf,
+      soma_SN/h_Kv4_2: SN_soma_i_Kv4_2/h_Kv4_2, soma_SN/h_Kv4_2_inf: SN_soma_i_Kv4_2/h_Kv4_2_inf, soma_SN/h_Na1_6: SN_soma_i_Na1_6/h_Na1_6,
+      soma_SN/h_Na1_6_inf: SN_soma_i_Na1_6/h_Na1_6_inf, soma_SN/h_inf: SN_soma_i_Na/h_inf, soma_SN/hc: SN_soma_i_CaL/hc, soma_SN/hc_RyR: SN_soma_RyR/hc_RyR,
+      soma_SN/hc_RyR_inf: SN_soma_RyR/hc_RyR_inf, soma_SN/hc_inf: SN_soma_i_CaL/hc_inf, soma_SN/i_Ca_L: SN_soma_i_CaL/i_Ca_L,
+      soma_SN/i_KCa_BK: SN_soma_i_BK/i_KCa_BK, soma_SN/i_KCa_SK: SN_soma_i_SK/i_KCa_SK, soma_SN/i_Kv1_5: SN_soma_i_Kv1_5/i_Kv1_5,
+      soma_SN/i_Kv2: SN_soma_i_Kv2/i_Kv2, soma_SN/i_Kv4_2: SN_soma_i_Kv4_2/i_Kv4_2, soma_SN/i_M: SN_soma_i_M/i_M, soma_SN/i_Na: SN_soma_i_Na/i_Na,
+      soma_SN/i_Na1_6: SN_soma_i_Na1_6/i_Na1_6, soma_SN/i_NaCa: SN_soma_i_NaCa/i_NaCa, soma_SN/i_NaK: SN_soma_i_NaK/i_NaK,
+      soma_SN/i_leak_K: SN_soma_i_leak_K/i_leak_K, soma_SN/i_leak_Na: SN_soma_i_leak_Na/i_leak_Na, soma_SN/j_Ca_L: SN_soma_i_CaL/j_Ca_L,
+      soma_SN/j_IP3: SN_soma_IP3R/j_IP3, soma_SN/j_KCa_BK: SN_soma_i_BK/j_KCa_BK, soma_SN/j_KCa_SK: SN_soma_i_SK/j_KCa_SK,
+      soma_SN/j_KM: SN_soma_i_M/j_KM, soma_SN/j_Kv1_5: SN_soma_i_Kv1_5/j_Kv1_5, soma_SN/j_Kv2: SN_soma_i_Kv2/j_Kv2, soma_SN/j_Kv4_2: SN_soma_i_Kv4_2/j_Kv4_2,
+      soma_SN/j_Na: SN_soma_i_Na/j_Na, soma_SN/j_Na1_6: SN_soma_i_Na1_6/j_Na1_6, soma_SN/j_NaCa_Ca: SN_soma_i_NaCa/j_NaCa_Ca,
+      soma_SN/j_NaCa_Na: SN_soma_i_NaCa/j_NaCa_Na, soma_SN/j_NaK_K: SN_soma_i_NaK/j_NaK_K, soma_SN/j_NaK_Na: SN_soma_i_NaK/j_NaK_Na,
+      soma_SN/j_RyR: SN_soma_RyR/j_RyR, soma_SN/j_SERCA: SN_soma_Ca/j_SERCA, soma_SN/j_diffCa: SN_soma_Ca/j_diffCa, soma_SN/j_diffCa_ER: SN_soma_Ca/j_diffCa_ER,
+      soma_SN/j_leak_Ca: SN_soma_Ca/j_leak_Ca, soma_SN/j_leak_K: SN_soma_i_leak_K/j_leak_K, soma_SN/j_leak_Na: SN_soma_i_leak_Na/j_leak_Na,
+      soma_SN/m: SN_soma_i_Na/m, soma_SN/m_BK: SN_soma_i_BK/m_BK, soma_SN/m_BK_inf: SN_soma_i_BK/m_BK_inf, soma_SN/m_IP3_inf: SN_soma_IP3R/m_IP3_inf,
+      soma_SN/m_Kv1_5: SN_soma_i_Kv1_5/m_Kv1_5, soma_SN/m_Kv1_5_inf: SN_soma_i_Kv1_5/m_Kv1_5_inf, soma_SN/m_Kv2: SN_soma_i_Kv2/m_Kv2,
+      soma_SN/m_Kv2_inf: SN_soma_i_Kv2/m_Kv2_inf, soma_SN/m_Kv4_2: SN_soma_i_Kv4_2/m_Kv4_2, soma_SN/m_Kv4_2_inf: SN_soma_i_Kv4_2/m_Kv4_2_inf,
+      soma_SN/m_Na1_6: SN_soma_i_Na1_6/m_Na1_6, soma_SN/m_Na1_6_inf: SN_soma_i_Na1_6/m_Na1_6_inf, soma_SN/m_SK: SN_soma_i_SK/m_SK,
+      soma_SN/m_SK_inf: SN_soma_i_SK/m_SK_inf, soma_SN/m_inf: SN_soma_i_Na/m_inf, soma_SN/tau_c: SN_soma_i_CaL/tau_c, soma_SN/tau_h: SN_soma_i_Na/tau_h,
+      soma_SN/tau_hIP3: SN_soma_IP3R/tau_hIP3, soma_SN/tau_h_BK: SN_soma_i_BK/tau_h_BK, soma_SN/tau_h_Kv1_5: SN_soma_i_Kv1_5/tau_h_Kv1_5,
+      soma_SN/tau_h_Na1_6: SN_soma_i_Na1_6/tau_h_Na1_6, soma_SN/tau_m: SN_soma_i_Na/tau_m, soma_SN/tau_m_BK: SN_soma_i_BK/tau_m_BK,
+      soma_SN/tau_m_Kv1_5: SN_soma_i_Kv1_5/tau_m_Kv1_5, soma_SN/tau_m_Kv2: SN_soma_i_Kv2/tau_m_Kv2, soma_SN/tau_m_Kv4_2: SN_soma_i_Kv4_2/tau_m_Kv4_2,
+      soma_SN/tau_m_Na1_6: SN_soma_i_Na1_6/tau_m_Na1_6, soma_SN/tau_w: SN_soma_i_M/tau_w, soma_SN/w: SN_soma_i_M/w, soma_SN/w_inf: SN_soma_i_M/w_inf,
+      soma_SN/z_BK: SN_soma_i_BK/z_BK, soma_SN/z_BK_inf: SN_soma_i_BK/z_BK_inf, axon_SN/I: SN_axon/I, axon_SN/I_channels: SN_axon/I_channels,
+      axon_SN/V: SN_axon/V, var_SN/B_Ca_ER_pre: SN_varicosity_Ca/B_Ca_ER_pre, var_SN/B_Ca_bulk: SN_varicosity_Ca/B_Ca_bulk,
+      var_SN/B_Cai: SN_varicosity_Ca/B_Cai, var_SN/CaB_Ca_ER_pre: SN_varicosity_Ca/CaB_Ca_ER_pre, var_SN/CaB_Ca_bulk: SN_varicosity_Ca/CaB_Ca_bulk,
+      var_SN/CaB_Cai: SN_varicosity_Ca/CaB_Cai, var_SN/Ca_ER: SN_varicosity_Ca/Ca_ER, var_SN/Ca_ER_pre: SN_varicosity_Ca/Ca_ER_pre,
+      var_SN/Ca_bulk: SN_varicosity_Ca/Ca_bulk, var_SN/Cai: SN_varicosity_Ca/Cai, var_SN/E_Ca: SN_varicosity_Ca/E_Ca, var_SN/NE: SN_varicosity_NE/NE,
+      var_SN/c: SN_varicosity_i_CaN/c, var_SN/c_RyR: SN_varicosity_RyR/c_RyR, var_SN/c_RyR_inf: SN_varicosity_RyR/c_RyR_inf,
+      var_SN/c_inf: SN_varicosity_i_CaN/c_inf, var_SN/h_IP3: SN_varicosity_IP3R/h_IP3, var_SN/h_IP3_inf: SN_varicosity_IP3R/h_IP3_inf,
+      var_SN/hc: SN_varicosity_i_CaN/hc, var_SN/hc_RyR: SN_varicosity_RyR/hc_RyR, var_SN/hc_RyR_inf: SN_varicosity_RyR/hc_RyR_inf,
+      var_SN/hc_inf: SN_varicosity_i_CaN/hc_inf, var_SN/i_Ca_N: SN_varicosity_i_CaN/i_Ca_N, var_SN/i_NaCa: SN_varicosity_i_NaCa/i_NaCa,
+      var_SN/j_Ca_N: SN_varicosity_i_CaN/j_Ca_N, var_SN/j_IP3: SN_varicosity_IP3R/j_IP3, var_SN/j_NaCa_Ca: SN_varicosity_i_NaCa/j_NaCa_Ca,
+      var_SN/j_RyR: SN_varicosity_RyR/j_RyR, var_SN/j_SERCA: SN_varicosity_Ca/j_SERCA, var_SN/j_diffCa: SN_varicosity_Ca/j_diffCa,
+      var_SN/j_diffCa_ER: SN_varicosity_Ca/j_diffCa_ER, var_SN/j_leak_Ca: SN_varicosity_Ca/j_leak_Ca, var_SN/m_IP3_inf: SN_varicosity_IP3R/m_IP3_inf,
+      var_SN/tau_c: SN_varicosity_i_CaN/tau_c, var_SN/tau_hIP3: SN_varicosity_IP3R/tau_hIP3}
+    ignore: {soma_SN/t: time, axon_SN/t: time, var_SN/t: time}
+globals: [R, F, T]

@@ -36,7 +36,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
     ap.add_argument('--check', action='store_true', help='only report configs not in PhLynx format')
     args = ap.parse_args(argv)
-    paths = sorted(glob.glob(os.path.join(REPO, 'modules', '*', '*_modules_config.json')))
+    paths = sorted(glob.glob(os.path.join(REPO, 'modules', '**', '*_modules_config.json'), recursive=True))
     not_phlynx = []
     for path in paths:
         with open(path) as f:

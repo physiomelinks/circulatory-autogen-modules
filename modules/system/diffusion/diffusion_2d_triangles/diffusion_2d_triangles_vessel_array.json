@@ -1,0 +1,18 @@
+[
+ {"name": "t0", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": [], "out_instances": ["f0", "f1"]},
+ {"name": "t1", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": ["f0"], "out_instances": ["f2"]},
+ {"name": "t2", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": ["f2"], "out_instances": ["f3"]},
+ {"name": "t3", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": ["f3"], "out_instances": ["f4"]},
+ {"name": "t4", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": ["f1"], "out_instances": ["f5"]},
+ {"name": "t5", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": ["f5"], "out_instances": ["f6"]},
+ {"name": "t6", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": ["f6"], "out_instances": ["f7"]},
+ {"name": "t7", "module_type": "tissue_diffusion_volume", "module_subtype": "nn", "inp_instances": ["f4", "f7"], "out_instances": []},
+ {"name": "f0", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t0"], "out_instances": ["t1"]},
+ {"name": "f1", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t0"], "out_instances": ["t4"]},
+ {"name": "f2", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t1"], "out_instances": ["t2"]},
+ {"name": "f3", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t2"], "out_instances": ["t3"]},
+ {"name": "f4", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t3"], "out_instances": ["t7"]},
+ {"name": "f5", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t4"], "out_instances": ["t5"]},
+ {"name": "f6", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t5"], "out_instances": ["t6"]},
+ {"name": "f7", "module_type": "tissue_diffusion_face", "module_subtype": "nn", "inp_instances": ["t6"], "out_instances": ["t7"]}
+]
