@@ -184,7 +184,9 @@ def compare(cf, lib_t, lib_outputs, tol):
         if c.size != t.size or l_vals.size != lib_t.size or len(ci_idx) < 2:
             continue
         cv, lv = c[ci_idx], l_vals[li_idx]
-        scale = max(float(np.max(np.abs(lv))), float(np.ptp(lv)), 1e-300)
+        # scaled by the whole run, not only the shared times: when the logs share few times
+        # (e.g. only the start and end, where a rate is ~0) those alone make a tiny scale
+        scale = max(float(np.max(np.abs(l_vals))), float(np.ptp(l_vals)), 1e-300)
         d = float(np.max(np.abs(cv - lv)) / scale)
         rows.append({'cuflynx': c_name, 'libcuflynx': l_name, 'difference': d, 'ok': d <= tol,
                      'common_times': int(len(ci_idx))})
