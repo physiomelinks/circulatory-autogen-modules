@@ -1,0 +1,35 @@
+[
+  {
+    "module_type": "outlet_flow",
+    "module_subtype": "nn_constant",
+    "module_format": "cellml",
+    "component_file": "outlet_flow_nn_constant_modules.cellml",
+    "component_type": "constant_flow_BC_type__outlet_flow_nn_constant",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "P"
+        ]
+      }
+    ],
+    "exit_ports": [],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "P",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

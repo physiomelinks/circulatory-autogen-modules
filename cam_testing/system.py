@@ -1,8 +1,9 @@
 """
-System models: modules/system/<category>/<model>/.
+System models: system_models/<category>/<model>/ (at the repo root; not modules, not supermodules).
 
-Each system dir holds the model built from this module library (<model>_vessel_array.csv,
-<model>_parameters.csv), circulatory_autogen's original under reference/, and a spec
+Each system dir holds the model built from this module library (<model>_vessel_array.json, whose
+records name a module_type, its version (module_subtype) and an instance, and
+<model>_parameters.csv, whose values win over the instances'), circulatory_autogen's original under reference/, and a spec
 <model>_system.yaml. The tests:
 
   system_run_test          the model generates with this library and runs; outputs finite
@@ -24,9 +25,11 @@ from dataclasses import dataclass
 import numpy as np
 import yaml
 
-from cam_testing.library import MODULES_DIR
+from cam_testing.library import MODULES_DIR, SYSTEM_MODELS_DIR
 
-SYSTEM_DIR = os.path.join(MODULES_DIR, 'system')
+SYSTEM_DIR = SYSTEM_MODELS_DIR
+# system models not moved yet (another session's modules/system/poiseuille): read where they are
+LEGACY_SYSTEM_DIR = os.path.join(MODULES_DIR, 'system')
 
 
 @dataclass
@@ -51,7 +54,11 @@ class System:
 
 def system_models():
     out = []
-    for spec_path in sorted(glob.glob(os.path.join(SYSTEM_DIR, '*', '*', '*_system.yaml'))):
+    paths = sorted(glob.glob(os.path.join(SYSTEM_DIR, '*', '*', '*_system.yaml')))
+    moved = {os.path.relpath(os.path.dirname(p), SYSTEM_DIR) for p in paths}
+    paths += sorted(p for p in glob.glob(os.path.join(LEGACY_SYSTEM_DIR, '*', '*', '*_system.yaml'))
+                    if os.path.relpath(os.path.dirname(p), LEGACY_SYSTEM_DIR) not in moved)
+    for spec_path in paths:
         d = os.path.dirname(spec_path)
         with open(spec_path) as f:
             spec = yaml.safe_load(f) or {}

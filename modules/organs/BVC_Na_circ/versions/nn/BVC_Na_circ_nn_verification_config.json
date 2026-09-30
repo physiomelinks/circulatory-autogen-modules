@@ -1,0 +1,59 @@
+{
+  "module_type": "BVC_Na_circ",
+  "version": "nn",
+  "sim_time": 10.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-12},
+  "outputs": ["q_vc_Na"],
+  "run_parameters": {
+    "v_giEpi_NKE": 1.16e-06,
+    "v_lptEpi_NKE": 0.0037,
+    "v_rptEpi_NKE": 0.0037,
+    "v_lgl_Na": 0.0038,
+    "v_rgl_Na": 0.0036
+  },
+  "invariants": [
+    {
+      "description": "exact solution: q_vc_Na = q_vc_Na_init + (v_giEpi_NKE + v_lptEpi_NKE + v_rptEpi_NKE - v_lgl_Na - v_rgl_Na) t (sodium mass balance of the circulation)",
+      "expr": "np.max(np.abs(q_vc_Na - (q_vc_Na_init + (v_giEpi_NKE + v_lptEpi_NKE + v_rptEpi_NKE - v_lgl_Na - v_rgl_Na)*t))) <= 1e-9*max(1.0e-3, np.max(np.abs(q_vc_Na)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "q_vc_Na_init": {"min": 0.001, "max": 1.0, "points": 5, "scale": "log"},
+      "v_giEpi_NKE": {"min": -0.001, "max": 0.001, "points": 5},
+      "v_lptEpi_NKE": {"min": -0.005, "max": 0.005, "points": 5},
+      "v_rptEpi_NKE": {"min": -0.005, "max": 0.005, "points": 5},
+      "v_lgl_Na": {"min": 0, "max": 0.005, "points": 5},
+      "v_rgl_Na": {"min": 0, "max": 0.005, "points": 5}
+    },
+    "rationale": "Na_circ is a pure integrator, so any finite constant fluxes work; the ranges span the magnitudes the fluxes take in the source model (glomerular Na flux about 3.5e-3 mol/s per kidney with kK_gl_Na = 1 /s; NKE fluxes of either sign, since the simplified NKE runs backwards when the gradients reverse), and q_vc_Na_init spans 1 mmol to 1 mol (source-model value 11.5 mmol; a physiological extracellular Na pool is about 2 mol). q_vc_Na may become negative for draining fluxes over long runs; that is not claimed as an invariant because the component itself has no positivity constraint."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.04, 0.02, 0.01, 0.005],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a pure sodium integrator (mass balance) with no physiological counterpart on its own; it is verified against its exact solution. Whole-body sodium-balance data (e.g. plasma Na with changes in intake) belong to a network using BVC_GI, BVC_Kidney and BVC_Na_circ together."
+      },
+      "calibrate": {
+        "note": "not_applicable: no free rate parameters: the only constant is the initial Na content, which is an initial condition, not a behaviour to calibrate."
+      }
+    }
+  }
+}

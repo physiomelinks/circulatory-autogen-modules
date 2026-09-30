@@ -1,0 +1,8 @@
+module_type: varicosity
+version: sympathetic
+reviewed: false
+description: 'Sympathetic-neuron varicosity (SN_simple''s SN_varicosity) built from its parts: a pass-through membrane (the
+  axon sets V), four-compartment Ca handling with E_Ca, N-type Ca channel, NaCa exchanger, IP3R, RyR and NE release. Each
+  submodule becomes <instance>_<submodule> in a model; the membrane takes the axon''s potential: per_submodule_inputs {"membrane":
+  ["<axon>"]}; NE (synaptic_NE) is available from NE. Default parameters are SN_simple''s (its default instance). Built by
+  tools/build_sn_modules.py. Tested through the neuron sympathetic version.'

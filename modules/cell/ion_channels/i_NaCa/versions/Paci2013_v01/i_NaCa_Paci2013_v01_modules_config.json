@@ -1,0 +1,134 @@
+[
+  {
+    "module_type": "i_NaCa",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_NaCa_Paci2013_v01_modules.cellml",
+    "component_type": "i_NaCa_Paci_2013",
+    "default_instance": "default",
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "NaCa_current",
+        "variables": [
+          "i_NaCa"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "NaCa_current",
+        "variables": [
+          "i_NaCa"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_NaCa",
+        "A_per_F",
+        "access",
+        "variable"
+      ],
+      [
+        "kNaCa",
+        "A_per_F",
+        "access",
+        "constant"
+      ],
+      [
+        "alpha",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Ksat",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Nao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "KmCa",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "KmNai",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "J_per_MK",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Vm",
+        "volt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

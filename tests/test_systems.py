@@ -1,5 +1,5 @@
 """
-System models (modules/system/<category>/<model>/): generated from this module library,
+System models (system_models/<category>/<model>/): generated from this module library,
 checked to run, and checked to reproduce circulatory_autogen's original model.
 
     pytest tests/test_systems.py                       # every system model

@@ -1,8 +1,13 @@
 """
-HTML reports: one page per module (modules/<name>/<name>.html) and a site index.
+HTML reports at two levels, and a site index:
 
-    python -m cam_testing.report                  # every module + site/index.html
-    python -m cam_testing.report --module heart   # one module
+    <module_type>/<module_type>.html                        every version, linking to its page
+    <module_type>/versions/<v>/<module_type>_<v>.html       the version: equations, variables,
+                                                            tests, references, and its instances
+                                                            with their validation / calibration
+
+    python -m cam_testing.report                  # every module_type and its versions
+    python -m cam_testing.report --module heart   # one module_type (or a category: --module cell)
     python -m cam_testing.report --site           # also assemble site/ as GitHub Pages serves it
 
 Pages read the result JSON and plots the tests wrote, so a report shows the last local (or
@@ -10,7 +15,6 @@ CI) test run. Plots are referenced relatively (plots/...), so a page works opene
 """
 import argparse
 import datetime
-import html
 import json
 import os
 import shutil
@@ -18,7 +22,9 @@ import shutil
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from cam_testing import bib, checks, phlynx, ranges, risk
-from cam_testing.library import REPO_ROOT, load_module, module_names, module_relpath
+from cam_testing import omex as omex_mod
+from cam_testing import supermodule as sm
+from cam_testing.library import REPO_ROOT, load_module_type, module_type_names, select_module_types
 from cam_testing.mathml import component_equations, component_variables
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
@@ -35,32 +41,38 @@ TEST_TITLES = {
     'phlynx_export_test': 'PhLynx: build & export',
     'cuflynx_simulate_test': 'CUFLynx: import & simulate',
     'phlynx_equivalence_test': 'PhLynx → CUFLynx vs libcuflynx',
+    'supermodule_structure_test': 'Supermodule: structure',
+    'supermodule_equivalence_test': 'Supermodule: reproduces',
 }
 TEST_SHORT = {
     'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate',
     'phlynx_export_test': 'PhLynx', 'cuflynx_simulate_test': 'CUFLynx', 'phlynx_equivalence_test': 'PhLynx≡',
+    'supermodule_structure_test': 'Structure', 'supermodule_equivalence_test': 'Reproduces',
 }
 TEST_ABOUT = {
-    'run_test': 'Generates the component alone with libcuflynx (every boundary condition becomes a '
-                'parameter), simulates it, and checks every output is finite.',
-    'verification_test_invariants': 'Checks the simulation against what the component is supposed to do: '
+    'run_test': 'Generates the version alone with libcuflynx (every boundary condition becomes a '
+                'parameter, valued from the default instance), simulates it, and checks every output is finite.',
+    'verification_test_invariants': 'Checks the simulation against what the version is supposed to do: '
                                     'the invariants in its spec (exact solutions, conservation laws, bounds, '
                                     'delays) evaluated at the run parameters.',
-    'verification_test_BC': 'Sweeps each boundary condition (or, for a self-contained component, each '
+    'verification_test_BC': 'Sweeps each boundary condition (or, for a self-contained version, each '
                             'constant) over a range and checks every run completes, stays finite and '
                             'keeps the invariants.',
     'verification_test_timestep': 'Integrates the generated right-hand side with a fixed-step scheme at '
                                   'successively halved steps. Differences between successive solutions must '
                                   'shrink at the scheme\'s order, and the finest solution must agree with '
                                   'libcuflynx\'s CVODE run at tight tolerances.',
-    'stability_test': 'Runs the component with a matrix of solvers, tolerances and timesteps. A '
+    'stability_test': 'Runs the version with a matrix of solvers, tolerances and timesteps. A '
                       'configuration works when it finishes with finite outputs within the tolerance of a '
                       'tight-tolerance reference. Declared-supported configurations must work.',
-    'validation_test_baseline': 'Compares the model with published or experimental baseline data.',
-    'validation_test_calibrate': 'Calibrates parameters to one data set with libcuflynx parameter '
-                                 'identification, then checks predictions against held-out data.',
-    'phlynx_export_test': 'Builds the component\'s test network in PhLynx (its own code, loaded with this '
+    'validation_test_baseline': 'Compares the model, at the instance\'s parameters, with published or '
+                                'experimental baseline data.',
+    'validation_test_calibrate': 'Calibrates parameters to the instance\'s obs_data with libcuflynx parameter '
+                                 'identification, then checks predictions against held-out data; writes the '
+                                 'instance\'s calibrated parameters. An instance without obs_data records this '
+                                 'as failed ("no calibration data in this instance").',
+    'phlynx_export_test': 'Builds the version\'s test network in PhLynx (its own code, loaded with this '
                           'library\'s modules and parameters), checks every connection was made, and exports '
                           'the .omex PhLynx sends to CUFLynx.',
     'cuflynx_simulate_test': 'Imports that .omex into a released CUFLynx through its API and simulates it; '
@@ -68,9 +80,16 @@ TEST_ABOUT = {
     'phlynx_equivalence_test': 'Compares CUFLynx\'s simulation of the PhLynx-built model with libcuflynx\'s '
                                'model of the same network (outputs matched by instance and variable, '
                                'normalised difference within 1e-6).',
+    'supermodule_structure_test': 'Every submodule is a library version with an existing instance, internal '
+                                  'connections name sibling submodules, and the instance parameters name '
+                                  'submodules or declared globals.',
+    'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
+                                    'with its submodules written out, output for output.',
 }
-# The tests shown for every component: the V&V tests, then the PhLynx -> CUFLynx pipeline
-REPORT_TESTS = checks.TESTS + phlynx.PIPELINE_TESTS
+# The tests shown for every version: verification, then the PhLynx -> CUFLynx pipeline. The
+# validation tests are shown per instance.
+REPORT_TESTS = checks.VERSION_TESTS + phlynx.PIPELINE_TESTS
+INSTANCE_TESTS = checks.INSTANCE_TESTS
 STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
                 'not_applicable': 'N/A', None: 'Not run'}
 
@@ -100,65 +119,105 @@ def _ports(entry):
     return out
 
 
-def component_context(component):
-    module = component.module
-    equations, unsupported = ([], set())
+def _cellml_equations(version):
+    equations, unsupported, cellml_vars = [], set(), {}
+    if version.format == 'cellml' and os.path.isfile(version.cellml_path):
+        equations, unsupported = component_equations(version.cellml_path, version.module_type)
+        cellml_vars = {v[0]: v for v in component_variables(version.cellml_path, version.module_type)}
+    return equations, unsupported, cellml_vars
+
+
+def _test_entry(version, test, r, spec_block=None, title=None):
+    base = test.split('__')[0]
+    return {
+        'key': test, 'title': title or TEST_TITLES.get(base, test), 'short': TEST_SHORT.get(base, test),
+        'about': TEST_ABOUT.get(base, ''),
+        'status': r.status if r else None, 'status_label': STATUS_LABEL.get(r.status if r else None, 'Not run'),
+        'message': r.message if r else 'This test has not been run yet.',
+        'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
+        'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
+        'known_issue': (version.spec.get('expected_failures') or {}).get(test),
+        'proposed_data': (spec_block or {}).get('status') == checks.PROPOSED,
+    }
+
+
+def instance_context(version, inst):
+    '''One instance: its files, and its validation (baseline) and calibration results.'''
+    tests = []
+    for test in INSTANCE_TESTS:
+        kind = test.rsplit('_', 1)[1]
+        v = inst.validation.get(kind) or {}
+        r = checks.load(version, test, inst)
+        if r is None and not version.is_supermodule:
+            # not run (e.g. slow tests excluded): what a run would record without data
+            if kind == 'calibrate' and not inst.has_obs_data:
+                r = checks.Result(test, checks.FAILED, checks.NO_CALIBRATION_DATA)
+            elif not v:
+                r = checks.Result(test, checks.NOT_APPLICABLE,
+                                  checks.NO_BASELINE_DATA if kind == 'baseline' else checks.NO_CALIBRATION_DATA)
+            elif v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED, checks.NOT_APPLICABLE):
+                r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
+        entry = _test_entry(version, test, r, v)
+        entry['anchor'] = f'{inst.name}--{test}'
+        tests.append(entry)
+    calibration = None
+    if os.path.isfile(inst.calibration_path):
+        with open(inst.calibration_path) as f:
+            calibration = json.load(f)
+    from cam_testing import omex as omex_mod
+    omex_file = omex_mod.omex_path(version, inst)
+    omex_result = checks.load(version, f'cuflynx_instance_omex_test__{inst.name}')
+    return {'name': inst.name, 'is_default': inst.is_default, 'files': inst.data_files(),
+            # the generated COMBINE archive for CUFLynx (tools/build_instance_omex.py), and its CUFLynx check
+            'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
+            'omex_status': omex_result.status if omex_result else None,
+            'omex_message': omex_result.message if omex_result else 'not checked yet (tests/test_instance_omex.py)',
+            'n_parameters': len(inst.parameters()), 'obs_data_name': inst.obs_data_name,
+            'has_obs_data': inst.has_obs_data, 'calibration': calibration,
+            'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
+            if os.path.isfile(inst.calibrated_parameters_path) else None,
+            'rel_dir': os.path.relpath(inst.dir, version.dir),
+            'tests': [] if version.is_supermodule else tests,
+            'baseline': None if version.is_supermodule else tests[0],
+            'calibrate': None if version.is_supermodule else tests[1]}
+
+
+def component_context(version):
+    '''The version page's content (what was a component's section of a module page).'''
+    equations, unsupported, cellml_vars = _cellml_equations(version)
+    params = {p.variable_name: p for p in version.parameters()}
+    spread = ranges.validated_spread(version) if not version.is_supermodule else {}
     variables = []
-    if component.config.get('module_format', 'cellml') == 'cellml':
-        # the component may live in another module's file (shared components)
-        cellml = module.cellml_path
-        equations, unsupported = component_equations(cellml, component.module_type)
-        if not equations:
-            for other in module_names():
-                path = load_module(other).cellml_path
-                eqs, uns = component_equations(path, component.module_type)
-                if eqs:
-                    cellml, equations, unsupported = path, eqs, uns
-                    break
-        cellml_vars = {v[0]: v for v in component_variables(cellml, component.module_type)}
-    else:
-        cellml_vars = {}
-    params = {p.variable_name: p for p in component.parameters()}
-    spread = ranges.validated_spread(component)
-    for name, units, access, kind in component.config['variables_and_units']:
+    for name, units, access, kind in version.config.get('variables_and_units') or []:
         cv = cellml_vars.get(name)
         p = params.get(name)
         variables.append({
             'name': name, 'units': units, 'kind': kind.strip(), 'access': access,
             'initial': cv[2] if cv else None,
-            'value': (p.value + ' (proposed)' if p.proposed else p.value) if p else None, 'todo': bool(p and (p.is_todo or p.proposed)),
+            'value': (p.value + ' (proposed)' if p.proposed else p.value) if p else None,
+            'todo': bool(p and (p.is_todo or p.proposed)),
             'reference': p.data_reference if p else '',
             'sourced': p.is_sourced if p else None,
-            'tested': ranges.tested_range(component, p) if p else None,
+            'tested': ranges.tested_range(version, p) if p else None,
             'validated': spread.get(name),
         })
-
     tests = []
-    validation_spec = component.spec.get('validation') or {}
-    for test in REPORT_TESTS:
-        r = checks.load(component, test)
-        if r is None and test.startswith('validation_test_'):
-            # not run (e.g. slow tests excluded): a skipped/pending spec still says why
-            v = validation_spec.get(test.rsplit('_', 1)[1]) or {}
-            if v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED, checks.NOT_APPLICABLE):
-                r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
-        tests.append({
-            'key': test, 'title': TEST_TITLES[test], 'short': TEST_SHORT[test], 'about': TEST_ABOUT[test],
-            'status': r.status if r else None, 'status_label': STATUS_LABEL[r.status if r else None],
-            'message': r.message if r else 'This test has not been run for this component yet.',
-            'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
-            'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
-            'known_issue': (component.spec.get('expected_failures') or {}).get(test),
-            'proposed_data': test.startswith('validation_test_') and
-                             (validation_spec.get(test.rsplit('_', 1)[1]) or {}).get('status') == checks.PROPOSED,
-        })
-    risk_result = risk.load(component)
-    if risk_result is not None and not all(os.path.isfile(os.path.join(module.dir, p)) for p in risk_result.get('plots', [])):
-        risk_result['plots'] = risk.make_plots(component, risk_result)   # e.g. on a fresh clone
-    proposals = component.spec.get('reference_proposals') or {}
-    bib_keys = set(bib.read(bib.bib_path(module))) | set(bib.read(bib.proposed_bib_path(module)))
+    if version.is_supermodule:
+        tests.append(_test_entry(version, 'supermodule_structure_test', checks.load(version, 'supermodule_structure_test')))
+        for e in (version.spec.get('supermodule') or {}).get('equivalent') or []:
+            name = sm.equivalence_result_name(e)
+            tests.append(_test_entry(version, name, checks.load(version, name),
+                                     title=f'Supermodule: reproduces {e["reproduces"]} ({e["model"]})'))
+    else:
+        for test in REPORT_TESTS:
+            tests.append(_test_entry(version, test, checks.load(version, test)))
+    risk_result = risk.load(version) if not version.is_supermodule else None
+    if risk_result is not None and not all(os.path.isfile(os.path.join(version.dir, p)) for p in risk_result.get('plots', [])):
+        risk_result['plots'] = risk.make_plots(version, risk_result)   # e.g. on a fresh clone
+    proposals = version.spec.get('reference_proposals') or {}
+    bib_keys = set(bib.read(bib.bib_path(version))) | set(bib.read(bib.proposed_bib_path(version)))
     references = []
-    for p in component.parameters():
+    for p in version.parameters():
         key = bib.reference_key(p.data_reference)
         references.append({'name': p.variable_name, 'value': p.value + (' (proposed)' if p.proposed else ''), 'units': p.units,
                            'reference': p.data_reference, 'key': key if key in bib_keys else None,
@@ -166,16 +225,18 @@ def component_context(component):
                            'sourced': p.is_sourced, 'proposal': proposals.get(p.variable_name)})
     return {
         'risk': risk_result, 'references': references, 'has_proposals': bool(proposals),
-        'id': component.id, 'label': component.label, 'vessel_type': component.vessel_type,
-        'BC_type': component.BC_type, 'module_type': component.module_type,
-        'format': component.config.get('module_format', 'cellml'),
-        'skip': component.spec.get('skip'), 'notes': component.spec.get('notes'),
-        'sweep_rationale': (component.spec.get('bc_sweep') or {}).get('rationale'),
+        'id': version.id, 'key': version.key, 'label': version.label, 'vessel_type': version.vessel_type,
+        'BC_type': version.BC_type, 'module_type': version.module_type, 'category': version.category,
+        'format': version.format, 'config_notes': version.config.get('notes'),
+        'description': version.spec.get('description'),
+        'submodules': version.submodules,
+        'skip': version.spec.get('skip'), 'notes': version.spec.get('notes'),
+        'sweep_rationale': (version.spec.get('bc_sweep') or {}).get('rationale'),
         'equations': equations, 'unsupported': sorted(unsupported),
-        'ports': _ports(component.config), 'variables': variables,
-        'todo': component.todo_parameters(), 'unsourced': component.unsourced_parameters(), 'invariants': component.spec.get('invariants') or [],
-        'validation': component.spec.get('validation') or {},
-        'tests': tests,
+        'ports': _ports(version.config), 'variables': variables,
+        'todo': version.todo_parameters(), 'unsourced': version.unsourced_parameters(),
+        'invariants': version.spec.get('invariants') or [],
+        'tests': tests, 'instances': [instance_context(version, i) for i in version.instances()],
         'phlynx_compatible': _phlynx_compatible(tests),
     }
 
@@ -183,7 +244,7 @@ def component_context(component):
 def _phlynx_compatible(tests):
     '''True when PhLynx builds and exports it, CUFLynx simulates it and it matches libcuflynx; None if not run.'''
     status = {t['key']: t['status'] for t in tests if t['key'] in phlynx.PIPELINE_TESTS}
-    if all(v is None for v in status.values()):
+    if not status or all(v is None for v in status.values()):
         return None
     return all(v == checks.PASSED for v in status.values())
 
@@ -191,13 +252,13 @@ def _phlynx_compatible(tests):
 def _status_counts(components):
     counts = {'passed': 0, 'failed': 0, 'skipped': 0, 'pending': 0, 'not_applicable': 0, None: 0}
     for c in components:
-        for t in c['tests']:
+        for t in c['tests'] + [t for i in c['instances'] for t in i['tests']]:
             counts[t['status']] = counts.get(t['status'], 0) + 1
     return counts
 
 
-def _structure(module):
-    path = os.path.join(module.results_dir, 'structure.json')
+def _structure(version):
+    path = os.path.join(version.results_dir, 'structure.json')
     if os.path.isfile(path):
         with open(path) as f:
             return json.load(f)
@@ -218,124 +279,224 @@ def _env():
     return env
 
 
-def module_context(name):
-    module = load_module(name)
-    components = [component_context(c) for c in module.components()]
-    return {
-        'name': name, 'reviewed': module.reviewed, 'components': components,
-        'all_sourced': module.all_sourced(),
-        'bibliography': [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f), 'proposed': False}
-                         for k, f in bib.read(bib.bib_path(module)).items()]
-                        + [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f), 'proposed': True}
-                           for k, f in bib.read(bib.proposed_bib_path(module)).items()],
-        'review': module.spec.get('review'),
-        'bib_keys': sorted(set(bib.read(bib.bib_path(module))) | set(bib.read(bib.proposed_bib_path(module)))),
-        'bib_file': os.path.basename(bib.bib_path(module)),
-        'n_sourced': sum(p.is_sourced for p in module.parameters), 'n_parameters': len(module.parameters),
-        'counts': _status_counts(components), 'structure': _structure(module),
-        'max_risk': max((c['risk']['failure_probability'] for c in components if c['risk']), default=None),
-        'known_issues': (module.spec.get('known_issues') or [])
-                        + [f'{c.id}: {t}: {why}' for c in module.components()
-                           for t, why in (c.spec.get('expected_failures') or {}).items()],
-        'test_keys': REPORT_TESTS, 'test_short': TEST_SHORT,
-        'phlynx': _module_phlynx(components),
-        'generated': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
-        'libcuflynx_version': _libcuflynx_version(),
-    }
+def _now():
+    return datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
 
 
 def _module_phlynx(components):
     run = [c for c in components if c['phlynx_compatible'] is not None]
     ok = sum(bool(c['phlynx_compatible']) for c in run)
-    return {'run': len(run), 'compatible': ok, 'total': len(components),
-            'all': bool(run) and len(run) == len(components) and ok == len(components)}
+    total = sum(1 for c in components if c['format'] != 'supermodule')
+    return {'run': len(run), 'compatible': ok, 'total': total,
+            'all': bool(run) and len(run) == total and ok == total}
+
+
+def version_context(version):
+    comp = component_context(version)
+    return {
+        'name': version.label, 'key': version.key, 'module_type': version.vessel_type, 'version': version.name,
+        'category': version.category, 'reviewed': version.reviewed, 'components': [comp],
+        'is_supermodule': version.is_supermodule,
+        'all_sourced': version.all_sourced(),
+        'bibliography': [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f), 'proposed': False}
+                         for k, f in bib.read(bib.bib_path(version)).items()]
+                        + [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f), 'proposed': True}
+                           for k, f in bib.read(bib.proposed_bib_path(version)).items()],
+        'review': version.spec.get('review'), 'review_scope': version.spec.get('review_scope'),
+        'bib_keys': sorted(set(bib.read(bib.bib_path(version))) | set(bib.read(bib.proposed_bib_path(version)))),
+        'bib_file': os.path.basename(bib.bib_path(version)),
+        'n_sourced': sum(p.is_sourced for p in version.parameters()), 'n_parameters': len(version.parameters()),
+        'counts': _status_counts([comp]), 'structure': _structure(version),
+        'max_risk': comp['risk']['failure_probability'] if comp['risk'] else None,
+        'known_issues': (version.spec.get('known_issues') or [])
+                        + [f'{t}: {why}' for t, why in (version.spec.get('expected_failures') or {}).items()],
+        'test_keys': [t['key'] for t in comp['tests']], 'test_short': {t['key']: t['short'] for t in comp['tests']},
+        'phlynx': _module_phlynx([comp]),
+        'module_type_href': f'../../{version.vessel_type}.html',
+        'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
+    }
+
+
+def build_version(version):
+    ctx = version_context(version)
+    with open(version.html_path, 'w') as f:
+        f.write(_env().get_template('version.html').render(**ctx))
+    return version.html_path, ctx
+
+
+def module_context(name, version_contexts=None):
+    '''A module_type: a summary row per version (from the version pages' contexts).'''
+    mtype = load_module_type(name)
+    vctx = version_contexts if version_contexts is not None else [version_context(v) for v in mtype.versions()]
+    rows = []
+    for c in vctx:
+        comp = c['components'][0]
+        rows.append({'version': c['version'], 'href': f'versions/{c["version"]}/{name}_{c["version"]}.html',
+                     'format': comp['format'], 'component_type': comp['module_type'], 'notes': comp['config_notes'],
+                     'counts': c['counts'], 'reviewed': c['reviewed'], 'max_risk': c['max_risk'],
+                     'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
+                     'phlynx': c['phlynx'], 'phlynx_compatible': comp['phlynx_compatible'], 'tests': comp['tests'],
+                     'instances': comp['instances'], 'submodules': comp['submodules'],
+                     'known_issues': len(c['known_issues']), 'is_supermodule': c['is_supermodule']})
+    counts = {}
+    for c in vctx:
+        for k, n in c['counts'].items():
+            counts[k] = counts.get(k, 0) + n
+    components = [r for r in rows if not r['is_supermodule']]
+    return {
+        'name': name, 'category': mtype.category, 'relpath': mtype.relpath, 'versions': rows,
+        'reviewed': bool(rows) and all(r['reviewed'] for r in rows),
+        'counts': counts, 'n_versions': len(rows),
+        'n_instances': sum(len(r['instances']) for r in rows),
+        'all_sourced': all(r['all_sourced'] for r in rows),
+        'n_sourced': sum(r['n_sourced'] for r in rows), 'n_parameters': sum(r['n_parameters'] for r in rows),
+        'max_risk': max((r['max_risk'] for r in rows if r['max_risk'] is not None), default=None),
+        'known_issues': sum(r['known_issues'] for r in rows),
+        'phlynx': {'run': sum(r['phlynx']['run'] for r in components),
+                   'compatible': sum(r['phlynx']['compatible'] for r in components),
+                   'total': len(components),
+                   'all': bool(components) and all(r['phlynx']['all'] for r in components)},
+        'ready_for_review': any(c.get('review') and not c['reviewed'] for c in vctx),
+        'test_keys': REPORT_TESTS, 'test_short': TEST_SHORT,
+        'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
+    }
 
 
 def build_module(name):
-    ctx = module_context(name)
-    out = os.path.join(load_module(name).dir, f'{name}.html')
-    with open(out, 'w') as f:
-        f.write(_env().get_template('module.html').render(**ctx))
-    return out, ctx
+    '''Writes every version page of a module_type and the module_type page; returns (path, context).'''
+    mtype = load_module_type(name)
+    vctx = [build_version(v)[1] for v in mtype.versions()]
+    ctx = module_context(name, vctx)
+    ctx['version_contexts'] = vctx
+    with open(mtype.html_path, 'w') as f:
+        f.write(_env().get_template('module_type.html').render(**ctx))
+    return mtype.html_path, ctx
 
 
-def build_index(contexts, out_path, module_href):
-    rows = [{'name': c['name'], 'href': module_href(c['name']), 'n_components': len(c['components']),
-             'counts': c['counts'], 'reviewed': c['reviewed'],
-             'known_issues': len(c['known_issues']), 'max_risk': c.get('max_risk'),
-             'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
-             'phlynx': c['phlynx'],
-             'ready_for_review': bool(c.get('review')) and not c['reviewed']}
-            for c in contexts]
-    totals = {k: sum(r['counts'].get(k, 0) for r in rows) for k in ('passed', 'failed', 'skipped', 'pending', 'not_applicable', None)}
+def build_index(contexts, out_path, href):
+    '''The site index: module_types grouped by category, each with links to its versions.'''
+    groups = {}
+    for c in contexts:
+        groups.setdefault(c['category'], []).append(c)
+    out_groups = []
+    for cat, ctxs in sorted(groups.items()):
+        rows = []
+        for c in sorted(ctxs, key=lambda c: c['name'].lower()):
+            rows.append({'name': c['name'], 'href': href(c['relpath'], f'{c["name"]}.html'),
+                         'n_versions': c['n_versions'], 'n_instances': c['n_instances'], 'counts': c['counts'],
+                         'reviewed': c['reviewed'], 'known_issues': c['known_issues'], 'max_risk': c['max_risk'],
+                         'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
+                         'phlynx': c['phlynx'], 'ready_for_review': c['ready_for_review'] and not c['reviewed'],
+                         'versions': [{'name': v['version'], 'href': href(c['relpath'], v['href']),
+                                       'counts': v['counts'], 'reviewed': v['reviewed'],
+                                       'phlynx_compatible': v['phlynx_compatible'],
+                                       'is_supermodule': v['is_supermodule']} for v in c['versions']]})
+        out_groups.append({'category': cat, 'anchor': cat.replace('/', '-'), 'rows': rows,
+                           'n_versions': sum(r['n_versions'] for r in rows)})
+    all_rows = [r for g in out_groups for r in g['rows']]
+    totals = {k: sum(r['counts'].get(k, 0) for r in all_rows)
+              for k in ('passed', 'failed', 'skipped', 'pending', 'not_applicable', None)}
     html_text = _env().get_template('index.html').render(
-        rows=rows, totals=totals, generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
-        libcuflynx_version=_libcuflynx_version())
+        groups=out_groups, totals=totals, n_module_types=len(all_rows), n_versions=sum(r['n_versions'] for r in all_rows),
+        generated=_now(), libcuflynx_version=_libcuflynx_version())
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, 'w') as f:
         f.write(html_text)
     return out_path
 
 
-def build_review_queue(contexts, out_path, module_href, standalone=True):
-    '''One page listing every module awaiting review: comment, questions, proposed fixes.'''
-    queue, reviewed = [], []
+def build_review_queue(contexts, out_path, href, standalone=True):
+    '''One page listing every version awaiting review. A review written for a whole old module was
+    copied to each of its versions; such a review is shown once, with the versions it covers.'''
+    queue, reviewed, by_review = [], [], {}
     for c in contexts:
-        module = load_module(c['name'])
-        if module.reviewed:
-            reviewed.append(c['name'])
-            continue
-        if not module.spec.get('review'):
-            continue
-        queue.append({
-            'name': c['name'], 'href': module_href(c['name']), 'review': module.spec['review'],
-            'n_components': len(c['components']), 'counts': c['counts'], 'n_known': len(c['known_issues']),
-            'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'], 'max_risk': c.get('max_risk'),
-            'n_proposals': sum(len(comp.get('reference_proposals') or {}) for comp in module.spec.get('components', [])),
-        })
+        for vc in c.get('version_contexts') or []:
+            if vc['reviewed']:
+                reviewed.append(vc['key'])
+                continue
+            if not vc.get('review'):
+                continue
+            key = json.dumps(vc['review'], sort_keys=True)
+            comp = vc['components'][0]
+            item = {'key': vc['key'],
+                    'href': href(c['relpath'], f'versions/{vc["version"]}/{c["name"]}_{vc["version"]}.html'),
+                    'counts': vc['counts'], 'n_known': len(vc['known_issues']),
+                    'n_sourced': vc['n_sourced'], 'n_parameters': vc['n_parameters'], 'max_risk': vc['max_risk'],
+                    'n_proposals': sum(1 for r in comp['references'] if r['proposal'])}
+            if key not in by_review:
+                by_review[key] = {'review': vc['review'], 'scope': vc.get('review_scope'), 'versions': []}
+                queue.append(by_review[key])
+            by_review[key]['versions'].append(item)
+    for q in queue:
+        vs = q['versions']
+        q['name'] = vs[0]['key'] if len(vs) == 1 else f'{vs[0]["key"]} and {len(vs) - 1} more'
+        q['anchor'] = vs[0]['key'].replace('/', '--')
+        q['href'] = vs[0]['href']
+        q['n_components'] = len(vs)
+        q['counts'] = {k: sum(v['counts'].get(k, 0) for v in vs) for k in ('passed', 'failed')}
+        q['n_known'] = sum(v['n_known'] for v in vs)
+        q['n_sourced'] = sum(v['n_sourced'] for v in vs)
+        q['n_parameters'] = sum(v['n_parameters'] for v in vs)
+        q['n_proposals'] = sum(v['n_proposals'] for v in vs)
+        q['max_risk'] = max((v['max_risk'] for v in vs if v['max_risk'] is not None), default=None)
     html_text = _env().get_template('review_queue.html').render(
-        modules=queue, reviewed=reviewed, standalone=standalone,
-        generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'))
+        modules=queue, reviewed=reviewed, standalone=standalone, generated=_now())
     with open(out_path, 'w') as f:
         f.write(html_text)
     return out_path
 
 
+def _href(relpath, page):
+    return f'modules/{relpath}/{page}'
+
+
 def assemble_site(names, contexts):
-    '''site/index.html + site/modules/<name>/{<name>.html, plots/}, as GitHub Pages serves it.'''
+    '''site/index.html + site/modules/<category>/<module_type>/ (its page, and each version's page
+    and plots), as GitHub Pages serves it.'''
     if os.path.isdir(SITE_DIR):
         shutil.rmtree(SITE_DIR)
     for name in names:
-        module = load_module(name)
-        dest = os.path.join(SITE_DIR, 'modules', module_relpath(name))
+        mtype = load_module_type(name)
+        dest = os.path.join(SITE_DIR, 'modules', mtype.relpath)
         os.makedirs(dest, exist_ok=True)
-        if not os.path.isfile(os.path.join(module.dir, f'{name}.html')):
+        if not os.path.isfile(mtype.html_path) or any(not os.path.isfile(v.html_path) for v in mtype.versions()):
             build_module(name)
-        shutil.copy2(os.path.join(module.dir, f'{name}.html'), dest)
-        if os.path.isdir(module.plots_dir):
-            shutil.copytree(module.plots_dir, os.path.join(dest, 'plots'))
-    build_review_queue(contexts, os.path.join(SITE_DIR, 'review_queue.html'), lambda n: f'modules/{module_relpath(n)}/{n}.html')
-    return build_index(contexts, os.path.join(SITE_DIR, 'index.html'), lambda n: f'modules/{module_relpath(n)}/{n}.html')
+        shutil.copy2(mtype.html_path, dest)
+        for v in mtype.versions():
+            vdest = os.path.join(dest, 'versions', v.name)
+            os.makedirs(vdest, exist_ok=True)
+            shutil.copy2(v.html_path, vdest)
+            if os.path.isdir(v.plots_dir):
+                shutil.copytree(v.plots_dir, os.path.join(vdest, 'plots'))
+            # the instances' CUFLynx archives, where they have been built (make omex)
+            for inst in v.instances():
+                archive = omex_mod.omex_path(v, inst)
+                if os.path.isfile(archive):
+                    idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
+                    os.makedirs(idest, exist_ok=True)
+                    shutil.copy2(archive, idest)
+    build_review_queue(contexts, os.path.join(SITE_DIR, 'review_queue.html'), _href)
+    return build_index(contexts, os.path.join(SITE_DIR, 'index.html'), _href)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--module', action='append', default=[], help='module name (repeatable); default all')
+    parser.add_argument('--module', action='append', default=[],
+                        help='module_type or category path (repeatable); default all')
     parser.add_argument('--site', action='store_true', help='also assemble site/ for GitHub Pages')
     args = parser.parse_args(argv)
-    names = args.module or module_names()
-    contexts = []
-    for name in names:
+    contexts = {}
+    for name in select_module_types(args.module):
         out, ctx = build_module(name)
-        contexts.append(ctx)
-        print(f'wrote {os.path.relpath(out, REPO_ROOT)}')
+        contexts[name] = ctx
+        print(f'wrote {os.path.relpath(out, REPO_ROOT)} and {ctx["n_versions"]} version page(s)')
     if args.site:
-        # the index always covers every module, even when only some pages were rebuilt
-        all_contexts = {c['name']: c for c in contexts}
-        for name in module_names():
-            if name not in all_contexts:
-                all_contexts[name] = module_context(name)
-        out = assemble_site(module_names(), [all_contexts[n] for n in module_names()])
+        # the index always covers every module_type, even when only some pages were rebuilt
+        for name in module_type_names():
+            if name not in contexts:
+                vctx = [version_context(v) for v in load_module_type(name).versions()]
+                contexts[name] = dict(module_context(name, vctx), version_contexts=vctx)
+        out = assemble_site(module_type_names(), [contexts[n] for n in module_type_names()])
         print(f'wrote {os.path.relpath(out, REPO_ROOT)}')
 
 

@@ -1,0 +1,72 @@
+[
+  {
+    "module_type": "i_f",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_f_Paci2013_v01_modules.cellml",
+    "component_type": "i_f_Paci_2013",
+    "default_instance": "default",
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "f_current",
+        "variables": [
+          "i_f"
+        ]
+      },
+      {
+        "port_type": "f_Xf_gate",
+        "variables": [
+          "Xf"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "f_current",
+        "variables": [
+          "i_f"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_f",
+        "A_per_F",
+        "access",
+        "variable"
+      ],
+      [
+        "g_f",
+        "S_per_F",
+        "access",
+        "constant"
+      ],
+      [
+        "Vm",
+        "volt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_f",
+        "volt",
+        "access",
+        "constant"
+      ],
+      [
+        "Xf",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

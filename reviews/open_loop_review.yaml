@@ -1,0 +1,68 @@
+summary: 'open_loop holds three prescribed aortic inflow waveforms (inlet_flow nn_adan: 21-harmonic Fourier fit, nn_adan_2:
+  linear interpolation, nn_aorticbif: 22-harmonic sine series) and two controlled terminal outlets (terminalOL pp_controller
+  / pp_wFB: 3-element-Windkessel-like terminal whose resistance is set by an adaptive controller). I traced all three waveforms
+  to the Boileau2015 benchmark inflows (ADAN56 and iliac bifurcation; data added under validation/ and compared as proposed
+  baselines, NRMSE 0.012 / 0.007 / 0.000), gave every waveform an exact-solution invariant, and set up the terminals alone
+  with constant inputs (exact identities, first integrals of the learning law, volume balance, a physical bound). The inflows
+  pass everything. Both terminals cannot be generated because u_a (and v_a) are port variables missing from variables_and_units;
+  with that fix in a patched copy they run and their invariants hold, but the sweep exposes a controller runaway (see proposed_fixes).
+  All TODO values have proposals, mostly honest placeholders.'
+comment: Both terminalOL components fail generation (u_a / v_a missing from variables_and_units). With that fixed, the controller
+  runs away when the observed pressure exceeds pressure_d (R_T falls to the 1 Pa s m^-3 floor, v ~ 1e4 m3/s), its membership
+  functions use a 0.01 Pa width on a Pa-valued error (exp overflow in Python), and the critic / R_T equations mix units (all
+  constants declared dimensionless). The global T = 1 s suits the ADAN56 waveforms but the aortic-bifurcation waveform needs
+  T = 1.1 s, and the interpolated waveform's knot times are absolute (only valid for T = 1 s). Most terminal values are placeholders
+  (only C_T and meanflow_4dflow are sourced).
+questions:
+- 'Confirm the source attribution: nn_adan_2 knots = Boileau2015 ADAN56 aortic-root inflow (identical data), nn_adan = a 21-harmonic
+  Fourier fit of it (max deviation 3.9e-5 m3/s, 7 % of peak), nn_aorticbif = Boileau2015 iliac-bifurcation inflow (exact at
+  T = 1.1 s). I could only read the benchmark data through the openBF copy (github INSIGNEO/openBF models/boileau2015); the
+  paper is paywalled. OK to cite Boileau2015 for all three?'
+- Accept the proposed baselines (validation/boileau2015_*_inflow.csv; NRMSE 0.012, 0.007, 0.000; thresholds 0.05 / 0.01 /
+  0.01)? They check the prescribed waveform against the published inflow, not a prediction.
+- T is one module-wide global (1 s). nn_aorticbif only reproduces its source with T = 1.1 s (tests use run_parameters T =
+  1.1). Should the aortic-bifurcation waveform get its own period parameter, or should T default to 1.1 when that component
+  is used? And should the interpolation knots be scaled by T (t_k T / 1.0) so nn_adan_2 works for other heart rates?
+- 'Terminal values: C_T = 3.6664e-10 m3/Pa (Boileau2015 iliac-bifurcation Windkessel compliance) and meanflow_4dflow = 7.9853e-6
+  m3/s (mean of that inflow) are proposed as sourced; u_in 12000 Pa, pressure_d 12000 Pa, BFF_ASL 0.5, I_T 1e-6, q_us 0, pressure_venous_dist
+  0 are placeholders and q_init = C_T x 9332.57 Pa follows the circulatory_autogen aortic_bif_hybrid example. Which should
+  be replaced by the intended patient/benchmark values?'
+- The terminals' R_T1 = 0.2 R_T / R_T2 = 0.8 R_T split equals the ADAN56 Windkessel R1/(R1 + R2) ratio in the benchmark (e.g.
+  vertebral_R 1.81e9 / 9.05e9), but not the iliac-bifurcation one (R1/(R1+R2) = 2 %). Intended?
+- Is the controller (three membership functions of the pressure error, linear consequents aa_i error + cc_i learned with rate
+  learning_rate (critic - K_a r_a)) from a publication (e.g. a brain-emotional-learning / adaptive fuzzy controller)? If so,
+  please give it so the learning law and its constants (learning_rate 1e7, K_a 0.9, 1e-6 scalings, 1 Pa / 0.01 widths, which
+  are hard-coded in the CellML) can be referenced.
+proposed_fixes:
+- 'terminalOL pp_controller: add ["u_a", "J_per_m3", "access", "boundary_condition"] and ["v_a", "m3_per_s", "access", "boundary_condition"]
+  to variables_and_units; terminalOL pp_wFB: add the u_a entry. Evidence: libcuflynx exits in LumpedPortVariableCheck ("the
+  port variable u_a is not a variable for vessel type: terminalOL") for every network, even when the port is unconnected;
+  with the entries added (patched copy in the scratchpad) both components generate, run and all 8 invariants hold at the run
+  point.'
+- 'Controller runaway when pressure_d < u_a: with a negative pressure error the critic 1e-6 error (v/1e-6)^2 is negative,
+  the coefficients learn downwards without bound, check < 0 and R_T = 1 Pa s m^-3, so the terminal short-circuits (patched
+  copy, pressure_d = 8000 Pa, u_a = 11000 Pa: v = 1.2e4 m3/s; wFB error_flow_percent = -1.5e11). Suggest a physiological lower
+  bound R_T,min (parameter) instead of 1, a continuous clamp (the current piecewise jumps from ~0 to 1 at check = 0), and
+  normalising the critic by a reference flow.'
+- 'Membership functions: x1 = 1/(1 + exp((-error + 1)/0.01)), x3 = 1/(1 + exp((error + 1)/0.01)), x2 = exp(-error^2) take
+  error in Pa with a 0.01 Pa width, i.e. they are hard switches that overflow math.exp for |error| > ~7 Pa in the Python-generated
+  model (solve_ivp and the fixed-step RK4 check fail with OverflowError; only CVODE/Myokit survives). Suggest an explicit
+  pressure scale parameter (e.g. error/P_width with P_width ~ 133 Pa) and an overflow-safe logistic (0.5 (1 + tanh(z/2))).'
+- 'Units: critic, check, aa_i, cc_i and learning_rate are declared dimensionless but combine Pa and m3/s (critic = 1e-6 error
+  (v/1e-6)^2 in Pa; R_T = check assigns a dimensionless value to Js_per_m6). Give the constants units (or normalise error
+  and v) so the CellML is unit-consistent.'
+findings:
+- 'Test summary (real library): inlet_flow nn_adan / nn_adan_2 / nn_aorticbif pass run, invariants (exact Fourier / interpolation
+  / sine-series solutions, period means, periodicity, bounds), BC sweep (T and P), stability; timestep is skipped (no states).
+  terminalOL pp_controller / pp_wFB: all tests fail at generation (recorded as expected failures).'
+- 'Patched copy (port variables added): both terminals pass run_test and all 8 invariants (R_T piecewise law, partition of
+  unity, first integrals aa_i - 100 = error (cc_i - 100), error = pressure_d - u_a, flow-fraction error, volume balance, pressure
+  law, physical bound) and stability (CVODE rtol 1e-6..1e-8 work; solve_ivp and fixed-step fail with OverflowError). BC sweep:
+  30 of 31 runs pass; pressure_d = 8000 Pa fails the physical bound (runaway above). Timestep fails (exp overflow and stiffness
+  I_T/R_T ~ 1e-15 s).'
+- 'Terminal solver tolerances: with the default atol 1e-8 the volume balance fails (q ~ 3e-6 m3, v ~ 1e-5 m3/s are below atol);
+  the spec uses rtol 1e-8, atol 1e-14 for the terminals. Worth making atol scale-aware for SI volumes.'
+- P in the three inflow components is a boundary condition that does not enter any equation (it is the downstream pressure
+  returned through the vessel port); the sweep over 0-20000 Pa confirms v is unaffected.
+- 'Joint failure risk (512 samples over the sweep box): the three inflows P(fail) = 0.000 [0, 0.007]; both terminals P(fail)
+  = 1.000 because generation fails (the risk map is uninformative until the config fix).'

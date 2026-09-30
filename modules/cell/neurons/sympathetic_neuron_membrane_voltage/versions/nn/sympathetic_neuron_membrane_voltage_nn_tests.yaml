@@ -1,0 +1,53 @@
+module_type: sympathetic_neuron_membrane_voltage
+version: nn
+reviewed: false
+notes: 'Membrane potential of the Tao 2011 sympathetic neuron: dVm/dt = -(I_Ca + I_Na + I_A + I_KV + I_KCa - i_stim)/C_m (nA,
+  pF, mV, s). Alone with constant currents the solution is exactly linear.'
+expected_failures:
+  run_test: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix: public_interface=''out''.
+    With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix:
+    public_interface=''out''. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix: public_interface=''out''.
+    With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix:
+    public_interface=''out''. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix: public_interface=''out''.
+    With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  i_Ca:
+    reference: definitional; i_Ca is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_Na:
+    reference: definitional; i_Na is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_A:
+    reference: definitional; i_A is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_KV:
+    reference: definitional; i_KV is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_KCa:
+    reference: definitional; i_KCa is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_stim:
+    reference: definitional; i_stim is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  C_m:
+    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: neuron Cm = 240 pF'
+    sourced: 'yes'
+    value: 240.0
+  Vm_init:
+    reference: unreferenced_placeholder; -60 mV, near the resting potential of rat sympathetic neurones; Tao 2011 lists no
+      initial conditions
+    sourced: 'no'
+    value: -60.0
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

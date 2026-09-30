@@ -1,0 +1,56 @@
+module_type: single_terminal
+version: vp_R1CR2_wI_wCont
+reviewed: false
+notes: 'Terminal (Windkessel-type) module. Jacobian timescales (nominal: fastest 3.8e-05 s, slowest decay 1 s; run: fastest
+  3.8e-05 s, slowest decay 1 s).'
+reference_proposals:
+  R_T1:
+    reference: unreferenced_placeholder; proximal (characteristic) resistance ~5% of the terminal total
+    sourced: 'no'
+    value: 13000000.0
+  R_T2:
+    reference: unreferenced_placeholder; terminal resistance copied from terminal pp_wCont_no_local (2.6e8 Pa s m^-3 = 1.96
+      mmHg s/mL)
+    sourced: 'no'
+    value: 260870000.0
+  C_T:
+    reference: unreferenced_placeholder; terminal compliance copied from terminal pp_wCont_no_local (4e-9 m^3/Pa = 0.53 mL/mmHg)
+    sourced: 'no'
+    value: 4.0e-09
+  I_T:
+    reference: unreferenced_placeholder; terminal inertance, small (I/R ~ 1e-4 s); order of magnitude only
+    sourced: 'no'
+    value: 10000.0
+  u_ext:
+    reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
+    sourced: definitional
+    value: 0.0
+  q_init:
+    reference: definitional; start at the unstressed volume q_us
+    sourced: definitional
+    value: 0.0
+  q_us:
+    reference: definitional; terminal unstressed volume 0 (only shifts q)
+    sourced: definitional
+    value: 0.0
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 5e-06
+      m^3/s
+    sourced: 'no'
+    value: 5.0e-06
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 666.61
+      Pa (5 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 666.61
+  Delta_R:
+    reference: 'definitional; Delta_R = 0: no control action (set by a controller module when connected)'
+    sourced: definitional
+    value: 0.0
+  R_local_multiplier:
+    reference: 'definitional; R_local_multiplier = 1: no local control'
+    sourced: definitional
+    value: 1.0
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

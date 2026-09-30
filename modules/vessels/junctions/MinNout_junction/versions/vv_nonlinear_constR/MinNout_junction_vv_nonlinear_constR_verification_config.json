@@ -1,0 +1,246 @@
+{
+  "module_type": "MinNout_junction",
+  "version": "vv_nonlinear_constR",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 1e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-07, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["u", "v", "q", "u_d", "q_C", "q_C_d", "q_p", "q_d", "I", "up1/v", "up2/v", "dn1/v", "dn2/v"],
+  "run_parameters": {},
+  "harness": {
+    "vessel_array": [
+      ["mod", "vv_nonlinear_constR", "MinNout_junction", "up1 up2", "dn1 dn2", "default"],
+      ["bcin1", "nn_constant", "inlet_flow", "", "up1", "default"],
+      ["up1", "vp", "arterial_simple", "bcin1", "mod", "default"],
+      ["bcin2", "nn_constant", "inlet_flow", "", "up2", "default"],
+      ["up2", "vp", "arterial_simple", "bcin2", "mod", "default"],
+      ["dn1", "pv", "arterial_simple", "mod", "bcout1", "default"],
+      ["bcout1", "nn_constant", "outlet_flow", "dn1", "", "default"],
+      ["dn2", "pv", "arterial_simple", "mod", "bcout2", "default"],
+      ["bcout2", "nn_constant", "outlet_flow", "dn2", "", "default"]
+    ],
+    "parameters": [
+      ["v_bcin1", "m3_per_s", 7.1442e-05, "harness: constant inflow (half the nominal flow)"],
+      [
+        "R_up1",
+        "Js_per_m6",
+        1000000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "C_up1",
+        "m6_per_J",
+        1e-09,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "I_up1",
+        "Js2_per_m6",
+        10000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "q_0_up1",
+        "m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_0_up1",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_ext_up1",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      ["v_bcin2", "m3_per_s", 7.1442e-05, "harness: constant inflow (half the nominal flow)"],
+      [
+        "R_up2",
+        "Js_per_m6",
+        1000000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "C_up2",
+        "m6_per_J",
+        1e-09,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "I_up2",
+        "Js2_per_m6",
+        10000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "q_0_up2",
+        "m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_0_up2",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_ext_up2",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "R_dn1",
+        "Js_per_m6",
+        1000000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "C_dn1",
+        "m6_per_J",
+        1e-09,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "I_dn1",
+        "Js2_per_m6",
+        10000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "q_0_dn1",
+        "m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_0_dn1",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_ext_dn1",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      ["v_bcout1", "m3_per_s", 7.1442e-05, "harness: constant outflow (half the nominal flow)"],
+      [
+        "R_dn2",
+        "Js_per_m6",
+        1000000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "C_dn2",
+        "m6_per_J",
+        1e-09,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "I_dn2",
+        "Js2_per_m6",
+        10000.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "q_0_dn2",
+        "m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_0_dn2",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      [
+        "u_ext_dn2",
+        "J_per_m3",
+        0.0,
+        "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
+      ],
+      ["v_bcout2", "m3_per_s", 7.1442e-05, "harness: constant outflow (half the nominal flow)"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "u = u_0 + K ((q_p/q0_2)^m - (q_p/q0_2)^n) + u_ext, u_d likewise with q_d; q0_2 = pi r0^2 l/2",
+      "expr": "np.max(np.abs((np.concatenate((u, u_d))) - (np.concatenate((u_0 + K_tube*((q_p/(np.pi*r_0**2*l/2))**m_tube - (q_p/(np.pi*r_0**2*l/2))**n_tube) + u_ext, u_0 + K_tube*((q_d/(np.pi*r_0**2*l/2))**m_tube - (q_d/(np.pi*r_0**2*l/2))**n_tube) + u_ext))))) <= 1e-08*(np.max(np.abs(np.concatenate((u, u_d)))) + np.max(np.abs(np.concatenate((u_0 + K_tube*((q_p/(np.pi*r_0**2*l/2))**m_tube - (q_p/(np.pi*r_0**2*l/2))**n_tube) + u_ext, u_0 + K_tube*((q_d/(np.pi*r_0**2*l/2))**m_tube - (q_d/(np.pi*r_0**2*l/2))**n_tube) + u_ext))))) + 1e-30"
+    },
+    {
+      "description": "q = q_p + q_d, q_p = q_C + q0/2, q_d = q_C_d + q0/2",
+      "expr": "np.max(np.abs((np.concatenate((q, q_p, q_d))) - (np.concatenate((q_p + q_d, q_C + np.pi*r_0**2*l/2, q_C_d + np.pi*r_0**2*l/2))))) <= 1e-08*(np.max(np.abs(np.concatenate((q, q_p, q_d)))) + np.max(np.abs(np.concatenate((q_p + q_d, q_C + np.pi*r_0**2*l/2, q_C_d + np.pi*r_0**2*l/2))))) + 1e-30"
+    },
+    {
+      "description": "I = I_scale rho l/(pi r0^2)",
+      "expr": "np.max(np.abs((I) - (I_scale*rho*l/(np.pi*r_0**2) + 0*t))) <= 1e-08*(np.max(np.abs(I)) + np.max(np.abs(I_scale*rho*l/(np.pi*r_0**2) + 0*t))) + 1e-30"
+    },
+    {
+      "description": "volume balance: d(q)/dt = ((up1/v + up2/v)) - ((dn1/v + dn2/v)) (trapezoidal integral of the flows from t = 0 s, rel. tol 0.05)",
+      "expr": "np.max(np.abs((((q) + 0*t)[(t >= 0)] - ((q) + 0*t)[(t >= 0)][0]) - np.concatenate(([0.0], np.cumsum(0.5*(((((up1__v + up2__v)) - ((dn1__v + dn2__v)) + 0*t))[(t >= 0)][1:] + ((((up1__v + up2__v)) - ((dn1__v + dn2__v)) + 0*t))[(t >= 0)][:-1])*np.diff(t[(t >= 0)])))))) <= 0.05*np.ptp(((q) + 0*t)[(t >= 0)]) + 1e-5*np.max(np.abs(((q) + 0*t))) + 1e-9*np.max(np.abs((((up1__v + up2__v)) - ((dn1__v + dn2__v)) + 0*t)))*t[-1] + 1e-18"
+    },
+    {
+      "description": "steady state at t_end: v = ((up1/v + up2/v) + (dn1/v + dn2/v))/2 (equal imposed flows at the run point)",
+      "expr": "abs((v)[-1] - (((up1__v[-1] + up2__v[-1]) + (dn1__v[-1] + dn2__v[-1]))/2)) <= 0.001*(abs((up1__v[-1] + up2__v[-1])) + abs((dn1__v[-1] + dn2__v[-1])) + 1e-12 + np.max(np.abs(v))) + 1e-18",
+      "applies": "run"
+    },
+    {"description": "q stays positive (the tube law needs a positive volume)", "expr": "np.all(q > 0)"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "u_ext": [-500.0, 1000.0],
+      "theta": [0.0, 90.0],
+      "beta_g": [0.0, 1.0],
+      "g": [1.0, 9.81]
+    },
+    "exclude": ["m_tube", "n_tube", "R_flag", "v_in_sum", "v_out_sum"],
+    "rationale": "Boundary conditions span physiological operating values for the vessel class (arterial inlet 60-150 mmHg, venous 0-15 mmHg, flows 0-2x the nominal flow; +-0.5% for the nonlinear vv types, whose volume drifts by (v_in - v_out) t and collapses the tube if the imbalance is larger); constants are swept 0.5-2x their value; rho and mu are swept 0.5-2x their library (test_fft fixture) value of 1; beta_g 0-1; g 1-9.81; the wall-thickness constants a-d between the fixture value 1 and the proposed Blanco 2015 values. The physiological rho/mu (1050, 0.004) cannot yet be combined with the others at the run point (framework issue), so the swept regime is the library one. Excluded: tube-law exponents (they define the law), switches (R_flag, blood_ctl_dir)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-05, 1e-05, 5e-06, 2.5e-06],
+    "t_end": 0.05,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-07, "atol": 1e-14}
+    ],
+    "cvode": [
+      {"rtol": 0.0001, "atol": 1e-08},
+      {"rtol": 1e-06, "atol": 1e-08},
+      {"rtol": 1e-07, "atol": 1e-14}
+    ],
+    "solve_ivp": ["LSODA"],
+    "fixed_step": {
+      "schemes": ["rk4"],
+      "dt_start": 5e-05
+    },
+    "time_budget": 10.0,
+    "t_end": 0.5
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: the Boileau et al. (2015) benchmark reference solutions (e.g. the aortic-bifurcation and 37-artery test cases, whose 1D reference pressure/flow waveforms are published as supplementary data), compared with a chain of these 0D segments (proposal only, not set up)."
+      },
+      "calibrate": {
+        "note": "pending: a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: the Boileau et al. (2015) benchmark reference solutions (e.g. the aortic-bifurcation and 37-artery test cases, whose 1D reference pressure/flow waveforms are published as supplementary data), compared with a chain of these 0D segments (proposal only, not set up)."
+      }
+    }
+  }
+}

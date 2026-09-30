@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       risk:
-        description: 'Also run the joint failure-risk analysis (make risk) for reviewed modules'
+        description: 'Also run the joint failure-risk analysis (make risk) for reviewed versions'
         type: boolean
         default: false
 
@@ -25,13 +25,15 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     outputs:
-      modules: ${{ steps.list.outputs.modules }}
+      categories: ${{ steps.list.outputs.categories }}
     steps:
       - uses: actions/checkout@v4
       - id: list
+        # one job per top-level category of modules/ (a directory holding module_types, i.e. with a
+        # versions/ directory somewhere below it), not one per module_type
         run: |
-          modules=$(python3 -c "import glob, json, os; print(json.dumps(sorted({os.path.basename(os.path.dirname(p)) for p in glob.glob('modules/**/*_tests.yaml', recursive=True) if os.path.basename(p) == os.path.basename(os.path.dirname(p)) + '_tests.yaml' and p.split(os.sep)[1] not in ('system', 'supermodules')})))")
-          echo "modules=$modules" >> "$GITHUB_OUTPUT"
+          categories=$(python3 -c "import glob, json, os; print(json.dumps(sorted({p.split(os.sep)[1] for p in glob.glob('modules/*/**/versions', recursive=True)})))")
+          echo "categories=$categories" >> "$GITHUB_OUTPUT"
 
   structure:
     runs-on: ubuntu-latest
@@ -42,27 +44,27 @@ jobs:
       - uses: ./.github/actions/setup
       - run: make structure PYTHON=python
 
-  module:
+  category:
     needs: discover
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
-        module: ${{ fromJSON(needs.discover.outputs.modules) }}
+        category: ${{ fromJSON(needs.discover.outputs.categories) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11', cache: pip }
       - uses: ./.github/actions/setup
       - name: Structural checks (results feed the report)
-        run: python -m pytest tests/test_structure.py -k "${{ matrix.module }}" || true
+        run: python -m pytest tests/test_structure.py -k test_version_structure -q || true
       - name: V&V tests
         id: tests
         run: |
           target=test
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then target=test-all; fi
-          if make $target PYTHON=python MODULE=${{ matrix.module }} PYTEST_ARGS=--quick-unreviewed; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+          if make $target PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="--quick-unreviewed --junitxml=junit-tests.xml"; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
       - name: PhLynx checkout (pipeline tests)
@@ -80,37 +82,36 @@ jobs:
       - name: PhLynx -> CUFLynx pipeline
         id: pipeline
         run: |
-          if make pipeline PYTHON=python MODULE=${{ matrix.module }} PYTEST_ARGS=--quick-unreviewed PHLYNX_DIR=$PWD/_phlynx CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
-      - name: Failure-risk analysis (on request)
-        if: github.event_name == 'workflow_dispatch' && inputs.risk
+          if make pipeline PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="--quick-unreviewed --junitxml=junit-pipeline.xml" PHLYNX_DIR=$PWD/_phlynx CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+      - name: CUFLynx archive per instance (built from the library's files, then loaded and run in CUFLynx)
+        id: omex
         run: |
-          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open(__import__('cam_testing.library', fromlist=['x']).module_dir('${{ matrix.module }}') + '/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
-          if [ "$reviewed" = "True" ]; then make risk PYTHON=python MODULE=${{ matrix.module }}; fi
+          make omex PYTHON=python MODULE=${{ matrix.category }} || true
+          if make omex-test PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="--quick-unreviewed --junitxml=junit-omex.xml" CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Failure-risk analysis (on request, reviewed versions)
+        if: github.event_name == 'workflow_dispatch' && inputs.risk
+        run: make risk PYTHON=python MODULE=${{ matrix.category }} RISK_ARGS=--reviewed-only
       - name: Report
         if: always()
-        run: make report PYTHON=python MODULE=${{ matrix.module }}
+        run: make report PYTHON=python MODULE=${{ matrix.category }}
       - name: Stage report files
         if: always()
         run: |
-          m=${{ matrix.module }}
-          d=$(python -c "from cam_testing.library import module_relpath; print(module_relpath('$m'))")
-          mkdir -p _artifact/modules/$d
-          for f in plots results $m.html; do if [ -e modules/$d/$f ]; then cp -r modules/$d/$f _artifact/modules/$d/; fi; done
+          mkdir -p _artifact
+          find modules/${{ matrix.category }} \( -type d \( -name plots -o -name results \) -o -type f \( -name '*.html' -o -name '*.omex' \) \) -prune -print \
+            | xargs -r -I{} cp -r --parents {} _artifact/
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: module-${{ matrix.module }}
+          name: category-${{ matrix.category }}
           path: _artifact/
           if-no-files-found: ignore
-      - name: Fail if a reviewed module's tests failed
-        if: steps.tests.outputs.ok == 'false' || steps.pipeline.outputs.ok == 'false'
-        run: |
-          reviewed=$(python -c "import yaml; print(bool(yaml.safe_load(open(__import__('cam_testing.library', fromlist=['x']).module_dir('${{ matrix.module }}') + '/${{ matrix.module }}_tests.yaml')).get('reviewed')))")
-          if [ "$reviewed" = "True" ]; then echo "::error::tests failed for reviewed module ${{ matrix.module }}"; exit 1; fi
-          echo "::warning::tests failed for ${{ matrix.module }} (not reviewed yet, so not blocking)"
+      - name: Fail if a reviewed version's tests failed
+        if: steps.tests.outputs.ok == 'false' || steps.pipeline.outputs.ok == 'false' || steps.omex.outputs.ok == 'false'
+        run: python tools/ci_reviewed_failures.py junit-tests.xml junit-pipeline.xml
 
   site:
-    needs: [module]
+    needs: [category]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -120,7 +121,7 @@ jobs:
       - uses: ./.github/actions/setup
       - uses: actions/download-artifact@v4
         with:
-          pattern: module-*
+          pattern: category-*
           path: .
           merge-multiple: true
       - run: make site PYTHON=python

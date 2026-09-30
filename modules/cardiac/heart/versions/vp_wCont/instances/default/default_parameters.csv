@@ -1,0 +1,56 @@
+variable_name,units,value,data_reference,sourced
+Delta_T,second,TODO,TODO,no
+u_intraThor,J_per_m3,0.0,control_parasymp: TO_BE_COUPLED_TO_RESP,no
+u_root,J_per_m3,TODO,TODO,no
+u_par,J_per_m3,TODO,TODO,no
+Delta_E_rv,J_per_m6,TODO,TODO,no
+Delta_E_lv,J_per_m6,TODO,TODO,no
+v_ivc,m3_per_s,TODO,TODO,no
+v_svc,m3_per_s,TODO,TODO,no
+v_pvn,m3_per_s,TODO,TODO,no
+rho,Js2_per_m5,1050,control_parasymp: known,no
+T,second,1,control_parasymp: defined_by_user,no
+T_min,second,0.25,control_parasymp: defined_by_user,no
+q_ra_us,m3,4.00e-06,control_parasymp: Korakianitis_2006_Table_1,yes
+q_rv_us,m3,1.00e-05,control_parasymp: Korakianitis_2006_Table_1,yes
+q_la_us,m3,4.00e-06,control_parasymp: Korakianitis_2006_Table_1,yes
+q_lv_us,m3,5.00e-06,control_parasymp: Korakianitis_2006_Table_1,yes
+q_ra_init,m3,4.00e-06,control_parasymp: Korakianitis_2006_Table_1,yes
+q_rv_init,m3,0.1e-03,control_parasymp: Korakianitis_2006_Table_1,yes
+q_la_init,m3,4.00e-06,control_parasymp: Korakianitis_2006_Table_1,yes
+q_lv_init,m3,0.1e-03,control_parasymp: user_defined,no
+T_ac,second,0.17,control_parasymp: Liang_2009_Table_2,yes
+T_ar,second,0.17,control_parasymp: Liang_2009_Table_2,yes
+t_astart,second,0.8,control_parasymp: Liang_2009_Table_2,yes
+T_vc,second,0.34,control_parasymp: Liang_2009_Table_2,yes
+T_vr,second,0.15,control_parasymp: Liang_2009_Table_2,yes
+t_vstart,second,0,control_parasymp: Liang_2009_Table_2,yes
+E_ra_A,J_per_m6,8.00e+06,control_parasymp: Liang_2009_Table_2,yes
+E_ra_B,J_per_m6,9.33e+06,control_parasymp: Liang_2009_Table_2,yes
+E_rv_A,J_per_m6,60e+06,control_parasymp: user_defined,no
+E_rv_B,J_per_m6,0.2e6,control_parasymp: user_defined,no
+E_la_A,J_per_m6,9.33e+06,control_parasymp: Liang_2009_Table_2,yes
+E_la_B,J_per_m6,1.20e+07,control_parasymp: Liang_2009_Table_2,yes
+E_lv_A,J_per_m6,200e6,control_parasymp: user_defined,no
+E_lv_B,J_per_m6,20e6,control_parasymp: user_defined,no
+K_vo_trv,m3_per_Js,0.3,control_parasymp: Mynard_2012,yes
+K_vo_puv,m3_per_Js,0.2,control_parasymp: Mynard_2012,yes
+K_vo_miv,m3_per_Js,0.3,control_parasymp: Mynard_2012,yes
+K_vo_aov,m3_per_Js,0.12,control_parasymp: Mynard_2012,yes
+K_vc_trv,m3_per_Js,0.4,control_parasymp: Mynard_2012,yes
+K_vc_puv,m3_per_Js,0.2,control_parasymp: Mynard_2012,yes
+K_vc_miv,m3_per_Js,0.4,control_parasymp: Mynard_2012,yes
+K_vc_aov,m3_per_Js,0.12,control_parasymp: Mynard_2012,yes
+M_rg_trv,dimensionless,0,control_parasymp: Mynard_2012,yes
+M_rg_puv,dimensionless,0,control_parasymp: Mynard_2012,yes
+M_rg_miv,dimensionless,0,control_parasymp: Mynard_2012,yes
+M_rg_aov,dimensionless,0,control_parasymp: Mynard_2012,yes
+M_st_trv,dimensionless,1,control_parasymp: Mynard_2012,yes
+M_st_puv,dimensionless,1,control_parasymp: Mynard_2012,yes
+M_st_miv,dimensionless,1,control_parasymp: Mynard_2012,yes
+M_st_aov,dimensionless,1,control_parasymp: Mynard_2012,yes
+l_eff,metre,0.02,control_parasymp: to_be_identified,no
+A_nn_trv,m2,0.0008,control_parasymp: Mynard_2012,yes
+A_nn_puv,m2,0.00071,control_parasymp: Mynard_2012,yes
+A_nn_miv,m2,0.00077,control_parasymp: Mynard_2012,yes
+A_nn_aov,m2,0.00068,control_parasymp: Mynard_2012,yes

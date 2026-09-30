@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="SN_Na_K_concentrations_soma_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="SN_Na_K_concentrations_soma">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="E_K" public_interface="out" units="milliV"/>
+        <variable name="E_Na" public_interface="out" units="milliV"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="Ki" public_interface="out" units="millimolar" initial_value="Ki_init"/>
+        <variable name="Ki_init" public_interface="in" units="millimolar"/>
+        <variable name="Ko" public_interface="in" units="millimolar"/>
+        <variable name="Nai" public_interface="out" units="millimolar" initial_value="Nai_init"/>
+        <variable name="Nai_init" public_interface="in" units="millimolar"/>
+        <variable name="Nao" public_interface="in" units="millimolar"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Vol" public_interface="in" units="m3"/>
+        <variable name="j_K_total" public_interface="in" units="mol_per_s"/>
+        <variable name="j_Na_total" public_interface="in" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>E_K</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Ko</ci>
+                            <ci>Ki</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="milliV_per_V">1000</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>E_Na</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Nao</ci>
+                            <ci>Nai</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="milliV_per_V">1000</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Nai</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <ci>j_Na_total</ci>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Ki</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <ci>j_K_total</ci>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,5 +1,5 @@
 """
-Builds the diffusion example system models (modules/system/diffusion/) from simple meshes of
+Builds the diffusion example system models (system_models/diffusion/) from simple meshes of
 diffusion_volume's tissue_diffusion_volume cells and tissue_diffusion_face faces:
 
   diffusion_2d_triangles  a 2D mesh of triangles (a 2 x 2 grid of squares, each cut along a diagonal),
@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from cam_testing import vessel_array  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(REPO, 'modules', 'system', 'diffusion')
+OUT = os.path.join(REPO, 'system_models', 'diffusion')
 SIGMA = 2.41e-9         # m2/s, tissue O2 diffusivity (Secomb 2020, Table 1)
 DEPTH = 2.0e-5          # m, depth of the 2D mesh
 
@@ -106,14 +106,14 @@ def write(model, description, cells, faces):
     for n, c in cells.items():
         inp = [f'f{k}' for k, f in enumerate(faces) if f[1] == n]
         out = [f'f{k}' for k, f in enumerate(faces) if f[0] == n]
-        rows.append([n, 'nn', 'tissue_diffusion_volume', ' '.join(inp), ' '.join(out)])
+        rows.append([n, 'nn', 'tissue_diffusion_volume', ' '.join(inp), ' '.join(out), 'default'])
         params += [[f'C_P_init_{n}', 'millimolar', round(C0[n], 6), 'example: random initial concentration'],
                    [f'V_P_{n}', 'm3', c['V'], 'example mesh: cell volume'],
                    [f'flux_c_{n}', 'mol_per_s', 0, 'example: closed domain, no capillary supply'],
                    [f'M_{n}', 'millimolar_per_s', 0, 'example: no consumption'],
                    [f'C50_{n}', 'millimolar', 0.0133, 'example (unused with M = 0)']]
     for k, (a, b, A, da, db) in enumerate(faces):
-        rows.append([f'f{k}', 'nn', 'tissue_diffusion_face', a, b])
+        rows.append([f'f{k}', 'nn', 'tissue_diffusion_face', a, b, 'default'])
         params += [[f'A_f_f{k}', 'm2', A, 'example mesh: face area'],
                    [f'd_up_f{k}', 'metre', da, f'example mesh: centre of {a} to the face'],
                    [f'd_down_f{k}', 'metre', db, f'example mesh: centre of {b} to the face'],

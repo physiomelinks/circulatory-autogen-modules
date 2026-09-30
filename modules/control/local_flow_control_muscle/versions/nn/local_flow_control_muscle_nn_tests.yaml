@@ -1,0 +1,39 @@
+module_type: local_flow_control_muscle
+version: nn
+reviewed: false
+notes: 'Local metabolic control of skeletal-muscle resistance (Ursino & Magosso 2000 O2 term, Magosso & Ursino 2001 CO2 term):
+  tau_O2 dx_O2/dt = C_O2_p - C_O2_vm_nom - x_O2, tau_CO2 dx_CO2/dt = phi(P_CO2_a) - x_CO2 with phi a tanh-like sigmoid of
+  PaCO2, R_mult = (1 + x_CO2)/(1 - g_O2_m x_O2). ISSUE: C_O2_p is an input of the CellML component but the config declares
+  it a "variable" with no port, so stand-alone it is unset (myokit warns "No value set for C_O2_p" and uses 0). R_mult is
+  singular at x_O2 = 1/g_O2_m (C_O2_p = 0.188 ml/ml).'
+reference_proposals:
+  P_CO2_a:
+    reference: West2008; 40 mmHg = 5332.9 Pa
+    sourced: true
+    value: 5332.8
+  P_O2_a:
+    reference: West2008; 100 mmHg = 13332 Pa (unused by the equations)
+    sourced: true
+    value: 13332.0
+  P_CO2_a_nom:
+    reference: West2008; 40 mmHg
+    sourced: true
+  k_CO2_m:
+    reference: MagossoUrsino2001; 142.8 mmHg = 19038 Pa (value from circulatory_autogen; not verified against the paywalled
+      paper)
+    sourced: true
+  C_O2_vm_nom:
+    reference: UrsinoMagosso2000; nominal muscle venous O2 content 0.155 ml/ml (not verified against the paper)
+    sourced: true
+  tau_O2:
+    reference: UrsinoMagosso2000; 10 s (not verified against the paper)
+    sourced: true
+  tau_CO2:
+    reference: MagossoUrsino2001; 20 s (Cheng2010 Table tau_cc = 20 s for the CO2 response)
+    sourced: true
+  g_O2_m:
+    reference: UrsinoMagosso2000; 30 (not verified against the paper)
+    sourced: true
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

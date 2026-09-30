@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_f_Xf_gate_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_f_Xf_gate_Paci_2013">
+        <variable name="Xf_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="Xf_init" name="Xf" public_interface="out" units="dimensionless"/>
+        <variable name="Xf_infinity" units="dimensionless"/>
+        <variable name="tau_Xf" units="second"/>
+        <variable name="Vm" public_interface="in" units="volt"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Xf_infinity</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <times/>
+                                        <ci>Vm</ci>
+                                        <cn cellml:units="milliV_per_V">1000</cn>
+                                    </apply>
+                                    <cn cellml:units="milliV">77.85</cn>
+                                </apply>
+                                <cn cellml:units="milliV">5</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_Xf</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <divide/>
+                        <cn cellml:units="second">1900</cn>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <apply>
+                                            <times/>
+                                            <ci>Vm</ci>
+                                            <cn cellml:units="milliV_per_V">1000</cn>
+                                        </apply>
+                                        <cn cellml:units="milliV">15</cn>
+                                    </apply>
+                                    <cn cellml:units="milliV">10</cn>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">1000</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Xf</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>Xf_infinity</ci>
+                        <ci>Xf</ci>
+                    </apply>
+                    <ci>tau_Xf</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

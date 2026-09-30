@@ -1,0 +1,47 @@
+{
+ "instance": "hudson_bay_lynx_hare",
+ "version": "Lotka_Volterra/nn",
+ "date": "2026-09-30",
+ "passed": true,
+ "summary": "start nominal -> alpha=0.4357, beta=0.02302, gamma=1.001, delta=0.02944, x_init=35.56, y_init=4.93 (prediction log_rmse 0.395)",
+ "method": "CMA-ES",
+ "files": [
+  "instances/hudson_bay_lynx_hare/hudson_bay_lynx_hare_obs_data.json",
+  "instances/hudson_bay_lynx_hare/hudson_bay_lynx_hare_params_for_id.csv",
+  "instances/hudson_bay_lynx_hare/hudson_bay_lynx_hare_validation_obs_data.json"
+ ],
+ "cost": 0.27190611775457457,
+ "calibrated_parameters": {
+  "alpha": 0.43567544314619744,
+  "beta": 0.023022916921280286,
+  "gamma": 1.0006547171972624,
+  "delta": 0.029439415339785755,
+  "x_init": 35.55564074419758,
+  "y_init": 4.930164374024523
+ },
+ "runs": [
+  {
+   "start": {},
+   "calibrated_parameters": {
+    "alpha": 0.43567544314619744,
+    "beta": 0.023022916921280286,
+    "gamma": 1.0006547171972624,
+    "delta": 0.029439415339785755,
+    "x_init": 35.55564074419758,
+    "y_init": 4.930164374024523
+   },
+   "cost": 0.27190611775457457,
+   "calibration_scores": {
+    "x": 0.1623853109283831,
+    "y": 0.2298536190169415
+   },
+   "prediction_scores": {
+    "x": 0.39504568763759834,
+    "y": 0.3279529012865185
+   },
+   "constant_items": {}
+  }
+ ],
+ "metric": "log_rmse",
+ "threshold": 0.5
+}

@@ -1,0 +1,50 @@
+{
+  "module_type": "NE_release_Tao_2011",
+  "version": "nn",
+  "sim_time": 0.05,
+  "pre_time": 0.0,
+  "dt": 1e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["Cai", "V_Ca", "V_1Ca", "V_2Ca", "V_3Ca", "V_4Ca", "V_5Ca", "NE"],
+  "run_parameters": {"i_Ca": -0.1},
+  "invariants": [
+    {
+      "description": "vesicle-site occupancy is conserved: V_Ca + V_1Ca + ... + V_5Ca stays at its initial total (all rate terms of the 5-site binding scheme cancel in the sum)",
+      "expr": "np.max(np.abs((V_Ca + V_1Ca + V_2Ca + V_3Ca + V_4Ca + V_5Ca) - (V_Ca + V_1Ca + V_2Ca + V_3Ca + V_4Ca + V_5Ca)[0])) <= 1e-9"
+    },
+    {
+      "description": "Cai is exactly Cai(t) = -i_Ca/(2 F V_Z 1e-6 K_Ca) (1 - exp(-K_Ca t)) from 0 for constant i_Ca",
+      "expr": "np.max(np.abs(Cai - (-i_Ca/(2*F*V_Z*1e-6*K_Ca))*(1 - np.exp(-K_Ca*t)))) <= 1e-6*max(1e-12, np.max(np.abs(Cai)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "i_Ca": {"min": -0.5, "max": 0.0, "points": 3}
+    },
+    "rationale": "N-type Ca current of a varicosity during an action potential is of the order of 0.1 nA or less."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0001, 5e-05, 2.5e-05, 1.25e-05],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: Tao 2011 Fig. of NE release per action potential; requires the unit defects to be fixed first."
+      },
+      "calibrate": {"note": "not_applicable: blocked by the unit defects."}
+    }
+  }
+}

@@ -1,0 +1,19 @@
+[
+ {"name": "lung_stretch", "module_type": "lung_stretch_receptor_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": [], "out_instances": ["sympathetic_afferent", "NTS"]},
+ {"name": "baroreceptor", "module_type": "baroreceptor", "module_subtype": "nn", "instance": "default", "inp_instances": [], "out_instances": ["sympathetic_afferent", "NTS", "LCN"]},
+ {"name": "cardiopulm_receptor", "module_type": "cardiopulmonary_receptor_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": [], "out_instances": ["sympathetic_afferent", "NTS", "LCN"]},
+ {"name": "sympathetic_afferent", "module_type": "sympathetic_afferent_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["lung_stretch", "baroreceptor", "cardiopulm_receptor"], "out_instances": ["sympathetic_efferent"]},
+ {"name": "sympathetic_efferent", "module_type": "sympathetic_efferent_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["sympathetic_afferent"], "out_instances": ["peripheral_effector_arms", "venous_volume_effector_lb", "LCN", "heart_effector_T", "heart_effector_Elv", "heart_effector_Erv"]},
+ {"name": "NTS", "module_type": "NTS_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["lung_stretch", "baroreceptor", "cardiopulm_receptor"], "out_instances": ["DMV", "NA"]},
+ {"name": "DMV", "module_type": "DMV_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["NTS"], "out_instances": ["LCN", "PNDMV"]},
+ {"name": "NA", "module_type": "NA_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["NTS"], "out_instances": ["NActr", "PNNA"]},
+ {"name": "NActr", "module_type": "NActr_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["NA"], "out_instances": ["LCN", "PNDMV"]},
+ {"name": "LCN", "module_type": "LCN_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["DMV", "NActr", "baroreceptor", "sympathetic_efferent", "cardiopulm_receptor"], "out_instances": ["PNNA", "PNDMV"]},
+ {"name": "PNNA", "module_type": "PNNA_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["NA", "LCN"], "out_instances": ["heart_effector_T"]},
+ {"name": "PNDMV", "module_type": "PNDMV_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["DMV", "NActr", "LCN"], "out_instances": ["heart_effector_Elv", "heart_effector_Erv"]},
+ {"name": "heart_effector_T", "module_type": "efferent_heart_period_effector", "module_subtype": "nn", "instance": "default", "inp_instances": ["sympathetic_efferent", "PNNA"], "out_instances": []},
+ {"name": "heart_effector_Elv", "module_type": "heart_effector_Gee2023", "module_subtype": "nn_lv", "instance": "default", "inp_instances": ["sympathetic_efferent", "PNDMV"], "out_instances": []},
+ {"name": "heart_effector_Erv", "module_type": "heart_effector_Gee2023", "module_subtype": "nn_rv", "instance": "default", "inp_instances": ["sympathetic_efferent", "PNDMV"], "out_instances": []},
+ {"name": "peripheral_effector_arms", "module_type": "peripheral_resistance_effector_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["sympathetic_efferent"], "out_instances": []},
+ {"name": "venous_volume_effector_lb", "module_type": "unstressed_volume_effector_Gee2023", "module_subtype": "nn", "instance": "default", "inp_instances": ["sympathetic_efferent"], "out_instances": []}
+]

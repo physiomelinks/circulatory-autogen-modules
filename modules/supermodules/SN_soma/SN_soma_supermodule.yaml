@@ -1,9 +1,0 @@
-supermodule: SN_soma
-description: 'Sympathetic-neuron soma (SN_simple''s SN_soma) built from its parts: the membrane with the sensing filter, Na/K
-  concentrations with their Nernst potentials, four-compartment Ca handling, and the ion channels i_Na, i_Na1_6, i_CaL, i_Kv2,
-  i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (modules/ion_channel, *_SN). Each submodule
-  becomes <instance>_<submodule> in a model; the membrane couples to the axon: per_submodule_outputs {"membrane": ["<axon>"]}
-  (VI_port: V out, the axial current I_out in); optional stimulus through membrane''s i_stim. Default parameters are SN_simple''s
-  (SN_soma_parameters.csv). Built by tools/build_sn_modules.py. Tested through the sympathetic_neuron supermodule.'
-reviewed: false
-globals: [R, F, T]

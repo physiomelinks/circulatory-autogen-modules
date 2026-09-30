@@ -1,0 +1,48 @@
+[
+  {
+    "module_type": "i_Kr_Xr2_gate",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_Kr_Xr2_gate_Paci2013_v01_modules.cellml",
+    "component_type": "i_Kr_Xr2_gate_Paci_2013",
+    "default_instance": "default",
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Kr_Xr2_gate",
+        "variables": [
+          "Xr2"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Xr2_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Xr2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

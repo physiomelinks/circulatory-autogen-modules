@@ -1,0 +1,50 @@
+{
+  "module_type": "Na_dynamics_Paci_2013",
+  "version": "nn",
+  "sim_time": 0.01,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["Nai"],
+  "run_parameters": {"i_Na": -1.0, "i_NaK": 0.2},
+  "invariants": [
+    {
+      "description": "exact for constant currents: Nai = Nai_init - Cm (I_Na + I_bNa + 3 I_NaK + 3 I_NaCa)/(F Vc 1e-18) t",
+      "expr": "np.max(np.abs(Nai - (Nai_init - Cm*(i_Na + i_b_Na + 3*i_NaK + 3*i_NaCa)/(F*Vc*1e-18)*t))) <= 1e-7*max(1.0, np.max(np.abs(Nai)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "i_Na": {"min": -5.0, "max": 0.0, "points": 3},
+      "i_b_Na": {"min": -1.0, "max": 0.0, "points": 3},
+      "i_NaK": {"min": 0.0, "max": 1.0, "points": 3},
+      "i_NaCa": {"min": -0.5, "max": 0.5, "points": 3},
+      "F": {"min": 96485.0, "max": 96485.0, "points": 1}
+    },
+    "rationale": "time-averaged Na currents of a beating hiPSC-CM are well below these bounds (instantaneous I_Na peaks are larger but brief); Nai stays positive over the 10 ms test for all combinations; F is a physical constant."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.001, 0.0005, 0.00025, 0.000125],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "mass balance, verified exactly; validation needs the assembled cell."
+      },
+      "calibrate": {"note": "not_applicable: no free parameters."}
+    }
+  }
+}

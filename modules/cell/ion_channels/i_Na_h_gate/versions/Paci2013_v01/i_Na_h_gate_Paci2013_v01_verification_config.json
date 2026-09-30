@@ -1,0 +1,50 @@
+{
+  "module_type": "i_Na_h_gate",
+  "version": "Paci2013_v01",
+  "sim_time": 0.02,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["h"],
+  "run_parameters": {"Vm": -0.02},
+  "invariants": [
+    {
+      "description": "h matches the exact voltage-clamp solution h(t) = h_inf(Vm) + (h_init - h_inf) exp(-t/tau_h(Vm)), with h_inf and tau_h transcribed from the Paci 2013 CellML (not from this module)",
+      "expr": "np.max(np.abs(h - ((1/np.sqrt(1+np.exp(((Vm*1000)+72.1)/5.7))) + (h_init - (1/np.sqrt(1+np.exp(((Vm*1000)+72.1)/5.7))))*np.exp(-t/(np.where(Vm<-0.04, 1.5/((0.057*np.exp(-((Vm*1000)+80)/6.8)+2.7*np.exp(0.079*(Vm*1000))+3.1e5*np.exp(0.3485*(Vm*1000)))*1000), 2.542/1000)))))) <= 1e-5"
+    },
+    {"description": "h stays in [0, 1]", "expr": "np.all((h >= -1e-9) & (h <= 1 + 1e-9))"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 7},
+      "h_init": {"min": 0.0, "max": 1.0, "points": 5}
+    },
+    "rationale": "Vm spans the physiological range of a cardiomyocyte action potential/clamp protocol (-100 to +50 mV); the initial gate value spans its whole range [0, 1]."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.01, 0.005, 0.0025, 0.00125],
+    "t_end": 0.2,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the steady-state/time-constant curves of the h gate in Paci et al. 2013 (fitted to hiPSC-CM voltage-clamp data, Ma et al. 2011) could be digitised and compared with the clamp steady state; not set up (figure digitisation needs owner approval)."
+      },
+      "calibrate": {
+        "note": "not_applicable: gate kinetics have no free parameters in this module (all constants are hard-coded in the CellML), so there is nothing to identify."
+      }
+    }
+  }
+}

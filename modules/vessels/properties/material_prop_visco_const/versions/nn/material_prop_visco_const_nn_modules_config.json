@@ -1,0 +1,111 @@
+[
+  {
+    "module_type": "material_prop_visco_const",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "material_prop_visco_const_nn_modules.cellml",
+    "component_type": "material_prop_visco_const_type",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "len_port",
+        "variables": [
+          "l"
+        ]
+      },
+      {
+        "port_type": "radius_port",
+        "variables": [
+          "r_0"
+        ]
+      },
+      {
+        "port_type": "stiffness_port",
+        "variables": [
+          "K_tube"
+        ]
+      },
+      {
+        "port_type": "visco_coeff_port",
+        "variables": [
+          "K_tube_visco"
+        ]
+      }
+    ],
+    "exit_ports": [],
+    "variables_and_units": [
+      [
+        "K_tube",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "K_tube_visco",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "l",
+        "metre",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "nu",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "SMvolfrac_art",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "K_m",
+        "Js_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ]
+    ]
+  }
+]

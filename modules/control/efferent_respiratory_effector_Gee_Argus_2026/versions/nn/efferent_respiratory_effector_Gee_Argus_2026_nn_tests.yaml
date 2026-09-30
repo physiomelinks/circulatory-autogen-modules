@@ -1,0 +1,96 @@
+module_type: efferent_respiratory_effector_Gee_Argus_2026
+version: nn
+reviewed: false
+notes: 'Chemoreflex respiratory effector (multiplicative muscle-pressure form): peripheral and central drives act on respiratory
+  rate (additive Delta_RR, first order) and on the muscle-pressure amplitude through multipliers alpha (first order towards
+  1 + G u), with time constants switched by the sign of the drive / a CO2 threshold; outputs are clamped. With constant drives
+  each state is an exact first-order response.'
+expected_failures:
+  run_test: u_p_resp is listed twice in the config variables_and_units (and twice in the parameters csv), so the generated
+    component declares it twice and libcellml rejects the model (VARIABLE_NAME_UNIQUE). A patched copy with the duplicate
+    removed generates and passes the invariants.
+  verification_test_invariants: generation fails (see run_test)
+  verification_test_BC: generation fails (see run_test)
+  verification_test_timestep: generation fails (see run_test)
+  stability_test: generation fails (see run_test)
+reference_proposals:
+  u_c_resp:
+    reference: circulatory_autogen; test operating point (100, above the CO2 threshold)
+    sourced: false
+    value: 100.0
+  u_p_resp:
+    reference: circulatory_autogen; test operating point (1)
+    sourced: false
+    value: 1.0
+  G_pA:
+    reference: unreferenced_placeholder; fractional muscle-pressure gain per unit peripheral drive (0.01 s, order of magnitude
+      only; the additive sibling uses -120 Pa s)
+    sourced: false
+    value: 0.01
+  G_pf:
+    reference: unreferenced_placeholder; copied from the additive sibling efferent_respiratory_effector (0.014855, "user_defined")
+    sourced: false
+    value: 0.014855
+  tau_pA_min:
+    reference: unreferenced_placeholder; copied from the sibling (10 s, library cites "Bizzotto2022", not found)
+    sourced: false
+    value: 10.0
+  tau_pA_max:
+    reference: unreferenced_placeholder; copied from the sibling (83 s)
+    sourced: false
+    value: 83.0
+  tau_pf_min:
+    reference: unreferenced_placeholder; copied from the sibling (17.526 s)
+    sourced: false
+    value: 17.526
+  tau_pf_max:
+    reference: unreferenced_placeholder; copied from the sibling (174.78 s)
+    sourced: false
+    value: 174.78
+  G_cA_max:
+    reference: unreferenced_placeholder; fractional gain (0.001 s per unit u_c, order of magnitude only)
+    sourced: false
+    value: 0.001
+  G_cf_max:
+    reference: unreferenced_placeholder; copied from the sibling (1.12e-4)
+    sourced: false
+    value: 0.000112
+  tau_cA_min:
+    reference: unreferenced_placeholder; copied from the sibling (30 s)
+    sourced: false
+    value: 30.0
+  tau_cA_max:
+    reference: unreferenced_placeholder; copied from the sibling (105 s)
+    sourced: false
+    value: 105.0
+  tau_cf_min:
+    reference: unreferenced_placeholder; copied from the sibling (35 s)
+    sourced: false
+    value: 35.0
+  tau_cf_max:
+    reference: unreferenced_placeholder; copied from the sibling (400 s)
+    sourced: false
+    value: 400.0
+  u_CO2_c_thresh:
+    reference: unreferenced_placeholder; copied from the sibling (41.98, "from_ICUHealthy" calibration)
+    sourced: false
+    value: 41.978
+  Delta_RR_resp_max:
+    reference: unreferenced_placeholder; copied from the sibling (0.75 /s)
+    sourced: false
+    value: 0.75
+  Delta_RR_resp_min:
+    reference: unreferenced_placeholder; copied from the sibling (-0.15 /s)
+    sourced: false
+    value: -0.15
+  alpha_P_mus_max:
+    reference: unreferenced_placeholder; muscle pressure may at most triple (3)
+    sourced: false
+    value: 3.0
+  alpha_P_mus_min:
+    reference: unreferenced_placeholder; muscle pressure may fall to 20 % (0.2)
+    sourced: false
+    value: 0.2
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

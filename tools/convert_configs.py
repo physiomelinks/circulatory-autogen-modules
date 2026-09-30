@@ -13,6 +13,10 @@ trimmed. libcuflynx reads both formats.
 
     python tools/convert_configs.py            # convert every module
     python tools/convert_configs.py --check    # exit 1 if any config is not in PhLynx format
+
+Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
+provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
+modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
 """
 import argparse
 import glob

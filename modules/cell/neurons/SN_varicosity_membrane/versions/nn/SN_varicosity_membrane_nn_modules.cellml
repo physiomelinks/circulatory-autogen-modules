@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="SN_varicosity_membrane_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="SN_varicosity_membrane">
+        <variable name="V" public_interface="out" units="milliV"/>
+        <variable name="V_in" public_interface="in" units="milliV"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>V</ci>
+                <ci>V_in</ci>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="rigid_vessel_vv" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="vv_rigid_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- IF KEEPING TRACK OF VOLUME, DONT USE THIS MODULE. IT DOESNT HAVE A BASELINE VOLUME.-->
+        <!-- Constitutive parameters-->
+        <variable name="R" public_interface="in" units="Js_per_m6"/>
+        <!-- State Variables-->
+        <variable name="v_in" public_interface="in" units="m3_per_s"/>
+        <variable name="u" public_interface="out" units="J_per_m3"/>
+        <variable name="v_out" public_interface="in" units="m3_per_s"/>
+        <!-- Conservation Laws-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>u</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>v_in</ci>
+                        <ci>v_out</ci>
+                    </apply>
+                    <ci>R</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

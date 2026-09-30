@@ -29,8 +29,8 @@ python_functions = ["test_*", "run_test", "*_test_*", "stability_test", "system_
                     "phlynx_*_test", "cuflynx_*_test"]
 markers = [
     "slow: long-running (calibration)",
-    "module_vv: per-module verification & validation tests",
-    "system_model: system-model tests (modules/system)",
-    "phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-component tests (need node, PhLynx and CUFLynx)",
+    "module_vv: per-version verification and per-instance validation tests",
+    "system_model: system-model tests (system_models/) and supermodule reproduces tests",
+    "phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)",
 ]
 filterwarnings = ["ignore::DeprecationWarning"]

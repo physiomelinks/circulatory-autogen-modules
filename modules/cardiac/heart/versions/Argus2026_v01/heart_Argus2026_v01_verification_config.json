@@ -1,0 +1,19 @@
+{
+  "module_type": "heart",
+  "version": "Argus2026_v01",
+  "validation": {
+    "default": {}
+  },
+  "supermodule": {
+    "globals": ["T", "rho", "l_eff"],
+    "equivalent": [
+      {
+        "model": "closed_loop_cvs/3compartment_supermodules",
+        "reproduces": "closed_loop_cvs/3compartment",
+        "instance": "heart",
+        "tol": 1e-09,
+        "solver_info": {"rtol": 1e-10, "atol": 1e-12}
+      }
+    ]
+  }
+}

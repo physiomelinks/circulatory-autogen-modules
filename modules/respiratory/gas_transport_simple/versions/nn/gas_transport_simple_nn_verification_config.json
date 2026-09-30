@@ -1,0 +1,84 @@
+{
+  "module_type": "gas_transport_simple",
+  "version": "nn",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": ["C_O2_out", "C_CO2_out", "dot_C_CO2_out", "P_O2_out", "P_CO2_out", "C_O2_out_extra_ub", "term/v_T"],
+  "harness": {
+    "vessel_array": [
+      ["term", "pp_I", "terminal", "", "mod", "default"],
+      ["mod", "nn", "gas_transport_simple", "term", "", "default"]
+    ],
+    "parameters": [
+      ["R_1_T_term", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["R_2_T_term", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["C_T_term", "m6_per_J", 1e-09, "harness flow source"],
+      ["I_T_term", "Js2_per_m6", 25000.0, "harness: I/R = 5 ms"],
+      ["u_ext_term", "J_per_m3", 0.0, "harness"],
+      ["u_in_term", "J_per_m3", 833.0, "harness: gives v_T = 8.33e-05 m3/s"],
+      ["u_out_term", "J_per_m3", 0.0, "harness"],
+      ["q_us_term", "m3", 0.0, "harness"],
+      ["q_init_term", "m3", 4.165e-07, "harness: equilibrium volume"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "O2 content matches the exact washout solution for the logged (time-varying) flow: C = C_in + (C_init - C_in) exp(-int v dt / q_0)",
+      "expr": "np.max(np.abs(C_O2_out - (C_O2_in + (C_O2_out_init - C_O2_in)*np.exp(-cumint(t, term__v_T)/q_0)))) <= 2e-3*abs(C_O2_out_init - C_O2_in) + 1e-6"
+    },
+    {
+      "description": "CO2 content matches the exact first-order washout solution",
+      "expr": "np.max(np.abs(C_CO2_out - (C_CO2_in + (C_CO2_out_init - C_CO2_in)*np.exp(-cumint(t, term__v_T)/q_0)))) <= 2e-3*abs(C_CO2_out_init - C_CO2_in) + 1e-6"
+    },
+    {
+      "description": "dot_C_CO2_out = v (C_CO2_in - C_CO2_out)/q_0 (exported derivative)",
+      "expr": "np.max(np.abs(dot_C_CO2_out - term__v_T*(C_CO2_in - C_CO2_out)/q_0)) <= 1e-9 + 1e-6*np.max(np.abs(dot_C_CO2_out))"
+    },
+    {
+      "description": "Spencer inverse is exact: forward curve at (P_O2_out, P_CO2_out) returns C_O2_out (below 99% of saturation, where the inversion is well conditioned)",
+      "expr": "np.max(np.where((C_O2_out_extra_ub == 0) & (C_O2_out < 0.99*C_O2_sat), np.abs(C_O2_sat*((P_O2_out)*(1 + beta_1*(P_CO2_out))/(k_1*(1 + alpha_1*(P_CO2_out))))**(1/h_1)/(1 + ((P_O2_out)*(1 + beta_1*(P_CO2_out))/(k_1*(1 + alpha_1*(P_CO2_out))))**(1/h_1)) - C_O2_out), 0)) <= 1e-6*C_O2_sat"
+    },
+    {
+      "description": "... and returns C_CO2_out",
+      "expr": "np.max(np.where((C_O2_out_extra_ub == 0) & (C_O2_out < 0.99*C_O2_sat) & (C_CO2_out < 0.99*C_CO2_sat), np.abs(C_CO2_sat*((P_CO2_out)*(1 + beta_2*(P_O2_out))/(k_2*(1 + alpha_2*(P_O2_out))))**(1/h_2)/(1 + ((P_CO2_out)*(1 + beta_2*(P_O2_out))/(k_2*(1 + alpha_2*(P_O2_out))))**(1/h_2)) - C_CO2_out), 0)) <= 1e-6*C_CO2_sat"
+    },
+    {"description": "partial pressures >= 0", "expr": "np.all(P_O2_out >= 0) & np.all(P_CO2_out >= 0)"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "C_CO2_in": {"min": 0.4, "max": 0.6, "points": 5},
+      "C_O2_in": {"min": 0.02, "max": 0.21, "points": 5},
+      "C_CO2_out_init": {"min": 0.4, "max": 0.6, "points": 3},
+      "C_O2_out_init": {"min": 0.02, "max": 0.21, "points": 3},
+      "q_0": {"min": 5e-05, "max": 0.002, "points": 4, "scale": "log"}
+    },
+    "rationale": "Contents from severely hypoxaemic venous blood (0.02 ml/ml, S ~ 10%) to fully saturated arterial blood (0.21 > C_O2_sat = 0.2045, which exercises the over-cap branch), CO2 0.40-0.60 ml/ml; compartment volumes 50 ml - 2 L."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the O2 dissociation curve implied by the P_O2_out(C_O2_out) inverse vs the standard human curve (Severinghaus 1979 eq. 1, which fits the standard curve to +-0.0055 saturation; points in instances/default/severinghaus1979_odc.csv). Offline, Spencer/C_sat at P_CO2 = 40 mmHg is within 0.03 saturation of it (max near P_O2 = 20-30 mmHg). Needs a curve (x-y) baseline mode rather than a time series."
+      },
+      "calibrate": {
+        "note": "not_applicable: linear transport compartment with an algebraic output map; verified against exact solutions"
+      }
+    }
+  }
+}

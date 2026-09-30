@@ -1,0 +1,179 @@
+{
+  "module_type": "respiratory_gas_transport",
+  "version": "nn",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.005,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": [
+    "F_O2_D",
+    "F_CO2_D",
+    "F_O2_A",
+    "F_CO2_A",
+    "P_O2_A",
+    "P_CO2_A",
+    "pge/M_O2",
+    "pge/M_CO2",
+    "lung/v_ml",
+    "lung/v_bA",
+    "lung/q_D",
+    "lung/q_A"
+  ],
+  "harness": {
+    "vessel_array": [
+      ["termv", "pp_I", "terminal", "", "ven", "default"],
+      ["ven", "nn", "gas_transport_simple", "termv", "pge", "default"],
+      ["terma", "pp_I", "terminal", "", "artg", "default"],
+      ["artg", "nn", "gas_transport_simple", "terma pge", "", "default"],
+      ["termp", "pp_I", "terminal", "", "pge", "default"],
+      ["pge", "nn", "pulmonary_GE", "termp ven", "mod artg", "default"],
+      ["mod", "nn", "respiratory_gas_transport", "pge", "lung", "default"],
+      ["lung", "nn", "simple_lung_bg", "mod", "", "default"]
+    ],
+    "parameters": [
+      ["R_1_T_termv", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["R_2_T_termv", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["C_T_termv", "m6_per_J", 1e-09, "harness flow source"],
+      ["I_T_termv", "Js2_per_m6", 25000.0, "harness: I/R = 5 ms"],
+      ["u_ext_termv", "J_per_m3", 0.0, "harness"],
+      ["u_in_termv", "J_per_m3", 833.0, "harness: gives v_T = 8.33e-05 m3/s"],
+      ["u_out_termv", "J_per_m3", 0.0, "harness"],
+      ["q_us_termv", "m3", 0.0, "harness"],
+      ["q_init_termv", "m3", 4.165e-07, "harness: equilibrium volume"],
+      ["R_1_T_terma", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["R_2_T_terma", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["C_T_terma", "m6_per_J", 1e-09, "harness flow source"],
+      ["I_T_terma", "Js2_per_m6", 25000.0, "harness: I/R = 5 ms"],
+      ["u_ext_terma", "J_per_m3", 0.0, "harness"],
+      ["u_in_terma", "J_per_m3", 833.0, "harness: gives v_T = 8.33e-05 m3/s"],
+      ["u_out_terma", "J_per_m3", 0.0, "harness"],
+      ["q_us_terma", "m3", 0.0, "harness"],
+      ["q_init_terma", "m3", 4.165e-07, "harness: equilibrium volume"],
+      ["R_1_T_termp", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["R_2_T_termp", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["C_T_termp", "m6_per_J", 1e-09, "harness flow source"],
+      ["I_T_termp", "Js2_per_m6", 25000.0, "harness: I/R = 5 ms"],
+      ["u_ext_termp", "J_per_m3", 0.0, "harness"],
+      ["u_in_termp", "J_per_m3", 833.0, "harness: gives v_T = 8.33e-05 m3/s"],
+      ["u_out_termp", "J_per_m3", 0.0, "harness"],
+      ["q_us_termp", "m3", 0.0, "harness"],
+      ["q_init_termp", "m3", 4.165e-07, "harness: equilibrium volume"],
+      ["C_CO2_in_ven", "dimensionless", 0.53, "gas_exchange_parameters.csv (harness value)"],
+      ["C_O2_in_ven", "dimensionless", 0.15, "gas_exchange_parameters.csv (harness value)"],
+      ["C_CO2_out_init_ven", "dimensionless", 0.53, "gas_exchange_parameters.csv (harness value)"],
+      ["C_O2_out_init_ven", "dimensionless", 0.15, "gas_exchange_parameters.csv (harness value)"],
+      ["q_0_ven", "m3", 0.0003, "gas_exchange_parameters.csv"],
+      ["C_CO2_in_artg", "dimensionless", 0.485, "gas_exchange_parameters.csv (harness value)"],
+      ["C_O2_in_artg", "dimensionless", 0.199, "gas_exchange_parameters.csv (harness value)"],
+      ["C_CO2_out_init_artg", "dimensionless", 0.485, "gas_exchange_parameters.csv (harness value)"],
+      ["C_O2_out_init_artg", "dimensionless", 0.199, "gas_exchange_parameters.csv (harness value)"],
+      ["q_0_artg", "m3", 0.0003, "gas_exchange_parameters.csv"],
+      ["C_CO2_p_init_pge", "dimensionless", 0.48, "gas_exchange_parameters.csv"],
+      ["C_O2_p_init_pge", "dimensionless", 0.2, "gas_exchange_parameters.csv"],
+      ["C_CO2_a_pge", "dimensionless", 0.485, "gas_exchange_parameters.csv (harness value)"],
+      ["C_O2_a_pge", "dimensionless", 0.199, "gas_exchange_parameters.csv (harness value)"],
+      ["q_0_pge", "m3", 0.002, "gas_exchange_parameters.csv"],
+      ["k_O2_pge", "m6_per_Js", 1.7e-08, "gas_exchange_parameters.csv"],
+      ["k_CO2_pge", "m6_per_Js", 4.9e-07, "gas_exchange_parameters.csv"],
+      ["shunt_fraction_pge", "dimensionless", 0.017, "gas_exchange_parameters.csv"],
+      ["overcap_solubility", "J_per_m3", 10000000000.0, "gas_exchange_parameters.csv global"],
+      ["saturation_cap", "dimensionless", 0.9999, "gas_exchange_parameters.csv global"],
+      ["k_1", "J_per_m3", 1998.5, "gas_exchange_parameters.csv global"],
+      ["k_2", "J_per_m3", 25917.4, "gas_exchange_parameters.csv global"],
+      ["h_1", "dimensionless", 0.3836, "gas_exchange_parameters.csv global"],
+      ["h_2", "dimensionless", 1.819, "gas_exchange_parameters.csv global"],
+      ["alpha_1", "m3_per_J", 0.00024, "gas_exchange_parameters.csv global"],
+      ["alpha_2", "m3_per_J", 0.000419, "gas_exchange_parameters.csv global"],
+      ["beta_1", "m3_per_J", 6.21e-05, "gas_exchange_parameters.csv global"],
+      ["beta_2", "m3_per_J", 0.000244, "gas_exchange_parameters.csv global"],
+      ["C_O2_sat", "dimensionless", 0.20448, "gas_exchange_parameters.csv global"],
+      ["C_CO2_sat", "dimensionless", 1.9564, "gas_exchange_parameters.csv global"],
+      ["flag_P_mus_control_lung", "dimensionless", 1.0, "lung_parameters.csv (library value)"],
+      ["flag_RR_control_lung", "dimensionless", 1.0, "lung_parameters.csv (library value)"],
+      ["P_mus_min_lung", "J_per_m3", -980.0, "lung_parameters.csv (library value)"],
+      ["P_plEE_lung", "J_per_m3", -490.0, "lung_parameters.csv (library value)"],
+      ["q_D_min_lung", "m3", 1e-05, "lung_parameters.csv (library value)"],
+      ["q_l_us_lung", "m3", 3.44e-05, "lung_parameters.csv (library value)"],
+      ["q_t_us_lung", "m3", 6.63e-06, "lung_parameters.csv (library value)"],
+      ["q_b_us_lung", "m3", 1.87e-05, "lung_parameters.csv (library value)"],
+      ["q_A_us_lung", "m3", 1.26e-06, "lung_parameters.csv (library value)"],
+      ["R_ml_lung", "Js_per_m6", 250000.0, "lung_parameters.csv (library value)"],
+      ["R_lt_lung", "Js_per_m6", 85000.0, "lung_parameters.csv (library value)"],
+      ["R_tb_lung", "Js_per_m6", 80000.0, "lung_parameters.csv (library value)"],
+      ["R_bA_lung", "Js_per_m6", 22000.0, "lung_parameters.csv (library value)"],
+      ["R_plwall_lung", "Js_per_m6", 10000.0, "lung_parameters.csv (library value)"],
+      ["alpha_LR_lung", "dimensionless", 1.0, "lung_parameters.csv (library value)"],
+      ["C_l_lung", "m6_per_J", 1.3e-08, "lung_parameters.csv (library value)"],
+      ["C_t_lung", "m6_per_J", 2.43e-08, "lung_parameters.csv (library value)"],
+      ["C_b_lung", "m6_per_J", 1.34e-06, "lung_parameters.csv (library value)"],
+      ["C_A_lung", "m6_per_J", 2.04e-05, "lung_parameters.csv (library value)"],
+      ["C_pl_lung", "m6_per_J", 2.5e-06, "lung_parameters.csv (library value)"],
+      ["T_resp_lung", "second", 5.0, "lung_parameters.csv (library value)"],
+      ["Delta_RR_resp_lung", "per_s", 0.0, "lung_parameters.csv (library value)"],
+      ["Delta_P_mus_lung", "J_per_m3", 0.0, "lung_parameters.csv (library value)"],
+      ["IE_ratio_lung", "dimensionless", 0.6, "lung_parameters.csv (library value)"],
+      ["P_m", "J_per_m3", 0.0, "lung_parameters.csv global (atmospheric reference)"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "P_O2_A = F_O2_A (P_atm - P_ws) and P_CO2_A = F_CO2_A (P_atm - P_ws)",
+      "expr": "np.max(np.abs(P_O2_A - F_O2_A*(P_atm - P_ws))) + np.max(np.abs(P_CO2_A - F_CO2_A*(P_atm - P_ws))) <= 1e-6"
+    },
+    {
+      "description": "gas fractions in [0, 1] and F_O2 + F_CO2 <= 1",
+      "expr": "np.all((F_O2_A >= 0) & (F_CO2_A >= 0) & (F_O2_D >= 0) & (F_CO2_D >= 0) & (F_O2_A + F_CO2_A <= 1) & (F_O2_D + F_CO2_D <= 1))"
+    },
+    {
+      "description": "alveolar O2 balance: F_O2_A(t) - F_O2_A(t0) = time integral of [max(v_bA,0)(F_D - F_A) - K M_O2]/q_A (trapezoid, t0 = 5 s after the lung start-up transient)",
+      "expr": "np.max(np.abs((F_O2_A - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_bA, 0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[1:] + ((np.maximum(lung__v_bA, 0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[:-1])))))[t >= 5] - (F_O2_A - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_bA, 0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[1:] + ((np.maximum(lung__v_bA, 0)*(F_O2_D - F_O2_A) - K_LOSSES*pge__M_O2)/lung__q_A)[:-1])))))[t >= 5][0])) <= 2e-2*np.ptp(F_O2_A[t >= 5]) + 1e-6"
+    },
+    {
+      "description": "dead-space O2 balance: F_O2_D(t) - F_O2_D(t0) = time integral of [max(v_ml,0)(F_i - F_D) - max(-v_bA,0)(F_D - F_A)]/q_D",
+      "expr": "np.max(np.abs((F_O2_D - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA, 0)*(F_O2_D - F_O2_A))/lung__q_D)[1:] + ((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA, 0)*(F_O2_D - F_O2_A))/lung__q_D)[:-1])))))[t >= 5] - (F_O2_D - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA, 0)*(F_O2_D - F_O2_A))/lung__q_D)[1:] + ((np.maximum(lung__v_ml, 0)*(F_O2_i - F_O2_D) - np.maximum(-lung__v_bA, 0)*(F_O2_D - F_O2_A))/lung__q_D)[:-1])))))[t >= 5][0])) <= 2e-2*np.ptp(F_O2_D[t >= 5]) + 1e-6"
+    },
+    {
+      "description": "inspired gas bounds: F_O2_D and F_O2_A never exceed F_O2_i (no O2 source other than inspired air), once the initial fractions have washed out (t >= 30 s). Run point only: with hypoxic inspired air (F_O2_i = 0.12) the 2 L pulmonary capillary pool, initialised at 0.20 ml/ml, releases O2 into the alveoli (M_O2 < 0) for longer than 30 s, which is physically correct",
+      "expr": "np.all((F_O2_D <= F_O2_i + 1e-9)[t >= 30]) & np.all((F_O2_A <= F_O2_i + 1e-9)[t >= 30])",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "F_O2_i": {"min": 0.12, "max": 0.6, "points": 4},
+      "F_CO2_i": {"min": 0.0, "max": 0.05, "points": 4},
+      "K_LOSSES": {"min": 1.0, "max": 1.2103, "points": 2},
+      "F_CO2_D_init": {"min": 0.0, "max": 0.06, "points": 3},
+      "F_O2_D_init": {"min": 0.12, "max": 0.21, "points": 3},
+      "F_CO2_A_init": {"min": 0.03, "max": 0.07, "points": 3},
+      "F_O2_A_init": {"min": 0.1, "max": 0.18, "points": 3}
+    },
+    "exclude": ["v_ml", "v_bA", "q_D", "q_A"],
+    "rationale": "Inspired O2 from hypoxic (12%) to 60% supplemental O2; inspired CO2 0-5% (hypercapnia challenges); K from the library 1 to the BTPS/STPD factor 1.2103 of Albanese. v_ml, v_bA, q_D, q_A are supplied by the lung in the harness, so their parameter values are unused and not swept."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.00025, 0.000125, 6.25e-05, 3.125e-05],
+    "t_end": 2.0,
+    "min_order": 0.8,
+    "tol": 0.01,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ],
+    "t_end": 10.0
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: normal alveolar P_O2 104 / P_CO2 40 mmHg and dead-space extremes (Albanese2014 Table 2-12); depends on the lung parameters (see lung review) so set up once those are settled"
+      },
+      "calibrate": {"note": "pending: candidate: capnography (end-tidal CO2 waveform) data; owner to choose"}
+    }
+  }
+}

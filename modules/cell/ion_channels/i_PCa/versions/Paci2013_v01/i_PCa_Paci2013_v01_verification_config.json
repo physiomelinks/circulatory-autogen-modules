@@ -1,0 +1,49 @@
+{
+  "module_type": "i_PCa",
+  "version": "Paci2013_v01",
+  "sim_time": 0.01,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["i_PCa"],
+  "run_parameters": {"Cai": 0.0005},
+  "invariants": [
+    {
+      "description": "i_PCa equals the Paci 2013 expression transcribed from the authors' CellML: sarcolemmal Ca pump I_PCa = g_PCa Cai/(Cai + KPCa); Vm declared but unused",
+      "expr": "np.max(np.abs(i_PCa - (g_PCa*Cai/(Cai + KPCa)))) <= 1e-9*max(1.0, np.max(np.abs(g_PCa*Cai/(Cai + KPCa))))"
+    },
+    {"description": "I_PCa is within [0, g_PCa]", "expr": "np.all((i_PCa >= 0) & (i_PCa <= g_PCa))"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 6},
+      "Cai": {"min": 1e-05, "max": 0.001, "points": 5, "scale": "log"}
+    },
+    "rationale": "Clamp inputs span the physiological operating range of a hiPSC-CM: Vm -100 to +50 mV, reversal potentials +/-30 mV about their resting values, gates over [0, 1], Cai 1e-5 to 1e-3 mM, Nai 5-20 mM, extracellular concentrations +/-50 %, T room to body temperature; drug switches 0/1; conductances by the default factors 0.5-2. R and F are physical constants (not swept)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the hiPSC-CM I-V / conductance data the current was fitted to (Ma et al. 2011, Am J Physiol Heart Circ Physiol 301:H2006, as used by Paci 2013) could be digitised and compared with the clamped steady-state current (gates at their steady state); needs the gate components composed with this one and owner approval of digitised data."
+      },
+      "calibrate": {
+        "note": "pending: the maximal conductance could be identified from the same I-V data once a baseline is agreed."
+      }
+    }
+  }
+}

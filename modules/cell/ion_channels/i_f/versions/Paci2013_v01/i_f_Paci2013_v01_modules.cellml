@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_f_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_f_Paci_2013">
+        <variable name="i_f" public_interface="out" units="A_per_F"/>
+        <variable name="g_f" public_interface="in" units="S_per_F"/>
+        <variable name="t" private_interface="out" public_interface="in" units="second"/>
+        <variable name="E_f" public_interface="in" units="volt"/>
+        <variable name="Vm" private_interface="out" public_interface="in" units="volt"/>
+        <variable name="Xf" private_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_f</ci>
+                <apply>
+                    <times/>
+                    <ci>g_f</ci>
+                    <ci>Xf</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Vm</ci>
+                        <ci>E_f</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

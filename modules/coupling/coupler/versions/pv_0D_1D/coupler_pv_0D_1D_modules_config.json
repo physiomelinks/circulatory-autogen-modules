@@ -1,0 +1,80 @@
+[
+  {
+    "module_type": "coupler",
+    "module_subtype": "pv_0D_1D",
+    "module_format": "cellml",
+    "component_file": "coupler_pv_0D_1D_modules.cellml",
+    "component_type": "pv_0D_1D_coupler_type",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "q_star",
+          "P_s_0D"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "0D_1D_port",
+        "variables": [
+          "P_t_star",
+          "A_star",
+          "flux"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "rho",
+        "Js2_per_m5",
+        "access",
+        "global_constant"
+      ],
+      [
+        "I",
+        "Js2_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "P_t_star",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "P_s_0D",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "P_s_star",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "A_star",
+        "m2",
+        "access",
+        "variable"
+      ],
+      [
+        "q_star",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "flux",
+        "kg",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

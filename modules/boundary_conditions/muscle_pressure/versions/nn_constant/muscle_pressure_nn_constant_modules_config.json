@@ -1,0 +1,28 @@
+[
+  {
+    "module_type": "muscle_pressure",
+    "module_subtype": "nn_constant",
+    "module_format": "cellml",
+    "component_file": "muscle_pressure_nn_constant_modules.cellml",
+    "component_type": "constant_pressure_generator_type",
+    "default_instance": "default",
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "thoracic_pressure_port",
+        "variables": [
+          "P"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "P",
+        "J_per_m3",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

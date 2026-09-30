@@ -1,0 +1,80 @@
+{
+  "module_type": "volume_sum",
+  "version": "nn",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": ["q_sum", "sum_blood_volume/q_mod_sum", "va/q", "vb/q", "va/v", "vb/v", "flow_out_a/v", "flow_out_b/v"],
+  "harness": {
+    "vessel_array": [
+      ["p_in_a", "nn_constant", "inlet_pressure", "", "va", "default"],
+      ["va", "pv", "arterial_simple", "p_in_a", "flow_out_a mod", "default"],
+      ["flow_out_a", "nn_constant", "outlet_flow", "va", "", "default"],
+      ["p_in_b", "nn_constant", "inlet_pressure", "", "vb", "default"],
+      ["vb", "pv", "arterial_simple", "p_in_b", "flow_out_b mod", "default"],
+      ["flow_out_b", "nn_constant", "outlet_flow", "vb", "", "default"],
+      ["mod", "nn", "volume_sum", "va vb", "", "default"]
+    ],
+    "parameters": [
+      ["P_p_in_a", "J_per_m3", 2000, "harness test value"],
+      ["v_flow_out_a", "m3_per_s", 0.0001, "harness test value"],
+      ["R_va", "Js_per_m6", 10000000.0, "harness test value"],
+      ["C_va", "m6_per_J", 1e-08, "harness test value"],
+      ["I_va", "Js2_per_m6", 100000.0, "harness test value"],
+      ["q_0_va", "m3", 0, "harness: zero unstressed volume"],
+      ["u_0_va", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["u_ext_va", "J_per_m3", 0, "harness: zero external pressure"],
+      ["P_p_in_b", "J_per_m3", 1500, "harness test value"],
+      ["v_flow_out_b", "m3_per_s", 2e-05, "harness test value"],
+      ["R_vb", "Js_per_m6", 10000000.0, "harness test value"],
+      ["C_vb", "m6_per_J", 1e-08, "harness test value"],
+      ["I_vb", "Js2_per_m6", 100000.0, "harness test value"],
+      ["q_0_vb", "m3", 0, "harness: zero unstressed volume"],
+      ["u_0_vb", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["u_ext_vb", "J_per_m3", 0, "harness: zero external pressure"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "the output is exactly the sum of the connected vessels' volumes, Σq = q_va + q_vb",
+      "expr": "np.max(np.abs(sum_blood_volume__q_mod_sum - (va__q + vb__q))) <= 1e-12*max(1e-30, np.max(np.abs(sum_blood_volume__q_mod_sum)))"
+    },
+    {
+      "description": "q_sum, the total on the exit volume_port, equals the generated sum exactly",
+      "expr": "np.max(np.abs(q_sum - sum_blood_volume__q_mod_sum)) <= 1e-12*max(1e-30, np.max(np.abs(sum_blood_volume__q_mod_sum)))"
+    },
+    {
+      "description": "volume balance: Σq(t) − Σq(0) = ∫(inflows − outflows) dt over both vessels (trapezoidal, < 1e-3 of max Σq)",
+      "expr": "np.max(np.abs((sum_blood_volume__q_mod_sum - sum_blood_volume__q_mod_sum[0]) - np.concatenate(([0.0], np.cumsum(0.5*((va__v + vb__v - flow_out_a__v - flow_out_b__v)[1:] + (va__v + vb__v - flow_out_a__v - flow_out_b__v)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(sum_blood_volume__q_mod_sum))"
+    },
+    {
+      "description": "steady state: Σq → C_a (P_in,a − R v_out,a) + C_b (P_in,b − R v_out,b) = 1e-8 (2000 − 1000) + 1e-8 (1500 − 200) = 2.3e-5 m^3 (0.1%)",
+      "expr": "abs(sum_blood_volume__q_mod_sum[-1] - 2.3e-5) <= 2.3e-8"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {},
+    "exclude": ["q"],
+    "rationale": "Nothing of the component to sweep: q is supplied by the connected vessels (the sum is formed by libcuflynx). The harness vessels have different pressures and outflows so the summed volumes differ and change in time."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {"status": "not_applicable", "reason": "bookkeeping component (sum of volumes); verified exactly."},
+      "calibrate": {"note": "not_applicable: bookkeeping component; nothing to calibrate."}
+    }
+  }
+}

@@ -1,0 +1,149 @@
+[
+  {
+    "module_type": "inlet_flow",
+    "module_subtype": "nn_fourier_8",
+    "module_format": "cellml",
+    "component_file": "inlet_flow_nn_fourier_8_modules.cellml",
+    "component_type": "fourier_flow_8_BC_type",
+    "default_instance": "default",
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "P"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "A_0",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_1",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_2",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_3",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_4",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_5",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_6",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_7",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A_8",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_0",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_1",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_2",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_3",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_4",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_5",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_6",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_7",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_8",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "P",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

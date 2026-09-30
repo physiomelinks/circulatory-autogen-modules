@@ -1,25 +1,32 @@
 """
-validation_test_calibrate: calibrate a component with libcuflynx parameter identification on
-one data set, then score its prediction of held-out data.
+validation_test_calibrate: calibrate a version, at one of its instances, with libcuflynx parameter
+identification on that instance's data, then score its prediction of held-out data.
 
-The inputs are ordinary libcuflynx files, committed in the module's validation/ directory, so
-the same calibration can be run with libcuflynx directly:
+The inputs are ordinary libcuflynx files, committed in the instance directory
+(versions/<version>/instances/<instance>/), so the same calibration can be run with libcuflynx
+directly:
 
-    validation/<component>_calibration_obs_data.json   obs_data fitted by CVS0DParamID
-    validation/<component>_params_for_id.csv           parameters calibrated, with bounds
-    validation/<component>_validation_obs_data.json    series over the full span, scored on
-                                                       prediction_window (held-out data)
+    <instance>_obs_data.json              obs_data fitted by CVS0DParamID ("obs_data_name": "<instance>")
+    <instance>_params_for_id.csv          parameters calibrated, with bounds
+    <instance>_validation_obs_data.json   series over the full span, scored on prediction_window
+                                          (held-out data; without it the obs_data is scored)
 
-The component is generated alone as a single vessel named "mod" (cam_testing.harness.VESSEL),
+and the results are written there too, and committed:
+
+    <instance>_calibrated_parameters.csv  the instance's parameters with the calibrated values
+    <instance>_calibration.json           summary: method, cost, fitted values, scores, date
+
+The version is generated alone as a single vessel named "mod" (cam_testing.harness.VESSEL),
 so operands are "mod/<variable>" and params_for_id vessel_name is "mod".
 
-Spec (validation.calibrate in <name>_tests.yaml):
+Spec (validation.<instance>.calibrate in <module_type>_<version>_verification_config.json; file
+references relative to the version directory, defaulting to the instance's files):
 
     status: active
     source: citation / URL
-    obs_data: validation/<component>_calibration_obs_data.json
-    params_for_id: validation/<component>_params_for_id.csv
-    validation_obs_data: validation/<component>_validation_obs_data.json
+    obs_data: instances/<instance>/<instance>_obs_data.json
+    params_for_id: instances/<instance>/<instance>_params_for_id.csv
+    validation_obs_data: instances/<instance>/<instance>_validation_obs_data.json
     prediction_window: [15, 20]           model time scored for series predictions (optional)
     initial_parameters: {a: 0.8}          optional optimiser start (default: nominal values)
     starts: [{a: 1}, {a: -1}]             optional: several starts, each calibrated and checked
@@ -33,11 +40,12 @@ Spec (validation.calibrate in <name>_tests.yaml):
     threshold: 0.5                        on the prediction window
 
 The obs_data files for tabular data are made with
-    python -m cam_testing.calibrate from-csv --csv validation/data.csv --time-column Year \
+    python -m cam_testing.calibrate from-csv --csv instances/<instance>/data.csv --time-column Year \
         --time-offset 1900 --variables x=Hare y=Lynx --window 0 15 --noise relative 0.25 \
-        --out validation/<component>_calibration_obs_data.json
+        --name <instance> --out instances/<instance>/<instance>_obs_data.json
 """
 import contextlib
+import copy
 import csv
 import io
 import json
@@ -48,8 +56,8 @@ import numpy as np
 from cam_testing import harness, plots
 
 
-def load_data(module_dir, v):
-    with open(os.path.join(module_dir, v['data'])) as f:
+def load_data(data_dir, v):
+    with open(os.path.join(data_dir, v['data'])) as f:
         rows = list(csv.DictReader(f, skipinitialspace=True))
     rows = [{k.strip(): val for k, val in r.items()} for r in rows]
     t = np.array([float(r[v.get('time_column', 't')]) for r in rows]) - float(v.get('time_offset', 0.0))
@@ -64,7 +72,7 @@ def score(metric, model, data):
     return float(np.sqrt(np.mean((model - data) ** 2)) / rng)
 
 
-def obs_data_from_series(t, data, window, noise, unit='dimensionless'):
+def obs_data_from_series(t, data, window, noise, unit='dimensionless', name=None):
     """libcuflynx obs_data (series items) for data evenly spaced from model time 0."""
     mask = (t >= window[0] - 1e-9) & (t <= window[1] + 1e-9)
     tw = t[mask]
@@ -87,8 +95,10 @@ def obs_data_from_series(t, data, window, noise, unit='dimensionless'):
             'weight': 1.0, 'value': [float(x) for x in values], 'std': [float(x) for x in std],
             'obs_dt': float(dts[0]), 'experiment_idx': 0, 'subexperiment_idx': 0,
         })
-    return {'protocol_info': {'pre_times': [0.0], 'sim_times': [[float(tw[-1])]], 'params_to_change': {}},
-            'data_items': items, 'prediction_items': []}
+    out = {'obs_data_name': name} if name else {}
+    out.update({'protocol_info': {'pre_times': [0.0], 'sim_times': [[float(tw[-1])]], 'params_to_change': {}},
+                'data_items': items, 'prediction_items': []})
+    return out
 
 
 def series_from_obs_data(obs):
@@ -116,7 +126,7 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
     from libcuflynx.param_id.paramID import CVS0DParamID
 
     component = cm.component
-    by_var = {p.variable_name: p for p in component.parameters()}
+    by_var = {p.variable_name: p for p in cm.parameters()}
     cal_end = float(obs['protocol_info']['sim_times'][0][-1])
     dts = [float(i['obs_dt']) for i in obs['data_items'] if i.get('data_type') == 'series']
     dt = min(dts + [float(cm.spec['dt'])])
@@ -125,7 +135,7 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
         # start the optimiser somewhere other than the nominal values: a model generated with them
         work_dir = os.path.join(cm.work_dir, f'calibration_{tag}')
         overrides = {harness.parameter_name(by_var[k]): float(val) for k, val in start_values.items()}
-        model_path = harness.generate(component, work_dir, overrides=overrides)
+        model_path = cm.generate(work_dir, overrides=overrides)
     inp = {
         'model_path': model_path, 'model_type': 'cellml',
         'file_prefix': os.path.splitext(os.path.basename(model_path))[0],
@@ -142,7 +152,9 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
         pid = CVS0DParamID.init_from_all_dicts(inp, obs, params_for_id)
         pid.run()
         best = np.asarray(pid.get_best_param_vals(), dtype=float).ravel()
-    return {p['param_name']: float(val) for p, val in zip(params_for_id, best)}, inp['param_id_method']
+        cost = getattr(getattr(pid, 'param_id', None), 'best_cost', None)
+    cal = {p['param_name']: float(val) for p, val in zip(params_for_id, best)}
+    return cal, inp['param_id_method'], (float(cost) if cost is not None and np.isfinite(cost) else None)
 
 
 def _evaluate(cm, v, val_obs, calibrated, cal_end):
@@ -151,8 +163,7 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end):
     using libcuflynx's own operation functions."""
     from libcuflynx.param_id.operation_funcs import get_operation_funcs_dict_for_mode
 
-    component = cm.component
-    by_var = {p.variable_name: p for p in component.parameters()}
+    by_var = {p.variable_name: p for p in cm.parameters()}
     series = series_from_obs_data(val_obs)
     constants = [i for i in val_obs['data_items'] if i.get('data_type') == 'constant']
     t_end = float(val_obs['protocol_info']['sim_times'][0][-1])
@@ -188,12 +199,21 @@ def run(cm, v, plot_path):
     from cam_testing.checks import FAILED, PASSED, Result
 
     component = cm.component
-    mdir = component.module.dir
-    with open(os.path.join(mdir, v['obs_data'])) as f:
+    inst = cm.instance
+    vdir = component.dir
+
+    def path(key, default):
+        # the spec's file reference (relative to the version directory), else the instance's convention
+        return os.path.join(vdir, v[key]) if v.get(key) else default
+    obs_path = path('obs_data', inst.obs_data_path)
+    with open(obs_path) as f:
         obs = json.load(f)
-    with open(os.path.join(mdir, v['validation_obs_data'])) as f:
+    val_path = path('validation_obs_data', inst.validation_obs_data_path
+                    if os.path.isfile(inst.validation_obs_data_path) else obs_path)
+    with open(val_path) as f:
         val_obs = json.load(f)
-    params_for_id = read_params_for_id(os.path.join(mdir, v['params_for_id']))
+    pfi_path = path('params_for_id', inst.params_for_id_path)
+    params_for_id = read_params_for_id(pfi_path)
     cal_end = float(obs['protocol_info']['sim_times'][0][-1])
     metric = v.get('metric', 'log_rmse')
     threshold = float(v.get('threshold', 0.5))
@@ -206,10 +226,10 @@ def run(cm, v, plot_path):
     starts = v.get('starts') or [v.get('initial_parameters') or {}]
     runs, problems, figs = [], [], []
     for n, start_values in enumerate(starts):
-        calibrated, method = _calibrate_once(cm, v, obs, params_for_id, start_values, n)
+        calibrated, method, cost = _calibrate_once(cm, v, obs, params_for_id, start_values, n)
         tm, out, series, cal_s, pred_s, z_s = _evaluate(cm, v, val_obs, calibrated, cal_end)
         label = ', '.join(f'{k}={val:g}' for k, val in start_values.items()) or 'nominal'
-        runs.append({'start': start_values, 'calibrated_parameters': calibrated, 'calibration_scores': cal_s,
+        runs.append({'start': start_values, 'calibrated_parameters': calibrated, 'cost': cost, 'calibration_scores': cal_s,
                      'prediction_scores': pred_s, 'constant_items': z_s})
         for var, sc in pred_s.items():
             if sc > threshold:
@@ -229,7 +249,7 @@ def run(cm, v, plot_path):
             if v.get('prediction_window'):
                 title += f', predicting {v["prediction_window"][0]:g} < t ≤ {v["prediction_window"][1]:g}'
             figs.append(plots.plot_model_vs_data(
-                plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}'), tm,
+                plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst), tm,
                 {k: out[k] for k in series}, {k: ts for k, (ts, _) in series.items()},
                 {k: d for k, (_, d) in series.items()}, cm.units(),
                 title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end))
@@ -238,8 +258,9 @@ def run(cm, v, plot_path):
     for r in runs:
         for k, val in r['calibrated_parameters'].items():
             validated.setdefault(k, []).append(val)
+    files = [os.path.relpath(p, vdir) for p in (obs_path, pfi_path, val_path)]
     metrics = {'metric': metric, 'threshold': threshold, 'method': method, 'source': v.get('source', ''),
-               'files': [v['obs_data'], v['params_for_id'], v['validation_obs_data']], 'runs': runs,
+               'files': sorted(set(files), key=files.index), 'runs': runs,
                'calibrated_parameters': runs[0]['calibrated_parameters'] if len(runs) == 1 else
                {k: vals for k, vals in validated.items()},
                'validated_values': {k: vals for k, vals in validated.items()}}
@@ -250,9 +271,38 @@ def run(cm, v, plot_path):
         + ', '.join(f'{k}={x:.4g}' for k, x in r['calibrated_parameters'].items())
         + (f" (prediction {metric} {max(r['prediction_scores'].values()):.3g})" if r['prediction_scores'] else '')
         for r in runs)
+    write_calibrated(cm, runs[0]['calibrated_parameters'], metrics, not problems, summary)
+    metrics['written'] = [os.path.basename(inst.calibrated_parameters_path), os.path.basename(inst.calibration_path)]
     if problems:
         return Result('validation_test_calibrate', FAILED, '; '.join(problems[:3]), metrics, figs, problems)
     return Result('validation_test_calibrate', PASSED, summary, metrics, figs)
+
+
+def write_calibrated(cm, calibrated, metrics, passed, summary):
+    '''<instance>_calibrated_parameters.csv (the instance's rows, calibrated values replaced, the
+    reference noting the calibration) and <instance>_calibration.json (the summary).'''
+    import datetime
+    from cam_testing.library import write_parameters
+    inst = cm.instance
+    date = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
+    params = []
+    for p in cm.parameters():
+        p = copy.copy(p)
+        if p.variable_name in calibrated:
+            p.value = f'{calibrated[p.variable_name]:.10g}'
+            p.data_reference = (f'calibrated to {os.path.basename(inst.obs_data_path)} '
+                                f'({metrics.get("method")}, {date})')
+            p.sourced = 'no'
+        params.append(p)
+    write_parameters(inst.calibrated_parameters_path, params)
+    summary_json = {'instance': inst.name, 'version': cm.component.key, 'date': date, 'passed': passed,
+                    'summary': summary, 'method': metrics.get('method'), 'files': metrics.get('files'),
+                    'cost': (metrics.get('runs') or [{}])[0].get('cost'),
+                    'calibrated_parameters': calibrated, 'runs': metrics.get('runs'),
+                    'metric': metrics.get('metric'), 'threshold': metrics.get('threshold')}
+    with open(inst.calibration_path, 'w') as f:
+        json.dump(summary_json, f, indent=1, default=float)
+        f.write('\n')
 
 
 def main(argv=None):
@@ -266,12 +316,13 @@ def main(argv=None):
     fc.add_argument('--variables', nargs='+', required=True, help='model_var=csv_column')
     fc.add_argument('--window', nargs=2, type=float, required=True)
     fc.add_argument('--noise', nargs=2, default=['relative', '0.1'], help='relative|absolute VALUE')
+    fc.add_argument('--name', help='obs_data_name (the instance the file belongs to)')
     fc.add_argument('--out', required=True)
     args = parser.parse_args(argv)
     spec = {'data': os.path.abspath(args.csv), 'time_column': args.time_column, 'time_offset': args.time_offset,
             'variables': dict(x.split('=', 1) for x in args.variables)}
     t, data = load_data('/', spec)
-    obs = obs_data_from_series(t, data, args.window, args.noise)
+    obs = obs_data_from_series(t, data, args.window, args.noise, name=args.name)
     with open(args.out, 'w') as f:
         json.dump(obs, f, indent=1)
     print(f'wrote {args.out}')

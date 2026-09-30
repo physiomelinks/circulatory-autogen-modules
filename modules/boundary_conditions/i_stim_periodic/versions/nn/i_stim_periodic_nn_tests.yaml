@@ -1,0 +1,7 @@
+module_type: i_stim_periodic
+version: nn
+reviewed: false
+notes: 'Rectangular stimulus current in nA: i = -stim_flag i_amplitude during the first pulse_duration of each period between
+  t_start and t_end (negative = inward/depolarising in the usual convention). Algebraic, no states. Sign: i = -stim_flag i_amplitude,
+  so a positive amplitude gives a negative (inward, depolarising in the usual convention) current; the opposite sign to the
+  Paci component. Timing and amplitude reuse the Paci 2013 protocol (no source of its own).'

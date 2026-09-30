@@ -7,9 +7,9 @@ the sweep uses (bc_sweep.ranges, or bc_sweep.factors x nominal; log scale where 
 so). Every sample is run with the component's solver settings and counts as a failure when the
 run errors, an output is non-finite, or an invariant is violated.
 
-Outputs, per component, committed in modules/<name>/risk/ so they are available on any clone:
-  <component>_risk.json          summaries + a fitted failure classifier (coefficients only)
-  <component>_risk_samples.npz   the samples and whether each failed
+Outputs, per version, committed in versions/<version>/risk/ so they are available on any clone:
+  <module_type>_<version>_risk.json          summaries + a fitted failure classifier (coefficients only)
+  <module_type>_<version>_risk_samples.npz   the samples and whether each failed
   - overall failure probability with a 95% interval
   - per-parameter failure-risk curves P(fail | parameter) with 95% intervals
   - a first-order importance of each parameter for failure: the correlation ratio eta^2, the
@@ -18,7 +18,7 @@ Outputs, per component, committed in modules/<name>/risk/ so they are available 
   - a logistic-regression classifier on quadratic features of the unit-box coordinates, giving a
     smooth P(fail | parameters) anywhere in the box; its 5-fold cross-validated AUC is stored
 
-    python -m cam_testing.risk --module Lotka_Volterra [--samples 1024] [--component ID]
+    python -m cam_testing.risk --module Lotka_Volterra [--samples 1024] [--component Lotka_Volterra/nn]
 """
 import argparse
 import json
@@ -28,7 +28,7 @@ import os
 import numpy as np
 
 from cam_testing import checks, harness, plots
-from cam_testing.library import load_module, module_names
+from cam_testing.library import all_versions
 
 DEFAULT_SAMPLES = 512
 DISCRETE = {}   # id(ComponentModel) -> {variable: allowed values} for discrete sweep ranges
@@ -180,15 +180,15 @@ def analyse(cm, n_samples=DEFAULT_SAMPLES, seed=0, corner_max=6):
 
 
 def risk_dir(component):
-    return os.path.join(component.module.dir, 'risk')
+    return component.risk_dir
 
 
 def result_path(component):
-    return os.path.join(risk_dir(component), f'{component.id}_risk.json')
+    return os.path.join(risk_dir(component), f'{component.stem}_risk.json')
 
 
 def samples_path(component):
-    return os.path.join(risk_dir(component), f'{component.id}_risk_samples.npz')
+    return os.path.join(risk_dir(component), f'{component.stem}_risk_samples.npz')
 
 
 def unit_coords(x, box):
@@ -269,7 +269,7 @@ def make_plots(component, result, x=None, failed=None):
     figs.append(plots.plot_risk_marginals(checks.plot_path(component, 'risk_marginals'), per_param, ranked,
                                           result['failure_probability'],
                                           f'{component.label}: failure risk by parameter'))
-    return [os.path.relpath(f, component.module.dir) for f in figs]
+    return [os.path.relpath(f, component.dir) for f in figs]
 
 
 def load(component):
@@ -310,33 +310,34 @@ def local_risk(component, values, k=25):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--module', action='append', default=[])
-    parser.add_argument('--component', action='append', default=[])
+    parser.add_argument('--module', action='append', default=[], help='module_type or category path (repeatable)')
+    parser.add_argument('--component', action='append', default=[], help='version, <module_type>/<version> (repeatable)')
     parser.add_argument('--samples', type=int, default=DEFAULT_SAMPLES)
     parser.add_argument('--seed', type=int, default=0)
+    parser.add_argument('--reviewed-only', action='store_true', help='only versions whose spec has reviewed: true')
     args = parser.parse_args(argv)
-    for name in args.module or module_names():
-        module = load_module(name)
-        for component in module.components():
-            if args.component and component.id not in args.component:
-                continue
-            if component.spec.get('skip'):
-                continue
-            cm = checks.ComponentModel(component)
-            try:
-                r = analyse(cm, args.samples, args.seed)
-            except harness.MissingParameters as e:
-                print(f'{name}/{component.id}: skipped ({e})')
-                continue
-            if r is None:
-                print(f'{name}/{component.id}: no parameters to sample')
-                continue
-            lo, hi = r['ci']
-            top = ', '.join(f"{x['variable']} ({x['importance']:.2f})" for x in r['ranking'][:3])
-            auc = r['classifier'].get('cv_auc')
-            print(f"{name}/{component.id}: P(fail) = {r['failure_probability']:.3f} [{lo:.3f}, {hi:.3f}] "
-                  f"over {r['n_samples']} samples; most influential: {top}"
-                  + (f"; classifier CV AUC {auc:.2f}" if auc is not None else ''))
+    for component in all_versions(args.module):
+        if args.reviewed_only and not component.reviewed:
+            continue
+        if args.component and component.key not in args.component and component.id not in args.component:
+            continue
+        if component.spec.get('skip') or component.is_supermodule:
+            continue
+        cm = checks.ComponentModel(component)
+        try:
+            r = analyse(cm, args.samples, args.seed)
+        except harness.MissingParameters as e:
+            print(f'{component.key}: skipped ({e})')
+            continue
+        if r is None:
+            print(f'{component.key}: no parameters to sample')
+            continue
+        lo, hi = r['ci']
+        top = ', '.join(f"{x['variable']} ({x['importance']:.2f})" for x in r['ranking'][:3])
+        auc = r['classifier'].get('cv_auc')
+        print(f"{component.key}: P(fail) = {r['failure_probability']:.3f} [{lo:.3f}, {hi:.3f}] "
+              f"over {r['n_samples']} samples; most influential: {top}"
+              + (f"; classifier CV AUC {auc:.2f}" if auc is not None else ''))
 
 
 if __name__ == '__main__':

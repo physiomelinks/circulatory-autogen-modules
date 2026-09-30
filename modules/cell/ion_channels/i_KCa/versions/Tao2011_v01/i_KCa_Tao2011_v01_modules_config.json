@@ -1,0 +1,90 @@
+[
+  {
+    "module_type": "i_KCa",
+    "module_subtype": "Tao2011_v01",
+    "module_format": "cellml",
+    "component_file": "i_KCa_Tao2011_v01_modules.cellml",
+    "component_type": "i_KCa_Tao_2011",
+    "default_instance": "default",
+    "notes": "Built for: sympathetic neuron (Tao et al. 2011)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "KCa_current",
+        "variables": [
+          "i_KCa"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "KCa_current",
+        "variables": [
+          "i_KCa"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_KCa",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_kcf",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "g_kcs",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "kcf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "kcs",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_kcf",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_kcs",
+        "second",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

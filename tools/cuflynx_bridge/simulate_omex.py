@@ -103,6 +103,12 @@ def run(job, binary):
             else:
                 res['model_id'] = body.get('model_id')
                 res['import_warnings'] = body.get('warnings') or []
+                # what CUFLynx's importer took from the archive
+                def _role(x):
+                    return {k: x.get(k) for k in ('filename', 'error')} if isinstance(x, dict) else None
+                res['imported'] = {'model_filename': body.get('model_filename'),
+                                   'obs_data': _role(body.get('obs_data')),
+                                   'params_for_id': _role(body.get('params_for_id'))}
                 res['stage'] = 'simulate'
                 # the states, plus the component's own outputs where CUFLynx can resolve them
                 outputs = list(dict.fromkeys((body.get('odes') or []) + list(m.get('extra_outputs') or [])))

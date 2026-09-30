@@ -1,0 +1,50 @@
+{
+  "module_type": "i_Na_j_gate",
+  "version": "Paci2013_v01",
+  "sim_time": 0.3,
+  "pre_time": 0.0,
+  "dt": 0.0015,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["j"],
+  "run_parameters": {"Vm": -0.02},
+  "invariants": [
+    {
+      "description": "j matches the exact voltage-clamp solution j(t) = j_inf(Vm) + (j_init - j_inf) exp(-t/tau_j(Vm)), with j_inf and tau_j transcribed from the Paci 2013 CellML (not from this module)",
+      "expr": "np.max(np.abs(j - ((1/np.sqrt(1+np.exp(((Vm*1000)+72.1)/5.7))) + (j_init - (1/np.sqrt(1+np.exp(((Vm*1000)+72.1)/5.7))))*np.exp(-t/(7/((np.where(Vm<-0.04, (-25428*np.exp(0.2444*(Vm*1000))-6.948e-6*np.exp(-0.04391*(Vm*1000)))*((Vm*1000)+37.78)/(1+np.exp(0.311*((Vm*1000)+79.23))), 0)+np.where(Vm<-0.04, 0.02424*np.exp(-0.01052*(Vm*1000))/(1+np.exp(-0.1378*((Vm*1000)+40.14))), 0.6*np.exp(0.057*(Vm*1000))/(1+np.exp(-0.1*((Vm*1000)+32)))))*1000)))))) <= 1e-5"
+    },
+    {"description": "j stays in [0, 1]", "expr": "np.all((j >= -1e-9) & (j <= 1 + 1e-9))"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 7},
+      "j_init": {"min": 0.0, "max": 1.0, "points": 5}
+    },
+    "rationale": "Vm spans the physiological range of a cardiomyocyte action potential/clamp protocol (-100 to +50 mV); the initial gate value spans its whole range [0, 1]."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.35, 0.175, 0.0875, 0.04375],
+    "t_end": 7.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the steady-state/time-constant curves of the j gate in Paci et al. 2013 (fitted to hiPSC-CM voltage-clamp data, Ma et al. 2011) could be digitised and compared with the clamp steady state; not set up (figure digitisation needs owner approval)."
+      },
+      "calibrate": {
+        "note": "not_applicable: gate kinetics have no free parameters in this module (all constants are hard-coded in the CellML), so there is nothing to identify."
+      }
+    }
+  }
+}

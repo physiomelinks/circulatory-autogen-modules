@@ -1,73 +1,80 @@
 """
-Supermodules: modules/supermodules/<name>/, a module made of other modules.
+Supermodule versions: a version whose config entry has module_format "supermodule" -- a module made
+of other modules' versions. Such a version replaces a monolithic one of the same module_type (e.g.
+cardiac/heart version Argus2026_v01, cell/neurons/soma version sympathetic).
 
-  <name>_modules_config.json   a config entry with module_format "supermodule": its module_type /
-                               module_subtype, the submodules (a vessel array of library modules,
-                               internal connections only) and default_parameters
-  <name>_parameters.csv        default parameters, {var}_{submodule} (local names) or globals
-  <name>_supermodule.yaml      description and tests
+  <module_type>_<version>_modules_config.json   one entry: module_format "supermodule", the
+                                                submodules (a vessel array of library versions, each
+                                                with its "instance"; internal connections only) and
+                                                "default_instance"
+  instances/<instance>/<instance>_parameters.csv  its parameters, {var}_{submodule} or globals
+  <module_type>_<version>_tests.yaml / _verification_config.json   description; supermodule.globals and
+                                                supermodule.equivalent (system models it must reproduce)
 
-A model uses one instance, e.g. {"name": "heart", "module_type": "heart", "module_subtype":
-"supermodule", "per_submodule_inputs": {"ra": ["venous_svc"]}, "per_submodule_outputs": {"aov":
-["aortic_root"]}}. libcuflynx expands it: each submodule becomes <instance>_<submodule>, the host
-modules in per_submodule_inputs / per_submodule_outputs are coupled to that submodule, and the
-default parameters are renamed to the prefixed names (the model's own parameter values win).
+A model uses one record, e.g. {"name": "heart", "module_type": "heart", "module_subtype":
+"Argus2026_v01", "instance": "default", "per_submodule_inputs": {"ra": ["venous_svc"]},
+"per_submodule_outputs": {"aov": ["aortic_root"]}}. libcuflynx expands it: each submodule becomes
+<name>_<submodule>, the host modules in per_submodule_inputs / per_submodule_outputs are coupled to
+that submodule, and the instance's parameters are renamed to the prefixed names. Precedence: the
+model's parameters file > the supermodule's instance > the submodules' instances.
+
+The version-level tests (tests/test_modules.py):
+  supermodule_structure_test    every submodule names a library (module_type, version) and an instance
+                                it has; internal connections name sibling submodules; the instance's
+                                parameters name submodules (or are declared globals)
+  supermodule_equivalence_test  each supermodule.equivalent entry: a system model using the version
+                                reproduces a system model with the submodules written out
 """
-import glob
-import json
+import csv
 import os
-from dataclasses import dataclass
 
-import yaml
-
-from cam_testing.library import MODULES_DIR
-
-SUPERMODULE_DIR = os.path.join(MODULES_DIR, 'supermodules')
-
-
-@dataclass
-class Supermodule:
-    name: str
-    dir: str
-    entry: dict       # the module_format "supermodule" config entry
-    spec: dict
-
-    @property
-    def submodules(self):
-        return self.entry.get('submodules') or []
-
-    @property
-    def submodule_names(self):
-        return [s['name'] for s in self.submodules]
-
-    @property
-    def defaults_path(self):
-        d = self.entry.get('default_parameters')
-        return os.path.join(self.dir, d) if d else None
+from cam_testing import checks, library
 
 
 def supermodules():
-    out = []
-    for cfg in sorted(glob.glob(os.path.join(SUPERMODULE_DIR, '*', '*_modules_config.json'))):
-        d = os.path.dirname(cfg)
-        name = os.path.basename(d)
-        spec_path = os.path.join(d, f'{name}_supermodule.yaml')
-        spec = {}
-        if os.path.isfile(spec_path):
-            with open(spec_path) as f:
-                spec = yaml.safe_load(f) or {}
-        with open(cfg) as f:
-            for entry in json.load(f):
-                if entry.get('module_format') == 'supermodule':
-                    out.append(Supermodule(entry.get('module_type', name), d, entry, spec))
-    return out
+    '''Every supermodule version in the library.'''
+    return [v for v in library.all_versions() if v.is_supermodule]
 
 
-def load_supermodule(name):
-    for s in supermodules():
-        if s.name == name:
-            return s
-    raise KeyError(f'no supermodule {name!r} in {SUPERMODULE_DIR}')
+def load_supermodule(key):
+    '''A supermodule version by "<module_type>/<version>" (or its module_type, if it has one supermodule version).'''
+    if '/' in key:
+        return library.version_by_key(key)
+    found = [v for v in supermodules() if v.vessel_type == key]
+    if len(found) != 1:
+        raise KeyError(f'{key}: {len(found)} supermodule versions')
+    return found[0]
+
+
+def structure_problems(version):
+    index = library.version_index()
+    names = set(version.submodule_names)
+    problems = []
+    if len(names) != len(version.submodules):
+        problems.append('duplicate submodule names')
+    for sub in version.submodules:
+        key = (sub['module_type'], sub['module_subtype'])
+        target = index.get(key)
+        if target is None:
+            problems.append(f'{sub["name"]}: ({key[0]}, {key[1]}) is not a version in the module library')
+        elif sub.get('instance') and sub['instance'] not in target.instance_names():
+            problems.append(f'{sub["name"]}: {key[0]}/{key[1]} has no instance {sub["instance"]} '
+                            f'(it has {target.instance_names()})')
+        for n in sub.get('inp_instances', []) + sub.get('out_instances', []):
+            if n not in names:
+                problems.append(f'{sub["name"]}: {n} is not a submodule (external connections belong in the host\'s '
+                                'per_submodule_inputs / per_submodule_outputs)')
+    declared = (version.spec.get('supermodule') or {}).get('globals') or ['T', 'rho', 'l_eff']
+    for inst in version.instances():
+        with open(inst.parameters_path) as f:
+            for row in csv.DictReader(f):
+                var = (row.get('variable_name') or '').strip()
+                owner = next((n for n in sorted(names, key=len, reverse=True) if var.endswith('_' + n)), None)
+                if owner is None and var not in declared:
+                    problems.append(f'instance {inst.name}: parameter {var} names no submodule and is not a declared global')
+    if version.default_instance_name not in version.instance_names():
+        problems.append(f'default_instance {version.default_instance_name} has no instances/ directory')
+    return problems
 
 
 def prefixed_output_map(names, instance, submodules):
@@ -78,3 +85,56 @@ def prefixed_output_map(names, instance, submodules):
         vessel, _, var = n.partition('/')
         out[n] = f'{instance}_{vessel}/{var}' if vessel in subs else n
     return out
+
+
+def equivalence(version, entry, work_dir):
+    '''(rows, missing) comparing entry["model"] (uses the version) with entry["reproduces"].'''
+    from cam_testing import system as systems
+    model = systems.load_system(entry['model'])
+    target = systems.load_system(entry['reproduces'])
+    solver_info = entry.get('solver_info') or {'rtol': 1e-10, 'atol': 1e-12}
+    t_ref, ref = systems.simulate(systems.generate(target, os.path.join(work_dir, 'target')), target.spec, solver_info)
+    t_new, new = systems.simulate(systems.generate(model, os.path.join(work_dir, 'model')), model.spec, solver_info)
+    # submodule outputs renamed <instance>_<sub>; an explicit output_map in the spec (for nested
+    # supermodules, or variables that moved between components) takes precedence
+    output_map = {**prefixed_output_map(ref, entry.get('instance', version.vessel_type), version.submodule_names),
+                  **(entry.get('output_map') or {})}
+    ignore = entry.get('ignore') or {}
+    ref = {k: v for k, v in ref.items() if k not in ignore}
+    return systems.compare(ref, new, output_map, float(entry.get('tol', 1e-9)))
+
+
+def equivalence_result_name(entry):
+    return 'supermodule_equivalence_test__' + library.safe_id(entry['model'])
+
+
+def structure_check(version):
+    problems = structure_problems(version)
+    if problems:
+        r = checks.Result('supermodule_structure_test', checks.FAILED, f'{len(problems)} problems', details=problems)
+    else:
+        r = checks.Result('supermodule_structure_test', checks.PASSED,
+                          f'{len(version.submodules)} submodules, all library versions with their instances; '
+                          'connections internal; parameters name submodules or globals')
+    return checks.save(version, r)
+
+
+def equivalence_check(version, entry, work_dir):
+    tol = float(entry.get('tol', 1e-9))
+    name = equivalence_result_name(entry)
+    try:
+        rows, missing = equivalence(version, entry, work_dir)
+    except Exception as e:  # noqa: BLE001
+        return checks.save(version, checks.Result(name, checks.FAILED, f'{type(e).__name__}: {str(e)[-1500:]}'))
+    bad = [r for r in rows if not r['ok']]
+    worst = max(rows, key=lambda r: r['difference']) if rows else None
+    metrics = {'model': entry['model'], 'reproduces': entry['reproduces'], 'compared': len(rows),
+               'missing': missing, 'tol': tol, 'worst': worst}
+    if bad or missing or not rows:
+        r = checks.Result(name, checks.FAILED, f'{len(bad)} of {len(rows)} outputs differ; {len(missing)} missing',
+                          metrics, details=[f"{x['reference']} -> {x['model']}: {x['difference']:.3g}" for x in bad[:20]]
+                          + missing[:20])
+    else:
+        r = checks.Result(name, checks.PASSED, f'{entry["model"]} reproduces {entry["reproduces"]}: all {len(rows)} '
+                          f'outputs within {tol:g} (worst {worst["reference"]} {worst["difference"]:.1e})', metrics)
+    return checks.save(version, r)

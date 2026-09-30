@@ -1,0 +1,72 @@
+[
+  {
+    "module_type": "efferent_resistance_effector",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "efferent_resistance_effector_nn_modules.cellml",
+    "component_type": "efferent_resistance_effector_Argus_type",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "sympathetic_efferent_firing_rate_port",
+        "variables": [
+          "f_s"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "resistance_delta_port",
+        "variables": [
+          "Delta_theta"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "G_theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "f_es_min",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_es_mid",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "tau_theta",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "f_s",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Delta_theta",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "sigma_theta",
+        "per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

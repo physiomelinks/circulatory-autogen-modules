@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="respiratory_gas_transport_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="respiratory_gas_transport_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!--constants-->
+        <variable name="F_O2_i" public_interface="in" units="dimensionless"/>
+        <variable name="F_CO2_i" public_interface="in" units="dimensionless"/>
+        <variable name="P_atm" public_interface="in" units="J_per_m3"/>
+        <variable name="P_ws" public_interface="in" units="J_per_m3"/>
+        <variable name="F_O2_D_init" public_interface="in" units="dimensionless"/>
+        <variable name="F_O2_A_init" public_interface="in" units="dimensionless"/>
+        <variable name="F_CO2_D_init" public_interface="in" units="dimensionless"/>
+        <variable name="F_CO2_A_init" public_interface="in" units="dimensionless"/>
+        <!-- This K causes a loss in mass? fix when turning into bond-graph-->
+        <variable name="K_LOSSES" public_interface="in" units="dimensionless"/>
+        <!-- volume fractions-->
+        <variable initial_value="F_O2_D_init" name="F_O2_D" public_interface="out" units="dimensionless"/>
+        <variable initial_value="F_CO2_D_init" name="F_CO2_D" public_interface="out" units="dimensionless"/>
+        <variable initial_value="F_O2_A_init" name="F_O2_A" public_interface="out" units="dimensionless"/>
+        <variable initial_value="F_CO2_A_init" name="F_CO2_A" public_interface="out" units="dimensionless"/>
+        <!-- partial pressures, outputs to the pulmonary gas exchange model-->
+        <variable name="P_O2_A" public_interface="out" units="J_per_m3"/>
+        <variable name="P_CO2_A" public_interface="out" units="J_per_m3"/>
+        <!-- inputs from lung model-->
+        <variable name="v_ml" public_interface="in" units="m3_per_s"/>
+        <variable name="v_bA" public_interface="in" units="m3_per_s"/>
+        <variable name="q_D" public_interface="in" units="m3"/>
+        <variable name="q_A" public_interface="in" units="m3"/>
+        <!--inputs from pulmonary gas exchange model-->
+        <variable name="M_O2" public_interface="in" units="m3_per_s"/>
+        <variable name="M_CO2" public_interface="in" units="m3_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>F_O2_D</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <max/>
+                                <ci>v_ml</ci>
+                                <cn cellml:units="m3_per_s">0</cn>
+                            </apply>
+                            <apply>
+                                <minus/>
+                                <ci>F_O2_i</ci>
+                                <ci>F_O2_D</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <max/>
+                                <apply>
+                                    <minus/>
+                                    <ci>v_bA</ci>
+                                </apply>
+                                <cn cellml:units="m3_per_s">0</cn>
+                            </apply>
+                            <apply>
+                                <minus/>
+                                <ci>F_O2_D</ci>
+                                <ci>F_O2_A</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>q_D</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>F_CO2_D</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <max/>
+                                <ci>v_ml</ci>
+                                <cn cellml:units="m3_per_s">0</cn>
+                            </apply>
+                            <apply>
+                                <minus/>
+                                <ci>F_CO2_i</ci>
+                                <ci>F_CO2_D</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <max/>
+                                <apply>
+                                    <minus/>
+                                    <ci>v_bA</ci>
+                                </apply>
+                                <cn cellml:units="m3_per_s">0</cn>
+                            </apply>
+                            <apply>
+                                <minus/>
+                                <ci>F_CO2_D</ci>
+                                <ci>F_CO2_A</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>q_D</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>F_O2_A</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <max/>
+                                <ci>v_bA</ci>
+                                <cn cellml:units="m3_per_s">0</cn>
+                            </apply>
+                            <apply>
+                                <minus/>
+                                <ci>F_O2_D</ci>
+                                <ci>F_O2_A</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>K_LOSSES</ci>
+                            <ci>M_O2</ci>
+                        </apply>
+                    </apply>
+                    <ci>q_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>F_CO2_A</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <max/>
+                                <ci>v_bA</ci>
+                                <cn cellml:units="m3_per_s">0</cn>
+                            </apply>
+                            <apply>
+                                <minus/>
+                                <ci>F_CO2_D</ci>
+                                <ci>F_CO2_A</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>K_LOSSES</ci>
+                            <ci>M_CO2</ci>
+                        </apply>
+                    </apply>
+                    <ci>q_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_O2_A</ci>
+                <apply>
+                    <times/>
+                    <ci>F_O2_A</ci>
+                    <apply>
+                        <minus/>
+                        <ci>P_atm</ci>
+                        <ci>P_ws</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_CO2_A</ci>
+                <apply>
+                    <times/>
+                    <ci>F_CO2_A</ci>
+                    <apply>
+                        <minus/>
+                        <ci>P_atm</ci>
+                        <ci>P_ws</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,70 @@
+module_type: gas_transport_simple
+version: nn
+reviewed: false
+notes: 'Well-mixed blood gas transport compartment (volume q_0, flow v) without exchange: q_0 dC/dt = v (C_in - C_out), plus
+  output partial pressures from the analytic inverse of the Spencer curves. With constant inflow content and flow, C_out =
+  C_in + (C_init - C_in) exp(-v t/q_0). Harness: pp_I terminal as a steady flow source (5 L/min).'
+reference_proposals:
+  k_1:
+    reference: Spencer1979; K1 = 14.99 mmHg as tabulated in Albanese2014 Table 2-6 (Spencer 1979 full text not accessed);
+      14.99 x 133.322 = 1998.5 Pa
+    sourced: 'yes'
+  k_2:
+    reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6); 194.4 x 133.322 = 25917.8 Pa (library 25917.4, 0.002%
+      low)
+    sourced: 'yes'
+  h_1:
+    reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+  h_2:
+    reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+  alpha_1:
+    reference: Spencer1979; alpha1 = 0.03198 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.399e-4 /Pa
+    sourced: 'yes'
+  alpha_2:
+    reference: Spencer1979; alpha2 = 0.05591 /mmHg (Albanese2014 Table 2-6); /133.322 = 4.194e-4 /Pa
+    sourced: 'yes'
+  beta_1:
+    reference: Spencer1979; beta1 = 0.008275 /mmHg (Albanese2014 Table 2-6); /133.322 = 6.207e-5 /Pa
+    sourced: 'yes'
+  beta_2:
+    reference: Spencer1979; beta2 = 0.03255 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.441e-4 /Pa
+    sourced: 'yes'
+  C_O2_sat:
+    reference: Spencer1979; C_sat,O2 = 9 mmol/L (Albanese2014 Table 2-6). Library 0.20448 ml/ml = 9 mmol/L x 22.72 ml/mmol;
+      the STPD molar volume 22.41 ml/mmol would give 0.2017 -- conversion factor to confirm
+    sourced: 'yes'
+  C_CO2_sat:
+    reference: Spencer1979; C_sat,CO2 = 86.11 mmol/L (Albanese2014 Table 2-6). Library 1.9564 = 86.11 x 22.72 ml/mmol (same
+      factor as C_O2_sat; 22.41 would give 1.930)
+    sourced: 'yes'
+  overcap_solubility:
+    reference: 'unreferenced_placeholder; numerical device: steep linear P_O2 rise (Pa per unit content) above the saturation
+      cap so the inverse curve stays finite'
+    sourced: 'no'
+  saturation_cap:
+    reference: 'unreferenced_placeholder; numerical device: content capped at 0.9999 of saturation before inverting the Spencer
+      curve'
+    sourced: 'no'
+  C_CO2_in:
+    reference: 'Spencer1979; test BC: arterial CO2 content at P_O2 100, P_CO2 40 mmHg (21.35 mmol/L x 22.72) = 0.485 ml/ml'
+    sourced: 'yes'
+    value: 0.485
+  C_O2_in:
+    reference: 'Spencer1979; test BC: arterial O2 content at P_O2 100, P_CO2 40 mmHg (8.75 mmol/L x 22.72) = 0.199 ml/ml'
+    sourced: 'yes'
+    value: 0.199
+  C_CO2_out_init:
+    reference: unreferenced_placeholder; initial condition (library 0.48)
+    sourced: 'no'
+  C_O2_out_init:
+    reference: unreferenced_placeholder; initial condition (library 0.20)
+    sourced: 'no'
+  q_0:
+    reference: unreferenced_placeholder; library 300 ml transport volume (arterial/venous pool lumped); owner to confirm which
+      pool it represents
+    sourced: 'no'
+review: reviews/gas_exchange_review.yaml
+review_scope: The review of the whole gas_exchange module (7 entries) before the move to versions; only the parts about this
+  version apply.

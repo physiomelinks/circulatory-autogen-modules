@@ -1,0 +1,19 @@
+module_type: P_outlet
+version: nn_micro
+reviewed: false
+notes: Constant-pressure outlet boundary (P is a parameter; the incoming flow v is accepted but unused). No equations; the
+  only check is that P is passed through unchanged.
+reference_proposals:
+  P:
+    reference: unreferenced_placeholder; outlet (venous) pressure of the network, 5 mmHg (666.6 Pa) as in the image-to-model
+      tutorial network; test value
+    sourced: 'no'
+    value: 666.6
+  v:
+    reference: unreferenced_placeholder; flow into the outlet, supplied by the upstream vessel in a network; not used by any
+      equation
+    sourced: 'no'
+    value: 1.0e-12
+review: reviews/microvasculature_network_review.yaml
+review_scope: The review of the whole microvasculature_network module (48 entries) before the move to versions; only the parts
+  about this version apply.

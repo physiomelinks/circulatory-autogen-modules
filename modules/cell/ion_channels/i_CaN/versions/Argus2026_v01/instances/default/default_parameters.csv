@@ -1,0 +1,12 @@
+variable_name,units,value,data_reference,sourced
+E_Ca,milliV,264.67332,"definitional; SN_varicosity E_Ca = RT/F ln(Cao/Cai) at Cao 2 mM, Cai 1e-4 mM (used when unconnected)",no
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+V_den_c,milliV,5,SN_simple: Tau2011_was_9.85,yes
+V_mid_c,milliV,8.1,SN_simple: Tau2011_was_8.1,yes
+c_init,dimensionless,0.01,SN_simple: Tau2011,yes
+g_CaN,microS,1e-5,SN_simple: to_be_identified,no
+hc_init,dimensionless,0.9,SN_simple: Tau2011,yes
+tau_c_max,millis,3.0,SN_simple: changed_from_belluzi1991_curves,yes
+tau_c_min,millis,0.2,SN_simple: changed_from_belluzi1991_curves,yes
+tau_hc,millis,20.0,SN_simple: changed_from_belluzi1991_curves,yes
+F,C_per_M,TODO,TODO,no

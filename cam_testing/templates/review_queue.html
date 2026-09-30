@@ -26,13 +26,15 @@ details summary { cursor: pointer; font-weight: 600; font-size: 0.88rem; color: 
   <header>
     <div class="eyebrow">circulatory-autogen-modules · review queue</div>
     <h1>Module review queue</h1>
-    <p>Each module still to review, with its potential-issues note, the questions to answer, and proposed fixes to the module (none applied). Full reports: <code>make serve</code>, then the module pages. After confirming a module's proposals: <code>python -m cam_testing.review apply --module NAME</code>, then set <code>reviewed: true</code>.</p>
-    <p class="muted">{{ modules|length }} modules awaiting review · {{ reviewed|length }} reviewed ({{ reviewed|join(', ') }}) · generated {{ generated }}</p>
-    <nav class="toc" aria-label="Modules">{% for m in modules %}<a href="#{{ m.name }}">{{ m.name }}</a>{% endfor %}</nav>
+    <p>Each version still to review, with its potential-issues note, the questions to answer, and proposed fixes (none applied). A review written for a whole module before the move to versions is shown once, with every version it covers. Full reports: <code>make serve</code>, then the version pages. After confirming a version's proposals: <code>python -m cam_testing.review apply --component MODULE_TYPE/VERSION</code> (or <code>--module MODULE_TYPE</code>), then set <code>reviewed: true</code> in its spec.</p>
+    <p class="muted">{{ modules|length }} reviews awaiting · {{ reviewed|length }} versions reviewed ({{ reviewed|join(', ') }}) · generated {{ generated }}</p>
+    <nav class="toc" aria-label="Reviews">{% for m in modules %}<a href="#{{ m.anchor }}">{{ m.name }}</a>{% endfor %}</nav>
   </header>
   {%- for m in modules %}
-  <section class="mod" id="{{ m.name }}">
-    <h2><a href="{{ m.href }}">{{ m.name }}</a> <span class="muted" style="font-size:0.85rem;font-weight:500">{{ m.n_components }} component{{ '' if m.n_components == 1 else 's' }}</span></h2>
+  <section class="mod" id="{{ m.anchor }}">
+    <h2><a href="{{ m.href }}">{{ m.name }}</a> <span class="muted" style="font-size:0.85rem;font-weight:500">{{ m.n_components }} version{{ '' if m.n_components == 1 else 's' }}</span></h2>
+    {%- if m.versions|length > 1 %}<details><summary>Versions ({{ m.versions|length }})</summary><p class="toc" style="margin:6px 0 0">{% for v in m.versions %}<a href="{{ v.href }}">{{ v.key }}</a>{% endfor %}</p></details>{% endif %}
+    {%- if m.scope %}<p class="muted" style="margin:0;font-size:0.84rem">{{ m.scope }}</p>{% endif %}
     <div class="meta">
       <span>{{ m.counts.passed }} passed</span><span>{{ m.counts.failed }} failed</span>
       <span>{{ m.n_known }} known issue{{ '' if m.n_known == 1 else 's' }}</span>

@@ -1,0 +1,44 @@
+module_type: Min_junction
+version: vp_noI
+reviewed: false
+notes: 'Flow-in / pressure-out RC compartment without inertance (litre / kPa): dq/dt = v_in_sum - v, v = (u - u_out)/R, u
+  = u_0 + (q - q_0)/C. Linear first order with time constant RC. Junction variant: the inflow/outflow is the sum over several
+  neighbours (a single constant alone). Tested in a harness (a1 + a2 -> mod): libcuflynx builds a junction only between real
+  vessels, so the neighbours are "simple" vp_noI (upstream, constant inflow at their open inlet) / pv_noI (downstream, constant
+  outflow at their open outlet) compartments with the same R and C. The neighbours are dynamic, so the checks are the port
+  sums, the Ohm and P-V laws, and mass balance rather than the single-compartment exact solution.'
+reference_proposals:
+  q_0:
+    reference: unreferenced_placeholder; unstressed volume not given in Bozkurt2019; 0.1 L test value
+    sourced: 'no'
+    value: 0.1
+  u_0:
+    reference: definitional; pressure at the unstressed volume (linear P-V law u = u_0 + (q - q_0)/C), 0
+    sourced: definitional
+    value: 0.0
+  C:
+    reference: 'Bozkurt2019; Table 2 (adult): systemic arterioles C = 1.7 mL/mmHg = 0.01275 L/kPa (representative compartment)'
+    sourced: 'yes'
+    value: 0.01275
+  q_init:
+    reference: definitional; initial volume q_0 + C x 12 kPa (mean systemic pressure 90 mmHg) = 0.253 L
+    sourced: definitional
+    value: 0.253
+  R:
+    reference: 'Bozkurt2019; Table 2 (adult): systemic arterioles R = 0.95 mmHg s/mL = 126.7 kPa s/L (used as the representative
+      compartment for this generic component)'
+    sourced: 'yes'
+    value: 126.7
+  u_out:
+    reference: unreferenced_placeholder; isolated-test boundary value (mean pressure - R x mean flow); in a network it is
+      supplied by the neighbouring compartment
+    sourced: 'no'
+    value: 1.446
+  v_in_sum:
+    reference: unreferenced_placeholder; isolated-test boundary value (mean flow); in a network it is supplied by the neighbouring
+      compartment
+    sourced: 'no'
+    value: 0.0833
+review: reviews/cvs_mvp_review.yaml
+review_scope: The review of the whole cvs_mvp module (23 entries) before the move to versions; only the parts about this version
+  apply.

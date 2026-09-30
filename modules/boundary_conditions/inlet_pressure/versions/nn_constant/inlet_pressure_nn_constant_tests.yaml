@@ -1,0 +1,18 @@
+module_type: inlet_pressure
+version: nn_constant
+reviewed: false
+notes: Constant pressure P imposed at the inlet of a vessel (the vessel supplies the flow v through the port). Tested upstream
+  of a BG arterial_simple pv vessel draining into a constant outflow (1e-4 m^3/s); steady state u = P − R v is analytic.
+reference_proposals:
+  P:
+    reference: Klabunde2021; normal mean arterial pressure ~93 mmHg for 120/80 mmHg (MAP = DP + (SP - DP)/3, cvphysiology.com
+      MAP page); 93 mmHg = 12399 Pa
+    sourced: 'yes'
+    value: 12399
+  v:
+    reference: definitional; the flow v is supplied by the connected vessel through the port; the parameter value is only
+      used when unconnected
+    sourced: definitional
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

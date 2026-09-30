@@ -1,0 +1,22 @@
+[
+  {
+    "module_type": "zero_flow",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "zero_flow_nn_modules.cellml",
+    "component_type": "zero_flow",
+    "default_instance": "default",
+    "notes": "libcuflynx helper: the generator connects v_zero to the v_ivc input of a monolithic heart module named \"heart\" that has only one vena cava input, and finds the component by its name (zero_flow), so the name must not change.",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v_zero",
+        "m3_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

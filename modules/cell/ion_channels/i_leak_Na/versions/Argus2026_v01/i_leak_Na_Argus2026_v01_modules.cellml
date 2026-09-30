@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_leak_Na_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_leak_Na_SN">
+        <variable name="E_Na" public_interface="in" units="milliV"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="g_leak_Na" public_interface="in" units="microS"/>
+        <variable name="i_leak_Na" public_interface="out" units="nanoA"/>
+        <variable name="j_leak_Na" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_leak_Na</ci>
+                <apply>
+                    <times/>
+                    <ci>g_leak_Na</ci>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_Na</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_leak_Na</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>i_leak_Na</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

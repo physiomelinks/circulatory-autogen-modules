@@ -1,0 +1,39 @@
+module_type: single_terminal
+version: vp_R1CR2_wCont
+reviewed: false
+notes: 'Terminal (Windkessel-type) module. Jacobian timescales (nominal: fastest 1.1 s, slowest decay 1.1 s; run: fastest
+  1.1 s, slowest decay 1.1 s).'
+reference_proposals:
+  R_T1:
+    reference: 'unreferenced_placeholder; circulatory_autogen aortic_bif_1d: "user_defined" (value 68123000)'
+    sourced: 'no'
+  R_T2:
+    reference: 'unreferenced_placeholder; circulatory_autogen aortic_bif_1d: "user_defined" (value 3101300000)'
+    sourced: 'no'
+  C_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen aortic_bif_1d: "user_defined" (value 3.6664e-10)'
+    sourced: 'no'
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen aortic_bif_1d: user_defined)'
+    sourced: definitional
+  q_init:
+    reference: 'definitional; zero initial/unstressed volume (circulatory_autogen aortic_bif_1d: user_defined)'
+    sourced: definitional
+  q_us:
+    reference: 'definitional; zero initial/unstressed volume (circulatory_autogen aortic_bif_1d: user_defined)'
+    sourced: definitional
+  v_in:
+    reference: 'unreferenced_placeholder; circulatory_autogen aortic_bif_1d: "WONT_BE_USED" (value 0.1)'
+    sourced: 'no'
+  u_out:
+    reference: 'unreferenced_placeholder; circulatory_autogen aortic_bif_1d: "user_defined" (value 0)'
+    sourced: 'no'
+  Delta_R:
+    reference: 'definitional; Delta_R = 0 (circulatory_autogen aortic_bif_1d: user_defined)'
+    sourced: definitional
+  R_local_multiplier:
+    reference: 'definitional; no local control (circulatory_autogen aortic_bif_1d: user_defined)'
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

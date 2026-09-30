@@ -1,0 +1,79 @@
+module_type: i_Ca
+version: Tao2011_v01
+reviewed: false
+notes: 'Tao 2011 rat sympathetic neuron N-type Ca current I_Ca (GHK) (kinetics from Belluzzi & Sacchi). Gates are internal
+  states starting at 0 (hard-coded initial values), so alone, with Vm clamped, each has the exact solution x_bar(Vm)(1 - exp(-t/tau_x)).
+  Invariants compare with the Tao 2011 Supporting Material equations (read from the rendered PDF): they fail on the time units
+  and on steady state has the wrong sign: module 1/(1+exp(-(V+19.91)/4.5)), Tao Eq. 93 1/(1+exp((V+19.91)/4.5)) (recorded
+  as expected failures).'
+known_issues:
+- 'undefined units: C_per_M'
+- 'undefined units: J_per_MK'
+expected_failures:
+  run_test: 'generation fails: the gate and time-constant variables c, tau_c, hc, tau_hc are exposed in the config but have
+    no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''. undefined
+    units C_per_M / J_per_MK (the globals F and R): generation fails. Proposed fix: define C_per_M = coulomb/mole and J_per_MK
+    = joule/(mole kelvin) in ion_channel_units.cellml (or rename to the existing C_per_mol / J_per_mol_K used by the cell
+    module). With the fix this test passes on a patched copy.'
+  verification_test_invariants: 'generation fails: the gate and time-constant variables c, tau_c, hc, tau_hc are exposed in
+    the config but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    undefined units C_per_M / J_per_MK (the globals F and R): generation fails. Proposed fix: define C_per_M = coulomb/mole
+    and J_per_MK = joule/(mole kelvin) in ion_channel_units.cellml (or rename to the existing C_per_mol / J_per_mol_K used
+    by the cell module). After that fix (patched copy): the module deviates from Tao 2011 Suppl.: every time constant is declared
+    in seconds but the Tao 2011 / Belluzzi & Sacchi expressions give milliseconds (Supplement p. 8 table is in ms; e.g. tau_hc
+    = 17-30 ms matches Belluzzi & Sacchi 1989 J Physiol 412:493 "tau = 29.3-17.6 ms"), so all gates are 1000x too slow; steady
+    state has the wrong sign: module 1/(1+exp(-(V+19.91)/4.5)), Tao Eq. 93 1/(1+exp((V+19.91)/4.5))'
+  verification_test_BC: 'generation fails: the gate and time-constant variables c, tau_c, hc, tau_hc are exposed in the config
+    but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    undefined units C_per_M / J_per_MK (the globals F and R): generation fails. Proposed fix: define C_per_M = coulomb/mole
+    and J_per_MK = joule/(mole kelvin) in ion_channel_units.cellml (or rename to the existing C_per_mol / J_per_mol_K used
+    by the cell module). After that fix (patched copy): the module deviates from Tao 2011 Suppl.: every time constant is declared
+    in seconds but the Tao 2011 / Belluzzi & Sacchi expressions give milliseconds (Supplement p. 8 table is in ms; e.g. tau_hc
+    = 17-30 ms matches Belluzzi & Sacchi 1989 J Physiol 412:493 "tau = 29.3-17.6 ms"), so all gates are 1000x too slow; steady
+    state has the wrong sign: module 1/(1+exp(-(V+19.91)/4.5)), Tao Eq. 93 1/(1+exp((V+19.91)/4.5))'
+  verification_test_timestep: 'generation fails: the gate and time-constant variables c, tau_c, hc, tau_hc are exposed in
+    the config but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    undefined units C_per_M / J_per_MK (the globals F and R): generation fails. Proposed fix: define C_per_M = coulomb/mole
+    and J_per_MK = joule/(mole kelvin) in ion_channel_units.cellml (or rename to the existing C_per_mol / J_per_mol_K used
+    by the cell module). With the fix this test passes on a patched copy.'
+  stability_test: 'generation fails: the gate and time-constant variables c, tau_c, hc, tau_hc are exposed in the config but
+    have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''. undefined
+    units C_per_M / J_per_MK (the globals F and R): generation fails. Proposed fix: define C_per_M = coulomb/mole and J_per_MK
+    = joule/(mole kelvin) in ion_channel_units.cellml (or rename to the existing C_per_mol / J_per_mol_K used by the cell
+    module). With the fix this test passes on a patched copy.'
+reference_proposals:
+  P_Ca:
+    reference: 'Tao2011; Supporting Material (Document S1) p. 8 neuron parameter table: PCa = 1.1e-16 cm/ms = 1.1e-15 m/s
+      (WKY; 1.54e-16 cm/ms for SHR). NOTE the module''s GHK expression is not dimensionally consistent (see review)'
+    sourced: 'yes'
+    value: 1.1e-15
+  Vm:
+    reference: definitional; clamp potential supplied by the membrane module in a network; -60 mV alone (test operating point
+      near rest)
+    sourced: definitional
+    value: -60.0
+  Cai:
+    reference: unreferenced_placeholder; resting cytosolic Ca 1e-4 mM (0.1 uM); Tao 2011 gives no neuron value
+    sourced: 'no'
+    value: 0.0001
+  R:
+    reference: Paci2013; gas constant as used in the authors' CellML (8.314472 J/(mol K), CODATA 2006)
+    sourced: 'yes'
+    value: 8.314472
+  T:
+    reference: Paci2013; temperature in the authors' CellML (310 K)
+    sourced: 'yes'
+    value: 310
+  F:
+    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+    sourced: 'yes'
+    value: 96485.3415
+  Cao:
+    reference: 'Paci2013; extracellular Ca in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cao = 1.8 mM (note: the Tao 2011 neuron currents share this global; Tao 2011 used its own bath
+      value)'
+    sourced: 'yes'
+    value: 1.8
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

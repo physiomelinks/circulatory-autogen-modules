@@ -1,0 +1,63 @@
+{
+  "module_type": "vein",
+  "version": "pp_micro",
+  "sim_time": 0.05,
+  "pre_time": 0.0,
+  "dt": 0.0005,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-24, "MaximumStep": 3.125e-05},
+  "outputs": ["u", "v", "v_d", "q_C", "q"],
+  "run_parameters": {"u_in": 1633.0},
+  "invariants": [
+    {
+      "description": "volume balance: q_C(t) = integral of (v - v_d)",
+      "expr": "np.max(np.abs(q_C - np.concatenate([[0.0], np.cumsum(0.5*((v - v_d)[1:] + (v - v_d)[:-1])*np.diff(t))]))) <= 2e-3*np.max(np.abs(q_C)) + 1e-8*np.min(C)*np.max(np.abs(u))"
+    },
+    {
+      "description": "pressure law u = u_0 + u_ext + q_C/C + (0.01/C)(v - v_d)",
+      "expr": "np.allclose(u, u_0 + u_ext + q_C/C + 0.01/C*(v - v_d), rtol=1e-8, atol=1e-6)"
+    },
+    {
+      "description": "total volume q = q_0 + stressed volume(s)",
+      "expr": "np.allclose(q, q_0 + q_C, rtol=1e-9, atol=1e-30)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "u_in": {"min": 1333.0, "max": 1933.0, "points": 5},
+      "u_out": {"min": 733.0, "max": 1333.0, "points": 5},
+      "u_ext": {"min": -1000.0, "max": 1000.0, "points": 5}
+    },
+    "rationale": "BCs span the reference pressure u_0 up to u_0 + 3 dp (dp = test pressure drop of the vessel class) and flows 0 to 3x the equilibrium flow dp/R; u_ext -1000..1000 Pa (tissue pressure); geometry, E, mu and the wall-thickness coefficients at 0.5-2x (the exact solution is re-evaluated at every point, so all invariants must hold across the whole region)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.002, 0.001, 0.0005, 0.00025],
+    "t_end": 0.05,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-24}
+    ],
+    "fixed_step": {
+      "schemes": ["euler", "heun", "rk4"],
+      "dt_start": 0.008
+    },
+    "max_step_start": 0.008
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "no single-compartment data: an isolated 0D segment with constant BCs has no measured counterpart. Candidate for a network built from these components: Pries1990 rat-mesentery networks (segment diameters, lengths, measured velocities/pressures), or the Boas2008 arteriole-capillary-venule chain (60 -> 25 mmHg); not set up"
+      },
+      "calibrate": {
+        "note": "pending: no single-compartment data: an isolated 0D segment with constant BCs has no measured counterpart. Candidate for a network built from these components: Pries1990 rat-mesentery networks (segment diameters, lengths, measured velocities/pressures), or the Boas2008 arteriole-capillary-venule chain (60 -> 25 mmHg); not set up"
+      }
+    }
+  }
+}

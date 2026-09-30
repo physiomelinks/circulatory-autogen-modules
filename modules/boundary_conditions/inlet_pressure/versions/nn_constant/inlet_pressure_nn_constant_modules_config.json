@@ -1,0 +1,35 @@
+[
+  {
+    "module_type": "inlet_pressure",
+    "module_subtype": "nn_constant",
+    "module_format": "cellml",
+    "component_file": "inlet_pressure_nn_constant_modules.cellml",
+    "component_type": "constant_pressure_BC_type__inlet_pressure_nn_constant",
+    "default_instance": "default",
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "P"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "P",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="terminal_pp_R1ICR2I" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="pp_T_R1ICR2I_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- Constitutive parameters-->
+        <variable name="I_T1" public_interface="in" units="Js2_per_m6"/>
+        <variable name="I_T2" public_interface="in" units="Js2_per_m6"/>
+        <variable name="R_T1" public_interface="in" units="Js_per_m6"/>
+        <variable name="R_T2" public_interface="in" units="Js_per_m6"/>
+        <variable name="C_T" public_interface="in" units="m6_per_J"/>
+        <!-- State Variables-->
+        <variable name="u_ext" public_interface="in" units="J_per_m3"/>
+        <variable initial_value="0.0" name="v" public_interface="out" units="m3_per_s"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="u" public_interface="out" units="J_per_m3"/>
+        <variable name="u_C" public_interface="out" units="J_per_m3"/>
+        <!-- v_T is the output flow to the venous side-->
+        <variable initial_value="0.0" name="v_T" public_interface="out" units="m3_per_s"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable name="q_us" public_interface="in" units="m3"/>
+        <variable name="q_init" public_interface="in" units="m3"/>
+        <variable initial_value="q_init" name="q" public_interface="out" units="m3"/>
+        <!-- Conservation Laws-->
+        <!-- For now terminals don't have a gravity effect, change this for leg terminals-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v</ci>
+                    <ci>v_T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u_C</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>q</ci>
+                        <ci>q_us</ci>
+                    </apply>
+                    <ci>C_T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u</ci>
+                <apply>
+                    <plus/>
+                    <ci>u_C</ci>
+                    <ci>u_ext</ci>
+                </apply>
+            </apply>
+            <!-- + 0.01{second}/C_T*(v-v_T); // No visco term-->
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>v</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>u_in</ci>
+                            <ci>u</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>R_T1</ci>
+                            <ci>v</ci>
+                        </apply>
+                    </apply>
+                    <ci>I_T1</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>v_T</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>u</ci>
+                            <ci>u_out</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>R_T2</ci>
+                            <ci>v_T</ci>
+                        </apply>
+                    </apply>
+                    <ci>I_T2</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

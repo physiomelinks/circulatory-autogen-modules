@@ -1,5 +1,5 @@
 """
-The PhLynx -> CUFLynx pipeline for one module: can each component be built in PhLynx from this
+The PhLynx -> CUFLynx pipeline for module versions: can each version be built in PhLynx from this
 library, exported as PhLynx's CUFLynx .omex, imported into CUFLynx and simulated there, and
 does CUFLynx's run reproduce the model libcuflynx builds from the same test network?
 
@@ -9,9 +9,9 @@ Two bridges, each running the real application code from a checkout:
                                          ~/software/CUFLynx; CI downloads the latest Ubuntu
                                          release) driven over its HTTP API
 
-A module's components are exported in one node run and simulated in one CUFLynx run
-(run_module), and the per-component results are cached in the module's results dir for the
-three tests (phlynx_export_test, cuflynx_simulate_test, phlynx_equivalence_test).
+A module_type's versions are exported in one node run and simulated in one CUFLynx run
+(run_versions), and the per-version results feed the three tests (phlynx_export_test,
+cuflynx_simulate_test, phlynx_equivalence_test), recorded in each version's results/.
 """
 import csv
 import glob
@@ -38,7 +38,7 @@ class PipelineUnavailable(Exception):
 
 
 def phlynx_dir():
-    d = os.environ.get('PHLYNX_DIR') or os.path.join(SIBLINGS, 'phlynx')
+    d = os.path.abspath(os.environ.get('PHLYNX_DIR') or os.path.join(SIBLINGS, 'phlynx'))
     if not os.path.isfile(os.path.join(d, 'src', 'utils', 'cellml.js')):
         raise PipelineUnavailable(f'no PhLynx checkout at {d} (set PHLYNX_DIR)')
     if not os.path.isdir(os.path.join(d, 'node_modules', 'libcellml.js')):
@@ -54,14 +54,13 @@ def cuflynx_bin():
 
 
 def library_files():
-    '''Every module's CellML, units and config: a harness can use neighbours from other modules.'''
+    '''Every version's CellML, units and config: a harness can use neighbours from other module_types.'''
     cellml, units, configs = [], [], []
-    from cam_testing.library import module_dir, module_names
-    for name in module_names():
-        d = module_dir(name)
-        cellml += sorted(glob.glob(os.path.join(d, f'{name}_modules.cellml')))
-        units += sorted(glob.glob(os.path.join(d, f'{name}_units.cellml')))
-        configs += sorted(glob.glob(os.path.join(d, f'{name}_modules_config.json')))
+    from cam_testing.library import all_versions
+    for v in all_versions():
+        cellml += [p for p in [v.cellml_path] if os.path.isfile(p)]
+        units += [p for p in [v.units_path] if os.path.isfile(p)]
+        configs.append(v.config_path)
     return {'cellml': cellml, 'units': units, 'configs': configs}
 
 
@@ -71,8 +70,8 @@ def _read_csv(path):
 
 
 def component_job(component, work_dir):
-    '''The component's test network (harness) as a PhLynx instance array plus its parameters.'''
-    prefix = f'{component.module.name}__{component.id}'
+    '''The version's test network (harness) as a PhLynx instance array plus its parameters.'''
+    prefix = component.id
     res = os.path.join(work_dir, 'resources', component.id)
     harness._write_resources(component, res, prefix, {})
     records = vessel_array.read_records(vessel_array.find(res, prefix))
@@ -193,13 +192,10 @@ def compare(cf, lib_t, lib_outputs, tol):
     return rows, unmatched
 
 
-def cache_path(module):
-    return os.path.join(module.dir, 'results', 'phlynx_pipeline.json')
-
-
-def run_module(module, components, solver_info=None, keep_dir=None):
-    '''Exports and simulates every component of a module; caches and returns {component id: result}.'''
-    work_dir = keep_dir or tempfile.mkdtemp(prefix=f'cam_phlynx_{module.name}_')
+def run_versions(name, components, solver_info=None, keep_dir=None):
+    '''Exports and simulates the given versions (e.g. every version of a module_type); returns
+    {version id: result} and keeps it in <work dir>/phlynx_pipeline.json.'''
+    work_dir = keep_dir or tempfile.mkdtemp(prefix=f'cam_phlynx_{name}_')
     os.makedirs(work_dir, exist_ok=True)
     jobs, results = [], {}
     for c in components:
@@ -214,13 +210,12 @@ def run_module(module, components, solver_info=None, keep_dir=None):
     for j in jobs:
         results[j['id']] = {'export': reports.get(j['id']), 'cuflynx': sims.get(j['id']), 'job': {
             k: j[k] for k in ('instances', 'sim_time', 'dt')}}
-    os.makedirs(os.path.dirname(cache_path(module)), exist_ok=True)
-    with open(cache_path(module), 'w') as f:
+    with open(os.path.join(work_dir, 'phlynx_pipeline.json'), 'w') as f:
         json.dump(results, f, default=float)
     return results
 
 
-# ---- the three pipeline checks, recorded like the other tests (results/<component>/<test>.json) ----
+# ---- the three pipeline checks, recorded like the other tests (<version>/results/<test>.json) ----
 
 PIPELINE_TESTS = ['phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test']
 EQUIVALENCE_TOL = 1e-6

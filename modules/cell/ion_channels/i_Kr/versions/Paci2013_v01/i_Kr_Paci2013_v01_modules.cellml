@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_Kr_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_Kr_Paci_2013">
+        <variable name="i_Kr" public_interface="out" units="A_per_F"/>
+        <variable name="g_Kr" public_interface="in" units="S_per_F"/>
+        <variable name="t" private_interface="out" public_interface="in" units="second"/>
+        <variable name="Vm" private_interface="out" public_interface="in" units="volt"/>
+        <variable name="E_K" public_interface="in" units="volt"/>
+        <variable name="Ko" public_interface="in" units="millimolar"/>
+        <variable name="Cao" private_interface="out" public_interface="in" units="millimolar"/>
+        <variable name="Xr1" private_interface="in" units="dimensionless"/>
+        <variable name="Xr2" private_interface="in" units="dimensionless"/>
+        <variable name="R" private_interface="out" public_interface="in" units="J_per_MK"/>
+        <variable name="T" private_interface="out" public_interface="in" units="kelvin"/>
+        <variable name="F" private_interface="out" public_interface="in" units="C_per_M"/>
+        <variable name="E4031_30nM" public_interface="in" units="dimensionless"/>
+        <variable name="E4031_100nM" public_interface="in" units="dimensionless"/>
+        <variable name="E4031_coeff" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>E4031_coeff</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.77</cn>
+                        <apply>
+                            <eq/>
+                            <ci>E4031_30nM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.5</cn>
+                        <apply>
+                            <eq/>
+                            <ci>E4031_100nM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">1</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_Kr</ci>
+                <apply>
+                    <times/>
+                    <ci>E4031_coeff</ci>
+                    <ci>g_Kr</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Vm</ci>
+                        <ci>E_K</ci>
+                    </apply>
+                    <ci>Xr1</ci>
+                    <ci>Xr2</ci>
+                    <apply>
+                        <root/>
+                        <apply>
+                            <divide/>
+                            <ci>Ko</ci>
+                            <cn cellml:units="millimolar">5.4</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

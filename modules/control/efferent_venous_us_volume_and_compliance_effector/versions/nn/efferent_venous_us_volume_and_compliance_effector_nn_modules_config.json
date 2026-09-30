@@ -1,0 +1,97 @@
+[
+  {
+    "module_type": "efferent_venous_us_volume_and_compliance_effector",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "efferent_venous_us_volume_and_compliance_effector_nn_modules.cellml",
+    "component_type": "efferent_venous_us_volume_and_compliance_effector_Argus_type",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "sympathetic_efferent_firing_rate_port",
+        "variables": [
+          "f_s"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "venous_us_and_compliance_delta_port",
+        "variables": [
+          "Delta_theta_us",
+          "Delta_theta_compliance"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "G_theta_us",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_theta_compliance",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "f_es_min",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_es_mid",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "tau_theta_us",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_theta_compliance",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "f_s",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Delta_theta_us",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "sigma_theta_us",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Delta_theta_compliance",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "sigma_theta_compliance",
+        "per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

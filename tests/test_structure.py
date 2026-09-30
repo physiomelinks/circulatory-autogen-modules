@@ -1,22 +1,30 @@
 """
-Fast static checks on the module library (no libcuflynx needed).
+Fast static checks on the module library (no libcuflynx generation needed).
 
-A problem listed (as a substring) under ``known_issues`` in a module's spec is reported as
-xfail rather than a failure, so known defects stay visible without blocking CI; once fixed,
-remove the entry.
+  - the directory layout of modules/ and system_models/ against modules/directory_schema.json
+    and its rules (version == module_subtype, default_instance, obs_data_name, unique names,
+    system-model records resolve);
+  - each version's CellML, config and units (test_version_structure);
+  - library-wide uniqueness, manifests, and the JSON files against libcuflynx's schemas.
+
+A problem listed (as a substring) under ``known_issues`` in a version's spec is reported as xfail
+rather than a failure, so known defects stay visible without blocking CI; once fixed, remove the
+entry.
 """
+import csv
 import functools
 import glob
 import json
 import os
 import re
 import xml.etree.ElementTree as ET
-from collections import defaultdict
 
 import pytest
 
-from cam_testing.library import MODULES_DIR, REPO_ROOT, load_module, module_names
 from cam_testing import bib
+from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, MODULES_DIR, REPO_ROOT, SYSTEM_MODELS_DIR, TESTS_KEYS,
+                                 VERIFICATION_KEYS, VERSIONS, all_versions, load_version, misplaced_spec_keys,
+                                 module_type_names, read_spec_files)
 from cam_testing.mathml import component_names
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
@@ -27,7 +35,9 @@ STANDARD_UNITS = {
     'sievert', 'steradian', 'tesla', 'volt', 'watt', 'weber',
 }
 VARIABLE_KINDS = {'variable', 'constant', 'global_constant', 'boundary_condition'}
-
+SCHEMA = json.load(open(os.path.join(MODULES_DIR, 'directory_schema.json')))
+LEVELS = SCHEMA['levels']
+EXCLUDED = {os.path.join(REPO_ROOT, p) for p in SCHEMA['excluded']}
 
 # unit names that denote the same unit (numerically identical definitions)
 EQUIVALENT_UNITS = [{'Hz', 'per_s', 'per_second'}, {'mol_per_m3', 'millimolar', 'mM'},
@@ -48,38 +58,288 @@ def _canonical(units_el):
 
 
 @functools.lru_cache(maxsize=1)
+def _versions():
+    return all_versions()
+
+
+VERSION_KEYS = [v.key for v in _versions()]
+
+
+@functools.lru_cache(maxsize=1)
 def _all_component_names():
-    return {c for n in module_names() for c in component_names(load_module(n).cellml_path)}
+    return {c for v in _versions() if os.path.isfile(v.cellml_path) for c in component_names(v.cellml_path)}
 
 
-def module_problems(name, library_components=None):
+# ----------------------------------------------------------------------------------------------
+# the directory layout
+# ----------------------------------------------------------------------------------------------
+
+def _fill(pattern, names):
+    for k, v in names.items():
+        pattern = pattern.replace('{' + k + '}', v)
+    return pattern
+
+
+def _check_files(level, d, names, problems, supermodule=False):
+    spec = LEVELS[level].get('files') or {}
+    files = sorted(f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f)) and not f.startswith('.'))
+    required = [_fill(f, names) for f in spec.get('required', [])]
+    if not supermodule:
+        required += [_fill(f, names) for f in spec.get('required_unless_supermodule', [])]
+    allowed = set(required) | {_fill(f, names) for f in spec.get('optional', [])} \
+        | {_fill(f, names) for f in spec.get('required_unless_supermodule', [])}
+    rel = os.path.relpath(d, REPO_ROOT)
+    for f in required:
+        if f not in files:
+            problems.append(f'{rel}: missing {f}')
+    extra_pat = spec.get('data_file_pattern')
+    ignored = spec.get('ignored_pattern')
+    for f in files:
+        if f in allowed or (ignored and re.match(ignored, f)):
+            continue
+        if extra_pat and re.match(extra_pat, f):
+            continue
+        problems.append(f'{rel}: unexpected file {f} (not allowed at the {level} level)')
+
+
+def _subdirs(d):
+    return sorted(x for x in os.listdir(d) if os.path.isdir(os.path.join(d, x)) and not x.startswith(('.', '__')))
+
+
+def _name_ok(level, name, d, problems):
+    pat = LEVELS[level].get('name_pattern')
+    if pat and not re.match(pat, name):
+        problems.append(f'{os.path.relpath(d, REPO_ROOT)}: name {name!r} does not match the {level} pattern {pat}')
+
+
+def walk_modules():
+    '''(problems, categories {path: name}, module_types {name: [paths]}) for modules/.'''
+    problems, cats, mts = [], {}, {}
+    _check_files('modules_root', MODULES_DIR, {}, problems)
+
+    def category(d):
+        name = os.path.basename(d)
+        _name_ok('category', name, d, problems)
+        _check_files('category', d, {}, problems)
+        cats[d] = name
+        children = [c for c in _subdirs(d) if os.path.join(d, c) not in EXCLUDED]
+        if not children:
+            problems.append(f'{os.path.relpath(d, REPO_ROOT)}: an empty category')
+        for c in children:
+            p = os.path.join(d, c)
+            if os.path.isdir(os.path.join(p, VERSIONS)):
+                module_type(p)
+            elif c in LEVELS or c in SCHEMA['generic_directory_names']:
+                problems.append(f'{os.path.relpath(p, REPO_ROOT)}: a generic directory name where a category belongs')
+            else:
+                category(p)
+
+    def module_type(d):
+        name = os.path.basename(d)
+        mts.setdefault(name, []).append(d)
+        _name_ok('module_type', name, d, problems)
+        _check_files('module_type', d, {'module_type': name}, problems)
+        extra = [c for c in _subdirs(d) if c != VERSIONS]
+        problems.extend(f'{os.path.relpath(os.path.join(d, c), REPO_ROOT)}: unexpected directory in a module_type' for c in extra)
+        vroot = os.path.join(d, VERSIONS)
+        if not _subdirs(vroot):
+            problems.append(f'{os.path.relpath(vroot, REPO_ROOT)}: no versions')
+        _check_files('versions', vroot, {}, problems)
+        for v in _subdirs(vroot):
+            version(os.path.join(vroot, v), name)
+
+    def version(d, mt):
+        v = os.path.basename(d)
+        names = {'module_type': mt, 'version': v}
+        _name_ok('version', v, d, problems)
+        rel = os.path.relpath(d, REPO_ROOT)
+        cfg = os.path.join(d, f'{mt}_{v}_modules_config.json')
+        supermodule = False
+        if os.path.isfile(cfg):
+            entries = json.load(open(cfg))
+            if len(entries) != 1:
+                problems.append(f'{rel}: the config has {len(entries)} entries (a version has one)')
+            for e in entries[:1]:
+                supermodule = e.get('module_format') == 'supermodule'
+                if e.get('module_type') != mt or e.get('module_subtype') != v:
+                    problems.append(f'{rel}: config entry is ({e.get("module_type")}, {e.get("module_subtype")}), '
+                                    f'not ({mt}, {v}): the version is its module_subtype')
+                di = e.get('default_instance')
+                if not di:
+                    problems.append(f'{rel}: config entry has no default_instance')
+                elif not os.path.isfile(os.path.join(d, 'instances', di, f'{di}_parameters.csv')):
+                    problems.append(f'{rel}: default_instance {di} has no instances/{di}/{di}_parameters.csv')
+        _check_files('version', d, names, problems, supermodule)
+        # the spec's two files: every key in its own file, identity keys matching the directories
+        tests, verification = read_spec_files(d, f'{mt}_{v}')
+        problems.extend(f'{rel}: {p}' for p in misplaced_spec_keys(tests, verification))
+        review = tests.get('review')
+        if isinstance(review, str) and not (review.startswith('reviews/') and os.path.isfile(os.path.join(REPO_ROOT, review))):
+            problems.append(f'{rel}: review: {review} is not a file in reviews/')
+        for fname, content in (('tests.yaml', tests), ('verification_config.json', verification)):
+            if content and (content.get('module_type'), content.get('version')) != (mt, v):
+                problems.append(f'{rel}: {fname} names ({content.get("module_type")}, {content.get("version")}), '
+                                f'not ({mt}, {v})')
+        allowed = set(LEVELS['version']['directories'])
+        for c in _subdirs(d):
+            if c not in allowed:
+                problems.append(f'{rel}: unexpected directory {c}')
+        if not os.path.isdir(os.path.join(d, 'instances')):
+            problems.append(f'{rel}: missing instances/')
+            return
+        if os.path.isdir(os.path.join(d, 'risk')):
+            _check_files('risk', os.path.join(d, 'risk'), names, problems)
+        iroot = os.path.join(d, 'instances')
+        _check_files('instances', iroot, {}, problems)
+        if not _subdirs(iroot):
+            problems.append(f'{rel}: no instances')
+        for i in _subdirs(iroot):
+            instance(os.path.join(iroot, i))
+
+    def instance(d):
+        i = os.path.basename(d)
+        _name_ok('instance', i, d, problems)
+        _check_files('instance', d, {'instance': i}, problems)
+        rel = os.path.relpath(d, REPO_ROOT)
+        for c in _subdirs(d):
+            problems.append(f'{rel}: unexpected directory {c}')
+        pp = os.path.join(d, f'{i}_parameters.csv')
+        if os.path.isfile(pp):
+            with open(pp, newline='') as f:
+                header = next(csv.reader(f), [])
+            if [h.strip() for h in header] != LEVELS['instance']['parameters_columns']:
+                problems.append(f'{rel}: {i}_parameters.csv columns are {header}, not {INSTANCE_COLUMNS}')
+        for suffix in ('obs_data.json', 'validation_obs_data.json'):
+            p = os.path.join(d, f'{i}_{suffix}')
+            if os.path.isfile(p):
+                name = json.load(open(p)).get('obs_data_name')
+                if name != i:
+                    problems.append(f'{rel}: {i}_{suffix} has obs_data_name {name!r}; the instance is named by it ({i!r})')
+
+    for c in _subdirs(MODULES_DIR):
+        p = os.path.join(MODULES_DIR, c)
+        if p in EXCLUDED:
+            continue
+        if os.path.isdir(os.path.join(p, VERSIONS)):
+            problems.append(f'modules/{c}: a module_type directly under modules/ (it belongs in a category)')
+            module_type(p)
+        else:
+            category(p)
+    return problems, cats, mts
+
+
+def test_modules_directory_layout():
+    problems, _, _ = walk_modules()
+    assert not problems, '\n'.join(problems[:60]) + (f'\n... {len(problems)} problems' if len(problems) > 60 else '')
+
+
+def test_no_directory_name_twice():
+    '''No category or module_type name appears twice in modules/, and no category is named as a module_type.'''
+    _, cats, mts = walk_modules()
+    problems = []
+    seen = {}
+    for path, name in cats.items():
+        seen.setdefault(name, []).append(os.path.relpath(path, REPO_ROOT))
+    for name, paths in mts.items():
+        seen.setdefault(name, []).extend(os.path.relpath(p, REPO_ROOT) for p in paths)
+    generic = set(SCHEMA['generic_directory_names'])
+    for name, paths in sorted(seen.items()):
+        if name in generic:
+            problems.append(f'{name}: a generic directory name used as a category or module_type ({paths})')
+        elif len(paths) > 1:
+            problems.append(f'{name} appears {len(paths)} times: {paths}')
+    assert not problems, '\n'.join(problems)
+
+
+def test_spec_key_lists_match_the_schema():
+    '''The key lists cam_testing splits the spec by are the ones directory_schema.json documents.'''
+    keys = SCHEMA['spec_keys']
+    assert (keys['both'], keys['verification_config'], keys['tests']) == \
+        (list(IDENTITY_KEYS), list(VERIFICATION_KEYS), list(TESTS_KEYS))
+
+
+def test_categories_are_not_module_types():
+    _, cats, mts = walk_modules()
+    clash = sorted(set(cats.values()) & set(mts))
+    assert not clash, f'category names that are also module_type names: {clash}'
+
+
+def test_system_models_directory_layout():
+    problems = []
+    _check_files('system_models_root', SYSTEM_MODELS_DIR, {}, problems)
+    for cat in _subdirs(SYSTEM_MODELS_DIR):
+        cdir = os.path.join(SYSTEM_MODELS_DIR, cat)
+        _name_ok('system_category', cat, cdir, problems)
+        _check_files('system_category', cdir, {}, problems)
+        for model in _subdirs(cdir):
+            mdir = os.path.join(cdir, model)
+            _name_ok('system_model', model, mdir, problems)
+            _check_files('system_model', mdir, {'model': model}, problems)
+            for c in _subdirs(mdir):
+                if c not in LEVELS['system_model']['directories']:
+                    problems.append(f'{os.path.relpath(mdir, REPO_ROOT)}: unexpected directory {c}')
+    assert not problems, '\n'.join(problems)
+
+
+SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_vessel_array.json')))
+
+
+@pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
+def test_system_model_records_resolve(path):
+    '''Every record names a (module_type, version) of the library and an instance of it. A model
+    listing modules that are not in this library (known.not_in_library in its spec) is exempt for those.'''
+    import yaml
+    model_dir = os.path.dirname(path)
+    spec_path = glob.glob(os.path.join(model_dir, '*_system.yaml'))
+    spec = yaml.safe_load(open(spec_path[0])) if spec_path else {}
+    index = {(v.vessel_type, v.name): v for v in _versions()}
+    problems, outside = [], []
+    for r in json.load(open(path)):
+        key = (r.get('module_type') or r.get('vessel_type'), r.get('module_subtype') or r.get('BC_type'))
+        v = index.get(key)
+        if v is None:
+            outside.append(f'{r["name"]}: ({key[0]}, {key[1]}) is not a version in the library')
+            continue
+        inst = r.get('instance')
+        if inst is None:
+            problems.append(f'{r["name"]}: names no instance')
+        elif inst not in v.instance_names():
+            problems.append(f'{r["name"]}: {v.key} has no instance {inst} (it has {v.instance_names()})')
+    if outside and not (spec.get('expected_failures') or spec.get('skip')):
+        problems += outside
+    assert not problems, '\n'.join(problems)
+
+
+# ----------------------------------------------------------------------------------------------
+# each version
+# ----------------------------------------------------------------------------------------------
+
+def version_problems(version, library_components=None):
     """
-    Returns (errors, warnings). Errors break model generation or are plainly wrong;
-    warnings are worth a look but can be legitimate (e.g. a component defined in another
-    module, which works because libcuflynx merges the whole library).
+    Returns (errors, warnings) for one version. Errors break model generation or are plainly
+    wrong; warnings are worth a look but can be legitimate.
     """
-    module = load_module(name)
     errors, warnings = [], []
+    entry = version.config
+    key = version.key
+    if version.is_supermodule:
+        return errors, warnings
     try:
-        components = set(component_names(module.cellml_path))
+        components = set(component_names(version.cellml_path))
     except ET.ParseError as e:
-        return [f'{name}_modules.cellml does not parse: {e}'], []
+        return [f'{os.path.basename(version.cellml_path)} does not parse: {e}'], []
     if library_components is None:
         library_components = _all_component_names()
-    cellml_text = open(module.cellml_path).read()
-    defined = set(_units_defined(module.units_path)) if os.path.isfile(module.units_path) else set()
+    cellml_text = open(version.cellml_path).read()
+    defined = set(_units_defined(version.units_path)) if os.path.isfile(version.units_path) else set()
     local_units = set(re.findall(r'<units\b[^>]*\bname="([^"]+)"', cellml_text))
-
     used_units = set(re.findall(r'\bunits="([^"]+)"', cellml_text))
-    for entry in module.config:
-        key = f"{entry['vessel_type']}/{entry['BC_type']}"
-        if entry.get('module_format', 'cellml') != 'cellml':
-            continue  # cpp / external modules are not CellML components
-        if entry['module_file'] != f'{name}_modules.cellml':
+    if entry.get('module_format', 'cellml') == 'cellml':
+        if entry['module_file'] != os.path.basename(version.cellml_path):
             errors.append(f"{key}: module_file is {entry['module_file']}")
         if entry['module_type'] not in components:
             if entry['module_type'] in library_components:
-                warnings.append(f"{key}: uses component {entry['module_type']} from another module")
+                warnings.append(f"{key}: uses component {entry['module_type']} from another version")
             else:
                 errors.append(f"{key}: module_type {entry['module_type']} is not a component in the library")
         names = {v[0] for v in entry['variables_and_units']}
@@ -93,22 +353,32 @@ def module_problems(name, library_components=None):
                     # libcuflynx stops ("the port variable ... is not a variable") as soon as such
                     # a port is connected, so this is an error even if no model connects it yet
                     errors.append(f"{key}: port variable {var} not in variables_and_units")
+        extra = sorted(components - {entry['module_type']})
+        if extra:
+            errors.append(f'{key}: components other than its own in the CellML file: {extra}')
     for unit in sorted(used_units - defined - STANDARD_UNITS - local_units):
         errors.append(f'undefined units: {unit}')
 
-    # a reviewed module's sourced parameters must cite an entry of its references.bib
-    if module.reviewed:
-        keys = set(bib.read(bib.bib_path(module)))
-        for p in module.parameters:
-            if not p.is_sourced or p.data_reference.lower().startswith('definitional'):
-                continue
-            key = bib.reference_key(p.data_reference)
-            if key not in keys:
-                errors.append(f'{p.vessel_type}/{p.variable_name}: sourced, but its reference '
-                              f'"{p.data_reference[:40]}" is not a key in {module.name}_references.bib')
+    # a reviewed version's sourced parameters must cite an entry of its references.bib
+    if version.reviewed:
+        keys = set(bib.read(bib.bib_path(version)))
+        for inst in version.instances():
+            for p in inst.parameters():
+                if not p.is_sourced or p.data_reference.lower().startswith('definitional'):
+                    continue
+                k = bib.reference_key(p.data_reference)
+                if k not in keys:
+                    errors.append(f'{inst.name}/{p.variable_name}: sourced, but its reference '
+                                  f'"{p.data_reference[:40]}" is not a key in {os.path.basename(bib.bib_path(version))}')
 
-    # every identifier used in a component's equations must be one of its declared variables
-    root = ET.parse(module.cellml_path).getroot()
+    # every instance's parameters are variables of the version
+    kinds = version.kinds
+    for inst in version.instances():
+        for p in inst.parameters():
+            if p.variable_name not in kinds:
+                warnings.append(f'instance {inst.name}: parameter {p.variable_name} is not a variable of the config entry')
+
+    root = ET.parse(version.cellml_path).getroot()
     for comp in root.iter(f'{{{CELLML_NS}}}component'):
         declared = {v.get('name') for v in comp.findall(f'{{{CELLML_NS}}}variable')}
         used = {ci.text.strip() for ci in comp.iter('{http://www.w3.org/1998/Math/MathML}ci') if ci.text}
@@ -117,12 +387,9 @@ def module_problems(name, library_components=None):
 
     # config variables must exist in the CellML component with the same units and a public interface
     comps = {c.get('name'): c for c in root.iter(f'{{{CELLML_NS}}}component')}
-    for entry in module.config:
-        comp = comps.get(entry['module_type'])
-        if comp is None or entry.get('module_format', 'cellml') != 'cellml':
-            continue
+    comp = comps.get(entry.get('module_type'))
+    if comp is not None and entry.get('module_format', 'cellml') == 'cellml':
         cvars = {v.get('name'): v for v in comp.findall(f'{{{CELLML_NS}}}variable')}
-        key = f"{entry['vessel_type']}/{entry['BC_type']}"
         declared_cfg = {v[0] for v in entry['variables_and_units']}
         for name, v in cvars.items():
             if v.get('public_interface') == 'in' and name not in declared_cfg and name not in ('t', 'time'):
@@ -139,27 +406,22 @@ def module_problems(name, library_components=None):
                 warnings.append(f'{key}: {name} has units {units} in the config but {v.get("units")} in the CellML')
             if not v.get('public_interface'):
                 warnings.append(f'{key}: config variable {name} has no public_interface in the CellML')
-
-    spec_keys = {(c['vessel_type'], c['BC_type']) for c in module.spec.get('components', [])}
-    for entry in module.config:
-        if (entry['vessel_type'], entry['BC_type']) not in spec_keys:
-            errors.append(f"{entry['vessel_type']}/{entry['BC_type']}: not listed in {name}_tests.yaml")
     return errors, warnings
 
 
-def write_structure_results(name, errors, warnings, known):
+def write_structure_results(version, errors, warnings, known):
     """Saved for the HTML report, next to the other test results."""
-    module = load_module(name)
-    os.makedirs(module.results_dir, exist_ok=True)
-    with open(os.path.join(module.results_dir, 'structure.json'), 'w') as f:
+    os.makedirs(version.results_dir, exist_ok=True)
+    with open(os.path.join(version.results_dir, 'structure.json'), 'w') as f:
         json.dump({'errors': errors, 'warnings': warnings, 'known_issues': known}, f, indent=2)
 
 
-@pytest.mark.parametrize('name', module_names())
-def test_module_structure(name):
-    known = load_module(name).spec.get('known_issues') or []
-    errors, warnings = module_problems(name)
-    write_structure_results(name, errors, warnings, known)
+@pytest.mark.parametrize('key', VERSION_KEYS)
+def test_version_structure(key):
+    version = load_version(*key.split('/', 1))
+    known = version.spec.get('known_issues') or []
+    errors, warnings = version_problems(version)
+    write_structure_results(version, errors, warnings, known)
     unknown = [p for p in errors if not any(k in p for k in known)]
     assert not unknown, '\n'.join(unknown)
     if errors:
@@ -167,26 +429,38 @@ def test_module_structure(name):
 
 
 def test_library_wide_uniqueness():
-    '''libcuflynx merges every module: components, (vessel_type, BC_type) and units must not clash.'''
+    '''libcuflynx merges every version: components, (module_type, version) pairs and units must not clash.'''
     component_owner, pair_owner, units_seen = {}, {}, {}
     problems = []
-    for name in module_names():
-        module = load_module(name)
-        for comp in component_names(module.cellml_path):
-            if comp in component_owner:
-                problems.append(f'component {comp} is in both {component_owner[comp]} and {name}')
-            component_owner[comp] = name
-        for entry in module.config:
-            pair = (entry['vessel_type'], entry['BC_type'])
-            if pair in pair_owner:
-                problems.append(f'{pair} is in both {pair_owner[pair]} and {name}')
-            pair_owner[pair] = name
-        if os.path.isfile(module.units_path):
-            for unit, el in _units_defined(module.units_path).items():
+    for version in _versions():
+        if os.path.isfile(version.cellml_path):
+            for comp in component_names(version.cellml_path):
+                if comp in component_owner:
+                    problems.append(f'component {comp} is in both {component_owner[comp]} and {version.key}')
+                component_owner[comp] = version.key
+        pair = (version.vessel_type, version.name)
+        if pair in pair_owner:
+            problems.append(f'{pair} is in both {pair_owner[pair]} and {version.key}')
+        pair_owner[pair] = version.key
+        if os.path.isfile(version.units_path):
+            for unit, el in _units_defined(version.units_path).items():
                 if unit in units_seen and units_seen[unit][1] != _canonical(el):
-                    problems.append(f'units {unit} differ between {units_seen[unit][0]} and {name}')
-                units_seen.setdefault(unit, (name, _canonical(el)))
+                    problems.append(f'units {unit} differ between {units_seen[unit][0]} and {version.key}')
+                units_seen.setdefault(unit, (version.key, _canonical(el)))
     assert not problems, '\n'.join(problems)
+
+
+def test_every_cellml_file_is_in_a_version():
+    '''Every *_modules.cellml under modules/ is <module_type>_<version>_modules.cellml in its version directory.'''
+    stray = []
+    for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules.cellml'), recursive=True):
+        if any(p.startswith(e + os.sep) for e in EXCLUDED):
+            continue
+        d = os.path.dirname(p)
+        v, mt = os.path.basename(d), os.path.basename(os.path.dirname(os.path.dirname(d)))
+        if os.path.basename(os.path.dirname(d)) != VERSIONS or os.path.basename(p) != f'{mt}_{v}_modules.cellml':
+            stray.append(os.path.relpath(p, MODULES_DIR))
+    assert not stray, f'module files outside a version directory: {stray}'
 
 
 @pytest.mark.parametrize('manifest', sorted(glob.glob(os.path.join(REPO_ROOT, 'manifests', '*.json'))),
@@ -199,25 +473,8 @@ def test_manifest_paths_exist(manifest):
     assert not missing, f'missing: {missing}'
 
 
-# not modules: system models (tests/test_systems.py) and supermodules (tests/test_supermodules.py)
-NON_MODULE_DIRS = {'template', 'system', 'supermodules'}
-
-
-def test_every_module_dir_has_spec():
-    # a module directory is any directory with a <name>_modules.cellml (modules may sit in category dirs)
-    cellml = [p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules.cellml'), recursive=True)
-              if os.path.relpath(p, MODULES_DIR).split(os.sep)[0] not in NON_MODULE_DIRS]
-    missing = []
-    for p in cellml:
-        d = os.path.dirname(p)
-        name = os.path.basename(d)
-        if os.path.basename(p) != f'{name}_modules.cellml' or not os.path.isfile(os.path.join(d, f'{name}_tests.yaml')):
-            missing.append(os.path.relpath(p, MODULES_DIR))
-    assert not missing, f'module files not in a <name>/ directory with <name>_tests.yaml: {missing}'
-
-
 # ----------------------------------------------------------------------------------------------
-# JSON files against libcuflynx's schemas (src/libcuflynx/schemas/*.schema.json)
+# JSON files against libcuflynx's schemas (libcuflynx/schemas/*.schema.json)
 # ----------------------------------------------------------------------------------------------
 
 def _libcuflynx_schema(name):
@@ -229,8 +486,15 @@ def _libcuflynx_schema(name):
         return None
 
 
-VESSEL_ARRAYS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_vessel_array.json'), recursive=True))
-MODULE_CONFIGS = sorted(glob.glob(os.path.join(MODULES_DIR, '**', '*_modules_config.json'), recursive=True))
+def _not_excluded(p):
+    return not any(p.startswith(e + os.sep) for e in EXCLUDED)
+
+
+VESSEL_ARRAYS = SYSTEM_ARRAYS
+MODULE_CONFIGS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules_config.json'), recursive=True)
+                        if _not_excluded(p))
+OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'instances', '*', '*obs_data.json'), recursive=True)
+                  if _not_excluded(p))
 
 
 def _validate(path, schema_name):
@@ -244,7 +508,7 @@ def _validate(path, schema_name):
     assert not errors, '\n'.join(f'{list(e.path)}: {e.message}' for e in errors[:20])
 
 
-@pytest.mark.parametrize('path', VESSEL_ARRAYS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
+@pytest.mark.parametrize('path', VESSEL_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
 def test_vessel_array_matches_libcuflynx_schema(path):
     _validate(path, 'vessel_array.schema.json')
 
@@ -254,7 +518,17 @@ def test_module_config_matches_libcuflynx_schema(path):
     _validate(path, 'module_config.schema.json')
 
 
+@pytest.mark.parametrize('path', OBS_DATA, ids=lambda p: os.path.relpath(p, MODULES_DIR))
+def test_obs_data_matches_libcuflynx_schema(path):
+    _validate(path, 'obs_data.schema.json')
+
+
 def test_no_csv_vessel_arrays_left():
-    left = [os.path.relpath(p, MODULES_DIR) for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_vessel_array.csv'), recursive=True)
-            if 'poiseuille' not in p]
+    left = [os.path.relpath(p, REPO_ROOT) for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_vessel_array.csv'),
+                                                              recursive=True)
+            if os.sep + 'reference' + os.sep not in p]
     assert not left, f'CSV vessel arrays left (run tools/convert_vessel_arrays.py): {left[:10]}'
+
+
+def test_module_type_names_listed():
+    assert module_type_names(), 'no module_types found under modules/'

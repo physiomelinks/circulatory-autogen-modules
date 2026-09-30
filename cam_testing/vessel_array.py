@@ -4,9 +4,10 @@ Vessel arrays: <prefix>_vessel_array.json, a JSON list of instance records in Ph
     {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp",
      "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}
 
-(module_type is libcuflynx's vessel_type, module_subtype its BC_type). A supermodule instance has
-no inp/out lists of its own; it gives per_submodule_inputs / per_submodule_outputs instead (see
-modules/supermodules/). libcuflynx reads these files, and still reads the older CSV layout
+(module_type is libcuflynx's vessel_type, module_subtype its BC_type: the version). A record may
+name an instance of that version, "instance": "default" (its parameters are the defaults; the
+model's own parameters file wins). A supermodule instance has no inp/out lists of its own; it
+gives per_submodule_inputs / per_submodule_outputs instead (see modules/README.md). libcuflynx reads these files, and still reads the older CSV layout
 (name, BC_type, vessel_type, inp_vessels, out_vessels with space-separated lists), which
 read_records here converts to the same records.
 """
@@ -18,7 +19,7 @@ import os
 TO_PHLYNX = {'vessel_type': 'module_type', 'BC_type': 'module_subtype',
              'inp_vessels': 'inp_instances', 'out_vessels': 'out_instances'}
 LIST_KEYS = ('inp_instances', 'out_instances')
-KEY_ORDER = ('name', 'module_type', 'module_subtype', 'inp_instances', 'out_instances')
+KEY_ORDER = ('name', 'module_type', 'module_subtype', 'instance', 'inp_instances', 'out_instances')
 
 
 def _as_list(v):
@@ -79,9 +80,17 @@ def find(directory, prefix):
 
 
 def from_rows(rows):
-    '''Spec harness rows [name, BC_type, vessel_type, inp, out] (inp/out space-separated) -> records.'''
-    return [normalise_record({'name': str(n), 'vessel_type': str(vt), 'BC_type': str(bc),
-                              'inp_vessels': str(i or ''), 'out_vessels': str(o or '')}) for n, bc, vt, i, o in rows]
+    '''Spec harness rows [name, module_subtype, module_type, inp, out(, instance)] (inp/out
+    space-separated) -> records.'''
+    out = []
+    for r in rows:
+        n, bc, vt, i, o = r[:5]
+        rec = {'name': str(n), 'vessel_type': str(vt), 'BC_type': str(bc)}
+        if len(r) > 5 and r[5]:
+            rec['instance'] = str(r[5])
+        rec.update({'inp_vessels': str(i or ''), 'out_vessels': str(o or '')})
+        out.append(normalise_record(rec))
+    return out
 
 
 def libcuflynx_reads_json():
@@ -91,3 +100,21 @@ def libcuflynx_reads_json():
     except ImportError:
         return False
     return hasattr(config_schemas, 'read_vessel_array_records')
+
+
+def to_library_versions(records, instance='default'):
+    '''Records naming circulatory_autogen's (or this library's pre-versions) module pairs -> this
+    library's (module_type, version), renamed where the move to versions changed them
+    (library.legacy_renames), each naming ``instance`` unless it names one already.'''
+    from cam_testing.library import legacy_renames
+    table = legacy_renames()
+    out = []
+    for rec in records:
+        rec = normalise_record(rec)
+        new = table.get((rec.get('module_type'), rec.get('module_subtype')))
+        if new:
+            rec['module_type'], rec['module_subtype'] = new
+        rec.setdefault('instance', instance)
+        out.append(normalise_record(rec))
+    return out
+

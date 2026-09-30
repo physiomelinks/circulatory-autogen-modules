@@ -1,0 +1,25 @@
+module_type: axon
+version: sympathetic_monolithic_v01
+reviewed: false
+notes: 'Owner''s passive axon segment: axial current I = (V_in - V)/R from the soma, plus a lumped "channel" current proportional
+  to it (channel_ratio), charging C. Exact RC solution for a constant soma potential.'
+reference_proposals:
+  channel_ratio:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
+    sourced: 'no'
+  C:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_determined')
+    sourced: 'no'
+  R:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_determined')
+    sourced: 'no'
+  V_rest_approx:
+    reference: unreferenced_placeholder; owner's value (-70 mV, same as SN_soma, cf. Davis2020)
+    sourced: 'no'
+  V_in:
+    reference: definitional; soma potential supplied by SN_soma in a network; -70 mV (= V_rest_approx) alone
+    sourced: definitional
+    value: -70.0
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

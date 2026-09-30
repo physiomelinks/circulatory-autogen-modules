@@ -1,10 +1,11 @@
 """
-Builds a single module component into a runnable model with libcuflynx, and runs it.
+Builds a single module version into a runnable model with libcuflynx, and runs it.
 
-A component is instantiated alone, as one vessel with no connections, so every
-boundary_condition variable becomes a parameter the tests can set. Models are generated
-from this repo's modules only (``use_builtin_modules: false``), never libcuflynx's
-bundled copies.
+A version is instantiated alone, as one vessel with no connections, so every
+boundary_condition variable becomes a parameter the tests can set. Its parameter values are
+those of an instance (by default the version's default instance), written to the model's
+parameters file. Models are generated from this repo's modules only
+(``use_builtin_modules: false``), never libcuflynx's bundled copies.
 """
 import contextlib
 import csv
@@ -30,7 +31,7 @@ class GenerationFailed(Exception):
 
 def parameter_name(param):
     '''The name libcuflynx gives a parameter in the generated model.'''
-    if param.kind == 'global_constant' or param.vessel_type == 'global':
+    if param.is_global:
         return param.variable_name
     return f'{param.variable_name}_{VESSEL}'
 
@@ -45,36 +46,44 @@ def output_key(variable):
     return variable.replace('/', '__')
 
 
-def _write_resources(component, resources_dir, prefix, overrides):
+def _write_resources(component, resources_dir, prefix, overrides, parameters=None, instances=True):
     '''
-    The test network: by default the component alone. A component that only works with
+    The test network: by default the version alone. A version that only works with
     neighbours (its inputs are variables another vessel supplies) gives a small network in its
-    spec, in which the component under test is the vessel named "mod":
+    spec, in which the version under test is the vessel named "mod":
 
         harness:
-          vessel_array:            # [name, BC_type, vessel_type, inp_vessels, out_vessels]
-            - [pressure_in, nn_constant, inlet_pressure, '', mod]
-            - [mod, pv_0D_1D, coupler, pressure_in, constant_1D]
+          vessel_array:    # [name, module_subtype (version), module_type, inp, out, instance]
+            - [pressure_in, nn_constant, inlet_pressure, '', mod, default]
+            - [mod, pv_0D_1D, coupler, pressure_in, constant_1D, default]
           parameters:              # values for the neighbours' parameters
             - [P_pressure_in, J_per_m3, 2000, source]
+
+    ``parameters``: the instance parameters to write (default: the version's default instance).
+    ``instances=False`` leaves "instance" out of the records (each record then gets its version's
+    default_instance). libcuflynx before circulatory_autogen #535's baad9e73 needed this for the C++
+    0D-1D split, which appended 5-column rows.
     '''
     os.makedirs(resources_dir, exist_ok=True)
     network = (component.spec.get('harness') or {})
-    rows = network.get('vessel_array') or [[VESSEL, component.BC_type, component.vessel_type, '', '']]
+    rows = network.get('vessel_array') or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.vessel_array must contain the component under test as vessel "{VESSEL}"')
-    vessel_array.write_records(os.path.join(resources_dir, f'{prefix}_vessel_array.json'), vessel_array.from_rows(rows))
+    records = vessel_array.from_rows(rows)
+    if not instances:
+        records = [{k: v for k, v in r.items() if k != 'instance'} for r in records]
+    vessel_array.write_records(os.path.join(resources_dir, f'{prefix}_vessel_array.json'), records)
     if not vessel_array.libcuflynx_reads_json():
         # a libcuflynx without JSON vessel-array support reads the CSV
         with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
-            writer.writerows([str(x) for x in r] for r in rows)
+            writer.writerows([str(x) for x in r[:5]] for r in rows)
 
-    params = component.parameters()
+    params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and parameter_name(p) not in overrides]
     if todo:
-        raise MissingParameters(f'parameters still TODO in {component.module.name}_parameters.csv: {", ".join(todo)}')
+        raise MissingParameters(f'parameters still TODO in the instance parameters of {component.key}: {", ".join(todo)}')
     with open(os.path.join(resources_dir, f'{prefix}_parameters.csv'), 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['variable_name', 'units', 'value', 'data_reference'])
@@ -89,20 +98,21 @@ def _write_resources(component, resources_dir, prefix, overrides):
                 writer.writerow([name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
 
 
-def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml'):
+def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None):
     '''
-    Generates the component's model in ``work_dir``; returns the path of the .cellml file,
-    or of the .py file for ``model_type='python'``.
+    Generates the version's model in ``work_dir``; returns the path of the .cellml file,
+    or of the .py file for ``model_type='python'``. ``parameters``: an instance's parameters
+    (default: the version's default instance).
     '''
     from libcuflynx.scripts.script_generate_with_new_architecture import generate_with_new_architecture
 
     overrides = overrides or {}
-    prefix = f'{component.module.name}__{component.id}'
+    prefix = component.id
     if model_type != 'cellml':
         work_dir = os.path.join(work_dir, model_type)
     resources_dir = os.path.join(work_dir, 'resources')
     generated_dir = os.path.join(work_dir, 'generated_models')
-    _write_resources(component, resources_dir, prefix, overrides)
+    _write_resources(component, resources_dir, prefix, overrides, parameters)
     config = {
         'file_prefix': prefix,
         'input_param_file': f'{prefix}_parameters.csv',

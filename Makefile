@@ -10,7 +10,7 @@ PYTEST_ARGS ?=
 PHLYNX_DIR ?= ../phlynx
 CUFLYNX_BIN ?= $(HOME)/software/CUFLynx
 
-.PHONY: setup structure test test-all systems pipeline pipeline-setup report site serve clean manifests risk
+.PHONY: setup structure test test-all systems pipeline pipeline-setup omex omex-test report site serve clean manifests risk
 
 setup:
 	python3 -m venv venv
@@ -23,23 +23,33 @@ endif
 structure:
 	$(PYTHON) -m pytest tests/test_structure.py
 
-# V&V tests, skipping slow calibration. MODULE=name runs one module (reviewed or not).
+# V&V tests, skipping slow calibration. MODULE=<module_type or category path> runs those versions
+# (reviewed or not), e.g. MODULE=Lotka_Volterra or MODULE=cell/neurons.
 test:
 	$(PYTHON) -m pytest tests/test_modules.py -m "not slow" $(MODULE_ARGS) $(PYTEST_ARGS)
 
 test-all:
 	$(PYTHON) -m pytest tests/test_modules.py $(MODULE_ARGS) $(PYTEST_ARGS)
 
-# the system models (modules/system) and supermodules
+# the system models (system_models/) and the supermodule versions' structure and "reproduces" tests
 systems:
-	$(PYTHON) -m pytest tests/test_systems.py tests/test_supermodules.py $(PYTEST_ARGS)
+	$(PYTHON) -m pytest tests/test_systems.py $(PYTEST_ARGS)
+	$(PYTHON) -m pytest tests/test_modules.py -k supermodule --include-unreviewed $(PYTEST_ARGS)
 
-# PhLynx build & export -> CUFLynx import & simulate -> compare with libcuflynx, per component
+# PhLynx build & export -> CUFLynx import & simulate -> compare with libcuflynx, per version
 pipeline-setup:
 	cd tools/phlynx_bridge && npm ci --no-audit --no-fund
 
 pipeline:
 	PHLYNX_DIR=$(PHLYNX_DIR) CUFLYNX_BIN=$(CUFLYNX_BIN) $(PYTHON) -m pytest tests/test_phlynx.py $(MODULE_ARGS) $(PYTEST_ARGS)
+
+# a COMBINE archive per instance for CUFLynx, generated from the library's files (not committed)
+omex:
+	$(PYTHON) tools/build_instance_omex.py $(MODULE_ARGS)
+
+# each instance's archive loads and runs in a released CUFLynx and reproduces libcuflynx
+omex-test:
+	CUFLYNX_BIN=$(CUFLYNX_BIN) $(PYTHON) -m pytest tests/test_instance_omex.py $(MODULE_ARGS) $(PYTEST_ARGS)
 
 report:
 	$(PYTHON) -m cam_testing.report $(MODULE_ARGS)
@@ -55,4 +65,11 @@ manifests:
 	$(PYTHON) tools/build_manifests.py
 
 clean:
-	rm -rf site modules/*/plots modules/*/results modules/*/*.html
+	rm -rf site
+	find modules system_models -type d \( -name plots -o -name results \) -prune -exec rm -rf {} +
+	find modules -name '*.html' -delete
+
+# joint failure-risk analysis (on request): MODULE=<module_type or category>; RISK_ARGS=--reviewed-only in CI
+RISK_ARGS ?=
+risk:
+	$(PYTHON) -m cam_testing.risk $(MODULE_ARGS) $(RISK_ARGS)

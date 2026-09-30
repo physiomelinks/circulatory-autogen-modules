@@ -1,0 +1,11 @@
+variable_name,units,value,data_reference,sourced
+Ca_bulk,millimolar,0.0001,"definitional; SN_simple Cai_init, the initial Ca_bulk (used when unconnected)",no
+Ca_mid_m_SK,millimolar,3e-4,SN_simple: gupta2016Computational,yes
+Cai_init,millimolar,1e-4,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
+E_K,milliV,-93.713686,"definitional; Nernst potential at SN_simple Ko 4.5, Ki_init 150 mM (used when unconnected)",no
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+g_KCa_SK,microS,5e-3,SN_simple: to_be_identified,no
+g_KCa_SK_mod,dimensionless,1.0,SN_simple: to_be_identified,no
+p_SK,dimensionless,4,SN_simple: gupta2016Computational,yes
+tau_m_SK,millis,5,SN_simple: gupta2016Computational,yes
+F,C_per_M,TODO,TODO,no

@@ -1,0 +1,56 @@
+module_type: terminal
+version: pp_controller
+reviewed: false
+notes: 'Controlled terminal: compliance C_T (state q_T, viscoelastic damper 0.01/C_T) between two resistive-inertive branches
+  R_T/2 with hard-coded I_T = 1e-6, draining to u_out = 0. R_T is set online by an adaptive controller: three membership functions
+  of the pressure error (pressure_d - u_a; logistic/Gaussian with 1 Pa width) weight linear consequents aa_i error + cc_i,
+  whose coefficients learn at rate learning_rate (critic - K_a r_a), r_a = BFF_ASL - v_a/meanflow_4dflow (u_a, v_a from pressure/flow
+  observers). Tested alone with constant u_in, u_a, v_a (harness values) at pressure_d = 13000 Pa and meanflow_4dflow = 1.24e-5
+  m3/s (the cerebral_elic values).'
+known_issues:
+- port variable u_in not in variables_and_units
+- port variable u_a not in variables_and_units
+- port variable v_a not in variables_and_units
+expected_failures:
+  run_test: 'libcuflynx exits during generation ("the port variable u_in is not a variable for vessel type: terminal"): u_in,
+    u_a and v_a are used in the entrance ports but missing from variables_and_units. Evidence (patched copy with the fix):
+    see review.findings'
+  verification_test_invariants: 'libcuflynx exits during generation ("the port variable u_in is not a variable for vessel
+    type: terminal"): u_in, u_a and v_a are used in the entrance ports but missing from variables_and_units. Evidence (patched
+    copy with the fix): see review.findings'
+  verification_test_BC: 'Generation fails as for run_test (port variables missing from variables_and_units). With the fix
+    (patched copy) the sweep runs, but whenever pressure_d <= u_a (observed pressure at or above target: pressure_d = 8000
+    and 12000 Pa with u_a = 12000 Pa; at error = 0 check decays into (0, 1), which the piecewise passes through unclamped)
+    the critic 1e-6 error (v/v_ref)^2 is negative, the consequent coefficients learn downwards without bound, check < 0 and
+    R_T falls to its 1 Pa s m^-3 floor: the terminal short-circuits (v ~ 1.2e4 m3/s) and the physical-bound invariant fails.
+    See review.proposed_fixes.'
+  verification_test_timestep: 'Generation fails as for run_test (port variables missing from variables_and_units). Even with
+    the fix (patched copy) this test fails: the RK4 reference is evaluated in Python and math.exp overflows in the membership
+    functions x1/x3 = 1/(1 + exp((-/+error + 1)/0.01)) once |error| exceeds ~7 Pa (OverflowError; the same error stops solve_ivp
+    in the stability matrix, where only CVODE works), and the flow equations are extremely stiff anyway (I_T/R_T ~ 1e-6/(1e8-1e13)
+    = 1e-14-1e-19 s), so no explicit fixed-step scheme can run at a practical dt.'
+  stability_test: 'libcuflynx exits during generation ("the port variable u_in is not a variable for vessel type: terminal"):
+    u_in, u_a and v_a are used in the entrance ports but missing from variables_and_units. Evidence (patched copy with the
+    fix): see review.findings'
+reference_proposals:
+  C_T:
+    reference: unreferenced_placeholder; 2.64334e-13 m3/Pa is the value circulatory_autogen cerebral_elic gives this terminal
+      ("ADAN_218"); ADAN is Blanco2015, but the per-terminal compliance could not be checked against the published model tables
+    sourced: 'no'
+    value: 2.64334e-13
+  BFF_ASL:
+    reference: unreferenced_placeholder; blood-flow fraction of this territory from a patient arterial-spin-labelling (ASL)
+      MRI measurement in the intended use; 0.0896 is the cerebral_elic "defined_by_user" value for a posterior-cerebral terminal
+    sourced: 'no'
+    value: 0.0896
+  pressure_d:
+    reference: unreferenced_placeholder; desired pressure at the observed site ("defined_by_user"). NB the library value 520346
+      Pa (3903 mmHg) is not physiological; circulatory_autogen cerebral_elic uses 13000 Pa
+    sourced: 'no'
+  meanflow_4dflow:
+    reference: unreferenced_placeholder; total flow of the territory from 4D-flow MRI in the intended use ("defined_by_user");
+      3e-4 m3/s is cardiac-output scale, whereas cerebral_elic uses 1.24e-5 m3/s
+    sourced: 'no'
+review: reviews/elic_review.yaml
+review_scope: The review of the whole elic module (4 entries) before the move to versions; only the parts about this version
+  apply.

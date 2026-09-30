@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="sum_blood_vol_2_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="sum_blood_vol_type2">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="q" public_interface="out" units="m3"/>
+        <!-- boundary conditions-->
+        <variable name="q_sum" public_interface="in" units="m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>q</ci>
+                <ci>q_sum</ci>
+            </apply>
+        </math>
+    </component>
+</model>

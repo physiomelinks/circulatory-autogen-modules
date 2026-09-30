@@ -1,0 +1,152 @@
+[
+  {
+    "module_type": "venous_novisco",
+    "module_subtype": "vp",
+    "module_format": "cellml",
+    "component_file": "venous_novisco_vp_modules.cellml",
+    "component_type": "vp_ven_simple_novisco_type",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "C",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "I",
+        "Js2_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C_change",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_us_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_us_wCont",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "Delta_q_us",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_C",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

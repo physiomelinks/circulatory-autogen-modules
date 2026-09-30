@@ -1,0 +1,119 @@
+[
+  {
+    "module_type": "vein",
+    "module_subtype": "pp_micro",
+    "module_format": "cellml",
+    "component_file": "vein_pp_micro_modules.cellml",
+    "component_type": "pp_simple_type__vein_pp_micro",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_d"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_d",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "C",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

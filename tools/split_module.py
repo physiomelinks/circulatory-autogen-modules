@@ -10,6 +10,10 @@ Each group (config module_types) becomes a module modules/<parent>/<new>/ with i
 components, and the old module's review block), bibliographies (the entries its references
 cite) and risk files. The old module's files are removed; its plots/results are regenerated
 by the tests. Component ids (<module_type>__<subtype>) are unchanged, so risk files move as is.
+
+Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
+provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
+modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
 """
 import argparse
 import csv

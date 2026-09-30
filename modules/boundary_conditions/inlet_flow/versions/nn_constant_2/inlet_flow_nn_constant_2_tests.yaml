@@ -1,0 +1,18 @@
+module_type: inlet_flow
+version: nn_constant_2
+reviewed: false
+notes: 'Two constant inflows v_1, v_2 on one port (flow_inlet_BC_2_port), consumed only by BG 2in2out_junction vv (e.g. the
+  two inflows of a cerebral junction). Tested alone: the component has no equations, so only the constants can be checked;
+  a harness with a 2in2out_junction needs a full cerebral network.'
+reference_proposals:
+  v_1:
+    reference: 'Zarrinkoob2015; Table 1: ICA flow 257 +- 48 mL/min (4.28e-6 m^3/s), VA 100 +- 22 mL/min, total CBF 717 mL/min.
+      The library value 3.1e-6 m^3/s (186 mL/min) is not in the paper: it is ~tCBF/4 (2.99e-6), i.e. between an ICA and a
+      VA flow'
+    sourced: 'no'
+  v_2:
+    reference: 'Zarrinkoob2015; as v_1: 3.1e-6 m^3/s is ~tCBF/4, not a tabulated value (ICA 4.28e-6, VA 1.67e-6 m^3/s)'
+    sourced: 'no'
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

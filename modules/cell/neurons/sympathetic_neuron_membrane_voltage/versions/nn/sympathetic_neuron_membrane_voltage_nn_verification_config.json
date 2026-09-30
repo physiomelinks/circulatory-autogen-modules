@@ -1,0 +1,54 @@
+{
+  "module_type": "sympathetic_neuron_membrane_voltage",
+  "version": "nn",
+  "sim_time": 0.02,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["Vm", "Vm_volt"],
+  "run_parameters": {"i_Na": -0.1, "i_KV": 0.02, "i_stim": 0.02},
+  "invariants": [
+    {
+      "description": "with constant currents Vm is exactly linear: Vm = Vm_init - 1e6 (sum I - i_stim)/C_m t (nA/pF = 1e6 mV/s)",
+      "expr": "np.max(np.abs(Vm - (Vm_init - 1e6*(i_Ca + i_Na + i_A + i_KV + i_KCa - i_stim)/C_m*t))) <= 1e-6*max(1.0, np.max(np.abs(Vm)))"
+    },
+    {"description": "Vm_volt = Vm/1000", "expr": "np.max(np.abs(Vm_volt - Vm/1000)) <= 1e-12"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "i_Ca": {"min": -1.0, "max": 1.0, "points": 3},
+      "i_Na": {"min": -1.0, "max": 1.0, "points": 3},
+      "i_A": {"min": -1.0, "max": 1.0, "points": 3},
+      "i_KV": {"min": -1.0, "max": 1.0, "points": 3},
+      "i_KCa": {"min": -1.0, "max": 1.0, "points": 3},
+      "i_stim": {"min": -1.0, "max": 1.0, "points": 3},
+      "Vm_init": {"min": -90.0, "max": 30.0, "points": 4},
+      "C_m": {"min": 10.0, "max": 200.0, "points": 3, "scale": "log"}
+    },
+    "rationale": "currents +/-1 nA (a sympathetic neuron action potential reaches a few nA of I_Na at most), Vm_init -90 to +30 mV, C_m 10-200 pF (small to large ganglion neurons)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.002, 0.001, 0.0005, 0.00025],
+    "t_end": 0.02,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a pure charge integrator; validation belongs to the assembled Tao 2011 neuron (action potential shape)."
+      },
+      "calibrate": {"note": "not_applicable: no free parameters besides C_m and the initial value."}
+    }
+  }
+}

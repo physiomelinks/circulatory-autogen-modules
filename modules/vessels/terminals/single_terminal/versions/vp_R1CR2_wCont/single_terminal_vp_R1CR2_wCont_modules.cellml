@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="single_terminal_vp_R1CR2_wCont" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="vp_T_R1CR2_wCont_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- Constitutive parameters-->
+        <variable name="R_T1" public_interface="in" units="Js_per_m6"/>
+        <variable name="R_T2" public_interface="in" units="Js_per_m6"/>
+        <variable name="C_T" public_interface="in" units="m6_per_J"/>
+        <!-- State Variables-->
+        <variable name="u_ext" public_interface="in" units="J_per_m3"/>
+        <variable name="u" public_interface="out" units="J_per_m3"/>
+        <variable name="u_C" public_interface="out" units="J_per_m3"/>
+        <!-- v_T is the output flow to the venous side-->
+        <variable name="v_in" public_interface="in" units="m3_per_s"/>
+        <variable name="v_T" public_interface="out" units="m3_per_s"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable name="q_init" public_interface="in" units="m3"/>
+        <variable name="q_us" public_interface="in" units="m3"/>
+        <variable initial_value="q_init" name="q" public_interface="out" units="m3"/>
+        <!-- R_T1_wCont is only used to transfer to the FV coupling with Lucas' models.-->
+        <variable name="R_T1_wCont" public_interface="out" units="Js_per_m6"/>
+        <variable name="R_T2_wCont" public_interface="out" units="Js_per_m6"/>
+        <!-- TODO this hasn't been modified for new control laws.-->
+        <variable name="Delta_R" public_interface="in" units="Js_per_m6"/>
+        <variable name="R_local_multiplier" public_interface="in" units="dimensionless"/>
+        <!-- Conservation Laws-->
+        <!-- For now terminals don't have a gravity effect, change this for leg terminals-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_in</ci>
+                    <ci>v_T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u_C</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>q</ci>
+                        <ci>q_us</ci>
+                    </apply>
+                    <ci>C_T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u</ci>
+                <apply>
+                    <plus/>
+                    <ci>u_C</ci>
+                    <ci>u_ext</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_T</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>u</ci>
+                        <ci>u_out</ci>
+                    </apply>
+                    <ci>R_T2_wCont</ci>
+                </apply>
+            </apply>
+            <!-- The below assumes that Delta_R1 is proportional to R1 etc-->
+            <apply>
+                <eq/>
+                <ci>R_T1_wCont</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <plus/>
+                        <ci>R_T1</ci>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>Delta_R</ci>
+                                <ci>R_T1</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>R_T1</ci>
+                                <ci>R_T2</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>R_local_multiplier</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_T2_wCont</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <plus/>
+                        <ci>R_T2</ci>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>Delta_R</ci>
+                                <ci>R_T2</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>R_T1</ci>
+                                <ci>R_T2</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>R_local_multiplier</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

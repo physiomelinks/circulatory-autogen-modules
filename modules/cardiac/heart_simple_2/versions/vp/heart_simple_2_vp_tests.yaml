@@ -1,0 +1,149 @@
+module_type: heart_simple_2
+version: vp
+reviewed: false
+notes: 'Four-chamber time-varying-elastance heart in litre/kPa. Ventricles: u = E(t)(q - q_us) with E(mt) = (Emax - Emin)(mt/To_pk)
+  exp((1 - (mt/To_pk)^2)/2) + Emin for mt < 0.4, held at its mt = 0.4 value until mt = 0.6, then Emin (discontinuous drop
+  at mt = 0.6). Atria: constant elastance (passive). Valves: ideal diodes with resistance. Alone, venous inflows (v_pvn, v_ivc,
+  v_svc) are constant and the aortic/pulmonary root pressures (u_root, u_par) are held constant; the heart settles to a periodic
+  state in which the mean ejection equals the inflow. SI duplicate (m3, Pa); its global constants are shared with heart_simple
+  and declared in litre/kPa, so CellML converts them on connection (E x 1e6, q x 1e-3, R x 1e6).'
+expected_failures:
+  run_test: 'module defect: heart_simplesimple_type2 (SI) shares its global constants (T, E_LVmax, q_LV_us, R_AV, ...) with
+    heart_simplesimple_type, and cvs_mvp_parameters.csv declares them once in litre/kPa units; libcuflynx refuses to generate
+    ("units of litre in parameters.csv file does not match with units of m3 in module_config.json for param q_LV_init"). See
+    review.proposed_fixes.'
+  verification_test_invariants: 'module defect: heart_simplesimple_type2 (SI) shares its global constants (T, E_LVmax, q_LV_us,
+    R_AV, ...) with heart_simplesimple_type, and cvs_mvp_parameters.csv declares them once in litre/kPa units; libcuflynx
+    refuses to generate ("units of litre in parameters.csv file does not match with units of m3 in module_config.json for
+    param q_LV_init"). See review.proposed_fixes.'
+  verification_test_BC: 'module defect: heart_simplesimple_type2 (SI) shares its global constants (T, E_LVmax, q_LV_us, R_AV,
+    ...) with heart_simplesimple_type, and cvs_mvp_parameters.csv declares them once in litre/kPa units; libcuflynx refuses
+    to generate ("units of litre in parameters.csv file does not match with units of m3 in module_config.json for param q_LV_init").
+    See review.proposed_fixes.'
+  verification_test_timestep: 'module defect: heart_simplesimple_type2 (SI) shares its global constants (T, E_LVmax, q_LV_us,
+    R_AV, ...) with heart_simplesimple_type, and cvs_mvp_parameters.csv declares them once in litre/kPa units; libcuflynx
+    refuses to generate ("units of litre in parameters.csv file does not match with units of m3 in module_config.json for
+    param q_LV_init"). See review.proposed_fixes.'
+  stability_test: 'module defect: heart_simplesimple_type2 (SI) shares its global constants (T, E_LVmax, q_LV_us, R_AV, ...)
+    with heart_simplesimple_type, and cvs_mvp_parameters.csv declares them once in litre/kPa units; libcuflynx refuses to
+    generate ("units of litre in parameters.csv file does not match with units of m3 in module_config.json for param q_LV_init").
+    See review.proposed_fixes.'
+reference_proposals:
+  T:
+    reference: 'Bozkurt2019; Table 1 (adult): cardiac cycle T = 0.8 s'
+    sourced: 'yes'
+    value: 0.8
+  delay:
+    reference: definitional; atrial activation delay (fraction of T). Only used for the output mta, which no equation uses
+      (atria have constant elastance)
+    sourced: definitional
+    value: 0.0
+  To_pk:
+    reference: 'Bozkurt2019; Table 1 (adult): end of ventricular systole T1 = 0.33 T, used as the time-to-peak fraction. NOTE:
+      Bozkurt uses a raised-cosine activation, not the x exp((1-x^2)/2) form of this module; value transferred, shape not'
+    sourced: 'no'
+    value: 0.33
+  E_LVmax:
+    reference: 'Bozkurt2019; Table 1 (adult): LV end-systolic elastance Ees = 2.5 mmHg/mL = 333.3 kPa/L'
+    sourced: 'yes'
+    value: 333.3
+  E_LVmin:
+    reference: unreferenced_placeholder; no linear LV diastolic elastance found in a verified source (Bozkurt2019 and Smith2004
+      use a nonlinear EDPVR). 10 kPa/L = 0.075 mmHg/mL, order of magnitude of the EDPVR slope at normal filling
+    sourced: 'no'
+    value: 10.0
+  E_RVmax:
+    reference: 'Bozkurt2019; Table 1 (adult): RV end-systolic elastance Ees = 1 mmHg/mL = 133.3 kPa/L'
+    sourced: 'yes'
+    value: 133.3
+  E_RVmin:
+    reference: unreferenced_placeholder; no linear RV diastolic elastance in a verified source; 6.7 kPa/L = 0.05 mmHg/mL,
+      order of magnitude
+    sourced: 'no'
+    value: 6.7
+  E_LA:
+    reference: 'Bozkurt2019; Table 1 (adult): LA minimum elastance 0.2 mmHg/mL = 26.7 kPa/L (this module has a constant, passive
+      atrium; Bozkurt atria are active, Emax 0.3 mmHg/mL)'
+    sourced: 'yes'
+    value: 26.7
+  E_RA:
+    reference: 'Bozkurt2019; Table 1 (adult): RA minimum elastance 0.2 mmHg/mL = 26.7 kPa/L (passive atrium, see E_LA)'
+    sourced: 'yes'
+    value: 26.7
+  q_LV_us:
+    reference: 'Bozkurt2019; Table 1 (adult): LV V0 = 15 mL = 0.015 L'
+    sourced: 'yes'
+    value: 0.015
+  q_RV_us:
+    reference: 'Bozkurt2019; Table 1 (adult): RV V0 = 40 mL = 0.040 L'
+    sourced: 'yes'
+    value: 0.04
+  q_LA_us:
+    reference: 'Bozkurt2019; Table 1 (adult): LA V0 = 5 mL = 0.005 L'
+    sourced: 'yes'
+    value: 0.005
+  q_RA_us:
+    reference: 'Bozkurt2019; Table 1 (adult): RA V0 = 5 mL = 0.005 L'
+    sourced: 'yes'
+    value: 0.005
+  q_LV_init:
+    reference: unreferenced_placeholder; initial condition (typical adult LV end-diastolic volume ~120 mL); the periodic state
+      does not depend on it
+    sourced: 'no'
+    value: 0.12
+  q_RV_init:
+    reference: unreferenced_placeholder; initial condition (typical RV end-diastolic volume ~140 mL)
+    sourced: 'no'
+    value: 0.14
+  q_LA_init:
+    reference: unreferenced_placeholder; initial condition (~50 mL)
+    sourced: 'no'
+    value: 0.05
+  q_RA_init:
+    reference: unreferenced_placeholder; initial condition (~50 mL)
+    sourced: 'no'
+    value: 0.05
+  R_AV:
+    reference: 'Bozkurt2019; Table 2 (adult) (valve resistances): aortic valve 0.002 mmHg s/mL = 0.2666 kPa s/L'
+    sourced: 'yes'
+    value: 0.2666
+  R_MV:
+    reference: 'Bozkurt2019; Table 2 (adult) (valve resistances): mitral valve 0.002 mmHg s/mL = 0.2666 kPa s/L'
+    sourced: 'yes'
+    value: 0.2666
+  R_PV:
+    reference: 'Bozkurt2019; Table 2 (adult) (valve resistances): pulmonary valve 0.001 mmHg s/mL = 0.1333 kPa s/L'
+    sourced: 'yes'
+    value: 0.1333
+  R_TV:
+    reference: 'Bozkurt2019; Table 2 (adult) (valve resistances): tricuspid valve 0.001 mmHg s/mL = 0.1333 kPa s/L'
+    sourced: 'yes'
+    value: 0.1333
+  v_pvn:
+    reference: unreferenced_placeholder; isolated-test boundary value (pulmonary venous return = cardiac output 5 L/min);
+      in a network it is supplied by the neighbouring vessel
+    sourced: 'no'
+    value: 8.33e-05
+  v_ivc:
+    reference: unreferenced_placeholder; isolated-test boundary value (IVC return 3 L/min); in a network it is supplied by
+      the neighbouring vessel
+    sourced: 'no'
+    value: 5.0e-05
+  v_svc:
+    reference: unreferenced_placeholder; isolated-test boundary value (SVC return 2 L/min); in a network it is supplied by
+      the neighbouring vessel
+    sourced: 'no'
+    value: 3.33e-05
+  u_root:
+    reference: unreferenced_placeholder; isolated-test boundary value (aortic root pressure held at 90 mmHg); in a network
+      it is supplied by the neighbouring vessel
+    sourced: 'no'
+    value: 12000.0
+  u_par:
+    reference: unreferenced_placeholder; isolated-test boundary value (pulmonary artery pressure held at 15 mmHg); in a network
+      it is supplied by the neighbouring vessel
+    sourced: 'no'
+    value: 2000.0
+review: reviews/cvs_mvp_review.yaml
+review_scope: The review of the whole cvs_mvp module (23 entries) before the move to versions; only the parts about this version
+  apply.

@@ -1,0 +1,63 @@
+{
+  "module_type": "i_piezo_Na",
+  "version": "Argus_unpublished_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0002,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["I_piezo", "m_r", "m_r_inf", "m_V", "m_V_inf"],
+  "run_parameters": {"r": 1.15, "Vm": -80.0},
+  "invariants": [
+    {
+      "description": "stretch gate: m_r = m_r_inf(r) + (m_r_init - m_r_inf) exp(-t/tau_r), m_r_inf = 1/(1 + exp(-(r - r_50)/k_r))",
+      "expr": "np.max(np.abs(m_r - ((1/(1+np.exp(-(r - r_50)/k_r))) + (m_r_init - (1/(1+np.exp(-(r - r_50)/k_r))))*np.exp(-t/tau_r)))) <= 1e-6"
+    },
+    {
+      "description": "voltage gate: m_V = m_V_inf(Vm) + (m_V_init - m_V_inf) exp(-t/tau_V), m_V_inf = 1/(1 + exp(-(Vm - V_50)/k_V))",
+      "expr": "np.max(np.abs(m_V - ((1/(1+np.exp(-(Vm - V_50)/k_V))) + (m_V_init - (1/(1+np.exp(-(Vm - V_50)/k_V))))*np.exp(-t/tau_V)))) <= 1e-6"
+    },
+    {
+      "description": "I_piezo = g m_r m_V (Vm - E_Na)",
+      "expr": "np.max(np.abs(I_piezo - g*m_r*m_V*(Vm - E_Na))) <= 1e-9*max(1.0, np.max(np.abs(I_piezo)))"
+    },
+    {
+      "description": "gates stay in [0, 1]",
+      "expr": "np.all((m_r >= -1e-9) & (m_r <= 1 + 1e-9) & (m_V >= -1e-9) & (m_V <= 1 + 1e-9))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "r": {"min": 1.0, "max": 1.3, "points": 4},
+      "Vm": {"min": -100.0, "max": 40.0, "points": 5},
+      "E_Na": {"min": 0.0, "max": 70.0, "points": 3},
+      "m_r_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "m_V_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "V_50": {"min": -60.0, "max": 20.0, "points": 3}
+    },
+    "rationale": "stretch ratio 1.0-1.3 (unstretched to strongly stretched membrane), clamp potential -100 to +40 mV, reversal 0 mV (non-selective cation, as measured for Piezo1) to +70 mV (pure Na); gate initial values over [0, 1]; V_50 -60 to +20 mV; other constants by factors 0.5-2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.002, 0.001, 0.0005, 0.00025],
+    "t_end": 0.1,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: Piezo1 pressure/stretch-response and I-V data (Coste et al. 2010, Science 330:55) once the model's stretch variable is mapped to the experimental stimulus; owner to choose."
+      },
+      "calibrate": {"note": "pending: r_50, k_r, tau_r and g could be identified from the same data."}
+    }
+  }
+}

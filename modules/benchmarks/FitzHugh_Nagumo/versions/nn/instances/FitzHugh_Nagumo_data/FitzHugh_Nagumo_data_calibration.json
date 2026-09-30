@@ -1,0 +1,45 @@
+{
+ "instance": "FitzHugh_Nagumo_data",
+ "version": "FitzHugh_Nagumo/nn",
+ "date": "2026-09-30",
+ "passed": true,
+ "summary": "start a=0.8, b=0.9, c=2 -> a=0.1999, b=0.2006, c=3 (prediction nrmse 0.000101)",
+ "method": "multi_start_sp_minimize",
+ "files": [
+  "instances/FitzHugh_Nagumo_data/FitzHugh_Nagumo_data_obs_data.json",
+  "instances/FitzHugh_Nagumo_data/FitzHugh_Nagumo_data_params_for_id.csv",
+  "instances/FitzHugh_Nagumo_data/FitzHugh_Nagumo_data_validation_obs_data.json"
+ ],
+ "cost": 4.526370989661677e-06,
+ "calibrated_parameters": {
+  "a": 0.1999116267559553,
+  "b": 0.20059597384053354,
+  "c": 2.9999928018398023
+ },
+ "runs": [
+  {
+   "start": {
+    "a": 0.8,
+    "b": 0.9,
+    "c": 2.0
+   },
+   "calibrated_parameters": {
+    "a": 0.1999116267559553,
+    "b": 0.20059597384053354,
+    "c": 2.9999928018398023
+   },
+   "cost": 4.526370989661677e-06,
+   "calibration_scores": {
+    "V": 6.465335142958059e-05,
+    "R": 8.25036469648772e-05
+   },
+   "prediction_scores": {
+    "V": 0.00010068542277508693,
+    "R": 5.82112138296044e-05
+   },
+   "constant_items": {}
+  }
+ ],
+ "metric": "nrmse",
+ "threshold": 0.1
+}

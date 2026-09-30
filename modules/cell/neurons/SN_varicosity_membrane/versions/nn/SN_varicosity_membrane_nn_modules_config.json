@@ -1,0 +1,42 @@
+[
+  {
+    "module_type": "SN_varicosity_membrane",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "SN_varicosity_membrane_nn_modules.cellml",
+    "component_type": "SN_varicosity_membrane",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_in",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

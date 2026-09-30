@@ -1,0 +1,48 @@
+{
+  "module_type": "SN_Na_K_concentrations_soma",
+  "version": "nn",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["Nai", "Ki", "E_K", "E_Na"],
+  "invariants": [
+    {
+      "description": "Nernst: E_Na = 1000 RT/F ln(Nao/Nai), E_K = 1000 RT/F ln(Ko/Ki) (mV)",
+      "expr": "np.max(np.abs(E_Na - 1000*R*T/F*np.log(Nao/Nai))) + np.max(np.abs(E_K - 1000*R*T/F*np.log(Ko/Ki))) <= 1e-9"
+    },
+    {
+      "description": "alone (no fluxes connected) Nai and Ki stay at their initial values",
+      "expr": "np.ptp(Nai) == 0 and np.ptp(Ki) == 0"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {}
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      }
+    }
+  }
+}

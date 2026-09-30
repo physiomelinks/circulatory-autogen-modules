@@ -1,20 +1,20 @@
 """
-PhLynx -> CUFLynx pipeline, per component: the component's test network is built in PhLynx
+PhLynx -> CUFLynx pipeline, per version: the version's test network is built in PhLynx
 (its real code, from a checkout) out of this library, exported as the .omex PhLynx sends to
 CUFLynx, imported into a released CUFLynx and simulated there, and compared with libcuflynx's
 model of the same network.
 
-    pytest tests/test_phlynx.py --module coupling
+    pytest tests/test_phlynx.py --module coupling            # a category, or a module_type
     PHLYNX_DIR=../phlynx CUFLYNX_BIN=~/software/CUFLynx pytest tests/test_phlynx.py
 
 Skips (not fails) when node, PhLynx or the CUFLynx binary isn't available. A failure listed
-under a component's expected_failures (e.g. a module feature PhLynx doesn't support yet) is a
+under a version's expected_failures (e.g. a module feature PhLynx doesn't support yet) is a
 recorded known issue, as in the other tests.
 """
 import pytest
 
 from cam_testing import checks, phlynx
-from cam_testing.library import load_module
+from cam_testing.library import load_module_type, load_version
 
 pytestmark = pytest.mark.phlynx_pipeline
 
@@ -23,19 +23,20 @@ _runs = {}
 
 @pytest.fixture
 def pipeline(component_key, tmp_path_factory):
-    module_name, component_id = component_key
-    if module_name not in _runs:
-        module = load_module(module_name)
-        work_dir = str(tmp_path_factory.mktemp(f'phlynx_{module_name}'))
+    # every version of a module_type in one PhLynx run and one CUFLynx run
+    mt, version_name = component_key
+    if mt not in _runs:
+        versions = [v for v in load_module_type(mt).versions() if not v.is_supermodule]
+        work_dir = str(tmp_path_factory.mktemp(f'phlynx_{mt}'))
         try:
-            _runs[module_name] = (phlynx.run_module(module, module.components(), keep_dir=work_dir), work_dir)
+            _runs[mt] = (phlynx.run_versions(mt, versions, keep_dir=work_dir), work_dir)
         except phlynx.PipelineUnavailable as e:
-            _runs[module_name] = (e, work_dir)
-    results, work_dir = _runs[module_name]
+            _runs[mt] = (e, work_dir)
+    results, work_dir = _runs[mt]
     if isinstance(results, phlynx.PipelineUnavailable):
         pytest.skip(f'PhLynx/CUFLynx pipeline unavailable: {results}')
-    component = load_module(module_name).component(component_id)
-    return component, results.get(component_id), work_dir
+    component = load_version(mt, version_name)
+    return component, results.get(component.id), work_dir
 
 
 def _record(component, result):

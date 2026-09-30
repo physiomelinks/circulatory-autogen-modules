@@ -1,0 +1,44 @@
+{
+  "module_type": "delay_test",
+  "version": "nn",
+  "sim_time": 10.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["V", "V_delay"],
+  "invariants": [
+    {
+      "description": "V_delay equals V shifted by the delay (t ≥ delay), to 1e-3 of max|V|",
+      "expr": "np.max(np.abs(np.interp(t[t >= delay] - delay, t, V) - V_delay[t >= delay])) <= 1e-3 * np.max(np.abs(V))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "delay": {"min": 0.05, "max": 2.0, "points": 6, "scale": "log"},
+      "k_e": {"min": 0.1, "max": 10, "points": 5, "scale": "log"}
+    }
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "test fixture for the delay feature, no physiological counterpart"
+      },
+      "calibrate": {"note": "not_applicable: test fixture for the delay feature, no physiological counterpart"}
+    }
+  }
+}

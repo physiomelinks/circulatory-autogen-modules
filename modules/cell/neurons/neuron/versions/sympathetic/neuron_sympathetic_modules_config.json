@@ -1,0 +1,45 @@
+[
+  {
+    "module_type": "neuron",
+    "module_subtype": "sympathetic",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "description": "Sympathetic neuron (SN_simple): an SN_soma supermodule instance \"soma\", the SN_axon cable \"axon\" and an SN_varicosity supermodule instance \"varicosity\", coupled soma -> axon -> varicosity through the plain axon module (the soma's membrane gives the axon V and takes its axial current; the axon sets the varicosity membrane's potential). A model uses one instance, e.g. {\"name\": \"SN\", \"module_type\": \"sympathetic_neuron\", \"module_subtype\": \"supermodule\"}; nested expansion names the parts SN_soma_<part>, SN_axon and SN_varicosity_<part>.",
+    "submodules": [
+      {
+        "name": "soma",
+        "module_type": "soma",
+        "module_subtype": "sympathetic",
+        "instance": "default",
+        "per_submodule_outputs": {
+          "membrane": [
+            "axon"
+          ]
+        }
+      },
+      {
+        "name": "axon",
+        "module_type": "axon",
+        "module_subtype": "sympathetic_monolithic_v01",
+        "instance": "default",
+        "inp_instances": [
+          "soma"
+        ],
+        "out_instances": [
+          "varicosity"
+        ]
+      },
+      {
+        "name": "varicosity",
+        "module_type": "varicosity",
+        "module_subtype": "sympathetic",
+        "instance": "default",
+        "per_submodule_inputs": {
+          "membrane": [
+            "axon"
+          ]
+        }
+      }
+    ]
+  }
+]

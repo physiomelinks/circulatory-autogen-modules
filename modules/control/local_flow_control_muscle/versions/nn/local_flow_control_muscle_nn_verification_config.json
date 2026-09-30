@@ -1,0 +1,59 @@
+{
+  "module_type": "local_flow_control_muscle",
+  "version": "nn",
+  "sim_time": 100.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "outputs": ["x_O2", "x_CO2", "phi_P_CO2_a", "C_O2_p", "R_local_multiplier"],
+  "invariants": [
+    {
+      "description": "x_O2 = (C_O2_p - C_O2_vm_nom)(1 - exp(-t/tau_O2)) (constant C_O2_p)",
+      "expr": "np.max(np.abs(x_O2 - (C_O2_p - C_O2_vm_nom)*(1 - np.exp(-t/tau_O2)))) <= 1e-4*max(1e-3, np.max(np.abs(C_O2_p - C_O2_vm_nom)))"
+    },
+    {
+      "description": "phi_P_CO2_a = (1 - e^z)/(1 + e^z), z = (P_CO2_a - P_CO2_a_nom)/k_CO2_m",
+      "expr": "np.max(np.abs(phi_P_CO2_a - (1 - np.exp((P_CO2_a - P_CO2_a_nom)/k_CO2_m))/(1 + np.exp((P_CO2_a - P_CO2_a_nom)/k_CO2_m)))) <= 1e-12"
+    },
+    {
+      "description": "x_CO2 = phi (1 - exp(-t/tau_CO2))",
+      "expr": "np.max(np.abs(x_CO2 - phi_P_CO2_a*(1 - np.exp(-t/tau_CO2)))) <= 1e-4*max(1e-2, np.max(np.abs(phi_P_CO2_a)))"
+    },
+    {
+      "description": "R_local_multiplier = (1 + x_CO2)/(1 - g_O2_m x_O2)",
+      "expr": "np.max(np.abs(R_local_multiplier - (1 + x_CO2)/(1 - g_O2_m*x_O2))) <= 1e-9*np.max(np.abs(R_local_multiplier))"
+    },
+    {"description": "the resistance multiplier stays positive", "expr": "np.min(R_local_multiplier) > 0"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "P_CO2_a": {"min": 3333, "max": 9333, "points": 7},
+      "P_O2_a": {"min": 4000, "max": 20000, "points": 3},
+      "g_O2_m": {"min": 15, "max": 45, "points": 3}
+    },
+    "rationale": "PaCO2 25-70 mmHg; PaO2 is unused; g_O2_m limited to 15-45 (x0.5-1.5) because with C_O2_p = 0 (unset, see notes) larger values are harmless but a C_O2_p above 0.188 ml/ml makes R_mult singular."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.2, 0.1, 0.05, 0.025],
+    "t_end": 100.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "Candidate: muscle (forearm/calf) vascular conductance vs arterial PCO2 or O2 content; needs an obtainable dataset and the C_O2_p port fix."
+      },
+      "calibrate": {"note": "pending: see baseline"}
+    }
+  }
+}

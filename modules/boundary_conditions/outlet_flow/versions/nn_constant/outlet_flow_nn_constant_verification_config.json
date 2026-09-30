@@ -1,0 +1,71 @@
+{
+  "module_type": "outlet_flow",
+  "version": "nn_constant",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-12},
+  "outputs": ["va/u", "va/v", "va/q"],
+  "harness": {
+    "vessel_array": [
+      ["p_in", "nn_constant", "inlet_pressure", "", "va", "default"],
+      ["va", "pv", "arterial_simple", "p_in", "mod", "default"],
+      ["mod", "nn_constant", "outlet_flow", "va", "", "default"]
+    ],
+    "parameters": [
+      ["P_p_in", "J_per_m3", 12000, "harness test value (90 mmHg)"],
+      ["R_va", "Js_per_m6", 10000000.0, "harness test value"],
+      ["C_va", "m6_per_J", 1e-08, "harness test value"],
+      ["I_va", "Js2_per_m6", 100000.0, "harness test value"],
+      ["q_0_va", "m3", 0, "harness: zero unstressed volume"],
+      ["u_0_va", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["u_ext_va", "J_per_m3", 0, "harness: zero external pressure"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "the vessels inflow reaches the imposed outflow at steady state (v_vessel → v, 0.1% or 1e-8 m^3/s)",
+      "expr": "abs(va__v[-1] - v) <= max(1e-3*abs(v), 1e-8)"
+    },
+    {
+      "description": "vessel pressure settles at P_in − R v = 12000 − 1e7 v (±1 Pa)",
+      "expr": "abs(va__u[-1] - (12000.0 - 1e7*v)) <= 1.0"
+    },
+    {
+      "description": "vessel volume balance: q(t) − q(0) = ∫(v_vessel − v) dt (trapezoidal, 0.1%)",
+      "expr": "np.max(np.abs((va__q - va__q[0]) - np.concatenate(([0.0], np.cumsum(0.5*(((va__v) - (v))[1:] + ((va__v) - (v))[:-1])*np.diff(t)))))) <= 1e-3*max(1e-12, np.max(np.abs(va__q - va__q[0])))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "v": {"min": 0.0, "max": 0.00015, "points": 5}
+    },
+    "exclude": ["P"],
+    "rationale": "Outflows from 0 to 9 L/min (0-1.5e-4 m^3/s), rest to exercise cardiac output. P is excluded: it is the pressure the connected vessel supplies (a port input)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "prescribed boundary value (a constant flow); verified against the analytic steady state of a test vessel."
+      },
+      "calibrate": {
+        "note": "not_applicable: prescribed boundary value (a constant flow); verified against the analytic steady state of a test vessel."
+      }
+    }
+  }
+}

@@ -1,0 +1,143 @@
+module_type: GE_capillary_merge
+version: nn
+reviewed: false
+notes: As GE_capillary, with two inflows (v_in = v_in_1 + v_in_2) whose contents are flow-weighted (|v| weights, eps = 1e-28
+  m3/s guard).
+expected_failures:
+  run_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+    and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap
+    without declaring it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy
+    of the library (duplicates removed, saturation_cap declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped
+    equations restored) it generates and runs.'
+  verification_test_invariants: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice
+    (J_per_m3/J2_per_m6 and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML
+    uses the global saturation_cap without declaring it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out.
+    Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added to the config as global_constant,
+    C_O2_a_capped/C_CO2_a_capped equations restored) it generates and runs.'
+  verification_test_BC: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+    and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap
+    without declaring it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy
+    of the library (duplicates removed, saturation_cap declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped
+    equations restored) it generates and runs.'
+  verification_test_timestep: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice
+    (J_per_m3/J2_per_m6 and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML
+    uses the global saturation_cap without declaring it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out.
+    Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added to the config as global_constant,
+    C_O2_a_capped/C_CO2_a_capped equations restored) it generates and runs.'
+  stability_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+    and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap
+    without declaring it, and C_O2_a_capped/C_CO2_a_capped whose equations are commented out. Evidence: in a patched copy
+    of the library (duplicates removed, saturation_cap declared and added to the config as global_constant, C_O2_a_capped/C_CO2_a_capped
+    equations restored) it generates and runs.'
+reference_proposals:
+  k_1:
+    reference: Spencer1979; K1 = 14.99 mmHg (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 14.99
+  k_2:
+    reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 194.4
+  a_1:
+    reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 0.3836
+  a_2:
+    reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 1.819
+  alpha_1:
+    reference: Spencer1979; 0.03198 /mmHg (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 0.03198
+  alpha_2:
+    reference: Spencer1979; 0.05591 /mmHg (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 0.05591
+  beta_1:
+    reference: Spencer1979; 0.008275 /mmHg (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 0.008275
+  beta_2:
+    reference: Spencer1979; 0.03255 /mmHg (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 0.03255
+  C_O2_sat:
+    reference: Spencer1979; 9 mmol/L = 9 mol/m3 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 9.0
+  C_CO2_sat:
+    reference: Spencer1979; 86.11 mmol/L = 86.11 mol/m3 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+    value: 86.11
+  S_O2:
+    reference: Albanese2014; O2 solubility 0.003 ml/dl/mmHg (eq. 2-14/A-75) / 22.4 ml/mmol = 1.34e-3 mmol/L/mmHg = 1.00e-5
+      mol/m3/Pa
+    sourced: 'yes'
+    value: 1.0e-05
+  S_CO2:
+    reference: unreferenced_placeholder; standard plasma CO2 solubility 0.03 mmol/L/mmHg (Henderson-Hasselbalch constant;
+      textbook page not verified) = 2.25e-4 mol/m3/Pa
+    sourced: 'no'
+    value: 0.000225
+  perm_O2:
+    reference: unreferenced_placeholder; order of magnitude chosen so a 1 mm, 3 um-radius capillary extracts ~25% of arterial
+      O2 at 1.4e-14 m3/s
+    sourced: 'no'
+    value: 2.0e-05
+  exp_threshold:
+    reference: unreferenced_placeholder; switch between exponential and linear axial profile; declared millimolar but used
+      as a dimensionless ratio (see finding)
+    sourced: 'no'
+    value: 0.9
+  C_O2_c_init:
+    reference: unreferenced_placeholder; initial condition ~ capillary mean content (8 mol/m3 ~ P_O2 60 mmHg)
+    sourced: 'no'
+    value: 8.0
+  ub_O2_t:
+    reference: 'unreferenced_placeholder; tissue free O2 at P_O2 = 20 mmHg: 1.0e-5 mol/m3/Pa x 2666 Pa = 0.027 mol/m3'
+    sourced: 'no'
+    value: 0.027
+  L:
+    reference: unreferenced_placeholder; single capillary length ~1 mm (order of magnitude)
+    sourced: 'no'
+    value: 0.001
+  r:
+    reference: unreferenced_placeholder; capillary radius ~3 um (order of magnitude)
+    sourced: 'no'
+    value: 3.0e-06
+  V:
+    reference: definitional; V = pi r^2 L = 2.83e-14 m3 for the proposed r, L
+    sourced: definitional
+    value: 2.83e-14
+  C_CO2_a_1:
+    reference: 'Spencer1979; test BC: arterial CO2 content 21.35 mol/m3 (P_O2 100, P_CO2 40 mmHg)'
+    sourced: 'yes'
+    value: 21.35
+  C_O2_a_1:
+    reference: 'Spencer1979; test BC: arterial O2 content 8.75 mol/m3'
+    sourced: 'yes'
+    value: 8.75
+  C_CO2_a_2:
+    reference: 'Spencer1979; test BC: CO2 content at P_O2 80, P_CO2 42 mmHg = 21.9 mol/m3 (second inflow slightly less oxygenated)'
+    sourced: 'yes'
+    value: 21.9
+  C_O2_a_2:
+    reference: 'Spencer1979; test BC: O2 content at P_O2 80, P_CO2 42 mmHg = 8.5 mol/m3'
+    sourced: 'yes'
+    value: 8.5
+  v_in_1:
+    reference: unreferenced_placeholder; half of a single-capillary flow
+    sourced: 'no'
+    value: 7.0e-15
+  v_in_2:
+    reference: unreferenced_placeholder; half of a single-capillary flow
+    sourced: 'no'
+    value: 7.0e-15
+  v_out:
+    reference: unreferenced_placeholder; = v_in_1 + v_in_2
+    sourced: 'no'
+    value: 1.4e-14
+review: reviews/gas_exchange_review.yaml
+review_scope: The review of the whole gas_exchange module (7 entries) before the move to versions; only the parts about this
+  version apply.

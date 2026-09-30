@@ -1,0 +1,553 @@
+{
+  "n_samples": 512,
+  "n_failures": 512,
+  "failure_probability": 1.0,
+  "ci": [
+    0.9925527526279385,
+    1.0
+  ],
+  "upper_bound_if_none_failed": null,
+  "seed": 0,
+  "box": [
+    {
+      "variable": "C_T",
+      "min": 1e-14,
+      "max": 1e-12,
+      "log": true
+    },
+    {
+      "variable": "BFF_ASL",
+      "min": 0.02,
+      "max": 0.5,
+      "log": true
+    },
+    {
+      "variable": "pressure_d",
+      "min": 8000.0,
+      "max": 16000.0,
+      "log": false
+    },
+    {
+      "variable": "meanflow_4dflow",
+      "min": 1e-06,
+      "max": 0.0003,
+      "log": true
+    }
+  ],
+  "failure_modes": {
+    "simulation error": 512
+  },
+  "ranking": [
+    {
+      "variable": "C_T",
+      "importance": 0.0
+    },
+    {
+      "variable": "BFF_ASL",
+      "importance": 0.0
+    },
+    {
+      "variable": "pressure_d",
+      "importance": 0.0
+    },
+    {
+      "variable": "meanflow_4dflow",
+      "importance": 0.0
+    }
+  ],
+  "per_parameter": {
+    "C_T": {
+      "range": [
+        1e-14,
+        1e-12
+      ],
+      "log": true,
+      "bins": [
+        {
+          "lo": 1e-14,
+          "hi": 1.7782794100389227e-14,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 1.7782794100389227e-14,
+          "hi": 3.1622776601683796e-14,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 3.1622776601683796e-14,
+          "hi": 5.6234132519034906e-14,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 5.6234132519034906e-14,
+          "hi": 1e-13,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 1e-13,
+          "hi": 1.7782794100389227e-13,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 1.7782794100389227e-13,
+          "hi": 3.162277660168379e-13,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 3.162277660168379e-13,
+          "hi": 5.62341325190349e-13,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 5.62341325190349e-13,
+          "hi": 1e-12,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    },
+    "BFF_ASL": {
+      "range": [
+        0.02,
+        0.5
+      ],
+      "log": true,
+      "bins": [
+        {
+          "lo": 0.02,
+          "hi": 0.029906975624424414,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.029906975624424414,
+          "hi": 0.044721359549995794,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.044721359549995794,
+          "hi": 0.0668740304976422,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.0668740304976422,
+          "hi": 0.1,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.1,
+          "hi": 0.14953487812212204,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.14953487812212204,
+          "hi": 0.22360679774997896,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.22360679774997896,
+          "hi": 0.334370152488211,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.334370152488211,
+          "hi": 0.5,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    },
+    "pressure_d": {
+      "range": [
+        8000.0,
+        16000.0
+      ],
+      "log": false,
+      "bins": [
+        {
+          "lo": 8000.0,
+          "hi": 9000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 9000.0,
+          "hi": 10000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 10000.0,
+          "hi": 11000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 11000.0,
+          "hi": 12000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 12000.0,
+          "hi": 13000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 13000.0,
+          "hi": 14000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 14000.0,
+          "hi": 15000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 15000.0,
+          "hi": 16000.0,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    },
+    "meanflow_4dflow": {
+      "range": [
+        1e-06,
+        0.0003
+      ],
+      "log": true,
+      "bins": [
+        {
+          "lo": 1e-06,
+          "hi": 2.0400469235504897e-06,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 2.0400469235504897e-06,
+          "hi": 4.161791450287817e-06,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 4.161791450287817e-06,
+          "hi": 8.490249844618393e-06,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 8.490249844618393e-06,
+          "hi": 1.7320508075688777e-05,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 1.7320508075688777e-05,
+          "hi": 3.53346492141403e-05,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 3.53346492141403e-05,
+          "hi": 7.208434242404265e-05,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 7.208434242404265e-05,
+          "hi": 0.00014705544099832826,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        },
+        {
+          "lo": 0.00014705544099832826,
+          "hi": 0.0003,
+          "n": 64,
+          "failures": 64,
+          "risk": 1.0,
+          "ci": [
+            0.9433739770288436,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    }
+  },
+  "example_failures": [
+    {
+      "sample": {
+        "C_T": 5.025403459188012e-13,
+        "BFF_ASL": 0.40088868333133454,
+        "pressure_d": 10901.740722358227,
+        "meanflow_4dflow": 7.998986251864663e-06
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 7.656053996698165e-14,
+        "BFF_ASL": 0.09648528866483866,
+        "pressure_d": 13088.190332055092,
+        "meanflow_4dflow": 0.0001947611788891272
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 1.0358128034092063e-14,
+        "BFF_ASL": 0.11347783039757692,
+        "pressure_d": 9231.827333569527,
+        "meanflow_4dflow": 3.5593057685639504e-06
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 2.106778509100373e-13,
+        "BFF_ASL": 0.027483919560107047,
+        "pressure_d": 14793.256275355816,
+        "meanflow_4dflow": 2.1263088639513535e-05
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 1.5641116798884778e-13,
+        "BFF_ASL": 0.182001791921982,
+        "pressure_d": 12521.267734467983,
+        "meanflow_4dflow": 5.2613770033009374e-05
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 2.3829303941396167e-14,
+        "BFF_ASL": 0.04301922110465212,
+        "pressure_d": 11457.91743695736,
+        "meanflow_4dflow": 1.0014919950655167e-06
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 3.195898469348422e-14,
+        "BFF_ASL": 0.2592105447811658,
+        "pressure_d": 15347.42347896099,
+        "meanflow_4dflow": 0.00011372060764542176
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 6.500400389515246e-13,
+        "BFF_ASL": 0.06088484178370334,
+        "pressure_d": 8659.109137952328,
+        "meanflow_4dflow": 9.645025255153923e-06
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 9.306133660016176e-13,
+        "BFF_ASL": 0.1455477508872034,
+        "pressure_d": 15564.098134636879,
+        "meanflow_4dflow": 2.0170915607535133e-06
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    },
+    {
+      "sample": {
+        "C_T": 4.58033828955711e-14,
+        "BFF_ASL": 0.02401912638826878,
+        "pressure_d": 8375.53995102644,
+        "meanflow_4dflow": 4.9025013334419004e-05
+      },
+      "reason": "GenerationFailed: libcuflynx exited during generation (None):\nsim_time not found in inp_data_dict, setting to None so it can be set in pro"
+    }
+  ],
+  "classifier": {
+    "kind": "constant",
+    "p_fail": 1.0,
+    "note": "every sample failed"
+  },
+  "plots": [
+    "plots/risk_corner.png",
+    "plots/risk_marginals.png"
+  ]
+}

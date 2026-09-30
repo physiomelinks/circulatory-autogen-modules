@@ -1,0 +1,45 @@
+module_type: i_Na1_6
+version: Argus2026_v01
+reviewed: false
+notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+  constant has epsilon_tau = 0.1 ms added, as in the original. NaV1.6 current of the SN soma, i_Na1_6 = g_Na1_6 g_Na1_6_mod
+  (V - E_Na) m_Na1_6^3 h_Na1_6 (the same law as i_Na_SN). Two features of the original are kept so that SN_simple is reproduced:
+  the gates start at i_Na_SN''s steady state (the original sets m_Na1_6''s initial value to m_init, computed from V_mid_m,
+  V_den_m, V_mid_h, V_den_h, the NaV1.7 values, which are this component''s own parameters here), and its Na flux j_Na1_6
+  = -i_Na1_6/F is computed but has no port, as the original leaves it out of dNai/dt. Built by tools/build_sn_modules.py;
+  SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+expected_failures:
+  run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
+    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
+    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
+    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
+    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units
+    J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M
+    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
+    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
+    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
+    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
+    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  stability_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
+    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
+    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
+    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
+    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+reference_proposals:
+  F:
+    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+    sourced: 'yes'
+    value: 96485.3415
+    note: (proposed for the ion_channel global F under i_CaL_Paci_2013/nn)
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

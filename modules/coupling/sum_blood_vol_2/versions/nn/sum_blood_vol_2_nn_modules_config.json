@@ -1,0 +1,42 @@
+[
+  {
+    "module_type": "sum_blood_vol_2",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "sum_blood_vol_2_nn_modules.cellml",
+    "component_type": "sum_blood_vol_type2",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q_sum"
+        ],
+        "multi_port": "sum"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q_sum",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

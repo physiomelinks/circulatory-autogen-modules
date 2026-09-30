@@ -1,0 +1,197 @@
+[
+  {
+    "module_type": "capillary_merge",
+    "module_subtype": "vp",
+    "module_format": "cellml",
+    "component_file": "capillary_merge_vp_modules.cellml",
+    "component_type": "vp_merge_capillary_type",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in_1",
+          "u"
+        ]
+      },
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in_2",
+          "u"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "length_and_radius_port",
+        "variables": [
+          "l",
+          "r"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      },
+      {
+        "port_type": "merge_flow_in_out_port",
+        "variables": [
+          "v_in_1",
+          "v_in_2",
+          "v"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_us",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "r",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "mu",
+        "Js_per_m3",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "C",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "v_in_total",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_in_1",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_in_2",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

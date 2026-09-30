@@ -1,0 +1,67 @@
+{
+  "module_type": "i_Na",
+  "version": "Tao2011_v01",
+  "sim_time": 5.0,
+  "pre_time": 0.0,
+  "dt": 0.005,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["i_Na", "m", "tau_m", "h", "tau_h"],
+  "run_parameters": {"Vm": -20.0},
+  "invariants": [
+    {
+      "description": "m follows the Tao 2011 steady state (Suppl. Eq. 86) from m(0) = 0: m = m_bar(Vm) (1 - exp(-t/tau_m)), using the module's own tau_m",
+      "expr": "np.max(np.abs(m - (1/(1+np.exp(-(Vm+36)/7.2)))*(1 - np.exp(-t/tau_m)))) <= 1e-5"
+    },
+    {
+      "description": "tau_m equals Tao 2011 Suppl. Eq. 88 (ms) converted to seconds",
+      "expr": "np.max(np.abs(tau_m - (1/(42.98*np.exp(0.08915*Vm)+0.923*np.exp(-0.03351*Vm))+0.06)/1000)) <= 1e-6*max(1e-3, np.max(np.abs((1/(42.98*np.exp(0.08915*Vm)+0.923*np.exp(-0.03351*Vm))+0.06)/1000)))"
+    },
+    {"description": "m stays in [0, 1]", "expr": "np.all((m >= -1e-9) & (m <= 1 + 1e-9))"},
+    {
+      "description": "h follows the Tao 2011 steady state (Suppl. Eq. 87) from h(0) = 0: h = h_bar(Vm) (1 - exp(-t/tau_h)), using the module's own tau_h",
+      "expr": "np.max(np.abs(h - (1/(1+np.exp((Vm+53.2)/6.5)))*(1 - np.exp(-t/tau_h)))) <= 1e-5"
+    },
+    {
+      "description": "tau_h equals Tao 2011 Suppl. Eq. 89 (ms) converted to seconds",
+      "expr": "np.max(np.abs(tau_h - (((-0.0046*Vm+0.26)+50.85)/((1+np.exp(-(Vm+59.46)/7.91))+(1+np.exp((Vm+40.94)/1.556))))/1000)) <= 1e-6*max(1e-3, np.max(np.abs((((-0.0046*Vm+0.26)+50.85)/((1+np.exp(-(Vm+59.46)/7.91))+(1+np.exp((Vm+40.94)/1.556))))/1000)))"
+    },
+    {"description": "h stays in [0, 1]", "expr": "np.all((h >= -1e-9) & (h <= 1 + 1e-9))"},
+    {
+      "description": "i_Na = g_Na*m**3*h*(Vm - E_Na) (Tao 2011 Suppl.; the module's encoded form)",
+      "expr": "np.max(np.abs(i_Na - (g_Na*m**3*h*(Vm - E_Na)))) <= 1e-9*max(1.0, np.max(np.abs(g_Na*m**3*h*(Vm - E_Na))))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -90.0, "max": 30.0, "points": 5},
+      "E_Na": {"min": 20.0, "max": 60.0, "points": 3}
+    },
+    "rationale": "clamp potential -90 to +30 mV (rest to action-potential peak of a sympathetic neuron); reversal potential +/-20 mV about the Tao value; conductances by 0.5-2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 5.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidates: the voltage-clamp steady-state and time-constant data of Belluzzi & Sacchi (J Physiol 1985 358:91 I_A; 1986 380:275 I_Na; 1988 397:127 I_KV; 1989 412:493 I_Ca; 1990 422:561 I_KCa), e.g. tau_hc 17.6-29.3 ms; set up after the unit/sign fixes."
+      },
+      "calibrate": {
+        "note": "not_applicable: kinetic constants are hard-coded in the CellML; only the maximal conductance is a parameter."
+      }
+    }
+  }
+}

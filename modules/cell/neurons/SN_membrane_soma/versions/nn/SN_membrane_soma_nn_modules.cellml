@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="SN_membrane_soma_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="SN_membrane_soma">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="C_sensed" public_interface="in" units="picoF"/>
+        <variable name="Cm" public_interface="in" units="picoF"/>
+        <variable name="I_in" public_interface="in" units="nanoA"/>
+        <variable name="I_in_delayed" public_interface="out" units="nanoA"/>
+        <variable name="I_out" public_interface="in" units="nanoA"/>
+        <variable name="R_diffSensed" public_interface="in" units="megaOhm"/>
+        <variable name="V" public_interface="out" units="milliV" initial_value="V_rest_approx"/>
+        <variable name="V_rest_approx" public_interface="in" units="milliV"/>
+        <variable name="V_sensed" public_interface="out" units="milliV" initial_value="V_rest_approx"/>
+        <variable name="i_ion" public_interface="in" units="nanoA"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>V</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>i_ion</ci>
+                            <ci>I_in_delayed</ci>
+                            <ci>I_out</ci>
+                        </apply>
+                    </apply>
+                    <ci>Cm</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>V_sensed</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <ci>I_in</ci>
+                            <ci>I_in_delayed</ci>
+                        </apply>
+                    </apply>
+                    <ci>C_sensed</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>I_in_delayed</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>V_sensed</ci>
+                            <ci>V</ci>
+                        </apply>
+                    </apply>
+                    <ci>R_diffSensed</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

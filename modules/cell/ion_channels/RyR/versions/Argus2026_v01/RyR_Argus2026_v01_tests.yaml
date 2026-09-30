@@ -1,0 +1,10 @@
+module_type: RyR
+version: Argus2026_v01
+reviewed: false
+notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+  constant has epsilon_tau = 0.1 ms added, as in the original. Ryanodine receptor Ca release from the ER of the SN soma and
+  varicosity (the same law in both): j_RyR = k_RyR (Ca_ER - Cai) c^3 hc^3, c activated by Cai and hc by Ca_ER. Built by tools/build_sn_modules.py;
+  SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

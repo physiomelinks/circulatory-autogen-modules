@@ -1,0 +1,126 @@
+[
+  {
+    "module_type": "sympathetic_neuron_membrane_voltage",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "sympathetic_neuron_membrane_voltage_nn_modules.cellml",
+    "component_type": "sympathetic_neuron_membrane_voltage",
+    "default_instance": "default",
+    "entrance_ports": [
+      {
+        "port_type": "stim_current",
+        "variables": [
+          "i_stim"
+        ]
+      },
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "Ca_current",
+        "variables": [
+          "i_Ca"
+        ]
+      },
+      {
+        "port_type": "Na_current",
+        "variables": [
+          "i_Na"
+        ]
+      },
+      {
+        "port_type": "A_current",
+        "variables": [
+          "i_A"
+        ]
+      },
+      {
+        "port_type": "KV_current",
+        "variables": [
+          "i_KV"
+        ]
+      },
+      {
+        "port_type": "KCa_current",
+        "variables": [
+          "i_KCa"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Vm",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm_init",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "Vm_volt",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "i_Ca",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_Na",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_A",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_KV",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_KCa",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_stim",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_m",
+        "picoF",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

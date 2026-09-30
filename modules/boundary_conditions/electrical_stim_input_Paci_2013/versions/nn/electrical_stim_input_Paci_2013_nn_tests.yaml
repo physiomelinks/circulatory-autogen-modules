@@ -1,0 +1,9 @@
+module_type: electrical_stim_input_Paci_2013
+version: nn
+reviewed: false
+notes: 'Paci et al. (2013) stimulus current density: i_stim = stim_flag i_stim_amplitude/Cm (A/F) during the first i_stim_pulse_duration
+  of each period between i_stim_start and i_stim_end, else 0; i_stim_period = 1/i_stim_frequency, frequency in Hz (the Paci
+  CellML uses beats per minute with period = 60/f; converted on review 2026-09-29). Algebraic, no states. Sign: i_stim = +amplitude/Cm,
+  as in the Paci model, where dVm/dt = -(sum of ionic currents) - i_stim, so a positive amplitude hyperpolarises and pacing
+  uses a negative amplitude (the Myokit port uses -5.5e-10 A). Reviewed 2026-09-29: the CellML variables were renamed to the
+  config names (they did not match, so no parameter reached the equations and i_stim was identically 0).'

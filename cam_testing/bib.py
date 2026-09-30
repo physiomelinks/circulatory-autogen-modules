@@ -1,6 +1,6 @@
 """
-Per-module BibTeX: modules/<name>/<name>_references.bib holds the sources cited by the module's
-parameters. A parameter's data_reference is "<bibkey>; <note>" (the note is optional), or
+Per-version BibTeX: versions/<version>/<module_type>_<version>_references.bib holds the sources
+cited by the version's parameters (all its instances). A parameter's data_reference is "<bibkey>; <note>" (the note is optional), or
 starts with "definitional" / names a test fixture when there is nothing to cite.
 
 A small reader, enough for the entries this repo writes (@type{key, field = {...}, ...}).
@@ -12,13 +12,13 @@ _ENTRY_RE = re.compile(r'@(\w+)\s*\{\s*([^,\s]+)\s*,(.*?)\n\}', re.S)
 _FIELD_RE = re.compile(r'(\w+)\s*=\s*(\{(?:[^{}]|\{[^{}]*\})*\}|"[^"]*"|\w+)\s*,?', re.S)
 
 
-def bib_path(module):
-    return os.path.join(module.dir, f'{module.name}_references.bib')
+def bib_path(version):
+    return version.path('references.bib')
 
 
-def proposed_bib_path(module):
-    '''Citations proposed for review, not yet confirmed (<name>_references_proposed.bib).'''
-    return os.path.join(module.dir, f'{module.name}_references_proposed.bib')
+def proposed_bib_path(version):
+    '''Citations proposed for review, not yet confirmed (<module_type>_<version>_references_proposed.bib).'''
+    return version.path('references_proposed.bib')
 
 
 def read(path):

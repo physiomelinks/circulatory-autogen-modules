@@ -1,0 +1,29 @@
+[
+  {
+    "module_type": "voltage_change",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "voltage_change_nn_modules.cellml",
+    "component_type": "voltage_change",
+    "default_instance": "default",
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Vm",
+        "volt",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

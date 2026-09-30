@@ -1,0 +1,103 @@
+module_type: i_NaCa
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM (ventricular-like) Na/Ca exchanger I_NaCa (Luo-Rudy/ten Tusscher form with alpha scaling). Algebraic:
+  all gates, concentrations and the membrane potential are inputs, so alone it is a pure function of its inputs, checked exactly
+  against the original model equations.'
+known_issues:
+- 'undefined units: C_per_M'
+- 'undefined units: J_per_MK'
+- port variable Cai not in variables_and_units
+expected_failures:
+  run_test: 'generation fails: R and F use the undefined units J_per_MK / C_per_M (known issue); fix: define them (joule/(mole
+    kelvin), coulomb/mole) in ion_channel_units.cellml. Also Cai is a port variable used in the equation but missing from
+    variables_and_units (known issue); fix: add [''Cai'', ''millimolar'', ''access'', ''boundary_condition''] and a parameters
+    row. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: R and F use the undefined units J_per_MK / C_per_M (known issue); fix:
+    define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. Also Cai is a port variable used in the equation
+    but missing from variables_and_units (known issue); fix: add [''Cai'', ''millimolar'', ''access'', ''boundary_condition'']
+    and a parameters row. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: R and F use the undefined units J_per_MK / C_per_M (known issue); fix: define them
+    (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. Also Cai is a port variable used in the equation but
+    missing from variables_and_units (known issue); fix: add [''Cai'', ''millimolar'', ''access'', ''boundary_condition'']
+    and a parameters row. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: R and F use the undefined units J_per_MK / C_per_M (known issue); fix: define
+    them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. Also Cai is a port variable used in the equation
+    but missing from variables_and_units (known issue); fix: add [''Cai'', ''millimolar'', ''access'', ''boundary_condition'']
+    and a parameters row. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: R and F use the undefined units J_per_MK / C_per_M (known issue); fix: define them (joule/(mole
+    kelvin), coulomb/mole) in ion_channel_units.cellml. Also Cai is a port variable used in the equation but missing from
+    variables_and_units (known issue); fix: add [''Cai'', ''millimolar'', ''access'', ''boundary_condition''] and a parameters
+    row. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  kNaCa:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      kNaCa = 4900'
+    sourced: 'yes'
+    value: 4900
+  alpha:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      alpha = 2.85714'
+    sourced: 'yes'
+    value: 2.8571432
+  gamma:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      gamma = 0.35'
+    sourced: 'yes'
+    value: 0.35
+  Ksat:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Ksat = 0.1'
+    sourced: 'yes'
+    value: 0.1
+  KmCa:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      KmCa = 1.38'
+    sourced: 'yes'
+    value: 1.38
+  KmNai:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      KmNai = 87.5'
+    sourced: 'yes'
+    value: 87.5
+  Vm:
+    reference: 'Paci2013; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  Nai:
+    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Nai = 10.9248'
+    sourced: 'yes'
+    value: 10.9248496211574
+  Cai:
+    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cai = 1.80774e-05 (applies once Cai is added to variables_and_units)'
+    sourced: 'yes'
+    value: 1.80773974140477e-05
+  R:
+    reference: Paci2013; gas constant as used in the authors' CellML (8.314472 J/(mol K), CODATA 2006)
+    sourced: 'yes'
+    value: 8.314472
+  T:
+    reference: Paci2013; temperature in the authors' CellML (310 K)
+    sourced: 'yes'
+    value: 310
+  F:
+    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+    sourced: 'yes'
+    value: 96485.3415
+  Cao:
+    reference: 'Paci2013; extracellular Ca in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cao = 1.8 mM (note: the Tao 2011 neuron currents share this global; Tao 2011 used its own bath
+      value)'
+    sourced: 'yes'
+    value: 1.8
+  Nao:
+    reference: 'Paci2013; extracellular Na in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Nao = 151 mM'
+    sourced: 'yes'
+    value: 151
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

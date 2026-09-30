@@ -1,14 +1,14 @@
 """
-Parameter ranges a module has been tested and validated over, and a check of a system
+Parameter ranges a module version has been tested and validated over, and a check of a system
 model's parameter values against them.
 
     tested range     the range each parameter is varied over by verification_test_BC and the
-                     joint risk analysis: bc_sweep.ranges in <name>_tests.yaml, or
-                     bc_sweep.factors x the nominal value
-    validated spread the values at which the component matched data in a passing validation
-                     test (published parameter intervals and calibrated values)
+                     joint risk analysis: bc_sweep.ranges in <module_type>_<version>_verification_config.json,
+                     or bc_sweep.factors x the nominal (default instance) value
+    validated spread the values at which the version matched data in a passing validation
+                     test of any of its instances (published parameter intervals and calibrated values)
 
-    python -m cam_testing.ranges check --vessel-array sys_vessel_array.csv --parameters sys_parameters.csv
+    python -m cam_testing.ranges check --vessel-array sys_vessel_array.json --parameters sys_parameters.csv
         lists each value as inside / outside the tested range and the validated spread, with
         the estimated failure risk near the values (from `make risk`)
 """
@@ -17,7 +17,7 @@ import csv
 import sys
 
 from cam_testing import checks
-from cam_testing.library import load_module, module_names
+from cam_testing.library import version_index
 
 
 def tested_range(component, param):
@@ -45,25 +45,22 @@ def validated_spread(component):
     def add(var, lo, hi):
         spans[var] = [min(spans[var][0], lo), max(spans[var][1], hi)] if var in spans else [lo, hi]
 
-    for test, kind in (('validation_test_baseline', 'baseline'), ('validation_test_calibrate', 'calibrate')):
-        r = checks.load(component, test)
-        if r is None or r.status != checks.PASSED:
-            continue
-        spec = (component.spec.get('validation') or {}).get(kind) or {}
-        for var, (lo, hi) in (spec.get('parameter_ranges') or {}).items():
-            add(var, float(lo), float(hi))
-        for var, val in (r.metrics.get('validated_values') or {}).items():
-            for x in (val if isinstance(val, list) else [val]):
-                add(var, float(x), float(x))
+    for inst in component.instances():
+        for test, kind in (('validation_test_baseline', 'baseline'), ('validation_test_calibrate', 'calibrate')):
+            r = checks.load(component, test, inst)
+            if r is None or r.status != checks.PASSED:
+                continue
+            spec = inst.validation.get(kind) or {}
+            for var, (lo, hi) in (spec.get('parameter_ranges') or {}).items():
+                add(var, float(lo), float(hi))
+            for var, val in (r.metrics.get('validated_values') or {}).items():
+                for x in (val if isinstance(val, list) else [val]):
+                    add(var, float(x), float(x))
     return spans
 
 
 def _module_index():
-    index = {}
-    for name in module_names():
-        for component in load_module(name).components():
-            index[(component.vessel_type, component.BC_type)] = component
-    return index
+    return version_index()
 
 
 def check(vessel_array_path, parameters_path, out=sys.stdout):
@@ -85,7 +82,7 @@ def check(vessel_array_path, parameters_path, out=sys.stdout):
         spread = validated_spread(component)
         mine = {}
         for p in component.parameters():
-            name = p.variable_name if p.vessel_type == 'global' else f"{p.variable_name}_{vessel['name']}"
+            name = p.variable_name if p.is_global else f"{p.variable_name}_{vessel['name']}"
             try:
                 val = float(values[name])
             except (KeyError, ValueError):
@@ -96,10 +93,10 @@ def check(vessel_array_path, parameters_path, out=sys.stdout):
             in_t = None if tr is None else tr[0] <= val <= tr[1]
             in_v = None if va is None else va[0] <= val <= va[1]
             outside += in_t is False
-            rows.append((name, val, component.module.name, tr, in_t, va, in_v))
+            rows.append((name, val, component.key, tr, in_t, va, in_v))
         lr = risk.local_risk(component, mine)
         if lr is not None:
-            risks.append((vessel['name'], component.module.name, lr))
+            risks.append((vessel['name'], component.key, lr))
 
     def span(r):
         return '—' if r is None else f'[{r[0]:.4g}, {r[1]:.4g}]'
@@ -119,7 +116,7 @@ def check(vessel_array_path, parameters_path, out=sys.stdout):
             print(f"  {vname:24s} {mod:24s} {model};  {lr['k']} nearest samples: {lr['risk']:.2f} "
                   f"[{lr['ci'][0]:.2f}, {lr['ci'][1]:.2f}]{note}", file=out)
     else:
-        print('\nno failure-risk samples found: run `make risk MODULE=<name>` for the modules used', file=out)
+        print('\nno failure-risk samples found: run `make risk MODULE=<module_type>` for the versions used', file=out)
     if unknown:
         print(f'\nnot in this library: {sorted(unknown)}', file=out)
     print(f'\n{outside} value(s) outside a tested range; {len(rows)} checked', file=out)

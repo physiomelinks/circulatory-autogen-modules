@@ -1,0 +1,3297 @@
+summary:
+  module_types: 216
+  versions: 365
+  categories:
+    benchmarks: 5
+    boundary_conditions: 10
+    cardiac: 11
+    cell: 1
+    cell/cardiomyocytes: 4
+    cell/ion_channels: 42
+    cell/neurons: 12
+    control: 33
+    coupling: 7
+    organs: 5
+    respiratory: 9
+    transport: 2
+    vessels/compartments: 15
+    vessels/junctions: 20
+    vessels/microvasculature: 28
+    vessels/properties: 8
+    vessels/terminals: 4
+  shared_components_renamed: 26
+  problems: []
+questions:
+- myocyte_membrane_voltage placed in cell/cardiomyocytes (the Paci cell's charge integrator); cell/myocytes is then empty and not created
+- 'ion channel versions: Paci2013_v01, Tao2011_v01, Argus2026_v01 (the _SN channels), Argus_unpublished_v01 (piezo); module_subtype changes from
+  nn to the version name'
+- 'instance names are proposed from each data set''s file name: confirm or rename (they become obs_data_name)'
+categories:
+  benchmarks:
+    delay_test:
+      from_modules:
+      - delay
+      versions:
+        nn:
+          from: 'delay: (delay_test, nn)'
+          component: delay_test
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    FitzHugh_Nagumo:
+      from_modules:
+      - FitzHugh_Nagumo
+      versions:
+        nn:
+          from: 'FitzHugh_Nagumo: (FitzHugh_Nagumo, nn)'
+          component: FitzHugh_Nagumo_main_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+          - name: FitzHugh_Nagumo_data
+            from:
+            - validation/FitzHugh_Nagumo__nn_calibration_obs_data.json
+            - validation/FitzHugh_Nagumo__nn_params_for_id.csv
+            - validation/FitzHugh_Nagumo__nn_validation_obs_data.json
+            - validation/SOURCES.md
+            status:
+              baseline: skipped
+              calibrate: active
+    Lotka_Volterra:
+      from_modules:
+      - Lotka_Volterra
+      versions:
+        nn:
+          from: 'Lotka_Volterra: (Lotka_Volterra, nn)'
+          component: Lotka_Volterra
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+          - name: hudson_bay_lynx_hare
+            from:
+            - validation/hudson_bay_lynx_hare.csv
+            - validation/Lotka_Volterra__nn_calibration_obs_data.json
+            - validation/Lotka_Volterra__nn_params_for_id.csv
+            - validation/Lotka_Volterra__nn_validation_obs_data.json
+            - validation/SOURCES.md
+            status:
+              baseline: active
+              calibrate: active
+    TwoMinima:
+      from_modules:
+      - TwoMinima
+      versions:
+        nn:
+          from: 'TwoMinima: (TwoMinima, nn)'
+          component: TwoMinima_main_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+          - name: TwoMinima_data
+            from:
+            - validation/TwoMinima__nn_obs_data.json
+            - validation/TwoMinima__nn_params_for_id.csv
+            - validation/SOURCES.md
+            status:
+              baseline: not_applicable
+              calibrate: active
+    VanDerPol:
+      from_modules:
+      - VanDerPol
+      versions:
+        nn:
+          from: 'VanDerPol: (VanDerPol, nn)'
+          component: VanDerPol
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  boundary_conditions:
+    CO2_O2_generator:
+      from_modules:
+      - boundary_condition
+      versions:
+        nn:
+          from: 'boundary_condition: (CO2_O2_generator, nn)'
+          component: CO2_O2_generator_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    electrical_stim_input_Paci_2013:
+      from_modules:
+      - input_stimulation
+      versions:
+        nn:
+          from: 'input_stimulation: (electrical_stim_input_Paci_2013, nn)'
+          component: stim_mode_Paci_2013
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_stim_periodic:
+      from_modules:
+      - input_stimulation
+      versions:
+        nn:
+          from: 'input_stimulation: (i_stim_periodic, nn)'
+          component: i_stim_periodic
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    inlet_flow:
+      from_modules:
+      - boundary_condition
+      - open_loop
+      versions:
+        nn_adan:
+          from: 'open_loop: (inlet_flow, nn_adan)'
+          component: adan_flow_fourier_BC_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+          - name: boileau2015_adan56_inflow
+            from:
+            - validation/boileau2015_adan56_inflow.csv
+            - validation/SOURCES.md
+            status:
+              baseline: proposed
+              calibrate: not_applicable
+        nn_adan_2:
+          from: 'open_loop: (inlet_flow, nn_adan_2)'
+          component: adan_flow_interp_BC_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+          - name: boileau2015_adan56_inflow
+            from:
+            - validation/boileau2015_adan56_inflow.csv
+            - validation/SOURCES.md
+            status:
+              baseline: proposed
+              calibrate: not_applicable
+        nn_aorticbif:
+          from: 'open_loop: (inlet_flow, nn_aorticbif)'
+          component: aorticbif_flow_BC_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+          - name: boileau2015_ibif_inflow
+            from:
+            - validation/boileau2015_ibif_inflow.csv
+            - validation/SOURCES.md
+            status:
+              baseline: proposed
+              calibrate: not_applicable
+        nn_constant:
+          from: 'boundary_condition: (inlet_flow, nn_constant)'
+          component: constant_flow_BC_type
+          component_renamed: constant_flow_BC_type__inlet_flow_nn_constant
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        nn_constant_2:
+          from: 'boundary_condition: (inlet_flow, nn_constant_2)'
+          component: constant_flow_2_BC_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        nn_constant_flow_port:
+          from: 'boundary_condition: (inlet_flow, nn_constant_flow_port)'
+          component: constant_flow_BC_type
+          component_renamed: constant_flow_BC_type__inlet_flow_nn_constant_flow_port
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        nn_fourier_8:
+          from: 'boundary_condition: (inlet_flow, nn_fourier_8)'
+          component: fourier_flow_8_BC_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    inlet_pressure:
+      from_modules:
+      - boundary_condition
+      versions:
+        nn_constant:
+          from: 'boundary_condition: (inlet_pressure, nn_constant)'
+          component: constant_pressure_BC_type
+          component_renamed: constant_pressure_BC_type__inlet_pressure_nn_constant
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    lung_vol_generator:
+      from_modules:
+      - boundary_condition
+      versions:
+        nn:
+          from: 'boundary_condition: (lung_vol_generator, nn)'
+          component: lung_Vol_generator_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    muscle_pressure:
+      from_modules:
+      - boundary_condition
+      versions:
+        nn_constant:
+          from: 'boundary_condition: (muscle_pressure, nn_constant)'
+          component: constant_pressure_generator_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    outlet_flow:
+      from_modules:
+      - boundary_condition
+      versions:
+        nn_constant:
+          from: 'boundary_condition: (outlet_flow, nn_constant)'
+          component: constant_flow_BC_type
+          component_renamed: constant_flow_BC_type__outlet_flow_nn_constant
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        nn_constant_flow_port:
+          from: 'boundary_condition: (outlet_flow, nn_constant_flow_port)'
+          component: constant_flow_BC_type
+          component_renamed: constant_flow_BC_type__outlet_flow_nn_constant_flow_port
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    outlet_pressure:
+      from_modules:
+      - boundary_condition
+      versions:
+        nn_constant:
+          from: 'boundary_condition: (outlet_pressure, nn_constant)'
+          component: constant_pressure_BC_type
+          component_renamed: constant_pressure_BC_type__outlet_pressure_nn_constant
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    voltage_change:
+      from_modules:
+      - input_stimulation
+      versions:
+        nn:
+          from: 'input_stimulation: (voltage_change, nn)'
+          component: voltage_change
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  cardiac:
+    cardiac_clock:
+      from_modules:
+      - cardiac
+      versions:
+        nn:
+          from: 'cardiac: (cardiac_clock, nn)'
+          component: cardiac_clock_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        nn_controlled:
+          from: 'cardiac: (cardiac_clock, nn_controlled)'
+          component: cardiac_clock_controlled_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    chamber:
+      from_modules:
+      - cardiac
+      versions:
+        vv:
+          from: 'cardiac: (chamber, vv)'
+          component: chamber_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart:
+      from_modules:
+      - heart
+      - supermodules/heart
+      versions:
+        Argus2026_v01:
+          from: supermodules/heart (module_format supermodule)
+          instances:
+          - name: default
+            from: supermodules/heart default_parameters
+        vp:
+          from: 'heart: (heart, vp)'
+          component: heart_simple
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_Ca:
+          from: 'heart: (heart, vp_Ca)'
+          component: heart_Ca_input
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_devel:
+          from: 'heart: (heart, vp_devel)'
+          component: heart_devel
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_wCont:
+          from: 'heart: (heart, vp_wCont)'
+          component: heart_simple_wCont
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_ASD:
+      from_modules:
+      - heart
+      versions:
+        vp_wCont:
+          from: 'heart: (heart_ASD, vp_wCont)'
+          component: heart_simple_wCont_ASD
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_LVprop:
+      from_modules:
+      - heart
+      versions:
+        vp:
+          from: 'heart: (heart_LVprop, vp)'
+          component: heart_simple_LVprop
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_new_valve:
+      from_modules:
+      - heart
+      versions:
+        vp:
+          from: 'heart: (heart_new_valve, vp)'
+          component: heart_new_valve
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_nonstiff:
+      from_modules:
+      - heart
+      versions:
+        vp_wCont:
+          from: 'heart: (heart_nonstiff, vp_wCont)'
+          component: heart_nonstiff
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_simple:
+      from_modules:
+      - cvs_mvp
+      versions:
+        vp:
+          from: 'cvs_mvp: (heart_simple, vp)'
+          component: heart_simplesimple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_simple_2:
+      from_modules:
+      - cvs_mvp
+      versions:
+        vp:
+          from: 'cvs_mvp: (heart_simple_2, vp)'
+          component: heart_simplesimple_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_simple_OLD:
+      from_modules:
+      - cvs_mvp
+      versions:
+        vp:
+          from: 'cvs_mvp: (heart_simple_OLD, vp)'
+          component: heart_simplesimple_type_OLD
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    valve:
+      from_modules:
+      - cardiac
+      versions:
+        pp:
+          from: 'cardiac: (valve, pp)'
+          component: valve_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_linear:
+          from: 'cardiac: (valve, pp_linear)'
+          component: valve_linear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_rmod:
+          from: 'cardiac: (valve, pp_rmod)'
+          component: valve_rmod_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  cell:
+    NKE_pump:
+      from_modules:
+      - NKE_pump
+      versions:
+        nn:
+          from: 'NKE_pump: (NKE_pump, nn)'
+          component: NKE_pump
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  cell/cardiomyocytes:
+    Ca_dynamics_Paci_2013:
+      from_modules:
+      - cardiomyocytes
+      versions:
+        nn:
+          from: 'cardiomyocytes: (Ca_dynamics_Paci_2013, nn)'
+          component: Ca_dynamics_Paci_2013
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    electric_potentials_Paci_2013:
+      from_modules:
+      - cardiomyocytes
+      versions:
+        nn:
+          from: 'cardiomyocytes: (electric_potentials_Paci_2013, nn)'
+          component: electric_potentials_Paci_2013
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    myocyte_membrane_voltage:
+      from_modules:
+      - myocytes
+      versions:
+        nn:
+          from: 'myocytes: (myocyte_membrane_voltage, nn)'
+          component: myocyte_membrane_voltage
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    Na_dynamics_Paci_2013:
+      from_modules:
+      - cardiomyocytes
+      versions:
+        nn:
+          from: 'cardiomyocytes: (Na_dynamics_Paci_2013, nn)'
+          component: Na_dynamics_Paci_2013
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  cell/ion_channels:
+    i_A:
+      from_modules:
+      - ion_channel
+      versions:
+        Tao2011_v01:
+          from: 'ion_channel: (i_A_Tao_2011, nn)'
+          component: i_A_Tao_2011
+          notes: 'Built for: sympathetic neuron (Tao et al. 2011)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_b_Ca:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_b_Ca_Paci_2013, nn)'
+          component: i_b_Ca_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_b_Na:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_b_Na_Paci_2013, nn)'
+          component: i_b_Na_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_BK:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_BK_SN, nn)'
+          component: i_BK_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Ca:
+      from_modules:
+      - ion_channel
+      versions:
+        Tao2011_v01:
+          from: 'ion_channel: (i_Ca_Tao_2011, nn)'
+          component: i_Ca_Tao_2011
+          notes: 'Built for: sympathetic neuron (Tao et al. 2011)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_CaL:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_CaL_SN, nn)'
+          component: i_CaL_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        Paci2013_v01:
+          from: 'ion_channel: (i_CaL_Paci_2013, nn)'
+          component: i_CaL_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_CaL_d_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_CaL_d_gate_Paci_2013, nn)'
+          component: i_CaL_d_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_CaL_f1_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_CaL_f1_gate_Paci_2013, nn)'
+          component: i_CaL_f1_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_CaL_f2_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_CaL_f2_gate_Paci_2013, nn)'
+          component: i_CaL_f2_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_CaL_fCa_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_CaL_fCa_gate_Paci_2013, nn)'
+          component: i_CaL_fCa_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_CaN:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_CaN_SN, nn)'
+          component: i_CaN_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_f:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_f_Paci_2013, nn)'
+          component: i_f_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_f_Xf_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_f_Xf_gate_Paci_2013, nn)'
+          component: i_f_Xf_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_K1:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_K1_Paci_2013, nn)'
+          component: i_K1_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_KCa:
+      from_modules:
+      - ion_channel
+      versions:
+        Tao2011_v01:
+          from: 'ion_channel: (i_KCa_Tao_2011, nn)'
+          component: i_KCa_Tao_2011
+          notes: 'Built for: sympathetic neuron (Tao et al. 2011)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Kr:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Kr_Paci_2013, nn)'
+          component: i_Kr_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Kr_Xr1_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Kr_Xr1_gate_Paci_2013, nn)'
+          component: i_Kr_Xr1_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Kr_Xr2_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Kr_Xr2_gate_Paci_2013, nn)'
+          component: i_Kr_Xr2_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Ks:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Ks_Paci_2013, nn)'
+          component: i_Ks_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Ks_Xs_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Ks_Xs_gate_Paci_2013, nn)'
+          component: i_Ks_Xs_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_KV:
+      from_modules:
+      - ion_channel
+      versions:
+        Tao2011_v01:
+          from: 'ion_channel: (i_KV_Tao_2011, nn)'
+          component: i_KV_Tao_2011
+          notes: 'Built for: sympathetic neuron (Tao et al. 2011)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Kv1_5:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_Kv1_5_SN, nn)'
+          component: i_Kv1_5_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Kv2:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_Kv2_SN, nn)'
+          component: i_Kv2_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Kv4_2:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_Kv4_2_SN, nn)'
+          component: i_Kv4_2_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_leak_K:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_leak_K_SN, nn)'
+          component: i_leak_K_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_leak_Na:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_leak_Na_SN, nn)'
+          component: i_leak_Na_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_M:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_M_SN, nn)'
+          component: i_M_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Na:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_Na_SN, nn)'
+          component: i_Na_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        Paci2013_v01:
+          from: 'ion_channel: (i_Na_Paci_2013, nn)'
+          component: i_Na_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        Tao2011_v01:
+          from: 'ion_channel: (i_Na_Tao_2011, nn)'
+          component: i_Na_Tao_2011
+          notes: 'Built for: sympathetic neuron (Tao et al. 2011)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Na1_6:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_Na1_6_SN, nn)'
+          component: i_Na1_6_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Na_h_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Na_h_gate_Paci_2013, nn)'
+          component: i_Na_h_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Na_j_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Na_j_gate_Paci_2013, nn)'
+          component: i_Na_j_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_Na_m_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_Na_m_gate_Paci_2013, nn)'
+          component: i_Na_m_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_NaCa:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_NaCa_SN, nn)'
+          component: i_NaCa_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        Paci2013_v01:
+          from: 'ion_channel: (i_NaCa_Paci_2013, nn)'
+          component: i_NaCa_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_NaK:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_NaK_SN, nn)'
+          component: i_NaK_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        Paci2013_v01:
+          from: 'ion_channel: (i_NaK_Paci_2013, nn)'
+          component: i_NaK_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_PCa:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_PCa_Paci_2013, nn)'
+          component: i_PCa_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_piezo_Na:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus_unpublished_v01:
+          from: 'ion_channel: (i_piezo_Na_Argus_unpublished, nn)'
+          component: i_piezo_Na_Argus_unpublished
+          notes: 'Built for: stretch-activated Na current (Piezo), not cell-specific'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_SK:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (i_SK_SN, nn)'
+          component: i_SK_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_to:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_to_Paci_2013, nn)'
+          component: i_to_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_to_q_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_to_q_gate_Paci_2013, nn)'
+          component: i_to_q_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    i_to_r_gate:
+      from_modules:
+      - ion_channel
+      versions:
+        Paci2013_v01:
+          from: 'ion_channel: (i_to_r_gate_Paci_2013, nn)'
+          component: i_to_r_gate_Paci_2013
+          notes: 'Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    IP3R:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (IP3R_SN, nn)'
+          component: IP3R_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    RyR:
+      from_modules:
+      - ion_channel
+      versions:
+        Argus2026_v01:
+          from: 'ion_channel: (RyR_SN, nn)'
+          component: RyR_SN
+          notes: 'Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)'
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  cell/neurons:
+    axon:
+      from_modules:
+      - neurons
+      versions:
+        sympathetic_monolithic_v01:
+          from: 'neurons: (SN_axon, nn)'
+          component: SN_axon
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    NE_release_Tao_2011:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (NE_release_Tao_2011, nn)'
+          component: NE_release_Tao_2011
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    neuron:
+      from_modules:
+      - supermodules/sympathetic_neuron
+      versions:
+        sympathetic:
+          from: supermodules/sympathetic_neuron (module_format supermodule)
+          instances:
+          - name: default
+            from: supermodules/sympathetic_neuron default_parameters
+    SN_Ca_handling_soma:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (SN_Ca_handling_soma, nn)'
+          component: SN_Ca_handling_soma
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    SN_Ca_handling_varicosity:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (SN_Ca_handling_varicosity, nn)'
+          component: SN_Ca_handling_varicosity
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    SN_membrane_soma:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (SN_membrane_soma, nn)'
+          component: SN_membrane_soma
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    SN_Na_K_concentrations_soma:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (SN_Na_K_concentrations_soma, nn)'
+          component: SN_Na_K_concentrations_soma
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    SN_NE_release:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (SN_NE_release, nn)'
+          component: SN_NE_release
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    SN_varicosity_membrane:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (SN_varicosity_membrane, nn)'
+          component: SN_varicosity_membrane
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    soma:
+      from_modules:
+      - neurons
+      - supermodules/SN_soma
+      versions:
+        sympathetic:
+          from: supermodules/SN_soma (module_format supermodule)
+          instances:
+          - name: default
+            from: supermodules/SN_soma default_parameters
+        sympathetic_monolithic_v01:
+          from: 'neurons: (SN_soma, nn)'
+          component: SN_soma
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    sympathetic_neuron_membrane_voltage:
+      from_modules:
+      - neurons
+      versions:
+        nn:
+          from: 'neurons: (sympathetic_neuron_membrane_voltage, nn)'
+          component: sympathetic_neuron_membrane_voltage
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    varicosity:
+      from_modules:
+      - neurons
+      - supermodules/SN_varicosity
+      versions:
+        sympathetic:
+          from: supermodules/SN_varicosity (module_format supermodule)
+          instances:
+          - name: default
+            from: supermodules/SN_varicosity default_parameters
+        sympathetic_monolithic_v01:
+          from: 'neurons: (SN_varicosity, nn)'
+          component: SN_varicosity
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  control:
+    afferent_to_respiratory_efferent:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (afferent_to_respiratory_efferent, nn)'
+          component: afferent_to_respiratory_efferent_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    afferent_to_sympathetic_efferent:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (afferent_to_sympathetic_efferent, nn)'
+          component: afferent_to_sympathetic_efferent_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    afferent_to_vagal_efferent:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (afferent_to_vagal_efferent, nn)'
+          component: afferent_to_vagal_efferent_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    baroreceptor:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (baroreceptor, nn)'
+          component: baroreceptor_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    cardiopulmonary_receptor_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (cardiopulmonary_receptor_Gee2023, nn)'
+          component: cardiopulmonary_receptor_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    chemoreceptor:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (chemoreceptor, nn)'
+          component: chemoreceptor_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    DMV_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (DMV_Gee2023, nn)'
+          component: DMV_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    efferent_heart_elastance_effector:
+      from_modules:
+      - control
+      versions:
+        nn_lv:
+          from: 'control: (efferent_heart_elastance_effector, nn_lv)'
+          component: efferent_heart_elastance_effector_type
+          component_renamed: efferent_heart_elastance_effector_type__efferent_heart_elastance_effector_nn_lv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        nn_rv:
+          from: 'control: (efferent_heart_elastance_effector, nn_rv)'
+          component: efferent_heart_elastance_effector_type
+          component_renamed: efferent_heart_elastance_effector_type__efferent_heart_elastance_effector_nn_rv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    efferent_heart_period_effector:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (efferent_heart_period_effector, nn)'
+          component: efferent_heart_period_effector_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    efferent_resistance_effector:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (efferent_resistance_effector, nn)'
+          component: efferent_resistance_effector_Argus_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    efferent_resistance_effector_Ursino:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (efferent_resistance_effector_Ursino, nn)'
+          component: efferent_resistance_effector_Ursino_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    efferent_respiratory_effector:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (efferent_respiratory_effector, nn)'
+          component: efferent_respiratory_effector_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    efferent_respiratory_effector_Gee_Argus_2026:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (efferent_respiratory_effector_Gee_Argus_2026, nn)'
+          component: efferent_respiratory_effector_Gee_Argus_2026_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    efferent_venous_us_volume_and_compliance_effector:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (efferent_venous_us_volume_and_compliance_effector, nn)'
+          component: efferent_venous_us_volume_and_compliance_effector_Argus_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    flow_observer:
+      from_modules:
+      - elic
+      versions:
+        nn:
+          from: 'elic: (flow_observer, nn)'
+          component: f_observer_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_effector_Gee2023:
+      from_modules:
+      - control
+      versions:
+        nn_lv:
+          from: 'control: (heart_effector_Gee2023, nn_lv)'
+          component: heart_effector_Gee2023
+          component_renamed: heart_effector_Gee2023__heart_effector_Gee2023_nn_lv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        nn_rv:
+          from: 'control: (heart_effector_Gee2023, nn_rv)'
+          component: heart_effector_Gee2023
+          component_renamed: heart_effector_Gee2023__heart_effector_Gee2023_nn_rv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    heart_effector_Gee2023_OLD:
+      from_modules:
+      - control
+      versions:
+        nn_rv:
+          from: 'control: (heart_effector_Gee2023_OLD, nn_rv)'
+          component: heart_effector_Gee2023
+          component_renamed: heart_effector_Gee2023__heart_effector_Gee2023_OLD_nn_rv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    LCN_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (LCN_Gee2023, nn)'
+          component: LCN_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    local_flow_control_brain:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (local_flow_control_brain, nn)'
+          component: local_flow_control_brain_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    local_flow_control_muscle:
+      from_modules:
+      - control
+      versions:
+        nn:
+          from: 'control: (local_flow_control_muscle, nn)'
+          component: local_flow_control_muscle_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    lung_stretch_receptor_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (lung_stretch_receptor_Gee2023, nn)'
+          component: lung_stretch_receptor_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    lung_stretch_receptor_with_threshold_OLD:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (lung_stretch_receptor_with_threshold_OLD, nn)'
+          component: lung_stretch_receptor_with_threshold
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    NA_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (NA_Gee2023, nn)'
+          component: NA_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    NActr_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (NActr_Gee2023, nn)'
+          component: NActr_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    NTS_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (NTS_Gee2023, nn)'
+          component: NTS_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    peripheral_resistance_effector_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (peripheral_resistance_effector_Gee2023, nn)'
+          component: peripheral_resistance_effector_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    pid_control:
+      from_modules:
+      - control_system
+      versions:
+        nn:
+          from: 'control_system: (pid_control, nn)'
+          component: pid_control_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    PNDMV_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (PNDMV_Gee2023, nn)'
+          component: PNDMV_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    PNNA_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (PNNA_Gee2023, nn)'
+          component: PNNA_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    pressure_observer:
+      from_modules:
+      - elic
+      versions:
+        nn:
+          from: 'elic: (pressure_observer, nn)'
+          component: p_observer_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    sympathetic_afferent_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (sympathetic_afferent_Gee2023, nn)'
+          component: sympathetic_afferent_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    sympathetic_efferent_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (sympathetic_efferent_Gee2023, nn)'
+          component: sympathetic_efferent_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    unstressed_volume_effector_Gee2023:
+      from_modules:
+      - parasympathetic
+      versions:
+        nn:
+          from: 'parasympathetic: (unstressed_volume_effector_Gee2023, nn)'
+          component: unstressed_volume_effector_Gee2023
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  coupling:
+    coupler:
+      from_modules:
+      - coupling
+      versions:
+        pv_0D_1D:
+          from: 'coupling: (coupler, pv_0D_1D)'
+          component: pv_0D_1D_coupler_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    FV1D_vessel:
+      from_modules:
+      - coupling
+      versions:
+        nn:
+          from: 'coupling: (FV1D_vessel, nn)'
+          component: Muller_1d
+          component_renamed: Muller_1d__FV1D_vessel_nn
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv:
+          from: 'coupling: (FV1D_vessel, pv)'
+          component: Muller_1d
+          component_renamed: Muller_1d__FV1D_vessel_pv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp:
+          from: 'coupling: (FV1D_vessel, vp)'
+          component: Muller_1d
+          component_renamed: Muller_1d__FV1D_vessel_vp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'coupling: (FV1D_vessel, vv)'
+          component: Muller_1d
+          component_renamed: Muller_1d__FV1D_vessel_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    FV1D_volume_sum:
+      from_modules:
+      - coupling
+      versions:
+        nn:
+          from: 'coupling: (FV1D_volume_sum, nn)'
+          component: volume_sum_1D
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    imposter_1D:
+      from_modules:
+      - coupling
+      versions:
+        nn:
+          from: 'coupling: (imposter_1D, nn)'
+          component: imposter_1D
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    sum_blood_vol:
+      from_modules:
+      - cvs_mvp
+      versions:
+        nn:
+          from: 'cvs_mvp: (sum_blood_vol, nn)'
+          component: sum_blood_vol_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    sum_blood_vol_2:
+      from_modules:
+      - cvs_mvp
+      versions:
+        nn:
+          from: 'cvs_mvp: (sum_blood_vol_2, nn)'
+          component: sum_blood_vol_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    volume_sum:
+      from_modules:
+      - coupling
+      versions:
+        nn:
+          from: 'coupling: (volume_sum, nn)'
+          component: volume_sum
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  organs:
+    BG_volume_control:
+      from_modules:
+      - BG_volume_control
+      versions:
+        nn:
+          from: 'BG_volume_control: (BG_volume_control, nn)'
+          component: BG_volume_control_main_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    BVC_GI:
+      from_modules:
+      - BVC_GI
+      versions:
+        nn:
+          from: 'BVC_GI: (BVC_GI, nn)'
+          component: BVC_GI_main_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    BVC_Kidney_left:
+      from_modules:
+      - BVC_Kidney
+      versions:
+        nn:
+          from: 'BVC_Kidney: (BVC_Kidney_left, nn)'
+          component: BVC_Kidney_main_type
+          component_renamed: BVC_Kidney_main_type__BVC_Kidney_left_nn
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    BVC_Kidney_right:
+      from_modules:
+      - BVC_Kidney
+      versions:
+        nn:
+          from: 'BVC_Kidney: (BVC_Kidney_right, nn)'
+          component: BVC_Kidney_main_type
+          component_renamed: BVC_Kidney_main_type__BVC_Kidney_right_nn
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    BVC_Na_circ:
+      from_modules:
+      - BVC_Na_circ
+      versions:
+        nn:
+          from: 'BVC_Na_circ: (BVC_Na_circ, nn)'
+          component: BVC_Na_circ_main_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  respiratory:
+    gas_transport_simple:
+      from_modules:
+      - gas_exchange
+      versions:
+        nn:
+          from: 'gas_exchange: (gas_transport_simple, nn)'
+          component: gas_transport_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    GE_capillary:
+      from_modules:
+      - gas_exchange
+      versions:
+        nn:
+          from: 'gas_exchange: (GE_capillary, nn)'
+          component: capillary_GE
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    GE_capillary_merge:
+      from_modules:
+      - gas_exchange
+      versions:
+        nn:
+          from: 'gas_exchange: (GE_capillary_merge, nn)'
+          component: capillary_GE_merge
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    lung_bg_Argus_Chase:
+      from_modules:
+      - lung
+      versions:
+        nn:
+          from: 'lung: (lung_bg_Argus_Chase, nn)'
+          component: lung_bond_graph_Argus_Chase_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    pulmonary_GE:
+      from_modules:
+      - gas_exchange
+      versions:
+        nn:
+          from: 'gas_exchange: (pulmonary_GE, nn)'
+          component: pulmonary_GE_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+          - name: pulmonary_GE_normal_blood_gases
+            from:
+            - validation/pulmonary_GE_normal_blood_gases.csv
+            - validation/SOURCES.md
+            status:
+              baseline: proposed
+              calibrate: pending
+        nn_5_lobe:
+          from: 'gas_exchange: (pulmonary_GE, nn_5_lobe)'
+          component: pulmonary_GE_5_lobe_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    respiratory_gas_transport:
+      from_modules:
+      - gas_exchange
+      versions:
+        nn:
+          from: 'gas_exchange: (respiratory_gas_transport, nn)'
+          component: respiratory_gas_transport_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    simple_lung_bg:
+      from_modules:
+      - lung
+      versions:
+        nn:
+          from: 'lung: (simple_lung_bg, nn)'
+          component: simple_lung_bond_graph_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    thoracic_cavity:
+      from_modules:
+      - lung
+      versions:
+        nn:
+          from: 'lung: (thoracic_cavity, nn)'
+          component: thoracic_cavity
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    tissue_GE_simple:
+      from_modules:
+      - gas_exchange
+      versions:
+        nn:
+          from: 'gas_exchange: (tissue_GE_simple, nn)'
+          component: tissue_GE_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  transport:
+    tissue_diffusion_face:
+      from_modules:
+      - diffusion_volume
+      versions:
+        nn:
+          from: 'diffusion_volume: (tissue_diffusion_face, nn)'
+          component: diffusion_face
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    tissue_diffusion_volume:
+      from_modules:
+      - diffusion_volume
+      versions:
+        nn:
+          from: 'diffusion_volume: (tissue_diffusion_volume, nn)'
+          component: diffusion_volume
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  vessels/compartments:
+    arterial:
+      from_modules:
+      - BG
+      versions:
+        pp:
+          from: 'BG: (arterial, pp)'
+          component: pp_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_nonlinear:
+          from: 'BG: (arterial, pp_nonlinear)'
+          component: pp_nonlinear_type
+          component_renamed: pp_nonlinear_type__arterial_pp_nonlinear
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_nonlinear_constR:
+          from: 'BG: (arterial, pp_nonlinear_constR)'
+          component: pp_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_nonlinear_visco:
+          from: 'BG: (arterial, pp_nonlinear_visco)'
+          component: pp_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv:
+          from: 'BG: (arterial, pv)'
+          component: pv_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear:
+          from: 'BG: (arterial, pv_nonlinear)'
+          component: pv_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear_constR:
+          from: 'BG: (arterial, pv_nonlinear_constR)'
+          component: pv_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear_visco:
+          from: 'BG: (arterial, pv_nonlinear_visco)'
+          component: pv_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp:
+          from: 'BG: (arterial, vp)'
+          component: vp_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear:
+          from: 'BG: (arterial, vp_nonlinear)'
+          component: vp_nonlinear_type
+          component_renamed: vp_nonlinear_type__arterial_vp_nonlinear
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear_constR:
+          from: 'BG: (arterial, vp_nonlinear_constR)'
+          component: vp_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear_visco:
+          from: 'BG: (arterial, vp_nonlinear_visco)'
+          component: vp_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (arterial, vv)'
+          component: vv_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear:
+          from: 'BG: (arterial, vv_nonlinear)'
+          component: vv_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_constR:
+          from: 'BG: (arterial, vv_nonlinear_constR)'
+          component: vv_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_visco:
+          from: 'BG: (arterial, vv_nonlinear_visco)'
+          component: vv_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    arterial_simple:
+      from_modules:
+      - BG
+      versions:
+        pp:
+          from: 'BG: (arterial_simple, pp)'
+          component: pp_simple_type
+          component_renamed: pp_simple_type__arterial_simple_pp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv:
+          from: 'BG: (arterial_simple, pv)'
+          component: pv_simple_type
+          component_renamed: pv_simple_type__arterial_simple_pv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp:
+          from: 'BG: (arterial_simple, vp)'
+          component: vp_simple_type
+          component_renamed: vp_simple_type__arterial_simple_vp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear:
+          from: 'BG: (arterial_simple, vp_nonlinear)'
+          component: vp_simple_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (arterial_simple, vv)'
+          component: vv_simple_type
+          component_renamed: vv_simple_type__arterial_simple_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    arterial_simple_novisco:
+      from_modules:
+      - BG
+      versions:
+        pp:
+          from: 'BG: (arterial_simple_novisco, pp)'
+          component: pp_simple_novisco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary:
+      from_modules:
+      - BG
+      - microvasculature_network
+      versions:
+        pp:
+          from: 'BG: (capillary, pp)'
+          component: pp_capillary_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_micro:
+          from: 'microvasculature_network: (capillary, pp_micro)'
+          component: pp_capillary_type_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_micro:
+          from: 'microvasculature_network: (capillary, pv_micro)'
+          component: pv_simple_type
+          component_renamed: pv_simple_type__capillary_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp:
+          from: 'BG: (capillary, vp)'
+          component: vp_capillary_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_micro:
+          from: 'microvasculature_network: (capillary, vp_micro)'
+          component: vp_capillary_type_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_micro:
+          from: 'microvasculature_network: (capillary, vv_micro)'
+          component: vv_simple_type
+          component_renamed: vv_simple_type__capillary_vv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_simple:
+      from_modules:
+      - BG
+      versions:
+        pp:
+          from: 'BG: (capillary_simple, pp)'
+          component: pp_simple_type
+          component_renamed: pp_simple_type__capillary_simple_pp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv:
+          from: 'BG: (capillary_simple, pv)'
+          component: pv_simple_type
+          component_renamed: pv_simple_type__capillary_simple_pv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp:
+          from: 'BG: (capillary_simple, vp)'
+          component: vp_simple_type
+          component_renamed: vp_simple_type__capillary_simple_vp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (capillary_simple, vv)'
+          component: vv_simple_type
+          component_renamed: vv_simple_type__capillary_simple_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_simple_vol_ctl_intake:
+      from_modules:
+      - BG
+      versions:
+        vv:
+          from: 'BG: (capillary_simple_vol_ctl_intake, vv)'
+          component: vv_simple_vol_ctl_type
+          component_renamed: vv_simple_vol_ctl_type__capillary_simple_vol_ctl_intake_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_simple_vol_ctl_uptake:
+      from_modules:
+      - BG
+      versions:
+        vv:
+          from: 'BG: (capillary_simple_vol_ctl_uptake, vv)'
+          component: vv_simple_vol_ctl_type
+          component_renamed: vv_simple_vol_ctl_type__capillary_simple_vol_ctl_uptake_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    constriction:
+      from_modules:
+      - BG
+      versions:
+        pv:
+          from: 'BG: (constriction, pv)'
+          component: pv_constriction_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    resistor:
+      from_modules:
+      - cardiac
+      versions:
+        pp:
+          from: 'cardiac: (resistor, pp)'
+          component: resistor_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    rigid_vessel:
+      from_modules:
+      - BG
+      versions:
+        vv:
+          from: 'BG: (rigid_vessel, vv)'
+          component: vv_rigid_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    simple:
+      from_modules:
+      - cvs_mvp
+      versions:
+        pp_noI:
+          from: 'cvs_mvp: (simple, pp_noI)'
+          component: pp_simple_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_noI:
+          from: 'cvs_mvp: (simple, pv_noI)'
+          component: pv_simple_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_noI:
+          from: 'cvs_mvp: (simple, vp_noI)'
+          component: vp_simple_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_noI:
+          from: 'cvs_mvp: (simple, vv_noI)'
+          component: vv_simple_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    simple_2:
+      from_modules:
+      - cvs_mvp
+      versions:
+        pp_noI:
+          from: 'cvs_mvp: (simple_2, pp_noI)'
+          component: pp_simple_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_noI:
+          from: 'cvs_mvp: (simple_2, pv_noI)'
+          component: pv_simple_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_noI:
+          from: 'cvs_mvp: (simple_2, vp_noI)'
+          component: vp_simple_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_noI:
+          from: 'cvs_mvp: (simple_2, vv_noI)'
+          component: vv_simple_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venous:
+      from_modules:
+      - BG
+      versions:
+        pp:
+          from: 'BG: (venous, pp)'
+          component: pp_simple_type
+          component_renamed: pp_simple_type__venous_pp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_nonlinear:
+          from: 'BG: (venous, pp_nonlinear)'
+          component: pp_nonlinear_type
+          component_renamed: pp_nonlinear_type__venous_pp_nonlinear
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv:
+          from: 'BG: (venous, pv)'
+          component: pv_simple_type
+          component_renamed: pv_simple_type__venous_pv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp:
+          from: 'BG: (venous, vp)'
+          component: vp_ven_simple_type
+          component_renamed: vp_ven_simple_type__venous_vp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear:
+          from: 'BG: (venous, vp_nonlinear)'
+          component: vp_nonlinear_type
+          component_renamed: vp_nonlinear_type__venous_vp_nonlinear
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_wCont:
+          from: 'BG: (venous, vp_wCont)'
+          component: vp_ven_simple_type
+          component_renamed: vp_ven_simple_type__venous_vp_wCont
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_woCont:
+          from: 'BG: (venous, vp_woCont)'
+          component: vp_simple_type
+          component_renamed: vp_simple_type__venous_vp_woCont
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (venous, vv)'
+          component: vv_simple_type
+          component_renamed: vv_simple_type__venous_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venous_novisco:
+      from_modules:
+      - BG
+      versions:
+        vp:
+          from: 'BG: (venous_novisco, vp)'
+          component: vp_ven_simple_novisco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_woCont:
+          from: 'BG: (venous_novisco, vp_woCont)'
+          component: vp_simple_novisco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venous_Rctl:
+      from_modules:
+      - BG
+      versions:
+        vp_woCont:
+          from: 'BG: (venous_Rctl, vp_woCont)'
+          component: vp_simple_Rctl_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  vessels/junctions:
+    2in2out_junction:
+      from_modules:
+      - BG
+      versions:
+        vv:
+          from: 'BG: (2in2out_junction, vv)'
+          component: vv_2in2out_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_merge:
+      from_modules:
+      - BG
+      versions:
+        vp:
+          from: 'BG: (capillary_merge, vp)'
+          component: vp_merge_capillary_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_split:
+      from_modules:
+      - BG
+      versions:
+        pv:
+          from: 'BG: (capillary_split, pv)'
+          component: pv_split_capillary_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    flow_merge:
+      from_modules:
+      - cardiac
+      versions:
+        vp:
+          from: 'cardiac: (flow_merge, vp)'
+          component: flow_merge_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    flow_split:
+      from_modules:
+      - cardiac
+      versions:
+        pv:
+          from: 'cardiac: (flow_split, pv)'
+          component: flow_split_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    flow_sum_2:
+      from_modules:
+      - BG
+      versions:
+        nn:
+          from: 'BG: (flow_sum_2, nn)'
+          component: flow_sum_2_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    merge_junction:
+      from_modules:
+      - BG
+      versions:
+        vp:
+          from: 'BG: (merge_junction, vp)'
+          component: vp_merge_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear:
+          from: 'BG: (merge_junction, vp_nonlinear)'
+          component: vp_merge_nonlinear_type
+          component_renamed: vp_merge_nonlinear_type__merge_junction_vp_nonlinear
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear_constR:
+          from: 'BG: (merge_junction, vp_nonlinear_constR)'
+          component: vp_merge_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear_visco:
+          from: 'BG: (merge_junction, vp_nonlinear_visco)'
+          component: vp_merge_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (merge_junction, vv)'
+          component: vv_merge_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear:
+          from: 'BG: (merge_junction, vv_nonlinear)'
+          component: vv_merge_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_constR:
+          from: 'BG: (merge_junction, vv_nonlinear_constR)'
+          component: vv_merge_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_visco:
+          from: 'BG: (merge_junction, vv_nonlinear_visco)'
+          component: vv_merge_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    merge_junction_simple:
+      from_modules:
+      - BG
+      versions:
+        vp:
+          from: 'BG: (merge_junction_simple, vp)'
+          component: vp_merge_simple_type
+          component_renamed: vp_merge_simple_type__merge_junction_simple_vp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (merge_junction_simple, vv)'
+          component: vv_merge_simple_type
+          component_renamed: vv_merge_simple_type__merge_junction_simple_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    Min_junction:
+      from_modules:
+      - BG
+      - cvs_mvp
+      versions:
+        vp:
+          from: 'BG: (Min_junction, vp)'
+          component: vp_Min_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_noI:
+          from: 'cvs_mvp: (Min_junction, vp_noI)'
+          component: vp_Min_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear:
+          from: 'BG: (Min_junction, vp_nonlinear)'
+          component: vp_Min_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear_constR:
+          from: 'BG: (Min_junction, vp_nonlinear_constR)'
+          component: vp_Min_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_nonlinear_visco:
+          from: 'BG: (Min_junction, vp_nonlinear_visco)'
+          component: vp_Min_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_simple:
+          from: 'BG: (Min_junction, vp_simple)'
+          component: vp_Min_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_simple_novisco:
+          from: 'BG: (Min_junction, vp_simple_novisco)'
+          component: vp_Min_simple_novisco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (Min_junction, vv)'
+          component: vv_Min_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_noI:
+          from: 'cvs_mvp: (Min_junction, vv_noI)'
+          component: vv_Min_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear:
+          from: 'BG: (Min_junction, vv_nonlinear)'
+          component: vv_Min_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_constR:
+          from: 'BG: (Min_junction, vv_nonlinear_constR)'
+          component: vv_Min_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_visco:
+          from: 'BG: (Min_junction, vv_nonlinear_visco)'
+          component: vv_Min_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_simple:
+          from: 'BG: (Min_junction, vv_simple)'
+          component: vv_Min_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    Min_junction_2:
+      from_modules:
+      - cvs_mvp
+      versions:
+        vp_noI:
+          from: 'cvs_mvp: (Min_junction_2, vp_noI)'
+          component: vp_Min_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_noI:
+          from: 'cvs_mvp: (Min_junction_2, vv_noI)'
+          component: vv_Min_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    Min_junction_usV_C_ctl:
+      from_modules:
+      - BG
+      versions:
+        vp_simple:
+          from: 'BG: (Min_junction_usV_C_ctl, vp_simple)'
+          component: vp_Min_usV_C_ctl_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    MinNout_junction:
+      from_modules:
+      - BG
+      - cvs_mvp
+      versions:
+        vv:
+          from: 'BG: (MinNout_junction, vv)'
+          component: vv_MinNout_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_noI:
+          from: 'cvs_mvp: (MinNout_junction, vv_noI)'
+          component: vv_MinNout_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear:
+          from: 'BG: (MinNout_junction, vv_nonlinear)'
+          component: vv_MinNout_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_constR:
+          from: 'BG: (MinNout_junction, vv_nonlinear_constR)'
+          component: vv_MinNout_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_visco:
+          from: 'BG: (MinNout_junction, vv_nonlinear_visco)'
+          component: vv_MinNout_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_simple:
+          from: 'BG: (MinNout_junction, vv_simple)'
+          component: vv_MinNout_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    MinNout_junction_2:
+      from_modules:
+      - cvs_mvp
+      versions:
+        vv_noI:
+          from: 'cvs_mvp: (MinNout_junction_2, vv_noI)'
+          component: vv_MinNout_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    Nout_junction:
+      from_modules:
+      - BG
+      - cvs_mvp
+      versions:
+        pv:
+          from: 'BG: (Nout_junction, pv)'
+          component: pv_Nout_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_noI:
+          from: 'cvs_mvp: (Nout_junction, pv_noI)'
+          component: pv_Nout_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear:
+          from: 'BG: (Nout_junction, pv_nonlinear)'
+          component: pv_Nout_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear_constR:
+          from: 'BG: (Nout_junction, pv_nonlinear_constR)'
+          component: pv_Nout_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear_visco:
+          from: 'BG: (Nout_junction, pv_nonlinear_visco)'
+          component: pv_Nout_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_simple:
+          from: 'BG: (Nout_junction, pv_simple)'
+          component: pv_Nout_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (Nout_junction, vv)'
+          component: vv_Nout_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_noI:
+          from: 'cvs_mvp: (Nout_junction, vv_noI)'
+          component: vv_Nout_noI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear:
+          from: 'BG: (Nout_junction, vv_nonlinear)'
+          component: vv_Nout_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_constR:
+          from: 'BG: (Nout_junction, vv_nonlinear_constR)'
+          component: vv_Nout_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_visco:
+          from: 'BG: (Nout_junction, vv_nonlinear_visco)'
+          component: vv_Nout_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_simple:
+          from: 'BG: (Nout_junction, vv_simple)'
+          component: vv_Nout_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    Nout_junction_2:
+      from_modules:
+      - cvs_mvp
+      versions:
+        pv_noI:
+          from: 'cvs_mvp: (Nout_junction_2, pv_noI)'
+          component: pv_Nout_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_noI:
+          from: 'cvs_mvp: (Nout_junction_2, vv_noI)'
+          component: vv_Nout_noI_type2
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    split_junction:
+      from_modules:
+      - BG
+      versions:
+        pv:
+          from: 'BG: (split_junction, pv)'
+          component: pv_split_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear:
+          from: 'BG: (split_junction, pv_nonlinear)'
+          component: pv_split_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear_constR:
+          from: 'BG: (split_junction, pv_nonlinear_constR)'
+          component: pv_split_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_nonlinear_visco:
+          from: 'BG: (split_junction, pv_nonlinear_visco)'
+          component: pv_split_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (split_junction, vv)'
+          component: vv_split_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear:
+          from: 'BG: (split_junction, vv_nonlinear)'
+          component: vv_split_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_constR:
+          from: 'BG: (split_junction, vv_nonlinear_constR)'
+          component: vv_split_nonlinear_constR_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_nonlinear_visco:
+          from: 'BG: (split_junction, vv_nonlinear_visco)'
+          component: vv_split_nonlinear_visco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_novisco:
+          from: 'BG: (split_junction, vv_novisco)'
+          component: vv_split_novisco_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    split_junction_simple:
+      from_modules:
+      - BG
+      versions:
+        pv:
+          from: 'BG: (split_junction_simple, pv)'
+          component: pv_split_simple_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (split_junction_simple, vv)'
+          component: vv_split_simple_type
+          component_renamed: vv_split_simple_type__split_junction_simple_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venous_merge_junction:
+      from_modules:
+      - BG
+      versions:
+        vp_nonlinear:
+          from: 'BG: (venous_merge_junction, vp_nonlinear)'
+          component: vp_merge_nonlinear_type
+          component_renamed: vp_merge_nonlinear_type__venous_merge_junction_vp_nonlinear
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venous_merge_junction_simple:
+      from_modules:
+      - BG
+      versions:
+        vp:
+          from: 'BG: (venous_merge_junction_simple, vp)'
+          component: vp_merge_simple_type
+          component_renamed: vp_merge_simple_type__venous_merge_junction_simple_vp
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv:
+          from: 'BG: (venous_merge_junction_simple, vv)'
+          component: vv_merge_simple_type
+          component_renamed: vv_merge_simple_type__venous_merge_junction_simple_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venous_split_junction_simple:
+      from_modules:
+      - BG
+      versions:
+        vv:
+          from: 'BG: (venous_split_junction_simple, vv)'
+          component: vv_split_simple_type
+          component_renamed: vv_split_simple_type__venous_split_junction_simple_vv
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  vessels/microvasculature:
+    arteriole:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pp_micro:
+          from: 'microvasculature_network: (arteriole, pp_micro)'
+          component: pp_simple_type
+          component_renamed: pp_simple_type__arteriole_pp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_micro:
+          from: 'microvasculature_network: (arteriole, pv_micro)'
+          component: pv_simple_type
+          component_renamed: pv_simple_type__arteriole_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_micro:
+          from: 'microvasculature_network: (arteriole, vp_micro)'
+          component: vp_simple_type
+          component_renamed: vp_simple_type__arteriole_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_micro:
+          from: 'microvasculature_network: (arteriole, vv_micro)'
+          component: vv_simple_type
+          component_renamed: vv_simple_type__arteriole_vv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    arteriole_Min:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (arteriole_Min, vp_micro)'
+          component: vp_Min_type_micro
+          component_renamed: vp_Min_type_micro__arteriole_Min_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    arteriole_Minlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (arteriole_Minlet, pv_micro)'
+          component: pv_Minlet_type_micro
+          component_renamed: pv_Minlet_type_micro__arteriole_Minlet_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    arteriole_Nout:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (arteriole_Nout, pv_micro)'
+          component: pv_Nout_type_micro
+          component_renamed: pv_Nout_type_micro__arteriole_Nout_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    arteriole_Noutlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (arteriole_Noutlet, vp_micro)'
+          component: vp_Noutlet_type_micro
+          component_renamed: vp_Noutlet_type_micro__arteriole_Noutlet_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pp_micro:
+          from: 'microvasculature_network: (artery, pp_micro)'
+          component: pp_type_micro
+          component_renamed: pp_type_micro__artery_pp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_micro:
+          from: 'microvasculature_network: (artery, pv_micro)'
+          component: pv_type_micro
+          component_renamed: pv_type_micro__artery_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_micro:
+          from: 'microvasculature_network: (artery, vp_micro)'
+          component: vp_type_micro
+          component_renamed: vp_type_micro__artery_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_micro:
+          from: 'microvasculature_network: (artery, vv_micro)'
+          component: vv_type_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery_inlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pp_micro:
+          from: 'microvasculature_network: (artery_inlet, pp_micro)'
+          component: pp_type_micro
+          component_renamed: pp_type_micro__artery_inlet_pp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_micro:
+          from: 'microvasculature_network: (artery_inlet, pv_micro)'
+          component: pv_type_micro
+          component_renamed: pv_type_micro__artery_inlet_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery_Min:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (artery_Min, vp_micro)'
+          component: vp_Min_type_micro
+          component_renamed: vp_Min_type_micro__artery_Min_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_micro:
+          from: 'microvasculature_network: (artery_Min, vv_micro)'
+          component: vv_Min_type_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery_Minlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (artery_Minlet, pv_micro)'
+          component: pv_Minlet_type_micro
+          component_renamed: pv_Minlet_type_micro__artery_Minlet_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery_MinNout:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vv_micro:
+          from: 'microvasculature_network: (artery_MinNout, vv_micro)'
+          component: vv_MinNout_type_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery_Nout:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (artery_Nout, pv_micro)'
+          component: pv_Nout_type_micro
+          component_renamed: pv_Nout_type_micro__artery_Nout_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_micro:
+          from: 'microvasculature_network: (artery_Nout, vv_micro)'
+          component: vv_Nout_type_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery_Noutlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (artery_Noutlet, vp_micro)'
+          component: vp_Noutlet_type_micro
+          component_renamed: vp_Noutlet_type_micro__artery_Noutlet_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    artery_outlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pp_micro:
+          from: 'microvasculature_network: (artery_outlet, pp_micro)'
+          component: pp_type_micro
+          component_renamed: pp_type_micro__artery_outlet_pp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_micro:
+          from: 'microvasculature_network: (artery_outlet, vp_micro)'
+          component: vp_type_micro
+          component_renamed: vp_type_micro__artery_outlet_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_Min:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (capillary_Min, vp_micro)'
+          component: vp_Min_type_micro
+          component_renamed: vp_Min_type_micro__capillary_Min_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_Minlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (capillary_Minlet, pv_micro)'
+          component: pv_Minlet_type_micro
+          component_renamed: pv_Minlet_type_micro__capillary_Minlet_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_Nout:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (capillary_Nout, pv_micro)'
+          component: pv_Nout_type_micro
+          component_renamed: pv_Nout_type_micro__capillary_Nout_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    capillary_Noutlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (capillary_Noutlet, vp_micro)'
+          component: vp_Noutlet_type_micro
+          component_renamed: vp_Noutlet_type_micro__capillary_Noutlet_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    P_outlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        nn_micro:
+          from: 'microvasculature_network: (P_outlet, nn_micro)'
+          component: constant_pressure_BC_type_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    vein:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pp_micro:
+          from: 'microvasculature_network: (vein, pp_micro)'
+          component: pp_simple_type
+          component_renamed: pp_simple_type__vein_pp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_micro:
+          from: 'microvasculature_network: (vein, pv_micro)'
+          component: pv_simple_type
+          component_renamed: pv_simple_type__vein_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_micro:
+          from: 'microvasculature_network: (vein, vp_micro)'
+          component: vp_simple_type
+          component_renamed: vp_simple_type__vein_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_micro:
+          from: 'microvasculature_network: (vein, vv_micro)'
+          component: vv_simple_type
+          component_renamed: vv_simple_type__vein_vv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    vein_Min:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (vein_Min, vp_micro)'
+          component: vp_Min_type_micro
+          component_renamed: vp_Min_type_micro__vein_Min_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    vein_Minlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (vein_Minlet, pv_micro)'
+          component: pv_Minlet_type_micro
+          component_renamed: pv_Minlet_type_micro__vein_Minlet_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    vein_Nout:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (vein_Nout, pv_micro)'
+          component: pv_Nout_type_micro
+          component_renamed: pv_Nout_type_micro__vein_Nout_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    vein_Noutlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (vein_Noutlet, vp_micro)'
+          component: vp_Noutlet_type_micro
+          component_renamed: vp_Noutlet_type_micro__vein_Noutlet_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venule:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pp_micro:
+          from: 'microvasculature_network: (venule, pp_micro)'
+          component: pp_simple_type
+          component_renamed: pp_simple_type__venule_pp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pv_micro:
+          from: 'microvasculature_network: (venule, pv_micro)'
+          component: pv_simple_type
+          component_renamed: pv_simple_type__venule_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_micro:
+          from: 'microvasculature_network: (venule, vp_micro)'
+          component: vp_simple_type
+          component_renamed: vp_simple_type__venule_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vv_micro:
+          from: 'microvasculature_network: (venule, vv_micro)'
+          component: vv_simple_type
+          component_renamed: vv_simple_type__venule_vv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venule_Min:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (venule_Min, vp_micro)'
+          component: vp_Min_type_micro
+          component_renamed: vp_Min_type_micro__venule_Min_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venule_Minlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (venule_Minlet, pv_micro)'
+          component: pv_Minlet_type_micro
+          component_renamed: pv_Minlet_type_micro__venule_Minlet_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venule_Nout:
+      from_modules:
+      - microvasculature_network
+      versions:
+        pv_micro:
+          from: 'microvasculature_network: (venule_Nout, pv_micro)'
+          component: pv_Nout_type_micro
+          component_renamed: pv_Nout_type_micro__venule_Nout_pv_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    venule_Noutlet:
+      from_modules:
+      - microvasculature_network
+      versions:
+        vp_micro:
+          from: 'microvasculature_network: (venule_Noutlet, vp_micro)'
+          component: vp_Noutlet_type_micro
+          component_renamed: vp_Noutlet_type_micro__venule_Noutlet_vp_micro
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  vessels/properties:
+    material_prop_const:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_const, nn)'
+          component: material_prop_const_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    material_prop_const_ven:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_const_ven, nn)'
+          component: material_prop_const_ven_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    material_prop_fromPWV:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_fromPWV, nn)'
+          component: material_prop_fromPWV_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    material_prop_fromPWV_ven:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_fromPWV_ven, nn)'
+          component: material_prop_fromPWV_ven_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    material_prop_visco_const:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_visco_const, nn)'
+          component: material_prop_visco_const_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    material_prop_visco_const_ven:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_visco_const_ven, nn)'
+          component: material_prop_visco_const_ven_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    material_prop_visco_fromPWV:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_visco_fromPWV, nn)'
+          component: material_prop_visco_fromPWV_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    material_prop_visco_fromPWV_ven:
+      from_modules:
+      - vessel_properties
+      versions:
+        nn:
+          from: 'vessel_properties: (material_prop_visco_fromPWV_ven, nn)'
+          component: material_prop_visco_fromPWV_ven_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+  vessels/terminals:
+    single_terminal:
+      from_modules:
+      - BG
+      versions:
+        vp_R1CR2_wCont:
+          from: 'BG: (single_terminal, vp_R1CR2_wCont)'
+          component: vp_T_R1CR2_wCont_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_R1CR2_wI:
+          from: 'BG: (single_terminal, vp_R1CR2_wI)'
+          component: vp_T_R1CR2_wI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_R1CR2_wI_wCont:
+          from: 'BG: (single_terminal, vp_R1CR2_wI_wCont)'
+          component: vp_T_R1CR2_wI_wCont_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_ZCIR_wCont:
+          from: 'BG: (single_terminal, vp_ZCIR_wCont)'
+          component: vp_T_ZCIR_wCont_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        vp_wCont:
+          from: 'BG: (single_terminal, vp_wCont)'
+          component: vp_T_wCont_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    terminal:
+      from_modules:
+      - BG
+      - elic
+      versions:
+        pp:
+          from: 'BG: (terminal, pp)'
+          component: pp_T_fixed_I_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_I:
+          from: 'BG: (terminal, pp_I)'
+          component: pp_T_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_R1CR2_wCont:
+          from: 'BG: (terminal, pp_R1CR2_wCont)'
+          component: pp_T_R1CR2_wCont_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_R1ICR2I:
+          from: 'BG: (terminal, pp_R1ICR2I)'
+          component: pp_T_R1ICR2I_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_RCR_wCont:
+          from: 'BG: (terminal, pp_RCR_wCont)'
+          component: pp_T_RCR_wCont_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_RICRI:
+          from: 'BG: (terminal, pp_RICRI)'
+          component: pp_T_RICRI_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_RICRI_nonlinear:
+          from: 'BG: (terminal, pp_RICRI_nonlinear)'
+          component: pp_T_RICRI_nonlinear_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_controller:
+          from: 'elic: (terminal, pp_controller)'
+          component: controller_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_spec_I:
+          from: 'BG: (terminal, pp_spec_I)'
+          component: pp_T_spec_I_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_wCont:
+          from: 'BG: (terminal, pp_wCont)'
+          component: pp_T_wCont_type
+          component_renamed: pp_T_wCont_type__terminal_pp_wCont
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_wCont_no_local:
+          from: 'BG: (terminal, pp_wCont_no_local)'
+          component: pp_T_wCont_type
+          component_renamed: pp_T_wCont_type__terminal_pp_wCont_no_local
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_wLocal:
+          from: 'BG: (terminal, pp_wLocal)'
+          component: pp_T_wCont_type
+          component_renamed: pp_T_wCont_type__terminal_pp_wLocal
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    terminal2:
+      from_modules:
+      - BG
+      - elic
+      versions:
+        pp:
+          from: 'BG: (terminal2, pp)'
+          component: W_controller2_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_controller:
+          from: 'elic: (terminal2, pp_controller)'
+          component: controller2_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+    terminalOL:
+      from_modules:
+      - open_loop
+      versions:
+        pp_controller:
+          from: 'open_loop: (terminalOL, pp_controller)'
+          component: controller_OL_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file
+        pp_wFB:
+          from: 'open_loop: (terminalOL, pp_wFB)'
+          component: pp_T_OL_wFB_type
+          instances:
+          - name: default
+            from: parameter rows in the module parameters file

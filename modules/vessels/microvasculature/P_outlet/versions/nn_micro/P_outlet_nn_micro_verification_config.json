@@ -1,0 +1,45 @@
+{
+  "module_type": "P_outlet",
+  "version": "nn_micro",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.005,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-24},
+  "outputs": ["mod/P"],
+  "invariants": [
+    {
+      "description": "the outlet pressure output equals the constant parameter P at all times",
+      "expr": "np.max(np.abs(mod__P - P)) <= 1e-9*abs(P) + 1e-12"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "P": {"min": 0.0, "max": 2000.0, "points": 5},
+      "v": {"min": 0.0, "max": 1e-09, "points": 3}
+    },
+    "rationale": "P over 0-15 mmHg (venous/outlet pressures); v is unused."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-24}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "boundary-condition component (fixed pressure); nothing to validate"
+      },
+      "calibrate": {"note": "not_applicable: boundary-condition component (fixed pressure); nothing to validate"}
+    }
+  }
+}

@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="sympathetic_efferent_Gee2023_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="sympathetic_efferent_Gee2023">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="f_esh" public_interface="out" units="Hz"/>
+        <variable name="f_esinf" public_interface="in" units="Hz"/>
+        <variable name="f_es0" public_interface="in" units="Hz"/>
+        <variable name="k_es" public_interface="in" units="second"/>
+        <variable name="f_ash" public_interface="in" units="Hz"/>
+        <!-- (Finbar note) are all three of these supposed to be the same?-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_esh</ci>
+                <apply>
+                    <plus/>
+                    <ci>f_esinf</ci>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <ci>f_es0</ci>
+                            <ci>f_esinf</ci>
+                        </apply>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <ci>k_es</ci>
+                                </apply>
+                                <ci>f_ash</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!-- s. 50 (peripheral circulation)-->
+        <variable name="f_esp" public_interface="out" units="Hz"/>
+        <variable name="f_asp" public_interface="in" units="Hz"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_esp</ci>
+                <apply>
+                    <plus/>
+                    <ci>f_esinf</ci>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <ci>f_es0</ci>
+                            <ci>f_esinf</ci>
+                        </apply>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <ci>k_es</ci>
+                                </apply>
+                                <ci>f_asp</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!-- s. 51 ( unstressed volumes)-->
+        <variable name="f_esv" public_interface="out" units="Hz"/>
+        <variable name="f_asv" public_interface="in" units="Hz"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_esv</ci>
+                <apply>
+                    <plus/>
+                    <ci>f_esinf</ci>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <ci>f_es0</ci>
+                            <ci>f_esinf</ci>
+                        </apply>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <ci>k_es</ci>
+                                </apply>
+                                <ci>f_asv</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

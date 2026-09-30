@@ -1,0 +1,14 @@
+module_type: sum_blood_vol_2
+version: nn
+reviewed: false
+notes: 'Blood-volume sum: q = q_sum, where q_sum is the "sum" multi-port collecting the volume ports of every compartment
+  in a network. Alone it cannot be generated (libcuflynx IndexError on the empty sum port), so it is tested with two pure-compliance
+  compartments (v1, v2, open flow BCs) feeding its volume port. SI variant (m3).'
+reference_proposals:
+  q_sum:
+    reference: 'Paeme2011; Table 3: total blood volume 5.5 L (Smith 2004 model values)'
+    sourced: 'yes'
+    value: 0.0055
+review: reviews/cvs_mvp_review.yaml
+review_scope: The review of the whole cvs_mvp module (23 entries) before the move to versions; only the parts about this version
+  apply.

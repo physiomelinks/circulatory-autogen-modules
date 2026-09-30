@@ -1,0 +1,102 @@
+comment: 'heart_devel cannot be generated; all 10 structure-test warnings are real and belong to it: B_* units dimensionless
+  in the config vs Js2_per_m9 in the CellML, and no public_interface on A_eff_* / u_rv / u_lv and its B saturation jumps from
+  1e10 to about 2e10 at the switch. heart_new_valve''s B = Rmod rho/(A_eff + eps) is dimensionally inconsistent and leaks
+  (16% aortic backflow). heart_nonstiff''s linearised valves let the RA volume go negative (-7 ml), and they are stiffer when
+  closed, not less (it needs CVODE MaximumStep 1e-4). heart_Ca_input has no Ca input and duplicates heart_simple. Many parameters
+  have shaky provenance: the LV/RV elastances are user values that differ from Liang 2009; T_vc = 0.34 s vs 0.30 s; K_vo_miv
+  and the aortic K_vo/K_vc differ from Mynard 2015; the annulus areas are unsourced; the primary tables could only be checked
+  through secondary sources.'
+summary: 'Four-chamber time-varying-elastance heart (Liang 2009 raised-cosine activation, Mynard 2012 valve dynamics) in 8
+  variants. Each variant is tested in a closed loop built from the circulatory_autogen 3compartment network: heart = "mod";
+  IVC fed by a zero-flow inlet; neighbour inertances raised to 1e5 so that the stiffness under test is the heart''s own. Runs
+  use a 20 s pre-time to reach the periodic state. Invariants checked: closed-loop blood-volume conservation, LV/RV volume
+  balance against the valve flows, the exact chamber P-V laws, activation and valve-area bounds, positive chamber volumes,
+  and at the run point valve backflow < 5%, a periodic state, LV/RV output balance and the heart period. What passes: heart
+  vp_wCont, vp, vp_Ca, LVprop and ASD pass run, invariants, the BC sweep (174-232 runs) and stability (9/9 solver families).
+  Recorded failures: RK4 self-convergence is non-monotone for all variants (piecewise-smooth valve law). heart_new_valve fails
+  the backflow invariant. heart_nonstiff fails the positive-volume invariant and the sweep (q_ra < 0). heart_devel does not
+  generate. References proposed for every parameter; the primary parameter tables were paywalled and were checked only through
+  secondary sources. Validation: proposed Maceira 2006 steady-state baseline targets on five adult variants. The nominal model
+  meets SV, EF and the aortic pressures but misses EDV (203 vs 142 +- 21 ml) and ESV (81 vs 47 +- 10 ml). The rest is pending.'
+questions:
+- 'References (see the table): Liang2009MBEC Table 2 for the timings (T_ac, T_ar, t_astart, T_vr, t_vstart) and atrial elastances;
+  Korakianitis2006JBiomech Table 1 for the unstressed volumes; Mynard2015ABME for K_vo/K_vc of the tricuspid and pulmonary
+  valves and K_vc_miv; Trudnowski1974 for rho. The primary tables were paywalled; the values were matched against Rabineau2021
+  Table 1 (open access, adapted from Liang 2009 and Mynard & Smolich 2015) and two arXiv reproductions. Please check them
+  against the primary tables before confirming.'
+- E_lv_A = 200e6, E_lv_B = 20e6, E_rv_A = 60e6 and E_rv_B = 0.2e6 Pa/m3 are user values; Liang 2009 Table 2 gives 3.67e8,
+  1.07e7 (0.10 mmHg/ml in Rabineau), 7.33e7 and 6.67e6. E_rv_B is about 30x below Liang. Keep them as unsourced user choices,
+  or switch to Liang (the proposals leave the values unchanged)?
+- 'T_vc = 0.34 s: every source seen gives 0.30 s (Liang 2009 via secondary sources; the CA 3compartment example also uses
+  0.30). Change to 0.30 s, or keep 0.34 s as a user choice?'
+- 'Valves: the secondary sources give K_vo_miv = 0.20 (library 0.30) and aortic K_vo = K_vc = 0.20 (library 0.12) Pa^-1 s^-1.
+  The annulus areas 6.8/7.7/8.0/7.1 cm2 (cited as Mynard_2012) were not found; the secondary sources list 5.0-6.0 cm2 A_eff,max.
+  l_eff is shared (2 cm), while Mynard 2015 uses 1.0-2.0 cm per valve. Where do these library values come from?'
+- 'Harness: is the 3compartment closed loop acceptable as the test network? It uses CA example parameters, the IVC fed by
+  a zero-flow inlet, and neighbour inertances raised from 1e-6..1e-1 to 1e5 Pa s2/m3 (the CA values made the network, not
+  the heart, stiff, with R/I up to 1e13 1/s). Initial volumes (q_*_init) set the closed-loop blood volume, so they are effectively
+  parameters: should they be sourced (e.g. from a total blood volume)?'
+- 'Validation (proposed, awaiting confirmation): baseline targets from Maceira2006LV Table 8 (verified in the paper PDF):
+  EDV 142 +- 21, ESV 47 +- 10, SV 95 +- 14 ml, EF 67 +- 4.6 %; aortic systolic 115-135 and diastolic 68-79 mmHg (range of
+  the Table 1 brachial cuff decile means; brachial, not central, pressure). They are set on heart vp_wCont, vp, vp_Ca, nonstiff
+  and new_valve, with a pass at 2 SD. At nominal parameters (heart vp) SV 122 ml, EF 60 %, aortic 131/77 mmHg pass, but EDV
+  203 ml (+2.9 SD) and ESV 81 ml (+3.4 SD) fail: the LV is too large, which fits the user-defined low E_lv_A plus too much
+  blood in the loop (initial volumes). new_valve also misses SV (125 ml) and diastolic pressure (67 mmHg, from aortic regurgitation).
+  Accept these targets? Accept the brachial pressure ranges as a proxy? Next step would be to calibrate E_lv_A, E_lv_B and
+  blood volume (q_lv_init) to them. Kawel-Boehm 2020 (RV volumes, CO) was not added as targets because I could not open its
+  tables to verify.'
+- heart_Ca_input (vp_Ca) has no calcium input and is equation-for-equation heart_simple (identical results). Rename it, remove
+  it, or add the intended Ca-driven activation?
+- 'heart_new_valve: what are the intended units and value of Rmod_valve_* (TODO; placeholder 3000 from the CA delay_devel
+  example)? As written, B = Rmod rho/(A_eff + eps_m4) needs Rmod in m^-2 (see proposed_fixes).'
+- 'heart_devel: approve the interface/units fix? Can the BioBeat measurements (r_ao, r_lvot, A_aov) and your 07/09/22 population
+  identification (gamma) be cited or shared for validation? They are proposed as unreferenced for now.'
+- 'R_ASD = 1e7 Pa s/m3 (0.075 mmHg s/ml, "moderate ASD"): no source found. The only published lumped value found (Ferrero
+  et al. 2026) is 0.0031 mmHg s/ml for a large defect. Keep as a placeholder?'
+- 'heart_nonstiff: keep it with its recorded known issues, or revise the linearisation (e.g. v_ref near peak flow, or a smooth
+  |v| approximation)?'
+proposed_fixes:
+- 'heart_devel (config + CellML; these are exactly the 10 structure-test warnings: 4 unit mismatches and 6 missing public
+  interfaces): in heart_modules_config.json set the units of B_aov, B_trv, B_puv, B_miv to Js2_per_m9 (CellML declares Js2_per_m9).
+  In the heart_devel CellML component add public_interface="out" to A_eff_trv, A_eff_puv, A_eff_miv, A_eff_aov, u_rv and u_lv,
+  which the config exposes. Evidence: a patched copy of the library generates and runs in the harness (LV peak 233 mmHg vs
+  aortic 137 mmHg, consistent with the stenotic valve).'
+- 'heart_devel: the B saturation B = 1e10 + 1e16 (1 - exp(-B_pre/1e16)) for B_pre >= 1e10 gives about 2e10 at the switch,
+  a factor-2 jump (the term 1e16(1 - exp(-1e-6)) is about 1e10). Proposed: B = 1e10 + 1e16 (1 - exp(-(B_pre - 1e10)/1e16)),
+  which is continuous with slope 1.'
+- 'heart_new_valve: B_x = Rmod_valve_x rho/(A_eff_x + eps_m4) adds m2 to m4 and gives kg m^-5, not the declared Js2_per_m9
+  (kg m^-7). Either declare Rmod in per_m2 (and source its value), or use B = Rmod rho/(2 A_eff^2 + eps_m4) with Rmod dimensionless.
+  The current form also closes leakily (16% aortic backflow).'
+- 'heart_nonstiff: R_lin = 2 B v_ref with v_ref = 50-100 ml/s under-resists open-valve flow (peak ~500 ml/s), which drives
+  q_ra negative. With the valve closed the rate v_ref/(l_eff A_eff) is huge (stiffer than the Bernoulli form). Consider a
+  smooth |v| (e.g. sqrt(v^2 + v_ref^2)), which keeps the Bernoulli loss at high flow and a finite slope at v = 0.'
+- 'All variants (optional): the valve state is clamped only below (zeta = max(zeta_pre, 0)); use min(max(zeta_pre, 0), 1).
+  A numerical overshoot of about 1e-5 above 1 was observed. The chi_v rate uses strict > 0.25 / > 0.5 where chi_a uses >=,
+  so at chi_vfloor exactly 0.5 the rate falls to the "otherwise 0" branch and the phase would stop. Make both use >= like
+  chi_a.'
+findings:
+- 'Test network: libcuflynx maps the zero IVC flow to a component literally named heart_module (CVSCellMLGenerator), so with
+  the test vessel "mod" v_ivc was left unset. The harness therefore feeds the IVC port from a zero-flow inlet_flow vessel
+  (framework note).'
+- heart vp_wCont (with zero control inputs), heart vp and heart vp_Ca give identical results; vp_wCont adds only the control
+  terms.
+- 'Stability (t_end 2 s): all generating variants work with all 9 solver families. CVODE rtol 1e-4 needs MaximumStep 1e-4.
+  Fixed step: RK4 works at dt 4e-4, Heun at 2e-4, Euler at 1e-4 (5e-5 for LVprop). heart_nonstiff needs MaximumStep 1e-4 even
+  at rtol 1e-6 (its declared configuration; 1e-3 differs by 0.21) and dt 5e-5 for every fixed-step scheme.'
+- RK4 self-convergence (verification_test_timestep) is non-monotone for every variant. Differences plateau at 3-6e-4 (normalised)
+  in A_eff_miv/A_eff_trv near valve closure and the atrial kick, because the valve law is only piecewise smooth. The fixed-step
+  solutions still agree with tight CVODE to 1.3-2.0e-4. Recorded as an expected failure.
+- 'BC sweep: the tricuspid annulus area is limited to 4-10 cm2. Above about 10.2 cm2 the RA volume goes negative (min q_ra
+  -1.0 ml at 11 cm2): the linear P-V law allows suction (u_ra < 0) and nothing stops the chamber from emptying. The same mechanism
+  produces q_ra < 0 in heart_nonstiff.'
+- 'Baseline targets (Maceira 2006, 2 SD): heart vp / vp_wCont / vp_Ca / nonstiff meet 4 of 6 (SV, EF, aortic systolic and
+  diastolic); EDV (203 ml) and ESV (81 ml) are too high. new_valve meets 2 of 6 (also misses SV 125 ml and diastolic 67 mmHg).'
+- 'Nominal haemodynamics (heart vp in the harness): LVEDV 203, ESV 81 ml, EF 60 %, CO 7.2 l/min, aortic 131/77 mmHg, PA 70/18
+  mmHg, mean LA pressure 22 mmHg, mean RA 1.3 mmHg. The pulmonary and LA pressures are high, which is consistent with the
+  very compliant RV (E_rv_B = 0.2e6) and the user-defined elastances. LVprop: LVEDV 116 ml, CO 3.9 l/min, aortic 77/47 mmHg
+  (neonatal-scaled use).'
+- 'Framework needs: (1) the calibrate test still evaluates from t = 0 without pre_time, so calibrating to the steady-state
+  targets needs the same pre_time support as the new baseline targets; (2) the heart zero-IVC mapping in libcuflynx should
+  use the actual vessel name; (3) the structure test now checks config/CellML units, but not dimensional consistency inside
+  equations, so the heart_new_valve error (A_eff [m2] + eps_m4 [m4]; B in kg m^-5) still passes; (4) the heart harness runs
+  a 20 s pre-time and the sweep is ~200-250 runs, so a full test run of one component takes 15-25 min.'

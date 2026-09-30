@@ -1,0 +1,17 @@
+module_type: outlet_pressure
+version: nn_constant
+reviewed: false
+notes: Constant pressure P imposed at the outlet of a vessel (the vessel supplies the flow v through the port). Alone it computes
+  nothing; tested downstream of a constant inflow (1e-4 m^3/s) and a BG arterial_simple vp vessel, whose steady state (v =
+  inflow, u = P + R v) is analytic.
+reference_proposals:
+  P:
+    reference: Klabunde2021; right-atrial pressure typically averages < 5 mmHg (cvphysiology.com, PCWP page); 666 Pa = 5 mmHg
+    sourced: 'yes'
+  v:
+    reference: definitional; the flow v is supplied by the connected vessel through the port; the parameter value is only
+      used when unconnected
+    sourced: definitional
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

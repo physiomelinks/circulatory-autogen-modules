@@ -1,0 +1,35 @@
+module_type: SN_Na_K_concentrations_soma
+version: nn
+reviewed: false
+notes: 'Cytosolic Na and K of the SN soma: Vol dNai/dt = j_Na_total, Vol dKi/dt = j_K_total (the ion fluxes of the channels
+  connected through Na_flux / K_flux), and their Nernst potentials E_Na, E_K. Built by tools/build_sn_modules.py; SN_simple_flat
+  checks that the assembled parts reproduce SN_simple.'
+expected_failures:
+  run_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K
+    / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao
+    components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question
+    on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and
+    invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the
+    defined units J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK
+    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
+    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined
+    units J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK /
+    C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the
+    pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined
+    units J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK /
+    C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the
+    pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
+    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  stability_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined units
+    J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK / C_per_M
+    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
+    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
+    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

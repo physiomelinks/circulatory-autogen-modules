@@ -14,6 +14,10 @@ Usage:
 The CellML, config and units files are overwritten from CA. The parameters file is only
 re-seeded with --reseed-parameters, and the tests spec is never overwritten, because both
 are edited by hand once a module has been reviewed.
+
+Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
+provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
+modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
 """
 import argparse
 import csv

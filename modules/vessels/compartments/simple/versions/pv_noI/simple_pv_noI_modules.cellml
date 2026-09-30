@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="simple_pv_noI" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="pv_simple_noI_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="q_init" public_interface="in" units="litre"/>
+        <variable name="q_0" public_interface="in" units="litre"/>
+        <variable initial_value="q_init" name="q" public_interface="out" units="litre"/>
+        <variable name="u" public_interface="out" units="kPa"/>
+        <variable name="u_0" public_interface="in" units="kPa"/>
+        <variable name="v" public_interface="out" units="L_per_s"/>
+        <!-- consitutive parameters
+ var E: kPa_per_L {pub: in};-->
+        <variable name="C" public_interface="in" units="L_per_kPa"/>
+        <variable name="R" public_interface="in" units="kPa_s_per_L"/>
+        <!-- boundary conditions-->
+        <variable name="u_in" public_interface="in" units="kPa"/>
+        <variable name="v_out" public_interface="in" units="L_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v</ci>
+                    <ci>v_out</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>u_in</ci>
+                        <ci>u</ci>
+                    </apply>
+                    <ci>R</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u</ci>
+                <apply>
+                    <plus/>
+                    <ci>u_0</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>q</ci>
+                            <ci>q_0</ci>
+                        </apply>
+                        <ci>C</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

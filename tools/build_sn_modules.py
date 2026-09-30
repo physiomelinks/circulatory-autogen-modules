@@ -28,6 +28,10 @@ Writes (and rewrites on every run):
   modules/system/cellular/SN_simple_supermodules/  SN_simple as one sympathetic_neuron instance
 
     python tools/build_sn_modules.py
+
+Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
+provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
+modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
 """
 import copy
 import csv

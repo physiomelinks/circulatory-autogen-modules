@@ -1,0 +1,13 @@
+variable_name,units,value,data_reference,sourced
+E_Na,milliV,64.455574,"definitional; Nernst potential at SN_simple Nao 145, Nai_init 13 mM (used when unconnected)",no
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+V_den_h,milliV,4.0,SN_simple: Belluzi1991_was_6.5,yes
+V_den_m,milliV,6,SN_simple: Belluzi1991_was_7.2,yes
+V_mid_h,milliV,40,SN_simple: Belluzi1991_was_53.2,yes
+V_mid_m,milliV,20,SN_simple: Belluzi1991_was_36,yes
+V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+g_Na,microS,2.3,SN_simple: user_defined,no
+g_Na_mod,dimensionless,1.0,SN_simple: user_defined,no
+tau_h_max,millis,5,SN_simple: user_defined,no
+tau_h_min,millis,0.15,SN_simple: user_defined,no
+F,C_per_M,TODO,TODO,no

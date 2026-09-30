@@ -1,0 +1,12 @@
+variable_name,units,value,data_reference,sourced
+Delta_V_mid_w,milliV,0,SN_simple: for_drug_control,yes
+E_K,milliV,-93.713686,"definitional; Nernst potential at SN_simple Ko 4.5, Ki_init 150 mM (used when unconnected)",no
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+V_den_w,milliV,10,SN_simple: Martin2023_was_10,yes
+V_mid_w,milliV,35,SN_simple: Martin2023_was_35,yes
+V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+g_M,microS,0.00389,SN_simple: Davis2021ThesisCalculatedFromMaxCurrent,no
+g_M_mod,dimensionless,1.0,SN_simple: can_be_modified_for_retagabine,yes
+tau_w_min,millis,30,SN_simple: gupta2016Computational,yes
+tau_w_num,millis,1200,SN_simple: Martin2023Modelling_was_400,yes
+F,C_per_M,TODO,TODO,no

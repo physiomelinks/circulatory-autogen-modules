@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="DMV_Gee2023_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="DMV_Gee2023">
+        <!--var f_NTS_br: Hz {pub: in}; will just write out f_NTS_ls + f_NTS_cp-->
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="f_NTS_ls" public_interface="in" units="Hz"/>
+        <variable name="f_NTS_cp" public_interface="in" units="Hz"/>
+        <variable name="f_min_DMV" public_interface="in" units="Hz"/>
+        <variable name="f_max_DMV" public_interface="in" units="Hz"/>
+        <variable name="f_mid_DMV" public_interface="in" units="Hz"/>
+        <variable name="f_DMV" public_interface="out" units="Hz"/>
+        <variable name="k_DMV" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_DMV</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>f_min_DMV</ci>
+                            <ci>f_max_DMV</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <power/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>f_NTS_ls</ci>
+                                        <ci>f_NTS_cp</ci>
+                                    </apply>
+                                    <ci>f_mid_DMV</ci>
+                                </apply>
+                                <ci>k_DMV</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>f_max_DMV</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

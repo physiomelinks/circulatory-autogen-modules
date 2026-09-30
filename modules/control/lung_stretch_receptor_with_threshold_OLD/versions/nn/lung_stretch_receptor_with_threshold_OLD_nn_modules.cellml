@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="lung_stretch_receptor_with_threshold_OLD_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="lung_stretch_receptor_with_threshold">
+        <variable name="q_A" public_interface="in" units="m3"/>
+        <variable name="q_b" public_interface="in" units="m3"/>
+        <variable name="V_lung" public_interface="out" units="m3"/>
+        <variable name="V_lung_stretch_thresh" public_interface="in" units="m3"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>V_lung</ci>
+                <apply>
+                    <plus/>
+                    <ci>q_A</ci>
+                    <ci>q_b</ci>
+                </apply>
+            </apply>
+        </math>
+        <!--V_lung = sel
+    case t > 50{second}:
+        0.6{m3};
+    otherwise:
+        0{m3};
+endsel;-->
+        <!-- s.43 (lr firing frequency)-->
+        <variable initial_value="0" name="f_ls" public_interface="out" units="Hz"/>
+        <!-- change to 2 from 0.5 as I changed tau to correct unit of second-->
+        <variable name="tau_lung" public_interface="in" units="second"/>
+        <variable name="G_al" public_interface="in" units="per_m3_s"/>
+        <!-- ode(f_ls, t) = tau_lung*(-f_ls+G_al*V_lung);
+ changed so that tau has correct units of seconds. tau should be a time constant-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>f_ls</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>f_ls</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>G_al</ci>
+                            <apply>
+                                <max/>
+                                <apply>
+                                    <minus/>
+                                    <ci>V_lung</ci>
+                                    <ci>V_lung_stretch_thresh</ci>
+                                </apply>
+                                <cn cellml:units="m3">0.0</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>tau_lung</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

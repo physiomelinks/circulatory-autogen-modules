@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="thoracic_cavity_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="thoracic_cavity">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="P_pl" public_interface="in" units="J_per_m3"/>
+        <variable name="P_thor" public_interface="out" units="J_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>P_thor</ci>
+                <ci>P_pl</ci>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -3,7 +3,7 @@ Converts vessel arrays from CSV (name, BC_type, vessel_type, inp_vessels, out_ve
 records in PhLynx's key names (<prefix>_vessel_array.json; see cam_testing/vessel_array.py) and
 removes the CSV.
 
-    python tools/convert_vessel_arrays.py                    # every modules/**/_vessel_array.csv
+    python tools/convert_vessel_arrays.py                    # every system_models/**/_vessel_array.csv
     python tools/convert_vessel_arrays.py path/to/x_vessel_array.csv ...
     python tools/convert_vessel_arrays.py --check            # exit 1 if any CSV vessel array is left
 """
@@ -18,7 +18,7 @@ from cam_testing import vessel_array  # noqa: E402
 
 
 def csv_vessel_arrays(skip=()):
-    paths = glob.glob(os.path.join(REPO, 'modules', '**', '*_vessel_array.csv'), recursive=True)
+    paths = glob.glob(os.path.join(REPO, 'system_models', '**', '*_vessel_array.csv'), recursive=True)
     return sorted(p for p in paths if not any(s in p for s in skip))
 
 
