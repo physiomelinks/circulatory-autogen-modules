@@ -13,8 +13,8 @@
       "expr": "(np.ptp(v_1) == 0) & (np.ptp(v_2) == 0) & (v_1[0] >= 0) & (v_2[0] >= 0)"
     },
     {
-      "description": "at the run point the flows are the library values 3.1e-6 m^3/s",
-      "expr": "(abs(v_1[0] - 3.1e-6) <= 1e-18) & (abs(v_2[0] - 3.1e-6) <= 1e-18)",
+      "description": "at the run point the flows are the library values v_1 = 4.28e-6 (ICA) and v_2 = 1.67e-6 m^3/s (VA)",
+      "expr": "(abs(v_1[0] - 4.28e-6) <= 1e-18) & (abs(v_2[0] - 1.67e-6) <= 1e-18)",
       "applies": "run"
     }
   ],

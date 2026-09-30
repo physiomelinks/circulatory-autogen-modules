@@ -2,7 +2,11 @@ comment: 'Config-only fix already applied: the four constant pressure/flow BCs d
   P for flow BCs) that were missing from variables_and_units, so libcuflynx exited whenever they were connected — please confirm.
   The nn_fourier_8 coefficients are test values (A_1 = 1e-3 m^3/s gives ~0.9 L/s reverse flow) with no source; T = 1 s ("biobeat_measurement")
   is unverifiable. lung_vol_generator jumps in volume when T_lung changes (phase 2πt/T uses absolute t), and CO2_O2_generator
-  sets dot_C_CO2_a = 0 even while C_CO2_a steps. C_CO2_a0 = 0.48 (literature) disagrees with the chemoreceptor nominal 0.36.'
+  sets dot_C_CO2_a = 0 even while C_CO2_a steps. C_CO2_a0 = 0.48 (literature) disagrees with the chemoreceptor nominal 0.36.
+  [Round 1 answers applied 2026-09-30: port-variable fix kept; outlet_pressure P = 1066 Pa (CVP 8 mmHg, ShahLouis2023); inlet_pressure
+  P = 12399 Pa (MAP 93 mmHg, Klabunde2021); inlet/outlet_flow v = 8.3333e-5 m^3/s (5 L/min, Demir2025); inlet_flow nn_constant_2
+  v_1 = 4.28e-6 (ICA), v_2 = 1.67e-6 m^3/s (VA), Zarrinkoob2015; nn_fourier_8 coefficients kept as test values. The generator
+  questions (lung_vol_generator, CO2_O2_generator, muscle_pressure) are still open.]'
 summary: 'Boundary-condition sources for circulatory models: constant pressure/flow inlets and outlets, a two-flow inlet,
   an 8-harmonic Fourier inflow, and prescribed lung-volume, blood-gas and muscle-pressure generators. Every component now
   has a test: the constant BCs and the Fourier inflow drive a BG arterial_simple test vessel (R 1e7, C 1e-8, I 1e5) whose
