@@ -47,6 +47,8 @@ VERSIONS, INSTANCES, DEFAULT_INSTANCE = 'versions', 'instances', 'default'
 # the old layout, until it is moved)
 UNMIGRATED = ('poiseuille_transport', 'system')
 GENERATED_DIRS = ('plots', 'results')
+# a supermodule's globals when its spec doesn't list supermodule.globals
+SUPERMODULE_DEFAULT_GLOBALS = ('T', 'rho', 'l_eff')
 
 
 def deep_merge(base, override):
@@ -237,6 +239,7 @@ class Parameter:
     sourced: str = ''
     kind: str = ''                  # from the config's variables_and_units
     proposed: bool = False          # value comes from a review proposal (not in the parameters file yet)
+    model_name: str = ''            # its name in a generated model, when known (a supermodule's flattened parameters)
 
     @property
     def is_global(self):
@@ -295,7 +298,7 @@ VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solv
                      'outputs', 'run_parameters', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
                      'parameter_ranges', 'validation', 'supermodule')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
-              'reference_proposals', 'review', 'review_scope')
+              'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
 # readable order of the nested keys the checks know (others follow in their own order)
 NESTED_ORDER = {
     'harness': ('vessel_array', 'parameters'),
@@ -663,6 +666,9 @@ class Version:
     # --- parameters -------------------------------------------------------------------------
     @property
     def kinds(self):
+        if self.is_supermodule:
+            # no variables_and_units: its instance rows are {var}_{submodule} or the declared globals
+            return {g: 'global_constant' for g in self.supermodule_globals}
         return {v[0]: v[3].strip() for v in self.config.get('variables_and_units') or []}
 
     @functools.cached_property
@@ -707,6 +713,11 @@ class Version:
     @property
     def submodule_names(self):
         return [s['name'] for s in self.submodules]
+
+    @property
+    def supermodule_globals(self):
+        '''The global constants a supermodule's instance may set (spec supermodule.globals).'''
+        return list((self.spec.get('supermodule') or {}).get('globals') or SUPERMODULE_DEFAULT_GLOBALS)
 
 
 def load_module_type(name):

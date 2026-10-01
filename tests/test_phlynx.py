@@ -7,7 +7,9 @@ model of the same network.
     pytest tests/test_phlynx.py --module coupling            # a category, or a module_type
     PHLYNX_DIR=../phlynx CUFLYNX_BIN=~/software/CUFLynx pytest tests/test_phlynx.py
 
-Skips (not fails) when node, PhLynx or the CUFLynx binary isn't available. A failure listed
+Skips (not fails) when node, PhLynx or the CUFLynx binary isn't available. A supermodule version
+has no PhLynx form (PhLynx has no supermodule support): its export test fails with that reason and
+the other two are skipped, without running the pipeline. A failure listed
 under a version's expected_failures (e.g. a module feature PhLynx doesn't support yet) is a
 recorded known issue, as in the other tests.
 """
@@ -25,6 +27,10 @@ _runs = {}
 def pipeline(component_key, tmp_path_factory):
     # every version of a module_type in one PhLynx run and one CUFLynx run
     mt, version_name = component_key
+    component = load_version(mt, version_name)
+    if component.is_supermodule:
+        # PhLynx has no supermodule form: the checks record that without running the pipeline
+        return component, None, None
     if mt not in _runs:
         versions = [v for v in load_module_type(mt).versions() if not v.is_supermodule]
         work_dir = str(tmp_path_factory.mktemp(f'phlynx_{mt}'))
@@ -35,7 +41,6 @@ def pipeline(component_key, tmp_path_factory):
     results, work_dir = _runs[mt]
     if isinstance(results, phlynx.PipelineUnavailable):
         pytest.skip(f'PhLynx/CUFLynx pipeline unavailable: {results}')
-    component = load_version(mt, version_name)
     return component, results.get(component.id), work_dir
 
 

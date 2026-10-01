@@ -20,7 +20,7 @@ def _param(name, units, value, kind='constant'):
 
 def _component(tmp_path, params, spec):
     comp = SimpleNamespace(spec=spec, label='fake/v', dir=str(tmp_path), results_dir=str(tmp_path / 'results'),
-                           plots_dir=str(tmp_path / 'plots'), id='fake_v')
+                           plots_dir=str(tmp_path / 'plots'), id='fake_v', is_supermodule=False)
     comp.parameters = lambda: params
     comp.boundary_conditions = lambda: [p for p in params if p.kind == 'boundary_condition']
     comp.config = {'module_format': 'cellml'}
@@ -119,6 +119,9 @@ class _FakeCM:
         self.nominal = {'a_mod': 1.0, 'b_mod': 1.0}
         self.helper = SimpleNamespace(model=SimpleNamespace(count_states=lambda: 1))
         self.model_path = 'unused'
+
+    def parameters(self):
+        return self.component.parameters()
 
     def outputs(self):
         return ['h']

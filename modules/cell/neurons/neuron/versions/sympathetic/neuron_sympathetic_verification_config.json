@@ -1,6 +1,32 @@
 {
   "module_type": "neuron",
   "version": "sympathetic",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 2e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "run_parameters": {"I_in_soma_membrane": -0.05},
+  "bc_sweep": {
+    "ranges": {
+      "I_in_soma_membrane": {"min": -0.2, "max": 0.05, "points": 6}
+    },
+    "rationale": "Supermodule default: the globals (R, F, T; factors 0.5-2) and the boundary conditions no internal connection closes: the soma's injected current I_in_soma_membrane -0.2 to +0.05 nA (as soma sympathetic_monolithic_v01) and the varicosity NaCa exchanger's Nai_varicosity_i_NaCa (factors 0.5-2). Each submodule's own parameters are swept in that submodule version's tests."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08, "MaximumStep": 1e-05},
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
+    ]
+  },
   "validation": {
     "default": {}
   },
@@ -11,8 +37,8 @@
         "model": "cellular/SN_simple_supermodules",
         "reproduces": "cellular/SN_simple",
         "instance": "SN",
-        "tol": 1e-09,
-        "solver_info": {"rtol": 1e-10, "atol": 1e-12},
+        "tol": 1e-07,
+        "solver_info": {"rtol": 1e-12, "atol": 1e-14},
         "output_map": {
           "soma_SN/B_Ca_ER_pre": "SN_soma_Ca/B_Ca_ER_pre",
           "soma_SN/B_Ca_bulk": "SN_soma_Ca/B_Ca_bulk",
@@ -156,7 +182,8 @@
           "var_SN/tau_c": "SN_varicosity_i_CaN/tau_c",
           "var_SN/tau_hIP3": "SN_varicosity_IP3R/tau_hIP3"
         },
-        "ignore": {"soma_SN/t": "time", "axon_SN/t": "time", "var_SN/t": "time"}
+        "ignore": {"soma_SN/t": "time", "axon_SN/t": "time", "var_SN/t": "time"},
+        "note": "tol 1e-7 at rtol 1e-12: the two models are the same equations assembled differently, so they differ only by solver error; since epsilon_tau 0.001 ms and tau_z_BK 1 ms the model is stiffer and that error is ~1e-8 (worst 1.1e-8 at rtol 1e-12, 3e-7 at rtol 1e-10). It passed at 1e-9 with epsilon_tau 0.1 ms."
       }
     ]
   }

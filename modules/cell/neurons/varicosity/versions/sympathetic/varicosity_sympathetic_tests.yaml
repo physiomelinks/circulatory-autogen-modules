@@ -7,6 +7,9 @@ description: 'Sympathetic-neuron varicosity (SN_simple''s SN_varicosity) built f
   ["<axon>"]}; NE (synaptic_NE) is available from NE. Default parameters are SN_simple''s (its default instance). Split out
   of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
   in git history). Tested through the neuron sympathetic version.'
+expected_failures:
+  phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
+    "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
 reference_proposals:
   B_Ca_init_Ca:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); at equilibrium

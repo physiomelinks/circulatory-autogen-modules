@@ -53,13 +53,15 @@ Each version (one config entry: `module_type`/`module_subtype`) is generated alo
 |---|---|
 | `run_test` | generates and simulates the version; every output finite |
 | `verification_test_invariants` | the spec's invariants hold (exact solutions, conservation laws, bounds, delays) |
-| `verification_test_BC` | sweeps each boundary condition (or each constant, for self-contained versions) over a range; every run finite and invariants hold |
+| `verification_test_BC` | sweeps each boundary condition and constant over a range (a supermodule: its globals and open boundary conditions); every run finite and invariants hold |
 | `verification_test_timestep` | fixed-step integration of the generated right-hand side at halved steps converges at the scheme's order, and agrees with CVODE at tight tolerances |
 | `stability_test` | a matrix of solvers, tolerances and timesteps (CVODE, SciPy `solve_ivp`, fixed-step Euler/Heun/RK4); reports which work, and requires the declared-supported ones to work |
 | `validation_test_baseline` | per instance: model vs baseline data (NRMSE threshold) or scalar targets |
 | `validation_test_calibrate` | per instance: calibrate to its obs_data with libcuflynx parameter identification, predict held-out data, and write `<instance>_calibrated_parameters.csv` / `<instance>_calibration.json` |
 
-Supermodule versions get `supermodule_structure_test` and `supermodule_equivalence_test` (the system model using them reproduces the one with the submodules written out) instead.
+Supermodule versions run the same tests, generated alone and expanded into their submodules, plus `supermodule_structure_test` and `supermodule_equivalence_test` (the system model using them reproduces the one with the submodules written out). Their BC sweep varies only their global constants and the boundary conditions no internal connection closes (`bc_sweep.sweep: globals_and_bcs`, the supermodule default; `all` sweeps every parameter): each submodule's own parameters are swept in that submodule version's tests. PhLynx has no supermodule support, so their PhLynx export test fails as a recorded known issue.
+
+Every version's report has the same test columns (Run, Invariants, BC sweep, Timestep, Stability, Calibration, PhLynx export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces). A column that doesn't apply shows N/A with the reason, one that applies but hasn't run shows Not run, and only a test that ran and passed shows Passed. A version with no calibration data of its own used inside supermodule versions shows "Pass in super" / "Fail in super" for Calibration, from those supermodules.
 
 `tests/test_structure.py` holds fast static checks: the directory schema, config ↔ CellML consistency, units, library-wide uniqueness and manifest paths. Known defects are listed under `known_issues` in a version's spec. They show as xfail until fixed.
 

@@ -64,5 +64,6 @@ notes: ['The reference is SN_simple''s (circulatory_autogen''s original with its
     equations verbatim, and only the sums of channel currents and fluxes become summed ports, added in the original order.']
 expected_failures: {system_equivalence_test: 'Deliberate differences from circulatory_autogen''s SN_simple (fixed in this
     library on 2026-10-02): i_Na1_6''s Na flux enters dNai/dt; the varicosity''s E_Ca has valence 2 (RT/(2F)); epsilon_tau
-    is 0.001 ms (was 0.1 ms); BK gating follows Khaliq 2003 (z^2, tau offsets from the midpoints). The first two are circulatory_autogen
+    is 0.001 ms (was 0.1 ms); BK gating follows Khaliq 2003 (z^2, tau offsets from the midpoints). Reviewed parameter values:
+    tau_z_BK 1 ms (Khaliq), Ca_mid_m_SK 0.63 uM (Hirschberg), g_M 0.00263 uS (Davis 2020). The first two fixes are circulatory_autogen
     PR #537. The decomposition is still checked exactly: neuron/sympathetic reproduces this library''s SN_simple (supermodule_equivalence_test).'}

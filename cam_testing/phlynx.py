@@ -201,7 +201,7 @@ def run_versions(name, components, solver_info=None, keep_dir=None):
     os.makedirs(work_dir, exist_ok=True)
     jobs, results = [], {}
     for c in components:
-        if _cpp(c):
+        if _cpp(c) or c.is_supermodule:
             continue
         try:
             jobs.append(component_job(c, work_dir))
@@ -232,10 +232,21 @@ def _cpp(component):
     return component.config.get('module_format', 'cellml') == 'cpp'
 
 
+# PhLynx (src/) has no notion of a supermodule: its configs are CellML modules, so a version of
+# module_format "supermodule" cannot be built there. Recorded as a failure (each supermodule
+# version lists it under expected_failures), not as N/A: it is a PhLynx limitation, not a test
+# that doesn't apply.
+NO_SUPERMODULE_SUPPORT = ('PhLynx has no supermodule support: it builds models from CellML module configs only, and a '
+                          'module_format "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form')
+
+
 def export_check(component, res):
     from cam_testing.checks import FAILED, NOT_APPLICABLE, PASSED, Result
     if _cpp(component):
         return Result('phlynx_export_test', NOT_APPLICABLE, CPP_REASON)
+    if component.is_supermodule:
+        return Result('phlynx_export_test', FAILED, NO_SUPERMODULE_SUPPORT,
+                      details=[f'submodules: {", ".join(component.submodule_names)}'])
     rep = (res or {}).get('export') or {}
     problems = []
     if not rep.get('ok'):
@@ -261,6 +272,8 @@ def simulate_check(component, res):
     from cam_testing.checks import FAILED, NOT_APPLICABLE, PASSED, SKIPPED, Result
     if _cpp(component):
         return Result('cuflynx_simulate_test', NOT_APPLICABLE, CPP_REASON)
+    if component.is_supermodule:
+        return Result('cuflynx_simulate_test', SKIPPED, 'no .omex: the PhLynx export failed (PhLynx has no supermodule support)')
     if not ((res or {}).get('export') or {}).get('ok'):
         return Result('cuflynx_simulate_test', SKIPPED, 'no .omex: the PhLynx export failed')
     cf = (res or {}).get('cuflynx') or {}
@@ -286,6 +299,8 @@ def equivalence_check(component, res, work_dir):
     from cam_testing.checks import FAILED, NOT_APPLICABLE, PASSED, SKIPPED, Result
     if _cpp(component):
         return Result('phlynx_equivalence_test', NOT_APPLICABLE, CPP_REASON)
+    if component.is_supermodule:
+        return Result('phlynx_equivalence_test', SKIPPED, 'no CUFLynx run to compare (PhLynx has no supermodule support)')
     cf = (res or {}).get('cuflynx') or {}
     if not cf.get('ok'):
         return Result('phlynx_equivalence_test', SKIPPED, 'no CUFLynx run to compare')

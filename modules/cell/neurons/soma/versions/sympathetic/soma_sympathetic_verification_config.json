@@ -1,6 +1,33 @@
 {
   "module_type": "soma",
   "version": "sympathetic",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 2e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "run_parameters": {"I_in_membrane": -0.05},
+  "bc_sweep": {
+    "ranges": {
+      "I_in_membrane": {"min": -0.2, "max": 0.05, "points": 6},
+      "I_out_membrane": {"min": -0.05, "max": 0.05, "points": 3}
+    },
+    "rationale": "Supermodule default: the globals (R, F, T; factors 0.5-2) and the boundary conditions no internal connection closes: the injected current I_in_membrane -0.2 to +0.05 nA and the axial current I_out_membrane +/-0.05 nA (the ranges of soma sympathetic_monolithic_v01). Each submodule's own parameters are swept in that submodule version's tests."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08, "MaximumStep": 1e-05},
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
+    ]
+  },
   "validation": {
     "default": {}
   },

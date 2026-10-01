@@ -48,18 +48,22 @@ TEST_TITLES = {
 TEST_SHORT = {
     'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
-    'phlynx_export_test': 'PhLynx', 'cuflynx_simulate_test': 'CUFLynx', 'phlynx_equivalence_test': 'PhLynx≡',
-    'supermodule_structure_test': 'Structure', 'supermodule_equivalence_test': 'Reproduces',
+    'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
+    'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
 }
 TEST_ABOUT = {
     'run_test': 'Generates the version alone with libcuflynx (every boundary condition becomes a '
-                'parameter, valued from the default instance), simulates it, and checks every output is finite.',
+                'parameter, valued from the default instance; a supermodule is expanded into its submodules, '
+                'and the boundary conditions no internal connection closes become parameters), simulates it, '
+                'and checks every output is finite.',
     'verification_test_invariants': 'Checks the simulation against what the version is supposed to do: '
                                     'the invariants in its spec (exact solutions, conservation laws, bounds, '
                                     'delays) evaluated at the run parameters.',
-    'verification_test_BC': 'Sweeps each boundary condition (or, for a self-contained version, each '
-                            'constant) over a range and checks every run completes, stays finite and '
-                            'keeps the invariants. Values outside a parameter\'s valid range (bc_sweep.bounds, '
+    'verification_test_BC': 'Sweeps each boundary condition and constant (bc_sweep.sweep: all, a component '
+                            'version\'s default; a supermodule version sweeps its global constants and the boundary '
+                            'conditions no internal connection closes, since each submodule\'s own parameters are '
+                            'swept in that submodule version\'s tests) over a range and checks every run completes, '
+                            'stays finite and keeps the invariants. Values outside a parameter\'s valid range (bc_sweep.bounds, '
                             'a gate initial value outside [0, 1], a negative physical quantity, or a broken '
                             'bc_sweep.constraints relation) are skipped. A failed run is rerun once with a tight '
                             'reference solver: if that fails too it is a parameter failure (the model breaks '
@@ -81,10 +85,15 @@ TEST_ABOUT = {
                                  'obs_data ("no calibration data in this instance").',
     'version_calibration': 'The version\'s calibration over its instances: failed when no instance has '
                            'calibration data (obs_data), otherwise failed if any instance\'s calibration '
-                           'failed and passed when all of them pass. Each instance\'s result is in Instances.',
+                           'failed and passed when all of them pass. Each instance\'s result is in Instances. '
+                           'A version with no calibration data of its own that is a submodule of supermodule '
+                           'versions is calibrated as part of them: "Pass in super" when any of those '
+                           'supermodules passes calibration (plainly or, transitively, in its own supermodules), '
+                           '"Fail in super" when none does (tests.yaml calibration_in_supermodule: false opts out).',
     'phlynx_export_test': 'Builds the version\'s test network in PhLynx (its own code, loaded with this '
                           'library\'s modules and parameters), checks every connection was made, and exports '
-                          'the .omex PhLynx sends to CUFLynx.',
+                          'the .omex PhLynx sends to CUFLynx. PhLynx has no supermodule support, so a supermodule '
+                          'version fails this test (a recorded known issue).',
     'cuflynx_simulate_test': 'Imports that .omex into a released CUFLynx through its API and simulates it; '
                              'every output must be finite.',
     'phlynx_equivalence_test': 'Compares CUFLynx\'s simulation of the PhLynx-built model with libcuflynx\'s '
@@ -96,12 +105,21 @@ TEST_ABOUT = {
     'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
                                     'with its submodules written out, output for output.',
 }
-# The tests shown for every version: verification, then the PhLynx -> CUFLynx pipeline. The
-# validation tests are shown per instance.
-REPORT_TESTS = checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS
+# The test columns of every version, component or supermodule, in this order: verification, the
+# version-level calibration, the PhLynx -> CUFLynx pipeline, then the supermodule tests. A column
+# that doesn't apply to a version is N/A with the reason (not_applicable_reason); one that applies
+# but has no result is "Not run". The validation tests are shown per instance.
+SUPERMODULE_TESTS = ['supermodule_structure_test', 'supermodule_equivalence_test']
+REPORT_TESTS = checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
 INSTANCE_TESTS = checks.INSTANCE_TESTS
+NOT_A_SUPERMODULE = 'not a supermodule'
+NO_EQUIVALENT = ('no system model to reproduce: the spec lists no supermodule.equivalent entry (the version is '
+                 'checked through the models that use it)')
 STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
-                'not_applicable': 'N/A', None: 'Not run'}
+                'not_applicable': 'N/A', checks.PASSED_IN_SUPER: 'Pass in super', checks.FAILED_IN_SUPER: 'Fail in super',
+                None: 'Not run'}
+# in the status counts, a pass / fail in a supermodule counts as a pass / fail
+COUNT_AS = {checks.PASSED_IN_SUPER: checks.PASSED, checks.FAILED_IN_SUPER: checks.FAILED}
 
 
 def _fmt(value):
@@ -154,6 +172,7 @@ def _test_entry(version, test, r, spec_block=None, title=None):
         'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
         'known_issue': (version.spec.get('expected_failures') or {}).get(test),
         'proposed_data': (spec_block or {}).get('status') == checks.PROPOSED,
+        'links': [],          # related version pages (version_calibration in a supermodule)
     }
 
 
@@ -164,7 +183,7 @@ def instance_context(version, inst):
         kind = test.rsplit('_', 1)[1]
         v = inst.validation.get(kind) or {}
         r = checks.load(version, test, inst)
-        if r is None and not version.is_supermodule:
+        if r is None:
             # not run (e.g. slow tests excluded): what a run would record without data
             if kind == 'calibrate' and not inst.has_obs_data:
                 r = checks.Result(test, checks.NOT_APPLICABLE, checks.NO_CALIBRATION_DATA)
@@ -196,9 +215,93 @@ def instance_context(version, inst):
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
             if os.path.isfile(inst.calibrated_parameters_path) else None,
             'rel_dir': os.path.relpath(inst.dir, version.dir),
-            'tests': [] if version.is_supermodule else tests,
-            'baseline': None if version.is_supermodule else tests[0],
-            'calibrate': None if version.is_supermodule else tests[1]}
+            'tests': tests, 'baseline': tests[0], 'calibrate': tests[1]}
+
+
+def not_applicable_reason(version, test):
+    '''Why a report column doesn't apply to the version, or None when it does.'''
+    if test in SUPERMODULE_TESTS and not version.is_supermodule:
+        return NOT_A_SUPERMODULE
+    if test == 'supermodule_equivalence_test' and not (version.spec.get('supermodule') or {}).get('equivalent'):
+        return NO_EQUIVALENT
+    if checks.is_cpp(version):
+        if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test'):
+            return checks.CPP_NOT_APPLICABLE
+        if test in phlynx.PIPELINE_TESTS:
+            return phlynx.CPP_REASON
+    return None
+
+
+def _equivalence_result(version):
+    '''The supermodule_equivalence_test column: one result over the spec's supermodule.equivalent
+    entries (each recorded on its own): failed if any failed, passed only if all ran and passed,
+    otherwise not run.'''
+    entries = (version.spec.get('supermodule') or {}).get('equivalent') or []
+    results = [(e, checks.load(version, sm.equivalence_result_name(e))) for e in entries]
+    lines = [f'{e["model"]} reproduces {e["reproduces"]}: '
+             + (f'{r.status}: {r.message}' if r else 'not run') for e, r in results]
+    if any(r is not None and r.status == checks.FAILED for _, r in results):
+        status = checks.FAILED
+    elif results and all(r is not None and r.status == checks.PASSED for _, r in results):
+        status = checks.PASSED
+    else:
+        return None if all(r is None for _, r in results) else checks.Result(
+            'supermodule_equivalence_test', checks.PENDING, 'not every system model has been compared yet', details=lines)
+    plots = [p for _, r in results if r for p in r.plots]
+    metrics = {'entries': [dict(r.metrics, status=r.status) for _, r in results if r]}
+    if len(results) == 1:
+        r = results[0][1]
+        return checks.Result('supermodule_equivalence_test', status, r.message, r.metrics, plots, r.details, r.timestamp)
+    return checks.Result('supermodule_equivalence_test', status, '; '.join(lines), metrics, plots, lines,
+                         max((r.timestamp for _, r in results if r), default=''))
+
+
+def version_tests(version):
+    '''The version's report columns (REPORT_TESTS), the same for every version.'''
+    tests = []
+    for test in REPORT_TESTS:
+        reason = not_applicable_reason(version, test)
+        if reason:
+            r = checks.Result(test, checks.NOT_APPLICABLE, reason)
+        elif test == 'version_calibration':
+            r = checks.version_calibration(version, _supermodule_index())
+        elif test == 'supermodule_equivalence_test':
+            r = _equivalence_result(version)
+        else:
+            r = checks.load(version, test)
+        title = None
+        entries = (version.spec.get('supermodule') or {}).get('equivalent') or []
+        if test == 'supermodule_equivalence_test' and entries:
+            title = 'Supermodule: reproduces ' + '; '.join(f'{e["reproduces"]} ({e["model"]})' for e in entries)
+        entry = _test_entry(version, test, r, title=title)
+        if r is not None and r.status in (checks.PASSED_IN_SUPER, checks.FAILED_IN_SUPER):
+            entry['links'] = _supermodule_links(version, r)
+        tests.append(entry)
+    return tests
+
+
+_index_cache = []
+
+
+def _supermodule_index():
+    '''The library's submodule -> supermodules index, built once per report run.'''
+    if not _index_cache:
+        _index_cache.append(checks.supermodule_index())
+    return _index_cache[0]
+
+
+def _supermodule_links(version, r):
+    '''Links to the supermodule version pages a calibration in super comes from: href relative to
+    this version's page, href_module relative to its module_type page.'''
+    from cam_testing.library import load_version
+    links = []
+    for row in (r.metrics or {}).get('supermodules') or []:
+        target = load_version(row['module_type'], row['version']).html_path
+        links.append({'key': row['key'], 'status': row['status'],
+                      'status_label': STATUS_LABEL.get(row['status'], row['status']),
+                      'href': os.path.relpath(target, version.dir),
+                      'href_module': os.path.relpath(target, version.mtype.dir)})
+    return links
 
 
 def component_context(version):
@@ -220,17 +323,7 @@ def component_context(version):
             'tested': ranges.tested_range(version, p) if p else None,
             'validated': spread.get(name),
         })
-    tests = []
-    if version.is_supermodule:
-        tests.append(_test_entry(version, 'supermodule_structure_test', checks.load(version, 'supermodule_structure_test')))
-        for e in (version.spec.get('supermodule') or {}).get('equivalent') or []:
-            name = sm.equivalence_result_name(e)
-            tests.append(_test_entry(version, name, checks.load(version, name),
-                                     title=f'Supermodule: reproduces {e["reproduces"]} ({e["model"]})'))
-    else:
-        for test in REPORT_TESTS:
-            r = checks.version_calibration(version) if test == 'version_calibration' else checks.load(version, test)
-            tests.append(_test_entry(version, test, r))
+    tests = version_tests(version)
     risk_result = risk.load(version) if not version.is_supermodule else None
     if risk_result is not None and not all(os.path.isfile(os.path.join(version.dir, p)) for p in risk_result.get('plots', [])):
         risk_result['plots'] = risk.make_plots(version, risk_result)   # e.g. on a fresh clone
@@ -273,7 +366,8 @@ def _status_counts(components):
     counts = {'passed': 0, 'failed': 0, 'skipped': 0, 'pending': 0, 'not_applicable': 0, None: 0}
     for c in components:
         for t in c['tests'] + [t for i in c['instances'] for t in i['tests']]:
-            counts[t['status']] = counts.get(t['status'], 0) + 1
+            status = COUNT_AS.get(t['status'], t['status'])
+            counts[status] = counts.get(status, 0) + 1
     return counts
 
 
@@ -306,7 +400,7 @@ def _now():
 def _module_phlynx(components):
     run = [c for c in components if c['phlynx_compatible'] is not None]
     ok = sum(bool(c['phlynx_compatible']) for c in run)
-    total = sum(1 for c in components if c['format'] != 'supermodule')
+    total = len(components)
     return {'run': len(run), 'compatible': ok, 'total': total,
             'all': bool(run) and len(run) == total and ok == total}
 
@@ -382,7 +476,6 @@ def module_context(name, version_contexts=None):
     for c in vctx:
         for k, n in c['counts'].items():
             counts[k] = counts.get(k, 0) + n
-    components = [r for r in rows if not r['is_supermodule']]
     return {
         'name': name, 'category': mtype.category, 'relpath': mtype.relpath, 'versions': rows,
         'reviewed': bool(rows) and all(r['reviewed'] for r in rows),
@@ -392,10 +485,10 @@ def module_context(name, version_contexts=None):
         'n_sourced': sum(r['n_sourced'] for r in rows), 'n_parameters': sum(r['n_parameters'] for r in rows),
         'max_risk': max((r['max_risk'] for r in rows if r['max_risk'] is not None), default=None),
         'known_issues': sum(r['known_issues'] for r in rows),
-        'phlynx': {'run': sum(r['phlynx']['run'] for r in components),
-                   'compatible': sum(r['phlynx']['compatible'] for r in components),
-                   'total': len(components),
-                   'all': bool(components) and all(r['phlynx']['all'] for r in components)},
+        'phlynx': {'run': sum(r['phlynx']['run'] for r in rows),
+                   'compatible': sum(r['phlynx']['compatible'] for r in rows),
+                   'total': len(rows),
+                   'all': bool(rows) and all(r['phlynx']['all'] for r in rows)},
         'ready_for_review': any(c.get('review') and not c['reviewed'] for c in vctx),
         'test_keys': REPORT_TESTS, 'test_short': TEST_SHORT,
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
@@ -526,6 +619,7 @@ def main(argv=None):
     parser.add_argument('--site', action='store_true', help='also assemble site/ for GitHub Pages')
     args = parser.parse_args(argv)
     contexts = {}
+    _index_cache.clear()
     for name in select_module_types(args.module):
         out, ctx = build_module(name)
         contexts[name] = ctx

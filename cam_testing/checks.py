@@ -40,13 +40,45 @@ NO_BASELINE_DATA = 'no baseline data in this instance'
 NO_INSTANCE_CALIBRATION = 'no instance has calibration data'
 
 
-def version_calibration(version):
-    '''The version's calibration, from its instances: failed when no instance has calibration
-    data (obs_data); otherwise failed if any instance's calibration failed, passed if they ran and
-    passed, pending if not run yet.'''
+# version_calibration of a version calibrated only as part of supermodules (below): pass-styled /
+# fail-styled, but distinct from a plain pass / fail so it's clear the version wasn't calibrated alone
+PASSED_IN_SUPER, FAILED_IN_SUPER = 'passed_in_super', 'failed_in_super'
+
+
+def supermodule_index(versions=None):
+    '''{(module_type, module_subtype): [supermodule versions whose submodules use it]} over ``versions``
+    (default: the whole library).'''
+    if versions is None:
+        from cam_testing.library import all_versions
+        versions = all_versions()
+    index = {}
+    for v in versions:
+        if not v.is_supermodule:
+            continue
+        for sub in v.submodules:
+            users = index.setdefault((sub['module_type'], sub['module_subtype']), [])
+            if all(u.key != v.key for u in users):
+                users.append(v)
+    return index
+
+
+def version_calibration(version, index=None, _seen=()):
+    '''
+    The version's calibration, from its instances: failed when no instance has calibration data
+    (obs_data); otherwise failed if any instance's calibration failed, passed if they ran and
+    passed, pending if not run yet.
+
+    A version with no calibration data of its own that is a submodule of supermodule versions
+    (``index``: supermodule_index(), built from the library when not given) is calibrated as part of
+    them instead: "passed_in_super" when any of those supermodules' version_calibration passes
+    (plainly or in its own supermodules: the rule applies transitively), "failed_in_super" when none
+    does (a supermodule with no calibration data counts as failed). tests.yaml
+    ``calibration_in_supermodule: false`` opts a version out (the plain rule).
+    '''
     with_data = [i for i in version.instances() if i.has_obs_data]
     if not with_data:
-        return Result('version_calibration', FAILED, NO_INSTANCE_CALIBRATION)
+        return _calibration_in_supermodules(version, index, _seen) \
+            or Result('version_calibration', FAILED, NO_INSTANCE_CALIBRATION)
     results = {i.name: load(version, 'validation_test_calibrate', i) for i in with_data}
     failed = [n for n, r in results.items() if r is not None and r.status == FAILED]
     passed = [n for n, r in results.items() if r is not None and r.status == PASSED]
@@ -56,6 +88,31 @@ def version_calibration(version):
         return Result('version_calibration', PASSED, f'calibrated: {", ".join(passed)}')
     missing = [n for n, r in results.items() if r is None or r.status not in (PASSED, FAILED)]
     return Result('version_calibration', PENDING, f'calibration not run yet: {", ".join(missing)}')
+
+
+def _calibration_in_supermodules(version, index, seen):
+    if version.spec.get('calibration_in_supermodule', True) is False:
+        return None
+    if index is None:
+        index = supermodule_index()
+    seen = tuple(seen) + (version.key,)
+    users = [s for s in index.get((version.vessel_type, version.name)) or [] if s.key not in seen]
+    if not users:
+        return None
+    rows = []
+    for s in users:
+        r = version_calibration(s, index, seen)
+        rows.append({'key': s.key, 'module_type': s.vessel_type, 'version': s.name, 'status': r.status,
+                     'message': r.message})
+    passing = [r for r in rows if r['status'] in (PASSED, PASSED_IN_SUPER)]
+    listed = '; '.join(f'{r["key"]} {r["status"].replace("_", " ")} ({r["message"]})' for r in rows)
+    metrics = {'supermodules': rows}
+    if passing:
+        return Result('version_calibration', PASSED_IN_SUPER,
+                      f'no calibration data of its own; calibrated in supermodule {", ".join(r["key"] for r in passing)}: '
+                      + listed, metrics)
+    return Result('version_calibration', FAILED_IN_SUPER,
+                  f'no calibration data of its own, and no supermodule using it passes calibration: {listed}', metrics)
 
 
 @dataclass
@@ -118,19 +175,52 @@ class ComponentModel(object):
         self.work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_{component.id}_')
         self._model_path = None
         self._helper = None
-        self._params = component.parameters() if self.instance.is_default else self.instance.parameters()
-        self.nominal = {harness.parameter_name(p): p.float_value
-                        for p in self._params if not p.is_todo}
-        self._var_of = {harness.parameter_name(p): p.variable_name for p in self._params}
+        # the instance's own rows: what the model is generated with
+        self._raw_params = component.parameters() if self.instance.is_default else self.instance.parameters()
+        self._params = None
+        if not component.is_supermodule:
+            self._load_parameters()
+        # A supermodule's parameters are those of its generated (flattened) model, read once it is
+        # generated: its own instance's, its submodules' instances' and the boundary conditions no
+        # internal connection closes (harness.supermodule_parameters).
+
+    def _load_parameters(self):
+        if self._params is not None:
+            return
+        if self.component.is_supermodule:
+            params = harness.supermodule_parameters(self.component, self.model_path)
+        else:
+            params = self._raw_params
+        nominal, var_of = {}, {}
+        for p in params:
+            var_of[harness.parameter_name(p)] = p.variable_name
+            if p.is_todo:
+                continue
+            try:
+                nominal[harness.parameter_name(p)] = p.float_value
+            except ValueError:
+                pass
         # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
         # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
         for name, _units, value, *_ref in (self.spec.get('harness') or {}).get('parameters') or []:
-            if name not in self.nominal:
-                self.nominal[name] = float(value)
-                self._var_of[name] = name
+            if name not in nominal:
+                nominal[name] = float(value)
+                var_of[name] = name
+        self._params, self._nominal, self._var_of_map = params, nominal, var_of
+
+    @property
+    def nominal(self):
+        '''Parameter values by their names in the generated model.'''
+        self._load_parameters()
+        return self._nominal
+
+    @property
+    def _var_of(self):
+        self._load_parameters()
+        return self._var_of_map
 
     def param_env(self, overrides=None):
-        '''Parameter values by variable name (e.g. alpha), for invariant expressions.'''
+        '''Parameter values by variable name (e.g. alpha; a supermodule's: <var>_<submodule>), for invariant expressions.'''
         values = dict(self.nominal)
         values.update(overrides or {})
         return {self._var_of[k]: v for k, v in values.items()}
@@ -154,11 +244,13 @@ class ComponentModel(object):
         return self._helper
 
     def parameters(self):
-        '''The parameters the model was generated with (the instance's).'''
+        '''The model's parameters: the instance's (a supermodule's: every parameter of its flattened
+        model, named <var>_<submodule path> or as the global it is).'''
+        self._load_parameters()
         return self._params
 
     def _instance_params(self):
-        return None if self.instance.is_default else self._params
+        return None if self.instance.is_default else self._raw_params
 
     def generate(self, work_dir, **kw):
         '''Another model of this version at this instance's parameters (e.g. a python model).'''
@@ -181,11 +273,17 @@ class ComponentModel(object):
         return model
 
     def outputs(self):
-        wanted = self.spec.get('outputs') or [v[0] for v in self.component.variables()]
+        '''The spec's outputs; by default the version's variables (a supermodule's: every state of its model).'''
+        wanted = self.spec.get('outputs')
+        if not wanted:
+            wanted = harness.state_outputs(self.helper) if self.component.is_supermodule \
+                else [v[0] for v in self.component.variables()]
         return list(wanted)
 
     def units(self):
-        return {v[0]: v[1] for v in self.component.config['variables_and_units']}
+        if self.component.is_supermodule:
+            return harness.supermodule_units(self.component, self.outputs())
+        return {v[0]: v[1] for v in self.component.config.get('variables_and_units') or []}
 
     def run(self, params=None, helper=None):
         '''Runs at nominal parameters plus ``params``; always restores the nominal values.
@@ -484,18 +582,20 @@ def unit_interval_states(spec):
     return lower & upper
 
 
-def parameter_bounds(component):
+def parameter_bounds(component, params=None):
     '''
     {variable: (lo, hi, why)}: the valid range of each parameter, for clipping the sweep.
       1. bc_sweep.bounds {variable: [min, max]} (null for no limit) when given;
       2. else a gate's initial value: a dimensionless "<x>_init" whose state x an invariant keeps
          in [0, 1] (unit_interval_states) lies in [0, 1];
       3. else a quantity in NON_NEGATIVE_UNITS with a non-negative value stays >= 0.
+    ``params``: the parameters to bound (default: the version's default instance; a supermodule's
+    model gives its flattened parameters, ComponentModel.parameters()).
     '''
     spec = component.spec
     gates = unit_interval_states(spec)
     out = {}
-    for p in component.parameters():
+    for p in (component.parameters() if params is None else params):
         name, units = p.variable_name, (p.units or '').strip()
         try:
             value = None if p.is_todo else p.float_value
@@ -816,30 +916,57 @@ def _recommend_settings(cm, points, numerical, reference, tol, version_cfg):
     return None, rows, notes
 
 
+# bc_sweep.sweep: what the boundary-condition sweep varies
+#   all             every boundary condition and constant (a component version's default)
+#   bcs             the boundary conditions only
+#   globals_and_bcs the global constants and the boundary conditions (a supermodule version's
+#                   default: each submodule's own parameters are swept in that submodule version's
+#                   own tests, so the supermodule sweeps what it adds -- its globals and the boundary
+#                   conditions no internal connection closes)
+# bc_sweep.extra_parameters are swept as well, whatever the mode.
+SWEEP_MODES = ('all', 'bcs', 'globals_and_bcs')
+
+
+def default_sweep_mode(component):
+    return 'globals_and_bcs' if component.is_supermodule else 'all'
+
+
+def sweep_parameter_names(cm):
+    '''(variable names to sweep, what they are) for the version's bc_sweep spec.'''
+    component, sweep_spec = cm.component, cm.spec.get('bc_sweep') or {}
+    params = cm.parameters()
+    mode = sweep_spec.get('sweep', default_sweep_mode(component))
+    if mode not in SWEEP_MODES:
+        raise ValueError(f'bc_sweep.sweep {mode!r}: expected one of {", ".join(SWEEP_MODES)}')
+    bcs = [p.variable_name for p in params if p.kind == 'boundary_condition']
+    if mode == 'bcs':
+        names, swept_kind = bcs, 'boundary conditions'
+    elif mode == 'globals_and_bcs':
+        globals_ = [p.variable_name for p in params if p.kind == 'global_constant' and p.variable_name not in bcs]
+        names = globals_ + bcs
+        swept_kind = 'global constants and boundary conditions (submodule parameters are swept in their own versions)'
+    else:
+        names = bcs + [p.variable_name for p in params if p.kind != 'boundary_condition' and p.variable_name not in bcs]
+        swept_kind = 'boundary conditions and constants' if bcs else 'constants (no boundary conditions)'
+    names = [n for n in names if n not in (sweep_spec.get('exclude') or [])]
+    names += [n for n in sweep_spec.get('extra_parameters', []) if n not in names]
+    return names, swept_kind
+
+
 def verification_test_BC(cm):
     if is_cpp(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_BC')
     def check():
         component, spec = cm.component, cm.spec
         sweep_spec = spec.get('bc_sweep') or {}
-        # 'all' (default): boundary conditions and every constant; 'bcs': boundary conditions only.
-        mode = sweep_spec.get('sweep', 'all')
-        bcs = [p.variable_name for p in component.boundary_conditions()]
-        if mode == 'bcs':
-            names, swept_kind = bcs, 'boundary conditions'
-        else:
-            names = bcs + [p.variable_name for p in component.parameters()
-                           if p.kind != 'boundary_condition' and p.variable_name not in bcs]
-            swept_kind = 'boundary conditions and constants' if bcs else 'constants (no boundary conditions)'
-        names = [n for n in names if n not in (sweep_spec.get('exclude') or [])]
-        names += [n for n in sweep_spec.get('extra_parameters', []) if n not in names]
+        cm.helper           # generate once: a model that doesn't generate fails here, not at every point
+        names, swept_kind = sweep_parameter_names(cm)
         if not names:
             return Result('verification_test_BC', SKIPPED, 'component has no boundary conditions or constants to sweep')
-        by_var = {p.variable_name: p for p in component.parameters()}
+        by_var = {p.variable_name: p for p in cm.parameters()}
         plot_output = sweep_spec.get('plot_output') or cm.outputs()[0]
-        cm.helper           # generate once: a model that doesn't generate fails here, not at every point
 
-        bounds = parameter_bounds(component)
+        bounds = parameter_bounds(component, cm.parameters())
         constraints = list(sweep_spec.get('constraints') or [])
         si = spec.get('solver_info') or {}
         version_cfg = dict({'solver': spec.get('solver', 'CVODE_myokit')}, **si)
@@ -925,6 +1052,7 @@ def verification_test_BC(cm):
 
         n_runs = len(points)
         metrics = {'swept_kind': swept_kind, 'swept': list(sweeps), 'n_runs': n_runs, 'n_failures': len(failed),
+                   'sweep_mode': sweep_spec.get('sweep', default_sweep_mode(component)),
                    'sweep_values': {k: [r[0] for r in v] for k, v in sweeps.items()},
                    'skipped_out_of_range': skipped,
                    'bounds': {k: [None if math.isinf(lo) else lo, None if math.isinf(hi) else hi, why]
@@ -961,7 +1089,7 @@ def verification_test_BC(cm):
                     f'settings {recommended["label"]}: a recommendation to adopt into the version\'s solver_info, '
                     f'not yet applied')
         else:
-            msg += 'all finite, invariants hold'
+            msg += 'all finite, invariants hold' if spec.get('invariants') else 'all finite (no invariants defined in the spec)'
         return Result('verification_test_BC', PASSED, msg + skip_note, metrics, figs, details)
     return _guard(cm.component, 'verification_test_BC', check)
 

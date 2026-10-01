@@ -31,9 +31,134 @@ class GenerationFailed(Exception):
 
 def parameter_name(param):
     '''The name libcuflynx gives a parameter in the generated model.'''
+    if getattr(param, 'model_name', ''):
+        return param.model_name            # known from the generated model (a supermodule's flattened parameters)
     if param.is_global:
         return param.variable_name
     return f'{param.variable_name}_{VESSEL}'
+
+
+# ---- supermodule versions ----------------------------------------------------------------------
+#
+# A supermodule generated alone is the vessel VESSEL ("mod"); libcuflynx expands it into the vessels
+# mod_<submodule> (nested supermodules: mod_<submodule>_<subsubmodule> ...), and names a submodule's
+# parameter <var>_mod_<submodule>. Its own instance names that parameter <var>_<submodule> (the
+# supermodule-level name used in the spec: run_parameters, bc_sweep, validation); globals keep
+# their names in both.
+
+def supermodule_model_name(version, name, vessel=VESSEL):
+    '''A supermodule instance's parameter name (<var>_<submodule>, or a global) -> its name in a model in
+    which the supermodule is the vessel ``vessel`` (<var>_<vessel>_<submodule>).'''
+    if name in version.supermodule_globals:
+        return name
+    for sub in sorted(version.submodule_names, key=len, reverse=True):
+        if name.endswith('_' + sub) and len(name) > len(sub) + 1:
+            return f'{name[:-len(sub)]}{vessel}_{sub}'
+    return name
+
+
+def model_parameter_name(component, param):
+    '''The name an instance's parameter has in the version's generated model.'''
+    if component.is_supermodule and not getattr(param, 'model_name', ''):
+        return supermodule_model_name(component, param.variable_name)
+    return parameter_name(param)
+
+
+def _submodule_version(sub):
+    from cam_testing.library import load_version
+    return load_version(sub['module_type'], sub['module_subtype'])
+
+
+def resolve_submodule_path(version, path):
+    '''"ra" or (nested) "soma_Ca" -> the component version at the end of that submodule path, or None.'''
+    for sub in sorted(version.submodules, key=lambda s: len(s['name']), reverse=True):
+        name = sub['name']
+        if path == name or path.startswith(name + '_'):
+            try:
+                target = _submodule_version(sub)
+            except Exception:  # noqa: BLE001 - a broken reference is the structure test's to report
+                return None
+            if path == name:
+                return target
+            if target.is_supermodule:
+                found = resolve_submodule_path(target, path[len(name) + 1:])
+                if found is not None:
+                    return found
+    return None
+
+
+def split_model_name(version, full, vessel=VESSEL):
+    '''A generated model's parameter name -> (supermodule-level name, variable, submodule path or None,
+    owning component version or None): "V_in_mod_membrane" -> ("V_in_membrane", "V_in", "membrane",
+    <its version>); a global (no "_mod_<submodule>" suffix) -> (name, name, None, None).'''
+    marker = f'_{vessel}_'
+    start = 0
+    while True:
+        i = full.find(marker, start)
+        if i <= 0:
+            return full, full, None, None
+        path = full[i + len(marker):]
+        owner = resolve_submodule_path(version, path)
+        if owner is not None:
+            return f'{full[:i]}_{path}', full[:i], path, owner
+        start = i + 1
+
+
+def generated_parameters_path(model_path):
+    '''The parameters file libcuflynx writes next to a generated model.'''
+    d = os.path.dirname(model_path)
+    return os.path.join(d, f'{os.path.basename(d)}_parameters.csv')
+
+
+def supermodule_parameters(version, model_path, vessel=VESSEL):
+    '''
+    Every parameter of a supermodule's generated model (the flattened model: the supermodule's own
+    instance, its submodules' instances, and the boundary conditions no internal connection closes),
+    as Parameters named at the supermodule level (<var>_<submodule path>, globals as they are), with
+    model_name the generated model's name, and kind from the owning submodule's config
+    (global_constant for the globals).
+    '''
+    from cam_testing.library import Parameter
+    own = {p.variable_name: p for p in version.default_instance.parameters()}
+    out = []
+    with open(generated_parameters_path(model_path), newline='') as f:
+        for row in csv.DictReader(f):
+            full = (row.get('variable_name') or '').strip()
+            if not full:
+                continue
+            name, var, _path, owner = split_model_name(version, full, vessel)
+            kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
+            mine = own.get(name)
+            out.append(Parameter(name, (row.get('units') or '').strip(), (row.get('value') or '').strip(),
+                                 (row.get('data_reference') or '').strip(), mine.sourced if mine else '',
+                                 kind, model_name=full))
+    return out
+
+
+def state_outputs(helper):
+    '''Every state of a generated model as an output name ("<vessel>/<var>"): a supermodule's default outputs.'''
+    out = []
+    for state in helper.model.states():
+        comp, var = state.parent().name(), state.name()
+        if comp.endswith('_module'):
+            comp = comp[:-len('_module')]
+        out.append(f'{comp}/{var}')
+    return out
+
+
+def supermodule_units(version, outputs, vessel=VESSEL):
+    '''{output_key: units} for "<vessel>_<submodule path>/<var>" outputs, from the owning submodule's config.'''
+    units = {}
+    for o in outputs:
+        comp, _, var = o.rpartition('/')
+        if not comp.startswith(vessel + '_'):
+            continue
+        owner = resolve_submodule_path(version, comp[len(vessel) + 1:])
+        if owner is not None:
+            u = {v[0]: v[1] for v in owner.config.get('variables_and_units') or []}.get(var)
+            if u:
+                units[output_key(o)] = u
+    return units
 
 
 def output_name(variable):
@@ -81,7 +206,7 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
             writer.writerows([str(x) for x in r[:5]] for r in rows)
 
     params = component.parameters() if parameters is None else parameters
-    todo = [p.variable_name for p in params if p.is_todo and parameter_name(p) not in overrides]
+    todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
     if todo:
         raise MissingParameters(f'parameters still TODO in the instance parameters of {component.key}: {", ".join(todo)}')
     with open(os.path.join(resources_dir, f'{prefix}_parameters.csv'), 'w', newline='') as f:
@@ -89,7 +214,7 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
         writer.writerow(['variable_name', 'units', 'value', 'data_reference'])
         written = set()
         for p in params:
-            name = parameter_name(p)
+            name = model_parameter_name(component, p)
             value = overrides.get(name, p.value)
             writer.writerow([name, p.units, value, p.data_reference or 'cam_testing'])
             written.add(name)

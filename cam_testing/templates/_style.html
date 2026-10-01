@@ -64,8 +64,8 @@ code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
   font-size: 0.78rem; font-weight: 600; white-space: nowrap; border: 1px solid transparent;
 }
 .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.chip.passed { color: var(--pass); background: var(--pass-bg); }
-.chip.failed { color: var(--fail); background: var(--fail-bg); }
+.chip.passed, .chip.passed_in_super { color: var(--pass); background: var(--pass-bg); }
+.chip.failed, .chip.failed_in_super { color: var(--fail); background: var(--fail-bg); }
 .chip.pending { color: var(--pend); background: var(--pend-bg); }
 .chip.skipped, .chip.none, .chip.not_applicable { color: var(--skip); background: var(--skip-bg); }
 .chip.none::before { background: transparent; border: 1.5px solid currentColor; width: 5px; height: 5px; }

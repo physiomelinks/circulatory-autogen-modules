@@ -167,7 +167,7 @@ A model uses one record, e.g.
 ## What runs
 
 **Per version** (`tests/test_modules.py`, ids `<module_type>/<version>`), at the default instance's
-parameters:
+parameters. Every version runs them, component or supermodule:
 
 | Test | Checks |
 |---|---|
@@ -177,7 +177,23 @@ parameters:
 | `verification_test_timestep` | fixed-step integration converges at the scheme's order and matches CVODE |
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
-| `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions only, in place of the above |
+| `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
+
+**Supermodule versions** run the same verification and validation tests as a component. The
+supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod_<submodule>`
+(nested supermodules: `mod_<submodule>_<subsubmodule>`), and its parameters are those of the
+flattened model: the supermodule's own instance, its submodules' instances, and the boundary
+conditions no internal connection closes. In the spec (`run_parameters`, `bc_sweep`, `validation`)
+a submodule's parameter is named as in the supermodule's instance, `<var>_<submodule path>` (e.g.
+`I_in_membrane`, or `I_in_soma_membrane` in `neuron/sympathetic`); globals keep their names. The
+default `outputs` are every state of the model (`mod_<submodule>/<var>`). The default BC sweep
+(`bc_sweep.sweep: globals_and_bcs`) varies only what the supermodule adds: its global constants and
+those open boundary conditions, plus any `bc_sweep.extra_parameters`. Each submodule's own parameters
+are swept in that submodule version's own tests (soma `sympathetic` has 133 parameters; sweeping them
+all again would repeat the submodules' sweeps at many times the run time). `bc_sweep.sweep: all`
+sweeps every parameter of the flattened model. PhLynx has no supermodule support, so a supermodule
+version's `phlynx_export_test` fails (an `expected_failures` known issue in its tests.yaml) and the
+other two pipeline tests are skipped.
 
 **Per instance** (ids `<module_type>/<version>/<instance>`), for whatever data the instance has:
 
@@ -210,12 +226,31 @@ How the boundary-condition sweep treats impossible values and failures:
   numerical failure passes with the recommended settings; the report shows the recommendation (settings,
   mean run time, failures n/N), which you may adopt into the version's `solver_info`.
 
+**The report's test overview has the same columns for every version**, component or supermodule,
+in this order: Run, Invariants, BC sweep, Timestep, Stability, Calibration (the version's), PhLynx
+export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces. The
+module_type page and the status counts use the same columns. A cell shows:
+- **N/A** when the test doesn't apply to the version, with the reason (hover the cell; the reasons
+  are also listed under the overview). For example "not a supermodule" for the last two columns of a
+  component, a C++ version's simulation tests, or a supermodule with no `supermodule.equivalent`.
+- **Not run** (grey) when the test applies but has no result yet.
+- Passed only when the test ran and passed. A test is never shown as passing because it didn't run.
+
 Status rules (decided in the Lotka_Volterra review, 2026-10-01):
 - An instance without obs_data has calibration **not applicable** ("no calibration data in this
   instance"); likewise an instance without baseline data has the baseline not applicable. The instance
   stays usable in models.
 - The version's **Calibration** column in the report's test overview fails when **no instance** has
   calibration data, fails when any instance's calibration fails, and passes when they all pass.
+- **Calibration in a supermodule.** A version with no calibration data of its own that is a submodule
+  of one or more supermodule versions (e.g. `SN_membrane_soma/nn`, which can't be validated alone) is
+  calibrated as part of them. Its Calibration column shows **Pass in super** when any of those
+  supermodules' calibration passes, and **Fail in super** when none does; a supermodule with no
+  calibration data counts as failed. The rule applies transitively: an ion channel takes its status
+  from `soma/sympathetic`, which (with no data of its own) takes it from `neuron/sympathetic`. The cell
+  and the test entry link to the supermodule versions. A version with calibration data of its own keeps
+  its own result. `calibration_in_supermodule: false` in tests.yaml opts a version out (the plain rule).
+  In the status counts, Pass in super counts as passed and Fail in super as failed.
 - A check blocked by an external release (e.g. the released CUFLynx is too old for a feature) is a
   **failure with a known issue** (`expected_failures`), not not-applicable.
 - In the stability matrix a configuration that is too inaccurate at a step (e.g. explicit Euler at a
@@ -252,11 +287,11 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `solver` | verification_config | libcuflynx solver for the runs (`CVODE_myokit`) |
 | `solver_info` | verification_config | solver settings for the runs (`rtol`, `atol`, `MaximumStep`, ...) |
 | `reference_solver_info` | verification_config | tolerances of the tight CVODE reference (timestep and stability tests) |
-| `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config |
+| `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod_<submodule>/<var>`) |
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
 | `harness` | verification_config | the test network: `vessel_array` rows `[name, module_subtype, module_type, inp, out, instance]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours |
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
-| `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all` or `bcs`), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
+| `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped` |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget`, `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
@@ -268,6 +303,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `skip` | tests | a reason not to run the version's tests |
 | `known_issues` | tests | substrings of structure problems that are known (xfail) |
 | `expected_failures` | tests | `{test: reason}`: known failures, recorded as failed and xfail in pytest |
+| `calibration_in_supermodule` | tests | `false`: the version's Calibration column uses the plain rule even when it has no calibration data and is a submodule of supermodule versions (default: derived from those supermodules, "Pass in super" / "Fail in super") |
 | `reference_proposals` | tests | proposed parameter references (and values for TODO parameters), awaiting review |
 | `review` | tests | the review: `summary`, `comment`, `questions`, `proposed_fixes`, `findings`. A review shared by several versions (a whole old module's review) is kept once, in `reviews/<name>_review.yaml` at the repo root, and `review:` gives that path instead |
 | `review_scope` | tests | which versions a review copied from a whole old module covers |

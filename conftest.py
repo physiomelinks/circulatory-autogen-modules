@@ -36,22 +36,24 @@ def _marks(config, version):
 _loaded = {}
 
 
-def _versions(config, supermodules):
+def _versions(config, supermodules=None):
+    '''The selected versions; supermodules=True/False: only supermodule / only component versions.'''
     key = tuple(config.getoption('--module'))
     if key not in _loaded:     # loaded once per session, not once per test function
         _loaded[key] = [v for name in select_module_types(key) for v in load_module_type(name).versions()]
-    return [v for v in _loaded[key] if v.is_supermodule == supermodules and _wanted(config, v)]
+    return [v for v in _loaded[key] if (supermodules is None or v.is_supermodule == supermodules) and _wanted(config, v)]
 
 
 def _selected_versions(config):
-    '''(module_type, version) of every selected component version: the V&V and pipeline tests.'''
-    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config, False)]
+    '''(module_type, version) of every selected version, component or supermodule: the V&V and
+    pipeline tests (a supermodule version is generated alone, like a component).'''
+    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config)]
 
 
 def _selected_instances(config):
-    '''(module_type, version, instance) of every instance of a selected component version.'''
+    '''(module_type, version, instance) of every instance of a selected version.'''
     return [pytest.param((v.vessel_type, v.name, i.name), id=i.key, marks=_marks(config, v))
-            for v in _versions(config, False) for i in v.instances()]
+            for v in _versions(config) for i in v.instances()]
 
 
 def _selected_supermodules(config):

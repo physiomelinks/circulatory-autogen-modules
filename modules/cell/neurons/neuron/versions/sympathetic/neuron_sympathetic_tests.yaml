@@ -10,6 +10,9 @@ description: 'Sympathetic neuron (SN_simple) built from its parts: a soma (soma,
   are their own versions'' defaults; this version''s default instance holds the axon''s parameters and the globals (SN_simple''s
   values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
   removed; in git history).'
+expected_failures:
+  phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
+    "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
 reference_proposals:
   channel_ratio_axon:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source

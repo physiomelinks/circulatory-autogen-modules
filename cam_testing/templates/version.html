@@ -1,5 +1,5 @@
 {%- macro chip(status, label=None) -%}
-<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A'}.get(status, 'Not run') }}</span>
+<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
 {%- endmacro -%}
 {%- macro test_article(c, t, anchor) -%}
           <article class="test {{ t.status or '' }}" id="{{ anchor }}">
@@ -8,6 +8,9 @@
             {%- if t.proposed_data %}<p class="message" style="color:var(--pend)">Proposed validation data: run for your review, not yet confirmed.</p>{% endif %}
             <p class="about">{{ t.about }}</p>
             <p class="message">{{ t.message }}</p>
+            {%- if t.links %}
+            <p class="message">Calibrated as part of: {% for l in t.links %}<a href="{{ l.href }}">{{ l.key }}</a> {{ chip(l.status, l.status_label) }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+            {%- endif %}
 
             {%- if t.key == 'verification_test_timestep' and t.metrics.dts %}
             <div class="table-wrap"><table>
@@ -149,7 +152,7 @@
 .toc a { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 4px; color: var(--ink-2); text-decoration: none; }
 .toc a:hover { background: var(--accent-soft); color: var(--ink); }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--skip); }
-.dot.failed { background: var(--fail); } .dot.passed { background: var(--pass); } .dot.pending { background: var(--pend); }
+.dot.failed, .dot.failed_in_super { background: var(--fail); } .dot.passed, .dot.passed_in_super { background: var(--pass); } .dot.pending { background: var(--pend); }
 main { display: grid; gap: 40px; min-width: 0; }
 header.module { display: grid; gap: 10px; }
 .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 0.88rem; }
@@ -169,7 +172,7 @@ section.component { display: grid; gap: 22px; padding-top: 28px; border-top: 2px
 .block { display: grid; gap: 8px; min-width: 0; }
 .tests { display: grid; gap: 14px; }
 .test { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
-.test.failed { border-color: var(--fail); }
+.test.failed, .test.failed_in_super { border-color: var(--fail); }
 .test-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
 .test .about { font-size: 0.84rem; color: var(--ink-2); max-width: 75ch; margin: 0; }
 .test .message { margin: 0; font-weight: 500; }
@@ -221,7 +224,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         <span class="num">{{ components[0].instances|length }} instance{{ '' if components[0].instances|length == 1 else 's' }}</span>
         <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
         <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
-        <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if is_supermodule %}PhLynx / CUFLynx: supermodule (tested through the models that use it){% elif phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
+        <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
         {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
         <span>libcuflynx {{ libcuflynx_version }}</span>
         <span>Report generated {{ generated }}</span>
@@ -265,11 +268,16 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           <tbody>
           {%- for c in components %}
             <tr><td><a href="#{{ c.id }}">{{ c.label }}</a></td>
-            {%- for t in c.tests %}<td><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}</tr>
+            {%- for t in c.tests %}<td title="{{ t.message }}"><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a>{% for l in t.links %}<br><a href="{{ l.href }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}</tr>
           {%- endfor %}
           </tbody>
         </table>
       </div>
+      <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has these columns. {{ chip('not_applicable') }} the test doesn't apply to this version; {{ chip(None) }} it applies but has no result yet; only a test that ran and passed shows {{ chip('passed') }}.</p>
+      {%- set na = components[0].tests|selectattr('status', 'equalto', 'not_applicable')|list %}
+      {%- if na %}
+      <ul class="muted" style="margin:0;font-size:0.84rem">{% for t in na %}<li>{{ t.short }}: N/A, {{ t.message }}</li>{% endfor %}</ul>
+      {%- endif %}
     </section>
 
     {%- if structure and (structure.errors or structure.warnings) %}
@@ -424,20 +432,18 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
 
       <div class="block" id="instances">
         <h3>Instances</h3>
-        <p class="muted" style="margin:0;font-size:0.84rem">An instance is a parameter set of this version (never different math), in <code>instances/&lt;instance&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. The verification tests above run at the default instance's parameters; validation runs per instance, for whatever data the instance has. An instance without obs_data is recorded as failing calibration ("no calibration data in this instance") but stays usable in models. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the instance's parameters, its obs_data and params_for_id, and every input file including the verification config: open it in CUFLynx to investigate the instance.</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">An instance is a parameter set of this version (never different math), in <code>instances/&lt;instance&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. The verification tests above run at the default instance's parameters; validation runs per instance, for whatever data the instance has. An instance without obs_data is N/A for calibration ("no calibration data in this instance") and stays usable in models; the version's Calibration column fails when no instance has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the instance's parameters, its obs_data and params_for_id, and every input file including the verification config: open it in CUFLynx to investigate the instance.</p>
         <div class="table-wrap"><table>
-          <thead><tr><th>Instance</th><th>Parameters</th><th>Data files</th><th>CUFLynx archive</th>{% if not is_supermodule %}<th>Baseline</th><th>Calibration</th><th>Calibrated values</th>{% endif %}</tr></thead>
+          <thead><tr><th>Instance</th><th>Parameters</th><th>Data files</th><th>CUFLynx archive</th><th>Baseline</th><th>Calibration</th><th>Calibrated values</th></tr></thead>
           <tbody>
           {%- for i in c.instances %}
             <tr><td class="mono">{{ i.name }}{% if i.is_default %} <span class="muted">(default)</span>{% endif %}</td>
             <td class="mono num">{{ i.n_parameters }}</td>
             <td class="mono" style="white-space:normal;font-size:0.78rem">{{ i.files|join(', ') or '—' }}</td>
             <td title="{{ i.omex_message }}">{% if i.omex %}<a href="{{ i.omex }}" download>.omex</a> {% endif %}{{ chip(i.omex_status) }}{% if not i.omex %} <span class="muted" style="font-size:0.78rem">make omex</span>{% endif %}</td>
-            {%- if not is_supermodule %}
             <td><a href="#{{ i.baseline.anchor }}" style="text-decoration:none">{{ chip(i.baseline.status) }}</a>{% if i.baseline.short == 'Fit check' %} <span class="muted" style="font-size:0.78rem">fit check</span>{% endif %}</td>
-            <td><a href="#{{ i.calibrate.anchor }}" style="text-decoration:none">{{ chip(i.calibrate.status) }}</a>{% if i.calibrate.status == 'failed' and not i.has_obs_data %} <span class="muted" style="font-size:0.78rem">no calibration data</span>{% endif %}</td>
-            <td class="mono" style="white-space:normal;font-size:0.78rem">{% if i.calibration %}{{ i.calibration.calibrated_parameters|fmt }}{% if i.calibration.cost is not none %} (cost {{ i.calibration.cost|fmt }}){% endif %}<br><span class="muted">{{ i.calibrated_file }}, {{ i.calibration.date }}</span>{% else %}—{% endif %}</td>
-            {%- endif %}</tr>
+            <td><a href="#{{ i.calibrate.anchor }}" style="text-decoration:none">{{ chip(i.calibrate.status) }}</a>{% if not i.has_obs_data %} <span class="muted" style="font-size:0.78rem">no calibration data</span>{% endif %}</td>
+            <td class="mono" style="white-space:normal;font-size:0.78rem">{% if i.calibration %}{{ i.calibration.calibrated_parameters|fmt }}{% if i.calibration.cost is not none %} (cost {{ i.calibration.cost|fmt }}){% endif %}<br><span class="muted">{{ i.calibrated_file }}, {{ i.calibration.date }}</span>{% else %}—{% endif %}</td></tr>
           {%- endfor %}
           </tbody>
         </table></div>

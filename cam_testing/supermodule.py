@@ -64,7 +64,7 @@ def structure_problems(version):
             if n not in names:
                 problems.append(f'{sub["name"]}: {n} is not a submodule (external connections belong in the host\'s '
                                 'per_submodule_inputs / per_submodule_outputs)')
-    declared = (version.spec.get('supermodule') or {}).get('globals') or ['T', 'rho', 'l_eff']
+    declared = version.supermodule_globals
     for inst in version.instances():
         with open(inst.parameters_path) as f:
             for row in csv.DictReader(f):
