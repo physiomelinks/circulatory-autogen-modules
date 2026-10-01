@@ -3,40 +3,60 @@ version: Argus2026_v01
 reviewed: false
 notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. M-type (KCNQ) K current of the SN soma, i_M = g_M_mod g_M w
-  (V - E_K); Delta_V_mid_w shifts the activation for drug studies. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
-  that the assembled parts reproduce SN_simple.
-expected_failures:
-  run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units
-    J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M
-    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
-    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  stability_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  (V - E_K); Delta_V_mid_w shifts the activation for drug studies. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple.
 reference_proposals:
-  F:
-    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+  Delta_V_mid_w:
+    reference: definitional; shift of the M-current activation for drug studies; 0 = no drug
+    sourced: 'no'
+  E_K:
+    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
+    sourced: 'no'
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  V_den_w:
+    reference: 'Martin2024; Eq. 18: slope 10 mV (= value; Zhou2018 Table A.2)'
     sourced: 'yes'
-    value: 96485.3415
-    note: (proposed for the ion_channel global F under i_CaL_Paci_2013/nn)
+    also_cites:
+    - Zhou2018
+  V_mid_w:
+    reference: 'Martin2024; Eq. 18: w_inf = 1/(1+exp(-(V+35)/10)), V1/2 = -35 mV (= value; from Zhou2018 Table A.2; -35 mV
+      is the M-current half-activation of Adams1982)'
+    sourced: 'yes'
+    also_cites:
+    - Zhou2018
+    - Adams1982
+  V_rest_approx:
+    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
+      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
+    sourced: 'yes'
+  g_M:
+    reference: Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x
+      Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed
+      with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV
+      and E_K = -93.7 mV the same calculation gives 0.00263 uS
+    sourced: 'yes'
+    value: 0.00263
+  g_M_mod:
+    reference: definitional; scaling factor, 1 = unmodified (retigabine studies)
+    sourced: 'no'
+  tau_w_min:
+    reference: unreferenced_placeholder; minimum M-current time constant 30 ms; no source found. Martin2024 / Zhou2018 have
+      no minimum term, and the CA reference gupta2016Computational (an SK channel model of bladder smooth muscle) is wrong
+      for this parameter. Adams1982 report a maximal tau of about 150 ms at -35 mV (bullfrog, 22 C)
+    sourced: 'no'
+    also_cites:
+    - Martin2024
+    - Adams1982
+  tau_w_num:
+    reference: 'Martin2024; Eq. 19: tau_w = 400/(3.3 exp((V+35)/20) + exp(-(V+35)/20)) ms (from Zhou2018); modified here to
+      numerator 1200 ms (was 400), with coefficients 2.0, /15 and /25 instead of 3.3, /20, /20 and an added tau_w_min'
+    sourced: 'yes'
+    also_cites:
+    - Zhou2018
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

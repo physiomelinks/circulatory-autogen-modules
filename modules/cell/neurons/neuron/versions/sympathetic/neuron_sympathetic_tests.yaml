@@ -10,3 +10,23 @@ description: 'Sympathetic neuron (SN_simple) built from its parts: a soma (soma,
   are their own versions'' defaults; this version''s default instance holds the axon''s parameters and the globals (SN_simple''s
   values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
   removed; in git history).'
+reference_proposals:
+  channel_ratio_axon:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source
+      found (the sister SN_full parameter files use 1.0)
+    sourced: 'no'
+  C_axon:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_determined'); lumped
+      axon capacitance; no source found (the sister SN_full parameter files use 8 pF)
+    sourced: 'no'
+  R_axon:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_determined'); lumped
+      axial resistance; no source found (the sister SN_full parameter files use 150 MOhm; somatic input resistance is about
+      218 MOhm in Wistar stellate neurons, Davis et al. 2019 bioRxiv)
+    sourced: 'no'
+  V_rest_approx_axon:
+    reference: unreferenced_placeholder; axon resting potential set equal to the soma's (-70 mV, Davis2020 soma measurements);
+      no axonal measurement
+    sourced: 'no'
+    also_cites:
+    - Davis2020

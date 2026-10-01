@@ -1,42 +1,63 @@
 module_type: i_BK
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. BK (large-conductance Ca-activated K) current of the SN soma,
   i_KCa_BK = g_KCa_BK m^3 h z (V - E_K), z driven by the sub-membrane Cai (Khaliq 2003 kinetics). z starts at its steady state
-  at Cai_init. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
-expected_failures:
-  run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units
-    J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M
-    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
-    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  stability_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  at Cai_init. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. BK follows Khaliq et al. 2003
+  (ModelDB 48332, bkpkj.mod): i = g m^3 z^2 h (V - E_K), z_inf = 1/(1 + z_coeff/Cai), tau_m = 1.505 + 1000/(exp((V + V_mid_m
+  + 57.5)/10.1) + exp(-(V + V_mid_m - 62.2)/10)) ms, tau_h = 1.9 + 1000/(exp((V + V_mid_h + 16.5)/5.2) + exp(-(V + V_mid_h
+  - 86.2)/12.9)) ms, with V_mid_m = V_mid_h - 3.1; at Khaliq''s midpoints (28.9, 32 mV) these are Khaliq''s 86.4, 33.3, 48.5,
+  54.2. Corrected 2026-10-02 from z^1 and offsets 80.2/39.5/90.2 (which reproduced Khaliq only with V_mid_m = 6.2, the slope).
+  Deliberate differences from Khaliq: the tau_m constant is 1.505 ms (Khaliq 0.505 ms); V_mid_h is 26 mV (Khaliq 32); the
+  +5 mV shift of V in Khaliq''s .mod is not applied.'
 reference_proposals:
-  F:
-    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+  Cai:
+    reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
+    sourced: 'no'
+  Cai_init:
+    reference: Wanaverbecq2003; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),
+      Results, first section; 1e-4 mM = value. (Replaces the CA reference Hagiwara1981, which could not be opened)
     sourced: 'yes'
-    value: 96485.3415
-    note: (proposed for the ion_channel global F under i_CaL_Paci_2013/nn)
+  E_K:
+    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
+    sourced: 'no'
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  V_den_h_BK:
+    reference: 'Khaliq2003; Table 1 and bkpkj.mod: BK h_inf k = -5.8 mV (= value in this sign convention)'
+    sourced: 'yes'
+  V_den_m_BK:
+    reference: 'Khaliq2003; Table 1 and ModelDB 48332 bkpkj.mod: BK m_inf k = 6.2 mV (= value)'
+    sourced: 'yes'
+  V_mid_h_BK:
+    reference: 'Khaliq2003; Table 1: BK h_inf V1/2 = -32 mV (m_inf V1/2 = -28.9 mV = -32 + 3.1); modified here to 26 mV (was
+      32). Note bkpkj.mod also shifts V by +5 mV inside rates()'
+    sourced: 'yes'
+  V_rest_approx:
+    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
+      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
+    sourced: 'yes'
+  g_KCa_BK:
+    reference: 'Khaliq2003; Table 1: BK conductance 70 (printed "pS/cm2", meaning pS/um2); ModelDB bkpkj.mod gkbar = 0.007
+      S/cm2 = 7 mS/cm2, NOT 70 uS/cm2 as the CA token says. 7 mS/cm2 over the membrane area of a 30 pF cell at 1 uF/cm2 (3000
+      um^2) gives 0.21 uS, consistent with 0.2 uS. Note Khaliq gates BK as m^3 z^2 h; this model uses z^1'
+    sourced: 'yes'
+  h_BK_min:
+    reference: 'Khaliq2003; Table 1 and bkpkj.mod: BK h y0 = 0.085 (= value)'
+    sourced: 'yes'
+  tau_z_BK:
+    reference: 'Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. The
+      model''s 5 ms DIFFERS from the cited source; keep 5 only if it is a deliberate modification (then record it as "modified
+      here to 5 ms (was 1)")'
+    sourced: 'yes'
+    value: 1
+  z_BK_coeff:
+    reference: 'Khaliq2003; Methods Eq. 13 and bkpkj.mod: z_coef = 0.001 mM (= value)'
+    sourced: 'yes'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

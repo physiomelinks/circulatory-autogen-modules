@@ -3,40 +3,59 @@ version: Argus2026_v01
 reviewed: false
 notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. N-type Ca current of the SN varicosity, i_Ca_N = g_CaN (V -
-  E_Ca) c^2 hc (the soma's L-type gating with a linear driving force), with its Ca flux j_Ca_N = -i_Ca_N/(2F). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history);
-  SN_simple_flat checks that the assembled parts reproduce SN_simple.
-expected_failures:
-  run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units
-    J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M
-    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
-    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  stability_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  E_Ca) c^2 hc (the soma's L-type gating with a linear driving force), with its Ca flux j_Ca_N = -i_Ca_N/(2F). Split out of
+  the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
+  in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
 reference_proposals:
-  F:
-    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+  E_Ca:
+    reference: definitional; Nernst potential RT/(2F) ln(Cao/Cai) at Cao 2 mM, Cai 1e-4 mM = 132.34 mV (used when unconnected).
+      The old value 264.67 mV omits the valence z = 2, as does the E_Ca equation in SN_Ca_handling_varicosity / the monolithic
+      varicosity CellML
+    sourced: 'no'
+    value: 132.33666
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  V_den_c:
+    reference: Tao2011; Supporting Material (Document S1) Eq. 91 (k = 9.85 mV); modified here to 5 mV (was 9.85)
     sourced: 'yes'
-    value: 96485.3415
-    note: (proposed for the ion_channel global F under i_CaL_Paci_2013/nn)
+    also_cites:
+    - BelluzziSacchi1991
+  V_mid_c:
+    reference: 'Tao2011; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao''s Ca current is a
+      nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type'
+    sourced: 'yes'
+    also_cites:
+    - BelluzziSacchi1991
+  c_init:
+    reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);
+      c_inf(-70 mV) is about 4e-6 with V_mid_c 8.1, V_den_c 5
+    sourced: 'no'
+  g_CaN:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
+    sourced: 'no'
+  hc_init:
+    reference: unreferenced_placeholder; initial hc gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong)
+    sourced: 'no'
+  tau_c_max:
+    reference: unreferenced_placeholder; owner's modification of Tao2011 Eq. 92, whose tau_c spans 0.13-0.56 ms; 3 ms is about
+      5x the source maximum (CA token changed_from_belluzi1991_curves)
+    sourced: 'no'
+    also_cites:
+    - Tao2011
+  tau_c_min:
+    reference: unreferenced_placeholder; owner's modification of Tao2011 Eq. 92, whose tau_c spans 0.13-0.56 ms (CA token
+      changed_from_belluzi1991_curves)
+    sourced: 'no'
+    also_cites:
+    - Tao2011
+  tau_hc:
+    reference: 'Tao2011; Supporting Material (Document S1) Eq. 94: tau_hc = 1/(0.242 e^{0.145V} + 0.0434 e^{-0.0201V}) + 17
+      ms, range 17.0-29.9 ms; 20 ms is a constant within that range'
+    sourced: 'yes'
+    also_cites:
+    - BelluzziSacchi1991
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

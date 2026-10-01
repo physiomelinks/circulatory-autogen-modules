@@ -1,8 +1,9 @@
 model: SN_simple_supermodules
 category: cellular
 reviewed: false
-description: SN_simple as one record "SN" of the supermodule version cell/neurons/neuron sympathetic, which
-  nests the soma and varicosity sympathetic supermodule versions. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history).
+description: SN_simple as one record "SN" of the supermodule version cell/neurons/neuron sympathetic, which nests the soma
+  and varicosity sympathetic supermodule versions. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history).
 sim_time: 2.0
 pre_time: 0.0
 dt: 0.01
@@ -56,6 +57,10 @@ equivalence:
   tol: 1.0e-09
   solver_info: {rtol: 1.0e-10, atol: 1.0e-12}
 invariants: []
-notes: ['Only the globals are in the parameters file; every other value comes from the supermodule versions'' default instances (SN_simple''s
-    values). Must reproduce circulatory_autogen''s SN_simple (equivalence) and the library''s SN_simple (tests/test_modules.py supermodule_equivalence_test,
-    1e-9).']
+notes: ['Only the globals are in the parameters file; every other value comes from the supermodule versions'' default instances
+    (SN_simple''s values). Must reproduce circulatory_autogen''s SN_simple (equivalence) and the library''s SN_simple (tests/test_modules.py
+    supermodule_equivalence_test, 1e-9).']
+expected_failures: {system_equivalence_test: 'Deliberate differences from circulatory_autogen''s SN_simple (fixed in this
+    library on 2026-10-02): i_Na1_6''s Na flux enters dNai/dt; the varicosity''s E_Ca has valence 2 (RT/(2F)); epsilon_tau
+    is 0.001 ms (was 0.1 ms); BK gating follows Khaliq 2003 (z^2, tau offsets from the midpoints). The first two are circulatory_autogen
+    PR #537. The decomposition is still checked exactly: neuron/sympathetic reproduces this library''s SN_simple (supermodule_equivalence_test).'}

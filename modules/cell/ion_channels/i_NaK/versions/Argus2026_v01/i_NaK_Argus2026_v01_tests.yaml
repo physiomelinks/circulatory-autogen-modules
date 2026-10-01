@@ -3,40 +3,44 @@ version: Argus2026_v01
 reviewed: false
 notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. Na/K pump of the SN soma (Lindblad 1996 form), with its fluxes
-  j_NaK_Na = -3 i_NaK/F and j_NaK_K = 2 i_NaK/F. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled
-  parts reproduce SN_simple.
-expected_failures:
-  run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units
-    J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M
-    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
-    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  stability_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  j_NaK_Na = -3 i_NaK/F and j_NaK_K = 2 i_NaK/F. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple.
 reference_proposals:
-  F:
-    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+  Ko:
+    reference: 'BoronBoulpaep2017; typical extracellular K 4.5 mM [NOT VERIFIED: full text not accessible; value not seen
+      in the source]'
+    sourced: 'no'
+  Ko_mid_NaK:
+    reference: Nygren1998; I_NaK k_NaK_K = 1 mM (PMR CellML; = value). The pump form used here, Nai^1.5/(Nai^1.5 + K^1.5)
+      (V+150)/(V+200), is Nygren 1998's; Lindblad1996 has the same K_mK = 1 mM but a different voltage factor
     sourced: 'yes'
-    value: 96485.3415
-    note: (proposed for the ion_channel global F under i_CaL_Paci_2013/nn)
+    also_cites:
+    - Lindblad1996
+  Nai:
+    reference: 'BoronBoulpaep2017; typical mammalian intracellular Na 15 mM, modified here to 13 mM (= Nai_init; constant
+      when unconnected) [NOT VERIFIED: full text not accessible; value not seen in the source]'
+    sourced: 'no'
+  Nai_mid_NaK:
+    reference: 'Paci2013; I_NaK Km_Na = 40 mM in the authors'' CellML (= tenTusscher2004 K_mNa). NOTE: the CA reference lindblad1996Model
+      is wrong for this value: Lindblad 1996 and Nygren 1998 (whose Nai^1.5 pump form this is) use K_mNa = 11 mM. Keeping
+      40 mM mixes the two models; 11 mM would be consistent with the form'
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+    - Nygren1998
+  Nai_power_NaK:
+    reference: Nygren1998; I_NaK Na-dependence exponent 1.5 (PMR CellML; = value; also in Lindblad1996)
+    sourced: 'yes'
+    also_cites:
+    - Lindblad1996
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  k_NaK:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
+    sourced: 'no'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

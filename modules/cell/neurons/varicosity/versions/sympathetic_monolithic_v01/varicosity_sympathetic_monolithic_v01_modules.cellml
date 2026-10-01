@@ -10,7 +10,7 @@
  var n_cleft: dimensionless {pub: in};
  var Vol_cleft: litre {pub: in};-->
         <variable name="N_avo" public_interface="in" units="per_mol"/>
-        <variable initial_value="1e-4" name="epsilon_tau" units="second"/>
+        <variable initial_value="1e-6" name="epsilon_tau" units="second"/>
         <!-- Vol of this lumped section. This is the volume of one varicosity.
  TODO should this be for a lumped compartment of multiple varicosities?
  TODO find out volume of extraceullular space and varicosities for specific tissue.-->
@@ -60,7 +60,11 @@ Vol_ER = Vol*c_ER;-->
                             <ci>R</ci>
                             <ci>T</ci>
                         </apply>
-                        <ci>F</ci>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2</cn>
+                            <ci>F</ci>
+                        </apply>
                     </apply>
                     <apply>
                         <ln/>

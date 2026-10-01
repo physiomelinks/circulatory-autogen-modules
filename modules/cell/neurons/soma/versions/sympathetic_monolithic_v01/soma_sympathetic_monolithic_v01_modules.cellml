@@ -31,7 +31,7 @@
                 </apply>
             </apply>
         </math>
-        <variable initial_value="1e-4" name="epsilon_tau" units="second"/>
+        <variable initial_value="1e-6" name="epsilon_tau" units="second"/>
         <!-- this regions volume-->
         <variable name="Vol" public_interface="in" units="m3"/>
         <!-- BC inputs-->
@@ -2085,7 +2085,7 @@
                                         <plus/>
                                         <ci>V</ci>
                                         <ci>V_mid_m_BK</ci>
-                                        <cn cellml:units="milliV">80.2</cn>
+                                        <cn cellml:units="milliV">57.5</cn>
                                     </apply>
                                     <cn cellml:units="milliV">10.1</cn>
                                 </apply>
@@ -2103,7 +2103,7 @@
                                                 <ci>V</ci>
                                                 <ci>V_mid_m_BK</ci>
                                             </apply>
-                                            <cn cellml:units="milliV">39.5</cn>
+                                            <cn cellml:units="milliV">62.2</cn>
                                         </apply>
                                     </apply>
                                     <cn cellml:units="milliV">10</cn>
@@ -2150,7 +2150,7 @@
                                                 <ci>V</ci>
                                                 <ci>V_mid_h_BK</ci>
                                             </apply>
-                                            <cn cellml:units="milliV">90.2</cn>
+                                            <cn cellml:units="milliV">86.2</cn>
                                         </apply>
                                     </apply>
                                     <cn cellml:units="milliV">12.9</cn>
@@ -2262,7 +2262,11 @@
                         <cn cellml:units="dimensionless">3</cn>
                     </apply>
                     <ci>h_BK</ci>
-                    <ci>z_BK</ci>
+                    <apply>
+                        <power/>
+                        <ci>z_BK</ci>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
                     <apply>
                         <minus/>
                         <ci>V</ci>
@@ -3701,6 +3705,7 @@
                     <apply>
                         <plus/>
                         <ci>j_Na</ci>
+                        <ci>j_Na1_6</ci>
                         <ci>j_NaCa_Na</ci>
                         <ci>j_NaK_Na</ci>
                         <ci>j_leak_Na</ci>

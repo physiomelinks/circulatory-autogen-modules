@@ -19,6 +19,6 @@ k_bind_Ca_ER,per_millimolar_s,0.5e3,SN_simple: user_defined,no
 k_leak_Ca,m3_per_s,2e-20,SN_simple: user_defined,no
 k_unbind_Ca,per_s,8e3,SN_simple: Matveev2002,yes
 k_unbind_Ca_ER,per_s,8e3,SN_simple: Matveev2002_for_k_unbind_Ca,yes
-F,C_per_M,96485,SN_simple: known,no
-R,J_per_MK,8.314,SN_simple: known,no
-T,kelvin,310.15,SN_simple: Tao2011,yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
+T,kelvin,310.15,"definitional; body temperature, 37 degC",yes

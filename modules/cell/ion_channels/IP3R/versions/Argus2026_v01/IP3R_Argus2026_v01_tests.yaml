@@ -4,7 +4,53 @@ reviewed: false
 notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. IP3 receptor Ca release from the ER (Li & Rinzel 1994 reduced
   form) of the SN soma and varicosity (the same law in both): j_IP3 = -k_IP3 m_inf^3 h^3 (Cai - Ca_ER), into the sub-membrane
-  Ca and out of the ER. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+  Ca and out of the ER. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script
+  (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+reference_proposals:
+  Ca_ER:
+    reference: definitional; Ca_ER_init (0.6 mM) used when unconnected
+    sourced: 'no'
+  Cai:
+    reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
+    sourced: 'no'
+  IP3:
+    reference: 'LiRinzel1994; IP3 = 0.2 uM read from a plot per the CA token [NOT VERIFIED: Li & Rinzel 1994 not accessible].
+      De Young & Keizer 1992 use a basal IP3 of 0.24 uM (p. 9897); the PMR li_rinzel_1994 CellML (a variant) uses 0.6 uM'
+    sourced: 'no'
+    also_cites:
+    - DeYoungKeizer1992
+  a_2:
+    reference: 'DeYoungKeizer1992; Table 1: a2 = 0.2 /uM/s = 200 /mM/s (= value), the constant Li & Rinzel 1994 adopt (the
+      csv unit per_millimolar omits /s)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_1:
+    reference: 'DeYoungKeizer1992; Table 1: d1 = 0.13 uM (= value; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_2:
+    reference: 'DeYoungKeizer1992; Table 1: d2 = 1.049 uM (= value; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_3:
+    reference: 'DeYoungKeizer1992; Table 1: d3 = 943.4 nM (rounded to 0.943 uM; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_5:
+    reference: 'DeYoungKeizer1992; Table 1: d5 = 82.34 nM (= value; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  h_IP3_init:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
+    sourced: 'no'
+  k_IP3:
+    reference: definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)
+    sourced: 'no'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

@@ -30,13 +30,19 @@
       "expr": "np.max(np.abs(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0])) <= 1e-6*(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]"
     },
     {
-      "description": "E_Ca = 1000 RT/F ln(Cao/Cai) (mV; as in the original, no 1/2)",
-      "expr": "np.max(np.abs(E_Ca - 1000*R*T/F*np.log(Cao/Cai))) <= 1e-9"
+      "description": "Nernst (z = 2): E_Ca = 1000 RT/(2F) ln(Cao/Cai) (mV)",
+      "expr": "np.max(np.abs(E_Ca - 1000*R*T/(2*F)*np.log(Cao/Cai))) <= 1e-9"
     }
   ],
   "bc_sweep": {
     "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
-    "ranges": {}
+    "ranges": {},
+    "bounds": {
+      "c_SL": [0, 1],
+      "c_ER": [0, 1],
+      "c_ER_pre": [0, 1]
+    },
+    "constraints": ["B_Ca_init < B_Ca_total", "c_SL + c_ER + c_ER_pre < 1"]
   },
   "timestep": {
     "scheme": "rk4",

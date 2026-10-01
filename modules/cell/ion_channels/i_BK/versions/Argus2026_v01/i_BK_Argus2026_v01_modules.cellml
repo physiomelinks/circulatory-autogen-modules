@@ -12,7 +12,7 @@
         <variable name="V_mid_h_BK" public_interface="in" units="milliV"/>
         <variable name="V_mid_m_BK" public_interface="out" units="milliV"/>
         <variable name="V_rest_approx" public_interface="in" units="milliV"/>
-        <variable name="epsilon_tau" units="second" initial_value="1e-4"/>
+        <variable name="epsilon_tau" units="second" initial_value="1e-6"/>
         <variable name="g_KCa_BK" public_interface="in" units="microS"/>
         <variable name="h_BK" public_interface="out" units="dimensionless" initial_value="h_BK_init"/>
         <variable name="h_BK_inf" public_interface="out" units="dimensionless"/>
@@ -211,7 +211,7 @@
                                         <plus/>
                                         <ci>V</ci>
                                         <ci>V_mid_m_BK</ci>
-                                        <cn cellml:units="milliV">80.2</cn>
+                                        <cn cellml:units="milliV">57.5</cn>
                                     </apply>
                                     <cn cellml:units="milliV">10.1</cn>
                                 </apply>
@@ -229,7 +229,7 @@
                                                 <ci>V</ci>
                                                 <ci>V_mid_m_BK</ci>
                                             </apply>
-                                            <cn cellml:units="milliV">39.5</cn>
+                                            <cn cellml:units="milliV">62.2</cn>
                                         </apply>
                                     </apply>
                                     <cn cellml:units="milliV">10</cn>
@@ -276,7 +276,7 @@
                                                 <ci>V</ci>
                                                 <ci>V_mid_h_BK</ci>
                                             </apply>
-                                            <cn cellml:units="milliV">90.2</cn>
+                                            <cn cellml:units="milliV">86.2</cn>
                                         </apply>
                                     </apply>
                                     <cn cellml:units="milliV">12.9</cn>
@@ -388,7 +388,11 @@
                         <cn cellml:units="dimensionless">3</cn>
                     </apply>
                     <ci>h_BK</ci>
-                    <ci>z_BK</ci>
+                    <apply>
+                        <power/>
+                        <ci>z_BK</ci>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
                     <apply>
                         <minus/>
                         <ci>V</ci>

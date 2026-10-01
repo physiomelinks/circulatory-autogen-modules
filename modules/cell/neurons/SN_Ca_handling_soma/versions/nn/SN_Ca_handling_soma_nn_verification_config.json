@@ -31,7 +31,13 @@
   ],
   "bc_sweep": {
     "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
-    "ranges": {}
+    "ranges": {},
+    "bounds": {
+      "c_SL": [0, 1],
+      "c_ER": [0, 1],
+      "c_ER_pre": [0, 1]
+    },
+    "constraints": ["B_Ca_init < B_Ca_total", "c_SL + c_ER + c_ER_pre < 1"]
   },
   "timestep": {
     "scheme": "rk4",

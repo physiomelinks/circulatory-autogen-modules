@@ -2,34 +2,31 @@ module_type: SN_Na_K_concentrations_soma
 version: nn
 reviewed: false
 notes: 'Cytosolic Na and K of the SN soma: Vol dNai/dt = j_Na_total, Vol dKi/dt = j_K_total (the ion fluxes of the channels
-  connected through Na_flux / K_flux), and their Nernst potentials E_Na, E_K. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat
-  checks that the assembled parts reproduce SN_simple.'
-expected_failures:
-  run_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK / C_per_M of the Paci/Tao
-    components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review question
-    on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s run and
-    invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the
-    defined units J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK /
-    C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the
-    pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK /
-    C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the
-    pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  stability_test: 'generation fails alone: this component (like SN_soma) declares the globals F and R in the defined units
-    J_per_mol_K / C_per_mol, but the module''s global rows in neurons_parameters.csv carry the undefined J_per_MK / C_per_M
-    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
-    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  connected through Na_flux / K_flux), and their Nernst potentials E_Na, E_K. Split out of the monolithic SN_soma / SN_varicosity
+  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
+  that the assembled parts reproduce SN_simple.'
+reference_proposals:
+  Ki_init:
+    reference: 'BoronBoulpaep2017; typical mammalian intracellular K 150 mM [NOT VERIFIED: full text not accessible; value
+      not seen in the source]'
+    sourced: 'no'
+  Ko:
+    reference: 'BoronBoulpaep2017; typical extracellular K 4.5 mM [NOT VERIFIED: full text not accessible; value not seen
+      in the source]'
+    sourced: 'no'
+  Nai_init:
+    reference: 'BoronBoulpaep2017; typical mammalian intracellular Na 15 mM, modified here to 13 mM (was 15) [NOT VERIFIED:
+      full text not accessible; value not seen in the source]'
+    sourced: 'no'
+  Nao:
+    reference: 'BoronBoulpaep2017; typical extracellular Na 145 mM [NOT VERIFIED: full text not accessible; value not seen
+      in the source]'
+    sourced: 'no'
+  Vol:
+    reference: 'Wu2012; volumes of rat spinal sympathetic PREganglionic neurons 1600-2500 um^3 (IML 2200 +- 250 um^3, Results/Fig.
+      1D-E), the source of the 2000 um^3 (CA token Wu2012Soma_Approx). Wrong cell type for a stellate (postganglionic) neuron,
+      which is likely larger: Cm 30 pF at 1 uF/cm2 implies about 3000 um^2 of membrane (a 31 um sphere, about 15600 um^3)'
+    sourced: 'no'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

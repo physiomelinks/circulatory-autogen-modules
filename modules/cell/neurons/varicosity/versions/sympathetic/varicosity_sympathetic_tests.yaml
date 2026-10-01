@@ -7,3 +7,266 @@ description: 'Sympathetic-neuron varicosity (SN_simple''s SN_varicosity) built f
   ["<axon>"]}; NE (synaptic_NE) is available from NE. Default parameters are SN_simple''s (its default instance). Split out
   of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
   in git history). Tested through the neuron sympathetic version.'
+reference_proposals:
+  B_Ca_init_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); at equilibrium
+      with Cai_init the free buffer would be B_tot Kd/(Kd + Cai) = 7.990 mM (Kd = 80 uM)
+    sourced: 'no'
+  B_Ca_total_Ca:
+    reference: 'Matveev2002; Table 1 ("actual" set): total of the FIXED (immobile) buffer 8 mM (= value). Matveev''s mobile
+      buffer is 0.56 mM (Kd 4 uM); here the 8 mM is used for the model''s buffer'
+    sourced: 'yes'
+  Ca_ER_init_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_checked_in_neurons');
+      0.6 mM is 2-10x the resting ER-lumen Ca measured in rat sensory neurons (60-270 uM, Solovyova2002, Abstract/Results)
+    sourced: 'no'
+    also_cites:
+    - Solovyova2002
+  Cai_init_Ca:
+    reference: Wanaverbecq2003; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),
+      Results, first section; 1e-4 mM = value. (Replaces the CA reference Hagiwara1981, which could not be opened)
+    sourced: 'yes'
+  Cao_Ca:
+    reference: 'Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no
+      separate neuron value). Khaliq2003 also uses 2 mM'
+    sourced: 'yes'
+    also_cites:
+    - Khaliq2003
+  D_Ca_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'identified_by_hand'); lumped
+      sub-membrane-to-bulk exchange coefficient
+    sourced: 'no'
+  D_Ca_ER_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'need_to_change_for_volume');
+      lumped pre-ER-to-ER exchange coefficient
+    sourced: 'no'
+  H_SERCA_Ca:
+    reference: Shannon2004; Table 11, SR Ca pump Hill coefficient H = 1.787 (= value)
+    sourced: 'yes'
+  K_mf_Ca:
+    reference: Shannon2004; Table 11, SR Ca pump Kmf = 0.246 uM; modified here to 0.1 uM (was 0.246e-3 mM)
+    sourced: 'yes'
+  K_mr_Ca:
+    reference: Shannon2004; Table 11, SR Ca pump Kmr = 1.7 mM; modified here to 0.5 mM (was 1.7; the varicosity's CA reference
+      omitted the change)
+    sourced: 'yes'
+  Vol_Ca:
+    reference: 'Brain1997; mouse vas deferens sympathetic varicosities: mean cross-sectional area 0.52 um^2 (n = 71), "a few
+      micrometres in length" (pp. 493-494, 497), i.e. about 0.5-2 um^3; 1 um^3 is of that order. The CA reference Bennett1998
+      could not be opened'
+    sourced: 'yes'
+    also_cites:
+    - Bennett1998
+  c_ER_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'Li1994Equations_was_0.185');
+      ER volume fraction. Li & Rinzel / De Young & Keizer c1 = 0.185 (DYK Table 1) is the ER/cytosol volume ratio, a different
+      quantity, so 0.01 is not sourced
+    sourced: 'no'
+    also_cites:
+    - DeYoungKeizer1992
+  c_ER_pre_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); pre-ER volume
+      fraction
+    sourced: 'no'
+  c_SL_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined_TO_BE_FOUND');
+      sub-membrane volume fraction
+    sourced: 'no'
+  k_SERCA_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); scales
+      with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the myocyte)
+    sourced: 'no'
+  k_bind_Ca_Ca:
+    reference: 'Matveev2002; Table 1: buffer on-rate 0.5 /uM/ms (= 0.5e6 /mM/s, "actual" fixed buffer) and 0.1 /uM/ms in the
+      "quoted" set (Tang et al. 2000); 0.1e6 /mM/s = the quoted value, paired here with the actual-set off-rate (was 0.5e6)'
+    sourced: 'yes'
+  k_bind_Ca_ER_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
+    sourced: 'no'
+  k_leak_Ca_Ca:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
+    sourced: 'no'
+  k_unbind_Ca_Ca:
+    reference: 'Matveev2002; Table 1 ("actual" set): fixed-buffer off-rate 8 /ms = 8e3 /s (= value; Kd 16 uM with kon 0.5
+      /uM/ms; with the kon 0.1 used here Kd = 80 uM)'
+    sourced: 'yes'
+  k_unbind_Ca_ER_Ca:
+    reference: unreferenced_placeholder; Matveev2002 fixed-buffer off-rate 8e3 /s reused for the pre-ER buffer; no source
+      for an ER-adjacent buffer
+    sourced: 'no'
+    also_cites:
+    - Matveev2002
+  V_den_c_i_CaN:
+    reference: Tao2011; Supporting Material (Document S1) Eq. 91 (k = 9.85 mV); modified here to 5 mV (was 9.85)
+    sourced: 'yes'
+    also_cites:
+    - BelluzziSacchi1991
+  V_mid_c_i_CaN:
+    reference: 'Tao2011; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao''s Ca current is a
+      nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type'
+    sourced: 'yes'
+    also_cites:
+    - BelluzziSacchi1991
+  c_init_i_CaN:
+    reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);
+      c_inf(-70 mV) is about 4e-6 with V_mid_c 8.1, V_den_c 5
+    sourced: 'no'
+  g_CaN_i_CaN:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
+    sourced: 'no'
+  hc_init_i_CaN:
+    reference: unreferenced_placeholder; initial hc gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong)
+    sourced: 'no'
+  tau_c_max_i_CaN:
+    reference: unreferenced_placeholder; owner's modification of Tao2011 Eq. 92, whose tau_c spans 0.13-0.56 ms; 3 ms is about
+      5x the source maximum (CA token changed_from_belluzi1991_curves)
+    sourced: 'no'
+    also_cites:
+    - Tao2011
+  tau_c_min_i_CaN:
+    reference: unreferenced_placeholder; owner's modification of Tao2011 Eq. 92, whose tau_c spans 0.13-0.56 ms (CA token
+      changed_from_belluzi1991_curves)
+    sourced: 'no'
+    also_cites:
+    - Tao2011
+  tau_hc_i_CaN:
+    reference: 'Tao2011; Supporting Material (Document S1) Eq. 94: tau_hc = 1/(0.242 e^{0.145V} + 0.0434 e^{-0.0201V}) + 17
+      ms, range 17.0-29.9 ms; 20 ms is a constant within that range'
+    sourced: 'yes'
+    also_cites:
+    - BelluzziSacchi1991
+  Cao_i_NaCa:
+    reference: 'Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no
+      separate neuron value). Khaliq2003 also uses 2 mM'
+    sourced: 'yes'
+    also_cites:
+    - Khaliq2003
+  KmCa_i_NaCa:
+    reference: Paci2013; I_NaCa KmCa = 1.38 mM in the authors' CellML (= value; = tenTusscher2004; cardiomyocyte value)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  KmNai_i_NaCa:
+    reference: Paci2013; I_NaCa KmNai = 87.5 mM in the authors' CellML (= value; = tenTusscher2004; cardiomyocyte value)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  Ksat_i_NaCa:
+    reference: Paci2013; I_NaCa Ksat = 0.1 in the authors' CellML (= value; = tenTusscher2004)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  Nai_i_NaCa:
+    reference: 'BoronBoulpaep2017; typical mammalian intracellular Na 15 mM, modified here to 13 mM (= Nai_init; constant
+      when unconnected) [NOT VERIFIED: full text not accessible; value not seen in the source]'
+    sourced: 'no'
+  Nao_i_NaCa:
+    reference: 'BoronBoulpaep2017; typical extracellular Na 145 mM [NOT VERIFIED: full text not accessible; value not seen
+      in the source]'
+    sourced: 'no'
+  alpha_NaCa_i_NaCa:
+    reference: Paci2013; I_NaCa alpha = 2.8571432 in the authors' CellML (tenTusscher2004 uses 2.5); reduced here to 1.2 for
+      the neuron
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  gamma_NaCa_i_NaCa:
+    reference: Paci2013; I_NaCa gamma = 0.35 in the authors' CellML (= value; = tenTusscher2004; cardiomyocyte value)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  k_NaCa_i_NaCa:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Paci
+      2013 kNaCa = 4900 A/F (ventricular) is per capacitance
+    sourced: 'no'
+    also_cites:
+    - Paci2013
+  IP3_IP3R:
+    reference: 'LiRinzel1994; IP3 = 0.2 uM read from a plot per the CA token [NOT VERIFIED: Li & Rinzel 1994 not accessible].
+      De Young & Keizer 1992 use a basal IP3 of 0.24 uM (p. 9897); the PMR li_rinzel_1994 CellML (a variant) uses 0.6 uM'
+    sourced: 'no'
+    also_cites:
+    - DeYoungKeizer1992
+  a_2_IP3R:
+    reference: 'DeYoungKeizer1992; Table 1: a2 = 0.2 /uM/s = 200 /mM/s (= value), the constant Li & Rinzel 1994 adopt (the
+      csv unit per_millimolar omits /s)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_1_IP3R:
+    reference: 'DeYoungKeizer1992; Table 1: d1 = 0.13 uM (= value; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_2_IP3R:
+    reference: 'DeYoungKeizer1992; Table 1: d2 = 1.049 uM (= value; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_3_IP3R:
+    reference: 'DeYoungKeizer1992; Table 1: d3 = 943.4 nM (rounded to 0.943 uM; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  d_5_IP3R:
+    reference: 'DeYoungKeizer1992; Table 1: d5 = 82.34 nM (= value; adopted by Li & Rinzel 1994)'
+    sourced: 'yes'
+    also_cites:
+    - LiRinzel1994
+  h_IP3_init_IP3R:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
+    sourced: 'no'
+  k_IP3_IP3R:
+    reference: definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)
+    sourced: 'no'
+  Ca_ER_RyR_den_RyR:
+    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
+      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
+      so it has no literature constants'
+    sourced: 'no'
+  Ca_ER_RyR_mid_RyR:
+    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
+      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
+      so it has no literature constants'
+    sourced: 'no'
+  Cai_RyR_den_RyR:
+    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
+      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
+      so it has no literature constants'
+    sourced: 'no'
+  Cai_RyR_mid_RyR:
+    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
+      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
+      so it has no literature constants'
+    sourced: 'no'
+  k_RyR_RyR:
+    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'');
+      the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
+      so it has no literature constants'
+    sourced: 'no'
+  tau_c_RyR_RyR:
+    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
+      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
+      so it has no literature constants'
+    sourced: 'no'
+  tau_hc_RyR_RyR:
+    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
+      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
+      so it has no literature constants'
+    sourced: 'no'
+  Cai_NE_base_NE:
+    reference: 'definitional; release threshold set at the resting Cai (1e-4 mM, cf. Wanaverbecq2003: 102 nM in rat SCG) so
+      release is zero at rest'
+    sourced: 'no'
+  NE_init_NE:
+    reference: definitional; baseline NE 0 (NE is relative to this baseline)
+    sourced: 'no'
+  k_NE_NE:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source
+      for a first-order release rate. The sister SN_full/SN_simple parameter files use 0.1 /s
+    sourced: 'no'
+  k_NET_NE:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); NET uptake
+      is reported as Michaelis-Menten kinetics, not a first-order constant. The sister SN_full/SN_simple parameter files use
+      0.03 /s
+    sourced: 'no'

@@ -27,12 +27,12 @@
   "run_parameters": {"V": -10.0},
   "invariants": [
     {
-      "description": "N-type Ca activation c matches the exact clamp solution c_inf(V) + (c_init - c_inf) exp(-t/tau), tau = |tau_c(V)|/1000 + epsilon_tau (0.1 ms)",
-      "expr": "np.max(np.abs(c - ((1/(1 + np.exp(-(V + V_mid_c)/V_den_c))) + (c_init - (1/(1 + np.exp(-(V + V_mid_c)/V_den_c))))*np.exp(-t/(np.abs((tau_c_min + (tau_c_max - tau_c_min)/(1 + np.exp((V_mid_c - 20 + V)/V_den_c)))/1000) + 1e-4))))) <= 1e-6"
+      "description": "N-type Ca activation c matches the exact clamp solution c_inf(V) + (c_init - c_inf) exp(-t/tau), tau = |tau_c(V)|/1000 + epsilon_tau (0.001 ms)",
+      "expr": "np.max(np.abs(c - ((1/(1 + np.exp(-(V + V_mid_c)/V_den_c))) + (c_init - (1/(1 + np.exp(-(V + V_mid_c)/V_den_c))))*np.exp(-t/(np.abs((tau_c_min + (tau_c_max - tau_c_min)/(1 + np.exp((V_mid_c - 20 + V)/V_den_c)))/1000) + 1e-6))))) <= 1e-6"
     },
     {
       "description": "inactivation hc matches its exact clamp solution (V_mid_hc = V_mid_c + 11, V_den_hc = V_den_c)",
-      "expr": "np.max(np.abs(hc - ((1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))) + (hc_init - (1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))))*np.exp(-t/(np.abs(tau_hc/1000) + 1e-4))))) <= 1e-6"
+      "expr": "np.max(np.abs(hc - ((1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))) + (hc_init - (1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))))*np.exp(-t/(np.abs(tau_hc/1000) + 1e-6))))) <= 1e-6"
     },
     {
       "description": "total Ca (free + buffered, four compartments) changes only by the plasma-membrane fluxes j_Ca_N + j_NaCa_Ca (trapezoid integral)",

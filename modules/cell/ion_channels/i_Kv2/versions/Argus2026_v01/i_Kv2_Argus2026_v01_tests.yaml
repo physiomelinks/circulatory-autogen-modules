@@ -3,39 +3,36 @@ version: Argus2026_v01
 reviewed: false
 notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. Kv2 delayed-rectifier K current of the SN soma, i_Kv2 = g_Kv2
-  (V - E_K) m_Kv2. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
-expected_failures:
-  run_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_invariants: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_BC: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units
-    J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M
-    of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending
-    review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  verification_test_timestep: 'generation fails alone: this component (like SN_soma) declares the global F in the defined
-    units J_per_mol_K / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK
-    / C_per_M of the Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix:
-    the pending review question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library
-    this component''s run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
-  stability_test: 'generation fails alone: this component (like SN_soma) declares the global F in the defined units J_per_mol_K
-    / C_per_mol, but the module''s global rows in ion_channel_parameters.csv carry the undefined J_per_MK / C_per_M of the
-    Paci/Tao components (libcuflynx exits: units in parameters.csv do not match module_config.json). Fix: the pending review
-    question on unifying R and F to J_per_mol_K / C_per_mol. With that fix applied to a copy of the library this component''s
-    run and invariant tests pass; it generates and reproduces SN_simple in SN_simple_flat.'
+  (V - E_K) m_Kv2. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
 reference_proposals:
-  F:
-    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+  E_K:
+    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
+    sourced: 'no'
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  V_den_m_Kv2:
+    reference: 'Tao2011; Supporting Material (Document S1) Eq. 96: k = 8.007 mV (rounded to 8)'
     sourced: 'yes'
-    value: 96485.3415
-    note: (proposed for the ion_channel global F under i_CaL_Paci_2013/nn)
+    also_cites:
+    - BelluzziSacchi1991
+  V_mid_m_Kv2:
+    reference: 'Tao2011; Supporting Material (Document S1) Eq. 96: delayed-rectifier n_inf V1/2 = -6.084 mV (rounded to 6)'
+    sourced: 'yes'
+    also_cites:
+    - BelluzziSacchi1991
+  V_rest_approx:
+    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
+      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
+    sourced: 'yes'
+  g_Kv2:
+    reference: unreferenced_placeholder; fitted to a K-current I-V curve in the Davis 2021 thesis (CA token 'Davis2021Thesis_fit_to_curve');
+      thesis not accessible. Tao 2011 uses g_KV = 0.44 uS for a 240 pF neuron
+    sourced: 'no'
+    also_cites:
+    - Tao2011
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

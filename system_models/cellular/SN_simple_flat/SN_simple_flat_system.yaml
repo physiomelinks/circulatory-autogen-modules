@@ -2,9 +2,10 @@ model: SN_simple_flat
 category: cellular
 reviewed: false
 description: 'SN_simple (sympathetic neuron: soma, axon, varicosity) with SN_soma and SN_varicosity decomposed into their
-  ion channels (modules/ion_channel, *_SN) and the neuron-specific membrane, concentration, Ca-handling and NE-release components
-  (modules/cell/neurons), wired explicitly. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); the vessel names are those a sympathetic_neuron
-  supermodule instance "SN" expands to (SN_soma_<part>, SN_axon, SN_varicosity_<part>).'
+  ion channels (cell/ion_channels, versions Argus2026_v01) and the neuron-specific membrane, concentration, Ca-handling and
+  NE-release components (modules/cell/neurons), wired explicitly. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); the vessel names are those a neuron/sympathetic
+  record "SN" expands to (SN_soma_<part>, SN_axon, SN_varicosity_<part>).'
 sim_time: 2.0
 pre_time: 0.0
 dt: 0.01
@@ -61,3 +62,7 @@ invariants: []
 notes: ['The reference is SN_simple''s (circulatory_autogen''s original with its bundled SN_soma, SN_axon and SN_varicosity).
     Every SN_simple output is compared, under its new name (equivalence.output_map), to 1e-9: the parts copy the original
     equations verbatim, and only the sums of channel currents and fluxes become summed ports, added in the original order.']
+expected_failures: {system_equivalence_test: 'Deliberate differences from circulatory_autogen''s SN_simple (fixed in this
+    library on 2026-10-02): i_Na1_6''s Na flux enters dNai/dt; the varicosity''s E_Ca has valence 2 (RT/(2F)); epsilon_tau
+    is 0.001 ms (was 0.1 ms); BK gating follows Khaliq 2003 (z^2, tau offsets from the midpoints). The first two are circulatory_autogen
+    PR #537. The decomposition is still checked exactly: neuron/sympathetic reproduces this library''s SN_simple (supermodule_equivalence_test).'}

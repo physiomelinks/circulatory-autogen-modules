@@ -49,8 +49,8 @@
   "run_parameters": {"I_in": -0.05},
   "invariants": [
     {
-      "description": "charge conservation: the change of membrane charge Cm (V - V0) equals the change of ionic charge F [Vol (dNai + dKi) + 2 dN_Ca] plus the charge carried by the currents that change no tracked ion pool (I_in_delayed, I_out and I_Na1_6, which is omitted from the Nai balance)",
-      "expr": "np.max(np.abs((Cm*1e-15*(V - V[0]) - F*(Vol*((Nai + Ki) - (Nai[0] + Ki[0])) + 2*((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]))) - (-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((i_Na1_6 + I_in_delayed + I_out)[1:]+(i_Na1_6 + I_in_delayed + I_out)[:-1])*np.diff(t))))))) <= 1e-3*(np.max(np.abs(Cm*1e-15*(V - V[0]))) + np.max(np.abs((-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((i_Na1_6 + I_in_delayed + I_out)[1:]+(i_Na1_6 + I_in_delayed + I_out)[:-1])*np.diff(t)))))))) + 1e-20"
+      "description": "charge conservation: the change of membrane charge Cm (V - V0) equals the change of ionic charge F [Vol (dNai + dKi) + 2 dN_Ca] plus the charge carried by the currents that change no tracked ion pool (I_in_delayed and I_out)",
+      "expr": "np.max(np.abs((Cm*1e-15*(V - V[0]) - F*(Vol*((Nai + Ki) - (Nai[0] + Ki[0])) + 2*((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]))) - (-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_in_delayed + I_out)[1:]+(I_in_delayed + I_out)[:-1])*np.diff(t))))))) <= 1e-3*(np.max(np.abs(Cm*1e-15*(V - V[0]))) + np.max(np.abs((-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_in_delayed + I_out)[1:]+(I_in_delayed + I_out)[:-1])*np.diff(t)))))))) + 1e-20"
     },
     {
       "description": "total Ca (free + buffered, all four compartments) changes only by the plasma-membrane fluxes: N_Ca(t) - N_Ca(0) = integral of (j_Ca_L + j_NaCa_Ca) dt (trapezoid on the output grid)",
@@ -99,7 +99,8 @@
   },
   "stability": {
     "supported": [
-      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08, "MaximumStep": 1e-05},
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
     ]
   },
   "validation": {
