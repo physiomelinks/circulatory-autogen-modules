@@ -855,6 +855,10 @@ def validation_test_baseline(cm):
                                        f'{component.label} [{cm.instance.name}]: model vs {v.get("source_short", "data")}')
         metrics = {metric: errors, 'threshold': threshold, 'source': v.get('source', ''),
                    'validated_values': params}
+        if v.get('kind') == 'fit_check':
+            # the published values were fitted to this same data: goodness of fit, not validation
+            metrics['kind'] = 'fit_check'
+            metrics['note'] = v.get('note', '')
         worst = max(errors.values())
         if worst > threshold:
             return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, [fig])

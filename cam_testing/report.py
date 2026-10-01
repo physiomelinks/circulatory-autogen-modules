@@ -127,6 +127,12 @@ def _cellml_equations(version):
     return equations, unsupported, cellml_vars
 
 
+# a baseline whose parameters were fitted to the same data (spec kind: fit_check)
+FIT_CHECK_TITLE = 'Goodness of fit: published parameters against the data they were fitted to'
+FIT_CHECK_ABOUT = ('The parameters were fitted to this data, so this shows how well that fit reproduces it; it '
+                   'is not an independent validation.')
+
+
 def _test_entry(version, test, r, spec_block=None, title=None):
     base = test.split('__')[0]
     return {
@@ -157,7 +163,10 @@ def instance_context(version, inst):
                                   checks.NO_BASELINE_DATA if kind == 'baseline' else checks.NO_CALIBRATION_DATA)
             elif v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED, checks.NOT_APPLICABLE):
                 r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
-        entry = _test_entry(version, test, r, v)
+        entry = _test_entry(version, test, r, v, title=FIT_CHECK_TITLE if v.get('kind') == 'fit_check' else None)
+        if v.get('kind') == 'fit_check':
+            entry['short'] = 'Fit check'
+            entry['about'] = v.get('note') or FIT_CHECK_ABOUT
         entry['anchor'] = f'{inst.name}--{test}'
         tests.append(entry)
     calibration = None

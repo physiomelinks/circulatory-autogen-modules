@@ -304,7 +304,7 @@ NESTED_ORDER = {
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
                   'tol'),
     'supermodule': ('globals', 'equivalent'),
-    'baseline': ('status', 'reason', 'source', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
+    'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
                  'threshold'),
     'calibrate': ('status', 'reason', 'note', 'source', 'obs_data', 'params_for_id',

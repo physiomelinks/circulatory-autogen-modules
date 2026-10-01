@@ -41,6 +41,19 @@
   "validation": {
     "default": {},
     "hudson_bay_lynx_hare": {
+      "calibrate": {
+        "status": "active",
+        "source": "Hudson's Bay Company lynx/hare pelts 1900-1920 (Hewitt 1921), via Carpenter (2018) Stan case study",
+        "obs_data": "instances/hudson_bay_lynx_hare/hudson_bay_lynx_hare_obs_data.json",
+        "params_for_id": "instances/hudson_bay_lynx_hare/hudson_bay_lynx_hare_params_for_id.csv",
+        "prediction_window": [15, 20],
+        "method": "CMA-ES",
+        "optimiser_options": {"num_calls_to_function": 4000, "cost_convergence": 1e-08, "max_patience": 60, "seed": 1},
+        "metric": "log_rmse",
+        "threshold": 0.5
+      }
+    },
+    "carpenter2018": {
       "baseline": {
         "status": "active",
         "source": "Hudson's Bay Company lynx/hare pelts 1900-1920 (Hewitt 1921), via Carpenter (2018) Stan case study",
@@ -49,7 +62,6 @@
         "time_column": "Year",
         "time_offset": 1900,
         "variables": {"x": "Hare", "y": "Lynx"},
-        "parameters": {"alpha": 0.545, "beta": 0.028, "gamma": 0.803, "delta": 0.024, "x_init": 33.956, "y_init": 5.933},
         "parameter_ranges": {
           "alpha": [0.465, 0.63],
           "beta": [0.022, 0.033],
@@ -61,18 +73,9 @@
         "sim_time": 20.0,
         "dt": 0.1,
         "metric": "log_rmse",
-        "threshold": 0.5
-      },
-      "calibrate": {
-        "status": "active",
-        "source": "Hudson's Bay Company lynx/hare pelts 1900-1920 (Hewitt 1921), via Carpenter (2018) Stan case study",
-        "obs_data": "instances/hudson_bay_lynx_hare/hudson_bay_lynx_hare_obs_data.json",
-        "params_for_id": "instances/hudson_bay_lynx_hare/hudson_bay_lynx_hare_params_for_id.csv",
-        "prediction_window": [15, 20],
-        "method": "CMA-ES",
-        "optimiser_options": {"num_calls_to_function": 4000, "cost_convergence": 1e-08, "max_patience": 60, "seed": 1},
-        "metric": "log_rmse",
-        "threshold": 0.5
+        "threshold": 0.5,
+        "kind": "fit_check",
+        "note": "Goodness of fit, not an independent validation: Carpenter (2018) fitted these values to the same 1900-1920 data. The independent check is hudson_bay_lynx_hare's calibration on 1900-1915 and prediction of 1915-1920."
       }
     }
   }

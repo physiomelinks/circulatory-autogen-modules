@@ -387,7 +387,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
             <td class="mono" style="white-space:normal;font-size:0.78rem">{{ i.files|join(', ') or '—' }}</td>
             <td title="{{ i.omex_message }}">{% if i.omex %}<a href="{{ i.omex }}" download>.omex</a> {% endif %}{{ chip(i.omex_status) }}{% if not i.omex %} <span class="muted" style="font-size:0.78rem">make omex</span>{% endif %}</td>
             {%- if not is_supermodule %}
-            <td><a href="#{{ i.baseline.anchor }}" style="text-decoration:none">{{ chip(i.baseline.status) }}</a></td>
+            <td><a href="#{{ i.baseline.anchor }}" style="text-decoration:none">{{ chip(i.baseline.status) }}</a>{% if i.baseline.short == 'Fit check' %} <span class="muted" style="font-size:0.78rem">fit check</span>{% endif %}</td>
             <td><a href="#{{ i.calibrate.anchor }}" style="text-decoration:none">{{ chip(i.calibrate.status) }}</a>{% if i.calibrate.status == 'failed' and not i.has_obs_data %} <span class="muted" style="font-size:0.78rem">no calibration data</span>{% endif %}</td>
             <td class="mono" style="white-space:normal;font-size:0.78rem">{% if i.calibration %}{{ i.calibration.calibrated_parameters|fmt }}{% if i.calibration.cost is not none %} (cost {{ i.calibration.cost|fmt }}){% endif %}<br><span class="muted">{{ i.calibrated_file }}, {{ i.calibration.date }}</span>{% else %}—{% endif %}</td>
             {%- endif %}</tr>
