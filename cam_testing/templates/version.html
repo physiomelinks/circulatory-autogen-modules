@@ -67,6 +67,52 @@
             <dl class="kv">
               {%- for k, vals in t.metrics.sweep_values.items() %}<dt>{{ k }}</dt><dd>{{ vals|fmt }}</dd>{% endfor %}
             </dl>
+            {%- if t.metrics.failures %}
+            <h5 style="margin:0">Failed runs</h5>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Point</th><th>Class</th><th>Problem</th><th>Violation / (atol + rtol·|bound|)</th></tr></thead>
+              <tbody>
+              {%- for f in t.metrics.failures %}
+                <tr><td class="mono">{{ f.parameter }} = {{ f.value|fmt }}</td>
+                <td class="{{ 'no' if f.class == 'parameter' or not f.fixed_by_recommended else '' }}">{{ f.class }}{% if f.fixed_by_recommended %}<br><span class="muted">fixed by the recommended settings</span>{% endif %}</td>
+                <td class="muted" style="font-size:0.78rem">{{ f.problems|join('; ') }}</td>
+                <td class="mono num">{% for v in f.violation %}{{ v.relative|fmt }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:0;font-size:0.84rem">Each failed run is rerun once with the reference solver ({{ t.metrics.reference_settings }}). <strong>parameter</strong>: the reference fails too, so the model breaks at that value (a failure). <strong>numerical</strong>: the reference passes, so the version's settings ({{ t.metrics.version_settings }}) are inadequate there. The violation column is the size of an invariant violation relative to the version's tolerances: of order 1–100 suggests solver error, far larger the model.</p>
+            {%- endif %}
+            {%- if t.metrics.recommended %}{% set rc = t.metrics.recommended %}
+            <div class="panel" style="padding:10px 14px">
+              <div class="eyebrow">Recommended solver settings</div>
+              <p style="margin:0"><span class="mono">{{ rc.label }}</span>: mean {{ rc.mean_seconds|fmt }} s per run, failures {{ rc.failures }} over the sweep, within {{ rc.accuracy|fmt }} of the reference (tol {{ rc.tol|fmt }}) at {{ rc.n_hard_points }} hard points.</p>
+              <p class="muted" style="margin:0;font-size:0.84rem">A recommendation, not applied: adopt it into the version's run settings (<code>solver_info</code>{% if rc.config.MaximumStep %}, including <code>MaximumStep</code>{% endif %}) to remove the numerical failures. Chosen as the cheapest CVODE setting, at least as strict as the version's, that passes the numerical failures, the nominal point and each parameter's extremes within tolerance of the reference, then confirmed over every sweep point.</p>
+            </div>
+            {%- elif t.metrics.n_numerical_failures %}
+            <p class="todo" style="margin:0">No candidate solver setting fixes the numerical failures (within the run-time budget of 20 s per state).</p>
+            {%- endif %}
+            {%- if t.metrics.candidates %}
+            <details><summary>{{ t.metrics.candidates|length }} candidate solver settings tried</summary>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Configuration</th><th>Nominal run [s]</th><th>Hard points</th><th>Note</th></tr></thead>
+              <tbody>
+              {%- for r in t.metrics.candidates|sort(attribute='label') %}
+                <tr><td class="mono">{{ r.label }}</td><td class="mono num">{{ r.seconds|fmt }}</td>
+                <td class="{{ 'yes' if r.passed_hard else ('no' if r.passed_hard is sameas false else '') }}">{{ 'Pass' if r.passed_hard else ('Fail' if r.passed_hard is sameas false else '—') }}</td>
+                <td class="muted">{{ r.note }}{% if r.confirmation %}; confirmation {{ r.confirmation }}{% endif %}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            </details>
+            {%- endif %}
+            {%- if t.metrics.skipped_out_of_range %}
+            <details><summary>{{ t.metrics.skipped_out_of_range|length }} point{{ '' if t.metrics.skipped_out_of_range|length == 1 else 's' }} skipped: outside the valid range</summary>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Point</th><th>Why not run</th></tr></thead>
+              <tbody>{% for sk in t.metrics.skipped_out_of_range %}<tr><td class="mono">{{ sk.parameter }} = {{ sk.value|fmt }}</td><td class="muted">{{ sk.reason }}</td></tr>{% endfor %}</tbody>
+            </table></div>
+            </details>
+            {%- endif %}
             {%- elif t.key == 'run_test' and t.metrics.final_values %}
             <dl class="kv">
               {%- for k, v in t.metrics.final_values.items() %}<dt>{{ k }}(t<sub>end</sub>)</dt><dd>{{ v|fmt }}</dd>{% endfor %}
@@ -176,6 +222,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
         <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
         <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if is_supermodule %}PhLynx / CUFLynx: supermodule (tested through the models that use it){% elif phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
+        {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
         <span>libcuflynx {{ libcuflynx_version }}</span>
         <span>Report generated {{ generated }}</span>
       </div>

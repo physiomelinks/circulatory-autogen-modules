@@ -59,7 +59,13 @@ TEST_ABOUT = {
                                     'delays) evaluated at the run parameters.',
     'verification_test_BC': 'Sweeps each boundary condition (or, for a self-contained version, each '
                             'constant) over a range and checks every run completes, stays finite and '
-                            'keeps the invariants.',
+                            'keeps the invariants. Values outside a parameter\'s valid range (bc_sweep.bounds, '
+                            'a gate initial value outside [0, 1], a negative physical quantity, or a broken '
+                            'bc_sweep.constraints relation) are skipped. A failed run is rerun once with a tight '
+                            'reference solver: if that fails too it is a parameter failure (the model breaks '
+                            'there); if it passes, a numerical failure, and the cheapest CVODE setting that '
+                            'passes every point is recommended. The test passes when there are no parameter '
+                            'failures and every numerical failure passes with the recommended settings.',
     'verification_test_timestep': 'Integrates the generated right-hand side with a fixed-step scheme at '
                                   'successively halved steps. Differences between successive solutions must '
                                   'shrink at the scheme\'s order, and the finest solution must agree with '
@@ -305,6 +311,26 @@ def _module_phlynx(components):
             'all': bool(run) and len(run) == total and ok == total}
 
 
+def _bc_summary(comp):
+    '''One line on the version's boundary-condition sweep: skipped points, failures by class and the
+    recommended solver settings; None when it hasn't run.'''
+    t = next((t for t in comp['tests'] if t['key'] == 'verification_test_BC'), None)
+    m = (t or {}).get('metrics') or {}
+    if 'n_runs' not in m or 'failures' not in m:
+        return None
+    parts = [f"{m['n_runs'] - m.get('n_failures', 0)}/{m['n_runs']} runs pass"]
+    if m.get('skipped_out_of_range'):
+        parts.append(f"{len(m['skipped_out_of_range'])} skipped (outside the valid range)")
+    if m.get('n_parameter_failures'):
+        parts.append(f"{m['n_parameter_failures']} parameter failure{'s' if m['n_parameter_failures'] > 1 else ''}")
+    if m.get('n_numerical_failures'):
+        n = m['n_numerical_failures']
+        rc = m.get('recommended')
+        parts.append(f"{n} numerical failure{'s' if n > 1 else ''}"
+                     + (f", fixed by the recommended {rc['label']}" if rc else ', not fixed by any candidate setting'))
+    return '; '.join(parts)
+
+
 def version_context(version):
     comp = component_context(version)
     return {
@@ -325,7 +351,7 @@ def version_context(version):
         'known_issues': (version.spec.get('known_issues') or [])
                         + [f'{t}: {why}' for t, why in (version.spec.get('expected_failures') or {}).items()],
         'test_keys': [t['key'] for t in comp['tests']], 'test_short': {t['key']: t['short'] for t in comp['tests']},
-        'phlynx': _module_phlynx([comp]),
+        'phlynx': _module_phlynx([comp]), 'bc_summary': _bc_summary(comp),
         'module_type_href': f'../../{version.vessel_type}.html',
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
     }

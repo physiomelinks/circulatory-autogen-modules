@@ -26,16 +26,27 @@ def tested_range(component, param):
     if param.variable_name in (sweep.get('exclude') or []) or param.is_todo:
         return None
     r = (sweep.get('ranges') or {}).get(param.variable_name)
-    if isinstance(r, dict):
-        return float(r['min']), float(r['max']), r.get('scale') == 'log'
-    if r is not None:
-        return float(r[0]), float(r[1]), False
-    nominal = param.float_value
-    if nominal == 0:
-        return None
-    factors = [float(f) for f in sweep.get('factors', [0.5, 2.0])]
-    lo, hi = sorted((nominal * min(factors), nominal * max(factors)))
-    return lo, hi, lo > 0
+    if isinstance(r, dict) and 'values' in r:
+        lo, hi, log = min(map(float, r['values'])), max(map(float, r['values'])), False
+    elif isinstance(r, dict):
+        lo, hi, log = float(r['min']), float(r['max']), r.get('scale') == 'log'
+    elif r is not None:
+        lo, hi, log = float(r[0]), float(r[1]), False
+    else:
+        nominal = param.float_value
+        if nominal == 0:
+            return None
+        factors = [float(f) for f in sweep.get('factors', [0.5, 2.0])]
+        lo, hi = sorted((nominal * min(factors), nominal * max(factors)))
+        log = lo > 0
+    # clipped to the parameter's valid range (the sweep doesn't run values outside it)
+    b = checks.parameter_bounds(component).get(param.variable_name)
+    if b is not None:
+        lo, hi = max(lo, b[0]), min(hi, b[1])
+        if lo > hi:
+            return None
+        log = log and lo > 0
+    return lo, hi, log
 
 
 def validated_spread(component):

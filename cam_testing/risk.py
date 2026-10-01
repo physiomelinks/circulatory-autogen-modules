@@ -73,7 +73,17 @@ def parameter_box(cm):
                 continue   # no scale to vary it by; give it a range in the spec
             lo, hi = sorted((nominal * min(factors), nominal * max(factors)))
             box.append((p.variable_name, pname, lo, hi, lo > 0))
-    return box
+    # clipped to each parameter's valid range, as the sweep is (bc_sweep.bounds, gate initial values)
+    bounds = checks.parameter_bounds(cm.component)
+    clipped = []
+    for var, pname, lo, hi, log in box:
+        if var in bounds:
+            lo, hi = max(lo, bounds[var][0]), min(hi, bounds[var][1])
+            if lo >= hi:
+                continue
+            log = log and lo > 0
+        clipped.append((var, pname, lo, hi, log))
+    return clipped
 
 
 def sample_box(box, n, seed=0):

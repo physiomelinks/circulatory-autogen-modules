@@ -173,7 +173,7 @@ parameters:
 |---|---|
 | `run_test` | generates the version alone (or in its spec's `harness` network) and simulates it; every output finite |
 | `verification_test_invariants` | the spec's invariants hold at the run parameters |
-| `verification_test_BC` | each boundary condition / constant swept over its tested range; runs finite, invariants hold |
+| `verification_test_BC` | each boundary condition / constant swept over its tested range; runs finite, invariants hold. Points outside a valid range are skipped; failures are classified and a solver setting recommended (below) |
 | `verification_test_timestep` | fixed-step integration converges at the scheme's order and matches CVODE |
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
@@ -185,6 +185,30 @@ parameters:
 |---|---|
 | `validation_test_baseline` | the model at the instance's parameters against its baseline data or scalar targets |
 | `validation_test_calibrate` | calibrates to `<instance>_obs_data.json` with libcuflynx, predicts the held-out data (the obs_data's `prediction_items` that carry a value), and writes the calibrated files |
+
+How the boundary-condition sweep treats impossible values and failures:
+- **Valid ranges.** A sweep value outside its parameter's valid range is not run; it is listed as
+  "skipped: outside the valid range". The valid range is `bc_sweep.bounds[param]` when given. Without
+  one, two generic rules apply: a dimensionless `<x>_init` whose state `x` an invariant keeps in
+  [0, 1] (the invariant has both `x >= 0` or `x >= -eps` and `x <= 1` or `x <= 1 + eps`, eps up to
+  1e-3) is a gate initial value and lies in [0, 1]; a concentration, amount, volume, conductance,
+  capacitance, resistance, time or temperature (by its units) with a non-negative value stays >= 0.
+  A point that breaks a `bc_sweep.constraints` relation (e.g. `B_Ca_init < B_Ca_total`) is skipped too.
+  The report's tested range and the joint risk analysis use the clipped range.
+- **Failure classes.** A failed run is rerun once with a tight reference: the reference tolerances
+  (`reference_solver_info`, default rtol 1e-10) with MaximumStep dt/10. If the reference fails too it
+  is a **parameter** failure (the model breaks there), and the test fails. If it passes it is a
+  **numerical** failure (the version's `solver_info` is inadequate there). An invariant violation's size
+  relative to `atol + rtol*|bound|` is recorded as a hint.
+- **Recommended settings.** For numerical failures the test searches CVODE settings: the configurations
+  the stability test found working plus a ladder of rtol 1e-6/1e-8/1e-10 by MaximumStep none/1e-4/1e-5,
+  keeping only those at least as strict as the version's and accurate at the nominal point. They are
+  ordered by measured run time, and a binary search finds the cheapest that passes the hard points (the
+  numerical failures, the nominal point and each parameter's extremes, up to 10) within the stability
+  test's `tol` of the reference. The winner is confirmed over every sweep point. Runs predicted over
+  20 s per state variable are not made. The test passes when there are no parameter failures and every
+  numerical failure passes with the recommended settings; the report shows the recommendation (settings,
+  mean run time, failures n/N), which you may adopt into the version's `solver_info`.
 
 Status rules (decided in the Lotka_Volterra review, 2026-10-01):
 - An instance without obs_data has calibration **not applicable** ("no calibration data in this
@@ -232,7 +256,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
 | `harness` | verification_config | the test network: `vessel_array` rows `[name, module_subtype, module_type, inp, out, instance]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours |
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
-| `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all` or `bcs`), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
+| `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all` or `bcs`), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped` |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget`, `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |

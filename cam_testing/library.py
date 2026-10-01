@@ -299,7 +299,7 @@ TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expec
 # readable order of the nested keys the checks know (others follow in their own order)
 NESTED_ORDER = {
     'harness': ('vessel_array', 'parameters'),
-    'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
+    'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'bounds', 'constraints', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
     'timestep': ('scheme', 'dts', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
                   'tol'),

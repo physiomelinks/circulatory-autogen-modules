@@ -7,13 +7,16 @@ results/instances/<instance>/<test>.json), with any figures in <version dir>/plo
 layer (tests/test_modules.py) turns a Result into pass / fail / skip; the report generator reads
 the JSON files, so the HTML shows exactly what the last test run found.
 """
+import ast
 import contextlib
 import datetime
 import io
 import json
 import math
 import os
+import re
 import tempfile
+import time
 import traceback
 from dataclasses import asdict, dataclass, field
 
@@ -184,15 +187,17 @@ class ComponentModel(object):
     def units(self):
         return {v[0]: v[1] for v in self.component.config['variables_and_units']}
 
-    def run(self, params=None):
-        '''Runs at nominal parameters plus ``params``; always restores the nominal values.'''
+    def run(self, params=None, helper=None):
+        '''Runs at nominal parameters plus ``params``; always restores the nominal values.
+        ``helper``: another simulation helper of this model (e.g. other solver settings).'''
         params = params or {}
+        helper = helper or self.helper
         try:
-            return harness.run(self.helper, self.outputs(), params={'parameters/' + k: v for k, v in params.items()})
+            return harness.run(helper, self.outputs(), params={'parameters/' + k: v for k, v in params.items()})
         finally:
             if params:
-                self.helper.set_param_vals(['parameters/' + k for k in params],
-                                           [self.nominal[k] for k in params])
+                helper.set_param_vals(['parameters/' + k for k in params],
+                                      [self.nominal[k] for k in params])
 
 
 SAFE_BUILTINS = {'abs': abs, 'max': max, 'min': min, 'len': len, 'float': float}
@@ -443,6 +448,374 @@ def sweep_values(param_name, nominal, sweep_spec):
     return [nominal * float(f) for f in sweep_spec.get('factors', [0.5, 1.0, 2.0])], None
 
 
+# Valid ranges. A sweep value outside its parameter's valid range is not run; it is reported as
+# skipped. The range is bc_sweep.bounds[param] when given, else a generic rule (below);
+# bc_sweep.constraints are relations between parameters (e.g. "B_Ca_init < B_Ca_total").
+
+# units of physically non-negative quantities: concentrations, amounts, volumes, conductances,
+# capacitances, resistances, times (time constants) and absolute temperature
+NON_NEGATIVE_UNITS = {
+    'millimolar', 'micromolar', 'nanomolar', 'molar', 'mol_per_m3', 'mole', 'fmol',
+    'm3', 'litre', 'microm3',
+    'microS', 'nanoS', 'milliS', 'siemens',
+    'picoF', 'nanoF', 'microF', 'farad',
+    'megaOhm', 'kiloOhm', 'ohm',
+    'second', 'millis',
+    'kelvin',
+}
+GATE_SLACK = 1e-3      # an invariant's "x >= -eps" / "x <= 1 + eps" counts as [0, 1] for eps up to this
+_NUM = r'\d+(?:\.\d*)?(?:[eE][-+]?\d+)?'
+_LOWER0 = re.compile(rf'\b([A-Za-z_]\w*)\s*>=?\s*(-?\s*{_NUM})(?![\w.])(?!\s*[-+*/(])')
+_UPPER1 = re.compile(rf'\b([A-Za-z_]\w*)\s*<=?\s*1(?:\.0*)?(?:\s*\+\s*({_NUM})(?![\w.]))?(?![\w.])(?!\s*[-+*/(])')
+
+
+def unit_interval_states(spec):
+    '''Variables the spec's invariants keep in [0, 1]: an invariant has both "x >= 0" (or >= -eps)
+    and "x <= 1" (or <= 1 + eps), with eps <= GATE_SLACK. Used for the gate heuristic.'''
+    lower, upper = set(), set()
+    for inv in spec.get('invariants') or []:
+        expr = inv['expr'] if isinstance(inv, dict) else inv
+        for name, val in _LOWER0.findall(expr):
+            if abs(float(val.replace(' ', ''))) <= GATE_SLACK:
+                lower.add(name)
+        for name, eps in _UPPER1.findall(expr):
+            if not eps or float(eps) <= GATE_SLACK:
+                upper.add(name)
+    return lower & upper
+
+
+def parameter_bounds(component):
+    '''
+    {variable: (lo, hi, why)}: the valid range of each parameter, for clipping the sweep.
+      1. bc_sweep.bounds {variable: [min, max]} (null for no limit) when given;
+      2. else a gate's initial value: a dimensionless "<x>_init" whose state x an invariant keeps
+         in [0, 1] (unit_interval_states) lies in [0, 1];
+      3. else a quantity in NON_NEGATIVE_UNITS with a non-negative value stays >= 0.
+    '''
+    spec = component.spec
+    gates = unit_interval_states(spec)
+    out = {}
+    for p in component.parameters():
+        name, units = p.variable_name, (p.units or '').strip()
+        try:
+            value = None if p.is_todo else p.float_value
+        except ValueError:
+            value = None
+        if units == 'dimensionless' and name.endswith('_init') and name[:-len('_init')] in gates:
+            out[name] = (0.0, 1.0, f'gate initial value: an invariant keeps {name[:-len("_init")]} in [0, 1]')
+        elif units in NON_NEGATIVE_UNITS and value is not None and value >= 0:
+            out[name] = (0.0, math.inf, f'non-negative quantity ({units})')
+    for name, (lo, hi) in ((spec.get('bc_sweep') or {}).get('bounds') or {}).items():
+        out[name] = (-math.inf if lo is None else float(lo), math.inf if hi is None else float(hi), 'bc_sweep.bounds')
+    return out
+
+
+def point_skip_reason(var, value, bounds, constraints, env):
+    '''Why a sweep point is not run (outside its valid range, or violating a constraint), or None.
+    ``env``: the point's parameter values by variable name, for the constraints.'''
+    if var in bounds:
+        lo, hi, why = bounds[var]
+        if not lo <= value <= hi:
+            return f'outside valid range [{lo:g}, {hi:g}] ({why})'
+    for expr in constraints:
+        names = {'np': np, '__builtins__': SAFE_BUILTINS}
+        names.update(env)
+        try:
+            ok = bool(np.all(eval(expr, names)))  # noqa: S307 - expressions come from the repo's own spec
+        except Exception as e:
+            raise ValueError(f'bc_sweep.constraints: could not evaluate {expr!r} ({type(e).__name__}: {e})')
+        if not ok:
+            return f'violates constraint {expr}'
+    return None
+
+
+def invariant_excess(spec, t, outputs, params, rtol, atol, only=None):
+    '''
+    For each invariant (in ``only``, when given), how far its comparisons miss: the largest
+    violation over its "a <= b" / "a >= b" sub-expressions, as {expr, excess, bound, relative}
+    with relative = excess / (atol + rtol*|bound|). A relative size of order 1-100 hints at solver
+    error; a much larger one at the model itself. Expressions without comparisons are left out.
+    '''
+    env = {'np': np, 't': t, '__builtins__': SAFE_BUILTINS}
+    env.update(INVARIANT_HELPERS)
+    env.update(params or {})
+    env.update(outputs)
+    env['param'] = dict(params or {})
+    out = []
+    for inv in spec.get('invariants') or []:
+        expr = inv['expr'] if isinstance(inv, dict) else inv
+        if only is not None and expr not in only:
+            continue
+        try:
+            tree = ast.parse(expr, mode='eval')
+        except SyntaxError:
+            continue
+        worst = None
+        for node in ast.walk(tree):
+            if not (isinstance(node, ast.Compare) and len(node.ops) == 1):
+                continue
+            op = node.ops[0]
+            if not isinstance(op, (ast.Lt, ast.LtE, ast.Gt, ast.GtE)):
+                continue
+            try:
+                with np.errstate(all='ignore'):
+                    a = np.asarray(eval(compile(ast.Expression(node.left), '<inv>', 'eval'), env), float)  # noqa: S307
+                    b = np.asarray(eval(compile(ast.Expression(node.comparators[0]), '<inv>', 'eval'), env), float)  # noqa: S307
+                    miss = (a - b) if isinstance(op, (ast.Lt, ast.LtE)) else (b - a)
+                    k = np.nanargmax(miss) if np.size(miss) and np.any(np.isfinite(miss)) else None
+            except Exception:
+                continue
+            if k is None:
+                continue
+            m = float(np.ravel(miss)[k])
+            if not m > 0:
+                continue
+            bound = float(np.max(np.abs(b))) if np.size(b) else 0.0
+            rel = m / (atol + rtol * bound)
+            if worst is None or rel > worst['relative']:
+                worst = {'excess': m, 'bound': bound, 'relative': rel}
+        if worst:
+            out.append(dict(expr=expr, **worst))
+    return out
+
+
+def cheapest_passing(n, passes):
+    '''
+    Binary search of a cost-ordered list of n candidates for the cheapest with passes(i) true,
+    assuming that once a candidate passes the more expensive (more accurate) ones do too.
+    Returns (index or None, {index: result} of the candidates evaluated).
+    '''
+    lo, hi, seen = 0, n, {}
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if mid not in seen:
+            seen[mid] = bool(passes(mid))
+        if seen[mid]:
+            hi = mid
+        else:
+            lo = mid + 1
+    return (lo if lo < n else None), seen
+
+
+PARAMETER_FAILURE, NUMERICAL_FAILURE = 'parameter', 'numerical'
+HARD_POINTS_CAP = 10           # points a candidate solver setting is evaluated on before the full confirmation
+HARD_FAILURES_CAP = 8          # of which at most this many are numerical failures (leaving room for nominal/extremes)
+
+
+def bc_reference_config(cm):
+    '''The tight reference a failed sweep point is rerun with: the stability test's reference
+    tolerances (reference_tolerances) and a MaximumStep of a tenth of the output interval dt.'''
+    step = float(cm.spec['dt']) / 10.0
+    given = (cm.spec.get('solver_info') or {}).get('MaximumStep')
+    if given:
+        step = min(step, float(given))
+    return dict({'solver': 'CVODE_myokit'}, **reference_tolerances(cm), MaximumStep=step)
+
+
+def solver_candidates(cm):
+    '''
+    CVODE settings to try where the version's own fail numerically: the CVODE configurations the
+    stability test found working (results/stability_test.json, if run), then a default ladder,
+    rtol 1e-6 / 1e-8 / 1e-10 (atol rtol/100, or the version's atol if smaller) x MaximumStep
+    none / 1e-4 / 1e-5. Duplicates removed; they are ordered by measured cost later.
+    '''
+    cands = []
+    r = load(cm.component, 'stability_test')
+    for row in ((r.metrics or {}).get('matrix') or []) if r is not None else []:
+        cfg = row.get('config') or {}
+        if row.get('works') and cfg.get('solver') == 'CVODE_myokit':
+            cands.append(dict(cfg))
+    atol_v = float((cm.spec.get('solver_info') or {}).get('atol', 1e-8))
+    for rtol in (1e-6, 1e-8, 1e-10):
+        for step in (None, 1e-4, 1e-5):
+            cfg = {'solver': 'CVODE_myokit', 'rtol': rtol, 'atol': min(rtol * 1e-2, atol_v)}
+            if step:
+                cfg['MaximumStep'] = step
+            cands.append(cfg)
+    out, seen = [], set()
+    for c in cands:
+        if config_label(c) not in seen:
+            seen.add(config_label(c))
+            out.append(c)
+    return out
+
+
+def _stricter(a, b):
+    '''Config a asks at least as much of CVODE as b (tighter or equal rtol and MaximumStep).'''
+    inf = math.inf
+    return (float(a.get('rtol', inf)) <= float(b.get('rtol', inf))
+            and float(a.get('atol', inf)) <= float(b.get('atol', inf))
+            and float(a.get('MaximumStep') or inf) <= float(b.get('MaximumStep') or inf))
+
+
+def classify_failures(failed, reference):
+    '''Classifies each failed point by one rerun at the reference settings (``reference(pname,
+    value)`` -> a _sweep_point result): "parameter" when the reference fails too (the model breaks
+    there), "numerical" when it passes (the version's solver settings are inadequate there).'''
+    for p in failed:
+        ref = reference(p['pname'], p['value'])
+        p['class'] = NUMERICAL_FAILURE if ref['ok'] else PARAMETER_FAILURE
+        if not ref['ok']:
+            p['reference_problems'] = ref['problems']
+    return failed
+
+
+def _cvode_helper(cm, cfg):
+    info = {k: v for k, v in cfg.items() if k != 'solver'}
+    return harness.simulation_helper(cm.model_path, cm.spec, solver_info=info, solver='CVODE_myokit')
+
+
+def _sweep_point(cm, helper, pname, value):
+    '''Runs one sweep point (pname None: the nominal point) with a helper (None: the version's
+    settings). Returns {ok, problems, t, out, bad, seconds}.'''
+    params = {} if pname is None else {pname: value}
+    start = time.perf_counter()
+    try:
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            t, out = cm.run(params, helper=helper)
+    except Exception as e:
+        return {'ok': False, 'problems': [f'simulation failed ({type(e).__name__}: {str(e)[:300]})'], 't': None,
+                'out': None, 'bad': [], 'seconds': time.perf_counter() - start}
+    seconds = time.perf_counter() - start
+    bad = _non_finite(out)
+    with np.errstate(all='ignore'):
+        inv = _check_invariants(cm.spec, t, out, cm.param_env(params))
+    problems = ([f'non-finite {", ".join(bad)}'] if bad else []) + inv
+    return {'ok': not problems, 'problems': problems, 't': t, 'out': out, 'bad': bad, 'seconds': seconds}
+
+
+def _accuracy(res, ref):
+    '''Max over outputs and time of |run - reference| / the reference's magnitude (as the stability test).'''
+    if res['out'] is None or ref['out'] is None:
+        return math.inf
+    keys = list(ref['out'])
+    R = np.column_stack([ref['out'][k] for k in keys])
+    scale = np.maximum(np.max(np.abs(R), axis=0), np.ptp(R, axis=0))
+    scale[scale == 0] = 1.0
+    with np.errstate(all='ignore'):
+        Y = np.column_stack([np.interp(ref['t'], res['t'], res['out'][k]) for k in keys])
+    if not np.all(np.isfinite(Y)):
+        return math.inf
+    return float(np.max(np.abs(Y - R) / scale))
+
+
+def _recommend_settings(cm, points, numerical, reference, tol, version_cfg):
+    '''
+    The cheapest CVODE setting that fixes the numerical failures: candidates (solver_candidates)
+    at least as strict as the version's settings (no looser rtol, atol or MaximumStep: a looser
+    setting that happens to pass is no fix) and accurate at the nominal point are ordered by
+    measured run time; a binary search finds the
+    cheapest that passes the hard points (the numerical failures, nominal, and each parameter's
+    extreme values) within ``tol`` of the reference; the winner is then confirmed over every sweep
+    point. Runs predicted over the stability budget (20 s per state) are not made.
+    Returns (recommended or None, [candidate rows], [notes]).
+    '''
+    n_states = max(cm.helper.model.count_states(), 1)
+    budget = float((cm.spec.get('stability') or {}).get('time_budget') or 20.0 * n_states)
+    usable = [p for p in points if p.get('class') != PARAMETER_FAILURE]
+    hard = []
+
+    def add(pname, value, cap=HARD_POINTS_CAP):
+        if (pname, value) not in hard and len(hard) < cap:
+            hard.append((pname, value))
+
+    for p in numerical:
+        add(p['pname'], p['value'], HARD_FAILURES_CAP)
+    add(None, None)
+    by_param = {}
+    for p in usable:
+        by_param.setdefault(p['pname'], []).append(p['value'])
+    for pname, values in by_param.items():
+        add(pname, min(values))
+        add(pname, max(values))
+
+    rows, notes, over = [], [], []
+    measured = []
+    ref_nominal = reference(None, None)
+    for cfg in solver_candidates(cm):
+        if not _stricter(cfg, version_cfg) or config_label(cfg) == config_label(version_cfg):
+            continue
+        row = {'config': cfg, 'label': config_label(cfg), 'seconds': None, 'passed_hard': None, 'note': ''}
+        rows.append(row)
+        if any(_stricter(cfg, o) for o in over):
+            row['note'] = f'not run: predicted over the {budget:.0f} s budget ({n_states} states x 20 s)'
+            continue
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                helper = _cvode_helper(cm, cfg)
+        except Exception as e:
+            row['note'] = f'{type(e).__name__}: {str(e)[:200]}'
+            continue
+        res = _sweep_point(cm, helper, None, None)
+        if res['seconds'] > budget:
+            over.append(cfg)
+            row['note'] = f'run took {res["seconds"]:.0f} s > {budget:.0f} s budget'
+            continue
+        res2 = _sweep_point(cm, helper, None, None) if res['ok'] else res     # second timing: less noise
+        row['seconds'] = min(res['seconds'], res2['seconds'])
+        acc = _accuracy(res, ref_nominal) if ref_nominal['ok'] else math.nan
+        if not res['ok'] or not acc <= tol:
+            row['note'] = 'fails at the nominal point' if not res['ok'] else f'inaccurate at the nominal point ({acc:.1e} > tol)'
+            continue
+        measured.append({'row': row, 'helper': helper, 'cfg': cfg})
+    # cost order; ties (equal times) go to the less strict setting first
+    strictness = lambda c: (-math.log10(float(c['cfg'].get('rtol', 1))), -math.log10(float(c['cfg'].get('MaximumStep') or 1e3)))
+    measured.sort(key=lambda c: (round(c['row']['seconds'], 3), strictness(c)))
+
+    def passes(i):
+        c = measured[i]
+        worst = 0.0
+        for k, (pname, value) in enumerate(hard):
+            res = _sweep_point(cm, c['helper'], pname, value)
+            if res['seconds'] > budget:
+                c['row']['note'] = f'run took {res["seconds"]:.0f} s > {budget:.0f} s budget'
+                c['row']['passed_hard'] = False
+                return False
+            ref = reference(pname, value)
+            acc = _accuracy(res, ref) if ref['ok'] else 0.0
+            if not res['ok'] or not acc <= tol:
+                c['row']['passed_hard'] = False
+                c['row']['note'] = (f'fails at hard point {k + 1}/{len(hard)}'
+                                    + ('' if res['ok'] else f' ({res["problems"][0][:120]})')
+                                    + ('' if not res['ok'] else f' (difference {acc:.1e} > tol)'))
+                return False
+            worst = max(worst, acc)
+        c['row']['passed_hard'] = True
+        c['row']['accuracy'] = worst
+        c['row']['note'] = f'passes all {len(hard)} hard points'
+        return True
+
+    start_at = 0
+    for _attempt in range(3):
+        idx, _seen = cheapest_passing(len(measured) - start_at, lambda i: passes(start_at + i))
+        if idx is None:
+            notes.append('no candidate setting passes the hard points')
+            return None, rows, notes
+        c = measured[start_at + idx]
+        fails, secs = [], []
+        for p in usable:
+            res = _sweep_point(cm, c['helper'], p['pname'], p['value'])
+            secs.append(res['seconds'])
+            if not res['ok']:
+                fails.append(p)
+        c['row']['confirmation'] = f'{len(fails)}/{len(usable)} failures'
+        if not fails:
+            return {'config': c['cfg'], 'label': c['row']['label'],
+                    'mean_seconds': float(np.mean(secs)) if secs else None,
+                    'n_failures': 0, 'n_runs': len(usable), 'failures': f'0/{len(usable)}',
+                    'accuracy': c['row'].get('accuracy'), 'tol': tol, 'n_hard_points': len(hard),
+                    'budget_seconds': budget}, rows, notes
+        notes.append(f'{c["row"]["label"]} passed the hard points but failed {len(fails)} of {len(usable)} '
+                     f'sweep points; those points were added to the hard points')
+        for p in fails:
+            add(p['pname'], p['value'], cap=len(hard) + len(fails))
+        start_at += idx + 1
+        if start_at >= len(measured):
+            break
+    notes.append('no candidate setting passes every sweep point')
+    return None, rows, notes
+
+
 def verification_test_BC(cm):
     if is_cpp(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_BC')
@@ -464,8 +837,15 @@ def verification_test_BC(cm):
             return Result('verification_test_BC', SKIPPED, 'component has no boundary conditions or constants to sweep')
         by_var = {p.variable_name: p for p in component.parameters()}
         plot_output = sweep_spec.get('plot_output') or cm.outputs()[0]
+        cm.helper           # generate once: a model that doesn't generate fails here, not at every point
 
-        sweeps, failures, notes, n_runs, failed_runs = {}, [], [], 0, 0
+        bounds = parameter_bounds(component)
+        constraints = list(sweep_spec.get('constraints') or [])
+        si = spec.get('solver_info') or {}
+        version_cfg = dict({'solver': spec.get('solver', 'CVODE_myokit')}, **si)
+        rtol, atol = float(si.get('rtol', 1e-6)), float(si.get('atol', 1e-8))
+
+        sweeps, points, skipped, notes = {}, [], [], []
         for var in names:
             # a component parameter, or (extra_parameters) one of its test network's, by full name
             pname = harness.parameter_name(by_var[var]) if var in by_var else var
@@ -478,39 +858,111 @@ def verification_test_BC(cm):
                 continue
             runs = []
             for value in values:
-                n_runs += 1
-                try:
-                    t, outputs = cm.run({pname: value})
-                except Exception as e:
-                    failed_runs += 1
-                    failures.append(f'{var}={value:.4g}: simulation failed ({type(e).__name__}: {e})')
-                    runs.append((value, None, None))
+                value = float(value)
+                why = point_skip_reason(var, value, bounds, constraints, cm.param_env({pname: value}))
+                if why:
+                    skipped.append({'parameter': var, 'value': value, 'reason': why})
                     continue
-                bad = _non_finite(outputs)
-                inv = _check_invariants(spec, t, outputs, cm.param_env({pname: value}))
-                if bad or inv:
-                    failed_runs += 1
-                if bad:
-                    failures.append(f'{var}={value:.4g}: non-finite {", ".join(bad)}')
-                failures += [f'{var}={value:.4g}: {m}' for m in inv]
-                runs.append((value, t, outputs[harness.output_key(plot_output)] if not bad else None))
-            sweeps[var] = runs
+                res = _sweep_point(cm, None, pname, value)
+                point = {'var': var, 'pname': pname, 'value': value, 'ok': res['ok'], 'problems': res['problems']}
+                if not res['ok'] and res['out'] is not None:
+                    failed_inv = {m.rsplit(': ', 1)[0] for m in res['problems']}
+                    point['violation'] = invariant_excess(spec, res['t'], res['out'], cm.param_env({pname: value}),
+                                                          rtol, atol, only=failed_inv)
+                points.append(point)
+                runs.append((value, res['t'], res['out'][harness.output_key(plot_output)]
+                             if res['out'] is not None and not res['bad'] else None))
+            if runs:
+                sweeps[var] = runs
+
+        # classify each failure with one run at the reference settings
+        ref_cfg = bc_reference_config(cm)
+        ref_cache, ref_helper = {}, []
+
+        def reference(pname, value):
+            if (pname, value) not in ref_cache:
+                if not ref_helper:
+                    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                        ref_helper.append(_cvode_helper(cm, ref_cfg))
+                ref_cache[(pname, value)] = _sweep_point(cm, ref_helper[0], pname, value)
+            return ref_cache[(pname, value)]
+
+        failed = classify_failures([p for p in points if not p['ok']], reference)
+        numerical = [p for p in failed if p['class'] == NUMERICAL_FAILURE]
+        parameter = [p for p in failed if p['class'] == PARAMETER_FAILURE]
+
+        recommended, candidates, search_notes = None, [], []
+        if numerical:
+            tol = float((spec.get('stability') or {}).get('tol', DEFAULT_STABILITY['tol']))
+            recommended, candidates, search_notes = _recommend_settings(cm, points, numerical, reference, tol,
+                                                                         version_cfg)
+        fixed = recommended is not None
 
         figs = []
         if sweeps:
             figs.append(plots.plot_sweep(plot_path(component, 'bc_sweep'), sweeps, plot_output, cm.units(),
                                          f'{component.label}: boundary-condition sweep'))
-        metrics = {'swept_kind': swept_kind, 'swept': list(sweeps), 'n_runs': n_runs, 'n_failures': len(failures),
-                   'sweep_values': {k: [r[0] for r in v] for k, v in sweeps.items()}}
-        if failures:
-            return Result('verification_test_BC', FAILED, f'{failed_runs} of {n_runs} runs failed',
-                          metrics, figs, failures + notes)
+
+        def fmt_point(p):
+            return f'{p["var"]}={p["value"]:.4g}'
+
+        failure_rows = []
+        for p in failed:
+            failure_rows.append({'parameter': p['var'], 'value': p['value'], 'class': p['class'],
+                                 'problems': p['problems'], 'violation': p.get('violation') or [],
+                                 'reference_problems': p.get('reference_problems') or [],
+                                 'fixed_by_recommended': bool(fixed and p['class'] == NUMERICAL_FAILURE)})
+        details = []
+        for p in failed:
+            hint = ''
+            if p.get('violation'):
+                v = max(p['violation'], key=lambda x: x['relative'])
+                hint = f' [violation {v["excess"]:.2g} = {v["relative"]:.2g} x (atol + rtol*|bound|)]'
+            tag = p['class'] + (', fixed by the recommended settings' if fixed and p['class'] == NUMERICAL_FAILURE else '')
+            details += [f'[{tag}] {fmt_point(p)}: {m}{hint if m.endswith("violated") else ""}' for m in p['problems']]
+        details += [f'[skipped] {s["parameter"]}={s["value"]:.4g}: {s["reason"]}' for s in skipped]
+        details += search_notes + notes
+
+        n_runs = len(points)
+        metrics = {'swept_kind': swept_kind, 'swept': list(sweeps), 'n_runs': n_runs, 'n_failures': len(failed),
+                   'sweep_values': {k: [r[0] for r in v] for k, v in sweeps.items()},
+                   'skipped_out_of_range': skipped,
+                   'bounds': {k: [None if math.isinf(lo) else lo, None if math.isinf(hi) else hi, why]
+                              for k, (lo, hi, why) in bounds.items() if k in names},
+                   'constraints': constraints,
+                   'failures': failure_rows,
+                   'n_parameter_failures': len(parameter), 'n_numerical_failures': len(numerical),
+                   'version_settings': config_label(version_cfg), 'reference_settings': config_label(ref_cfg),
+                   'recommended': recommended, 'candidates': candidates}
+
+        skip_note = (f'; {len(skipped)} point{"" if len(skipped) == 1 else "s"} skipped (outside the valid range)'
+                     if skipped else '')
         if not sweeps:
-            return Result('verification_test_BC', SKIPPED, 'no boundary condition could be swept', metrics,
-                          figs, notes)
-        return Result('verification_test_BC', PASSED,
-                      f'{n_runs} runs over {len(sweeps)} {swept_kind}: all finite, invariants hold',
-                      metrics, figs, notes)
+            return Result('verification_test_BC', SKIPPED, 'no boundary condition could be swept' + skip_note,
+                          metrics, figs, details)
+        if parameter or (numerical and not fixed):
+            parts = []
+            if parameter:
+                parts.append(f'{len(parameter)} parameter failure{"" if len(parameter) == 1 else "s"} '
+                             f'(the reference solver fails there too: the model breaks)')
+            if numerical:
+                parts.append(f'{len(numerical)} numerical failure{"" if len(numerical) == 1 else "s"} '
+                             f'(the reference solver passes there) '
+                             + (f'that the recommended settings {recommended["label"]} fix' if fixed
+                                else 'that no candidate solver setting fixes'))
+            return Result('verification_test_BC', FAILED, f'{len(failed)} of {n_runs} runs failed: ' + '; '.join(parts)
+                          + skip_note, metrics, figs, details)
+        msg = f'{n_runs} runs over {len(sweeps)} {swept_kind}: '
+        if numerical:
+            one = len(numerical) == 1
+            msg += (f'{len(numerical)} run{"" if one else "s"} failed at the version\'s solver settings '
+                    f'({config_label(version_cfg)}) but pass{"es" if one else ""} with the reference solver '
+                    f'(numerical failure{"" if one else "s"}), and every point passes with the recommended '
+                    f'settings {recommended["label"]}: a recommendation to adopt into the version\'s solver_info, '
+                    f'not yet applied')
+        else:
+            msg += 'all finite, invariants hold'
+        return Result('verification_test_BC', PASSED, msg + skip_note, metrics, figs, details)
     return _guard(cm.component, 'verification_test_BC', check)
 
 
