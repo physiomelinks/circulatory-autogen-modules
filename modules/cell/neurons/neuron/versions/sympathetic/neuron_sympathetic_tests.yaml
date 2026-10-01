@@ -1,9 +1,12 @@
 module_type: neuron
 version: sympathetic
 reviewed: false
-description: 'Sympathetic neuron (SN_simple): an SN_soma supermodule instance "soma", the SN_axon cable "axon" and an SN_varicosity
-  supermodule instance "varicosity", coupled soma -> axon -> varicosity through the plain axon module (the soma''s membrane
-  gives the axon V and takes its axial current; the axon sets the varicosity membrane''s potential). A model uses one instance,
-  e.g. {"name": "SN", "module_type": "sympathetic_neuron", "module_subtype": "supermodule"}; nested expansion names the parts
-  SN_soma_<part>, SN_axon and SN_varicosity_<part>. The soma and varicosity parameters are the soma / varicosity sympathetic
-  versions'' defaults; its default instance holds the axon''s and the globals (SN_simple''s values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history).'
+description: 'Sympathetic neuron (SN_simple) built from its parts: a soma (soma, version sympathetic), an axon cable (axon,
+  version sympathetic_monolithic_v01) and a varicosity (varicosity, version sympathetic), coupled soma -> axon -> varicosity.
+  The soma''s membrane gives the axon V and takes its axial current; the axon sets the varicosity membrane''s potential. The
+  soma and varicosity are themselves built from their parts, with the ion channels as submodules (cell/ion_channels, versions
+  Argus2026_v01). A model uses one record, e.g. {"name": "SN", "module_type": "neuron", "module_subtype": "sympathetic", "instance":
+  "default"}; the expanded parts are named SN_soma_<part>, SN_axon and SN_varicosity_<part>. The soma and varicosity parameters
+  are their own versions'' defaults; this version''s default instance holds the axon''s parameters and the globals (SN_simple''s
+  values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history).'
