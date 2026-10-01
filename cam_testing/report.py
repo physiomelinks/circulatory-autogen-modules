@@ -38,6 +38,7 @@ TEST_TITLES = {
     'stability_test': 'Stability: solvers & settings',
     'validation_test_baseline': 'Validation: baseline data',
     'validation_test_calibrate': 'Validation: calibrate & predict',
+    'version_calibration': 'Calibration (all instances)',
     'phlynx_export_test': 'PhLynx: build & export',
     'cuflynx_simulate_test': 'CUFLynx: import & simulate',
     'phlynx_equivalence_test': 'PhLynx → CUFLynx vs libcuflynx',
@@ -46,7 +47,7 @@ TEST_TITLES = {
 }
 TEST_SHORT = {
     'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
-    'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate',
+    'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
     'phlynx_export_test': 'PhLynx', 'cuflynx_simulate_test': 'CUFLynx', 'phlynx_equivalence_test': 'PhLynx≡',
     'supermodule_structure_test': 'Structure', 'supermodule_equivalence_test': 'Reproduces',
 }
@@ -70,8 +71,11 @@ TEST_ABOUT = {
                                 'experimental baseline data.',
     'validation_test_calibrate': 'Calibrates parameters to the instance\'s obs_data with libcuflynx parameter '
                                  'identification, then checks predictions against held-out data; writes the '
-                                 'instance\'s calibrated parameters. An instance without obs_data records this '
-                                 'as failed ("no calibration data in this instance").',
+                                 'instance\'s calibrated parameters. Not applicable to an instance without '
+                                 'obs_data ("no calibration data in this instance").',
+    'version_calibration': 'The version\'s calibration over its instances: failed when no instance has '
+                           'calibration data (obs_data), otherwise failed if any instance\'s calibration '
+                           'failed and passed when all of them pass. Each instance\'s result is in Instances.',
     'phlynx_export_test': 'Builds the version\'s test network in PhLynx (its own code, loaded with this '
                           'library\'s modules and parameters), checks every connection was made, and exports '
                           'the .omex PhLynx sends to CUFLynx.',
@@ -88,7 +92,7 @@ TEST_ABOUT = {
 }
 # The tests shown for every version: verification, then the PhLynx -> CUFLynx pipeline. The
 # validation tests are shown per instance.
-REPORT_TESTS = checks.VERSION_TESTS + phlynx.PIPELINE_TESTS
+REPORT_TESTS = checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS
 INSTANCE_TESTS = checks.INSTANCE_TESTS
 STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
                 'not_applicable': 'N/A', None: 'Not run'}
@@ -157,7 +161,7 @@ def instance_context(version, inst):
         if r is None and not version.is_supermodule:
             # not run (e.g. slow tests excluded): what a run would record without data
             if kind == 'calibrate' and not inst.has_obs_data:
-                r = checks.Result(test, checks.FAILED, checks.NO_CALIBRATION_DATA)
+                r = checks.Result(test, checks.NOT_APPLICABLE, checks.NO_CALIBRATION_DATA)
             elif not v:
                 r = checks.Result(test, checks.NOT_APPLICABLE,
                                   checks.NO_BASELINE_DATA if kind == 'baseline' else checks.NO_CALIBRATION_DATA)
@@ -219,7 +223,8 @@ def component_context(version):
                                      title=f'Supermodule: reproduces {e["reproduces"]} ({e["model"]})'))
     else:
         for test in REPORT_TESTS:
-            tests.append(_test_entry(version, test, checks.load(version, test)))
+            r = checks.version_calibration(version) if test == 'version_calibration' else checks.load(version, test)
+            tests.append(_test_entry(version, test, r))
     risk_result = risk.load(version) if not version.is_supermodule else None
     if risk_result is not None and not all(os.path.isfile(os.path.join(version.dir, p)) for p in risk_result.get('plots', [])):
         risk_result['plots'] = risk.make_plots(version, risk_result)   # e.g. on a fresh clone

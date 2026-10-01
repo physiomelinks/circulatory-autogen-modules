@@ -47,7 +47,7 @@ Nothing else is needed to regenerate them.
 
 ## Tests
 
-Each version (one config entry: `module_type`/`module_subtype`) is generated alone with libcuflynx at its default instance's parameters. Every boundary condition becomes a parameter. The version then goes through the verification tests; each instance goes through the validation tests, for whatever data it has (an instance without obs_data records calibration as failed, "no calibration data in this instance", xfail in pytest):
+Each version (one config entry: `module_type`/`module_subtype`) is generated alone with libcuflynx at its default instance's parameters. Every boundary condition becomes a parameter. The version then goes through the verification tests; each instance goes through the validation tests, for whatever data it has (calibration is not applicable to an instance without obs_data; the version's Calibration in the report overview fails when no instance has calibration data; see `modules/README.md`):
 
 | Test | What it checks |
 |---|---|

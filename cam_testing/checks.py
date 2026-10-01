@@ -34,6 +34,25 @@ INSTANCE_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
 TESTS = VERSION_TESTS + INSTANCE_TESTS
 NO_CALIBRATION_DATA = 'no calibration data in this instance'
 NO_BASELINE_DATA = 'no baseline data in this instance'
+NO_INSTANCE_CALIBRATION = 'no instance has calibration data'
+
+
+def version_calibration(version):
+    '''The version's calibration, from its instances: failed when no instance has calibration
+    data (obs_data); otherwise failed if any instance's calibration failed, passed if they ran and
+    passed, pending if not run yet.'''
+    with_data = [i for i in version.instances() if i.has_obs_data]
+    if not with_data:
+        return Result('version_calibration', FAILED, NO_INSTANCE_CALIBRATION)
+    results = {i.name: load(version, 'validation_test_calibrate', i) for i in with_data}
+    failed = [n for n, r in results.items() if r is not None and r.status == FAILED]
+    passed = [n for n, r in results.items() if r is not None and r.status == PASSED]
+    if failed:
+        return Result('version_calibration', FAILED, f'calibration failed: {", ".join(failed)}')
+    if passed and len(passed) == len(results):
+        return Result('version_calibration', PASSED, f'calibrated: {", ".join(passed)}')
+    missing = [n for n, r in results.items() if r is None or r.status not in (PASSED, FAILED)]
+    return Result('version_calibration', PENDING, f'calibration not run yet: {", ".join(missing)}')
 
 
 @dataclass
@@ -805,10 +824,11 @@ def _validation_status(cm, kind, test):
     inst = cm.instance
     v = inst.validation.get(kind) or {}
     if kind == 'calibrate' and not inst.has_obs_data:
-        # an instance without obs_data has nothing to calibrate to: recorded as a failure (the
-        # instance stays usable; pytest marks it xfail so CI isn't blocked)
+        # an instance without obs_data has nothing to calibrate to: not applicable for that
+        # instance. A version with no calibration data in any instance fails the version-level
+        # calibration (version_calibration, in the report's test overview).
         why = v.get('note') or v.get('reason')
-        return Result(test, FAILED, NO_CALIBRATION_DATA, details=[why] if why else []), v
+        return Result(test, NOT_APPLICABLE, NO_CALIBRATION_DATA, details=[why] if why else []), v
     if not v:
         return Result(test, NOT_APPLICABLE, NO_BASELINE_DATA if kind == 'baseline' else NO_CALIBRATION_DATA), v
     status = v.get('status', PENDING)
@@ -921,8 +941,8 @@ def _baseline_targets(cm, v):
 def validation_test_calibrate(cm):
     '''
     Calibrate to the instance's obs_data with libcuflynx parameter identification, then validate
-    on its held-out data; writes the instance's calibrated parameters. An instance without
-    obs_data is recorded as failed ("no calibration data in this instance").
+    on its held-out data; writes the instance's calibrated parameters. Not applicable to an
+    instance without obs_data ("no calibration data in this instance"); see version_calibration.
     '''
     def check():
         early, v = _validation_status(cm, 'calibrate', 'validation_test_calibrate')

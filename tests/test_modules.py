@@ -24,9 +24,6 @@ def _assert(result, version):
         return
     if result.status in (checks.SKIPPED, checks.PENDING, checks.NOT_APPLICABLE):
         pytest.skip(f'{result.status}: {result.message}')
-    if result.message == checks.NO_CALIBRATION_DATA:
-        # recorded as a failure in the results and the report; the instance stays usable
-        pytest.xfail(checks.NO_CALIBRATION_DATA)
     # A failure listed under expected_failures in the spec is a recorded known issue: it
     # stays 'failed' in the results and the report, but does not fail the run.
     known = (version.spec.get('expected_failures') or {}).get(result.test)

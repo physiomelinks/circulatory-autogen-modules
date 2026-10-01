@@ -186,9 +186,17 @@ parameters:
 | `validation_test_baseline` | the model at the instance's parameters against its baseline data or scalar targets |
 | `validation_test_calibrate` | calibrates to `<instance>_obs_data.json` with libcuflynx, predicts the held-out data (the obs_data's `prediction_items` that carry a value), and writes the calibrated files |
 
-An instance without obs_data records calibration as **failed**, with the message "no calibration data
-in this instance". It shows that way in the reports. pytest marks it xfail, so CI isn't blocked, and
-the instance stays usable in models.
+Status rules (decided in the Lotka_Volterra review, 2026-10-01):
+- An instance without obs_data has calibration **not applicable** ("no calibration data in this
+  instance"); likewise an instance without baseline data has the baseline not applicable. The instance
+  stays usable in models.
+- The version's **Calibration** column in the report's test overview fails when **no instance** has
+  calibration data, fails when any instance's calibration fails, and passes when they all pass.
+- A check blocked by an external release (e.g. the released CUFLynx is too old for a feature) is a
+  **failure with a known issue** (`expected_failures`), not not-applicable.
+- In the stability matrix a configuration that is too inaccurate at a step (e.g. explicit Euler at a
+  coarse dt) is shown as not working at that step; the test fails only if a declared-supported
+  configuration fails.
 
 The version's spec is described in the next section.
 
