@@ -39,13 +39,13 @@ tau_c_min,millis,0.2,SN_simple: changed_from_belluzi1991_curves,yes
 tau_c_max,millis,3.0,SN_simple: changed_from_belluzi1991_curves,yes
 tau_hc,millis,20.0,SN_simple: changed_from_belluzi1991_curves,yes
 tau_h_Kv4_2,millis,7.0,SN_simple: was_approx_7,yes
-tau_z_BK,millis,5,SN_simple: khaliq2003Contribution,yes
+tau_z_BK,millis,1,"Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02)",yes
 tau_m_SK,millis,5,SN_simple: gupta2016Computational,yes
 R_diffSensed,megaOhm,10,SN_simple: user_defined,no
 C_sensed,picoF,2,SN_simple: user_defined,no
 p_SK,dimensionless,4,SN_simple: gupta2016Computational,yes
 Cai_init,millimolar,1e-4,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
-Ca_mid_m_SK,millimolar,3e-4,SN_simple: gupta2016Computational,yes
+Ca_mid_m_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
 B_Ca_init,millimolar,7.95,SN_simple: user_defined,no
 B_Ca_total,millimolar,8,SN_simple: Matveev2002,yes
 k_bind_Ca,per_millimolar_s,0.1e6,SN_simple: Matveev2002_was_0.5e6,yes
@@ -70,8 +70,8 @@ Vol,m3,2000.0e-18,SN_simple: Wu2012Soma_Approx,yes
 Cao,millimolar,2,SN_simple: Tau2011,yes
 Ko,millimolar,4.5,SN_simple: BoronBoulpaep2017,yes
 Nao,millimolar,145,SN_simple: BoronBoulpaep2017,yes
-g_M,microS,0.00389,SN_simple: Davis2021ThesisCalculatedFromMaxCurrent,no
-g_M_mod,dimensionless,1.0,SN_simple: can_be_modified_for_retagabine,yes
+g_M,microS,0.00263,"Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV and E_K = -93.7 mV the same calculation gives 0.00263 uS",yes
+g_M_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
 g_leak_Na,microS,0.0003,SN_simple: to_be_identified,no
 g_leak_K,microS,0.0001,SN_simple: to_be_identified,no
 delta_gM,microS,0.000,SN_simple: to_be_identified,no

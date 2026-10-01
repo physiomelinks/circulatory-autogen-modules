@@ -186,12 +186,6 @@ reference_proposals:
     reference: 'Bekkers2000; via Channelpedia Kcnd2 model 40 (wikipage 16): hTau = 0.01 v + 6.7 ms, 5.7-7.2 ms over -100 to
       +50 mV; 7 ms approximates it'
     sourced: 'yes'
-  tau_z_BK:
-    reference: 'Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. The
-      model''s 5 ms DIFFERS from the cited source; keep 5 only if it is a deliberate modification (then record it as "modified
-      here to 5 ms (was 1)")'
-    sourced: 'yes'
-    value: 1
   tau_m_SK:
     reference: Hirschberg1998; SK activation time constant 4.9 ms for a Ca jump to 9.5 uM, mean 4.1 +- 0.6 ms (Discussion,
       Fig. 13A); activation is Ca dependent (about 50 ms at 0.5 uM), so a constant 5 ms is the high-Ca limit (CA reference
@@ -213,12 +207,6 @@ reference_proposals:
     reference: Wanaverbecq2003; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),
       Results, first section; 1e-4 mM = value. (Replaces the CA reference Hagiwara1981, which could not be opened)
     sourced: 'yes'
-  Ca_mid_m_SK:
-    reference: Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch),
-      Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). The model's 0.3 uM is below every published value; the CA
-      reference Gupta2016 (SK in bladder smooth muscle) could not be opened
-    sourced: 'yes'
-    value: 0.00063
   B_Ca_init:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); at equilibrium
       with Cai_init the free buffer would be B_tot Kd/(Kd + Cai) = 7.990 mM (Kd = 80 uM)
@@ -319,16 +307,6 @@ reference_proposals:
   Nao:
     reference: 'BoronBoulpaep2017; typical extracellular Na 145 mM [NOT VERIFIED: full text not accessible; value not seen
       in the source]'
-    sourced: 'no'
-  g_M:
-    reference: Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x
-      Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed
-      with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV
-      and E_K = -93.7 mV the same calculation gives 0.00263 uS
-    sourced: 'yes'
-    value: 0.00263
-  g_M_mod:
-    reference: definitional; scaling factor, 1 = unmodified (retigabine studies)
     sourced: 'no'
   g_leak_Na:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')

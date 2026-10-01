@@ -33,16 +33,6 @@ reference_proposals:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
       +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
     sourced: 'yes'
-  g_M:
-    reference: Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x
-      Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed
-      with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV
-      and E_K = -93.7 mV the same calculation gives 0.00263 uS
-    sourced: 'yes'
-    value: 0.00263
-  g_M_mod:
-    reference: definitional; scaling factor, 1 = unmodified (retigabine studies)
-    sourced: 'no'
   tau_w_min:
     reference: unreferenced_placeholder; minimum M-current time constant 30 ms; no source found. Martin2024 / Zhou2018 have
       no minimum term, and the CA reference gupta2016Computational (an SK channel model of bladder smooth muscle) is wrong

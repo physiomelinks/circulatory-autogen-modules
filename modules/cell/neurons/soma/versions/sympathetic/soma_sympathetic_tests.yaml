@@ -374,21 +374,9 @@ reference_proposals:
   h_BK_min_i_BK:
     reference: 'Khaliq2003; Table 1 and bkpkj.mod: BK h y0 = 0.085 (= value)'
     sourced: 'yes'
-  tau_z_BK_i_BK:
-    reference: 'Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. The
-      model''s 5 ms DIFFERS from the cited source; keep 5 only if it is a deliberate modification (then record it as "modified
-      here to 5 ms (was 1)")'
-    sourced: 'yes'
-    value: 1
   z_BK_coeff_i_BK:
     reference: 'Khaliq2003; Methods Eq. 13 and bkpkj.mod: z_coef = 0.001 mM (= value)'
     sourced: 'yes'
-  Ca_mid_m_SK_i_SK:
-    reference: Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch),
-      Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). The model's 0.3 uM is below every published value; the CA
-      reference Gupta2016 (SK in bladder smooth muscle) could not be opened
-    sourced: 'yes'
-    value: 0.00063
   Cai_init_i_SK:
     reference: Wanaverbecq2003; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),
       Results, first section; 1e-4 mM = value. (Replaces the CA reference Hagiwara1981, which could not be opened)
@@ -427,16 +415,6 @@ reference_proposals:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
       +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
     sourced: 'yes'
-  g_M_i_M:
-    reference: Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x
-      Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed
-      with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV
-      and E_K = -93.7 mV the same calculation gives 0.00263 uS
-    sourced: 'yes'
-    value: 0.00263
-  g_M_mod_i_M:
-    reference: definitional; scaling factor, 1 = unmodified (retigabine studies)
-    sourced: 'no'
   tau_w_min_i_M:
     reference: unreferenced_placeholder; minimum M-current time constant 30 ms; no source found. Martin2024 / Zhou2018 have
       no minimum term, and the CA reference gupta2016Computational (an SK channel model of bladder smooth muscle) is wrong

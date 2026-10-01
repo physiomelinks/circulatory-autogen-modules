@@ -11,12 +11,6 @@ reference_proposals:
   Ca_bulk:
     reference: definitional; resting bulk Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
     sourced: 'no'
-  Ca_mid_m_SK:
-    reference: Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch),
-      Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). The model's 0.3 uM is below every published value; the CA
-      reference Gupta2016 (SK in bladder smooth muscle) could not be opened
-    sourced: 'yes'
-    value: 0.00063
   Cai_init:
     reference: Wanaverbecq2003; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),
       Results, first section; 1e-4 mM = value. (Replaces the CA reference Hagiwara1981, which could not be opened)

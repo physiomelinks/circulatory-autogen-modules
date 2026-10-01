@@ -5,8 +5,8 @@ V,milliV,-70,definitional; clamp value when unconnected: the SN resting potentia
 V_den_w,milliV,10,SN_simple: Martin2023_was_10,yes
 V_mid_w,milliV,35,SN_simple: Martin2023_was_35,yes
 V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
-g_M,microS,0.00389,SN_simple: Davis2021ThesisCalculatedFromMaxCurrent,no
-g_M_mod,dimensionless,1.0,SN_simple: can_be_modified_for_retagabine,yes
+g_M,microS,0.00263,"Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV and E_K = -93.7 mV the same calculation gives 0.00263 uS",yes
+g_M_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
 tau_w_min,millis,30,SN_simple: gupta2016Computational,yes
 tau_w_num,millis,1200,SN_simple: Martin2023Modelling_was_400,yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
