@@ -3,18 +3,6 @@ version: vv
 reviewed: false
 notes: 'vv lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 0.018 s, slowest decay 0.1 s; run: fastest 0.018
   s, slowest decay 0.1 s).'
-expected_failures:
-  run_test: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond with any
-    variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
-  verification_test_invariants: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not
-    correspond with any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass
-    (see review.proposed_fixes)'
-  verification_test_BC: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond
-    with any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
-  verification_test_timestep: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond
-    with any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
-  stability_test: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond with
-    any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
 reference_proposals:
   q_0:
     reference: unreferenced_placeholder; unstressed volume 0.0001 m^3 (100 mL), order of magnitude for this vessel class

@@ -255,6 +255,16 @@
                             </apply>
                         </apply>
                     </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2</cn>
+                        <ci>K_tube_visco</ci>
+                        <apply>
+                            <minus/>
+                            <ci>v_in_sum</ci>
+                            <ci>v</ci>
+                        </apply>
+                    </apply>
                     <ci>u_ext</ci>
                 </apply>
             </apply>
@@ -287,6 +297,16 @@
                                 </apply>
                                 <ci>n_tube</ci>
                             </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2</cn>
+                        <ci>K_tube_visco</ci>
+                        <apply>
+                            <minus/>
+                            <ci>v</ci>
+                            <ci>v_out</ci>
                         </apply>
                     </apply>
                     <ci>u_ext</ci>

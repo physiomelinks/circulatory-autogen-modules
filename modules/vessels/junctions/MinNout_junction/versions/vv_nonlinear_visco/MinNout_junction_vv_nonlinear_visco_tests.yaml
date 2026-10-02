@@ -7,14 +7,6 @@ notes: 'vv vessel with a nonlinear tube law. Tested in a harness network (libcuf
   dn2 (arterial_simple pv); bcout2 (outlet_flow nn_constant). Jacobian timescales (nominal: fastest 2.9e-05 s, slowest decay
   0.011 s, shortest oscillation period 0.00023 s; run: fastest 0.00055 s, slowest decay 0.01 s, shortest oscillation period
   0.0035 s).'
-expected_failures:
-  verification_test_invariants: 'the stated viscoelastic law is not implemented: vv_Min/Nout/MinNout_nonlinear_visco_type
-    declare K_tube_visco but their pressure equations omit the 2 K_visco (inflow - v) / (v - outflow) terms that the other
-    *_nonlinear_visco types have, so u = u_0 + K((q_p/q0_2)^m - (q_p/q0_2)^n) + u_ext exactly and the visco invariant fails
-    (see review.proposed_fixes)'
-  verification_test_BC: 'the stated viscoelastic law is not implemented: vv_Min/Nout/MinNout_nonlinear_visco_type declare
-    K_tube_visco but their pressure equations omit the 2 K_visco (inflow - v) / (v - outflow) terms that the other *_nonlinear_visco
-    types have, so u = u_0 + K((q_p/q0_2)^m - (q_p/q0_2)^n) + u_ext exactly and the visco invariant fails (see review.proposed_fixes)'
 reference_proposals:
   v_in_sum:
     reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.000142884
