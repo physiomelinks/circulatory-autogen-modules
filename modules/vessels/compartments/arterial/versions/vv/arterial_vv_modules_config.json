@@ -14,6 +14,10 @@
         "variables": [
           "v_in",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -29,6 +33,10 @@
         "variables": [
           "v_out",
           "u_d"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -41,6 +49,18 @@
         "port_type": "volume_port",
         "variables": [
           "q"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "pressure_feedback_port",
+        "variables": [
+          "u_d"
         ]
       }
     ],

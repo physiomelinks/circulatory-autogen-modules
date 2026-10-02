@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<model name="split_junction_vv_novisco" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
-    <component name="vv_split_novisco_type">
+<model name="arterial_vv_novisco" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="vv_novisco_type">
         <variable name="t" public_interface="in" units="second"/>
         <!-- Constitutive parameters-->
         <variable name="mu" public_interface="in" units="Js_per_m3"/>
@@ -31,8 +31,7 @@
         <variable initial_value="0.0" name="q_C" public_interface="out" units="m3"/>
         <variable name="u_C_d" public_interface="out" units="J_per_m3"/>
         <variable initial_value="0.0" name="q_C_d" public_interface="out" units="m3"/>
-        <variable name="v_out_1" public_interface="in" units="m3_per_s"/>
-        <variable name="v_out_2" public_interface="in" units="m3_per_s"/>
+        <variable name="v_out" public_interface="in" units="m3_per_s"/>
         <variable name="q_0" public_interface="out" units="m3"/>
         <variable name="q" public_interface="out" units="m3"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -259,14 +258,10 @@
                     <ci>q_C_d</ci>
                 </apply>
                 <apply>
-                    <minus/>
-                    <apply>
                         <minus/>
                         <ci>v</ci>
-                        <ci>v_out_1</ci>
+                        <ci>v_out</ci>
                     </apply>
-                    <ci>v_out_2</ci>
-                </apply>
             </apply>
             <apply>
                 <eq/>

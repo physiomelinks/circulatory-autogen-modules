@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<model name="Min_junction_usV_C_ctl_vp_simple" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
-    <component name="vp_Min_usV_C_ctl_type">
+<model name="arterial_simple_vp_usV_C_ctl" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="vp_usV_C_ctl_type">
         <variable name="t" public_interface="in" units="second"/>
         <variable name="q_us_wCont" public_interface="out" units="m3"/>
         <variable name="Delta_q_us" public_interface="in" units="dimensionless"/>
@@ -31,7 +31,7 @@
         <variable initial_value="0.0" name="q_C" public_interface="out" units="m3"/>
         <variable name="q" public_interface="out" units="m3"/>
         <variable name="u_ext" public_interface="in" units="J_per_m3"/>
-        <variable name="v_in_sum" public_interface="in" units="m3_per_s"/>
+        <variable name="v_in" public_interface="in" units="m3_per_s"/>
         <variable name="u_out" public_interface="in" units="J_per_m3"/>
         <!-- Constitutive Relations-->
         <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -83,7 +83,7 @@
                 </apply>
                 <apply>
                     <minus/>
-                    <ci>v_in_sum</ci>
+                    <ci>v_in</ci>
                     <ci>v</ci>
                 </apply>
             </apply>
@@ -109,7 +109,7 @@
                         <ci>R_v</ci>
                         <apply>
                             <minus/>
-                            <ci>v_in_sum</ci>
+                            <ci>v_in</ci>
                             <ci>v</ci>
                         </apply>
                     </apply>

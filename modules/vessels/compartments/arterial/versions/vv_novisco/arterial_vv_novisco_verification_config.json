@@ -1,5 +1,5 @@
 {
-  "module_type": "split_junction",
+  "module_type": "arterial",
   "version": "vv_novisco",
   "sim_time": 0.5,
   "pre_time": 0.0,
@@ -8,7 +8,7 @@
   "solver_info": {"rtol": 1e-07, "atol": 1e-14},
   "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
   "outputs": ["u", "v", "q", "u_d", "q_C", "q_C_d", "R", "C", "I"],
-  "run_parameters": {"v_out_1": 4.47008e-05, "v_out_2": 4.47008e-05},
+  "run_parameters": {"v_out": 8.94016e-05},
   "invariants": [
     {
       "description": "R = 8 mu l/(pi r0^4), C = 2 pi r0^3 l/(E h), I = rho l/(pi r0^2), h = r0 (a e^{b r0} + c e^{d r0})",
@@ -23,12 +23,12 @@
       "expr": "np.max(np.abs((np.concatenate((u, u_d))) - (np.concatenate((u_0 + q_C/((2*np.pi*r_0**3*l/(E*r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0))))/2) + u_ext, u_0 + q_C_d/((2*np.pi*r_0**3*l/(E*r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0))))/2) + u_ext))))) <= 1e-08*(np.max(np.abs(np.concatenate((u, u_d)))) + np.max(np.abs(np.concatenate((u_0 + q_C/((2*np.pi*r_0**3*l/(E*r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0))))/2) + u_ext, u_0 + q_C_d/((2*np.pi*r_0**3*l/(E*r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0))))/2) + u_ext))))) + 1e-30"
     },
     {
-      "description": "exact volume balance with both flows imposed: q(t) = q(0) + ((v_in) - (v_out_1 + v_out_2)) t",
-      "expr": "np.max(np.abs((q) - (q)[0] - ((v_in) - (v_out_1 + v_out_2))*t)) <= 1e-6*(np.max(np.abs(q)) + abs((v_in) - (v_out_1 + v_out_2))*t[-1]) + 1e-18"
+      "description": "exact volume balance with both flows imposed: q(t) = q(0) + ((v_in) - (v_out)) t",
+      "expr": "np.max(np.abs((q) - (q)[0] - ((v_in) - (v_out))*t)) <= 1e-6*(np.max(np.abs(q)) + abs((v_in) - (v_out))*t[-1]) + 1e-18"
     },
     {
-      "description": "steady state at t_end: v = (v_in + v_out_1 + v_out_2)/2 (the two half compliances fill at the same rate)",
-      "expr": "abs((v)[-1] - ((v_in + v_out_1 + v_out_2)/2)) <= 0.001*(abs(v_in) + abs(v_out_1 + v_out_2) + 1e-12 + np.max(np.abs(v))) + 1e-18"
+      "description": "steady state at t_end: v = (v_in + v_out)/2 (the two half compliances fill at the same rate)",
+      "expr": "abs((v)[-1] - ((v_in + v_out)/2)) <= 0.001*(abs(v_in) + abs(v_out) + 1e-12 + np.max(np.abs(v))) + 1e-18"
     }
   ],
   "bc_sweep": {
@@ -36,8 +36,7 @@
     "ranges": {
       "theta": [0.0, 90.0],
       "u_ext": [-500.0, 1000.0],
-      "v_out_1": [0.0, 0.000111752],
-      "v_out_2": [0.0, 0.000111752],
+      "v_out": [0.0, 0.000223504],
       "v_in": [0.0, 0.000223504],
       "beta_g": [0.0, 1.0],
       "g": [1.0, 9.81],

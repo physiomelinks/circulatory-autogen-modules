@@ -1,4 +1,4 @@
-module_type: split_junction
+module_type: arterial
 version: vv_novisco
 reviewed: false
 notes: 'vv linear R-C-I vessel with coefficients from geometry (Poiseuille R, thin-wall C, inertance I). Jacobian timescales
@@ -30,12 +30,7 @@ reference_proposals:
     reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
     sourced: definitional
     value: 0.0
-  v_out_1:
-    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 5.5876e-05
-      m^3/s (mean velocity x lumen area), half of the total for a two-branch port
-    sourced: 'no'
-    value: 5.5876e-05
-  v_out_2:
+  v_out:
     reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 5.5876e-05
       m^3/s (mean velocity x lumen area), half of the total for a two-branch port
     sourced: 'no'

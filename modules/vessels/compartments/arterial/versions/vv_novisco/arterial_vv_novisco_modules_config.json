@@ -1,10 +1,10 @@
 [
   {
-    "module_type": "split_junction",
+    "module_type": "arterial",
     "module_subtype": "vv_novisco",
     "module_format": "cellml",
-    "component_file": "split_junction_vv_novisco_modules.cellml",
-    "component_type": "vv_split_novisco_type",
+    "component_file": "arterial_vv_novisco_modules.cellml",
+    "component_type": "vv_novisco_type",
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
@@ -14,6 +14,10 @@
         "variables": [
           "v_in",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -27,15 +31,12 @@
       {
         "port_type": "vessel_port",
         "variables": [
-          "v_out_1",
+          "v_out",
           "u_d"
-        ]
-      },
-      {
-        "port_type": "vessel_port",
-        "variables": [
-          "v_out_2",
-          "u_d"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -186,13 +187,7 @@
         "global_constant"
       ],
       [
-        "v_out_1",
-        "m3_per_s",
-        "access",
-        "boundary_condition"
-      ],
-      [
-        "v_out_2",
+        "v_out",
         "m3_per_s",
         "access",
         "boundary_condition"

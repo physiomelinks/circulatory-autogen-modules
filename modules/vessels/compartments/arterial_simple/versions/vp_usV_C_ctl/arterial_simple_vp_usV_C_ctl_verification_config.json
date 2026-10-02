@@ -1,6 +1,6 @@
 {
-  "module_type": "Min_junction_usV_C_ctl",
-  "version": "vp_simple",
+  "module_type": "arterial_simple",
+  "version": "vp_usV_C_ctl",
   "sim_time": 20.0,
   "pre_time": 0.0,
   "dt": 0.0002,
@@ -11,7 +11,7 @@
   "run_parameters": {},
   "harness": {
     "vessel_array": [
-      ["mod", "vp_simple", "Min_junction_usV_C_ctl", "up1 up2", "bcout", "default"],
+      ["mod", "vp_usV_C_ctl", "arterial_simple", "up1 up2", "bcout", "default"],
       ["bcin1", "nn_constant", "inlet_flow", "", "up1", "default"],
       ["up1", "vp", "arterial_simple", "bcin1", "mod", "default"],
       ["bcin2", "nn_constant", "inlet_flow", "", "up2", "default"],
@@ -122,7 +122,7 @@
       "Delta_q_us": [-0.5, 0.5],
       "Delta_C": [-0.5, 0.5]
     },
-    "exclude": ["v_in_sum", "u_out"],
+    "exclude": ["v_in", "u_out"],
     "rationale": "Boundary conditions span physiological operating values for the vessel class (arterial inlet 60-150 mmHg, venous 0-15 mmHg, flows 0-2x the nominal flow; +-0.5% for the nonlinear vv types, whose volume drifts by (v_in - v_out) t and collapses the tube if the imbalance is larger); constants are swept 0.5-2x their value; rho and mu are swept 0.5-2x their library (test_fft fixture) value of 1; beta_g 0-1; g 1-9.81; the wall-thickness constants a-d between the fixture value 1 and the proposed Blanco 2015 values. The physiological rho/mu (1050, 0.004) cannot yet be combined with the others at the run point (framework issue), so the swept regime is the library one. Excluded: tube-law exponents (they define the law), switches (R_flag, blood_ctl_dir)."
   },
   "timestep": {

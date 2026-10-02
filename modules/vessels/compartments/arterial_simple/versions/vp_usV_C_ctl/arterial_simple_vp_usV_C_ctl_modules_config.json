@@ -1,10 +1,10 @@
 [
   {
-    "module_type": "Min_junction_usV_C_ctl",
-    "module_subtype": "vp_simple",
+    "module_type": "arterial_simple",
+    "module_subtype": "vp_usV_C_ctl",
     "module_format": "cellml",
-    "component_file": "Min_junction_usV_C_ctl_vp_simple_modules.cellml",
-    "component_type": "vp_Min_usV_C_ctl_type",
+    "component_file": "arterial_simple_vp_usV_C_ctl_modules.cellml",
+    "component_type": "vp_usV_C_ctl_type",
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
@@ -12,10 +12,13 @@
       {
         "port_type": "vessel_port",
         "variables": [
-          "v_in_sum",
+          "v_in",
           "u"
         ],
-        "multi_port": "True"
+        "multi_port": [
+          "sum",
+          "True"
+        ]
       },
       {
         "port_type": "venous_us_volume_delta_port",
@@ -60,7 +63,7 @@
         "variable"
       ],
       [
-        "v_in_sum",
+        "v_in",
         "m3_per_s",
         "access",
         "boundary_condition"
