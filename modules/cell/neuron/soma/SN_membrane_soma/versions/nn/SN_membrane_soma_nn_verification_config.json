@@ -7,11 +7,11 @@
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
   "outputs": ["V", "V_sensed", "I_in_delayed"],
-  "run_parameters": {"I_in": -0.05},
+  "run_parameters": {"I_in": 0.05},
   "invariants": [
     {
-      "description": "charge balance with no channels or axon connected: Cm (V - V0) + C_sensed (V_sensed - V_sensed0) = -1e6 I_in t (pF mV = 1e-15 C, nA s = 1e-9 C)",
-      "expr": "np.max(np.abs(Cm*(V - V[0]) + C_sensed*(V_sensed - V_sensed[0]) + 1e6*I_in*t)) <= 1e-6*max(1e-12, np.max(np.abs(1e6*I_in*t)))"
+      "description": "charge balance with no channels or axon connected: Cm (V - V0) + C_sensed (V_sensed - V_sensed0) = +1e6 I_in t (pF mV = 1e-15 C, nA s = 1e-9 C)",
+      "expr": "np.max(np.abs(Cm*(V - V[0]) + C_sensed*(V_sensed - V_sensed[0]) - 1e6*I_in*t)) <= 1e-6*max(1e-12, np.max(np.abs(1e6*I_in*t)))"
     }
   ],
   "bc_sweep": {

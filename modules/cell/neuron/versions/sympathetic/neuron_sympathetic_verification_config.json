@@ -6,10 +6,10 @@
   "dt": 2e-05,
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
-  "run_parameters": {"I_in_soma_membrane": -0.05},
+  "run_parameters": {"I_in_soma_membrane": 0.05},
   "bc_sweep": {
     "ranges": {
-      "I_in_soma_membrane": {"min": -0.2, "max": 0.05, "points": 6}
+      "I_in_soma_membrane": {"min": -0.05, "max": 0.2, "points": 6}
     },
     "rationale": "Supermodule default: the globals (R, F, T; factors 0.5-2) and the boundary conditions no internal connection closes: the soma's injected current I_in_soma_membrane -0.2 to +0.05 nA (as soma sympathetic_monolithic_v01) and the varicosity NaCa exchanger's Nai_varicosity_i_NaCa (factors 0.5-2). Each submodule's own parameters are swept in that submodule version's tests."
   },

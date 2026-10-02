@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
-C_sensed,picoF,2,SN_simple: user_defined,no
-Cm,picoF,30,SN_simple: Davis2021Transcriptomic,yes
-I_in,nanoA,0.0,SN_simple: user_defined,no
-I_out,nanoA,0.0,definitional; no axial current when unconnected,no
-R_diffSensed,megaOhm,10,SN_simple: user_defined,no
-V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+C_sensed,picoF,2,"unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter capacitance of the sensed-voltage (electrode) stage, not a physiological quantity",no
+Cm,picoF,30,"Hong2021; whole-cell capacitance of rat stellate ganglion neurons 33.4 +- 3.0 pF (sham) and 36.3 +- 3.0 pF (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF. The CA token Davis2021Transcriptomic could not be identified",yes
+I_in,nanoA,0.0,definitional; injected current (positive depolarises); 0 = no stimulus,no
+I_out,nanoA,0.0,"definitional; axial current to the axon, supplied in a network; 0 for the isolated soma",no
+R_diffSensed,megaOhm,10,"unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter resistance of the sensed-voltage (electrode) stage, not a physiological quantity",no
+V_rest_approx,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes

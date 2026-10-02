@@ -12,26 +12,6 @@ expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
 reference_proposals:
-  C_sensed_membrane:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter capacitance
-      of the sensed-voltage (electrode) stage, not a physiological quantity
-    sourced: 'no'
-  Cm_membrane:
-    reference: Hong2021; whole-cell capacitance of rat stellate ganglion neurons 33.4 +- 3.0 pF (sham) and 36.3 +- 3.0 pF
-      (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF. The CA token Davis2021Transcriptomic could
-      not be identified
-    sourced: 'yes'
-  I_in_membrane:
-    reference: definitional; injected current; 0 = no stimulus
-    sourced: 'no'
-  R_diffSensed_membrane:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter resistance
-      of the sensed-voltage (electrode) stage, not a physiological quantity
-    sourced: 'no'
-  V_rest_approx_membrane:
-    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
-    sourced: 'yes'
   Ki_init_Na_K:
     reference: 'BoronBoulpaep2017; typical mammalian intracellular K 150 mM [NOT VERIFIED: full text not accessible; value
       not seen in the source]'

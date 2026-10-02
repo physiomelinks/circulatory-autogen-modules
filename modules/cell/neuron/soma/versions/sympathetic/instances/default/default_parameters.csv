@@ -2,11 +2,11 @@ variable_name,units,value,data_reference,sourced
 R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
 T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
-C_sensed_membrane,picoF,2,user_defined,no
-Cm_membrane,picoF,30,Davis2021Transcriptomic,yes
-I_in_membrane,nanoA,0.00,user_defined,no
-R_diffSensed_membrane,megaOhm,10,user_defined,no
-V_rest_approx_membrane,milliV,-70,Davis2021Thesis_from_traces,yes
+C_sensed_membrane,picoF,2,"unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter capacitance of the sensed-voltage (electrode) stage, not a physiological quantity",no
+Cm_membrane,picoF,30,"Hong2021; whole-cell capacitance of rat stellate ganglion neurons 33.4 +- 3.0 pF (sham) and 36.3 +- 3.0 pF (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF. The CA token Davis2021Transcriptomic could not be identified",yes
+I_in_membrane,nanoA,0.00,definitional; injected current (positive depolarises); 0 = no stimulus,no
+R_diffSensed_membrane,megaOhm,10,"unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter resistance of the sensed-voltage (electrode) stage, not a physiological quantity",no
+V_rest_approx_membrane,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
 Ki_init_Na_K,millimolar,150,BoronBoulpaep2017,yes
 Ko_Na_K,millimolar,4.5,BoronBoulpaep2017,yes
 Nai_init_Na_K,millimolar,13,BoronBoulpaep2017_was_15,yes
@@ -86,7 +86,7 @@ V_mid_h_BK_i_BK,milliV,26,khaliq2003Contribution_was_32,yes
 V_rest_approx_i_BK,milliV,-70,Davis2021Thesis_from_traces,yes
 g_KCa_BK_i_BK,microS,0.2,was70microS_per_cm2_inKhaliq2003,yes
 h_BK_min_i_BK,dimensionless,0.085,Khaliq2003Contribution,yes
-tau_z_BK_i_BK,millis,1,"Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02)",yes
+tau_z_BK_i_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 z_BK_coeff_i_BK,millimolar,0.001,Khaliq2003Contribution,yes
 Ca_mid_m_SK_i_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
 Cai_init_i_SK,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes

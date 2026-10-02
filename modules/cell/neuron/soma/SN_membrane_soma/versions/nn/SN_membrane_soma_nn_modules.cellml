@@ -26,16 +26,7 @@
                     <divide/>
                     <apply>
                         <times/>
-                        <apply>
-                            <minus/>
-                            <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
-                        </apply>
-                        <apply>
-                            <plus/>
-                            <ci>i_ion</ci>
-                            <ci>I_in_delayed</ci>
-                            <ci>I_out</ci>
-                        </apply>
+                        <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn><apply><minus/><ci>I_in_delayed</ci><apply><plus/><ci>i_ion</ci><ci>I_out</ci></apply></apply>
                     </apply>
                     <ci>Cm</ci>
                 </apply>
@@ -53,10 +44,7 @@
                     <divide/>
                     <apply>
                         <times/>
-                        <apply>
-                            <minus/>
-                            <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
-                        </apply>
+                        <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
                         <apply>
                             <minus/>
                             <ci>I_in</ci>
@@ -72,13 +60,10 @@
                 <apply>
                     <divide/>
                     <apply>
-                        <minus/>
-                        <apply>
                             <minus/>
                             <ci>V_sensed</ci>
                             <ci>V</ci>
                         </apply>
-                    </apply>
                     <ci>R_diffSensed</ci>
                 </apply>
             </apply>

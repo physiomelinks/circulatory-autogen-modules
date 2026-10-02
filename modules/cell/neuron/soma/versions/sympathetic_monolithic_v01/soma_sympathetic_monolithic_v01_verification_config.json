@@ -46,11 +46,11 @@
     "c_RyR",
     "hc_RyR"
   ],
-  "run_parameters": {"I_in": -0.05},
+  "run_parameters": {"I_in": 0.05},
   "invariants": [
     {
       "description": "charge conservation: the change of membrane charge Cm (V - V0) equals the change of ionic charge F [Vol (dNai + dKi) + 2 dN_Ca] plus the charge carried by the currents that change no tracked ion pool (I_in_delayed and I_out)",
-      "expr": "np.max(np.abs((Cm*1e-15*(V - V[0]) - F*(Vol*((Nai + Ki) - (Nai[0] + Ki[0])) + 2*((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]))) - (-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_in_delayed + I_out)[1:]+(I_in_delayed + I_out)[:-1])*np.diff(t))))))) <= 1e-3*(np.max(np.abs(Cm*1e-15*(V - V[0]))) + np.max(np.abs((-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_in_delayed + I_out)[1:]+(I_in_delayed + I_out)[:-1])*np.diff(t)))))))) + 1e-20"
+      "expr": "np.max(np.abs((Cm*1e-15*(V - V[0]) - F*(Vol*((Nai + Ki) - (Nai[0] + Ki[0])) + 2*((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]))) - (-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t))))))) <= 1e-3*(np.max(np.abs(Cm*1e-15*(V - V[0]))) + np.max(np.abs((-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t)))))))) + 1e-20"
     },
     {
       "description": "total Ca (free + buffered, all four compartments) changes only by the plasma-membrane fluxes: N_Ca(t) - N_Ca(0) = integral of (j_Ca_L + j_NaCa_Ca) dt (trapezoid on the output grid)",
@@ -76,7 +76,7 @@
   "bc_sweep": {
     "factors": [0.5, 1.0, 2.0],
     "ranges": {
-      "I_in": {"min": -0.2, "max": 0.05, "points": 6},
+      "I_in": {"min": -0.05, "max": 0.2, "points": 6},
       "I_out": {"min": -0.05, "max": 0.05, "points": 3},
       "Delta_V_mid_w": {"min": -10.0, "max": 10.0, "points": 3},
       "k_thresh_m": {"min": -5, "max": 5, "points": 3},
@@ -87,7 +87,7 @@
       "B_Ca_total": {"min": 8.0, "max": 16.0, "points": 3},
       "h_IP3_init": {"min": 0.0, "max": 1.0, "points": 3}
     },
-    "rationale": "injected current I_in from -0.2 nA (strong depolarising drive; the soma model uses I_in > 0 as outward) to +0.05 nA, axial current I_out +/-0.05 nA; zero-valued switches (Delta_V_mid_w, k_thresh_*, delta_gM, k_IP3) over their plausible ranges; all other constants by factors 0.5-2 of their values, except that the free-buffer initial value must not exceed B_Ca_total (B_Ca_init 4-7.95 mM, B_Ca_total 8-16 mM) and h_IP3_init spans [0, 1]."
+    "rationale": "injected current I_in from +0.2 nA (strong depolarising drive; the soma model uses I_in > 0 as outward) to +0.05 nA, axial current I_out +/-0.05 nA; zero-valued switches (Delta_V_mid_w, k_thresh_*, delta_gM, k_IP3) over their plausible ranges; all other constants by factors 0.5-2 of their values, except that the free-buffer initial value must not exceed B_Ca_total (B_Ca_init 4-7.95 mM, B_Ca_total 8-16 mM) and h_IP3_init spans [0, 1]."
   },
   "timestep": {
     "scheme": "rk4",

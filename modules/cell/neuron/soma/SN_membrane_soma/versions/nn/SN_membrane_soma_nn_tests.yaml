@@ -1,37 +1,17 @@
 module_type: SN_membrane_soma
 version: nn
-reviewed: false
+reviewed: true
+description: 'Sympathetic-neuron soma membrane with a recording-electrode stage. dV/dt = (I_in_delayed - i_ion - I_out)/Cm:
+  i_ion is the summed channel current (membrane_current port, a multi_port sum), I_out the axial current to the axon. The
+  electrode: the injected current I_in charges the electrode capacitance C_sensed (V_sensed, the potential the electrode records)
+  and reaches the membrane through R_diffSensed as I_in_delayed = (V_sensed - V)/R_diffSensed (tau = R_diffSensed C_sensed
+  = 20 us). Positive I_in is a depolarising (inward) injected current.'
 notes: 'Membrane of the SN soma: Cm dV/dt = -(i_ion + I_in_delayed + I_out), i_ion the sum of the currents of the channels
   connected through membrane_current. The injected current I_in reaches the membrane through a sensing/electrode filter (V_sensed,
   C_sensed, R_diffSensed) as I_in_delayed; I_out is the axial current into the axon (VI_port). Copied verbatim from SN_soma
   except that the channel currents are one summed port variable. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
   by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
   reproduce SN_simple.'
-reference_proposals:
-  C_sensed:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter capacitance
-      of the sensed-voltage (electrode) stage, not a physiological quantity
-    sourced: 'no'
-  Cm:
-    reference: Hong2021; whole-cell capacitance of rat stellate ganglion neurons 33.4 +- 3.0 pF (sham) and 36.3 +- 3.0 pF
-      (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF. The CA token Davis2021Transcriptomic could
-      not be identified
-    sourced: 'yes'
-  I_in:
-    reference: definitional; injected current; 0 = no stimulus
-    sourced: 'no'
-  I_out:
-    reference: definitional; axial current to the axon, supplied in a network; 0 for the isolated soma
-    sourced: 'no'
-    value: 0.0
-  R_diffSensed:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter resistance
-      of the sensed-voltage (electrode) stage, not a physiological quantity
-    sourced: 'no'
-  V_rest_approx:
-    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
-    sourced: 'yes'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

@@ -183,7 +183,10 @@
                             <ci>i_NaK</ci>
                             <ci>i_leak_Na</ci>
                             <ci>i_leak_K</ci>
-                            <ci>I_in_delayed</ci>
+                            <apply>
+                                <minus/>
+                                <ci>I_in_delayed</ci>
+                            </apply>
                             <ci>I_out</ci>
                         </apply>
                     </apply>
@@ -208,10 +211,7 @@
                     <divide/>
                     <apply>
                         <times/>
-                        <apply>
-                            <minus/>
-                            <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
-                        </apply>
+                        <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
                         <apply>
                             <minus/>
                             <ci>I_in</ci>
@@ -231,13 +231,10 @@
                 <apply>
                     <divide/>
                     <apply>
-                        <minus/>
-                        <apply>
                             <minus/>
                             <ci>V_sensed</ci>
                             <ci>V</ci>
                         </apply>
-                    </apply>
                     <ci>R_diffSensed</ci>
                 </apply>
             </apply>
