@@ -7,11 +7,11 @@ Cm_membrane,picoF,30,"Hong2021; whole-cell capacitance of rat stellate ganglion 
 I_in_membrane,nanoA,0.00,definitional; injected current (positive depolarises); 0 = no stimulus,no
 R_diffSensed_membrane,megaOhm,10,"unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter resistance of the sensed-voltage (electrode) stage, not a physiological quantity",no
 V_rest_approx_membrane,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
-Ki_init_Na_K,millimolar,150,BoronBoulpaep2017,yes
-Ko_Na_K,millimolar,4.5,BoronBoulpaep2017,yes
-Nai_init_Na_K,millimolar,13,BoronBoulpaep2017_was_15,yes
-Nao_Na_K,millimolar,145,BoronBoulpaep2017,yes
-Vol_Na_K,m3,2000.0e-18,Wu2012Soma_Approx,yes
+Ki_init_Na_K,millimolar,200,"BrownScholfield1974; rat superior cervical ganglion neurons: [K]i 192.7 +- 2.8 mmol/kg cell water, 207 mM corrected to fresh (flame photometry); Galvan1984 196 mmol/L cell water (electron microprobe). Was 150 (Boron & Boulpaep 2017 Table 5-2 gives a generic 120 mM)",yes
+Ko_Na_K,millimolar,4.5,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular K 4.5 mM,yes
+Nai_init_Na_K,millimolar,13,BrownScholfield1974; rat superior cervical ganglion [Na]i 19.8 mmol/kg cell water (22 mM fresh); Galvan1984 5 mmol/L cell water; Boron & Boulpaep 2017 Table 5-2 generic 15 mM. 13 mM lies within the range,yes
+Nao_Na_K,millimolar,145,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular Na 145 mM,yes
+Vol_Na_K,m3,7500.0e-18,"MoWallisWatson1994; rat stellate ganglion neurons, mean projected soma area ~463 um^2 (reported for this group; full text not checked): a sphere of that cross-section (diameter ~24 um) holds ~7,500 um^3. Was 2000 um^3 (Wu2012, spinal preganglionic neurons: wrong cell type)",no
 B_Ca_init_Ca,millimolar,7.95,user_defined,no
 B_Ca_total_Ca,millimolar,8,Matveev2002,yes
 Ca_ER_init_Ca,millimolar,0.6,to_be_checked_in_neurons,no
@@ -21,7 +21,7 @@ D_Ca_ER_Ca,m3_per_s,4.8e-15,need_to_change_for_volume,yes
 H_SERCA_Ca,dimensionless,1.787,Shannon2004Mathematical,yes
 K_mf_Ca,millimolar,0.1e-3,Shannon2004Mathematical_was_0.246e-3,yes
 K_mr_Ca,millimolar,0.5,Shannon2004Mathematical_was_1.7,yes
-Vol_Ca,m3,2000.0e-18,Wu2012Soma_Approx,yes
+Vol_Ca,m3,7500.0e-18,"MoWallisWatson1994; rat stellate ganglion neurons, mean projected soma area ~463 um^2 (reported for this group; full text not checked): a sphere of that cross-section (diameter ~24 um) holds ~7,500 um^3. Was 2000 um^3 (Wu2012, spinal preganglionic neurons: wrong cell type)",no
 c_ER_Ca,dimensionless,0.01,user_defined,no
 c_ER_pre_Ca,dimensionless,0.049,user_defined,no
 c_SL_Ca,dimensionless,0.02,user_defined_TO_BE_FOUND,no
@@ -106,7 +106,7 @@ Cao_i_NaCa,millimolar,2,Tau2011,yes
 KmCa_i_NaCa,millimolar,1.38,Paci_2013_CHECK_FOR_SN,no
 KmNai_i_NaCa,millimolar,87.5,Paci_2013_CHECK_FOR_SN,no
 Ksat_i_NaCa,dimensionless,0.1,Paci_2013_CHECK_FOR_SN,no
-Nao_i_NaCa,millimolar,145,BoronBoulpaep2017,yes
+Nao_i_NaCa,millimolar,145,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular Na 145 mM,yes
 alpha_NaCa_i_NaCa,dimensionless,1.2,Paci_2013_decreased_for_SN,yes
 gamma_NaCa_i_NaCa,dimensionless,0.35,Paci_2013_CHECK_FOR_SN,no
 k_NaCa_i_NaCa,nanoA,300,to_be_identified,no

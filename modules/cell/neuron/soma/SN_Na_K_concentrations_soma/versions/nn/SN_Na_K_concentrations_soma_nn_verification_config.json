@@ -6,15 +6,33 @@
   "dt": 0.0001,
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
-  "outputs": ["Nai", "Ki", "E_K", "E_Na"],
+  "outputs": ["Nai", "Ki", "E_Na", "E_K", "lNa/j_leak_Na", "lK/j_leak_K"],
+  "harness": {
+    "vessel_array": [
+      ["mod", "nn", "SN_Na_K_concentrations_soma", "", "lNa lK", "default"],
+      ["lNa", "Argus2026_v01", "i_leak_Na", "mod", "", "default"],
+      ["lK", "Argus2026_v01", "i_leak_K", "mod", "", "default"]
+    ]
+  },
   "invariants": [
     {
       "description": "Nernst: E_Na = 1000 RT/F ln(Nao/Nai), E_K = 1000 RT/F ln(Ko/Ki) (mV)",
       "expr": "np.max(np.abs(E_Na - 1000*R*T/F*np.log(Nao/Nai))) + np.max(np.abs(E_K - 1000*R*T/F*np.log(Ko/Ki))) <= 1e-9"
     },
     {
-      "description": "alone (no fluxes connected) Nai and Ki stay at their initial values",
-      "expr": "np.ptp(Nai) == 0 and np.ptp(Ki) == 0"
+      "description": "Na amount changes exactly by the integrated Na flux of the connected channels: Vol (Nai - Nai0) = integral j_Na_total dt (here the Na leak flux) (harness: Na and K leak channels at a fixed V) Tolerance: 1e-6 of the integral plus 100 x the solver resolution of the concentration (rtol 1e-8 x |c|): the change over the run is small next to the concentration itself.",
+      "expr": "np.max(np.abs(Vol*(Nai - Nai[0]) - np.concatenate(([0.0], np.cumsum(0.5*(lNa__j_leak_Na[1:] + lNa__j_leak_Na[:-1])*np.diff(t)))))) <= 1e-6*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*(lNa__j_leak_Na[1:] + lNa__j_leak_Na[:-1])*np.diff(t)))))) + 100*1e-8*Vol*np.max(np.abs(Nai))",
+      "applies": "run"
+    },
+    {
+      "description": "K amount changes exactly by the integrated K flux: Vol (Ki - Ki0) = integral j_K_total dt (here the K leak flux) Tolerance: 1e-6 of the integral plus 100 x the solver resolution of the concentration (rtol 1e-8 x |c|): the change over the run is small next to the concentration itself.",
+      "expr": "np.max(np.abs(Vol*(Ki - Ki[0]) - np.concatenate(([0.0], np.cumsum(0.5*(lK__j_leak_K[1:] + lK__j_leak_K[:-1])*np.diff(t)))))) <= 1e-6*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*(lK__j_leak_K[1:] + lK__j_leak_K[:-1])*np.diff(t)))))) + 100*1e-8*Vol*np.max(np.abs(Ki))",
+      "applies": "run"
+    },
+    {
+      "description": "the leaks move the concentrations (the harness exercises the dynamics): Nai and Ki change",
+      "expr": "(abs(Nai[-1] - Nai[0]) > 0) & (abs(Ki[-1] - Ki[0]) > 0)",
+      "applies": "run"
     }
   ],
   "bc_sweep": {

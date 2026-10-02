@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
 Cai,millimolar,0.0001,definitional; SN_simple Cai_init (Hagiwara1981; used when unconnected),no
 Cai_init,millimolar,1e-4,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
-E_K,milliV,-93.713686,"definitional; Nernst potential at SN_simple Ko 4.5, Ki_init 150 mM (used when unconnected)",no
+E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
 V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
 V_den_h_BK,milliV,5.8,SN_simple: khaliq2003Contribution,yes
 V_den_m_BK,milliV,6.2,SN_simple: khaliq2003Contribution,yes
@@ -9,6 +9,6 @@ V_mid_h_BK,milliV,26,SN_simple: khaliq2003Contribution_was_32,yes
 V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
 g_KCa_BK,microS,0.2,SN_simple: was70microS_per_cm2_inKhaliq2003,yes
 h_BK_min,dimensionless,0.085,SN_simple: Khaliq2003Contribution,yes
-tau_z_BK,millis,1,"Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02)",yes
+tau_z_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 z_BK_coeff,millimolar,0.001,SN_simple: Khaliq2003Contribution,yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

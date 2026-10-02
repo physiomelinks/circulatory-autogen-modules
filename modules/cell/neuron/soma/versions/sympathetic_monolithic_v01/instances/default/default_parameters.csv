@@ -39,7 +39,7 @@ tau_c_min,millis,0.2,SN_simple: changed_from_belluzi1991_curves,yes
 tau_c_max,millis,3.0,SN_simple: changed_from_belluzi1991_curves,yes
 tau_hc,millis,20.0,SN_simple: changed_from_belluzi1991_curves,yes
 tau_h_Kv4_2,millis,7.0,SN_simple: was_approx_7,yes
-tau_z_BK,millis,1,"Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02)",yes
+tau_z_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 tau_m_SK,millis,5,SN_simple: gupta2016Computational,yes
 R_diffSensed,megaOhm,10,SN_simple: user_defined,no
 C_sensed,picoF,2,SN_simple: user_defined,no
@@ -52,8 +52,8 @@ k_bind_Ca,per_millimolar_s,0.1e6,SN_simple: Matveev2002_was_0.5e6,yes
 k_unbind_Ca,per_s,8e3,SN_simple: Matveev2002,yes
 k_bind_Ca_ER,per_millimolar_s,0.5e3,SN_simple: user_defined,no
 k_unbind_Ca_ER,per_s,8e3,SN_simple: Matveev2002_for_k_unbind_Ca,yes
-Nai_init,millimolar,13,SN_simple: BoronBoulpaep2017_was_15,yes
-Ki_init,millimolar,150,SN_simple: BoronBoulpaep2017,yes
+Nai_init,millimolar,13,BrownScholfield1974; rat superior cervical ganglion [Na]i 19.8 mmol/kg cell water (22 mM fresh); Galvan1984 5 mmol/L cell water; Boron & Boulpaep 2017 Table 5-2 generic 15 mM. 13 mM lies within the range,yes
+Ki_init,millimolar,200,"BrownScholfield1974; rat superior cervical ganglion neurons: [K]i 192.7 +- 2.8 mmol/kg cell water, 207 mM corrected to fresh (flame photometry); Galvan1984 196 mmol/L cell water (electron microprobe). Was 150 (Boron & Boulpaep 2017 Table 5-2 gives a generic 120 mM)",yes
 g_Na,microS,2.3,SN_simple: user_defined,no
 g_Na_mod,dimensionless,1.0,SN_simple: user_defined,no
 g_Na1_6,microS,0.5,SN_simple: user_defined,no
@@ -66,10 +66,10 @@ g_Kv2,microS,0.0013333,SN_simple: Davis2021Thesis_fit_to_curve,yes
 g_KCa_BK,microS,0.2,SN_simple: was70microS_per_cm2_inKhaliq2003,yes
 g_KCa_SK,microS,5e-3,SN_simple: to_be_identified,no
 g_KCa_SK_mod,dimensionless,1.0,SN_simple: to_be_identified,no
-Vol,m3,2000.0e-18,SN_simple: Wu2012Soma_Approx,yes
+Vol,m3,7500.0e-18,"MoWallisWatson1994; rat stellate ganglion neurons, mean projected soma area ~463 um^2 (reported for this group; full text not checked): a sphere of that cross-section (diameter ~24 um) holds ~7,500 um^3. Was 2000 um^3 (Wu2012, spinal preganglionic neurons: wrong cell type)",no
 Cao,millimolar,2,SN_simple: Tau2011,yes
-Ko,millimolar,4.5,SN_simple: BoronBoulpaep2017,yes
-Nao,millimolar,145,SN_simple: BoronBoulpaep2017,yes
+Ko,millimolar,4.5,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular K 4.5 mM,yes
+Nao,millimolar,145,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular Na 145 mM,yes
 g_M,microS,0.00263,"Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV and E_K = -93.7 mV the same calculation gives 0.00263 uS",yes
 g_M_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
 g_leak_Na,microS,0.0003,SN_simple: to_be_identified,no

@@ -232,14 +232,6 @@ reference_proposals:
     sourced: 'no'
     also_cites:
     - Matveev2002
-  Nai_init:
-    reference: 'BoronBoulpaep2017; typical mammalian intracellular Na 15 mM, modified here to 13 mM (was 15) [NOT VERIFIED:
-      full text not accessible; value not seen in the source]'
-    sourced: 'no'
-  Ki_init:
-    reference: 'BoronBoulpaep2017; typical mammalian intracellular K 150 mM [NOT VERIFIED: full text not accessible; value
-      not seen in the source]'
-    sourced: 'no'
   g_Na:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); Tao 2011
       uses g_Na = 9.28 uS for a 240 pF neuron (parameter table), i.e. 1.16 uS scaled to 30 pF
@@ -289,25 +281,12 @@ reference_proposals:
   g_KCa_SK_mod:
     reference: definitional; scaling factor, 1 = unmodified
     sourced: 'no'
-  Vol:
-    reference: 'Wu2012; volumes of rat spinal sympathetic PREganglionic neurons 1600-2500 um^3 (IML 2200 +- 250 um^3, Results/Fig.
-      1D-E), the source of the 2000 um^3 (CA token Wu2012Soma_Approx). Wrong cell type for a stellate (postganglionic) neuron,
-      which is likely larger: Cm 30 pF at 1 uF/cm2 implies about 3000 um^2 of membrane (a 31 um sphere, about 15600 um^3)'
-    sourced: 'no'
   Cao:
     reference: 'Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no
       separate neuron value). Khaliq2003 also uses 2 mM'
     sourced: 'yes'
     also_cites:
     - Khaliq2003
-  Ko:
-    reference: 'BoronBoulpaep2017; typical extracellular K 4.5 mM [NOT VERIFIED: full text not accessible; value not seen
-      in the source]'
-    sourced: 'no'
-  Nao:
-    reference: 'BoronBoulpaep2017; typical extracellular Na 145 mM [NOT VERIFIED: full text not accessible; value not seen
-      in the source]'
-    sourced: 'no'
   g_leak_Na:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
     sourced: 'no'
