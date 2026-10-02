@@ -14,6 +14,10 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   ms); V_mid_h is 26 mV (Khaliq 32); the +5 mV shift of V in Khaliq''s .mod is not applied. Geometry re-parameterisation (2026-10-02):
   the maximal conductance is g_KCa_BK = A_mem rho_BK gamma_BK (membrane area x channel density x single-channel conductance,
   1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_KCa_BK.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
 reference_proposals:
   Cai:
     reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected

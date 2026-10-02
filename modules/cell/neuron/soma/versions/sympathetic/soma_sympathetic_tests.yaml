@@ -8,6 +8,10 @@ description: 'Sympathetic-neuron soma (SN_simple''s SN_soma) built from its part
   ["<axon>"]} (VI_port: V out, the axial current I_out in); optional stimulus through membrane''s i_stim. Default parameters
   are SN_simple''s (its default instance). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
   by a one-off script (tools/build_sn_modules.py, removed; in git history). Tested through the neuron sympathetic version.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
 expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

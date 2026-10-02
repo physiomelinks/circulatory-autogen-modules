@@ -10,6 +10,10 @@ notes: 'Owner''s sympathetic stellate-ganglion neuron soma ("SN_simple"): Na (Na
   are A_mem x density x turnover x e; the ER volumes c_ER Vol and c_ER_pre Vol (spheres by default) give the ER areas A_ER
   (IP3R, RyR) and A_ER_pre (SERCA, Ca leak). The defaults reproduce every previous value (Cm 30 pF, Vol 7,500 um^3, the conductances,
   k_NaK, k_NaCa, k_SERCA, k_leak_Ca, k_IP3, k_RyR).'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
 reference_proposals:
   V_rest_approx:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3

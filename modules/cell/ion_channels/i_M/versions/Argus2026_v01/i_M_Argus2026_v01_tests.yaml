@@ -8,6 +8,10 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal
   conductance is g_M = A_mem rho_M gamma_M (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem
   from the membrane through membrane_area; the defaults reproduce the previous g_M.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
 reference_proposals:
   Delta_V_mid_w:
     reference: definitional; shift of the M-current activation for drug studies; 0 = no drug

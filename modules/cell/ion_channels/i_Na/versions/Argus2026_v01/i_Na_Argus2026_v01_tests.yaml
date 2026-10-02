@@ -12,6 +12,10 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance
   is g_Na = A_mem rho_Na gamma_Na (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the
   membrane through membrane_area; the defaults reproduce the previous g_Na.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.
