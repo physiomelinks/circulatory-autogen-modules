@@ -1,15 +1,15 @@
 variable_name,units,value,data_reference,sourced
-E_Na,milliV,64.455574,"definitional; Nernst potential at SN_simple Nao 145, Nai_init 13 mM (used when unconnected)",no
-V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
-V_den_h,milliV,4.0,SN_simple: Belluzi1991_was_6.5,yes
-V_den_m,milliV,6,SN_simple: Belluzi1991_was_7.2,yes
-V_mid_h,milliV,40,SN_simple: Belluzi1991_was_53.2,yes
-V_mid_m,milliV,20,SN_simple: Belluzi1991_was_36,yes
-V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+E_Na,milliV,64.455574,"definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 310.15 K (used when unconnected)",no
+V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)",no
+V_den_h,milliV,4.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 4 mV (was 6.5),yes
+V_den_m,milliV,6,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 6 mV (was 7.2),yes
+V_mid_h,milliV,40,"Tao2011; Supporting Material (Document S1) Eq. 87 (h_inf V1/2 = -53.2 mV, k = 6.5 mV); modified here to 40 mV (was 53.2)",yes
+V_mid_m,milliV,20,"Tao2011; Supporting Material (Document S1) Eq. 86 (Belluzzi-Sacchi I_Na m_inf V1/2 = -36 mV, k = 7.2 mV); modified here to 20 mV (was 36)",yes
+V_rest_approx,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
 A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
-rho_Na,per_um2,51.111111111111114,definitional; chosen so that g_Na = A rho gamma_Na (1e-6 uS/pS) reproduces the previous g_Na = 2.3 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na = 15 picoS; a density for calibration through gamma_Na,no
+rho_Na,per_um2,51.111111111111114,"definitional; chosen so that g_Na = A rho gamma_Na reproduces the previous g_Na 2.3 uS at A 3000 um^2. For calibration: Keynes1971 measured 75 channels/um^2 (TTX binding, rabbit vagus C fibres; an axonal density)",no
 gamma_Na,picoS,15.0,"Magee1995; TTX-sensitive single Na channel conductance 15 +- 0.3 pS in rat CA1 neurons, cell-attached (Abstract, point 2); cf. Sigworth & Neher 1980 ~18 pS in rat muscle",yes
-g_Na_mod,dimensionless,1.0,SN_simple: user_defined,no
-tau_h_max,millis,5,SN_simple: user_defined,no
-tau_h_min,millis,0.15,SN_simple: user_defined,no
+g_Na_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
+tau_h_max,millis,5,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h. Tao2011 Eq. 89 (Belluzzi-Sacchi) peaks at about 20-42 ms near -46 mV,no
+tau_h_min,millis,0.15,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h,no
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

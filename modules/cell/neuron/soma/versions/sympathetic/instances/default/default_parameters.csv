@@ -38,16 +38,16 @@ rho_leak_Ca_Ca,per_um2,4.0303643922268835,definitional; chosen so that k_leak_Ca
 k_leak_Ca_single_Ca,um3_per_s,0.01,unreferenced_placeholder; per-protein Ca leak coefficient (flux per concentration difference) of an ER leak pathway; 0.01 um^3/s assumed,no
 k_unbind_Ca_Ca,per_s,8e3,"Matveev2002; Table 1 (""actual"" set): fixed-buffer off-rate 8 /ms = 8e3 /s (= value; Kd 16 uM with kon 0.5 /uM/ms; with the kon 0.1 used here Kd = 80 uM)",yes
 k_unbind_Ca_ER_Ca,per_s,8e3,unreferenced_placeholder; Matveev2002 fixed-buffer off-rate 8e3 /s reused for the pre-ER buffer; no source for an ER-adjacent buffer,no
-V_den_h_i_Na,milliV,4.0,Belluzi1991_was_6.5,yes
-V_den_m_i_Na,milliV,6,Belluzi1991_was_7.2,yes
-V_mid_h_i_Na,milliV,40,Belluzi1991_was_53.2,yes
-V_mid_m_i_Na,milliV,20,Belluzi1991_was_36,yes
-V_rest_approx_i_Na,milliV,-70,Davis2021Thesis_from_traces,yes
+V_den_h_i_Na,milliV,4.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 4 mV (was 6.5),yes
+V_den_m_i_Na,milliV,6,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 6 mV (was 7.2),yes
+V_mid_h_i_Na,milliV,40,"Tao2011; Supporting Material (Document S1) Eq. 87 (h_inf V1/2 = -53.2 mV, k = 6.5 mV); modified here to 40 mV (was 53.2)",yes
+V_mid_m_i_Na,milliV,20,"Tao2011; Supporting Material (Document S1) Eq. 86 (Belluzzi-Sacchi I_Na m_inf V1/2 = -36 mV, k = 7.2 mV); modified here to 20 mV (was 36)",yes
+V_rest_approx_i_Na,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
 rho_Na_i_Na,per_um2,51.111111111111114,definitional; chosen so that g_Na = A rho gamma_Na (1e-6 uS/pS) reproduces the previous g_Na = 2.3 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na = 15 picoS; a density for calibration through gamma_Na,no
 gamma_Na_i_Na,picoS,15.0,"Magee1995; TTX-sensitive single Na channel conductance 15 +- 0.3 pS in rat CA1 neurons, cell-attached (Abstract, point 2); cf. Sigworth & Neher 1980 ~18 pS in rat muscle",yes
-g_Na_mod_i_Na,dimensionless,1.0,user_defined,no
-tau_h_max_i_Na,millis,5,user_defined,no
-tau_h_min_i_Na,millis,0.15,user_defined,no
+g_Na_mod_i_Na,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
+tau_h_max_i_Na,millis,5,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h. Tao2011 Eq. 89 (Belluzzi-Sacchi) peaks at about 20-42 ms near -46 mV,no
+tau_h_min_i_Na,millis,0.15,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h,no
 V_den_h_i_Na1_6,milliV,4.0,Belluzi1991_was_6.5,yes
 V_den_h_Na1_6_i_Na1_6,milliV,8.0,Belluzi1991_was_6.5,yes
 V_den_m_i_Na1_6,milliV,6,Belluzi1991_was_7.2,yes
