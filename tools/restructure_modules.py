@@ -46,7 +46,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 from cam_testing import bib as bibmod  # noqa: E402
-from cam_testing.library import write_spec  # noqa: E402
+from cam_testing.library import DEFAULT_LICENCE, write_spec  # noqa: E402
 from import_from_libcuflynx import read_units_blocks, units_closure, write_units_file  # noqa: E402
 
 MAP = os.path.join(REPO, 'tools', 'restructure_map.yaml')
@@ -234,9 +234,10 @@ def config_head(entry, mt, v, component_file, component_type, extra):
         head['component_file'] = component_file
         head['component_type'] = component_type
     head['default_instance'] = 'default'
+    head['licence'], head['creator'] = entry.get('licence', DEFAULT_LICENCE), list(entry.get('creator', []))
     head.update(extra)
     skip = {'module_type', 'module_subtype', 'module_format', 'component_file', 'component_type',
-            'default_parameters', 'default_instance', 'vessel_type', 'BC_type', 'module_file'}
+            'default_parameters', 'default_instance', 'vessel_type', 'BC_type', 'module_file', 'licence', 'creator'}
     return {**head, **{k: val for k, val in entry.items() if k not in skip}}
 
 
@@ -581,7 +582,7 @@ def build_zero_flow(stage, olds):
     with open(os.path.join(dest, f'{stem}_modules.cellml'), 'w') as f:
         f.write(CELLML_HEAD.format(name=stem) + '    ' + block + '\n</model>\n')
     entry = {'module_type': mt, 'module_subtype': v, 'module_format': 'cellml', 'component_file': f'{stem}_modules.cellml',
-             'component_type': 'zero_flow', 'default_instance': 'default',
+             'component_type': 'zero_flow', 'default_instance': 'default', 'licence': DEFAULT_LICENCE, 'creator': [],
              'notes': ('libcuflynx helper: the generator connects v_zero to the v_ivc input of a monolithic heart '
                        'module named "heart" that has only one vena cava input, and finds the component by its name '
                        '(zero_flow), so the name must not change.'),

@@ -30,7 +30,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 from cam_testing import bib  # noqa: E402
-from cam_testing.library import load_module, module_dir, normalise_config_entry  # noqa: E402
+from cam_testing.library import load_module, module_dir, normalise_config_entry, with_record_keys  # noqa: E402
 from import_from_libcuflynx import read_units_blocks, units_closure, write_units_file  # noqa: E402
 
 CELLML_HEAD = ("<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -80,7 +80,7 @@ def split(old, groups, parent_dir):
         for e in entries:
             e['component_file'] = f'{new}_modules.cellml'
         with open(os.path.join(dest, f'{new}_modules_config.json'), 'w') as f:
-            json.dump(entries, f, indent=2)
+            json.dump([with_record_keys(e) for e in entries], f, indent=2)
             f.write('\n')
         used = set()
         for c in comps:

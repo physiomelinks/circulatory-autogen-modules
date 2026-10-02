@@ -208,6 +208,38 @@ def is_supermodule(entry):
     return entry.get('module_format') == 'supermodule'
 
 
+# Every config entry carries its licence (an SPDX id from LICENCES) and its creators (a list of
+# names; empty until given in review). libcuflynx's schema allows extra keys, and both config
+# formats carry them unchanged.
+LICENCES = {
+    'CC0-1.0': 'https://spdx.org/licenses/CC0-1.0.html',
+    'CC-BY-4.0': 'https://spdx.org/licenses/CC-BY-4.0.html',
+    'MIT': 'https://spdx.org/licenses/MIT.html',
+    'Apache-2.0': 'https://spdx.org/licenses/Apache-2.0.html',
+    '0BSD': 'https://spdx.org/licenses/0BSD.html',
+}
+DEFAULT_LICENCE = 'CC0-1.0'
+RECORD_KEYS = ('licence', 'creator')
+
+
+def with_record_keys(entry, licence=DEFAULT_LICENCE, creator=None):
+    '''The entry with "licence" and "creator" (the defaults where missing; existing values kept),
+    placed after "default_instance" (or after the subtype key when it has none), other keys in order.'''
+    values = {'licence': entry.get('licence', licence),
+              'creator': list(entry.get('creator', creator if creator is not None else []))}
+    rest = [(k, v) for k, v in entry.items() if k not in RECORD_KEYS]
+    keys = [k for k, _ in rest]
+    anchor = next((k for k in ('default_instance', 'module_subtype', 'BC_type') if k in keys), None)
+    out = {}
+    if anchor is None:
+        out.update(values)
+    for k, v in rest:
+        out[k] = v
+        if k == anchor:
+            out.update(values)
+    return out
+
+
 def config_format(entry):
     if is_supermodule(entry):
         # a supermodule has no CellML component: only its type/subtype keys tell the style
@@ -662,6 +694,17 @@ class Version:
     @property
     def reviewed(self):
         return bool(self.spec.get('reviewed', False))
+
+    @property
+    def licence(self):
+        '''The config entry's SPDX licence id (None when missing).'''
+        return self.config.get('licence')
+
+    @property
+    def creators(self):
+        '''The config entry's creator names ([] until given in review).'''
+        c = self.config.get('creator') or []
+        return [c] if isinstance(c, str) else list(c)
 
     # --- files ------------------------------------------------------------------------------
     def path(self, suffix):

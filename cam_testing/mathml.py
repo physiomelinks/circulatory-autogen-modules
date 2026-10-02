@@ -180,6 +180,33 @@ def component_equations(cellml_path, component_name):
     return equations, converter.unsupported
 
 
+def equation_target(eq):
+    '''(variable, kind) an equation (a top-level MathML apply) defines: ("x", "ode") for d(x)/dt = ...,
+    ("y", "algebraic") for y = ..., (None, None) otherwise (e.g. 0 = f(x)).'''
+    children = list(eq)
+    if len(children) < 2 or _local(children[0].tag) != 'eq':
+        return None, None
+    lhs = children[1]
+    if _local(lhs.tag) == 'ci':
+        return (lhs.text or '').strip(), 'algebraic'
+    if _local(lhs.tag) == 'apply' and len(lhs) and _local(lhs[0].tag) == 'diff':
+        ci = [c for c in lhs if _local(c.tag) == 'ci']
+        if ci:
+            return (ci[0].text or '').strip(), 'ode'
+    return None, None
+
+
+def component_equation_targets(cellml_path, component_name):
+    '''What each equation of component_equations() defines, in the same order: [(variable, kind)].'''
+    root = ET.parse(cellml_path).getroot()
+    for comp in root.iter(f'{{{CELLML_NS}}}component'):
+        if comp.get('name') != component_name:
+            continue
+        return [equation_target(eq) for math in comp.iter(f'{{{MATHML_NS}}}math') for eq in math
+                if _local(eq.tag) == 'apply']
+    return []
+
+
 def component_variables(cellml_path, component_name):
     '''[(name, units, initial_value or None, interface)] for one component.'''
     root = ET.parse(cellml_path).getroot()

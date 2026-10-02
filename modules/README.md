@@ -184,6 +184,19 @@ version's name is the config entry's `module_subtype`**, so a model picks a vers
   in the config's `component_type`). The generated model names every component after its vessel, so
   results are unchanged.
 
+**Licence and creator.** Every config entry has two record-keeping keys, after `default_instance`:
+- `"licence"`: the SPDX id of the licence the version is published under. It is one of `CC0-1.0`
+  (the default, chosen as the most open), `CC-BY-4.0`, `MIT`, `Apache-2.0` and `0BSD`
+  (`cam_testing.library.LICENCES`). The version page links it to its SPDX page.
+- `"creator"`: a list of the names of the people who created the version, e.g. `["A. Author"]`. It is `[]`
+  until the creators are given in review, and the version page shows "creator: not set (to be given in
+  review)" until then.
+
+`tests/test_structure.py` checks both keys in every entry. libcuflynx's config schema allows extra
+keys, and both config formats carry them unchanged (`library.normalise_config_entry`,
+`library.to_phlynx_entry`). The tools that write new config entries (`tools/restructure_modules.py`,
+`tools/import_from_libcuflynx.py`, `tools/split_module.py`) add them with `library.with_record_keys`.
+
 ## Instances
 
 An instance is **a parameter set of a version: only the parameters change, never the math**.
@@ -349,6 +362,28 @@ Status rules (decided in the Lotka_Volterra review, 2026-10-01):
   coarse dt) is shown as not working at that step; the test fails only if a declared-supported
   configuration fails.
 
+What the version page shows besides the tests:
+- **Contents.** A line of counts at the top: states (variables with a d/dt equation in the CellML),
+  algebraic variables (defined by an algebraic equation), parameters / constants (config kinds `constant`
+  and `global_constant`), boundary conditions, ports, equations and instances. A supermodule adds its
+  parts and nested levels, and its other counts are summed over all its parts. Each count links to its
+  section and explains itself on hover; the module_type page shows them compactly per version.
+- **Unit consistency** (informational, not a test column). `checks.unit_consistency` runs libcellml's unit
+  checks on the version's CellML with its units file, without simulating: the Validator's units issues
+  (undefined or invalid units) and the Analyser's `ANALYSER_UNITS` issues (equation sides or terms in
+  units that are not equivalent, or an argument that should be dimensionless). Inputs are treated as
+  constants for the check. Each issue is mapped to the equation (and the variable it defines). The result
+  is `results/unit_consistency.json`; the report computes it when it is missing or older than the CellML,
+  units or config. The page shows a "Unit consistency" block only when an equation fails (or libcellml
+  could not check the equations, e.g. an undeclared variable), and the header gives the count.
+- **Structure** (supermodule versions). A diagram of the parts (each linked to its version page) and their
+  internal connections with the port types the configs connect, the modules outside that couple to a
+  part (from the supermodule versions and system models that use this one, through
+  `per_submodule_inputs` / `per_submodule_outputs`), and a table of the parts: version, instance, ports,
+  connections, the supermodule instance's rows `<var>_<part>` that override the part, and the globals it
+  shares. A collapsible tree lists every nested level. The diagram is drawn by mermaid (loaded from
+  cdn.jsdelivr.net like MathJax); offline, its source text and the table remain.
+
 The version's spec is described in the next section.
 
 ```bash
@@ -455,7 +490,7 @@ each version's CellML, config and units, and validates the JSON files against li
 
 - **A new version** of an existing module_type: add
   `versions/<source>_vXX/` with the six files, one config entry (`module_subtype` = the directory name,
-  `"default_instance": "default"`), a component name no other version uses, and
+  `"default_instance": "default"`, `"licence"` and `"creator"`), a component name no other version uses, and
   `instances/default/default_parameters.csv`. Then run `make structure` and
   `pytest tests/test_modules.py --component <module_type>/<source>_vXX`.
 - **A data instance**: add `instances/<name>/` with `<name>_parameters.csv`, the obs_data files

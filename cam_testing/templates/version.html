@@ -190,11 +190,35 @@ tr.supported td:first-child { font-weight: 600; }
 .box.on::after { content: ""; position: absolute; left: 3.5px; top: 0.5px; width: 3px; height: 7px; border: solid var(--panel); border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .yes { color: var(--pass); font-weight: 600; } .no { color: var(--fail); font-weight: 600; }
 footer { color: var(--ink-3); font-size: 0.8rem; }
+.contents-bar { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 8px 12px; list-style: none; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; font-size: 0.88rem; }
+.contents-bar a { color: var(--ink-2); text-decoration: none; border-bottom: 1px dotted var(--ink-3); }
+.contents-bar a:hover { color: var(--ink); }
+.contents-bar strong { font-variant-numeric: tabular-nums; color: var(--ink); }
+.unit-eq { display: grid; gap: 4px; padding: 8px 0; border-bottom: 1px dashed var(--rule); }
+.unit-eq:last-child { border-bottom: 0; }
+.unit-eq .tex { overflow-x: auto; }
+.diagram { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 10px; overflow-x: auto; }
+pre.mermaid { margin: 0; font-size: 0.78rem; white-space: pre; color: var(--ink-3); }
+pre.mermaid[data-processed] { color: inherit; text-align: center; }
+.tree, .tree ul { list-style: none; margin: 0; padding-left: 18px; }
+.tree { padding-left: 0; font-size: 0.85rem; }
+.tree li { padding: 1px 0; }
 </style>
 <script>
 window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" defer></script>
+{%- if components[0].structure_view %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.mermaid) { return; }   // offline: the diagram's source and the parts table still show the structure
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: dark ? 'dark' : 'neutral', flowchart: { htmlLabels: true } });
+  mermaid.run({ querySelector: 'pre.mermaid' });
+});
+</script>
+{%- endif %}
 {%- if standalone is not defined or standalone %}
 </head>
 <body>
@@ -204,6 +228,8 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
     <div class="eyebrow">{{ module_type }} · {{ version }}</div>
     <ol>
       <li><a href="#overview"><span class="mono">Test overview</span></a></li>
+      {%- if components[0].structure_view %}<li><a href="#{{ components[0].id }}-structure"><span class="mono">Structure</span></a></li>{% endif %}
+      {%- if components[0].unit_consistency %}<li><a href="#unit-consistency"><span class="dot failed"></span><span class="mono">Unit consistency</span></a></li>{% endif %}
       <li><a href="#instances"><span class="mono">Instances</span></a></li>
       {%- for t in components[0].tests %}
       <li><a href="#{{ components[0].id }}--{{ t.key }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ t.short }}</span></a></li>
@@ -219,10 +245,18 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
     <header class="module">
       <div class="eyebrow">circulatory-autogen-modules · {{ location or 'modules' }} · <a href="{{ module_type_href }}">{{ module_type }}</a> · version</div>
       <h1>{{ module_type }} <span class="muted">{{ version }}</span></h1>
+      <ul class="contents-bar" aria-label="Contents">
+        {%- for k in components[0].contents %}
+        <li title="{{ k.about }}"><a href="{{ k.href }}"><strong>{{ k.count }}</strong> {{ k.label }}</a></li>
+        {%- endfor %}
+      </ul>
       <div class="meta">
         <span><a href="{{ module_type_href }}">All versions of {{ module_type }}</a></span>
         <span class="num">{{ components[0].instances|length }} instance{{ '' if components[0].instances|length == 1 else 's' }}</span>
         <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
+        <span title="The config entry's licence (SPDX id)">Licence: {% if licence_url %}<a href="{{ licence_url }}">{{ licence }}</a>{% else %}<span class="todo">{{ licence or 'not set' }}</span>{% endif %}</span>
+        <span title="The config entry's creator list">{% if creators %}Creator{{ 's' if creators|length > 1 }}: {{ creators|join(', ') }}{% else %}<span class="todo">Creator: not set (to be given in review)</span>{% endif %}</span>
+        {%- if unit_failures %}<span title="libcellml unit checks on the CellML (informational, not a test column)"><a href="#unit-consistency" class="todo">Unit consistency: {{ components[0].unit_consistency.message }}</a></span>{% elif components[0].unit_consistency %}<span><a href="#unit-consistency" class="todo">Unit consistency: not checked</a></span>{% endif %}
         <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
         <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
         {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
@@ -245,6 +279,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
       {%- if review_scope %}<p class="muted" style="margin:0;max-width:80ch">{{ review_scope }}</p>{% endif %}
       {%- if review.comment %}<p class="todo" style="margin:0;max-width:80ch"><strong>Potential issues:</strong> {{ review.comment }}</p>{% endif %}
       {%- if review.summary %}<p style="margin:0;max-width:80ch">{{ review.summary }}</p>{% endif %}
+      {%- if not creators %}<p class="todo" style="margin:0;max-width:80ch">Creator: not set. Please give the creator(s) of this version (config <code>"creator"</code>, a list of names). Licence: {{ licence or 'not set' }}.</p>{% endif %}
       {%- if review.questions %}
       <div class="eyebrow">Questions</div>
       <ol class="issues">{% for q in review.questions %}<li>{{ q }}</li>{% endfor %}</ol>
@@ -315,8 +350,44 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
         {%- if c.todo %}<p class="todo" style="margin:0">{{ c.todo|length }} parameter value{{ '' if c.todo|length == 1 else 's' }} still to set: {{ c.todo|join(', ') }}</p>{% endif %}
       </div>
 
+      {%- if c.structure_view %}{% set sv = c.structure_view %}
+      <div class="block" id="{{ c.id }}-structure">
+        <h3>Structure</h3>
+        <p class="muted" style="margin:0;font-size:0.84rem">The parts of this supermodule version and how they connect. In a model, each part becomes <code>&lt;record name&gt;_&lt;part&gt;</code>; the instance's parameters are renamed the same way. Precedence: the model's parameters file, then this version's instance, then each part's instance. Solid arrows are the internal connections (<code>inp_instances</code> / <code>out_instances</code>, and a part's <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code> naming a sibling, labelled <code>part/inner part</code>), with the port types the configs connect{% if not sv.labelled %} (listed in the table: too many connections to label){% endif %}; dashed boxes are the modules outside that couple to a part, from the supermodule versions and system models that use this one. Click a part to open its version page.</p>
+        <div class="diagram"><pre class="mermaid">{{ sv.mermaid }}</pre></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Part</th><th>module_type</th><th>Version</th><th>Instance</th><th>Ports</th><th>Connections</th><th>Set by this supermodule's instance</th><th>Globals shared</th></tr></thead>
+          <tbody>
+          {%- for p in sv.parts %}
+            <tr><td class="mono">{{ p.name }}</td><td class="mono">{{ p.module_type }}</td>
+            <td class="mono">{% if p.href %}<a href="{{ p.href }}">{{ p.version }}</a>{% else %}{{ p.version }} <span class="todo">(not in the library)</span>{% endif %}{% if p.is_supermodule %}<br><span class="muted">supermodule, {{ p.n_parts }} parts</span>{% endif %}</td>
+            <td class="mono">{{ p.instance }}</td>
+            <td class="mono" style="font-size:0.78rem">{% if p.is_supermodule %}<span class="muted">its parts' (see its page)</span>{% else %}{{ p.ports|join('; ') or '—' }}{% endif %}</td>
+            <td class="mono" style="font-size:0.78rem">
+              {%- for e in p.inputs %}← {{ e.label }}{% if e.ports %} <span class="muted">({{ e.ports|join(', ') }})</span>{% endif %}<br>{% endfor %}
+              {%- for e in p.outputs %}→ {{ e.label }}{% if e.ports %} <span class="muted">({{ e.ports|join(', ') }})</span>{% endif %}<br>{% endfor %}
+              {%- for x in p.external %}{{ '←' if x.direction == 'in' else '→' }} ‹{{ x.external }}› <span class="muted">(outside: {% for w in x.where %}{% if w.href %}<a href="{{ w.href }}">{{ w.name }}</a>{% else %}{{ w.name }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %})</span><br>{% endfor %}
+              {%- if not p.inputs and not p.outputs and not p.external %}—{% endif %}</td>
+            <td class="mono" style="font-size:0.78rem">{% for o in p.overrides %}{{ o.name }} = {{ o.value }}{% if not loop.last %}<br>{% endif %}{% else %}—{% endfor %}</td>
+            <td class="mono" style="font-size:0.78rem">{{ p.globals|join(', ') or '—' }}</td></tr>
+          {%- endfor %}
+          </tbody>
+        </table></div>
+        <p class="muted" style="margin:0;font-size:0.84rem">Globals of this supermodule (<code>supermodule.globals</code>): {{ sv.globals|join(', ') or 'none' }}{% if sv.global_rows %}; set by its instance: {% for g in sv.global_rows %}<code>{{ g.name }} = {{ g.value }}</code>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. "Set by this supermodule's instance" lists its instance's rows <code>&lt;var&gt;_&lt;part&gt;</code>, which override the part's own instance.</p>
+        {%- if sv.external %}
+        <p class="muted" style="margin:0;font-size:0.84rem">Outside couplings: {% for x in sv.external %}<code>{{ x.part }} {{ '←' if x.direction == 'in' else '→' }} ‹{{ x.external }}›</code>{% if not loop.last %}, {% endif %}{% endfor %}.</p>
+        {%- else %}
+        <p class="muted" style="margin:0;font-size:0.84rem">No supermodule version or system model couples a module to a part of this one from outside (through <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code>).</p>
+        {%- endif %}
+        {%- macro tree(nodes) -%}
+        <ul class="tree">{% for n in nodes %}<li><span class="mono">{{ n.name }}</span> {% if n.href %}<a href="{{ n.href }}" class="mono">{{ n.key }}</a>{% else %}<span class="mono">{{ n.key }}</span>{% endif %}{% if n.children %} <span class="muted">({{ n.children|length }} parts)</span>{{ tree(n.children) }}{% endif %}</li>{% endfor %}</ul>
+        {%- endmacro %}
+        <details><summary>Full tree of parts (all nested levels)</summary>{{ tree(sv.tree) }}</details>
+      </div>
+      {%- endif %}
+
       {%- if c.equations %}
-      <div class="block">
+      <div class="block" id="{{ c.id }}-equations">
         <h3>Equations</h3>
         <div class="equations">
           {%- for eq in c.equations %}<div class="eq">\[ {{ eq }} \]</div>{% endfor %}
@@ -325,8 +396,39 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
       </div>
       {%- endif %}
 
+      {%- if c.unit_consistency %}{% set uc = c.unit_consistency %}
+      <div class="block panel" id="unit-consistency" style="border-color:var(--fail)">
+        <h3>Unit consistency</h3>
+        <p class="message" style="margin:0;font-weight:500">{{ uc.message }}</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">libcellml {{ uc.libcellml_version }}'s unit checks on this version's CellML with its units file (Validator: undefined or invalid units; Analyser: the two sides of an equation, or the terms of a sum, in units that are not equivalent, or an argument that should be dimensionless). Only failing equations are listed. Informational: not a test column, and nothing is shown when every equation is consistent. Inputs are treated as constants for the check.</p>
+        {%- for g in uc.equations %}
+        <div class="unit-eq">
+          {%- if g.latex %}<div class="tex">\[ {{ g.latex }} \]</div>{% else %}<code>{{ g.equation or '' }}</code>{% endif %}
+          {%- if g.variable %}<div class="muted" style="font-size:0.8rem">defines <code>{{ g.variable }}</code></div>{% endif %}
+          <ul class="issues">
+          {%- for f in g.issues %}
+            <li><strong>{{ f.kind }}</strong>{% if f.expression %} in <code>{{ f.expression }}</code>{% endif %}:
+              {%- if f.sides %} {% for sd in f.sides %}<code>{{ sd.expression }}</code> is in <code>{{ sd.units }}</code>{% if sd.base %} <span class="muted">({{ sd.base }})</span>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% if f.kind == 'not dimensionless' %}, but should be dimensionless{% endif %}
+              {%- else %} {{ f.message }}{% endif %}
+              <details><summary>libcellml message</summary><pre>{{ f.message }}</pre></details></li>
+          {%- endfor %}
+          </ul>
+        </div>
+        {%- endfor %}
+        {%- if uc.definition_issues %}
+        <div class="eyebrow">Units definitions</div>
+        <ul class="issues">{% for d in uc.definition_issues %}<li>{{ d.message }}</li>{% endfor %}</ul>
+        {%- endif %}
+        {%- if uc.status == 'not_checked' or (uc.other_issues and not uc.equations) %}
+        <div class="eyebrow">Why the equations could not be checked</div>
+        <ul class="issues">{% for o in uc.other_issues[:10] %}<li>{{ o }}</li>{% endfor %}{% if uc.other_issues|length > 10 %}<li>… and {{ uc.other_issues|length - 10 }} more</li>{% endif %}</ul>
+        {%- endif %}
+        <div class="muted" style="font-size:0.75rem">Checked {{ uc.timestamp }} (<code>results/unit_consistency.json</code>)</div>
+      </div>
+      {%- endif %}
+
       <div class="two">
-        <div class="block">
+        <div class="block" id="{{ c.id }}-variables">
           <h3>Variables &amp; parameters</h3>
           <p class="muted" style="margin:0;font-size:0.84rem">Tested range: the range each parameter is varied over in the boundary-condition sweep and the joint failure-risk analysis. Validated values: the spread of values at which the component matched data in a passing validation test. Check a system model's values, and the failure risk near them, with <code>python -m cam_testing.ranges check</code>.</p>
           <div class="table-wrap">
@@ -349,7 +451,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
             </table>
           </div>
         </div>
-        <div class="block">
+        <div class="block" id="{{ c.id }}-ports">
           <h3>Ports</h3>
           {%- if c.ports %}
           <div class="table-wrap">
@@ -416,19 +518,6 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
           </tbody>
         </table></div>
       </div>
-
-      {%- if c.submodules %}
-      <div class="block">
-        <h3>Submodules</h3>
-        <p class="muted" style="margin:0;font-size:0.84rem">In a model, each submodule becomes <code>&lt;record name&gt;_&lt;submodule&gt;</code>; the instance's parameters are renamed the same way. Precedence: the model's parameters file, then this version's instance, then each submodule's instance.</p>
-        <div class="table-wrap"><table>
-          <thead><tr><th>Submodule</th><th>module_type</th><th>Version</th><th>Instance</th><th>Inputs</th><th>Outputs</th></tr></thead>
-          <tbody>{% for sub in c.submodules %}<tr><td class="mono">{{ sub.name }}</td><td class="mono">{{ sub.module_type }}</td><td class="mono">{{ sub.module_subtype }}</td><td class="mono">{{ sub.instance or '(default)' }}</td>
-            <td class="mono">{{ (sub.inp_instances or [])|join(', ') }}{% if sub.per_submodule_inputs %} {{ sub.per_submodule_inputs|fmt }}{% endif %}</td>
-            <td class="mono">{{ (sub.out_instances or [])|join(', ') }}{% if sub.per_submodule_outputs %} {{ sub.per_submodule_outputs|fmt }}{% endif %}</td></tr>{% endfor %}</tbody>
-        </table></div>
-      </div>
-      {%- endif %}
 
       <div class="block" id="instances">
         <h3>Instances</h3>

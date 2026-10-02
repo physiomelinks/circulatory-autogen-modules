@@ -24,8 +24,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from cam_testing import bib, checks, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
-from cam_testing.library import REPO_ROOT, load_module_type, module_type_names, select_module_types
-from cam_testing.mathml import component_equations, component_variables
+from cam_testing.library import LICENCES, REPO_ROOT, load_module_type, module_type_names, select_module_types
+from cam_testing.mathml import component_equation_targets, component_equations, component_variables
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
 SITE_DIR = os.path.join(REPO_ROOT, 'site')
@@ -304,6 +304,342 @@ def _supermodule_links(version, r):
     return links
 
 
+# ---- contents summary ---------------------------------------------------------------------------
+
+CONTENTS_ABOUT = {
+    'states': 'State variables: the variables with a d/dt equation in the CellML component',
+    'algebraic': 'Algebraic variables: the variables an algebraic equation (x = ...) defines in the CellML component',
+    'parameters': 'Parameters and constants: the config\'s variables_and_units of kind constant or global_constant',
+    'boundary_conditions': 'Boundary conditions: the config\'s variables_and_units of kind boundary_condition (set by a '
+                           'connected module, or a parameter when nothing connects them)',
+    'ports': 'Ports: the config\'s entrance, exit and general ports, through which models connect the version',
+    'equations': 'Equations: the equations of the CellML component',
+    'instances': 'Instances: the parameter sets of this version (instances/)',
+    'parts': 'Parts: the submodules this supermodule version is built from',
+    'levels': 'Nested levels: how deep the supermodule nests (1 when every part is a component)',
+}
+SUPER_ABOUT_SUFFIX = ', summed over every part (all nested levels), counting each use of a version'
+_contents_cache = {}
+
+
+def _leaf_contents(version):
+    '''Counts of one component version (cached per report run).'''
+    if version.key in _contents_cache:
+        return _contents_cache[version.key]
+    kinds = [v[3].strip() for v in version.config.get('variables_and_units') or []]
+    targets = []
+    if version.format == 'cellml' and os.path.isfile(version.cellml_path):
+        targets = component_equation_targets(version.cellml_path, version.module_type)
+    out = {'states': len({v for v, k in targets if k == 'ode'}),
+           'algebraic': len({v for v, k in targets if k == 'algebraic'}),
+           'parameters': sum(k in ('constant', 'global_constant') for k in kinds),
+           'boundary_conditions': kinds.count('boundary_condition'),
+           'ports': len(_ports(version.config)), 'equations': len(targets)}
+    _contents_cache[version.key] = out
+    return out
+
+
+def _sub_version(sub):
+    from cam_testing.library import load_version
+    try:
+        return load_version(sub['module_type'], sub['module_subtype'])
+    except (OSError, ValueError, KeyError):
+        return None
+
+
+def contents(version, _depth=0):
+    '''The contents summary bar: {key: count} (states, algebraic, parameters, boundary_conditions, ports,
+    equations, instances; a supermodule adds parts and levels, its other counts summed over its parts).'''
+    if not version.is_supermodule:
+        return dict(_leaf_contents(version), instances=len(version.instance_names()))
+    if _depth > 10:
+        raise ValueError(f'{version.key}: supermodules nest more than 10 levels (a cycle?)')
+    total = {k: 0 for k in ('states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations')}
+    levels, leaves = 1, 0
+    for sub in version.submodules:
+        sv = _sub_version(sub)
+        if sv is None:
+            continue
+        c = contents(sv, _depth + 1)
+        for k in total:
+            total[k] += c[k]
+        if sv.is_supermodule:
+            levels = max(levels, c['levels'] + 1)
+            leaves += c['components']
+        else:
+            leaves += 1
+    return dict(total, instances=len(version.instance_names()), parts=len(version.submodules), levels=levels,
+                components=leaves)
+
+
+def contents_bar(version, c, comp_id):
+    '''[{key, count, label, about, href}] for the version page's summary bar (and, compact, the module_type page).'''
+    sup = version.is_supermodule
+    structure = f'#{comp_id}-structure'
+    href = {'states': f'#{comp_id}-variables', 'algebraic': f'#{comp_id}-equations',
+            'parameters': f'#{comp_id}-variables', 'boundary_conditions': f'#{comp_id}-variables',
+            'ports': f'#{comp_id}-ports', 'equations': f'#{comp_id}-equations', 'instances': '#instances',
+            'parts': structure, 'levels': structure}
+    labels = {'states': ('state', 'states'), 'algebraic': ('algebraic', 'algebraic'),
+              'parameters': ('parameter', 'parameters'), 'boundary_conditions': ('boundary condition', 'boundary conditions'),
+              'ports': ('port', 'ports'), 'equations': ('equation', 'equations'), 'instances': ('instance', 'instances'),
+              'parts': ('part', 'parts'), 'levels': ('nested level', 'nested levels')}
+    short = {'states': 'st', 'algebraic': 'alg', 'parameters': 'par', 'boundary_conditions': 'BC', 'ports': 'ports',
+             'equations': 'eq', 'instances': 'inst', 'parts': 'parts', 'levels': 'levels'}
+    keys = ['states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations', 'instances']
+    if sup:
+        keys = ['parts', 'levels'] + keys
+    out = []
+    for k in keys:
+        n = c.get(k, 0)
+        about = CONTENTS_ABOUT[k]
+        if sup and k not in ('instances', 'parts', 'levels'):
+            about += SUPER_ABOUT_SUFFIX + f' ({c.get("components", 0)} component versions)'
+            link = structure        # a supermodule has no equations or variables of its own: its parts do
+        else:
+            link = href[k]
+        out.append({'key': k, 'count': n, 'label': labels[k][0 if n == 1 else 1],
+                    'short': 'level' if k == 'levels' and n == 1 else short[k], 'about': about,
+                    'href': link})
+    return out
+
+
+# ---- unit consistency ---------------------------------------------------------------------------
+
+def unit_consistency_context(version, equations):
+    '''The version page's "Unit consistency" block: shown only when libcellml found failures (or could not
+    check the equations); None when every equation is unit-consistent or the check doesn't apply.'''
+    r = checks.load_unit_consistency(version)
+    if r.get('status') not in (checks.UNITS_INCONSISTENT, checks.UNITS_NOT_CHECKED):
+        return None
+    groups = {}
+    for f in r.get('failures') or []:
+        key = f.get('equation') or f['message']
+        g = groups.setdefault(key, {'equation': f.get('equation'), 'variable': f.get('variable'),
+                                    'latex': equations[f['equation_index']] if f.get('equation_index') is not None
+                                    and f['equation_index'] < len(equations) else None,
+                                    'issues': []})
+        g['issues'].append(f)
+    return {'status': r['status'], 'message': r.get('message', ''), 'n_failures': r.get('n_failures', 0),
+            'equations': list(groups.values()), 'definition_issues': r.get('definition_issues') or [],
+            'other_issues': r.get('other_issues') or [], 'libcellml_version': r.get('libcellml_version'),
+            'timestamp': r.get('timestamp')}
+
+
+# ---- supermodule structure ----------------------------------------------------------------------
+
+def _port_types(version, sides):
+    if version is None or version.is_supermodule:
+        return set()
+    return {p['port_type'] for s in sides for p in version.config.get(s) or []}
+
+
+def _inner_version(sv, inner):
+    '''The version of part ``inner`` of supermodule version ``sv`` (or sv itself when inner is None).'''
+    if sv is None or inner is None:
+        return sv
+    sub = next((s for s in sv.submodules if s['name'] == inner), None)
+    return _sub_version(sub) if sub else None
+
+
+def _edge_ports(src, dst):
+    '''The port types libcuflynx can connect from src (exit / general) to dst (entrance / general).'''
+    return sorted(_port_types(src, ('exit_ports', 'general_ports')) & _port_types(dst, ('entrance_ports', 'general_ports')))
+
+
+def _global_names(version, _depth=0):
+    '''The global constants a version uses: a component's global_constant variables; a supermodule's globals
+    and its parts'.'''
+    if not version.is_supermodule:
+        return {v[0] for v in version.config.get('variables_and_units') or [] if v[3].strip() == 'global_constant'}
+    out = set(version.supermodule_globals)
+    if _depth < 10:
+        for sub in version.submodules:
+            sv = _sub_version(sub)
+            if sv is not None:
+                out |= _global_names(sv, _depth + 1)
+    return out
+
+
+def _system_model_uses(version):
+    '''(model, record) for every system-model record using this version (system_models/*/*/*_vessel_array.json).'''
+    import glob
+    from cam_testing.library import SYSTEM_MODELS_DIR
+    out = []
+    for path in sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_vessel_array.json'))):
+        try:
+            with open(path) as f:
+                rows = json.load(f)
+        except (OSError, ValueError):
+            continue
+        for r in rows if isinstance(rows, list) else []:
+            if isinstance(r, dict) and (r.get('module_type'), r.get('module_subtype')) == (version.vessel_type, version.name):
+                out.append((os.path.relpath(os.path.dirname(path), SYSTEM_MODELS_DIR).replace(os.sep, '/'), r))
+    return out
+
+
+def _mermaid_id(prefix, name):
+    return prefix + ''.join(ch if ch.isalnum() else '_' for ch in name)
+
+
+def _mermaid_text(text):
+    return text.replace('"', '#quot;')
+
+
+def _structure_tree(version, from_dir, _depth=0):
+    '''Nested [{name, key, href, is_supermodule, children}] of a supermodule's parts, for the collapsible tree.'''
+    out = []
+    for sub in version.submodules:
+        sv = _sub_version(sub)
+        node = {'name': sub['name'], 'key': f'{sub["module_type"]}/{sub["module_subtype"]}',
+                'href': os.path.relpath(sv.html_path, from_dir) if sv else None,
+                'is_supermodule': bool(sv and sv.is_supermodule), 'children': []}
+        if sv is not None and sv.is_supermodule and _depth < 10:
+            node['children'] = _structure_tree(sv, from_dir, _depth + 1)
+        out.append(node)
+    return out
+
+
+def supermodule_structure(version):
+    '''A supermodule version's parts and connections: {parts, edges, external, globals, mermaid, tree}.
+    Edges are the internal connections (inp_instances / out_instances between parts, and a part's
+    per_submodule_inputs / per_submodule_outputs naming a sibling, which couple one of that part's own
+    parts), with the port types libcuflynx can connect where the configs give them. External are the
+    couplings from outside: the supermodule versions that use this one and the system models whose
+    records name it, through per_submodule_inputs / per_submodule_outputs.'''
+    if not version.is_supermodule:
+        return None
+    subs = version.submodules
+    versions = {s['name']: _sub_version(s) for s in subs}
+    # the supermodule's own instance: rows <var>_<part> override the part's instance; others are globals
+    names = sorted(versions, key=len, reverse=True)
+    overrides, global_rows = {}, []
+    for p in version.default_instance.parameters():
+        owner = next((n for n in names if p.variable_name.endswith('_' + n)), None)
+        if owner is None:
+            global_rows.append({'name': p.variable_name, 'value': p.value, 'units': p.units})
+        else:
+            overrides.setdefault(owner, []).append({'name': p.variable_name, 'var': p.variable_name[:-len(owner) - 1],
+                                                    'value': p.value, 'units': p.units})
+    sup_globals = set(version.supermodule_globals)
+
+    edges = {}
+
+    def add_edge(src, dst, src_inner=None, dst_inner=None):
+        k = (src, dst, src_inner, dst_inner)
+        if k in edges or src not in versions or dst not in versions:
+            return
+        a = _inner_version(versions[src], src_inner)
+        b = _inner_version(versions[dst], dst_inner)
+        edges[k] = {'src': src, 'dst': dst, 'src_inner': src_inner, 'dst_inner': dst_inner, 'ports': _edge_ports(a, b)}
+
+    for s in subs:
+        for t in s.get('out_instances') or []:
+            add_edge(s['name'], t)
+        for t in s.get('inp_instances') or []:
+            add_edge(t, s['name'])
+        for inner, others in (s.get('per_submodule_outputs') or {}).items():
+            for t in others:
+                add_edge(s['name'], t, src_inner=inner)
+        for inner, others in (s.get('per_submodule_inputs') or {}).items():
+            for t in others:
+                add_edge(t, s['name'], dst_inner=inner)
+    # a plain connection to a supermodule part that a per_submodule_* entry resolves (e.g. axon's inp_instances
+    # ["soma"] and soma's per_submodule_outputs {"membrane": ["axon"]}) is one coupling: keep the resolved one
+    resolved = {(e['src'], e['dst']) for e in edges.values() if e['src_inner'] or e['dst_inner']}
+    edges = [e for e in edges.values() if e['src_inner'] or e['dst_inner'] or (e['src'], e['dst']) not in resolved]
+    for e in edges:
+        e['label'] = (e['src'] + (f'/{e["src_inner"]}' if e['src_inner'] else '') + ' → '
+                      + e['dst'] + (f'/{e["dst_inner"]}' if e['dst_inner'] else ''))
+
+    # couplings from outside: supermodules using this version, and system models
+    external = {}
+
+    def add_external(part, ext, direction, where, href):
+        k = (part, ext, direction)
+        row = external.setdefault(k, {'part': part, 'external': ext, 'direction': direction, 'where': []})
+        if all(w['name'] != where for w in row['where']):
+            row['where'].append({'name': where, 'href': href})
+
+    for parent in _supermodule_index().get((version.vessel_type, version.name)) or []:
+        href = os.path.relpath(parent.html_path, version.dir)
+        for rec in parent.submodules:
+            if (rec['module_type'], rec['module_subtype']) != (version.vessel_type, version.name):
+                continue
+            for part, others in (rec.get('per_submodule_inputs') or {}).items():
+                for o in others:
+                    add_external(part, o, 'in', parent.key, href)
+            for part, others in (rec.get('per_submodule_outputs') or {}).items():
+                for o in others:
+                    add_external(part, o, 'out', parent.key, href)
+    for model, rec in _system_model_uses(version):
+        for part, others in (rec.get('per_submodule_inputs') or {}).items():
+            for o in others:
+                add_external(part, o, 'in', f'system model {model}', None)
+        for part, others in (rec.get('per_submodule_outputs') or {}).items():
+            for o in others:
+                add_external(part, o, 'out', f'system model {model}', None)
+    external = sorted(external.values(), key=lambda r: (r['part'], r['direction'], r['external']))
+
+    parts = []
+    for s in subs:
+        sv = versions[s['name']]
+        ports = []
+        if sv is not None and not sv.is_supermodule:
+            ports = [f'{p["side"]} {p["type"]}' for p in _ports(sv.config)]
+        uses = _global_names(sv) if sv is not None else set()
+        parts.append({
+            'name': s['name'], 'module_type': s['module_type'], 'version': s['module_subtype'],
+            'instance': s.get('instance') or '(default)', 'is_supermodule': bool(sv and sv.is_supermodule),
+            'n_parts': len(sv.submodules) if sv is not None and sv.is_supermodule else 0,
+            'href': os.path.relpath(sv.html_path, version.dir) if sv is not None else None,
+            'missing': sv is None, 'ports': ports,
+            'inputs': [e for e in edges if e['dst'] == s['name']],
+            'outputs': [e for e in edges if e['src'] == s['name']],
+            'external': [r for r in external if r['part'] == s['name']],
+            'overrides': overrides.get(s['name'], []),
+            'globals': sorted(uses & (sup_globals | {g['name'] for g in global_rows})),
+        })
+
+    # the diagram (mermaid flowchart)
+    lines = ['flowchart LR']      # many parts stack vertically: readable at page width
+    for p in parts:
+        nid = _mermaid_id('p_', p['name'])
+        label = f'<b>{p["name"]}</b><br/>{p["module_type"]} / {p["version"]}'
+        if p['is_supermodule']:
+            label += f'<br/><i>supermodule, {p["n_parts"]} parts</i>'
+        shape = ('[["', '"]]') if p['is_supermodule'] else ('["', '"]')
+        lines.append(f'  {nid}{shape[0]}{_mermaid_text(label)}{shape[1]}')
+        if p['href']:
+            lines.append(f'  click {nid} "{p["href"]}" "open {p["module_type"]} {p["version"]}"')
+    labelled = len(edges) <= 20
+    for e in edges:
+        label = []
+        if e['src_inner'] or e['dst_inner']:
+            label.append(e['label'])
+        if e['ports'] and labelled:
+            label.append(', '.join(e['ports']))
+        arrow = f'-->|"{_mermaid_text(" · ".join(label))}"|' if label and (labelled or e['src_inner'] or e['dst_inner']) else '-->'
+        lines.append(f'  {_mermaid_id("p_", e["src"])} {arrow} {_mermaid_id("p_", e["dst"])}')
+    # one dashed node per outside module (e.g. a volume_sum coupled to all four chambers)
+    xids = {}
+    for r in external:
+        where = sorted({w['name'] for w in r['where']})
+        key = (r['external'], tuple(where))
+        if key not in xids:
+            xids[key] = f'x{len(xids)}'
+            short = [w.rsplit('/', 1)[-1] if w.startswith('system model ') else w for w in where]   # model name only
+            shown = ', '.join(short[:2]) + (f' +{len(short) - 2}' if len(short) > 2 else '')
+            label = f'‹{r["external"]}›<br/><i>{shown}</i>'
+            lines.append(f'  {xids[key]}(["{_mermaid_text(label)}"]):::ext')
+        xid, pid = xids[key], _mermaid_id('p_', r['part'])
+        lines.append(f'  {xid} -.-> {pid}' if r['direction'] == 'in' else f'  {pid} -.-> {xid}')
+    lines.append('  classDef ext stroke-dasharray: 5 4')
+    return {'parts': parts, 'edges': edges, 'external': external, 'labelled': labelled,
+            'globals': sorted(sup_globals), 'global_rows': global_rows, 'mermaid': '\n'.join(lines),
+            'tree': _structure_tree(version, version.dir)}
+
+
 def component_context(version):
     '''The version page's content (what was a component's section of a module page).'''
     equations, unsupported, cellml_vars = _cellml_equations(version)
@@ -351,6 +687,9 @@ def component_context(version):
         'invariants': version.spec.get('invariants') or [],
         'tests': tests, 'instances': [instance_context(version, i) for i in version.instances()],
         'phlynx_compatible': _phlynx_compatible(tests),
+        'contents': contents_bar(version, contents(version), version.id),
+        'unit_consistency': unit_consistency_context(version, equations),
+        'structure_view': supermodule_structure(version),
     }
 
 
@@ -447,6 +786,8 @@ def version_context(version):
                         + [f'{t}: {why}' for t, why in (version.spec.get('expected_failures') or {}).items()],
         'test_keys': [t['key'] for t in comp['tests']], 'test_short': {t['key']: t['short'] for t in comp['tests']},
         'phlynx': _module_phlynx([comp]), 'bc_summary': _bc_summary(comp),
+        'licence': version.licence, 'licence_url': LICENCES.get(version.licence), 'creators': version.creators,
+        'unit_failures': (comp['unit_consistency'] or {}).get('n_failures', 0),
         'module_type_href': f'../../{version.vessel_type}.html',
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
     }
@@ -472,7 +813,10 @@ def module_context(name, version_contexts=None):
                      'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
                      'phlynx': c['phlynx'], 'phlynx_compatible': comp['phlynx_compatible'], 'tests': comp['tests'],
                      'instances': comp['instances'], 'submodules': comp['submodules'],
-                     'known_issues': len(c['known_issues']), 'is_supermodule': c['is_supermodule']})
+                     'known_issues': len(c['known_issues']), 'is_supermodule': c['is_supermodule'],
+                     'contents': comp['contents'], 'unit_failures': c['unit_failures'],
+                     'unit_status': (comp['unit_consistency'] or {}).get('status'),
+                     'creators': c['creators'], 'licence': c['licence']})
     counts = {}
     for c in vctx:
         for k, n in c['counts'].items():
@@ -626,6 +970,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     contexts = {}
     _index_cache.clear()
+    _contents_cache.clear()
     for name in select_module_types(args.module):
         out, ctx = build_module(name)
         contexts[name] = ctx

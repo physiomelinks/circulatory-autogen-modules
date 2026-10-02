@@ -21,6 +21,8 @@ td.wrap-cell { white-space: normal; font-size: 0.8rem; max-width: 34ch; }
 .box.on { background: var(--pass); border-color: var(--pass); }
 .box.on::after { content: ""; position: absolute; left: 3.5px; top: 0.5px; width: 3px; height: 7px; border: solid var(--panel); border-width: 0 2px 2px 0; transform: rotate(45deg); }
 footer { color: var(--ink-3); font-size: 0.8rem; }
+.contents { font-size: 0.74rem; color: var(--ink-2); white-space: normal; max-width: 30ch; }
+.contents span { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -50,12 +52,14 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
     <h2 id="versions-h">Versions</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Version</th><th>Component</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}<th>Instances</th><th>Calibration</th><th>Sourced</th><th>Max P(fail)</th><th>Status</th></tr></thead>
+        <thead><tr><th>Version</th><th>Component</th><th>Contents</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}<th>Instances</th><th>Calibration</th><th>Sourced</th><th>Max P(fail)</th><th>Status</th></tr></thead>
         <tbody>
         {%- for v in versions %}
           <tr>
             <td class="name"><a href="{{ v.href }}">{{ v.version }}</a></td>
             <td class="mono" style="font-size:0.78rem">{% if v.is_supermodule %}supermodule ({{ v.submodules|length }} submodules){% else %}{{ v.component_type }}{% if v.format != 'cellml' %} ({{ v.format }}){% endif %}{% endif %}</td>
+            <td class="contents">{% for k in v.contents %}<span title="{{ k.about }}"><a href="{{ v.href }}{{ k.href }}" style="color:inherit;text-decoration:none">{{ k.count }} {{ k.short }}</a></span>{% if not loop.last %} · {% endif %}{% endfor %}
+              {%- if v.unit_failures %}<br><a href="{{ v.href }}#unit-consistency" class="todo" title="libcellml unit checks: undefined units or equations whose units are inconsistent (informational)">{{ v.unit_failures }} unit issue{{ '' if v.unit_failures == 1 else 's' }}</a>{% elif v.unit_status == 'not_checked' %}<br><a href="{{ v.href }}#unit-consistency" class="todo" title="libcellml could not check the equations' units">units not checked</a>{% endif %}</td>
             {%- for t in v.tests %}<td title="{{ t.message }}">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}{% for l in t.links %}<br><a href="{{ l.href_module }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}
             <td class="wrap-cell mono">{% for i in v.instances %}{{ i.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
             <td class="wrap-cell">{% for i in v.instances %}{% if i.calibrate %}<span class="mono">{{ i.name }}</span> {{ chip(i.calibrate.status) }}{% if not loop.last %}<br>{% endif %}{% endif %}{% endfor %}</td>
@@ -63,7 +67,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
             <td class="num">{{ '%.2f'|format(v.max_risk) if v.max_risk is not none else '—' }}</td>
             <td>{{ 'Reviewed' if v.reviewed else 'Not reviewed yet' }}</td>
           </tr>
-          {%- if v.notes %}<tr><td></td><td colspan="{{ test_keys|length + 7 }}" class="muted" style="white-space:normal;font-size:0.8rem">{{ v.notes }}</td></tr>{% endif %}
+          {%- if v.notes %}<tr><td></td><td colspan="{{ test_keys|length + 8 }}" class="muted" style="white-space:normal;font-size:0.8rem">{{ v.notes }}</td></tr>{% endif %}
         {%- endfor %}
         </tbody>
       </table>

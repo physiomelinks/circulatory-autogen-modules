@@ -1542,3 +1542,179 @@ CHECKS = {
     'validation_test_baseline': validation_test_baseline,
     'validation_test_calibrate': validation_test_calibrate,
 }
+
+
+# ----------------------------------------------------------------------------------------------
+# unit consistency (libcellml): informational, not a test column; no simulation
+# ----------------------------------------------------------------------------------------------
+
+UNIT_CONSISTENCY = 'unit_consistency'
+UNITS_CONSISTENT, UNITS_INCONSISTENT, UNITS_NOT_CHECKED = 'consistent', 'inconsistent', 'not_checked'
+# libcellml 0.6 ANALYSER_UNITS messages: "The units in '<expr>'[ in '<parent>' ...][ in equation '<eq>'] in component
+# '<c>' are not equivalent. '<a>' is in '<u>' (i.e. '<base>') while '<b>' is '<u>'." and "The unit of '<expr>' ... is not
+# dimensionless. '<expr>' is in '<u>'."
+_UNITS_ISSUE = re.compile(r"^The units? (?:in|of) '(?P<expression>[^']*)'(?P<chain>.*?) in component '(?P<component>[^']*)' "
+                          r"(?:are|is) (?P<what>[^.]*)\.\s*(?P<detail>.*)$", re.S)
+_UNITS_EQUATION = re.compile(r" in equation '(?P<equation>[^']*)'")
+_UNITS_SIDE = re.compile(r"'(?P<expression>[^']*)' is (?:in )?'(?P<units>[^']*)'(?: \(i\.e\. '(?P<base>[^']*)'\))?")
+
+
+def unit_consistency_path(version):
+    return os.path.join(version.results_dir, f'{UNIT_CONSISTENCY}.json')
+
+
+def _units_model(version):
+    '''The version's CellML component as a stand-alone libcellml model: its units file's units added,
+    every input made a local constant (initial value 1) unless an equation defines it or it is the
+    variable of integration, so the analyser can check the equations' units on their own.'''
+    import xml.etree.ElementTree as ET
+    import libcellml
+    from cam_testing.mathml import CELLML_NS, MATHML_NS
+    parser = libcellml.Parser(False)        # CellML 1.1 -> 2.0
+    with open(version.cellml_path) as f:
+        model = parser.parseModel(f.read())
+    if os.path.isfile(version.units_path):
+        with open(version.units_path) as f:
+            units_model = parser.parseModel(f.read())
+        for i in range(units_model.unitsCount()):
+            u = units_model.units(i)
+            if not model.hasUnits(u.name()):
+                model.addUnits(u.clone())
+    model.linkUnits()
+    if not re.match(r'[A-Za-z_]', model.name() or ''):
+        model.setName('m_' + (model.name() or 'model'))   # a CellML 2.0 identifier can't start with a digit
+    root = ET.parse(version.cellml_path).getroot()
+    defined = {}
+    from cam_testing.mathml import equation_target
+    for comp in root.iter(f'{{{CELLML_NS}}}component'):
+        bvars = {(ci.text or '').strip() for b in comp.iter(f'{{{MATHML_NS}}}bvar') for ci in b.iter(f'{{{MATHML_NS}}}ci')}
+        targets = {equation_target(eq)[0] for m in comp.iter(f'{{{MATHML_NS}}}math') for eq in m}
+        defined[comp.get('name')] = bvars | targets
+    for ci in range(model.componentCount()):
+        c = model.component(ci)
+        keep = defined.get(c.name(), set())
+        for vi in range(c.variableCount()):
+            var = c.variable(vi)
+            var.removeInterfaceType()
+            init = var.initialValue()
+            if var.name() not in keep and not init:
+                var.setInitialValue('1')
+            elif init in keep:
+                # a state initialised by a computed variable (e.g. a gate's steady state): the analyser
+                # stops at that before checking any units, and an initial value doesn't enter the equations
+                var.setInitialValue('1')
+    return model
+
+
+def unit_consistency(version, save=True):
+    '''
+    libcellml's unit checks on the version's CellML component (no simulation): the Validator's units
+    issues (undefined or invalid units) and the Analyser's ANALYSER_UNITS issues (the two sides of an
+    equation, or the terms of a sum, in units that are not equivalent or differ by a scaling factor).
+    Each analyser issue is mapped to the equation it is about (equation_index, in the order of
+    mathml.component_equations, and the variable that equation defines). Written to
+    results/unit_consistency.json; informational, not a test column.
+    '''
+    import libcellml
+    from cam_testing.mathml import component_equation_targets
+    out = {'status': UNITS_NOT_CHECKED, 'message': '', 'n_failures': 0, 'n_equations': 0, 'failures': [],
+           'definition_issues': [], 'other_issues': [], 'libcellml_version': libcellml.versionString()}
+    if version.is_supermodule:
+        out.update(status=NOT_APPLICABLE, message='a supermodule has no CellML of its own: each part is checked in its '
+                                                  'own version')
+    elif version.format != 'cellml' or not os.path.isfile(version.cellml_path):
+        out.update(status=NOT_APPLICABLE, message=f'no CellML component to check (module_format {version.format})')
+    else:
+        try:
+            out.update(_unit_issues(version, component_equation_targets(version.cellml_path, version.module_type)))
+        except Exception as e:  # noqa: BLE001
+            out.update(status=UNITS_NOT_CHECKED, message=f'libcellml could not check the units: {type(e).__name__}: {e}')
+    out['timestamp'] = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    if save:
+        path = unit_consistency_path(version)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w') as f:
+            json.dump(out, f, indent=2)
+    return out
+
+
+def _unit_issues(version, targets):
+    import libcellml
+    model = _units_model(version)
+    rule = libcellml.Issue.ReferenceRule
+    error = libcellml.Issue.Level.ERROR
+    validator = libcellml.Validator()
+    validator.validateModel(model)
+    definition = []
+    for i in range(validator.issueCount()):
+        it = validator.issue(i)
+        name = next((n for n in dir(rule) if getattr(rule, n) == it.referenceRule() and n.isupper()), '')
+        if it.level() == error and 'UNIT' in name:
+            definition.append({'rule': name, 'message': it.description()})
+    analyser = libcellml.Analyser()
+    analyser.analyseModel(model)
+    failures, other = [], []
+    for i in range(analyser.issueCount()):
+        it = analyser.issue(i)
+        if it.referenceRule() == rule.ANALYSER_UNITS:
+            failures.append(_unit_failure(it.description(), targets))
+        elif it.level() == error:
+            other.append(it.description())
+    n_equations = len({f['equation'] or f['message'] for f in failures})
+    if failures or definition:
+        status = UNITS_INCONSISTENT
+    elif other:
+        # libcellml's analyser checks units only once the model is otherwise valid
+        return {'status': UNITS_NOT_CHECKED, 'n_failures': 0, 'n_equations': 0, 'failures': [], 'definition_issues': [],
+                'other_issues': other,
+                'message': 'libcellml could not check the equations\' units: ' + '; '.join(other[:3])
+                           + (f' (and {len(other) - 3} more)' if len(other) > 3 else '')}
+    else:
+        return {'status': UNITS_CONSISTENT, 'message': 'every equation is unit-consistent', 'n_failures': 0,
+                'n_equations': 0, 'failures': [], 'definition_issues': [], 'other_issues': []}
+    parts = []
+    if failures:
+        parts.append(f'{n_equations} equation{"" if n_equations == 1 else "s"} with inconsistent units'
+                     + (f' ({len(failures)} issues)' if len(failures) != n_equations else ''))
+    if definition:
+        parts.append(f'{len(definition)} undefined or invalid units' + (
+            ', so libcellml could not check the equations' if not failures and other else ''))
+    return {'status': status, 'message': '; '.join(parts), 'n_failures': n_equations + len(definition),
+            'n_equations': n_equations, 'failures': failures, 'definition_issues': definition, 'other_issues': other}
+
+
+def _unit_failure(description, targets):
+    '''One ANALYSER_UNITS issue -> {equation, variable, equation_index, kind, sides, message}.'''
+    m = _UNITS_ISSUE.match(description.strip())
+    row = {'message': description.strip(), 'equation': None, 'expression': None, 'variable': None,
+           'equation_index': None, 'kind': 'not equivalent', 'sides': []}
+    if not m:
+        return row
+    # a sub-expression's issue names its equation: "The units in '<sub>' in '<...>' in equation '<eq>' ..."
+    e = _UNITS_EQUATION.search(m['chain'])
+    eq = e['equation'] if e else m['expression']
+    row['equation'] = eq
+    row['expression'] = m['expression'] if e else None
+    what = m['what']
+    row['kind'] = ('not dimensionless' if 'dimensionless' in what else
+                   'scaling factor' if 'scaling' in what or 'multiplication' in m['detail'] else 'not equivalent')
+    row['sides'] = [{'expression': x['expression'], 'units': x['units'], 'base': x['base']}
+                    for x in _UNITS_SIDE.finditer(m['detail'])]
+    lhs = eq.split(' = ', 1)[0].strip()
+    r = re.fullmatch(r'd(\w+)/d\w+', lhs)
+    var = r[1] if r else (lhs if re.fullmatch(r'\w+', lhs) else None)
+    row['variable'] = var
+    if var is not None:
+        row['equation_index'] = next((k for k, (v, _) in enumerate(targets) if v == var), None)
+    return row
+
+
+def load_unit_consistency(version):
+    '''The recorded unit check (results/unit_consistency.json), recomputed when missing or older than the
+    version's CellML, units or config file.'''
+    path = unit_consistency_path(version)
+    sources = [p for p in (version.cellml_path, version.units_path, version.config_path) if os.path.isfile(p)]
+    if os.path.isfile(path) and all(os.path.getmtime(path) >= os.path.getmtime(p) for p in sources):
+        with open(path) as f:
+            return json.load(f)
+    return unit_consistency(version)

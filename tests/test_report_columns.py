@@ -179,8 +179,8 @@ def test_report_links_and_counts_for_calibration_in_super():
     assert t['status'] in (checks.PASSED_IN_SUPER, checks.FAILED_IN_SUPER)
     assert t['status_label'] in ('Pass in super', 'Fail in super')
     link = next(l for l in t['links'] if l['key'] == 'soma/sympathetic')
-    assert link['href'] == '../../../soma/versions/sympathetic/soma_sympathetic.html'
-    assert link['href_module'] == '../soma/versions/sympathetic/soma_sympathetic.html'
+    assert link['href'] == '../../../versions/sympathetic/soma_sympathetic.html'
+    assert link['href_module'] == '../versions/sympathetic/soma_sympathetic.html'
     counts = report._status_counts([{'tests': [t], 'instances': []}])
     assert counts.get(checks.PASSED_IN_SUPER, 0) == 0 and counts.get(checks.FAILED_IN_SUPER, 0) == 0
     assert counts['passed'] + counts['failed'] == 1

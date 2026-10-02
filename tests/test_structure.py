@@ -22,8 +22,8 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from cam_testing import bib
-from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, MODULES_DIR, REPO_ROOT, SYSTEM_MODELS_DIR, TESTS_KEYS,
-                                 VERIFICATION_KEYS, VERSIONS, all_versions, ancestors_of, load_version,
+from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, MODULES_DIR, REPO_ROOT, SYSTEM_MODELS_DIR,
+                                 TESTS_KEYS, VERIFICATION_KEYS, VERSIONS, all_versions, ancestors_of, load_version,
                                  misplaced_spec_keys, module_relpath, module_type_names, parent_of, read_spec_files)
 from cam_testing.mathml import component_names
 
@@ -564,6 +564,40 @@ def test_vessel_array_matches_libcuflynx_schema(path):
 @pytest.mark.parametrize('path', MODULE_CONFIGS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
 def test_module_config_matches_libcuflynx_schema(path):
     _validate(path, 'module_config.schema.json')
+
+
+def licence_and_creator_problems(entry):
+    '''The config entry's "licence" (an SPDX id from library.LICENCES) and "creator" (a list of names).'''
+    problems = []
+    if 'licence' not in entry:
+        problems.append('no "licence"')
+    elif entry['licence'] not in LICENCES:
+        problems.append(f'licence {entry["licence"]!r} is not one of {sorted(LICENCES)}')
+    if 'creator' not in entry:
+        problems.append('no "creator"')
+    elif not (isinstance(entry['creator'], list) and all(isinstance(c, str) and c.strip() for c in entry['creator'])):
+        problems.append(f'creator {entry["creator"]!r} is not a list of names')
+    return problems
+
+
+def test_every_config_entry_has_licence_and_creator():
+    '''Every version's config entry has "licence" (CC0-1.0, CC-BY-4.0, MIT, Apache-2.0 or 0BSD) and
+    "creator" (a list of names, empty until given in review).'''
+    problems = []
+    for path in MODULE_CONFIGS:
+        with open(path) as f:
+            for e in json.load(f):
+                problems += [f'{os.path.relpath(path, MODULES_DIR)}: {p}' for p in licence_and_creator_problems(e)]
+    assert not problems, '\n'.join(problems[:30])
+
+
+def test_licence_and_creator_rules():
+    assert licence_and_creator_problems({'licence': 'CC0-1.0', 'creator': []}) == []
+    assert licence_and_creator_problems({'licence': 'MIT', 'creator': ['A. Author']}) == []
+    assert licence_and_creator_problems({'creator': []}) == ['no "licence"']
+    assert 'is not one of' in licence_and_creator_problems({'licence': 'GPL-3.0', 'creator': []})[0]
+    assert 'not a list of names' in licence_and_creator_problems({'licence': 'MIT', 'creator': 'A. Author'})[0]
+    assert licence_and_creator_problems({'licence': 'MIT'}) == ['no "creator"']
 
 
 @pytest.mark.parametrize('path', OBS_DATA, ids=lambda p: os.path.relpath(p, MODULES_DIR))

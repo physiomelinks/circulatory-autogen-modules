@@ -34,7 +34,7 @@ import yaml
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES_DIR = os.path.join(REPO_ROOT, 'modules')
 sys.path.insert(0, REPO_ROOT)
-from cam_testing.library import normalise_config_entry, to_phlynx_entry  # noqa: E402
+from cam_testing.library import normalise_config_entry, to_phlynx_entry, with_record_keys  # noqa: E402
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
 
@@ -265,7 +265,7 @@ def import_module(name, cellml_src, config_src, unit_blocks, sources, reseed):
     # Written in PhLynx's key names (the library's format; libcuflynx reads both), with the
     # CellML file named as it is in this repo.
     with open(os.path.join(dest, f'{name}_modules_config.json'), 'w') as f:
-        json.dump([to_phlynx_entry(dict(e, module_file=f'{name}_modules.cellml')) for e in config], f, indent=2,
+        json.dump([with_record_keys(to_phlynx_entry(dict(e, module_file=f'{name}_modules.cellml'))) for e in config], f, indent=2,
                   ensure_ascii=False)
         f.write('\n')
 
