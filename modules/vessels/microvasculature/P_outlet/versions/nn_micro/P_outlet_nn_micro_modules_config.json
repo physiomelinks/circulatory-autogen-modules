@@ -10,15 +10,14 @@
     "creator": [],
     "entrance_ports": [
       {
-        "port_type": "flow_port",
+        "port_type": "vessel_port",
         "variables": [
-          "v"
-        ]
-      },
-      {
-        "port_type": "pressure_port",
-        "variables": [
+          "v",
           "P"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       }
     ],

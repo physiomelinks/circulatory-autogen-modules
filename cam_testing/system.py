@@ -86,7 +86,11 @@ def generate(system, work_dir, reference=False, quiet=True):
         'model_type': 'cellml', 'solver': 'CVODE_myokit',
         'resources_dir': resources, 'generated_models_dir': out_dir, 'DEBUG': False,
     }
-    if not reference:
+    if reference:
+        # the original is built from libcuflynx's bundled modules: say so, or a
+        # CUFLYNX_MODULE_LIBRARY in the environment would build it from a library instead
+        config['use_builtin_modules'] = True
+    else:
         config.update({'module_library_dirs': [MODULES_DIR], 'use_builtin_modules': False})
     log = io.StringIO()
     try:

@@ -388,13 +388,14 @@ def _run_point(cm):
     return {(harness.parameter_name(by_var[k]) if k in by_var else k): float(v) for k, v in (cm.spec.get('run_parameters') or {}).items()}
 
 
-CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp): libcuflynx generates the 0D model coupled to it '
+CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp or external_api): libcuflynx generates the 0D model coupled to it '
                       '(checked by run_test), but the 1D solver it couples to is not runnable here, so there is no '
                       'simulation to check')
 
 
 def is_cpp(component):
-    return component.config.get('module_format', 'cellml') == 'cpp'
+    # cpp: the C++ 1D solver component as it was; external_api: the same, described by an api block
+    return component.config.get('module_format', 'cellml') in ('cpp', 'external_api')
 
 
 def _cpp_not_applicable(cm, test):
@@ -434,18 +435,25 @@ def cpp_generation_check(cm):
         tail = [l for l in log.getvalue().splitlines() if l.strip()][-6:]
         if not ok:
             return Result('run_test', FAILED, 'C++ 0D-1D generation failed: ' + (tail[-1] if tail else ''), details=tail)
-        src = os.path.join(cfg['cpp_generated_models_dir'], 'model0d.cc')
+        out_dir = cfg['cpp_generated_models_dir']
+        # libcuflynx's template generator writes model0d.cpp (+ model0d_core.c/.h); before it, model0d.cc
+        src = os.path.join(out_dir, 'model0d.cpp')
+        if not os.path.exists(src):
+            src = os.path.join(out_dir, 'model0d.cc')
         coupler = [f for f in os.listdir(cfg['cpp_generated_models_dir']) if f.endswith('_coupler1d0d.json')]
         metrics = {'generated': sorted(os.listdir(cfg['cpp_generated_models_dir'])), 'coupler': coupler}
         gxx = shutil.which('g++')
         if not gxx:
             return Result('run_test', PASSED, 'generated the C++ 0D model and 0D-1D coupler (g++ not available, '
                           'compilation not checked)', metrics)
-        p = subprocess.run([gxx, '-std=c++17', '-fsyntax-only', src], capture_output=True, text=True)
+        includes = ['-I', out_dir]
+        if os.environ.get('SUNDIALS_DIR'):
+            includes += ['-I', os.path.join(os.environ['SUNDIALS_DIR'], 'include')]
+        p = subprocess.run([gxx, '-std=c++17', '-fsyntax-only'] + includes + [src], capture_output=True, text=True)
         if p.returncode != 0:
-            return Result('run_test', FAILED, 'generated model0d.cc does not compile: '
+            return Result('run_test', FAILED, f'generated {os.path.basename(src)} does not compile: '
                           + (p.stderr.strip().splitlines() or [''])[0][:300], metrics, details=p.stderr.splitlines()[:20])
-        return Result('run_test', PASSED, 'generated the C++ 0D model coupled to the 1D vessel (model0d.cc, '
+        return Result('run_test', PASSED, f'generated the C++ 0D model coupled to the 1D vessel ({os.path.basename(src)}, '
                       f'{", ".join(coupler)}) and it compiles; the 1D solver itself is not runnable here', metrics)
     return _guard(cm.component, 'run_test', check)
 

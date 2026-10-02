@@ -29,6 +29,10 @@
         "variables": [
           "v_out",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -72,6 +76,32 @@
         "port_type": "volume_port",
         "variables": [
           "q"
+        ]
+      },
+      {
+        "port_type": "pressure_and_deriv_port",
+        "variables": [
+          "u",
+          "du_dt"
+        ]
+      },
+      {
+        "port_type": "pressure_feedback_port",
+        "variables": [
+          "u"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "radius_us_and_s_port",
+        "variables": [
+          "r_0",
+          "r"
         ]
       }
     ],
@@ -213,6 +243,12 @@
         "Js_per_m6",
         "access",
         "boundary_condition"
+      ],
+      [
+        "du_dt",
+        "J_per_m3s",
+        "access",
+        "variable"
       ]
     ]
   }
