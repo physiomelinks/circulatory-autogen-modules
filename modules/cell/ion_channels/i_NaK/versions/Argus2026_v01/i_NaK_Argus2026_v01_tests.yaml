@@ -1,11 +1,13 @@
 module_type: i_NaK
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
-  constant has epsilon_tau = 0.1 ms added, as in the original. Na/K pump of the SN soma (Lindblad 1996 form), with its fluxes
-  j_NaK_Na = -3 i_NaK/F and j_NaK_K = 2 i_NaK/F. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
-  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
-  reproduce SN_simple.
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Na/K pump of the SN
+  soma (Lindblad 1996 form), with its fluxes j_NaK_Na = -3 i_NaK/F and j_NaK_K = 2 i_NaK/F. Split out of the monolithic SN_soma
+  / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat
+  checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal current is k_NaK
+  = A_mem rho_NaK r_NaK e (membrane area x density x turnover x elementary charge, one net charge per cycle), A_mem from the
+  membrane through membrane_area; the defaults reproduce the previous k_NaK.'
 reference_proposals:
   Ko:
     reference: 'BoronBoulpaep2017; typical extracellular K 4.5 mM [NOT VERIFIED: full text not accessible; value not seen
@@ -38,9 +40,13 @@ reference_proposals:
     reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
     sourced: 'no'
     value: -70.0
-  k_NaK:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
-    sourced: 'no'
+  rho_NaK:
+    value: 750.0
+    reference: Landowne1970; ouabain binding, at most 750 Na/K pump sites/um^2 in rabbit vagus C fibres (Abstract, point 4;
+      an upper limit)
+    sourced: 'yes'
+    previous: 'previous k_NaK (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''user_defined'')'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

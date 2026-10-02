@@ -6,7 +6,7 @@
   "dt": 0.0001,
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
-  "outputs": ["V", "V_sensed", "I_in_delayed"],
+  "outputs": ["V", "V_sensed", "I_in_delayed", "Cm", "A_mem", "Vol"],
   "run_parameters": {"I_in": 0.05},
   "invariants": [
     {
@@ -16,7 +16,12 @@
   ],
   "bc_sweep": {
     "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
-    "ranges": {}
+    "ranges": {
+      "d": {
+        "values": [19.275732104070492, 22.065205075171992, 24.285900630052804, 27.80041634445638, 30.59831741945869]
+      }
+    },
+    "rationale": "Constants by factors 0.5-2; the diameter d by the cube roots of those factors, so the volume k_V d^3 spans 0.5-2 of its value (as Vol did) and the area k_A d^2 0.63-1.59; k_A and c_m scale Cm by 0.5-2 (as Cm did)."
   },
   "timestep": {
     "scheme": "rk4",

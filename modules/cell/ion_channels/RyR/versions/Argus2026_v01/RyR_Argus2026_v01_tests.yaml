@@ -1,11 +1,13 @@
 module_type: RyR
 version: Argus2026_v01
 reviewed: false
-notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
-  constant has epsilon_tau = 0.1 ms added, as in the original. Ryanodine receptor Ca release from the ER of the SN soma and
-  varicosity (the same law in both): j_RyR = k_RyR (Ca_ER - Cai) c^3 hc^3, c activated by Cai and hc by Ca_ER. Split out of
-  the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
-  in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Ryanodine receptor Ca
+  release from the ER of the SN soma and varicosity (the same law in both): j_RyR = k_RyR (Ca_ER - Cai) c^3 hc^3, c activated
+  by Cai and hc by Ca_ER. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script
+  (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  Geometry re-parameterisation (2026-10-02): k_RyR = A_ER rho_RyR k_RyR_single (membrane area x density x per-protein permeability,
+  1e-18 m3/um3), A_ER through the A_ER port; the defaults reproduce the previous k_RyR.'
 reference_proposals:
   Ca_ER:
     reference: definitional; Ca_ER_init (0.6 mM) used when unconnected
@@ -33,11 +35,6 @@ reference_proposals:
       RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
       so it has no literature constants'
     sourced: 'no'
-  k_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'');
-      the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
   tau_c_RyR:
     reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
       RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
@@ -47,6 +44,13 @@ reference_proposals:
     reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
       RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
       so it has no literature constants'
+    sourced: 'no'
+  rho_RyR:
+    reference: 'definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 1.5e-13
+      m3_per_s (to_be_identified) with A = 86.01 um^2 (the soma ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density
+      for calibration through k_RyR_single. The previous k_RyR (as proposed in review): unreferenced_placeholder; owner''s
+      hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
+      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants'
     sourced: 'no'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this

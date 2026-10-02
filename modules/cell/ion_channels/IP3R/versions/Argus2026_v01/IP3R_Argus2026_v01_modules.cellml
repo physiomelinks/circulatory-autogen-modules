@@ -15,7 +15,10 @@
         <variable name="h_IP3_inf" public_interface="out" units="dimensionless"/>
         <variable name="h_IP3_init" public_interface="in" units="dimensionless"/>
         <variable name="j_IP3" public_interface="out" units="mol_per_s"/>
-        <variable name="k_IP3" public_interface="in" units="m3_per_s"/>
+        <variable name="k_IP3" public_interface="out" units="m3_per_s"/>
+        <variable name="A_ER" public_interface="in" units="um2"/>
+        <variable name="rho_IP3R" public_interface="in" units="per_um2"/>
+        <variable name="k_IP3R_single" public_interface="in" units="um3_per_s"/>
         <variable name="m_IP3_inf" public_interface="out" units="dimensionless"/>
         <variable name="tau_hIP3" public_interface="out" units="millis"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -144,6 +147,9 @@
                     </apply>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>k_IP3</ci><apply><times/><ci>A_ER</ci><ci>rho_IP3R</ci><ci>k_IP3R_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
         </math>
     </component>
 </model>

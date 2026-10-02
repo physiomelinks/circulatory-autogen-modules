@@ -32,10 +32,20 @@
         <variable name="j_diffCa" public_interface="out" units="mol_per_s"/>
         <variable name="j_diffCa_ER" public_interface="out" units="mol_per_s"/>
         <variable name="j_leak_Ca" public_interface="out" units="mol_per_s"/>
-        <variable name="k_SERCA" public_interface="in" units="mol_per_s"/>
+        <variable name="k_SERCA" public_interface="out" units="mol_per_s"/>
         <variable name="k_bind_Ca" public_interface="in" units="per_millimolar_s"/>
         <variable name="k_bind_Ca_ER" public_interface="in" units="per_millimolar_s"/>
-        <variable name="k_leak_Ca" public_interface="in" units="m3_per_s"/>
+        <variable name="k_leak_Ca" public_interface="out" units="m3_per_s"/>
+        <variable name="rho_SERCA" public_interface="in" units="per_um2"/>
+        <variable name="r_SERCA" public_interface="in" units="per_s"/>
+        <variable name="rho_leak_Ca" public_interface="in" units="per_um2"/>
+        <variable name="k_leak_Ca_single" public_interface="in" units="um3_per_s"/>
+        <variable name="k_A_ER" public_interface="in" units="dimensionless"/>
+        <variable name="k_V_ER" public_interface="in" units="dimensionless"/>
+        <variable name="k_A_ER_pre" public_interface="in" units="dimensionless"/>
+        <variable name="k_V_ER_pre" public_interface="in" units="dimensionless"/>
+        <variable name="A_ER" public_interface="out" units="um2"/>
+        <variable name="A_ER_pre" public_interface="out" units="um2"/>
         <variable name="k_unbind_Ca" public_interface="in" units="per_s"/>
         <variable name="k_unbind_Ca_ER" public_interface="in" units="per_s"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -430,6 +440,12 @@
                     </apply>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>A_ER</ci><apply><times/><ci>k_A_ER</ci><apply><power/><apply><root/><degree><cn cellml:units="dimensionless">3.0</cn></degree><apply><divide/><apply><times/><ci>c_ER</ci><ci>Vol</ci><cn cellml:units="um3_per_m3" type="e-notation">1<sep/>18</cn></apply><ci>k_V_ER</ci></apply></apply><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply>
+            <apply><eq/><ci>A_ER_pre</ci><apply><times/><ci>k_A_ER_pre</ci><apply><power/><apply><root/><degree><cn cellml:units="dimensionless">3.0</cn></degree><apply><divide/><apply><times/><ci>c_ER_pre</ci><ci>Vol</ci><cn cellml:units="um3_per_m3" type="e-notation">1<sep/>18</cn></apply><ci>k_V_ER_pre</ci></apply></apply><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply>
+            <apply><eq/><ci>k_SERCA</ci><apply><divide/><apply><times/><ci>A_ER_pre</ci><ci>rho_SERCA</ci><ci>r_SERCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
+            <apply><eq/><ci>k_leak_Ca</ci><apply><times/><ci>A_ER_pre</ci><ci>rho_leak_Ca</ci><ci>k_leak_Ca_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
         </math>
     </component>
 </model>

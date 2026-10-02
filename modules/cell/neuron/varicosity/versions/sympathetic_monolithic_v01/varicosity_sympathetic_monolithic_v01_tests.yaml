@@ -3,7 +3,10 @@ version: sympathetic_monolithic_v01
 reviewed: false
 notes: 'Owner''s sympathetic varicosity: N-type Ca current, NCX, four-compartment Ca handling as in SN_soma, and a phenomenological
   NE release/reuptake driven by Cai above a baseline. The membrane potential is an input (from the axon), so alone the Ca-channel
-  gates have exact solutions and total Ca is conserved up to the membrane fluxes.'
+  gates have exact solutions and total Ca is conserved up to the membrane fluxes. Geometry (2026-10-02): the varicosity is
+  a sphere of diameter d (area A_mem = k_A d^2, volume Vol = k_V d^3); g_CaN = A_mem rho_CaN gamma_CaN, k_NaCa = A_mem rho_NaCa
+  r_NaCa e, and the ER areas from c_ER Vol and c_ER_pre Vol give k_IP3, k_RyR (A_ER) and k_SERCA, k_leak_Ca (A_ER_pre). The
+  defaults reproduce the previous values.'
 reference_proposals:
   c_init:
     reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);
@@ -94,16 +97,6 @@ reference_proposals:
       is reported as Michaelis-Menten kinetics, not a first-order constant. The sister SN_full/SN_simple parameter files use
       0.03 /s
     sourced: 'no'
-  g_CaN:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
-    sourced: 'no'
-  Vol:
-    reference: 'Brain1997; mouse vas deferens sympathetic varicosities: mean cross-sectional area 0.52 um^2 (n = 71), "a few
-      micrometres in length" (pp. 493-494, 497), i.e. about 0.5-2 um^3; 1 um^3 is of that order. The CA reference Bennett1998
-      could not be opened'
-    sourced: 'yes'
-    also_cites:
-    - Bennett1998
   Cao:
     reference: 'Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no
       separate neuron value). Khaliq2003 also uses 2 mM'
@@ -114,12 +107,6 @@ reference_proposals:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); dimensionless
       cAMP level scaling the Ca permeability
     sourced: 'no'
-  k_NaCa:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Paci
-      2013 kNaCa = 4900 A/F (ventricular) is per capacitance
-    sourced: 'no'
-    also_cites:
-    - Paci2013
   alpha_NaCa:
     reference: Paci2013; I_NaCa alpha = 2.8571432 in the authors' CellML (tenTusscher2004 uses 2.5); reduced here to 1.2 for
       the neuron
@@ -159,10 +146,6 @@ reference_proposals:
     reference: Shannon2004; Table 11, SR Ca pump Kmr = 1.7 mM; modified here to 0.5 mM (was 1.7; the varicosity's CA reference
       omitted the change)
     sourced: 'yes'
-  k_SERCA:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); scales
-      with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the myocyte)
-    sourced: 'no'
   H_SERCA:
     reference: Shannon2004; Table 11, SR Ca pump Hill coefficient H = 1.787 (= value)
     sourced: 'yes'
@@ -174,11 +157,6 @@ reference_proposals:
   tau_hc_RyR:
     reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
       RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  k_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'');
-      the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
       so it has no literature constants'
     sourced: 'no'
   Cai_RyR_mid:
@@ -206,12 +184,6 @@ reference_proposals:
     sourced: 'no'
   Ca_ER_RyR_tau_den:
     reference: definitional; not used by any equation (CA token NOT_USED)
-    sourced: 'no'
-  k_IP3:
-    reference: definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)
-    sourced: 'no'
-  k_leak_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
   h_IP3_init:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
@@ -278,6 +250,55 @@ reference_proposals:
   N_avo:
     reference: CODATA2018; Avogadro constant 6.02214076e23 /mol (exact), rounded to 6.02e23
     sourced: 'yes'
+  d:
+    value: 1.0
+    reference: 'Luff1988; sympathetic postganglionic varicosities (guinea-pig submucosal arterioles, serial EM): small 0.5-1.0
+      um, large > 1 um diameter (Abstract); proposed d = 1.0 um (sphere: Vol 0.52 um^3, A 3.1 um^2, was 1 um^3 and 4.8 um^2).
+      Brain1997 gives no dimensions in its abstract'
+    sourced: 'yes'
+    previous: 'previous Vol (as proposed in review): Brain1997; mouse vas deferens sympathetic varicosities: mean cross-sectional
+      area 0.52 um^2 (n = 71), "a few micrometres in length" (pp. 493-494, 497), i.e. about 0.5-2 um^3; 1 um^3 is of that
+      order. The CA reference Bennett1998 could not be opened'
+  rho_CaN:
+    reference: 'definitional; chosen so that g_CaN = A rho gamma_CaN (1e-6 uS/pS) reproduces the previous g_CaN = 1e-05 microS
+      (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and gamma_CaN = 13 picoS; a density for calibration
+      through gamma_CaN. The previous g_CaN (as proposed in review): unreferenced_placeholder; owner''s hand-set value in
+      the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+  rho_NaCa:
+    reference: 'definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 0.15 nanoA (to_be_identified)
+      with A = 4.836 um^2 (the varicosity membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa.
+      The previous k_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model
+      (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
+    sourced: 'no'
+    also_cites:
+    - Paci2013
+  rho_SERCA:
+    reference: 'definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 1.5e-19 mol_per_s
+      (to_be_identified) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and r_SERCA = 20 per_s; a density for
+      calibration through r_SERCA. The previous k_SERCA (as proposed in review): unreferenced_placeholder; owner''s hand-set
+      value in the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286
+      umol/L cytosol/s for the myocyte)'
+    sourced: 'no'
+  rho_RyR:
+    reference: 'definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 7.5e-17
+      m3_per_s (to_be_identified) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_RyR_single = 3.023 um3_per_s;
+      a density for calibration through k_RyR_single. The previous k_RyR (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
+      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants'
+    sourced: 'no'
+  rho_IP3R:
+    reference: 'definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0
+      m3_per_s (user_defined) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_IP3R_single = 0.8637 um3_per_s;
+      a density for calibration through k_IP3R_single. The previous k_IP3 (as proposed in review): definitional; IP3-receptor
+      flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)'
+    sourced: 'no'
+  rho_leak_Ca:
+    reference: 'definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca
+      = 2e-20 m3_per_s (user_defined) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and k_leak_Ca_single = 0.01
+      um3_per_s; a density for calibration through k_leak_Ca_single. The previous k_leak_Ca (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''user_defined'')'
+    sourced: 'no'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

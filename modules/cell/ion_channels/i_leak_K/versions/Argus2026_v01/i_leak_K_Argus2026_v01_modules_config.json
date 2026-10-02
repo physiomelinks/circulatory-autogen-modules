@@ -35,6 +35,12 @@
         "variables": [
           "j_leak_K"
         ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
@@ -59,6 +65,24 @@
       [
         "g_leak_K",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_leak_K",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_leak_K",
+        "picoS",
         "access",
         "constant"
       ],

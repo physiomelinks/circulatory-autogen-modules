@@ -45,6 +45,19 @@
           "j_ER_release"
         ],
         "multi_port": "sum"
+      },
+      {
+        "port_type": "compartment_volume",
+        "variables": [
+          "Vol"
+        ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
+        ],
+        "multi_port": "True"
       }
     ],
     "variables_and_units": [
@@ -166,7 +179,7 @@
         "Vol",
         "m3",
         "access",
-        "constant"
+        "boundary_condition"
       ],
       [
         "c_ER",
@@ -232,7 +245,7 @@
         "k_SERCA",
         "mol_per_s",
         "access",
-        "constant"
+        "variable"
       ],
       [
         "k_bind_Ca",
@@ -250,7 +263,67 @@
         "k_leak_Ca",
         "m3_per_s",
         "access",
+        "variable"
+      ],
+      [
+        "rho_SERCA",
+        "per_um2",
+        "access",
         "constant"
+      ],
+      [
+        "r_SERCA",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "rho_leak_Ca",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_leak_Ca_single",
+        "um3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A_ER",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V_ER",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A_ER_pre",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V_ER_pre",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ER_pre",
+        "um2",
+        "access",
+        "variable"
       ],
       [
         "k_unbind_Ca",

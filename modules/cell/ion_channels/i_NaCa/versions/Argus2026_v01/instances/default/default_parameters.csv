@@ -9,7 +9,9 @@ Nao,millimolar,145,SN_simple: BoronBoulpaep2017,yes
 V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
 alpha_NaCa,dimensionless,1.2,SN_simple: Paci_2013_decreased_for_SN,yes
 gamma_NaCa,dimensionless,0.35,SN_simple: Paci_2013_CHECK_FOR_SN,no
-k_NaCa,nanoA,300,SN_simple: to_be_identified,no
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_NaCa,per_um2,124830.18148921525,definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 300 nanoA (to_be_identified) with A = 3000 um^2 (the soma membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa,no
+r_NaCa,per_s,5000.0,"Hilgemann1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)",yes
 R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
 T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

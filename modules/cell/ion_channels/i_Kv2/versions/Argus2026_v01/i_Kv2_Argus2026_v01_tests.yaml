@@ -1,10 +1,13 @@
 module_type: i_Kv2
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
-  constant has epsilon_tau = 0.1 ms added, as in the original. Kv2 delayed-rectifier K current of the SN soma, i_Kv2 = g_Kv2
-  (V - E_K) m_Kv2. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
-  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Kv2 delayed-rectifier
+  K current of the SN soma, i_Kv2 = g_Kv2 (V - E_K) m_Kv2. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_Kv2 = A_mem rho_Kv2 gamma_Kv2
+  (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area;
+  the defaults reproduce the previous g_Kv2.'
 reference_proposals:
   E_K:
     reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
@@ -27,9 +30,12 @@ reference_proposals:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
       +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
     sourced: 'yes'
-  g_Kv2:
-    reference: unreferenced_placeholder; fitted to a K-current I-V curve in the Davis 2021 thesis (CA token 'Davis2021Thesis_fit_to_curve');
-      thesis not accessible. Tao 2011 uses g_KV = 0.44 uS for a 240 pF neuron
+  rho_Kv2:
+    reference: 'definitional; chosen so that g_Kv2 = A rho gamma_Kv2 (1e-6 uS/pS) reproduces the previous g_Kv2 = 0.0013333
+      microS (Davis2021Thesis_fit_to_curve) with A = 3000 um^2 (the soma membrane area) and gamma_Kv2 = 7.8 picoS; a density
+      for calibration through gamma_Kv2. The previous g_Kv2 (as proposed in review): unreferenced_placeholder; fitted to a
+      K-current I-V curve in the Davis 2021 thesis (CA token ''Davis2021Thesis_fit_to_curve''); thesis not accessible. Tao
+      2011 uses g_KV = 0.44 uS for a 240 pF neuron'
     sourced: 'no'
     also_cites:
     - Tao2011

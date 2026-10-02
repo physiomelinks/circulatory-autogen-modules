@@ -4,7 +4,9 @@ V,milliV,-70,definitional; clamp value when unconnected: the SN resting potentia
 V_den_c,milliV,5,SN_simple: Tau2011_was_9.85,yes
 V_mid_c,milliV,8.1,SN_simple: Tau2011_was_8.1,yes
 c_init,dimensionless,0.01,SN_simple: Tau2011,yes
-g_CaN,microS,1e-5,SN_simple: to_be_identified,no
+A_mem,um2,4.83597586204941,definitional; the varicosity membrane area 4.836 um^2 (used when unconnected; in a varicosity it comes from the membrane through the membrane_area port),no
+rho_CaN,per_um2,0.15906422843574358,definitional; chosen so that g_CaN = A rho gamma_CaN (1e-6 uS/pS) reproduces the previous g_CaN = 1e-05 microS (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and gamma_CaN = 13 picoS; a density for calibration through gamma_CaN,no
+gamma_CaN,picoS,13.0,"Fox1987; N-type Ca channel single-channel conductance 13 pS in 110 mM Ba, chick sensory neurons (Abstract, point 6); lower in physiological Ca",yes
 hc_init,dimensionless,0.9,SN_simple: Tau2011,yes
 tau_c_max,millis,3.0,SN_simple: changed_from_belluzi1991_curves,yes
 tau_c_min,millis,0.2,SN_simple: changed_from_belluzi1991_curves,yes

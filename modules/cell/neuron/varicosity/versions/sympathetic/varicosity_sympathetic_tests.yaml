@@ -53,13 +53,6 @@ reference_proposals:
     reference: Shannon2004; Table 11, SR Ca pump Kmr = 1.7 mM; modified here to 0.5 mM (was 1.7; the varicosity's CA reference
       omitted the change)
     sourced: 'yes'
-  Vol_Ca:
-    reference: 'Brain1997; mouse vas deferens sympathetic varicosities: mean cross-sectional area 0.52 um^2 (n = 71), "a few
-      micrometres in length" (pp. 493-494, 497), i.e. about 0.5-2 um^3; 1 um^3 is of that order. The CA reference Bennett1998
-      could not be opened'
-    sourced: 'yes'
-    also_cites:
-    - Bennett1998
   c_ER_Ca:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'Li1994Equations_was_0.185');
       ER volume fraction. Li & Rinzel / De Young & Keizer c1 = 0.185 (DYK Table 1) is the ER/cytosol volume ratio, a different
@@ -75,18 +68,11 @@ reference_proposals:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined_TO_BE_FOUND');
       sub-membrane volume fraction
     sourced: 'no'
-  k_SERCA_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); scales
-      with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the myocyte)
-    sourced: 'no'
   k_bind_Ca_Ca:
     reference: 'Matveev2002; Table 1: buffer on-rate 0.5 /uM/ms (= 0.5e6 /mM/s, "actual" fixed buffer) and 0.1 /uM/ms in the
       "quoted" set (Tang et al. 2000); 0.1e6 /mM/s = the quoted value, paired here with the actual-set off-rate (was 0.5e6)'
     sourced: 'yes'
   k_bind_Ca_ER_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
-    sourced: 'no'
-  k_leak_Ca_Ca:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
   k_unbind_Ca_Ca:
@@ -113,9 +99,6 @@ reference_proposals:
   c_init_i_CaN:
     reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);
       c_inf(-70 mV) is about 4e-6 with V_mid_c 8.1, V_den_c 5
-    sourced: 'no'
-  g_CaN_i_CaN:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
     sourced: 'no'
   hc_init_i_CaN:
     reference: unreferenced_placeholder; initial hc gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong)
@@ -178,12 +161,6 @@ reference_proposals:
     sourced: 'yes'
     also_cites:
     - tenTusscher2004
-  k_NaCa_i_NaCa:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Paci
-      2013 kNaCa = 4900 A/F (ventricular) is per capacitance
-    sourced: 'no'
-    also_cites:
-    - Paci2013
   IP3_IP3R:
     reference: 'LiRinzel1994; IP3 = 0.2 uM read from a plot per the CA token [NOT VERIFIED: Li & Rinzel 1994 not accessible].
       De Young & Keizer 1992 use a basal IP3 of 0.24 uM (p. 9897); the PMR li_rinzel_1994 CellML (a variant) uses 0.6 uM'
@@ -219,9 +196,6 @@ reference_proposals:
   h_IP3_init_IP3R:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
-  k_IP3_IP3R:
-    reference: definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)
-    sourced: 'no'
   Ca_ER_RyR_den_RyR:
     reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
       RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
@@ -240,11 +214,6 @@ reference_proposals:
   Cai_RyR_mid_RyR:
     reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
       RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  k_RyR_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'');
-      the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
       so it has no literature constants'
     sourced: 'no'
   tau_c_RyR_RyR:
@@ -273,3 +242,104 @@ reference_proposals:
       is reported as Michaelis-Menten kinetics, not a first-order constant. The sister SN_full/SN_simple parameter files use
       0.03 /s
     sourced: 'no'
+  d_membrane:
+    value: 1.0
+    reference: 'Luff1988; sympathetic postganglionic varicosities (guinea-pig submucosal arterioles, serial EM): small 0.5-1.0
+      um, large > 1 um diameter (Abstract); proposed d = 1.0 um (sphere: Vol 0.52 um^3, A 3.1 um^2, was 1 um^3 and 4.8 um^2).
+      Brain1997 gives no dimensions in its abstract'
+    sourced: 'yes'
+    previous: 'previous Vol_Ca (as proposed in review): Brain1997; mouse vas deferens sympathetic varicosities: mean cross-sectional
+      area 0.52 um^2 (n = 71), "a few micrometres in length" (pp. 493-494, 497), i.e. about 0.5-2 um^3; 1 um^3 is of that
+      order. The CA reference Bennett1998 could not be opened'
+  rho_SERCA_Ca:
+    reference: 'definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 1.5e-19 mol_per_s
+      (to_be_identified) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and r_SERCA = 20 per_s; a density for
+      calibration through r_SERCA. The previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set
+      value in the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286
+      umol/L cytosol/s for the myocyte)'
+    sourced: 'no'
+    previous: 'previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
+      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
+      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
+      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
+      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
+      myocyte)'
+  rho_leak_Ca_Ca:
+    reference: 'definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca
+      = 2e-20 m3_per_s (user_defined) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and k_leak_Ca_single = 0.01
+      um3_per_s; a density for calibration through k_leak_Ca_single. The previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''user_defined'')'
+    sourced: 'no'
+    previous: 'previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''user_defined'') previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder; owner''s
+      hand-set value in the SN_simple model (CA token ''user_defined'') previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''user_defined'') previous k_leak_Ca_Ca (as proposed in review):
+      unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined'') previous k_leak_Ca_Ca
+      (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined'')'
+  rho_CaN_i_CaN:
+    reference: 'definitional; chosen so that g_CaN = A rho gamma_CaN (1e-6 uS/pS) reproduces the previous g_CaN = 1e-05 microS
+      (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and gamma_CaN = 13 picoS; a density for calibration
+      through gamma_CaN. The previous g_CaN_i_CaN (as proposed in review): unreferenced_placeholder; owner''s hand-set value
+      in the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+    previous: 'previous g_CaN_i_CaN (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified'') previous g_CaN_i_CaN (as proposed in review): unreferenced_placeholder; owner''s
+      hand-set value in the SN_simple model (CA token ''to_be_identified'') previous g_CaN_i_CaN (as proposed in review):
+      unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'') previous g_CaN_i_CaN
+      (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'')
+      previous g_CaN_i_CaN (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model
+      (CA token ''to_be_identified'')'
+  rho_NaCa_i_NaCa:
+    reference: 'definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 0.15 nanoA (to_be_identified)
+      with A = 4.836 um^2 (the varicosity membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa.
+      The previous k_NaCa_i_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
+    sourced: 'no'
+    also_cites:
+    - Paci2013
+    previous: 'previous k_NaCa_i_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance previous k_NaCa_i_NaCa
+      (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'');
+      Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance previous k_NaCa_i_NaCa (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular)
+      is per capacitance previous k_NaCa_i_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value
+      in the SN_simple model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance
+      previous k_NaCa_i_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model
+      (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
+  rho_IP3R_IP3R:
+    reference: 'definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0
+      m3_per_s (user_defined) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_IP3R_single = 0.8637 um3_per_s;
+      a density for calibration through k_IP3R_single. The previous k_IP3_IP3R (as proposed in review): definitional; IP3-receptor
+      flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)'
+    sourced: 'no'
+    previous: 'previous k_IP3_IP3R (as proposed in review): definitional; IP3-receptor flux switched off (0; was 0.03e-15
+      m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in review): definitional; IP3-receptor flux switched
+      off (0; was 0.03e-15 m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in review): definitional; IP3-receptor
+      flux switched off (0; was 0.03e-15 m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in review): definitional;
+      IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in
+      review): definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)'
+  rho_RyR_RyR:
+    reference: 'definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 7.5e-17
+      m3_per_s (to_be_identified) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_RyR_single = 3.023 um3_per_s;
+      a density for calibration through k_RyR_single. The previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
+      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants'
+    sourced: 'no'
+    previous: 'previous k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml:
+      ''developed by Finbar Argus''), so it has no literature constants previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
+      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants previous
+      k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token
+      ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed
+      by Finbar Argus''), so it has no literature constants previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
+      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants previous
+      k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token
+      ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed
+      by Finbar Argus''), so it has no literature constants'

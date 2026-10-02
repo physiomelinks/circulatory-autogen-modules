@@ -23,7 +23,10 @@
         <variable name="hc_init" public_interface="out" units="dimensionless"/>
         <variable name="i_Ca_L" public_interface="out" units="nanoA"/>
         <variable name="j_Ca_L" public_interface="out" units="mol_per_s"/>
-        <variable name="p_Ca" public_interface="in" units="m3_per_s"/>
+        <variable name="p_Ca" public_interface="out" units="m3_per_s"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_CaL" public_interface="in" units="per_um2"/>
+        <variable name="p_Ca_single" public_interface="in" units="um3_per_s"/>
         <variable name="tau_c" public_interface="out" units="millis"/>
         <variable name="tau_c_max" public_interface="in" units="millis"/>
         <variable name="tau_c_min" public_interface="in" units="millis"/>
@@ -350,6 +353,9 @@
                     <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>p_Ca</ci><apply><times/><ci>A_mem</ci><ci>rho_CaL</ci><ci>p_Ca_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
         </math>
     </component>
 </model>

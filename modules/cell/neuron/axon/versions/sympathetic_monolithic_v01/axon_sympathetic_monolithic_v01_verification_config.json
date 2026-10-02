@@ -6,7 +6,7 @@
   "dt": 1e-05,
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
-  "outputs": ["V", "I", "I_channels"],
+  "outputs": ["V", "I", "I_channels", "C", "R"],
   "run_parameters": {"V_in": -20.0},
   "invariants": [
     {
@@ -25,7 +25,7 @@
       "V_rest_approx": {"min": -80.0, "max": -50.0, "points": 3},
       "channel_ratio": {"min": 0.0, "max": 2.0, "points": 3}
     },
-    "rationale": "soma potential -90 to +40 mV; resting potential -80 to -50 mV; channel_ratio 0-2; R and C by 0.5-2."
+    "rationale": "soma potential -90 to +40 mV; resting potential -80 to -50 mV; channel_ratio 0-2; c_m, d_ax, L_ax and R_i by 0.5-2 (C = c_m pi d_ax L_ax and R = 4 R_i L_ax/(pi d_ax^2) span the RC time 0.25-4 of its value, as the previous R and C sweeps did)."
   },
   "timestep": {
     "scheme": "rk4",
@@ -46,7 +46,9 @@
         "status": "not_applicable",
         "reason": "phenomenological cable stand-in; no directly comparable measurement."
       },
-      "calibrate": {"note": "not_applicable: R and C would need conduction-delay data; none chosen."}
+      "calibrate": {
+        "note": "not_applicable: d_ax, L_ax and R_i (R and C) would need conduction-delay data; none chosen."
+      }
     }
   }
 }

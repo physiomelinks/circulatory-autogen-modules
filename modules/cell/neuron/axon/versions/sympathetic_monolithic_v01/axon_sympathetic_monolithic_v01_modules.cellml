@@ -2,8 +2,12 @@
 <model name="axon_sympathetic_monolithic_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
     <component name="SN_axon">
         <variable name="t" public_interface="in" units="second"/>
-        <variable name="C" public_interface="in" units="picoF"/>
-        <variable name="R" public_interface="in" units="megaOhm"/>
+        <variable name="C" public_interface="out" units="picoF"/>
+        <variable name="R" public_interface="out" units="megaOhm"/>
+        <variable name="c_m" public_interface="in" units="uF_per_cm2"/>
+        <variable name="d_ax" public_interface="in" units="um"/>
+        <variable name="L_ax" public_interface="in" units="um"/>
+        <variable name="R_i" public_interface="in" units="ohm_cm"/>
         <variable name="V_in" public_interface="in" units="milliV"/>
         <variable name="I" public_interface="out" units="nanoA"/>
         <variable name="V_rest_approx" public_interface="in" units="milliV"/>
@@ -59,6 +63,10 @@
                     <ci>C</ci>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>C</ci><apply><times/><ci>c_m</ci><pi/><ci>d_ax</ci><ci>L_ax</ci><cn cellml:units="picoF_cm2_per_uF_um2">0.01</cn></apply></apply>
+            <apply><eq/><ci>R</ci><apply><divide/><apply><times/><cn cellml:units="dimensionless">4.0</cn><ci>R_i</ci><ci>L_ax</ci><cn cellml:units="megaOhm_um_per_ohm_cm">0.01</cn></apply><apply><times/><pi/><apply><power/><ci>d_ax</ci><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply></apply>
         </math>
     </component>
 </model>

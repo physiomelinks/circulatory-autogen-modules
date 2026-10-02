@@ -15,7 +15,10 @@
         <variable name="V_mid_m_Na1_6" public_interface="in" units="milliV"/>
         <variable name="V_rest_approx" public_interface="in" units="milliV"/>
         <variable name="epsilon_tau" units="second" initial_value="1e-6"/>
-        <variable name="g_Na1_6" public_interface="in" units="microS"/>
+        <variable name="g_Na1_6" public_interface="out" units="microS"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_Na1_6" public_interface="in" units="per_um2"/>
+        <variable name="gamma_Na1_6" public_interface="in" units="picoS"/>
         <variable name="g_Na1_6_mod" public_interface="in" units="dimensionless"/>
         <variable name="h_Na1_6" public_interface="out" units="dimensionless" initial_value="h_init"/>
         <variable name="h_Na1_6_inf" public_interface="out" units="dimensionless"/>
@@ -324,6 +327,9 @@
                     <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>g_Na1_6</ci><apply><times/><ci>A_mem</ci><ci>rho_Na1_6</ci><ci>gamma_Na1_6</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
         </math>
     </component>
 </model>

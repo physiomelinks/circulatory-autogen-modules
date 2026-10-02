@@ -1,11 +1,13 @@
 module_type: i_CaL
 version: Argus2026_v01
 reviewed: false
-notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
-  constant has epsilon_tau = 0.1 ms added, as in the original. L-type Ca current of the SN soma: GHK flux with permeability
-  p_Ca (1 + cAMP), gates c^2 hc; Ca flux j_Ca_L = -i_Ca_L/(2F) into the sub-membrane Ca. Split out of the monolithic SN_soma
-  / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat
-  checks that the assembled parts reproduce SN_simple.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. L-type Ca current of
+  the SN soma: GHK flux with permeability p_Ca (1 + cAMP), gates c^2 hc; Ca flux j_Ca_L = -i_Ca_L/(2F) into the sub-membrane
+  Ca. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation
+  (2026-10-02): p_Ca = A_mem rho_CaL p_Ca_single (membrane area x density x per-protein permeability, 1e-18 m3/um3), A_mem
+  through the A_mem port; the defaults reproduce the previous p_Ca.'
 reference_proposals:
   Cai:
     reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
@@ -39,12 +41,6 @@ reference_proposals:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); dimensionless
       cAMP level scaling the Ca permeability
     sourced: 'no'
-  p_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Tao
-      2011 P_Ca = 1.1e-16 cm/ms (WKY) is a permeability per area, not comparable to m3/s
-    sourced: 'no'
-    also_cites:
-    - Tao2011
   tau_c_max:
     reference: unreferenced_placeholder; owner's modification of Tao2011 Eq. 92, whose tau_c spans 0.13-0.56 ms; 3 ms is about
       5x the source maximum (CA token changed_from_belluzi1991_curves)
@@ -63,6 +59,15 @@ reference_proposals:
     sourced: 'yes'
     also_cites:
     - BelluzziSacchi1991
+  rho_CaL:
+    reference: 'definitional; chosen so that p_Ca = A rho p_Ca_single (1e-18 m3/um3) reproduces the previous p_Ca = 4e-14
+      m3_per_s (to_be_identified) with A = 3000 um^2 (the soma membrane area) and p_Ca_single = 0.0831 um3_per_s; a density
+      for calibration through p_Ca_single. The previous p_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set
+      value in the SN_simple model (CA token ''to_be_identified''); Tao 2011 P_Ca = 1.1e-16 cm/ms (WKY) is a permeability
+      per area, not comparable to m3/s'
+    sourced: 'no'
+    also_cites:
+    - Tao2011
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

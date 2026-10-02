@@ -10,7 +10,9 @@ V_mid_h_Na1_6,milliV,53.2,SN_simple: Belluzi1991_was_53.2,yes
 V_mid_m,milliV,20,SN_simple: Belluzi1991_was_36,yes
 V_mid_m_Na1_6,milliV,36,SN_simple: Belluzi1991_was_36,yes
 V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
-g_Na1_6,microS,0.5,SN_simple: user_defined,no
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_Na1_6,per_um2,11.11111111111111,definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration through gamma_Na1_6,no
+gamma_Na1_6,picoS,15.0,"Magee1995; 15 pS, the TTX-sensitive neuronal Na channel conductance (Abstract, point 2), used as a proxy: no Nav1.6 single-channel conductance could be verified (Chatelier et al. 2010 has no value in its abstract)",no
 g_Na1_6_mod,dimensionless,1.0,SN_simple: user_defined,no
 tau_h_Na1_6_max,millis,300,SN_simple: user_defined,no
 tau_h_Na1_6_min,millis,0.15,SN_simple: user_defined,no

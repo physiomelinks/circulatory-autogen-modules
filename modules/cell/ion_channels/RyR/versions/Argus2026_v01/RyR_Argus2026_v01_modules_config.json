@@ -35,6 +35,12 @@
         "variables": [
           "j_RyR"
         ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
+        ]
       }
     ],
     "variables_and_units": [
@@ -107,6 +113,24 @@
       [
         "k_RyR",
         "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_RyR",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_RyR_single",
+        "um3_per_s",
         "access",
         "constant"
       ],

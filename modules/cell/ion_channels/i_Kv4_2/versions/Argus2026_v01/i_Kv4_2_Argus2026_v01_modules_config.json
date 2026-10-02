@@ -35,6 +35,12 @@
         "variables": [
           "j_Kv4_2"
         ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
@@ -89,6 +95,24 @@
       [
         "g_Kv4_2",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_Kv4_2",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Kv4_2",
+        "picoS",
         "access",
         "constant"
       ],

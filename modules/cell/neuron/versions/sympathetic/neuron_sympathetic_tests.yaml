@@ -18,18 +18,36 @@ reference_proposals:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source
       found (the sister SN_full parameter files use 1.0)
     sourced: 'no'
-  C_axon:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_determined'); lumped
-      axon capacitance; no source found (the sister SN_full parameter files use 8 pF)
-    sourced: 'no'
-  R_axon:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_determined'); lumped
-      axial resistance; no source found (the sister SN_full parameter files use 150 MOhm; somatic input resistance is about
-      218 MOhm in Wistar stellate neurons, Davis et al. 2019 bioRxiv)
-    sourced: 'no'
   V_rest_approx_axon:
     reference: unreferenced_placeholder; axon resting potential set equal to the soma's (-70 mV, Davis2020 soma measurements);
       no axonal measurement
     sourced: 'no'
     also_cites:
     - Davis2020
+  R_i_axon:
+    value: 200.0
+    reference: 'Major1994; cytoplasmic resistivity 170-340 ohm cm in rat CA3 pyramidal neurons (Abstract; specific membrane
+      resistance 120-200 kOhm cm^2, Cm 0.7-0.8 uF/cm^2). A central-neuron proxy: no value for postganglionic sympathetic axons
+      was verified. The axon model has no membrane leak, so R_m has no parameter. Proposed R_i = 200 ohm cm (R = 811 MOhm
+      at the present d_ax, L_ax)'
+    sourced: 'yes'
+    previous: 'previous R_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axial resistance; no source found (the sister SN_full parameter files
+      use 150 MOhm; somatic input resistance is about 218 MOhm in Wistar stellate neurons, Davis et al. 2019 bioRxiv)'
+  L_ax_axon:
+    reference: 'definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple
+      to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um. The previous C_axon (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''to_be_determined''); lumped axon capacitance; no source found
+      (the sister SN_full parameter files use 8 pF)'
+    sourced: 'no'
+    previous: 'previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF)'

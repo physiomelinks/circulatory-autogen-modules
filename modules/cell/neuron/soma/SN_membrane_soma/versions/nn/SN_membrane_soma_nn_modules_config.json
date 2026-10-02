@@ -41,6 +41,20 @@
           "i_ion"
         ],
         "multi_port": "sum"
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "compartment_volume",
+        "variables": [
+          "Vol"
+        ],
+        "multi_port": "True"
       }
     ],
     "variables_and_units": [
@@ -54,7 +68,43 @@
         "Cm",
         "picoF",
         "access",
+        "variable"
+      ],
+      [
+        "c_m",
+        "uF_per_cm2",
+        "access",
         "constant"
+      ],
+      [
+        "d",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "Vol",
+        "m3",
+        "access",
+        "variable"
       ],
       [
         "I_in",

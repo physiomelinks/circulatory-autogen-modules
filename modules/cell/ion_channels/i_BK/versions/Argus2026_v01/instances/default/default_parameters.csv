@@ -7,7 +7,9 @@ V_den_h_BK,milliV,5.8,SN_simple: khaliq2003Contribution,yes
 V_den_m_BK,milliV,6.2,SN_simple: khaliq2003Contribution,yes
 V_mid_h_BK,milliV,26,SN_simple: khaliq2003Contribution_was_32,yes
 V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
-g_KCa_BK,microS,0.2,SN_simple: was70microS_per_cm2_inKhaliq2003,yes
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_BK,per_um2,0.5555555555555557,definitional; chosen so that g_KCa_BK = A rho gamma_BK (1e-6 uS/pS) reproduces the previous g_KCa_BK = 0.2 microS (was70microS_per_cm2_inKhaliq2003) with A = 3000 um^2 (the soma membrane area) and gamma_BK = 120 picoS; a density for calibration through gamma_BK,no
+gamma_BK,picoS,120.0,"Smart1987; BK channels of cultured rat superior cervical ganglion (sympathetic) neurons, ~120 pS at 0 mV with 4.7 mM external K (~200 pS in symmetrical 150 mM K) (Abstract, point 2)",yes
 h_BK_min,dimensionless,0.085,SN_simple: Khaliq2003Contribution,yes
 tau_z_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 z_BK_coeff,millimolar,0.001,SN_simple: Khaliq2003Contribution,yes

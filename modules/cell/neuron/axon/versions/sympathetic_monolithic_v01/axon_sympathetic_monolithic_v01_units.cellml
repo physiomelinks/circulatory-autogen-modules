@@ -16,4 +16,27 @@
     <units name="nanoA">
         <unit prefix="nano" units="ampere"/>
     </units>
+    <units name="um">
+        <unit prefix="micro" units="metre"/>
+    </units>
+    <units name="uF_per_cm2">
+        <unit prefix="micro" units="farad"/>
+        <unit exponent="-2" prefix="centi" units="metre"/>
+    </units>
+    <units name="ohm_cm">
+        <unit units="ohm"/>
+        <unit prefix="centi" units="metre"/>
+    </units>
+    <units name="picoF_cm2_per_uF_um2">
+        <unit prefix="pico" units="farad"/>
+        <unit exponent="2" prefix="centi" units="metre"/>
+        <unit exponent="-1" prefix="micro" units="farad"/>
+        <unit exponent="-2" prefix="micro" units="metre"/>
+    </units>
+    <units name="megaOhm_um_per_ohm_cm">
+        <unit prefix="mega" units="ohm"/>
+        <unit prefix="micro" units="metre"/>
+        <unit exponent="-1" units="ohm"/>
+        <unit exponent="-1" prefix="centi" units="metre"/>
+    </units>
 </model>

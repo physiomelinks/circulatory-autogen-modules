@@ -44,7 +44,9 @@
     "w",
     "h_IP3",
     "c_RyR",
-    "hc_RyR"
+    "hc_RyR",
+    "Cm",
+    "Vol"
   ],
   "run_parameters": {"I_in": 0.05},
   "invariants": [
@@ -82,12 +84,15 @@
       "k_thresh_m": {"min": -5, "max": 5, "points": 3},
       "k_thresh_h": {"min": -5, "max": 5, "points": 3},
       "delta_gM": {"min": 0.0, "max": 0.002, "points": 3},
-      "k_IP3": {"min": 0.0, "max": 3e-17, "points": 3},
       "B_Ca_init": {"min": 4.0, "max": 7.95, "points": 3},
       "B_Ca_total": {"min": 8.0, "max": 16.0, "points": 3},
-      "h_IP3_init": {"min": 0.0, "max": 1.0, "points": 3}
+      "h_IP3_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "rho_IP3R": {"min": 0.0, "max": 0.4038660392013737, "points": 3},
+      "d": {
+        "values": [19.275732104070492, 24.285900630052804, 30.59831741945869]
+      }
     },
-    "rationale": "injected current I_in from +0.2 nA (strong depolarising drive; the soma model uses I_in > 0 as outward) to +0.05 nA, axial current I_out +/-0.05 nA; zero-valued switches (Delta_V_mid_w, k_thresh_*, delta_gM, k_IP3) over their plausible ranges; all other constants by factors 0.5-2 of their values, except that the free-buffer initial value must not exceed B_Ca_total (B_Ca_init 4-7.95 mM, B_Ca_total 8-16 mM) and h_IP3_init spans [0, 1]."
+    "rationale": "injected current I_in from +0.2 nA (strong depolarising drive; the soma model uses I_in > 0 as outward) to +0.05 nA, axial current I_out +/-0.05 nA; zero-valued switches (Delta_V_mid_w, k_thresh_*, delta_gM, rho_IP3R (IP3R density; k_IP3 = A_ER rho_IP3R k_IP3R_single)) over their plausible ranges; all other constants by factors 0.5-2 of their values, except that the free-buffer initial value must not exceed B_Ca_total (B_Ca_init 4-7.95 mM, B_Ca_total 8-16 mM) and h_IP3_init spans [0, 1]. The diameter d spans the cube roots of the factors, so the volume k_V d^3 spans 0.5-2 (as Vol did); k_A, c_m, the densities and the per-protein rates scale their products by 0.5-2 (as Cm and the conductances did)."
   },
   "timestep": {
     "scheme": "rk4",
@@ -110,7 +115,7 @@
         "reason": "candidate: stellate-ganglion neuron current-clamp recordings (Davis et al. / Paterson group, the source of V_rest and several fits) - rheobase, AP amplitude/width and firing frequency vs injected current; data not public in tabulated form, needs owner-supplied traces."
       },
       "calibrate": {
-        "note": "pending: same data; the \"to_be_identified\" conductances (g_Kv1_5, g_Kv4_2, g_KCa_SK, p_Ca, k_NaCa, leaks) are the natural parameters to identify."
+        "note": "pending: same data; the single-channel conductances / per-protein rates of the \"to_be_identified\" mechanisms (gamma_Kv1_5, gamma_Kv4_2, gamma_SK, p_Ca_single, r_NaCa, gamma_leak_*) are the natural parameters to identify."
       }
     }
   }

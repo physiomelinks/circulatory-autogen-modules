@@ -13,7 +13,10 @@
         <variable name="c_inf" public_interface="out" units="dimensionless"/>
         <variable name="c_init" public_interface="in" units="dimensionless"/>
         <variable name="epsilon_tau" units="second" initial_value="1e-6"/>
-        <variable name="g_CaN" public_interface="in" units="microS"/>
+        <variable name="g_CaN" public_interface="out" units="microS"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_CaN" public_interface="in" units="per_um2"/>
+        <variable name="gamma_CaN" public_interface="in" units="picoS"/>
         <variable name="hc" public_interface="out" units="dimensionless" initial_value="hc_init"/>
         <variable name="hc_inf" public_interface="out" units="dimensionless"/>
         <variable name="hc_init" public_interface="in" units="dimensionless"/>
@@ -224,6 +227,9 @@
                     <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>g_CaN</ci><apply><times/><ci>A_mem</ci><ci>rho_CaN</ci><ci>gamma_CaN</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
         </math>
     </component>
 </model>

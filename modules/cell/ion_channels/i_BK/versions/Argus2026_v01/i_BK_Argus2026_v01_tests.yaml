@@ -1,17 +1,19 @@
 module_type: i_BK
 version: Argus2026_v01
 reviewed: false
-notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
-  constant has epsilon_tau = 0.1 ms added, as in the original. BK (large-conductance Ca-activated K) current of the SN soma,
-  i_KCa_BK = g_KCa_BK m^3 h z (V - E_K), z driven by the sub-membrane Cai (Khaliq 2003 kinetics). z starts at its steady state
-  at Cai_init. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
-  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. BK follows Khaliq et al. 2003
-  (ModelDB 48332, bkpkj.mod): i = g m^3 z^2 h (V - E_K), z_inf = 1/(1 + z_coeff/Cai), tau_m = 1.505 + 1000/(exp((V + V_mid_m
-  + 57.5)/10.1) + exp(-(V + V_mid_m - 62.2)/10)) ms, tau_h = 1.9 + 1000/(exp((V + V_mid_h + 16.5)/5.2) + exp(-(V + V_mid_h
-  - 86.2)/12.9)) ms, with V_mid_m = V_mid_h - 3.1; at Khaliq''s midpoints (28.9, 32 mV) these are Khaliq''s 86.4, 33.3, 48.5,
-  54.2. Corrected 2026-10-02 from z^1 and offsets 80.2/39.5/90.2 (which reproduced Khaliq only with V_mid_m = 6.2, the slope).
-  Deliberate differences from Khaliq: the tau_m constant is 1.505 ms (Khaliq 0.505 ms); V_mid_h is 26 mV (Khaliq 32); the
-  +5 mV shift of V in Khaliq''s .mod is not applied.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. BK (large-conductance
+  Ca-activated K) current of the SN soma, i_KCa_BK = g_KCa_BK m^3 h z (V - E_K), z driven by the sub-membrane Cai (Khaliq
+  2003 kinetics). z starts at its steady state at Cai_init. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. BK follows Khaliq et al. 2003 (ModelDB 48332, bkpkj.mod): i = g m^3 z^2 h (V - E_K), z_inf = 1/(1 +
+  z_coeff/Cai), tau_m = 1.505 + 1000/(exp((V + V_mid_m + 57.5)/10.1) + exp(-(V + V_mid_m - 62.2)/10)) ms, tau_h = 1.9 + 1000/(exp((V
+  + V_mid_h + 16.5)/5.2) + exp(-(V + V_mid_h - 86.2)/12.9)) ms, with V_mid_m = V_mid_h - 3.1; at Khaliq''s midpoints (28.9,
+  32 mV) these are Khaliq''s 86.4, 33.3, 48.5, 54.2. Corrected 2026-10-02 from z^1 and offsets 80.2/39.5/90.2 (which reproduced
+  Khaliq only with V_mid_m = 6.2, the slope). Deliberate differences from Khaliq: the tau_m constant is 1.505 ms (Khaliq 0.505
+  ms); V_mid_h is 26 mV (Khaliq 32); the +5 mV shift of V in Khaliq''s .mod is not applied. Geometry re-parameterisation (2026-10-02):
+  the maximal conductance is g_KCa_BK = A_mem rho_BK gamma_BK (membrane area x channel density x single-channel conductance,
+  1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_KCa_BK.'
 reference_proposals:
   Cai:
     reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
@@ -41,17 +43,20 @@ reference_proposals:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
       +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
     sourced: 'yes'
-  g_KCa_BK:
-    reference: 'Khaliq2003; Table 1: BK conductance 70 (printed "pS/cm2", meaning pS/um2); ModelDB bkpkj.mod gkbar = 0.007
-      S/cm2 = 7 mS/cm2, NOT 70 uS/cm2 as the CA token says. 7 mS/cm2 over the membrane area of a 30 pF cell at 1 uF/cm2 (3000
-      um^2) gives 0.21 uS, consistent with 0.2 uS. Note Khaliq gates BK as m^3 z^2 h; this model uses z^1'
-    sourced: 'yes'
   h_BK_min:
     reference: 'Khaliq2003; Table 1 and bkpkj.mod: BK h y0 = 0.085 (= value)'
     sourced: 'yes'
   z_BK_coeff:
     reference: 'Khaliq2003; Methods Eq. 13 and bkpkj.mod: z_coef = 0.001 mM (= value)'
     sourced: 'yes'
+  rho_BK:
+    reference: 'definitional; chosen so that g_KCa_BK = A rho gamma_BK (1e-6 uS/pS) reproduces the previous g_KCa_BK = 0.2
+      microS (was70microS_per_cm2_inKhaliq2003) with A = 3000 um^2 (the soma membrane area) and gamma_BK = 120 picoS; a density
+      for calibration through gamma_BK. The previous g_KCa_BK (as proposed in review): Khaliq2003; Table 1: BK conductance
+      70 (printed "pS/cm2", meaning pS/um2); ModelDB bkpkj.mod gkbar = 0.007 S/cm2 = 7 mS/cm2, NOT 70 uS/cm2 as the CA token
+      says. 7 mS/cm2 over the membrane area of a 30 pF cell at 1 uF/cm2 (3000 um^2) gives 0.21 uS, consistent with 0.2 uS.
+      Note Khaliq gates BK as m^3 z^2 h; this model uses z^1'
+    sourced: 'no'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

@@ -13,7 +13,10 @@
         <variable name="hc_RyR" public_interface="out" units="dimensionless" initial_value="1.0"/>
         <variable name="hc_RyR_inf" public_interface="out" units="dimensionless"/>
         <variable name="j_RyR" public_interface="out" units="mol_per_s"/>
-        <variable name="k_RyR" public_interface="in" units="m3_per_s"/>
+        <variable name="k_RyR" public_interface="out" units="m3_per_s"/>
+        <variable name="A_ER" public_interface="in" units="um2"/>
+        <variable name="rho_RyR" public_interface="in" units="per_um2"/>
+        <variable name="k_RyR_single" public_interface="in" units="um3_per_s"/>
         <variable name="tau_c_RyR" public_interface="in" units="millis"/>
         <variable name="tau_hc_RyR" public_interface="in" units="millis"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -140,6 +143,9 @@
                     </apply>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>k_RyR</ci><apply><times/><ci>A_ER</ci><ci>rho_RyR</ci><ci>k_RyR_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
         </math>
     </component>
 </model>

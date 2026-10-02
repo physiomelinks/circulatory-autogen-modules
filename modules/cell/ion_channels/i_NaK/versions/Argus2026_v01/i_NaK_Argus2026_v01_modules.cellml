@@ -11,7 +11,10 @@
         <variable name="i_NaK" public_interface="out" units="nanoA"/>
         <variable name="j_NaK_K" public_interface="out" units="mol_per_s"/>
         <variable name="j_NaK_Na" public_interface="out" units="mol_per_s"/>
-        <variable name="k_NaK" public_interface="in" units="nanoA"/>
+        <variable name="k_NaK" public_interface="out" units="nanoA"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_NaK" public_interface="in" units="per_um2"/>
+        <variable name="r_NaK" public_interface="in" units="per_s"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -107,6 +110,9 @@
                     <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>k_NaK</ci><apply><times/><ci>A_mem</ci><ci>rho_NaK</ci><ci>r_NaK</ci><cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn></apply></apply>
         </math>
     </component>
 </model>

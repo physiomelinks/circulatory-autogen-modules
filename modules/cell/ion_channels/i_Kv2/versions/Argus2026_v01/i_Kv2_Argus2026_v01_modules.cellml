@@ -9,7 +9,10 @@
         <variable name="V_mid_m_Kv2" public_interface="in" units="milliV"/>
         <variable name="V_rest_approx" public_interface="in" units="milliV"/>
         <variable name="epsilon_tau" units="second" initial_value="1e-6"/>
-        <variable name="g_Kv2" public_interface="in" units="microS"/>
+        <variable name="g_Kv2" public_interface="out" units="microS"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_Kv2" public_interface="in" units="per_um2"/>
+        <variable name="gamma_Kv2" public_interface="in" units="picoS"/>
         <variable name="i_Kv2" public_interface="out" units="nanoA"/>
         <variable name="j_Kv2" public_interface="out" units="mol_per_s"/>
         <variable name="m_Kv2" public_interface="out" units="dimensionless" initial_value="m_Kv2_init"/>
@@ -175,6 +178,9 @@
                     <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>g_Kv2</ci><apply><times/><ci>A_mem</ci><ci>rho_Kv2</ci><ci>gamma_Kv2</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
         </math>
     </component>
 </model>

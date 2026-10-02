@@ -1,12 +1,14 @@
 module_type: i_NaCa
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
-  constant has epsilon_tau = 0.1 ms added, as in the original. Na/Ca exchanger of the SN soma and varicosity (the same law
-  in both; Paci 2013 form), with its Ca flux j_NaCa_Ca = i_NaCa/F and Na flux j_NaCa_Na = -3 i_NaCa/F. In the varicosity Nai
-  is a constant (no Na pool is connected). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
-  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
-  reproduce SN_simple.
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Na/Ca exchanger of the
+  SN soma and varicosity (the same law in both; Paci 2013 form), with its Ca flux j_NaCa_Ca = i_NaCa/F and Na flux j_NaCa_Na
+  = -3 i_NaCa/F. In the varicosity Nai is a constant (no Na pool is connected). Split out of the monolithic SN_soma / SN_varicosity
+  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
+  that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal current is k_NaCa =
+  A_mem rho_NaCa r_NaCa e (membrane area x density x turnover x elementary charge, one net charge per cycle), A_mem from the
+  membrane through membrane_area; the defaults reproduce the previous k_NaCa.'
 reference_proposals:
   Cai:
     reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
@@ -55,12 +57,13 @@ reference_proposals:
     sourced: 'yes'
     also_cites:
     - tenTusscher2004
-  k_NaCa:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Paci
-      2013 kNaCa = 4900 A/F (ventricular) is per capacitance
-    sourced: 'no'
-    also_cites:
-    - Paci2013
+  rho_NaCa:
+    value: 400.0
+    reference: Hilgemann1991; Na/Ca exchanger density ~400 /um^2 in guinea-pig cardiac myocytes (Abstract); no neuronal value
+      found. With the model's exchanger formula this gives a much smaller i_NaCa than the present k_NaCa
+    sourced: 'yes'
+    previous: 'previous k_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

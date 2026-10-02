@@ -47,6 +47,12 @@
         "variables": [
           "j_NaCa_Ca"
         ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
@@ -149,6 +155,24 @@
       [
         "k_NaCa",
         "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_NaCa",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_NaCa",
+        "per_s",
         "access",
         "constant"
       ]

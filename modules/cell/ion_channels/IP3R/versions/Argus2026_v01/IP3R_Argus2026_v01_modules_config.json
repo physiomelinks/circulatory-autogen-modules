@@ -35,6 +35,12 @@
         "variables": [
           "j_IP3"
         ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
+        ]
       }
     ],
     "variables_and_units": [
@@ -119,6 +125,24 @@
       [
         "k_IP3",
         "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_IP3R",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_IP3R_single",
+        "um3_per_s",
         "access",
         "constant"
       ],

@@ -4,7 +4,12 @@ reviewed: false
 notes: 'Owner''s sympathetic stellate-ganglion neuron soma ("SN_simple"): Na (NaV1.7-like and NaV1.6), L-type Ca, Kv2, Kv1.5,
   Kv4.2, BK, SK and M currents, NCX and Na/K pump, Na/K leaks, a four-compartment Ca model (sub-membrane, bulk, pre-ER and
   ER; mobile buffer; SERCA, RyR, IP3R, leak and diffusion) and Na/K concentrations. Every gating time constant has epsilon_tau
-  = 0.1 ms added. Verified with exact conservation laws (charge, total Ca).'
+  = 0.1 ms added. Verified with exact conservation laws (charge, total Ca). Geometry (2026-10-02): the soma is a compartment
+  of diameter d: area A_mem = k_A d^2, volume Vol = k_V d^3, Cm = c_m A_mem. Each channel conductance is A_mem x density x
+  single-channel conductance (g_X = A_mem rho_X gamma_X), p_Ca = A_mem rho_CaL p_Ca_single, the pump and exchanger maxima
+  are A_mem x density x turnover x e; the ER volumes c_ER Vol and c_ER_pre Vol (spheres by default) give the ER areas A_ER
+  (IP3R, RyR) and A_ER_pre (SERCA, Ca leak). The defaults reproduce every previous value (Cm 30 pF, Vol 7,500 um^3, the conductances,
+  k_NaK, k_NaCa, k_SERCA, k_leak_Ca, k_IP3, k_RyR).'
 reference_proposals:
   V_rest_approx:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
@@ -232,51 +237,11 @@ reference_proposals:
     sourced: 'no'
     also_cites:
     - Matveev2002
-  g_Na:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); Tao 2011
-      uses g_Na = 9.28 uS for a 240 pF neuron (parameter table), i.e. 1.16 uS scaled to 30 pF
-    sourced: 'no'
-    also_cites:
-    - Tao2011
   g_Na_mod:
     reference: definitional; scaling factor, 1 = unmodified
     sourced: 'no'
-  g_Na1_6:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
-    sourced: 'no'
   g_Na1_6_mod:
     reference: definitional; scaling factor, 1 = unmodified
-    sourced: 'no'
-  Cm:
-    reference: Hong2021; whole-cell capacitance of rat stellate ganglion neurons 33.4 +- 3.0 pF (sham) and 36.3 +- 3.0 pF
-      (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF. The CA token Davis2021Transcriptomic could
-      not be identified
-    sourced: 'yes'
-  p_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Tao
-      2011 P_Ca = 1.1e-16 cm/ms (WKY) is a permeability per area, not comparable to m3/s
-    sourced: 'no'
-    also_cites:
-    - Tao2011
-  g_Kv1_5:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
-    sourced: 'no'
-  g_Kv4_2:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
-    sourced: 'no'
-  g_Kv2:
-    reference: unreferenced_placeholder; fitted to a K-current I-V curve in the Davis 2021 thesis (CA token 'Davis2021Thesis_fit_to_curve');
-      thesis not accessible. Tao 2011 uses g_KV = 0.44 uS for a 240 pF neuron
-    sourced: 'no'
-    also_cites:
-    - Tao2011
-  g_KCa_BK:
-    reference: 'Khaliq2003; Table 1: BK conductance 70 (printed "pS/cm2", meaning pS/um2); ModelDB bkpkj.mod gkbar = 0.007
-      S/cm2 = 7 mS/cm2, NOT 70 uS/cm2 as the CA token says. 7 mS/cm2 over the membrane area of a 30 pF cell at 1 uF/cm2 (3000
-      um^2) gives 0.21 uS, consistent with 0.2 uS. Note Khaliq gates BK as m^3 z^2 h; this model uses z^1'
-    sourced: 'yes'
-  g_KCa_SK:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
     sourced: 'no'
   g_KCa_SK_mod:
     reference: definitional; scaling factor, 1 = unmodified
@@ -287,12 +252,6 @@ reference_proposals:
     sourced: 'yes'
     also_cites:
     - Khaliq2003
-  g_leak_Na:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
-    sourced: 'no'
-  g_leak_K:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified')
-    sourced: 'no'
   delta_gM:
     reference: definitional; additive change of g_M for experiments; 0 = none
     sourced: 'no'
@@ -309,12 +268,6 @@ reference_proposals:
   I_in:
     reference: definitional; injected current; 0 = no stimulus
     sourced: 'no'
-  k_NaCa:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Paci
-      2013 kNaCa = 4900 A/F (ventricular) is per capacitance
-    sourced: 'no'
-    also_cites:
-    - Paci2013
   alpha_NaCa:
     reference: Paci2013; I_NaCa alpha = 2.8571432 in the authors' CellML (tenTusscher2004 uses 2.5); reduced here to 1.2 for
       the neuron
@@ -341,9 +294,6 @@ reference_proposals:
     sourced: 'yes'
     also_cites:
     - tenTusscher2004
-  k_NaK:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
-    sourced: 'no'
   Nai_mid_NaK:
     reference: 'Paci2013; I_NaK Km_Na = 40 mM in the authors'' CellML (= tenTusscher2004 K_mNa). NOTE: the CA reference lindblad1996Model
       is wrong for this value: Lindblad 1996 and Nygren 1998 (whose Nai^1.5 pump form this is) use K_mNa = 11 mM. Keeping
@@ -375,18 +325,9 @@ reference_proposals:
   K_mr:
     reference: Shannon2004; Table 11, SR Ca pump Kmr = 1.7 mM; modified here to 0.5 mM (was 1.7)
     sourced: 'yes'
-  k_SERCA:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); scales
-      with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the myocyte)
-    sourced: 'no'
   H_SERCA:
     reference: Shannon2004; Table 11, SR Ca pump Hill coefficient H = 1.787 (= value)
     sourced: 'yes'
-  k_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''to_be_identified'');
-      the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
   tau_c_RyR:
     reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
       RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
@@ -432,12 +373,6 @@ reference_proposals:
   c_SL:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined_TO_BE_FOUND');
       sub-membrane volume fraction
-    sourced: 'no'
-  k_IP3:
-    reference: definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)
-    sourced: 'no'
-  k_leak_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
   h_IP3_init:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
@@ -490,6 +425,128 @@ reference_proposals:
     reference: definitional; axial current to the axon, supplied in a network; 0 for the isolated soma
     sourced: 'no'
     value: 0.0
+  k_A:
+    value: 3.141592653589793
+    reference: 'Wallis1996; rat stellate (putative cardiac) neurones, mean two-dimensional soma area 463 um^2 (Abstract; the
+      area is not in the Mo et al. 1994 abstract). A sphere of that projected area has d = sqrt(4 x 463/pi) = 24.28 um, the
+      present d (24.29 um, from Vol 7,500 um^3); proposed: a spherical soma, k_A = pi, so A = 1,853 um^2 and Cm = 18.5 pF
+      (all conductances x 0.618 at fixed densities; needs re-calibration)'
+    sourced: 'yes'
+    also_cites:
+    - MoWallisWatson1994
+    previous: 'previous Cm (as proposed in review): Hong2021; whole-cell capacitance of rat stellate ganglion neurons 33.4
+      +- 3.0 pF (sham) and 36.3 +- 3.0 pF (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF. The CA
+      token Davis2021Transcriptomic could not be identified'
+  rho_Na:
+    value: 75.0
+    reference: Keynes1971; TTX binding, 75 Na channels/um^2 in rabbit vagus non-myelinated (C) fibres (Abstract, point 6);
+      a saxitoxin re-measurement gave 4-6 x more (Ritchie et al. 1976). An axonal density, used as an estimate for the soma
+    sourced: 'yes'
+    previous: 'previous g_Na (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model
+      (CA token ''user_defined''); Tao 2011 uses g_Na = 9.28 uS for a 240 pF neuron (parameter table), i.e. 1.16 uS scaled
+      to 30 pF'
+  rho_NaK:
+    value: 750.0
+    reference: Landowne1970; ouabain binding, at most 750 Na/K pump sites/um^2 in rabbit vagus C fibres (Abstract, point 4;
+      an upper limit)
+    sourced: 'yes'
+    previous: 'previous k_NaK (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''user_defined'')'
+  rho_NaCa:
+    value: 400.0
+    reference: Hilgemann1991; Na/Ca exchanger density ~400 /um^2 in guinea-pig cardiac myocytes (Abstract); no neuronal value
+      found. With the model's exchanger formula this gives a much smaller i_NaCa than the present k_NaCa
+    sourced: 'yes'
+    previous: 'previous k_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
+  rho_Na1_6:
+    reference: 'definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5
+      microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration
+      through gamma_Na1_6. The previous g_Na1_6 (as proposed in review): unreferenced_placeholder; owner''s hand-set value
+      in the SN_simple model (CA token ''user_defined'')'
+    sourced: 'no'
+  rho_CaL:
+    reference: 'definitional; chosen so that p_Ca = A rho p_Ca_single (1e-18 m3/um3) reproduces the previous p_Ca = 4e-14
+      m3_per_s (to_be_identified) with A = 3000 um^2 (the soma membrane area) and p_Ca_single = 0.0831 um3_per_s; a density
+      for calibration through p_Ca_single. The previous p_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set
+      value in the SN_simple model (CA token ''to_be_identified''); Tao 2011 P_Ca = 1.1e-16 cm/ms (WKY) is a permeability
+      per area, not comparable to m3/s'
+    sourced: 'no'
+    also_cites:
+    - Tao2011
+  rho_Kv1_5:
+    reference: 'definitional; chosen so that g_Kv1_5 = A rho gamma_Kv1_5 (1e-6 uS/pS) reproduces the previous g_Kv1_5 = 0.0887849
+      microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv1_5 = 11.8 picoS; a density for calibration
+      through gamma_Kv1_5. The previous g_Kv1_5 (as proposed in review): unreferenced_placeholder; owner''s hand-set value
+      in the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+  rho_Kv4_2:
+    reference: 'definitional; chosen so that g_Kv4_2 = A rho gamma_Kv4_2 (1e-6 uS/pS) reproduces the previous g_Kv4_2 = 0.1
+      microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv4_2 = 7.5 picoS; a density for calibration
+      through gamma_Kv4_2. The previous g_Kv4_2 (as proposed in review): unreferenced_placeholder; owner''s hand-set value
+      in the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+  rho_Kv2:
+    reference: 'definitional; chosen so that g_Kv2 = A rho gamma_Kv2 (1e-6 uS/pS) reproduces the previous g_Kv2 = 0.0013333
+      microS (Davis2021Thesis_fit_to_curve) with A = 3000 um^2 (the soma membrane area) and gamma_Kv2 = 7.8 picoS; a density
+      for calibration through gamma_Kv2. The previous g_Kv2 (as proposed in review): unreferenced_placeholder; fitted to a
+      K-current I-V curve in the Davis 2021 thesis (CA token ''Davis2021Thesis_fit_to_curve''); thesis not accessible. Tao
+      2011 uses g_KV = 0.44 uS for a 240 pF neuron'
+    sourced: 'no'
+    also_cites:
+    - Tao2011
+  rho_BK:
+    reference: 'definitional; chosen so that g_KCa_BK = A rho gamma_BK (1e-6 uS/pS) reproduces the previous g_KCa_BK = 0.2
+      microS (was70microS_per_cm2_inKhaliq2003) with A = 3000 um^2 (the soma membrane area) and gamma_BK = 120 picoS; a density
+      for calibration through gamma_BK. The previous g_KCa_BK (as proposed in review): Khaliq2003; Table 1: BK conductance
+      70 (printed "pS/cm2", meaning pS/um2); ModelDB bkpkj.mod gkbar = 0.007 S/cm2 = 7 mS/cm2, NOT 70 uS/cm2 as the CA token
+      says. 7 mS/cm2 over the membrane area of a 30 pF cell at 1 uF/cm2 (3000 um^2) gives 0.21 uS, consistent with 0.2 uS.
+      Note Khaliq gates BK as m^3 z^2 h; this model uses z^1'
+    sourced: 'no'
+  rho_SK:
+    reference: 'definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005
+      microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_SK = 10.3 picoS; a density for calibration
+      through gamma_SK. The previous g_KCa_SK (as proposed in review): unreferenced_placeholder; owner''s hand-set value in
+      the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+  rho_leak_Na:
+    reference: 'definitional; chosen so that g_leak_Na = A rho gamma_leak_Na (1e-6 uS/pS) reproduces the previous g_leak_Na
+      = 0.0003 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_Na = 20 picoS; a density
+      for calibration through gamma_leak_Na. The previous g_leak_Na (as proposed in review): unreferenced_placeholder; owner''s
+      hand-set value in the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+  rho_leak_K:
+    reference: 'definitional; chosen so that g_leak_K = A rho gamma_leak_K (1e-6 uS/pS) reproduces the previous g_leak_K =
+      0.0001 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_K = 50 picoS; a density
+      for calibration through gamma_leak_K. The previous g_leak_K (as proposed in review): unreferenced_placeholder; owner''s
+      hand-set value in the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+  rho_SERCA:
+    reference: 'definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 3e-16 mol_per_s
+      (to_be_identified) with A = 248.1 um^2 (the soma pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration
+      through r_SERCA. The previous k_SERCA (as proposed in review): unreferenced_placeholder; owner''s hand-set value in
+      the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s
+      for the myocyte)'
+    sourced: 'no'
+  rho_RyR:
+    reference: 'definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 1.5e-13
+      m3_per_s (to_be_identified) with A = 86.01 um^2 (the soma ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density
+      for calibration through k_RyR_single. The previous k_RyR (as proposed in review): unreferenced_placeholder; owner''s
+      hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
+      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants'
+    sourced: 'no'
+  rho_IP3R:
+    reference: 'definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0
+      m3_per_s (user_defined_was_0.03e-15) with A = 86.01 um^2 (the soma ER membrane area) and k_IP3R_single = 0.8637 um3_per_s;
+      a density for calibration through k_IP3R_single. The previous k_IP3 (as proposed in review): definitional; IP3-receptor
+      flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)'
+    sourced: 'no'
+  rho_leak_Ca:
+    reference: 'definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca
+      = 1e-17 m3_per_s (user_defined) with A = 248.1 um^2 (the soma pre-ER membrane area) and k_leak_Ca_single = 0.01 um3_per_s;
+      a density for calibration through k_leak_Ca_single. The previous k_leak_Ca (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''user_defined'')'
+    sourced: 'no'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

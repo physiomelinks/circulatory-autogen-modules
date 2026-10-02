@@ -41,6 +41,12 @@
         "variables": [
           "j_KCa_SK"
         ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
@@ -83,6 +89,24 @@
       [
         "g_KCa_SK",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_SK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_SK",
+        "picoS",
         "access",
         "constant"
       ],

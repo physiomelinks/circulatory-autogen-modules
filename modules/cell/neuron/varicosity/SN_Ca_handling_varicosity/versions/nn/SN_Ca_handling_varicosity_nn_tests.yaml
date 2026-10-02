@@ -1,10 +1,16 @@
 module_type: SN_Ca_handling_varicosity
 version: nn
 reviewed: false
-notes: Four-compartment Ca of the SN varicosity, as SN_Ca_handling_soma except that the ER leak j_leak_Ca enters the sub-membrane
+notes: 'Four-compartment Ca of the SN varicosity, as SN_Ca_handling_soma except that the ER leak j_leak_Ca enters the sub-membrane
   Cai (not the bulk), as in the original SN_varicosity; also gives E_Ca = RT/F ln(Cao/Cai) (sic, no factor 1/2, as in the
   original). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
-  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry (2026-10-02): Vol
+  is an input (compartment_volume port) from the membrane. The ER volumes are V_ER = c_ER Vol and V_ER_pre = c_ER_pre Vol,
+  with membrane areas A_ER = k_A_ER (V_ER/k_V_ER)^(2/3) and A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3) (shape factors;
+  default a sphere). SERCA and the Ca leak move Ca across the pre-ER membrane, so k_SERCA = A_ER_pre rho_SERCA r_SERCA / N_A
+  and k_leak_Ca = A_ER_pre rho_leak_Ca k_leak_Ca_single (1e-18 m3/um3); A_ER goes to IP3R and RyR (ER_membrane_area), whose
+  release crosses the ER membrane. The diffusion constants D_Ca, D_Ca_ER are unchanged. The defaults reproduce the previous
+  k_SERCA and k_leak_Ca.'
 reference_proposals:
   B_Ca_init:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); at equilibrium
@@ -70,18 +76,11 @@ reference_proposals:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined_TO_BE_FOUND');
       sub-membrane volume fraction
     sourced: 'no'
-  k_SERCA:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); scales
-      with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the myocyte)
-    sourced: 'no'
   k_bind_Ca:
     reference: 'Matveev2002; Table 1: buffer on-rate 0.5 /uM/ms (= 0.5e6 /mM/s, "actual" fixed buffer) and 0.1 /uM/ms in the
       "quoted" set (Tang et al. 2000); 0.1e6 /mM/s = the quoted value, paired here with the actual-set off-rate (was 0.5e6)'
     sourced: 'yes'
   k_bind_Ca_ER:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
-    sourced: 'no'
-  k_leak_Ca:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
   k_unbind_Ca:
@@ -94,6 +93,19 @@ reference_proposals:
     sourced: 'no'
     also_cites:
     - Matveev2002
+  rho_SERCA:
+    reference: 'definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 1.5e-19 mol_per_s
+      (to_be_identified) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and r_SERCA = 20 per_s; a density for
+      calibration through r_SERCA. The previous k_SERCA (as proposed in review): unreferenced_placeholder; owner''s hand-set
+      value in the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286
+      umol/L cytosol/s for the myocyte)'
+    sourced: 'no'
+  rho_leak_Ca:
+    reference: 'definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca
+      = 2e-20 m3_per_s (user_defined) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and k_leak_Ca_single = 0.01
+      um3_per_s; a density for calibration through k_leak_Ca_single. The previous k_leak_Ca (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''user_defined'')'
+    sourced: 'no'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

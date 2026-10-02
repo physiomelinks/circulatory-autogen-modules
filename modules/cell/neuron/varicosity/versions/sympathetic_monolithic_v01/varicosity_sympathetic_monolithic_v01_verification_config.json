@@ -22,7 +22,8 @@
     "NE",
     "h_IP3",
     "c_RyR",
-    "hc_RyR"
+    "hc_RyR",
+    "Vol"
   ],
   "run_parameters": {"V": -10.0},
   "invariants": [
@@ -53,14 +54,17 @@
     "ranges": {
       "V": {"min": -90.0, "max": 30.0, "points": 5},
       "NE_init": {"min": 0.0, "max": 0.001, "points": 3},
-      "k_IP3": {"min": 0.0, "max": 3e-20, "points": 3},
       "B_Ca_init": {"min": 4.0, "max": 7.95, "points": 3},
       "B_Ca_total": {"min": 8.0, "max": 16.0, "points": 3},
       "h_IP3_init": {"min": 0.0, "max": 1.0, "points": 3},
       "c_init": {"min": 0.0, "max": 1.0, "points": 3},
-      "hc_init": {"min": 0.0, "max": 1.0, "points": 3}
+      "hc_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "rho_IP3R": {"min": 0.0, "max": 0.1547431776317185, "points": 3},
+      "d": {
+        "values": [0.9847450218426967, 1.2407009817988002, 1.5631852835935443]
+      }
     },
-    "rationale": "clamped varicosity potential -90 to +30 mV (rest to action-potential peak); NE baseline 0-1 uM; k_IP3 (0 by default) up to a small value; other constants by factors 0.5-2. Gate initial values over [0, 1]; the free-buffer initial value must not exceed B_Ca_total (the bound buffer would be negative), so B_Ca_init spans 4-7.95 mM and B_Ca_total 8-16 mM."
+    "rationale": "clamped varicosity potential -90 to +30 mV (rest to action-potential peak); NE baseline 0-1 uM; rho_IP3R (IP3R density; k_IP3 = A_ER rho_IP3R k_IP3R_single) (0 by default) up to a small value; other constants by factors 0.5-2. Gate initial values over [0, 1]; the free-buffer initial value must not exceed B_Ca_total (the bound buffer would be negative), so B_Ca_init spans 4-7.95 mM and B_Ca_total 8-16 mM. The diameter d spans the cube roots of the factors, so the volume k_V d^3 spans 0.5-2 (as Vol did); k_A, c_m, the densities and the per-protein rates scale their products by 0.5-2 (as Cm and the conductances did)."
   },
   "timestep": {
     "scheme": "rk4",

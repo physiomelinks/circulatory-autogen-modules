@@ -47,6 +47,12 @@
           "j_K_total"
         ],
         "multi_port": "sum"
+      },
+      {
+        "port_type": "compartment_volume",
+        "variables": [
+          "Vol"
+        ]
       }
     ],
     "variables_and_units": [
@@ -120,7 +126,7 @@
         "Vol",
         "m3",
         "access",
-        "constant"
+        "boundary_condition"
       ],
       [
         "j_K_total",

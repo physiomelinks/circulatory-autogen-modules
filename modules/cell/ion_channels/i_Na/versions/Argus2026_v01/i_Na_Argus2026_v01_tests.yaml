@@ -1,11 +1,14 @@
 module_type: i_Na
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
-  constant has epsilon_tau = 0.1 ms added, as in the original. Fast (NaV1.7-like) Na current of the SN soma, i_Na = g_Na g_Na_mod
-  (V - E_Na) m^3 h, with its Na flux j_Na = -i_Na/F into the Na pool. Gates start at their steady state at V_rest_approx.
-  Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
-  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Fast (NaV1.7-like) Na
+  current of the SN soma, i_Na = g_Na g_Na_mod (V - E_Na) m^3 h, with its Na flux j_Na = -i_Na/F into the Na pool. Gates start
+  at their steady state at V_rest_approx. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_Na = A_mem rho_Na gamma_Na
+  (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area;
+  the defaults reproduce the previous g_Na.'
 reference_proposals:
   E_Na:
     reference: definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 310.15 K (used when unconnected)
@@ -40,12 +43,6 @@ reference_proposals:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
       +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
     sourced: 'yes'
-  g_Na:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); Tao 2011
-      uses g_Na = 9.28 uS for a 240 pF neuron (parameter table), i.e. 1.16 uS scaled to 30 pF
-    sourced: 'no'
-    also_cites:
-    - Tao2011
   g_Na_mod:
     reference: definitional; scaling factor, 1 = unmodified
     sourced: 'no'
@@ -59,6 +56,14 @@ reference_proposals:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's
       simplified tau_h
     sourced: 'no'
+  rho_Na:
+    value: 75.0
+    reference: Keynes1971; TTX binding, 75 Na channels/um^2 in rabbit vagus non-myelinated (C) fibres (Abstract, point 6);
+      a saxitoxin re-measurement gave 4-6 x more (Ritchie et al. 1976). An axonal density, used as an estimate for the soma
+    sourced: 'yes'
+    previous: 'previous g_Na (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model
+      (CA token ''user_defined''); Tao 2011 uses g_Na = 9.28 uS for a 240 pF neuron (parameter table), i.e. 1.16 uS scaled
+      to 30 pF'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

@@ -4,7 +4,10 @@
         <variable name="E_K" public_interface="in" units="milliV"/>
         <variable name="F" public_interface="in" units="C_per_mol"/>
         <variable name="V" public_interface="in" units="milliV"/>
-        <variable name="g_leak_K" public_interface="in" units="microS"/>
+        <variable name="g_leak_K" public_interface="out" units="microS"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_leak_K" public_interface="in" units="per_um2"/>
+        <variable name="gamma_leak_K" public_interface="in" units="picoS"/>
         <variable name="i_leak_K" public_interface="out" units="nanoA"/>
         <variable name="j_leak_K" public_interface="out" units="mol_per_s"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -37,6 +40,9 @@
                     <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
                 </apply>
             </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>g_leak_K</ci><apply><times/><ci>A_mem</ci><ci>rho_leak_K</ci><ci>gamma_leak_K</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
         </math>
     </component>
 </model>

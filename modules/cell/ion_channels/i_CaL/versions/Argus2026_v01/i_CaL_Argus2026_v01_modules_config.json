@@ -35,6 +35,12 @@
         "variables": [
           "j_Ca_L"
         ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
@@ -161,6 +167,24 @@
       [
         "p_Ca",
         "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_CaL",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "p_Ca_single",
+        "um3_per_s",
         "access",
         "constant"
       ],
