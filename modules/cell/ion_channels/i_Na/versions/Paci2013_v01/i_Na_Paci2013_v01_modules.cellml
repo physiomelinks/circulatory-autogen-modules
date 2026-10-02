@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_Na_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_Na_Paci_2013">
+        <variable name="i_Na" public_interface="out" units="A_per_F"/>
+        <variable name="g_Na" public_interface="in" units="S_per_F"/>
+        <variable name="t" private_interface="out" public_interface="in" units="second"/>
+        <variable name="Vm" private_interface="out" public_interface="in" units="volt"/>
+        <variable name="E_Na" public_interface="in" units="volt"/>
+        <variable name="m" private_interface="in" units="dimensionless"/>
+        <variable name="h" private_interface="in" units="dimensionless"/>
+        <variable name="j" private_interface="in" units="dimensionless"/>
+        <variable name="TTX_3uM" public_interface="in" units="dimensionless"/>
+        <variable name="TTX_10uM" public_interface="in" units="dimensionless"/>
+        <variable name="TTX_30uM" public_interface="in" units="dimensionless"/>
+        <variable name="TTX_coeff" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>TTX_coeff</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.18</cn>
+                        <apply>
+                            <eq/>
+                            <ci>TTX_3uM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.06</cn>
+                        <apply>
+                            <eq/>
+                            <ci>TTX_10uM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.02</cn>
+                        <apply>
+                            <eq/>
+                            <ci>TTX_30uM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">1</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_Na</ci>
+                <apply>
+                    <times/>
+                    <ci>TTX_coeff</ci>
+                    <ci>g_Na</ci>
+                    <apply>
+                        <power/>
+                        <ci>m</ci>
+                        <cn cellml:units="dimensionless">3</cn>
+                    </apply>
+                    <ci>h</ci>
+                    <ci>j</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Vm</ci>
+                        <ci>E_Na</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,49 @@
+comment: '"mvp" is most likely "minimum viable product": B. Ghitti added it in July 2025 to test the blood-volume sum, and
+  no literature source for the heart was found. The ventricular elastance x exp((1 - x^2)/2) is held flat from mt = 0.4 to
+  0.6 and then drops discontinuously to Emin, which looks unintended. Units are litre/kPa, with an SI "_2" duplicate of every
+  component. The SI heart cannot be generated: it shares its global constants (declared in litre/kPa) with the litre heart.
+  heart_simple_OLD references a type that does not exist. All 150 parameters were TODO: proposals are from Bozkurt2019 (adult),
+  but E_LVmin, E_RVmin, the unstressed vessel volume and the initial volumes are placeholders.'
+summary: 'Minimal closed-loop CVS building blocks in litre/kPa, each duplicated in SI: a 4-chamber varying-elastance heart
+  with passive atria and diode valves, RC compartments without inertance (pv/vp/pp/vv), junction variants (Nout/Min/MinNout),
+  and a blood-volume sum. Specs: the vessel compartments are checked against exact solutions (first-order relaxation with
+  RC; linear filling for the pure compliance; Ohm law for the pure resistance) plus volume balance. Junctions and the volume
+  sum cannot be generated alone (libcuflynx needs real neighbour vessels), so they run in harnesses of "simple" compartments
+  with open BCs and are checked on port sums, P-V/Ohm laws and mass balance. The heart, alone with constant venous inflows
+  and constant root pressures, is checked on diode valves, the exact elastance law recovered from u/(q - q_us), atrial P-V
+  laws, whole-heart volume balance and the periodic state (ejection per beat = inflow per beat). Values are proposed from
+  Bozkurt2019 (heart, valves, a representative systemic-arteriole R and C) and Paeme2011 (total blood volume). The SI heart
+  is recorded as an expected failure and heart_simple_OLD is skipped.'
+questions:
+- What is cvs_mvp for, and what is the source of the heart? The elastance E = (Emax - Emin) x exp((1 - x^2)/2) + Emin (x =
+  mt/To_pk) was not found in Bozkurt2019, Smith2004/Paeme2011, Safaei2018 or others checked. Please ask B. Ghitti, or give
+  a reference.
+- 'Elastance shape: E is held at its mt = 0.4 value (~0.96 Emax with To_pk = 0.33) until mt = 0.6, then drops discontinuously
+  to Emin. Is the plateau-then-drop intended, or was a relaxation branch meant for 0.4-0.6?'
+- 'Confirm the Bozkurt2019 (adult) values: T 0.8 s, To_pk 0.33 (from T1 = 0.33 T, although Bozkurt uses a raised cosine),
+  LV/RV Ees 2.5/1 mmHg/mL, V0 15/40/5/5 mL, atrial E 0.2 mmHg/mL (Emin; atria are passive here), valve R 0.002/0.001 mmHg
+  s/mL. E_LVmin, E_RVmin and all *_init volumes are placeholders.'
+- Generic vessel compartments are tested with Bozkurt2019 systemic-arteriole R and C (0.95 mmHg s/mL, 1.7 mL/mmHg), u_0 =
+  0 and a placeholder unstressed volume of 0.1 L. Acceptable as test fixtures?
+- Every component exists twice (litre/kPa and SI "_2"). Keep both? If yes, the SI heart needs its own global names (see proposed_fixes).
+- delay and the output mta (atrial timing) are unused because the atria have constant elastance. Keep them?
+- 'Validation: pending. Candidate: an adult LV pressure-volume loop (e.g. Bozkurt2019 adult haemodynamics), once the heart
+  is in a closed loop with these compartments. Constant root pressures cannot give a physiological loop. Set this up as a
+  system-level validation?'
+proposed_fixes:
+- 'Delete the config entry heart_simple_OLD/vp (now the version heart/vp_simple_OLD): its module_type heart_simplesimple_type_OLD is not in the CellML (structure
+  known issue). Its ports (v_headV, v_lArmV, v_rArmV, v_V1, v_pulmV, u_AA, u_pulmA) belong to an older network.'
+- 'heart_simple_2 (SI): its global constants (T, To_pk, E_*, q_*_us, q_*_init, R_*) share names with heart_simple, and cvs_mvp_parameters.csv
+  declares them in litre/kPa. libcuflynx stops with "units of litre in parameters.csv file does not match with units of m3
+  ... for param q_LV_init". Fix: make them constants of the vessel (per-component rows with SI units), or rename the SI globals
+  (e.g. suffix _SI). Evidence: a patched copy with SI globals generates and runs.'
+findings:
+- 'Heart alone (constant BCs): reaches a periodic state within 10 beats. Ejected volume per beat = 66.6 mL = inflow x T. LV
+  volume 51-118 mL, LV peak pressure = root pressure + valve drop.'
+- 'Heart timestep test: the RHS is non-smooth (diode valves, the elastance drop at mt = 0.6), so RK4 converges at order ~1-2
+  in the max norm and flows at the valve edges dominate the difference. The tolerances were relaxed (tol 0.1, cvode_tol 0.05),
+  and logged points avoid mt = 0.6 (dt 3.5 ms, t_end 4.2 s).'
+- 'libcuflynx: connecting litre/kPa vessels to SI boundary_condition vessels with more than one neighbour writes duplicate
+  unit_converter components (invalid CellML). Its generic-junction code ignores "nn" boundary vessels as junction neighbours,
+  and a sum_blood_vol with an empty sum port raises IndexError. The harnesses therefore use same-unit "simple" neighbours
+  with open BCs.'

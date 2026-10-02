@@ -1,0 +1,251 @@
+variable_name,units,value,data_reference
+rho_Na_soma_SN,per_um2,51.111111111111114,definitional; chosen so that g_Na = A rho gamma_Na (1e-6 uS/pS) reproduces the previous g_Na = 2.3 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na = 15 picoS; a density for calibration through gamma_Na
+gamma_Na_soma_SN,picoS,15.0,"Magee1995; TTX-sensitive single Na channel conductance 15 +- 0.3 pS in rat CA1 neurons, cell-attached (Abstract, point 2); cf. Sigworth & Neher 1980 ~18 pS in rat muscle"
+g_Na_mod_soma_SN,dimensionless,1.0,user_defined
+rho_Na1_6_soma_SN,per_um2,11.11111111111111,definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration through gamma_Na1_6
+gamma_Na1_6_soma_SN,picoS,15.0,"Magee1995; 15 pS, the TTX-sensitive neuronal Na channel conductance (Abstract, point 2), used as a proxy: no Nav1.6 single-channel conductance could be verified (Chatelier et al. 2010 has no value in its abstract)"
+g_Na1_6_mod_soma_SN,dimensionless,1.0,user_defined
+g_Na_soma_SN_OLD,microS,9.28,Tau2011
+d_soma_SN,um,24.285900630052804,"definitional; soma diameter of the sphere of the model volume: d = (Vol/k_V)^(1/3) = (6 Vol/pi)^(1/3) with Vol = 7,500 um^3, the previous volume parameter (Wallis1996 (was 2000 um3))"
+k_A_soma_SN,dimensionless,5.086427133679043,"definitional; area shape factor A = k_A d^2, chosen to reproduce the previous Cm: A = Cm/c_m = 30 pF (Davis2021Transcriptomic) / (0.01 pF/um^2) = 3,000 um^2, so k_A = A/d^2 = 5.086. It is larger than a sphere's pi because the area includes membrane beyond the soma sphere (dendrites)"
+k_V_soma_SN,dimensionless,0.5235987755982988,"definitional; volume shape factor V = k_V d^3 of a sphere, pi/6 (to double precision; the last bit is chosen so that Vol reproduces the previous value where a float allows)"
+c_m_soma_SN,uF_per_cm2,1.0,"Gentet2000; specific membrane capacitance 0.9 uF/cm^2 measured directly in nucleated patches of cortical pyramidal, spinal cord and hippocampal neurons (Abstract); 1 uF/cm^2 (0.01 pF/um^2) is the conventional value used here"
+Cm_SN_OLD,picoF,240,Tau2011
+rho_CaL_soma_SN,per_um2,160.45574768876767,definitional; chosen so that p_Ca = A rho p_Ca_single (1e-18 m3/um3) reproduces the previous p_Ca = 4e-14 m3_per_s (to_be_identified) with A = 3000 um^2 (the soma membrane area) and p_Ca_single = 0.0831 um3_per_s; a density for calibration through p_Ca_single
+p_Ca_single_soma_SN,um3_per_s,0.0830966389511686,"Church1996; single L-type channel conductance 2.4 pS in 2 mM Ca (Abstract, point 4), converted to a per-channel GHK permeability P = gamma R T/(z^2 F^2 Cao) (the limiting slope at negative V, 37 degC, Cao 2 mM) = 0.0831 um^3/s"
+rho_Kv2_soma_SN,per_um2,0.056978632478632475,definitional; chosen so that g_Kv2 = A rho gamma_Kv2 (1e-6 uS/pS) reproduces the previous g_Kv2 = 0.0013333 microS (Davis2021Thesis_fit_to_curve) with A = 3000 um^2 (the soma membrane area) and gamma_Kv2 = 7.8 picoS; a density for calibration through gamma_Kv2
+gamma_Kv2_soma_SN,picoS,7.8,Trapani2006; Kv2.1 single-channel conductance 7.8 +- 0.3 pS with 10 mM external K (Fig. 6B and Results)
+rho_Kv1_5_soma_SN,per_um2,2.508049120338983,definitional; chosen so that g_Kv1_5 = A rho gamma_Kv1_5 (1e-6 uS/pS) reproduces the previous g_Kv1_5 = 0.0887849 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv1_5 = 11.8 picoS; a density for calibration through gamma_Kv1_5
+gamma_Kv1_5_soma_SN,picoS,11.8,Kwan2006; Kv1.5 single-channel conductance 11.8 +- 0.6 pS at pH 7.4 (Abstract)
+rho_Kv4_2_soma_SN,per_um2,4.4444444444444455,definitional; chosen so that g_Kv4_2 = A rho gamma_Kv4_2 (1e-6 uS/pS) reproduces the previous g_Kv4_2 = 0.1 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv4_2 = 7.5 picoS; a density for calibration through gamma_Kv4_2
+gamma_Kv4_2_soma_SN,picoS,7.5,"Kaulin2009; neuronal Kv4.2 (with DPP6, as in cerebellar granule neurons) unitary conductance ~7.5 pS; Kv4.2 alone ~4 pS (Abstract)"
+rho_BK_soma_SN,per_um2,0.5555555555555557,definitional; chosen so that g_KCa_BK = A rho gamma_BK (1e-6 uS/pS) reproduces the previous g_KCa_BK = 0.2 microS (was70microS_per_cm2_inKhaliq2003) with A = 3000 um^2 (the soma membrane area) and gamma_BK = 120 picoS; a density for calibration through gamma_BK
+gamma_BK_soma_SN,picoS,120.0,"Smart1987; BK channels of cultured rat superior cervical ganglion (sympathetic) neurons, ~120 pS at 0 mV with 4.7 mM external K (~200 pS in symmetrical 150 mM K) (Abstract, point 2)"
+rho_SK_soma_SN,per_um2,0.16181229773462782,definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_SK = 10.3 picoS; a density for calibration through gamma_SK
+gamma_SK_soma_SN,picoS,10.3,"Hirschberg1998; rSK2 single-channel conductance 10.3 +- 1.3 pS, inside-out (Results)"
+g_KCa_SK_mod_soma_SN,dimensionless,1.0,to_be_identified
+Cai_init_soma_SN,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease
+Nai_init_soma_SN,millimolar,13,BoronBoulpaep2017_was_15
+Ki_init_soma_SN,millimolar,200,BrownScholfield1974 (was 150)
+Cao_soma_SN,millimolar,2,Tau2011
+Nao_soma_SN,millimolar,145,BoronBoulpaep2017
+Ko_soma_SN,millimolar,4.5,BoronBoulpaep2017
+#,#,#,#
+B_Ca_total_soma_SN,millimolar,8,Matveev2002
+B_Ca_init_soma_SN,millimolar,7.95,user_defined
+k_bind_Ca_soma_SN,per_millimolar_s,0.1e6,Matveev2002_was_0.5e6
+k_unbind_Ca_soma_SN,per_s,8e3,Matveev2002
+k_bind_Ca_ER_soma_SN,per_millimolar_s,0.5e3,user_defined
+k_unbind_Ca_ER_soma_SN,per_s,8e3,Matveev2002_for_k_unbind_Ca
+#,#,#,#
+B_Ca_total_var_SN,millimolar,8,Matveev2002
+B_Ca_init_var_SN,millimolar,7.95,user_defined
+k_bind_Ca_var_SN,per_millimolar_s,0.1e6,Matveev2002_was_0.5e6
+k_unbind_Ca_var_SN,per_s,8e3,Matveev2002
+k_bind_Ca_ER_var_SN,per_millimolar_s,0.5e3,user_defined
+k_unbind_Ca_ER_var_SN,per_s,8e3,Matveev2002_for_k_unbind_Ca
+#,#,#,#
+rho_CaN_var_SN,per_um2,0.15906422843574358,definitional; chosen so that g_CaN = A rho gamma_CaN (1e-6 uS/pS) reproduces the previous g_CaN = 1e-05 microS (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and gamma_CaN = 13 picoS; a density for calibration through gamma_CaN
+gamma_CaN_var_SN,picoS,13.0,"Fox1987; N-type Ca channel single-channel conductance 13 pS in 110 mM Ba, chick sensory neurons (Abstract, point 6); lower in physiological Ca"
+d_var_SN,um,1.2407009817988002,"definitional; varicosity diameter of the sphere of the model volume: d = (6 Vol/pi)^(1/3) with Vol = 1 um^3, the previous volume parameter (bennet1998Sympathetic)"
+k_A_var_SN,dimensionless,3.141592653589793,"definitional; area shape factor A = k_A d^2 of a sphere, pi"
+k_V_var_SN,dimensionless,0.5235987755982987,"definitional; volume shape factor V = k_V d^3 of a sphere, pi/6 (to double precision; the last bit is chosen so that Vol reproduces the previous value where a float allows)"
+Cai_init_var_SN,millimolar,1e-4,Hagiwara1981
+Nai_var_SN,millimolar,13,BoronBoulpaep2017_was_15
+Cao_var_SN,millimolar,2,Tau2011
+Nao_var_SN,millimolar,145,BoronBoulpaep2017
+#,#,#,#
+a_cleft,dimensionless,4000,Tao_2011
+n_cleft,dimensionless,12,Tao_2011
+Vol_cleft,litre,1.5e-15,Tao_2011_UNUSED
+N_avo,per_mol,6.02e23,known
+R,J_per_mol_K,8.314,known
+F,C_per_mol,96485,known
+T,kelvin,310.15,Tao2011
+#,#,#,#
+V_rest_approx_soma_SN,milliV,-70,Davis2021Thesis_from_traces
+h_BK_min_soma_SN,dimensionless,0.085,Khaliq2003Contribution
+z_BK_coeff_soma_SN,millimolar,0.001,Khaliq2003Contribution
+k_thresh_m_soma_SN,milliV,0,user_defined_removed_dependence_was_15
+k_thresh_h_soma_SN,milliV,0,user_defined_removed_dependence
+V_mid_m_soma_SN,milliV,20,Belluzi1991_was_36
+V_mid_h_soma_SN,milliV,40,Belluzi1991_was_53.2
+V_den_m_soma_SN,milliV,6,Belluzi1991_was_7.2
+V_den_h_soma_SN,milliV,4.0,Belluzi1991_was_6.5
+V_mid_m_Na1_6_soma_SN,milliV,36,Belluzi1991_was_36
+V_mid_h_Na1_6_soma_SN,milliV,53.2,Belluzi1991_was_53.2
+V_den_m_Na1_6_soma_SN,milliV,8.0,Belluzi1991_was_7.2
+V_den_h_Na1_6_soma_SN,milliV,8.0,Belluzi1991_was_6.5
+V_mid_m_Kv1_5_soma_SN,milliV,6.0,Philipson1991-channelpedia
+V_den_m_Kv1_5_soma_SN,milliV,6.4,Philipson1991-channelpedia
+V_mid_h_Kv1_5_soma_SN,milliV,25.3,Philipson1991-channelpedia
+V_den_h_Kv1_5_soma_SN,milliV,3.5,Philipson1991-channelpedia
+V_mid_m_Kv4_2_soma_SN,milliV,18.8,Bekkers2000-channelpedia
+V_den_m_Kv4_2_soma_SN,milliV,16.6,Bekkers2000-channelpedia
+V_mid_h_Kv4_2_soma_SN,milliV,81.6,Bekkers2000-channelpedia
+V_den_h_Kv4_2_soma_SN,milliV,6.7,Bekkers2000-channelpedia
+V_mid_c_soma_SN,milliV,8.1,Tau2011_was_8.1
+V_den_c_soma_SN,milliV,5,Tau2011_was_9.85
+V_mid_m_Kv2_soma_SN,milliV,6,Tau2011_was_6
+V_den_m_Kv2_soma_SN,milliV,8,Tau2011_was_8
+V_mid_w_soma_SN,milliV,35,Martin2023_was_35
+Delta_V_mid_w_soma_SN,milliV,0,for_drug_control
+V_den_w_soma_SN,milliV,10,Martin2023_was_10
+V_den_m_BK_soma_SN,milliV,6.2,khaliq2003Contribution
+V_mid_h_BK_soma_SN,milliV,26,khaliq2003Contribution_was_32
+V_den_h_BK_soma_SN,milliV,5.8,khaliq2003Contribution
+Ca_mid_m_SK_soma_SN,millimolar,0.00063,Hirschberg1998 (was 3e-4; set on review 2026-10-02)
+tau_c_min_soma_SN,millis,0.2,changed_from_belluzi1991_curves
+tau_c_max_soma_SN,millis,3.0,changed_from_belluzi1991_curves
+tau_hc_soma_SN,millis,20.0,changed_from_belluzi1991_curves
+tau_h_min_soma_SN,millis,0.15,user_defined
+tau_h_max_soma_SN,millis,5,user_defined
+tau_h_Na1_6_min_soma_SN,millis,0.15,user_defined
+tau_h_Na1_6_max_soma_SN,millis,300,user_defined
+tau_h_Kv4_2_soma_SN,millis,7.0,was_approx_7
+tau_z_BK_soma_SN,millis,1,Khaliq2003 (was 5; set to the source value on review 2026-10-02)
+tau_m_SK_soma_SN,millis,5,gupta2016Computational
+tau_w_min_soma_SN,millis,30,gupta2016Computational
+R_diffSensed_soma_SN,megaOhm,10,user_defined
+C_sensed_soma_SN,picoF,2,user_defined
+p_SK_soma_SN,dimensionless,4,gupta2016Computational
+Cai_I_Na_mid_soma_SN,millimolar,2.0e-4,user_defined
+Cai_I_Na_den_soma_SN,millimolar,0.3e-4,user_defined
+#,#,#,#
+V_mid_c_var_SN,milliV,8.1,Tau2011_was_8.1
+V_den_c_var_SN,milliV,5,Tau2011_was_9.85
+tau_c_min_var_SN,millis,0.2,changed_from_belluzi1991_curves
+tau_c_max_var_SN,millis,3.0,changed_from_belluzi1991_curves
+tau_hc_var_SN,millis,20.0,changed_from_belluzi1991_curves
+c_init_var_SN,dimensionless,0.01,Tau2011
+hc_init_var_SN,dimensionless,0.9,Tau2011
+b_var_SN,dimensionless,0.25,Tau2011
+NE_init_var_SN,millimolar,0.0,user_defined
+Cai_NE_base_var_SN,millimolar,1e-4,user_defined
+k_NE_var_SN,per_s,200,user_defined
+k_NET_var_SN,per_s,100,user_defined
+#,#,#,#
+rho_M_soma_SN,per_um2,0.0974074074074074,definitional; chosen so that g_M = A rho gamma_M (1e-6 uS/pS) reproduces the previous g_M = 0.00263 microS (Davis2020 (was 0.00389; recomputed on review 2026-10-02)) with A = 3000 um^2 (the soma membrane area) and gamma_M = 9 picoS; a density for calibration through gamma_M
+gamma_M_soma_SN,picoS,9.0,"Selyanko2001; KCNQ2/KCNQ3 (M-type) single-channel conductance 9.0 +- 0.3 pS (Abstract, point 2); native rat SCG M-channels show ~7, 12 and 19 pS levels (Selyanko & Brown 1993)"
+g_M_mod_soma_SN,dimensionless,1.0,can_be_modified_for_retagabine
+delta_gM_soma_SN,microS,0.000,to_be_identified
+tau_w_num_soma_SN,millis,1200,Martin2023Modelling_was_400
+cAMP_soma_SN,dimensionless,0.01,user_defined
+#,#,#,#
+rho_leak_K_soma_SN,per_um2,0.0006666666666666668,definitional; chosen so that g_leak_K = A rho gamma_leak_K (1e-6 uS/pS) reproduces the previous g_leak_K = 0.0001 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_K = 50 picoS; a density for calibration through gamma_leak_K
+gamma_leak_K_soma_SN,picoS,50.0,"Kang2006; TREK-2, the major background K channel of rat DRG neurons (69% of the resting K current at 37 degC), ~50 pS in 150 mM KCl (Abstract); a ganglion-neuron proxy for the K leak"
+rho_leak_Na_soma_SN,per_um2,0.005,definitional; chosen so that g_leak_Na = A rho gamma_leak_Na (1e-6 uS/pS) reproduces the previous g_leak_Na = 0.0003 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_Na = 20 picoS; a density for calibration through gamma_leak_Na
+gamma_leak_Na_soma_SN,picoS,20.0,unreferenced_placeholder; no verified single-channel conductance for the Na leak channel NALCN (Lu et al. 2007 gives none in its abstract); 20 pS assumed
+#,#,#,#
+cAMP_var_SN,dimensionless,0.01,user_defined
+#,#,#,#
+Ksat_soma_SN,dimensionless,0.1,Paci_2013_CHECK_FOR_SN
+KmCa_soma_SN,millimolar,1.38,Paci_2013_CHECK_FOR_SN
+KmNai_soma_SN,millimolar,87.5,Paci_2013_CHECK_FOR_SN
+alpha_NaCa_soma_SN,dimensionless,1.2,Paci_2013_decreased_for_SN
+gamma_NaCa_soma_SN,dimensionless,0.35,Paci_2013_CHECK_FOR_SN
+rho_NaCa_soma_SN,per_um2,124830.18148921525,definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 300 nanoA (to_be_identified) with A = 3000 um^2 (the soma membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa
+r_NaCa_soma_SN,per_s,5000.0,"Hilgemann1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)"
+#,#,#,#
+Ksat_var_SN,dimensionless,0.1,Paci_2013_CHECK_FOR_SN
+KmCa_var_SN,millimolar,1.38,Paci_2013_CHECK_FOR_SN
+KmNai_var_SN,millimolar,87.5,Paci_2013_CHECK_FOR_SN
+alpha_NaCa_var_SN,dimensionless,1.2,Paci_2013_CHECK_FOR_SN
+gamma_NaCa_var_SN,dimensionless,0.35,Paci_2013_CHECK_FOR_SN
+rho_NaCa_var_SN,per_um2,38719.23218294793,definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 0.15 nanoA (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa
+r_NaCa_var_SN,per_s,5000.0,"Hilgemann1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)"
+#,#,#,#
+rho_NaK_soma_SN,per_um2,16644.024198562034,definitional; chosen so that k_NaK = A rho r_NaK e reproduces the previous k_NaK = 0.4 nanoA (user_defined) with A = 3000 um^2 (the soma membrane area) and r_NaK = 50 per_s; a density for calibration through r_NaK
+r_NaK_soma_SN,per_s,50.0,"Landowne1970; Na/K pump turnover 22 cations/s per ouabain site at 20 degC in rabbit vagus C fibres (Abstract, point 5); 50 cycles/s (one net charge each) is an estimate for 37 degC (Q10 ~3), not a measured value"
+Nai_mid_NaK_soma_SN,millimolar,40,lindblad1996Model
+Nai_power_NaK_soma_SN,dimensionless,1.5,lindblad1996Model
+Ko_mid_NaK_soma_SN,millimolar,1,lindblad1996Model
+Na_coop_soma_SN,millimolar,5,user_defined
+#,#,#,#
+Ca_ER_init_soma_SN,millimolar,0.6,to_be_checked_in_neurons
+h_IP3_init_soma_SN,dimensionless,0.99,user_defined
+c_ER_soma_SN,dimensionless,0.01,user_defined
+c_ER_pre_soma_SN,dimensionless,0.049,user_defined
+k_A_ER_soma_SN,dimensionless,3.141592653589793,"definitional; ER area shape factor A_ER = k_A_ER (V_ER/k_V_ER)^(2/3), V_ER = c_ER Vol; a sphere (pi)"
+k_V_ER_soma_SN,dimensionless,0.5235987755982988,"definitional; ER volume shape factor of a sphere, pi/6"
+k_A_ER_pre_soma_SN,dimensionless,3.141592653589793,"definitional; pre-ER area shape factor A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3), V_ER_pre = c_ER_pre Vol; a sphere (pi)"
+k_V_ER_pre_soma_SN,dimensionless,0.5235987755982988,"definitional; pre-ER volume shape factor of a sphere, pi/6"
+c_SL_soma_SN,dimensionless,0.02,user_defined_TO_BE_FOUND
+rho_IP3R_soma_SN,per_um2,0.0,definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0 m3_per_s (user_defined_was_0.03e-15) with A = 86.01 um^2 (the soma ER membrane area) and k_IP3R_single = 0.8637 um3_per_s; a density for calibration through k_IP3R_single
+k_IP3R_single_soma_SN,um3_per_s,0.8636921110362579,unreferenced_placeholder; per-receptor flux coefficient i/(2 F dCa) for a ~0.1 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 0.864 um^3/s
+rho_leak_Ca_soma_SN,per_um2,4.0303643922268835,definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca = 1e-17 m3_per_s (user_defined) with A = 248.1 um^2 (the soma pre-ER membrane area) and k_leak_Ca_single = 0.01 um3_per_s; a density for calibration through k_leak_Ca_single
+k_leak_Ca_single_soma_SN,um3_per_s,0.01,unreferenced_placeholder; per-protein Ca leak coefficient (flux per concentration difference) of an ER leak pathway; 0.01 um^3/s assumed
+IP3_soma_SN,millimolar,200e-6,Li1994Equations_from_plot
+IP3_SN_OLD,millimolar,500e-6,Li1994Equations_from_plot
+a_2_soma_SN,per_millimolar,200,Li1994Equations
+d_1_soma_SN,millimolar,0.13e-3,Li1994Equations
+d_2_soma_SN,millimolar,1.049e-3,Li1994Equations
+d_3_soma_SN,millimolar,0.943e-3,Li1994Equations
+d_5_soma_SN,millimolar,0.08234e-3,Li1994Equations
+K_mf_soma_SN,millimolar,0.1e-3,Shannon2004Mathematical_was_0.246e-3
+K_mr_soma_SN,millimolar,0.5,Shannon2004Mathematical_was_1.7
+rho_SERCA_soma_SN,per_um2,36407.132526123205,definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 3e-16 mol_per_s (to_be_identified) with A = 248.1 um^2 (the soma pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration through r_SERCA
+r_SERCA_soma_SN,per_s,20.0,"unreferenced_placeholder; maximal Ca transport per SERCA pump, ~10-20 Ca/s at room temperature (Lytton et al. 1992, value not verified from the paper); 20 Ca/s assumed"
+H_SERCA_soma_SN,dimensionless,1.787,Shannon2004Mathematical
+rho_RyR_soma_SN,per_um2,576.9514845733909,definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 1.5e-13 m3_per_s (to_be_identified) with A = 86.01 um^2 (the soma ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density for calibration through k_RyR_single
+k_RyR_single_soma_SN,um3_per_s,3.0229223886269025,unreferenced_placeholder; per-channel flux coefficient i/(2 F dCa) for a ~0.35 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 3.02 um^3/s
+Cai_RyR_mid_soma_SN,millimolar,8e-4,user_defined
+Cai_RyR_den_soma_SN,millimolar,1e-4,user_defined
+Ca_ER_RyR_mid_soma_SN,millimolar,0.5,user_defined
+Ca_ER_RyR_den_soma_SN,millimolar,0.03,user_defined
+Ca_ER_RyR_tau_mid_soma_SN,millimolar,0.3,NOT_USED
+Ca_ER_RyR_tau_den_soma_SN,millimolar,0.01,NOT_USED
+tau_c_RyR_soma_SN,millis,0.01,user_defined
+tau_hc_RyR_soma_SN,millis,10,user_defined
+#,#,#,#
+Ca_ER_init_var_SN,millimolar,0.6,to_be_checked_in_neurons
+h_IP3_init_var_SN,dimensionless,0.99,user_defined
+c_ER_var_SN,dimensionless,0.01,Li1994Equations_was_0.185
+c_ER_pre_var_SN,dimensionless,0.049,user_defined
+k_A_ER_var_SN,dimensionless,3.141592653589793,"definitional; ER area shape factor A_ER = k_A_ER (V_ER/k_V_ER)^(2/3), V_ER = c_ER Vol; a sphere (pi)"
+k_V_ER_var_SN,dimensionless,0.5235987755982988,"definitional; ER volume shape factor of a sphere, pi/6"
+k_A_ER_pre_var_SN,dimensionless,3.141592653589793,"definitional; pre-ER area shape factor A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3), V_ER_pre = c_ER_pre Vol; a sphere (pi)"
+k_V_ER_pre_var_SN,dimensionless,0.5235987755982988,"definitional; pre-ER volume shape factor of a sphere, pi/6"
+c_SL_var_SN,dimensionless,0.02,user_defined_TO_BE_FOUND
+rho_IP3R_var_SN,per_um2,0.0,definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0 m3_per_s (user_defined) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_IP3R_single = 0.8637 um3_per_s; a density for calibration through k_IP3R_single
+k_IP3R_single_var_SN,um3_per_s,0.8636921110362579,unreferenced_placeholder; per-receptor flux coefficient i/(2 F dCa) for a ~0.1 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 0.864 um^3/s
+rho_leak_Ca_var_SN,per_um2,3.0885062497465667,definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca = 2e-20 m3_per_s (user_defined) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and k_leak_Ca_single = 0.01 um3_per_s; a density for calibration through k_leak_Ca_single
+k_leak_Ca_single_var_SN,um3_per_s,0.01,unreferenced_placeholder; per-protein Ca leak coefficient (flux per concentration difference) of an ER leak pathway; 0.01 um^3/s assumed
+IP3_var_SN,millimolar,200e-6,Li1994Equations_from_plot
+IP3_SN_OLD,millimolar,500e-6,Li1994Equations_from_plot
+a_2_var_SN,per_millimolar,200,Li1994Equations
+d_1_var_SN,millimolar,0.13e-3,Li1994Equations
+d_2_var_SN,millimolar,1.049e-3,Li1994Equations
+d_3_var_SN,millimolar,0.943e-3,Li1994Equations
+d_5_var_SN,millimolar,0.08234e-3,Li1994Equations
+K_mf_var_SN,millimolar,0.1e-3,Shannon2004Mathematical_was_0.246e-3
+K_mr_var_SN,millimolar,0.5,Shannon2004Mathematical
+rho_SERCA_var_SN,per_um2,6974.782265292578,definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 1.5e-19 mol_per_s (to_be_identified) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration through r_SERCA
+r_SERCA_var_SN,per_s,20.0,"unreferenced_placeholder; maximal Ca transport per SERCA pump, ~10-20 Ca/s at room temperature (Lytton et al. 1992, value not verified from the paper); 20 Ca/s assumed"
+H_SERCA_var_SN,dimensionless,1.787,Shannon2004Mathematical
+rho_RyR_var_SN,per_um2,110.5308411655132,definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 7.5e-17 m3_per_s (to_be_identified) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density for calibration through k_RyR_single
+k_RyR_single_var_SN,um3_per_s,3.0229223886269025,unreferenced_placeholder; per-channel flux coefficient i/(2 F dCa) for a ~0.35 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 3.02 um^3/s
+Cai_RyR_mid_var_SN,millimolar,8e-4,user_defined
+Cai_RyR_den_var_SN,millimolar,1e-4,user_defined
+Ca_ER_RyR_mid_var_SN,millimolar,0.5,user_defined
+Ca_ER_RyR_den_var_SN,millimolar,0.03,user_defined
+Ca_ER_RyR_tau_mid_var_SN,millimolar,0.3,NOT_USED
+Ca_ER_RyR_tau_den_var_SN,millimolar,0.01,NOT_USED
+tau_c_RyR_var_SN,millis,0.01,user_defined
+tau_hc_RyR_var_SN,millis,10,user_defined
+#,#,#,#
+tau_Ca_soma_SN_OLD,millis,2.0,Tomek2020Development_was_0.2
+D_Ca_soma_SN,m3_per_s,6e-12,identified_by_hand
+D_Ca_var_SN,m3_per_s,3e-15,identified_by_hand
+tau_Ca_ER_soma_SN_OLD,millis,600.0,Tomek2020Development_was_60
+D_Ca_ER_soma_SN,m3_per_s,4.8e-15,need_to_change_for_volume
+D_Ca_ER_var_SN,m3_per_s,2.4e-18,need_to_change_for_volume
+#,#,#,#
+I_in_soma_SN,nanoA,0.00,user_defined
+#,#,#,#
+channel_ratio_axon_SN,dimensionless,0.5,user_defined
+c_m_axon_SN,uF_per_cm2,1.0,"Gentet2000; specific membrane capacitance 0.9 uF/cm^2 measured directly in nucleated patches of cortical pyramidal, spinal cord and hippocampal neurons (Abstract); 1 uF/cm^2 (0.01 pF/um^2) is the conventional value used here"
+d_ax_axon_SN,um,1.0,"definitional; axon diameter 1 um, within the 0.3-1.5 um range of unmyelinated postganglionic sympathetic axons; with L_ax and R_i chosen to reproduce the previous C and R"
+L_ax_axon_SN,um,318.3098861837907,definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um
+R_i_axon_SN,ohm_cm,74.02203300817018,definitional; axial (cytoplasmic) resistivity chosen so that R = 4 R_i L_ax/(pi d_ax^2) reproduces the previous R = 300 MOhm (SN_simple to_be_determined R = 300 MOhm): R_i = 74.02 ohm cm (typical axoplasm 70-200 ohm cm)
+V_rest_approx_axon_SN,milliV,-70,user_defined

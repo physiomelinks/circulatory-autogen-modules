@@ -1,0 +1,5 @@
+[
+ {"name": "soma_SN", "module_type": "SN_soma", "module_subtype": "nn", "inp_instances": [], "out_instances": ["axon_SN"]},
+ {"name": "axon_SN", "module_type": "SN_axon", "module_subtype": "nn", "inp_instances": ["soma_SN"], "out_instances": ["var_SN"]},
+ {"name": "var_SN", "module_type": "SN_varicosity", "module_subtype": "nn", "inp_instances": ["axon_SN"], "out_instances": []}
+]

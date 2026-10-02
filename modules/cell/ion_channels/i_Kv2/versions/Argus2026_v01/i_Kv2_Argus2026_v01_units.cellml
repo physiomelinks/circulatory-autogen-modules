@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="Units" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <units name="milliV">
+        <unit prefix="milli" units="volt"/>
+    </units>
+    <units name="microS">
+        <unit prefix="micro" units="siemens"/>
+    </units>
+    <units name="nanoA">
+        <unit prefix="nano" units="ampere"/>
+    </units>
+    <units name="C_per_mol">
+        <unit units="coulomb"/>
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="millis">
+        <unit prefix="milli" units="second"/>
+    </units>
+    <units name="mol_per_s">
+        <unit units="mole"/>
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="A_per_nanoA">
+        <unit exponent="-1" prefix="nano" units="ampere"/>
+        <unit units="ampere"/>
+    </units>
+    <units name="millis_per_s">
+        <unit prefix="milli" units="second"/>
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="um2">
+        <unit exponent="2" prefix="micro" units="metre"/>
+    </units>
+    <units name="per_um2">
+        <unit exponent="-2" prefix="micro" units="metre"/>
+    </units>
+    <units name="microS_per_picoS">
+        <unit prefix="micro" units="siemens"/>
+        <unit exponent="-1" prefix="pico" units="siemens"/>
+    </units>
+    <units name="picoS">
+        <unit prefix="pico" units="siemens"/>
+    </units>
+</model>

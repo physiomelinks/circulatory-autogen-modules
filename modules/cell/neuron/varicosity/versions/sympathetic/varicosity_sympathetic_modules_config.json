@@ -1,0 +1,93 @@
+[
+  {
+    "module_type": "varicosity",
+    "module_subtype": "sympathetic",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Sympathetic-neuron varicosity (SN_simple's SN_varicosity) built from its parts: a pass-through membrane (the axon sets V), four-compartment Ca handling with E_Ca, N-type Ca channel, NaCa exchanger, IP3R, RyR and NE release. Each submodule becomes <instance>_<submodule> in a model; the membrane takes the axon's potential: per_submodule_inputs {\"membrane\": [\"<axon>\"]}; NE (synaptic_NE) is available from NE. Geometry: the membrane computes the area A_mem and volume Vol from the diameter d (membrane_area to i_CaN and i_NaCa, compartment_volume to Ca); Ca computes the ER area A_ER for IP3R and RyR.",
+    "submodules": [
+      {
+        "name": "membrane",
+        "module_type": "SN_varicosity_membrane",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "i_CaN",
+          "i_NaCa",
+          "Ca"
+        ]
+      },
+      {
+        "name": "Ca",
+        "module_type": "SN_Ca_handling_varicosity",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "membrane"
+        ],
+        "out_instances": [
+          "i_CaN",
+          "i_NaCa",
+          "IP3R",
+          "RyR",
+          "NE"
+        ]
+      },
+      {
+        "name": "i_CaN",
+        "module_type": "i_CaN",
+        "module_subtype": "Argus2026_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_NaCa",
+        "module_type": "i_NaCa",
+        "module_subtype": "Argus2026_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "IP3R",
+        "module_type": "IP3R",
+        "module_subtype": "Argus2026_v01",
+        "instance": "default",
+        "inp_instances": [
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "RyR",
+        "module_type": "RyR",
+        "module_subtype": "Argus2026_v01",
+        "instance": "default",
+        "inp_instances": [
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "NE",
+        "module_type": "SN_NE_release",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "Ca"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

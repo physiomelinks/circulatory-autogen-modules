@@ -1,0 +1,60 @@
+module_type: venous
+version: vp_wCont
+reviewed: false
+notes: 'vp lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 2e-11 s, slowest decay 0.018 s; run: fastest
+  2e-11 s, slowest decay 0.018 s).'
+expected_failures:
+  run_test: 'generation fails: libcellml "Component mod contains multiple variables with the name v_in / u_out" (the config
+    entry for venous vp_wCont lists v_in and u_out twice). With the duplicates removed in a patched copy the tests pass (see
+    review.proposed_fixes)'
+  verification_test_invariants: 'generation fails: libcellml "Component mod contains multiple variables with the name v_in
+    / u_out" (the config entry for venous vp_wCont lists v_in and u_out twice). With the duplicates removed in a patched copy
+    the tests pass (see review.proposed_fixes)'
+  verification_test_BC: 'generation fails: libcellml "Component mod contains multiple variables with the name v_in / u_out"
+    (the config entry for venous vp_wCont lists v_in and u_out twice). With the duplicates removed in a patched copy the tests
+    pass (see review.proposed_fixes)'
+  verification_test_timestep: 'generation fails: libcellml "Component mod contains multiple variables with the name v_in /
+    u_out" (the config entry for venous vp_wCont lists v_in and u_out twice). With the duplicates removed in a patched copy
+    the tests pass (see review.proposed_fixes)'
+  stability_test: 'generation fails: libcellml "Component mod contains multiple variables with the name v_in / u_out" (the
+    config entry for venous vp_wCont lists v_in and u_out twice). With the duplicates removed in a patched copy the tests
+    pass (see review.proposed_fixes)'
+reference_proposals:
+  R:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "small_chosen" (value 1.00e-07)'
+    sourced: 'no'
+  C:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "to_be_identified" (value 2e-6)'
+    sourced: 'no'
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen control_parasymp: user_defined)'
+    sourced: definitional
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0
+      Pa (0 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 0.0
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+  I:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "small_chosen" (value 1.00e-07)'
+    sourced: 'no'
+  q_C_init:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "user_defined" (value 1e-4)'
+    sourced: 'no'
+  q_us_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "user_defined_TO_BE_FOUND" (value 9.00e-04)'
+    sourced: 'no'
+  Delta_q_us:
+    reference: 'definitional; Delta_q_us = 0: no control action (set by a controller module when connected)'
+    sourced: definitional
+    value: 0.0
+  Delta_C:
+    reference: 'definitional; Delta_C = 0 (circulatory_autogen control_phys_asd: user_defined)'
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

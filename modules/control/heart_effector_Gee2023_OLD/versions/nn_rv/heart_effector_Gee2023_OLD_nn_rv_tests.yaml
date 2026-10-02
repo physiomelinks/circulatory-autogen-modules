@@ -1,0 +1,47 @@
+module_type: heart_effector_Gee2023_OLD
+version: nn_rv
+reviewed: false
+notes: 'Compliance (inverse-elastance) form of the Gee2023 effector. The config points at module_type heart_effector_Gee2023
+  (elastance form, no inv_* variables) instead of heart_effector_Gee2023_INV, so the generated model has no equations for
+  the inv_* variables: myokit warns "No value set" and every output is 0. The invariants below are the INV component''s exact
+  solution (initial inv_Delta_Es = 1e-7, inv_Delta_Ev = -1e-7).'
+expected_failures:
+  verification_test_invariants: config module_type is heart_effector_Gee2023 but the variables (inv_*) belong to heart_effector_Gee2023_INV;
+    the generated model leaves inv_* unset (all outputs 0), so the INV-law invariants fail. Also heart_effector_Gee2023_INV
+    declares inv_sigma_Es in J_per_m6 (should be m6_per_J). A patched copy fixing both runs and passes.
+  verification_test_BC: same defect (see verification_test_invariants)
+reference_proposals:
+  inv_G_Es:
+    reference: unreferenced_placeholder; order-of-magnitude value keeping inv_Delta_Es positive (-1e-7 m6/J)
+    sourced: false
+    value: -1.0e-07
+  tau_Es:
+    reference: Gee2023; tau = 8 s (Simulink sympathetic contractility effector)
+    sourced: true
+    value: 8.0
+  f_esh:
+    reference: circulatory_autogen; test operating point (5 Hz)
+    sourced: false
+    value: 5.0
+  inv_G_Ev:
+    reference: unreferenced_placeholder; order-of-magnitude value keeping inv_Delta_Ev negative (-2e-8 m6 s/J)
+    sourced: false
+    value: -2.0e-08
+  tau_Ev:
+    reference: Gee2023; tau = 1.5 s (Simulink vagal contractility effector)
+    sourced: true
+    value: 1.5
+  f_PNDMV_filt:
+    reference: circulatory_autogen; test operating point (5 Hz)
+    sourced: false
+    value: 5.0
+  scale:
+    reference: Gee2023; RV scaling 0.5903
+    sourced: true
+    value: 0.5903
+  f_es_min:
+    reference: Ursino1998; 2.66 spikes/s
+    sourced: true
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

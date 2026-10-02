@@ -1,0 +1,89 @@
+{
+  "module_type": "venous",
+  "version": "vp_nonlinear",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.002,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-07, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["u", "v", "q", "q_C", "I"],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "u = u_0 + K ((q/q0)^m - (q/q0)^n) + u_ext, q0 = pi r0^2 l (for m = 1/2, n = 0: u - u_0 - u_ext = K (sqrt(A/A0) - 1))",
+      "expr": "np.max(np.abs((u) - (u_0 + K_tube*((q/(np.pi*r_0**2*l))**m_tube - (q/(np.pi*r_0**2*l))**n_tube) + u_ext))) <= 1e-08*(np.max(np.abs(u)) + np.max(np.abs(u_0 + K_tube*((q/(np.pi*r_0**2*l))**m_tube - (q/(np.pi*r_0**2*l))**n_tube) + u_ext))) + 1e-30"
+    },
+    {
+      "description": "q = q_C + pi r0^2 l",
+      "expr": "np.max(np.abs((q) - (q_C + np.pi*r_0**2*l))) <= 1e-08*(np.max(np.abs(q)) + np.max(np.abs(q_C + np.pi*r_0**2*l))) + 1e-30"
+    },
+    {
+      "description": "I = I_scale rho l/(pi r0^2)",
+      "expr": "np.max(np.abs((I) - (I_scale*rho*l/(np.pi*r_0**2) + 0*t))) <= 1e-08*(np.max(np.abs(I)) + np.max(np.abs(I_scale*rho*l/(np.pi*r_0**2) + 0*t))) + 1e-30"
+    },
+    {
+      "description": "volume balance: d(q)/dt = (v_in) - (v) (trapezoidal integral of the flows from t = 0.004 s, rel. tol 0.05)",
+      "expr": "np.max(np.abs((((q) + 0*t)[(t >= 0.004)] - ((q) + 0*t)[(t >= 0.004)][0]) - np.concatenate(([0.0], np.cumsum(0.5*((((v_in) - (v) + 0*t))[(t >= 0.004)][1:] + (((v_in) - (v) + 0*t))[(t >= 0.004)][:-1])*np.diff(t[(t >= 0.004)])))))) <= 0.05*np.ptp(((q) + 0*t)[(t >= 0.004)]) + 1e-5*np.max(np.abs(((q) + 0*t))) + 1e-9*np.max(np.abs(((v_in) - (v) + 0*t)))*t[-1] + 1e-18"
+    },
+    {
+      "description": "steady state at t_end: v = v_in",
+      "expr": "abs((v)[-1] - (v_in)) <= 0.001*(abs(v_in) + 1e-12 + np.max(np.abs(v))) + 1e-18"
+    },
+    {
+      "description": "steady state at t_end: u = u_out + R (v_in) + gravity term",
+      "expr": "abs((u)[-1] - (u_out + (R_flag*8*mu*l/(np.pi*(q[-1]/(np.pi*l))**2))*(v_in) + beta_g*rho*g*l*np.cos(theta*np.pi/180))) <= 0.001*(abs(u_out) + 1.0 + np.max(np.abs(u))) + 1e-18"
+    },
+    {"description": "q stays positive (the tube law needs a positive volume)", "expr": "np.all(q > 0)"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "u_0": [0.0, 2000.0],
+      "u_ext": [-200.0, 200.0],
+      "u_out": [0.0, 1300.0],
+      "v_in": [0.0, 0.0001256638],
+      "theta": [0.0, 90.0],
+      "beta_g": [0.0, 1.0],
+      "g": [1.0, 9.81]
+    },
+    "exclude": ["m_tube", "n_tube", "R_flag"],
+    "rationale": "Boundary conditions span physiological operating values for the vessel class (arterial inlet 60-150 mmHg, venous 0-15 mmHg, flows 0-2x the nominal flow; +-0.5% for the nonlinear vv types, whose volume drifts by (v_in - v_out) t and collapses the tube if the imbalance is larger); constants are swept 0.5-2x their value; rho and mu are swept 0.5-2x their library (test_fft fixture) value of 1; beta_g 0-1; g 1-9.81; the wall-thickness constants a-d between the fixture value 1 and the proposed Blanco 2015 values. The physiological rho/mu (1050, 0.004) cannot yet be combined with the others at the run point (framework issue), so the swept regime is the library one. Excluded: tube-law exponents (they define the law), switches (R_flag, blood_ctl_dir)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [1e-05, 5e-06, 2.5e-06, 1.25e-06],
+    "t_end": 0.02,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-07, "atol": 1e-14}
+    ],
+    "cvode": [
+      {"rtol": 0.0001, "atol": 1e-08},
+      {"rtol": 1e-06, "atol": 1e-08},
+      {"rtol": 1e-07, "atol": 1e-14}
+    ],
+    "solve_ivp": ["LSODA"],
+    "fixed_step": {
+      "schemes": ["rk4"],
+      "dt_start": 2e-05
+    },
+    "time_budget": 10.0,
+    "t_end": 2.0
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: venous pressure/flow waveforms of the Muller & Toro (2014) global model or measured central venous pressure ranges (proposal only, not set up)."
+      },
+      "calibrate": {
+        "note": "pending: a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: venous pressure/flow waveforms of the Muller & Toro (2014) global model or measured central venous pressure ranges (proposal only, not set up)."
+      }
+    }
+  }
+}

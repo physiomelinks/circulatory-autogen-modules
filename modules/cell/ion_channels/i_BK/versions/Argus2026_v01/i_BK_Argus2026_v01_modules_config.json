@@ -1,0 +1,235 @@
+[
+  {
+    "module_type": "i_BK",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "i_BK_Argus2026_v01_modules.cellml",
+    "component_type": "i_BK_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_KCa_BK"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_KCa_BK"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_h_BK",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m_BK",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h_BK",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m_BK",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_KCa_BK",
+        "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_BK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_BK",
+        "picoS",
+        "access",
+        "constant"
+      ],
+      [
+        "h_BK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_BK_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_BK_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_BK_min",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_KCa_BK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_KCa_BK",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_BK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_BK_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_BK_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_BK",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_m_BK",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_z_BK",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "z_BK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "z_BK_coeff",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "z_BK_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "z_BK_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

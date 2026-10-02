@@ -1,0 +1,92 @@
+[
+  {
+    "module_type": "i_Kr_Xr1_gate",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_Kr_Xr1_gate_Paci2013_v01_modules.cellml",
+    "component_type": "i_Kr_Xr1_gate_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Kr_Xr1_gate",
+        "variables": [
+          "Xr1"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Xr1_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Xr1",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Vm",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_half",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "R",
+        "J_per_MK",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "L0",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,80 @@
+module_type: efferent_respiratory_effector
+version: nn
+reviewed: false
+notes: 'Chemoreflex respiratory effector (additive form): respiratory-rate and muscle-pressure changes are first-order responses
+  to central (u_c_resp) and peripheral (u_p_resp) drives, with sign/threshold-switched gains and time constants, then clamped.
+  The CellML names the muscle-pressure states alpha_P_mus* (dimensionless) while the config and parameters use Delta_P_mus*
+  (J_per_m3); G_pA, G_cA are Js_per_m3, so Delta_P_mus [Pa] is the dimensionally consistent reading.'
+expected_failures:
+  run_test: 'two defects: (1) u_p_resp is listed twice in variables_and_units (duplicate variable -> libcellml VARIABLE_NAME_UNIQUE);
+    (2) the config/parameters declare Delta_P_mus, Delta_P_mus_max/min (J_per_m3) but the CellML component uses alpha_P_mus*
+    (dimensionless). A patched copy (duplicate removed, CellML alpha_P_mus* renamed to Delta_P_mus* with J_per_m3 units) generates
+    and passes both invariants.'
+  verification_test_invariants: generation fails (see run_test)
+  verification_test_BC: generation fails (see run_test)
+  verification_test_timestep: generation fails (see run_test)
+  stability_test: generation fails (see run_test)
+reference_proposals:
+  u_c_resp:
+    reference: circulatory_autogen; test operating point (100)
+    sourced: false
+    value: 100.0
+  u_p_resp:
+    reference: circulatory_autogen; test operating point (1)
+    sourced: false
+    value: 1.0
+  G_pA:
+    reference: unreferenced_placeholder; library cites "Bizotto2022" (-120 Pa s, converted from dyne/cm2); no such publication
+      could be identified - owner to give the full reference (possibly Albanese2016 chemoreflex table)
+    sourced: false
+  G_pf:
+    reference: unreferenced_placeholder; "user_defined"
+    sourced: false
+  tau_pA_min:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  tau_pA_max:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  tau_pf_min:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  tau_pf_max:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  G_cA_max:
+    reference: unreferenced_placeholder; "Bizotto2022" - source not identified
+    sourced: false
+  G_cf_max:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  tau_cA_min:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  tau_cA_max:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  tau_cf_min:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  tau_cf_max:
+    reference: unreferenced_placeholder; "Bizzotto2022_converted" - source not identified
+    sourced: false
+  u_CO2_c_thresh:
+    reference: unreferenced_placeholder; calibrated ("from_ICUHealthy")
+    sourced: false
+  Delta_RR_resp_max:
+    reference: unreferenced_placeholder; calibrated ("from_ICUHealthy")
+    sourced: false
+  Delta_P_mus_max:
+    reference: unreferenced_placeholder; calibrated ("from_ICUHealthy")
+    sourced: false
+  Delta_RR_resp_min:
+    reference: unreferenced_placeholder; calibrated ("from_ICUHealthy")
+    sourced: false
+  Delta_P_mus_min:
+    reference: unreferenced_placeholder; calibrated ("from_ICUHealthy")
+    sourced: false
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

@@ -1,0 +1,121 @@
+[
+  {
+    "module_type": "heart_effector_Gee2023_OLD",
+    "module_subtype": "nn_rv",
+    "module_format": "cellml",
+    "component_file": "heart_effector_Gee2023_OLD_nn_rv_modules.cellml",
+    "component_type": "heart_effector_Gee2023__heart_effector_Gee2023_OLD_nn_rv",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "sympathetic_efferent_heart_freq",
+        "variables": [
+          "f_esh"
+        ]
+      },
+      {
+        "port_type": "vagal_efferent_filt_firing_rate_port",
+        "variables": [
+          "f_PNDMV_filt"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Elastance_delta_port_rv",
+        "variables": [
+          "Delta_Emax"
+        ]
+      },
+      {
+        "port_type": "Elastance_delta_port",
+        "variables": [
+          "Delta_Emax"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "inv_G_Es",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "f_es_min",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "tau_Es",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "f_esh",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "inv_Delta_Es",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "inv_sigma_Es",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "inv_G_Ev",
+        "m6s_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_Ev",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "f_PNDMV_filt",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "inv_Delta_Ev",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "inv_sigma_Ev",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "Delta_Emax",
+        "J_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "scale",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

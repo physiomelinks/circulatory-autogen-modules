@@ -1,0 +1,122 @@
+{
+  "module_type": "soma",
+  "version": "sympathetic_monolithic_v01",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 2e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": [
+    "V",
+    "Nai",
+    "Ki",
+    "Cai",
+    "CaB_Cai",
+    "Ca_bulk",
+    "CaB_Ca_bulk",
+    "Ca_ER_pre",
+    "CaB_Ca_ER_pre",
+    "Ca_ER",
+    "j_Ca_L",
+    "j_NaCa_Ca",
+    "i_Na1_6",
+    "I_in_delayed",
+    "E_Na",
+    "E_K",
+    "B_Cai",
+    "B_Ca_bulk",
+    "B_Ca_ER_pre",
+    "m",
+    "h",
+    "m_Na1_6",
+    "h_Na1_6",
+    "c",
+    "hc",
+    "m_Kv2",
+    "m_Kv1_5",
+    "h_Kv1_5",
+    "m_Kv4_2",
+    "h_Kv4_2",
+    "m_BK",
+    "h_BK",
+    "z_BK",
+    "m_SK",
+    "w",
+    "h_IP3",
+    "c_RyR",
+    "hc_RyR",
+    "Cm",
+    "Vol"
+  ],
+  "run_parameters": {"I_in": 0.05},
+  "invariants": [
+    {
+      "description": "charge conservation: the change of membrane charge Cm (V - V0) equals the change of ionic charge F [Vol (dNai + dKi) + 2 dN_Ca] plus the charge carried by the currents that change no tracked ion pool (I_in_delayed and I_out)",
+      "expr": "np.max(np.abs((Cm*1e-15*(V - V[0]) - F*(Vol*((Nai + Ki) - (Nai[0] + Ki[0])) + 2*((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]))) - (-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t))))))) <= 1e-3*(np.max(np.abs(Cm*1e-15*(V - V[0]))) + np.max(np.abs((-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t)))))))) + 1e-20"
+    },
+    {
+      "description": "total Ca (free + buffered, all four compartments) changes only by the plasma-membrane fluxes: N_Ca(t) - N_Ca(0) = integral of (j_Ca_L + j_NaCa_Ca) dt (trapezoid on the output grid)",
+      "expr": "np.max(np.abs(((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) - np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_L + j_NaCa_Ca)[1:]+(j_Ca_L + j_NaCa_Ca)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_L + j_NaCa_Ca)[1:]+(j_Ca_L + j_NaCa_Ca)[:-1])*np.diff(t)))))) + 1e-21"
+    },
+    {
+      "description": "every gating variable stays in [0, 1]",
+      "expr": "np.all((m >= -1e-6) & (m <= 1 + 1e-6)) & np.all((h >= -1e-6) & (h <= 1 + 1e-6)) & np.all((m_Na1_6 >= -1e-6) & (m_Na1_6 <= 1 + 1e-6)) & np.all((h_Na1_6 >= -1e-6) & (h_Na1_6 <= 1 + 1e-6)) & np.all((c >= -1e-6) & (c <= 1 + 1e-6)) & np.all((hc >= -1e-6) & (hc <= 1 + 1e-6)) & np.all((m_Kv2 >= -1e-6) & (m_Kv2 <= 1 + 1e-6)) & np.all((m_Kv1_5 >= -1e-6) & (m_Kv1_5 <= 1 + 1e-6)) & np.all((h_Kv1_5 >= -1e-6) & (h_Kv1_5 <= 1 + 1e-6)) & np.all((m_Kv4_2 >= -1e-6) & (m_Kv4_2 <= 1 + 1e-6)) & np.all((h_Kv4_2 >= -1e-6) & (h_Kv4_2 <= 1 + 1e-6)) & np.all((m_BK >= -1e-6) & (m_BK <= 1 + 1e-6)) & np.all((h_BK >= -1e-6) & (h_BK <= 1 + 1e-6)) & np.all((z_BK >= -1e-6) & (z_BK <= 1 + 1e-6)) & np.all((m_SK >= -1e-6) & (m_SK <= 1 + 1e-6)) & np.all((w >= -1e-6) & (w <= 1 + 1e-6)) & np.all((h_IP3 >= -1e-6) & (h_IP3 <= 1 + 1e-6)) & np.all((c_RyR >= -1e-6) & (c_RyR <= 1 + 1e-6)) & np.all((hc_RyR >= -1e-6) & (hc_RyR <= 1 + 1e-6))"
+    },
+    {
+      "description": "free buffer stays within [0, B_Ca_total]",
+      "expr": "np.all((B_Cai >= -1e-9) & (B_Cai <= B_Ca_total + 1e-9)) & np.all((B_Ca_bulk >= -1e-9) & (B_Ca_bulk <= B_Ca_total + 1e-9)) & np.all((B_Ca_ER_pre >= -1e-9) & (B_Ca_ER_pre <= B_Ca_total + 1e-9))"
+    },
+    {
+      "description": "Nernst: E_Na = 1000 RT/F ln(Nao/Nai), E_K = 1000 RT/F ln(Ko/Ki) (mV)",
+      "expr": "np.max(np.abs(E_Na - 1000*R*T/F*np.log(Nao/Nai))) + np.max(np.abs(E_K - 1000*R*T/F*np.log(Ko/Ki))) <= 1e-9"
+    },
+    {
+      "description": "concentrations stay positive",
+      "expr": "np.all((Cai > 0) & (Ca_bulk > 0) & (Ca_ER > 0) & (Ca_ER_pre > 0) & (Nai > 0) & (Ki > 0))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 1.0, 2.0],
+    "ranges": {
+      "I_in": {"min": -0.05, "max": 0.2, "points": 6},
+      "I_out": {"min": -0.05, "max": 0.05, "points": 3},
+      "Delta_V_mid_w": {"min": -10.0, "max": 10.0, "points": 3},
+      "k_thresh_m": {"min": -5, "max": 5, "points": 3},
+      "k_thresh_h": {"min": -5, "max": 5, "points": 3},
+      "delta_gM": {"min": 0.0, "max": 0.002, "points": 3},
+      "B_Ca_init": {"min": 4.0, "max": 7.95, "points": 3},
+      "B_Ca_total": {"min": 8.0, "max": 16.0, "points": 3},
+      "h_IP3_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "rho_IP3R": {"min": 0.0, "max": 0.4038660392013737, "points": 3},
+      "d": {
+        "values": [19.275732104070492, 24.285900630052804, 30.59831741945869]
+      }
+    },
+    "rationale": "injected current I_in from +0.2 nA (strong depolarising drive; the soma model uses I_in > 0 as outward) to +0.05 nA, axial current I_out +/-0.05 nA; zero-valued switches (Delta_V_mid_w, k_thresh_*, delta_gM, rho_IP3R (IP3R density; k_IP3 = A_ER rho_IP3R k_IP3R_single)) over their plausible ranges; all other constants by factors 0.5-2 of their values, except that the free-buffer initial value must not exceed B_Ca_total (B_Ca_init 4-7.95 mM, B_Ca_total 8-16 mM) and h_IP3_init spans [0, 1]. The diameter d spans the cube roots of the factors, so the volume k_V d^3 spans 0.5-2 (as Vol did); k_A, c_m, the densities and the per-protein rates scale their products by 0.5-2 (as Cm and the conductances did)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08, "MaximumStep": 1e-05},
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: stellate-ganglion neuron current-clamp recordings (Davis et al. / Paterson group, the source of V_rest and several fits) - rheobase, AP amplitude/width and firing frequency vs injected current; data not public in tabulated form, needs owner-supplied traces."
+      },
+      "calibrate": {
+        "note": "pending: same data; the single-channel conductances / per-protein rates of the \"to_be_identified\" mechanisms (gamma_Kv1_5, gamma_Kv4_2, gamma_SK, p_Ca_single, r_NaCa, gamma_leak_*) are the natural parameters to identify."
+      }
+    }
+  }
+}

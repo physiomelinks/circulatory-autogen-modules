@@ -1,0 +1,69 @@
+[
+  {
+    "module_type": "cardiac_clock",
+    "module_subtype": "nn_controlled",
+    "module_format": "cellml",
+    "component_file": "cardiac_clock_nn_controlled_modules.cellml",
+    "component_type": "cardiac_clock_controlled_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "period_delta_port",
+        "variables": [
+          "Delta_T"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "cardiac_clock_port",
+        "variables": [
+          "mt",
+          "T_eff"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T_min",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Delta_T",
+        "second",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "T_eff",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "s",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "mt",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

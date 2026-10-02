@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_BK_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_BK_SN">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Cai_init" public_interface="in" units="millimolar"/>
+        <variable name="E_K" public_interface="in" units="milliV"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="V_den_h_BK" public_interface="in" units="milliV"/>
+        <variable name="V_den_m_BK" public_interface="in" units="milliV"/>
+        <variable name="V_mid_h_BK" public_interface="in" units="milliV"/>
+        <variable name="V_mid_m_BK" public_interface="out" units="milliV"/>
+        <variable name="V_rest_approx" public_interface="in" units="milliV"/>
+        <variable name="epsilon_tau" units="second" initial_value="1e-6"/>
+        <variable name="g_KCa_BK" public_interface="out" units="microS"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_BK" public_interface="in" units="per_um2"/>
+        <variable name="gamma_BK" public_interface="in" units="picoS"/>
+        <variable name="h_BK" public_interface="out" units="dimensionless" initial_value="h_BK_init"/>
+        <variable name="h_BK_inf" public_interface="out" units="dimensionless"/>
+        <variable name="h_BK_init" public_interface="out" units="dimensionless"/>
+        <variable name="h_BK_min" public_interface="in" units="dimensionless"/>
+        <variable name="i_KCa_BK" public_interface="out" units="nanoA"/>
+        <variable name="j_KCa_BK" public_interface="out" units="mol_per_s"/>
+        <variable name="m_BK" public_interface="out" units="dimensionless" initial_value="m_BK_init"/>
+        <variable name="m_BK_inf" public_interface="out" units="dimensionless"/>
+        <variable name="m_BK_init" public_interface="out" units="dimensionless"/>
+        <variable name="tau_h_BK" public_interface="out" units="millis"/>
+        <variable name="tau_m_BK" public_interface="out" units="millis"/>
+        <variable name="tau_z_BK" public_interface="in" units="millis"/>
+        <variable name="z_BK" public_interface="out" units="dimensionless" initial_value="z_BK_init"/>
+        <variable name="z_BK_coeff" public_interface="in" units="millimolar"/>
+        <variable name="z_BK_inf" public_interface="out" units="dimensionless"/>
+        <variable name="z_BK_init" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>V_mid_m_BK</ci>
+                <apply>
+                    <minus/>
+                    <ci>V_mid_h_BK</ci>
+                    <cn cellml:units="milliV">3.1</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>m_BK_init</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V_rest_approx</ci>
+                                        <ci>V_mid_m_BK</ci>
+                                    </apply>
+                                </apply>
+                                <ci>V_den_m_BK</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>h_BK_init</ci>
+                <apply>
+                    <plus/>
+                    <ci>h_BK_min</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <ci>h_BK_min</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V_rest_approx</ci>
+                                        <ci>V_mid_h_BK</ci>
+                                    </apply>
+                                    <ci>V_den_h_BK</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>z_BK_init</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <divide/>
+                            <ci>z_BK_coeff</ci>
+                            <ci>Cai_init</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>m_BK_inf</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V</ci>
+                                        <ci>V_mid_m_BK</ci>
+                                    </apply>
+                                </apply>
+                                <ci>V_den_m_BK</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>h_BK_inf</ci>
+                <apply>
+                    <plus/>
+                    <ci>h_BK_min</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <ci>h_BK_min</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V</ci>
+                                        <ci>V_mid_h_BK</ci>
+                                    </apply>
+                                    <ci>V_den_h_BK</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>z_BK_inf</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <divide/>
+                            <ci>z_BK_coeff</ci>
+                            <ci>Cai</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_m_BK</ci>
+                <apply>
+                    <plus/>
+                    <cn cellml:units="millis">1.505</cn>
+                    <apply>
+                        <divide/>
+                        <cn cellml:units="millis">1000</cn>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V</ci>
+                                        <ci>V_mid_m_BK</ci>
+                                        <cn cellml:units="milliV">57.5</cn>
+                                    </apply>
+                                    <cn cellml:units="milliV">10.1</cn>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <minus/>
+                                        <apply>
+                                            <minus/>
+                                            <apply>
+                                                <plus/>
+                                                <ci>V</ci>
+                                                <ci>V_mid_m_BK</ci>
+                                            </apply>
+                                            <cn cellml:units="milliV">62.2</cn>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="milliV">10</cn>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_h_BK</ci>
+                <apply>
+                    <plus/>
+                    <cn cellml:units="millis">1.9</cn>
+                    <apply>
+                        <divide/>
+                        <cn cellml:units="millis">1000</cn>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V</ci>
+                                        <ci>V_mid_h_BK</ci>
+                                        <cn cellml:units="milliV">16.5</cn>
+                                    </apply>
+                                    <cn cellml:units="milliV">5.2</cn>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <minus/>
+                                        <apply>
+                                            <minus/>
+                                            <apply>
+                                                <plus/>
+                                                <ci>V</ci>
+                                                <ci>V_mid_h_BK</ci>
+                                            </apply>
+                                            <cn cellml:units="milliV">86.2</cn>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="milliV">12.9</cn>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>m_BK</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>m_BK_inf</ci>
+                        <ci>m_BK</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <abs/>
+                            <apply>
+                                <divide/>
+                                <ci>tau_m_BK</ci>
+                                <cn cellml:units="millis_per_s">1000</cn>
+                            </apply>
+                        </apply>
+                        <ci>epsilon_tau</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>h_BK</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>h_BK_inf</ci>
+                        <ci>h_BK</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <abs/>
+                            <apply>
+                                <divide/>
+                                <ci>tau_h_BK</ci>
+                                <cn cellml:units="millis_per_s">1000</cn>
+                            </apply>
+                        </apply>
+                        <ci>epsilon_tau</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>z_BK</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>z_BK_inf</ci>
+                        <ci>z_BK</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <abs/>
+                            <apply>
+                                <divide/>
+                                <ci>tau_z_BK</ci>
+                                <cn cellml:units="millis_per_s">1000</cn>
+                            </apply>
+                        </apply>
+                        <ci>epsilon_tau</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_KCa_BK</ci>
+                <apply>
+                    <times/>
+                    <ci>g_KCa_BK</ci>
+                    <apply>
+                        <power/>
+                        <ci>m_BK</ci>
+                        <cn cellml:units="dimensionless">3</cn>
+                    </apply>
+                    <ci>h_BK</ci>
+                    <apply>
+                        <power/>
+                        <ci>z_BK</ci>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_K</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_KCa_BK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>i_KCa_BK</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>g_KCa_BK</ci><apply><times/><ci>A_mem</ci><ci>rho_BK</ci><ci>gamma_BK</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
+        </math>
+    </component>
+</model>

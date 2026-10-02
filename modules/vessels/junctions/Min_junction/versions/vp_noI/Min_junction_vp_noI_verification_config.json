@@ -1,0 +1,78 @@
+{
+  "module_type": "Min_junction",
+  "version": "vp_noI",
+  "sim_time": 5.0,
+  "pre_time": 0.0,
+  "dt": 0.05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10, "MaximumStep": 0.0125},
+  "outputs": ["q", "u", "v", "a1/v", "a1/q", "a2/v", "a2/q"],
+  "harness": {
+    "vessel_array": [
+      ["a1", "vp_noI", "simple", "", "mod", "default"],
+      ["a2", "vp_noI", "simple", "", "mod", "default"],
+      ["mod", "vp_noI", "Min_junction", "a1 a2", "", "default"]
+    ],
+    "parameters": [
+      ["q_init_a1", "litre", 0.253, "test value: same compartment as the component under test"],
+      ["q_0_a1", "litre", 0.1, "test value: same compartment as the component under test"],
+      ["u_0_a1", "kPa", 0.0, "test value: same compartment as the component under test"],
+      ["C_a1", "L_per_kPa", 0.01275, "test value: same compartment as the component under test"],
+      ["R_a1", "kPa_s_per_L", 126.7, "test value: same compartment as the component under test"],
+      ["v_in_a1", "L_per_s", 0.04165, "test value: inflow of the upstream neighbour (open inlet)"],
+      ["q_init_a2", "litre", 0.253, "test value: same compartment as the component under test"],
+      ["q_0_a2", "litre", 0.1, "test value: same compartment as the component under test"],
+      ["u_0_a2", "kPa", 0.0, "test value: same compartment as the component under test"],
+      ["C_a2", "L_per_kPa", 0.01275, "test value: same compartment as the component under test"],
+      ["R_a2", "kPa_s_per_L", 126.7, "test value: same compartment as the component under test"],
+      ["v_in_a2", "L_per_s", 0.04165, "test value: inflow of the upstream neighbour (open inlet)"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "Ohm law v = (u - u_out)/R and pressure-volume law u = u_0 + (q - q_0)/C",
+      "expr": "np.allclose(v*R, u - u_out, rtol=1e-8, atol=1e-9*np.max(np.abs(u))) & np.allclose(u, u_0 + (q - q_0)/C, rtol=1e-8, atol=1e-9*np.max(np.abs(u)))"
+    },
+    {
+      "description": "volume stays positive (q > 0) at the run point (not across the sweep: a constant forced outflow can legitimately drain the compartment below zero)",
+      "expr": "np.all(q > 0)",
+      "applies": "run"
+    },
+    {
+      "description": "mass balance of the junction with its neighbours: q(t) - q_init = integral of ((a1__v + a2__v) - (v)), the sums taken over the connected neighbours",
+      "expr": "np.max(np.abs(q - q_init - np.concatenate([[0.0], np.cumsum(0.5*(((a1__v + a2__v) - (v))[1:] + ((a1__v + a2__v) - (v))[:-1])*np.diff(t))]))) <= 1e-2*np.max(np.abs(q - q_init)) + 1e-6*abs(q_init)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "u_out": {"min": 0.0, "max": 12.0, "points": 5},
+      "q_init": {"min": 0.1, "max": 0.406, "points": 3},
+      "u_0": {"min": 0.0, "max": 6.0, "points": 3}
+    },
+    "exclude": ["v_in_sum"],
+    "rationale": "Pressures 0.5-1.5x a 12 kPa (90 mmHg) mean plus the R x flow drop, flows 0-3x a 5 L/min cardiac output, initial volume from unstressed to unstressed + 2 C x 12 kPa, u_0 0-6 kPa; R, C, q_0 at 0.5-2x. The exact solution is checked at every point."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.2, 0.1, 0.05, 0.025],
+    "t_end": 5.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "generic linear RC building block with no specific anatomical counterpart; verified against its exact solution. Validation belongs to a network built from it."
+      },
+      "calibrate": {"note": "not_applicable: generic building block; see baseline"}
+    }
+  }
+}

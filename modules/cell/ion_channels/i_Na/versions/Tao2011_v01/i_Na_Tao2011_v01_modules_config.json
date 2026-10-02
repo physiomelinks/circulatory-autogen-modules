@@ -1,0 +1,86 @@
+[
+  {
+    "module_type": "i_Na",
+    "module_subtype": "Tao2011_v01",
+    "module_format": "cellml",
+    "component_file": "i_Na_Tao2011_v01_modules.cellml",
+    "component_type": "i_Na_Tao_2011",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "notes": "Built for: sympathetic neuron (Tao et al. 2011)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "Na_current",
+        "variables": [
+          "i_Na"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Na_current",
+        "variables": [
+          "i_Na"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_Na",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_Na",
+        "microS",
+        "access",
+        "constant"
+      ],
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "m",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_m",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h",
+        "second",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

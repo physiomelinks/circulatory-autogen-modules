@@ -1,0 +1,48 @@
+{
+  "module_type": "i_Na1_6",
+  "version": "Argus2026_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["m_Na1_6", "h_Na1_6", "h_Na1_6_inf", "i_Na1_6", "j_Na1_6", "m_Na1_6_inf", "tau_h_Na1_6", "tau_m_Na1_6"],
+  "invariants": [
+    {
+      "description": "the ion flux j_Na1_6 = -i_Na1_6/F (mol/s; the current in nA, so the factor 1e-9)",
+      "expr": "np.max(np.abs(j_Na1_6 - 1e-9*(-i_Na1_6/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Na1_6)))"
+    },
+    {
+      "description": "every gating variable stays in [0, 1]",
+      "expr": "np.all((m_Na1_6 >= -1e-9) & (m_Na1_6 <= 1 + 1e-9)) & np.all((h_Na1_6 >= -1e-9) & (h_Na1_6 <= 1 + 1e-9))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {}
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      }
+    }
+  }
+}

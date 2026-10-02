@@ -1,0 +1,11 @@
+module_type: heart
+version: Argus2026_v01
+reviewed: false
+description: 'Four-chamber heart: cardiac clock, four generic chambers and four Mynard valves (nested in heart: cardiac_clock, chamber,
+  valve). Defined by the module_format "supermodule" entry in heart_Argus2026_v01_modules_config.json; default parameters
+  (3compartment''s: Liang 2009, Korakianitis 2006, Mynard 2012) in its default instance. A model uses one "heart" entry whose
+  per_submodule_inputs / per_submodule_outputs couple ra, la, puv, aov (and the chambers'' volumes) to the circulation; libcuflynx
+  expands it into heart_clock, heart_ra ... heart_aov.'
+expected_failures:
+  phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
+    "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

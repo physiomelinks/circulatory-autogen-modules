@@ -1,0 +1,59 @@
+model: control_phys_asd
+category: controlled_cvs
+reviewed: false
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+equivalence:
+  reference: reference
+  output_map: {heart/u_ra: ra/u, heart/u_rv: rv/u, heart/u_la: la/u, heart/u_lv: lv/u, heart/q_ra: ra/q, heart/q_rv: rv/q,
+    heart/q_la: la/q, heart/q_lv: lv/q, heart/v_trv: trv/v, heart/v_puv: puv/v, heart/v_miv: miv/v, heart/v_aov: aov/v, heart/zeta_trv: trv/zeta,
+    heart/zeta_puv: puv/zeta, heart/zeta_miv: miv/zeta, heart/zeta_aov: aov/zeta, heart/zeta_trv_pre: trv/zeta_pre, heart/zeta_puv_pre: puv/zeta_pre,
+    heart/zeta_miv_pre: miv/zeta_pre, heart/zeta_aov_pre: aov/zeta_pre, heart/e_a: ra/e, heart/e_v: lv/e, heart/s: heart_clock/s,
+    heart/mt: heart_clock/mt, heart/chi_a: ra/chi, heart/chi_v: lv/chi, heart/v_asd: asd_shunt/v, heart/T_wCont: heart_clock/T_eff,
+    heart/chi_afloor: ra/chi_floor, heart/chi_vfloor: lv/chi_floor, heart/chi_afloor_final: ra/chi_floor_final, heart/chi_vfloor_final: lv/chi_floor_final,
+    heart/R_lin_trv: trv/R_lin, heart/R_lin_puv: puv/R_lin, heart/R_lin_miv: miv/R_lin, heart/R_lin_aov: aov/R_lin, heart/vel_trv: trv/vel,
+    heart/vel_puv: puv/vel, heart/vel_miv: miv/vel, heart/vel_aov: aov/vel, heart/E_lv_A_wCont: lv/E_A_eff, heart/E_rv_A_wCont: rv/E_A_eff,
+    heart/A_eff_trv: trv/A_eff, heart/B_trv: trv/B, heart/L_trv: trv/L, heart/A_eff_puv: puv/A_eff, heart/B_puv: puv/B, heart/L_puv: puv/L,
+    heart/A_eff_miv: miv/A_eff, heart/B_miv: miv/B, heart/L_miv: miv/L, heart/A_eff_aov: aov/A_eff, heart/B_aov: aov/B, heart/L_aov: aov/L,
+    heart/T_ac_wCont: ra/T_c_eff, heart/T_ar_wCont: ra/T_r_eff, heart/T_vc_wCont: lv/T_c_eff, heart/T_vr_wCont: lv/T_r_eff}
+  ignore: {heart/q_heart: sum of the four chambers (no single variable after the split), par/t: time, pcap/t: time, pulmonary_GE/t: time,
+    respiratory_gt/t: time, lung/t: time, pvn/t: time, ascending_aorta_A/t: time, ascending_aorta_B/t: time, ascending_aorta_C/t: time,
+    ascending_aorta_D/t: time, aortic_arch_C2/t: time, aortic_arch_C46/t: time, aortic_arch_C64/t: time, brachiocephalic_trunk_C4/t: time,
+    subclavian_L66/t: time, subclavian_L78/t: time, brachial_L82/t: time, common_carotid_L48_A/t: time, common_carotid_L48_B/t: time,
+    common_carotid_L48_C/t: time, common_carotid_L48_D/t: time, common_carotid_R6_A/t: time, common_carotid_R6_B/t: time,
+    common_carotid_R6_C/t: time, external_carotid_L62/t: time, external_carotid_R26/t: time, internal_carotid_L50_A/t: time,
+    internal_carotid_L50_B/t: time, internal_carotid_L50_C/t: time, internal_carotid_R8_A/t: time, internal_carotid_R8_B/t: time,
+    internal_carotid_R8_C/t: time, posterior_communicating_L8/t: time, posterior_communicating_R206/t: time, internal_carotid_L112/t: time,
+    internal_carotid_R48/t: time, middle_cerebral_L114/t: time, middle_cerebral_R52/t: time, anterior_cerebral_L110/t: time,
+    anterior_cerebral_R46/t: time, anterior_cerebral_R238/t: time, anterior_cerebral_L42/t: time, anterior_communicating_C44/t: time,
+    vertebral_L2/t: time, subclavian_R28/t: time, subclavian_R30/t: time, brachial_R34/t: time, vertebral_R272/t: time, basilar_C4/t: time,
+    posterior_cerebral_pre_L6/t: time, posterior_cerebral_post_L12/t: time, posterior_cerebral_pre_R204/t: time, posterior_cerebral_post_R208/t: time,
+    posterior_cerebral_L_T/t: time, posterior_cerebral_R_T/t: time, external_carotid_L_T/t: time, external_carotid_R_T/t: time,
+    middle_cerebral_L_T/t: time, middle_cerebral_R_T/t: time, anterior_cerebral_L_T/t: time, anterior_cerebral_R_T/t: time,
+    arm_L_T/t: time, arm_R_T/t: time, aortic_arch_C94/t: time, thoracic_aorta_C96/t: time, thoracic_aorta_C100/t: time, thoracic_aorta_C104/t: time,
+    thoracic_aorta_C108/t: time, thoracic_aorta_C112/t: time, abdominal_aorta_C114/t: time, trunk_C_T/t: time, abdominal_aorta_C136/t: time,
+    abdominal_aorta_C164/t: time, abdominal_aorta_C176/t: time, abdominal_aorta_C188/t: time, abdominal_aorta_C192/t: time,
+    common_iliac_L194/t: time, external_iliac_L198/t: time, common_iliac_R216/t: time, external_iliac_R220/t: time, femoral_L200/t: time,
+    femoral_R222/t: time, leg_L_T/t: time, leg_R_T/t: time, venous_lb/t: time, venous_ub/t: time, venous_ivc/t: time, venous_svc/t: time,
+    middle_cerebral_L_GE/t: time, middle_cerebral_R_GE/t: time, anterior_cerebral_L_GE/t: time, anterior_cerebral_R_GE/t: time,
+    posterior_cerebral_L_GE/t: time, posterior_cerebral_R_GE/t: time, external_carotid_L_GE/t: time, external_carotid_R_GE/t: time,
+    arm_L_GE/t: time, arm_R_GE/t: time, leg_L_GE/t: time, leg_R_GE/t: time, trunk_C_GE/t: time, arterial_gas_transport/t: time,
+    venous_gas_transport/t: time, common_carotid_L_baro/t: time, arterial_chemoreceptor/t: time, vagal_efferent/t: time, sympathetic_efferent/t: time,
+    trunk_resistance_effector/t: time, arm_leg_resistance_effector/t: time, lv_elastance_effector/t: time, rv_elastance_effector/t: time,
+    heart_period_effector/t: time, venous_constriction_effector/t: time, arm_L_LC/t: time, arm_R_LC/t: time, leg_L_LC/t: time,
+    leg_R_LC/t: time, middle_cerebral_L_LC/t: time, middle_cerebral_R_LC/t: time, anterior_cerebral_L_LC/t: time, anterior_cerebral_R_LC/t: time,
+    posterior_cerebral_L_LC/t: time, posterior_cerebral_R_LC/t: time, external_carotid_L_LC/t: time, external_carotid_R_LC/t: time,
+    heart_clock/t: time, ra/t: time, rv/t: time, la/t: time, lv/t: time, trv/t: time, puv/t: time, miv/t: time, aov/t: time,
+    ra_inflow/t: time, la_outflow/t: time, asd_shunt/t: time, heart/q: sum of the four chambers (no single variable after
+      the split)}
+  wrapped: {heart/mt: 1.0, heart/chi_afloor: 1.0, heart/chi_vfloor: 1.0, heart/chi_afloor_final: 1.0, heart/chi_vfloor_final: 1.0}
+  reciprocal: [heart/L_trv, heart/L_puv, heart/L_miv, heart/L_aov, heart/B_trv, heart/B_puv, heart/B_miv, heart/B_aov]
+  tol: 1.0e-06
+  solver_info: {rtol: 1.0e-10, atol: 1.0e-12}
+invariants: []
+notes: ['Equivalence at rtol 1e-10/atol 1e-12: only the valve internals (zeta, A_eff, L, B of aov/trv) differ, by up to ~5e-6.
+    Tighter tolerances don''t help: circulatory_autogen''s original then either fails in CVODE or logs broken algebraics (e_a
+    stuck at 0 or 1e300) while its states still match.']
+expected_failures: {system_equivalence_test: 'valve internals differ by up to ~5e-6 > 1e-6 at rtol 1e-10, and the original
+    can''t be simulated reliably at tighter tolerances (to review)'}

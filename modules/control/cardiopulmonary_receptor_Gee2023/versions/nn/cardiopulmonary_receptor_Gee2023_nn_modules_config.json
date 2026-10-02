@@ -1,0 +1,98 @@
+[
+  {
+    "module_type": "cardiopulmonary_receptor_Gee2023",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "cardiopulmonary_receptor_Gee2023_nn_modules.cellml",
+    "component_type": "cardiopulmonary_receptor_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "thoracic_pressure_port",
+        "variables": [
+          "P_mus"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "P_pvn"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "cardiopulmonary_firing_rate_port",
+        "variables": [
+          "f_cp"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_cp",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "P_pv_P_thor",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_cp",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "P_l_init",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "P_l",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "f_maxl",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "P_tn",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "k_l",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "P_pvn",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "P_mus",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

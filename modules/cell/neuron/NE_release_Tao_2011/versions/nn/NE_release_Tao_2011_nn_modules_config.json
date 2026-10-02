@@ -1,0 +1,169 @@
+[
+  {
+    "module_type": "NE_release_Tao_2011",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "NE_release_Tao_2011_nn_modules.cellml",
+    "component_type": "NE_release_Tao_2011",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "Ca_current",
+        "variables": [
+          "i_Ca"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "NE_release",
+        "variables": [
+          "NE"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_Ca",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_Ca",
+        "J_per_M",
+        "access",
+        "variable"
+      ],
+      [
+        "V_1Ca",
+        "J_per_M",
+        "access",
+        "variable"
+      ],
+      [
+        "V_2Ca",
+        "J_per_M",
+        "access",
+        "variable"
+      ],
+      [
+        "V_3Ca",
+        "J_per_M",
+        "access",
+        "variable"
+      ],
+      [
+        "V_4Ca",
+        "J_per_M",
+        "access",
+        "variable"
+      ],
+      [
+        "V_5Ca",
+        "J_per_M",
+        "access",
+        "variable"
+      ],
+      [
+        "NE",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "K_off",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_on",
+        "m3_per_millimol_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_Ca",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "b",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "E",
+        "per_millis",
+        "access",
+        "variable"
+      ],
+      [
+        "Cai",
+        "M_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "gamma",
+        "m3_per_M_millis",
+        "access",
+        "constant"
+      ],
+      [
+        "C_m",
+        "picoF",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V_Z",
+        "litre",
+        "access",
+        "constant"
+      ],
+      [
+        "a",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "n",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "V_cleft",
+        "litre",
+        "access",
+        "constant"
+      ],
+      [
+        "P_up",
+        "per_millis",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,166 @@
+[
+  {
+    "module_type": "chamber",
+    "module_subtype": "vv",
+    "module_format": "cellml",
+    "component_file": "chamber_vv_modules.cellml",
+    "component_type": "chamber_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ]
+      },
+      {
+        "port_type": "cardiac_clock_port",
+        "variables": [
+          "mt",
+          "T_eff"
+        ]
+      },
+      {
+        "port_type": "Elastance_delta_port",
+        "variables": [
+          "Delta_E"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "e",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "mt",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "T_eff",
+        "second",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T_c",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "T_r",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "t_start",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "E_A",
+        "J_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "E_B",
+        "J_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_E",
+        "J_per_m6",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_A_eff",
+        "J_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "q_us",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

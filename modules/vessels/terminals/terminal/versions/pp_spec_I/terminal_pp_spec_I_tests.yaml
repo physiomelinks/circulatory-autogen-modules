@@ -1,0 +1,41 @@
+module_type: terminal
+version: pp_spec_I
+reviewed: false
+notes: 'Terminal (Windkessel-type) module. Jacobian timescales (nominal: fastest 1.8e-07 s, slowest decay 2.8 s; run: fastest
+  1.8e-07 s, slowest decay 2.8 s).'
+reference_proposals:
+  R_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_nonstiff: "calculated_from_mean_P_and_v" (value
+      110000000)'
+    sourced: 'no'
+  C_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_nonstiff: "calculated_from_approx_P_and_q" (value
+      0.0000001)'
+    sourced: 'no'
+  I_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_nonstiff: "temp" (value 10)'
+    sourced: 'no'
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen 3compartment_nonstiff: user_defined)'
+    sourced: definitional
+  u_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 13332.2
+      Pa (100 mmHg), typical inlet pressure for this vessel class
+    sourced: 'no'
+    value: 13332.2
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 666.61
+      Pa (5 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 666.61
+  q_us:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_nonstiff: "user_defined_70%Of3.5LVenousTotBloodVolume"
+      (value 0.00245)'
+    sourced: 'no'
+  q_init:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_nonstiff: "user_defined_70%Of3.5LVenousTotBloodVolume"
+      (value 0.00245)'
+    sourced: 'no'
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

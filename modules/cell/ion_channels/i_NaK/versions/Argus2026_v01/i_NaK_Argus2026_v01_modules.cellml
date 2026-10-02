@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_NaK_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_NaK_SN">
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="Ko" public_interface="in" units="millimolar"/>
+        <variable name="Ko_mid_NaK" public_interface="in" units="millimolar"/>
+        <variable name="Nai" public_interface="in" units="millimolar"/>
+        <variable name="Nai_mid_NaK" public_interface="in" units="millimolar"/>
+        <variable name="Nai_power_NaK" public_interface="in" units="dimensionless"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="i_NaK" public_interface="out" units="nanoA"/>
+        <variable name="j_NaK_K" public_interface="out" units="mol_per_s"/>
+        <variable name="j_NaK_Na" public_interface="out" units="mol_per_s"/>
+        <variable name="k_NaK" public_interface="out" units="nanoA"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_NaK" public_interface="in" units="per_um2"/>
+        <variable name="r_NaK" public_interface="in" units="per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_NaK</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <times/>
+                                        <ci>k_NaK</ci>
+                                        <apply>
+                                            <plus/>
+                                            <ci>V</ci>
+                                            <cn cellml:units="milliV">150</cn>
+                                        </apply>
+                                    </apply>
+                                    <apply>
+                                        <plus/>
+                                        <ci>V</ci>
+                                        <cn cellml:units="milliV">200</cn>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <power/>
+                                    <ci>Nai</ci>
+                                    <ci>Nai_power_NaK</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <power/>
+                                    <ci>Nai</ci>
+                                    <ci>Nai_power_NaK</ci>
+                                </apply>
+                                <apply>
+                                    <power/>
+                                    <ci>Nai_mid_NaK</ci>
+                                    <ci>Nai_power_NaK</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>Ko</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>Ko</ci>
+                        <ci>Ko_mid_NaK</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaK_Na</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">3</cn>
+                            </apply>
+                            <ci>i_NaK</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaK_K</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2</cn>
+                            <ci>i_NaK</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>k_NaK</ci><apply><times/><ci>A_mem</ci><ci>rho_NaK</ci><ci>r_NaK</ci><cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn></apply></apply>
+        </math>
+    </component>
+</model>

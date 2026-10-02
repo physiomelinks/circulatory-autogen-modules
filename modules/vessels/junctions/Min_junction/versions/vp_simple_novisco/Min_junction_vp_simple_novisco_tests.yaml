@@ -1,0 +1,39 @@
+module_type: Min_junction
+version: vp_simple_novisco
+reviewed: false
+notes: 'vp lumped linear R-C-I vessel. Tested in a harness network (libcuflynx sums the flows at a Min/Nout node only when
+  real vessels are connected there): mod (Min_junction vp_simple_novisco); bcin1 (inlet_flow nn_constant); up1 (arterial_simple
+  vp); bcin2 (inlet_flow nn_constant); up2 (arterial_simple vp); bcout (outlet_pressure nn_constant). Jacobian timescales
+  (nominal: fastest 5.9e-13 s, slowest decay 0.021 s; run: fastest 5.9e-13 s, slowest decay 0.021 s).'
+reference_proposals:
+  v_in_sum:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 12665.6
+      Pa (95 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 12665.6
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  u_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "user_defined" (value 0)'
+    sourced: 'no'
+  q_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 0.0001484)'
+    sourced: 'no'
+  R:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 169559.858501986)'
+    sourced: 'no'
+  C:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 1.21676662404483E-07)'
+    sourced: 'no'
+  I:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "small_chosen" (value 0.0000001)'
+    sourced: 'no'
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

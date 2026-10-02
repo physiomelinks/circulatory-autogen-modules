@@ -1,0 +1,553 @@
+{
+  "n_samples": 256,
+  "n_failures": 256,
+  "failure_probability": 1.0,
+  "ci": [
+    0.9852156082782743,
+    1.0
+  ],
+  "upper_bound_if_none_failed": null,
+  "seed": 0,
+  "box": [
+    {
+      "variable": "G_theta",
+      "min": 46330000.0,
+      "max": 185320000.0,
+      "log": true
+    },
+    {
+      "variable": "tau_theta",
+      "min": 3.0,
+      "max": 12.0,
+      "log": true
+    },
+    {
+      "variable": "f_s",
+      "min": 0.0,
+      "max": 60.0,
+      "log": false
+    },
+    {
+      "variable": "f_es_min",
+      "min": 1.33,
+      "max": 5.32,
+      "log": true
+    }
+  ],
+  "failure_modes": {
+    "simulation error": 256
+  },
+  "ranking": [
+    {
+      "variable": "G_theta",
+      "importance": 0.0
+    },
+    {
+      "variable": "tau_theta",
+      "importance": 0.0
+    },
+    {
+      "variable": "f_s",
+      "importance": 0.0
+    },
+    {
+      "variable": "f_es_min",
+      "importance": 0.0
+    }
+  ],
+  "per_parameter": {
+    "G_theta": {
+      "range": [
+        46330000.0,
+        185320000.0
+      ],
+      "log": true,
+      "bins": [
+        {
+          "lo": 46330000.0,
+          "hi": 55095965.63807609,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 55095965.63807609,
+          "hi": 65520514.344745524,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 65520514.344745524,
+          "hi": 77917461.83740923,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 77917461.83740923,
+          "hi": 92660000.00000004,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 92660000.00000004,
+          "hi": 110191931.2761522,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 110191931.2761522,
+          "hi": 131041028.68949106,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 131041028.68949106,
+          "hi": 155834923.6748185,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 155834923.6748185,
+          "hi": 185320000.0,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    },
+    "tau_theta": {
+      "range": [
+        3.0,
+        12.0
+      ],
+      "log": true,
+      "bins": [
+        {
+          "lo": 3.0,
+          "hi": 3.567621345008163,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 3.567621345008163,
+          "hi": 4.242640687119285,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 4.242640687119285,
+          "hi": 5.045378491522287,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 5.045378491522287,
+          "hi": 6.0,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 6.0,
+          "hi": 7.135242690016327,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 7.135242690016327,
+          "hi": 8.485281374238571,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 8.485281374238571,
+          "hi": 10.090756983044576,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 10.090756983044576,
+          "hi": 12.0,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    },
+    "f_s": {
+      "range": [
+        0.0,
+        60.0
+      ],
+      "log": false,
+      "bins": [
+        {
+          "lo": 0.0,
+          "hi": 7.5,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 7.5,
+          "hi": 15.0,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 15.0,
+          "hi": 22.5,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 22.5,
+          "hi": 30.0,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 30.0,
+          "hi": 37.5,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 37.5,
+          "hi": 45.0,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 45.0,
+          "hi": 52.5,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 52.5,
+          "hi": 60.0,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    },
+    "f_es_min": {
+      "range": [
+        1.33,
+        5.32
+      ],
+      "log": true,
+      "bins": [
+        {
+          "lo": 1.33,
+          "hi": 1.5816454629536192,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 1.5816454629536192,
+          "hi": 1.8809040379562165,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 1.8809040379562165,
+          "hi": 2.236784464574881,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 2.236784464574881,
+          "hi": 2.66,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 2.66,
+          "hi": 3.1632909259072384,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 3.1632909259072384,
+          "hi": 3.7618080759124326,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 3.7618080759124326,
+          "hi": 4.473568929149761,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        },
+        {
+          "lo": 4.473568929149761,
+          "hi": 5.32,
+          "n": 32,
+          "failures": 32,
+          "risk": 1.0,
+          "ci": [
+            0.8928172849426366,
+            1.0
+          ]
+        }
+      ],
+      "importance": 0.0
+    }
+  },
+  "example_failures": [
+    {
+      "sample": {
+        "G_theta": 150648835.57902497,
+        "tau_theta": 10.910872067520613,
+        "f_s": 21.7630554176867,
+        "f_es_min": 2.204614742602668
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 85501614.97036536,
+        "tau_theta": 5.908251999725061,
+        "f_s": 38.16142749041319,
+        "f_es_min": 4.78973180461812
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 46823343.53503202,
+        "tau_theta": 6.33578076570223,
+        "f_s": 9.23870500177145,
+        "f_es_min": 1.8107563340936303
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 115960822.14370431,
+        "tau_theta": 3.440135763070125,
+        "f_s": 50.94942206516862,
+        "f_es_min": 2.7959468074795786
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 106016318.40518004,
+        "tau_theta": 7.765326882841672,
+        "f_s": 33.909508008509874,
+        "f_es_min": 3.484671531281725
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 60170570.6461889,
+        "tau_theta": 4.172326586735538,
+        "f_s": 25.934380777180195,
+        "f_es_min": 1.3304820215287094
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 65729438.288974464,
+        "tau_theta": 9.042775652418687,
+        "f_s": 55.10567609220743,
+        "f_es_min": 4.202616471447633
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 162783976.38586095,
+        "tau_theta": 4.845564808038438,
+        "f_s": 4.943318534642458,
+        "f_es_min": 2.3071979355049748
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 181351398.8203753,
+        "tau_theta": 7.052675427338406,
+        "f_s": 56.73073600977659,
+        "f_es_min": 1.5773013260599646
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    },
+    {
+      "sample": {
+        "G_theta": 73250785.85223128,
+        "tau_theta": 3.246173742656655,
+        "f_s": 2.8165496326982975,
+        "f_es_min": 3.42534810166856
+      },
+      "reason": "GenerationFailed: generation returned False:\nalent variable 'Delta_theta' in component 'mod' with non-matching units of 'Js_per_m3'. The m"
+    }
+  ],
+  "classifier": {
+    "kind": "constant",
+    "p_fail": 1.0,
+    "note": "every sample failed"
+  },
+  "plots": [
+    "plots/risk_corner.png",
+    "plots/risk_marginals.png"
+  ]
+}

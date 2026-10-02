@@ -1,0 +1,69 @@
+module_type: i_NaCa
+version: Argus2026_v01
+reviewed: false
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Na/Ca exchanger of the
+  SN soma and varicosity (the same law in both; Paci 2013 form), with its Ca flux j_NaCa_Ca = i_NaCa/F and Na flux j_NaCa_Na
+  = -3 i_NaCa/F. In the varicosity Nai is a constant (no Na pool is connected). Split out of the monolithic SN_soma / SN_varicosity
+  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
+  that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal current is k_NaCa =
+  A_mem rho_NaCa r_NaCa e (membrane area x density x turnover x elementary charge, one net charge per cycle), A_mem from the
+  membrane through membrane_area; the defaults reproduce the previous k_NaCa.'
+reference_proposals:
+  Cai:
+    reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
+    sourced: 'no'
+  Cao:
+    reference: 'Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no
+      separate neuron value). Khaliq2003 also uses 2 mM'
+    sourced: 'yes'
+    also_cites:
+    - Khaliq2003
+  KmCa:
+    reference: Paci2013; I_NaCa KmCa = 1.38 mM in the authors' CellML (= value; = tenTusscher2004; cardiomyocyte value)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  KmNai:
+    reference: Paci2013; I_NaCa KmNai = 87.5 mM in the authors' CellML (= value; = tenTusscher2004; cardiomyocyte value)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  Ksat:
+    reference: Paci2013; I_NaCa Ksat = 0.1 in the authors' CellML (= value; = tenTusscher2004)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  Nai:
+    reference: 'BoronBoulpaep2017; typical mammalian intracellular Na 15 mM, modified here to 13 mM (= Nai_init; constant
+      when unconnected) [NOT VERIFIED: full text not accessible; value not seen in the source]'
+    sourced: 'no'
+  Nao:
+    reference: 'BoronBoulpaep2017; typical extracellular Na 145 mM [NOT VERIFIED: full text not accessible; value not seen
+      in the source]'
+    sourced: 'no'
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  alpha_NaCa:
+    reference: Paci2013; I_NaCa alpha = 2.8571432 in the authors' CellML (tenTusscher2004 uses 2.5); reduced here to 1.2 for
+      the neuron
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  gamma_NaCa:
+    reference: Paci2013; I_NaCa gamma = 0.35 in the authors' CellML (= value; = tenTusscher2004; cardiomyocyte value)
+    sourced: 'yes'
+    also_cites:
+    - tenTusscher2004
+  rho_NaCa:
+    value: 400.0
+    reference: Hilgemann1991; Na/Ca exchanger density ~400 /um^2 in guinea-pig cardiac myocytes (Abstract); no neuronal value
+      found. With the model's exchanger formula this gives a much smaller i_NaCa than the present k_NaCa
+    sourced: 'yes'
+    previous: 'previous k_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

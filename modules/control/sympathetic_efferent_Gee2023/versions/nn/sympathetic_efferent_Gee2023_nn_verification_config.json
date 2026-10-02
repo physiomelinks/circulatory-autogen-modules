@@ -1,0 +1,60 @@
+{
+  "module_type": "sympathetic_efferent_Gee2023",
+  "version": "nn",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["f_esh", "f_esp", "f_esv"],
+  "invariants": [
+    {
+      "description": "f_esh = f_esinf + (f_es0 - f_esinf) exp(-k_es f_ash)",
+      "expr": "np.max(np.abs(f_esh - (f_esinf + (f_es0 - f_esinf)*np.exp(-k_es*f_ash)))) <= 1e-9 * max(1.0, np.max(np.abs(f_esh)))"
+    },
+    {
+      "description": "f_esp = f_esinf + (f_es0 - f_esinf) exp(-k_es f_asp)",
+      "expr": "np.max(np.abs(f_esp - (f_esinf + (f_es0 - f_esinf)*np.exp(-k_es*f_asp)))) <= 1e-9 * max(1.0, np.max(np.abs(f_esp)))"
+    },
+    {
+      "description": "f_esv = f_esinf + (f_es0 - f_esinf) exp(-k_es f_asv)",
+      "expr": "np.max(np.abs(f_esv - (f_esinf + (f_es0 - f_esinf)*np.exp(-k_es*f_asv)))) <= 1e-9 * max(1.0, np.max(np.abs(f_esv)))"
+    },
+    {
+      "description": "for non-negative drive, efferent firing lies between f_esinf and f_es0",
+      "expr": "(np.all(f_ash < 0) | np.all((f_esh >= min(f_esinf, f_es0) - 1e-9) & (f_esh <= max(f_esinf, f_es0) + 1e-9))) & (np.all(f_asp < 0) | np.all((f_esp >= min(f_esinf, f_es0) - 1e-9) & (f_esp <= max(f_esinf, f_es0) + 1e-9))) & (np.all(f_asv < 0) | np.all((f_esv >= min(f_esinf, f_es0) - 1e-9) & (f_esv <= max(f_esinf, f_es0) + 1e-9)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_ash": {"min": -20.0, "max": 80.0, "points": 5},
+      "f_asp": {"min": -20.0, "max": 80.0, "points": 5},
+      "f_asv": {"min": -20.0, "max": 80.0, "points": 5}
+    },
+    "rationale": "afferent drive -20..80 Hz covers the range produced by the sympathetic afferent block over physiological receptor inputs (lung stretch and low f_cp make it negative); constants x0.5-x2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      },
+      "calibrate": {
+        "note": "not_applicable: intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      }
+    }
+  }
+}

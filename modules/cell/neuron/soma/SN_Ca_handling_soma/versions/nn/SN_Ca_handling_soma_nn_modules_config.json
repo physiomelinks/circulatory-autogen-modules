@@ -1,0 +1,344 @@
+[
+  {
+    "module_type": "SN_Ca_handling_soma",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "SN_Ca_handling_soma_nn_modules.cellml",
+    "component_type": "SN_Ca_handling_soma",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "bulk_Ca",
+        "variables": [
+          "Ca_bulk"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "ER_Ca",
+        "variables": [
+          "Ca_ER"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_Ca_in"
+        ],
+        "multi_port": "sum"
+      },
+      {
+        "port_type": "ER_Ca_release",
+        "variables": [
+          "j_ER_release"
+        ],
+        "multi_port": "sum"
+      },
+      {
+        "port_type": "compartment_volume",
+        "variables": [
+          "Vol"
+        ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "variables_and_units": [
+      [
+        "B_Ca_ER_pre",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "B_Ca_bulk",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "B_Ca_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "B_Ca_total",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "B_Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "CaB_Ca_ER_pre",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "CaB_Ca_bulk",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "CaB_Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Ca_ER",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Ca_ER_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ca_ER_pre",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Ca_bulk",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "D_Ca",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "D_Ca_ER",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "H_SERCA",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "K_mf",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_mr",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Vol",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "c_ER",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_ER_pre",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_SL",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_bulk",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Ca_in",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_ER_release",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_SERCA",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_diffCa",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_diffCa_ER",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_leak_Ca",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_SERCA",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_bind_Ca",
+        "per_millimolar_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_bind_Ca_ER",
+        "per_millimolar_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_leak_Ca",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_SERCA",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_SERCA",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "rho_leak_Ca",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_leak_Ca_single",
+        "um3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A_ER",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V_ER",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A_ER_pre",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V_ER_pre",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ER_pre",
+        "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "k_unbind_Ca",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_unbind_Ca_ER",
+        "per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

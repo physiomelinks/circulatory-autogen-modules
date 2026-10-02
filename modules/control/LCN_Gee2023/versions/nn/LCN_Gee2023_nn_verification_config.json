@@ -1,0 +1,62 @@
+{
+  "module_type": "LCN_Gee2023",
+  "version": "nn",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["f_LCN", "f_input_LCN_sum", "f_input_LCN"],
+  "invariants": [
+    {
+      "description": "weighted input sum",
+      "expr": "np.max(np.abs(f_input_LCN_sum - (k_evEmax_gainLCN*(f_DMV + f_NActr) + k_br_gainLCN*f_br - k_esh_gainLCN*f_esh + k_cp_gainLCN*f_cp))) <= 1e-9 * max(1.0, np.max(np.abs(f_input_LCN_sum)))"
+    },
+    {
+      "description": "input clipped at zero",
+      "expr": "np.max(np.abs(f_input_LCN - (np.maximum(f_input_LCN_sum, 0.0)))) <= 1e-9 * max(1.0, np.max(np.abs(f_input_LCN)))"
+    },
+    {
+      "description": "f_LCN is the exact Gee 2023 sigmoid of its input",
+      "expr": "np.max(np.abs(f_LCN - (((f_min_LCN - f_max_LCN)/(1 + (np.maximum(k_evEmax_gainLCN*(f_DMV + f_NActr) + k_br_gainLCN*f_br - k_esh_gainLCN*f_esh + k_cp_gainLCN*f_cp, 0.0)/f_mid_LCN)**k_LCN) + f_max_LCN)))) <= 1e-9 * max(1.0, np.max(np.abs(f_LCN)))"
+    },
+    {
+      "description": "f_LCN within [f_min_LCN, f_max_LCN]",
+      "expr": "np.all((f_LCN >= min(f_min_LCN, f_max_LCN) - 1e-9) & (f_LCN <= max(f_min_LCN, f_max_LCN) + 1e-9))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_NActr": {"min": 0.61, "max": 11.0, "points": 4},
+      "f_DMV": {"min": 2.59, "max": 6.66, "points": 4},
+      "f_esh": {"min": 0.0, "max": 60.0, "points": 4},
+      "f_br": {"min": 0.0, "max": 47.78, "points": 4},
+      "f_cp": {"min": 0.0, "max": 20.0, "points": 4}
+    },
+    "rationale": "inputs over their source populations' output ranges (f_esh up to 60 Hz so the clip at 0 is exercised); constants x0.5-x2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      },
+      "calibrate": {
+        "note": "not_applicable: intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+module_type: arterial_simple
+version: vp
+reviewed: false
+notes: 'vp lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 2.3e-14 s, slowest decay 0.013 s; run: fastest
+  2.3e-14 s, slowest decay 0.013 s).'
+reference_proposals:
+  q_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "user_defined_TO_DO" (value 0)'
+    sourced: 'no'
+  R:
+    reference: Safaei2018; Table S3 R_par = 10.664e6 J s m^-6 (0.08 mmHg s/mL), pulmonary arteries; Safaei et al. model the
+      pulmonary loop after Blanco & Feijoo 2013, whose Table 8 (the circulatory_autogen label) could not be checked (paywalled)
+    sourced: 'yes'
+  C:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops "to_be_identified". The digits match
+      Safaei2018 Table S3 C_par = 0.0309077e-6 m^6/J, but this value is 100x smaller: check whether this is intended'
+    sourced: 'no'
+    also_cites:
+    - Safaei2018
+  I:
+    reference: 'unreferenced_placeholder; I = 0.000001 is a small nonzero stand-in: Safaei2018 Table S3 gives I = 0 for the
+      pulmonary arteries and veins (circulatory_autogen label Blanco_2013_Table_8 not verifiable). Makes the module very stiff
+      (I/R ~ 1e-13 s)'
+    sourced: 'no'
+    also_cites:
+    - Safaei2018
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen 3compartment_extra_ops: user_defined)'
+    sourced: definitional
+  u_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "Mynard&Smolich_2015_assumedRefOf11mmHg"
+      (value 1463); an assumed reference pressure. Not found in the accessible Mynard2015 supplementary files'
+    sourced: 'no'
+    also_cites:
+    - Mynard2015
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 12665.6
+      Pa (95 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 12665.6
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

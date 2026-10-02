@@ -1,0 +1,575 @@
+{%- macro chip(status, label=None) -%}
+<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
+{%- endmacro -%}
+{%- macro test_article(c, t, anchor) -%}
+          <article class="test {{ t.status or '' }}" id="{{ anchor }}">
+            <div class="test-head"><h4>{{ t.title }}</h4>{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Failed · known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</div>
+            {%- if t.known_issue %}<p class="message" style="color:var(--fail)">Known issue: {{ t.known_issue }}</p>{% endif %}
+            {%- if t.proposed_data %}<p class="message" style="color:var(--pend)">Proposed validation data: run for your review, not yet confirmed.</p>{% endif %}
+            <p class="about">{{ t.about }}</p>
+            <p class="message">{{ t.message }}</p>
+            {%- if t.links %}
+            <p class="message">Calibrated as part of: {% for l in t.links %}<a href="{{ l.href }}">{{ l.key }}</a> {{ chip(l.status, l.status_label) }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+            {%- endif %}
+
+            {%- if t.key == 'verification_test_timestep' and t.metrics.dts %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>dt [s]</th><th>Difference to next dt</th><th>Observed order</th></tr></thead>
+              <tbody>
+              {%- for i in range(t.metrics.dts|length - 1) %}
+                <tr><td class="mono num">{{ t.metrics.dts[i]|fmt }}</td><td class="mono num">{{ t.metrics.successive_differences[i]|fmt }}</td>
+                <td class="mono num">{{ (t.metrics.observed_orders[i-1]|fmt) if i > 0 else '—' }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:0;font-size:0.84rem">Scheme {{ t.metrics.scheme }} (expected order {{ t.metrics.expected_order }}); finest fixed-step vs tight-tolerance CVODE: <span class="mono">{{ t.metrics.cvode_tight_vs_finest|fmt }}</span>. Differences are max over outputs and time, normalised by each output's magnitude.</p>
+            {%- elif t.key == 'stability_test' and t.metrics.matrix %}
+            {%- if t.metrics.families %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Solver family</th><th>Works at</th><th>If not</th></tr></thead>
+              <tbody>
+              {%- for f in t.metrics.families %}
+                <tr><td class="mono">{{ f.family }}</td>
+                <td class="mono {{ 'yes' if f.works_at else 'no' }}">{{ f.works_at or 'No setting found' }}</td>
+                <td class="muted">{{ f.stop }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:0;font-size:0.84rem">Each family's step (CVODE MaximumStep and solve_ivp max_step ÷10, fixed-step dt ÷2) is reduced until it works, or until the next run is predicted to exceed {{ t.metrics.budget_seconds|fmt }} s (20 s per state variable). Over t = 0–{{ t.metrics.t_end|fmt }} s.</p>
+            <details><summary>All {{ t.metrics.matrix|length }} runs</summary>
+            {%- endif %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Configuration</th><th>Works</th><th>Difference</th><th>Time [s]</th><th>Note</th></tr></thead>
+              <tbody>
+              {%- for r in t.metrics.matrix %}
+                <tr class="{{ 'supported' if r.label in t.metrics.supported }}"><td class="mono">{{ r.label }}{% if r.label in t.metrics.supported %} <span class="muted">· declared</span>{% endif %}</td>
+                <td class="{{ 'yes' if r.works else 'no' }}">{{ 'Yes' if r.works else 'No' }}</td>
+                <td class="mono num">{{ r.difference|fmt }}</td><td class="mono num">{{ r.seconds|fmt }}</td><td class="muted">{{ r.note }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            {%- if t.metrics.families %}</details>{% endif %}
+            <p class="muted" style="margin:0;font-size:0.84rem">Works = finishes, finite outputs, and within {{ t.metrics.tol|fmt }} (normalised) of CVODE at rtol 1e-10.</p>
+            {%- elif t.key == 'verification_test_invariants' and t.metrics.invariants %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Invariant</th><th>Holds</th></tr></thead>
+              <tbody>
+              {%- for r in t.metrics.invariants %}
+                <tr><td>{{ r.invariant }}<br><code style="font-size:0.75rem">{{ r.expr }}</code></td>
+                <td class="{{ 'yes' if r.holds else 'no' }}">{{ 'Yes' if r.holds else 'No' }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            {%- elif t.key == 'validation_test_baseline' and t.metrics.targets %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Target</th><th>Model</th><th>Data</th><th>Met</th></tr></thead>
+              <tbody>{% for r in t.metrics.targets %}<tr><td>{{ r.name }}</td><td class="mono num">{{ r.model|fmt }} {{ r.units }}</td><td class="mono num">{{ r.target }} {{ r.units }}</td><td class="{{ 'yes' if r.ok else 'no' }}">{{ 'Yes' if r.ok else 'No' }}</td></tr>{% endfor %}</tbody>
+            </table></div>
+            {%- elif t.key == 'verification_test_BC' and t.metrics.sweep_values %}
+            {%- if c.sweep_rationale %}<p class="about"><strong>Why these ranges:</strong> {{ c.sweep_rationale }}</p>{% endif %}
+            <dl class="kv">
+              {%- for k, vals in t.metrics.sweep_values.items() %}<dt>{{ k }}</dt><dd>{{ vals|fmt }}</dd>{% endfor %}
+            </dl>
+            {%- if t.metrics.failures %}
+            <h5 style="margin:0">Failed runs</h5>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Point</th><th>Class</th><th>Problem</th><th>Violation / (atol + rtol·|bound|)</th></tr></thead>
+              <tbody>
+              {%- for f in t.metrics.failures %}
+                <tr><td class="mono">{{ f.parameter }} = {{ f.value|fmt }}</td>
+                <td class="{{ 'no' if f.class == 'parameter' or not f.fixed_by_recommended else '' }}">{{ f.class }}{% if f.fixed_by_recommended %}<br><span class="muted">fixed by the recommended settings</span>{% endif %}</td>
+                <td class="muted" style="font-size:0.78rem">{{ f.problems|join('; ') }}</td>
+                <td class="mono num">{% for v in f.violation %}{{ v.relative|fmt }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:0;font-size:0.84rem">Each failed run is rerun once with the reference solver ({{ t.metrics.reference_settings }}). <strong>parameter</strong>: the reference fails too, so the model breaks at that value (a failure). <strong>numerical</strong>: the reference passes, so the version's settings ({{ t.metrics.version_settings }}) are inadequate there. The violation column is the size of an invariant violation relative to the version's tolerances: of order 1–100 suggests solver error, far larger the model.</p>
+            {%- endif %}
+            {%- if t.metrics.recommended %}{% set rc = t.metrics.recommended %}
+            <div class="panel" style="padding:10px 14px">
+              <div class="eyebrow">Recommended solver settings</div>
+              <p style="margin:0"><span class="mono">{{ rc.label }}</span>: mean {{ rc.mean_seconds|fmt }} s per run, failures {{ rc.failures }} over the sweep, within {{ rc.accuracy|fmt }} of the reference (tol {{ rc.tol|fmt }}) at {{ rc.n_hard_points }} hard points.</p>
+              <p class="muted" style="margin:0;font-size:0.84rem">A recommendation, not applied: adopt it into the version's run settings (<code>solver_info</code>{% if rc.config.MaximumStep %}, including <code>MaximumStep</code>{% endif %}) to remove the numerical failures. Chosen as the cheapest CVODE setting, at least as strict as the version's, that passes the numerical failures, the nominal point and each parameter's extremes within tolerance of the reference, then confirmed over every sweep point.</p>
+            </div>
+            {%- elif t.metrics.n_numerical_failures %}
+            <p class="todo" style="margin:0">No candidate solver setting fixes the numerical failures (within the run-time budget of 20 s per state).</p>
+            {%- endif %}
+            {%- if t.metrics.candidates %}
+            <details><summary>{{ t.metrics.candidates|length }} candidate solver settings tried</summary>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Configuration</th><th>Nominal run [s]</th><th>Hard points</th><th>Note</th></tr></thead>
+              <tbody>
+              {%- for r in t.metrics.candidates|sort(attribute='label') %}
+                <tr><td class="mono">{{ r.label }}</td><td class="mono num">{{ r.seconds|fmt }}</td>
+                <td class="{{ 'yes' if r.passed_hard else ('no' if r.passed_hard is sameas false else '') }}">{{ 'Pass' if r.passed_hard else ('Fail' if r.passed_hard is sameas false else '—') }}</td>
+                <td class="muted">{{ r.note }}{% if r.confirmation %}; confirmation {{ r.confirmation }}{% endif %}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            </details>
+            {%- endif %}
+            {%- if t.metrics.skipped_out_of_range %}
+            <details><summary>{{ t.metrics.skipped_out_of_range|length }} point{{ '' if t.metrics.skipped_out_of_range|length == 1 else 's' }} skipped: outside the valid range</summary>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Point</th><th>Why not run</th></tr></thead>
+              <tbody>{% for sk in t.metrics.skipped_out_of_range %}<tr><td class="mono">{{ sk.parameter }} = {{ sk.value|fmt }}</td><td class="muted">{{ sk.reason }}</td></tr>{% endfor %}</tbody>
+            </table></div>
+            </details>
+            {%- endif %}
+            {%- elif t.key == 'run_test' and t.metrics.final_values %}
+            <dl class="kv">
+              {%- for k, v in t.metrics.final_values.items() %}<dt>{{ k }}(t<sub>end</sub>)</dt><dd>{{ v|fmt }}</dd>{% endfor %}
+            </dl>
+            {%- elif t.metrics %}
+            <dl class="kv">{% for k, v in t.metrics.items() %}<dt>{{ k }}</dt><dd>{{ v|fmt }}</dd>{% endfor %}</dl>
+            {%- endif %}
+
+            {%- if t.plots %}
+            <div class="plots">
+              {%- for p in t.plots %}<figure><img src="{{ p }}" alt="{{ t.title }} plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}
+            </div>
+            {%- endif %}
+            {%- if t.details %}
+            <details><summary>{{ t.details|length }} detail{{ '' if t.details|length == 1 else 's' }}</summary><pre>{{ t.details|join('\n') }}</pre></details>
+            {%- endif %}
+            {%- if t.timestamp %}<div class="muted" style="font-size:0.75rem">Run {{ t.timestamp }}</div>{% endif %}
+          </article>
+{%- endmacro -%}
+
+{%- if standalone is not defined or standalone %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{%- endif %}
+<title>{{ module_type }} {{ version }}</title>
+{% include '_style.html' %}
+<style>
+.page { max-width: 1240px; margin: 0 auto; padding-block: 28px 64px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px; }
+@media (max-width: 960px) { .page { grid-template-columns: minmax(0, 1fr); } .toc { display: none; } }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; font-size: 0.84rem; }
+.toc ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
+.toc a { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 4px; color: var(--ink-2); text-decoration: none; }
+.toc a:hover { background: var(--accent-soft); color: var(--ink); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--skip); }
+.dot.failed, .dot.failed_in_super { background: var(--fail); } .dot.passed, .dot.passed_in_super { background: var(--pass); } .dot.pending { background: var(--pend); }
+main { display: grid; gap: 40px; min-width: 0; }
+header.module { display: grid; gap: 10px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 0.88rem; }
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.grid-table td:first-child { font-family: var(--font-mono); font-size: 0.8rem; white-space: nowrap; }
+.grid-table td { white-space: nowrap; }
+.panel.review { border: 2px solid var(--pend); }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; }
+.issues { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.88rem; }
+section.component { display: grid; gap: 22px; padding-top: 28px; border-top: 2px solid var(--rule-strong); scroll-margin-top: 16px; }
+.comp-head { display: grid; gap: 6px; }
+.comp-head .tags { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.85rem; color: var(--ink-2); }
+.equations { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 18px; overflow-x: auto; }
+.equations .eq { padding: 6px 0; border-bottom: 1px dashed var(--rule); overflow-x: auto; }
+.equations .eq:last-child { border-bottom: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.block { display: grid; gap: 8px; min-width: 0; }
+.tests { display: grid; gap: 14px; }
+.test { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
+.test.failed, .test.failed_in_super { border-color: var(--fail); }
+.test-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
+.test .about { font-size: 0.84rem; color: var(--ink-2); max-width: 75ch; margin: 0; }
+.test .message { margin: 0; font-weight: 500; }
+.plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 12px; }
+.plots figure { margin: 0; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
+.plots img { display: block; width: 100%; height: auto; }
+details { font-size: 0.85rem; }
+details summary { cursor: pointer; color: var(--ink-2); }
+details pre { white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.78rem; background: var(--paper); padding: 10px; border-radius: 6px; overflow-x: auto; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px; font-size: 0.84rem; margin: 0; }
+.kv dt { color: var(--ink-3); } .kv dd { margin: 0; font-family: var(--font-mono); font-size: 0.8rem; overflow-wrap: anywhere; }
+tr.supported td:first-child { font-weight: 600; }
+.box { display: inline-block; width: 13px; height: 13px; border: 1.5px solid var(--ink-3); border-radius: 3px; vertical-align: -2px; margin-right: 6px; position: relative; }
+.box.on { background: var(--pass); border-color: var(--pass); }
+.box.on::after { content: ""; position: absolute; left: 3.5px; top: 0.5px; width: 3px; height: 7px; border: solid var(--panel); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.yes { color: var(--pass); font-weight: 600; } .no { color: var(--fail); font-weight: 600; }
+footer { color: var(--ink-3); font-size: 0.8rem; }
+.contents-bar { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 8px 12px; list-style: none; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; font-size: 0.88rem; }
+.contents-bar a { color: var(--ink-2); text-decoration: none; border-bottom: 1px dotted var(--ink-3); }
+.contents-bar a:hover { color: var(--ink); }
+.contents-bar strong { font-variant-numeric: tabular-nums; color: var(--ink); }
+.unit-eq { display: grid; gap: 4px; padding: 8px 0; border-bottom: 1px dashed var(--rule); }
+.unit-eq:last-child { border-bottom: 0; }
+.unit-eq .tex { overflow-x: auto; }
+.diagram { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 10px; overflow-x: auto; }
+pre.mermaid { margin: 0; font-size: 0.78rem; white-space: pre; color: var(--ink-3); }
+pre.mermaid[data-processed] { color: inherit; text-align: center; }
+.tree, .tree ul { list-style: none; margin: 0; padding-left: 18px; }
+.tree { padding-left: 0; font-size: 0.85rem; }
+.tree li { padding: 1px 0; }
+</style>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" defer></script>
+{%- if components[0].structure_view %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.mermaid) { return; }   // offline: the diagram's source and the parts table still show the structure
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: dark ? 'dark' : 'neutral', flowchart: { htmlLabels: true } });
+  mermaid.run({ querySelector: 'pre.mermaid' });
+});
+</script>
+{%- endif %}
+{%- if standalone is not defined or standalone %}
+</head>
+<body>
+{%- endif %}
+<div class="page">
+  <nav class="toc" aria-label="Sections">
+    <div class="eyebrow">{{ module_type }} · {{ version }}</div>
+    <ol>
+      <li><a href="#overview"><span class="mono">Test overview</span></a></li>
+      {%- if components[0].structure_view %}<li><a href="#{{ components[0].id }}-structure"><span class="mono">Structure</span></a></li>{% endif %}
+      {%- if components[0].unit_consistency %}<li><a href="#unit-consistency"><span class="dot failed"></span><span class="mono">Unit consistency</span></a></li>{% endif %}
+      <li><a href="#instances"><span class="mono">Instances</span></a></li>
+      {%- for t in components[0].tests %}
+      <li><a href="#{{ components[0].id }}--{{ t.key }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ t.short }}</span></a></li>
+      {%- endfor %}
+      {%- for i in components[0].instances %}{% for t in i.tests %}
+      <li><a href="#{{ t.anchor }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ i.name }}: {{ t.short }}</span></a></li>
+      {%- endfor %}{% endfor %}
+      {%- if bibliography %}<li><a href="#bibliography"><span class="mono">References</span></a></li>{% endif %}
+    </ol>
+  </nav>
+
+  <main>
+    <header class="module">
+      <div class="eyebrow">circulatory-autogen-modules · {{ location or 'modules' }} · <a href="{{ module_type_href }}">{{ module_type }}</a> · version</div>
+      <h1>{{ module_type }} <span class="muted">{{ version }}</span></h1>
+      <ul class="contents-bar" aria-label="Contents">
+        {%- for k in components[0].contents %}
+        <li title="{{ k.about }}"><a href="{{ k.href }}"><strong>{{ k.count }}</strong> {{ k.label }}</a></li>
+        {%- endfor %}
+      </ul>
+      <div class="meta">
+        <span><a href="{{ module_type_href }}">All versions of {{ module_type }}</a></span>
+        <span class="num">{{ components[0].instances|length }} instance{{ '' if components[0].instances|length == 1 else 's' }}</span>
+        <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
+        <span title="The config entry's licence (SPDX id)">Licence: {% if licence_url %}<a href="{{ licence_url }}">{{ licence }}</a>{% else %}<span class="todo">{{ licence or 'not set' }}</span>{% endif %}</span>
+        <span title="The config entry's creator list">{% if creators %}Creator{{ 's' if creators|length > 1 }}: {{ creators|join(', ') }}{% else %}<span class="todo">Creator: not set (to be given in review)</span>{% endif %}</span>
+        {%- if unit_failures %}<span title="libcellml unit checks on the CellML (informational, not a test column)"><a href="#unit-consistency" class="todo">Unit consistency: {{ components[0].unit_consistency.message }}</a></span>{% elif components[0].unit_consistency %}<span><a href="#unit-consistency" class="todo">Unit consistency: not checked</a></span>{% endif %}
+        <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
+        <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
+        {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
+        <span>libcuflynx {{ libcuflynx_version }}</span>
+        <span>Report generated {{ generated }}</span>
+      </div>
+      <div class="counts">
+        {{ chip('passed', counts.passed ~ ' passed') }}
+        {{ chip('failed', counts.failed ~ ' failed') }}
+        {{ chip('pending', counts.pending ~ ' pending') }}
+        {{ chip('skipped', counts.skipped ~ ' skipped') }}
+        {%- if counts.not_applicable %} {{ chip('not_applicable', counts.not_applicable ~ ' N/A') }}{% endif %}
+        {%- if counts[None] %} {{ chip(None, counts[None] ~ ' not run') }}{% endif %}
+      </div>
+    </header>
+
+    {%- if review and not reviewed %}
+    <section class="panel review" aria-labelledby="review-h">
+      <h2 id="review-h">Awaiting your review</h2>
+      {%- if review_scope %}<p class="muted" style="margin:0;max-width:80ch">{{ review_scope }}</p>{% endif %}
+      {%- if review.comment %}<p class="todo" style="margin:0;max-width:80ch"><strong>Potential issues:</strong> {{ review.comment }}</p>{% endif %}
+      {%- if review.summary %}<p style="margin:0;max-width:80ch">{{ review.summary }}</p>{% endif %}
+      {%- if not creators %}<p class="todo" style="margin:0;max-width:80ch">Creator: not set. Please give the creator(s) of this version (config <code>"creator"</code>, a list of names). Licence: {{ licence or 'not set' }}.</p>{% endif %}
+      {%- if review.questions %}
+      <div class="eyebrow">Questions</div>
+      <ol class="issues">{% for q in review.questions %}<li>{{ q }}</li>{% endfor %}</ol>
+      {%- endif %}
+      {%- if review.proposed_fixes %}
+      <div class="eyebrow">Proposed fixes to the module (not applied)</div>
+      <ul class="issues">{% for f in review.proposed_fixes %}<li>{{ f }}</li>{% endfor %}</ul>
+      {%- endif %}
+      {%- if review.findings %}
+      <div class="eyebrow">Findings</div>
+      <ul class="issues">{% for f in review.findings %}<li>{{ f }}</li>{% endfor %}</ul>
+      {%- endif %}
+    </section>
+    {%- endif %}
+
+    <section class="block" aria-labelledby="overview">
+      <h2 id="overview">Test overview</h2>
+      <div class="table-wrap">
+        <table class="grid-table">
+          <thead><tr><th>Version</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}</tr></thead>
+          <tbody>
+          {%- for c in components %}
+            <tr><td><a href="#{{ c.id }}">{{ c.label }}</a></td>
+            {%- for t in c.tests %}<td title="{{ t.message }}"><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a>{% for l in t.links %}<br><a href="{{ l.href }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}</tr>
+          {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has these columns. {{ chip('not_applicable') }} the test doesn't apply to this version; {{ chip(None) }} it applies but has no result yet; only a test that ran and passed shows {{ chip('passed') }}.</p>
+      {%- set na = components[0].tests|selectattr('status', 'equalto', 'not_applicable')|list %}
+      {%- if na %}
+      <ul class="muted" style="margin:0;font-size:0.84rem">{% for t in na %}<li>{{ t.short }}: N/A, {{ t.message }}</li>{% endfor %}</ul>
+      {%- endif %}
+    </section>
+
+    {%- if structure and (structure.errors or structure.warnings) %}
+    <section class="panel" aria-labelledby="structure">
+      <h2 id="structure">Structural checks</h2>
+      {%- if structure.errors %}
+      <div class="eyebrow">Known issues to fix</div>
+      <ul class="issues">{% for e in structure.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+      {%- endif %}
+      {%- if structure.warnings %}
+      <details><summary>{{ structure.warnings|length }} warning{{ '' if structure.warnings|length == 1 else 's' }} (may be intentional)</summary>
+        <ul class="issues">{% for w in structure.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+      </details>
+      {%- endif %}
+    </section>
+    {%- endif %}
+
+    {%- for c in components %}
+    <section class="component" id="{{ c.id }}" aria-labelledby="{{ c.id }}-h">
+      <div class="comp-head">
+        <div class="eyebrow">Version</div>
+        <h2 id="{{ c.id }}-h">{{ c.label }}</h2>
+        <div class="tags">
+          <span title="libcuflynx: vessel_type">module_type <code>{{ c.vessel_type }}</code></span>
+          <span title="libcuflynx: BC_type">module_subtype <code>{{ c.BC_type }}</code></span>
+          {%- if c.module_type %}<span title="the CellML component (libcuflynx: module_type)">component_type <code>{{ c.module_type }}</code></span>{% endif %}
+          {%- if c.format != 'cellml' %}<span class="chip skipped">{{ c.format }}</span>{% endif %}
+          <span><span class="box {{ 'on' if c.phlynx_compatible }}" role="img" aria-label="{{ 'PhLynx/CUFLynx compatible' if c.phlynx_compatible else 'not PhLynx/CUFLynx compatible' }}"></span>{{ 'PhLynx / CUFLynx compatible' if c.phlynx_compatible else ('PhLynx / CUFLynx: not tested' if c.phlynx_compatible is none else 'Not PhLynx / CUFLynx compatible') }}</span>
+        </div>
+        {%- if c.config_notes %}<p style="margin:0;max-width:75ch"><strong>{{ c.config_notes }}</strong></p>{% endif %}
+        {%- if c.description %}<p style="margin:0;max-width:75ch">{{ c.description }}</p>{% endif %}
+        {%- if c.notes %}<p style="margin:0;max-width:75ch">{{ c.notes }}</p>{% endif %}
+        {%- if c.skip %}<p class="muted" style="margin:0">Not tested: {{ c.skip }}</p>{% endif %}
+        {%- if c.unsourced and not c.todo %}<p class="muted" style="margin:0">Unsourced: {{ c.unsourced|join(', ') }}</p>{% endif %}
+        {%- if c.todo %}<p class="todo" style="margin:0">{{ c.todo|length }} parameter value{{ '' if c.todo|length == 1 else 's' }} still to set: {{ c.todo|join(', ') }}</p>{% endif %}
+      </div>
+
+      {%- if c.structure_view %}{% set sv = c.structure_view %}
+      <div class="block" id="{{ c.id }}-structure">
+        <h3>Structure</h3>
+        <p class="muted" style="margin:0;font-size:0.84rem">The parts of this supermodule version and how they connect. In a model, each part becomes <code>&lt;record name&gt;_&lt;part&gt;</code>; the instance's parameters are renamed the same way. Precedence: the model's parameters file, then this version's instance, then each part's instance. Solid arrows are the internal connections (<code>inp_instances</code> / <code>out_instances</code>, and a part's <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code> naming a sibling, labelled <code>part/inner part</code>), with the port types the configs connect{% if not sv.labelled %} (listed in the table: too many connections to label){% endif %}; dashed boxes are the modules outside that couple to a part, from the supermodule versions and system models that use this one. Click a part to open its version page.</p>
+        <div class="diagram"><pre class="mermaid">{{ sv.mermaid }}</pre></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Part</th><th>module_type</th><th>Version</th><th>Instance</th><th>Ports</th><th>Connections</th><th>Set by this supermodule's instance</th><th>Globals shared</th></tr></thead>
+          <tbody>
+          {%- for p in sv.parts %}
+            <tr><td class="mono">{{ p.name }}</td><td class="mono">{{ p.module_type }}</td>
+            <td class="mono">{% if p.href %}<a href="{{ p.href }}">{{ p.version }}</a>{% else %}{{ p.version }} <span class="todo">(not in the library)</span>{% endif %}{% if p.is_supermodule %}<br><span class="muted">supermodule, {{ p.n_parts }} parts</span>{% endif %}</td>
+            <td class="mono">{{ p.instance }}</td>
+            <td class="mono" style="font-size:0.78rem">{% if p.is_supermodule %}<span class="muted">its parts' (see its page)</span>{% else %}{{ p.ports|join('; ') or '—' }}{% endif %}</td>
+            <td class="mono" style="font-size:0.78rem">
+              {%- for e in p.inputs %}← {{ e.label }}{% if e.ports %} <span class="muted">({{ e.ports|join(', ') }})</span>{% endif %}<br>{% endfor %}
+              {%- for e in p.outputs %}→ {{ e.label }}{% if e.ports %} <span class="muted">({{ e.ports|join(', ') }})</span>{% endif %}<br>{% endfor %}
+              {%- for x in p.external %}{{ '←' if x.direction == 'in' else '→' }} ‹{{ x.external }}› <span class="muted">(outside: {% for w in x.where %}{% if w.href %}<a href="{{ w.href }}">{{ w.name }}</a>{% else %}{{ w.name }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %})</span><br>{% endfor %}
+              {%- if not p.inputs and not p.outputs and not p.external %}—{% endif %}</td>
+            <td class="mono" style="font-size:0.78rem">{% for o in p.overrides %}{{ o.name }} = {{ o.value }}{% if not loop.last %}<br>{% endif %}{% else %}—{% endfor %}</td>
+            <td class="mono" style="font-size:0.78rem">{{ p.globals|join(', ') or '—' }}</td></tr>
+          {%- endfor %}
+          </tbody>
+        </table></div>
+        <p class="muted" style="margin:0;font-size:0.84rem">Globals of this supermodule (<code>supermodule.globals</code>): {{ sv.globals|join(', ') or 'none' }}{% if sv.global_rows %}; set by its instance: {% for g in sv.global_rows %}<code>{{ g.name }} = {{ g.value }}</code>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. "Set by this supermodule's instance" lists its instance's rows <code>&lt;var&gt;_&lt;part&gt;</code>, which override the part's own instance.</p>
+        {%- if sv.external %}
+        <p class="muted" style="margin:0;font-size:0.84rem">Outside couplings: {% for x in sv.external %}<code>{{ x.part }} {{ '←' if x.direction == 'in' else '→' }} ‹{{ x.external }}›</code>{% if not loop.last %}, {% endif %}{% endfor %}.</p>
+        {%- else %}
+        <p class="muted" style="margin:0;font-size:0.84rem">No supermodule version or system model couples a module to a part of this one from outside (through <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code>).</p>
+        {%- endif %}
+        {%- macro tree(nodes) -%}
+        <ul class="tree">{% for n in nodes %}<li><span class="mono">{{ n.name }}</span> {% if n.href %}<a href="{{ n.href }}" class="mono">{{ n.key }}</a>{% else %}<span class="mono">{{ n.key }}</span>{% endif %}{% if n.children %} <span class="muted">({{ n.children|length }} parts)</span>{{ tree(n.children) }}{% endif %}</li>{% endfor %}</ul>
+        {%- endmacro %}
+        <details><summary>Full tree of parts (all nested levels)</summary>{{ tree(sv.tree) }}</details>
+      </div>
+      {%- endif %}
+
+      {%- if c.equations %}
+      <div class="block" id="{{ c.id }}-equations">
+        <h3>Equations</h3>
+        <div class="equations">
+          {%- for eq in c.equations %}<div class="eq">\[ {{ eq }} \]</div>{% endfor %}
+        </div>
+        {%- if c.unsupported %}<p class="muted" style="margin:0">MathML not converted: {{ c.unsupported|join(', ') }}</p>{% endif %}
+      </div>
+      {%- endif %}
+
+      {%- if c.unit_consistency %}{% set uc = c.unit_consistency %}
+      <div class="block panel" id="unit-consistency" style="border-color:var(--fail)">
+        <h3>Unit consistency</h3>
+        <p class="message" style="margin:0;font-weight:500">{{ uc.message }}</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">libcellml {{ uc.libcellml_version }}'s unit checks on this version's CellML with its units file (Validator: undefined or invalid units; Analyser: the two sides of an equation, or the terms of a sum, in units that are not equivalent, or an argument that should be dimensionless). Only failing equations are listed. Informational: not a test column, and nothing is shown when every equation is consistent. Inputs are treated as constants for the check.</p>
+        {%- for g in uc.equations %}
+        <div class="unit-eq">
+          {%- if g.latex %}<div class="tex">\[ {{ g.latex }} \]</div>{% else %}<code>{{ g.equation or '' }}</code>{% endif %}
+          {%- if g.variable %}<div class="muted" style="font-size:0.8rem">defines <code>{{ g.variable }}</code></div>{% endif %}
+          <ul class="issues">
+          {%- for f in g.issues %}
+            <li><strong>{{ f.kind }}</strong>{% if f.expression %} in <code>{{ f.expression }}</code>{% endif %}:
+              {%- if f.sides %} {% for sd in f.sides %}<code>{{ sd.expression }}</code> is in <code>{{ sd.units }}</code>{% if sd.base %} <span class="muted">({{ sd.base }})</span>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% if f.kind == 'not dimensionless' %}, but should be dimensionless{% endif %}
+              {%- else %} {{ f.message }}{% endif %}
+              <details><summary>libcellml message</summary><pre>{{ f.message }}</pre></details></li>
+          {%- endfor %}
+          </ul>
+        </div>
+        {%- endfor %}
+        {%- if uc.definition_issues %}
+        <div class="eyebrow">Units definitions</div>
+        <ul class="issues">{% for d in uc.definition_issues %}<li>{{ d.message }}</li>{% endfor %}</ul>
+        {%- endif %}
+        {%- if uc.status == 'not_checked' or (uc.other_issues and not uc.equations) %}
+        <div class="eyebrow">Why the equations could not be checked</div>
+        <ul class="issues">{% for o in uc.other_issues[:10] %}<li>{{ o }}</li>{% endfor %}{% if uc.other_issues|length > 10 %}<li>… and {{ uc.other_issues|length - 10 }} more</li>{% endif %}</ul>
+        {%- endif %}
+        <div class="muted" style="font-size:0.75rem">Checked {{ uc.timestamp }} (<code>results/unit_consistency.json</code>)</div>
+      </div>
+      {%- endif %}
+
+      <div class="two">
+        <div class="block" id="{{ c.id }}-variables">
+          <h3>Variables &amp; parameters</h3>
+          <p class="muted" style="margin:0;font-size:0.84rem">Tested range: the range each parameter is varied over in the boundary-condition sweep and the joint failure-risk analysis. Validated values: the spread of values at which the component matched data in a passing validation test. Check a system model's values, and the failure risk near them, with <code>python -m cam_testing.ranges check</code>.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Units</th><th>Kind</th><th>Value</th><th>Tested range</th><th>Validated values</th><th>Sourced</th><th>Source</th></tr></thead>
+              <tbody>
+              {%- for v in c.variables %}
+                <tr>
+                  <td class="mono">{{ v.name }}</td>
+                  <td class="mono">{{ v.units }}</td>
+                  <td>{{ v.kind|replace('_', ' ') }}</td>
+                  <td class="mono num {{ 'todo' if v.todo }}">{{ v.value if v.value is not none else (('init ' ~ v.initial) if v.initial else '') }}</td>
+                  <td class="mono num">{% if v.tested %}{{ v.tested[0]|fmt }} – {{ v.tested[1]|fmt }}{{ ' (log)' if v.tested[2] }}{% endif %}</td>
+                  <td class="mono num">{% if v.validated %}{{ v.validated[0]|fmt }} – {{ v.validated[1]|fmt }}{% endif %}</td>
+                  <td>{% if v.sourced is not none %}<span class="box {{ 'on' if v.sourced }}" role="img" aria-label="{{ 'sourced' if v.sourced else 'not sourced' }}"></span>{% endif %}</td>
+                  <td class="muted" style="font-size:0.78rem">{{ v.reference }}</td>
+                </tr>
+              {%- endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="block" id="{{ c.id }}-ports">
+          <h3>Ports</h3>
+          {%- if c.ports %}
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Side</th><th>Port type</th><th>Variables</th></tr></thead>
+              <tbody>
+              {%- for p in c.ports %}
+                <tr><td>{{ p.side }}</td><td class="mono">{{ p.type }}{% if p.multi %} <span class="muted">(multi: {{ p.multi }})</span>{% endif %}</td><td class="mono">{{ p.variables }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table>
+          </div>
+          {%- else %}<p class="muted" style="margin:0">No ports: this component is self-contained.</p>{% endif %}
+          {%- if c.invariants %}
+          <h4>Invariants checked</h4>
+          <ul class="issues">{% for inv in c.invariants %}<li>{% if inv is mapping and inv.description %}{{ inv.description }}: {% endif %}<code>{{ inv.expr if inv is mapping else inv }}</code></li>{% endfor %}</ul>
+          {%- endif %}
+        </div>
+      </div>
+
+      {%- if c.risk %}
+      <div class="block">
+        <h3>Failure risk over the joint parameter space</h3>
+        <div class="test">
+          <p class="message">P(fail) = {{ '%.3f'|format(c.risk.failure_probability) }} (95% interval {{ '%.3f'|format(c.risk.ci[0]) }}–{{ '%.3f'|format(c.risk.ci[1]) }}) over {{ c.risk.n_samples }} Sobol samples of the box below{% if c.risk.upper_bound_if_none_failed %}; none failed, so P(fail) &lt; {{ '%.3f'|format(c.risk.upper_bound_if_none_failed) }} at 95% confidence{% endif %}.</p>
+          {%- if c.risk.classifier %}<p class="about">Stored failure classifier ({{ 'constant: ' ~ c.risk.classifier.note if c.risk.classifier.kind == 'constant' else 'logistic regression on quadratic terms' }}{% if c.risk.classifier.cv_auc %}, 5-fold cross-validated AUC {{ '%.2f'|format(c.risk.classifier.cv_auc) }}{% endif %}) gives P(fail) at any parameter set in the box: <code>python -m cam_testing.ranges check</code>.</p>{% endif %}
+          <p class="about">All parameters are varied together over their tested ranges, which the one-at-a-time sweep doesn't cover. η² is the share of the failure indicator's variance explained by that parameter alone (a first-order Sobol-type index), so it ranks which parameters drive failures. Run on request with <code>make risk MODULE={{ module_type }}</code>.</p>
+          <div class="two">
+            <div class="table-wrap"><table>
+              <thead><tr><th>Parameter</th><th>Sampled range</th><th>η²</th></tr></thead>
+              <tbody>
+              {%- for rk in c.risk.ranking %}{% set b = (c.risk.box|selectattr('variable','equalto',rk.variable)|list)[0] %}
+                <tr><td class="mono">{{ rk.variable }}</td><td class="mono num">{{ b.min|fmt }} – {{ b.max|fmt }}{{ ' (log)' if b.log }}</td><td class="mono num">{{ '%.3f'|format(rk.importance) }}</td></tr>
+              {%- endfor %}
+              </tbody>
+            </table></div>
+            {%- if c.risk.failure_modes %}
+            <div class="table-wrap"><table>
+              <thead><tr><th>Failure mode</th><th>Samples</th></tr></thead>
+              <tbody>{% for m, n in c.risk.failure_modes.items() %}<tr><td>{{ m }}</td><td class="mono num">{{ n }}</td></tr>{% endfor %}</tbody>
+            </table></div>
+            {%- endif %}
+          </div>
+          <div class="plots">{% for p in c.risk.plots %}<figure><img src="{{ p }}" alt="failure risk plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}</div>
+        </div>
+      </div>
+      {%- endif %}
+
+      <div class="block">
+        <h3>Parameter references</h3>
+        {%- if c.has_proposals %}<p class="todo" style="margin:0">Proposed references are shown for review and are not applied yet.</p>{% endif %}
+        <div class="table-wrap"><table>
+          <thead><tr><th>Parameter</th><th>Value</th><th>Units</th><th>Current reference</th><th>Sourced</th>{% if c.has_proposals %}<th>Proposed reference</th><th>Proposed status</th>{% endif %}</tr></thead>
+          <tbody>
+          {%- for r in c.references %}
+            <tr><td class="mono">{{ r.name }}</td><td class="mono num">{{ r.value }}</td><td class="mono">{{ r.units }}</td>
+            <td>{% if r.key %}<a href="#ref-{{ r.key }}">{{ r.key }}</a>{% if r.note %}; {{ r.note }}{% endif %}{% else %}{{ r.reference }}{% endif %}</td>
+            <td><span class="box {{ 'on' if r.sourced }}" role="img" aria-label="{{ 'sourced' if r.sourced else 'not sourced' }}"></span></td>
+            {%- if c.has_proposals %}
+            <td>{% if r.proposal %}{% set pk = r.proposal.reference.split(';')[0].strip() %}{% if pk in bib_keys %}<a href="#ref-{{ pk }}">{{ pk }}</a>{{ ';' ~ r.proposal.reference.split(';', 1)[1] if ';' in r.proposal.reference }}{% else %}{{ r.proposal.reference }}{% endif %}{% if r.proposal.note %}<br><span class="muted" style="font-size:0.8rem">{{ r.proposal.note }}</span>{% endif %}{% endif %}</td>
+            <td>{% if r.proposal %}{{ {'yes':'sourced','no':'unsourced','definitional':'definitional'}.get(r.proposal.sourced, r.proposal.sourced) }}{% endif %}</td>
+            {%- endif %}</tr>
+          {%- endfor %}
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="block" id="instances">
+        <h3>Instances</h3>
+        <p class="muted" style="margin:0;font-size:0.84rem">An instance is a parameter set of this version (never different math), in <code>instances/&lt;instance&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. The verification tests above run at the default instance's parameters; validation runs per instance, for whatever data the instance has. An instance without obs_data is N/A for calibration ("no calibration data in this instance") and stays usable in models; the version's Calibration column fails when no instance has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the instance's parameters, its obs_data and params_for_id, and every input file including the verification config: open it in CUFLynx to investigate the instance.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Instance</th><th>Parameters</th><th>Data files</th><th>CUFLynx archive</th><th>Baseline</th><th>Calibration</th><th>Calibrated values</th></tr></thead>
+          <tbody>
+          {%- for i in c.instances %}
+            <tr><td class="mono">{{ i.name }}{% if i.is_default %} <span class="muted">(default)</span>{% endif %}</td>
+            <td class="mono num">{{ i.n_parameters }}</td>
+            <td class="mono" style="white-space:normal;font-size:0.78rem">{{ i.files|join(', ') or '—' }}</td>
+            <td title="{{ i.omex_message }}">{% if i.omex %}<a href="{{ i.omex }}" download>.omex</a> {% endif %}{{ chip(i.omex_status) }}{% if not i.omex %} <span class="muted" style="font-size:0.78rem">make omex</span>{% endif %}</td>
+            <td><a href="#{{ i.baseline.anchor }}" style="text-decoration:none">{{ chip(i.baseline.status) }}</a>{% if i.baseline.short == 'Fit check' %} <span class="muted" style="font-size:0.78rem">fit check</span>{% endif %}</td>
+            <td><a href="#{{ i.calibrate.anchor }}" style="text-decoration:none">{{ chip(i.calibrate.status) }}</a>{% if not i.has_obs_data %} <span class="muted" style="font-size:0.78rem">no calibration data</span>{% endif %}</td>
+            <td class="mono" style="white-space:normal;font-size:0.78rem">{% if i.calibration %}{{ i.calibration.calibrated_parameters|fmt }}{% if i.calibration.cost is not none %} (cost {{ i.calibration.cost|fmt }}){% endif %}<br><span class="muted">{{ i.calibrated_file }}, {{ i.calibration.date }}</span>{% else %}—{% endif %}</td></tr>
+          {%- endfor %}
+          </tbody>
+        </table></div>
+        {%- for i in c.instances %}{% for t in i.tests %}
+        {%- if t.status not in (none, 'not_applicable') or t.message != 'no baseline data in this instance' %}
+        <h4 style="margin:8px 0 0">{{ i.name }}</h4>
+        {{ test_article(c, t, t.anchor) }}
+        {%- endif %}
+        {%- endfor %}{% endfor %}
+      </div>
+
+      <div class="block">
+        <h3>Verification &amp; validation</h3>
+        <div class="tests">
+        {%- for t in c.tests %}
+          {{ test_article(c, t, c.id ~ "--" ~ t.key) }}
+        {%- endfor %}
+        </div>
+      </div>
+    </section>
+    {%- endfor %}
+
+    {%- if bibliography %}
+    <section class="block" aria-labelledby="bibliography">
+      <h2 id="bibliography">References</h2>
+      <p class="muted" style="margin:0;font-size:0.84rem">From <code>{{ bib_file }}</code>; entries marked proposed come from the <code>_references_proposed.bib</code> awaiting confirmation.</p>
+      <ul class="issues">
+      {%- for b in bibliography %}
+        <li id="ref-{{ b.key }}"><span class="mono">{{ b.key }}</span>{% if b.proposed %} <span class="chip pending">proposed</span>{% endif %}: {{ b.text }}{% if b.link %} <a href="{{ b.link }}">{{ b.link }}</a>{% endif %}</li>
+      {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+    <footer>Generated by <code>python -m cam_testing.report</code> from the results of <code>pytest --component {{ key }}</code>.</footer>
+  </main>
+</div>
+{%- if standalone is not defined or standalone %}
+</body>
+</html>
+{%- endif %}

@@ -1,0 +1,64 @@
+{
+  "module_type": "lung_vol_generator",
+  "version": "nn",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-12},
+  "outputs": ["q_lung_V", "q_b"],
+  "run_parameters": {"T_lung_multiplier": 0.5, "q_lung_max_multiplier": 1.5},
+  "invariants": [
+    {
+      "description": "q_lung_V is exactly amp(t) sin(2π t/T(t) + φ) + q_baseline, with the piecewise amplitude and period of the perturbation windows (relative 1e-9)",
+      "expr": "np.max(np.abs(q_lung_V - (np.where((t < t_start_q_lung_amp) | (t > t_end_q_lung_amp), q_lung_max, q_lung_max*q_lung_max_multiplier)*np.sin(2*np.pi/np.where((t < t_start_T_lung) | (t > t_end_T_lung), T_lung_0, T_lung_0*T_lung_multiplier)*t + phi_lung) + q_lung_baseline))) <= 1e-9*np.max(np.abs(q_lung_V))"
+    },
+    {
+      "description": "q_b is the baseline volume",
+      "expr": "np.max(np.abs(q_b - q_lung_baseline)) <= 1e-12*abs(q_lung_baseline)"
+    },
+    {
+      "description": "lung volume stays within baseline ± the largest amplitude, and positive",
+      "expr": "np.all(np.abs(q_lung_V - q_lung_baseline) <= q_lung_max*max(1.0, q_lung_max_multiplier)*(1 + 1e-9)) & np.all(q_lung_V > 0)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "T_lung_0": {"min": 2.5, "max": 6.0, "points": 4},
+      "q_lung_max": {"min": 0.0001, "max": 0.0005, "points": 3},
+      "q_lung_baseline": {"min": 0.0018, "max": 0.0035, "points": 3},
+      "phi_lung": [-3.14159, 3.14159],
+      "T_lung_multiplier": {"min": 0.5, "max": 2.0, "points": 3},
+      "q_lung_max_multiplier": {"min": 0.5, "max": 3.0, "points": 3},
+      "t_start_T_lung": [0.0, 30.0],
+      "t_end_T_lung": [30.0, 60.0],
+      "t_start_q_lung_amp": [0.0, 30.0],
+      "t_end_q_lung_amp": [30.0, 60.0]
+    },
+    "rationale": "Breathing periods 2.5-6 s (10-24 breaths/min), half tidal volumes 0.1-0.5 L, mid-tidal baselines 1.8-3.5 L (about FRC), rate and depth multipliers from halving to doubling/tripling (exercise-like), perturbation windows anywhere in the 60 s run."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "prescribed input (a sinusoidal lung volume); its values are sourced physiological constants. Validation belongs to the stretch-receptor model it drives."
+      },
+      "calibrate": {
+        "note": "not_applicable: prescribed input (a sinusoidal lung volume); its values are sourced physiological constants. Validation belongs to the stretch-receptor model it drives."
+      }
+    }
+  }
+}

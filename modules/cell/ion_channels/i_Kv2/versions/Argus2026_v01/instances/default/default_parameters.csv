@@ -1,0 +1,10 @@
+variable_name,units,value,data_reference,sourced
+E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+V_den_m_Kv2,milliV,8,SN_simple: Tau2011_was_8,yes
+V_mid_m_Kv2,milliV,6,SN_simple: Tau2011_was_6,yes
+V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_Kv2,per_um2,0.056978632478632475,definitional; chosen so that g_Kv2 = A rho gamma_Kv2 (1e-6 uS/pS) reproduces the previous g_Kv2 = 0.0013333 microS (Davis2021Thesis_fit_to_curve) with A = 3000 um^2 (the soma membrane area) and gamma_Kv2 = 7.8 picoS; a density for calibration through gamma_Kv2,no
+gamma_Kv2,picoS,7.8,Trapani2006; Kv2.1 single-channel conductance 7.8 +- 0.3 pS with 10 mM external K (Fig. 6B and Results),yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

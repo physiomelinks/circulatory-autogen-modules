@@ -1,0 +1,17 @@
+variable_name,units,value,data_reference,sourced
+Cai,millimolar,0.0001,definitional; SN_simple Cai_init (Hagiwara1981; used when unconnected),no
+Cao,millimolar,2,SN_simple: Tau2011,yes
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+V_den_c,milliV,5,SN_simple: Tau2011_was_9.85,yes
+V_mid_c,milliV,8.1,SN_simple: Tau2011_was_8.1,yes
+V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+cAMP,dimensionless,0.01,SN_simple: user_defined,no
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_CaL,per_um2,160.45574768876767,definitional; chosen so that p_Ca = A rho p_Ca_single (1e-18 m3/um3) reproduces the previous p_Ca = 4e-14 m3_per_s (to_be_identified) with A = 3000 um^2 (the soma membrane area) and p_Ca_single = 0.0831 um3_per_s; a density for calibration through p_Ca_single,no
+p_Ca_single,um3_per_s,0.0830966389511686,"Church1996; single L-type channel conductance 2.4 pS in 2 mM Ca (Abstract, point 4), converted to a per-channel GHK permeability P = gamma R T/(z^2 F^2 Cao) (the limiting slope at negative V, 37 degC, Cao 2 mM) = 0.0831 um^3/s",yes
+tau_c_max,millis,3.0,SN_simple: changed_from_belluzi1991_curves,yes
+tau_c_min,millis,0.2,SN_simple: changed_from_belluzi1991_curves,yes
+tau_hc,millis,20.0,SN_simple: changed_from_belluzi1991_curves,yes
+R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
+T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

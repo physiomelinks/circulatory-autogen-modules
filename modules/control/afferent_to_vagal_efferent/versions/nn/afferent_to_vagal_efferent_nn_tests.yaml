@@ -1,0 +1,36 @@
+module_type: afferent_to_vagal_efferent
+version: nn
+reviewed: false
+notes: 'Central integration to vagal efferent activity (Ursino 1998 sigmoid plus the Ursino & Magosso 2000 chemoreceptor term):
+  f_v = (f_ev_0 + f_ev_inf e^y)/(1 + e^y) + W_cv f_apc - theta_v, y = (f_ab - f_ab_0)/k_ev. Purely algebraic.'
+reference_proposals:
+  f_ab:
+    reference: circulatory_autogen; test operating point = f_ab_0 (baroreceptor output at the vagal set point)
+    sourced: false
+    value: 25.0
+  f_apc:
+    reference: circulatory_autogen; test operating point = f_apc_nom (3.7 spikes/s)
+    sourced: false
+    value: 3.7
+  W_cv:
+    reference: UrsinoMagosso2000; W_c,v = 0.2 in open reimplementations of that model (e.g. Baby-Monitor-Simulator chemo_f.m);
+      the library 0.208 does not match - owner to confirm (could be a MagossoUrsino2001 value)
+    sourced: true
+  f_ev_0:
+    reference: Ursino1998; f_ev,0 = 3.2 spikes/s (Cheng2010 Table, citing MagossoUrsino2001)
+    sourced: true
+  f_ev_inf:
+    reference: Ursino1998; f_ev,inf = 6.3 spikes/s (Cheng2010 Table)
+    sourced: true
+  f_ab_0:
+    reference: Ursino1998; f_cs,0 = 25 spikes/s (Cheng2010 Table)
+    sourced: true
+  theta_v:
+    reference: UrsinoMagosso2000; theta_v = -0.68 spikes/s (open reimplementations; primary not read)
+    sourced: true
+  k_ev:
+    reference: Ursino1998; k_ev = 7.06 spikes/s (Cheng2010 Table)
+    sourced: true
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

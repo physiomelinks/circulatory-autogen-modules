@@ -1,0 +1,106 @@
+{
+  "module_type": "coupler",
+  "version": "pv_0D_1D",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": ["q_star", "P_s_star", "flux", "vessel0d/u", "vessel0d/v", "imposter1d/P_t_star", "imposter1d/A_star"],
+  "harness": {
+    "vessel_array": [
+      ["pressure_in", "nn_constant", "inlet_pressure", "", "vessel0d", "default"],
+      ["vessel0d", "pv", "arterial_simple", "pressure_in", "mod", "default"],
+      ["mod", "pv_0D_1D", "coupler", "vessel0d", "imposter1d", "default"],
+      ["imposter1d", "nn", "imposter_1D", "mod", "", "default"]
+    ],
+    "parameters": [
+      ["P_pressure_in", "J_per_m3", 2000, "harness test value (circulatory_autogen 0D_1D_coupling_test)"],
+      [
+        "R_vessel0d",
+        "Js_per_m6",
+        10000000.0,
+        "harness test value (large-artery order; chosen so R/I and 1/sqrt(IC) are non-stiff)"
+      ],
+      ["C_vessel0d", "m6_per_J", 1e-08, "harness test value (circulatory_autogen 0D_1D_coupling_test)"],
+      [
+        "I_vessel0d",
+        "Js2_per_m6",
+        100000.0,
+        "harness test value (rho l / A for a ~5 cm, r ~1.25 cm segment)"
+      ],
+      ["q_0_vessel0d", "m3", 0, "harness: zero unstressed volume"],
+      ["u_0_vessel0d", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["u_ext_vessel0d", "J_per_m3", 0, "harness: zero external pressure"],
+      [
+        "P_t_star_imposter1d",
+        "J_per_m3",
+        1000,
+        "harness test value (circulatory_autogen 0D_1D_coupling_test)"
+      ],
+      [
+        "A_star_imposter1d",
+        "m2",
+        0.001,
+        "harness test value (circulatory_autogen 0D_1D_coupling_test); an area of 10 cm^2"
+      ]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "static pressure at the interface is total minus dynamic pressure, P_s* = P_t* − ½ρ(q*/A*)²",
+      "expr": "np.max(np.abs(P_s_star - (imposter1d__P_t_star - 0.5*rho*(q_star/imposter1d__A_star)**2))) <= 1e-9*max(1.0, np.max(np.abs(imposter1d__P_t_star)))"
+    },
+    {
+      "description": "flux is the time integral of ρ q* (trapezoidal integral of the output, relative error < 1e-3)",
+      "expr": "np.max(np.abs(flux - np.concatenate(([0.0], np.cumsum(0.5*(rho*q_star[1:] + rho*q_star[:-1])*np.diff(t)))))) <= 1e-3*max(1e-30, np.max(np.abs(flux)))"
+    },
+    {
+      "description": "steady state: q* satisfies the analytic balance R q* = P_in − P_t* + ½ρ(q*/A*)² of the harness (P_in = 2000 Pa, R = 1e7 Pa s m^-3), residual < 0.1% of P_in",
+      "expr": "abs(1e7*q_star[-1] - (2000.0 - imposter1d__P_t_star[-1] + 0.5*rho*(q_star[-1]/imposter1d__A_star[-1])**2)) <= 2.0"
+    },
+    {
+      "description": "steady state: q* equals the closed-form root q = (R − sqrt(R² − 2kΔP))/k, k = ρ/A*², ΔP = P_in − P_t* (0.1%)",
+      "expr": "abs(q_star[-1] - (1e7 - np.sqrt(1e14 - 2*(rho/imposter1d__A_star[-1]**2)*(2000.0 - imposter1d__P_t_star[-1])))/(rho/imposter1d__A_star[-1]**2)) <= 1e-3*abs((1e7 - np.sqrt(1e14 - 2*(rho/imposter1d__A_star[-1]**2)*(2000.0 - imposter1d__P_t_star[-1])))/(rho/imposter1d__A_star[-1]**2))"
+    },
+    {
+      "description": "momentum balance at steady state: interface static pressure equals the 0D pressure (P_s_0D − P_s* → 0, < 0.1 Pa)",
+      "expr": "abs(vessel0d__u[-1] - P_s_star[-1]) <= 0.1"
+    },
+    {
+      "description": "flow into the coupler equals flow out of the 0D vessel at steady state (inflow v of vessel0d = q*, 0.1%)",
+      "expr": "abs(vessel0d__v[-1] - q_star[-1]) <= 1e-3*abs(q_star[-1])"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "I": {"min": 20000.0, "max": 500000.0, "points": 5, "scale": "log"},
+      "rho": {"min": 1040.0, "max": 1060.0, "points": 3}
+    },
+    "rationale": "I spans rho l / (pi r^2) for interface segments of about 1-10 cm with radii 0.8-1.5 cm (2e4-5e5 Pa s^2 m^-6); below ~1e4 the coupler becomes stiff relative to the harness dynamics. rho spans the usual whole-blood density range 1040-1060 kg m^-3."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 2.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "numerical interface between a 0D and a 1D model with no physiological counterpart of its own; verified against the analytic steady state of the harness. Validation belongs to a coupled 0D-1D model."
+      },
+      "calibrate": {
+        "note": "not_applicable: numerical interface component; nothing to calibrate against data on its own."
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "module_type": "DMV_Gee2023",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "DMV_Gee2023_nn_modules.cellml",
+    "component_type": "DMV_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "NTS_ls_freq",
+        "variables": [
+          "f_NTS_ls"
+        ]
+      },
+      {
+        "port_type": "NTS_cp_freq",
+        "variables": [
+          "f_NTS_cp"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "DMV_freq",
+        "variables": [
+          "f_DMV"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_DMV",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NTS_ls",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_NTS_cp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_min_DMV",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_DMV",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_DMV",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "k_DMV",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

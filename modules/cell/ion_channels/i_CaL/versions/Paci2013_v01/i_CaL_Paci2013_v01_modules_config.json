@@ -1,0 +1,167 @@
+[
+  {
+    "module_type": "i_CaL",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_CaL_Paci2013_v01_modules.cellml",
+    "component_type": "i_CaL_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "CaL_d_gate",
+        "variables": [
+          "d"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "CaL_f1_gate",
+        "variables": [
+          "f1"
+        ]
+      },
+      {
+        "port_type": "CaL_f2_gate",
+        "variables": [
+          "f2"
+        ]
+      },
+      {
+        "port_type": "CaL_fCa_gate",
+        "variables": [
+          "fCa"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "CaL_current",
+        "variables": [
+          "i_CaL"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "CaL_current",
+        "variables": [
+          "i_CaL"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_CaL",
+        "A_per_F",
+        "access",
+        "variable"
+      ],
+      [
+        "g_CaL",
+        "m3_per_Fs",
+        "access",
+        "constant"
+      ],
+      [
+        "Vm",
+        "volt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "R",
+        "J_per_MK",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "d",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f1",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f2",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "fCa",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "nifed_3nM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "nifed_10nM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "nifed_30nM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "nifed_100nM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ]
+    ]
+  }
+]

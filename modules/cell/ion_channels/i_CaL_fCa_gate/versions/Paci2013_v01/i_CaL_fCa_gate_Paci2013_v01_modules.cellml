@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_CaL_fCa_gate_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_CaL_fCa_gate_Paci_2013">
+        <variable name="fCa_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="fCa_init" name="fCa" public_interface="out" units="dimensionless"/>
+        <variable name="constfCa" units="dimensionless"/>
+        <variable name="alpha_fCa" units="dimensionless"/>
+        <variable name="beta_fCa" units="dimensionless"/>
+        <variable name="gamma_fCa" units="dimensionless"/>
+        <variable name="fCa_inf" units="dimensionless"/>
+        <variable initial_value="0.002" name="tau_fCa" units="second"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Vm" public_interface="in" units="volt"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>alpha_fCa</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>Cai</ci>
+                                <cn cellml:units="millimolar">0.0006</cn>
+                            </apply>
+                            <cn cellml:units="dimensionless">8</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>beta_fCa</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">0.1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>Cai</ci>
+                                    <cn cellml:units="millimolar">0.0009</cn>
+                                </apply>
+                                <cn cellml:units="millimolar">0.0001</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>gamma_fCa</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">0.3</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>Cai</ci>
+                                    <cn cellml:units="millimolar">0.00075</cn>
+                                </apply>
+                                <cn cellml:units="millimolar">0.0008</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>fCa_inf</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>alpha_fCa</ci>
+                        <ci>beta_fCa</ci>
+                        <ci>gamma_fCa</ci>
+                    </apply>
+                    <cn cellml:units="dimensionless">1.3156</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>constfCa</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">0</cn>
+                        <apply>
+                            <and/>
+                            <apply>
+                                <gt/>
+                                <ci>Vm</ci>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="volt">0.06</cn>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <gt/>
+                                <ci>fCa_inf</ci>
+                                <ci>fCa</ci>
+                            </apply>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">1</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>fCa</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>constfCa</ci>
+                        <apply>
+                            <minus/>
+                            <ci>fCa_inf</ci>
+                            <ci>fCa</ci>
+                        </apply>
+                    </apply>
+                    <ci>tau_fCa</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

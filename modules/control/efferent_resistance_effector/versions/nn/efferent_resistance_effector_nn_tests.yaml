@@ -1,0 +1,26 @@
+module_type: efferent_resistance_effector
+version: nn
+reviewed: false
+notes: 'Saturating resistance effector (Argus variant): tau_theta dsigma/dt = max(f_s - f_es_min, 0) - sigma; Delta_theta
+  = G_theta sigma/(f_es_mid + sigma), a dimensionless fractional change (Michaelis-Menten saturation, unlike the Ursino logarithm).
+  Exact: sigma = S (1 - e^(-t/tau)), S = max(f_s - f_es_min, 0).'
+reference_proposals:
+  f_s:
+    reference: circulatory_autogen; test operating point (10 spikes/s, above f_es_min)
+    sourced: false
+    value: 10.0
+  G_theta:
+    reference: unreferenced_placeholder; "assumed that R can double"
+    sourced: false
+  tau_theta:
+    reference: Ursino1998; tau_R,sp = 6 s (Gee2023 Simulink [6 1] for the R effector)
+    sourced: true
+  f_es_min:
+    reference: Ursino1998; f_es,min = 2.66 spikes/s (Cheng2010 Table; Gee2023 Simulink 2.66)
+    sourced: true
+  f_es_mid:
+    reference: unreferenced_placeholder; "to_be_calibrated" half-saturation of the Argus effector
+    sourced: false
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

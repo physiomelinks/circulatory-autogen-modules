@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="resistor_pp" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="resistor_type">
+        <variable name="u_in" units="J_per_m3" public_interface="in"/>
+        <variable name="u_out" units="J_per_m3" public_interface="in"/>
+        <variable name="R" units="Js_per_m6" public_interface="in"/>
+        <variable name="v" units="m3_per_s" public_interface="out"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>u_in</ci>
+                        <ci>u_out</ci>
+                    </apply>
+                    <ci>R</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

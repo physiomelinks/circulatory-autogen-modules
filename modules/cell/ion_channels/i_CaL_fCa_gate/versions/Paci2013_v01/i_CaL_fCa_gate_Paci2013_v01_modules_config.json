@@ -1,0 +1,62 @@
+[
+  {
+    "module_type": "i_CaL_fCa_gate",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_CaL_fCa_gate_Paci2013_v01_modules.cellml",
+    "component_type": "i_CaL_fCa_gate_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "CaL_fCa_gate",
+        "variables": [
+          "fCa"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "fCa_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "fCa",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

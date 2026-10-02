@@ -1,0 +1,54 @@
+{
+  "module_type": "axon",
+  "version": "sympathetic_monolithic_v01",
+  "sim_time": 0.02,
+  "pre_time": 0.0,
+  "dt": 1e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["V", "I", "I_channels", "C", "R"],
+  "run_parameters": {"V_in": -20.0},
+  "invariants": [
+    {
+      "description": "exact RC relaxation: V = V_in + (V_rest_approx - V_in) exp(-t (1 + channel_ratio) 1e6/(R C)) (MOhm, pF, s)",
+      "expr": "np.max(np.abs(V - (V_in + (V_rest_approx - V_in)*np.exp(-t*(1 + channel_ratio)*1e6/(R*C))))) <= 1e-6*max(1.0, np.max(np.abs(V)))"
+    },
+    {
+      "description": "I = (V_in - V)/R and I_channels = channel_ratio I",
+      "expr": "np.max(np.abs(I - (V_in - V)/R)) + np.max(np.abs(I_channels - channel_ratio*I)) <= 1e-9"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "V_in": {"min": -90.0, "max": 40.0, "points": 5},
+      "V_rest_approx": {"min": -80.0, "max": -50.0, "points": 3},
+      "channel_ratio": {"min": 0.0, "max": 2.0, "points": 3}
+    },
+    "rationale": "soma potential -90 to +40 mV; resting potential -80 to -50 mV; channel_ratio 0-2; c_m, d_ax, L_ax and R_i by 0.5-2 (C = c_m pi d_ax L_ax and R = 4 R_i L_ax/(pi d_ax^2) span the RC time 0.25-4 of its value, as the previous R and C sweeps did)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0001, 5e-05, 2.5e-05, 1.25e-05],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "phenomenological cable stand-in; no directly comparable measurement."
+      },
+      "calibrate": {
+        "note": "not_applicable: d_ax, L_ax and R_i (R and C) would need conduction-delay data; none chosen."
+      }
+    }
+  }
+}

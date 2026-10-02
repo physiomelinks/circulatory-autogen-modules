@@ -1,0 +1,62 @@
+{
+  "module_type": "simple",
+  "version": "pv_noI",
+  "sim_time": 5.0,
+  "pre_time": 0.0,
+  "dt": 0.05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10, "MaximumStep": 0.0125},
+  "outputs": ["q", "u", "v"],
+  "run_parameters": {"v_out": 0.04165},
+  "invariants": [
+    {
+      "description": "exact solution with constant BCs: u(t) = u_ss + (u(0) - u_ss) e^(-t/RC), u_ss = u_in - R v_out, u(0) = u_0 + (q_init - q_0)/C",
+      "expr": "np.max(np.abs(u - ((u_in - R*v_out) + ((u_0 + (q_init - q_0)/C) - (u_in - R*v_out))*np.exp(-t/(R*C))))) <= 1e-6*(np.max(np.abs(u)) + 1e-3) + 1e-4*abs(u_in - R*v_out - (u_0 + (q_init - q_0)/C))"
+    },
+    {
+      "description": "Ohm law v = (u_in - u)/R and pressure-volume law u = u_0 + (q - q_0)/C",
+      "expr": "np.allclose(v*R, u_in - u, rtol=1e-8, atol=1e-9*abs(u_in)) & np.allclose(u, u_0 + (q - q_0)/C, rtol=1e-8, atol=1e-9*np.max(np.abs(u)))"
+    },
+    {
+      "description": "volume balance: q(t) - q_init = integral of (inflow - outflow)",
+      "expr": "np.max(np.abs(q - q_init - np.concatenate([[0.0], np.cumsum(0.5*((v - v_out)[1:] + (v - v_out)[:-1])*np.diff(t))]))) <= (2e-3 + ((t[1] - t[0])/(R*C))**2/3)*np.max(np.abs(q - q_init)) + 1e-6*abs(q_init)"
+    },
+    {
+      "description": "volume stays positive (q > 0) at the run point (not across the sweep: a constant forced outflow can legitimately drain the compartment below zero)",
+      "expr": "np.all(q > 0)",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "u_in": {"min": 6.0, "max": 39.11, "points": 5},
+      "v_out": {"min": 0.0, "max": 0.2499, "points": 5},
+      "q_init": {"min": 0.1, "max": 0.406, "points": 3},
+      "u_0": {"min": 0.0, "max": 6.0, "points": 3}
+    },
+    "rationale": "Pressures 0.5-1.5x a 12 kPa (90 mmHg) mean plus the R x flow drop, flows 0-3x a 5 L/min cardiac output, initial volume from unstressed to unstressed + 2 C x 12 kPa, u_0 0-6 kPa; R, C, q_0 at 0.5-2x. The exact solution is checked at every point."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.2, 0.1, 0.05, 0.025],
+    "t_end": 5.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "generic linear RC building block with no specific anatomical counterpart; verified against its exact solution. Validation belongs to a network built from it."
+      },
+      "calibrate": {"note": "not_applicable: generic building block; see baseline"}
+    }
+  }
+}

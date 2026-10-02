@@ -1,0 +1,9 @@
+module_type: inlet_flow
+version: nn_constant_2
+reviewed: false
+notes: 'Two constant inflows v_1, v_2 on one port (flow_inlet_BC_2_port), consumed only by BG 2in2out_junction vv (e.g. the
+  two inflows of a cerebral junction). Tested alone: the component has no equations, so only the constants can be checked;
+  a harness with a 2in2out_junction needs a full cerebral network.'
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

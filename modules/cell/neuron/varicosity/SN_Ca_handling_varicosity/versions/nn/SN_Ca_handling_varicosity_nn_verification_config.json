@@ -1,0 +1,71 @@
+{
+  "module_type": "SN_Ca_handling_varicosity",
+  "version": "nn",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": [
+    "Cai",
+    "Ca_bulk",
+    "Ca_ER_pre",
+    "Ca_ER",
+    "B_Cai",
+    "B_Ca_bulk",
+    "B_Ca_ER_pre",
+    "CaB_Ca_ER_pre",
+    "CaB_Ca_bulk",
+    "CaB_Cai",
+    "E_Ca",
+    "c_bulk",
+    "j_SERCA",
+    "j_diffCa",
+    "j_diffCa_ER",
+    "j_leak_Ca"
+  ],
+  "invariants": [
+    {
+      "description": "alone (no channel fluxes connected) the total Ca, free + buffered in all four compartments, is conserved (relative 1e-6)",
+      "expr": "np.max(np.abs(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0])) <= 1e-6*(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]"
+    },
+    {
+      "description": "Nernst (z = 2): E_Ca = 1000 RT/(2F) ln(Cao/Cai) (mV)",
+      "expr": "np.max(np.abs(E_Ca - 1000*R*T/(2*F)*np.log(Cao/Cai))) <= 1e-9"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {},
+    "bounds": {
+      "c_SL": [0, 1],
+      "c_ER": [0, 1],
+      "c_ER_pre": [0, 1]
+    },
+    "constraints": ["B_Ca_init < B_Ca_total", "c_SL + c_ER + c_ER_pre < 1"]
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      }
+    }
+  }
+}

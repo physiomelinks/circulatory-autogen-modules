@@ -1,0 +1,64 @@
+summary: 'elic holds two controlled cerebral terminals (terminal / controller_type and terminal2 / controller2_type: a compliance
+  between two resistive-inertive branches whose resistance R_T is learned online from the observed pressure error and the
+  ASL/4D-flow flow-fraction error) and two pass-through observers (pressure_observer, flow_observer) that route a vessel''s
+  pressure / flow to every controlled terminal. I set up the terminals alone with constant inputs (exact identities, first
+  integrals of the learning law, volume balance, a physical bound) and the observers in a small BG-arterial test network.
+  Both observers pass everything. Both terminals fail generation because u_in, u_a and v_a are port variables missing from
+  variables_and_units; terminal2 has a second defect (error_flow_percent units). With both fixed in a patched copy the terminals
+  run, their invariants hold, and a terminal2 + observers network routes the source vessel''s u and v exactly into u_a and
+  v_a. The sweep exposes a controller runaway (see proposed_fixes). Parameter values are all user-defined; proposals are placeholders.'
+comment: 'Both controlled terminals fail generation (u_in/u_a/v_a missing from variables_and_units); terminal2 also declares
+  error_flow_percent in Js_per_m6 (config: dimensionless), which Myokit rejects. The global pressure_d = 520346 Pa (3903 mmHg)
+  and meanflow_4dflow = 3e-4 m3/s look wrong for a cerebral model (circulatory_autogen cerebral_elic uses 13000 Pa and 1.24e-5
+  m3/s). The controller runs away to R_T = 1 Pa s m^-3 whenever the observed pressure is at or above pressure_d, its membership
+  functions use a 0.01 Pa width (exp overflow in Python), I_T = 1e-6 is hard-coded in the CellML, and critic/check/R_T mix
+  units under dimensionless declarations.'
+questions:
+- 'pressure_d = 520346 Pa and meanflow_4dflow = 3e-4 m3/s (globals): are these intended? For a cerebral territory circulatory_autogen
+  cerebral_elic uses 13000 Pa and 1.24e-5 m3/s; the tests use those at the run point (run_parameters) but the sweeps are centred
+  on the library values.'
+- 'terminal (controller_type) C_T and BFF_ASL were TODO; I propose the terminal2 / cerebral_elic values (2.64334e-13 m3/Pa
+  "ADAN_218", 0.0896) as placeholders. The ADAN attribution (Blanco2015) could not be checked for this specific terminal:
+  can you give the ADAN table/terminal the compliance comes from?'
+- What does "elic" refer to, and is the controller from a publication (three membership functions of the pressure error with
+  learned linear consequents; learning_rate 1e6 / 1e8, K_a 0.001 / 0.01, critic scalings 1e-4 / 1e-6, 1 Pa and 0.01 Pa widths
+  all hard-coded)? A reference would let these constants be cited.
+- terminal vs terminal2 differ only in the critic flow scale (1e-4 vs 1e-6 m3/s), learning_rate (1e6 vs 1e8), K_a (0.001 vs
+  0.01) and variable access flags. Is terminal (controller_type) still used, or should it be retired in favour of terminal2
+  (the one cerebral_elic uses)?
+- The observers are pure aliases (no equations; flattened away) so they are verified structurally in a test network. Is that
+  sufficient, or do you want them exercised end-to-end with a controlled terminal once the config fix is in (the patched-copy
+  evidence below does that)?
+proposed_fixes:
+- 'terminal and terminal2 (pp_controller) configs: add ["u_in", "J_per_m3", "access", "boundary_condition"], ["u_a", "J_per_m3",
+  "access", "boundary_condition"] and ["v_a", "m3_per_s", "access", "boundary_condition"] to variables_and_units. Evidence:
+  libcuflynx exits in LumpedPortVariableCheck ("the port variable u_in is not a variable for vessel type: terminal2") for
+  any network, connected or not; with the entries added (patched copy) both terminals generate, run and all 8 invariants hold.'
+- 'controller2_type (terminal2): change the CellML declaration of error_flow_percent from units="Js_per_m6" to units="dimensionless"
+  (it is 100 r_a, and the config says dimensionless). Evidence: after the port fix, Myokit refuses the generated model ("Connected
+  variables must have compatible units. Found Js_per_m6 and dimensionless"), libcellml reports the same map_variables error;
+  with the unit changed in the patched copy the model generates and runs, and a network pressure_in -> BG arterial pv -> terminal2
+  with pressure/flow observers gives error = pressure_d - art.u and error_flow_percent = 100 (BFF_ASL - art.v/meanflow) exactly
+  (max difference 0).'
+- 'Controller runaway when pressure_d <= u_a: with error < 0 the critic is negative and the consequent coefficients learn
+  downwards without bound (with error = 0, check decays into (0, 1), which the piecewise passes unclamped); R_T reaches the
+  1 Pa s m^-3 floor and the terminal short-circuits (patched copy: v = 1.2e4 m3/s at pressure_d = 8000 and 12000 Pa, u_a =
+  12000 Pa). Suggest a physiological R_T,min parameter used for check <= R_T,min, and normalising the critic by a reference
+  flow.'
+- 'Membership functions exp((-/+error + 1)/0.01) with error in Pa overflow math.exp for |error| > ~7 Pa in the Python-generated
+  model (solve_ivp and fixed-step fail; only CVODE works): use an explicit pressure width parameter and an overflow-safe logistic
+  (0.5 (1 + tanh(z/2))).'
+- 'Units / constants: critic, check, aa_i, cc_i, learning_rate, K_a are dimensionless but combine Pa and m3/s, and I_T = 1e-6
+  Js2_per_m6 is an equation in the CellML rather than a parameter (open_loop''s terminals take I_T as a constant). Make I_T
+  a constant in variables_and_units and give the controller constants units.'
+findings:
+- 'Test summary (real library): pressure_observer and flow_observer pass run, invariants (source-vessel steady state u = P_in
+  - R v_out, volume balance), timestep (RK4 order 4.01, agrees with CVODE to 2e-7) and stability (9 of 9 solver families);
+  BC sweep skipped (no parameters). terminal / terminal2: all tests fail at generation (recorded as expected failures).'
+- 'Patched copy (port variables added; terminal2 error_flow_percent unit fixed): both terminals pass run_test, all 8 invariants,
+  stability (CVODE rtol 1e-6..1e-8; solve_ivp and fixed-step fail with OverflowError); BC sweep 10 of 12 runs pass, pressure_d
+  = 8000 and 12000 Pa (<= u_a) fail the physical bound; timestep fails (exp overflow and stiffness I_T/R_T ~ 1e-14..1e-19
+  s).'
+- 'Terminal solver tolerances: SI volumes (q_T ~ 1e-9 m3) need atol ~ 1e-16; the spec uses rtol 1e-8, atol 1e-16 for the terminals.'
+- 'Joint failure risk (512 samples): terminal and terminal2 P(fail) = 1.000 because generation fails (uninformative until
+  the config fix); the observers have no parameters to sample.'

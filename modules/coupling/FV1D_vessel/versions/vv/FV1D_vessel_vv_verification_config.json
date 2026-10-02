@@ -1,0 +1,66 @@
+{
+  "module_type": "FV1D_vessel",
+  "version": "vv",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": [],
+  "harness": {
+    "vessel_array": [
+      ["f_in", "nn_constant", "inlet_flow", "", "ves", "default"],
+      ["ves", "vp", "arterial_simple", "f_in", "mod", "default"],
+      ["mod", "vv", "FV1D_vessel", "ves", "term", "default"],
+      ["term", "pp_R1CR2_wCont", "terminal", "mod", "p_out", "default"],
+      ["p_out", "nn_constant", "outlet_pressure", "term", "", "default"]
+    ],
+    "parameters": [
+      ["v_f_in", "m3_per_s", 8.3333e-05, "library default (module parameters)"],
+      ["q_0_ves", "m3", 0.0, "library default (module parameters)"],
+      ["R_ves", "Js_per_m6", 10664000.0, "library default (module parameters)"],
+      ["C_ves", "m6_per_J", 3.09077e-10, "library default (module parameters)"],
+      ["I_ves", "Js2_per_m6", 1e-06, "library default (module parameters)"],
+      ["u_ext_ves", "J_per_m3", 0.0, "library default (module parameters)"],
+      ["u_0_ves", "J_per_m3", 1463.0, "library default (module parameters)"],
+      ["u_out_ves", "J_per_m3", 12665.6, "library default (module parameters)"],
+      ["v_in_ves", "m3_per_s", 0.0001, "library default (module parameters)"],
+      ["R_T1_term", "Js_per_m6", 13000000.0, "library default (module parameters)"],
+      ["R_T2_term", "Js_per_m6", 260870000.0, "library default (module parameters)"],
+      ["C_T_term", "m6_per_J", 4e-09, "library default (module parameters)"],
+      ["q_us_term", "m3", 0.0, "library default (module parameters)"],
+      ["q_init_term", "m3", 0.0, "library default (module parameters)"],
+      ["Delta_R_term", "dimensionless", 0.0, "library default (module parameters)"],
+      ["u_ext_term", "J_per_m3", 0.0, "library default (module parameters)"],
+      ["u_out_term", "J_per_m3", 666.61, "library default (module parameters)"],
+      ["u_in_term", "J_per_m3", 13332.2, "library default (module parameters)"],
+      ["R_local_multiplier_term", "dimensionless", 1.0, "library default (module parameters)"],
+      ["P_p_out", "J_per_m3", 666.0, "library default (module parameters)"]
+    ]
+  },
+  "invariants": [],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {}
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "C++ 1D finite-volume solver, not a CellML component; validated with the solver itself."
+      },
+      "calibrate": {"note": "not_applicable: C++ component, not testable here."}
+    }
+  }
+}

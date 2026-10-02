@@ -1,0 +1,55 @@
+[
+  {
+    "module_type": "flow_sum_2",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "flow_sum_2_nn_modules.cellml",
+    "component_type": "flow_sum_2_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_1"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_2"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_total"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v_1",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_2",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_total",
+        "m3_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

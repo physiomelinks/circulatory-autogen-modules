@@ -1,0 +1,215 @@
+[
+  {
+    "module_type": "NTS_Gee2023",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "NTS_Gee2023_nn_modules.cellml",
+    "component_type": "NTS_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "lung_stretch_firing_rate_port",
+        "variables": [
+          "f_ls"
+        ]
+      },
+      {
+        "port_type": "baroreceptor_firing_rate_port",
+        "variables": [
+          "f_br"
+        ]
+      },
+      {
+        "port_type": "cardiopulmonary_firing_rate_port",
+        "variables": [
+          "f_cp"
+        ]
+      },
+      {
+        "port_type": "chemoreceptor_firing_rate_port",
+        "variables": [
+          "f_apc"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "NTS_br_freq",
+        "variables": [
+          "f_NTS_br"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "NTS_ls_freq",
+        "variables": [
+          "f_NTS_ls"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "NTS_cp_freq",
+        "variables": [
+          "f_NTS_cp"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "NTS_ch_freq",
+        "variables": [
+          "f_NTS_ch"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_NTS_br",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NTS_ls",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NTS_cp",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NTS_ch",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_ls",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_br",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_cp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_apc",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_min_br",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_br",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_br",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_min_ls",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_ls",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_ls",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_min_cp",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_cp",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_cp",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_min_ch",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_ch",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_ch",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NTS_br",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NTS_ls",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NTS_cp",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NTS_ch",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

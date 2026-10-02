@@ -1,0 +1,83 @@
+module_type: i_Kr_Xr1_gate
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM I_Kr activation Xr1 (V_half from the Ca-dependent formula of Paci 2013, using R, T, F, Cao, Q,
+  L0) gate: dXr1/dt = (Xr1_inf(Vm) - Xr1)/tau_Xr1(Vm). Alone the membrane voltage is a boundary condition, i.e. a voltage
+  clamp, so the gate has the exact solution used as the invariant. The run point steps the clamp from rest (-74.3 mV) to -20
+  mV.'
+known_issues:
+- 'undefined units: C_per_M'
+- 'undefined units: J_per_MK'
+expected_failures:
+  run_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters file)
+    but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. Also V_half is exposed in the config but has no interface in
+    the CellML (fix: public_interface=''out''). Also R and F use the undefined units J_per_MK / C_per_M (known issue); fix:
+    define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix applied to a copy of
+    the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and
+    the parameters file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have
+    compatible units''). Fix: declare Vm as volt in the config and parameters file. Also V_half is exposed in the config but
+    has no interface in the CellML (fix: public_interface=''out''). Also R and F use the undefined units J_per_MK / C_per_M
+    (known issue); fix: define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix
+    applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters
+    file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. Also V_half is exposed in the config but has no interface in
+    the CellML (fix: public_interface=''out''). Also R and F use the undefined units J_per_MK / C_per_M (known issue); fix:
+    define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix applied to a copy of
+    the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and
+    the parameters file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have
+    compatible units''). Fix: declare Vm as volt in the config and parameters file. Also V_half is exposed in the config but
+    has no interface in the CellML (fix: public_interface=''out''). Also R and F use the undefined units J_per_MK / C_per_M
+    (known issue); fix: define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix
+    applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters
+    file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. Also V_half is exposed in the config but has no interface in
+    the CellML (fix: public_interface=''out''). Also R and F use the undefined units J_per_MK / C_per_M (known issue); fix:
+    define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix applied to a copy of
+    the library, all tests of this component pass.'
+reference_proposals:
+  Xr1_init:
+    reference: 'Paci2013; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Xr1_init = 0.00778547'
+    sourced: 'yes'
+    value: 0.00778547011240132
+  Vm:
+    reference: 'Paci2013; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Vm = -0.0743340 V; here the clamped voltage (units declared dimensionless but used as volts)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  L0:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      L0 = 0.025'
+    sourced: 'yes'
+    value: 0.025
+  Q:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Q = 2.3'
+    sourced: 'yes'
+    value: 2.3
+  R:
+    reference: Paci2013; gas constant as used in the authors' CellML (8.314472 J/(mol K), CODATA 2006)
+    sourced: 'yes'
+    value: 8.314472
+  T:
+    reference: Paci2013; temperature in the authors' CellML (310 K)
+    sourced: 'yes'
+    value: 310
+  F:
+    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+    sourced: 'yes'
+    value: 96485.3415
+  Cao:
+    reference: 'Paci2013; extracellular Ca in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cao = 1.8 mM (note: the Tao 2011 neuron currents share this global; Tao 2011 used its own bath
+      value)'
+    sourced: 'yes'
+    value: 1.8
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

@@ -1,0 +1,49 @@
+{
+  "module_type": "i_CaL_fCa_gate",
+  "version": "Paci2013_v01",
+  "sim_time": 0.02,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["fCa"],
+  "run_parameters": {"Vm": -0.08, "Cai": 0.0005},
+  "invariants": [
+    {
+      "description": "fCa matches the exact solution: frozen at fCa_init when Vm > -60 mV and fCa_inf > fCa (Paci 2013 constfCa = 0), else fCa_inf(Cai) + (fCa_init - fCa_inf) exp(-t/tau_fCa), tau_fCa = 2 ms; fCa_inf transcribed from the Paci 2013 CellML",
+      "expr": "np.max(np.abs(fCa - np.where((Vm > -0.06) & (((1/(1+(Cai/0.0006)**8) + 0.1/(1+np.exp((Cai-0.0009)/0.0001)) + 0.3/(1+np.exp((Cai-0.00075)/0.0008)))/1.3156) > fCa_init), fCa_init, ((1/(1+(Cai/0.0006)**8) + 0.1/(1+np.exp((Cai-0.0009)/0.0001)) + 0.3/(1+np.exp((Cai-0.00075)/0.0008)))/1.3156) + (fCa_init - ((1/(1+(Cai/0.0006)**8) + 0.1/(1+np.exp((Cai-0.0009)/0.0001)) + 0.3/(1+np.exp((Cai-0.00075)/0.0008)))/1.3156))*np.exp(-t/0.002)))) <= 1e-5"
+    },
+    {"description": "fCa stays in [0, 1]", "expr": "np.all((fCa >= -1e-9) & (fCa <= 1 + 1e-9))"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 7},
+      "Cai": {"min": 1e-05, "max": 0.002, "points": 5, "scale": "log"},
+      "fCa_init": {"min": 0.0, "max": 1.0, "points": 5}
+    },
+    "rationale": "Vm -100 to +50 mV (both sides of the -60 mV freeze threshold); Cai from diastolic (1e-5 mM) to high systolic (2e-3 mM), covering the fCa_inf transition around 0.6-0.9 uM; fCa_init over [0, 1]."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0004, 0.0002, 0.0001, 5e-05],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "Ca-dependent inactivation is not measured in isolation; its effect is validated through the whole-cell Ca transient of an assembled Paci model, not this component."
+      },
+      "calibrate": {"note": "not_applicable: no free parameters (constants hard-coded in the CellML)."}
+    }
+  }
+}

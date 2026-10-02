@@ -1,0 +1,90 @@
+module_type: arterial
+version: vv_nonlinear_visco
+reviewed: false
+notes: 'vv vessel with a nonlinear tube law. Jacobian timescales (nominal: fastest 2.6e-07 s, slowest decay 0.0039 s; run:
+  fastest 0.0003 s, slowest decay 0.0036 s).'
+reference_proposals:
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.000153732
+      m^3/s (mean velocity x lumen area)
+    sourced: 'no'
+    value: 0.000153732
+  v_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.000153732
+      m^3/s (mean velocity x lumen area)
+    sourced: 'no'
+    value: 0.000153732
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  theta:
+    reference: 'definitional; inclination angle 0 deg, only used when beta_g = 1 (circulatory_autogen cvs_model_0d: defined_by_user)'
+    sourced: definitional
+  l:
+    reference: 'Safaei2018; ADAN-86 arterial geometry/material (Safaei et al. build a 218-segment network from ADAN-86 and
+      the ADAN cerebral vessels; E from Blanco2015). The vessel-level value 0.0153234 could not be checked: the ADAN data
+      are in supplementary material not accessible here'
+    sourced: 'no'
+    also_cites:
+    - Blanco2015
+  r_0:
+    reference: 'Safaei2018; ADAN-86 arterial geometry/material (Safaei et al. build a 218-segment network from ADAN-86 and
+      the ADAN cerebral vessels; E from Blanco2015). The vessel-level value 0.015642 could not be checked: the ADAN data are
+      in supplementary material not accessible here'
+    sourced: 'no'
+    also_cites:
+    - Blanco2015
+  u_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "assumedRefOf80mmHg" (value 10600)'
+    sourced: 'no'
+  K_tube:
+    reference: Olufsen2000; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
+      m^-1, k3 = 8.65e4 Pa (converted from g s^-2 cm^-1, cm^-1), r0 = 0.015642 m, rho = 1050 (vessel_properties material_prop_fromPWV
+      formula); normally supplied by a vessel_properties module
+    sourced: 'no'
+    value: 115333.0
+  m_tube:
+    reference: 'Boileau2015; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0 (circulatory_autogen
+      cvs_model_0d: known)'
+    sourced: 'yes'
+  n_tube:
+    reference: 'Boileau2015; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0 (circulatory_autogen
+      cvs_model_0d: known)'
+    sourced: 'yes'
+  I_scale:
+    reference: definitional; no scaling of the inertance
+    sourced: definitional
+  K_tube_visco:
+    reference: unreferenced_placeholder; K_visco = (2/3) Gamma h/(l pi r0^3) (vessel_properties formula) with Gamma = 0.1
+      x K_m, K_m = 3e4 Pa s, h from the a-d wall-thickness fit, r0 = 0.015642 m, l = 0.0153234 m; order of magnitude only
+    sourced: 'no'
+    value: 18904100.0
+  beta_g:
+    reference: definitional; gravity switch in beta_g rho g l cos(theta) (0 = off, as in the circulatory_autogen models; 1
+      = on). Library value 1 is a test_fft fixture value
+    sourced: definitional
+    value: 0.0
+  rho:
+    reference: Boileau2015; Table II, blood mass density 1050 kg m^-3 (Safaei2018 Sec. 2.2.4 uses 1040). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 1050.0
+    also_cites:
+    - Safaei2018
+  mu:
+    reference: Boileau2015; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also Safaei2018 Sec. 2.2.4). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 0.004
+    also_cites:
+    - Safaei2018
+  g:
+    reference: definitional; standard gravity 9.81 m s^-2 (library value 1 is a test_fft fixture value)
+    sourced: definitional
+    value: 9.81
+  R_flag:
+    reference: definitional; switch for the viscous (Poiseuille) resistance, 1 = on
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

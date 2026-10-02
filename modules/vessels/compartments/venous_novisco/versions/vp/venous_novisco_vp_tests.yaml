@@ -1,0 +1,43 @@
+module_type: venous_novisco
+version: vp
+reviewed: false
+notes: 'vp lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 1.2e-14 s, slowest decay 1 s; run: fastest 1.2e-14
+  s, slowest decay 1 s).'
+reference_proposals:
+  R:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 8572918.09858893)'
+    sourced: 'no'
+  C:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 1.21676662404483E-07)'
+    sourced: 'no'
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0
+      Pa (0 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 0.0
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+  I:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "small_chosen" (value 0.0000001)'
+    sourced: 'no'
+  q_C_init:
+    reference: 'definitional; zero initial/unstressed volume (circulatory_autogen cvs_model_0d: user_defined_TO_DO)'
+    sourced: definitional
+  q_us_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 0.0002968)'
+    sourced: 'no'
+  Delta_q_us:
+    reference: 'definitional; Delta_q_us = 0 (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  Delta_C:
+    reference: 'definitional; Delta_C = 0 (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

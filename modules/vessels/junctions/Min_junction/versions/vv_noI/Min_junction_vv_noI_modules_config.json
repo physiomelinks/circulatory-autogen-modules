@@ -1,0 +1,94 @@
+[
+  {
+    "module_type": "Min_junction",
+    "module_subtype": "vv_noI",
+    "module_format": "cellml",
+    "component_file": "Min_junction_vv_noI_modules.cellml",
+    "component_type": "vv_Min_noI_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in_sum",
+          "u"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u_d"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q_init",
+        "litre",
+        "access",
+        "constant"
+      ],
+      [
+        "q_0",
+        "litre",
+        "access",
+        "constant"
+      ],
+      [
+        "q",
+        "litre",
+        "access",
+        "variable"
+      ],
+      [
+        "u",
+        "kPa",
+        "access",
+        "variable"
+      ],
+      [
+        "u_d",
+        "kPa",
+        "access",
+        "variable"
+      ],
+      [
+        "u_0",
+        "kPa",
+        "access",
+        "constant"
+      ],
+      [
+        "C",
+        "L_per_kPa",
+        "access",
+        "constant"
+      ],
+      [
+        "v_in_sum",
+        "L_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "L_per_s",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

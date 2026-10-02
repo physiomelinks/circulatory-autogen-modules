@@ -1,0 +1,141 @@
+[
+  {
+    "module_type": "terminal",
+    "module_subtype": "pp_R1ICR2I",
+    "module_format": "cellml",
+    "component_file": "terminal_pp_R1ICR2I_modules.cellml",
+    "component_type": "pp_T_R1ICR2I_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_T",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_T"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u_C",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_T",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_T1",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "R_T2",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "C_T",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "I_T1",
+        "Js2_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "I_T2",
+        "Js2_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_us",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

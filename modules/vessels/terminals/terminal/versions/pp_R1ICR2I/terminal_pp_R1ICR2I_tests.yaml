@@ -1,0 +1,52 @@
+module_type: terminal
+version: pp_R1ICR2I
+reviewed: false
+notes: 'Terminal (Windkessel-type) module. Jacobian timescales (nominal: fastest 3.8e-05 s, slowest decay 0.049 s; run: fastest
+  3.8e-05 s, slowest decay 0.049 s).'
+reference_proposals:
+  R_T1:
+    reference: unreferenced_placeholder; proximal (characteristic) resistance ~5% of the terminal total
+    sourced: 'no'
+    value: 13000000.0
+  R_T2:
+    reference: unreferenced_placeholder; terminal resistance copied from terminal pp_wCont_no_local (2.6e8 Pa s m^-3 = 1.96
+      mmHg s/mL)
+    sourced: 'no'
+    value: 260870000.0
+  C_T:
+    reference: unreferenced_placeholder; terminal compliance copied from terminal pp_wCont_no_local (4e-9 m^3/Pa = 0.53 mL/mmHg)
+    sourced: 'no'
+    value: 4.0e-09
+  I_T1:
+    reference: unreferenced_placeholder; terminal inertance, small (I/R ~ 1e-4 s); order of magnitude only
+    sourced: 'no'
+    value: 10000.0
+  I_T2:
+    reference: unreferenced_placeholder; terminal inertance, small (I/R ~ 1e-4 s); order of magnitude only
+    sourced: 'no'
+    value: 10000.0
+  u_ext:
+    reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
+    sourced: definitional
+    value: 0.0
+  q_us:
+    reference: definitional; terminal unstressed volume 0 (only shifts q)
+    sourced: definitional
+    value: 0.0
+  q_init:
+    reference: definitional; start at the unstressed volume q_us
+    sourced: definitional
+    value: 0.0
+  u_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 13332.2
+      Pa (100 mmHg), typical inlet pressure for this vessel class
+    sourced: 'no'
+    value: 13332.2
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 666.61
+      Pa (5 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 666.61
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

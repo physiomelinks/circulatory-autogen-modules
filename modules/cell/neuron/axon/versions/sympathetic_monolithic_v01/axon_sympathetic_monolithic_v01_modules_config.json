@@ -1,0 +1,104 @@
+[
+  {
+    "module_type": "axon",
+    "module_subtype": "sympathetic_monolithic_v01",
+    "module_format": "cellml",
+    "component_file": "axon_sympathetic_monolithic_v01_modules.cellml",
+    "component_type": "SN_axon",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "VI_port",
+        "variables": [
+          "V_in",
+          "I"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "I",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "I_channels",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "channel_ratio",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C",
+        "picoF",
+        "access",
+        "variable"
+      ],
+      [
+        "R",
+        "megaOhm",
+        "access",
+        "variable"
+      ],
+      [
+        "c_m",
+        "uF_per_cm2",
+        "access",
+        "constant"
+      ],
+      [
+        "d_ax",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "L_ax",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "R_i",
+        "ohm_cm",
+        "access",
+        "constant"
+      ],
+      [
+        "V_in",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,25 @@
+module_type: SN_Ca_handling_soma
+version: nn
+reviewed: true
+description: 'Four-compartment Ca of the sympathetic-neuron soma: sub-membrane (Cai, fraction c_SL), bulk, pre-ER and ER.
+  Cai receives j_Ca_in, the summed Ca flux of the channels on the Ca_flux port; the ER loses j_ER_release (IP3R, RyR). Diffusion
+  links sub-membrane-bulk (D_Ca) and pre-ER-ER (D_Ca_ER); SERCA (Shannon 2004 form) and a leak move Ca between bulk and pre-ER
+  across the pre-ER membrane (area from its volume fraction). A fixed buffer binds Ca in each of the first three.'
+notes: 'Four-compartment Ca of the SN soma (sub-membrane Cai, bulk, pre-ER, ER) with a fixed (immobile) buffer in each of
+  the first three (no buffer exchange between compartments; Matveev 2002 fixed-buffer values), SERCA and a leak between bulk
+  and pre-ER, and diffusion. Cai receives j_Ca_in, the sum of the Ca fluxes of the channels connected through Ca_flux; the
+  ER loses j_ER_release (IP3R, RyR). Copied verbatim from SN_soma except for those two summed port variables. Split out of
+  the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
+  in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry (2026-10-02): Vol is an input
+  (compartment_volume port) from the membrane. The ER volumes are V_ER = c_ER Vol and V_ER_pre = c_ER_pre Vol, with membrane
+  areas A_ER = k_A_ER (V_ER/k_V_ER)^(2/3) and A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3) (shape factors; default a
+  sphere). SERCA and the Ca leak move Ca across the pre-ER membrane, so k_SERCA = A_ER_pre rho_SERCA r_SERCA / N_A and k_leak_Ca
+  = A_ER_pre rho_leak_Ca k_leak_Ca_single (1e-18 m3/um3); A_ER goes to IP3R and RyR (ER_membrane_area), whose release crosses
+  the ER membrane. The diffusion constants D_Ca, D_Ca_ER are unchanged. The defaults reproduce the previous k_SERCA and k_leak_Ca.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

@@ -1,0 +1,12 @@
+variable_name,units,value,data_reference,sourced
+E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+V_den_h_Kv1_5,milliV,3.5,SN_simple: Philipson1991-channelpedia,yes
+V_den_m_Kv1_5,milliV,6.4,SN_simple: Philipson1991-channelpedia,yes
+V_mid_h_Kv1_5,milliV,25.3,SN_simple: Philipson1991-channelpedia,yes
+V_mid_m_Kv1_5,milliV,6.0,SN_simple: Philipson1991-channelpedia,yes
+V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_Kv1_5,per_um2,2.508049120338983,definitional; chosen so that g_Kv1_5 = A rho gamma_Kv1_5 (1e-6 uS/pS) reproduces the previous g_Kv1_5 = 0.0887849 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv1_5 = 11.8 picoS; a density for calibration through gamma_Kv1_5,no
+gamma_Kv1_5,picoS,11.8,Kwan2006; Kv1.5 single-channel conductance 11.8 +- 0.6 pS at pH 7.4 (Abstract),yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

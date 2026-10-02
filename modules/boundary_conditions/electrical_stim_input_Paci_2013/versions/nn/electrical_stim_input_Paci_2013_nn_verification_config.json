@@ -1,0 +1,55 @@
+{
+  "module_type": "electrical_stim_input_Paci_2013",
+  "version": "nn",
+  "sim_time": 3.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": ["i_stim_period", "i_stim"],
+  "invariants": [
+    {
+      "description": "i_stim is the exact rectangular pulse train: stim_flag i_stim_amplitude/Cm while t_start <= t <= t_end and (t - t_start) mod period <= pulse_duration, else 0 (samples within 1e-9 s of an edge excluded)",
+      "expr": "(lambda N, i, t, s, e, P, d, a: N.all((N.abs(i - N.where((t >= s) & (t <= e) & (N.mod(t - s, P) <= d), a, 0.0)) <= 1e-9*max(abs(a), 1e-300)) | (N.minimum(N.mod(t - s, P), P - N.mod(t - s, P)) < 1e-9) | (N.abs(N.mod(t - s, P) - d) < 1e-9) | (N.abs(t - e) < 1e-9)))(np, i_stim, t, i_stim_start, i_stim_end, 1.0/i_stim_frequency, i_stim_pulse_duration, stim_flag*i_stim_amplitude/Cm)"
+    },
+    {
+      "description": "i_stim_period = 1/i_stim_frequency (Hz)",
+      "expr": "np.allclose(i_stim_period, 1.0/i_stim_frequency, rtol=1e-12, atol=0)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "stim_flag": {"min": 0, "max": 1, "points": 2},
+      "i_stim_start": {"min": 0.0, "max": 0.5, "points": 3},
+      "i_stim_end": {"min": 1.0, "max": 800.0, "points": 3},
+      "i_stim_frequency": {"min": 0.5, "max": 3.0, "points": 4},
+      "i_stim_pulse_duration": {"min": 0.001, "max": 0.01, "points": 4},
+      "i_stim_amplitude": {"min": 1e-10, "max": 2e-09, "points": 4, "scale": "log"},
+      "Cm": {"min": 5e-11, "max": 2e-10, "points": 4, "scale": "log"}
+    },
+    "rationale": "Pacing from 30 to 180 beats/min (0.33-2 s periods), pulses of 1-10 ms, amplitudes 0.1-2 nA and capacitances 50-200 pF bracket the Paci 2013 hiPSC-CM protocol (60 bpm, 5 ms, 0.55 nA, 98.7 pF). t_end = 1 s checks that pacing stops; stim_flag 0 checks the switch."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "prescribed stimulus waveform (an input, not a physiological response); verified against its exact analytic pulse train"
+      },
+      "calibrate": {
+        "note": "not_applicable: prescribed stimulus waveform (an input, not a physiological response); verified against its exact analytic pulse train"
+      }
+    }
+  }
+}

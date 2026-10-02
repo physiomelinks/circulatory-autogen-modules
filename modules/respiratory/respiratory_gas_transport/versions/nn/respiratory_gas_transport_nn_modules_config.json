@@ -1,0 +1,163 @@
+[
+  {
+    "module_type": "respiratory_gas_transport",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "respiratory_gas_transport_nn_modules.cellml",
+    "component_type": "respiratory_gas_transport_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "gas_volume_rate_and_partial_pressure_port",
+        "variables": [
+          "M_O2",
+          "M_CO2",
+          "P_O2_A",
+          "P_CO2_A"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "lung_flow_and_volume_port",
+        "variables": [
+          "v_ml",
+          "v_bA",
+          "q_D",
+          "q_A"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "F_O2_i",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "F_CO2_i",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "P_atm",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "P_ws",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "K_LOSSES",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "F_CO2_D_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "F_O2_D_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "F_CO2_A_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "F_O2_A_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "F_CO2_D",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "F_O2_D",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "F_CO2_A",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "F_O2_A",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "M_CO2",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "M_O2",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "P_CO2_A",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "P_O2_A",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v_ml",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_bA",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q_D",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q_A",
+        "m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

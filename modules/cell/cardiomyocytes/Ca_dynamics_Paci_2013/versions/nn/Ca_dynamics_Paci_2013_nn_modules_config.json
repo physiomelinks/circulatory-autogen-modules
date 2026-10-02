@@ -1,0 +1,250 @@
+[
+  {
+    "module_type": "Ca_dynamics_Paci_2013",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "Ca_dynamics_Paci_2013_nn_modules.cellml",
+    "component_type": "Ca_dynamics_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "CaL_current",
+        "variables": [
+          "i_CaL"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "internal_Ca_d_gate_port",
+        "variables": [
+          "Cai",
+          "d"
+        ]
+      },
+      {
+        "port_type": "CaL_current",
+        "variables": [
+          "i_CaL"
+        ]
+      },
+      {
+        "port_type": "PCa_current",
+        "variables": [
+          "i_PCa"
+        ]
+      },
+      {
+        "port_type": "b_Ca_current",
+        "variables": [
+          "i_b_Ca"
+        ]
+      },
+      {
+        "port_type": "NaCa_current",
+        "variables": [
+          "i_NaCa"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ca_SR_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Ca_SR",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "g_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "g",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_CaL",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_PCa",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_b_Ca",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaCa",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_up",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "i_rel",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "i_leak",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Vc",
+        "microm3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V_SR",
+        "microm3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Cm",
+        "farad",
+        "access",
+        "global_constant"
+      ],
+      [
+        "a_rel",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "b_rel",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "c_rel",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_g",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "Kup",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Buf_C",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Buf_SR",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Kbuf_C",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Kbuf_SR",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "VmaxUp",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "V_leak",
+        "per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,72 @@
+{
+  "module_type": "material_prop_visco_fromPWV",
+  "version": "nn",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["K_tube", "K_tube_visco", "c0", "Gamma"],
+  "invariants": [
+    {
+      "description": "Olufsen wave speed c0 = sqrt(2/(3ρ) (k1 e^{k2 r0} + k3)) (relative 1e-9)",
+      "expr": "np.max(np.abs((c0) - ((2.0/(3.0*rho)*(k_1*np.exp(k_2*r_0) + k_3))**0.5))) <= 1e-9*np.max(np.abs((2.0/(3.0*rho)*(k_1*np.exp(k_2*r_0) + k_3))**0.5))"
+    },
+    {
+      "description": "K_tube = ρ c0² / (m − n), i.e. the tube law reproduces the wave speed c0 at A = A0 (relative 1e-9)",
+      "expr": "np.max(np.abs((K_tube) - (rho*c0**2/(m_tube - n_tube)))) <= 1e-9*np.max(np.abs(rho*c0**2/(m_tube - n_tube)))"
+    },
+    {
+      "description": "at the run point the arterial wave speed is physiological, 3-15 m/s",
+      "expr": "(c0[0] >= 3) & (c0[0] <= 15)",
+      "applies": "run"
+    },
+    {
+      "description": "wall viscosity Γ = SMvolfrac_art · K_m (relative 1e-12)",
+      "expr": "np.max(np.abs((Gamma) - (SMvolfrac_art*K_m))) <= 1e-12*np.max(np.abs(SMvolfrac_art*K_m))"
+    },
+    {
+      "description": "lumped visco-elastic coefficient K_tube_visco = (2/3) Γ h / (l π r0³) (the 0D form of the Kelvin-Voigt term, Alastruey2011 Eq. 4) (relative 1e-9)",
+      "expr": "np.max(np.abs((K_tube_visco) - ((2.0/3.0)*Gamma*(r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0)))/(l*np.pi*r_0**3)))) <= 1e-9*np.max(np.abs((2.0/3.0)*Gamma*(r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0)))/(l*np.pi*r_0**3)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "r_0": {"min": 0.001, "max": 0.016, "points": 5, "scale": "log"},
+      "l": {"min": 0.005, "max": 0.2, "points": 4, "scale": "log"},
+      "K_m": {"min": 1000.0, "max": 100000.0, "points": 3, "scale": "log"},
+      "SMvolfrac_art": [0.05, 0.55],
+      "k_1": {"min": 100000.0, "max": 3000000.0, "points": 4, "scale": "log"},
+      "k_2": [-2500.0, -500.0],
+      "k_3": [20000.0, 100000.0],
+      "rho": [1040.0, 1060.0],
+      "m_tube": [0.25, 1.0],
+      "n_tube": [-0.5, 0.0]
+    },
+    "rationale": "Arterial radii 1-16 mm (small arteries to the aorta, ADAN range) and lengths 0.5-20 cm; E 0.05-2 MPa (identified value to above the ADAN elastin/large-artery range); nu 0.3-0.5; wall viscosity K_M 1e3-1e5 Pa s around Toro2022/Muller2023 (3-3.6e4) and smooth-muscle fractions 0.05-0.55 (Muller2023 weights 0.10-0.55); Olufsen-type k1 1e5-3e6 Pa, k2 -2500..-500 m^-1, k3 2e4-1e5 Pa spanning the Toro2022 and Olufsen2000 sets; rho 1040-1060 kg/m^3; tube-law exponents around m = 0.5, n = 0. The Avolio/Blanco thickness-fit coefficients are swept by factors 0.5-2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 0.1,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: compare the implied wave speed c0 = sqrt(K_tube (m - n)/rho) with measured pulse wave velocities of named arteries vs radius (e.g. the Charlton2019 in-silico/in-vivo PWV database or Avolio1980 segment data); needs a network-level geometry table, not set up."
+      },
+      "calibrate": {
+        "note": "not_applicable: algebraic constitutive relation with no dynamics; parameters are calibrated in the vessel network that uses it."
+      }
+    }
+  }
+}

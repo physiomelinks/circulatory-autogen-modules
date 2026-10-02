@@ -1,0 +1,10 @@
+module_type: FV1D_volume_sum
+version: nn
+reviewed: true
+notes: Placeholder that receives the total volume q_sum of a 1D (C++ finite-volume) model; the volume_port has no variables
+  in the config, so it cannot be connected from CellML and has no equations. Alone it only holds q_sum.
+known_issues:
+- 'FV1D_volume_sum: its volume_ports list no variables, so it can''t be connected from CellML and only holds q_sum.'
+expected_failures:
+  cuflynx_simulate_test: placeholder with no equations (it only holds q_sum for a C++ 1D model), so CUFLynx has nothing to
+    simulate and returns no outputs

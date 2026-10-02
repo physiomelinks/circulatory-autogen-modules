@@ -1,0 +1,92 @@
+[
+  {
+    "module_type": "afferent_to_vagal_efferent",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "afferent_to_vagal_efferent_nn_modules.cellml",
+    "component_type": "afferent_to_vagal_efferent_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "baroreceptor_firing_rate_port",
+        "variables": [
+          "f_ab"
+        ]
+      },
+      {
+        "port_type": "chemoreceptor_firing_rate_port",
+        "variables": [
+          "f_apc"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vagal_efferent_firing_rate_port",
+        "variables": [
+          "f_v"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "W_cv",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_ev_0",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_ev_inf",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_ab_0",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "theta_v",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "k_ev",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_apc",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_ab",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_v",
+        "per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

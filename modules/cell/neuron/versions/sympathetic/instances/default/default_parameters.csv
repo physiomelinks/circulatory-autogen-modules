@@ -1,0 +1,10 @@
+variable_name,units,value,data_reference,sourced
+R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
+channel_ratio_axon,dimensionless,0.5,user_defined,no
+c_m_axon,uF_per_cm2,1.0,"Gentet2000; specific membrane capacitance 0.9 uF/cm^2 measured directly in nucleated patches of cortical pyramidal, spinal cord and hippocampal neurons (Abstract); 1 uF/cm^2 (0.01 pF/um^2) is the conventional value used here",yes
+d_ax_axon,um,1.0,"definitional; axon diameter 1 um, within the 0.3-1.5 um range of unmyelinated postganglionic sympathetic axons; with L_ax and R_i chosen to reproduce the previous C and R",no
+L_ax_axon,um,318.3098861837907,definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um,no
+R_i_axon,ohm_cm,74.02203300817018,definitional; axial (cytoplasmic) resistivity chosen so that R = 4 R_i L_ax/(pi d_ax^2) reproduces the previous R = 300 MOhm (SN_simple to_be_determined R = 300 MOhm): R_i = 74.02 ohm cm (typical axoplasm 70-200 ohm cm),no
+V_rest_approx_axon,milliV,-70,user_defined,no

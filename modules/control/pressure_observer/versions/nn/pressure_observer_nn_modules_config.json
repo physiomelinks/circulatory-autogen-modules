@@ -1,0 +1,38 @@
+[
+  {
+    "module_type": "pressure_observer",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "pressure_observer_nn_modules.cellml",
+    "component_type": "p_observer_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "pressure_feedback_port",
+        "variables": [
+          "u"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "pressure_feed_port",
+        "variables": [
+          "u"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "no_access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,60 @@
+comment: 'Four of the eight components do not generate: material_prop_visco_fromPWV, _visco_const_ven and _visco_fromPWV_ven
+  use h in K_tube_visco without defining it, and the two fromPWV_ven components reference r_min/r_max while declaring r0_min/r0_max.
+  The arterial E (108 kPa) is a calibrated value with no source, the "Avolio_1980" h(r0) fit is really Blanco et al.s fit
+  to Avolios data, and the venous bending-stiffness law (E (h/r)^3/(12(1-nu^2)) with h/r = 0.05) gives K ~ 15 Pa, two orders
+  softer than the c0-based venous K. The fromPWV k1-k3 (Olufsen) are TODO; Toro2022 and Olufsen2000 give different sets.'
+summary: 'Algebraic wall-property components that supply a vessels tube-law stiffness K_tube (and, for the visco variants,
+  a lumped visco-elastic coefficient K_tube_visco): from a Young modulus (arterial thin-wall E h/((1-nu^2) r0) with the Avolio/Blanco
+  h(r0) fit; venous bending law) or from a wave speed (Olufsen c0(r0) for arteries, Toro/Muller c0(r0) for veins, K = rho
+  c0^2/(m-n)). Each component is tested alone (r_0, l, hr_ratio are port inputs set as parameters) with exact invariants (every
+  equation reproduced to 1e-9) and physical bounds, swept over physiological ranges. The four well-formed components pass
+  every test; the four defective ones fail at generation and are recorded as expected failures with proposed fixes (a patched
+  copy passes everything). References proposed for all parameters, mainly Toro2022 (read directly), Muller2023, Alastruey2011,
+  Petrova2025.'
+questions:
+- 'Approve the CellML fixes for the four non-generating components (see proposed_fixes)? In particular: should h in the venous
+  visco components be hr_ratio * r_0 (requires adding hr_ratio to material_prop_visco_fromPWV_ven)?'
+- 'a..d_vessel: currently "Avolio_1980". The fit h/r0 = a e^{b r0} + c e^{d r0} is printed in Muller2023 Eq. (43) (and Blanco2015),
+  fitted to Avolio1980 data; Avolio1980 itself was not readable. Cite Muller2023 (proposed) / Blanco2015?'
+- 'E (material_prop_visco_const = 108067.6 Pa, "07_02_2026_identified") and the TODO E of material_prop_const (proposed the
+  same value): no literature source. ADAN uses an elastin modulus 0.4 MPa (0.34 MPa after the large-artery weight, Muller2023).
+  Keep the identified value (sourced no)?'
+- 'k_1, k_2, k_3 (TODO): proposed the Toro2022 Eq. (84) set (3e5 Pa, -700 m^-1, 4e4 Pa; c0 = 5.0 m/s at the aortic root) rather
+  than Olufsen2000 (2e6 Pa, -2253 m^-1, 8.65e4 Pa, read only via Duanmu 2019; c0 = 7.4 m/s). Which set do you want?'
+- 'Venous E (TODO): proposed 1.15 MPa (Petrova2025, human great saphenous vein, circumferential initial modulus). With hr_ratio
+  = 0.05 (Toro2022) the bending law gives K_tube ~ 15 Pa, while K = rho c0^2/(m-n) with c0 = 1.5-4 m/s gives ~200-1500 Pa.
+  Which venous stiffness model/values should the library default to?'
+- 'c0_max/c0_min/r0_max/r0_min (TODO): proposed Toro2022 Eq. (85) values 4.0 / 1.5 m/s and 8 / 0.8 mm (after Muller2014).
+  Note the law gives NaN for r_0 outside [r0_min, r0_max]; clamp it?'
+- 'SMvolfrac_ven and venous K_m (TODO): proposed Toro2022 (8%, 5e3 Pa s). K_m (arterial, 3e4 Pa s) and SMvolfrac_art (0.1)
+  confirmed in Toro2022 (published 2021 online, hence "Toro_2021").'
+- 'rho (TODO): proposed 1050 kg/m^3 (Trudnowski1974, 1050.6 at 37 C; also Alastruey2011). Toro2022 uses 1060. OK?'
+- 'r_0 / l test values: the ADAN-86 ascending-aorta numbers (0.015642, 0.0153234 m) cannot be checked in the published papers
+  (Safaei2016/Blanco2015 give no per-vessel table). They are only test values (supplied by the connected vessel); proposed
+  as circulatory_autogen test values, sourced no.'
+- 'Validation: pending. A candidate is comparing the implied c0 with measured PWV vs radius (Charlton2019 database, Avolio1980
+  segment data), which needs a geometry table. Worth setting up at module level, or leave to the network models?'
+proposed_fixes:
+- 'material_prop_visco_fromPWV_type: declare h (out, metre) and compute it like material_prop_visco_const (h = r_0 (a_vessel
+  e^{b_vessel r_0} + c_vessel e^{d_vessel r_0})), adding a_vessel..d_vessel as inputs in the CellML and as global_constant
+  variables in the config.'
+- 'material_prop_visco_const_ven_type: declare h (out, metre) with h = hr_ratio * r_0.'
+- 'material_prop_fromPWV_ven_type and material_prop_visco_fromPWV_ven_type: rename <ci>r_min</ci>/<ci>r_max</ci> in the c0
+  equation to r0_min/r0_max (the declared variables).'
+- 'material_prop_visco_fromPWV_ven_type: also declare h = hr_ratio * r_0, adding hr_ratio (dimensionless, boundary_condition)
+  to the CellML and config.'
+- 'Evidence: a patched copy of the library with exactly these changes generates and passes run, invariant, sweep (31-66 runs
+  each) and stability tests for all four components.'
+findings:
+- Structure tests pass even though four components reference undeclared variables; the error only appears at generation (libcellml
+  MATH_CI_VARIABLE_REFERENCE). A structure check that validates each components MathML identifiers against its declared variables
+  would catch this earlier.
+- All components are algebraic (no states), so the timestep test is skipped and sim_time is 0.1 s.
+- The fromPWV_ven c0 law is only defined for r0_min <= r_0 <= r0_max; the sweep keeps r_0 in 0.8-8 mm and r0_max >= 6 mm >
+  r_0.
+- Gamma is the wall viscosity (phi in Alastruey2011, gamma in Toro2022), not their Gamma; K_tube_visco = (2/3) Gamma h/(l
+  pi r0^3) is the linearised volume-rate form of the Kelvin-Voigt term Gamma_A/(A0 sqrt(A)) dA/dt with Gamma_A = (2/3) sqrt(pi)
+  phi h, which checks out.
+- 'Risk (512 samples) for the four generating components: material_prop_const and _visco_const P(fail) = 0.006 (3 samples:
+  the h/r0 < 0.5 thin-wall bound fails when the thickness-fit coefficients a, c are both near 2x nominal at small r_0); fromPWV
+  and const_ven 0. Not run for the four non-generating components (every sample would fail at generation).'

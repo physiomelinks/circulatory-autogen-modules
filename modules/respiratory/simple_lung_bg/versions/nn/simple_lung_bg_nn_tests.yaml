@@ -1,0 +1,96 @@
+module_type: simple_lung_bg
+version: nn
+reviewed: false
+notes: 'Respiratory mechanics after Albanese et al. (2016) / Rideout-Fukui: series larynx (extrathoracic), trachea, bronchi
+  and alveoli, each a linear compliance with a resistance to the next, the intrathoracic ones referenced to pleural pressure.
+  Differences from Albanese: the chest wall is a pleural compliance C_pl charged through a resistance R_plwall from the muscle
+  pressure generator P_mus (Albanese: P_pl follows P_mus through C_cw directly), and alpha_LR scales all airway resistances.
+  P_mus is the Albanese parabolic/exponential profile (eq. 2-6) offset to P_plEE, with breathing rate and amplitude adjustable
+  by controller inputs Delta_RR_resp / Delta_P_mus. Initial volumes are hard-coded in the CellML (q_l = 10 L, q_t = q_b =
+  1 L), giving a violent ~50 ms start-up transient.'
+reference_proposals:
+  flag_P_mus_control:
+    reference: 'definitional; switch: 1 = muscle-pressure amplitude follows the controller input Delta_P_mus'
+    sourced: definitional
+  flag_RR_control:
+    reference: 'definitional; switch: 1 = rate follows the controller input Delta_RR_resp'
+    sourced: definitional
+  P_mus_min:
+    reference: 'Albanese2014; P_mus,min = -5 cmH2O relative to baseline (Table 2-5, [MODEL], tuned for VT ~ 500 ml); here
+      absolute: P_plEE - 490 Pa = -980 Pa'
+    sourced: 'yes'
+  P_plEE:
+    reference: Albanese2014; P_pl,EE = -5 cmH2O = -490 Pa (Table 2-5, citing West2008)
+    sourced: 'yes'
+  q_D_min:
+    reference: unreferenced_placeholder; numerical floor on dead-space volume (10 ml)
+    sourced: 'no'
+  q_l_us:
+    reference: Albanese2014; V_u,l = 34.4 ml (Table 2-5, from Fukui1972) = 3.44e-5 m3
+    sourced: 'yes'
+  q_t_us:
+    reference: Albanese2014; V_u,t = 6.63 ml (Table 2-5, from Fukui1972) = 6.63e-6 m3
+    sourced: 'yes'
+  q_b_us:
+    reference: Albanese2014; V_u,b = 18.7 ml (Table 2-5, from Rideout1991/Fukui1972) = 1.87e-5 m3
+    sourced: 'yes'
+  q_A_us:
+    reference: Albanese2014; V_u,A = 1.263 L (Table 2-5, set so FRC = 2.4 L) = 1.263e-3 m3. LIBRARY VALUE 1.26e-6 m3 IS 1000x
+      TOO SMALL (ml/L slip) -- see proposed fix
+    sourced: 'yes'
+  R_ml:
+    reference: Albanese2014; R_ml = 1.021 cmH2O s/L (Table 2-5, from Rideout1991) = 1.001e5 Pa s/m3 (1 cmH2O s/L = 9.807e4
+      Pa s/m3). Library 2.5e5 is 2.5x larger; the reason for the change is not recorded
+    sourced: 'yes'
+  R_lt:
+    reference: Albanese2014; R_lt = 0.3369 cmH2O s/L = 3.304e4 Pa s/m3. Library 8.5e4 (2.6x)
+    sourced: 'yes'
+  R_tb:
+    reference: Albanese2014; R_tb = 0.3063 cmH2O s/L = 3.004e4 Pa s/m3. Library 8.0e4 (2.7x)
+    sourced: 'yes'
+  R_bA:
+    reference: Albanese2014; R_bA = 0.0817 cmH2O s/L = 8.01e3 Pa s/m3. Library 2.2e4 (2.7x)
+    sourced: 'yes'
+  R_plwall:
+    reference: unreferenced_placeholder; chest-wall resistance is not in Albanese (chest-wall viscous resistance neglected
+      there); library 1e4 Pa s/m3
+    sourced: 'no'
+  alpha_LR:
+    reference: definitional; airway-resistance multiplier, 1 = nominal
+    sourced: definitional
+  C_l:
+    reference: Albanese2014; C_l = 0.00127 L/cmH2O (Table 2-5, from Fukui1972) = 1.295e-8 m6/J (1 L/cmH2O = 1.0197e-5 m6/J)
+    sourced: 'yes'
+  C_t:
+    reference: Albanese2014; C_t = 0.00238 L/cmH2O (Table 2-5, from Fukui1972) = 2.427e-8 m6/J
+    sourced: 'yes'
+  C_b:
+    reference: Albanese2014; C_b = 0.0131 L/cmH2O (Table 2-5, from Fukui1972) = 1.336e-7 m6/J. LIBRARY 1.34e-6 IS 10x LARGER
+      (not noted in the csv)
+    sourced: 'yes'
+  C_A:
+    reference: Albanese2014; C_A = 0.2 L/cmH2O (Table 2-5, from Fukui1972) = 2.04e-6 m6/J. Library 2.04e-5 (10x, "to get ~3
+      L") -- with q_A_us 1000x small this gives an end-expiratory lung volume of ~14 L
+    sourced: 'yes'
+  C_pl:
+    reference: Albanese2014; chest-wall compliance C_cw = 0.2445 L/cmH2O (Table 2-5, citing van Meurs) = 2.49e-6 m6/J; library
+      2.5e-6 matches
+    sourced: 'yes'
+  T_resp:
+    reference: Albanese2014; RR = 12 breaths/min (Table 2-5) -> T = 5 s
+    sourced: 'yes'
+  Delta_RR_resp:
+    reference: definitional; controller input, 0 = no respiratory-rate change
+    sourced: definitional
+  Delta_P_mus:
+    reference: definitional; controller input, 0 = no effort change
+    sourced: definitional
+  IE_ratio:
+    reference: Albanese2014; IE_ratio = 0.6 (Table 2-5, [MODEL])
+    sourced: 'yes'
+  P_m:
+    reference: definitional; mouth (airway opening) pressure = atmospheric = 0 gauge
+    sourced: definitional
+review: reviews/lung_review.yaml
+review_scope: The review of the whole lung module (3 entries) before the move to versions; only the parts about this version
+  apply.

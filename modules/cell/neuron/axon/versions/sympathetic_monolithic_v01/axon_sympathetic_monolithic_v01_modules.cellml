@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="axon_sympathetic_monolithic_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="SN_axon">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="C" public_interface="out" units="picoF"/>
+        <variable name="R" public_interface="out" units="megaOhm"/>
+        <variable name="c_m" public_interface="in" units="uF_per_cm2"/>
+        <variable name="d_ax" public_interface="in" units="um"/>
+        <variable name="L_ax" public_interface="in" units="um"/>
+        <variable name="R_i" public_interface="in" units="ohm_cm"/>
+        <variable name="V_in" public_interface="in" units="milliV"/>
+        <variable name="I" public_interface="out" units="nanoA"/>
+        <variable name="V_rest_approx" public_interface="in" units="milliV"/>
+        <variable initial_value="V_rest_approx" name="V" public_interface="out" units="milliV"/>
+        <variable name="channel_ratio" public_interface="in" units="dimensionless"/>
+        <variable name="I_channels" public_interface="out" units="nanoA"/>
+        <!-- simple approximation of the extra input current that comes from ion channels in the axon membrane.
+ channel_ratio should be a small value. it potentiates the current in the axon due to ion channel currents.
+ Simple approximation.-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>I</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>V_in</ci>
+                        <ci>V</ci>
+                    </apply>
+                    <ci>R</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>I_channels</ci>
+                <apply>
+                    <times/>
+                    <ci>I</ci>
+                    <ci>channel_ratio</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>V</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
+                        <apply>
+                            <plus/>
+                            <ci>I</ci>
+                            <ci>I_channels</ci>
+                        </apply>
+                    </apply>
+                    <ci>C</ci>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>C</ci><apply><times/><ci>c_m</ci><pi/><ci>d_ax</ci><ci>L_ax</ci><cn cellml:units="picoF_cm2_per_uF_um2">0.01</cn></apply></apply>
+            <apply><eq/><ci>R</ci><apply><divide/><apply><times/><cn cellml:units="dimensionless">4.0</cn><ci>R_i</ci><ci>L_ax</ci><cn cellml:units="megaOhm_um_per_ohm_cm">0.01</cn></apply><apply><times/><pi/><apply><power/><ci>d_ax</ci><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply></apply>
+        </math>
+    </component>
+</model>

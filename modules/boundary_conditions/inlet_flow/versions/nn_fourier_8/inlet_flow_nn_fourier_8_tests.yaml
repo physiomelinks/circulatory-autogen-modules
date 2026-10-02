@@ -1,0 +1,82 @@
+module_type: inlet_flow
+version: nn_fourier_8
+reviewed: false
+notes: 'Periodic inflow from an 8-harmonic Fourier series v(t) = Σ_{i=0..8} A_i cos(2π i t/T + φ_i), T the (global) heart
+  period. Tested feeding a BG arterial_simple vp vessel into a constant outlet pressure. The library values (A_0 = 1e-4, A_1
+  = 1e-3, A_4 = 1e-4 m^3/s) are test values: A_1 = 1e-3 gives a peak inflow of ~1.1e-3 m^3/s and a large reverse flow (−9e-4
+  m^3/s), which is not an aortic waveform.'
+reference_proposals:
+  A_0:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_1:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_2:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_3:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_4:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_5:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_6:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_7:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  A_8:
+    reference: unreferenced_placeholder; test waveform coefficient (test_fft example); no published Fourier coefficient set
+      found
+    sourced: 'no'
+  phi_0:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_1:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_2:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_3:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_4:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_5:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_6:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_7:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  phi_8:
+    reference: unreferenced_placeholder; test waveform phase (test_fft example)
+    sourced: 'no'
+  P:
+    reference: definitional; the pressure P is supplied by the connected vessel through the port; the parameter value is only
+      used when unconnected
+    sourced: definitional
+  T:
+    reference: unreferenced_placeholder; heart period 1 s (60 bpm), labelled biobeat_measurement in circulatory_autogen; the
+      measurement is not available. Klabunde2021 uses 70 bpm (T = 0.857 s) as a resting value
+    sourced: 'no'
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

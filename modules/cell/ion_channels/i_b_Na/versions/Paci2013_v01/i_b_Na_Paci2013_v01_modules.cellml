@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_b_Na_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_b_Na_Paci_2013">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="i_b_Na" public_interface="out" units="A_per_F"/>
+        <variable name="g_b_Na" public_interface="in" units="S_per_F"/>
+        <variable name="E_Na" public_interface="in" units="volt"/>
+        <variable name="Vm" public_interface="in" units="volt"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_b_Na</ci>
+                <apply>
+                    <times/>
+                    <ci>g_b_Na</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Vm</ci>
+                        <ci>E_Na</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

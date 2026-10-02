@@ -1,0 +1,19 @@
+module_type: inlet_flow
+version: nn_adan
+reviewed: false
+notes: 'Prescribed periodic inflow: 21-harmonic Fourier series v = a0/2 + sum_k a_k cos(2 pi k t/T) + b_k sin(2 pi k t/T),
+  a fit of the Boileau2015 ADAN56 aortic-root inflow (checked here: max deviation from the benchmark data 3.9e-5 m3/s, ~7
+  % of the 5.7e-4 m3/s peak, mean 112.4 vs 112.9 mL/s). P (downstream pressure) is not used. No states.'
+reference_proposals:
+  P:
+    reference: unreferenced_placeholder; P is the pressure returned by the downstream vessel through the vessel port and does
+      not enter the flow equation; 13332 Pa (100 mmHg) only lets the component run alone
+    sourced: 'no'
+    value: 13332
+  T:
+    reference: Boileau2015; ADAN56 benchmark cardiac period 1.0 s (inflow data span 0-1 s). NB the aortic-bifurcation inflow
+      (nn_aorticbif) needs T = 1.1 s, the Boileau2015 iliac-bifurcation period, but T is one module-wide global
+    sourced: 'yes'
+review: reviews/open_loop_review.yaml
+review_scope: The review of the whole open_loop module (5 entries) before the move to versions; only the parts about this
+  version apply.

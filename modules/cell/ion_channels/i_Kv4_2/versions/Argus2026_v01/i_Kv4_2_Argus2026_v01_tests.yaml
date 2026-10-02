@@ -1,0 +1,53 @@
+module_type: i_Kv4_2
+version: Argus2026_v01
+reviewed: false
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Kv4.2 A-type K current
+  of the SN soma, i_Kv4_2 = g_Kv4_2 m^3 h (V - E_K) (Channelpedia Kv4.2 kinetics). Split out of the monolithic SN_soma / SN_varicosity
+  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
+  that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_Kv4_2
+  = A_mem rho_Kv4_2 gamma_Kv4_2 (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the
+  membrane through membrane_area; the defaults reproduce the previous g_Kv4_2.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+reference_proposals:
+  E_K:
+    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
+    sourced: 'no'
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  V_den_h_Kv4_2:
+    reference: 'Bekkers2000; via Channelpedia Kcnd2 model 40 (wikipage 16): slope 6.7 mV (= value)'
+    sourced: 'yes'
+  V_den_m_Kv4_2:
+    reference: 'Bekkers2000; via Channelpedia Kcnd2 model 40 (wikipage 16): slope 16.6 mV (= value)'
+    sourced: 'yes'
+  V_mid_h_Kv4_2:
+    reference: 'Bekkers2000; via Channelpedia Kcnd2 model 40 (wikipage 16): hInf = 1/(1+exp((v+81.6)/6.7)), V1/2 = -81.6 mV
+      (= value)'
+    sourced: 'yes'
+  V_mid_m_Kv4_2:
+    reference: 'Bekkers2000; via Channelpedia Kcnd2 model 40 (wikipage 16, 40.channelml): mInf = 1/(1+exp((v+18.8)/-16.6)),
+      V1/2 = -18.8 mV (= value)'
+    sourced: 'yes'
+  V_rest_approx:
+    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
+      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
+    sourced: 'yes'
+  tau_h_Kv4_2:
+    reference: 'Bekkers2000; via Channelpedia Kcnd2 model 40 (wikipage 16): hTau = 0.01 v + 6.7 ms, 5.7-7.2 ms over -100 to
+      +50 mV; 7 ms approximates it'
+    sourced: 'yes'
+  rho_Kv4_2:
+    reference: 'definitional; chosen so that g_Kv4_2 = A rho gamma_Kv4_2 (1e-6 uS/pS) reproduces the previous g_Kv4_2 = 0.1
+      microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv4_2 = 7.5 picoS; a density for calibration
+      through gamma_Kv4_2. The previous g_Kv4_2 (as proposed in review): unreferenced_placeholder; owner''s hand-set value
+      in the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="cardiac_clock_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="cardiac_clock_type">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="T" units="second" public_interface="in"/>
+        <variable name="T_eff" units="second" public_interface="out"/>
+        <variable name="s" units="dimensionless" public_interface="out" initial_value="0.0"/>
+        <variable name="mt" units="dimensionless" public_interface="out"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>s</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <ci>T_eff</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>mt</ci>
+                <apply>
+                    <minus/>
+                    <ci>s</ci>
+                    <apply>
+                        <floor/>
+                        <ci>s</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>T_eff</ci>
+                <ci>T</ci>
+            </apply>
+        </math>
+    </component>
+</model>

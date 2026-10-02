@@ -1,0 +1,6 @@
+module_type: FitzHugh_Nagumo
+version: nn
+reviewed: true
+expected_failures:
+  cuflynx_instance_omex_test: 'The released CUFLynx''s libcuflynx predates held-out data in prediction_items (value, std,
+    obs_dt, data_type; circulatory_autogen #535) and rejects the obs_data. Passes once a CUFLynx release bundles it.'

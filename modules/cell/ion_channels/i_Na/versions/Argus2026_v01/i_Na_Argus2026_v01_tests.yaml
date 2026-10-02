@@ -1,0 +1,21 @@
+module_type: i_Na
+version: Argus2026_v01
+reviewed: true
+description: 'Fast (NaV1.7-like, Belluzzi-Sacchi / Tao 2011 kinetics, modified) Na current of the sympathetic-neuron soma:
+  i_Na = g_Na g_Na_mod m^3 h (V - E_Na), g_Na = A rho_Na gamma_Na; m and h relax to Boltzmann steady states with the owner''s
+  simplified time constants; its Na flux j_Na = -i_Na/F goes to the soma''s Na balance.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. Fast (NaV1.7-like) Na current of the SN soma, i_Na = g_Na g_Na_mod (V - E_Na) m^3 h, with its Na flux
+  j_Na = -i_Na/F into the Na pool. Gates start at their steady state at V_rest_approx. Split out of the monolithic SN_soma
+  / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat
+  checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance
+  is g_Na = A_mem rho_Na gamma_Na (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the
+  membrane through membrane_area; the defaults reproduce the previous g_Na.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

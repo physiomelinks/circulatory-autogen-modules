@@ -1,0 +1,111 @@
+[
+  {
+    "module_type": "afferent_to_sympathetic_efferent",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "afferent_to_sympathetic_efferent_nn_modules.cellml",
+    "component_type": "afferent_to_sympathetic_efferent_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "baroreceptor_firing_rate_port",
+        "variables": [
+          "f_ab"
+        ]
+      },
+      {
+        "port_type": "chemoreceptor_firing_rate_port",
+        "variables": [
+          "f_apc"
+        ]
+      },
+      {
+        "port_type": "TODO baroreceptor_firing_rate_port",
+        "variables": [
+          "f_ab"
+        ]
+      },
+      {
+        "port_type": "chemoreceptor_firing_rate_port",
+        "variables": [
+          "f_apc"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "sympathetic_efferent_firing_rate_port",
+        "variables": [
+          "f_s"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "sympathetic_efferent_heart_freq",
+        "variables": [
+          "f_s"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "W_bs",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "W_cs",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "f_es_0",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_es_inf",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_es_max",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "k_es",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_apc",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_ab",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_s",
+        "per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

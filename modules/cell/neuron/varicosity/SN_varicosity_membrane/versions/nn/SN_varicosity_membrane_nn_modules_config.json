@@ -1,0 +1,89 @@
+[
+  {
+    "module_type": "SN_varicosity_membrane",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "SN_varicosity_membrane_nn_modules.cellml",
+    "component_type": "SN_varicosity_membrane",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "compartment_volume",
+        "variables": [
+          "Vol"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_in",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "d",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "Vol",
+        "m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

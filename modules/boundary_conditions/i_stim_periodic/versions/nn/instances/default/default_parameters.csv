@@ -1,0 +1,7 @@
+variable_name,units,value,data_reference,sourced
+stim_flag,dimensionless,1,definitional; 1 enables the pulse train,yes
+t_start,second,0.0,Paci2013; same timing as the Paci stim_mode (i_stim_Start = 0 s),yes
+t_end,second,800.0,Paci2013; same timing as the Paci stim_mode (i_stim_End = 800 s),yes
+period,second,1.0,Paci2013; 1 s pacing period (60/i_stim_frequency with i_stim_frequency = 60),yes
+pulse_duration,second,0.005,Paci2013; i_stim_PulseDuration = 0.005 s,yes
+i_amplitude,nanoA,0.55,Paci2013; i_stim_Amplitude = 5.5e-10 A = 0.55 nA (hiPSC-CM scale; adult myocyte models typically need larger currents),yes

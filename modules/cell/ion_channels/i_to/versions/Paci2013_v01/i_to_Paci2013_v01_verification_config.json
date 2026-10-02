@@ -1,0 +1,51 @@
+{
+  "module_type": "i_to",
+  "version": "Paci2013_v01",
+  "sim_time": 0.01,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["i_to"],
+  "run_parameters": {"Vm": 0.02, "q": 0.8, "r": 0.5},
+  "invariants": [
+    {
+      "description": "i_to equals the Paci 2013 expression transcribed from the authors' CellML: transient outward current I_to = g_to (Vm - E_K) q r",
+      "expr": "np.max(np.abs(i_to - (g_to*(Vm - E_K)*q*r))) <= 1e-9*max(1.0, np.max(np.abs(g_to*(Vm - E_K)*q*r)))"
+    },
+    {"description": "i_to has the sign of (Vm - E_K)", "expr": "np.all(i_to*(Vm - E_K) >= 0)"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 6},
+      "E_K": {"min": -0.11880285397707481, "max": -0.05880285397707481, "points": 3},
+      "q": {"min": 0.0, "max": 1.0, "points": 5},
+      "r": {"min": 0.0, "max": 1.0, "points": 5}
+    },
+    "rationale": "Clamp inputs span the physiological operating range of a hiPSC-CM: Vm -100 to +50 mV, reversal potentials +/-30 mV about their resting values, gates over [0, 1], Cai 1e-5 to 1e-3 mM, Nai 5-20 mM, extracellular concentrations +/-50 %, T room to body temperature; drug switches 0/1; conductances by the default factors 0.5-2. R and F are physical constants (not swept)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the hiPSC-CM I-V / conductance data the current was fitted to (Ma et al. 2011, Am J Physiol Heart Circ Physiol 301:H2006, as used by Paci 2013) could be digitised and compared with the clamped steady-state current (gates at their steady state); needs the gate components composed with this one and owner approval of digitised data."
+      },
+      "calibrate": {
+        "note": "pending: the maximal conductance could be identified from the same I-V data once a baseline is agreed."
+      }
+    }
+  }
+}

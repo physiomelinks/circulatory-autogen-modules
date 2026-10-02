@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="Units" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <units name="m3">
+        <unit exponent="3" units="metre"/>
+    </units>
+    <units name="millimolar">
+        <unit prefix="milli" units="mole"/>
+        <unit exponent="-1" units="litre"/>
+    </units>
+    <units name="microm">
+        <unit prefix="micro" units="metre"/>
+    </units>
+    <units name="microm3">
+        <unit exponent="3" units="microm"/>
+    </units>
+    <units name="m3_per_microm3">
+        <unit units="m3"/>
+        <unit exponent="-1" units="microm3"/>
+    </units>
+    <units name="A_per_F">
+        <unit units="ampere"/>
+        <unit exponent="-1" units="farad"/>
+    </units>
+</model>

@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_to_q_gate_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_to_q_gate_Paci_2013">
+        <variable name="q_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="q_init" name="q" public_interface="out" units="dimensionless"/>
+        <variable name="q_inf" units="dimensionless"/>
+        <variable name="tau_q" units="second"/>
+        <variable name="Vm" public_interface="in" units="volt"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>q_inf</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <times/>
+                                        <ci>Vm</ci>
+                                        <cn cellml:units="milliV_per_V">1000</cn>
+                                    </apply>
+                                    <cn cellml:units="milliV">53</cn>
+                                </apply>
+                                <cn cellml:units="milliV">13</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_q</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="second">6.06</cn>
+                        <apply>
+                            <divide/>
+                            <cn cellml:units="second">39.102</cn>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.57</cn>
+                                    <apply>
+                                        <exp/>
+                                        <apply>
+                                            <times/>
+                                            <apply>
+                                                <minus/>
+                                                <cn cellml:units="per_milliV">0.08</cn>
+                                            </apply>
+                                            <apply>
+                                                <plus/>
+                                                <apply>
+                                                    <times/>
+                                                    <ci>Vm</ci>
+                                                    <cn cellml:units="milliV_per_V">1000</cn>
+                                                </apply>
+                                                <cn cellml:units="milliV">44</cn>
+                                            </apply>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.065</cn>
+                                    <apply>
+                                        <exp/>
+                                        <apply>
+                                            <times/>
+                                            <cn cellml:units="per_milliV">0.1</cn>
+                                            <apply>
+                                                <plus/>
+                                                <apply>
+                                                    <times/>
+                                                    <ci>Vm</ci>
+                                                    <cn cellml:units="milliV_per_V">1000</cn>
+                                                </apply>
+                                                <cn cellml:units="milliV">45.93</cn>
+                                            </apply>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">1000</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>q_inf</ci>
+                        <ci>q</ci>
+                    </apply>
+                    <ci>tau_q</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

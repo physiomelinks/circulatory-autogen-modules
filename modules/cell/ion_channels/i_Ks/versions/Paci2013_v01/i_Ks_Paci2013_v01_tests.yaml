@@ -1,0 +1,76 @@
+module_type: i_Ks
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM (ventricular-like) slow delayed rectifier I_Ks = Chromanol_coeff g_Ks (Vm - E_Ks) Xs^2 (1 + 0.6/(1
+  + (3.8e-5/Cai)^1.4)). Algebraic: all gates, concentrations and the membrane potential are inputs, so alone it is a pure
+  function of its inputs, checked exactly against the original model equations.'
+expected_failures:
+  run_test: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the original Paci encapsulation
+    hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    Also Chromanol_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''.
+    With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of
+    the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. Also Chromanol_coeff is exposed in the config but has no public interface in the CellML;
+    fix: public_interface=''out''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the original
+    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    Also Chromanol_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''.
+    With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the
+    original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. Also Chromanol_coeff is exposed in the config but has no public interface in the CellML;
+    fix: public_interface=''out''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the original
+    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    Also Chromanol_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''.
+    With the proposed fix applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  g_Ks:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      g_Ks = 2.041'
+    sourced: 'yes'
+    value: 2.041
+  Vm:
+    reference: 'Paci2013; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  E_Ks:
+    reference: 'definitional; Nernst potential of the Paci2013 electric_potentials at the CellML initial state (R=8.314472,
+      T=310, F=96485.3415, Nao=151, Ko=5.4, Ki=150, Cao=1.8 mM, Nai=10.9248, Cai=1.80774e-5 mM): E_Ks = -0.0725882 V'
+    sourced: definitional
+    value: -0.0725881638981798
+  Xs:
+    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Xs = 0.0322945'
+    sourced: 'yes'
+    value: 0.0322944866983666
+  Cai:
+    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cai = 1.80774e-05'
+    sourced: 'yes'
+    value: 1.80773974140477e-05
+  Chromanol_iKs30:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  Chromanol_iKs50:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  Chromanol_iKs70:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  Chromanol_iKs90:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

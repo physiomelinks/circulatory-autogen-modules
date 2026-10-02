@@ -1,0 +1,7 @@
+variable_name,units,value,data_reference,sourced
+E_Na,milliV,64.455574,"definitional; Nernst potential at SN_simple Nao 145, Nai_init 13 mM (used when unconnected)",no
+V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_leak_Na,per_um2,0.005,definitional; chosen so that g_leak_Na = A rho gamma_leak_Na (1e-6 uS/pS) reproduces the previous g_leak_Na = 0.0003 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_Na = 20 picoS; a density for calibration through gamma_leak_Na,no
+gamma_leak_Na,picoS,20.0,unreferenced_placeholder; no verified single-channel conductance for the Na leak channel NALCN (Lu et al. 2007 gives none in its abstract); 20 pS assumed,no
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

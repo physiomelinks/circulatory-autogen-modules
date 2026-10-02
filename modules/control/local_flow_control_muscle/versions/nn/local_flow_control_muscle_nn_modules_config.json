@@ -1,0 +1,117 @@
+[
+  {
+    "module_type": "local_flow_control_muscle",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "local_flow_control_muscle_nn_modules.cellml",
+    "component_type": "local_flow_control_muscle_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "O2_port",
+        "variables": [
+          "C_O2_p"
+        ]
+      },
+      {
+        "port_type": "partial_pressure_port",
+        "variables": [
+          "P_CO2_a",
+          "P_O2_a"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "resistance_multiplier_port",
+        "variables": [
+          "R_local_multiplier"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "P_CO2_a_nom",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "k_CO2_m",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "C_O2_vm_nom",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "tau_O2",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "tau_CO2",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "g_O2_m",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "x_O2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "x_CO2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "P_CO2_a",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "P_O2_a",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "phi_P_CO2_a",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "C_O2_p",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "R_local_multiplier",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

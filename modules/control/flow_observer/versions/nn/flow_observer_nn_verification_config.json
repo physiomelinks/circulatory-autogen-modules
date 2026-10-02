@@ -1,0 +1,77 @@
+{
+  "module_type": "flow_observer",
+  "version": "nn",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": ["art/u", "art/v", "art/q_C"],
+  "harness": {
+    "vessel_array": [
+      ["pressure_in", "nn_constant", "inlet_pressure", "", "art", "default"],
+      ["art", "pv", "arterial", "pressure_in", "flow_out mod", "default"],
+      ["flow_out", "nn_constant", "outlet_flow", "art", "", "default"],
+      ["mod", "nn", "flow_observer", "art", "", "default"]
+    ],
+    "parameters": [
+      ["P_pressure_in", "J_per_m3", 13000, "test value (harness): inlet pressure ~97.5 mmHg"],
+      ["v_flow_out", "m3_per_s", 5e-06, "test value (harness): constant outflow 5 mL/s"],
+      ["E_art", "J_per_m3", 400000, "BG arterial pv example value (FinalModel: ADAN_86)"],
+      ["l_art", "metre", 0.0432111, "BG arterial pv example value (FinalModel: ADAN_86)"],
+      ["r_0_art", "metre", 0.0117401, "BG arterial pv example value (FinalModel: ADAN_86)"],
+      ["u_0_art", "J_per_m3", 10640, "BG arterial pv example value (80 mmHg reference)"],
+      ["u_ext_art", "J_per_m3", 0, "test value (harness): no external pressure"],
+      ["theta_art", "dimensionless", 90, "test value (harness): horizontal vessel (no gravity term)"],
+      ["beta_g", "dimensionless", 1, "test value (harness): "],
+      ["rho", "Js2_per_m5", 1050, "test value (harness): blood density"],
+      ["mu", "Js_per_m3", 0.004, "test value (harness): blood viscosity"],
+      ["g", "m_per_s2", 9.81, "test value (harness): "],
+      [
+        "a_vessel",
+        "dimensionless",
+        0.2802,
+        "test value (harness): wall-thickness law constants (h/r0 = a e^{b r0} + c e^{d r0})"
+      ],
+      ["b_vessel", "per_m", -505.3, "test value (harness): "],
+      ["c_vessel", "dimensionless", 0.1324, "test value (harness): "],
+      ["d_vessel", "per_m", -11.14, "test value (harness): "]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "with the observer attached, the source vessel reaches its analytic steady state u = P_in - R v_out = 13000 - 23169.05 x 5e-6 Pa and v = v_out (observer does not load it)",
+      "expr": "(abs(art__u[-1] - 12999.884154745678) <= 1e-5*13000) & (abs(art__v[-1] - 5.0e-06) <= 1e-3*5.0e-06)"
+    },
+    {
+      "description": "source vessel volume balance: q_C(t) = integral of (v - v_out) dt (trapezoid, 1 % of swing)",
+      "expr": "np.max(np.abs(art__q_C - art__q_C[0] - np.concatenate([[0.0], np.cumsum(0.5*np.diff(t)*((art__v - 5.0e-06)[1:] + (art__v - 5.0e-06)[:-1]))]))) <= 1e-2*np.max(np.abs(art__q_C - art__q_C[0]))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {},
+    "rationale": "the observer has no parameters of its own; nothing to sweep (the test network's parameters are fixtures)"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0004, 0.0002, 0.0001, 5e-05],
+    "t_end": 0.2,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "signal pass-through with no equations or physiological counterpart"
+      },
+      "calibrate": {"note": "not_applicable: signal pass-through with no parameters"}
+    }
+  }
+}

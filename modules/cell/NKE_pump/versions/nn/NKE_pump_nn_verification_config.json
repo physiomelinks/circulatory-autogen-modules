@@ -1,0 +1,89 @@
+{
+  "module_type": "NKE_pump",
+  "version": "nn",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": [
+    "v_1",
+    "v_2",
+    "v_3",
+    "v_4",
+    "u_e",
+    "q_1",
+    "q_2",
+    "q_3",
+    "q_4",
+    "v_NKE",
+    "u_equil",
+    "Power_external",
+    "Power_dissipation"
+  ],
+  "invariants": [
+    {
+      "description": "total pump amount q_1+q_2+q_3+q_4 is conserved (relative drift < 1e-6)",
+      "expr": "np.ptp(q_1 + q_2 + q_3 + q_4) <= 1e-6 * np.max(q_1 + q_2 + q_3 + q_4)"
+    },
+    {
+      "description": "pump state amounts stay non-negative",
+      "expr": "np.all(np.array([q_1, q_2, q_3, q_4]) >= -1e-9 * np.max(q_1 + q_2 + q_3 + q_4))"
+    },
+    {
+      "description": "second law: every reaction dissipates, so Power_dissipation >= 0",
+      "expr": "np.all(Power_dissipation >= -1e-9 * max(1e-12, np.max(np.abs(Power_dissipation))))"
+    },
+    {
+      "description": "energy balance (exact identity): Power_external - Power_dissipation = sum_i u_i dq_i/dt with u_i = RT ln(K_i q_i), dq_1/dt = v_4 - v_1 etc.",
+      "expr": "np.max(np.abs(Power_external - Power_dissipation - 0.0025773*(np.log(K_1*q_1)*(v_4 - v_1) + np.log(K_2*q_2)*(v_1 - v_2) + np.log(K_3*q_3)*(v_2 - v_3) + np.log(K_4*q_4)*(v_3 - v_4)))) <= 1e-6 * max(1e-12, np.max(np.abs(Power_external)))"
+    },
+    {
+      "description": "cycle steady state at t_end: v_1 = v_2 = v_3 = v_4, so Na+ efflux (3 v_4) : K+ influx (2 v_1) = 3 : 2 and net charge 1 e per cycle (relative 1e-4)",
+      "expr": "max(abs(v_1[-1] - v_4[-1]), abs(v_2[-1] - v_4[-1]), abs(v_3[-1] - v_4[-1])) <= 1e-4 * max(abs(v_4[-1]), 1e-12)",
+      "applies": "run"
+    },
+    {
+      "description": "v_NKE equals the exact rapid-equilibrium (kappa_1, kappa_3 -> infinity) steady-state flux of the module's own reaction scheme (two-pool cycle q_1+q_2, q_3+q_4; relative 1e-6). Algebraic check, independent of the ODE solution.",
+      "applies": "run",
+      "expr": "(lambda N, vN, K1, K2, K3, K4, k2, k4, z1, ph, qt, QKo, QPi, QATP, QKi, QNai, QADP, QNao: (lambda r1, r3: (lambda bp, bm, gp, gm: N.max(N.abs(vN - qt*(bp*gp - bm*gm)/(bp + bm + gp + gm))) <= 1e-6*N.max(N.abs(qt*(bp*gp - bm*gm)/(bp + bm + gp + gm))))(k2*K2*QATP*r1/(1 + r1), k2*K3*QKi**2/(1 + r3), k4*K4*r3/(1 + r3), k4*K1*QNao**3*N.exp((-1 - z1)*ph)/(1 + r1)))(K1*QKo**2/(K2*QPi), K3*QNai**3/(K4*QADP*N.exp(z1*ph))))(np, v_NKE, K_1, K_2, K_3, K_4, kappa_2, kappa_4, z_1, 0.0964853321/0.0025773*u_e, q_1 + q_2 + q_3 + q_4, 0.009236*27.9828, 0.04565*0.038, 2.3715*380, 0.0012595*0.038, 0.00083514*1900, 7.976e-05*0.038, 0.0061242*777.3)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "K_1": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "K_2": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "K_3": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "K_4": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "kappa_2": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "kappa_4": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "z_1": {"min": -0.5, "max": 0.5, "points": 5},
+      "flag_0": {"min": 0, "max": 1, "points": 2}
+    },
+    "rationale": "K_1..K_4, kappa_2 and kappa_4 have no sourced values (all 1); a two-decade log range around 1 is swept as the claimed working region. z_1 spans -0.5..0.5, which covers both the current value 0.5 and the Pan et al. (2020) charge split (-0.055 on the intracellular Na+ binding step). flag_0 is a switch: 0 holds u_e at -0.12 V, 1 ramps it at 1 mV/s."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [1e-05, 5e-06, 2.5e-06, 1.25e-06],
+    "t_end": 0.005,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: steady-state Na/K pump current-voltage curves in guinea-pig ventricular myocytes (NakaoGadsby1989, J Gen Physiol 94:539; the data Terkildsen2007 and Pan2020 fitted). This needs sourced K/kappa values first (the current values are all 1) and pump current I = F v_4 per pump. It also needs u_e as a sweepable input: it is hard-coded through q_mem_init."
+      },
+      "calibrate": {
+        "note": "pending: as baseline: fit K_1..K_4, kappa_2, kappa_4, z_1 to the NakaoGadsby1989 I-V data (via Pan2020) once u_e and the ion amounts are exposed as parameters"
+      }
+    }
+  }
+}

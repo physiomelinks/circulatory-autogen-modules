@@ -1,0 +1,50 @@
+{
+  "module_type": "i_Kr_Xr2_gate",
+  "version": "Paci2013_v01",
+  "sim_time": 0.02,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["Xr2"],
+  "run_parameters": {"Vm": -0.02},
+  "invariants": [
+    {
+      "description": "Xr2 matches the exact voltage-clamp solution Xr2(t) = Xr2_inf(Vm) + (Xr2_init - Xr2_inf) exp(-t/tau_Xr2(Vm)), with Xr2_inf and tau_Xr2 transcribed from the Paci 2013 CellML (not from this module)",
+      "expr": "np.max(np.abs(Xr2 - ((1/(1+np.exp(((Vm*1000)+88)/50))) + (Xr2_init - (1/(1+np.exp(((Vm*1000)+88)/50))))*np.exp(-t/((3/(1+np.exp((-60-(Vm*1000))/20)))*(1.12/(1+np.exp((-60+(Vm*1000))/20)))/1000))))) <= 1e-5"
+    },
+    {"description": "Xr2 stays in [0, 1]", "expr": "np.all((Xr2 >= -1e-9) & (Xr2 <= 1 + 1e-9))"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 7},
+      "Xr2_init": {"min": 0.0, "max": 1.0, "points": 5}
+    },
+    "rationale": "Vm spans the physiological range of a cardiomyocyte action potential/clamp protocol (-100 to +50 mV); the initial gate value spans its whole range [0, 1]."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0002, 0.0001, 5e-05, 2.5e-05],
+    "t_end": 0.004,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the steady-state/time-constant curves of the Xr2 gate in Paci et al. 2013 (fitted to hiPSC-CM voltage-clamp data, Ma et al. 2011) could be digitised and compared with the clamp steady state; not set up (figure digitisation needs owner approval)."
+      },
+      "calibrate": {
+        "note": "not_applicable: gate kinetics have no free parameters in this module (all constants are hard-coded in the CellML), so there is nothing to identify."
+      }
+    }
+  }
+}

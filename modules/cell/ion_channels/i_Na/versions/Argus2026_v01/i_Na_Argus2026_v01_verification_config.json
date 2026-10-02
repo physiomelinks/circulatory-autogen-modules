@@ -1,0 +1,59 @@
+{
+  "module_type": "i_Na",
+  "version": "Argus2026_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["m", "h", "h_inf", "i_Na", "j_Na", "m_inf", "tau_h", "tau_m"],
+  "run_parameters": {"V": -20.0},
+  "invariants": [
+    {
+      "description": "the ion flux j_Na = -i_Na/F (mol/s; the current in nA, so the factor 1e-9)",
+      "expr": "np.max(np.abs(j_Na - 1e-9*(-i_Na/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Na)))"
+    },
+    {
+      "description": "every gating variable stays in [0, 1]",
+      "expr": "np.all((m >= -1e-9) & (m <= 1 + 1e-9)) & np.all((h >= -1e-9) & (h <= 1 + 1e-9))"
+    },
+    {
+      "description": "voltage step (V clamped at the run value, gates starting at rest V_rest_approx): m follows its exact clamp solution m_inf(V) + (m0 - m_inf) exp(-t/tau), tau = |tau_m(V)|/1000 + epsilon_tau (1e-6 s)",
+      "expr": "np.max(np.abs(m - ((1/(1 + np.exp(-(V + V_mid_m)/V_den_m))) + ((1/(1 + np.exp(-(V_rest_approx + V_mid_m)/V_den_m))) - (1/(1 + np.exp(-(V + V_mid_m)/V_den_m))))*np.exp(-t/(np.abs(0.06 + 0.8/(np.exp((V_mid_m + 10 + V)/10) + np.exp(-(V_mid_m + 10 + V)/20)))/1000 + 1e-6))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "h follows its exact clamp solution h_inf(V) + (h0 - h_inf) exp(-t/tau), tau = |tau_h(V)|/1000 + epsilon_tau",
+      "expr": "np.max(np.abs(h - ((1/(1 + np.exp((V + V_mid_h)/V_den_h))) + ((1/(1 + np.exp((V_rest_approx + V_mid_h)/V_den_h))) - (1/(1 + np.exp((V + V_mid_h)/V_den_h))))*np.exp(-t/(np.abs(tau_h_min + (tau_h_max - tau_h_min)/(1 + np.exp(-(V_mid_h + 10 + V)/14) + np.exp((V_mid_h - 20 + V)/2)))/1000 + 1e-6))))) <= 1e-6",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {}
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "module_type": "NActr_Gee2023",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "NActr_Gee2023_nn_modules.cellml",
+    "component_type": "NActr_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "NA_freq",
+        "variables": [
+          "f_NA"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "NActr_freq",
+        "variables": [
+          "f_NActr"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_NActr",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NA",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_min_NActr",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_NActr",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_NActr",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NActr",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

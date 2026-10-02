@@ -1,0 +1,72 @@
+comment: 'Three module defects stop 27 of the 48 entries from working as shipped. (1) pv_Minlet_type_micro and vp_Noutlet_type_micro
+  put initial_value="0.0" on an input (v_out_sum / v_in_sum), so generation fails; each is otherwise identical to pv_Nout
+  / vp_Min. (2) 14 arteriole/capillary/venule/vein pp/pv/vp/vv entries point at BG *_simple_type, which needs an inertance
+  I that the entry never declares (I = 0, division by zero). (3) every vv_*_micro type adds a stray "+ 2 {J_per_m3}" to u
+  and u_d. Every parameter was TODO: the proposed geometry comes from Boas2008 and the wall law from Watanabe2013, but the
+  wall law is fitted on arteries and is extrapolated to capillaries here. mu is a single global 0.004 Pa s, which is not the
+  apparent viscosity of microvessels. Volumes are about 1e-14 to 1e-19 m3, so the default solver atol is meaningless (see
+  findings).'
+summary: 'Microvascular network library, imported from libcuflynx; it supports the image-to-model tutorial (Argus, Ghitti,
+  Davis). It has 48 config entries: 0D segments for artery/arteriole/capillary/venule/vein with Poiseuille R = 8 mu l/(pi
+  r_0^4), thin-wall C = 2 pi r_0^3 l/(E h), h from an arterial wall-thickness fit, and no inertance, plus junction variants
+  (Minlet/Nout/Min/MinNout/Noutlet) and a constant-pressure outlet. Most entries run alone, because their boundary conditions
+  become parameters. With constant BCs each segment is linear first order, so the invariants are exact solutions (u(t) relaxing
+  with RC or RC/4), volume balance, Ohm law, the geometric identities for R, C, q_0, and for vv total-volume conservation.
+  I proposed references and values for all 370 parameters; the proposals are shared per vessel class. Results: all 21 working
+  entries pass run/BC/timestep/stability, and invariants too except the four vv types, which fail on the +2 Pa defect. The
+  24 broken entries are recorded as expected failures, with evidence from a patched copy: the 10 Minlet/Noutlet entries pass
+  everything once the stray initial_value is removed, and the 14 BG-type entries generate and run once I is declared. Validation:
+  one scalar target is proposed and fails as expected (capillary pp vs Williams1988, see questions); the other entries are
+  pending, with candidates listed.'
+questions:
+- 'References: confirm the proposed per-class values. Geometry: Boas2008 Table 1 (arteriole d 30.5 um x 100 um, capillary
+  8 x 250 um, venule 36.6 x 100 um). Small artery: Watanabe2013 perforator radius 180 um. Wall law: Watanabe2013 Eq. 3.1 (fit
+  to Avolio1980 data). E: artery from Olufsen1999 via Watanabe2013, arteriole from the Gao2015 pressure-strain modulus, capillary
+  from Salipante2022 (in vitro). u_0: Boas2008 60/25 mmHg and Williams1988 19.4 mmHg. Vein geometry/E/u_0, artery length/u_0
+  and venule E have no verified source (placeholders).'
+- The Watanabe2013 h/r fit is for arteries of r ~0.2-1.4 cm. At capillary radii it gives h/r ~0.41 (h ~1.6 um at r = 4 um).
+  Keep it for microvessels, or give arterioles/capillaries/venules their own wall law or a direct E h?
+- mu is one global constant (0.004 Pa s, a large-artery value). Apparent viscosity in microvessels is ~1.5-2.1 mPa s in vitro
+  (Pries1992 law) and ~4x higher than in a glass tube in vivo (Pries1994). Should mu become a per-vessel parameter (e.g. Pries
+  in-vivo law from r_0)?
+- The image-to-model tutorial that uses this library samples E from an unreferenced dict (artery 160 kPa, arteriole/capillary/venule
+  6.5 kPa, vein 210 kPa). Its pressure pre-solve uses MU = 3.5e-3 while the model uses mu = 4e-3, and it multiplies the radii
+  by 4 ("TODO radii are not being set correctly"). Should the library carry the proposed literature values instead, and is
+  u_0 meant to be the pre-solved steady pressure (the pressure at q_C = 0)?
+- 'The 14 entries arteriole/capillary/venule/vein x pp/pv/vp/vv_micro point at the BG types pp/pv/vp/vv_simple_type, which
+  have inertance and R_v = 0.01/C. Was that intended? Even with I declared they are extremely stiff (I/R ~1e-11 s for an arteriole),
+  and the matching _micro types without inertance exist. Proposed: repoint them (see proposed_fixes).'
+- 'Duplicates: pv_Minlet_type_micro = pv_Nout_type_micro and vp_Noutlet_type_micro = vp_Min_type_micro (apart from the defect).
+  artery_inlet/artery_outlet reuse pp/pv/vp_type_micro. Keep them, or remove them?'
+- You previously had your own (Feb 2026) version of this config; the libcuflynx one was imported. Which is canonical? The
+  import brought the BG-type entries and the stray initial values.
+- theta, rho, g, beta_g and R_v are declared but unused, because the gravity/viscoelastic terms are commented out. Remove
+  them from the config, or keep them for the planned terms?
+- 'Validation (proposed, fails): a pp capillary held between the Williams1988 arteriolar-limb (37.7 mmHg) and venular-limb
+  (14.6 mmHg) pressures settles at their mean, 26.1 mmHg, against a measured apex of 19.4 +- 1.0 mmHg. A uniform segment cannot
+  place the apex below the mean; the measured profile implies more resistance on the arteriolar side (tapering, or Fahraeus-Lindqvist
+  effects). Keep this as a documented limitation, change the target, or drop it? Other candidates, for networks built from
+  these components: Pries1990 rat-mesentery networks, the Boas2008 arteriole-capillary-venule chain.'
+proposed_fixes:
+- 'pv_Minlet_type_micro: remove initial_value="0.0" from <variable name="v_out_sum" public_interface="in">. vp_Noutlet_type_micro:
+  remove it from v_in_sum. Evidence: patched copy, all 10 Minlet/Noutlet entries pass run, invariants, BC sweep and timestep.
+  Alternatively delete these two types, since they duplicate pv_Nout / vp_Min.'
+- 'Config entries {arteriole, venule, vein} pp_micro, {arteriole, capillary, venule, vein} pv_micro, {arteriole, venule, vein}
+  vp_micro and {arteriole, capillary, venule, vein} vv_micro use BG *_simple_type without declaring I. Either add ["I", "Js2_per_m6",
+  "access", "constant"] (plus an I value, e.g. rho l/(pi r^2)), or, preferred, point them at pp/pv/vp/vv_type_micro like the
+  artery entries. Evidence: with I declared in a patched copy all 14 generate and run.'
+- 'vv_type_micro, vv_Min_type_micro, vv_MinNout_type_micro, vv_Nout_type_micro: u = u_0 + u_C (+ u_ext) + 2 {J_per_m3}, and
+  u_d likewise. The 2 is left over from the commented-out 2 R_v (v_in - v) term. Remove the "+ 2" constant (or restore 2 R_v
+  (...) with R_v = 0). Evidence: at t = 0 the run shows u = u_0 + 2 Pa.'
+findings:
+- 'Structure test: 14 warnings, "uses component <x>_simple_type from another module" (the BG-type entries). The structure
+  check does not catch the missing I, because I is absent from both the config and the parameters; the harness shows it (Myokit:
+  "No value set for I").'
+- Volumes are SI and tiny (capillary stressed volume ~1e-19 m3). The framework's tight CVODE reference in the timestep/stability
+  tests uses a hard-coded atol = 1e-12, which does no error control on these states. It is accurate here only because the
+  spec caps MaximumStep at d0/64. The spec solver uses atol = 1e-24.
+- 'Time constants are very short: RC ~1e-5 s (small artery) to ~0.05 s (capillary), so sim_time is 25x a nice step d0 ~ tau/5
+  per component. The exact-solution invariants hold at every sweep point regardless.'
+- 'All working pv/vp/pp components: RK4 converges at order 4 and agrees with CVODE to <1e-3. All solver families work.'
+- The 14 BG-type entries have a relaxation time (R + 0.01/C) C ~ 0.01 s and an inertial time I/R ~ 1e-11 s. After the I fix,
+  explicit fixed-step schemes are impractical for them.

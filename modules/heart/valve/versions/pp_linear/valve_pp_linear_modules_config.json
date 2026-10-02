@@ -1,0 +1,123 @@
+[
+  {
+    "module_type": "valve",
+    "module_subtype": "pp_linear",
+    "module_format": "cellml",
+    "component_file": "valve_pp_linear_modules.cellml",
+    "component_type": "valve_linear_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "zeta",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "A_eff",
+        "m2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_nn",
+        "m2",
+        "access",
+        "constant"
+      ],
+      [
+        "M_st",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "M_rg",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vo",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "K_vc",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "l_eff",
+        "metre",
+        "access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "access",
+        "global_constant"
+      ],
+      [
+        "vel",
+        "m_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_ref",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "R_lin",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

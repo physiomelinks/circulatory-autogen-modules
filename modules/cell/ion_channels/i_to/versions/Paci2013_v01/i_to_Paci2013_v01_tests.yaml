@@ -1,0 +1,51 @@
+module_type: i_to
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM (ventricular-like) transient outward current I_to = g_to (Vm - E_K) q r. Algebraic: all gates,
+  concentrations and the membrane potential are inputs, so alone it is a pure function of its inputs, checked exactly against
+  the original model equations.'
+expected_failures:
+  run_test: 'generation fails: the gate inputs q, r are declared private_interface=''in'' (a leftover of the original Paci
+    encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: the gate inputs q, r are declared private_interface=''in'' (a leftover
+    of the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: the gate inputs q, r are declared private_interface=''in'' (a leftover of the original
+    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: the gate inputs q, r are declared private_interface=''in'' (a leftover of
+    the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: the gate inputs q, r are declared private_interface=''in'' (a leftover of the original
+    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    With the proposed fix applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  g_to:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      g_to = 29.9038'
+    sourced: 'yes'
+    value: 29.9038
+  Vm:
+    reference: 'Paci2013; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  E_K:
+    reference: 'definitional; Nernst potential of the Paci2013 electric_potentials at the CellML initial state (R=8.314472,
+      T=310, F=96485.3415, Nao=151, Ko=5.4, Ki=150, Cao=1.8 mM, Nai=10.9248, Cai=1.80774e-5 mM): E_K = -0.0888029 V'
+    sourced: definitional
+    value: -0.08880285397707481
+  q:
+    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): q = 0.839296'
+    sourced: 'yes'
+    value: 0.839295925773219
+  r:
+    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): r = 0.0057329'
+    sourced: 'yes'
+    value: 0.00573289893326379
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_KCa_Tao2011_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_KCa_Tao_2011">
+        <variable name="i_KCa" public_interface="out" units="nanoA"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="Vm" public_interface="in" units="milliV"/>
+        <variable name="g_kcf" public_interface="in" units="microS"/>
+        <variable name="g_kcs" public_interface="in" units="microS"/>
+        <variable name="E_K" public_interface="in" units="milliV"/>
+        <variable initial_value="0.0" name="kcf" units="dimensionless"/>
+        <variable name="kcf_bar" units="dimensionless"/>
+        <variable name="tau_kcf" units="second"/>
+        <variable initial_value="0.0" name="kcs" units="dimensionless"/>
+        <variable name="kcs_bar" units="dimensionless"/>
+        <variable name="tau_kcs" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_KCa</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>g_kcf</ci>
+                        <ci>kcf</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Vm</ci>
+                            <ci>E_K</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>g_kcs</ci>
+                        <ci>kcs</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Vm</ci>
+                            <ci>E_K</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kcf_bar</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>Vm</ci>
+                                        <cn cellml:units="milliV">11.54</cn>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="milliV">4.99</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>kcf</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>kcf_bar</ci>
+                        <ci>kcf</ci>
+                    </apply>
+                    <ci>tau_kcf</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_kcf</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <cn cellml:units="second">1</cn>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">1292</cn>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="per_milliV">0.274</cn>
+                                        <ci>Vm</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.00359</cn>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <times/>
+                                        <apply>
+                                            <minus/>
+                                            <cn cellml:units="per_milliV">0.126</cn>
+                                        </apply>
+                                        <ci>Vm</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="second">1.4</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kcs_bar</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>Vm</ci>
+                                    <cn cellml:units="milliV">15.18</cn>
+                                </apply>
+                                <cn cellml:units="milliV">4.0</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>kcs</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>kcs_bar</ci>
+                        <ci>kcs</ci>
+                    </apply>
+                    <ci>tau_kcs</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_kcs</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <divide/>
+                            <cn cellml:units="second">1</cn>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.25</cn>
+                                    <apply>
+                                        <exp/>
+                                        <apply>
+                                            <times/>
+                                            <cn cellml:units="per_milliV">0.7</cn>
+                                            <ci>Vm</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.00073</cn>
+                                    <apply>
+                                        <exp/>
+                                        <apply>
+                                            <times/>
+                                            <apply>
+                                                <minus/>
+                                                <cn cellml:units="per_milliV">0.144</cn>
+                                            </apply>
+                                            <ci>Vm</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="second">92</cn>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="s_per_milliV">1.9</cn>
+                        <ci>Vm</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

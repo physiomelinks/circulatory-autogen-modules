@@ -1,0 +1,27 @@
+module_type: i_leak_K
+version: Argus2026_v01
+reviewed: false
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. K leak of the SN soma,
+  i_leak_K = g_leak_K (V - E_K). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off
+  script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  Geometry re-parameterisation (2026-10-02): the maximal conductance is g_leak_K = A_mem rho_leak_K gamma_leak_K (membrane
+  area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults
+  reproduce the previous g_leak_K.'
+reference_proposals:
+  E_K:
+    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
+    sourced: 'no'
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  rho_leak_K:
+    reference: 'definitional; chosen so that g_leak_K = A rho gamma_leak_K (1e-6 uS/pS) reproduces the previous g_leak_K =
+      0.0001 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_K = 50 picoS; a density
+      for calibration through gamma_leak_K. The previous g_leak_K (as proposed in review): unreferenced_placeholder; owner''s
+      hand-set value in the SN_simple model (CA token ''to_be_identified'')'
+    sourced: 'no'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

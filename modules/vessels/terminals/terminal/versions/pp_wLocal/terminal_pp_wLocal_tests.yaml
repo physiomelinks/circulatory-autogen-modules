@@ -1,0 +1,44 @@
+module_type: terminal
+version: pp_wLocal
+reviewed: false
+notes: 'Terminal (Windkessel-type) module. Jacobian timescales (nominal: fastest 1.2e-16 s, slowest decay 0.04 s; run: fastest
+  1.2e-16 s, slowest decay 0.04 s).'
+reference_proposals:
+  R_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "calc_from_user_assumptions" (value 11999999999.999998)'
+    sourced: 'no'
+  C_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "to_be_identified" (value 1.00e-11)'
+    sourced: 'no'
+  I_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen control_parasymp: "defined_by_user" (value 1.00e-06)'
+    sourced: 'no'
+  q_us:
+    reference: 'definitional; zero initial/unstressed volume (circulatory_autogen control_parasymp: user_defined_TO_DO)'
+    sourced: definitional
+  q_init:
+    reference: 'definitional; zero initial/unstressed volume (circulatory_autogen control_parasymp: user_defined_TO_DO)'
+    sourced: definitional
+  Delta_R:
+    reference: 'definitional; Delta_R = 0 (circulatory_autogen control_parasymp: user_defined)'
+    sourced: definitional
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen control_parasymp: user_defined)'
+    sourced: definitional
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 666.61
+      Pa (5 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 666.61
+  u_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 13332.2
+      Pa (100 mmHg), typical inlet pressure for this vessel class
+    sourced: 'no'
+    value: 13332.2
+  R_local_multiplier:
+    reference: 'definitional; R_local_multiplier = 1: no local control'
+    sourced: definitional
+    value: 1.0
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

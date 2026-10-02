@@ -1,0 +1,55 @@
+{
+  "module_type": "heart",
+  "version": "Argus2026_v01",
+  "sim_time": 5.0,
+  "pre_time": 20.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-06, "atol": 1e-08, "MaximumStep": 0.001},
+  "bc_sweep": {
+    "ranges": {
+      "T": {"min": 0.6, "max": 1.5, "points": 5},
+      "rho": {"min": 1040, "max": 1070, "points": 3},
+      "Delta_E_lv": {"min": -100000000.0, "max": 100000000.0, "points": 5},
+      "Delta_E_rv": {"min": -30000000.0, "max": 30000000.0, "points": 5},
+      "u_ext_ra": {"min": -1000, "max": 1000, "points": 3},
+      "u_ext_rv": {"min": -1000, "max": 1000, "points": 3},
+      "u_ext_la": {"min": -1000, "max": 1000, "points": 3},
+      "u_ext_lv": {"min": -1000, "max": 1000, "points": 3}
+    },
+    "rationale": "Supermodule default: the globals and the boundary conditions no internal connection closes, alone (no circulation): T 0.6-1.5 s and rho 1040-1070 kg/m3 (as heart vp), l_eff by factors 0.5-2; the venous inflows v_in_ra / v_in_la and the arterial pressures u_out_puv / u_out_aov by factors 0.5-2; Delta_E_lv +-100 MPa/m3 and Delta_E_rv +-30 MPa/m3 (inotropic control, as heart vp); the external pressures u_ext_* +-1 kPa (heart vp's intrathoracic swing). The atrial Delta_E_ra / Delta_E_la (nominal 0, no range in heart vp) are not swept. Each submodule's own parameters are swept in that submodule version's tests."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0002, 0.0001, 5e-05, 2.5e-05],
+    "t_end": 1.0,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08, "MaximumStep": 0.001}
+    ],
+    "fixed_step": {
+      "schemes": ["euler", "heun", "rk4"],
+      "dt_start": 0.0004
+    },
+    "t_end": 2.0
+  },
+  "validation": {
+    "default": {}
+  },
+  "supermodule": {
+    "globals": ["T", "rho", "l_eff"],
+    "equivalent": [
+      {
+        "model": "closed_loop_cvs/3compartment_supermodules",
+        "reproduces": "closed_loop_cvs/3compartment",
+        "instance": "heart",
+        "tol": 1e-09,
+        "solver_info": {"rtol": 1e-10, "atol": 1e-12}
+      }
+    ]
+  }
+}

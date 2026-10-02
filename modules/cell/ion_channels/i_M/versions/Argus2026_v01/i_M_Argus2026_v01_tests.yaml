@@ -1,0 +1,58 @@
+module_type: i_M
+version: Argus2026_v01
+reviewed: false
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. M-type (KCNQ) K current
+  of the SN soma, i_M = g_M_mod g_M w (V - E_K); Delta_V_mid_w shifts the activation for drug studies. Split out of the monolithic
+  SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history);
+  SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal
+  conductance is g_M = A_mem rho_M gamma_M (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem
+  from the membrane through membrane_area; the defaults reproduce the previous g_M.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+reference_proposals:
+  Delta_V_mid_w:
+    reference: definitional; shift of the M-current activation for drug studies; 0 = no drug
+    sourced: 'no'
+  E_K:
+    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
+    sourced: 'no'
+  V:
+    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
+    sourced: 'no'
+    value: -70.0
+  V_den_w:
+    reference: 'Martin2024; Eq. 18: slope 10 mV (= value; Zhou2018 Table A.2)'
+    sourced: 'yes'
+    also_cites:
+    - Zhou2018
+  V_mid_w:
+    reference: 'Martin2024; Eq. 18: w_inf = 1/(1+exp(-(V+35)/10)), V1/2 = -35 mV (= value; from Zhou2018 Table A.2; -35 mV
+      is the M-current half-activation of Adams1982)'
+    sourced: 'yes'
+    also_cites:
+    - Zhou2018
+    - Adams1982
+  V_rest_approx:
+    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
+      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
+    sourced: 'yes'
+  tau_w_min:
+    reference: unreferenced_placeholder; minimum M-current time constant 30 ms; no source found. Martin2024 / Zhou2018 have
+      no minimum term, and the CA reference gupta2016Computational (an SK channel model of bladder smooth muscle) is wrong
+      for this parameter. Adams1982 report a maximal tau of about 150 ms at -35 mV (bullfrog, 22 C)
+    sourced: 'no'
+    also_cites:
+    - Martin2024
+    - Adams1982
+  tau_w_num:
+    reference: 'Martin2024; Eq. 19: tau_w = 400/(3.3 exp((V+35)/20) + exp(-(V+35)/20)) ms (from Zhou2018); modified here to
+      numerator 1200 ms (was 400), with coefficients 2.0, /15 and /25 instead of 3.3, /20, /20 and an added tau_w_min'
+    sourced: 'yes'
+    also_cites:
+    - Zhou2018
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

@@ -1,0 +1,130 @@
+[
+  {
+    "module_type": "i_Na",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_Na_Paci2013_v01_modules.cellml",
+    "component_type": "i_Na_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "Na_m_gate",
+        "variables": [
+          "m"
+        ]
+      },
+      {
+        "port_type": "Na_h_gate",
+        "variables": [
+          "h"
+        ]
+      },
+      {
+        "port_type": "Na_j_gate",
+        "variables": [
+          "j"
+        ]
+      },
+      {
+        "port_type": "Na_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "Na_current",
+        "variables": [
+          "i_Na"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Na_current",
+        "variables": [
+          "i_Na"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_Na",
+        "A_per_F",
+        "access",
+        "variable"
+      ],
+      [
+        "g_Na",
+        "S_per_F",
+        "access",
+        "constant"
+      ],
+      [
+        "Vm",
+        "volt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_Na",
+        "volt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "h",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "j",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "TTX_3uM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "TTX_10uM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "TTX_30uM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "TTX_coeff",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

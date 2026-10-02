@@ -1,0 +1,50 @@
+module_type: i_Na
+version: Tao2011_v01
+reviewed: false
+notes: 'Tao 2011 rat sympathetic neuron Na current I_Na (Belluzzi & Sacchi 1991) (kinetics from Belluzzi & Sacchi). Gates
+  are internal states starting at 0 (hard-coded initial values), so alone, with Vm clamped, each has the exact solution x_bar(Vm)(1
+  - exp(-t/tau_x)). Invariants compare with the Tao 2011 Supporting Material equations (read from the rendered PDF): they
+  fail on the time units and on steady state has the wrong sign: the module uses 1/(1+exp(-(V+53.2)/6.5)) (activation-like),
+  Tao Eq. 87 1/(1+exp((V+53.2)/6.5)), tau_h has a spurious "+ 17" added (not in Eq. 89; copied from tau_hc) (recorded as expected
+  failures).'
+expected_failures:
+  run_test: 'generation fails: the gate and time-constant variables m, tau_m, h, tau_h are exposed in the config but have
+    no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''. With the
+    fix this test passes on a patched copy.'
+  verification_test_invariants: 'generation fails: the gate and time-constant variables m, tau_m, h, tau_h are exposed in
+    the config but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    After that fix (patched copy): the module deviates from Tao 2011 Suppl.: every time constant is declared in seconds but
+    the Tao 2011 / Belluzzi & Sacchi expressions give milliseconds (Supplement p. 8 table is in ms; e.g. tau_hc = 17-30 ms
+    matches Belluzzi & Sacchi 1989 J Physiol 412:493 "tau = 29.3-17.6 ms"), so all gates are 1000x too slow; steady state
+    has the wrong sign: the module uses 1/(1+exp(-(V+53.2)/6.5)) (activation-like), Tao Eq. 87 1/(1+exp((V+53.2)/6.5)); tau_h
+    has a spurious "+ 17" added (not in Eq. 89; copied from tau_hc)'
+  verification_test_BC: 'generation fails: the gate and time-constant variables m, tau_m, h, tau_h are exposed in the config
+    but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    After that fix (patched copy): the module deviates from Tao 2011 Suppl.: every time constant is declared in seconds but
+    the Tao 2011 / Belluzzi & Sacchi expressions give milliseconds (Supplement p. 8 table is in ms; e.g. tau_hc = 17-30 ms
+    matches Belluzzi & Sacchi 1989 J Physiol 412:493 "tau = 29.3-17.6 ms"), so all gates are 1000x too slow; steady state
+    has the wrong sign: the module uses 1/(1+exp(-(V+53.2)/6.5)) (activation-like), Tao Eq. 87 1/(1+exp((V+53.2)/6.5)); tau_h
+    has a spurious "+ 17" added (not in Eq. 89; copied from tau_hc)'
+  verification_test_timestep: 'generation fails: the gate and time-constant variables m, tau_m, h, tau_h are exposed in the
+    config but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    With the fix this test passes on a patched copy.'
+  stability_test: 'generation fails: the gate and time-constant variables m, tau_m, h, tau_h are exposed in the config but
+    have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''. With
+    the fix this test passes on a patched copy.'
+reference_proposals:
+  g_Na:
+    reference: 'Tao2011; Supporting Material (Document S1) p. 8 neuron parameter table: gNa = 9.28 uS'
+    sourced: 'yes'
+    value: 9.28
+  E_Na:
+    reference: 'Tao2011; Supporting Material (Document S1) p. 8 neuron parameter table: ENa = 40 mV'
+    sourced: 'yes'
+    value: 40.0
+  Vm:
+    reference: definitional; clamp potential supplied by the membrane module in a network; -60 mV alone (test operating point
+      near rest)
+    sourced: definitional
+    value: -60.0
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

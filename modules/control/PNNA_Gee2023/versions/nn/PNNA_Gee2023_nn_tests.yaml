@@ -1,0 +1,36 @@
+module_type: PNNA_Gee2023
+version: nn
+reviewed: false
+notes: ICN principal neurons receiving NA input (Gee 2023 eq. 3, input f_NA + f_LCN), plus an additive vagal stimulation term
+  f_vagal_stim. Parameters re-identified by the module author. Algebraic.
+reference_proposals:
+  f_min_PNNA:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.26 gives f_min,PNNA
+      = 0.86 Hz for comparison
+    sourced: 'no'
+  f_max_PNNA:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.26 gives f_max,PNNA
+      = 12.62 Hz for comparison
+    sourced: 'no'
+  f_mid_PNNA:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.26 gives f_mid,PNNA
+      = 13.81 Hz for comparison
+    sourced: 'no'
+  k_PNNA:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.26 gives k_PNNA =
+      3.23 for comparison
+    sourced: 'no'
+  f_vagal_stim:
+    reference: definitional; no vagal nerve stimulation (0 Hz) by default
+    sourced: definitional
+  f_NA:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (NA output)
+    sourced: 'no'
+    value: 10.0
+  f_LCN:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (LCN output)
+    sourced: 'no'
+    value: 5.0
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.

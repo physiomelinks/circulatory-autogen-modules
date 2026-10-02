@@ -1,0 +1,143 @@
+[
+  {
+    "module_type": "electric_potentials_Paci_2013",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "electric_potentials_Paci_2013_nn_modules.cellml",
+    "component_type": "electric_potentials_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "E_Ks_potential",
+        "variables": [
+          "E_Ks"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "Ca_potential",
+        "variables": [
+          "E_Ca"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "R",
+        "J_per_MK",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "E_Na",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "E_K",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "E_Ks",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "E_Ca",
+        "volt",
+        "access",
+        "variable"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Ki",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Ko",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "PkNa",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,89 @@
+{
+  "module_type": "capillary",
+  "version": "pp",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-07, "atol": 1e-20},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 9.999999999999999e-23},
+  "outputs": ["u", "v", "v_d", "q_C", "q", "R", "C"],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "u = q_C/C + u_ext",
+      "expr": "np.max(np.abs((u) - (q_C/C + u_ext))) <= 1e-08*(np.max(np.abs(u)) + np.max(np.abs(q_C/C + u_ext))) + 1e-30"
+    },
+    {
+      "description": "v = (u_in - u)/(R/2) and v_d = (u - u_out)/(R/2)",
+      "expr": "np.max(np.abs((np.concatenate((v, v_d))) - (np.concatenate(((u_in - u)/(R/2), (u - u_out)/(R/2)))))) <= 1e-08*(np.max(np.abs(np.concatenate((v, v_d)))) + np.max(np.abs(np.concatenate(((u_in - u)/(R/2), (u - u_out)/(R/2)))))) + 1e-30"
+    },
+    {
+      "description": "R = 8 mu l/(pi r^4) and C = 2 pi r^3 l/(E h), h = r (a e^{b r} + c e^{d r})",
+      "expr": "np.max(np.abs((np.concatenate((R, C))) - (np.concatenate((8*mu*l/(np.pi*r**4) + 0*t, 2*np.pi*r**3*l/(E*r*(a_vessel*np.exp(b_vessel*r) + c_vessel*np.exp(d_vessel*r))) + 0*t))))) <= 1e-08*(np.max(np.abs(np.concatenate((R, C)))) + np.max(np.abs(np.concatenate((8*mu*l/(np.pi*r**4) + 0*t, 2*np.pi*r**3*l/(E*r*(a_vessel*np.exp(b_vessel*r) + c_vessel*np.exp(d_vessel*r))) + 0*t))))) + 1e-30"
+    },
+    {
+      "description": "volume balance: d(q)/dt = (v) - (v_d) (trapezoidal integral of the flows from t = 0.02 s, rel. tol 0.05)",
+      "expr": "np.max(np.abs((((q) + 0*t)[(t >= 0.02)] - ((q) + 0*t)[(t >= 0.02)][0]) - np.concatenate(([0.0], np.cumsum(0.5*((((v) - (v_d) + 0*t))[(t >= 0.02)][1:] + (((v) - (v_d) + 0*t))[(t >= 0.02)][:-1])*np.diff(t[(t >= 0.02)])))))) <= 0.05*np.ptp(((q) + 0*t)[(t >= 0.02)]) + 1e-5*np.max(np.abs(((q) + 0*t))) + 1e-9*np.max(np.abs(((v) - (v_d) + 0*t)))*t[-1] + 1e-18"
+    },
+    {
+      "description": "steady state at t_end: v = (u_in - u_out)/R",
+      "expr": "abs((v)[-1] - ((u_in - u_out)/R[-1])) <= 0.001*(abs(u_in - u_out)/R[-1] + 1e-15 + np.max(np.abs(v))) + 1e-18"
+    },
+    {
+      "description": "steady state at t_end: u = (u_in + u_out)/2",
+      "expr": "abs((u)[-1] - ((u_in + u_out)/2)) <= 0.001*(abs(u_in) + abs(u_out) + 1.0 + np.max(np.abs(u))) + 1e-18"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "q_C_init": [0.0, 1e-05],
+      "u_ext": [-500.0, 1000.0],
+      "u_in": [2000.0, 8000.0],
+      "u_out": [666.0, 4000.0],
+      "a_vessel": [0.2, 1.0],
+      "b_vessel": [-600.0, 1.0],
+      "c_vessel": [0.1, 1.0],
+      "d_vessel": [-15.0, 1.0]
+    },
+    "exclude": [],
+    "rationale": "Boundary conditions span physiological operating values for the vessel class (arterial inlet 60-150 mmHg, venous 0-15 mmHg, flows 0-2x the nominal flow; +-0.5% for the nonlinear vv types, whose volume drifts by (v_in - v_out) t and collapses the tube if the imbalance is larger); constants are swept 0.5-2x their value; rho and mu are swept 0.5-2x their library (test_fft fixture) value of 1; beta_g 0-1; g 1-9.81; the wall-thickness constants a-d between the fixture value 1 and the proposed Blanco 2015 values. The physiological rho/mu (1050, 0.004) cannot yet be combined with the others at the run point (framework issue), so the swept regime is the library one. Excluded: tube-law exponents (they define the law), switches (R_flag, blood_ctl_dir)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0001, 5e-05, 2.5e-05, 1.25e-05],
+    "t_end": 0.2,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-07, "atol": 1e-20}
+    ],
+    "cvode": [
+      {"rtol": 0.0001, "atol": 1e-08},
+      {"rtol": 1e-06, "atol": 1e-08},
+      {"rtol": 1e-07, "atol": 1e-20}
+    ],
+    "solve_ivp": ["LSODA"],
+    "fixed_step": {
+      "schemes": ["rk4"],
+      "dt_start": 0.0002
+    },
+    "time_budget": 10.0,
+    "t_end": 0.5
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: a peripheral-bed pressure drop / flow pair from a closed-loop model such as the circulatory_autogen cvs_model_0d (proposal only)."
+      },
+      "calibrate": {
+        "note": "pending: a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: a peripheral-bed pressure drop / flow pair from a closed-loop model such as the circulatory_autogen cvs_model_0d (proposal only)."
+      }
+    }
+  }
+}

@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="NTS_Gee2023_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="NTS_Gee2023">
+        <!-- baroreceptors-->
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="f_br" public_interface="in" units="Hz"/>
+        <variable name="f_min_br" public_interface="in" units="Hz"/>
+        <variable name="f_max_br" public_interface="in" units="Hz"/>
+        <variable name="f_mid_br" public_interface="in" units="Hz"/>
+        <variable name="f_NTS_br" public_interface="out" units="Hz"/>
+        <variable name="k_NTS_br" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_NTS_br</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>f_min_br</ci>
+                            <ci>f_max_br</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <power/>
+                                <apply>
+                                    <divide/>
+                                    <ci>f_br</ci>
+                                    <ci>f_mid_br</ci>
+                                </apply>
+                                <ci>k_NTS_br</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>f_max_br</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- lung stretch receptors-->
+        <variable name="f_ls" public_interface="in" units="Hz"/>
+        <variable name="f_min_ls" public_interface="in" units="Hz"/>
+        <variable name="f_max_ls" public_interface="in" units="Hz"/>
+        <variable name="f_mid_ls" public_interface="in" units="Hz"/>
+        <variable name="f_NTS_ls" public_interface="out" units="Hz"/>
+        <variable name="k_NTS_ls" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_NTS_ls</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>f_min_ls</ci>
+                            <ci>f_max_ls</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <power/>
+                                <apply>
+                                    <divide/>
+                                    <ci>f_ls</ci>
+                                    <ci>f_mid_ls</ci>
+                                </apply>
+                                <ci>k_NTS_ls</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>f_max_ls</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- cardiopulmonary receptros-->
+        <variable name="f_cp" public_interface="in" units="Hz"/>
+        <variable name="f_min_cp" public_interface="in" units="Hz"/>
+        <variable name="f_max_cp" public_interface="in" units="Hz"/>
+        <variable name="f_mid_cp" public_interface="in" units="Hz"/>
+        <variable name="f_NTS_cp" public_interface="out" units="Hz"/>
+        <variable name="k_NTS_cp" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_NTS_cp</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>f_min_cp</ci>
+                            <ci>f_max_cp</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <power/>
+                                <apply>
+                                    <divide/>
+                                    <ci>f_cp</ci>
+                                    <ci>f_mid_cp</ci>
+                                </apply>
+                                <ci>k_NTS_cp</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>f_max_cp</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- chemoreceptors-->
+        <variable name="f_apc" public_interface="in" units="Hz"/>
+        <variable name="f_min_ch" public_interface="in" units="Hz"/>
+        <variable name="f_max_ch" public_interface="in" units="Hz"/>
+        <variable name="f_mid_ch" public_interface="in" units="Hz"/>
+        <variable name="f_NTS_ch" public_interface="out" units="Hz"/>
+        <variable name="k_NTS_ch" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_NTS_ch</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>f_min_ch</ci>
+                            <ci>f_max_ch</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <power/>
+                                <apply>
+                                    <divide/>
+                                    <ci>f_apc</ci>
+                                    <ci>f_mid_ch</ci>
+                                </apply>
+                                <ci>k_NTS_ch</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>f_max_ch</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

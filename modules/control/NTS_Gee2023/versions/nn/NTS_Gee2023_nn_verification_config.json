@@ -1,0 +1,77 @@
+{
+  "module_type": "NTS_Gee2023",
+  "version": "nn",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["f_NTS_br", "f_NTS_ls", "f_NTS_cp", "f_NTS_ch"],
+  "invariants": [
+    {
+      "description": "f_NTS_br is the exact sigmoid of f_br",
+      "expr": "np.max(np.abs(f_NTS_br - (((f_min_br - f_max_br)/(1 + (f_br/f_mid_br)**k_NTS_br) + f_max_br)))) <= 1e-9 * max(1.0, np.max(np.abs(f_NTS_br)))"
+    },
+    {
+      "description": "f_NTS_ls is the exact sigmoid of f_ls",
+      "expr": "np.max(np.abs(f_NTS_ls - (((f_min_ls - f_max_ls)/(1 + (f_ls/f_mid_ls)**k_NTS_ls) + f_max_ls)))) <= 1e-9 * max(1.0, np.max(np.abs(f_NTS_ls)))"
+    },
+    {
+      "description": "f_NTS_cp is the exact sigmoid of f_cp",
+      "expr": "np.max(np.abs(f_NTS_cp - (((f_min_cp - f_max_cp)/(1 + (f_cp/f_mid_cp)**k_NTS_cp) + f_max_cp)))) <= 1e-9 * max(1.0, np.max(np.abs(f_NTS_cp)))"
+    },
+    {
+      "description": "f_NTS_ch is the exact sigmoid of f_apc",
+      "expr": "np.max(np.abs(f_NTS_ch - (((f_min_ch - f_max_ch)/(1 + (f_apc/f_mid_ch)**k_NTS_ch) + f_max_ch)))) <= 1e-9 * max(1.0, np.max(np.abs(f_NTS_ch)))"
+    },
+    {
+      "description": "f_NTS_br within [f_min_br, f_max_br]",
+      "expr": "np.all((f_NTS_br >= min(f_min_br, f_max_br) - 1e-9) & (f_NTS_br <= max(f_min_br, f_max_br) + 1e-9))"
+    },
+    {
+      "description": "f_NTS_ls within [f_min_ls, f_max_ls]",
+      "expr": "np.all((f_NTS_ls >= min(f_min_ls, f_max_ls) - 1e-9) & (f_NTS_ls <= max(f_min_ls, f_max_ls) + 1e-9))"
+    },
+    {
+      "description": "f_NTS_cp within [f_min_cp, f_max_cp]",
+      "expr": "np.all((f_NTS_cp >= min(f_min_cp, f_max_cp) - 1e-9) & (f_NTS_cp <= max(f_min_cp, f_max_cp) + 1e-9))"
+    },
+    {
+      "description": "f_NTS_ch within [f_min_ch, f_max_ch]",
+      "expr": "np.all((f_NTS_ch >= min(f_min_ch, f_max_ch) - 1e-9) & (f_NTS_ch <= max(f_min_ch, f_max_ch) + 1e-9))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_br": {"min": 0.0, "max": 60.0, "points": 5},
+      "f_ls": {"min": 0.0, "max": 30.0, "points": 4},
+      "f_cp": {"min": 0.0, "max": 30.0, "points": 4},
+      "f_apc": {"min": 0.0, "max": 20.0, "points": 5}
+    },
+    "rationale": "afferent inputs from silent to beyond their receptors' saturation (baroreceptor f_max 47.8 Hz, f_max,l 20 Hz, chemoreceptor f_apc up to ~20 Hz in hypoxia); sigmoid constants x0.5-x2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      },
+      "calibrate": {
+        "note": "not_applicable: intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      }
+    }
+  }
+}

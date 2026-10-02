@@ -1,0 +1,163 @@
+[
+  {
+    "module_type": "IP3R",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "IP3R_Argus2026_v01_modules.cellml",
+    "component_type": "IP3R_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "ER_Ca",
+        "variables": [
+          "Ca_ER"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_IP3"
+        ]
+      },
+      {
+        "port_type": "ER_Ca_release",
+        "variables": [
+          "j_IP3"
+        ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Ca_ER",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "IP3",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Q_2",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "a_2",
+        "per_millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_1",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_2",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_3",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "d_5",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "h_IP3",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_IP3_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_IP3_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "j_IP3",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_IP3",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_IP3R",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_IP3R_single",
+        "um3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "m_IP3_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_hIP3",
+        "millis",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,132 @@
+comment: Twelve components cannot be generated as shipped (7 *_nonlinear_constR export a non-existent r port; terminal2/pp
+  lacks u_in; vv_merge_simple_type uses the typo q_Cq_C_d; venous/vp_wCont lists v_in/u_out twice; terminal/pp_R1CR2_wCont
+  declares Delta_R dimensionless vs Js_per_m6), and the vv Min/Nout/MinNout *_nonlinear_visco types silently omit their viscoelastic
+  term. split_junction_simple/vv declares an unused l instead of u_0 (Myokit sets u_0 = 0), and vv_rigid_type's u = (v_in
+  - v_out)/R is not dimensionally a pressure. All global constants (rho, mu, g, beta_g, a-d) are test values of 1, so geometric
+  R, C, I are unphysiological until the proposed values are applied; the Voigt time 0.01 s is hard-coded. Existing C = 3.09077e-10
+  / 6.0015e-9 look 100x smaller than their apparent Safaei 2018 source, and I = 1e-6 makes several components extremely stiff.
+summary: 'BG is the bond-graph vessel library: 116 components. It has lumped R-C-I vessels (vp/pv/pp/vv port patterns, splits,
+  merges, Min/Nout junctions, venous and control variants), geometric vessels with R, C and I from r0, l and E, nonlinear
+  tube-law vessels (m, n, K_tube, optional viscoelastic K_tube_visco), Windkessel terminals and capillary segments.
+
+  Preparation: (1) Every component has a spec generated from shared templates (scratch generator, not in the repo). Each spec
+  has exact algebraic checks of its constitutive law, volume balance, the analytic steady state under constant BCs, derived-coefficient
+  checks (Poiseuille R, thin-wall C, inertance I) and positivity for tube laws. (2) sim_time, output dt, the RK4 steps and
+  the stability settings come from Jacobian eigenvalues of each generated model. (3) Components are tested alone, with their
+  boundary conditions as constant parameters. The Min/Nout/MinNout junctions (which libcuflynx only generates with real vessels
+  at the summed node) use harness networks: two arterial_simple neighbours fed or drained by boundary_condition constant-flow
+  inlets/outlets, plus a constant-pressure or constant-flow boundary on the other side. (4) A separate connectivity check
+  wired every component into boundary_condition inlets/outlets matching its vessel ports. It found only the generation defects
+  listed below (results in the findings). (5) Every parameter has a reference proposal, 7 verified citations are in BG_references_proposed.bib,
+  and every TODO has a proposed value (mostly honest placeholders). (6) Validation is pending: a single vessel under constant
+  BCs has no measured counterpart; candidates are described per vessel class.
+
+  Depth: all 116 components ran every test except calibration, plus the failure-risk analysis (256 Sobol samples each); there
+  is no per-component hand-tuning beyond templates. The 12 components that cannot be generated are recorded as expected failures;
+  on a patched copy of the library (fixes below), all 13 affected components (including split_junction_simple vv) pass all
+  5 tests. The representative components checked by hand are arterial_simple vp, arterial pv/pp/vv, arterial pv_nonlinear,
+  venous vp_nonlinear, terminal pp and capillary pp.
+
+  Test summary: run_test: 12 failed, 104 passed; verification_test_invariants: 15 failed, 101 passed; verification_test_BC:
+  15 failed, 101 passed; verification_test_timestep: 12 failed, 102 passed, 2 skipped; stability_test: 12 failed, 104 passed.
+  Every failure is a recorded expected failure: 12 generation defects (5 tests each) and 3 Min/Nout/MinNout vv_nonlinear_visco
+  types (invariants + sweep); the 2 skipped timestep tests are the algebraic flow_sum_2 and rigid_vessel.'
+questions:
+- 'Global constants (all currently the test_fft fixture value 1): apply rho = 1050 kg/m^3 and mu = 0.004 Pa s (Boileau2015
+  Table II), g = 9.81, beta_g = 0 (gravity off, as in the circulatory_autogen models), and the wall-thickness fit a = 0.2802,
+  b = -505.3 1/m, c = 0.1324, d = -11.14 1/m? The fit is Blanco2015 Eq. (2), fitted to Avolio1980 data; the SI values are
+  in Safaei2018 Table S3. It is not Avolio 1980 itself, which the circulatory_autogen label says.'
+- 'Lumped arterial/venous values: arterial_simple vp R = 1.0664e7 and venous vp R = 1.333e6 are exactly Safaei2018 Table S3
+  R_par and R_pvn (pulmonary artery/vein; the circulatory_autogen label Blanco_2013_Table_8 could not be checked, paywalled).
+  The C values 3.09077e-10 and 6.0015e-9 have the digits of C_par = 3.09077e-8 and C_pvn = 6.0015e-7 but are 100x smaller.
+  Is that deliberate? For the TODO siblings I proposed the Table S3 values: arterial R 1.0664e7, C 3.09077e-8; venous R 3.999e6,
+  C 1.125281e-7, I 6.665e4 (systemic veins).'
+- 'Inertances I = 1e-6 (labelled Blanco_2013_Table_8 in arterial_simple vp and venous vp; Safaei2018 Table S3 has I = 0 there)
+  and other ''small_chosen'' values make those components extremely stiff (fastest time scale 2e-14 s): only implicit solvers
+  work, and the RK4 check only covers a very short window. Keep these, or use rho l/(pi r^2)-sized values like the 1e5 proposed
+  for the arterial TODOs?'
+- 'ADAN values (E = 0.4/1.6 MPa, l, r_0 for ''ADAN_86''/''ADAN_218'' vessels): I proposed Safaei2018 (which builds the 218-segment
+  network from ADAN-86 plus the ADAN cerebral vessels) as the citation. The vessel-level numbers could not be checked because
+  the ADAN data are in inaccessible supplementary material. Can you confirm them, or point to the ADAN-86 table?'
+- 'Nout_junction vv_nonlinear_visco l = 0.0744 m, r_0 = 0.01445 m and u_0 = 10 kPa (Boileau_2015) are verified: Boileau2015
+  Table XII, ADAN56 test vessel 1 (aortic arch I), length 7.441 cm, mean of the proximal and distal radii 1.595 and 1.295
+  cm, and Pd = P0 = 10 kPa. Accept as cited?'
+- 'arterial_simple vv q_0 = 6.94e-6 m^3 (''Mynard&Smolich_2015''): in the Mynard2015 supplement, 6.9419 is the aortic-root
+  A0 in cm^2 with length 1 cm, so A0 l = 6.94 mL fits. Is that the intended origin? The reference pressures 1463 Pa (''assumedRefOf11mmHg'')
+  and 13300 Pa (''assumedRefOf100mmHg'') are not in the accessible parts of Mynard2015, so I marked them placeholders.'
+- 'TODO tube-law values: arterial K_tube is a placeholder from Olufsen2000''s stiffness fit, K = rho c0^2/(m - n) (about 1.15e5
+  Pa for r0 = 1.5 cm); its constants are confirmed only through secondary sources. Venous law m = 10, n = -3/2 (Muller2014,
+  confirmed only secondarily); venous K_tube = 10 Pa is an order-of-magnitude placeholder. K_tube_visco comes from the vessel_properties
+  formula with Gamma = 0.1 x 3e4 Pa s. These are normally supplied by vessel_properties when connected: acceptable as stand-alone
+  test values?'
+- 'Placeholder geometry/values grouped by class (all sourced: no), proposed so that verification can run: arterial geometric
+  TODOs copy the split_junction pv ADAN_86 segment (E 0.4 MPa, l 0.0148 m, r0 0.0133 m, u_0 10640 Pa). Nonlinear arterial
+  TODOs copy arterial pv_nonlinear_visco (l 0.0148, r0 0.0151). Venous nonlinear: l 0.1 m, r0 0.01 m, u_0 0. Capillary segments:
+  r 1e-4 m, l 1e-3 m, E 1.6 MPa. Terminals: R_T 2.6e8, C_T 4e-9 (copied from terminal pp_wCont_no_local), R_T1 or Zc 1.3e7,
+  I_T 1e4, frac 0.05. Lumped capillary: R 1e8, C 1e-10, I 1e5. Boundary conditions: 100/95 mmHg arterial, 5/0 mmHg venous,
+  40/10 mmHg capillary; flows 0.2 m/s x lumen area or 1e-4/1e-5/5e-6 m^3/s by class. Please replace any where you have data.'
+- 'Validation: all pending. A candidate for the arterial classes is the Boileau2015 benchmark (ADAN56 and aortic-bifurcation
+  reference waveforms in its supplementary data), compared with a chain of these segments. Candidates for the terminals are
+  published three-element Windkessel fits, and for the veins the Muller2014 venous waveforms. Which, if any, should be set
+  up now, or should validation live in network-level models?'
+- The Voigt/viscoelastic wall term uses R_v = 0.01 s/C with 0.01 s hard-coded in the CellML (Safaei2018 Table S3 lists it
+  as the Voigt parameter f = 0.01 s). Promote it to a parameter?
+proposed_fixes:
+- 'arterial/split_junction/merge_junction *_nonlinear_constR (7 components): remove r from the radius_0_and_s_port exit port
+  in the config, or drop the port. The constR types have no r, and libcuflynx exits with "the port variable r is not a variable".
+  In a patched copy, all seven generate and run.'
+- 'terminal2/pp (W_controller2_type): add [''u_in'', ''J_per_m3'', ''access'', ''boundary_condition''] to variables_and_units
+  and a u_in parameter row. Also consider renaming the port "multi_portgjsfglj"; this module is used with BC_type pp_controller
+  in circulatory_autogen. With u_in declared in a patched copy, it generates and passes.'
+- 'vv_merge_simple_type (merge_junction_simple/vv, venous_merge_junction_simple/vv): in the CellML, q = q_Cq_C_d + q_0 should
+  be q = q_C + q_C_d + q_0. libcellml rejects the undeclared variable. With the fix in a patched copy, both components pass
+  all tests.'
+- 'venous/vp_wCont: remove the duplicate v_in and u_out entries from variables_and_units. libcellml: "Component mod contains
+  multiple variables with the name v_in". The patched copy passes.'
+- 'terminal/pp_R1CR2_wCont: Delta_R is added to R_T1 + R_T2 in the CellML (Js_per_m6), but the config and the parameters file
+  say dimensionless, so generation fails on the units mapping. Change both to Js_per_m6; the patched copy passes.'
+- 'split_junction_simple/vv: the config lists a constant l that vv_split_simple_type does not use, and omits u_0, which it
+  does use. Myokit then sets u_0 = 0 silently ("No value set"). Replace l by u_0 in the config and the parameters file. The
+  patched copy runs with u_0 as a parameter.'
+- 'rigid_vessel/vv (vv_rigid_type): u = (v_in - v_out)/R is not dimensionally a pressure (m^3/s divided by Pa s/m^3). If it
+  is meant as a penalty for flow mismatch, it should be u = R (v_in - v_out) (Pa s/m^3 times m^3/s = Pa), or be documented.
+  The test currently only checks the law as written.'
+- vv_Min_nonlinear_visco_type, vv_Nout_nonlinear_visco_type and vv_MinNout_nonlinear_visco_type declare K_tube_visco, but
+  their u and u_d equations omit the viscoelastic terms 2 K_visco (inflow - v) and 2 K_visco (v - outflow) that vv_nonlinear_visco_type
+  (and all other *_visco types) include. As implemented, they equal the non-visco types. Add the terms, or drop K_tube_visco
+  from these configs. The stated-law invariant fails; this is recorded as expected_failures.
+- 'vv_simple_vol_ctl_type (capillary_simple_vol_ctl_uptake/intake vv): v_blood_intake is a ''variable'' supplied through blood_uptake_port.
+  Used alone it is silently 0. That is harmless in a network, but a boundary_condition kind would make the module testable
+  and explicit.'
+findings:
+- 'Connectivity: every component was wired into boundary_condition constant-pressure/flow inlets and outlets matching its
+  vessel ports and generated with libcuflynx. All connect except the generation defects above (and the Min/Nout junctions,
+  which need vessel neighbours rather than boundary_condition modules at the summed node; this is a libcuflynx requirement).'
+- 'Solver tolerance: the circulatory_autogen default atol = 1e-8 is too loose for SI volumes in small vessels (q0 of an ADAN_218
+  segment is about 3e-8 m^3). The specs use rtol 1e-7, atol 1e-14; stiff components (I = 1e-6) still need CVODE with small
+  absolute tolerances.'
+- 'Nonlinear vv types with imposed inflow and outflow have no steady state: the volume drifts by (v_in - v_out) t. An imbalance
+  larger than about 0.5% over 2 s empties the tube, and CVODE then grinds without failing (runs of over 20 minutes observed).
+  The sweep ranges for these flows are therefore +-0.5%. The working region is limited by the imposed-flow configuration,
+  not by a bug.'
+- The tests run at the library values of the global constants (the test_fft fixture value 1). Setting the physiological values
+  at the run point breaks the timestep/stability tests (framework issue, reported). In an earlier run with rho = 1050, mu
+  = 0.004 and the Blanco2015 a-d as run parameters, every geometric and nonlinear component generated and ran. Their timescales
+  then move from about 1e-5-1e-4 s to 1e-3-10 s, and the arterial nonlinear vessels become lightly damped (Poiseuille R is
+  small). Re-run once the globals are applied.
+- 'Stiffness: components with I = 1e-6 or the fixture globals have eigenvalues up to about 5e13 1/s. RK4 convergence is then
+  checked on a window of about 2e4 steps at |lambda| dt <= 1 (see each component''s timestep t_end), and stability uses CVODE/LSODA
+  plus RK4 started at the explicit stability limit. The stability matrix is trimmed (3 CVODE tolerance sets, LSODA, RK4; 10
+  s budget) to keep the 116 components tractable.'
+- 'Capillary/constriction segments (r = 0.1 mm) hold volumes of about 1e-13 m^3: they need atol 1e-20 (set in their specs),
+  otherwise CVODE errors reach several percent.'
+- 'Junction harnesses: the node sums v_in_sum/v_out_sum cannot be logged (they live in libcuflynx''s generic_junction_connection),
+  so the volume balance of Min/Nout/MinNout junctions uses the neighbours'' flows (up1/v + up2/v, dn1/v + dn2/v). This verifies
+  the summation and the junction together.'
+- 'Failure risk (256 joint Sobol samples per component over the sweep box): 0 failures for 75 components. The 15 generation-defect
+  components fail every sample, as expected. The rest are low: 0.4-8% for most. The exceptions are terminal pp_RICRI at 26%
+  and venous pp_nonlinear at 15%, both from steady-state checks not reached when R_T and C_T (or l and r_0) are jointly large.
+  arterial vp is at 97%: the library test-fixture geometry (E = 1 Pa, l = r_0 = 1 m) relaxes on minute timescales at joint
+  corners, so the steady state is not reached in 60 s. The failures are steady states not reached within sim_time at joint
+  corners, or trapezoidal balance checks on transients that the output grid does not resolve. None is a non-finite run, apart
+  from one CVODE error sample each in arterial_simple vp and split_junction pv_nonlinear_visco.'
