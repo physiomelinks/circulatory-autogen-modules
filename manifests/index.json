@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T00:51:40Z",
+  "generatedAt": "2026-10-02T04:39:00Z",
   "collections": {
     "modules": [
       {
@@ -168,6 +168,11 @@
         "path": "modules/vessels/compartments/arterial/versions/vv_nonlinear_visco/arterial_vv_nonlinear_visco_modules.cellml"
       },
       {
+        "name": "arterial (vv_novisco)",
+        "file": "arterial_vv_novisco_modules.cellml",
+        "path": "modules/vessels/compartments/arterial/versions/vv_novisco/arterial_vv_novisco_modules.cellml"
+      },
+      {
         "name": "arterial_simple (pp)",
         "file": "arterial_simple_pp_modules.cellml",
         "path": "modules/vessels/compartments/arterial_simple/versions/pp/arterial_simple_pp_modules.cellml"
@@ -186,6 +191,11 @@
         "name": "arterial_simple (vp_nonlinear)",
         "file": "arterial_simple_vp_nonlinear_modules.cellml",
         "path": "modules/vessels/compartments/arterial_simple/versions/vp_nonlinear/arterial_simple_vp_nonlinear_modules.cellml"
+      },
+      {
+        "name": "arterial_simple (vp_usV_C_ctl)",
+        "file": "arterial_simple_vp_usV_C_ctl_modules.cellml",
+        "path": "modules/vessels/compartments/arterial_simple/versions/vp_usV_C_ctl/arterial_simple_vp_usV_C_ctl_modules.cellml"
       },
       {
         "name": "arterial_simple (vv)",
@@ -368,11 +378,6 @@
         "path": "modules/vessels/compartments/venous_Rctl/versions/vp_woCont/venous_Rctl_vp_woCont_modules.cellml"
       },
       {
-        "name": "2in2out_junction (vv)",
-        "file": "2in2out_junction_vv_modules.cellml",
-        "path": "modules/vessels/junctions/2in2out_junction/versions/vv/2in2out_junction_vv_modules.cellml"
-      },
-      {
         "name": "capillary_merge (vp)",
         "file": "capillary_merge_vp_modules.cellml",
         "path": "modules/vessels/junctions/capillary_merge/versions/vp/capillary_merge_vp_modules.cellml"
@@ -396,316 +401,6 @@
         "name": "flow_sum_2 (nn)",
         "file": "flow_sum_2_nn_modules.cellml",
         "path": "modules/vessels/junctions/flow_sum_2/versions/nn/flow_sum_2_nn_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vp)",
-        "file": "merge_junction_vp_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp/merge_junction_vp_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear)",
-        "file": "merge_junction_vp_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear/merge_junction_vp_nonlinear_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear_constR)",
-        "file": "merge_junction_vp_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear_constR/merge_junction_vp_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear_visco)",
-        "file": "merge_junction_vp_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear_visco/merge_junction_vp_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vv)",
-        "file": "merge_junction_vv_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv/merge_junction_vv_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear)",
-        "file": "merge_junction_vv_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear/merge_junction_vv_nonlinear_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear_constR)",
-        "file": "merge_junction_vv_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear_constR/merge_junction_vv_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear_visco)",
-        "file": "merge_junction_vv_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear_visco/merge_junction_vv_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "merge_junction_simple (vp)",
-        "file": "merge_junction_simple_vp_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction_simple/versions/vp/merge_junction_simple_vp_modules.cellml"
-      },
-      {
-        "name": "merge_junction_simple (vv)",
-        "file": "merge_junction_simple_vv_modules.cellml",
-        "path": "modules/vessels/junctions/merge_junction_simple/versions/vv/merge_junction_simple_vv_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vp)",
-        "file": "Min_junction_vp_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp/Min_junction_vp_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vp_noI)",
-        "file": "Min_junction_vp_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_noI/Min_junction_vp_noI_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear)",
-        "file": "Min_junction_vp_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear/Min_junction_vp_nonlinear_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear_constR)",
-        "file": "Min_junction_vp_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear_constR/Min_junction_vp_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear_visco)",
-        "file": "Min_junction_vp_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear_visco/Min_junction_vp_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vp_simple)",
-        "file": "Min_junction_vp_simple_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_simple/Min_junction_vp_simple_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vp_simple_novisco)",
-        "file": "Min_junction_vp_simple_novisco_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_simple_novisco/Min_junction_vp_simple_novisco_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vv)",
-        "file": "Min_junction_vv_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv/Min_junction_vv_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vv_noI)",
-        "file": "Min_junction_vv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_noI/Min_junction_vv_noI_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear)",
-        "file": "Min_junction_vv_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear/Min_junction_vv_nonlinear_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear_constR)",
-        "file": "Min_junction_vv_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear_constR/Min_junction_vv_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear_visco)",
-        "file": "Min_junction_vv_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear_visco/Min_junction_vv_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "Min_junction (vv_simple)",
-        "file": "Min_junction_vv_simple_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_simple/Min_junction_vv_simple_modules.cellml"
-      },
-      {
-        "name": "Min_junction_2 (vp_noI)",
-        "file": "Min_junction_2_vp_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction_2/versions/vp_noI/Min_junction_2_vp_noI_modules.cellml"
-      },
-      {
-        "name": "Min_junction_2 (vv_noI)",
-        "file": "Min_junction_2_vv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction_2/versions/vv_noI/Min_junction_2_vv_noI_modules.cellml"
-      },
-      {
-        "name": "Min_junction_usV_C_ctl (vp_simple)",
-        "file": "Min_junction_usV_C_ctl_vp_simple_modules.cellml",
-        "path": "modules/vessels/junctions/Min_junction_usV_C_ctl/versions/vp_simple/Min_junction_usV_C_ctl_vp_simple_modules.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv)",
-        "file": "MinNout_junction_vv_modules.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv/MinNout_junction_vv_modules.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_noI)",
-        "file": "MinNout_junction_vv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_noI/MinNout_junction_vv_noI_modules.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear)",
-        "file": "MinNout_junction_vv_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear/MinNout_junction_vv_nonlinear_modules.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear_constR)",
-        "file": "MinNout_junction_vv_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear_constR/MinNout_junction_vv_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear_visco)",
-        "file": "MinNout_junction_vv_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear_visco/MinNout_junction_vv_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_simple)",
-        "file": "MinNout_junction_vv_simple_modules.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_simple/MinNout_junction_vv_simple_modules.cellml"
-      },
-      {
-        "name": "MinNout_junction_2 (vv_noI)",
-        "file": "MinNout_junction_2_vv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction_2/versions/vv_noI/MinNout_junction_2_vv_noI_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (pv)",
-        "file": "Nout_junction_pv_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv/Nout_junction_pv_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_noI)",
-        "file": "Nout_junction_pv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_noI/Nout_junction_pv_noI_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear)",
-        "file": "Nout_junction_pv_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear/Nout_junction_pv_nonlinear_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear_constR)",
-        "file": "Nout_junction_pv_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear_constR/Nout_junction_pv_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear_visco)",
-        "file": "Nout_junction_pv_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear_visco/Nout_junction_pv_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_simple)",
-        "file": "Nout_junction_pv_simple_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_simple/Nout_junction_pv_simple_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (vv)",
-        "file": "Nout_junction_vv_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv/Nout_junction_vv_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_noI)",
-        "file": "Nout_junction_vv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_noI/Nout_junction_vv_noI_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear)",
-        "file": "Nout_junction_vv_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear/Nout_junction_vv_nonlinear_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear_constR)",
-        "file": "Nout_junction_vv_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear_constR/Nout_junction_vv_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear_visco)",
-        "file": "Nout_junction_vv_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear_visco/Nout_junction_vv_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_simple)",
-        "file": "Nout_junction_vv_simple_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_simple/Nout_junction_vv_simple_modules.cellml"
-      },
-      {
-        "name": "Nout_junction_2 (pv_noI)",
-        "file": "Nout_junction_2_pv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction_2/versions/pv_noI/Nout_junction_2_pv_noI_modules.cellml"
-      },
-      {
-        "name": "Nout_junction_2 (vv_noI)",
-        "file": "Nout_junction_2_vv_noI_modules.cellml",
-        "path": "modules/vessels/junctions/Nout_junction_2/versions/vv_noI/Nout_junction_2_vv_noI_modules.cellml"
-      },
-      {
-        "name": "split_junction (pv)",
-        "file": "split_junction_pv_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv/split_junction_pv_modules.cellml"
-      },
-      {
-        "name": "split_junction (pv_nonlinear)",
-        "file": "split_junction_pv_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear/split_junction_pv_nonlinear_modules.cellml"
-      },
-      {
-        "name": "split_junction (pv_nonlinear_constR)",
-        "file": "split_junction_pv_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear_constR/split_junction_pv_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "split_junction (pv_nonlinear_visco)",
-        "file": "split_junction_pv_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear_visco/split_junction_pv_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "split_junction (vv)",
-        "file": "split_junction_vv_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv/split_junction_vv_modules.cellml"
-      },
-      {
-        "name": "split_junction (vv_nonlinear)",
-        "file": "split_junction_vv_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear/split_junction_vv_nonlinear_modules.cellml"
-      },
-      {
-        "name": "split_junction (vv_nonlinear_constR)",
-        "file": "split_junction_vv_nonlinear_constR_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear_constR/split_junction_vv_nonlinear_constR_modules.cellml"
-      },
-      {
-        "name": "split_junction (vv_nonlinear_visco)",
-        "file": "split_junction_vv_nonlinear_visco_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear_visco/split_junction_vv_nonlinear_visco_modules.cellml"
-      },
-      {
-        "name": "split_junction (vv_novisco)",
-        "file": "split_junction_vv_novisco_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_novisco/split_junction_vv_novisco_modules.cellml"
-      },
-      {
-        "name": "split_junction_simple (pv)",
-        "file": "split_junction_simple_pv_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction_simple/versions/pv/split_junction_simple_pv_modules.cellml"
-      },
-      {
-        "name": "split_junction_simple (vv)",
-        "file": "split_junction_simple_vv_modules.cellml",
-        "path": "modules/vessels/junctions/split_junction_simple/versions/vv/split_junction_simple_vv_modules.cellml"
-      },
-      {
-        "name": "venous_merge_junction (vp_nonlinear)",
-        "file": "venous_merge_junction_vp_nonlinear_modules.cellml",
-        "path": "modules/vessels/junctions/venous_merge_junction/versions/vp_nonlinear/venous_merge_junction_vp_nonlinear_modules.cellml"
-      },
-      {
-        "name": "venous_merge_junction_simple (vp)",
-        "file": "venous_merge_junction_simple_vp_modules.cellml",
-        "path": "modules/vessels/junctions/venous_merge_junction_simple/versions/vp/venous_merge_junction_simple_vp_modules.cellml"
-      },
-      {
-        "name": "venous_merge_junction_simple (vv)",
-        "file": "venous_merge_junction_simple_vv_modules.cellml",
-        "path": "modules/vessels/junctions/venous_merge_junction_simple/versions/vv/venous_merge_junction_simple_vv_modules.cellml"
-      },
-      {
-        "name": "venous_split_junction_simple (vv)",
-        "file": "venous_split_junction_simple_vv_modules.cellml",
-        "path": "modules/vessels/junctions/venous_split_junction_simple/versions/vv/venous_split_junction_simple_vv_modules.cellml"
       },
       {
         "name": "arteriole (pp_micro)",
@@ -1250,6 +945,11 @@
         "path": "modules/vessels/compartments/arterial/versions/vv_nonlinear_visco/arterial_vv_nonlinear_visco_modules_config.json"
       },
       {
+        "name": "arterial (vv_novisco)",
+        "file": "arterial_vv_novisco_modules_config.json",
+        "path": "modules/vessels/compartments/arterial/versions/vv_novisco/arterial_vv_novisco_modules_config.json"
+      },
+      {
         "name": "arterial_simple (pp)",
         "file": "arterial_simple_pp_modules_config.json",
         "path": "modules/vessels/compartments/arterial_simple/versions/pp/arterial_simple_pp_modules_config.json"
@@ -1268,6 +968,11 @@
         "name": "arterial_simple (vp_nonlinear)",
         "file": "arterial_simple_vp_nonlinear_modules_config.json",
         "path": "modules/vessels/compartments/arterial_simple/versions/vp_nonlinear/arterial_simple_vp_nonlinear_modules_config.json"
+      },
+      {
+        "name": "arterial_simple (vp_usV_C_ctl)",
+        "file": "arterial_simple_vp_usV_C_ctl_modules_config.json",
+        "path": "modules/vessels/compartments/arterial_simple/versions/vp_usV_C_ctl/arterial_simple_vp_usV_C_ctl_modules_config.json"
       },
       {
         "name": "arterial_simple (vv)",
@@ -1450,11 +1155,6 @@
         "path": "modules/vessels/compartments/venous_Rctl/versions/vp_woCont/venous_Rctl_vp_woCont_modules_config.json"
       },
       {
-        "name": "2in2out_junction (vv)",
-        "file": "2in2out_junction_vv_modules_config.json",
-        "path": "modules/vessels/junctions/2in2out_junction/versions/vv/2in2out_junction_vv_modules_config.json"
-      },
-      {
         "name": "capillary_merge (vp)",
         "file": "capillary_merge_vp_modules_config.json",
         "path": "modules/vessels/junctions/capillary_merge/versions/vp/capillary_merge_vp_modules_config.json"
@@ -1478,316 +1178,6 @@
         "name": "flow_sum_2 (nn)",
         "file": "flow_sum_2_nn_modules_config.json",
         "path": "modules/vessels/junctions/flow_sum_2/versions/nn/flow_sum_2_nn_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vp)",
-        "file": "merge_junction_vp_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp/merge_junction_vp_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear)",
-        "file": "merge_junction_vp_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear/merge_junction_vp_nonlinear_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear_constR)",
-        "file": "merge_junction_vp_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear_constR/merge_junction_vp_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear_visco)",
-        "file": "merge_junction_vp_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear_visco/merge_junction_vp_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vv)",
-        "file": "merge_junction_vv_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv/merge_junction_vv_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear)",
-        "file": "merge_junction_vv_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear/merge_junction_vv_nonlinear_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear_constR)",
-        "file": "merge_junction_vv_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear_constR/merge_junction_vv_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear_visco)",
-        "file": "merge_junction_vv_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear_visco/merge_junction_vv_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "merge_junction_simple (vp)",
-        "file": "merge_junction_simple_vp_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction_simple/versions/vp/merge_junction_simple_vp_modules_config.json"
-      },
-      {
-        "name": "merge_junction_simple (vv)",
-        "file": "merge_junction_simple_vv_modules_config.json",
-        "path": "modules/vessels/junctions/merge_junction_simple/versions/vv/merge_junction_simple_vv_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vp)",
-        "file": "Min_junction_vp_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp/Min_junction_vp_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vp_noI)",
-        "file": "Min_junction_vp_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_noI/Min_junction_vp_noI_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear)",
-        "file": "Min_junction_vp_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear/Min_junction_vp_nonlinear_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear_constR)",
-        "file": "Min_junction_vp_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear_constR/Min_junction_vp_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear_visco)",
-        "file": "Min_junction_vp_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear_visco/Min_junction_vp_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vp_simple)",
-        "file": "Min_junction_vp_simple_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_simple/Min_junction_vp_simple_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vp_simple_novisco)",
-        "file": "Min_junction_vp_simple_novisco_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_simple_novisco/Min_junction_vp_simple_novisco_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vv)",
-        "file": "Min_junction_vv_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv/Min_junction_vv_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vv_noI)",
-        "file": "Min_junction_vv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_noI/Min_junction_vv_noI_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear)",
-        "file": "Min_junction_vv_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear/Min_junction_vv_nonlinear_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear_constR)",
-        "file": "Min_junction_vv_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear_constR/Min_junction_vv_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear_visco)",
-        "file": "Min_junction_vv_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear_visco/Min_junction_vv_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "Min_junction (vv_simple)",
-        "file": "Min_junction_vv_simple_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_simple/Min_junction_vv_simple_modules_config.json"
-      },
-      {
-        "name": "Min_junction_2 (vp_noI)",
-        "file": "Min_junction_2_vp_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction_2/versions/vp_noI/Min_junction_2_vp_noI_modules_config.json"
-      },
-      {
-        "name": "Min_junction_2 (vv_noI)",
-        "file": "Min_junction_2_vv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction_2/versions/vv_noI/Min_junction_2_vv_noI_modules_config.json"
-      },
-      {
-        "name": "Min_junction_usV_C_ctl (vp_simple)",
-        "file": "Min_junction_usV_C_ctl_vp_simple_modules_config.json",
-        "path": "modules/vessels/junctions/Min_junction_usV_C_ctl/versions/vp_simple/Min_junction_usV_C_ctl_vp_simple_modules_config.json"
-      },
-      {
-        "name": "MinNout_junction (vv)",
-        "file": "MinNout_junction_vv_modules_config.json",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv/MinNout_junction_vv_modules_config.json"
-      },
-      {
-        "name": "MinNout_junction (vv_noI)",
-        "file": "MinNout_junction_vv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_noI/MinNout_junction_vv_noI_modules_config.json"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear)",
-        "file": "MinNout_junction_vv_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear/MinNout_junction_vv_nonlinear_modules_config.json"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear_constR)",
-        "file": "MinNout_junction_vv_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear_constR/MinNout_junction_vv_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear_visco)",
-        "file": "MinNout_junction_vv_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear_visco/MinNout_junction_vv_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "MinNout_junction (vv_simple)",
-        "file": "MinNout_junction_vv_simple_modules_config.json",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_simple/MinNout_junction_vv_simple_modules_config.json"
-      },
-      {
-        "name": "MinNout_junction_2 (vv_noI)",
-        "file": "MinNout_junction_2_vv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/MinNout_junction_2/versions/vv_noI/MinNout_junction_2_vv_noI_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (pv)",
-        "file": "Nout_junction_pv_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv/Nout_junction_pv_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (pv_noI)",
-        "file": "Nout_junction_pv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_noI/Nout_junction_pv_noI_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear)",
-        "file": "Nout_junction_pv_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear/Nout_junction_pv_nonlinear_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear_constR)",
-        "file": "Nout_junction_pv_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear_constR/Nout_junction_pv_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear_visco)",
-        "file": "Nout_junction_pv_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear_visco/Nout_junction_pv_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (pv_simple)",
-        "file": "Nout_junction_pv_simple_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_simple/Nout_junction_pv_simple_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (vv)",
-        "file": "Nout_junction_vv_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv/Nout_junction_vv_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (vv_noI)",
-        "file": "Nout_junction_vv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_noI/Nout_junction_vv_noI_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear)",
-        "file": "Nout_junction_vv_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear/Nout_junction_vv_nonlinear_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear_constR)",
-        "file": "Nout_junction_vv_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear_constR/Nout_junction_vv_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear_visco)",
-        "file": "Nout_junction_vv_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear_visco/Nout_junction_vv_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "Nout_junction (vv_simple)",
-        "file": "Nout_junction_vv_simple_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_simple/Nout_junction_vv_simple_modules_config.json"
-      },
-      {
-        "name": "Nout_junction_2 (pv_noI)",
-        "file": "Nout_junction_2_pv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction_2/versions/pv_noI/Nout_junction_2_pv_noI_modules_config.json"
-      },
-      {
-        "name": "Nout_junction_2 (vv_noI)",
-        "file": "Nout_junction_2_vv_noI_modules_config.json",
-        "path": "modules/vessels/junctions/Nout_junction_2/versions/vv_noI/Nout_junction_2_vv_noI_modules_config.json"
-      },
-      {
-        "name": "split_junction (pv)",
-        "file": "split_junction_pv_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/pv/split_junction_pv_modules_config.json"
-      },
-      {
-        "name": "split_junction (pv_nonlinear)",
-        "file": "split_junction_pv_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear/split_junction_pv_nonlinear_modules_config.json"
-      },
-      {
-        "name": "split_junction (pv_nonlinear_constR)",
-        "file": "split_junction_pv_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear_constR/split_junction_pv_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "split_junction (pv_nonlinear_visco)",
-        "file": "split_junction_pv_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear_visco/split_junction_pv_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "split_junction (vv)",
-        "file": "split_junction_vv_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/vv/split_junction_vv_modules_config.json"
-      },
-      {
-        "name": "split_junction (vv_nonlinear)",
-        "file": "split_junction_vv_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear/split_junction_vv_nonlinear_modules_config.json"
-      },
-      {
-        "name": "split_junction (vv_nonlinear_constR)",
-        "file": "split_junction_vv_nonlinear_constR_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear_constR/split_junction_vv_nonlinear_constR_modules_config.json"
-      },
-      {
-        "name": "split_junction (vv_nonlinear_visco)",
-        "file": "split_junction_vv_nonlinear_visco_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear_visco/split_junction_vv_nonlinear_visco_modules_config.json"
-      },
-      {
-        "name": "split_junction (vv_novisco)",
-        "file": "split_junction_vv_novisco_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_novisco/split_junction_vv_novisco_modules_config.json"
-      },
-      {
-        "name": "split_junction_simple (pv)",
-        "file": "split_junction_simple_pv_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction_simple/versions/pv/split_junction_simple_pv_modules_config.json"
-      },
-      {
-        "name": "split_junction_simple (vv)",
-        "file": "split_junction_simple_vv_modules_config.json",
-        "path": "modules/vessels/junctions/split_junction_simple/versions/vv/split_junction_simple_vv_modules_config.json"
-      },
-      {
-        "name": "venous_merge_junction (vp_nonlinear)",
-        "file": "venous_merge_junction_vp_nonlinear_modules_config.json",
-        "path": "modules/vessels/junctions/venous_merge_junction/versions/vp_nonlinear/venous_merge_junction_vp_nonlinear_modules_config.json"
-      },
-      {
-        "name": "venous_merge_junction_simple (vp)",
-        "file": "venous_merge_junction_simple_vp_modules_config.json",
-        "path": "modules/vessels/junctions/venous_merge_junction_simple/versions/vp/venous_merge_junction_simple_vp_modules_config.json"
-      },
-      {
-        "name": "venous_merge_junction_simple (vv)",
-        "file": "venous_merge_junction_simple_vv_modules_config.json",
-        "path": "modules/vessels/junctions/venous_merge_junction_simple/versions/vv/venous_merge_junction_simple_vv_modules_config.json"
-      },
-      {
-        "name": "venous_split_junction_simple (vv)",
-        "file": "venous_split_junction_simple_vv_modules_config.json",
-        "path": "modules/vessels/junctions/venous_split_junction_simple/versions/vv/venous_split_junction_simple_vv_modules_config.json"
       },
       {
         "name": "arteriole (pp_micro)",
@@ -2322,6 +1712,11 @@
         "path": "modules/vessels/compartments/arterial/versions/vv_nonlinear_visco/arterial_vv_nonlinear_visco_units.cellml"
       },
       {
+        "name": "arterial (vv_novisco)",
+        "file": "arterial_vv_novisco_units.cellml",
+        "path": "modules/vessels/compartments/arterial/versions/vv_novisco/arterial_vv_novisco_units.cellml"
+      },
+      {
         "name": "arterial_simple (pp)",
         "file": "arterial_simple_pp_units.cellml",
         "path": "modules/vessels/compartments/arterial_simple/versions/pp/arterial_simple_pp_units.cellml"
@@ -2340,6 +1735,11 @@
         "name": "arterial_simple (vp_nonlinear)",
         "file": "arterial_simple_vp_nonlinear_units.cellml",
         "path": "modules/vessels/compartments/arterial_simple/versions/vp_nonlinear/arterial_simple_vp_nonlinear_units.cellml"
+      },
+      {
+        "name": "arterial_simple (vp_usV_C_ctl)",
+        "file": "arterial_simple_vp_usV_C_ctl_units.cellml",
+        "path": "modules/vessels/compartments/arterial_simple/versions/vp_usV_C_ctl/arterial_simple_vp_usV_C_ctl_units.cellml"
       },
       {
         "name": "arterial_simple (vv)",
@@ -2522,11 +1922,6 @@
         "path": "modules/vessels/compartments/venous_Rctl/versions/vp_woCont/venous_Rctl_vp_woCont_units.cellml"
       },
       {
-        "name": "2in2out_junction (vv)",
-        "file": "2in2out_junction_vv_units.cellml",
-        "path": "modules/vessels/junctions/2in2out_junction/versions/vv/2in2out_junction_vv_units.cellml"
-      },
-      {
         "name": "capillary_merge (vp)",
         "file": "capillary_merge_vp_units.cellml",
         "path": "modules/vessels/junctions/capillary_merge/versions/vp/capillary_merge_vp_units.cellml"
@@ -2550,316 +1945,6 @@
         "name": "flow_sum_2 (nn)",
         "file": "flow_sum_2_nn_units.cellml",
         "path": "modules/vessels/junctions/flow_sum_2/versions/nn/flow_sum_2_nn_units.cellml"
-      },
-      {
-        "name": "merge_junction (vp)",
-        "file": "merge_junction_vp_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp/merge_junction_vp_units.cellml"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear)",
-        "file": "merge_junction_vp_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear/merge_junction_vp_nonlinear_units.cellml"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear_constR)",
-        "file": "merge_junction_vp_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear_constR/merge_junction_vp_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "merge_junction (vp_nonlinear_visco)",
-        "file": "merge_junction_vp_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vp_nonlinear_visco/merge_junction_vp_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "merge_junction (vv)",
-        "file": "merge_junction_vv_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv/merge_junction_vv_units.cellml"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear)",
-        "file": "merge_junction_vv_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear/merge_junction_vv_nonlinear_units.cellml"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear_constR)",
-        "file": "merge_junction_vv_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear_constR/merge_junction_vv_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "merge_junction (vv_nonlinear_visco)",
-        "file": "merge_junction_vv_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction/versions/vv_nonlinear_visco/merge_junction_vv_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "merge_junction_simple (vp)",
-        "file": "merge_junction_simple_vp_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction_simple/versions/vp/merge_junction_simple_vp_units.cellml"
-      },
-      {
-        "name": "merge_junction_simple (vv)",
-        "file": "merge_junction_simple_vv_units.cellml",
-        "path": "modules/vessels/junctions/merge_junction_simple/versions/vv/merge_junction_simple_vv_units.cellml"
-      },
-      {
-        "name": "Min_junction (vp)",
-        "file": "Min_junction_vp_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp/Min_junction_vp_units.cellml"
-      },
-      {
-        "name": "Min_junction (vp_noI)",
-        "file": "Min_junction_vp_noI_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_noI/Min_junction_vp_noI_units.cellml"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear)",
-        "file": "Min_junction_vp_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear/Min_junction_vp_nonlinear_units.cellml"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear_constR)",
-        "file": "Min_junction_vp_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear_constR/Min_junction_vp_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "Min_junction (vp_nonlinear_visco)",
-        "file": "Min_junction_vp_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_nonlinear_visco/Min_junction_vp_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "Min_junction (vp_simple)",
-        "file": "Min_junction_vp_simple_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_simple/Min_junction_vp_simple_units.cellml"
-      },
-      {
-        "name": "Min_junction (vp_simple_novisco)",
-        "file": "Min_junction_vp_simple_novisco_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vp_simple_novisco/Min_junction_vp_simple_novisco_units.cellml"
-      },
-      {
-        "name": "Min_junction (vv)",
-        "file": "Min_junction_vv_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv/Min_junction_vv_units.cellml"
-      },
-      {
-        "name": "Min_junction (vv_noI)",
-        "file": "Min_junction_vv_noI_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_noI/Min_junction_vv_noI_units.cellml"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear)",
-        "file": "Min_junction_vv_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear/Min_junction_vv_nonlinear_units.cellml"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear_constR)",
-        "file": "Min_junction_vv_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear_constR/Min_junction_vv_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "Min_junction (vv_nonlinear_visco)",
-        "file": "Min_junction_vv_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_nonlinear_visco/Min_junction_vv_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "Min_junction (vv_simple)",
-        "file": "Min_junction_vv_simple_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction/versions/vv_simple/Min_junction_vv_simple_units.cellml"
-      },
-      {
-        "name": "Min_junction_2 (vp_noI)",
-        "file": "Min_junction_2_vp_noI_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction_2/versions/vp_noI/Min_junction_2_vp_noI_units.cellml"
-      },
-      {
-        "name": "Min_junction_2 (vv_noI)",
-        "file": "Min_junction_2_vv_noI_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction_2/versions/vv_noI/Min_junction_2_vv_noI_units.cellml"
-      },
-      {
-        "name": "Min_junction_usV_C_ctl (vp_simple)",
-        "file": "Min_junction_usV_C_ctl_vp_simple_units.cellml",
-        "path": "modules/vessels/junctions/Min_junction_usV_C_ctl/versions/vp_simple/Min_junction_usV_C_ctl_vp_simple_units.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv)",
-        "file": "MinNout_junction_vv_units.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv/MinNout_junction_vv_units.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_noI)",
-        "file": "MinNout_junction_vv_noI_units.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_noI/MinNout_junction_vv_noI_units.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear)",
-        "file": "MinNout_junction_vv_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear/MinNout_junction_vv_nonlinear_units.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear_constR)",
-        "file": "MinNout_junction_vv_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear_constR/MinNout_junction_vv_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_nonlinear_visco)",
-        "file": "MinNout_junction_vv_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_nonlinear_visco/MinNout_junction_vv_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "MinNout_junction (vv_simple)",
-        "file": "MinNout_junction_vv_simple_units.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction/versions/vv_simple/MinNout_junction_vv_simple_units.cellml"
-      },
-      {
-        "name": "MinNout_junction_2 (vv_noI)",
-        "file": "MinNout_junction_2_vv_noI_units.cellml",
-        "path": "modules/vessels/junctions/MinNout_junction_2/versions/vv_noI/MinNout_junction_2_vv_noI_units.cellml"
-      },
-      {
-        "name": "Nout_junction (pv)",
-        "file": "Nout_junction_pv_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv/Nout_junction_pv_units.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_noI)",
-        "file": "Nout_junction_pv_noI_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_noI/Nout_junction_pv_noI_units.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear)",
-        "file": "Nout_junction_pv_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear/Nout_junction_pv_nonlinear_units.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear_constR)",
-        "file": "Nout_junction_pv_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear_constR/Nout_junction_pv_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_nonlinear_visco)",
-        "file": "Nout_junction_pv_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_nonlinear_visco/Nout_junction_pv_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "Nout_junction (pv_simple)",
-        "file": "Nout_junction_pv_simple_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/pv_simple/Nout_junction_pv_simple_units.cellml"
-      },
-      {
-        "name": "Nout_junction (vv)",
-        "file": "Nout_junction_vv_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv/Nout_junction_vv_units.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_noI)",
-        "file": "Nout_junction_vv_noI_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_noI/Nout_junction_vv_noI_units.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear)",
-        "file": "Nout_junction_vv_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear/Nout_junction_vv_nonlinear_units.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear_constR)",
-        "file": "Nout_junction_vv_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear_constR/Nout_junction_vv_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_nonlinear_visco)",
-        "file": "Nout_junction_vv_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_nonlinear_visco/Nout_junction_vv_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "Nout_junction (vv_simple)",
-        "file": "Nout_junction_vv_simple_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction/versions/vv_simple/Nout_junction_vv_simple_units.cellml"
-      },
-      {
-        "name": "Nout_junction_2 (pv_noI)",
-        "file": "Nout_junction_2_pv_noI_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction_2/versions/pv_noI/Nout_junction_2_pv_noI_units.cellml"
-      },
-      {
-        "name": "Nout_junction_2 (vv_noI)",
-        "file": "Nout_junction_2_vv_noI_units.cellml",
-        "path": "modules/vessels/junctions/Nout_junction_2/versions/vv_noI/Nout_junction_2_vv_noI_units.cellml"
-      },
-      {
-        "name": "split_junction (pv)",
-        "file": "split_junction_pv_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv/split_junction_pv_units.cellml"
-      },
-      {
-        "name": "split_junction (pv_nonlinear)",
-        "file": "split_junction_pv_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear/split_junction_pv_nonlinear_units.cellml"
-      },
-      {
-        "name": "split_junction (pv_nonlinear_constR)",
-        "file": "split_junction_pv_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear_constR/split_junction_pv_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "split_junction (pv_nonlinear_visco)",
-        "file": "split_junction_pv_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/pv_nonlinear_visco/split_junction_pv_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "split_junction (vv)",
-        "file": "split_junction_vv_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv/split_junction_vv_units.cellml"
-      },
-      {
-        "name": "split_junction (vv_nonlinear)",
-        "file": "split_junction_vv_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear/split_junction_vv_nonlinear_units.cellml"
-      },
-      {
-        "name": "split_junction (vv_nonlinear_constR)",
-        "file": "split_junction_vv_nonlinear_constR_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear_constR/split_junction_vv_nonlinear_constR_units.cellml"
-      },
-      {
-        "name": "split_junction (vv_nonlinear_visco)",
-        "file": "split_junction_vv_nonlinear_visco_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_nonlinear_visco/split_junction_vv_nonlinear_visco_units.cellml"
-      },
-      {
-        "name": "split_junction (vv_novisco)",
-        "file": "split_junction_vv_novisco_units.cellml",
-        "path": "modules/vessels/junctions/split_junction/versions/vv_novisco/split_junction_vv_novisco_units.cellml"
-      },
-      {
-        "name": "split_junction_simple (pv)",
-        "file": "split_junction_simple_pv_units.cellml",
-        "path": "modules/vessels/junctions/split_junction_simple/versions/pv/split_junction_simple_pv_units.cellml"
-      },
-      {
-        "name": "split_junction_simple (vv)",
-        "file": "split_junction_simple_vv_units.cellml",
-        "path": "modules/vessels/junctions/split_junction_simple/versions/vv/split_junction_simple_vv_units.cellml"
-      },
-      {
-        "name": "venous_merge_junction (vp_nonlinear)",
-        "file": "venous_merge_junction_vp_nonlinear_units.cellml",
-        "path": "modules/vessels/junctions/venous_merge_junction/versions/vp_nonlinear/venous_merge_junction_vp_nonlinear_units.cellml"
-      },
-      {
-        "name": "venous_merge_junction_simple (vp)",
-        "file": "venous_merge_junction_simple_vp_units.cellml",
-        "path": "modules/vessels/junctions/venous_merge_junction_simple/versions/vp/venous_merge_junction_simple_vp_units.cellml"
-      },
-      {
-        "name": "venous_merge_junction_simple (vv)",
-        "file": "venous_merge_junction_simple_vv_units.cellml",
-        "path": "modules/vessels/junctions/venous_merge_junction_simple/versions/vv/venous_merge_junction_simple_vv_units.cellml"
-      },
-      {
-        "name": "venous_split_junction_simple (vv)",
-        "file": "venous_split_junction_simple_vv_units.cellml",
-        "path": "modules/vessels/junctions/venous_split_junction_simple/versions/vv/venous_split_junction_simple_vv_units.cellml"
       },
       {
         "name": "arteriole (pp_micro)",
