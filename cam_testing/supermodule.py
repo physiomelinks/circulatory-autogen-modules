@@ -1,7 +1,7 @@
 """
 Supermodule versions: a version whose config entry has module_format "supermodule" -- a module made
 of other modules' versions. Such a version replaces a monolithic one of the same module_type (e.g.
-cardiac/heart version Argus2026_v01, cell/neurons/soma version sympathetic).
+heart version Argus2026_v01, cell/neuron/soma version sympathetic).
 
   <module_type>_<version>_modules_config.json   one entry: module_format "supermodule", the
                                                 submodules (a vessel array of library versions, each

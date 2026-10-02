@@ -29,8 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: list
-        # one job per top-level category of modules/ (a directory holding module_types, i.e. with a
-        # versions/ directory somewhere below it), not one per module_type
+        # one job per top-level directory of modules/ that holds module_types (a versions/ directory
+        # somewhere below it): a category (cell, vessels, ...), or a module_type directly under
+        # modules/ with the module_types nested in it (heart: MODULE=heart selects heart, cardiac_clock,
+        # chamber and valve). Not one per module_type.
         run: |
           categories=$(python3 -c "import glob, json, os; print(json.dumps(sorted({p.split(os.sep)[1] for p in glob.glob('modules/*/**/versions', recursive=True)})))")
           echo "categories=$categories" >> "$GITHUB_OUTPUT"

@@ -1,7 +1,7 @@
 module_type: i_NaK
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+notes: Copied verbatim from the owner's SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. Na/K pump of the SN soma (Lindblad 1996 form), with its fluxes
   j_NaK_Na = -3 i_NaK/F and j_NaK_K = 2 i_NaK/F. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
   by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts

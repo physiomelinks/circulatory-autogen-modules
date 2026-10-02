@@ -2,7 +2,7 @@
 Per-instance COMBINE archives (.omex) for CUFLynx, generated from the library's own files so
 nothing is kept in two places:
 
-    modules/<category>/<module_type>/versions/<version>/instances/<instance>/<module_type>_<version>_<instance>.omex
+    modules/<module_type path>/versions/<version>/instances/<instance>/<module_type>_<version>_<instance>.omex
 
 Built by ``python tools/build_instance_omex.py`` (``make omex``); not committed. Each archive holds
 

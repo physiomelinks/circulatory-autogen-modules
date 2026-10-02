@@ -26,10 +26,12 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">circulatory-autogen-modules · {{ category }} · module_type</div>
+    <div class="eyebrow">circulatory-autogen-modules · {{ location or 'modules' }} · module_type</div>
     <h1>{{ name }}</h1>
     <p>{{ n_versions }} version{{ '' if n_versions == 1 else 's' }} (each a <code>module_subtype</code>, with its own CellML, config, units and tests) and {{ n_instances }} instance{{ '' if n_instances == 1 else 's' }} (parameter sets of a version). Open a version for its equations, parameters, test results and instances.</p>
     <div class="meta">
+      {%- if parent %}<span>Nested in <a href="../{{ parent }}.html">{{ parent }}</a></span>{% endif %}
+      {%- if nested %}<span>Nested module_types: {% for n in nested %}<a href="{{ n }}/{{ n }}.html">{{ n }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</span>{% endif %}
       <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
       <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
       <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% elif phlynx.run %}PhLynx / CUFLynx compatible: {{ phlynx.compatible }} of {{ phlynx.total }} versions{% else %}PhLynx / CUFLynx: not tested yet{% endif %}</span>

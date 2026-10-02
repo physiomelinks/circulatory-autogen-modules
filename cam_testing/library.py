@@ -22,8 +22,12 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
                 <instance>_calibrated_parameters.csv      written by calibration (committed)
                 <instance>_calibration.json               written by calibration (committed)
 
-A module_type directory is any directory under modules/ with a versions/ subdirectory; every
-other directory above one is a category. System models live in system_models/.
+A module_type directory is any directory under modules/ with a versions/ subdirectory. A module_type
+may contain the module_types that only exist within it (nested module_types: its other
+subdirectories with versions/, e.g. cell/neuron/soma/SN_membrane_soma), which may nest again. Every
+other directory above a module_type is a category. A module_type's category is the category path
+above its outermost enclosing module_type ("cell" for soma; "" for heart and its nested
+module_types, which sit directly under modules/). System models live in system_models/.
 """
 import copy
 import csv
@@ -71,29 +75,40 @@ def safe_id(text):
 # ----------------------------------------------------------------------------------------------
 
 @functools.lru_cache(maxsize=None)
-def _module_type_dirs():
-    '''module_type name -> directory, for every modules/**/<name>/ that has versions/.'''
-    found = {}
+def _discover():
+    '''(module_type name -> directory, module_type name -> enclosing module_type name or None), for
+    every modules/**/<name>/ that has versions/, nested module_types included.'''
+    found, parents = {}, {}
     if not os.path.isdir(MODULES_DIR):
-        return found
+        return found, parents
+    enclosing = {MODULES_DIR: None}     # directory -> the module_type it is in (None: none)
     for root, dirs, files in os.walk(MODULES_DIR):
         rel = os.path.relpath(root, MODULES_DIR)
         if rel != '.' and rel.split(os.sep)[0] in UNMIGRATED:
             dirs[:] = []
             continue
+        inside = enclosing[root]
         if VERSIONS in dirs:
             name = os.path.basename(root)
             if name in found:
                 raise ValueError(f'two module_types are called {name}: {found[name]} and {root}')
-            found[name] = root
-            dirs[:] = []
-            continue
-        dirs[:] = sorted(d for d in dirs if not d.startswith('.') and d not in GENERATED_DIRS)
-    return found
+            found[name], parents[name] = root, inside
+            inside = name
+            # the other subdirectories of a module_type are nested module_types (or stray directories)
+            dirs[:] = [d for d in dirs if d != VERSIONS]
+        dirs[:] = sorted(d for d in dirs if not d.startswith(('.', '__')) and d not in GENERATED_DIRS)
+        for d in dirs:
+            enclosing[os.path.join(root, d)] = inside
+    return found, parents
+
+
+def _module_type_dirs():
+    '''module_type name -> directory, for every modules/**/<name>/ that has versions/.'''
+    return _discover()[0]
 
 
 def module_type_names():
-    '''Every module_type, in case-insensitive order.'''
+    '''Every module_type (nested ones included), in case-insensitive order.'''
     return sorted(_module_type_dirs(), key=str.lower)
 
 
@@ -108,33 +123,66 @@ def module_type_dir(name):
 module_dir = module_type_dir
 
 
-def category_of(name):
-    '''The category path of a module_type, e.g. "cell/neurons".'''
-    return os.path.relpath(os.path.dirname(module_type_dir(name)), MODULES_DIR).replace(os.sep, '/')
+def parent_of(name):
+    '''The module_type a nested module_type sits in (e.g. "soma" for SN_membrane_soma), or None.'''
+    return _discover()[1].get(name)
+
+
+def ancestors_of(name):
+    '''The enclosing module_types, innermost first (e.g. ["soma", "neuron"] for SN_membrane_soma).'''
+    out, p = [], parent_of(name)
+    while p is not None:
+        out.append(p)
+        p = parent_of(p)
+    return out
+
+
+def nested_in(name):
+    '''The module_types directly nested in a module_type.'''
+    return sorted((n for n, p in _discover()[1].items() if p == name), key=str.lower)
 
 
 def module_relpath(name):
-    '''The module_type directory relative to modules/, e.g. "cell/neurons/soma".'''
+    '''The module_type directory relative to modules/, e.g. "cell/neuron/soma".'''
     return os.path.relpath(module_type_dir(name), MODULES_DIR).replace(os.sep, '/')
+
+
+def category_of(name):
+    '''The category path of a module_type: the categories above its outermost enclosing module_type,
+    e.g. "cell" for neuron, soma and SN_membrane_soma, "vessels/compartments" for simple, and "" for
+    heart (directly under modules/) and the module_types nested in it.'''
+    outer = (ancestors_of(name) or [name])[-1]
+    rel = os.path.relpath(os.path.dirname(module_type_dir(outer)), MODULES_DIR).replace(os.sep, '/')
+    return '' if rel == '.' else rel
+
+
+def group_of(name):
+    '''Where a module_type is listed in the reports: its category, or for a module_type directly under
+    modules/ (and those nested in it) the outermost module_type's name, e.g. "heart".'''
+    return category_of(name) or module_relpath(name).split('/')[0]
 
 
 def categories():
     '''Every category path (with its parents), sorted.'''
     out = set()
     for name in module_type_names():
-        parts = category_of(name).split('/')
+        cat = category_of(name)
+        if not cat:
+            continue
+        parts = cat.split('/')
         for i in range(1, len(parts) + 1):
             out.add('/'.join(parts[:i]))
     return sorted(out)
 
 
 def matches_selector(name, selector):
-    '''--module selector: a module_type name, or a category path (prefix) such as "cell" or "cell/neurons".'''
-    if selector == name:
-        return True
-    cat = category_of(name)
+    '''--module selector: a module_type name (which selects it and the module_types nested in it), or
+    a path under modules/ (a prefix) such as "cell", "cell/neuron" or "heart".'''
     sel = selector.strip('/')
-    return cat == sel or cat.startswith(sel + '/')
+    if sel == name or sel in ancestors_of(name):
+        return True
+    rel = module_relpath(name)
+    return rel == sel or rel.startswith(sel + '/')
 
 
 def select_module_types(selectors):
@@ -425,11 +473,32 @@ class ModuleType:
 
     @property
     def category(self):
-        return os.path.relpath(os.path.dirname(self.dir), MODULES_DIR).replace(os.sep, '/')
+        '''The category path above the outermost enclosing module_type ("" directly under modules/).'''
+        return category_of(self.name)
+
+    @property
+    def group(self):
+        '''Where the reports list it: the category, or the outermost module_type for one under modules/.'''
+        return group_of(self.name)
+
+    @property
+    def parent(self):
+        '''The module_type it is nested in, or None.'''
+        return parent_of(self.name)
+
+    @property
+    def nested(self):
+        '''The module_types nested directly in it.'''
+        return nested_in(self.name)
 
     @property
     def relpath(self):
         return os.path.relpath(self.dir, MODULES_DIR).replace(os.sep, '/')
+
+    @property
+    def location(self):
+        '''The directory it sits in, relative to modules/ (e.g. "cell/neuron/soma"; "" under modules/).'''
+        return os.path.dirname(self.relpath)
 
     @property
     def versions_dir(self):
@@ -779,14 +848,28 @@ def version_index():
     return {(v.vessel_type, v.name): v for v in all_versions()}
 
 
+# The alternative hearts became versions of heart (2026-10, nested module_types). A version name
+# keeps the old module_subtype's port letters first: libcuflynx's vessel-port rule reads them.
+HEART_VERSION_RENAMES = {
+    ('heart_ASD', 'vp_wCont'): ('heart', 'vp_wCont_ASD'),
+    ('heart_LVprop', 'vp'): ('heart', 'vp_LVprop'),
+    ('heart_new_valve', 'vp'): ('heart', 'vp_new_valve'),
+    ('heart_nonstiff', 'vp_wCont'): ('heart', 'vp_wCont_nonstiff'),
+    ('heart_simple', 'vp'): ('heart', 'vp_simple'),
+    ('heart_simple_2', 'vp'): ('heart', 'vp_simple_2'),
+    ('heart_simple_OLD', 'vp'): ('heart', 'vp_simple_OLD'),
+}
+
+
 @functools.lru_cache(maxsize=None)
 def legacy_renames():
     '''(old module_type, old module_subtype) -> (module_type, version) for every pair that changed in
     the move to versions (ion channels, the sympathetic-neuron pieces, the supermodules), from
-    tools/restructure_map.yaml. circulatory_autogen's own models still use the old pairs.'''
+    tools/restructure_map.yaml, and in the move of the alternative hearts into heart
+    (HEART_VERSION_RENAMES). circulatory_autogen's own models still use the old pairs.'''
     path = os.path.join(REPO_ROOT, 'tools', 'restructure_map.yaml')
     if not os.path.isfile(path):
-        return {}
+        return dict(HEART_VERSION_RENAMES)
     with open(path) as f:
         m = yaml.safe_load(f)
     out = {}
@@ -799,8 +882,11 @@ def legacy_renames():
                 else:
                     r = re.match(r'supermodules/(\w+)', info['from'])
                     old = (r[1], 'supermodule')
-                if old != (mt, v):
-                    out[old] = (mt, v)
+                new = HEART_VERSION_RENAMES.get((mt, v), (mt, v))
+                if old != new:
+                    out[old] = new
+    for old, new in HEART_VERSION_RENAMES.items():
+        out.setdefault(old, new)
     return out
 
 

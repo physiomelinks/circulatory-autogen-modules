@@ -43,7 +43,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
         <tbody>
         {%- for r in g.rows %}
           <tr>
-            <td class="name"><a href="{{ r.href }}">{{ r.name }}</a></td>
+            <td class="name"><a href="{{ r.href }}">{{ r.display }}</a></td>
             <td class="vers">{% for v in r.versions %}<a href="{{ v.href }}" title="{{ v.counts.passed }} passed, {{ v.counts.failed }} failed{{ ', PhLynx / CUFLynx compatible' if v.phlynx_compatible }}">{{ v.name }}</a>{% if v.phlynx_compatible %}<span class="tick" title="PhLynx / CUFLynx compatible">✓</span>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</td>
             <td class="num">{{ r.n_instances }}</td>
             <td class="num">{{ r.counts.passed }}</td>

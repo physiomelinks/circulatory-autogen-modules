@@ -23,6 +23,11 @@ Idempotent: the new tree is built from the source in a staging directory and mov
 run from the same source gives the same files. With the old layout gone and no --source, there is
 nothing to do. Another session's uncommitted work is left alone: modules/poiseuille_transport/ and
 modules/system/poiseuille/ stay where they are (see LEFT_IN_PLACE).
+
+Historical: this made the first versions layout (categories cardiac and cell/neurons). The later move
+to nested module_types (cell/neuron and heart as module_types holding their parts, the alternative
+hearts as versions of heart) was done by hand and is not in the map; modules/README.md describes the
+current layout, and cam_testing.library.HEART_VERSION_RENAMES the heart renames.
 """
 import argparse
 import copy

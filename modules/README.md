@@ -13,8 +13,10 @@ modules/
   README.md                         this file
   directory_schema.json             the layout, machine-readable (tests/test_structure.py checks it)
   <category>/[<subcategory>/...]    physiological grouping only: subcategories and module_types, no files
-    <module_type>/                  a directory with versions/ is a module_type
+    <module_type>/                  a directory with versions/ is a module_type (it may also sit directly in modules/)
       <module_type>.html            report across the versions (generated)
+      <nested module_type>/         a module_type that only exists within this one, laid out the same way
+                                    (its own versions/, and possibly module_types nested in it)
       versions/
         <version>/                  version == the config entry's module_subtype
           <module_type>_<version>_modules.cellml         its CellML component
@@ -37,13 +39,13 @@ modules/
               SOURCES.md, raw data files                 where the data came from (e.g. hudson_bay_lynx_hare.csv)
 ```
 
-The categories are:
+The top level of `modules/` holds categories and one module_type, `heart`:
 
-| Category | Holds |
+| Directory | Holds |
 |---|---|
 | `vessels/compartments`, `vessels/junctions`, `vessels/terminals`, `vessels/microvasculature`, `vessels/properties` | 0D vessel segments, junctions, terminal beds, microvascular networks, wall material laws |
-| `cardiac` | the heart (monolithic and supermodule versions), cardiac clock, chamber, valve |
-| `cell`, `cell/ion_channels`, `cell/neurons`, `cell/cardiomyocytes` | cell models and their parts |
+| `heart` (a module_type) | the heart's versions (monolithic: `vp`, `vp_Ca`, `vp_wCont`, `vp_devel` and the former alternative hearts, see below; supermodule: `Argus2026_v01`), with the nested module_types `cardiac_clock`, `chamber` and `valve` |
+| `cell`, `cell/ion_channels`, `cell/cardiomyocytes` | cell models and their parts; `cell/neuron` is the module_type neuron, with its parts nested in it |
 | `respiratory` | lungs, gas exchange and transport |
 | `control` | baroreflex, autonomic control, effectors, observers, PID control |
 | `boundary_conditions` | inlet/outlet pressures and flows, generators, stimuli |
@@ -55,22 +57,94 @@ The categories are:
 `modules/poiseuille_transport/` and `modules/system/` are another session's work in the old layout and
 are excluded from the schema (`directory_schema.json`, `excluded`) until they move.
 
+## Nested module_types
+
+**A module_type may contain the module_types that only exist within it.** Any directory with a
+`versions/` directory is a module_type. Its other subdirectories that have `versions/` are **nested
+module_types**, which may nest again. A nested module_type is a full module_type: its own versions,
+instances, tests and reports, and it is named in configs and vessel arrays by its name alone
+(`"module_type": "soma"`), never by its path. Only where it sits on disk says that it belongs to its
+parent.
+
+```
+modules/
+  heart/                                  module_type heart (directly in modules/)
+    versions/vp/ vp_wCont/ vp_wCont_ASD/ ... Argus2026_v01/
+    cardiac_clock/versions/nn/ nn_controlled/    nested: used only in heart
+    chamber/versions/vv/                         nested: used only in heart
+    valve/versions/pp/ pp_linear/ pp_rmod/       nested: used only in heart
+  cell/                                   category (there is no module_type "cell")
+    neuron/                               module_type neuron
+      versions/sympathetic/
+      NE_release_Tao_2011/                nested: a part of the Tao 2011 neuron
+      sympathetic_neuron_membrane_voltage/    nested: a part of the Tao 2011 neuron
+      axon/versions/sympathetic_monolithic_v01/
+      soma/                               nested in neuron
+        versions/sympathetic/ sympathetic_monolithic_v01/
+        SN_membrane_soma/  SN_Na_K_concentrations_soma/  SN_Ca_handling_soma/   nested in soma
+      varicosity/                         nested in neuron
+        versions/sympathetic/ sympathetic_monolithic_v01/
+        SN_varicosity_membrane/  SN_Ca_handling_varicosity/  SN_NE_release/   nested in varicosity
+    ion_channels/                         category: channels shared by neurons and cardiomyocytes
+      i_Na/  i_CaL/  ...
+    cardiomyocytes/                       category: there is no module_type "cardiomyocyte"
+      myocyte_membrane_voltage/  Ca_dynamics_Paci_2013/  ...
+```
+
+**Categories remain only for grouping where no module_type of that meaning exists**: `cell`,
+`cell/ion_channels`, `cell/cardiomyocytes`, `vessels/...`, `control`, ... A category is never put
+beside a module_type of the same meaning: there is no category `cell/neurons` holding a module_type
+`neuron`, and no category `cardiac` holding a module_type `heart`. The module_type holds its parts
+itself.
+
+**Used only within its parent.** A nested module_type is used only inside its parent: every
+supermodule submodule and every test-harness record (`harness.vessel_array` in a verification config)
+that names it belongs to a version of the parent, of a module_type nested (at any depth) in the
+parent, or of the nested module_type itself. `tests/test_structure.py` checks this. System models are
+exempt: they may wire a parent's parts explicitly, e.g. `system_models/cellular/SN_simple_flat` (the
+soma and varicosity parts, wired by hand) and the closed-loop models (the heart as cardiac clock,
+chamber and valve records).
+
+The category of a nested module_type is the category path above its outermost enclosing module_type
+(`cell` for neuron, soma and `SN_membrane_soma`; none for heart and its nested module_types, which form
+their own group, `heart`, in the site index).
+
+Selecting a module_type by name (`--module neuron`, `MODULE=heart`) selects it **and the module_types
+nested in it**. A path under `modules/` selects everything below it (`--module cell/neuron/soma`:
+soma and its three parts).
+
 ## Placement rule
 
-A module_type goes in **the most specific category that covers every context it is used in**, not as
+A module_type goes in **the most specific place that covers every context it is used in**, not as
 shallow as possible:
-- `soma`, `axon` and `varicosity` are only parts of neurons, so they are in `cell/neurons/`.
-- A sarcoplasmic reticulum (or a generic Ca store) would belong to several cell types, so it would go
-  in `cell/`, as `NKE_pump` does today.
-- Every ion channel is in `cell/ion_channels/`, one module_type per channel kind (`i_Na`, `i_CaL`,
-  ...), because channels of one kind are used across cell types. The cell type a version was built
-  for is in its config entry's `"notes"`, e.g. `"Built for: sympathetic neuron (Tao et al. 2011)"`.
-- `myocyte_membrane_voltage` is only used by the Paci cardiomyocyte, so it is in `cell/cardiomyocytes/`.
+- **Inside the module_type it is only used within**, as a nested module_type, when there is one:
+  - `soma`, `axon` and `varicosity` are only parts of the neuron, so they are in `cell/neuron/`.
+  - The membrane, Na/K and Ca-handling parts of the soma (`SN_membrane_soma`,
+    `SN_Na_K_concentrations_soma`, `SN_Ca_handling_soma`) are only parts of the soma, so they are in
+    `cell/neuron/soma/`, not in `cell/neuron/`.
+  - `SN_varicosity_membrane`, `SN_Ca_handling_varicosity` and `SN_NE_release` are only parts of the
+    varicosity, so they are in `cell/neuron/varicosity/`.
+  - `NE_release_Tao_2011` and `sympathetic_neuron_membrane_voltage` are parts of the Tao 2011 neuron,
+    neither soma- nor varicosity-specific, so they are directly in `cell/neuron/`.
+  - `cardiac_clock`, `chamber` and `valve` are only used to build hearts, so they are in `heart/`.
+- **Otherwise in the most specific category covering all its uses**:
+  - Every ion channel is in `cell/ion_channels/`, one module_type per channel kind (`i_Na`, `i_CaL`,
+    ...), because channels of one kind are used across cell types (the soma's channels by the neuron,
+    the Paci channels by the cardiomyocyte). They are not nested in `soma` even though the soma
+    supermodule uses them. The cell type a version was built for is in its config entry's `"notes"`,
+    e.g. `"Built for: sympathetic neuron (Tao et al. 2011)"`.
+  - A sarcoplasmic reticulum (or a generic Ca store) would belong to several cell types, so it would
+    go in `cell/`, as `NKE_pump` does today.
+  - `myocyte_membrane_voltage` is only used by the Paci cardiomyocyte, which is not a module_type, so it
+    is in the category `cell/cardiomyocytes/`.
+- **One module_type, not several.** A variant of a module_type with the same role and ports is a
+  version of it, not a module_type beside it: the alternative hearts `heart_ASD`, `heart_LVprop`, ...
+  are versions of `heart` (see "Versions").
 
-**No directory name appears twice** among the categories and module_types, so a category is never
-named like a module_type: the category `cell/neurons/` holds the module_type `neuron`. The generic
-names (`versions`, `instances`, `risk`, `plots`, `results`), version names (which repeat across
-module_types: `nn`, `vp`, ...) and instance names (which name data sets, and `default`) are exempt.
+**No directory name appears twice** anywhere in `modules/`, among the categories, module_types and
+nested module_types, so a category is never named like a module_type. The generic names (`versions`,
+`instances`, `risk`, `plots`, `results`), version names (which repeat across module_types: `nn`, `vp`,
+...) and instance names (which name data sets, and `default`) are exempt.
 
 ## Versions
 
@@ -86,6 +160,24 @@ version's name is the config entry's `module_subtype`**, so a model picks a vers
   exempts names starting `nn`. So a version name starts with one of those four only when it follows
   that port convention. `Argus2026_v01` or `sympathetic` are safe; a version called `vp_Smith2027_v01`
   would be read as a v-in/p-out vessel.
+- **A module_type folded into another keeps its port letters first.** When a former module_type
+  becomes a version of another, the version is named `<old module_subtype>_<old module_type suffix>`,
+  so its first two letters (and so libcuflynx's connection rule) are unchanged. The alternative hearts
+  became versions of `heart` this way:
+
+  | Former (module_type, module_subtype) | Now (`heart`, version) |
+  |---|---|
+  | `heart_ASD`, `vp_wCont` | `vp_wCont_ASD` |
+  | `heart_LVprop`, `vp` | `vp_LVprop` |
+  | `heart_new_valve`, `vp` | `vp_new_valve` |
+  | `heart_nonstiff`, `vp_wCont` | `vp_wCont_nonstiff` |
+  | `heart_simple`, `vp` | `vp_simple` |
+  | `heart_simple_2`, `vp` | `vp_simple_2` |
+  | `heart_simple_OLD`, `vp` | `vp_simple_OLD` |
+
+  Their CellML components keep their names (`heart_new_valve`, `heart_nonstiff`, ...), so generated
+  models are unchanged. `cam_testing.library.legacy_renames()` maps circulatory_autogen's old pairs
+  to these (`HEART_VERSION_RENAMES`).
 - **Shared components.** libcuflynx finds CellML components by name across the whole library, so two
   versions can't define components with the same name. A component that several old entries shared
   was copied into each version and renamed `<component>__<module_type>_<version>` (in the CellML and
@@ -145,10 +237,10 @@ module_type:
 
 | Supermodule version | Built from |
 |---|---|
-| `cardiac/heart` `Argus2026_v01` | cardiac clock, four chambers, four valves |
-| `cell/neurons/neuron` `sympathetic` | soma `sympathetic`, axon `sympathetic_monolithic_v01`, varicosity `sympathetic` |
-| `cell/neurons/soma` `sympathetic` | membrane, Na/K, Ca handling and 15 `cell/ion_channels` versions |
-| `cell/neurons/varicosity` `sympathetic` | membrane, Ca handling, channels, NE release |
+| `heart` `Argus2026_v01` | cardiac clock, four chambers, four valves (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`) |
+| `cell/neuron` `sympathetic` | soma `sympathetic`, axon `sympathetic_monolithic_v01`, varicosity `sympathetic` |
+| `cell/neuron/soma` `sympathetic` | membrane, Na/K, Ca handling (nested in soma) and 15 `cell/ion_channels` versions |
+| `cell/neuron/varicosity` `sympathetic` | membrane, Ca handling, NE release (nested in varicosity) and channels |
 
 The monolithic versions sit beside them. For example, `soma` also has `sympathetic_monolithic_v01`.
 
@@ -261,7 +353,8 @@ The version's spec is described in the next section.
 
 ```bash
 pytest tests/test_modules.py --module Lotka_Volterra          # a module_type
-pytest tests/test_modules.py --module cell/neurons            # every module_type in a category
+pytest tests/test_modules.py --module neuron                  # neuron and the module_types nested in it
+pytest tests/test_modules.py --module cell                    # every module_type in a category
 pytest tests/test_modules.py --component Lotka_Volterra/nn    # one version (and its instances)
 pytest tests/test_modules.py --module Lotka_Volterra -m slow  # calibration
 python -m cam_testing.report --module Lotka_Volterra          # Lotka_Volterra.html + the version pages
@@ -338,7 +431,8 @@ An instance with no obs_data or params_for_id still loads and simulates, but CUF
 
 ## Directory schema
 
-`directory_schema.json` describes every level: `modules_root`, `category`, `module_type`, `versions`,
+`directory_schema.json` describes every level: `modules_root` (categories and top-level module_types),
+`category`, `module_type` (its `versions` and nested module_types), `versions`,
 `version`, `instances`, `instance`, `risk`, and `system_models_root` / `system_category` /
 `system_model`. For each level it gives the name pattern, the required and optional files (with
 `{module_type}`, `{version}`, `{instance}`, `{model}` placeholders) and the allowed subdirectories.
@@ -347,10 +441,11 @@ An instance with no obs_data or params_for_id still loads and simulates, but CUF
 - the spec keys each sit in their own file (tests.yaml or verification_config.json);
 - the default instance exists;
 - an instance is its obs_data_name;
-- no directory name repeats;
+- no directory name repeats (nested module_types included);
 - no category is named like a module_type;
+- a nested module_type is used only within its parent;
 - where a module_type goes (placement);
-- how versions are named;
+- how versions are named (the port letters first);
 - every system-model record names an existing version and instance.
 
 `tests/test_structure.py` walks `modules/` and `system_models/` and checks all of this. It also checks
@@ -366,8 +461,12 @@ each version's CellML, config and units, and validates the JSON files against li
 - **A data instance**: add `instances/<name>/` with `<name>_parameters.csv`, the obs_data files
   (`"obs_data_name": "<name>"`), `<name>_params_for_id.csv`, the raw data and `SOURCES.md`. Then add
   `validation.<name>` to the version's verification_config.json.
-- **A new module_type**: put it in the most specific category covering all its uses (create the
-  category if none fits, with a name no module_type has). Then run `make manifests`.
+- **A new module_type**: put it in the most specific place covering all its uses: inside the
+  module_type it is only used within (a nested module_type), otherwise in the most specific category
+  (create the category if none fits and no module_type of that meaning exists, with a name no
+  module_type has). Then run `make manifests`.
 
 `tools/restructure_modules.py` moved the old per-module layout into this one, driven by
-`tools/restructure_map.yaml` (made by `tools/restructure_map.py`).
+`tools/restructure_map.yaml` (made by `tools/restructure_map.py`). The later move to nested
+module_types (the category `cell/neurons` and `cardiac` replaced by the module_types `cell/neuron` and
+`heart`, the alternative hearts made versions of `heart`) is not in that map.

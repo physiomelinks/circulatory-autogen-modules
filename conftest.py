@@ -6,8 +6,8 @@ from cam_testing.library import load_version, select_module_types, load_module_t
 
 def pytest_addoption(parser):
     parser.addoption('--module', action='append', default=[],
-                     help='only test this module_type, or every module_type under a category path '
-                          '(e.g. Lotka_Volterra, cell, cell/neurons); repeatable')
+                     help='only test this module_type (and the module_types nested in it), or every module_type '
+                          'under a path in modules/ (e.g. Lotka_Volterra, neuron, cell, cell/neuron); repeatable')
     parser.addoption('--component', action='append', default=[],
                      help='only test this version, <module_type>/<version> (e.g. Lotka_Volterra/nn) or '
                           '<module_type>__<version>; repeatable')

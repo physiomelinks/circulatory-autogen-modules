@@ -1,7 +1,7 @@
 module_type: i_Na1_6
 version: Argus2026_v01
 reviewed: false
-notes: 'Copied verbatim from the owner''s SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. NaV1.6 current of the SN soma, i_Na1_6 = g_Na1_6 g_Na1_6_mod
   (V - E_Na) m_Na1_6^3 h_Na1_6 (the same law as i_Na_SN). Two features of the original are kept so that SN_simple is reproduced:
   the gates start at i_Na_SN''s steady state (the original sets m_Na1_6''s initial value to m_init, computed from V_mid_m,

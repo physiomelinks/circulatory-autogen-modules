@@ -17,7 +17,7 @@
   "levels": {
     "modules_root": {
       "path": "modules/",
-      "description": "The module library: category directories, this schema and the README.",
+      "description": "The module library: category directories and top-level module_types (heart), this schema and the README.",
       "files": {
         "required": [
           "README.md",
@@ -26,11 +26,12 @@
         "optional": []
       },
       "directories": [
-        "category"
+        "category",
+        "module_type"
       ]
     },
     "category": {
-      "description": "A physiological grouping (vessels, cardiac, cell, ...), possibly nested (cell/neurons). Holds only subcategories and module_types, no files. A directory is a category when it has no versions/ directory.",
+      "description": "A physiological grouping (vessels, cell, control, ...), possibly nested (cell/ion_channels), used only where no module_type of that meaning exists. Holds only subcategories and module_types, no files. A directory is a category when it has no versions/ directory and is not inside a module_type.",
       "name_pattern": "^[a-z][a-z0-9_]*$",
       "files": {
         "required": [],
@@ -43,7 +44,7 @@
       "min_children": 1
     },
     "module_type": {
-      "description": "One module_type: a directory with versions/. Its report across versions is generated next to it.",
+      "description": "One module_type: a directory with versions/. Its report across versions is generated next to it. Its other subdirectories are nested module_types: module_types that only exist within it (each with versions/, possibly nesting again), e.g. heart/chamber, cell/neuron/soma/SN_membrane_soma.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [],
@@ -52,7 +53,8 @@
         ]
       },
       "directories": [
-        "versions"
+        "versions",
+        "module_type"
       ],
       "required_directories": [
         "versions"
@@ -211,10 +213,11 @@
     "spec_files": "A version's spec is two files. {module_type}_{version}_verification_config.json holds what the checks run: the keys in spec_keys.verification_config. {module_type}_{version}_tests.yaml holds review and record-keeping: the keys in spec_keys.tests. module_type and version (equal to the directory names) are in both. Any other key, or a key in the wrong file, is an error.",
     "default_instance_exists": "The config entry's default_instance names an instance directory of the version.",
     "instance_is_obs_data_name": "An instance with an obs_data (and a validation obs_data) has \"obs_data_name\" equal to the instance directory's name.",
-    "unique_directory_names": "No category or module_type directory name appears twice in modules/ (the generic names above, version names, which repeat across module_types, and instance names, which name data sets, are exempt).",
+    "unique_directory_names": "No category or module_type directory name appears twice in modules/, nested module_types included (the generic names above, version names, which repeat across module_types, and instance names, which name data sets, are exempt).",
     "category_is_not_module_type": "No category directory has the name of a module_type.",
-    "placement": "A module_type sits in the most specific category that covers every context it is used in (not as shallow as possible).",
-    "version_names": "Versions are named <source>_vXX (e.g. Argus2026_v01); existing module_subtypes (vp, nn_constant, ...) are kept. libcuflynx's vessel-port connection rule reads a module_subtype's first two letters as the inlet and outlet port kinds when they are pp, pv, vp or vv (and exempts names starting nn), so a version name starts with one of those four only when it means that port convention.",
+    "nested_module_types": "A module_type's subdirectories other than versions/ are nested module_types. A nested module_type is used only within its parent: every supermodule submodule and every harness record (verification_config harness.vessel_array) that names it belongs to a version of its parent, of a module_type nested (at any depth) in its parent, or of itself. System models are exempt: they may wire a parent's parts explicitly (e.g. SN_simple_flat, 3compartment's chambers and valves).",
+    "placement": "A module_type sits in the most specific place that covers every context it is used in (not as shallow as possible): inside the module_type it is only used within (a nested module_type, e.g. heart/chamber, cell/neuron/soma), otherwise in the most specific category covering its uses (e.g. cell/ion_channels for channels shared by neurons and cardiomyocytes). A category exists only where no module_type of that meaning does (cell, not cell/neurons beside the module_type neuron).",
+    "version_names": "Versions are named <source>_vXX (e.g. Argus2026_v01); existing module_subtypes (vp, nn_constant, ...) are kept. libcuflynx's vessel-port connection rule reads a module_subtype's first two letters as the inlet and outlet port kinds when they are pp, pv, vp or vv (and exempts names starting nn), so a version name starts with one of those four only when it means that port convention, and a module_type folded into another as a version keeps its old module_subtype's prefix first (heart_ASD vp_wCont -> heart vp_wCont_ASD).",
     "system_model_records_resolve": "Every record of a system model's vessel array names a (module_type, version) of the library and an instance that version has (records of modules not in this library are listed in the model's spec as known)."
   },
   "spec_keys": {

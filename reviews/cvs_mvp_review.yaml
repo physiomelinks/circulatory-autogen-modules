@@ -31,7 +31,7 @@ questions:
   is in a closed loop with these compartments. Constant root pressures cannot give a physiological loop. Set this up as a
   system-level validation?'
 proposed_fixes:
-- 'Delete the config entry heart_simple_OLD/vp: its module_type heart_simplesimple_type_OLD is not in the CellML (structure
+- 'Delete the config entry heart_simple_OLD/vp (now the version heart/vp_simple_OLD): its module_type heart_simplesimple_type_OLD is not in the CellML (structure
   known issue). Its ports (v_headV, v_lArmV, v_rArmV, v_V1, v_pulmV, u_AA, u_pulmA) belong to an older network.'
 - 'heart_simple_2 (SI): its global constants (T, To_pk, E_*, q_*_us, q_*_init, R_*) share names with heart_simple, and cvs_mvp_parameters.csv
   declares them in litre/kPa. libcuflynx stops with "units of litre in parameters.csv file does not match with units of m3

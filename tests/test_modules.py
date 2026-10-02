@@ -3,7 +3,7 @@ The standard V&V tests: per version (module_type/version) for verification, and 
 (module_type/version/instance) for validation.
 
     pytest                                        # every reviewed version
-    pytest --module Lotka_Volterra                # one module_type (or a category: --module cell)
+    pytest --module Lotka_Volterra                # one module_type and those nested in it (or a category: --module cell)
     pytest --component Lotka_Volterra/nn          # one version
     pytest -m "not slow"                          # skip calibration
 

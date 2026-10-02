@@ -23,8 +23,8 @@ endif
 structure:
 	$(PYTHON) -m pytest tests/test_structure.py
 
-# V&V tests, skipping slow calibration. MODULE=<module_type or category path> runs those versions
-# (reviewed or not), e.g. MODULE=Lotka_Volterra or MODULE=cell/neurons.
+# V&V tests, skipping slow calibration. MODULE=<module_type or path under modules/> runs those versions
+# (reviewed or not), e.g. MODULE=Lotka_Volterra, MODULE=heart (with cardiac_clock, chamber, valve) or MODULE=cell.
 test:
 	$(PYTHON) -m pytest tests/test_modules.py -m "not slow" $(MODULE_ARGS) $(PYTEST_ARGS)
 

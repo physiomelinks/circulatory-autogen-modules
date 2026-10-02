@@ -13,6 +13,11 @@ the tree. The version is the entry's module_subtype (new versions: <source>_vXX)
 
 The map is made from the old per-module layout; once modules/ has moved to versions, pass --source
 with a copy of the old tree (the script refuses to read the new layout).
+
+Historical: this made the first versions layout (categories cardiac and cell/neurons). The later move
+to nested module_types (cell/neuron and heart as module_types holding their parts, the alternative
+hearts as versions of heart) was done by hand and is not in the map; modules/README.md describes the
+current layout, and cam_testing.library.HEART_VERSION_RENAMES the heart renames.
 """
 import collections
 import glob

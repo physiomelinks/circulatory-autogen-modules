@@ -1,7 +1,7 @@
 module_type: i_Na
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+notes: Copied verbatim from the owner's SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. Fast (NaV1.7-like) Na current of the SN soma, i_Na = g_Na g_Na_mod
   (V - E_Na) m^3 h, with its Na flux j_Na = -i_Na/F into the Na pool. Gates start at their steady state at V_rest_approx.
   Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,

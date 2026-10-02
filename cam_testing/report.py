@@ -7,7 +7,7 @@ HTML reports at two levels, and a site index:
                                                             with their validation / calibration
 
     python -m cam_testing.report                  # every module_type and its versions
-    python -m cam_testing.report --module heart   # one module_type (or a category: --module cell)
+    python -m cam_testing.report --module heart   # a module_type and those nested in it (or a category: --module cell)
     python -m cam_testing.report --site           # also assemble site/ as GitHub Pages serves it
 
 Pages read the result JSON and plots the tests wrote, so a report shows the last local (or
@@ -429,7 +429,8 @@ def version_context(version):
     comp = component_context(version)
     return {
         'name': version.label, 'key': version.key, 'module_type': version.vessel_type, 'version': version.name,
-        'category': version.category, 'reviewed': version.reviewed, 'components': [comp],
+        'category': version.category, 'location': version.mtype.location, 'reviewed': version.reviewed,
+        'components': [comp],
         'is_supermodule': version.is_supermodule,
         'all_sourced': version.all_sourced(),
         'bibliography': [{'key': k, 'text': bib.format_entry(f), 'link': bib.link(f), 'proposed': False}
@@ -477,7 +478,8 @@ def module_context(name, version_contexts=None):
         for k, n in c['counts'].items():
             counts[k] = counts.get(k, 0) + n
     return {
-        'name': name, 'category': mtype.category, 'relpath': mtype.relpath, 'versions': rows,
+        'name': name, 'category': mtype.category, 'group': mtype.group, 'relpath': mtype.relpath,
+        'location': mtype.location, 'parent': mtype.parent, 'nested': mtype.nested, 'versions': rows,
         'reviewed': bool(rows) and all(r['reviewed'] for r in rows),
         'counts': counts, 'n_versions': len(rows),
         'n_instances': sum(len(r['instances']) for r in rows),
@@ -507,15 +509,19 @@ def build_module(name):
 
 
 def build_index(contexts, out_path, href):
-    '''The site index: module_types grouped by category, each with links to its versions.'''
+    '''The site index: module_types grouped by category (a module_type directly under modules/ and the
+    ones nested in it form their own group), each with links to its versions. A nested module_type
+    is listed by its path in the group, e.g. neuron/soma/SN_membrane_soma under cell.'''
     groups = {}
     for c in contexts:
-        groups.setdefault(c['category'], []).append(c)
+        groups.setdefault(c['group'], []).append(c)
     out_groups = []
     for cat, ctxs in sorted(groups.items()):
         rows = []
-        for c in sorted(ctxs, key=lambda c: c['name'].lower()):
-            rows.append({'name': c['name'], 'href': href(c['relpath'], f'{c["name"]}.html'),
+        for c in ctxs:
+            c['display'] = c['relpath'][len(c['category']) + 1:] if c['category'] else c['relpath']
+        for c in sorted(ctxs, key=lambda c: c['display'].lower()):
+            rows.append({'name': c['name'], 'display': c['display'], 'href': href(c['relpath'], f'{c["name"]}.html'),
                          'n_versions': c['n_versions'], 'n_instances': c['n_instances'], 'counts': c['counts'],
                          'reviewed': c['reviewed'], 'known_issues': c['known_issues'], 'max_risk': c['max_risk'],
                          'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
@@ -584,8 +590,8 @@ def _href(relpath, page):
 
 
 def assemble_site(names, contexts):
-    '''site/index.html + site/modules/<category>/<module_type>/ (its page, and each version's page
-    and plots), as GitHub Pages serves it.'''
+    '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page and
+    plots; a nested module_type's directory is inside its parent's), as GitHub Pages serves it.'''
     if os.path.isdir(SITE_DIR):
         shutil.rmtree(SITE_DIR)
     for name in names:
@@ -615,7 +621,7 @@ def assemble_site(names, contexts):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--module', action='append', default=[],
-                        help='module_type or category path (repeatable); default all')
+                        help='module_type (with those nested in it) or path under modules/ (repeatable); default all')
     parser.add_argument('--site', action='store_true', help='also assemble site/ for GitHub Pages')
     args = parser.parse_args(argv)
     contexts = {}

@@ -320,7 +320,7 @@ def local_risk(component, values, k=25):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--module', action='append', default=[], help='module_type or category path (repeatable)')
+    parser.add_argument('--module', action='append', default=[], help='module_type (with those nested in it) or path under modules/ (repeatable)')
     parser.add_argument('--component', action='append', default=[], help='version, <module_type>/<version> (repeatable)')
     parser.add_argument('--samples', type=int, default=DEFAULT_SAMPLES)
     parser.add_argument('--seed', type=int, default=0)

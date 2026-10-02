@@ -3,7 +3,7 @@ Builds a COMBINE archive (.omex) for every instance of every version, from the l
 (see cam_testing/omex.py): load one in CUFLynx to investigate that parameter set.
 
     python tools/build_instance_omex.py                       # every instance
-    python tools/build_instance_omex.py --module Lotka_Volterra --module cell/neurons
+    python tools/build_instance_omex.py --module Lotka_Volterra --module neuron
     python tools/build_instance_omex.py --version heart/Argus2026_v01
 
 C++ (module_format cpp) versions are skipped: CUFLynx runs CellML models.
@@ -20,7 +20,7 @@ from cam_testing import library, omex  # noqa: E402
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
-    ap.add_argument('--module', action='append', default=[], help='module_type or category path (repeatable)')
+    ap.add_argument('--module', action='append', default=[], help='module_type (with those nested in it) or path under modules/ (repeatable)')
     ap.add_argument('--version', action='append', default=[], help='<module_type>/<version> (repeatable)')
     args = ap.parse_args(argv)
     versions = ([library.version_by_key(k) for k in args.version] if args.version

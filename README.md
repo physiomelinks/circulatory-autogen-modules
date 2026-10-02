@@ -9,8 +9,9 @@ Phlynx loads the versions listed in `manifests/index.json` (and `vitalworkshop.j
 **[`modules/README.md`](modules/README.md) documents the library in full**: the layout, the placement and naming rules, versions and instances, supermodule versions, what is tested per version and per instance, and the directory schema (`modules/directory_schema.json`, checked by `tests/test_structure.py`). In short:
 
 ```
-modules/<category>/<module_type>/
+modules/<category>/<module_type>/                    (or modules/<module_type>/, e.g. heart)
   <module_type>.html                                 report across the versions (generated)
+  <nested module_type>/                              module_types used only within this one (same layout)
   versions/<version>/                                version == the config entry's module_subtype
     <module_type>_<version>_modules.cellml / _modules_config.json / _units.cellml
     <module_type>_<version>_verification_config.json   what the checks run (JSON)
@@ -41,7 +42,7 @@ use_builtin_modules: false
 - an instance table with each instance's data, baseline and calibration results;
 - results and plots from the last test run.
 
-The site index (`make site`) groups the module_types by category and links both levels.
+The site index (`make site`) groups the module_types by category (heart, directly under `modules/`, is its own group), lists a nested module_type by its path (e.g. `neuron/soma/SN_membrane_soma` under `cell`) and links both levels.
 
 Nothing else is needed to regenerate them.
 
@@ -100,7 +101,7 @@ The version report shows all of this, regenerating the plots from the committed 
 
 ## System models
 
-`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into `cardiac` clock, chamber and valve vessels. System models are not modules or supermodules: they use the library. Every vessel-array record names a module_type, a version (`module_subtype`) and an instance (`"instance": "default"`); the model's own parameters file wins over the instance values. Each directory contains:
+`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into cardiac clock, chamber and valve vessels (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`). System models are not modules or supermodules: they use the library. Every vessel-array record names a module_type, a version (`module_subtype`) and an instance (`"instance": "default"`); the model's own parameters file wins over the instance values. Each directory contains:
 - the vessel array and parameters;
 - the original under `reference/`;
 - a `<model>_system.yaml` spec.
@@ -117,7 +118,7 @@ Some system models are examples built from this library, with no circulatory_aut
 
 Vessel arrays are JSON (`<model>_vessel_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_vessel_arrays.py` converts CSV files; `cam_testing/vessel_array.py` reads either.
 
-Supermodules are versions: `cardiac/heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neurons/neuron`, `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A model uses one through one record:
+Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A model uses one through one record:
 
 ```json
 {"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "instance": "default",
@@ -160,7 +161,7 @@ Then:
 make setup                                   # venv + libcuflynx (pinned git ref) + cam_testing
 make setup LIBCUFLYNX=../circulatory_autogen # ...or a local libcuflynx checkout
 make structure                               # static checks
-make test MODULE=Lotka_Volterra              # V&V tests for one module_type (MODULE=cell: a category; make test: all)
+make test MODULE=Lotka_Volterra              # V&V tests for one module_type and those nested in it (MODULE=cell: a category; make test: all)
 make test-all MODULE=Lotka_Volterra          # including slow calibration
 make systems                                 # system models + supermodule versions
 make risk MODULE=Lotka_Volterra              # joint failure-risk analysis (on request)
@@ -172,7 +173,7 @@ The reports open straight from disk. Plots load by relative path, and MathJax lo
 
 ## CI
 
-`.github/workflows/module-tests.yml` runs the structural checks and then one job per top-level category (`vessels`, `cardiac`, `cell`, ...). Each job runs the tests of every version in the category, builds their reports and uploads them as an artifact; failures of versions not reviewed yet are warnings (`tools/ci_reviewed_failures.py`). On `main`, the site is assembled and deployed to GitHub Pages (enable Pages with source "GitHub Actions" in the repository settings). The same `make` targets run locally.
+`.github/workflows/module-tests.yml` runs the structural checks and then one job per top-level directory of `modules/` (`vessels`, `heart`, `cell`, ...: a category, or a module_type directly under `modules/` with its nested module_types). Each job runs the tests of every version in it, builds their reports and uploads them as an artifact; failures of versions not reviewed yet are warnings (`tools/ci_reviewed_failures.py`). On `main`, the site is assembled and deployed to GitHub Pages (enable Pages with source "GitHub Actions" in the repository settings). The same `make` targets run locally.
 
 ## Importing from libcuflynx
 

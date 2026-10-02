@@ -12,7 +12,7 @@ summary: 'Four-chamber time-varying-elastance heart (Liang 2009 raised-cosine ac
   use a 20 s pre-time to reach the periodic state. Invariants checked: closed-loop blood-volume conservation, LV/RV volume
   balance against the valve flows, the exact chamber P-V laws, activation and valve-area bounds, positive chamber volumes,
   and at the run point valve backflow < 5%, a periodic state, LV/RV output balance and the heart period. What passes: heart
-  vp_wCont, vp, vp_Ca, LVprop and ASD pass run, invariants, the BC sweep (174-232 runs) and stability (9/9 solver families).
+  vp_wCont, vp, vp_Ca, vp_LVprop and vp_wCont_ASD pass run, invariants, the BC sweep (174-232 runs) and stability (9/9 solver families).
   Recorded failures: RK4 self-convergence is non-monotone for all variants (piecewise-smooth valve law). heart_new_valve fails
   the backflow invariant. heart_nonstiff fails the positive-volume invariant and the sweep (q_ra < 0). heart_devel does not
   generate. References proposed for every parameter; the primary parameter tables were paywalled and were checked only through
@@ -38,10 +38,10 @@ questions:
   parameters: should they be sourced (e.g. from a total blood volume)?'
 - 'Validation (proposed, awaiting confirmation): baseline targets from Maceira2006LV Table 8 (verified in the paper PDF):
   EDV 142 +- 21, ESV 47 +- 10, SV 95 +- 14 ml, EF 67 +- 4.6 %; aortic systolic 115-135 and diastolic 68-79 mmHg (range of
-  the Table 1 brachial cuff decile means; brachial, not central, pressure). They are set on heart vp_wCont, vp, vp_Ca, nonstiff
-  and new_valve, with a pass at 2 SD. At nominal parameters (heart vp) SV 122 ml, EF 60 %, aortic 131/77 mmHg pass, but EDV
+  the Table 1 brachial cuff decile means; brachial, not central, pressure). They are set on heart vp_wCont, vp, vp_Ca, vp_wCont_nonstiff
+  and vp_new_valve, with a pass at 2 SD. At nominal parameters (heart vp) SV 122 ml, EF 60 %, aortic 131/77 mmHg pass, but EDV
   203 ml (+2.9 SD) and ESV 81 ml (+3.4 SD) fail: the LV is too large, which fits the user-defined low E_lv_A plus too much
-  blood in the loop (initial volumes). new_valve also misses SV (125 ml) and diastolic pressure (67 mmHg, from aortic regurgitation).
+  blood in the loop (initial volumes). vp_new_valve also misses SV (125 ml) and diastolic pressure (67 mmHg, from aortic regurgitation).
   Accept these targets? Accept the brachial pressure ranges as a proxy? Next step would be to calibrate E_lv_A, E_lv_B and
   blood volume (q_lv_init) to them. Kawel-Boehm 2020 (RV volumes, CO) was not added as targets because I could not open its
   tables to verify.'
@@ -81,7 +81,7 @@ findings:
 - heart vp_wCont (with zero control inputs), heart vp and heart vp_Ca give identical results; vp_wCont adds only the control
   terms.
 - 'Stability (t_end 2 s): all generating variants work with all 9 solver families. CVODE rtol 1e-4 needs MaximumStep 1e-4.
-  Fixed step: RK4 works at dt 4e-4, Heun at 2e-4, Euler at 1e-4 (5e-5 for LVprop). heart_nonstiff needs MaximumStep 1e-4 even
+  Fixed step: RK4 works at dt 4e-4, Heun at 2e-4, Euler at 1e-4 (5e-5 for vp_LVprop). heart_nonstiff needs MaximumStep 1e-4 even
   at rtol 1e-6 (its declared configuration; 1e-3 differs by 0.21) and dt 5e-5 for every fixed-step scheme.'
 - RK4 self-convergence (verification_test_timestep) is non-monotone for every variant. Differences plateau at 3-6e-4 (normalised)
   in A_eff_miv/A_eff_trv near valve closure and the atrial kick, because the valve law is only piecewise smooth. The fixed-step
@@ -89,11 +89,11 @@ findings:
 - 'BC sweep: the tricuspid annulus area is limited to 4-10 cm2. Above about 10.2 cm2 the RA volume goes negative (min q_ra
   -1.0 ml at 11 cm2): the linear P-V law allows suction (u_ra < 0) and nothing stops the chamber from emptying. The same mechanism
   produces q_ra < 0 in heart_nonstiff.'
-- 'Baseline targets (Maceira 2006, 2 SD): heart vp / vp_wCont / vp_Ca / nonstiff meet 4 of 6 (SV, EF, aortic systolic and
-  diastolic); EDV (203 ml) and ESV (81 ml) are too high. new_valve meets 2 of 6 (also misses SV 125 ml and diastolic 67 mmHg).'
+- 'Baseline targets (Maceira 2006, 2 SD): heart vp / vp_wCont / vp_Ca / vp_wCont_nonstiff meet 4 of 6 (SV, EF, aortic systolic and
+  diastolic); EDV (203 ml) and ESV (81 ml) are too high. vp_new_valve meets 2 of 6 (also misses SV 125 ml and diastolic 67 mmHg).'
 - 'Nominal haemodynamics (heart vp in the harness): LVEDV 203, ESV 81 ml, EF 60 %, CO 7.2 l/min, aortic 131/77 mmHg, PA 70/18
   mmHg, mean LA pressure 22 mmHg, mean RA 1.3 mmHg. The pulmonary and LA pressures are high, which is consistent with the
-  very compliant RV (E_rv_B = 0.2e6) and the user-defined elastances. LVprop: LVEDV 116 ml, CO 3.9 l/min, aortic 77/47 mmHg
+  very compliant RV (E_rv_B = 0.2e6) and the user-defined elastances. vp_LVprop: LVEDV 116 ml, CO 3.9 l/min, aortic 77/47 mmHg
   (neonatal-scaled use).'
 - 'Framework needs: (1) the calibrate test still evaluates from t = 0 without pre_time, so calibrating to the steady-state
   targets needs the same pre_time support as the new baseline targets; (2) the heart zero-IVC mapping in libcuflynx should

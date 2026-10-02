@@ -3,7 +3,7 @@ Fast static checks on the module library (no libcuflynx generation needed).
 
   - the directory layout of modules/ and system_models/ against modules/directory_schema.json
     and its rules (version == module_subtype, default_instance, obs_data_name, unique names,
-    system-model records resolve);
+    nested module_types used only within their parent, system-model records resolve);
   - each version's CellML, config and units (test_version_structure);
   - library-wide uniqueness, manifests, and the JSON files against libcuflynx's schemas.
 
@@ -23,8 +23,8 @@ import pytest
 
 from cam_testing import bib
 from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, MODULES_DIR, REPO_ROOT, SYSTEM_MODELS_DIR, TESTS_KEYS,
-                                 VERIFICATION_KEYS, VERSIONS, all_versions, load_version, misplaced_spec_keys,
-                                 module_type_names, read_spec_files)
+                                 VERIFICATION_KEYS, VERSIONS, all_versions, ancestors_of, load_version,
+                                 misplaced_spec_keys, module_relpath, module_type_names, parent_of, read_spec_files)
 from cam_testing.mathml import component_names
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
@@ -113,8 +113,9 @@ def _name_ok(level, name, d, problems):
 
 
 def walk_modules():
-    '''(problems, categories {path: name}, module_types {name: [paths]}) for modules/.'''
-    problems, cats, mts = [], {}, {}
+    '''(problems, categories {path: name}, module_types {name: [paths]}, parents {module_type path: the
+    path of the module_type it is nested in, or None}) for modules/.'''
+    problems, cats, mts, parents = [], {}, {}, {}
     _check_files('modules_root', MODULES_DIR, {}, problems)
 
     def category(d):
@@ -134,13 +135,22 @@ def walk_modules():
             else:
                 category(p)
 
-    def module_type(d):
+    def module_type(d, parent=None):
         name = os.path.basename(d)
         mts.setdefault(name, []).append(d)
+        parents[d] = parent
         _name_ok('module_type', name, d, problems)
         _check_files('module_type', d, {'module_type': name}, problems)
-        extra = [c for c in _subdirs(d) if c != VERSIONS]
-        problems.extend(f'{os.path.relpath(os.path.join(d, c), REPO_ROOT)}: unexpected directory in a module_type' for c in extra)
+        # its other subdirectories are nested module_types (each with versions/); anything else is stray
+        for c in _subdirs(d):
+            p = os.path.join(d, c)
+            if c == VERSIONS:
+                continue
+            if os.path.isdir(os.path.join(p, VERSIONS)):
+                module_type(p, d)
+            else:
+                problems.append(f'{os.path.relpath(p, REPO_ROOT)}: unexpected directory in a module_type '
+                                f'(only versions/ and nested module_types, which have versions/)')
         vroot = os.path.join(d, VERSIONS)
         if not _subdirs(vroot):
             problems.append(f'{os.path.relpath(vroot, REPO_ROOT)}: no versions')
@@ -220,21 +230,21 @@ def walk_modules():
         if p in EXCLUDED:
             continue
         if os.path.isdir(os.path.join(p, VERSIONS)):
-            problems.append(f'modules/{c}: a module_type directly under modules/ (it belongs in a category)')
-            module_type(p)
+            module_type(p)     # a top-level module_type (heart), with the module_types nested in it
         else:
             category(p)
-    return problems, cats, mts
+    return problems, cats, mts, parents
 
 
 def test_modules_directory_layout():
-    problems, _, _ = walk_modules()
+    problems, _, _, _ = walk_modules()
     assert not problems, '\n'.join(problems[:60]) + (f'\n... {len(problems)} problems' if len(problems) > 60 else '')
 
 
 def test_no_directory_name_twice():
-    '''No category or module_type name appears twice in modules/, and no category is named as a module_type.'''
-    _, cats, mts = walk_modules()
+    '''No category or module_type name (nested module_types included) appears twice in modules/, and no
+    category is named as a module_type.'''
+    _, cats, mts, _ = walk_modules()
     problems = []
     seen = {}
     for path, name in cats.items():
@@ -258,9 +268,48 @@ def test_spec_key_lists_match_the_schema():
 
 
 def test_categories_are_not_module_types():
-    _, cats, mts = walk_modules()
+    _, cats, mts, _ = walk_modules()
     clash = sorted(set(cats.values()) & set(mts))
     assert not clash, f'category names that are also module_type names: {clash}'
+
+
+def test_nested_module_types_found_by_the_library():
+    '''cam_testing.library finds the same module_types, and the same nesting, as the walk of modules/.'''
+    _, _, mts, parents = walk_modules()
+    walked = {name: os.path.relpath(paths[0], MODULES_DIR).replace(os.sep, '/') for name, paths in mts.items()}
+    assert walked == {n: module_relpath(n) for n in module_type_names()}
+    walked_parents = {os.path.basename(d): (os.path.basename(p) if p else None) for d, p in parents.items()}
+    assert walked_parents == {n: parent_of(n) for n in module_type_names()}
+
+
+def _uses_of_module_types(version):
+    '''(module_type, where) for every module_type a version's supermodule submodules and harness name.'''
+    out = [(s.get('module_type') or s.get('vessel_type'), f'submodule {s.get("name")}') for s in version.submodules]
+    for row in ((version.spec.get('harness') or {}).get('vessel_array') or []):
+        if isinstance(row, (list, tuple)) and len(row) > 2:
+            out.append((row[2], f'harness record {row[0]}'))
+        elif isinstance(row, dict):
+            out.append((row.get('module_type') or row.get('vessel_type'), f'harness record {row.get("name")}'))
+    return out
+
+
+def test_nested_module_types_used_only_within_their_parent():
+    '''A nested module_type is used only within its parent: every supermodule submodule and harness record
+    naming it belongs to a version of the parent, of a module_type nested (at any depth) in the parent, or
+    of the nested module_type itself. System models are exempt (they may wire a parent's parts explicitly).'''
+    names = set(module_type_names())
+    problems = []
+    for version in _versions():
+        user = version.vessel_type
+        for used, where in _uses_of_module_types(version):
+            parent = parent_of(used) if used in names else None
+            if parent is None or used == user:
+                continue
+            if user == parent or parent in ancestors_of(user):
+                continue
+            problems.append(f'{version.key}: {where} uses {used}, which is nested in {parent} '
+                            f'({module_relpath(used)}); {user} ({module_relpath(user)}) is not inside {parent}')
+    assert not problems, '\n'.join(problems)
 
 
 def test_system_models_directory_layout():

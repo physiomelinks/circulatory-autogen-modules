@@ -1,7 +1,7 @@
 module_type: i_Kv1_5
 version: Argus2026_v01
 reviewed: false
-notes: Copied verbatim from the owner's SN_soma (modules/cell/neurons, the SN_simple sympathetic neuron); every gating time
+notes: Copied verbatim from the owner's SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple sympathetic neuron); every gating time
   constant has epsilon_tau = 0.1 ms added, as in the original. Kv1.5 K current of the SN soma, i_Kv1_5 = g_Kv1_5 m h (V -
   E_K) (Channelpedia Kv1.5 kinetics). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by
   a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce
