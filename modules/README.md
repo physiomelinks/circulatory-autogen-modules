@@ -43,7 +43,7 @@ The top level of `modules/` holds categories and one module_type, `heart`:
 
 | Directory | Holds |
 |---|---|
-| `vessels/compartments`, `vessels/junctions`, `vessels/terminals`, `vessels/microvasculature`, `vessels/properties` | 0D vessel segments, junctions, terminal beds, microvascular networks, wall material laws |
+| `vessels/compartments`, `vessels/junctions`, `vessels/terminals`, `vessels/microvasculature`, `vessels/properties` | 0D vessel segments, algebraic flow nodes, terminal beds, microvascular networks, wall material laws |
 | `heart` (a module_type) | the heart's versions (monolithic: `vp`, `vp_Ca`, `vp_wCont`, `vp_devel` and the former alternative hearts, see below; supermodule: `Argus2026_v01`), with the nested module_types `cardiac_clock`, `chamber` and `valve` |
 | `cell`, `cell/ion_channels`, `cell/cardiomyocytes` | cell models and their parts; `cell/neuron` is the module_type neuron, with its parts nested in it |
 | `respiratory` | lungs, gas exchange and transport |
@@ -240,6 +240,42 @@ libcuflynx loads `<config dir>/instances/<instance>/<instance>_parameters.csv` f
 `<model>_parameters.csv` wins** over instance values, so a model only lists what it changes. Every
 record in `system_models/` names `"instance": "default"`, and the version specs' harness networks do
 the same.
+
+## Connecting vessels
+
+There are no junction module types. Any number of vessels can meet at a point (a **node**), on
+either side of it, because every vessel's **compliant end** sums over its node: a `vessel_port`
+whose flow is an input and whose pressure is an output has `"multi_port": ["sum", "True"]`. The
+BC letters say which ends those are: `v` is a compliant end (it takes the summed flow and sets
+the pressure), `p` is not (it takes the node's pressure and gives its own flow).
+
+| BC type | inlet | outlet |
+|---|---|---|
+| `vp` | sums | plain |
+| `pv` | plain | sums |
+| `vv` | sums | sums |
+| `pp` | plain | plain |
+
+Each node has exactly one summing end, its **owner**. libcuflynx (`generators/port_nodes.py`)
+gives the owner the signed sum of every other end's flow (flows into the node add, flows out of it
+subtract) and maps its pressure to every end. So:
+
+- **many vessels into one** (the old `Min`): the downstream vessel's inlet owns the node (`vp` or
+  `vv`), and the upstream vessels end in `p` (`vp` or `pp`);
+- **one vessel into many** (the old `Nout`): the upstream vessel's outlet owns it (`pv` or `vv`),
+  and the downstream vessels start with `p` (`pv` or `pp`);
+- **inflows and other outflows at one node** (which the junction types could not express): one
+  owner on either side, everything else `p` at that node.
+
+Two summing ends at one node (for example three `pv` vessels merging) would be two compliances
+for one pressure, and generation stops naming the node; so does a node of three or more ends
+where none sums. Where only two modules meet the connection is one-to-one, so a vessel whose port
+can sum costs nothing there. A summing port left unconnected is a boundary condition set by the
+parameters file, like any other open port. A 1D vessel can only meet one 0D module at a node.
+
+`python -m libcuflynx.utilities.junction_migration <vessel_array>...` converts a vessel array that
+still names the removed junction types (and the microvasculature `<vessel>_Min/_Nout/_Minlet/
+_Noutlet/_MinNout` and `artery_inlet/_outlet`) to these vessels, with its parameters file.
 
 ## Supermodule versions
 
