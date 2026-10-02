@@ -224,12 +224,13 @@ EQUIVALENCE_TOL = 1e-6
 SOLVER_INFO = {'rtol': 1e-10, 'atol': 1e-12}
 
 
-CPP_REASON = ('C++ 1D-solver component (module_format cpp): PhLynx builds CellML models only, so it has no '
+CPP_REASON = ('C++ 1D-solver component (module_format cpp or external_api): PhLynx builds CellML models only, so it has no '
               'PhLynx/CUFLynx form')
 
 
 def _cpp(component):
-    return component.config.get('module_format', 'cellml') == 'cpp'
+    # cpp: the C++ 1D solver component as it was; external_api: the same, described by an api block
+    return component.config.get('module_format', 'cellml') in ('cpp', 'external_api')
 
 
 # PhLynx (src/) has no notion of a supermodule: its configs are CellML modules, so a version of
