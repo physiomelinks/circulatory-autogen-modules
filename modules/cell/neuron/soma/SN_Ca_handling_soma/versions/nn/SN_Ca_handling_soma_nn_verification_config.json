@@ -21,12 +21,25 @@
     "j_SERCA",
     "j_diffCa",
     "j_diffCa_ER",
-    "j_leak_Ca"
+    "j_leak_Ca",
+    "cal/j_Ca_L"
   ],
+  "harness": {
+    "vessel_array": [
+      ["mod", "nn", "SN_Ca_handling_soma", "", "cal", "default"],
+      ["cal", "Argus2026_v01", "i_CaL", "mod", "", "default"]
+    ]
+  },
   "invariants": [
     {
-      "description": "alone (no channel fluxes connected) the total Ca, free + buffered in all four compartments, is conserved (relative 1e-6)",
-      "expr": "np.max(np.abs(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0])) <= 1e-6*(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]"
+      "description": "total Ca (free + buffered, four compartments) changes exactly by the integrated Ca influx of the connected channel (harness: the L-type Ca channel at a fixed V): Vol-weighted total - total0 = integral j_Ca_L dt. Tolerance: 1e-6 of the integral plus 100 x the solver resolution of the total.",
+      "expr": "np.max(np.abs((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) - np.concatenate(([0.0], np.cumsum(0.5*(cal__j_Ca_L[1:] + cal__j_Ca_L[:-1])*np.diff(t)))))) <= 1e-6*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*(cal__j_Ca_L[1:] + cal__j_Ca_L[:-1])*np.diff(t)))))) + 100*1e-8*np.max(np.abs(Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)))",
+      "applies": "run"
+    },
+    {
+      "description": "the channel moves Ca (the harness exercises j_Ca_in): total Ca changes",
+      "expr": "abs((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[-1] - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) > 0",
+      "applies": "run"
     }
   ],
   "bc_sweep": {

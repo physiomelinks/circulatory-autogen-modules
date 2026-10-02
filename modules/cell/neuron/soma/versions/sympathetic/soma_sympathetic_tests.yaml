@@ -12,72 +12,12 @@ expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
 reference_proposals:
-  B_Ca_init_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); at equilibrium
-      with Cai_init the free buffer would be B_tot Kd/(Kd + Cai) = 7.990 mM (Kd = 80 uM)
-    sourced: 'no'
-  B_Ca_total_Ca:
-    reference: 'Matveev2002; Table 1 ("actual" set): total of the FIXED (immobile) buffer 8 mM (= value). Matveev''s mobile
-      buffer is 0.56 mM (Kd 4 uM); here the 8 mM is used for the model''s buffer'
-    sourced: 'yes'
   Ca_ER_init_Ca:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_checked_in_neurons');
       0.6 mM is 2-10x the resting ER-lumen Ca measured in rat sensory neurons (60-270 uM, Solovyova2002, Abstract/Results)
     sourced: 'no'
     also_cites:
     - Solovyova2002
-  Cai_init_Ca:
-    reference: Wanaverbecq2003; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),
-      Results, first section; 1e-4 mM = value. (Replaces the CA reference Hagiwara1981, which could not be opened)
-    sourced: 'yes'
-  D_Ca_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'identified_by_hand'); lumped
-      sub-membrane-to-bulk exchange coefficient
-    sourced: 'no'
-  D_Ca_ER_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'need_to_change_for_volume');
-      lumped pre-ER-to-ER exchange coefficient
-    sourced: 'no'
-  H_SERCA_Ca:
-    reference: Shannon2004; Table 11, SR Ca pump Hill coefficient H = 1.787 (= value)
-    sourced: 'yes'
-  K_mf_Ca:
-    reference: Shannon2004; Table 11, SR Ca pump Kmf = 0.246 uM; modified here to 0.1 uM (was 0.246e-3 mM)
-    sourced: 'yes'
-  K_mr_Ca:
-    reference: Shannon2004; Table 11, SR Ca pump Kmr = 1.7 mM; modified here to 0.5 mM (was 1.7)
-    sourced: 'yes'
-  c_ER_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); ER volume
-      fraction. Li & Rinzel / De Young & Keizer c1 = 0.185 is the ER/cytosol volume ratio, a different quantity and value
-    sourced: 'no'
-    also_cites:
-    - DeYoungKeizer1992
-  c_ER_pre_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); pre-ER volume
-      fraction
-    sourced: 'no'
-  c_SL_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined_TO_BE_FOUND');
-      sub-membrane volume fraction
-    sourced: 'no'
-  k_bind_Ca_Ca:
-    reference: 'Matveev2002; Table 1: buffer on-rate 0.5 /uM/ms (= 0.5e6 /mM/s, "actual" fixed buffer) and 0.1 /uM/ms in the
-      "quoted" set (Tang et al. 2000); 0.1e6 /mM/s = the quoted value, paired here with the actual-set off-rate (was 0.5e6)'
-    sourced: 'yes'
-  k_bind_Ca_ER_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
-    sourced: 'no'
-  k_unbind_Ca_Ca:
-    reference: 'Matveev2002; Table 1 ("actual" set): fixed-buffer off-rate 8 /ms = 8e3 /s (= value; Kd 16 uM with kon 0.5
-      /uM/ms; with the kon 0.1 used here Kd = 80 uM)'
-    sourced: 'yes'
-  k_unbind_Ca_ER_Ca:
-    reference: unreferenced_placeholder; Matveev2002 fixed-buffer off-rate 8e3 /s reused for the pre-ER buffer; no source
-      for an ER-adjacent buffer
-    sourced: 'no'
-    also_cites:
-    - Matveev2002
   V_den_h_i_Na:
     reference: Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 4 mV (was 6.5)
     sourced: 'yes'
@@ -499,36 +439,6 @@ reference_proposals:
     sourced: 'yes'
     previous: 'previous k_NaCa_i_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
       model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
-  rho_SERCA_Ca:
-    reference: 'definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 3e-16 mol_per_s
-      (to_be_identified) with A = 248.1 um^2 (the soma pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration
-      through r_SERCA. The previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value
-      in the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L
-      cytosol/s for the myocyte)'
-    sourced: 'no'
-    previous: 'previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
-      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
-      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
-      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
-      myocyte) previous k_SERCA_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s for the
-      myocyte)'
-  rho_leak_Ca_Ca:
-    reference: 'definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca
-      = 1e-17 m3_per_s (user_defined) with A = 248.1 um^2 (the soma pre-ER membrane area) and k_leak_Ca_single = 0.01 um3_per_s;
-      a density for calibration through k_leak_Ca_single. The previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''user_defined'')'
-    sourced: 'no'
-    previous: 'previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''user_defined'') previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder; owner''s
-      hand-set value in the SN_simple model (CA token ''user_defined'') previous k_leak_Ca_Ca (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''user_defined'') previous k_leak_Ca_Ca (as proposed in review):
-      unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined'') previous k_leak_Ca_Ca
-      (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined'')'
   rho_Na1_6_i_Na1_6:
     reference: 'definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5
       microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration
