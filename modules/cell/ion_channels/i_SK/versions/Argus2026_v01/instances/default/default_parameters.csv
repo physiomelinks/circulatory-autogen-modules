@@ -1,5 +1,5 @@
 variable_name,units,value,data_reference,sourced
-Ca_bulk,millimolar,0.0001,"definitional; SN_simple Cai_init, the initial Ca_bulk (used when unconnected)",no
+Cai,millimolar,0.0001,"definitional; the sub-membrane (shell) Ca at rest, SN_simple Cai_init (used when unconnected; in a soma it comes from the Ca handling through internal_Ca)",no
 Ca_mid_m_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
 Cai_init,millimolar,1e-4,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
 E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no

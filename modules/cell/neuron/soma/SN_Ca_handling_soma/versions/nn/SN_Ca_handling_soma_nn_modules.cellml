@@ -16,7 +16,6 @@
         <variable name="Ca_bulk" public_interface="out" units="millimolar" initial_value="Cai_init"/>
         <variable name="Cai" public_interface="out" units="millimolar" initial_value="Cai_init"/>
         <variable name="Cai_init" public_interface="in" units="millimolar"/>
-        <variable name="D_Ca" public_interface="in" units="m3_per_s"/>
         <variable name="D_Ca_ER" public_interface="in" units="m3_per_s"/>
         <variable name="H_SERCA" public_interface="in" units="dimensionless"/>
         <variable name="K_mf" public_interface="in" units="millimolar"/>
@@ -24,7 +23,13 @@
         <variable name="Vol" public_interface="in" units="m3"/>
         <variable name="c_ER" public_interface="in" units="dimensionless"/>
         <variable name="c_ER_pre" public_interface="in" units="dimensionless"/>
-        <variable name="c_SL" public_interface="in" units="dimensionless"/>
+        <!-- The sub-membrane compartment (Cai) is a shell under the membrane, V_shell = A_mem d_shell, exchanging with
+ the bulk cytosol with time constant tau_shell (Khaliq et al. 2003, ModelDB 48332 cadiff.mod: 0.1 um, 1 ms); the bulk
+ is what is left of Vol, c_bulk = 1 - V_shell/Vol - c_ER - c_ER_pre.-->
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="d_shell" public_interface="in" units="um"/>
+        <variable name="tau_shell" public_interface="in" units="millis"/>
+        <variable name="V_shell" public_interface="out" units="m3"/>
         <variable name="c_bulk" public_interface="out" units="dimensionless"/>
         <variable name="j_Ca_in" public_interface="in" units="mol_per_s"/>
         <variable name="j_ER_release" public_interface="in" units="mol_per_s"/>
@@ -59,7 +64,11 @@
                         <apply>
                             <minus/>
                             <cn cellml:units="dimensionless">1</cn>
-                            <ci>c_SL</ci>
+                            <apply>
+                                <divide/>
+                                <ci>V_shell</ci>
+                                <ci>Vol</ci>
+                            </apply>
                         </apply>
                         <ci>c_ER</ci>
                     </apply>
@@ -245,7 +254,15 @@
                     <times/>
                     <apply>
                         <minus/>
-                        <ci>D_Ca</ci>
+                        <apply>
+                            <divide/>
+                            <ci>V_shell</ci>
+                            <apply>
+                                <divide/>
+                                <ci>tau_shell</ci>
+                                <cn cellml:units="millis_per_s">1000</cn>
+                            </apply>
+                        </apply>
                     </apply>
                     <apply>
                         <minus/>
@@ -285,11 +302,7 @@
                             <apply>
                                 <divide/>
                                 <cn cellml:units="dimensionless">1</cn>
-                                <apply>
-                                    <times/>
-                                    <ci>Vol</ci>
-                                    <ci>c_SL</ci>
-                                </apply>
+                                <ci>V_shell</ci>
                             </apply>
                             <apply>
                                 <plus/>
@@ -442,6 +455,7 @@
             </apply>
         </math>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>V_shell</ci><apply><times/><ci>A_mem</ci><ci>d_shell</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
             <apply><eq/><ci>A_ER</ci><apply><times/><ci>k_A_ER</ci><apply><power/><apply><root/><degree><cn cellml:units="dimensionless">3.0</cn></degree><apply><divide/><apply><times/><ci>c_ER</ci><ci>Vol</ci><cn cellml:units="um3_per_m3" type="e-notation">1<sep/>18</cn></apply><ci>k_V_ER</ci></apply></apply><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply>
             <apply><eq/><ci>A_ER_pre</ci><apply><times/><ci>k_A_ER_pre</ci><apply><power/><apply><root/><degree><cn cellml:units="dimensionless">3.0</cn></degree><apply><divide/><apply><times/><ci>c_ER_pre</ci><ci>Vol</ci><cn cellml:units="um3_per_m3" type="e-notation">1<sep/>18</cn></apply><ci>k_V_ER_pre</ci></apply></apply><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply>
             <apply><eq/><ci>k_SERCA</ci><apply><divide/><apply><times/><ci>A_ER_pre</ci><ci>rho_SERCA</ci><ci>r_SERCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>

@@ -1,10 +1,11 @@
 module_type: SN_Ca_handling_soma
 version: nn
 reviewed: true
-description: 'Four-compartment Ca of the sympathetic-neuron soma: sub-membrane (Cai, fraction c_SL), bulk, pre-ER and ER.
-  Cai receives j_Ca_in, the summed Ca flux of the channels on the Ca_flux port; the ER loses j_ER_release (IP3R, RyR). Diffusion
-  links sub-membrane-bulk (D_Ca) and pre-ER-ER (D_Ca_ER); SERCA (Shannon 2004 form) and a leak move Ca between bulk and pre-ER
-  across the pre-ER membrane (area from its volume fraction). A fixed buffer binds Ca in each of the first three.'
+description: 'Four-compartment Ca of the sympathetic-neuron soma: a sub-membrane shell (Cai, volume V_shell = A_mem d_shell), bulk,
+  pre-ER and ER. Cai receives j_Ca_in, the summed Ca flux of the channels on the Ca_flux port; the ER loses j_ER_release (IP3R,
+  RyR). The shell exchanges with the bulk with time constant tau_shell (Khaliq 2003) and pre-ER with ER by diffusion (D_Ca_ER);
+  SERCA (Shannon 2004 form) and a leak move Ca between bulk and pre-ER across the pre-ER membrane (area from its volume fraction).
+  A fixed buffer binds Ca in each of the first three.'
 notes: 'Four-compartment Ca of the SN soma (sub-membrane Cai, bulk, pre-ER, ER) with a fixed (immobile) buffer in each of
   the first three (no buffer exchange between compartments; Matveev 2002 fixed-buffer values), SERCA and a leak between bulk
   and pre-ER, and diffusion. Cai receives j_Ca_in, the sum of the Ca fluxes of the channels connected through Ca_flux; the
@@ -15,7 +16,13 @@ notes: 'Four-compartment Ca of the SN soma (sub-membrane Cai, bulk, pre-ER, ER) 
   areas A_ER = k_A_ER (V_ER/k_V_ER)^(2/3) and A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3) (shape factors; default a
   sphere). SERCA and the Ca leak move Ca across the pre-ER membrane, so k_SERCA = A_ER_pre rho_SERCA r_SERCA / N_A and k_leak_Ca
   = A_ER_pre rho_leak_Ca k_leak_Ca_single (1e-18 m3/um3); A_ER goes to IP3R and RyR (ER_membrane_area), whose release crosses
-  the ER membrane. The diffusion constants D_Ca, D_Ca_ER are unchanged. The defaults reproduce the previous k_SERCA and k_leak_Ca.'
+  the ER membrane. The diffusion constant D_Ca_ER is unchanged. The defaults reproduce the previous k_SERCA and k_leak_Ca.
+  Membrane shell (review 2026-10-05, Khaliq et al. 2003, ModelDB 48332 cadiff.mod): the sub-membrane compartment was a fixed
+  fraction c_SL = 0.02 of Vol exchanging with the bulk through D_Ca = 6e-12 m3/s (hand-set). It is now a shell under the membrane,
+  V_shell = A_mem d_shell (1e-18 m3/um3; A_mem from the membrane through shell_membrane_area, not membrane_area, since the channels connect to both the membrane and Ca; d_shell 0.1 um, 300 um^3 at 3,000 um^2),
+  exchanging with the bulk as j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk) with tau_shell 1 ms; dCai/dt = (j_Ca_in + j_diffCa)/V_shell
+  + buffer terms, and the bulk is what is left of Vol, c_bulk = 1 - V_shell/Vol - c_ER - c_ER_pre (0.921 -> 0.901), so the compartments
+  still add up. BK and SK read the shell Ca (internal_Ca). The invariants weight the shell by V_shell (an output).'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

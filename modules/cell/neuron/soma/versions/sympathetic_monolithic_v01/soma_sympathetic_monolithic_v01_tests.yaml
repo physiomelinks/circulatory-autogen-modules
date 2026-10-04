@@ -9,7 +9,11 @@ notes: 'Owner''s sympathetic stellate-ganglion neuron soma ("SN_simple"): Na (Na
   single-channel conductance (g_X = A_mem rho_X gamma_X), p_Ca = A_mem rho_CaL p_Ca_single, the pump and exchanger maxima
   are A_mem x density x turnover x e; the ER volumes c_ER Vol and c_ER_pre Vol (spheres by default) give the ER areas A_ER
   (IP3R, RyR) and A_ER_pre (SERCA, Ca leak). The defaults reproduce every previous value (Cm 30 pF, Vol 7,500 um^3, the conductances,
-  k_NaK, k_NaCa, k_SERCA, k_leak_Ca, k_IP3, k_RyR).'
+  k_NaK, k_NaCa, k_SERCA, k_leak_Ca, k_IP3, k_RyR). Membrane shell (review 2026-10-05, Khaliq et al. 2003, ModelDB 48332 cadiff.mod):
+  the sub-membrane compartment (Cai) is a shell V_shell = A_mem d_shell (d_shell 0.1 um) exchanging with the bulk as j_diffCa
+  = -(V_shell/tau_shell)(Cai - Ca_bulk), tau_shell 1 ms (was a fraction c_SL = 0.02 of Vol with exchange D_Ca = 6e-12 m3/s);
+  c_bulk = 1 - V_shell/Vol - c_ER - c_ER_pre; SK reads the shell Ca (Cai, was Ca_bulk), as BK does. Same equations as the modular
+  soma sympathetic.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
@@ -374,10 +378,6 @@ reference_proposals:
     sourced: 'no'
     also_cites:
     - DeYoungKeizer1992
-  c_SL:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined_TO_BE_FOUND');
-      sub-membrane volume fraction
-    sourced: 'no'
   h_IP3_init:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
@@ -413,10 +413,6 @@ reference_proposals:
     sourced: 'yes'
     also_cites:
     - LiRinzel1994
-  D_Ca:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'identified_by_hand'); lumped
-      sub-membrane-to-bulk exchange coefficient
-    sourced: 'no'
   c_ER_pre:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); pre-ER volume
       fraction

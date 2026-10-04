@@ -18,7 +18,7 @@ B_Ca_init_SN_soma_Ca,millimolar,7.95,user_defined
 B_Ca_total_SN_soma_Ca,millimolar,8,Matveev2002
 Ca_ER_init_SN_soma_Ca,millimolar,0.6,to_be_checked_in_neurons
 Cai_init_SN_soma_Ca,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease
-D_Ca_SN_soma_Ca,m3_per_s,6e-12,identified_by_hand
+tau_shell_SN_soma_Ca,millis,1.0,"Khaliq2003; ModelDB 48332 cadiff.mod: beta = 1 /ms; j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk). Replaces D_Ca = 6e-12 m3/s (review 2026-10-05)"
 D_Ca_ER_SN_soma_Ca,m3_per_s,4.8e-15,need_to_change_for_volume
 H_SERCA_SN_soma_Ca,dimensionless,1.787,Shannon2004Mathematical
 K_mf_SN_soma_Ca,millimolar,0.1e-3,Shannon2004Mathematical_was_0.246e-3
@@ -29,7 +29,7 @@ k_A_ER_SN_soma_Ca,dimensionless,3.141592653589793,"definitional; ER area shape f
 k_V_ER_SN_soma_Ca,dimensionless,0.5235987755982988,"definitional; ER volume shape factor of a sphere, pi/6"
 k_A_ER_pre_SN_soma_Ca,dimensionless,3.141592653589793,"definitional; pre-ER area shape factor A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3), V_ER_pre = c_ER_pre Vol; a sphere (pi)"
 k_V_ER_pre_SN_soma_Ca,dimensionless,0.5235987755982988,"definitional; pre-ER volume shape factor of a sphere, pi/6"
-c_SL_SN_soma_Ca,dimensionless,0.02,user_defined_TO_BE_FOUND
+d_shell_SN_soma_Ca,um,0.1,"Khaliq2003; ModelDB 48332 cadiff.mod: shell depth 0.1 um; V_shell = A_mem d_shell. Replaces c_SL = 0.02 (review 2026-10-05)"
 rho_SERCA_SN_soma_Ca,per_um2,36407.132526123205,definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 3e-16 mol_per_s (to_be_identified) with A = 248.1 um^2 (the soma pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration through r_SERCA
 r_SERCA_SN_soma_Ca,per_s,20.0,"unreferenced_placeholder; maximal Ca transport per SERCA pump, ~10-20 Ca/s at room temperature (Lytton et al. 1992, value not verified from the paper); 20 Ca/s assumed"
 k_bind_Ca_SN_soma_Ca,per_millimolar_s,0.1e6,Matveev2002_was_0.5e6

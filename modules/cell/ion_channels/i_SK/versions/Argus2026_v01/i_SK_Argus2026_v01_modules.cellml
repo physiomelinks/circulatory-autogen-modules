@@ -2,7 +2,7 @@
 <model name="i_SK_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
     <component name="i_SK_SN">
         <variable name="t" units="second" public_interface="in"/>
-        <variable name="Ca_bulk" public_interface="in" units="millimolar"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
         <variable name="Ca_mid_m_SK" public_interface="in" units="millimolar"/>
         <variable name="Cai_init" public_interface="in" units="millimolar"/>
         <variable name="E_K" public_interface="in" units="milliV"/>
@@ -53,7 +53,7 @@
                     <divide/>
                     <apply>
                         <power/>
-                        <ci>Ca_bulk</ci>
+                        <ci>Cai</ci>
                         <ci>p_SK</ci>
                     </apply>
                     <apply>
@@ -65,7 +65,7 @@
                         </apply>
                         <apply>
                             <power/>
-                            <ci>Ca_bulk</ci>
+                            <ci>Cai</ci>
                             <ci>p_SK</ci>
                         </apply>
                     </apply>

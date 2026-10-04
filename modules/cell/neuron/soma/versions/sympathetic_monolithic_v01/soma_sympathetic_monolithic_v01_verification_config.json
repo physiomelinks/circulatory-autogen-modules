@@ -46,17 +46,19 @@
     "c_RyR",
     "hc_RyR",
     "Cm",
-    "Vol"
+    "Vol",
+    "V_shell"
   ],
   "run_parameters": {"I_in": 0.05},
+  "rest_check": {"label": "rest (0 pA, 30 s)", "sim_time": 30, "dt": 0.0001, "window": 10, "voltage": "V", "parameters": {"I_in": 0.0}},
   "invariants": [
     {
       "description": "charge conservation: the change of membrane charge Cm (V - V0) equals the change of ionic charge F [Vol (dNai + dKi) + 2 dN_Ca] plus the charge carried by the currents that change no tracked ion pool (I_in_delayed and I_out)",
-      "expr": "np.max(np.abs((Cm*1e-15*(V - V[0]) - F*(Vol*((Nai + Ki) - (Nai[0] + Ki[0])) + 2*((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]))) - (-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t))))))) <= 1e-3*(np.max(np.abs(Cm*1e-15*(V - V[0]))) + np.max(np.abs((-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t)))))))) + 1e-20"
+      "expr": "np.max(np.abs((Cm*1e-15*(V - V[0]) - F*(Vol*((Nai + Ki) - (Nai[0] + Ki[0])) + 2*((V_shell*(Cai + CaB_Cai) + Vol*((1 - V_shell/Vol - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (V_shell*(Cai + CaB_Cai) + Vol*((1 - V_shell/Vol - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]))) - (-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t))))))) <= 1e-3*(np.max(np.abs(Cm*1e-15*(V - V[0]))) + np.max(np.abs((-1e-9*np.concatenate(([0.0], np.cumsum(0.5*((I_out - I_in_delayed)[1:]+(I_out - I_in_delayed)[:-1])*np.diff(t)))))))) + 1e-20"
     },
     {
       "description": "total Ca (free + buffered, all four compartments) changes only by the plasma-membrane fluxes: N_Ca(t) - N_Ca(0) = integral of (j_Ca_L + j_NaCa_Ca) dt (trapezoid on the output grid)",
-      "expr": "np.max(np.abs(((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) - np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_L + j_NaCa_Ca)[1:]+(j_Ca_L + j_NaCa_Ca)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_L + j_NaCa_Ca)[1:]+(j_Ca_L + j_NaCa_Ca)[:-1])*np.diff(t)))))) + 1e-21"
+      "expr": "np.max(np.abs(((V_shell*(Cai + CaB_Cai) + Vol*((1 - V_shell/Vol - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (V_shell*(Cai + CaB_Cai) + Vol*((1 - V_shell/Vol - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) - np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_L + j_NaCa_Ca)[1:]+(j_Ca_L + j_NaCa_Ca)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_L + j_NaCa_Ca)[1:]+(j_Ca_L + j_NaCa_Ca)[:-1])*np.diff(t)))))) + 1e-21"
     },
     {
       "description": "every gating variable stays in [0, 1]",

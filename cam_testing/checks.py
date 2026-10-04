@@ -476,10 +476,47 @@ def run_test(cm):
             warning = f'; WARNING: every output is constant{" (all zero)" if len(zero) == len(outputs) else ""}'
         elif zero:
             warning = f'; note: identically zero: {", ".join(zero)}'
+        figs, details = [fig], [f'constant outputs: {", ".join(flat)}'] if flat else []
+        rest = rest_check(cm)
+        if rest:
+            warning += f'; {rest["text"]}'
+            metrics['rest_check'] = {k: v for k, v in rest.items() if k != 'fig'}
+            details.append(rest['text'])
+            figs += [rest['fig']] if rest.get('fig') else []
         return Result('run_test', PASSED, f'generated and simulated {cm.spec["sim_time"]} s; '
-                      f'all {len(outputs)} outputs finite' + warning, metrics, [fig],
-                      [f'constant outputs: {", ".join(flat)}'] if flat else [])
+                      f'all {len(outputs)} outputs finite' + warning, metrics, figs, details)
     return _guard(cm.component, 'run_test', check)
+
+
+def rest_check(cm):
+    '''
+    spec ``rest_check: {sim_time, window, voltage, parameters, threshold (mV, default 0), dt}``: a long
+    run (e.g. at 0 pA injected) reported by run_test, information rather than a pass/fail gate: the
+    spikes (upward crossings of the threshold by ``voltage``) and their rate in the last ``window`` s.
+    '''
+    rc = cm.spec.get('rest_check')
+    if not rc:
+        return None
+    sim_time, window, thr = float(rc['sim_time']), float(rc.get('window', 10.0)), float(rc.get('threshold', 0.0))
+    label = rc.get('label', f'rest ({sim_time:g} s)')
+    try:
+        spec = dict(cm.spec, sim_time=sim_time, dt=float(rc.get('dt', cm.spec['dt'])))
+        helper = harness.simulation_helper(cm.model_path, spec)
+        by_var = {p.variable_name: p for p in cm.parameters()}
+        params = {'parameters/' + (harness.parameter_name(by_var[k]) if k in by_var else k): float(v)
+                  for k, v in (rc.get('parameters') or {}).items()}
+        t, out = harness.run(helper, [rc['voltage']], params)
+    except Exception as e:
+        return {'text': f'{label}: did not run ({type(e).__name__}: {str(e)[:200]})'}
+    v = out[harness.output_key(rc['voltage'])]
+    up = np.flatnonzero((v[:-1] < thr) & (v[1:] >= thr)) + 1
+    n = int(np.sum(t[up] >= t[-1] - window))
+    text = (f'{label}: fires at {n / window:.3g} Hz in the last {window:g} s ({n} spikes)' if n
+            else f'{label}: silent in the last {window:g} s (no spikes; V ends at {v[-1]:.1f} mV)')
+    fig = plots.plot_outputs(plot_path(cm.component, 'rest'), t, {rc['voltage']: v}, {rc['voltage']: 'mV'},
+                             f'{cm.component.label}: {label}')
+    return {'text': text, 'spikes_in_window': n, 'rate_Hz': n / window, 'window_s': window, 'sim_time_s': sim_time,
+            'spikes_total': int(up.size), 'fig': fig}
 
 
 # ----------------------------------------------------------------------------------------------

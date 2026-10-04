@@ -7,7 +7,9 @@
         <variable name="F" public_interface="in" units="C_per_mol"/>
         <variable name="T" public_interface="in" units="kelvin"/>
         <!-- c_ER is the ratio between ER volume and total volume.
- c_SL is the ration between sub sarcolemmal volume and total volume.-->
+ The sub-membrane compartment (Ca concentration Cai) is a shell under the membrane, V_shell = A_mem d_shell,
+ exchanging with the bulk cytosol with time constant tau_shell (Khaliq et al. 2003, ModelDB 48332 cadiff.mod:
+ 0.1 um, 1 ms); the bulk is what is left of Vol, c_bulk = 1 - V_shell/Vol - c_ER - c_ER_pre.-->
         <variable name="c_ER_pre" public_interface="in" units="dimensionless"/>
         <variable name="k_A_ER" public_interface="in" units="dimensionless"/>
         <variable name="k_V_ER" public_interface="in" units="dimensionless"/>
@@ -16,7 +18,9 @@
         <variable name="A_ER" public_interface="out" units="um2"/>
         <variable name="A_ER_pre" public_interface="out" units="um2"/>
         <variable name="c_ER" public_interface="in" units="dimensionless"/>
-        <variable name="c_SL" public_interface="in" units="dimensionless"/>
+        <variable name="d_shell" public_interface="in" units="um"/>
+        <variable name="tau_shell" public_interface="in" units="millis"/>
+        <variable name="V_shell" public_interface="out" units="m3"/>
         <variable name="c_bulk" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
@@ -29,7 +33,11 @@
                         <apply>
                             <minus/>
                             <cn cellml:units="dimensionless">1</cn>
-                            <ci>c_SL</ci>
+                            <apply>
+                                <divide/>
+                                <ci>V_shell</ci>
+                                <ci>Vol</ci>
+                            </apply>
                         </apply>
                         <ci>c_ER</ci>
                     </apply>
@@ -2382,7 +2390,7 @@
                     <divide/>
                     <apply>
                         <power/>
-                        <ci>Ca_bulk</ci>
+                        <ci>Cai</ci>
                         <ci>p_SK</ci>
                     </apply>
                     <apply>
@@ -2394,7 +2402,7 @@
                         </apply>
                         <apply>
                             <power/>
-                            <ci>Ca_bulk</ci>
+                            <ci>Cai</ci>
                             <ci>p_SK</ci>
                         </apply>
                     </apply>
@@ -3313,7 +3321,6 @@
         <variable name="j_NaCa_Ca" public_interface="out" units="mol_per_s"/>
         <variable initial_value="Cai_init" name="Ca_bulk" public_interface="out" units="millimolar"/>
         <variable name="j_diffCa" public_interface="out" units="mol_per_s"/>
-        <variable name="D_Ca" public_interface="in" units="m3_per_s"/>
         <variable name="j_diffCa_ER" public_interface="out" units="mol_per_s"/>
         <variable name="D_Ca_ER" public_interface="in" units="m3_per_s"/>
         <variable initial_value="Ca_ER_init" name="Ca_ER_pre" public_interface="out" units="millimolar"/>
@@ -3470,7 +3477,15 @@
                     <times/>
                     <apply>
                         <minus/>
-                        <ci>D_Ca</ci>
+                        <apply>
+                            <divide/>
+                            <ci>V_shell</ci>
+                            <apply>
+                                <divide/>
+                                <ci>tau_shell</ci>
+                                <cn cellml:units="millis_per_s">1000</cn>
+                            </apply>
+                        </apply>
                     </apply>
                     <apply>
                         <minus/>
@@ -3510,11 +3525,7 @@
                             <apply>
                                 <divide/>
                                 <cn cellml:units="dimensionless">1</cn>
-                                <apply>
-                                    <times/>
-                                    <ci>Vol</ci>
-                                    <ci>c_SL</ci>
-                                </apply>
+                                <ci>V_shell</ci>
                             </apply>
                             <apply>
                                 <plus/>
@@ -3967,6 +3978,7 @@
             </apply>
         </math>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>V_shell</ci><apply><times/><ci>A_mem</ci><ci>d_shell</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
             <apply><eq/><ci>A_mem</ci><apply><times/><ci>k_A</ci><apply><power/><ci>d</ci><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply>
             <apply><eq/><ci>Vol</ci><apply><times/><ci>k_V</ci><apply><power/><ci>d</ci><cn cellml:units="dimensionless">3.0</cn></apply><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
             <apply><eq/><ci>Cm</ci><apply><times/><ci>c_m</ci><ci>A_mem</ci><cn cellml:units="picoF_cm2_per_uF_um2">0.01</cn></apply></apply>

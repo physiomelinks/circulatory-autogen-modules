@@ -3,8 +3,9 @@ version: Argus2026_v01
 reviewed: false
 notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
   sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. SK (small-conductance
-  Ca-activated K) current of the SN soma, i_KCa_SK = g_KCa_SK g_KCa_SK_mod m_SK (V - E_K), m_SK a Hill function of the bulk
-  cytosolic Ca (Ca_bulk, as in the original). m_SK starts at its steady state at Cai_init. Split out of the monolithic SN_soma
+  Ca-activated K) current of the SN soma, i_KCa_SK = g_KCa_SK g_KCa_SK_mod m_SK (V - E_K), m_SK a Hill function of the
+  sub-membrane (shell) Ca, Cai, through internal_Ca (review 2026-10-05; the original read the bulk cytosolic Ca, Ca_bulk, through
+  bulk_Ca; SK now reads the Khaliq 2003 membrane shell, as BK does). m_SK starts at its steady state at Cai_init. Split out of the monolithic SN_soma
   / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat
   checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance
   is g_KCa_SK = A_mem rho_SK gamma_SK (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from
@@ -14,8 +15,8 @@ known_issues:
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
   (2026-10-03).'
 reference_proposals:
-  Ca_bulk:
-    reference: definitional; resting bulk Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
+  Cai:
+    reference: definitional; resting sub-membrane (shell) Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected
     sourced: 'no'
   Cai_init:
     reference: Wanaverbecq2003; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),

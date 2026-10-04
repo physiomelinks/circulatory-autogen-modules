@@ -60,6 +60,12 @@
           "A_ER"
         ],
         "multi_port": "True"
+      },
+      {
+        "port_type": "shell_membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
@@ -148,12 +154,6 @@
         "constant"
       ],
       [
-        "D_Ca",
-        "m3_per_s",
-        "access",
-        "constant"
-      ],
-      [
         "D_Ca_ER",
         "m3_per_s",
         "access",
@@ -196,10 +196,28 @@
         "constant"
       ],
       [
-        "c_SL",
-        "dimensionless",
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "d_shell",
+        "um",
         "access",
         "constant"
+      ],
+      [
+        "tau_shell",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "V_shell",
+        "m3",
+        "access",
+        "variable"
       ],
       [
         "c_bulk",
