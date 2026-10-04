@@ -1,10 +1,10 @@
 variable_name,units,value,data_reference,sourced
-E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
-V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
-V_den_m_Kv2,milliV,8,SN_simple: Tau2011_was_8,yes
-V_mid_m_Kv2,milliV,6,SN_simple: Tau2011_was_6,yes
-V_rest_approx,milliV,-70,SN_simple: Davis2021Thesis_from_traces,yes
+E_K,milliV,-101.402,"definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 310.15 K (the soma defaults; used when unconnected)",no
+V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)",no
+V_den_m_Kv2,milliV,8,BelluzziSacchi1988; n_inf slope k = 8.91 mV (Abstract); 8 mV here is Tao2011 Document S1 Eq. 96's rounded 8.007 mV (Tao values not relied on for now),yes
+V_mid_m_Kv2,milliV,6,BelluzziSacchi1988; n_inf V1/2 = -6.54 mV (Abstract); 6 mV here is Tao2011 Document S1 Eq. 96's rounded -6.084 mV (Tao values not relied on for now),yes
+V_rest_approx,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)",yes
 A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
-rho_Kv2,per_um2,0.056978632478632475,definitional; chosen so that g_Kv2 = A rho gamma_Kv2 (1e-6 uS/pS) reproduces the previous g_Kv2 = 0.0013333 microS (Davis2021Thesis_fit_to_curve) with A = 3000 um^2 (the soma membrane area) and gamma_Kv2 = 7.8 picoS; a density for calibration through gamma_Kv2,no
+rho_Kv2,per_um2,0.056978632478632475,"definitional; chosen so that g_Kv2 = A rho gamma_Kv2 reproduces the previous g_Kv2 = 0.0013333 uS at A = 3000 um^2, gamma 7.8 pS. That g_Kv2 is the owner's one-point estimate 0.24 nA / 180 mV (CA_user ad0ce77, 2024-07-21) from the TOTAL K current of Davis2021Thesis Appendix Fig. 19 (p. 359; axis 'Current (pA)', caption 'density'), withdrawn by the owner in 2025-05 as not Kv2-specific (the CA token 'Davis2021Thesis_fit_to_curve' was wrong). **About 250x smaller than BelluzziSacchi1988's delayed-rectifier gK = 0.33 uS (rat SCG, 37 degC): rho would be ~14 /um^2**",no
 gamma_Kv2,picoS,7.8,Trapani2006; Kv2.1 single-channel conductance 7.8 +- 0.3 pS with 10 mM external K (Fig. 6B and Results),yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
