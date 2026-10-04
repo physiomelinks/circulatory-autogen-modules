@@ -21,8 +21,34 @@
       "E",
       "l",
       "r_0",
-      "u_ext"
+      "u_ext",
+      {
+        "name": "v_in",
+        "variable": "v_in",
+        "submodules": [
+          "C_p"
+        ]
+      },
+      {
+        "name": "v_out",
+        "variable": "v_out",
+        "submodules": [
+          "C_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C_p/u",
+      "u_d": "C_d/u",
+      "v": "R/v",
+      "q_C": "C_p/q_C",
+      "q_C_d": "C_d/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "vv_micro",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "C_p",

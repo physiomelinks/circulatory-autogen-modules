@@ -90,7 +90,7 @@ def _wall(r):
 def _compliance_ports(extra_entrance=(), extra_exit=()):
     entrance = [port('vessel_port', ['v_in', 'u'], SUM_TRUE), port('external_pressure_port', ['u_ext'])]
     exit_ = [port('vessel_port', ['v_out', 'u'], SUM_TRUE), port('volume_port', ['q']),
-             port('pressure_and_deriv_port', ['u', 'du_C_dt'])]
+             port('pressure_and_deriv_port', ['u', 'du_C_dt']), port('pressure_feedback_port', ['u'])]
     return entrance + list(extra_entrance), exit_ + list(extra_exit)
 
 
@@ -287,17 +287,19 @@ def _resistance(form, law):
         variables += [V('Delta_R', 'dimensionless' if law == 'controlled' else 'Js_per_m6', 'boundary_condition', 0),
                       V('R_wCont', 'Js_per_m6', 'variable')]
         if law == 'controlled':
-            variables.append(V('R_local_multiplier', 'dimensionless', 'constant', 1))
+            variables.append(V('R_local_multiplier', 'dimensionless', 'boundary_condition', 1))
             rhs = m.times(m.ci('R'), m.ci('R_local_multiplier'), m.plus(m.ci('Delta_R'), m.cn(1)))
         elif law == 'controlled_share':
             variables += [V('R_other', 'Js_per_m6', 'constant', 1e7),
-                          V('R_local_multiplier', 'dimensionless', 'constant', 1)]
+                          V('R_local_multiplier', 'dimensionless', 'boundary_condition', 1)]
             rhs = m.times(m.ci('R_local_multiplier'), m.plus(m.ci('R'), m.divide(
                 m.times(m.ci('Delta_R'), m.ci('R')), m.plus(m.ci('R'), m.ci('R_other')))))
         else:
             rhs = m.plus(m.ci('R'), m.ci('Delta_R'))
         equations.append(m.eq(m.ci('R_wCont'), rhs))
         entrance_extra.append(port('resistance_delta_port', ['Delta_R']))
+        if law != 'controlled_additive':
+            entrance_extra.append(port('resistance_multiplier_port', ['R_local_multiplier']))
         resistance = m.ci('R_wCont')
     else:
         variables += [V('l', 'metre', 'constant', 0.1), V('mu', 'Js_per_m3', 'global_constant', 0.004),
@@ -335,7 +337,8 @@ def _resistance(form, law):
                       V('u_out', 'J_per_m3', 'boundary_condition', 10000), V('v', 'm3_per_s', 'variable')]
         equations.append(m.eq(m.ci('v'), m.divide(m.minus(m.ci('u_in'), m.ci('u_out')), m.ci('R_eff'))))
         entrance = [port('vessel_port', ['v', 'u_in'])]
-        exit_ = [port('vessel_port', ['v', 'u_out']), port('flow_port', ['v']), port('flow_feedback_port', ['v'])]
+        exit_ = [port('vessel_port', ['v', 'u_out']), port('flow_port', ['v']), port('flow_feedback_port', ['v']),
+                 port('pressure_port', ['u_out'])]
         outputs = ['v']
     return Version('resistance', f'{form}_{law}', f'Resistance in {_FORMS[form]}; {_LAWS[law]}.', variables,
                    equations, entrance + entrance_extra, exit_, outputs=outputs)
@@ -370,7 +373,8 @@ def _inertance(version, description, law):
     equations += [m.eq(m.ci('I_eff'), m.times(m.ci('fraction'), m.ci('I'))),
                   m.ode('v', m.divide(drive, m.ci('I_eff')))]
     entrance = [port('vessel_port', ['v', 'u_in'])]
-    exit_ = [port('vessel_port', ['v', 'u_out']), port('flow_port', ['v']), port('flow_feedback_port', ['v'])]
+    exit_ = [port('vessel_port', ['v', 'u_out']), port('flow_port', ['v']), port('flow_feedback_port', ['v']),
+             port('pressure_port', ['u_out'])]
     return Version('inertance', version, description, variables, equations, entrance, exit_, outputs=['v'],
                    sim_time=0.1, dt=0.0001)
 

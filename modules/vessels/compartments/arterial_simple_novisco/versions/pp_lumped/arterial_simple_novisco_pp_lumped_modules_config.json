@@ -14,17 +14,46 @@
       },
       "outputs": {
         "vessel_port": "I_d",
-        "flow_port": [
-          "I_p",
-          "I_d"
-        ],
+        "flow_port": "I_p",
         "volume_port": "V"
       }
     },
     "shared_parameters": [
       "I",
-      "R"
+      "R",
+      "C",
+      "q_0",
+      "u_0",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I_p"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I_p/v",
+      "v_d": "I_d/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pp",
+      "parameters": {
+        "fraction_R_p": "(Rp / R if Rp > 0 else (fracR if fracR >= 0 else 0.5))",
+        "fraction_R_d": "(1.0 - (Rp / R if Rp > 0 else (fracR if fracR >= 0 else 0.5)))"
+      }
+    },
     "submodules": [
       {
         "name": "I_p",

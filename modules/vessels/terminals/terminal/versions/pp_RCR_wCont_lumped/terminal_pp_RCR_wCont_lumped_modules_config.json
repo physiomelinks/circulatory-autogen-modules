@@ -18,10 +18,59 @@
       }
     },
     "shared_parameters": [
-      "R",
+      {
+        "name": "R_T",
+        "variable": "R",
+        "submodules": [
+          "R_p",
+          "R_d"
+        ]
+      },
       "R_local_multiplier",
-      "Delta_R"
+      {
+        "name": "C_T",
+        "variable": "C",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "q_us",
+        "variable": "q_0",
+        "submodules": [
+          "C"
+        ]
+      },
+      "Delta_R",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "R_p"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "R_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R_p/v",
+      "v_T": "R_d/v",
+      "q": "V/q",
+      "u_C": "C/u_C"
+    },
+    "replaces": {
+      "module_subtype": "pp_RCR_wCont",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_us)"
+      }
+    },
     "submodules": [
       {
         "name": "R_p",

@@ -17,8 +17,42 @@
         "flow_port": "I",
         "volume_port": "V",
         "pressure_and_deriv_port": "C",
+        "pressure_feedback_port": "C",
         "flow_feedback_port": "I"
       }
+    },
+    "shared_parameters": [
+      "I",
+      "R",
+      "C",
+      "q_0",
+      "u_0",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "v_out",
+        "variable": "v_out",
+        "submodules": [
+          "C"
+        ]
+      }
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I/v",
+      "q_C": "C/q_C",
+      "q": "V/q",
+      "du_C_dt": "C/du_C_dt"
+    },
+    "replaces": {
+      "module_subtype": "pv",
+      "parameters": {}
     },
     "submodules": [
       {

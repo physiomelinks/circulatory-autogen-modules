@@ -14,17 +14,84 @@
       },
       "outputs": {
         "vessel_port": "I_d",
-        "flow_port": [
-          "I_p",
-          "I_d"
-        ],
+        "flow_port": "I_d",
         "volume_port": "V"
       }
     },
     "shared_parameters": [
-      "I",
-      "R"
+      {
+        "name": "I_T_1",
+        "variable": "I",
+        "submodules": [
+          "I_p"
+        ]
+      },
+      {
+        "name": "R_T",
+        "variable": "R",
+        "submodules": [
+          "R_p",
+          "R_d"
+        ]
+      },
+      {
+        "name": "frac_R_T_1_of_R_T",
+        "variable": "fraction",
+        "submodules": [
+          "R_p"
+        ]
+      },
+      {
+        "name": "C_T",
+        "variable": "C",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "q_us",
+        "variable": "q_0",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "I_T_2",
+        "variable": "I",
+        "submodules": [
+          "I_d"
+        ]
+      },
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I_p"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I_p/v",
+      "v_T": "I_d/v",
+      "q": "V/q",
+      "u_C": "C/u_C"
+    },
+    "replaces": {
+      "module_subtype": "pp_RICRI",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_us)",
+        "fraction_R_d": "(1.0 - frac_R_T_1_of_R_T)"
+      }
+    },
     "submodules": [
       {
         "name": "I_p",

@@ -14,14 +14,32 @@
       "outputs": {
         "vessel_port": "C",
         "flow_port": "R",
+        "pressure_feedback_port": "C",
         "flow_feedback_port": "R",
         "pressure_and_deriv_port": "C"
       }
     },
     "shared_parameters": [
       "l",
-      "r_0"
+      "r_0",
+      "u_0",
+      "E",
+      "u_in",
+      "u_ext",
+      "v_out"
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R/v",
+      "q_C": "C/q_C",
+      "q": "V/q",
+      "du_C_dt": "C/du_C_dt",
+      "u_C": "C/u_C"
+    },
+    "replaces": {
+      "module_subtype": "pv_micro",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "R",

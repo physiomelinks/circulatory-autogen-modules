@@ -76,7 +76,7 @@ def structure_problems(version):
                 problems.append(f'{sub["name"]}: {n} is not a submodule (external connections belong in the host\'s '
                                 'per_submodule_inputs / per_submodule_outputs)')
     declared = version.supermodule_globals
-    shared = set(version.config.get('shared_parameters') or [])
+    shared = set(version.shared_parameter_names)
     for key, routes in (version.config.get('routes') or {}).items():
         for port_type, subs in routes.items():
             for n in [subs] if isinstance(subs, str) else subs:
@@ -112,17 +112,23 @@ def equivalence(version, entry, work_dir):
     solver_info = entry.get('solver_info') or {'rtol': 1e-10, 'atol': 1e-12}
     ref_path = systems.generate(target, os.path.join(work_dir, 'target'))
     t_ref, ref = systems.simulate(ref_path, target.spec, solver_info)
-    t_new, new = systems.simulate(systems.generate(model, os.path.join(work_dir, 'model')), model.spec, solver_info)
     # submodule outputs renamed <instance>_<sub>; an explicit output_map in the spec (for nested
     # supermodules, or variables that moved between components) takes precedence
     output_map = {**prefixed_output_map(ref, entry.get('instance', version.vessel_type), version.submodule_names),
                   **(entry.get('output_map') or {})}
+    new_path = systems.generate(model, os.path.join(work_dir, 'model'))
+    t_new, new = systems.simulate(new_path, model.spec, solver_info)
+    # a supermodule instance's outputs (aortic_root/u) are in a component of its own, not a module's
+    _, exposed = systems.simulate(new_path, model.spec, solver_info,
+                                  names=sorted({t for t in output_map.values() if t not in new}))
+    new.update(exposed)
     ignore = entry.get('ignore') or {}
     # vessels replaced by supermodules (e.g. a model rebuilt with lumped vessels): only their mapped
     # outputs are compared, the rest have no single counterpart
     replaced = tuple(f'{v}/' for v in entry.get('replaced_vessels') or [])
     mapped = entry.get('output_map') or {}
-    ref = {k: v for k, v in ref.items() if k not in ignore and (not k.startswith(replaced) or k in mapped)}
+    ref = {k: v for k, v in ref.items() if k not in ignore and not k.endswith(('/t', '/time'))
+           and (not k.startswith(replaced) or k in mapped)}
     tol = float(entry.get('tol', 1e-9))
     rows, missing = systems.compare(ref, new, output_map, tol, wrapped=entry.get('wrapped'),
                                     reciprocal=entry.get('reciprocal'))

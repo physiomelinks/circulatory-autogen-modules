@@ -17,9 +17,32 @@
       }
     },
     "shared_parameters": [
+      "E",
       "l",
-      "r_0"
+      {
+        "name": "r",
+        "variable": "r_0",
+        "submodules": [
+          "C",
+          "R",
+          "V"
+        ]
+      },
+      "q_C_init",
+      "u_ext",
+      "v_in",
+      "u_out"
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "vp_micro",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "C",

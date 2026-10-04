@@ -52,6 +52,43 @@ OWN = {'fraction', 'gravity_factor', 'q_C_init', 'v_init', 'u_in', 'u_out', 'v_i
 GLOBALS = {'rho', 'mu', 'g', 'beta_g', 'a_vessel', 'b_vessel', 'c_vessel', 'd_vessel'}
 
 
+class Expr(float):
+    '''A number that remembers how it was computed from the monolithic version's parameters (its
+    expr: a parameter name, or arithmetic of them). The family builders do ordinary arithmetic on
+    the monolithic values; what comes out says which supermodule parameters are a monolithic
+    parameter renamed (kept under its name: shared_parameters) and which are computed (recorded in
+    the config's "replaces", for libcuflynx.utilities.lumped_migration).'''
+
+    def __new__(cls, value, expr=None):
+        out = float.__new__(cls, value)
+        out.expr = expr if expr is not None else repr(float(value))
+        return out
+
+    @property
+    def name(self):
+        return self.expr if self.expr.isidentifier() else None
+
+
+def _expr(x):
+    return x.expr if isinstance(x, Expr) else repr(float(x))
+
+
+def _binary(symbol, fn):
+    def forward(a, b):
+        return Expr(fn(float(a), float(b)), f'({_expr(a)} {symbol} {_expr(b)})')
+
+    def reverse(a, b):
+        return Expr(fn(float(b), float(a)), f'({_expr(b)} {symbol} {_expr(a)})')
+    return forward, reverse
+
+
+Expr.__add__, Expr.__radd__ = _binary('+', lambda a, b: a + b)
+Expr.__sub__, Expr.__rsub__ = _binary('-', lambda a, b: a - b)
+Expr.__mul__, Expr.__rmul__ = _binary('*', lambda a, b: a * b)
+Expr.__truediv__, Expr.__rtruediv__ = _binary('/', lambda a, b: a / b)
+Expr.__neg__ = lambda a: Expr(-float(a), f'(-{_expr(a)})')
+
+
 @dataclass
 class Sub:
     name: str
@@ -176,7 +213,7 @@ def lumped_noI(bc, M, comp='vv_linear_novisco', r_law='linear', geometric=False,
 
 def _q_init(M, q0_name):
     '''q_C_init for a monolithic version whose volume state q starts at q_init.'''
-    return float(M['q_init']) - float(M[q0_name])
+    return M['q_init'] - M[q0_name]
 
 
 def simple_noI(bc):
@@ -258,8 +295,9 @@ def arterial_simple_vp_nonlinear(M):
 
 
 def arterial_simple_novisco_pp(M):
-    rp = float(M['Rp'])
-    frac = rp / float(M['R']) if rp > 0 else (float(M['fracR']) if float(M['fracR']) >= 0 else 0.5)
+    rp, fr = float(M['Rp']), float(M['fracR'])
+    frac = Expr(rp / float(M['R']) if rp > 0 else (fr if fr >= 0 else 0.5),
+                '(Rp / R if Rp > 0 else (fracR if fracR >= 0 else 0.5))')
     cpar = _p(M, 'C', 'q_0', 'u_0')
     chain = [I('I_p', 'pp_linear', I=M['I'], fraction=0.5), R('R_p', 'vp_linear', R=M['R'], fraction=frac),
              C(version='vv_linear_novisco', **cpar), R('R_d', 'pv_linear', R=M['R'], fraction=1 - frac),
@@ -328,7 +366,7 @@ def _whole(key, var='R'):
 
 
 def _frac(M, first):
-    f = float(M['frac_R_T_1_of_R_T'])
+    f = M['frac_R_T_1_of_R_T']
     return {'R': M['R_T'], 'fraction': f if first else 1 - f}
 
 
@@ -352,7 +390,7 @@ def _terminal2_pp(M):
 
 
 def _zcir(M):
-    rt2 = float(M['R_T']) - float(M['Zc'])
+    rt2 = M['R_T'] - M['Zc']
     return terminal_vp(lambda M: {'R': rt2}, lambda M: {'I': M['I_T']}, law='controlled_share',
                        r_extra=lambda M: {'R_other': M['Zc'], 'R_local_multiplier': M.get('R_local_multiplier', 1)})(M)
 
@@ -445,11 +483,11 @@ def mono_values(version):
                 v = BC_VALUES[p.variable_name]
             else:
                 continue
-        values[p.variable_name] = float(v)
+        values[p.variable_name] = Expr(float(v), p.variable_name)
     # constants and globals of the config that the instance has no row for
     for name, _units, _access, kind in (version.config.get('variables_and_units') or []):
         if name not in values and kind in ('constant', 'global_constant') and name in FILL:
-            values[name] = FILL[name]
+            values[name] = Expr(FILL[name], name)
     return values
 
 
@@ -497,8 +535,10 @@ def open_boundary_conditions(layout):
             for name, s in subs.items()}
 
 
-def routes(layout, mono_config):
-    '''The supermodule's routes for the monolithic version's ports, and the ports no submodule offers.'''
+def routes(layout, mono_config, outputs=None):
+    '''The supermodule's routes for the monolithic version's ports, and the ports no submodule offers.
+    ``outputs``: the monolithic outputs' submodule variables (output_map).'''
+    outputs = outputs or {}
     subs = all_subs(layout)
     chain = layout.chain
     result, dropped = {'inputs': {}, 'outputs': {}}, []
@@ -514,6 +554,11 @@ def routes(layout, mono_config):
             offering = [s.name for s in subs if t in [q['port_type'] for q in _ports(s.cv, side)]]
             if t == 'volume_port' and 'V' in offering:
                 offering = ['V']
+            # a port of the monolithic version's outputs goes to the submodule(s) those outputs are
+            # (a pp vessel's flow_port [v_T] is its outlet inertance's, not both inertances')
+            owners = {outputs[v].split('/')[0] for v in p.get('variables') or [] if v in outputs}
+            if owners & set(offering):
+                offering = [s for s in offering if s in owners]
             if not offering:
                 dropped.append(f'{key[:-1]} {t} {p.get("variables", [])}')
                 continue
@@ -522,42 +567,80 @@ def routes(layout, mono_config):
 
 
 def instance_rows(layout, mono_rows, bc_values, M):
-    '''The supermodule's default instance: shared rows for a constant every submodule that has it
-    gives the same value, <var>_<sub> rows otherwise, globals by name, and the open boundary
-    conditions (the monolithic instance's value where it has one, else a test value).'''
+    '''The supermodule's default instance, from the submodules' parameters and the open boundary
+    conditions (the monolithic instance's value where it has one, else a test value):
+
+    - a value that is a monolithic parameter (an Expr with a name) is a shared parameter under
+      that name, setting its variable in each submodule that takes it from there: the supermodule
+      keeps the monolithic version's parameter names (C, R_T, l ...);
+    - any other value is the submodule's own row <var>_<sub>; one computed from monolithic
+      parameters (q_init - q_us, R_T - Zc ...) is also recorded as an expression.
+
+    Returns (rows, shared_parameters entries, globals, {row name: expression}).'''
     subs = all_subs(layout)
-    units = {}
-    values = {}                                 # var -> {sub: value}
+    units, values, boundary = {}, [], set()       # values: (sub, var, value)
     for s in subs:
         for var, value in s.params.items():
             cv_var = next((v for v in s.cv.variables if v.name == var), None)
             if cv_var is None:
                 raise KeyError(f'{s.module_type}/{s.version} has no variable {var}')
             units[var] = cv_var.units
-            values.setdefault(var, {})[s.name] = value
-    open_bcs = open_boundary_conditions(layout)
-    boundary = set()
-    for name, bcs in open_bcs.items():
+            values.append((s.name, var, value))
+    given = {(sub, var) for sub, var, _ in values}
+    for name, bcs in open_boundary_conditions(layout).items():
         s = next(x for x in subs if x.name == name)
         for var in bcs:
+            if (name, var) in given:
+                continue
             units[var] = s.cv.var(var).units
-            values.setdefault(var, {})[name] = bc_values.get(var, M.get(var, BC_VALUES.get(var, s.cv.var(var).default)))
+            values.append((name, var, bc_values.get(var, M.get(var, BC_VALUES.get(var, s.cv.var(var).default)))))
             boundary.add(var)
-    shared, rows = [], []
-    for var, by_sub in values.items():
-        have = [s.name for s in subs if any(v.name == var for v in s.cv.variables)]
-        same = len(set(map(float, by_sub.values()))) == 1 and set(by_sub) == set(have)
-        if var not in OWN and same and len(have) > 1:
-            shared.append(var)
-            rows.append([var, units[var], next(iter(by_sub.values())), _ref(var, mono_rows, var in boundary), 'no'])
+    rows, shared, computed, groups = [], [], {}, {}
+    for sub, var, value in values:
+        name = value.name if isinstance(value, Expr) else None
+        if name is not None:
+            groups.setdefault((name, var), []).append((sub, value))
+            continue
+        rows.append([f'{var}_{sub}', units[var], float(value), _ref(var, mono_rows, var in boundary), 'no'])
+        if isinstance(value, Expr):
+            computed[f'{var}_{sub}'] = value.expr
+    for (name, var), members in groups.items():
+        member_subs = [sub for sub, _ in members]
+        everyone = [s.name for s in subs if any(v.name == var for v in s.cv.variables)]
+        if name == var and member_subs == everyone:
+            shared.append(name)
         else:
-            for sub, value in by_sub.items():
-                rows.append([f'{var}_{sub}', units[var], value, _ref(var, mono_rows, var in boundary), 'no'])
+            shared.append({'name': name, 'variable': var, 'submodules': member_subs})
+        rows.append([name, units[var], float(members[0][1]), _ref(name, mono_rows, var in boundary), 'no'])
     globals_ = sorted({v.name for s in subs for v in s.cv.variables if v.kind == 'global_constant'})
     for g in globals_:
         if g in mono_rows:
             rows.append([g, mono_rows[g][0], mono_rows[g][1], mono_rows[g][2], 'no'])
-    return rows, shared, globals_
+    seen = set()
+    rows = [r for r in rows if not (r[0] in seen or seen.add(r[0]))]
+    return rows, shared, globals_, computed
+
+
+# monolithic variables that no single submodule variable stands for
+NO_COUNTERPART = {'R_v', 'C', 'R', 'I', 'q_0', 'h', 'r', 'q_p', 'q_d', 'q_0_2'}
+
+
+def output_map(mono, layout):
+    '''{monolithic variable: "<submodule>/<variable>"}: the layout's compared outputs, plus each
+    other monolithic variable that exactly one submodule has a variable of the same name for
+    (the vessel's total volume q is vessel_volume's).'''
+    out = dict(layout.outputs)
+    subs = all_subs(layout)
+    for name, _units, _access, kind in mono.config.get('variables_and_units') or []:
+        if name in out or kind != 'variable' or name in NO_COUNTERPART:
+            continue
+        if name == 'q' and any(s.name == 'V' for s in subs):
+            out[name] = 'V/q'
+            continue
+        having = [s.name for s in subs if any(v.name == name and v.kind == 'variable' for v in s.cv.variables)]
+        if len(having) == 1:
+            out[name] = f'{having[0]}/{name}'
+    return out
 
 
 def _ref(var, mono_rows, boundary=False):
@@ -568,7 +651,7 @@ def _ref(var, mono_rows, boundary=False):
     return 'lumped split of the monolithic version (tools/lumped/vessels.py)'
 
 
-def supermodule_entry(module_type, version, layout, mono_config, description, template=False):
+def supermodule_entry(module_type, version, layout, mono_config, description, template=False, outputs=None):
     subs = all_subs(layout)
     conns = edges(layout)
     records = []
@@ -582,7 +665,7 @@ def supermodule_entry(module_type, version, layout, mono_config, description, te
         rec['inp_instances'] = [a for a, b in conns if b == s.name]
         rec['out_instances'] = [b for a, b in conns if a == s.name]
         records.append(rec)
-    route, dropped = routes(layout, mono_config)
+    route, dropped = routes(layout, mono_config, outputs)
     entry = {'module_type': module_type, 'module_subtype': version, 'module_format': 'supermodule',
              'default_instance': 'default', 'licence': 'CC0-1.0', 'creator': [], 'description': description}
     if template:
@@ -619,11 +702,15 @@ def write_vessel(mono, layout, units_library, bib):
     stem = f'{mono.vessel_type}_{name}'
     M = mono_values(mono)
     mono_rows = _mono_rows(mono)
-    rows, shared, globals_ = instance_rows(layout, mono_rows, layout.bc_values, M)
-    entry, dropped = supermodule_entry(mono.vessel_type, name, layout, mono.config, _description(mono, layout))
+    rows, shared, globals_, computed = instance_rows(layout, mono_rows, layout.bc_values, M)
+    entry, dropped = supermodule_entry(mono.vessel_type, name, layout, mono.config, _description(mono, layout),
+                                       outputs=output_map(mono, layout))
     if shared:
         entry['shared_parameters'] = shared
-    # keep key order: shared_parameters before submodules
+    # the monolithic version's outputs, under the instance's own name (aortic_root/u)
+    entry['outputs'] = output_map(mono, layout)
+    entry['replaces'] = {'module_subtype': mono.BC_type, 'parameters': computed}
+    # keep key order: shared_parameters and replaces before submodules
     entry = {k: entry[k] for k in [k for k in entry if k != 'submodules'] + ['submodules']}
     write_json(os.path.join(vdir, f'{stem}_modules_config.json'), [entry])
     write_instance(vdir, rows)

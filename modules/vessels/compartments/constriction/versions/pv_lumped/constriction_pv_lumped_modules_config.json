@@ -19,8 +19,29 @@
     },
     "shared_parameters": [
       "l",
-      "r_0"
+      {
+        "name": "r",
+        "variable": "r_0",
+        "submodules": [
+          "R",
+          "C",
+          "V"
+        ]
+      },
+      "E",
+      "u_in",
+      "u_ext",
+      "v_out"
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R/v",
+      "q_C": "C/q_C"
+    },
+    "replaces": {
+      "module_subtype": "pv",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "R",

@@ -18,8 +18,25 @@
     },
     "shared_parameters": [
       "l",
-      "r_0"
+      "r_0",
+      "u_0",
+      "E",
+      "u_in",
+      "u_ext",
+      "v_out"
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R/v",
+      "q_C": "C/q_C",
+      "u_C": "C/u_C",
+      "du_C_dt": "C/du_C_dt",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pv_micro_noI",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "R",

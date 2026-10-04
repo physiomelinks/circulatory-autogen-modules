@@ -325,16 +325,28 @@ compliance between two halves of R and I. The order follows the BC letters: `vp`
 `pv` is I -> R -> C, `vv` is C -> R -> I -> C, `pp` is I -> R -> C -> R -> I, and the vessels without
 inertance put a flow-form resistance where R and I were.
 
-A `_lumped` version's config entry has three keys that let a model use it like the monolithic one:
+A `_lumped` version's config entry has the keys that let a model use it exactly as it used the
+monolithic version, with the same names:
 
 - **`routes`** say which submodule a host connects to, by port type: `{"inputs": {"vessel_port": "C"},
   "outputs": {"vessel_port": "I", "volume_port": "V"}}`. A model keeps its one record for the vessel
   (`{"name": "aortic_root", "module_type": "arterial", "module_subtype": "vp_lumped", ...}`) with its
   usual `inp_instances`/`out_instances`, and libcuflynx links each neighbour to the routed submodule.
   Ports of the monolithic version that no submodule offers are listed in the version's `notes`.
-- **`shared_parameters`** are set once for the whole vessel (its geometry `l`, `r_0`, and anything every
-  submodule that has it gives the same value): an instance row `l`, or a model parameters-file row
-  `l_<vessel>`, reaches `l` in every submodule. The rest are `<var>_<submodule>` (`fraction_C_p`).
+- **`shared_parameters`** keep the monolithic version's parameter names. An entry is a variable
+  (`"l"`: the vessel's `l`, in every submodule that has one) or `{"name": "C_T", "variable": "C",
+  "submodules": ["C"]}` (the terminal's `C_T` is its compliance's `C`). Each is one parameter of the
+  model, `<name>_<vessel>` (`C_T_systemic_T`, as before), mapped to every submodule that takes it,
+  so parameters files, params_for_id and calibration keep their names. What the vessel splits
+  (`fraction_R_p`, a terminal's `q_C_init_C = q_init - q_us`) is `<var>_<vessel>_<submodule>`.
+- **`outputs`** keep the monolithic version's output names: `{"u": "C_p/u", "v": "I/v", "q": "V/q"}`
+  gives the model `aortic_root/u` (computed from the submodule's variable in a component named after
+  the vessel), so obs_data, prediction variables and plots keep working.
+- **`replaces`** says which monolithic version it is the twin of and how to compute the split
+  parameters from its parameters (`{"module_subtype": "pp_RICRI", "parameters": {"fraction_R_d":
+  "(1.0 - frac_R_T_1_of_R_T)"}}`). `python -m libcuflynx.utilities.lumped_migration --library
+  modules <vessel_array> --parameters <parameters.csv>` moves a model onto the twins with it: the
+  records' `module_subtype`, and only the computed rows of the parameters file, change.
 - its default instance carries the monolithic default instance's values (TODOs filled with
   representative values), and its spec's `supermodule.equivalent_version` checks that it reproduces
   the monolithic version (`supermodule_version_equivalence_test`). Each output's difference is

@@ -1,19 +1,17 @@
 '''
 System models rebuilt with lumped vessels: a copy of a system model whose vessels with a
-<version>_lumped twin use it, with the model's parameters translated (shared parameters keep their
-names <var>_<vessel>; the others become <var>_<vessel>_<submodule>). The copy must reproduce the
-original (supermodule.equivalent in the spec of the _lumped version named in LUMPED_SYSTEMS).
+<version>_lumped twin use it, converted by libcuflynx.utilities.lumped_migration (shared
+parameters keep their names; computed ones become <var>_<vessel>_<submodule>; outputs
+<vessel>/<var> become <vessel>_<submodule>/<var>). The copy must reproduce the original
+(supermodule.equivalent in the spec of the _lumped version named in LUMPED_SYSTEMS).
 '''
-import csv
 import os
 import shutil
 
 import yaml
 
-from cam_testing.library import REPO_ROOT, load_version
+from cam_testing.library import MODULES_DIR, REPO_ROOT
 from cam_testing import system as systems
-
-from . import vessels
 
 SYSTEMS_DIR = os.path.join(REPO_ROOT, 'system_models')
 
@@ -21,26 +19,9 @@ SYSTEMS_DIR = os.path.join(REPO_ROOT, 'system_models')
 LUMPED_SYSTEMS = [('closed_loop_cvs/3compartment', '3compartment_lumped', ('arterial_simple', 'vp_lumped'))]
 
 
-def _read_rows(path):
-    with open(path, newline='') as f:
-        return list(csv.reader(f))
-
-
-def _vessel_values(rows, vessel, mono):
-    '''{var: value} of one vessel's rows (<var>_<vessel>), over the monolithic default instance's.'''
-    values = vessels.mono_values(mono)
-    suffix = f'_{vessel}'
-    for r in rows[1:]:
-        if r and r[0].endswith(suffix):
-            try:
-                values[r[0][:-len(suffix)]] = float(r[2])
-            except ValueError:
-                pass
-    return values
-
-
 def build(source, name):
     '''Writes system_models/<category>/<name>; returns (system dir, the equivalence entry).'''
+    from libcuflynx.utilities.lumped_migration import Library, migrate_files
     from cam_testing import vessel_array
     category, src_name = source.split('/')
     src = os.path.join(SYSTEMS_DIR, category, src_name)
@@ -48,41 +29,11 @@ def build(source, name):
     if os.path.isdir(dst):
         shutil.rmtree(dst)
     os.makedirs(dst)
+    result = migrate_files(Library([MODULES_DIR]), os.path.join(src, f'{src_name}_vessel_array.json'),
+                           os.path.join(src, f'{src_name}_parameters.csv'), out_dir=dst, prefix=name,
+                           old_prefix=src_name)
     records = vessel_array.read_records(os.path.join(src, f'{src_name}_vessel_array.json'))
-    rows = _read_rows(os.path.join(src, f'{src_name}_parameters.csv'))
-    header, body = rows[0], rows[1:]
-    output_map, replaced, added = {}, [], []
-    for rec in records:
-        key = (rec['module_type'], rec['module_subtype'])
-        if key not in vessels.FAMILIES:
-            continue
-        vessel = rec['name']
-        mono = load_version(*key)
-        M = _vessel_values(rows, vessel, mono)
-        layout = vessels.FAMILIES[key](M)
-        inst_rows, shared, _globals = vessels.instance_rows(layout, {}, layout.bc_values, M)
-        had = {r[0][:-len(vessel) - 1] for r in body if r and r[0].endswith(f'_{vessel}')}
-        sub_names = [s.name for s in vessels.all_subs(layout)]
-        for var_name, units, value, *_rest in inst_rows:
-            if var_name in _globals:
-                continue
-            if var_name in shared:
-                var, new_name = var_name, f'{var_name}_{vessel}'
-            else:
-                sub = next(s for s in sorted(sub_names, key=len, reverse=True) if var_name.endswith('_' + s))
-                var, new_name = var_name[:-len(sub) - 1], f'{var_name[:-len(sub) - 1]}_{vessel}_{sub}'
-            kind = next((v.kind for s in vessels.all_subs(layout) for v in s.cv.variables if v.name == var), '')
-            if kind == 'boundary_condition' and var not in had:
-                continue            # connected in the model
-            added.append([new_name, units, value, f'{source}: {vessel} split into lumped submodules']
-                         + [''] * (len(header) - 4))
-        body = [r for r in body if not (r and r[0].endswith(f'_{vessel}'))]
-        rec['module_subtype'] = f'{key[1]}_lumped'
-        replaced.append(vessel)
-        output_map.update({f'{vessel}/{k}': f'{vessel}_{v}' for k, v in layout.outputs.items()})
-    vessel_array.write_records(os.path.join(dst, f'{name}_vessel_array.json'), records)
-    with open(os.path.join(dst, f'{name}_parameters.csv'), 'w', newline='') as f:
-        csv.writer(f).writerows([header] + body + [r[:len(header)] for r in added])
+    replaced = sorted(result['replaced'])
     src_spec = systems.load_system(src_name).spec
     spec = {
         'model': name, 'category': category, 'reviewed': False,
@@ -93,16 +44,16 @@ def build(source, name):
                                   f'{source} (the same model with the monolithic vessels)'},
         'invariants': src_spec.get('invariants') or [],
         'notes': [f'{source} with its vessels {", ".join(replaced)} replaced by their _lumped supermodule versions '
-                  '(compliance, resistance and inertance submodules from modules/haemodynamics/lumped_constitutive). '
-                  'Generated by tools/lumped/systems.py.'],
+                  '(compliance, resistance and inertance submodules from modules/haemodynamics/lumped_constitutive), '
+                  'converted by libcuflynx.utilities.lumped_migration. Generated by tools/lumped/systems.py.'],
     }
     with open(os.path.join(dst, f'{name}_system.yaml'), 'w') as f:
         yaml.safe_dump(spec, f, sort_keys=False, width=120)
     entry = {'model': f'{category}/{name}', 'reproduces': source, 'replaced_vessels': replaced,
-             'output_map': output_map, 'tol': 1e-6, 'solver_info': {'rtol': 1e-10, 'atol': 1e-14}}
+             'output_map': {o: o for o in result['outputs']}, 'tol': 1e-6, 'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
+             'ignore': {f'{r["name"]}/t': 'time' for r in records}}
     # the heart's sawtooth phases and the valves' near-singular inertances, compared as the
     # supermodule heart's system test compares them
-    entry['ignore'] = {f'{r["name"]}/t': 'time' for r in records}
     chambers = [r['name'] for r in records if r['module_type'] == 'chamber']
     valves = [r['name'] for r in records if r['module_type'] == 'valve']
     if chambers:

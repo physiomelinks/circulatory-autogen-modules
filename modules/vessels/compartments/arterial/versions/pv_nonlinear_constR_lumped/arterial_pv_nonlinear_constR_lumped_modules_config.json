@@ -19,13 +19,46 @@
         "stiffness_port": "C",
         "volume_port": "V",
         "pressure_and_deriv_port": "C",
+        "pressure_feedback_port": "C",
         "flow_feedback_port": "I"
       }
     },
     "shared_parameters": [
       "l",
-      "r_0"
+      "r_0",
+      "I_scale",
+      "theta",
+      "R_flag",
+      "u_0",
+      "m_tube",
+      "n_tube",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "v_out",
+        "variable": "v_out",
+        "submodules": [
+          "C"
+        ]
+      },
+      "K_tube"
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pv_nonlinear_constR",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "I",

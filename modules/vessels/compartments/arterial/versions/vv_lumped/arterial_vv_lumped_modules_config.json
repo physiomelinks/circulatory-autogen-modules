@@ -19,7 +19,8 @@
         "vessel_port": "C_d",
         "flow_port": "I",
         "volume_port": "V",
-        "flow_feedback_port": "I"
+        "flow_feedback_port": "I",
+        "pressure_feedback_port": "C_d"
       }
     },
     "shared_parameters": [
@@ -27,8 +28,35 @@
       "E",
       "l",
       "r_0",
-      "u_ext"
+      "theta",
+      "u_ext",
+      {
+        "name": "v_in",
+        "variable": "v_in",
+        "submodules": [
+          "C_p"
+        ]
+      },
+      {
+        "name": "v_out",
+        "variable": "v_out",
+        "submodules": [
+          "C_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C_p/u",
+      "u_d": "C_d/u",
+      "v": "I/v",
+      "q_C": "C_p/q_C",
+      "q_C_d": "C_d/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "vv",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "C_p",

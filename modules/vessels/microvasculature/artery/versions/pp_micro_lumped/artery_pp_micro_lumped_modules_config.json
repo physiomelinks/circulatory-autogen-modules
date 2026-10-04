@@ -13,21 +13,37 @@
       },
       "outputs": {
         "vessel_port": "R_d",
-        "flow_port": [
-          "R_p",
-          "R_d"
-        ],
-        "flow_feedback_port": [
-          "R_p",
-          "R_d"
-        ]
+        "flow_port": "R_p",
+        "flow_feedback_port": "R_p"
       }
     },
     "shared_parameters": [
       "l",
       "r_0",
-      "R_flag"
+      "u_0",
+      "E",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "R_p"
+        ]
+      },
+      "u_ext"
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R_p/v",
+      "v_d": "R_d/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pp_micro",
+      "parameters": {
+        "u_out_R_d": "(u_0 - 2000.0)"
+      }
+    },
     "submodules": [
       {
         "name": "R_p",

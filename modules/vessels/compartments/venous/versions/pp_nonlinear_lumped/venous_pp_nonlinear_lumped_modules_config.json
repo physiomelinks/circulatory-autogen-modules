@@ -14,14 +14,8 @@
       },
       "outputs": {
         "vessel_port": "I_d",
-        "flow_port": [
-          "I_p",
-          "I_d"
-        ],
-        "flow_feedback_port": [
-          "I_p",
-          "I_d"
-        ],
+        "flow_port": "I_p",
+        "flow_feedback_port": "I_p",
         "radius_port": "V",
         "stiffness_port": "C",
         "volume_port": "V"
@@ -32,8 +26,38 @@
       "r_0",
       "I_scale",
       "theta",
-      "R_flag"
+      "R_flag",
+      "u_0",
+      "m_tube",
+      "n_tube",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I_p"
+        ]
+      },
+      "u_ext",
+      "K_tube",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I_p/v",
+      "v_d": "I_d/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pp_nonlinear",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "I_p",

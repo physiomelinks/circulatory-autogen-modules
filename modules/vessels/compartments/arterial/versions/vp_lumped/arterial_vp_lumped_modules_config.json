@@ -19,9 +19,37 @@
       }
     },
     "shared_parameters": [
+      "u_0",
+      "E",
       "l",
-      "r_0"
+      "r_0",
+      "theta",
+      "u_ext",
+      {
+        "name": "v_in",
+        "variable": "v_in",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "vp",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "C",

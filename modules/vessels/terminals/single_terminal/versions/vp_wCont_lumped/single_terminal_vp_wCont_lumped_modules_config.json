@@ -11,12 +11,53 @@
       "inputs": {
         "vessel_port": "C",
         "resistance_delta_port": "R",
+        "resistance_multiplier_port": "R",
         "external_pressure_port": "C"
       },
       "outputs": {
         "vessel_port": "R",
         "flow_port": "R",
         "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      {
+        "name": "C_T",
+        "variable": "C",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "q_us",
+        "variable": "q_0",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "R_T2",
+        "variable": "R",
+        "submodules": [
+          "R"
+        ]
+      },
+      "R_local_multiplier",
+      "u_ext",
+      "v_in",
+      "Delta_R",
+      "u_out"
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v_T": "R/v",
+      "q": "V/q",
+      "u_C": "C/u_C"
+    },
+    "replaces": {
+      "module_subtype": "vp_wCont",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_us)"
       }
     },
     "submodules": [

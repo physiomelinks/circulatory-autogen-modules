@@ -19,9 +19,45 @@
     },
     "shared_parameters": [
       "l",
-      "r_0",
-      "R_flag"
+      {
+        "name": "r",
+        "variable": "r_0",
+        "submodules": [
+          "R_p",
+          "C",
+          "R_d",
+          "V"
+        ]
+      },
+      "E",
+      "q_C_init",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "R_p"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "R_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R_p/v",
+      "v_d": "R_d/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pp",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "R_p",

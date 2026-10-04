@@ -14,23 +14,80 @@
           "R_p",
           "R_d"
         ],
+        "resistance_multiplier_port": [
+          "R_p",
+          "R_d"
+        ],
         "external_pressure_port": "C"
       },
       "outputs": {
         "vessel_port": "I_d",
-        "flow_port": [
-          "I_p",
-          "I_d"
-        ],
+        "flow_port": "I_d",
         "volume_port": "V"
       }
     },
     "shared_parameters": [
-      "I",
-      "R",
+      {
+        "name": "I_T",
+        "variable": "I",
+        "submodules": [
+          "I_p",
+          "I_d"
+        ]
+      },
+      {
+        "name": "R_T",
+        "variable": "R",
+        "submodules": [
+          "R_p",
+          "R_d"
+        ]
+      },
       "R_local_multiplier",
-      "Delta_R"
+      {
+        "name": "C_T",
+        "variable": "C",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "q_us",
+        "variable": "q_0",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I_p"
+        ]
+      },
+      "Delta_R",
+      "u_ext",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I_p/v",
+      "v_T": "I_d/v",
+      "q": "V/q",
+      "u_C": "C/u_C"
+    },
+    "replaces": {
+      "module_subtype": "pp_wCont_no_local",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_us)"
+      }
+    },
     "submodules": [
       {
         "name": "I_p",

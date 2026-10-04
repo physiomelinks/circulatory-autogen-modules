@@ -51,6 +51,8 @@ def supermodule_model_name(version, name, vessel=VESSEL):
     which the supermodule is the vessel ``vessel`` (<var>_<vessel>_<submodule>).'''
     if name in version.supermodule_globals:
         return name
+    if name in version.shared_parameter_names:
+        return f'{name}_{vessel}'
     for sub in sorted(version.submodule_names, key=len, reverse=True):
         if name.endswith('_' + sub) and len(name) > len(sub) + 1:
             return f'{name[:-len(sub)]}{vessel}_{sub}'
@@ -91,6 +93,9 @@ def split_model_name(version, full, vessel=VESSEL):
     '''A generated model's parameter name -> (supermodule-level name, variable, submodule path or None,
     owning component version or None): "V_in_mod_membrane" -> ("V_in_membrane", "V_in", "membrane",
     <its version>); a global (no "_mod_<submodule>" suffix) -> (name, name, None, None).'''
+    for shared in version.shared_parameter_names:
+        if full == f'{shared}_{vessel}':
+            return shared, shared, '', None
     marker = f'_{vessel}_'
     start = 0
     while True:
@@ -126,8 +131,8 @@ def supermodule_parameters(version, model_path, vessel=VESSEL):
             full = (row.get('variable_name') or '').strip()
             if not full:
                 continue
-            name, var, _path, owner = split_model_name(version, full, vessel)
-            kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
+            name, var, path, owner = split_model_name(version, full, vessel)
+            kind = ('constant' if path == '' else 'global_constant') if owner is None else owner.kinds.get(var, '')
             mine = own.get(name)
             out.append(Parameter(name, (row.get('units') or '').strip(), (row.get('value') or '').strip(),
                                  (row.get('data_reference') or '').strip(), mine.sourced if mine else '',

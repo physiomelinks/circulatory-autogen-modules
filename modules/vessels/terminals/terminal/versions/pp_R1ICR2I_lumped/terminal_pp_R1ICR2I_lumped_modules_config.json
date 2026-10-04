@@ -14,16 +14,82 @@
       },
       "outputs": {
         "vessel_port": "I_d",
-        "flow_port": [
-          "I_p",
-          "I_d"
-        ],
+        "flow_port": "I_d",
         "volume_port": "V"
       }
     },
     "shared_parameters": [
-      "I"
+      {
+        "name": "I_T1",
+        "variable": "I",
+        "submodules": [
+          "I_p"
+        ]
+      },
+      {
+        "name": "R_T1",
+        "variable": "R",
+        "submodules": [
+          "R_p"
+        ]
+      },
+      {
+        "name": "C_T",
+        "variable": "C",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "q_us",
+        "variable": "q_0",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "R_T2",
+        "variable": "R",
+        "submodules": [
+          "R_d"
+        ]
+      },
+      {
+        "name": "I_T2",
+        "variable": "I",
+        "submodules": [
+          "I_d"
+        ]
+      },
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I_p"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I_d"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I_p/v",
+      "v_T": "I_d/v",
+      "q": "V/q",
+      "u_C": "C/u_C"
+    },
+    "replaces": {
+      "module_subtype": "pp_R1ICR2I",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_us)"
+      }
+    },
     "submodules": [
       {
         "name": "I_p",

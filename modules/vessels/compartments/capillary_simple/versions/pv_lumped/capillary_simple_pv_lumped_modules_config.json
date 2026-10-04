@@ -18,6 +18,38 @@
         "volume_port": "V"
       }
     },
+    "shared_parameters": [
+      "I",
+      "R",
+      "C",
+      "q_0",
+      "u_0",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "v_out",
+        "variable": "v_out",
+        "submodules": [
+          "C"
+        ]
+      }
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pv",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "I",

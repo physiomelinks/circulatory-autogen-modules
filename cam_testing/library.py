@@ -833,6 +833,12 @@ class Version:
         return [s['name'] for s in self.submodules]
 
     @property
+    def shared_parameter_names(self):
+        '''The supermodule-level names of its shared_parameters: each is one parameter of a model,
+        <name>_<vessel>, that every submodule taking it is mapped to.'''
+        return [e if isinstance(e, str) else e['name'] for e in self.config.get('shared_parameters') or []]
+
+    @property
     def supermodule_globals(self):
         '''The global constants a supermodule's instance may set (spec supermodule.globals).'''
         return list((self.spec.get('supermodule') or {}).get('globals') or SUPERMODULE_DEFAULT_GLOBALS)

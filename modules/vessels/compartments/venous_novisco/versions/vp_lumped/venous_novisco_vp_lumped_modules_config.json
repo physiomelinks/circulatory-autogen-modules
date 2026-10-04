@@ -15,8 +15,45 @@
       "outputs": {
         "vessel_port": "I",
         "flow_port": "I",
+        "pressure_port": "I",
         "volume_port": "V"
       }
+    },
+    "shared_parameters": [
+      "C",
+      "q_us_0",
+      "q_C_init",
+      "R",
+      "I",
+      "u_ext",
+      {
+        "name": "v_in",
+        "variable": "v_in",
+        "submodules": [
+          "C"
+        ]
+      },
+      "Delta_q_us",
+      "Delta_C",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I"
+        ]
+      }
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I/v",
+      "q_C_change": "C/q_C_change",
+      "q_C": "C/q_C",
+      "q": "V/q",
+      "q_us_wCont": "C/q_us_wCont"
+    },
+    "replaces": {
+      "module_subtype": "vp",
+      "parameters": {}
     },
     "submodules": [
       {

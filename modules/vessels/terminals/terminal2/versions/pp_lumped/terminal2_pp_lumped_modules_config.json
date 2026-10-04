@@ -13,9 +13,32 @@
       }
     },
     "shared_parameters": [
-      "I",
-      "R"
+      {
+        "name": "R_T",
+        "variable": "R",
+        "submodules": [
+          "R_p",
+          "R_d"
+        ]
+      },
+      {
+        "name": "C_T",
+        "variable": "C",
+        "submodules": [
+          "C"
+        ]
+      }
     ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I_p/v",
+      "v_T": "I_d/v",
+      "q_T": "C/q_C"
+    },
+    "replaces": {
+      "module_subtype": "pp",
+      "parameters": {}
+    },
     "submodules": [
       {
         "name": "I_p",
