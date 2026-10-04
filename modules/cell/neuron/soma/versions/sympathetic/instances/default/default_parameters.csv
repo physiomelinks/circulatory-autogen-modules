@@ -48,20 +48,16 @@ gamma_Na_i_Na,picoS,15.0,"Magee1995; TTX-sensitive single Na channel conductance
 g_Na_mod_i_Na,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
 tau_h_max_i_Na,millis,5,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h. Tao2011 Eq. 89 (Belluzzi-Sacchi) peaks at about 20-42 ms near -46 mV,no
 tau_h_min_i_Na,millis,0.15,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h,no
-V_den_h_i_Na1_6,milliV,4.0,Belluzi1991_was_6.5,yes
-V_den_h_Na1_6_i_Na1_6,milliV,8.0,Belluzi1991_was_6.5,yes
-V_den_m_i_Na1_6,milliV,6,Belluzi1991_was_7.2,yes
-V_den_m_Na1_6_i_Na1_6,milliV,8.0,Belluzi1991_was_7.2,yes
-V_mid_h_i_Na1_6,milliV,40,Belluzi1991_was_53.2,yes
-V_mid_h_Na1_6_i_Na1_6,milliV,53.2,Belluzi1991_was_53.2,yes
-V_mid_m_i_Na1_6,milliV,20,Belluzi1991_was_36,yes
-V_mid_m_Na1_6_i_Na1_6,milliV,36,Belluzi1991_was_36,yes
-V_rest_approx_i_Na1_6,milliV,-70,Davis2021Thesis_from_traces,yes
-rho_Na1_6_i_Na1_6,per_um2,11.11111111111111,definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration through gamma_Na1_6,no
+V_den_h_Na1_6_i_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 8 mV (was 6.5),yes
+V_den_m_Na1_6_i_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 8 mV (was 7.2),yes
+V_mid_h_Na1_6_i_Na1_6,milliV,53.2,Tao2011; Supporting Material (Document S1) Eq. 87: h_inf V1/2 = -53.2 mV (= value; reused for NaV1.6),yes
+V_mid_m_Na1_6_i_Na1_6,milliV,36,Tao2011; Supporting Material (Document S1) Eq. 86: m_inf V1/2 = -36 mV (= value; the Belluzzi-Sacchi I_Na gate reused for the NaV1.6 current; no NaV1.6-specific source),yes
+V_rest_approx_i_Na1_6,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
+rho_Na1_6_i_Na1_6,per_um2,11.11111111111111,definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration through gamma_Na1_6. The previous g_Na1_6_i_Na1_6 (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'),no
 gamma_Na1_6_i_Na1_6,picoS,15.0,"Magee1995; 15 pS, the TTX-sensitive neuronal Na channel conductance (Abstract, point 2), used as a proxy: no Nav1.6 single-channel conductance could be verified (Chatelier et al. 2010 has no value in its abstract)",no
-g_Na1_6_mod_i_Na1_6,dimensionless,1.0,user_defined,no
-tau_h_Na1_6_max_i_Na1_6,millis,300,user_defined,no
-tau_h_Na1_6_min_i_Na1_6,millis,0.15,user_defined,no
+g_Na1_6_mod_i_Na1_6,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
+tau_h_Na1_6_max_i_Na1_6,millis,300,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 300 ms slow recovery; no NaV1.6 source found,no
+tau_h_Na1_6_min_i_Na1_6,millis,0.15,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 0.15 ms,no
 Cao_i_CaL,millimolar,2,Tau2011,yes
 V_den_c_i_CaL,milliV,5,Tau2011_was_9.85,yes
 V_mid_c_i_CaL,milliV,8.1,Tau2011_was_8.1,yes

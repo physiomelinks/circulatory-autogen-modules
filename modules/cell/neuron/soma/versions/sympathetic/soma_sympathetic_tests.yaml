@@ -22,63 +22,6 @@ reference_proposals:
     sourced: 'no'
     also_cites:
     - Solovyova2002
-  V_den_h_i_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 4 mV (was 6.5)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_den_h_Na1_6_i_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 8 mV (was 6.5)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_den_m_i_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 6 mV (was 7.2)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_den_m_Na1_6_i_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 8 mV (was 7.2)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_h_i_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 87 (h_inf V1/2 = -53.2 mV, k = 6.5 mV); modified here to 40
-      mV (was 53.2)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_h_Na1_6_i_Na1_6:
-    reference: 'Tao2011; Supporting Material (Document S1) Eq. 87: h_inf V1/2 = -53.2 mV (= value; reused for NaV1.6)'
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_m_i_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 86 (Belluzzi-Sacchi I_Na m_inf V1/2 = -36 mV, k = 7.2 mV); modified
-      here to 20 mV (was 36)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_m_Na1_6_i_Na1_6:
-    reference: 'Tao2011; Supporting Material (Document S1) Eq. 86: m_inf V1/2 = -36 mV (= value; the Belluzzi-Sacchi I_Na
-      gate reused for the NaV1.6 current; no NaV1.6-specific source)'
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_rest_approx_i_Na1_6:
-    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
-    sourced: 'yes'
-  g_Na1_6_mod_i_Na1_6:
-    reference: definitional; scaling factor, 1 = unmodified
-    sourced: 'no'
-  tau_h_Na1_6_max_i_Na1_6:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 300 ms slow
-      recovery; no NaV1.6 source found
-    sourced: 'no'
-  tau_h_Na1_6_min_i_Na1_6:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 0.15 ms
-    sourced: 'no'
   Cao_i_CaL:
     reference: 'Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no
       separate neuron value). Khaliq2003 also uses 2 mM'
@@ -404,19 +347,6 @@ reference_proposals:
     sourced: 'yes'
     previous: 'previous k_NaCa_i_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
       model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
-  rho_Na1_6_i_Na1_6:
-    reference: 'definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5
-      microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration
-      through gamma_Na1_6. The previous g_Na1_6_i_Na1_6 (as proposed in review): unreferenced_placeholder; owner''s hand-set
-      value in the SN_simple model (CA token ''user_defined'')'
-    sourced: 'no'
-    previous: 'previous g_Na1_6_i_Na1_6 (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the
-      SN_simple model (CA token ''user_defined'') previous g_Na1_6_i_Na1_6 (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''user_defined'') previous g_Na1_6_i_Na1_6 (as proposed in
-      review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined'') previous
-      g_Na1_6_i_Na1_6 (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA
-      token ''user_defined'') previous g_Na1_6_i_Na1_6 (as proposed in review): unreferenced_placeholder; owner''s hand-set
-      value in the SN_simple model (CA token ''user_defined'')'
   rho_CaL_i_CaL:
     reference: 'definitional; chosen so that p_Ca = A rho p_Ca_single (1e-18 m3/um3) reproduces the previous p_Ca = 4e-14
       m3_per_s (to_be_identified) with A = 3000 um^2 (the soma membrane area) and p_Ca_single = 0.0831 um3_per_s; a density

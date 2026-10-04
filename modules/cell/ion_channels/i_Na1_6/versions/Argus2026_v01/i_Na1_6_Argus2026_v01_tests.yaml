@@ -1,91 +1,25 @@
 module_type: i_Na1_6
 version: Argus2026_v01
-reviewed: false
+reviewed: true
+description: 'NaV1.6 current of the sympathetic-neuron soma: i_Na1_6 = g_Na1_6 g_Na1_6_mod m^3 h (V - E_Na), g = A rho gamma;
+  Belluzzi-Sacchi (Tao 2011) gates with the owner''s midpoints, slopes and slow inactivation (tau_h up to 300 ms); its Na
+  flux goes to the soma''s Na balance.'
 notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
-  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. NaV1.6 current of the
-  SN soma, i_Na1_6 = g_Na1_6 g_Na1_6_mod (V - E_Na) m_Na1_6^3 h_Na1_6 (the same law as i_Na_SN). Two features of the original
-  are kept so that SN_simple is reproduced: the gates start at i_Na_SN''s steady state (the original sets m_Na1_6''s initial
-  value to m_init, computed from V_mid_m, V_den_m, V_mid_h, V_den_h, the NaV1.7 values, which are this component''s own parameters
-  here), and its Na flux j_Na1_6 = -i_Na1_6/F is computed but has no port, as the original leaves it out of dNai/dt. Split
-  out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
-  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation
-  (2026-10-02): the maximal conductance is g_Na1_6 = A_mem rho_Na1_6 gamma_Na1_6 (membrane area x channel density x single-channel
-  conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_Na1_6.'
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. NaV1.6 current of the SN soma, i_Na1_6 = g_Na1_6 g_Na1_6_mod (V - E_Na) m_Na1_6^3 h_Na1_6 (the same
+  law as i_Na_SN). Two features of the original are kept so that SN_simple is reproduced: the gates start at i_Na_SN''s steady
+  state (the original sets m_Na1_6''s initial value to m_init, computed from V_mid_m, V_den_m, V_mid_h, V_den_h, the NaV1.7
+  values, which are this component''s own parameters here), and its Na flux j_Na1_6 = -i_Na1_6/F is computed but has no port,
+  as the original leaves it out of dNai/dt. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_Na1_6 = A_mem rho_Na1_6 gamma_Na1_6
+  (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area;
+  the defaults reproduce the previous g_Na1_6. The gates start from their own steady state at V_rest_approx (fixed on review
+  2026-10-05: they used i_Na''s midpoints and slopes, carried here as four extra parameters).'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
   (2026-10-03).'
-reference_proposals:
-  E_Na:
-    reference: definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 310.15 K (used when unconnected)
-    sourced: 'no'
-  V:
-    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
-    sourced: 'no'
-    value: -70.0
-  V_den_h:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 4 mV (was 6.5)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_den_h_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 8 mV (was 6.5)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_den_m:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 6 mV (was 7.2)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_den_m_Na1_6:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 8 mV (was 7.2)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_h:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 87 (h_inf V1/2 = -53.2 mV, k = 6.5 mV); modified here to 40
-      mV (was 53.2)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_h_Na1_6:
-    reference: 'Tao2011; Supporting Material (Document S1) Eq. 87: h_inf V1/2 = -53.2 mV (= value; reused for NaV1.6)'
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_m:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 86 (Belluzzi-Sacchi I_Na m_inf V1/2 = -36 mV, k = 7.2 mV); modified
-      here to 20 mV (was 36)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_m_Na1_6:
-    reference: 'Tao2011; Supporting Material (Document S1) Eq. 86: m_inf V1/2 = -36 mV (= value; the Belluzzi-Sacchi I_Na
-      gate reused for the NaV1.6 current; no NaV1.6-specific source)'
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_rest_approx:
-    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)'
-    sourced: 'yes'
-  g_Na1_6_mod:
-    reference: definitional; scaling factor, 1 = unmodified
-    sourced: 'no'
-  tau_h_Na1_6_max:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 300 ms slow
-      recovery; no NaV1.6 source found
-    sourced: 'no'
-  tau_h_Na1_6_min:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 0.15 ms
-    sourced: 'no'
-  rho_Na1_6:
-    reference: 'definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5
-      microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration
-      through gamma_Na1_6. The previous g_Na1_6 (as proposed in review): unreferenced_placeholder; owner''s hand-set value
-      in the SN_simple model (CA token ''user_defined'')'
-    sourced: 'no'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

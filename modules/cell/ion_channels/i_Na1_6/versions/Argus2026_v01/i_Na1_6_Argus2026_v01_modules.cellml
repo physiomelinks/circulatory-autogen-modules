@@ -5,13 +5,9 @@
         <variable name="E_Na" public_interface="in" units="milliV"/>
         <variable name="F" public_interface="in" units="C_per_mol"/>
         <variable name="V" public_interface="in" units="milliV"/>
-        <variable name="V_den_h" public_interface="in" units="milliV"/>
         <variable name="V_den_h_Na1_6" public_interface="in" units="milliV"/>
-        <variable name="V_den_m" public_interface="in" units="milliV"/>
         <variable name="V_den_m_Na1_6" public_interface="in" units="milliV"/>
-        <variable name="V_mid_h" public_interface="in" units="milliV"/>
         <variable name="V_mid_h_Na1_6" public_interface="in" units="milliV"/>
-        <variable name="V_mid_m" public_interface="in" units="milliV"/>
         <variable name="V_mid_m_Na1_6" public_interface="in" units="milliV"/>
         <variable name="V_rest_approx" public_interface="in" units="milliV"/>
         <variable name="epsilon_tau" units="second" initial_value="1e-6"/>
@@ -51,10 +47,10 @@
                                     <apply>
                                         <plus/>
                                         <ci>V_rest_approx</ci>
-                                        <ci>V_mid_m</ci>
+                                        <ci>V_mid_m_Na1_6</ci>
                                     </apply>
                                 </apply>
-                                <ci>V_den_m</ci>
+                                <ci>V_den_m_Na1_6</ci>
                             </apply>
                         </apply>
                     </apply>
@@ -76,9 +72,9 @@
                                 <apply>
                                     <plus/>
                                     <ci>V_rest_approx</ci>
-                                    <ci>V_mid_h</ci>
+                                    <ci>V_mid_h_Na1_6</ci>
                                 </apply>
-                                <ci>V_den_h</ci>
+                                <ci>V_den_h_Na1_6</ci>
                             </apply>
                         </apply>
                     </apply>
