@@ -18,6 +18,7 @@ import contextlib
 import glob
 import io
 import json
+import re
 import os
 import tempfile
 from dataclasses import dataclass
@@ -128,6 +129,20 @@ def simulate(model_path, spec, solver_info, names=None):
     return t, out
 
 
+def state_names(model_path):
+    '''The states of a generated model, as output names ("<vessel>/<var>"), read from its flat CellML.'''
+    flat = model_path[:-len('.cellml')] + '_flat.cellml'
+    if not os.path.isfile(flat):
+        return set()
+    with open(flat) as f:
+        text = f.read()
+    out = set()
+    for comp in re.finditer(r'<component name="([^"]+)_module".*?</component>', text, re.S):
+        for var in re.findall(r'<diff/>\s*<bvar>.*?</bvar>\s*<ci>\s*(\w+)\s*</ci>', comp.group(0), re.S):
+            out.add(f'{comp.group(1)}/{var}')
+    return out
+
+
 def compare(ref, new, output_map, tol, ignore=None, wrapped=None, reciprocal=None):
     '''
     Normalised max differences for every reference variable that exists in the new model.
@@ -156,7 +171,7 @@ def compare(ref, new, output_map, tol, ignore=None, wrapped=None, reciprocal=Non
             d = np.abs(d) % period
             d = np.minimum(d, period - d)
         diff = float(np.max(np.abs(d)) / scale)
-        rows.append({'reference': name, 'model': target, 'difference': diff, 'ok': diff <= tol})
+        rows.append({'reference': name, 'model': target, 'difference': diff, 'ok': diff <= tol, 'scale': scale})
     return rows, missing
 
 

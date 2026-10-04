@@ -110,7 +110,8 @@ def equivalence(version, entry, work_dir):
     model = systems.load_system(entry['model'])
     target = systems.load_system(entry['reproduces'])
     solver_info = entry.get('solver_info') or {'rtol': 1e-10, 'atol': 1e-12}
-    t_ref, ref = systems.simulate(systems.generate(target, os.path.join(work_dir, 'target')), target.spec, solver_info)
+    ref_path = systems.generate(target, os.path.join(work_dir, 'target'))
+    t_ref, ref = systems.simulate(ref_path, target.spec, solver_info)
     t_new, new = systems.simulate(systems.generate(model, os.path.join(work_dir, 'model')), model.spec, solver_info)
     # submodule outputs renamed <instance>_<sub>; an explicit output_map in the spec (for nested
     # supermodules, or variables that moved between components) takes precedence
@@ -122,8 +123,10 @@ def equivalence(version, entry, work_dir):
     replaced = tuple(f'{v}/' for v in entry.get('replaced_vessels') or [])
     mapped = entry.get('output_map') or {}
     ref = {k: v for k, v in ref.items() if k not in ignore and (not k.startswith(replaced) or k in mapped)}
-    return systems.compare(ref, new, output_map, float(entry.get('tol', 1e-9)), wrapped=entry.get('wrapped'),
-                           reciprocal=entry.get('reciprocal'))
+    tol = float(entry.get('tol', 1e-9))
+    rows, missing = systems.compare(ref, new, output_map, tol, wrapped=entry.get('wrapped'),
+                                    reciprocal=entry.get('reciprocal'))
+    return rows, missing + coarse_atol(rows, solver_info, systems.state_names(ref_path))
 
 
 def equivalence_result_name(entry):
@@ -160,6 +163,23 @@ def equivalence_check(version, entry, work_dir):
         r = checks.Result(name, checks.PASSED, f'{entry["model"]} reproduces {entry["reproduces"]}: all {len(rows)} '
                           f'outputs within {tol:g} (worst {worst["reference"]} {worst["difference"]:.1e})', metrics)
     return checks.save(version, r)
+
+
+def coarse_atol(rows, solver_info, states):
+    """Marks rows of states the solver does not resolve. Each difference is relative to the
+    output's own scale (max |value|, or its range), so a flow of 1e-11 m^3/s is judged against
+    1e-11, not against the pressures; but for a state that only means something if CVODE's
+    absolute tolerance is well below its scale (atol <= 1% of it), or it is noise in both runs.
+    (Algebraic outputs are computed from the states, so their accuracy follows the states'.)
+    Returns the reasons."""
+    atol = float((solver_info or {}).get('atol', 1e-12))
+    bad = []
+    for r in rows:
+        if r['reference'] in states and atol > 1e-2 * r['scale']:
+            r['ok'] = False
+            bad.append(f"{r['reference']}: state of scale {r['scale']:.2g} is not resolved by atol {atol:g} "
+                       f"(needs atol <= {1e-2 * r['scale']:.2g})")
+    return bad
 
 
 # ---- a supermodule version that reproduces a monolithic version ----------------------------------
@@ -203,8 +223,9 @@ def version_equivalence(version, entry, work_dir):
     _, ref = systems.simulate(mono_path, spec, solver_info, names=list(output_map))
     _, new = systems.simulate(super_path, spec, solver_info, names=list(output_map.values()))
     missing = [k for k in output_map if k not in ref]
-    rows, missing_new = systems.compare(ref, new, output_map, float(entry.get('tol', 1e-6)))
-    return rows, missing + missing_new
+    tol = float(entry.get('tol', 1e-6))
+    rows, missing_new = systems.compare(ref, new, output_map, tol)
+    return rows, missing + missing_new + coarse_atol(rows, solver_info, systems.state_names(mono_path))
 
 
 def version_equivalence_check(version, entry, work_dir):

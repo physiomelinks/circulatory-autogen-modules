@@ -195,7 +195,13 @@ def simple_noI(bc):
 
 def micro_noI(bc):
     def build(M):
-        return lumped_noI(bc, M, comp='vv_linear_geometric_novisco', r_law='geometric', geometric=True, q_state='q_C')
+        layout = lumped_noI(bc, M, comp='vv_linear_geometric_novisco', r_law='geometric', geometric=True,
+                            q_state='q_C')
+        if bc == 'pp' and 'u_0' in M:
+            # the instance's u_in and u_out sit either side of u_0, which starts the vessel at its
+            # equilibrium (nothing moves); drive it off it
+            layout.bc_values['u_out'] = M['u_0'] - 2000
+        return layout
     return build
 
 

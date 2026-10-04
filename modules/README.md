@@ -337,7 +337,11 @@ A `_lumped` version's config entry has three keys that let a model use it like t
   `l_<vessel>`, reaches `l` in every submodule. The rest are `<var>_<submodule>` (`fraction_C_p`).
 - its default instance carries the monolithic default instance's values (TODOs filled with
   representative values), and its spec's `supermodule.equivalent_version` checks that it reproduces
-  the monolithic version (`supermodule_version_equivalence_test`).
+  the monolithic version (`supermodule_version_equivalence_test`). Each output's difference is
+  relative to that output's own scale (its largest magnitude, or its range), so a microvascular flow
+  of 1e-11 m^3/s is judged against 1e-11, not against the pressures. A state whose scale the
+  solver's `atol` does not resolve (atol above 1% of it) fails the check rather than passing on
+  noise; the microvascular equivalences run at atol 1e-20 for this.
 
 The monolithic versions stay in the library, and models that name them still build, but their config
 entries say `"available_to_phlynx": false`, so the PhLynx manifests (`make manifests`) offer the
