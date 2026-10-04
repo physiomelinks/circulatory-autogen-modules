@@ -30,14 +30,14 @@ V_mid_h_BK,milliV,26,SN_simple: khaliq2003Contribution_was_32,yes
 V_den_h_BK,milliV,5.8,SN_simple: khaliq2003Contribution,yes
 k_thresh_m,milliV,0,SN_simple: user_defined_removed_dependence_was_15,no
 k_thresh_h,milliV,0,SN_simple: user_defined_removed_dependence,no
-tau_h_min,millis,0.15,SN_simple: user_defined,no
-tau_h_max,millis,5,SN_simple: user_defined,no
-tau_h_Na1_6_min,millis,0.15,SN_simple: user_defined,no
-tau_h_Na1_6_max,millis,300,SN_simple: user_defined,no
+tau_h_min,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
+tau_h_max,millis,5,"owner's hand-set value (CA_user 70f2cf7, 2025-05-04: reset from 300 to 5 ms when the slow component was moved to i_Na1_6; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 9B: tau_h bell-shaped, peak ~22 ms near -50 mV at 37 degC (46.1 ms at -50 mV, 2.5 ms at -100 mV at 27 degC, p. 282); = Tao2011 Document S1 Eq. 89 (peak ~23-42 ms near -46 mV); here ~4x faster",no
+tau_h_Na1_6_min,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21, for i_Na; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
+tau_h_Na1_6_max,millis,300,"owner's calibration value (CA_user 35f61a8, 2025-05-01: tau_h_max 300 ms, the upper bound of its 50-300 ms calibration range; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'; a 2026-08 free fit gave 1004 ms, sympathetic_neuron 7ab2983). Physiological counterpart: BelluzziSacchi1986 slow Na inactivation, recovery tau_s1 0.13-1.4 s at -100 to -60 mV (27 degC; Fig. 7, Table 1, pp. 282-284). Not a NaV1.6 property: Herzog2003 report Nav1.6 reprimes ~5x faster than Nav1.7",no
 tau_w_min,millis,30,SN_simple: gupta2016Computational,yes
-tau_c_min,millis,0.2,SN_simple: changed_from_belluzi1991_curves,yes
-tau_c_max,millis,3.0,SN_simple: changed_from_belluzi1991_curves,yes
-tau_hc,millis,20.0,SN_simple: changed_from_belluzi1991_curves,yes
+tau_c_min,millis,0.2,"BelluzziSacchi1989; Eq. 4 tau_c = 1/(...) + 0.1 ms (= Tao2011 Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",yes
+tau_c_max,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. BelluzziSacchi1989 Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); 3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1),no
+tau_hc,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
 tau_h_Kv4_2,millis,7.0,SN_simple: was_approx_7,yes
 tau_z_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 tau_m_SK,millis,5,SN_simple: gupta2016Computational,yes

@@ -9,7 +9,7 @@ k_V_membrane,dimensionless,0.5235987755982988,"definitional; volume shape factor
 c_m_membrane,uF_per_cm2,1.0,"Gentet2000; specific membrane capacitance 0.9 uF/cm^2 measured directly in nucleated patches of cortical pyramidal, spinal cord and hippocampal neurons (Abstract); 1 uF/cm^2 (0.01 pF/um^2) is the conventional value used here",yes
 I_in_membrane,nanoA,0.00,definitional; injected current (positive depolarises); 0 = no stimulus,no
 R_diffSensed_membrane,megaOhm,10,"unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter resistance of the sensed-voltage (electrode) stage, not a physiological quantity",no
-V_rest_approx_membrane,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
+V_rest_approx_membrane,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)",yes
 Ki_init_Na_K,millimolar,200,"BrownScholfield1974; rat superior cervical ganglion neurons: [K]i 192.7 +- 2.8 mmol/kg cell water, 207 mM corrected to fresh (flame photometry); Galvan1984 196 mmol/L cell water (electron microprobe). Was 150 (Boron & Boulpaep 2017 Table 5-2 gives a generic 120 mM)",yes
 Ko_Na_K,millimolar,4.5,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular K 4.5 mM,yes
 Nai_init_Na_K,millimolar,13,BrownScholfield1974; rat superior cervical ganglion [Na]i 19.8 mmol/kg cell water (22 mM fresh); Galvan1984 5 mmol/L cell water; Boron & Boulpaep 2017 Table 5-2 generic 15 mM. 13 mM lies within the range,yes
@@ -42,32 +42,32 @@ V_den_h_i_Na,milliV,4.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6
 V_den_m_i_Na,milliV,6,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 6 mV (was 7.2),yes
 V_mid_h_i_Na,milliV,40,"Tao2011; Supporting Material (Document S1) Eq. 87 (h_inf V1/2 = -53.2 mV, k = 6.5 mV); modified here to 40 mV (was 53.2)",yes
 V_mid_m_i_Na,milliV,20,"Tao2011; Supporting Material (Document S1) Eq. 86 (Belluzzi-Sacchi I_Na m_inf V1/2 = -36 mV, k = 7.2 mV); modified here to 20 mV (was 36)",yes
-V_rest_approx_i_Na,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
+V_rest_approx_i_Na,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)",yes
 rho_Na_i_Na,per_um2,51.111111111111114,definitional; chosen so that g_Na = A rho gamma_Na (1e-6 uS/pS) reproduces the previous g_Na = 2.3 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na = 15 picoS; a density for calibration through gamma_Na,no
 gamma_Na_i_Na,picoS,15.0,"Magee1995; TTX-sensitive single Na channel conductance 15 +- 0.3 pS in rat CA1 neurons, cell-attached (Abstract, point 2); cf. Sigworth & Neher 1980 ~18 pS in rat muscle",yes
 g_Na_mod_i_Na,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
-tau_h_max_i_Na,millis,5,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h. Tao2011 Eq. 89 (Belluzzi-Sacchi) peaks at about 20-42 ms near -46 mV,no
-tau_h_min_i_Na,millis,0.15,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); the owner's simplified tau_h,no
+tau_h_max_i_Na,millis,5,"owner's hand-set value (CA_user 70f2cf7, 2025-05-04: reset from 300 to 5 ms when the slow component was moved to i_Na1_6; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 9B: tau_h bell-shaped, peak ~22 ms near -50 mV at 37 degC (46.1 ms at -50 mV, 2.5 ms at -100 mV at 27 degC, p. 282); = Tao2011 Document S1 Eq. 89 (peak ~23-42 ms near -46 mV); here ~4x faster",no
+tau_h_min_i_Na,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
 V_den_h_Na1_6_i_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 8 mV (was 6.5),yes
 V_den_m_Na1_6_i_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 8 mV (was 7.2),yes
 V_mid_h_Na1_6_i_Na1_6,milliV,53.2,Tao2011; Supporting Material (Document S1) Eq. 87: h_inf V1/2 = -53.2 mV (= value; reused for NaV1.6),yes
 V_mid_m_Na1_6_i_Na1_6,milliV,36,Tao2011; Supporting Material (Document S1) Eq. 86: m_inf V1/2 = -36 mV (= value; the Belluzzi-Sacchi I_Na gate reused for the NaV1.6 current; no NaV1.6-specific source),yes
-V_rest_approx_i_Na1_6,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the Davis 2021 thesis cited by the CA token could not be found)",yes
+V_rest_approx_i_Na1_6,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)",yes
 rho_Na1_6_i_Na1_6,per_um2,11.11111111111111,definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration through gamma_Na1_6. The previous g_Na1_6_i_Na1_6 (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'),no
 gamma_Na1_6_i_Na1_6,picoS,15.0,"Magee1995; 15 pS, the TTX-sensitive neuronal Na channel conductance (Abstract, point 2), used as a proxy: no Nav1.6 single-channel conductance could be verified (Chatelier et al. 2010 has no value in its abstract)",no
 g_Na1_6_mod_i_Na1_6,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
-tau_h_Na1_6_max_i_Na1_6,millis,300,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 300 ms slow recovery; no NaV1.6 source found,no
-tau_h_Na1_6_min_i_Na1_6,millis,0.15,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); 0.15 ms,no
-Cao_i_CaL,millimolar,2,Tau2011,yes
-V_den_c_i_CaL,milliV,5,Tau2011_was_9.85,yes
-V_mid_c_i_CaL,milliV,8.1,Tau2011_was_8.1,yes
-V_rest_approx_i_CaL,milliV,-70,Davis2021Thesis_from_traces,yes
-cAMP_i_CaL,dimensionless,0.01,user_defined,no
-rho_CaL_i_CaL,per_um2,160.45574768876767,definitional; chosen so that p_Ca = A rho p_Ca_single (1e-18 m3/um3) reproduces the previous p_Ca = 4e-14 m3_per_s (to_be_identified) with A = 3000 um^2 (the soma membrane area) and p_Ca_single = 0.0831 um3_per_s; a density for calibration through p_Ca_single,no
+tau_h_Na1_6_max_i_Na1_6,millis,300,"owner's calibration value (CA_user 35f61a8, 2025-05-01: tau_h_max 300 ms, the upper bound of its 50-300 ms calibration range; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'; a 2026-08 free fit gave 1004 ms, sympathetic_neuron 7ab2983). Physiological counterpart: BelluzziSacchi1986 slow Na inactivation, recovery tau_s1 0.13-1.4 s at -100 to -60 mV (27 degC; Fig. 7, Table 1, pp. 282-284). Not a NaV1.6 property: Herzog2003 report Nav1.6 reprimes ~5x faster than Nav1.7",no
+tau_h_Na1_6_min_i_Na1_6,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21, for i_Na; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
+Cao_i_CaL,millimolar,2,Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no separate neuron value). Khaliq2003 also uses 2 mM,yes
+V_den_c_i_CaL,milliV,5,Tao2011; Supporting Material (Document S1) Eq. 91 (k = 9.85 mV); modified here to 5 mV (was 9.85),yes
+V_mid_c_i_CaL,milliV,8.1,"Tao2011; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao's Ca current is a nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type",yes
+V_rest_approx_i_CaL,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)",yes
+cAMP_i_CaL,dimensionless,0.01,unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); dimensionless cAMP level scaling the Ca permeability,no
+rho_CaL_i_CaL,per_um2,160.45574768876767,"definitional; chosen so that p_Ca = A rho p_Ca_single (1e-18 m3/um3) reproduces the previous p_Ca = 4e-14 m3_per_s (to_be_identified) with A = 3000 um^2 (the soma membrane area) and p_Ca_single = 0.0831 um3_per_s; a density for calibration through p_Ca_single. The previous p_Ca_i_CaL (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'); Tao 2011 P_Ca = 1.1e-16 cm/ms (WKY) is a permeability per area, not comparable to m3/s",no
 p_Ca_single_i_CaL,um3_per_s,0.0830966389511686,"Church1996; single L-type channel conductance 2.4 pS in 2 mM Ca (Abstract, point 4), converted to a per-channel GHK permeability P = gamma R T/(z^2 F^2 Cao) (the limiting slope at negative V, 37 degC, Cao 2 mM) = 0.0831 um^3/s",yes
-tau_c_max_i_CaL,millis,3.0,changed_from_belluzi1991_curves,yes
-tau_c_min_i_CaL,millis,0.2,changed_from_belluzi1991_curves,yes
-tau_hc_i_CaL,millis,20.0,changed_from_belluzi1991_curves,yes
+tau_c_max_i_CaL,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. BelluzziSacchi1989 Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); 3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1),no
+tau_c_min_i_CaL,millis,0.2,"BelluzziSacchi1989; Eq. 4 tau_c = 1/(...) + 0.1 ms (= Tao2011 Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",yes
+tau_hc_i_CaL,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
 V_den_m_Kv2_i_Kv2,milliV,8,Tau2011_was_8,yes
 V_mid_m_Kv2_i_Kv2,milliV,6,Tau2011_was_6,yes
 V_rest_approx_i_Kv2,milliV,-70,Davis2021Thesis_from_traces,yes
