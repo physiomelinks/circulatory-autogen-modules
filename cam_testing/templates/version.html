@@ -444,7 +444,7 @@ window.addEventListener('DOMContentLoaded', function () {
                   <td class="mono num">{% if v.tested %}{{ v.tested[0]|fmt }} – {{ v.tested[1]|fmt }}{{ ' (log)' if v.tested[2] }}{% endif %}</td>
                   <td class="mono num">{% if v.validated %}{{ v.validated[0]|fmt }} – {{ v.validated[1]|fmt }}{% endif %}</td>
                   <td>{% if v.sourced is not none %}<span class="box {{ 'on' if v.sourced }}" role="img" aria-label="{{ 'sourced' if v.sourced else 'not sourced' }}"></span>{% endif %}</td>
-                  <td class="muted" style="font-size:0.78rem">{{ v.reference }}</td>
+                  <td class="muted" style="font-size:0.78rem">{{ v.reference|emph }}</td>
                 </tr>
               {%- endfor %}
               </tbody>
@@ -508,7 +508,7 @@ window.addEventListener('DOMContentLoaded', function () {
           <tbody>
           {%- for r in c.references %}
             <tr><td class="mono">{{ r.name }}</td><td class="mono num">{{ r.value }}</td><td class="mono">{{ r.units }}</td>
-            <td>{% if r.key %}<a href="#ref-{{ r.key }}">{{ r.key }}</a>{% if r.note %}; {{ r.note }}{% endif %}{% else %}{{ r.reference }}{% endif %}</td>
+            <td>{% if r.key %}<a href="#ref-{{ r.key }}">{{ r.key }}</a>{% if r.note %}; {{ r.note|emph }}{% endif %}{% else %}{{ r.reference|emph }}{% endif %}</td>
             <td><span class="box {{ 'on' if r.sourced }}" role="img" aria-label="{{ 'sourced' if r.sourced else 'not sourced' }}"></span></td>
             {%- if c.has_proposals %}
             <td>{% if r.proposal %}{% set pk = r.proposal.reference.split(';')[0].strip() %}{% if pk in bib_keys %}<a href="#ref-{{ pk }}">{{ pk }}</a>{{ ';' ~ r.proposal.reference.split(';', 1)[1] if ';' in r.proposal.reference }}{% else %}{{ r.proposal.reference }}{% endif %}{% if r.proposal.note %}<br><span class="muted" style="font-size:0.8rem">{{ r.proposal.note }}</span>{% endif %}{% endif %}</td>

@@ -726,9 +726,17 @@ def _libcuflynx_version():
         return 'unknown'
 
 
+def _emph(text):
+    '''Escapes text and renders **...** (a reference's flagged difference from the literature) bold.'''
+    import re
+    from markupsafe import Markup, escape
+    return Markup(re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', str(escape(text or ''))))
+
+
 def _env():
     env = Environment(loader=FileSystemLoader(TEMPLATES), autoescape=select_autoescape(['html']))
     env.filters['fmt'] = _fmt
+    env.filters['emph'] = _emph
     return env
 
 
