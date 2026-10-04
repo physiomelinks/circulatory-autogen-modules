@@ -8,6 +8,7 @@
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "available_to_phlynx": false,
     "entrance_ports": [
       {
         "port_type": "vessel_port",
@@ -29,6 +30,10 @@
         "variables": [
           "v_out",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -44,13 +49,6 @@
         ]
       },
       {
-        "port_type": "radius_0_and_s_port",
-        "variables": [
-          "r_0",
-          "r"
-        ]
-      },
-      {
         "port_type": "stiffness_port",
         "variables": [
           "K_tube"
@@ -60,6 +58,25 @@
         "port_type": "volume_port",
         "variables": [
           "q"
+        ]
+      },
+      {
+        "port_type": "pressure_and_deriv_port",
+        "variables": [
+          "u",
+          "du_dt"
+        ]
+      },
+      {
+        "port_type": "pressure_feedback_port",
+        "variables": [
+          "u"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
         ]
       }
     ],
@@ -189,6 +206,12 @@
         "dimensionless",
         "access",
         "constant"
+      ],
+      [
+        "du_dt",
+        "J_per_m3s",
+        "access",
+        "variable"
       ]
     ]
   }

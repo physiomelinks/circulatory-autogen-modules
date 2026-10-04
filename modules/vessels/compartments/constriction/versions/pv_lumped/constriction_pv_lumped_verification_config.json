@@ -1,0 +1,35 @@
+{
+  "module_type": "constriction",
+  "version": "pv_lumped",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 2e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_R/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": ["a_vessel", "b_vessel", "c_vessel", "d_vessel", "mu"],
+    "equivalent_version": {
+      "version": "constriction/pv",
+      "monolithic_parameters": {
+        "E": 1600000.0,
+        "a_vessel": 1.0,
+        "b_vessel": 1.0,
+        "c_vessel": 1.0,
+        "d_vessel": 1.0,
+        "l": 0.001,
+        "mu": 1.0,
+        "r": 0.0001,
+        "rho": 1.0,
+        "u_ext": 0.0,
+        "u_in": 5332.88,
+        "v_out": 3.14159e-10
+      },
+      "output_map": {"u": "C/u", "v": "R/v", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

@@ -1,0 +1,124 @@
+[
+  {
+    "module_type": "single_terminal",
+    "module_subtype": "vp_R1CR2_wI_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "single_terminal/vp_R1CR2_wI built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_linear_novisco) -> R (resistance pv_linear) -> I (inertance pp_linear); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "C",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "I",
+        "flow_port": "I",
+        "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      {
+        "name": "C_T",
+        "variable": "C",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "q_us",
+        "variable": "q_0",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "R_T2",
+        "variable": "R",
+        "submodules": [
+          "R"
+        ]
+      },
+      {
+        "name": "I_T",
+        "variable": "I",
+        "submodules": [
+          "I"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "v_in",
+        "variable": "v_in",
+        "submodules": [
+          "C"
+        ]
+      },
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "I"
+        ]
+      }
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v_T": "I/v",
+      "q": "V/q",
+      "u_C": "C/u_C"
+    },
+    "replaces": {
+      "module_subtype": "vp_R1CR2_wI",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_us)"
+      }
+    },
+    "submodules": [
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_novisco",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R",
+          "V"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pv_linear",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": [
+          "I"
+        ]
+      },
+      {
+        "name": "I",
+        "module_type": "inertance",
+        "module_subtype": "pp_linear",
+        "instance": "default",
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

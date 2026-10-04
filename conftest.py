@@ -57,7 +57,15 @@ def _selected_instances(config):
 
 
 def _selected_supermodules(config):
-    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config, True)]
+    # a template (an empty supermodule) is skipped by every other test, but its structure is checked
+    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=[] if v.config.get('template') else _marks(config, v))
+            for v in _versions(config, True)]
+
+
+def _selected_version_equivalences(config):
+    '''Supermodule versions that say which monolithic version they reproduce (supermodule.equivalent_version).'''
+    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config, True)
+            if (v.spec.get('supermodule') or {}).get('equivalent_version')]
 
 
 def _selected_equivalences(config):
@@ -78,10 +86,12 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize('supermodule_key', _selected_supermodules(metafunc.config))
     if 'equivalence_key' in metafunc.fixturenames:
         metafunc.parametrize('equivalence_key', _selected_equivalences(metafunc.config))
+    if 'version_equivalence_key' in metafunc.fixturenames:
+        metafunc.parametrize('version_equivalence_key', _selected_version_equivalences(metafunc.config))
 
 
 _models = {}
-QUICK_TESTS = ('run_test', 'supermodule_structure_test', 'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test',
+QUICK_TESTS = ('run_test', 'supermodule_structure_test', 'supermodule_version_equivalence_test', 'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test',
                'cuflynx_instance_omex_test')
 
 

@@ -43,7 +43,8 @@ The top level of `modules/` holds categories and one module_type, `heart`:
 
 | Directory | Holds |
 |---|---|
-| `vessels/compartments`, `vessels/junctions`, `vessels/terminals`, `vessels/microvasculature`, `vessels/properties` | 0D vessel segments, junctions, terminal beds, microvascular networks, wall material laws |
+| `vessels/compartments`, `vessels/junctions`, `vessels/terminals`, `vessels/microvasculature`, `vessels/properties` | 0D vessel segments, algebraic flow nodes, terminal beds, microvascular networks, wall material laws |
+| `haemodynamics/lumped_constitutive`, `haemodynamics/lumped_vessel` | the compliance, resistance, inertance and vessel_volume modules the vessels' `_lumped` supermodules are built from, and the empty lumped vessels (templates); see "Lumped vessels" |
 | `heart` (a module_type) | the heart's versions (monolithic: `vp`, `vp_Ca`, `vp_wCont`, `vp_devel` and the former alternative hearts, see below; supermodule: `Argus2026_v01`), with the nested module_types `cardiac_clock`, `chamber` and `valve` |
 | `cell`, `cell/ion_channels`, `cell/cardiomyocytes` | cell models and their parts; `cell/neuron` is the module_type neuron, with its parts nested in it |
 | `respiratory` | lungs, gas exchange and transport |
@@ -241,6 +242,42 @@ libcuflynx loads `<config dir>/instances/<instance>/<instance>_parameters.csv` f
 record in `system_models/` names `"instance": "default"`, and the version specs' harness networks do
 the same.
 
+## Connecting vessels
+
+There are no junction module types. Any number of vessels can meet at a point (a **node**), on
+either side of it, because every vessel's **compliant end** sums over its node: a `vessel_port`
+whose flow is an input and whose pressure is an output has `"multi_port": ["sum", "True"]`. The
+BC letters say which ends those are: `v` is a compliant end (it takes the summed flow and sets
+the pressure), `p` is not (it takes the node's pressure and gives its own flow).
+
+| BC type | inlet | outlet |
+|---|---|---|
+| `vp` | sums | plain |
+| `pv` | plain | sums |
+| `vv` | sums | sums |
+| `pp` | plain | plain |
+
+Each node has exactly one summing end, its **owner**. libcuflynx (`generators/port_nodes.py`)
+gives the owner the signed sum of every other end's flow (flows into the node add, flows out of it
+subtract) and maps its pressure to every end. So:
+
+- **many vessels into one** (the old `Min`): the downstream vessel's inlet owns the node (`vp` or
+  `vv`), and the upstream vessels end in `p` (`vp` or `pp`);
+- **one vessel into many** (the old `Nout`): the upstream vessel's outlet owns it (`pv` or `vv`),
+  and the downstream vessels start with `p` (`pv` or `pp`);
+- **inflows and other outflows at one node** (which the junction types could not express): one
+  owner on either side, everything else `p` at that node.
+
+Two summing ends at one node (for example three `pv` vessels merging) would be two compliances
+for one pressure, and generation stops naming the node; so does a node of three or more ends
+where none sums. Where only two modules meet the connection is one-to-one, so a vessel whose port
+can sum costs nothing there. A summing port left unconnected is a boundary condition set by the
+parameters file, like any other open port. A 1D vessel can only meet one 0D module at a node.
+
+`python -m libcuflynx.utilities.junction_migration <vessel_array>...` converts a vessel array that
+still names the removed junction types (and the microvasculature `<vessel>_Min/_Nout/_Minlet/
+_Noutlet/_MinNout` and `artery_inlet/_outlet`) to these vessels, with its parameters file.
+
 ## Supermodule versions
 
 A supermodule version is a version whose config entry has `"module_format": "supermodule"`. It is
@@ -269,6 +306,104 @@ A model uses one record, e.g.
   it must reproduce: `system_models/closed_loop_cvs/3compartment_supermodules` reproduces
   `3compartment`, and `system_models/cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
+## Lumped vessels
+
+Every 0D vessel version that splits into a compliance, a resistance and an inertance has a
+supermodule twin, `<version>_lumped` beside it (`arterial` `vp` -> `arterial` `vp_lumped`), built
+from the modules in `haemodynamics/lumped_constitutive`:
+
+| module_type | Versions | What it is |
+|---|---|---|
+| `compliance` | `vv_linear`, `vv_linear_novisco`, `vv_linear_geometric`(`_novisco`), `vv_nonlinear`, `vv_nonlinear_geometric`(`_visco`), `vv_linear_controlled`(`_novisco`, `_stressed`), `vv_linear_volume_flux` | the pressure-volume law P(A): a compliant node (`vv`, both ports sum) |
+| `resistance` | `<form>_<law>`: form `pv` (u_out = u_in - f R v, before an inertance), `vp` (u_in = u_out + f R v, after one), `pp` (v = (u_in - u_out)/(f R), no inertance); law `linear`, `geometric` (Poiseuille from r_0), `nonlinear` (Poiseuille from the vessel's volume), `volume_scaled`, `controlled`, `controlled_share`, `controlled_additive` | the pressure drop |
+| `inertance` | `pp_linear`, `pp_geometric` (I from r_0, l, rho, with the hydrostatic term) | the flow's inertia |
+| `vessel_volume` | `nn`, `nn_geometric` | the whole vessel's volume (summed over its compliances) and, `nn_geometric`, its r_0, l and radius r: for hosts that read a vessel's volume or radius (volume sums, material-property modules) and resistance laws that need the whole volume |
+
+Every compliance, resistance and inertance has a dimensionless `fraction`, the share of the vessel it
+stands for: a `vv` vessel is two half compliances (fraction 0.5) around R and I; a `pp` vessel is a
+compliance between two halves of R and I. The order follows the BC letters: `vp` is C -> R -> I,
+`pv` is I -> R -> C, `vv` is C -> R -> I -> C, `pp` is I -> R -> C -> R -> I, and the vessels without
+inertance put a flow-form resistance where R and I were.
+
+A `_lumped` version's config entry has the keys that let a model use it exactly as it used the
+monolithic version, with the same names:
+
+- **`routes`** say which submodule a host connects to, by port type: `{"inputs": {"vessel_port": "C"},
+  "outputs": {"vessel_port": "I", "volume_port": "V"}}`. A model keeps its one record for the vessel
+  (`{"name": "aortic_root", "module_type": "arterial", "module_subtype": "vp_lumped", ...}`) with its
+  usual `inp_instances`/`out_instances`, and libcuflynx links each neighbour to the routed submodule.
+  Ports of the monolithic version that no submodule offers are listed in the version's `notes`.
+- **`shared_parameters`** keep the monolithic version's parameter names. An entry is a variable
+  (`"l"`: the vessel's `l`, in every submodule that has one) or `{"name": "C_T", "variable": "C",
+  "submodules": ["C"]}` (the terminal's `C_T` is its compliance's `C`). Each is one parameter of the
+  model, `<name>_<vessel>` (`C_T_systemic_T`, as before), mapped to every submodule that takes it,
+  so parameters files, params_for_id and calibration keep their names. What the vessel splits
+  (`fraction_R_p`, a terminal's `q_C_init_C = q_init - q_us`) is `<var>_<vessel>_<submodule>`.
+- **`outputs`** keep the monolithic version's output names: `{"u": "C_p/u", "v": "I/v", "q": "V/q"}`
+  gives the model `aortic_root/u` (computed from the submodule's variable in a component named after
+  the vessel), so obs_data, prediction variables and plots keep working.
+- **`replaces`** says which monolithic version it is the twin of and how to compute the split
+  parameters from its parameters (`{"module_subtype": "pp_RICRI", "parameters": {"fraction_R_d":
+  "(1.0 - frac_R_T_1_of_R_T)"}}`). `python -m libcuflynx.utilities.lumped_migration --library
+  modules <vessel_array> --parameters <parameters.csv>` moves a model onto the twins with it: the
+  records' `module_subtype`, and only the computed rows of the parameters file, change.
+- its default instance carries the monolithic default instance's values (TODOs filled with
+  representative values), and its spec's `supermodule.equivalent_version` checks that it reproduces
+  the monolithic version (`supermodule_version_equivalence_test`). Each output's difference is
+  relative to that output's own scale (its largest magnitude, or its range), so a microvascular flow
+  of 1e-11 m^3/s is judged against 1e-11, not against the pressures. A state whose scale the
+  solver's `atol` does not resolve (atol above 1% of it) fails the check rather than passing on
+  noise; the microvascular equivalences run at atol 1e-20 for this.
+
+The monolithic versions stay in the library, and models that name them still build, but their config
+entries say `"available_to_phlynx": false`, so the PhLynx manifests (`make manifests`) offer the
+`_lumped` versions instead. `tools/lumped/` generates all of it: `python -m tools.lumped.write` rewrites
+the constitutive modules, the `_lumped` versions and the templates (edit `tools/lumped/constitutive.py`
+and `tools/lumped/vessels.py`, not the generated files).
+
+### Empty lumped vessels (templates)
+
+`haemodynamics/lumped_vessel` holds one empty supermodule per layout: `vp_empty`, `pv_empty`,
+`vv_empty`, `pp_empty`, `vp_noI_empty`, `pv_noI_empty`, `pp_noI_empty`. An empty supermodule has
+`"template": true`, and each submodule is a **slot**: a `name`, the `module_type` that fits it and the
+versions that fit its place (`choices`; for a resistance, the ones of the right form), with no
+`module_subtype`:
+
+```json
+{"name": "R", "module_type": "resistance", "choices": ["pv_controlled", "pv_geometric", "pv_linear", ...],
+ "inp_instances": ["C"], "out_instances": ["I"]}
+```
+
+A template is dragged into a model, and a version is chosen for each slot; the result is a lumped
+vessel like the `_lumped` versions. libcuflynx refuses to generate a template, naming the slots that
+still need a version. Only `supermodule_structure_test` runs on a template (its slots name library
+module_types and versions); every other test is skipped (`skip` in its tests.yaml).
+
+### What PhLynx needs for this
+
+PhLynx builds models from CellML module configs only, so it has no supermodules yet (each
+`_lumped` version's `phlynx_export_test` is an expected failure). To offer lumped vessels it needs to:
+
+1. **Read supermodule configs from the manifests.** A `"module_format": "supermodule"` entry has no
+   CellML of its own; its `submodules` name library versions (`module_type`, `module_subtype`) whose
+   CellML, units and configs are in the same manifest (`haemodynamics/` is in the curated set).
+2. **Show a supermodule as one node** with the ports its `routes` give: a port type under
+   `routes.inputs` is an inlet of the node, under `routes.outputs` an outlet, each with the port's
+   variables taken from the routed submodule's config.
+3. **Templates: let the user choose each slot.** For a `"template": true` entry, offer each slot's
+   `choices` (versions of its `module_type`), and store the choice as the slot's `module_subtype`.
+   The filled entry (`template` dropped, each slot with its `module_subtype` and `"instance":
+   "default"`) is a supermodule config like the `_lumped` ones, saved with the model (its
+   `module_library_dirs` or external modules) under a new `module_subtype`. libcuflynx has no way
+   yet to choose the slots inline in a vessel-array record.
+4. **Edit parameters per vessel.** Show `shared_parameters` once for the vessel, and the others per
+   submodule as `<var>_<submodule>`.
+5. **Export the model as libcuflynx reads it:** one record per supermodule
+   (`module_type`, `module_subtype`, `instance`, `inp_instances`, `out_instances`), not the expanded
+   submodules; libcuflynx expands it and routes the connections. The parameters file names a
+   submodule parameter `<var>_<vessel>_<submodule>`, or a shared one `<var>_<vessel>`.
+6. **Honour `"available_to_phlynx": false`** for anything that reads configs outside the manifests.
+
 ## What runs
 
 **Per version** (`tests/test_modules.py`, ids `<module_type>/<version>`), at the default instance's
@@ -283,6 +418,7 @@ parameters. Every version runs them, component or supermodule:
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
+| `supermodule_version_equivalence_test` | a supermodule version with `supermodule.equivalent_version`: it reproduces that monolithic version |
 
 **Supermodule versions** run the same verification and validation tests as a component. The
 supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod_<submodule>`
@@ -425,7 +561,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget`, `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per instance, `validation.<instance>.baseline` / `.calibrate`: `status`, `source`, data references relative to the version directory (`data: instances/<i>/<file>.csv`, `obs_data`, `params_for_id`), variables, targets, metric, threshold, optimiser settings |
-| `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance`, `tol`, `solver_info`, `output_map`, `ignore`) |
+| `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule), `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance`, `tol`, `solver_info`, `output_map`, `ignore`) and `equivalent_version` (the monolithic version it reproduces: `version`, `monolithic_parameters`, `output_map` from monolithic outputs to `<submodule>/<var>`, `tol`, `solver_info`; both run alone, or in the monolithic version's `harness` network) |
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |
 | `notes` | tests | notes on the version, shown in its report |

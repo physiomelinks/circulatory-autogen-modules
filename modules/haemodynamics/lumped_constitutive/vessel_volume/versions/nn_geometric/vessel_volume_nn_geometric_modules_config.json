@@ -1,0 +1,95 @@
+[
+  {
+    "module_type": "vessel_volume",
+    "module_subtype": "nn_geometric",
+    "module_format": "cellml",
+    "component_file": "vessel_volume_nn_geometric_modules.cellml",
+    "component_type": "vessel_volume_nn_geometric",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "The whole vessel's volume and geometry: q_total summed over its compliances, r_0 and l, and the radius r = sqrt(q_total/(pi l)), for hosts (volume_port, radius_port, len_port, radius_0_and_s_port: material-property modules) and resistance laws (total_volume_port).",
+    "entrance_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q_total"
+        ],
+        "multi_port": [
+          "sum"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "total_volume_port",
+        "variables": [
+          "q"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "radius_port",
+        "variables": [
+          "r_0"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "len_port",
+        "variables": [
+          "l"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "radius_0_and_s_port",
+        "variables": [
+          "r_0",
+          "r"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q_total",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "r",
+        "metre",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

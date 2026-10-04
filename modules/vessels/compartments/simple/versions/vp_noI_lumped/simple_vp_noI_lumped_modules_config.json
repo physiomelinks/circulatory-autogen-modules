@@ -1,0 +1,72 @@
+[
+  {
+    "module_type": "simple",
+    "module_subtype": "vp_noI_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "simple/vp_noI built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_linear_novisco) -> R (resistance pp_linear); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "R",
+        "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      "C",
+      "q_0",
+      "u_0",
+      "R",
+      "v_in",
+      "u_out"
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R/v",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "vp_noI",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_0)"
+      }
+    },
+    "submodules": [
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_novisco",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R",
+          "V"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pp_linear",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

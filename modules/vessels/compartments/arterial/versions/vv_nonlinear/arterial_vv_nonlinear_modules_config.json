@@ -8,12 +8,17 @@
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "available_to_phlynx": false,
     "entrance_ports": [
       {
         "port_type": "vessel_port",
         "variables": [
           "v_in",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -29,6 +34,10 @@
         "variables": [
           "v_out",
           "u_d"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -60,6 +69,12 @@
         "port_type": "volume_port",
         "variables": [
           "q"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
         ]
       }
     ],

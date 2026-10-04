@@ -1,0 +1,88 @@
+[
+  {
+    "module_type": "resistance",
+    "module_subtype": "pp_linear",
+    "module_format": "cellml",
+    "component_file": "resistance_pp_linear_modules.cellml",
+    "component_type": "resistance_pp_linear",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Resistance in flow form, for a vessel without inertance: v = (u_in - u_out)/(f R); R a parameter.",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_out"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "fraction",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "R_eff",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

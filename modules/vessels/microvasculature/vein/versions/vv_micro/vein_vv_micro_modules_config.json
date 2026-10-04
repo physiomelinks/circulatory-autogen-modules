@@ -8,31 +8,30 @@
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "available_to_phlynx": false,
     "entrance_ports": [
       {
-        "port_type": "flow_port",
+        "port_type": "vessel_port",
         "variables": [
-          "v_in"
-        ]
-      },
-      {
-        "port_type": "pressure_port",
-        "variables": [
+          "v_in",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       }
     ],
     "exit_ports": [
       {
-        "port_type": "flow_port",
+        "port_type": "vessel_port",
         "variables": [
-          "v_out"
-        ]
-      },
-      {
-        "port_type": "pressure_port",
-        "variables": [
+          "v_out",
           "u_d"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -107,6 +106,12 @@
       [
         "C",
         "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "I",
+        "Js2_per_m6",
         "access",
         "constant"
       ],

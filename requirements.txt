@@ -1,9 +1,8 @@
-# libcuflynx needs module_library_dirs / use_builtin_modules (merged, #521), the per-variable
-# multi_port list form used by the flow_merge/flow_split junctions (#530), and reading this
-# library's PhLynx-format module configs (#533, stacked on #530), and JSON vessel arrays plus
-# supermodules (#534), module versions/instances + obs_data_name and held-out data in prediction_items
-# (#535, stacked on #534), and prediction items with an operation as SA / emulator features (#536,
-# stacked on #535; the instances' obs_data use it). Pinned to #536's branch until these are merged
-# and released.
-libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/prediction-item-features
+# libcuflynx needs, beyond its last release: module_library_dirs / use_builtin_modules (#521), list-form
+# and PhLynx-schema multi_ports (#530, #533), JSON vessel arrays and supermodules (#534), versions/instances
+# and held-out prediction data (#535), prediction items as features (#536), the C++ template generator's
+# api blocks the coupling modules use (#520), and ports that sum over a whole node, which the vessels here
+# rely on now that the junction module types are gone (feat/node-multiports, built on all of these).
+# Pinned to that branch until it is merged and released.
+libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/node-multiports
 -e .

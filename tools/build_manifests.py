@@ -3,7 +3,8 @@ Rewrite the PhLynx manifests for the versions layout
 (modules/<category>/<module_type>/versions/<version>/..., nested module_types inside their parent's
 directory, e.g. modules/heart/chamber/versions/vv/).
 
-all.json lists every version; index.json and vitalworkshop.json keep a curated set of paths under
+all.json lists every version available to PhLynx (a config entry with "available_to_phlynx": false
+is left out of every manifest); index.json and vitalworkshop.json keep a curated set of paths under
 modules/ (CURATED: categories or module_types, each with what is nested in it). Each version contributes its CellML file, config and units file, named
 "<module_type> (<version>)"; a supermodule version has only its config. The PhLynx templates file
 (manifests/template_modules.cellml) is listed under "templates".
@@ -23,8 +24,9 @@ MANIFESTS_DIR = os.path.join(REPO_ROOT, 'manifests')
 TEMPLATE = os.path.join(MANIFESTS_DIR, 'template_modules.cellml')
 
 # paths under modules/ (prefixes) in the curated manifests: the bond-graph vessels, the heart and the
-# microvasculature: what the per-module manifests had (BG, heart, microvasculature_network), by category
-CURATED = ['vessels', 'heart']
+# microvasculature: what the per-module manifests had (BG, heart, microvasculature_network), by category,
+# and the lumped constitutive modules (haemodynamics/) the vessels' _lumped supermodules are built from
+CURATED = ['vessels', 'heart', 'haemodynamics']
 MANIFEST_SELECTION = {'index.json': CURATED, 'vitalworkshop.json': CURATED, 'all.json': None}
 
 
@@ -56,7 +58,8 @@ def build(versions):
 
 
 def main():
-    versions = sorted(all_versions(), key=lambda v: (v.mtype.relpath.lower(), v.name.lower()))
+    versions = sorted((v for v in all_versions() if v.available_to_phlynx),
+                      key=lambda v: (v.mtype.relpath.lower(), v.name.lower()))
     for filename, prefixes in MANIFEST_SELECTION.items():
         chosen = _selected(versions, prefixes)
         with open(os.path.join(MANIFESTS_DIR, filename), 'w') as f:

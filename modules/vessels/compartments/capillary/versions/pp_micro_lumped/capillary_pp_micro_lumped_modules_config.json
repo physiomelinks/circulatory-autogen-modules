@@ -1,0 +1,106 @@
+[
+  {
+    "module_type": "capillary",
+    "module_subtype": "pp_micro_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "capillary/pp_micro built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): R_p (resistance pp_geometric) -> C (compliance vv_linear_geometric_novisco) -> R_d (resistance pp_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "R_p"
+      },
+      "outputs": {
+        "vessel_port": "R_d",
+        "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      "l",
+      {
+        "name": "r",
+        "variable": "r_0",
+        "submodules": [
+          "R_p",
+          "C",
+          "R_d",
+          "V"
+        ]
+      },
+      "E",
+      "q_C_init",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "R_p"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "u_out",
+        "variable": "u_out",
+        "submodules": [
+          "R_d"
+        ]
+      }
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R_p/v",
+      "v_d": "R_d/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pp_micro",
+      "parameters": {}
+    },
+    "submodules": [
+      {
+        "name": "R_p",
+        "module_type": "resistance",
+        "module_subtype": "pp_geometric",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "C"
+        ]
+      },
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_geometric_novisco",
+        "instance": "default",
+        "inp_instances": [
+          "R_p"
+        ],
+        "out_instances": [
+          "R_d",
+          "V"
+        ]
+      },
+      {
+        "name": "R_d",
+        "module_type": "resistance",
+        "module_subtype": "pp_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,158 @@
+[
+  {
+    "module_type": "arterial_simple",
+    "module_subtype": "vp_usV_C_ctl",
+    "module_format": "cellml",
+    "component_file": "arterial_simple_vp_usV_C_ctl_modules.cellml",
+    "component_type": "vp_usV_C_ctl_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "available_to_phlynx": false,
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      },
+      {
+        "port_type": "venous_us_volume_delta_port",
+        "variables": [
+          "Delta_q_us"
+        ]
+      },
+      {
+        "port_type": "venous_us_and_compliance_delta_port",
+        "variables": [
+          "Delta_q_us",
+          "Delta_C"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_C",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "C",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "I",
+        "Js2_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "q_us_wCont",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "C_wCont",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "Delta_q_us",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Delta_C",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

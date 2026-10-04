@@ -1,0 +1,55 @@
+[
+  {
+    "module_type": "vessel_volume",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "vessel_volume_nn_modules.cellml",
+    "component_type": "vessel_volume_nn",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "The whole vessel's volume: the sum of its compliances' volumes (volume_port in, summed), passed to hosts (volume_port) and to resistance laws that need it (total_volume_port).",
+    "entrance_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q_total"
+        ],
+        "multi_port": [
+          "sum"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "total_volume_port",
+        "variables": [
+          "q"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q_total",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

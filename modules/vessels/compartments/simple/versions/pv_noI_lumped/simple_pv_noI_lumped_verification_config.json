@@ -1,0 +1,22 @@
+{
+  "module_type": "simple",
+  "version": "pv_noI_lumped",
+  "sim_time": 5.0,
+  "pre_time": 0.0,
+  "dt": 0.05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/u", "mod_R/v", "mod_V/q"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent_version": {
+      "version": "simple/pv_noI",
+      "monolithic_parameters": {"C": 0.01275, "R": 126.7, "q_0": 0.1, "q_init": 0.253, "u_0": 0.0, "u_in": 22.55, "v_out": 0.0833},
+      "output_map": {"u": "C/u", "v": "R/v", "q": "V/q"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

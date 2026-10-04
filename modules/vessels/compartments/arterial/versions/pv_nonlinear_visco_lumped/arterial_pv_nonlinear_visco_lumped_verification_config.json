@@ -1,0 +1,40 @@
+{
+  "module_type": "arterial",
+  "version": "pv_nonlinear_visco_lumped",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 0.0002,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_I/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": ["beta_g", "g", "mu", "rho"],
+    "equivalent_version": {
+      "version": "arterial/pv_nonlinear_visco",
+      "monolithic_parameters": {
+        "I_scale": 1.0,
+        "K_tube": 115333.0,
+        "K_tube_visco": 21203000.0,
+        "R_flag": 1.0,
+        "beta_g": 1.0,
+        "g": 1.0,
+        "l": 0.014796,
+        "m_tube": 0.5,
+        "mu": 1.0,
+        "n_tube": 0.0,
+        "r_0": 0.01508,
+        "rho": 1.0,
+        "theta": 0.0,
+        "u_0": 10600.0,
+        "u_ext": 0.0,
+        "u_in": 13332.2,
+        "v_out": 0.000142884
+      },
+      "output_map": {"u": "C/u", "v": "I/v", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

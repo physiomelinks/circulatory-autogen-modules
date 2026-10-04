@@ -79,3 +79,9 @@ def supermodule_equivalence_test(equivalence_key, tmp_path):
     version = load_version(mt, v)
     entry = next(e for e in version.spec['supermodule']['equivalent'] if e['model'] == model)
     _assert(supermodule.equivalence_check(version, entry, str(tmp_path)), version)
+
+
+def supermodule_version_equivalence_test(version_equivalence_key, tmp_path):
+    version = load_version(*version_equivalence_key)
+    entry = version.spec['supermodule']['equivalent_version']
+    _assert(supermodule.version_equivalence_check(version, entry, str(tmp_path)), version)

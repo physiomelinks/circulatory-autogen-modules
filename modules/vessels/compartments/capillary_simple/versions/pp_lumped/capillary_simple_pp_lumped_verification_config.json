@@ -1,0 +1,31 @@
+{
+  "module_type": "capillary_simple",
+  "version": "pp_lumped",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 1e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_I_d/v", "mod_I_p/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent_version": {
+      "version": "capillary_simple/pp",
+      "monolithic_parameters": {
+        "C": 1e-10,
+        "I": 100000.0,
+        "R": 100000000.0,
+        "q_0": 1e-05,
+        "u_0": 0.0,
+        "u_ext": 0.0,
+        "u_in": 5332.88,
+        "u_out": 1333.22
+      },
+      "output_map": {"u": "C/u", "v": "I_p/v", "v_d": "I_d/v", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

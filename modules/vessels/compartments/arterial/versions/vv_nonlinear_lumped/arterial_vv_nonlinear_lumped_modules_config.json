@@ -1,0 +1,133 @@
+[
+  {
+    "module_type": "arterial",
+    "module_subtype": "vv_nonlinear_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "arterial/vv_nonlinear built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C_p (compliance vv_nonlinear_geometric) -> R (resistance pv_nonlinear) -> I (inertance pp_geometric) -> C_d (compliance vv_nonlinear_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "C_p",
+        "external_pressure_port": [
+          "C_p",
+          "C_d"
+        ]
+      },
+      "outputs": {
+        "vessel_port": "C_d",
+        "flow_port": "I",
+        "radius_port": "V",
+        "radius_0_and_s_port": "V",
+        "stiffness_port": [
+          "C_p",
+          "C_d"
+        ],
+        "volume_port": "V",
+        "flow_feedback_port": "I"
+      }
+    },
+    "shared_parameters": [
+      "u_0",
+      "l",
+      "r_0",
+      "m_tube",
+      "n_tube",
+      "R_flag",
+      "I_scale",
+      "theta",
+      "u_ext",
+      {
+        "name": "v_in",
+        "variable": "v_in",
+        "submodules": [
+          "C_p"
+        ]
+      },
+      "K_tube",
+      {
+        "name": "v_out",
+        "variable": "v_out",
+        "submodules": [
+          "C_d"
+        ]
+      }
+    ],
+    "outputs": {
+      "u": "C_p/u",
+      "u_d": "C_d/u",
+      "v": "I/v",
+      "q_C": "C_p/q_C",
+      "q_C_d": "C_d/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "vv_nonlinear",
+      "parameters": {}
+    },
+    "submodules": [
+      {
+        "name": "C_p",
+        "module_type": "compliance",
+        "module_subtype": "vv_nonlinear_geometric",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R",
+          "V"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pv_nonlinear",
+        "instance": "default",
+        "inp_instances": [
+          "C_p",
+          "V"
+        ],
+        "out_instances": [
+          "I"
+        ]
+      },
+      {
+        "name": "I",
+        "module_type": "inertance",
+        "module_subtype": "pp_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": [
+          "C_d"
+        ]
+      },
+      {
+        "name": "C_d",
+        "module_type": "compliance",
+        "module_subtype": "vv_nonlinear_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "I"
+        ],
+        "out_instances": [
+          "V"
+        ]
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "C_p",
+          "C_d"
+        ],
+        "out_instances": [
+          "R"
+        ]
+      }
+    ]
+  }
+]

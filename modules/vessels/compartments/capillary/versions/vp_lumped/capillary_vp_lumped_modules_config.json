@@ -1,0 +1,81 @@
+[
+  {
+    "module_type": "capillary",
+    "module_subtype": "vp_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "capillary/vp built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_linear_geometric_novisco) -> R (resistance pp_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "C",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "R",
+        "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      "E",
+      "l",
+      {
+        "name": "r",
+        "variable": "r_0",
+        "submodules": [
+          "C",
+          "R",
+          "V"
+        ]
+      },
+      "q_C_init",
+      "u_ext",
+      "v_in",
+      "u_out"
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R/v",
+      "q_C": "C/q_C",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "vp",
+      "parameters": {}
+    },
+    "submodules": [
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_geometric_novisco",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R",
+          "V"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pp_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

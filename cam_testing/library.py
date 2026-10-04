@@ -696,6 +696,12 @@ class Version:
         return bool(self.spec.get('reviewed', False))
 
     @property
+    def available_to_phlynx(self):
+        '''False when the config entry says "available_to_phlynx": false: the version stays in the
+        library (models that name it still build) but the PhLynx manifests leave it out.'''
+        return self.config.get('available_to_phlynx', True) is not False
+
+    @property
     def licence(self):
         '''The config entry's SPDX licence id (None when missing).'''
         return self.config.get('licence')
@@ -825,6 +831,12 @@ class Version:
     @property
     def submodule_names(self):
         return [s['name'] for s in self.submodules]
+
+    @property
+    def shared_parameter_names(self):
+        '''The supermodule-level names of its shared_parameters: each is one parameter of a model,
+        <name>_<vessel>, that every submodule taking it is mapped to.'''
+        return [e if isinstance(e, str) else e['name'] for e in self.config.get('shared_parameters') or []]
 
     @property
     def supermodule_globals(self):

@@ -1,0 +1,33 @@
+{
+  "module_type": "arterial_simple",
+  "version": "vp_usV_C_ctl_lumped",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.0002,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_I/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent_version": {
+      "version": "arterial_simple/vp_usV_C_ctl",
+      "monolithic_parameters": {
+        "C": 1.125281e-07,
+        "Delta_C": 0.0,
+        "Delta_q_us": 0.0,
+        "I": 66650.0,
+        "R": 3999000.0,
+        "q_0": 0.0001,
+        "u_0": 0.0,
+        "u_ext": 0.0,
+        "u_out": 0.0,
+        "v_in": 0.0001
+      },
+      "output_map": {"u": "C/u", "v": "I/v", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

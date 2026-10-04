@@ -1,0 +1,41 @@
+[
+  {
+    "module_type": "resistor",
+    "module_subtype": "pp_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "resistor/pp built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): R (resistance pp_linear). Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "R"
+      },
+      "outputs": {
+        "vessel_port": "R"
+      }
+    },
+    "shared_parameters": [
+      "R",
+      "u_in",
+      "u_out"
+    ],
+    "outputs": {
+      "v": "R/v"
+    },
+    "replaces": {
+      "module_subtype": "pp",
+      "parameters": {}
+    },
+    "submodules": [
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pp_linear",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": []
+      }
+    ]
+  }
+]

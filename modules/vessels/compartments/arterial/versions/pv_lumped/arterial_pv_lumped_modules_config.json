@@ -1,0 +1,104 @@
+[
+  {
+    "module_type": "arterial",
+    "module_subtype": "pv_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "arterial/pv built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): I (inertance pp_geometric) -> R (resistance vp_geometric) -> C (compliance vv_linear_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "I",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "C",
+        "flow_port": "I",
+        "pressure_feedback_port": "C",
+        "flow_feedback_port": "I",
+        "volume_port": "V",
+        "pressure_and_deriv_port": "C"
+      }
+    },
+    "shared_parameters": [
+      "l",
+      "r_0",
+      "theta",
+      "u_0",
+      "E",
+      {
+        "name": "u_in",
+        "variable": "u_in",
+        "submodules": [
+          "I"
+        ]
+      },
+      "u_ext",
+      {
+        "name": "v_out",
+        "variable": "v_out",
+        "submodules": [
+          "C"
+        ]
+      }
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "I/v",
+      "q_C": "C/q_C",
+      "q": "V/q",
+      "du_C_dt": "C/du_C_dt"
+    },
+    "replaces": {
+      "module_subtype": "pv",
+      "parameters": {}
+    },
+    "submodules": [
+      {
+        "name": "I",
+        "module_type": "inertance",
+        "module_subtype": "pp_geometric",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "vp_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "I"
+        ],
+        "out_instances": [
+          "C"
+        ]
+      },
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": [
+          "V"
+        ]
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]
