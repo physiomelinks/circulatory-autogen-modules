@@ -1413,7 +1413,7 @@
                 </apply>
             </apply>
         </math>
-        <!-- i_Kv1_5. This is part of the A type current, the fast activating, fast inactivating current-->
+        <!-- i_Kv1_5: Kv1.5 delayed-rectifier K current, slowly inactivating (tau_h of seconds); Channelpedia model 21 from Philipson 1991. -->
         <variable name="i_Kv1_5" public_interface="out" units="nanoA"/>
         <variable name="g_Kv1_5" public_interface="out" units="microS"/>
         <variable name="rho_Kv1_5" public_interface="in" units="per_um2"/>
@@ -1544,7 +1544,7 @@
                                 <times/>
                                 <apply>
                                     <minus/>
-                                    <cn cellml:units="millis_per_milliV">0.1165</cn>
+                                    <cn cellml:units="millis_per_milliV">0.1163</cn>
                                 </apply>
                                 <ci>V</ci>
                             </apply>

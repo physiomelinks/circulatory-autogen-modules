@@ -1,49 +1,24 @@
 module_type: i_Kv1_5
 version: Argus2026_v01
 reviewed: false
+description: 'Kv1.5 delayed-rectifier K current of the sympathetic-neuron soma: i_Kv1_5 = g_Kv1_5 m h (V - E_K), g = A rho
+  gamma; slowly inactivating (tau_h of seconds); Channelpedia model 21 kinetics (Philipson 1991); its K flux goes to the soma''s
+  K balance.'
 notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
-  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Kv1.5 K current of the
-  SN soma, i_Kv1_5 = g_Kv1_5 m h (V - E_K) (Channelpedia Kv1.5 kinetics). Split out of the monolithic SN_soma / SN_varicosity
-  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
-  that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_Kv1_5
-  = A_mem rho_Kv1_5 gamma_Kv1_5 (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the
-  membrane through membrane_area; the defaults reproduce the previous g_Kv1_5.'
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. Kv1.5 K current of the SN soma, i_Kv1_5 = g_Kv1_5 m h (V - E_K) (Channelpedia Kv1.5 kinetics). Split
+  out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation
+  (2026-10-02): the maximal conductance is g_Kv1_5 = A_mem rho_Kv1_5 gamma_Kv1_5 (membrane area x channel density x single-channel
+  conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_Kv1_5. Time
+  constants: Channelpedia Kv1.5 model 21 (from Philipson 1991; oocytes, listed at 9 degC, no Q10): tau_m = -0.1163 V + 8.33
+  ms for V < 50 mV, else 2 ms (was -0.1165, a transcription slip, fixed on review 2026-10-05); tau_h = -15.5 V + 1620 ms for
+  V < 100 mV, else 50 ms (2.7 s at -70 mV). **Uncorrected for temperature (9 degC oocyte fits used at 37 degC); a 37 degC
+  source and Q10 comparison is pending.**'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
   (2026-10-03).'
-reference_proposals:
-  E_K:
-    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 150 mM, 310.15 K (used when unconnected)
-    sourced: 'no'
-  V:
-    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
-    sourced: 'no'
-    value: -70.0
-  V_den_h_Kv1_5:
-    reference: 'Philipson1991; via Channelpedia Kcna5 model 21 (wikipage 5): slope 3.5 mV (= value)'
-    sourced: 'yes'
-  V_den_m_Kv1_5:
-    reference: 'Philipson1991; via Channelpedia Kcna5 model 21 (wikipage 5): slope 6.4 mV (= value)'
-    sourced: 'yes'
-  V_mid_h_Kv1_5:
-    reference: 'Philipson1991; via Channelpedia Kcna5 model 21 (wikipage 5): hInf = 1/(1+exp((v+25.3)/3.5)), V1/2 = -25.3
-      mV (= value)'
-    sourced: 'yes'
-  V_mid_m_Kv1_5:
-    reference: 'Philipson1991; via Channelpedia Kcna5 model 21 (wikipage 5, 21.channelml): mInf = 1/(1+exp((v+6.0)/-6.4)),
-      V1/2 = -6.0 mV (= value)'
-    sourced: 'yes'
-  V_rest_approx:
-    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)'
-    sourced: 'yes'
-  rho_Kv1_5:
-    reference: 'definitional; chosen so that g_Kv1_5 = A rho gamma_Kv1_5 (1e-6 uS/pS) reproduces the previous g_Kv1_5 = 0.0887849
-      microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv1_5 = 11.8 picoS; a density for calibration
-      through gamma_Kv1_5. The previous g_Kv1_5 (as proposed in review): unreferenced_placeholder; owner''s hand-set value
-      in the SN_simple model (CA token ''to_be_identified'')'
-    sourced: 'no'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.
