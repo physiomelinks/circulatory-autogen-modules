@@ -1,0 +1,22 @@
+{
+  "module_type": "terminal2",
+  "version": "pp_lumped",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_I_d/v", "mod_I_p/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent_version": {
+      "version": "terminal2/pp",
+      "monolithic_parameters": {"C_T": 4e-09, "R_T": 260870000.0, "u_in": 11000},
+      "output_map": {"u": "C/u", "v": "I_p/v", "v_T": "I_d/v", "q_T": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

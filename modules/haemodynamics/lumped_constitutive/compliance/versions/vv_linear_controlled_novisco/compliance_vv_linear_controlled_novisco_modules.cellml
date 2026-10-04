@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="compliance_vv_linear_controlled_novisco" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="compliance_vv_linear_controlled_novisco">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="C" public_interface="in" units="m6_per_J"/>
+        <variable name="q_us_0" public_interface="in" units="m3"/>
+        <variable name="fraction" public_interface="in" units="dimensionless"/>
+        <variable name="u_0" public_interface="in" units="J_per_m3"/>
+        <variable name="q_C_init" public_interface="in" units="m3"/>
+        <variable name="u_ext" public_interface="in" units="J_per_m3"/>
+        <variable name="v_in" public_interface="in" units="m3_per_s"/>
+        <variable name="v_out" public_interface="in" units="m3_per_s"/>
+        <variable name="Delta_q_us" public_interface="in" units="dimensionless"/>
+        <variable name="Delta_C" public_interface="in" units="dimensionless"/>
+        <variable name="C_eff" public_interface="out" units="m6_per_J"/>
+        <variable name="C_wCont" public_interface="out" units="m6_per_J"/>
+        <variable name="q_us_wCont" public_interface="out" units="m3"/>
+        <variable name="q_C" public_interface="out" units="m3"/>
+        <variable name="u_C" public_interface="out" units="J_per_m3"/>
+        <variable name="u" public_interface="out" units="J_per_m3"/>
+        <variable name="q" public_interface="out" units="m3"/>
+        <variable name="du_C_dt" public_interface="out" units="J_per_m3s"/>
+        <variable initial_value="q_C_init" name="q_C_change" public_interface="out" units="m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>C_eff</ci><apply><times/><ci>fraction</ci><ci>C</ci></apply></apply>
+            <apply><eq/><ci>C_wCont</ci><apply><times/><ci>C_eff</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>Delta_C</ci></apply></apply></apply>
+            <apply><eq/><ci>q_us_wCont</ci><apply><times/><ci>fraction</ci><ci>q_us_0</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>Delta_q_us</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>q_C_change</ci></apply><apply><minus/><ci>v_in</ci><ci>v_out</ci></apply></apply>
+            <apply><eq/><ci>q_C</ci><apply><minus/><apply><plus/><ci>q_C_change</ci><apply><times/><ci>fraction</ci><ci>q_us_0</ci></apply></apply><ci>q_us_wCont</ci></apply></apply>
+            <apply><eq/><ci>u_C</ci><apply><divide/><ci>q_C</ci><ci>C_wCont</ci></apply></apply>
+            <apply><eq/><ci>q</ci><apply><plus/><ci>q_C</ci><ci>q_us_wCont</ci></apply></apply>
+            <apply><eq/><ci>du_C_dt</ci><apply><divide/><apply><minus/><ci>v_in</ci><ci>v_out</ci></apply><ci>C_wCont</ci></apply></apply>
+            <apply><eq/><ci>u</ci><apply><plus/><ci>u_0</ci><ci>u_C</ci><ci>u_ext</ci></apply></apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,33 @@
+{
+  "module_type": "venous_novisco",
+  "version": "vp_lumped",
+  "sim_time": 50.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/q_C_change", "mod_C/u", "mod_I/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent_version": {
+      "version": "venous_novisco/vp",
+      "monolithic_parameters": {
+        "C": 1.21676662404483e-07,
+        "Delta_C": 0.0,
+        "Delta_q_us": 0.0,
+        "I": 1e-07,
+        "R": 8572918.09858893,
+        "q_C_init": 0.0,
+        "q_us_0": 0.0002968,
+        "u_ext": 0.0,
+        "u_out": 0.0,
+        "v_in": 0.0001
+      },
+      "output_map": {"u": "C/u", "v": "I/v", "q_C_change": "C/q_C_change", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

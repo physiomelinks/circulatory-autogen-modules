@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="resistance_pv_geometric" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="resistance_pv_geometric">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="fraction" public_interface="in" units="dimensionless"/>
+        <variable name="R_eff" public_interface="out" units="Js_per_m6"/>
+        <variable name="l" public_interface="in" units="metre"/>
+        <variable name="mu" public_interface="in" units="Js_per_m3"/>
+        <variable name="R_flag" public_interface="in" units="dimensionless"/>
+        <variable name="R" public_interface="out" units="Js_per_m6"/>
+        <variable name="r_0" public_interface="in" units="metre"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="v" public_interface="in" units="m3_per_s"/>
+        <variable name="v_in" public_interface="out" units="m3_per_s"/>
+        <variable name="u_out" public_interface="out" units="J_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>R</ci><apply><divide/><apply><times/><cn cellml:units="dimensionless">8</cn><ci>mu</ci><ci>l</ci></apply><apply><times/><pi/><apply><power/><ci>r_0</ci><cn cellml:units="dimensionless">4</cn></apply></apply></apply></apply>
+            <apply><eq/><ci>R_eff</ci><apply><times/><ci>fraction</ci><apply><times/><ci>R</ci><ci>R_flag</ci></apply></apply></apply>
+            <apply><eq/><ci>v_in</ci><ci>v</ci></apply>
+            <apply><eq/><ci>u_out</ci><apply><minus/><ci>u_in</ci><apply><times/><ci>R_eff</ci><ci>v</ci></apply></apply></apply>
+        </math>
+    </component>
+</model>

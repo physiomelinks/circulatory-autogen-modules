@@ -1,0 +1,157 @@
+[
+  {
+    "module_type": "compliance",
+    "module_subtype": "vv_nonlinear",
+    "module_format": "cellml",
+    "component_file": "compliance_vv_nonlinear_modules.cellml",
+    "component_type": "compliance_vv_nonlinear",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Nonlinear tube law u = K_tube ((q/(f q_0))^m - (q/(f q_0))^n) + u_0 + u_ext, q_0 a parameter.",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      },
+      {
+        "port_type": "pressure_and_deriv_port",
+        "variables": [
+          "u",
+          "du_C_dt"
+        ]
+      },
+      {
+        "port_type": "stiffness_port",
+        "variables": [
+          "K_tube"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "fraction",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m_tube",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "n_tube",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "K_tube",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q_0f",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "du_C_dt",
+        "J_per_m3s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

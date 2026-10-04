@@ -1,0 +1,42 @@
+[
+  {
+    "module_type": "simple",
+    "module_subtype": "vv_noI_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "simple/vv_noI built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_linear_novisco); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "C",
+        "volume_port": "V"
+      }
+    },
+    "submodules": [
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_novisco",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "V"
+        ]
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

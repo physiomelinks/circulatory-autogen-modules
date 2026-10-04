@@ -1,0 +1,88 @@
+[
+  {
+    "module_type": "inertance",
+    "module_subtype": "pp_linear",
+    "module_format": "cellml",
+    "component_file": "inertance_pp_linear_modules.cellml",
+    "component_type": "inertance_pp_linear",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Inertance: dv/dt = (u_in - u_out)/(f I), I a parameter.",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "fraction",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_init",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "I_eff",
+        "Js2_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "I",
+        "Js2_per_m6",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "module_type": "arterial_simple",
+    "module_subtype": "pp_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "arterial_simple/pp built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): I_p (inertance pp_linear) -> R_p (resistance vp_linear) -> C (compliance vv_linear) -> R_d (resistance pv_linear) -> I_d (inertance pp_linear); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "I_p",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "I_d",
+        "flow_port": [
+          "I_p",
+          "I_d"
+        ],
+        "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      "I",
+      "R"
+    ],
+    "submodules": [
+      {
+        "name": "I_p",
+        "module_type": "inertance",
+        "module_subtype": "pp_linear",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R_p"
+        ]
+      },
+      {
+        "name": "R_p",
+        "module_type": "resistance",
+        "module_subtype": "vp_linear",
+        "instance": "default",
+        "inp_instances": [
+          "I_p"
+        ],
+        "out_instances": [
+          "C"
+        ]
+      },
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear",
+        "instance": "default",
+        "inp_instances": [
+          "R_p"
+        ],
+        "out_instances": [
+          "R_d",
+          "V"
+        ]
+      },
+      {
+        "name": "R_d",
+        "module_type": "resistance",
+        "module_subtype": "pv_linear",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": [
+          "I_d"
+        ]
+      },
+      {
+        "name": "I_d",
+        "module_type": "inertance",
+        "module_subtype": "pp_linear",
+        "instance": "default",
+        "inp_instances": [
+          "R_d"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

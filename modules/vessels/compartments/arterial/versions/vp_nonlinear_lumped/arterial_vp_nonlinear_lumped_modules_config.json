@@ -1,0 +1,77 @@
+[
+  {
+    "module_type": "arterial",
+    "module_subtype": "vp_nonlinear_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "arterial/vp_nonlinear built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_nonlinear_geometric) -> R (resistance pv_nonlinear) -> I (inertance pp_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "C",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "I",
+        "flow_port": "I",
+        "radius_port": "V",
+        "radius_0_and_s_port": "V",
+        "stiffness_port": "C",
+        "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      "l",
+      "r_0"
+    ],
+    "submodules": [
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_nonlinear_geometric",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R",
+          "V"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pv_nonlinear",
+        "instance": "default",
+        "inp_instances": [
+          "C",
+          "V"
+        ],
+        "out_instances": [
+          "I"
+        ]
+      },
+      {
+        "name": "I",
+        "module_type": "inertance",
+        "module_subtype": "pp_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn_geometric",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": [
+          "R"
+        ]
+      }
+    ]
+  }
+]

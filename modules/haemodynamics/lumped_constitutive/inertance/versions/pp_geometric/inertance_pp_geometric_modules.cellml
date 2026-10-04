@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="inertance_pp_geometric" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="inertance_pp_geometric">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="fraction" public_interface="in" units="dimensionless"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable name="v_init" public_interface="in" units="m3_per_s"/>
+        <variable initial_value="v_init" name="v" public_interface="out" units="m3_per_s"/>
+        <variable name="I_eff" public_interface="out" units="Js2_per_m6"/>
+        <variable name="r_0" public_interface="in" units="metre"/>
+        <variable name="l" public_interface="in" units="metre"/>
+        <variable name="I_scale" public_interface="in" units="dimensionless"/>
+        <variable name="theta" public_interface="in" units="dimensionless"/>
+        <variable name="gravity_factor" public_interface="in" units="dimensionless"/>
+        <variable name="rho" public_interface="in" units="Js2_per_m5"/>
+        <variable name="g" public_interface="in" units="m_per_s2"/>
+        <variable name="beta_g" public_interface="in" units="dimensionless"/>
+        <variable name="I" public_interface="out" units="Js2_per_m6"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>I</ci><apply><divide/><apply><times/><ci>I_scale</ci><ci>l</ci><ci>rho</ci></apply><apply><times/><pi/><apply><power/><ci>r_0</ci><cn cellml:units="dimensionless">2</cn></apply></apply></apply></apply>
+            <apply><eq/><ci>I_eff</ci><apply><times/><ci>fraction</ci><ci>I</ci></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>v</ci></apply><apply><divide/><apply><minus/><apply><minus/><ci>u_in</ci><ci>u_out</ci></apply><apply><times/><ci>gravity_factor</ci><ci>beta_g</ci><ci>g</ci><ci>l</ci><ci>rho</ci><apply><cos/><apply><divide/><apply><times/><pi/><ci>theta</ci></apply><cn cellml:units="dimensionless">180</cn></apply></apply></apply></apply><ci>I_eff</ci></apply></apply>
+        </math>
+    </component>
+</model>

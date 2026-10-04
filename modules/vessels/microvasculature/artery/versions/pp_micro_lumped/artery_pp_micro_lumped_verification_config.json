@@ -1,0 +1,39 @@
+{
+  "module_type": "artery",
+  "version": "pp_micro_lumped",
+  "sim_time": 2.5e-05,
+  "pre_time": 0.0,
+  "dt": 2.5e-07,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_R_d/v", "mod_R_p/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": ["a_vessel", "b_vessel", "c_vessel", "d_vessel", "mu"],
+    "equivalent_version": {
+      "version": "artery/pp_micro",
+      "monolithic_parameters": {
+        "E": 3660000.0,
+        "a_vessel": 0.2802,
+        "b_vessel": -505.3,
+        "beta_g": 0.0,
+        "c_vessel": 0.1324,
+        "d_vessel": -11.14,
+        "g": 9.81,
+        "l": 0.005,
+        "mu": 0.004,
+        "r_0": 0.00018,
+        "rho": 1040.0,
+        "theta": 0.0,
+        "u_0": 10670.0,
+        "u_ext": 0.0,
+        "u_in": 11170.0,
+        "u_out": 10170.0
+      },
+      "output_map": {"u": "C/u", "v": "R_p/v", "v_d": "R_d/v", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

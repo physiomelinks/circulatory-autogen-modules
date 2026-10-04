@@ -1,0 +1,68 @@
+[
+  {
+    "module_type": "capillary_simple",
+    "module_subtype": "pv_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "capillary_simple/pv built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): I (inertance pp_linear) -> R (resistance vp_linear) -> C (compliance vv_linear); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "I",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "C",
+        "flow_port": "I",
+        "volume_port": "V"
+      }
+    },
+    "submodules": [
+      {
+        "name": "I",
+        "module_type": "inertance",
+        "module_subtype": "pp_linear",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "vp_linear",
+        "instance": "default",
+        "inp_instances": [
+          "I"
+        ],
+        "out_instances": [
+          "C"
+        ]
+      },
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear",
+        "instance": "default",
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": [
+          "V"
+        ]
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

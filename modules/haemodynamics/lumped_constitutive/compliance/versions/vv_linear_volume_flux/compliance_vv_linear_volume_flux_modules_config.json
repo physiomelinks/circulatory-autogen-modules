@@ -1,0 +1,175 @@
+[
+  {
+    "module_type": "compliance",
+    "module_subtype": "vv_linear_volume_flux",
+    "module_format": "cellml",
+    "component_file": "compliance_vv_linear_volume_flux_modules.cellml",
+    "component_type": "compliance_vv_linear_volume_flux",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Linear compliance with a controlled extra flux blood_ctl_dir * v_blood_intake.",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      },
+      {
+        "port_type": "blood_intake_port",
+        "variables": [
+          "v_blood_intake"
+        ]
+      },
+      {
+        "port_type": "blood_uptake_port",
+        "variables": [
+          "v_blood_intake"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      },
+      {
+        "port_type": "pressure_and_deriv_port",
+        "variables": [
+          "u",
+          "du_C_dt"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "C",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "fraction",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_eff",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u_C",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "du_C_dt",
+        "J_per_m3s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_v",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "v_blood_intake",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "blood_ctl_dir",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

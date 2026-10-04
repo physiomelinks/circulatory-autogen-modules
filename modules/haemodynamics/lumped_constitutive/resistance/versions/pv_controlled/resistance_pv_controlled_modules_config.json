@@ -1,0 +1,100 @@
+[
+  {
+    "module_type": "resistance",
+    "module_subtype": "pv_controlled",
+    "module_format": "cellml",
+    "component_file": "resistance_pv_controlled_modules.cellml",
+    "component_type": "resistance_pv_controlled",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Resistance in pressure-drop form, upstream of an inertance: u_out = u_in - f R v; R R_local_multiplier (1 + Delta_R), Delta_R from a controller.",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u_in"
+        ]
+      },
+      {
+        "port_type": "resistance_delta_port",
+        "variables": [
+          "Delta_R"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "fraction",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "R_eff",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_R",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "R_wCont",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "R_local_multiplier",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

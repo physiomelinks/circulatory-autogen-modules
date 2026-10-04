@@ -1,0 +1,56 @@
+[
+  {
+    "module_type": "single_terminal",
+    "module_subtype": "vp_R1CR2_wCont_lumped",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "single_terminal/vp_R1CR2_wCont built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_linear_novisco) -> R (resistance pp_controlled_share); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "C",
+        "resistance_delta_port": "R",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "R",
+        "flow_port": "R",
+        "volume_port": "V"
+      }
+    },
+    "submodules": [
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_novisco",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "R",
+          "V"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pp_controlled_share",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "nn",
+        "instance": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,136 @@
+[
+  {
+    "module_type": "inertance",
+    "module_subtype": "pp_geometric",
+    "module_format": "cellml",
+    "component_file": "inertance_pp_geometric_modules.cellml",
+    "component_type": "inertance_pp_geometric",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Inertance from the geometry, I = I_scale rho l/(pi r_0^2), with the hydrostatic term gravity_factor beta_g g l rho cos(pi theta/180): dv/dt = (u_in - u_out - that)/(f I).",
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "fraction",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_init",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "I_eff",
+        "Js2_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "I_scale",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "gravity_factor",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "access",
+        "global_constant"
+      ],
+      [
+        "g",
+        "m_per_s2",
+        "access",
+        "global_constant"
+      ],
+      [
+        "beta_g",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "I",
+        "Js2_per_m6",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

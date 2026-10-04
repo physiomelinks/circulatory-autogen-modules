@@ -1,0 +1,93 @@
+[
+  {
+    "module_type": "lumped_vessel",
+    "module_subtype": "pv_empty",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Empty lumped vessel (inlet inertance, resistance, outlet compliance): drag it in, then choose a version for each submodule. Each slot names the module_type that fits it and the versions that fit its place (choices). V (vessel_volume) gathers the compliances' volumes; choose nn_geometric for a vessel with material-property modules or a nonlinear resistance.",
+    "template": true,
+    "routes": {
+      "inputs": {
+        "vessel_port": "I",
+        "external_pressure_port": "C"
+      },
+      "outputs": {
+        "vessel_port": "C",
+        "volume_port": "V",
+        "flow_port": "I",
+        "flow_feedback_port": "I",
+        "pressure_and_deriv_port": "C"
+      }
+    },
+    "submodules": [
+      {
+        "name": "I",
+        "module_type": "inertance",
+        "choices": [
+          "pp_geometric",
+          "pp_linear"
+        ],
+        "inp_instances": [],
+        "out_instances": [
+          "R"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "choices": [
+          "vp_controlled",
+          "vp_controlled_additive",
+          "vp_controlled_share",
+          "vp_geometric",
+          "vp_linear",
+          "vp_nonlinear",
+          "vp_volume_scaled"
+        ],
+        "inp_instances": [
+          "I"
+        ],
+        "out_instances": [
+          "C"
+        ]
+      },
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "choices": [
+          "vv_linear",
+          "vv_linear_controlled",
+          "vv_linear_controlled_novisco",
+          "vv_linear_controlled_stressed",
+          "vv_linear_geometric",
+          "vv_linear_geometric_novisco",
+          "vv_linear_novisco",
+          "vv_linear_volume_flux",
+          "vv_nonlinear",
+          "vv_nonlinear_geometric",
+          "vv_nonlinear_geometric_visco"
+        ],
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": [
+          "V"
+        ]
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "choices": [
+          "nn",
+          "nn_geometric"
+        ],
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "module_type": "compliance",
+  "version": "vv_linear_controlled_novisco",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-07, "atol": 1e-12},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-14},
+  "outputs": ["u", "q", "q_C"],
+  "run_parameters": {}
+}

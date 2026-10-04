@@ -1,0 +1,124 @@
+[
+  {
+    "module_type": "lumped_vessel",
+    "module_subtype": "vv_empty",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Empty lumped vessel (compliance in two halves around a resistance and inertance (give the compliances fraction 0.5)): drag it in, then choose a version for each submodule. Each slot names the module_type that fits it and the versions that fit its place (choices). V (vessel_volume) gathers the compliances' volumes; choose nn_geometric for a vessel with material-property modules or a nonlinear resistance.",
+    "template": true,
+    "routes": {
+      "inputs": {
+        "vessel_port": "C_p",
+        "external_pressure_port": [
+          "C_p",
+          "C_d"
+        ]
+      },
+      "outputs": {
+        "vessel_port": "C_d",
+        "volume_port": "V",
+        "flow_port": "I",
+        "flow_feedback_port": "I",
+        "pressure_and_deriv_port": [
+          "C_p",
+          "C_d"
+        ]
+      }
+    },
+    "submodules": [
+      {
+        "name": "C_p",
+        "module_type": "compliance",
+        "choices": [
+          "vv_linear",
+          "vv_linear_controlled",
+          "vv_linear_controlled_novisco",
+          "vv_linear_controlled_stressed",
+          "vv_linear_geometric",
+          "vv_linear_geometric_novisco",
+          "vv_linear_novisco",
+          "vv_linear_volume_flux",
+          "vv_nonlinear",
+          "vv_nonlinear_geometric",
+          "vv_nonlinear_geometric_visco"
+        ],
+        "inp_instances": [],
+        "out_instances": [
+          "R",
+          "V"
+        ]
+      },
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "choices": [
+          "pv_controlled",
+          "pv_controlled_additive",
+          "pv_controlled_share",
+          "pv_geometric",
+          "pv_linear",
+          "pv_nonlinear",
+          "pv_volume_scaled"
+        ],
+        "inp_instances": [
+          "C_p"
+        ],
+        "out_instances": [
+          "I"
+        ]
+      },
+      {
+        "name": "I",
+        "module_type": "inertance",
+        "choices": [
+          "pp_geometric",
+          "pp_linear"
+        ],
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": [
+          "C_d"
+        ]
+      },
+      {
+        "name": "C_d",
+        "module_type": "compliance",
+        "choices": [
+          "vv_linear",
+          "vv_linear_controlled",
+          "vv_linear_controlled_novisco",
+          "vv_linear_controlled_stressed",
+          "vv_linear_geometric",
+          "vv_linear_geometric_novisco",
+          "vv_linear_novisco",
+          "vv_linear_volume_flux",
+          "vv_nonlinear",
+          "vv_nonlinear_geometric",
+          "vv_nonlinear_geometric_visco"
+        ],
+        "inp_instances": [
+          "I"
+        ],
+        "out_instances": [
+          "V"
+        ]
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "choices": [
+          "nn",
+          "nn_geometric"
+        ],
+        "inp_instances": [
+          "C_p",
+          "C_d"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]
