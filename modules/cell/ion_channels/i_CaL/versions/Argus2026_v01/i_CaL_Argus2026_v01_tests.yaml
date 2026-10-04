@@ -12,8 +12,9 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   reproduce SN_simple. Geometry re-parameterisation (2026-10-02): p_Ca = A_mem rho_CaL p_Ca_single (membrane area x density
   x per-protein permeability, 1e-18 m3/um3), A_mem through the A_mem port; the defaults reproduce the previous p_Ca. The GHK
   exponent is written V*2e-3*F/(R*T) rather than 2e-3*V*F/(R*T): libcellml (0.6.3-0.7.1, main) wrongly reports the latter
-  as not dimensionless (cellml/libcellml#1485). The step test clamps at +10 mV, not 0 mV: the GHK expression is 0/0 at exactly
-  V = 0 (a removable singularity the CellML does not guard).'
+  as not dimensionless (cellml/libcellml#1485). The GHK expression is 0/0 at exactly V = 0 mV; a piecewise uses its analytic
+  limit 1e6 F p_Ca (1 + cAMP)(Cai - Cao)/(2e-3) c^2 hc for |V| < 1e-6 mV (added on review 2026-10-05; continuous with the
+  GHK branch to 1e-7 relative). The step test clamps at +10 mV.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

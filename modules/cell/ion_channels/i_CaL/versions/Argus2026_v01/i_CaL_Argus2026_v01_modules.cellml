@@ -247,7 +247,47 @@
             <apply>
                 <eq/>
                 <ci>i_Ca_L</ci>
-                <apply>
+                <piecewise>
+                <piece>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="nanoA_per_milliA" type="e-notation">1<sep/>6</cn>
+                                <ci>F</ci>
+                                <ci>p_Ca</ci>
+                                <apply>
+                                    <plus/>
+                                    <cn cellml:units="dimensionless">1</cn>
+                                    <ci>cAMP</ci>
+                                </apply>
+                                <apply>
+                                    <minus/>
+                                    <ci>Cai</ci>
+                                    <ci>Cao</ci>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="V_per_milliV" type="e-notation">2<sep/>-3</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <ci>c</ci>
+                            <cn cellml:units="dimensionless">2</cn>
+                        </apply>
+                        <ci>hc</ci>
+                    </apply>
+                    <apply>
+                        <lt/>
+                        <apply>
+                            <abs/>
+                            <ci>V</ci>
+                        </apply>
+                        <cn cellml:units="milliV" type="e-notation">1<sep/>-6</cn>
+                    </apply>
+                </piece>
+                <otherwise><apply>
                     <times/>
                     <apply>
                         <divide/>
@@ -331,7 +371,7 @@
                         <cn cellml:units="dimensionless">2</cn>
                     </apply>
                     <ci>hc</ci>
-                </apply>
+                </apply></otherwise></piecewise>
             </apply>
             <apply>
                 <eq/>
