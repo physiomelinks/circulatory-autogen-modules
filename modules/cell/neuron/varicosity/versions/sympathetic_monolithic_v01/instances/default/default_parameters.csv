@@ -29,11 +29,11 @@ Cao,millimolar,2,SN_simple: Tau2011,yes
 cAMP,dimensionless,0.01,SN_simple: user_defined,no
 rho_NaCa,per_um2,38719.23218294793,definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 0.15 nanoA (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa,no
 r_NaCa,per_s,5000.0,"Hilgemann1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)",yes
-alpha_NaCa,dimensionless,1.2,SN_simple: Paci_2013_CHECK_FOR_SN,no
-gamma_NaCa,dimensionless,0.35,SN_simple: Paci_2013_CHECK_FOR_SN,no
-Ksat,dimensionless,0.1,SN_simple: Paci_2013_CHECK_FOR_SN,no
-KmCa,millimolar,1.38,SN_simple: Paci_2013_CHECK_FOR_SN,no
-KmNai,millimolar,87.5,SN_simple: Paci_2013_CHECK_FOR_SN,no
+alpha_NaCa,dimensionless,1.2,"Paci2013; alpha = 2.857 (enhancement factor of the outward mode); **modified here to 1.2 (owner, CA_user ad0ce77, 2024-07-21)**",yes
+gamma_NaCa,dimensionless,0.35,"Paci2013; i_NaCa: gamma = 0.35 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
+Ksat,dimensionless,0.1,"Paci2013; i_NaCa: Ksat = 0.1 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
+KmCa,millimolar,1.38,"Paci2013; i_NaCa: KmCa = 1.38 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
+KmNai,millimolar,87.5,"Paci2013; i_NaCa: KmNai = 87.5 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
 Ca_ER_init,millimolar,0.6,SN_simple: to_be_checked_in_neurons,no
 K_mf,millimolar,0.1e-3,SN_simple: Shannon2004Mathematical_was_0.246e-3,yes
 K_mr,millimolar,0.5,SN_simple: Shannon2004Mathematical,yes

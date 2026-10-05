@@ -42,13 +42,13 @@ tau_hc_i_CaN,millis,20.0,changed_from_belluzi1991_curves,yes
 Q10_CaN_i_CaN,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_CaN_i_CaN,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cao_i_NaCa,millimolar,2,Tau2011,yes
-KmCa_i_NaCa,millimolar,1.38,Paci_2013_CHECK_FOR_SN,no
-KmNai_i_NaCa,millimolar,87.5,Paci_2013_CHECK_FOR_SN,no
-Ksat_i_NaCa,dimensionless,0.1,Paci_2013_CHECK_FOR_SN,no
+KmCa_i_NaCa,millimolar,1.38,"Paci2013; i_NaCa: KmCa = 1.38 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
+KmNai_i_NaCa,millimolar,87.5,"Paci2013; i_NaCa: KmNai = 87.5 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
+Ksat_i_NaCa,dimensionless,0.1,"Paci2013; i_NaCa: Ksat = 0.1 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
 Nai_i_NaCa,millimolar,13,BoronBoulpaep2017_was_15,yes
 Nao_i_NaCa,millimolar,145,BoronBoulpaep2017,yes
-alpha_NaCa_i_NaCa,dimensionless,1.2,Paci_2013_CHECK_FOR_SN,no
-gamma_NaCa_i_NaCa,dimensionless,0.35,Paci_2013_CHECK_FOR_SN,no
+alpha_NaCa_i_NaCa,dimensionless,1.2,"Paci2013; alpha = 2.857 (enhancement factor of the outward mode); **modified here to 1.2 (owner, CA_user ad0ce77, 2024-07-21)**",yes
+gamma_NaCa_i_NaCa,dimensionless,0.35,"Paci2013; i_NaCa: gamma = 0.35 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",yes
 rho_NaCa_i_NaCa,per_um2,38719.23218294793,definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 0.15 nanoA (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa,no
 r_NaCa_i_NaCa,per_s,5000.0,"Hilgemann1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)",yes
 IP3_IP3R,millimolar,200e-6,Li1994Equations_from_plot,yes

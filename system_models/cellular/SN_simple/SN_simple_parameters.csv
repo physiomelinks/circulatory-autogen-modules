@@ -144,8 +144,8 @@ KmCa_soma_SN,millimolar,1.38,Paci_2013_CHECK_FOR_SN
 KmNai_soma_SN,millimolar,87.5,Paci_2013_CHECK_FOR_SN
 alpha_NaCa_soma_SN,dimensionless,1.2,Paci_2013_decreased_for_SN
 gamma_NaCa_soma_SN,dimensionless,0.35,Paci_2013_CHECK_FOR_SN
-rho_NaCa_soma_SN,per_um2,124830.18148921525,definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 300 nanoA (to_be_identified) with A = 3000 um^2 (the soma membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa
-r_NaCa_soma_SN,per_s,5000.0,"Hilgemann1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)"
+rho_NaCa_soma_SN,per_um2,400.0,"HilgemannNicollPhilipson1991; Abstract: Na+-induced charge movements indicate ~400 exchangers per um^2 in guinea-pig (cardiac) sarcolemma, giant patches (= value; set on review 2026-10-05, was 124830 /um^2, which reproduced the old k_NaCa 300 nA). Cardiac proxy: no neuronal NCX density found. With r_NaCa 5000 /s (same sentence: maximal I_NaCa 20-30 uA/cm^2) and A = 3000 um^2, k_NaCa = 0.96 nA. In rat SCG neurons NCX is a minor Ca-extrusion path (PMCA dominant; Wanaverbecq2003)"
+r_NaCa_soma_SN,per_s,5000.0,"HilgemannNicollPhilipson1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)"
 #,#,#,#
 Ksat_var_SN,dimensionless,0.1,Paci_2013_CHECK_FOR_SN
 KmCa_var_SN,millimolar,1.38,Paci_2013_CHECK_FOR_SN
