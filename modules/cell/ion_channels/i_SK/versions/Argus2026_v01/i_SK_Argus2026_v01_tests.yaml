@@ -18,7 +18,8 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   (Q10_SK, T_ref_SK). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
   recording temperature (on review) scales them, and the model can be run at 37 degC by changing T. tau_m_SK and p_SK traced
   to Hirschberg 1998 on review (2026-10-05; previously cited to Gupta 2016, not verified); **a single tau makes deactivation
-  ~11x faster than measured (57 ms)**.'
+  ~11x faster than measured (57 ms)**. m_inf is written 1/(1 + (Ca_mid_m_SK/Cai)^p_SK), identical to the original Cai^p/(Ca_mid^p
+  + Cai^p) for Cai > 0, so libcellml can check its units (a variable exponent needs a dimensionless base).'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

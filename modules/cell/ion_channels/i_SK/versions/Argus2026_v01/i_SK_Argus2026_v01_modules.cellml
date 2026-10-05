@@ -29,52 +29,12 @@
             <apply>
                 <eq/>
                 <ci>m_SK_init</ci>
-                <apply>
-                    <divide/>
-                    <apply>
-                        <power/>
-                        <ci>Cai_init</ci>
-                        <ci>p_SK</ci>
-                    </apply>
-                    <apply>
-                        <plus/>
-                        <apply>
-                            <power/>
-                            <ci>Ca_mid_m_SK</ci>
-                            <ci>p_SK</ci>
-                        </apply>
-                        <apply>
-                            <power/>
-                            <ci>Cai_init</ci>
-                            <ci>p_SK</ci>
-                        </apply>
-                    </apply>
-                </apply>
+                <apply><divide/><cn cellml:units="dimensionless">1</cn><apply><plus/><cn cellml:units="dimensionless">1</cn><apply><power/><apply><divide/><ci>Ca_mid_m_SK</ci><ci>Cai_init</ci></apply><ci>p_SK</ci></apply></apply></apply>
             </apply>
             <apply>
                 <eq/>
                 <ci>m_SK_inf</ci>
-                <apply>
-                    <divide/>
-                    <apply>
-                        <power/>
-                        <ci>Cai</ci>
-                        <ci>p_SK</ci>
-                    </apply>
-                    <apply>
-                        <plus/>
-                        <apply>
-                            <power/>
-                            <ci>Ca_mid_m_SK</ci>
-                            <ci>p_SK</ci>
-                        </apply>
-                        <apply>
-                            <power/>
-                            <ci>Cai</ci>
-                            <ci>p_SK</ci>
-                        </apply>
-                    </apply>
-                </apply>
+                <apply><divide/><cn cellml:units="dimensionless">1</cn><apply><plus/><cn cellml:units="dimensionless">1</cn><apply><power/><apply><divide/><ci>Ca_mid_m_SK</ci><ci>Cai</ci></apply><ci>p_SK</ci></apply></apply></apply>
             </apply>
             <apply>
                 <eq/>
