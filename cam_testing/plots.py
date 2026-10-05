@@ -149,16 +149,18 @@ def plot_timestep_traces(path, runs, output, units, title):
 def plot_model_vs_data(path, t_model, model, t_data, data, units, title, split=None):
     '''
     One panel per compared variable: model line, data as dots. ``split`` marks the end of
-    the calibration window; data after it were held out.
+    the calibration window; data after it were held out. ``t_model`` may be a dict (a time base
+    per compared variable).
     '''
     names = list(model)
     fig, axes = _grid(len(names))
     for ax, name in zip(axes, names):
+        tm = t_model[name] if isinstance(t_model, dict) else t_model    # a dict: one time base per panel
         if split is not None:
-            ax.axvspan(split, max(np.max(t_model), np.max(t_data[name])), color=GRID, alpha=0.6, lw=0)
+            ax.axvspan(split, max(np.max(tm), np.max(t_data[name])), color=GRID, alpha=0.6, lw=0)
             ax.text(split, 0.98, ' held out', transform=ax.get_xaxis_transform(), va='top',
                     fontsize=8, color=TEXT_SECONDARY)
-        ax.plot(t_model, model[name], color=CATEGORICAL[0], label='model')
+        ax.plot(tm, model[name], color=CATEGORICAL[0], label='model')
         ax.plot(t_data[name], data[name], linestyle='none', marker='o', markersize=4,
                 color=DATA_COLOUR, label='data')
         ax.set_title(name)

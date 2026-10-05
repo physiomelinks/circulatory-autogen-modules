@@ -228,19 +228,23 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
 
 
 def _constant_features(param_id, best):
-    """{data_item_name: value} of the constant data_items at ``best``, evaluated by libcuflynx
-    itself over the whole protocol (each item on its own sub-experiment, cross-segment
-    operation_kwargs references resolved), as the cost was."""
+    """The data_items at ``best``, evaluated by libcuflynx itself over the whole protocol (each
+    item on its own sub-experiment, cross-segment operation_kwargs references resolved), as the
+    cost was: {data_item_name: value} for constant items, and under the key ``SERIES``
+    {data_item_name: (t from the sub-experiment start, model, data, std)} for series items, the
+    model aligned to the data's sample times by libcuflynx."""
     from libcuflynx.utilities.obs_data_helpers import obs_item_names
 
     info = param_id.obs_info
     names = list(obs_item_names(info))
-    const_idx = {}
+    const_idx, series_idx = {}, {}
     for JJ, dtype in enumerate(info['data_types']):
         if dtype == 'constant':
             const_idx[JJ] = len(const_idx)
+        elif dtype == 'series':
+            series_idx[JJ] = len(series_idx)
     _, operands_list, _ = param_id.get_cost_obs_and_pred_from_params(best)
-    out, k = {}, 0
+    out, k = {SERIES: {}}, 0
     with param_id.accumulating_temp_results():
         for exp_idx, n_sub in enumerate(param_id.protocol_info['num_sub_per_exp']):
             for sub_idx in range(n_sub):
@@ -250,10 +254,20 @@ def _constant_features(param_id, best):
                     continue
                 with param_id.evaluating_segment(exp_idx, sub_idx):
                     obs = param_id.get_obs_output_dict(operands)
+                here = lambda JJ: (int(info['experiment_idxs'][JJ]), int(info['subexperiment_idxs'][JJ])) == (exp_idx, sub_idx)
                 for JJ, c in const_idx.items():
-                    if (int(info['experiment_idxs'][JJ]), int(info['subexperiment_idxs'][JJ])) == (exp_idx, sub_idx):
+                    if here(JJ):
                         out[names[JJ]] = float(obs['const'][c])
+                for JJ, c in series_idx.items():
+                    if here(JJ):
+                        model, data, std = param_id._align_series_to_ground_truth(np.asarray(obs['series'][c], dtype=float), c)
+                        t = np.arange(len(data)) * float(info['obs_dt'][c])
+                        out[SERIES][names[JJ]] = (t, np.asarray(model, dtype=float), np.asarray(data, dtype=float),
+                                                  np.asarray(std, dtype=float))
     return out
+
+
+SERIES = '__series__'   # the key of _constant_features' series items
 
 
 def _z(model_value, item):
@@ -274,7 +288,14 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     if features is not None:
         z_scores = {i['data_item_name']: _z(features[i['data_item_name']], i) for i in constants
                     if float(i.get('weight', 1.0)) != 0 and i['data_item_name'] in features}
-        return None, {}, {}, {}, {}, z_scores
+        # series items, by ``metric``, on the samples that carry data (leaving out samples given
+        # a much larger std than the rest to exclude them, e.g. those inside a voltage jump)
+        metric = v.get('metric', 'log_rmse')
+        cal_scores = {}
+        for name, (t, model, data, std) in features.get(SERIES, {}).items():
+            keep = std < 0.5 * np.max(std) if np.ptp(std) > 0 else np.ones(len(std), bool)
+            cal_scores[name] = score(metric, model[keep], data[keep])
+        return None, None, features.get(SERIES, {}), cal_scores, {}, z_scores
     by_var = {p.variable_name: p for p in cm.parameters()}
     series = series_from_obs_data(val_obs)
     t_end = float(val_obs['protocol_info']['sim_times'][0][-1])
@@ -341,6 +362,11 @@ def run(cm, v, plot_path):
         for var, sc in pred_s.items():
             if sc > threshold:
                 problems.append(f'start {label}: prediction {metric} for {var} {sc:.3g} > {threshold}')
+        if features is not None:
+            # a multi-segment protocol has no held-out window: its series fit is checked instead
+            for var, sc in cal_s.items():
+                if sc > threshold:
+                    problems.append(f'start {label}: fit {metric} for {var} {sc:.3g} > {threshold}')
         for name, z in z_s.items():
             if z['z'] > z_threshold:
                 problems.append(f'start {label}: {name} = {z["model"]:.4g} vs {z["data"]:.4g} ({z["z"]:.2f} std)')
@@ -351,7 +377,15 @@ def run(cm, v, plot_path):
             g = abs(got) if compare_abs else got
             if abs(g - float(want)) > expected_tol * max(abs(float(want)), 1e-12):
                 problems.append(f'start {label}: {par} = {got:.4g}, expected {"|" + par + "| = " if compare_abs else ""}{want}')
-        if series:
+        if features is not None and series:
+            # one panel per series item, model and data against time from its sub-experiment's start
+            figs.append(plots.plot_model_vs_data(
+                plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst),
+                {k: t for k, (t, m, d, sd) in series.items()}, {k: m for k, (t, m, d, sd) in series.items()},
+                {k: t for k, (t, m, d, sd) in series.items()},
+                {k: d for k, (t, m, d, sd) in series.items()}, {},
+                f'{component.label}: calibrated ({label}); time from the start of each sub-experiment'))
+        elif series:
             title = f'{component.label}: calibrated to t ≤ {cal_end:g}'
             if v.get('prediction_window'):
                 title += f', predicting {v["prediction_window"][0]:g} < t ≤ {v["prediction_window"][1]:g}'

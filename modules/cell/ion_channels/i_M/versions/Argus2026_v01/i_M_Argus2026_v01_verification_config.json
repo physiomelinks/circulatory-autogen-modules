@@ -69,6 +69,20 @@
         "optimiser_options": {"num_calls_to_function": 400, "cost_convergence": 1e-10, "max_patience": 40, "seed": 1},
         "dt": 0.001
       }
+    },
+    "davis2020_wistar_kinetics": {
+      "calibrate": {
+        "status": "active",
+        "note": "Fits tau_w (tau_w_num, tau_w_min) to the time course of the relaxations; the defaults are NOT changed (the calibrated values are in davis2020_wistar_kinetics_calibrated_parameters.csv, for the owner to decide; comparison: reviews/i_M_Argus2026_v01_tau_w_refit.html).",
+        "source": "Davis et al. 2020, Hypertension 76:1915, Fig. 3C: the representative Wistar deactivation trace (n = 1, raw current), digitised by tools/i_M_davis2020_kinetics.py",
+        "obs_data": "instances/davis2020_wistar_kinetics/davis2020_wistar_kinetics_obs_data.json",
+        "params_for_id": "instances/davis2020_wistar_kinetics/davis2020_wistar_kinetics_params_for_id.csv",
+        "method": "CMA-ES",
+        "optimiser_options": {"num_calls_to_function": 1500, "cost_convergence": 1e-10, "max_patience": 60, "seed": 1},
+        "metric": "nrmse",
+        "threshold": 0.25,
+        "dt": 0.001
+      }
     }
   }
 }
