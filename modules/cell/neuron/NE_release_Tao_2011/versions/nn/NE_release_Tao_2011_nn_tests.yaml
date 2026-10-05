@@ -1,92 +1,33 @@
 module_type: NE_release_Tao_2011
 version: nn
-reviewed: false
-notes: 'Tao 2011 Ca-triggered NE release at a sympathetic varicosity: Ca entry into an active-zone volume V_Z, a 5-site Ca-binding
-  scheme for vesicle fusion (calyx-of-Held kinetics), release rate E = gamma V_5Ca, NE in the cleft with reuptake P_up. NOTE:
-  the occupancy states start at 0 (V_Ca = 0, so nothing can ever bind: the first state should start at the number of releasable
-  vesicles/1) and several units are inconsistent (see review).'
-known_issues:
-- 'undefined units: C_per_M'
-- 'undefined units: M_per_m3'
-- 'undefined units: m3_per_M_millis'
-expected_failures:
-  run_test: 'generation fails: undefined units M_per_m3 and m3_per_M_millis (known issues), F in C_per_M (see R/F note), and
-    the config declares K_off per_s / Cai M_per_m3 while the CellML uses per_millis / millimol_per_m3. With these defined/aligned
-    on a copy the component runs and its invariants hold, but the model is not usable as is (see review: vesicle states start
-    at 0, units of V_Ca and gamma).'
-  verification_test_invariants: 'generation fails: undefined units M_per_m3 and m3_per_M_millis (known issues), F in C_per_M
-    (see R/F note), and the config declares K_off per_s / Cai M_per_m3 while the CellML uses per_millis / millimol_per_m3.
-    With these defined/aligned on a copy the component runs and its invariants hold, but the model is not usable as is (see
-    review: vesicle states start at 0, units of V_Ca and gamma).'
-  verification_test_BC: 'generation fails: undefined units M_per_m3 and m3_per_M_millis (known issues), F in C_per_M (see
-    R/F note), and the config declares K_off per_s / Cai M_per_m3 while the CellML uses per_millis / millimol_per_m3. With
-    these defined/aligned on a copy the component runs and its invariants hold, but the model is not usable as is (see review:
-    vesicle states start at 0, units of V_Ca and gamma).'
-  verification_test_timestep: 'generation fails: undefined units M_per_m3 and m3_per_M_millis (known issues), F in C_per_M
-    (see R/F note), and the config declares K_off per_s / Cai M_per_m3 while the CellML uses per_millis / millimol_per_m3.
-    With these defined/aligned on a copy the component runs and its invariants hold, but the model is not usable as is (see
-    review: vesicle states start at 0, units of V_Ca and gamma).'
-  stability_test: 'generation fails: undefined units M_per_m3 and m3_per_M_millis (known issues), F in C_per_M (see R/F note),
-    and the config declares K_off per_s / Cai M_per_m3 while the CellML uses per_millis / millimol_per_m3. With these defined/aligned
-    on a copy the component runs and its invariants hold, but the model is not usable as is (see review: vesicle states start
-    at 0, units of V_Ca and gamma).'
+reviewed: true
+description: 'Tao et al. 2011 Ca-triggered NE release at a sympathetic varicosity: Ca entry from i_Ca into an active-zone volume
+  V_Z with clearance K_Ca (Eq. 2), the five-site Ca-binding scheme for vesicle fusion of Schneggenburger & Neher 2000 (Document
+  S1 Eqs. 108-114, fusion rate E = gamma V_5Ca), and NE in the cleft from n vesicles of a molecules each, cleared by NET at
+  P_up (Eq. 3). Not used by the sympathetic neuron, which uses SN_NE_release.'
+notes: 'Reviewed 2026-10-06 (fix + fill + trace). Equation fixes: (1) dV_1Ca/dt lost K_off b V_1Ca, but Document S1 Eq. 109
+  has K_off b^0 = K_off and Eq. 108 gains K_off V_1Ca, so the vesicle number was not conserved; now K_off. (2) dV_4Ca/dt keeps
+  the gain term 5 K_off b^4 V_5Ca: Eq. 112 prints V_2Ca, a typo in Document S1 (V_5Ca matches the loss term of Eq. 113 and
+  conserves the vesicle number), as the owner''s 2023 CellML comment says ("I think the above V_2Ca should be V_5Ca... error
+  in supp material of Tao 2011?", circulatory_autogen 4753f825, 2023-11-24). As printed (Eq. 113), fusion does not deplete
+  V_5Ca: E = gamma V_5Ca is a rate, the releasable pool is not used up. Units (generation failed on the undefined units C_per_M,
+  M_per_m3 and m3_per_M_millis): the vesicle states are fractions of the n releasable vesicles (dimensionless, were J_per_M),
+  V_Ca starts at 1 (all states started at 0, so nothing could bind); Cai (active-zone Ca, Tao''s Ca_Z) and NE are in millimolar,
+  as the internal_Ca and NE_release ports of the other modules (SN_NE_release); K_on per_millimolar_s, K_off, gamma, E, P_up
+  per_s, F C_per_mol. The Ca equation was dCai/dt = -i_Ca/(2 F V_Z 1e-6) - K_Ca Cai, 1e12 too large for i_Ca in nA and V_Z
+  in L; it is now -i_Ca 1e-9 A/nA 1e3 mmol/mol/(2 F V_Z) - K_Ca Cai. Tao''s Eq. 2 multiplies i_Ca by Cm (his i_Ca is normalised
+  to capacitance); here i_Ca is absolute, so C_m (240 pF) is a declared parameter that the equations do not use. The NE equation
+  divides E n a/V_cleft by Avogadro''s number (and 1e3 mmol/mol) for mM. Parameters: Document S1 p. 8 Table (Neuron, Cleft)
+  and main text p. 596 (n, a), cross-checked with the owner''s 2024 values (CA_user 71ffd8d). K_Ca is not given anywhere in
+  Tao 2011 (main text, Document S1) or in the owner''s history; it stays TODO and the tests use the review proposal 1000 /s
+  (1 ms clearance). With these values the run (i_Ca = -0.002 nA) gives a ~0.1 mM active-zone Ca plateau and a cleft NE of
+  ~30 nM; P_up = 1e7 /s (as printed) makes NE quasi-steady and the module stiff for fixed-step solvers.'
 reference_proposals:
-  i_Ca:
-    reference: definitional; N-type Ca current supplied by the neuron in a network; 0 alone (test operating point)
-    sourced: definitional
-    value: 0.0
-  K_off:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: Koff = 9.5 /ms = 9500 /s (= SchneggenburgerNeher2000
-      Fig. 3e koff 9,500 /s); config declares per_s, the CellML per_millis (9.5)'
-    sourced: 'yes'
-    value: 9500.0
-  K_on:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: Kon = 90 /(mM ms) = 90 m^3/(mmol s) (= SchneggenburgerNeher2000
-      kon 9e7 /(M s))'
-    sourced: 'yes'
-    value: 90.0
   K_Ca:
     reference: unreferenced_placeholder; Ca clearance rate K[Ca] of Tao 2011 Eq. 2 is not given numerically in the paper or
       supplement; 1000 /s (1 ms clearance) as an order of magnitude
     sourced: 'no'
     value: 1000.0
-  b:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: b = 0.25 (cooperativity; = SchneggenburgerNeher2000)'
-    sourced: 'yes'
-    value: 0.25
-  gamma:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: gamma = 6 /ms (= SchneggenburgerNeher2000
-      6,000 /s); the module units m3_per_M_millis are inconsistent with E = gamma V_5Ca in per_millis'
-    sourced: 'yes'
-    value: 6.0
-  C_m:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: neuron Cm = 240 pF (declared but unused by
-      the equations of this component)'
-    sourced: 'yes'
-    value: 240.0
-  V_Z:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: VZ = 10e-17 L (active-zone volume)'
-    sourced: 'yes'
-    value: 1.0e-16
-  a:
-    reference: 'Tao2011; main text (Eq. 3): a = 4000 NE molecules per vesicle'
-    sourced: 'yes'
-    value: 4000.0
-  n:
-    reference: 'Tao2011; main text (Eq. 3): n = 12 releasable vesicles per varicosity'
-    sourced: 'yes'
-    value: 12.0
-  V_cleft:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: Vcleft = 1.5e-15 L'
-    sourced: 'yes'
-    value: 1.5e-15
-  P_up:
-    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: Pup = 10000 /ms (NE reuptake)'
-    sourced: 'yes'
-    value: 10000.0
-  F:
-    reference: CODATA2018; Faraday constant 96485.33212 C/mol, rounded to 96485 C/mol
-    sourced: 'yes'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

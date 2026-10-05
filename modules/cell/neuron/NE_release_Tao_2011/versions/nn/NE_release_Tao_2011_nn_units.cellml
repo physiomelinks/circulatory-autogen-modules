@@ -1,18 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <model name="Units" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
-    <units name="millis">
-        <unit prefix="milli" units="second"/>
-    </units>
-    <units name="per_millis">
-        <unit exponent="-1" units="millis"/>
-    </units>
-    <units name="J_per_mol">
-        <unit units="joule"/>
-        <unit exponent="-1" units="mole"/>
-    </units>
-    <units name="J_per_M">
-        <unit units="J_per_mol"/>
-    </units>
     <units name="per_s">
         <unit exponent="-1" units="second"/>
     </units>
@@ -22,13 +9,27 @@
     <units name="nanoA">
         <unit prefix="nano" units="ampere"/>
     </units>
-    <units name="m3_per_millimol_s">
-        <unit exponent="3" units="metre"/>
-        <unit exponent="-1" units="second"/>
-        <unit exponent="-1" prefix="milli" units="mole"/>
-    </units>
-    <units name="millimol_per_m3">
-        <unit exponent="-3" units="metre"/>
+    <units name="millimolar">
         <unit prefix="milli" units="mole"/>
+        <unit exponent="-1" units="litre"/>
+    </units>
+    <units name="per_millimolar_s">
+        <unit exponent="-1" units="second"/>
+        <unit exponent="-1" units="millimolar"/>
+    </units>
+    <units name="C_per_mol">
+        <unit units="coulomb"/>
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="A_per_nanoA">
+        <unit exponent="-1" prefix="nano" units="ampere"/>
+        <unit units="ampere"/>
+    </units>
+    <units name="millimol_per_mol">
+        <unit prefix="milli" units="mole"/>
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="per_mol">
+        <unit exponent="-1" units="mole"/>
     </units>
 </model>

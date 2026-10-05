@@ -5,46 +5,106 @@
   "pre_time": 0.0,
   "dt": 1e-05,
   "solver": "CVODE_myokit",
-  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
-  "outputs": ["Cai", "V_Ca", "V_1Ca", "V_2Ca", "V_3Ca", "V_4Ca", "V_5Ca", "NE"],
-  "run_parameters": {"i_Ca": -0.1},
+  "solver_info": {
+    "rtol": 1e-08,
+    "atol": 1e-10
+  },
+  "outputs": [
+    "Cai",
+    "V_Ca",
+    "V_1Ca",
+    "V_2Ca",
+    "V_3Ca",
+    "V_4Ca",
+    "V_5Ca",
+    "E",
+    "NE"
+  ],
+  "run_parameters": {
+    "i_Ca": -0.002
+  },
   "invariants": [
     {
-      "description": "vesicle-site occupancy is conserved: V_Ca + V_1Ca + ... + V_5Ca stays at its initial total (all rate terms of the 5-site binding scheme cancel in the sum)",
+      "description": "vesicle conservation: V_Ca + V_1Ca + ... + V_5Ca stays at its initial total 1 (every binding/unbinding term of Eqs. 108-113 cancels in the sum, with the Eq. 109 b^0 fix and V_5Ca in Eq. 112)",
       "expr": "np.max(np.abs((V_Ca + V_1Ca + V_2Ca + V_3Ca + V_4Ca + V_5Ca) - (V_Ca + V_1Ca + V_2Ca + V_3Ca + V_4Ca + V_5Ca)[0])) <= 1e-9"
     },
     {
-      "description": "Cai is exactly Cai(t) = -i_Ca/(2 F V_Z 1e-6 K_Ca) (1 - exp(-K_Ca t)) from 0 for constant i_Ca",
-      "expr": "np.max(np.abs(Cai - (-i_Ca/(2*F*V_Z*1e-6*K_Ca))*(1 - np.exp(-K_Ca*t)))) <= 1e-6*max(1e-12, np.max(np.abs(Cai)))"
+      "description": "values within bounds: every vesicle fraction stays in [0, 1]; Cai and NE stay non-negative (i_Ca <= 0)",
+      "expr": "np.all(np.vstack([V_Ca, V_1Ca, V_2Ca, V_3Ca, V_4Ca, V_5Ca]) >= -1e-9) & np.all(np.vstack([V_Ca, V_1Ca, V_2Ca, V_3Ca, V_4Ca, V_5Ca]) <= 1 + 1e-9) & np.all(Cai >= -1e-12) & np.all(NE >= -1e-15)"
+    },
+    {
+      "description": "Ca step (i_Ca stepped from 0 to its run value at t = 0, Cai from 0): Cai follows its exact solution Cai(t) = -i_Ca 1e-6/(2 F V_Z K_Ca) (1 - exp(-K_Ca t)) (i_Ca in nA: 1e-9 A/nA x 1e3 mmol/mol)",
+      "expr": "np.max(np.abs(Cai - (-i_Ca*1e-6/(2*F*V_Z*K_Ca))*(1 - np.exp(-K_Ca*t)))) <= 1e-6*max(1e-12, np.max(np.abs(Cai)))"
+    },
+    {
+      "description": "Ca step, release exercised: at the end of the run (Cai at its plateau) the vesicle states are at the detailed-balance equilibrium of the 5-site scheme, V_5Ca = x^5 b^-10 / sum_k C(5,k) x^k b^-k(k-1)/2 with x = K_on Cai/K_off, and V_5Ca > 0.5 at the run's ~0.1 mM plateau",
+      "expr": "abs(V_5Ca[-1] - (((K_on*Cai[-1]/K_off)**5*b**-10)/(1 + 5*(K_on*Cai[-1]/K_off) + 10*(K_on*Cai[-1]/K_off)**2*b**-1 + 10*(K_on*Cai[-1]/K_off)**3*b**-3 + 5*(K_on*Cai[-1]/K_off)**4*b**-6 + (K_on*Cai[-1]/K_off)**5*b**-10))) <= 1e-4*max(1e-9, V_5Ca[-1]) and V_5Ca[-1] > 0.5",
+      "applies": "run"
+    },
+    {
+      "description": "Ca step, NE release: E = gamma V_5Ca and the cleft NE is at its quasi-steady state n a E 1e3/(N_A V_cleft P_up) (NET clearance P_up = 1e7 /s is much faster than the vesicle kinetics), and NE > 0",
+      "expr": "np.max(np.abs(E - gamma*V_5Ca)) <= 1e-9*gamma and abs(NE[-1] - n*a*E[-1]*1e3/(6.02214076e23*V_cleft*P_up)) <= 1e-4*NE[-1] and NE[-1] > 0",
+      "applies": "run"
     }
   ],
   "bc_sweep": {
-    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
     "ranges": {
-      "i_Ca": {"min": -0.5, "max": 0.0, "points": 3}
+      "i_Ca": {
+        "min": -0.01,
+        "max": 0.0,
+        "points": 3
+      }
     },
-    "rationale": "N-type Ca current of a varicosity during an action potential is of the order of 0.1 nA or less."
+    "bounds": {
+      "i_Ca": [
+        null,
+        0.0
+      ],
+      "b": [
+        0,
+        1
+      ]
+    },
+    "rationale": "i_Ca is swept from 0 (no Ca entry) to -0.01 nA (active-zone Ca plateau ~0.5 mM with K_Ca 1000 /s); the run's -0.002 nA gives a ~0.1 mM plateau, the peak active-zone Ca Tao 2011 cites for exocytosis. Outward i_Ca (> 0) would drive Cai negative, so it is bounded to <= 0; b is a cooperativity factor in [0, 1]."
   },
   "timestep": {
     "scheme": "rk4",
-    "dts": [0.0001, 5e-05, 2.5e-05, 1.25e-05],
-    "t_end": 0.01,
+    "dts": [
+      2e-07,
+      1e-07,
+      5e-08,
+      2.5e-08
+    ],
+    "t_end": 0.001,
     "min_order": 0.8,
     "tol": 0.0001,
     "cvode_tol": 0.001
   },
   "stability": {
     "supported": [
-      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
     ]
   },
   "validation": {
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "candidate: Tao 2011 Fig. of NE release per action potential; requires the unit defects to be fixed first."
+        "reason": "candidate: none in Tao 2011 for this component alone (NE release is reported only as the WKY/SHR ratio of stimulation-evoked release, main text p. 597-598); a validation needs the varicosity Ca current and K_Ca (unsourced)."
       },
-      "calibrate": {"note": "not_applicable: blocked by the unit defects."}
+      "calibrate": {
+        "note": "not_applicable: no data instance yet; K_Ca would be the parameter to calibrate."
+      }
     }
   }
 }
