@@ -40,10 +40,10 @@ tau_c_max,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0c
 tau_hc,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
 tau_h_Kv4_2,millis,7.0,"Bekkers2000; Fig. 8Ab, Table 1: I_A decay tau = 0.01 V + 6.7 ms (6.2-7.4 ms over -37 to +73 mV, 22-25 degC); at 37 degC in rat SCG the decay tau is 6.0-9.9 ms over 0 to -50 mV (BelluzziSacchiWanke1985a, p. 96); 7.0 ms = value. **Voltage dependence ignored: recovery from inactivation near rest is much slower (Bekkers Fig. 5A ~40-45 ms at -77 to -97 mV; BelluzziSacchiWanke1985a 42.3 ms at -70 mV, 37 degC) and is not represented by a constant tau_h**",yes
 tau_z_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
-tau_m_SK,millis,5,SN_simple: gupta2016Computational,yes
+tau_m_SK,millis,5,"Hirschberg1998; Results, Fig. 13A: rSK2 macroscopic activation tau 4.1 +- 0.6 ms after a jump to 9.5 uM Ca (deactivation 57.3 +- 11.1 ms; model activation ~5 ms at 5 uM, ~50 ms at 0.5 uM Ca); 5 ms ~ value **(one tau used for activation and deactivation: deactivation is ~11x too fast against the measured 57 ms)**. Previously cited to Gupta2016 (bladder SK model, not verified)",yes
 R_diffSensed,megaOhm,10,SN_simple: user_defined,no
 C_sensed,picoF,2,SN_simple: user_defined,no
-p_SK,dimensionless,4,SN_simple: gupta2016Computational,yes
+p_SK,dimensionless,4,"Hirschberg1998; Results: Hill coefficient 3.2 +- 1.0 (single channel), 3.6 (effective open probability), 4.8 +- 1.5 in macropatches (Kohler et al. 1996); 4 within the range. Previously cited to Gupta2016 (not verified)",yes
 Cai_init,millimolar,1e-4,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
 Ca_mid_m_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
 B_Ca_init,millimolar,7.95,SN_simple: user_defined,no
@@ -161,7 +161,7 @@ T_ref_Kv4_2,kelvin,296.65,Bekkers2000; recorded at 22-25 degC (23.5 degC = 296.6
 Q10_BK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_BK,kelvin,295.15,"Khaliq2003; Methods: BK (iberiotoxin-sensitive K(Ca)) currents recorded in this study in mouse Purkinje neurons at room temperature, not stated numerically; 22 degC = the lower end of the paper's 22-34 degC warming series. ModelDB 48332 bkpkj.mod has no temperature factor, so the kinetics are room-temperature as fitted",yes
 Q10_SK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
-T_ref_SK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T_ref_SK,kelvin,295.15,"Hirschberg1998; rSK2 in Xenopus oocytes, inside-out patches at room temperature (kinetics as measured; equal to the model temperature)",yes
 Q10_M,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_M,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Q10_IP3R,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no

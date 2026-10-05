@@ -116,14 +116,14 @@ z_BK_coeff_i_BK,millimolar,0.001,Khaliq2003; Methods: z_inf = 1/(1 + 0.001 mM/Ca
 Q10_BK_i_BK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_BK_i_BK,kelvin,295.15,"Khaliq2003; Methods: BK (iberiotoxin-sensitive K(Ca)) currents recorded in this study in mouse Purkinje neurons at room temperature, not stated numerically; 22 degC = the lower end of the paper's 22-34 degC warming series. ModelDB 48332 bkpkj.mod has no temperature factor, so the kinetics are room-temperature as fitted",yes
 Ca_mid_m_SK_i_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
-Cai_init_i_SK,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
+Cai_init_i_SK,millimolar,1e-4,"definitional; resting cytosolic Ca 1e-4 mM (the soma's Cai_init, cf. Wanaverbecq2003), the Ca at which m_SK starts",no
 rho_SK_i_SK,per_um2,0.16181229773462782,definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_SK = 10.3 picoS; a density for calibration through gamma_SK,no
 gamma_SK_i_SK,picoS,10.3,"Hirschberg1998; rSK2 single-channel conductance 10.3 +- 1.3 pS, inside-out (Results)",yes
 g_KCa_SK_mod_i_SK,dimensionless,1.0,to_be_identified,no
-p_SK_i_SK,dimensionless,4,gupta2016Computational,yes
-tau_m_SK_i_SK,millis,5,gupta2016Computational,yes
+p_SK_i_SK,dimensionless,4,"Hirschberg1998; Results: Hill coefficient 3.2 +- 1.0 (single channel), 3.6 (effective open probability), 4.8 +- 1.5 in macropatches (Kohler et al. 1996); 4 within the range. Previously cited to Gupta2016 (not verified)",yes
+tau_m_SK_i_SK,millis,5,"Hirschberg1998; Results, Fig. 13A: rSK2 macroscopic activation tau 4.1 +- 0.6 ms after a jump to 9.5 uM Ca (deactivation 57.3 +- 11.1 ms; model activation ~5 ms at 5 uM, ~50 ms at 0.5 uM Ca); 5 ms ~ value **(one tau used for activation and deactivation: deactivation is ~11x too fast against the measured 57 ms)**. Previously cited to Gupta2016 (bladder SK model, not verified)",yes
 Q10_SK_i_SK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
-T_ref_SK_i_SK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T_ref_SK_i_SK,kelvin,295.15,"Hirschberg1998; rSK2 in Xenopus oocytes, inside-out patches at room temperature (kinetics as measured; equal to the model temperature)",yes
 Delta_V_mid_w_i_M,milliV,0,for_drug_control,yes
 V_den_w_i_M,milliV,10,Martin2023_was_10,yes
 V_mid_w_i_M,milliV,35,Martin2023_was_35,yes
