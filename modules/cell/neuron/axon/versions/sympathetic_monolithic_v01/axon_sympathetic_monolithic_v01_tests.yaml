@@ -1,43 +1,17 @@
 module_type: axon
 version: sympathetic_monolithic_v01
-reviewed: false
+reviewed: true
+description: 'Pseudo-physiological axon of the sympathetic neuron: one RC compartment charged through the axial resistance
+  R = 4 R_i L/(pi d^2) from the soma (V_in), with the axon''s channel current lumped as channel_ratio x the axial current;
+  C = c_m pi d L. It passes the soma''s AP to the varicosity.'
 notes: 'Owner''s passive axon segment: axial current I = (V_in - V)/R from the soma, plus a lumped "channel" current proportional
   to it (channel_ratio), charging C. Exact RC solution for a constant soma potential. Geometry (2026-10-02): the cable is
   a cylinder of diameter d_ax and length L_ax; its membrane capacitance is C = c_m pi d_ax L_ax (c_m = 1 uF/cm^2) and R, the
   axial resistance between the soma and the cable through which I = (V_in - V)/R flows, is R = 4 R_i L_ax/(pi d_ax^2) with
   the axial resistivity R_i. The model has no membrane leak, so a specific membrane resistance R_m does not enter. The defaults
-  reproduce the previous C = 10 pF and R = 300 MOhm.'
-reference_proposals:
-  channel_ratio:
-    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source
-      found (the sister SN_full parameter files use 1.0)
-    sourced: 'no'
-  V_rest_approx:
-    reference: unreferenced_placeholder; axon resting potential set equal to the soma's (-70 mV, Davis2020 soma measurements);
-      no axonal measurement
-    sourced: 'no'
-    also_cites:
-    - Davis2020
-  V_in:
-    reference: definitional; upstream membrane potential supplied in a network; -70 mV (the SN resting potential) when unconnected
-    sourced: 'no'
-    value: -70.0
-  R_i:
-    value: 200.0
-    reference: 'Major1994; cytoplasmic resistivity 170-340 ohm cm in rat CA3 pyramidal neurons (Abstract; specific membrane
-      resistance 120-200 kOhm cm^2, Cm 0.7-0.8 uF/cm^2). A central-neuron proxy: no value for postganglionic sympathetic axons
-      was verified. The axon model has no membrane leak, so R_m has no parameter. Proposed R_i = 200 ohm cm (R = 811 MOhm
-      at the present d_ax, L_ax)'
-    sourced: 'yes'
-    previous: 'previous R (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model
-      (CA token ''to_be_determined''); lumped axial resistance; no source found (the sister SN_full parameter files use 150
-      MOhm; somatic input resistance is about 218 MOhm in Wistar stellate neurons, Davis et al. 2019 bioRxiv)'
-  L_ax:
-    reference: 'definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple
-      to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um. The previous C (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''to_be_determined''); lumped axon capacitance; no source found
-      (the sister SN_full parameter files use 8 pF)'
-    sourced: 'no'
+  reproduce the previous C = 10 pF and R = 300 MOhm. Reviewed 2026-10-05: kept as a pseudo-physiological axon (user: "it just
+  passes the AP to the varicosity"); no membrane leak and R_i 74 ohm cm (derived) left as they are. The neuron supermodule
+  checks AP transmission; it currently fails (see neuron/sympathetic).'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

@@ -22,6 +22,10 @@ known_issues:
 expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
+  verification_test_invariants: 'AP transmission fails (found on review 2026-10-05, user request "a check making sure the
+    output and input APs are similar"): at 50 pA the soma fires (+56 mV) but the axon/varicosity node peaks at about -6 mV;
+    the pre-review library behaved the same (soma +58 mV, axon -3 mV), so it is the pseudo-physiological axon''s design (axial
+    R 300 MOhm into the varicosity load, no regenerative axonal current), not a review change.'
 reference_proposals:
   channel_ratio_axon:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source

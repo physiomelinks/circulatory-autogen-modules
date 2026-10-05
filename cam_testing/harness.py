@@ -54,6 +54,15 @@ def supermodule_model_name(version, name, vessel=VESSEL):
     for sub in sorted(version.submodule_names, key=len, reverse=True):
         if name.endswith('_' + sub) and len(name) > len(sub) + 1:
             return f'{name[:-len(sub)]}{vessel}_{sub}'
+    # a nested submodule's parameter: <var>_<submodule>_<subsubmodule>... (e.g. I_in_soma_membrane in
+    # the neuron, whose soma is itself a supermodule): split at the leftmost "_" whose remainder is a
+    # submodule path that resolves
+    i = name.find('_')
+    while i > 0:
+        path = name[i + 1:]
+        if '_' in path and resolve_submodule_path(version, path) is not None:
+            return f'{name[:i]}_{vessel}_{path}'
+        i = name.find('_', i + 1)
     return name
 
 

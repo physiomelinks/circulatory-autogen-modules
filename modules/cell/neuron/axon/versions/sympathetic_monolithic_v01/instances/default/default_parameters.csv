@@ -1,8 +1,8 @@
 variable_name,units,value,data_reference,sourced
-channel_ratio,dimensionless,0.5,SN_simple: user_defined,no
+channel_ratio,dimensionless,0.5,"unreferenced_placeholder; owner's lumped ratio of axonal channel current to axial current, a simple approximation of the extra input current from the axon membrane's channels (CA_user ad0ce77, 2024-07-21; CA token 'user_defined')",no
 c_m,uF_per_cm2,1.0,"Gentet2000; specific membrane capacitance 0.9 uF/cm^2 measured directly in nucleated patches of cortical pyramidal, spinal cord and hippocampal neurons (Abstract); 1 uF/cm^2 (0.01 pF/um^2) is the conventional value used here",yes
 d_ax,um,1.0,"definitional; axon diameter 1 um, within the 0.3-1.5 um range of unmyelinated postganglionic sympathetic axons; with L_ax and R_i chosen to reproduce the previous C and R",no
-L_ax,um,318.3098861837907,definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um,no
-R_i,ohm_cm,74.02203300817018,definitional; axial (cytoplasmic) resistivity chosen so that R = 4 R_i L_ax/(pi d_ax^2) reproduces the previous R = 300 MOhm (SN_simple to_be_determined R = 300 MOhm): R_i = 74.02 ohm cm (typical axoplasm 70-200 ohm cm),no
-V_in,milliV,TODO,TODO,no
-V_rest_approx,milliV,-70,SN_simple: user_defined,no
+L_ax,um,318.3098861837907,definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um. The previous C (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_determined'); lumped axon capacitance; no source found (the sister SN_full parameter files use 8 pF),no
+R_i,ohm_cm,74.02203300817018,definitional; axial (cytoplasmic) resistivity chosen so that R = 4 R_i L_ax/(pi d_ax^2) reproduces the previous R = 300 MOhm (SN_simple to_be_determined R = 300 MOhm): R_i = 74.02 ohm cm (typical axoplasm 70-200 ohm cm) **Kept on review 2026-10-05 (pseudo-physiological axon); Major1994 gives 170-340 ohm cm in rat CA3 neurons.**,no
+V_in,milliV,-70,"definitional; the input (soma) voltage, an input from the coupled soma; -70 mV (rest) when unconnected",no
+V_rest_approx,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it",yes

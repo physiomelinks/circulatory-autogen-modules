@@ -15,6 +15,18 @@
     "voltage": "mod_soma_membrane/V",
     "parameters": {"I_in_soma_membrane": 0.0}
   },
+  "invariants": [
+    {
+      "description": "AP transmission: every somatic action potential (upward 0 mV crossing) reaches the axon output, the same spike count",
+      "expr": "int(np.sum((mod_soma_membrane__V[1:] >= 0) & (mod_soma_membrane__V[:-1] < 0))) > 0 and int(np.sum((mod_axon__V[1:] >= 0) & (mod_axon__V[:-1] < 0))) == int(np.sum((mod_soma_membrane__V[1:] >= 0) & (mod_soma_membrane__V[:-1] < 0)))",
+      "applies": "run"
+    },
+    {
+      "description": "AP transmission: the axon-output action potential peaks within 20 mV of the somatic one",
+      "expr": "abs(np.max(mod_axon__V) - np.max(mod_soma_membrane__V)) <= 20",
+      "applies": "run"
+    }
+  ],
   "bc_sweep": {
     "ranges": {
       "I_in_soma_membrane": {"min": -0.05, "max": 0.2, "points": 6},
