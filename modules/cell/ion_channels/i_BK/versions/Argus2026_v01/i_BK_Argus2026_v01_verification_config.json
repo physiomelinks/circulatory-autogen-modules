@@ -19,6 +19,7 @@
     "tau_m_BK",
     "z_BK_inf"
   ],
+  "run_parameters": {"V": 10.0},
   "invariants": [
     {
       "description": "the ion flux j_KCa_BK = -i_KCa_BK/F (mol/s; the current in nA, so the factor 1e-9)",
@@ -27,6 +28,21 @@
     {
       "description": "every gating variable stays in [0, 1]",
       "expr": "np.all((m_BK >= -1e-9) & (m_BK <= 1 + 1e-9)) & np.all((h_BK >= -1e-9) & (h_BK <= 1 + 1e-9)) & np.all((z_BK >= -1e-9) & (z_BK <= 1 + 1e-9))"
+    },
+    {
+      "description": "voltage step (V clamped at the run value, Cai fixed, gates starting at rest V_rest_approx): m_BK follows its exact clamp solution, tau = |tau_m_BK(V)|/1000/phi + epsilon_tau",
+      "expr": "np.max(np.abs(m_BK - ((1/(1 + np.exp(-(V + (V_mid_h_BK - 3.1))/V_den_m_BK))) + ((1/(1 + np.exp(-(V_rest_approx + (V_mid_h_BK - 3.1))/V_den_m_BK))) - (1/(1 + np.exp(-(V + (V_mid_h_BK - 3.1))/V_den_m_BK))))*np.exp(-t/(np.abs(1.505 + 1000/(np.exp((V + (V_mid_h_BK - 3.1) + 57.5)/10.1) + np.exp(-((V + (V_mid_h_BK - 3.1)) - 62.2)/10)))/1000/(Q10_BK**((T - T_ref_BK)/10)) + 1e-6))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "h_BK follows its exact clamp solution",
+      "expr": "np.max(np.abs(h_BK - ((h_BK_min + (1 - h_BK_min)/(1 + np.exp((V + V_mid_h_BK)/V_den_h_BK))) + ((h_BK_min + (1 - h_BK_min)/(1 + np.exp((V_rest_approx + V_mid_h_BK)/V_den_h_BK))) - (h_BK_min + (1 - h_BK_min)/(1 + np.exp((V + V_mid_h_BK)/V_den_h_BK))))*np.exp(-t/(np.abs(1.9 + 1000/(np.exp((V + V_mid_h_BK + 16.5)/5.2) + np.exp(-((V + V_mid_h_BK) - 86.2)/12.9)))/1000/(Q10_BK**((T - T_ref_BK)/10)) + 1e-6))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "with Cai fixed at Cai_init, z_BK stays at z_inf = 1/(1 + z_BK_coeff/Cai)",
+      "expr": "np.max(np.abs(z_BK - 1/(1 + z_BK_coeff/Cai))) <= 1e-9",
+      "applies": "run"
     }
   ],
   "bc_sweep": {
