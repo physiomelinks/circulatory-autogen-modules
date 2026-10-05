@@ -93,16 +93,16 @@ gamma_Kv1_5_i_Kv1_5,picoS,11.8,Kwan2006; Kv1.5 single-channel conductance 11.8 +
 Q10_m_Kv1_5_i_Kv1_5,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); cf. Courtemanche et al. 1998 (K_Q10 = 3 for I_Kur, room temperature to 37 degC); Wang1993IKur activation tau 46.7 ms at 16 degC, 7.1 ms at 25 degC (Q10 ~8 over 16-25 degC, likely inflated)",no
 Q10_h_Kv1_5_i_Kv1_5,dimensionless,1,"RichSnyders1998; Abstract: hKv1.5 ""time constants of slow inactivation displayed little temperature and voltage dependence"" (Q10 ~1; temperature changes the extent of inactivation instead)",yes
 T_ref_Kv1_5_i_Kv1_5,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review (Philipson 1991, the source of these kinetics, recorded at room temperature, so this also matches the source)",no
-V_den_h_Kv4_2_i_Kv4_2,milliV,6.7,Bekkers2000-channelpedia,yes
-V_den_m_Kv4_2_i_Kv4_2,milliV,16.6,Bekkers2000-channelpedia,yes
-V_mid_h_Kv4_2_i_Kv4_2,milliV,81.6,Bekkers2000-channelpedia,yes
-V_mid_m_Kv4_2_i_Kv4_2,milliV,18.8,Bekkers2000-channelpedia,yes
+V_den_h_Kv4_2_i_Kv4_2,milliV,6.7,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",yes
+V_den_m_Kv4_2_i_Kv4_2,milliV,19.1,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)",yes
+V_mid_h_Kv4_2_i_Kv4_2,milliV,81.6,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",yes
+V_mid_m_Kv4_2_i_Kv4_2,milliV,56.2,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)",yes
 V_rest_approx_i_Kv4_2,milliV,-70,Davis2021Thesis_from_traces,yes
 rho_Kv4_2_i_Kv4_2,per_um2,4.4444444444444455,definitional; chosen so that g_Kv4_2 = A rho gamma_Kv4_2 (1e-6 uS/pS) reproduces the previous g_Kv4_2 = 0.1 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv4_2 = 7.5 picoS; a density for calibration through gamma_Kv4_2,no
 gamma_Kv4_2_i_Kv4_2,picoS,7.5,"Kaulin2009; neuronal Kv4.2 (with DPP6, as in cerebellar granule neurons) unitary conductance ~7.5 pS; Kv4.2 alone ~4 pS (Abstract)",yes
-tau_h_Kv4_2_i_Kv4_2,millis,7.0,was_approx_7,yes
+tau_h_Kv4_2_i_Kv4_2,millis,7.0,"Bekkers2000; Fig. 8Ab, Table 1: I_A decay tau = 0.01 V + 6.7 ms (6.2-7.4 ms over -37 to +73 mV, 22-25 degC); at 37 degC in rat SCG the decay tau is 6.0-9.9 ms over 0 to -50 mV (BelluzziSacchiWanke1985a, p. 96); 7.0 ms = value. **Voltage dependence ignored: recovery from inactivation near rest is much slower (Bekkers Fig. 5A ~40-45 ms at -77 to -97 mV; BelluzziSacchiWanke1985a 42.3 ms at -70 mV, 37 degC) and is not represented by a constant tau_h**",yes
 Q10_Kv4_2_i_Kv4_2,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
-T_ref_Kv4_2_i_Kv4_2,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T_ref_Kv4_2_i_Kv4_2,kelvin,296.65,Bekkers2000; recorded at 22-25 degC (23.5 degC = 296.65 K); P13-15 rat L5 pyramidal nucleated patches,yes
 Cai_init_i_BK,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
 V_den_h_BK_i_BK,milliV,5.8,khaliq2003Contribution,yes
 V_den_m_BK_i_BK,milliV,6.2,khaliq2003Contribution,yes

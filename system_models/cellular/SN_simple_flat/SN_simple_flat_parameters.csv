@@ -18,7 +18,7 @@ B_Ca_init_SN_soma_Ca,millimolar,7.95,user_defined
 B_Ca_total_SN_soma_Ca,millimolar,8,Matveev2002
 Ca_ER_init_SN_soma_Ca,millimolar,0.6,to_be_checked_in_neurons
 Cai_init_SN_soma_Ca,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease
-tau_shell_SN_soma_Ca,millis,1.0,"Khaliq2003; ModelDB 48332 cadiff.mod: beta = 1 /ms; j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk). Replaces D_Ca = 6e-12 m3/s (review 2026-10-05)"
+tau_shell_SN_soma_Ca,millis,1.0,Khaliq2003; ModelDB 48332 cadiff.mod: beta = 1 /ms; j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk). Replaces D_Ca = 6e-12 m3/s (review 2026-10-05)
 D_Ca_ER_SN_soma_Ca,m3_per_s,4.8e-15,need_to_change_for_volume
 H_SERCA_SN_soma_Ca,dimensionless,1.787,Shannon2004Mathematical
 K_mf_SN_soma_Ca,millimolar,0.1e-3,Shannon2004Mathematical_was_0.246e-3
@@ -29,7 +29,7 @@ k_A_ER_SN_soma_Ca,dimensionless,3.141592653589793,"definitional; ER area shape f
 k_V_ER_SN_soma_Ca,dimensionless,0.5235987755982988,"definitional; ER volume shape factor of a sphere, pi/6"
 k_A_ER_pre_SN_soma_Ca,dimensionless,3.141592653589793,"definitional; pre-ER area shape factor A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3), V_ER_pre = c_ER_pre Vol; a sphere (pi)"
 k_V_ER_pre_SN_soma_Ca,dimensionless,0.5235987755982988,"definitional; pre-ER volume shape factor of a sphere, pi/6"
-d_shell_SN_soma_Ca,um,0.1,"Khaliq2003; ModelDB 48332 cadiff.mod: shell depth 0.1 um; V_shell = A_mem d_shell. Replaces c_SL = 0.02 (review 2026-10-05)"
+d_shell_SN_soma_Ca,um,0.1,Khaliq2003; ModelDB 48332 cadiff.mod: shell depth 0.1 um; V_shell = A_mem d_shell. Replaces c_SL = 0.02 (review 2026-10-05)
 rho_SERCA_SN_soma_Ca,per_um2,36407.132526123205,definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 3e-16 mol_per_s (to_be_identified) with A = 248.1 um^2 (the soma pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration through r_SERCA
 r_SERCA_SN_soma_Ca,per_s,20.0,"unreferenced_placeholder; maximal Ca transport per SERCA pump, ~10-20 Ca/s at room temperature (Lytton et al. 1992, value not verified from the paper); 20 Ca/s assumed"
 k_bind_Ca_SN_soma_Ca,per_millimolar_s,0.1e6,Matveev2002_was_0.5e6
@@ -84,14 +84,14 @@ V_mid_m_Kv1_5_SN_soma_i_Kv1_5,milliV,6.0,Philipson1991-channelpedia
 V_rest_approx_SN_soma_i_Kv1_5,milliV,-70,Davis2021Thesis_from_traces
 rho_Kv1_5_SN_soma_i_Kv1_5,per_um2,2.508049120338983,definitional; chosen so that g_Kv1_5 = A rho gamma_Kv1_5 (1e-6 uS/pS) reproduces the previous g_Kv1_5 = 0.0887849 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv1_5 = 11.8 picoS; a density for calibration through gamma_Kv1_5
 gamma_Kv1_5_SN_soma_i_Kv1_5,picoS,11.8,Kwan2006; Kv1.5 single-channel conductance 11.8 +- 0.6 pS at pH 7.4 (Abstract)
-V_den_h_Kv4_2_SN_soma_i_Kv4_2,milliV,6.7,Bekkers2000-channelpedia
-V_den_m_Kv4_2_SN_soma_i_Kv4_2,milliV,16.6,Bekkers2000-channelpedia
-V_mid_h_Kv4_2_SN_soma_i_Kv4_2,milliV,81.6,Bekkers2000-channelpedia
-V_mid_m_Kv4_2_SN_soma_i_Kv4_2,milliV,18.8,Bekkers2000-channelpedia
+V_den_h_Kv4_2_SN_soma_i_Kv4_2,milliV,6.7,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40"
+V_den_m_Kv4_2_SN_soma_i_Kv4_2,milliV,19.1,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)"
+V_mid_h_Kv4_2_SN_soma_i_Kv4_2,milliV,81.6,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40"
+V_mid_m_Kv4_2_SN_soma_i_Kv4_2,milliV,56.2,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)"
 V_rest_approx_SN_soma_i_Kv4_2,milliV,-70,Davis2021Thesis_from_traces
 rho_Kv4_2_SN_soma_i_Kv4_2,per_um2,4.4444444444444455,definitional; chosen so that g_Kv4_2 = A rho gamma_Kv4_2 (1e-6 uS/pS) reproduces the previous g_Kv4_2 = 0.1 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv4_2 = 7.5 picoS; a density for calibration through gamma_Kv4_2
 gamma_Kv4_2_SN_soma_i_Kv4_2,picoS,7.5,"Kaulin2009; neuronal Kv4.2 (with DPP6, as in cerebellar granule neurons) unitary conductance ~7.5 pS; Kv4.2 alone ~4 pS (Abstract)"
-tau_h_Kv4_2_SN_soma_i_Kv4_2,millis,7.0,was_approx_7
+tau_h_Kv4_2_SN_soma_i_Kv4_2,millis,7.0,"Bekkers2000; Fig. 8Ab, Table 1: I_A decay tau = 0.01 V + 6.7 ms (6.2-7.4 ms over -37 to +73 mV, 22-25 degC); at 37 degC in rat SCG the decay tau is 6.0-9.9 ms over 0 to -50 mV (BelluzziSacchiWanke1985a, p. 96); 7.0 ms = value. **Voltage dependence ignored: recovery from inactivation near rest is much slower (Bekkers Fig. 5A ~40-45 ms at -77 to -97 mV; BelluzziSacchiWanke1985a 42.3 ms at -70 mV, 37 degC) and is not represented by a constant tau_h**"
 Cai_init_SN_soma_i_BK,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease
 V_den_h_BK_SN_soma_i_BK,milliV,5.8,khaliq2003Contribution
 V_den_m_BK_SN_soma_i_BK,milliV,6.2,khaliq2003Contribution

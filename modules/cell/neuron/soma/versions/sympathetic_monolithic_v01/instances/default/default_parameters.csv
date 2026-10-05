@@ -16,10 +16,10 @@ V_mid_m_Kv1_5,milliV,6.0,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philips
 V_den_m_Kv1_5,milliV,6.4,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): m_inf k = 6.4 mV (= value)",yes
 V_mid_h_Kv1_5,milliV,25.3,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): h_inf V1/2 = -25.3 mV (= value) **At 37 degC native human atrial I_Kur inactivates half at -7.5 mV (Feng1998), so this room-temperature value is a calibration candidate**",yes
 V_den_h_Kv1_5,milliV,3.5,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): h_inf k = 3.5 mV (= value)",yes
-V_mid_m_Kv4_2,milliV,18.8,SN_simple: Bekkers2000-channelpedia,yes
-V_den_m_Kv4_2,milliV,16.6,SN_simple: Bekkers2000-channelpedia,yes
-V_mid_h_Kv4_2,milliV,81.6,SN_simple: Bekkers2000-channelpedia,yes
-V_den_h_Kv4_2,milliV,6.7,SN_simple: Bekkers2000-channelpedia,yes
+V_mid_m_Kv4_2,milliV,56.2,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)",yes
+V_den_m_Kv4_2,milliV,19.1,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)",yes
+V_mid_h_Kv4_2,milliV,81.6,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",yes
+V_den_h_Kv4_2,milliV,6.7,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",yes
 V_mid_m_Kv2,milliV,6,BelluzziSacchi1988; n_inf V1/2 = -6.54 mV (Abstract); 6 mV here is Tao2011 Document S1 Eq. 96's rounded -6.084 mV (Tao values not relied on for now),yes
 V_den_m_Kv2,milliV,8,BelluzziSacchi1988; n_inf slope k = 8.91 mV (Abstract); 8 mV here is Tao2011 Document S1 Eq. 96's rounded 8.007 mV (Tao values not relied on for now),yes
 V_mid_w,milliV,35,SN_simple: Martin2023_was_35,yes
@@ -38,7 +38,7 @@ tau_w_min,millis,30,SN_simple: gupta2016Computational,yes
 tau_c_min,millis,0.2,"BelluzziSacchi1989; Eq. 4 tau_c = 1/(...) + 0.1 ms (= Tao2011 Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",yes
 tau_c_max,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. BelluzziSacchi1989 Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); 3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1),no
 tau_hc,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
-tau_h_Kv4_2,millis,7.0,SN_simple: was_approx_7,yes
+tau_h_Kv4_2,millis,7.0,"Bekkers2000; Fig. 8Ab, Table 1: I_A decay tau = 0.01 V + 6.7 ms (6.2-7.4 ms over -37 to +73 mV, 22-25 degC); at 37 degC in rat SCG the decay tau is 6.0-9.9 ms over 0 to -50 mV (BelluzziSacchiWanke1985a, p. 96); 7.0 ms = value. **Voltage dependence ignored: recovery from inactivation near rest is much slower (Bekkers Fig. 5A ~40-45 ms at -77 to -97 mV; BelluzziSacchiWanke1985a 42.3 ms at -70 mV, 37 degC) and is not represented by a constant tau_h**",yes
 tau_z_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 tau_m_SK,millis,5,SN_simple: gupta2016Computational,yes
 R_diffSensed,megaOhm,10,SN_simple: user_defined,no
@@ -157,7 +157,7 @@ Q10_m_Kv1_5,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (
 Q10_h_Kv1_5,dimensionless,1,"RichSnyders1998; Abstract: hKv1.5 ""time constants of slow inactivation displayed little temperature and voltage dependence"" (Q10 ~1; temperature changes the extent of inactivation instead)",yes
 T_ref_Kv1_5,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review (Philipson 1991, the source of these kinetics, recorded at room temperature, so this also matches the source)",no
 Q10_Kv4_2,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
-T_ref_Kv4_2,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T_ref_Kv4_2,kelvin,296.65,Bekkers2000; recorded at 22-25 degC (23.5 degC = 296.65 K); P13-15 rat L5 pyramidal nucleated patches,yes
 Q10_BK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_BK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Q10_SK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no

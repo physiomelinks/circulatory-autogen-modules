@@ -80,10 +80,10 @@ V_mid_m_Kv1_5_soma_SN,milliV,6.0,Philipson1991-channelpedia
 V_den_m_Kv1_5_soma_SN,milliV,6.4,Philipson1991-channelpedia
 V_mid_h_Kv1_5_soma_SN,milliV,25.3,Philipson1991-channelpedia
 V_den_h_Kv1_5_soma_SN,milliV,3.5,Philipson1991-channelpedia
-V_mid_m_Kv4_2_soma_SN,milliV,18.8,Bekkers2000-channelpedia
-V_den_m_Kv4_2_soma_SN,milliV,16.6,Bekkers2000-channelpedia
-V_mid_h_Kv4_2_soma_SN,milliV,81.6,Bekkers2000-channelpedia
-V_den_h_Kv4_2_soma_SN,milliV,6.7,Bekkers2000-channelpedia
+V_mid_m_Kv4_2_soma_SN,milliV,56.2,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)"
+V_den_m_Kv4_2_soma_SN,milliV,19.1,"Bekkers2000; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)"
+V_mid_h_Kv4_2_soma_SN,milliV,81.6,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40"
+V_den_h_Kv4_2_soma_SN,milliV,6.7,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40"
 V_mid_c_soma_SN,milliV,8.1,Tau2011_was_8.1
 V_den_c_soma_SN,milliV,5,Tau2011_was_9.85
 V_mid_m_Kv2_soma_SN,milliV,6,Tau2011_was_6
@@ -102,7 +102,7 @@ tau_h_min_soma_SN,millis,0.15,user_defined
 tau_h_max_soma_SN,millis,5,user_defined
 tau_h_Na1_6_min_soma_SN,millis,0.15,user_defined
 tau_h_Na1_6_max_soma_SN,millis,300,user_defined
-tau_h_Kv4_2_soma_SN,millis,7.0,was_approx_7
+tau_h_Kv4_2_soma_SN,millis,7.0,"Bekkers2000; Fig. 8Ab, Table 1: I_A decay tau = 0.01 V + 6.7 ms (6.2-7.4 ms over -37 to +73 mV, 22-25 degC); at 37 degC in rat SCG the decay tau is 6.0-9.9 ms over 0 to -50 mV (BelluzziSacchiWanke1985a, p. 96); 7.0 ms = value. **Voltage dependence ignored: recovery from inactivation near rest is much slower (Bekkers Fig. 5A ~40-45 ms at -77 to -97 mV; BelluzziSacchiWanke1985a 42.3 ms at -70 mV, 37 degC) and is not represented by a constant tau_h**"
 tau_z_BK_soma_SN,millis,1,Khaliq2003 (was 5; set to the source value on review 2026-10-02)
 tau_m_SK_soma_SN,millis,5,gupta2016Computational
 tau_w_min_soma_SN,millis,30,gupta2016Computational
@@ -170,7 +170,7 @@ k_A_ER_soma_SN,dimensionless,3.141592653589793,"definitional; ER area shape fact
 k_V_ER_soma_SN,dimensionless,0.5235987755982988,"definitional; ER volume shape factor of a sphere, pi/6"
 k_A_ER_pre_soma_SN,dimensionless,3.141592653589793,"definitional; pre-ER area shape factor A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3), V_ER_pre = c_ER_pre Vol; a sphere (pi)"
 k_V_ER_pre_soma_SN,dimensionless,0.5235987755982988,"definitional; pre-ER volume shape factor of a sphere, pi/6"
-d_shell_soma_SN,um,0.1,"Khaliq2003; ModelDB 48332 cadiff.mod: shell depth 0.1 um; V_shell = A_mem d_shell. Replaces c_SL = 0.02 (review 2026-10-05)"
+d_shell_soma_SN,um,0.1,Khaliq2003; ModelDB 48332 cadiff.mod: shell depth 0.1 um; V_shell = A_mem d_shell. Replaces c_SL = 0.02 (review 2026-10-05)
 rho_IP3R_soma_SN,per_um2,0.0,definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0 m3_per_s (user_defined_was_0.03e-15) with A = 86.01 um^2 (the soma ER membrane area) and k_IP3R_single = 0.8637 um3_per_s; a density for calibration through k_IP3R_single
 k_IP3R_single_soma_SN,um3_per_s,0.8636921110362579,unreferenced_placeholder; per-receptor flux coefficient i/(2 F dCa) for a ~0.1 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 0.864 um^3/s
 rho_leak_Ca_soma_SN,per_um2,4.0303643922268835,definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca = 1e-17 m3_per_s (user_defined) with A = 248.1 um^2 (the soma pre-ER membrane area) and k_leak_Ca_single = 0.01 um3_per_s; a density for calibration through k_leak_Ca_single
@@ -235,7 +235,7 @@ tau_c_RyR_var_SN,millis,0.01,user_defined
 tau_hc_RyR_var_SN,millis,10,user_defined
 #,#,#,#
 tau_Ca_soma_SN_OLD,millis,2.0,Tomek2020Development_was_0.2
-tau_shell_soma_SN,millis,1.0,"Khaliq2003; ModelDB 48332 cadiff.mod: beta = 1 /ms; j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk). Replaces D_Ca = 6e-12 m3/s (review 2026-10-05)"
+tau_shell_soma_SN,millis,1.0,Khaliq2003; ModelDB 48332 cadiff.mod: beta = 1 /ms; j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk). Replaces D_Ca = 6e-12 m3/s (review 2026-10-05)
 D_Ca_var_SN,m3_per_s,3e-15,identified_by_hand
 tau_Ca_ER_soma_SN_OLD,millis,600.0,Tomek2020Development_was_60
 D_Ca_ER_soma_SN,m3_per_s,4.8e-15,need_to_change_for_volume
