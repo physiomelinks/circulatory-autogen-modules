@@ -446,9 +446,218 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
         f.write('\n')
 
 
+
+# ----------------------------------------------------------------------------------------------
+# calibrate apply: copy an instance's calibrated values to every place that uses the version
+# ----------------------------------------------------------------------------------------------
+#
+#     python -m cam_testing.calibrate apply <module_type>/<version> <instance> [--dry-run]
+#
+# The calibrated parameters (those in <instance>_params_for_id.csv, with their values from
+# <instance>_calibrated_parameters.csv) are written to:
+#   1. the version's default instance (row <var>);
+#   2. every supermodule version using the version's default instance as a submodule, recursively
+#      (row <var>_<submodule path>, outer first: soma/sympathetic rho_M_i_M, a neuron using that
+#      soma as "soma" rho_M_soma_i_M), where the row exists;
+#   3. every system model whose vessel array uses the version, or a supermodule chain over it, at
+#      its default instance (row <var>_<vessel> or <var>_<vessel>_<submodule path>), where the row exists;
+#   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
+#      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
+#      to the vessel of `reproduces` ("soma_SN/w": "SN_soma_i_M/w" -> soma_SN), giving row
+#      <var>_<that vessel> in that system model and row <var> in that vessel's version's default instance.
+# Each rewritten reference reads "Calibrated (libcuflynx) to instances/<instance>/<instance>_obs_data.json:
+# <note>" (with the version named when it is written elsewhere), and keeps the old value. <note> is the
+# obs_data's "calibration_note" (else its obs_data_name); an obs_data "reference_key" (a BibTeX key of
+# the version) prefixes the reference and marks the row sourced.
+
+
+def _system_models(root=None):
+    """[{key, dir, vessels, parameters_path}] of every system model under ``root``."""
+    from cam_testing.library import SYSTEM_MODELS_DIR
+    root = root or SYSTEM_MODELS_DIR
+    out = []
+    for d, _dirs, files in os.walk(root):
+        for f in files:
+            if f.endswith('_vessel_array.json'):
+                name = f[:-len('_vessel_array.json')]
+                with open(os.path.join(d, f)) as fh:
+                    vessels = json.load(fh)
+                out.append({'key': os.path.relpath(d, root).replace(os.sep, '/'), 'dir': d, 'vessels': vessels,
+                            'parameters_path': os.path.join(d, f'{name}_parameters.csv')})
+    return sorted(out, key=lambda m: m['key'])
+
+
+def _csv_rows(path):
+    """(lines without their line endings, line ending, header) of a parameters CSV."""
+    with open(path, newline='') as f:
+        raw = f.read()
+    eol = '\r\n' if '\r\n' in raw else '\n'
+    lines = raw.split(eol)
+    return lines, eol, next(csv.reader([lines[0]]))
+
+
+def _row_values(path, names):
+    """{row name: {column: value}} of the rows of ``path`` named in ``names``."""
+    if not os.path.isfile(path):
+        return {}
+    lines, _eol, header = _csv_rows(path)
+    out = {}
+    for ln in lines[1:]:
+        if not ln.strip():
+            continue
+        row = dict(zip(header, next(csv.reader([ln]))))
+        if row.get('variable_name') in names:
+            out[row['variable_name']] = row
+    return out
+
+
+def apply_plan(version, instance_name, versions=None, systems=None):
+    """The changes ``apply`` would make: [{path, row, variable, value, old, reference, sourced}].
+    ``versions`` (default: the library) and ``systems`` (default: _system_models()) are what is
+    searched for users of the version."""
+    from cam_testing.library import all_versions, read_parameters
+    inst = version.instance(instance_name)
+    names = [p['param_name'] for p in read_params_for_id(inst.params_for_id_path)]
+    if not os.path.isfile(inst.calibrated_parameters_path):
+        raise FileNotFoundError(f'{inst.calibrated_parameters_path}: run the calibration first')
+    calibrated = {p.variable_name: p.value for p in read_parameters(inst.calibrated_parameters_path)
+                  if p.variable_name in names}
+    if os.path.isfile(inst.calibration_path):
+        # full precision from the summary (the CSV keeps 10 significant figures)
+        with open(inst.calibration_path) as f:
+            full = (json.load(f).get('calibrated_parameters') or {})
+        calibrated.update({k: repr(float(v)) for k, v in full.items() if k in names and not isinstance(v, list)})
+    missing = [n for n in names if n not in calibrated]
+    if missing:
+        raise KeyError(f'{inst.calibrated_parameters_path} has no row for {missing}')
+    with open(inst.obs_data_path) as f:
+        obs = json.load(f)
+    note = obs.get('calibration_note') or obs.get('obs_data_name') or instance_name
+    key = obs.get('reference_key')
+    versions = all_versions() if versions is None else versions
+    systems = _system_models() if systems is None else systems
+    by_key = {v.key: v for v in versions}
+    by_key.setdefault(version.key, version)
+
+    def default_of(mt, sub):
+        v = by_key.get(f'{mt}/{sub}')
+        return v.default_instance_name if v is not None else 'default'
+
+    # (version, submodule path) of every supermodule chain over the version's default instance
+    chain, todo = [], [(version.mtype.name, version.name, '')]
+    while todo:
+        mt, vname, sfx = todo.pop(0)
+        for S in versions:
+            if not S.is_supermodule:
+                continue
+            for sub in S.submodules:
+                if (sub.get('module_type'), sub.get('module_subtype')) != (mt, vname):
+                    continue
+                if (sub.get('instance') or 'default') != default_of(mt, vname):
+                    continue
+                path = sub['name'] + ('_' + sfx if sfx else '')
+                if all((c[0].key, c[1]) != (S.key, path) for c in chain):
+                    chain.append((S, path))
+                    todo.append((S.mtype.name, S.name, path))
+
+    targets = []          # (csv path, suffix, where, own)
+    targets.append((version.default_instance.parameters_path, '', f'{version.key} default instance', True))
+    for S, path in chain:
+        targets.append((S.default_instance.parameters_path, '_' + path, f'{S.key} default instance', False))
+    flattened = {}        # system key -> [flattened vessel names]
+    systems_by_key = {m['key']: m for m in systems}
+    chain_by_key = {}
+    for S, path in chain:
+        chain_by_key.setdefault(S.key, []).append(path)
+    for m in systems:
+        for ves in m['vessels']:
+            vk = f"{ves.get('module_type')}/{ves.get('module_subtype')}"
+            inst_name = ves.get('instance') or 'default'
+            if inst_name != default_of(ves.get('module_type'), ves.get('module_subtype')):
+                continue
+            if vk == version.key:
+                flattened.setdefault(m['key'], []).append(ves['name'])
+            for path in chain_by_key.get(vk, []):
+                flattened.setdefault(m['key'], []).append(f"{ves['name']}_{path}")
+    for mkey, fl in flattened.items():
+        for F in fl:
+            targets.append((systems_by_key[mkey]['parameters_path'], '_' + F, f'system model {mkey}', False))
+    # monolithic counterparts, through supermodule.equivalent output maps
+    for S in versions:
+        for e in ((S.spec.get('supermodule') or {}).get('equivalent') or []):
+            rep = systems_by_key.get(e.get('reproduces'))
+            if rep is None:
+                continue
+            omap = e.get('output_map') or {}
+            for F in flattened.get(e.get('model'), []):
+                mono = sorted({a.split('/', 1)[0] for a, b in omap.items() if b.split('/', 1)[0] == F})
+                if len(mono) != 1:
+                    continue
+                targets.append((rep['parameters_path'], '_' + mono[0], f"system model {rep['key']}", False))
+                ves = next((x for x in rep['vessels'] if x['name'] == mono[0]), None)
+                mv = by_key.get(f"{ves.get('module_type')}/{ves.get('module_subtype')}") if ves else None
+                if mv is not None:
+                    targets.append((mv.default_instance.parameters_path, '', f'{mv.key} default instance', False))
+
+    import datetime
+    today = datetime.date.today().isoformat()
+    obs_rel = f'instances/{instance_name}/{instance_name}_obs_data.json'
+    plan, seen = [], set()
+    for path, sfx, where, own in targets:
+        rows = _row_values(path, {n + sfx for n in names})
+        for n in names:
+            row = rows.get(n + sfx)
+            if row is None or (path, n + sfx) in seen:
+                continue
+            seen.add((path, n + sfx))
+            to = obs_rel if own else f'{version.mtype.name} {version.name} {obs_rel}'
+            ref = (f'{key}; ' if key else '') + f'Calibrated (libcuflynx) to {to}: {note} (was {row.get("value")}; applied {today})'
+            plan.append({'path': path, 'where': where, 'row': n + sfx, 'variable': n, 'value': calibrated[n],
+                         'old': row.get('value'), 'reference': ref, 'sourced': 'yes' if key else None})
+    return plan
+
+
+def write_plan(plan):
+    """Rewrites the rows of ``plan`` in place, keeping each file's columns and line endings."""
+    by_path = {}
+    for c in plan:
+        by_path.setdefault(c['path'], {})[c['row']] = c
+    for path, changes in by_path.items():
+        lines, eol, header = _csv_rows(path)
+        for k, ln in enumerate(lines[1:], start=1):
+            if not ln.strip():
+                continue
+            row = next(csv.reader([ln]))
+            c = changes.get(row[0])
+            if c is None:
+                continue
+            d = dict(zip(header, row))
+            d['value'] = c['value']
+            d['data_reference'] = c['reference']
+            if c['sourced'] and 'sourced' in d:
+                d['sourced'] = c['sourced']
+            b = io.StringIO()
+            csv.writer(b, lineterminator='').writerow([d.get(h, '') for h in header])
+            lines[k] = b.getvalue()
+        with open(path, 'w', newline='') as f:
+            f.write(eol.join(lines))
+
+
+def apply_command(version_key, instance_name, dry_run=False, versions=None, systems=None, out=print):
+    from cam_testing.library import REPO_ROOT, version_by_key
+    version = version_by_key(version_key)
+    plan = apply_plan(version, instance_name, versions=versions, systems=systems)
+    for c in plan:
+        rel = os.path.relpath(c['path'], REPO_ROOT)
+        out(f"{'would set' if dry_run else 'set'} {rel}: {c['row']} {c['old']} -> {c['value']}")
+    if not dry_run:
+        write_plan(plan)
+    out(f'{len(plan)} row(s){" (dry run: nothing written)" if dry_run else ""}')
+    return plan
+
 def main(argv=None):
     import argparse
-    parser = argparse.ArgumentParser(description='Make libcuflynx obs_data from tabular data')
+    parser = argparse.ArgumentParser(description='Make libcuflynx obs_data from tabular data; apply calibrations')
     sub = parser.add_subparsers(dest='cmd', required=True)
     fc = sub.add_parser('from-csv')
     fc.add_argument('--csv', required=True)
@@ -464,7 +673,15 @@ def main(argv=None):
                     help='scalar features of each held-out series added as prediction_items '
                          f'(default {" ".join(FEATURE_OPERATIONS)}; none: --validation-features)')
     fc.add_argument('--out', required=True)
+    ap = sub.add_parser('apply', help="copy an instance's calibrated values into the version's default "
+                                      'instance, its supermodules, monolithic counterparts and system models')
+    ap.add_argument('version', help='<module_type>/<version>')
+    ap.add_argument('instance')
+    ap.add_argument('--dry-run', action='store_true', help='print the changes without writing them')
     args = parser.parse_args(argv)
+    if args.cmd == 'apply':
+        apply_command(args.version, args.instance, dry_run=args.dry_run)
+        return
     spec = {'data': os.path.abspath(args.csv), 'time_column': args.time_column, 'time_offset': args.time_offset,
             'variables': dict(x.split('=', 1) for x in args.variables)}
     t, data = load_data('/', spec)

@@ -25,12 +25,15 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   changes. The default, the soma supermodule, the monolithic soma and SN_simple(_flat) use that value. To redo it: edit instances/davis2020_wistar/davis2020_wistar_obs_data.json
   (value, std, Cm, protocol) or _params_for_id.csv and run venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01
   -k ''calibrate and davis2020_wistar'' --include-unreviewed, which rewrites davis2020_wistar_calibrated_parameters.csv and
-  _calibration.json; then copy the calibrated rho_M into the default and the supermodule/system rows. tau_w refit (2026-10-05,
-  not applied): instance davis2020_wistar_kinetics calibrates tau_w_num and tau_w_min with libcuflynx to the digitised Davis2020
-  Fig. 3C Wistar trace (n = 1, raw current; relaxation taus ~74 ms at -55 mV and ~160 ms back at -25 mV; tools/i_M_davis2020_kinetics.py).
-  With the shape fixed no values fit both phases; the fit gives tau_w_num ~0, tau_w_min 105 ms (a nearly flat tau_w; the present
-  one is 466 ms at -55 mV). The defaults are unchanged pending the owner''s decision: reviews/i_M_Argus2026_v01_tau_w_refit.html
-  compares them.'
+  _calibration.json; then venv/bin/python -m cam_testing.calibrate apply i_M/Argus2026_v01 davis2020_wistar (--dry-run first),
+  which copies rho_M into the default, soma sympathetic, the monolithic soma and SN_simple(_flat). Provenance page: reviews/i_M_Argus2026_v01_g_M_fit.html
+  (tools/i_M_davis2020_kinetics.py gm-report). tau_w refit (2026-10-05, not applied): instance davis2020_wistar_kinetics calibrates
+  tau_w_num and tau_w_min with libcuflynx to the digitised Davis2020 Fig. 3C Wistar trace (n = 1, raw current; relaxation
+  taus ~74 ms at -55 mV and ~160 ms back at -25 mV; tools/i_M_davis2020_kinetics.py). With the shape fixed no values fit both
+  phases; the fit gives tau_w_num ~0, tau_w_min 105 ms (a nearly flat tau_w; the present one is 466 ms at -55 mV). The defaults
+  are unchanged pending the owner''s decision: reviews/i_M_Argus2026_v01_tau_w_refit.html compares them; to adopt them run
+  venv/bin/python -m cam_testing.calibrate apply i_M/Argus2026_v01 davis2020_wistar_kinetics, then recalibrate and apply davis2020_wistar
+  (g_M depends on tau_w).'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

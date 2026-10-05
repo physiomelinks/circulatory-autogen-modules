@@ -1,5 +1,7 @@
 {
  "obs_data_name": "davis2020_wistar_kinetics",
+ "reference_key": "Davis2020",
+ "calibration_note": "Davis2020 Fig. 3C representative Wistar deactivation trace (n = 1, raw current), digitised; relaxations at -55 mV and back at -25 mV mapped onto w (tools/i_M_davis2020_kinetics.py)",
  "comment": "Davis et al. 2020 (Hypertension 76:1915) Fig. 3C, the representative Wistar M-current deactivation trace (perforated patch, room temperature; raw current, not XE-991-subtracted; n = 1): held at -25 mV, 1 s step to -55 mV (Davis2021Thesis p. 172), back to -25 mV. Digitised and normalised by tools/i_M_davis2020_kinetics.py (see its docstring): each slow relaxation is mapped onto the gate w with the module's fixed w_inf, so the data constrain tau_w only. Protocol: the channel module alone, V clamped: sub-experiment 0 holds -25 mV for 10 s (steady state), 1 steps to -55 mV for 1 s, 2 returns to -25 mV for 0.5 s (the trace ends ~0.5 s after the return). To redo: edit this file (or re-digitise with the tool) and run venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k 'calibrate and davis2020_wistar_kinetics' --include-unreviewed",
  "protocol_info": {
   "pre_times": [

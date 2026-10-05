@@ -226,6 +226,29 @@ An instance is **a parameter set of a version: only the parameters change, never
 - **Data instances.** They currently hold the version's default values, plus their data, e.g.
   `benchmarks/Lotka_Volterra/versions/nn/instances/hudson_bay_lynx_hare/`. Calibration writes
   `<instance>_calibrated_parameters.csv` and `<instance>_calibration.json` beside them.
+- **Recalibrating, and applying a calibration.** A calibration to data is always a libcuflynx run on
+  a committed obs_data, never a hand calculation, so anyone can change the data and redo it:
+  1. edit `<instance>_obs_data.json` (values, std, protocol) or `<instance>_params_for_id.csv`;
+  2. run the instance's calibration test,
+     `pytest tests/test_modules.py --component <module_type>/<version> -k 'calibrate and <instance>' --include-unreviewed`
+     (it rewrites `<instance>_calibrated_parameters.csv` and `<instance>_calibration.json`);
+  3. to make the calibrated values the defaults, run
+     `python -m cam_testing.calibrate apply <module_type>/<version> <instance>` (`--dry-run` lists the changes first).
+
+  `apply` copies the parameters of `<instance>_params_for_id.csv`, at their calibrated values, into:
+  - the version's default instance;
+  - every supermodule version that uses the version's default instance, recursively (row
+    `<var>_<submodule path>`, e.g. soma/sympathetic `rho_M_i_M`);
+  - the system models that use the version or such a supermodule at its default instance (row
+    `<var>_<vessel>[_<submodule path>]`, e.g. `rho_M_SN_soma_i_M`);
+  - the monolithic counterparts named by a supermodule's `supermodule.equivalent` output_map (row
+    `<var>_<vessel>` in the `reproduces` system model, e.g. `rho_M_soma_SN`, and `<var>` in that
+    vessel's version's default instance).
+
+  Only rows that already exist are rewritten. Each reference becomes `Calibrated (libcuflynx) to
+  instances/<instance>/<instance>_obs_data.json: <note> (was <old value>; applied <date>)`. The
+  `<note>` is the obs_data's optional `"calibration_note"`; an optional `"reference_key"` (a BibTeX key)
+  prefixes the reference and marks the row sourced.
 
 ### Source figures
 
