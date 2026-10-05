@@ -124,11 +124,13 @@
             <dl class="kv">{% for k, v in t.metrics.items() %}<dt>{{ k }}</dt><dd>{{ v|fmt }}</dd>{% endfor %}</dl>
             {%- endif %}
 
-            {%- if t.plots %}
+            {%- if t.plots or t.source_figures %}
             <div class="plots">
+              {%- for sf in t.source_figures or [] %}<figure class="source-figure"><img src="{{ sf.file }}" alt="source: {{ sf.caption or sf.source }}" loading="lazy"><figcaption><strong>Source</strong> ({{ sf.source|emph }}){% if sf.caption %}: {{ sf.caption|emph }}{% endif %}</figcaption></figure>{% endfor %}
               {%- for p in t.plots %}<figure><img src="{{ p }}" alt="{{ t.title }} plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}
             </div>
             {%- endif %}
+            {%- if t.source_figures_missing %}<p class="muted" style="font-size:0.84rem"><strong>No source screenshot.</strong> This instance's data were extracted from a publication; add the figure or table to <code>source_figures/</code> (modules/README.md, "Source figures").</p>{% endif %}
             {%- if t.details %}
             <details><summary>{{ t.details|length }} detail{{ '' if t.details|length == 1 else 's' }}</summary><pre>{{ t.details|join('\n') }}</pre></details>
             {%- endif %}
@@ -179,6 +181,8 @@ section.component { display: grid; gap: 22px; padding-top: 28px; border-top: 2px
 .plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 12px; }
 .plots figure { margin: 0; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
 .plots img { display: block; width: 100%; height: auto; }
+.plots figcaption { font-size: 0.8rem; margin-top: 4px; color: var(--muted, inherit); }
+.source-figure { outline: 2px solid var(--rule); }
 details { font-size: 0.85rem; }
 details summary { cursor: pointer; color: var(--ink-2); }
 details pre { white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.78rem; background: var(--paper); padding: 10px; border-radius: 6px; overflow-x: auto; }

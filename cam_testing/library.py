@@ -47,6 +47,8 @@ SYSTEM_MODELS_DIR = os.path.join(REPO_ROOT, 'system_models')
 REVIEWS_DIR = os.path.join(REPO_ROOT, 'reviews')
 
 VERSIONS, INSTANCES, DEFAULT_INSTANCE = 'versions', 'instances', 'default'
+SOURCE_FIGURES = 'source_figures'              # instance dir: screenshots of the data's publication figures
+SOURCE_FIGURES_INDEX = 'source_figures.json'
 # directories under modules/ that are not categories or module_types (another session's work in
 # the old layout, until it is moved)
 UNMIGRATED = ('poiseuille_transport', 'system')
@@ -387,10 +389,10 @@ NESTED_ORDER = {
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
                   'tol'),
     'supermodule': ('globals', 'equivalent'),
-    'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
+    'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
                  'threshold'),
-    'calibrate': ('status', 'reason', 'note', 'source', 'obs_data', 'params_for_id',
+    'calibrate': ('status', 'reason', 'note', 'source', 'source_kind', 'obs_data', 'params_for_id',
                   'prediction_window', 'initial_parameters', 'starts', 'expected_parameters', 'expected_compare',
                   'expected_rtol', 'z_threshold', 'method', 'optimiser_options', 'do_ad', 'metric', 'threshold'),
 }
@@ -618,6 +620,29 @@ class Instance:
         '''This instance's validation spec: {baseline: {...}, calibrate: {...}}.'''
         return ((self.version.spec.get('validation') or {}).get(self.name)) or {}
 
+    @property
+    def source_figures_dir(self):
+        return os.path.join(self.dir, SOURCE_FIGURES)
+
+    def source_figures(self):
+        '''Screenshots of the publication figures/tables the instance's data were extracted from:
+        source_figures/source_figures.json lists [{"file", "source", "caption"}], file relative to
+        source_figures/. Returned with file relative to the version directory.'''
+        index = os.path.join(self.source_figures_dir, SOURCE_FIGURES_INDEX)
+        if not os.path.isfile(index):
+            return []
+        with open(index) as f:
+            entries = json.load(f)
+        return [dict(e, file=os.path.relpath(os.path.join(self.source_figures_dir, e['file']), self.version.dir))
+                for e in entries]
+
+    def needs_source_figures(self):
+        '''True when the instance's validation data were extracted from a publication (a paper or a
+        book): a validation entry with a source and source_kind "publication" (the default when a
+        source is given; "dataset" and "synthetic" are exempt).'''
+        return any(isinstance(e, dict) and e.get('source') and e.get('source_kind', 'publication') == 'publication'
+                   for e in self.validation.values())
+
     def parameters(self):
         '''The instance's own rows, then the version's globals, TODO values filled from review proposals.'''
         return self.version._apply_proposals(read_parameters(self.parameters_path, self.version.kinds))
@@ -631,7 +656,8 @@ class Instance:
         if not os.path.isdir(self.dir):
             return []
         return sorted(f for f in os.listdir(self.dir)
-                      if f != os.path.basename(self.parameters_path) and not f.endswith('.omex'))   # .omex: generated
+                      if f != os.path.basename(self.parameters_path) and not f.endswith('.omex')
+                      and f != SOURCE_FIGURES)   # .omex: generated
 
 
 @dataclass

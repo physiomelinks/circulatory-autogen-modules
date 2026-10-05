@@ -197,6 +197,9 @@ def instance_context(version, inst):
             entry['short'] = 'Fit check'
             entry['about'] = v.get('note') or FIT_CHECK_ABOUT
         entry['anchor'] = f'{inst.name}--{test}'
+        # the publication figures the data were extracted from, shown beside the test's plots
+        entry['source_figures'] = inst.source_figures()
+        entry['source_figures_missing'] = inst.needs_source_figures() and not entry['source_figures']
         tests.append(entry)
     calibration = None
     if os.path.isfile(inst.calibration_path):

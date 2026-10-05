@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from cam_testing import bib
+from cam_testing import bib, library
 from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, MODULES_DIR, REPO_ROOT, SYSTEM_MODELS_DIR,
                                  TESTS_KEYS, VERIFICATION_KEYS, VERSIONS, all_versions, ancestors_of, load_version,
                                  misplaced_spec_keys, module_relpath, module_type_names, parent_of, read_spec_files)
@@ -614,3 +614,39 @@ def test_no_csv_vessel_arrays_left():
 
 def test_module_type_names_listed():
     assert module_type_names(), 'no module_types found under modules/'
+
+
+# Instances whose data were extracted from a publication but have no source screenshot yet.
+# Remove an entry when its instances/<i>/source_figures/ is added; never add new ones.
+MISSING_SOURCE_FIGURES = {
+    'capillary/pp_micro::default', 'heart/vp::default', 'heart/vp_Ca::default',
+    'heart/vp_new_valve::default', 'heart/vp_wCont::default', 'heart/vp_wCont_nonstiff::default',
+    'inlet_flow/nn_adan::boileau2015_adan56_inflow', 'inlet_flow/nn_adan_2::boileau2015_adan56_inflow',
+    'inlet_flow/nn_aorticbif::boileau2015_ibif_inflow', 'Lotka_Volterra/nn::carpenter2018',
+    'Lotka_Volterra/nn::hudson_bay_lynx_hare', 'pulmonary_GE/nn::pulmonary_GE_normal_blood_gases',
+}
+
+
+def _publication_instances():
+    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.instances() if i.needs_source_figures()]
+
+
+@pytest.mark.parametrize('key,inst', _publication_instances(), ids=lambda x: x if isinstance(x, str) else '')
+def test_publication_data_has_source_figures(key, inst):
+    '''Validation or calibration data extracted from a paper or book carries a screenshot of the
+    figure/table it came from (instances/<i>/source_figures/, listed in source_figures.json), shown
+    in the report beside the validation plots (modules/README.md, "Source figures").'''
+    if key in MISSING_SOURCE_FIGURES:
+        pytest.xfail('source screenshot not added yet')
+    figures = inst.source_figures()
+    assert figures, f'{key}: data from a publication but no {library.SOURCE_FIGURES}/{library.SOURCE_FIGURES_INDEX}'
+    for f in figures:
+        assert f.get('source') and f.get('file'), f'{key}: each source figure needs "file" and "source"'
+        assert os.path.isfile(os.path.join(inst.version.dir, f['file'])), f'{key}: {f["file"]} missing'
+
+
+def test_missing_source_figures_list_is_current():
+    '''The known-gap list only shrinks: every entry still needs figures and still lacks them.'''
+    have = {k for k, i in _publication_instances() if not i.source_figures()}
+    stale = MISSING_SOURCE_FIGURES - have
+    assert not stale, f'remove from MISSING_SOURCE_FIGURES (now has figures or no longer needs them): {sorted(stale)}'
