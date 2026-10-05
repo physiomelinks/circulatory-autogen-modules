@@ -114,7 +114,7 @@ h_BK_min_i_BK,dimensionless,0.085,Khaliq2003; Table 1: BK h y0 = 0.085 (= value)
 tau_z_BK_i_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 z_BK_coeff_i_BK,millimolar,0.001,Khaliq2003; Methods: z_inf = 1/(1 + 0.001 mM/Ca) (= value),yes
 Q10_BK_i_BK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
-T_ref_BK_i_BK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T_ref_BK_i_BK,kelvin,295.15,"Khaliq2003; Methods: BK (iberiotoxin-sensitive K(Ca)) currents recorded in this study in mouse Purkinje neurons at room temperature, not stated numerically; 22 degC = the lower end of the paper's 22-34 degC warming series. ModelDB 48332 bkpkj.mod has no temperature factor, so the kinetics are room-temperature as fitted",yes
 Ca_mid_m_SK_i_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
 Cai_init_i_SK,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
 rho_SK_i_SK,per_um2,0.16181229773462782,definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_SK = 10.3 picoS; a density for calibration through gamma_SK,no

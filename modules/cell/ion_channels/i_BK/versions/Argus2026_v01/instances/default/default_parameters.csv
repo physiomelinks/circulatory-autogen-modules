@@ -15,5 +15,5 @@ tau_z_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpk
 z_BK_coeff,millimolar,0.001,Khaliq2003; Methods: z_inf = 1/(1 + 0.001 mM/Ca) (= value),yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
 Q10_BK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
-T_ref_BK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T_ref_BK,kelvin,295.15,"Khaliq2003; Methods: BK (iberiotoxin-sensitive K(Ca)) currents recorded in this study in mouse Purkinje neurons at room temperature, not stated numerically; 22 degC = the lower end of the paper's 22-34 degC warming series. ModelDB 48332 bkpkj.mod has no temperature factor, so the kinetics are room-temperature as fitted",yes
 T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
