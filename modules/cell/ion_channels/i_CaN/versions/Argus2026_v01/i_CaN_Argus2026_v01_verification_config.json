@@ -7,6 +7,7 @@
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
   "outputs": ["c", "hc", "V_den_hc", "V_mid_hc", "c_inf", "hc_inf", "i_Ca_N", "j_Ca_N", "tau_c"],
+  "run_parameters": {"V": 10.0},
   "invariants": [
     {
       "description": "the ion flux j_Ca_N = -i_Ca_N/(2*F) (mol/s; the current in nA, so the factor 1e-9)",
@@ -15,6 +16,16 @@
     {
       "description": "every gating variable stays in [0, 1]",
       "expr": "np.all((c >= -1e-9) & (c <= 1 + 1e-9)) & np.all((hc >= -1e-9) & (hc <= 1 + 1e-9))"
+    },
+    {
+      "description": "voltage step (V clamped at the run value, gates starting at c_init, hc_init): c follows its exact clamp solution, tau = |tau_c(V)|/1000/phi + epsilon_tau",
+      "expr": "np.max(np.abs(c - ((1/(1 + np.exp(-(V + V_mid_c)/V_den_c))) + (c_init - (1/(1 + np.exp(-(V + V_mid_c)/V_den_c))))*np.exp(-t/(np.abs(tau_c_min + (tau_c_max - tau_c_min)/(1 + np.exp((V_mid_c - 20 + V)/V_den_c)))/1000/(Q10_CaN**((T - T_ref_CaN)/10)) + 1e-6))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "hc follows its exact clamp solution (V_mid_hc = V_mid_c + 11, V_den_hc = V_den_c, tau_hc constant)",
+      "expr": "np.max(np.abs(hc - ((1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))) + (hc_init - (1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))))*np.exp(-t/(np.abs(tau_hc)/1000/(Q10_CaN**((T - T_ref_CaN)/10)) + 1e-6))))) <= 1e-6",
+      "applies": "run"
     }
   ],
   "bc_sweep": {

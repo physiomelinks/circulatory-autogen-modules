@@ -1,70 +1,23 @@
 module_type: i_CaN
 version: Argus2026_v01
-reviewed: false
+reviewed: true
+description: 'N-type (CaV2.2) Ca current of the sympathetic-neuron varicosity: ohmic i_Ca_N = g c^2 hc (V - E_Ca), g = A rho
+  gamma (Fox 1987); gating as i_CaL''s (Belluzzi & Sacchi 1989 curves as modified); its Ca flux goes to the varicosity''s
+  Ca balance and NE release.'
 notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
-  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. N-type Ca current of
-  the SN varicosity, i_Ca_N = g_CaN (V - E_Ca) c^2 hc (the soma''s L-type gating with a linear driving force), with its Ca
-  flux j_Ca_N = -i_Ca_N/(2F). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off
-  script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
-  Geometry re-parameterisation (2026-10-02): the maximal conductance is g_CaN = A_mem rho_CaN gamma_CaN (membrane area x channel
-  density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce
-  the previous g_CaN. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the
-  Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K)
-  (Q10_CaN, T_ref_CaN). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
-  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T.'
-reference_proposals:
-  E_Ca:
-    reference: definitional; Nernst potential RT/(2F) ln(Cao/Cai) at Cao 2 mM, Cai 1e-4 mM = 132.34 mV (used when unconnected).
-      The old value 264.67 mV omits the valence z = 2, as does the E_Ca equation in SN_Ca_handling_varicosity / the monolithic
-      varicosity CellML
-    sourced: 'no'
-    value: 132.33666
-  V:
-    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
-    sourced: 'no'
-    value: -70.0
-  V_den_c:
-    reference: Tao2011; Supporting Material (Document S1) Eq. 91 (k = 9.85 mV); modified here to 5 mV (was 9.85)
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  V_mid_c:
-    reference: 'Tao2011; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao''s Ca current is a
-      nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type'
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  c_init:
-    reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);
-      c_inf(-70 mV) is about 4e-6 with V_mid_c 8.1, V_den_c 5
-    sourced: 'no'
-  hc_init:
-    reference: unreferenced_placeholder; initial hc gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong)
-    sourced: 'no'
-  tau_c_max:
-    reference: unreferenced_placeholder; owner's modification of Tao2011 Eq. 92, whose tau_c spans 0.13-0.56 ms; 3 ms is about
-      5x the source maximum (CA token changed_from_belluzi1991_curves)
-    sourced: 'no'
-    also_cites:
-    - Tao2011
-  tau_c_min:
-    reference: unreferenced_placeholder; owner's modification of Tao2011 Eq. 92, whose tau_c spans 0.13-0.56 ms (CA token
-      changed_from_belluzi1991_curves)
-    sourced: 'no'
-    also_cites:
-    - Tao2011
-  tau_hc:
-    reference: 'Tao2011; Supporting Material (Document S1) Eq. 94: tau_hc = 1/(0.242 e^{0.145V} + 0.0434 e^{-0.0201V}) + 17
-      ms, range 17.0-29.9 ms; 20 ms is a constant within that range'
-    sourced: 'yes'
-    also_cites:
-    - BelluzziSacchi1991
-  rho_CaN:
-    reference: 'definitional; chosen so that g_CaN = A rho gamma_CaN (1e-6 uS/pS) reproduces the previous g_CaN = 1e-05 microS
-      (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and gamma_CaN = 13 picoS; a density for calibration
-      through gamma_CaN. The previous g_CaN (as proposed in review): unreferenced_placeholder; owner''s hand-set value in
-      the SN_simple model (CA token ''to_be_identified'')'
-    sourced: 'no'
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. N-type Ca current of the SN varicosity, i_Ca_N = g_CaN (V - E_Ca) c^2 hc (the soma''s L-type gating
+  with a linear driving force), with its Ca flux j_Ca_N = -i_Ca_N/(2F). Split out of the monolithic SN_soma / SN_varicosity
+  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
+  that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_CaN
+  = A_mem rho_CaN gamma_CaN (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane
+  through membrane_area; the defaults reproduce the previous g_CaN. Temperature (review 2026-10-05): the model is at room
+  temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; every gating time constant
+  is divided by phi = Q10^((T - T_ref)/10 K) (Q10_CaN, T_ref_CaN). T_ref defaults to 295.15 K, so phi = 1 and the kinetics
+  are unchanged; setting T_ref to the source''s recording temperature (on review) scales them, and the model can be run at
+  37 degC by changing T. Reviewed 2026-10-06: kinetics shared with i_CaL (Belluzzi & Sacchi 1989 measured the mixed N- and
+  L-type I_Ca of rat SCG); V_mid_hc = V_mid_c + 11 = 19.1 mV (BelluzziSacchi1989 Eq. 5: hc_inf V1/2 -19.91 mV, k 4.50 mV;
+  the slope here is V_den_c = 5 mV). The 2024 note "fit to data from Huang1998" is being traced.'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

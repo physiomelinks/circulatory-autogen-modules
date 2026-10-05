@@ -30,15 +30,15 @@ rho_leak_Ca_Ca,per_um2,3.0885062497465667,definitional; chosen so that k_leak_Ca
 k_leak_Ca_single_Ca,um3_per_s,0.01,unreferenced_placeholder; per-protein Ca leak coefficient (flux per concentration difference) of an ER leak pathway; 0.01 um^3/s assumed,no
 k_unbind_Ca_Ca,per_s,8e3,Matveev2002,yes
 k_unbind_Ca_ER_Ca,per_s,8e3,Matveev2002_for_k_unbind_Ca,yes
-V_den_c_i_CaN,milliV,5,Tau2011_was_9.85,yes
-V_mid_c_i_CaN,milliV,8.1,Tau2011_was_8.1,yes
+V_den_c_i_CaN,milliV,5,Tao2011; Supporting Material (Document S1) Eq. 91 (k = 9.85 mV); modified here to 5 mV (was 9.85),yes
+V_mid_c_i_CaN,milliV,8.1,"Tao2011; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao's Ca current is a nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type",yes
 c_init_i_CaN,dimensionless,0.01,Tau2011,yes
 rho_CaN_i_CaN,per_um2,0.15906422843574358,definitional; chosen so that g_CaN = A rho gamma_CaN (1e-6 uS/pS) reproduces the previous g_CaN = 1e-05 microS (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and gamma_CaN = 13 picoS; a density for calibration through gamma_CaN,no
 gamma_CaN_i_CaN,picoS,13.0,"Fox1987; N-type Ca channel single-channel conductance 13 pS in 110 mM Ba, chick sensory neurons (Abstract, point 6); lower in physiological Ca",yes
 hc_init_i_CaN,dimensionless,0.9,Tau2011,yes
-tau_c_max_i_CaN,millis,3.0,changed_from_belluzi1991_curves,yes
-tau_c_min_i_CaN,millis,0.2,changed_from_belluzi1991_curves,yes
-tau_hc_i_CaN,millis,20.0,changed_from_belluzi1991_curves,yes
+tau_c_max_i_CaN,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. BelluzziSacchi1989 Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); **3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1)**,no
+tau_c_min_i_CaN,millis,0.2,"BelluzziSacchi1989; Eq. 4 tau_c = 1/(...) + 0.1 ms (= Tao2011 Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",yes
+tau_hc_i_CaN,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
 Q10_CaN_i_CaN,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_CaN_i_CaN,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cao_i_NaCa,millimolar,2,Tau2011,yes
