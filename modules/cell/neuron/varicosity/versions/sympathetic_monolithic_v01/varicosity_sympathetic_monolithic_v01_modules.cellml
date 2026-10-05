@@ -236,12 +236,16 @@ Vol_ER = Vol*c_ER;-->
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_c</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_c</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaN</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -266,12 +270,16 @@ Vol_ER = Vol*c_ER;-->
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_hc</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_hc</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaN</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -552,8 +560,12 @@ Vol_ER = Vol*c_ER;-->
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_hIP3</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_hIP3</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_IP3R</ci>
                     </apply>
                 </apply>
             </apply>
@@ -763,8 +775,12 @@ Vol_ER = Vol*c_ER;-->
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_c_RyR</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_c_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
                     </apply>
                 </apply>
             </apply>
@@ -787,8 +803,12 @@ Vol_ER = Vol*c_ER;-->
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_hc_RyR</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_hc_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
                     </apply>
                 </apply>
             </apply>
@@ -1222,6 +1242,16 @@ Vol_ER = Vol*c_ER;-->
         <variable name="Cai_NE_base" public_interface="in" units="millimolar"/>
         <variable name="k_NE" public_interface="in" units="per_s"/>
         <variable name="k_NET" public_interface="in" units="per_s"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="Q10_CaN" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_CaN" public_interface="in" units="kelvin"/>
+        <variable name="phi_CaN" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_IP3R" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_IP3R" public_interface="in" units="kelvin"/>
+        <variable name="phi_IP3R" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_RyR" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_RyR" public_interface="in" units="kelvin"/>
+        <variable name="phi_RyR" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -1271,6 +1301,59 @@ Vol_ER = Vol*c_ER;-->
             <apply><eq/><ci>k_RyR</ci><apply><times/><ci>A_ER</ci><ci>rho_RyR</ci><ci>k_RyR_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
             <apply><eq/><ci>k_SERCA</ci><apply><divide/><apply><times/><ci>A_ER_pre</ci><ci>rho_SERCA</ci><ci>r_SERCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
             <apply><eq/><ci>k_leak_Ca</ci><apply><times/><ci>A_ER_pre</ci><ci>rho_leak_Ca</ci><ci>k_leak_Ca_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_CaN</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_CaN</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_CaN</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_IP3R</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_IP3R</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_IP3R</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_RyR</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_RyR</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_RyR</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
         </math>
     </component>
 </model>

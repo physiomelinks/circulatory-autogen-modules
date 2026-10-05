@@ -19,6 +19,11 @@
         <variable name="m_Kv2_inf" public_interface="out" units="dimensionless"/>
         <variable name="m_Kv2_init" public_interface="out" units="dimensionless"/>
         <variable name="tau_m_Kv2" public_interface="out" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_Kv2" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_Kv2" public_interface="in" units="kelvin"/>
+        <variable name="phi_Kv2" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -137,12 +142,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m_Kv2</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m_Kv2</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_Kv2</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -181,6 +190,25 @@
         </math>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply><eq/><ci>g_Kv2</ci><apply><times/><ci>A_mem</ci><ci>rho_Kv2</ci><ci>gamma_Kv2</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_Kv2</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_Kv2</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Kv2</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
         </math>
     </component>
 </model>

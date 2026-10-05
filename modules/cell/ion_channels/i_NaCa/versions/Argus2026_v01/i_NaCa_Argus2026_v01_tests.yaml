@@ -8,7 +8,9 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
   that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal current is k_NaCa =
   A_mem rho_NaCa r_NaCa e (membrane area x density x turnover x elementary charge, one net charge per cycle), A_mem from the
-  membrane through membrane_area; the defaults reproduce the previous k_NaCa.'
+  membrane through membrane_area; the defaults reproduce the previous k_NaCa. Temperature (review 2026-10-05): the model is
+  at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to (was 310.15 K); this
+  enters the Nernst/GHK terms.'
 reference_proposals:
   Cai:
     reference: definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. Wanaverbecq2003) used when unconnected

@@ -8,7 +8,10 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
   Geometry re-parameterisation (2026-10-02): the maximal conductance is g_CaN = A_mem rho_CaN gamma_CaN (membrane area x channel
   density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce
-  the previous g_CaN.'
+  the previous g_CaN. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the
+  Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K)
+  (Q10_CaN, T_ref_CaN). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
+  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T.'
 reference_proposals:
   E_Ca:
     reference: definitional; Nernst potential RT/(2F) ln(Cao/Cai) at Cao 2 mM, Cai 1e-4 mM = 132.34 mV (used when unconnected).

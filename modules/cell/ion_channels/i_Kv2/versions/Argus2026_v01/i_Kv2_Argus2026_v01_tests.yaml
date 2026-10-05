@@ -14,7 +14,11 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   of the Belluzzi-Sacchi delayed-rectifier tau_n (CA 837d3aae, 2024-07-21: ''modified from Belucci but fit to the same data''):
   offset 2.31 ms = Tao2011 Document S1 Eq. 97; amplitude 45 ms gives the source peak 24.8 ms (Tao Eq. 97 peak 24.7 ms at -27.5
   mV; BelluzziSacchi1988 tau_n max 25.5 ms at -30 mV, min 1.8 ms at -80/+20 mV, 37 degC, Abstract point 3); the centre is
-  -16 mV, not -30 mV, and the slopes (4 mV) are the owner''s.'
+  -16 mV, not -30 mV, and the slopes (4 mV) are the owner''s. Temperature (review 2026-10-05): the model is at room temperature,
+  T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided
+  by phi = Q10^((T - T_ref)/10 K) (Q10_Kv2, T_ref_Kv2). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged;
+  setting T_ref to the source''s recording temperature (on review) scales them, and the model can be run at 37 degC by changing
+  T.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

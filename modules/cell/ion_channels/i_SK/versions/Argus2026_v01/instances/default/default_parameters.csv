@@ -2,7 +2,7 @@ variable_name,units,value,data_reference,sourced
 Cai,millimolar,0.0001,"definitional; the sub-membrane (shell) Ca at rest, SN_simple Cai_init (used when unconnected; in a soma it comes from the Ca handling through internal_Ca)",no
 Ca_mid_m_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
 Cai_init,millimolar,1e-4,SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
-E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
+E_K,milliV,-96.4979,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected; at 295.15 K)",no
 V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
 A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
 rho_SK,per_um2,0.16181229773462782,definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_SK = 10.3 picoS; a density for calibration through gamma_SK,no
@@ -11,3 +11,6 @@ g_KCa_SK_mod,dimensionless,1.0,SN_simple: to_be_identified,no
 p_SK,dimensionless,4,SN_simple: gupta2016Computational,yes
 tau_m_SK,millis,5,SN_simple: gupta2016Computational,yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_SK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_SK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

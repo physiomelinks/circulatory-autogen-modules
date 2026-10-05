@@ -1,6 +1,6 @@
 variable_name,units,value,data_reference,sourced
 Delta_V_mid_w,milliV,0,SN_simple: for_drug_control,yes
-E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
+E_K,milliV,-96.4979,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected; at 295.15 K)",no
 V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
 V_den_w,milliV,10,SN_simple: Martin2023_was_10,yes
 V_mid_w,milliV,35,SN_simple: Martin2023_was_35,yes
@@ -12,3 +12,6 @@ g_M_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigab
 tau_w_min,millis,30,SN_simple: gupta2016Computational,yes
 tau_w_num,millis,1200,SN_simple: Martin2023Modelling_was_400,yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_M,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_M,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

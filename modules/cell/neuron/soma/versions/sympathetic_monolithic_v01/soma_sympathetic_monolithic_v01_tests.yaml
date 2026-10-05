@@ -12,8 +12,13 @@ notes: 'Owner''s sympathetic stellate-ganglion neuron soma ("SN_simple"): Na (Na
   k_NaK, k_NaCa, k_SERCA, k_leak_Ca, k_IP3, k_RyR). Membrane shell (review 2026-10-05, Khaliq et al. 2003, ModelDB 48332 cadiff.mod):
   the sub-membrane compartment (Cai) is a shell V_shell = A_mem d_shell (d_shell 0.1 um) exchanging with the bulk as j_diffCa
   = -(V_shell/tau_shell)(Cai - Ca_bulk), tau_shell 1 ms (was a fraction c_SL = 0.02 of Vol with exchange D_Ca = 6e-12 m3/s);
-  c_bulk = 1 - V_shell/Vol - c_ER - c_ER_pre; SK reads the shell Ca (Cai, was Ca_bulk), as BK does. Same equations as the modular
-  soma sympathetic.'
+  c_bulk = 1 - V_shell/Vol - c_ER - c_ER_pre; SK reads the shell Ca (Cai, was Ca_bulk), as BK does. Same equations as the
+  modular soma sympathetic. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like
+  the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10
+  K) (Q10_m_Na, Q10_h_Na, T_ref_Na, Q10_m_Na1_6, Q10_h_Na1_6, T_ref_Na1_6, Q10_CaL, T_ref_CaL, Q10_Kv2, T_ref_Kv2, Q10_m_Kv1_5,
+  Q10_h_Kv1_5, T_ref_Kv1_5, Q10_Kv4_2, T_ref_Kv4_2, Q10_BK, T_ref_BK, Q10_SK, T_ref_SK, Q10_M, T_ref_M, Q10_IP3R, T_ref_IP3R,
+  Q10_RyR, T_ref_RyR). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
+  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
@@ -21,7 +26,8 @@ known_issues:
 reference_proposals:
   V_rest_approx:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)'
+      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value
+      was read from)'
     sourced: 'yes'
   h_BK_min:
     reference: 'Khaliq2003; Table 1 and bkpkj.mod: BK h y0 = 0.085 (= value)'

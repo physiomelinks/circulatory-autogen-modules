@@ -16,7 +16,10 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   limit 1e6 F p_Ca (1 + cAMP)(Cai - Cao)/(2e-3) c^2 hc for |V| < 1e-6 mV (added on review 2026-10-05; continuous with the
   GHK branch to 1e-7 relative). The step test clamps at +10 mV. Time constants traced on review (2026-10-05): tau_hc and tau_c_min
   from Belluzzi & Sacchi 1989 (= Tao 2011 Eqs 92, 94); tau_c_max 3 ms is the owner''s fit to the Davis traces (about 5x the
-  source), kept for recalibration.'
+  source), kept for recalibration. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC),
+  like the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10
+  K) (Q10_CaL, T_ref_CaL). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
+  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

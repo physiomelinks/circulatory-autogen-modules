@@ -527,12 +527,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_m_Na</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -557,12 +561,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_h</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_h</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_h_Na</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -829,12 +837,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m_Na1_6</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m_Na1_6</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_m_Na1_6</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -859,12 +871,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_h_Na1_6</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_h_Na1_6</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_h_Na1_6</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -1085,12 +1101,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_c</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_c</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaL</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -1115,12 +1135,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_hc</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_hc</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaL</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -1387,12 +1411,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m_Kv2</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m_Kv2</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_Kv2</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -1608,12 +1636,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m_Kv1_5</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m_Kv1_5</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_m_Kv1_5</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -1638,12 +1670,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_h_Kv1_5</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_h_Kv1_5</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_h_Kv1_5</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -1887,12 +1923,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m_Kv4_2</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m_Kv4_2</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_Kv4_2</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -1917,12 +1957,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_h_Kv4_2</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_h_Kv4_2</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_Kv4_2</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -2249,12 +2293,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m_BK</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m_BK</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_BK</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -2279,12 +2327,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_h_BK</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_h_BK</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_BK</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -2309,12 +2361,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_z_BK</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_z_BK</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_BK</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -2426,8 +2482,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_m_SK</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_m_SK</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_SK</ci>
                     </apply>
                 </apply>
             </apply>
@@ -2604,8 +2664,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_w</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_w</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_M</ci>
                     </apply>
                 </apply>
             </apply>
@@ -3013,8 +3077,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_hIP3</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_hIP3</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_IP3R</ci>
                     </apply>
                 </apply>
             </apply>
@@ -3256,8 +3324,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_c_RyR</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_c_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
                     </apply>
                 </apply>
             </apply>
@@ -3280,8 +3352,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_hc_RyR</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_hc_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
                     </apply>
                 </apply>
             </apply>
@@ -3820,6 +3896,46 @@
         <variable name="j_NaK_K" public_interface="out" units="mol_per_s"/>
         <!-- var j_HCN_k: mol_per_s {pub: out};-->
         <variable name="j_leak_K" public_interface="out" units="mol_per_s"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="Q10_m_Na" public_interface="in" units="dimensionless"/>
+        <variable name="Q10_h_Na" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_Na" public_interface="in" units="kelvin"/>
+        <variable name="phi_m_Na" public_interface="out" units="dimensionless"/>
+        <variable name="phi_h_Na" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_m_Na1_6" public_interface="in" units="dimensionless"/>
+        <variable name="Q10_h_Na1_6" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_Na1_6" public_interface="in" units="kelvin"/>
+        <variable name="phi_m_Na1_6" public_interface="out" units="dimensionless"/>
+        <variable name="phi_h_Na1_6" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_CaL" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_CaL" public_interface="in" units="kelvin"/>
+        <variable name="phi_CaL" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_Kv2" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_Kv2" public_interface="in" units="kelvin"/>
+        <variable name="phi_Kv2" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_m_Kv1_5" public_interface="in" units="dimensionless"/>
+        <variable name="Q10_h_Kv1_5" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_Kv1_5" public_interface="in" units="kelvin"/>
+        <variable name="phi_m_Kv1_5" public_interface="out" units="dimensionless"/>
+        <variable name="phi_h_Kv1_5" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_Kv4_2" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_Kv4_2" public_interface="in" units="kelvin"/>
+        <variable name="phi_Kv4_2" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_BK" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_BK" public_interface="in" units="kelvin"/>
+        <variable name="phi_BK" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_SK" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_SK" public_interface="in" units="kelvin"/>
+        <variable name="phi_SK" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_M" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_M" public_interface="in" units="kelvin"/>
+        <variable name="phi_M" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_IP3R" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_IP3R" public_interface="in" units="kelvin"/>
+        <variable name="phi_IP3R" public_interface="out" units="dimensionless"/>
+        <variable name="Q10_RyR" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_RyR" public_interface="in" units="kelvin"/>
+        <variable name="phi_RyR" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -4001,6 +4117,246 @@
             <apply><eq/><ci>k_RyR</ci><apply><times/><ci>A_ER</ci><ci>rho_RyR</ci><ci>k_RyR_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
             <apply><eq/><ci>k_SERCA</ci><apply><divide/><apply><times/><ci>A_ER_pre</ci><ci>rho_SERCA</ci><ci>r_SERCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
             <apply><eq/><ci>k_leak_Ca</ci><apply><times/><ci>A_ER_pre</ci><ci>rho_leak_Ca</ci><ci>k_leak_Ca_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_m_Na</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_m_Na</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Na</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_h_Na</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_h_Na</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Na</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_m_Na1_6</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_m_Na1_6</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Na1_6</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_h_Na1_6</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_h_Na1_6</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Na1_6</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_CaL</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_CaL</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_CaL</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_Kv2</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_Kv2</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Kv2</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_m_Kv1_5</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_m_Kv1_5</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Kv1_5</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_h_Kv1_5</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_h_Kv1_5</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Kv1_5</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_Kv4_2</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_Kv4_2</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_Kv4_2</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_BK</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_BK</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_BK</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_SK</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_SK</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_SK</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_M</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_M</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_M</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_IP3R</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_IP3R</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_IP3R</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_RyR</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_RyR</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_RyR</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
         </math>
     </component>
 </model>

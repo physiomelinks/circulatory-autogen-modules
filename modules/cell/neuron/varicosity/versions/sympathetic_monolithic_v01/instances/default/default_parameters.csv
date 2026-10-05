@@ -72,5 +72,11 @@ k_V_ER_pre,dimensionless,0.5235987755982988,"definitional; pre-ER volume shape f
 D_Ca_ER,m3_per_s,2.4e-18,SN_simple: need_to_change_for_volume,yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
 R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
-T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
 N_avo,per_mol,6.02e23,SN_simple: known,no
+Q10_CaN,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_CaN,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+Q10_IP3R,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_IP3R,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+Q10_RyR,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_RyR,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no

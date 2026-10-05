@@ -10,7 +10,8 @@ notes: 'Four-compartment Ca of the SN varicosity, as SN_Ca_handling_soma except 
   default a sphere). SERCA and the Ca leak move Ca across the pre-ER membrane, so k_SERCA = A_ER_pre rho_SERCA r_SERCA / N_A
   and k_leak_Ca = A_ER_pre rho_leak_Ca k_leak_Ca_single (1e-18 m3/um3); A_ER goes to IP3R and RyR (ER_membrane_area), whose
   release crosses the ER membrane. The diffusion constants D_Ca, D_Ca_ER are unchanged. The defaults reproduce the previous
-  k_SERCA and k_leak_Ca.'
+  k_SERCA and k_leak_Ca. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the
+  Davis 2021 thesis recordings it is calibrated to (was 310.15 K); this enters the Nernst/GHK terms.'
 reference_proposals:
   B_Ca_init:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); at equilibrium

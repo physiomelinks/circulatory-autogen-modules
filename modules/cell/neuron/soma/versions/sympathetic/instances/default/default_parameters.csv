@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
 R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
-T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
 C_sensed_membrane,picoF,2,"unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter capacitance of the sensed-voltage (electrode) stage, not a physiological quantity",no
 d_membrane,um,24.285900630052804,"definitional; soma diameter of the sphere of the model volume: d = (Vol/k_V)^(1/3) = (6 Vol/pi)^(1/3) with Vol = 7,500 um^3, the previous volume parameter (Wallis1996; rat stellate soma, mean projected area ~463 um^2; 7,500 um^3 the owner's choice on review, see SN_Na_K_concentrations_soma)",no
 k_A_membrane,dimensionless,5.086427133679043,"definitional; area shape factor A = k_A d^2, chosen to reproduce the previous Cm: A = Cm/c_m = 30 pF (the previous Cm, Hong2021: rat stellate ganglion whole-cell capacitance 33-36 pF) / (0.01 pF/um^2) = 3,000 um^2, so k_A = A/d^2 = 5.086. It is larger than a sphere's pi because the area includes membrane beyond the soma sphere (dendrites)",no
@@ -48,6 +48,9 @@ gamma_Na_i_Na,picoS,15.0,"Magee1995; TTX-sensitive single Na channel conductance
 g_Na_mod_i_Na,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
 tau_h_max_i_Na,millis,5,"owner's hand-set value (CA_user 70f2cf7, 2025-05-04: reset from 300 to 5 ms when the slow component was moved to i_Na1_6; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 9B: tau_h bell-shaped, peak ~22 ms near -50 mV at 37 degC (46.1 ms at -50 mV, 2.5 ms at -100 mV at 27 degC, p. 282); = Tao2011 Document S1 Eq. 89 (peak ~23-42 ms near -46 mV); here ~4x faster",no
 tau_h_min_i_Na,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
+Q10_m_Na_i_Na,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); BelluzziSacchi1986 Table 2 also gives a measured tau_m Q10 (17-27 degC), not re-read",no
+Q10_h_Na_i_Na,dimensionless,2.37,"BelluzziSacchi1986; Table 2: temperature coefficient of tau_h Q10 = 2.37 (rat sympathetic neurone Na current, 17-27 degC; used there to reconstruct the 37 degC kinetics)",yes
+T_ref_Na_i_Na,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 V_den_h_Na1_6_i_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 8 mV (was 6.5),yes
 V_den_m_Na1_6_i_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 8 mV (was 7.2),yes
 V_mid_h_Na1_6_i_Na1_6,milliV,53.2,Tao2011; Supporting Material (Document S1) Eq. 87: h_inf V1/2 = -53.2 mV (= value; reused for NaV1.6),yes
@@ -58,6 +61,9 @@ gamma_Na1_6_i_Na1_6,picoS,15.0,"Magee1995; 15 pS, the TTX-sensitive neuronal Na 
 g_Na1_6_mod_i_Na1_6,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
 tau_h_Na1_6_max_i_Na1_6,millis,300,"owner's calibration value (CA_user 35f61a8, 2025-05-01: tau_h_max 300 ms, the upper bound of its 50-300 ms calibration range; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'; a 2026-08 free fit gave 1004 ms, sympathetic_neuron 7ab2983). Physiological counterpart: BelluzziSacchi1986 slow Na inactivation, recovery tau_s1 0.13-1.4 s at -100 to -60 mV (27 degC; Fig. 7, Table 1, pp. 282-284). Not a NaV1.6 property: Herzog2003 report Nav1.6 reprimes ~5x faster than Nav1.7",no
 tau_h_Na1_6_min_i_Na1_6,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21, for i_Na; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
+Q10_m_Na1_6_i_Na1_6,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); BelluzziSacchi1986 Table 2 also gives a measured tau_m Q10 (17-27 degC), not re-read",no
+Q10_h_Na1_6_i_Na1_6,dimensionless,2.37,"BelluzziSacchi1986; Table 2: temperature coefficient of tau_h Q10 = 2.37 (rat sympathetic neurone Na current, 17-27 degC; used there to reconstruct the 37 degC kinetics); the Nav1.6 gate is a copy of the Belluzzi-Sacchi fast Na gate",yes
+T_ref_Na1_6_i_Na1_6,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cao_i_CaL,millimolar,2,Tao2011; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no separate neuron value). Khaliq2003 also uses 2 mM,yes
 V_den_c_i_CaL,milliV,5,Tao2011; Supporting Material (Document S1) Eq. 91 (k = 9.85 mV); modified here to 5 mV (was 9.85),yes
 V_mid_c_i_CaL,milliV,8.1,"Tao2011; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao's Ca current is a nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type",yes
@@ -68,11 +74,15 @@ p_Ca_single_i_CaL,um3_per_s,0.0830966389511686,"Church1996; single L-type channe
 tau_c_max_i_CaL,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. BelluzziSacchi1989 Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); 3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1),no
 tau_c_min_i_CaL,millis,0.2,"BelluzziSacchi1989; Eq. 4 tau_c = 1/(...) + 0.1 ms (= Tao2011 Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",yes
 tau_hc_i_CaL,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
+Q10_CaL_i_CaL,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_CaL_i_CaL,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 V_den_m_Kv2_i_Kv2,milliV,8,BelluzziSacchi1988; n_inf slope k = 8.91 mV (Abstract); 8 mV here is Tao2011 Document S1 Eq. 96's rounded 8.007 mV (Tao values not relied on for now),yes
 V_mid_m_Kv2_i_Kv2,milliV,6,BelluzziSacchi1988; n_inf V1/2 = -6.54 mV (Abstract); 6 mV here is Tao2011 Document S1 Eq. 96's rounded -6.084 mV (Tao values not relied on for now),yes
 V_rest_approx_i_Kv2,milliV,-70,Davis2021Thesis_from_traces,yes
 rho_Kv2_i_Kv2,per_um2,0.056978632478632475,"definitional; chosen so that g_Kv2 = A rho gamma_Kv2 reproduces the previous g_Kv2 = 0.0013333 uS at A = 3000 um^2, gamma 7.8 pS. That g_Kv2 is the owner's one-point estimate 0.24 nA / 180 mV (CA_user ad0ce77, 2024-07-21) from the TOTAL K current of Davis2021Thesis Appendix Fig. 19 (p. 359; axis 'Current (pA)', caption 'density'), withdrawn by the owner in 2025-05 as not Kv2-specific (the CA token 'Davis2021Thesis_fit_to_curve' was wrong). **About 250x smaller than BelluzziSacchi1988's delayed-rectifier gK = 0.33 uS (rat SCG, 37 degC): rho would be ~14 /um^2**",no
 gamma_Kv2_i_Kv2,picoS,7.8,Trapani2006; Kv2.1 single-channel conductance 7.8 +- 0.3 pS with 10 mM external K (Fig. 6B and Results),yes
+Q10_Kv2_i_Kv2,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_Kv2_i_Kv2,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 V_den_h_Kv1_5_i_Kv1_5,milliV,3.5,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): h_inf k = 3.5 mV (= value)",yes
 V_den_m_Kv1_5_i_Kv1_5,milliV,6.4,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): m_inf k = 6.4 mV (= value)",yes
 V_mid_h_Kv1_5_i_Kv1_5,milliV,25.3,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): h_inf V1/2 = -25.3 mV (= value) **At 37 degC native human atrial I_Kur inactivates half at -7.5 mV (Feng1998), so this room-temperature value is a calibration candidate**",yes
@@ -80,6 +90,9 @@ V_mid_m_Kv1_5_i_Kv1_5,milliV,6.0,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from
 V_rest_approx_i_Kv1_5,milliV,-70,Davis2021Thesis_from_traces,yes
 rho_Kv1_5_i_Kv1_5,per_um2,2.508049120338983,"definitional; chosen so that g_Kv1_5 = A rho gamma_Kv1_5 reproduces the previous g_Kv1_5 = 0.0887849 uS at A 3000 um^2, gamma 11.8 pS. That g is an unreferenced placeholder: the previous g_A value (CA_user ad0ce77, 2024-07-21, 'to_be_identified') carried over when Kv1.5 replaced I_A (2025-05-01); a 2026-08 free calibration gave 0.106 uS (sympathetic_neuron 7ab2983)",no
 gamma_Kv1_5_i_Kv1_5,picoS,11.8,Kwan2006; Kv1.5 single-channel conductance 11.8 +- 0.6 pS at pH 7.4 (Abstract),yes
+Q10_m_Kv1_5_i_Kv1_5,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); cf. Courtemanche et al. 1998 (K_Q10 = 3 for I_Kur, room temperature to 37 degC); Wang1993IKur activation tau 46.7 ms at 16 degC, 7.1 ms at 25 degC (Q10 ~8 over 16-25 degC, likely inflated)",no
+Q10_h_Kv1_5_i_Kv1_5,dimensionless,1,"RichSnyders1998; Abstract: hKv1.5 ""time constants of slow inactivation displayed little temperature and voltage dependence"" (Q10 ~1; temperature changes the extent of inactivation instead)",yes
+T_ref_Kv1_5_i_Kv1_5,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review (Philipson 1991, the source of these kinetics, recorded at room temperature, so this also matches the source)",no
 V_den_h_Kv4_2_i_Kv4_2,milliV,6.7,Bekkers2000-channelpedia,yes
 V_den_m_Kv4_2_i_Kv4_2,milliV,16.6,Bekkers2000-channelpedia,yes
 V_mid_h_Kv4_2_i_Kv4_2,milliV,81.6,Bekkers2000-channelpedia,yes
@@ -88,6 +101,8 @@ V_rest_approx_i_Kv4_2,milliV,-70,Davis2021Thesis_from_traces,yes
 rho_Kv4_2_i_Kv4_2,per_um2,4.4444444444444455,definitional; chosen so that g_Kv4_2 = A rho gamma_Kv4_2 (1e-6 uS/pS) reproduces the previous g_Kv4_2 = 0.1 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv4_2 = 7.5 picoS; a density for calibration through gamma_Kv4_2,no
 gamma_Kv4_2_i_Kv4_2,picoS,7.5,"Kaulin2009; neuronal Kv4.2 (with DPP6, as in cerebellar granule neurons) unitary conductance ~7.5 pS; Kv4.2 alone ~4 pS (Abstract)",yes
 tau_h_Kv4_2_i_Kv4_2,millis,7.0,was_approx_7,yes
+Q10_Kv4_2_i_Kv4_2,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_Kv4_2_i_Kv4_2,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cai_init_i_BK,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
 V_den_h_BK_i_BK,milliV,5.8,khaliq2003Contribution,yes
 V_den_m_BK_i_BK,milliV,6.2,khaliq2003Contribution,yes
@@ -98,6 +113,8 @@ gamma_BK_i_BK,picoS,120.0,"Smart1987; BK channels of cultured rat superior cervi
 h_BK_min_i_BK,dimensionless,0.085,Khaliq2003Contribution,yes
 tau_z_BK_i_BK,millis,1,Khaliq2003; Methods (text after Eq. 12) and ModelDB 48332 bkpkj.mod line 34 (ztau = 1 ms): tau_z = 1 ms. Was 5 ms; set to the source's 1 ms on review (2026-10-02),yes
 z_BK_coeff_i_BK,millimolar,0.001,Khaliq2003Contribution,yes
+Q10_BK_i_BK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_BK_i_BK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Ca_mid_m_SK_i_SK,millimolar,0.00063,"Hirschberg1998; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to Gupta2016, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
 Cai_init_i_SK,millimolar,1e-4,Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease,yes
 rho_SK_i_SK,per_um2,0.16181229773462782,definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_SK = 10.3 picoS; a density for calibration through gamma_SK,no
@@ -105,6 +122,8 @@ gamma_SK_i_SK,picoS,10.3,"Hirschberg1998; rSK2 single-channel conductance 10.3 +
 g_KCa_SK_mod_i_SK,dimensionless,1.0,to_be_identified,no
 p_SK_i_SK,dimensionless,4,gupta2016Computational,yes
 tau_m_SK_i_SK,millis,5,gupta2016Computational,yes
+Q10_SK_i_SK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_SK_i_SK,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Delta_V_mid_w_i_M,milliV,0,for_drug_control,yes
 V_den_w_i_M,milliV,10,Martin2023_was_10,yes
 V_mid_w_i_M,milliV,35,Martin2023_was_35,yes
@@ -114,6 +133,8 @@ gamma_M_i_M,picoS,9.0,"Selyanko2001; KCNQ2/KCNQ3 (M-type) single-channel conduct
 g_M_mod_i_M,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
 tau_w_min_i_M,millis,30,gupta2016Computational,yes
 tau_w_num_i_M,millis,1200,Martin2023Modelling_was_400,yes
+Q10_M_i_M,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_M_i_M,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cao_i_NaCa,millimolar,2,Tau2011,yes
 KmCa_i_NaCa,millimolar,1.38,Paci_2013_CHECK_FOR_SN,no
 KmNai_i_NaCa,millimolar,87.5,Paci_2013_CHECK_FOR_SN,no
@@ -142,6 +163,8 @@ d_5_IP3R,millimolar,0.08234e-3,Li1994Equations,yes
 h_IP3_init_IP3R,dimensionless,0.99,user_defined,no
 rho_IP3R_IP3R,per_um2,0.0,definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0 m3_per_s (user_defined_was_0.03e-15) with A = 86.01 um^2 (the soma ER membrane area) and k_IP3R_single = 0.8637 um3_per_s; a density for calibration through k_IP3R_single,no
 k_IP3R_single_IP3R,um3_per_s,0.8636921110362579,unreferenced_placeholder; per-receptor flux coefficient i/(2 F dCa) for a ~0.1 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 0.864 um^3/s,no
+Q10_IP3R_IP3R,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_IP3R_IP3R,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Ca_ER_RyR_den_RyR,millimolar,0.03,user_defined,no
 Ca_ER_RyR_mid_RyR,millimolar,0.5,user_defined,no
 Cai_RyR_den_RyR,millimolar,1e-4,user_defined,no
@@ -150,3 +173,5 @@ rho_RyR_RyR,per_um2,576.9514845733909,definitional; chosen so that k_RyR = A rho
 k_RyR_single_RyR,um3_per_s,3.0229223886269025,unreferenced_placeholder; per-channel flux coefficient i/(2 F dCa) for a ~0.35 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 3.02 um^3/s,no
 tau_c_RyR_RyR,millis,0.01,user_defined,no
 tau_hc_RyR_RyR,millis,10,user_defined,no
+Q10_RyR_RyR,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_RyR_RyR,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no

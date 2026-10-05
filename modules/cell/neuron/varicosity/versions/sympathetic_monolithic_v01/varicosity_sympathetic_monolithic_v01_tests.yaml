@@ -6,7 +6,11 @@ notes: 'Owner''s sympathetic varicosity: N-type Ca current, NCX, four-compartmen
   gates have exact solutions and total Ca is conserved up to the membrane fluxes. Geometry (2026-10-02): the varicosity is
   a sphere of diameter d (area A_mem = k_A d^2, volume Vol = k_V d^3); g_CaN = A_mem rho_CaN gamma_CaN, k_NaCa = A_mem rho_NaCa
   r_NaCa e, and the ER areas from c_ER Vol and c_ER_pre Vol give k_IP3, k_RyR (A_ER) and k_SERCA, k_leak_Ca (A_ER_pre). The
-  defaults reproduce the previous values.'
+  defaults reproduce the previous values. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K
+  (22 degC), like the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T
+  - T_ref)/10 K) (Q10_CaN, T_ref_CaN, Q10_IP3R, T_ref_IP3R, Q10_RyR, T_ref_RyR). T_ref defaults to 295.15 K, so phi = 1 and
+  the kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them, and the model
+  can be run at 37 degC by changing T.'
 reference_proposals:
   c_init:
     reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);

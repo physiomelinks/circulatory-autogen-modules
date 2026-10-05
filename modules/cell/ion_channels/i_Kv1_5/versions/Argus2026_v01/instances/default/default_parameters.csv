@@ -1,5 +1,5 @@
 variable_name,units,value,data_reference,sourced
-E_K,milliV,-101.402,"definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 310.15 K (the soma defaults; used when unconnected)",no
+E_K,milliV,-96.4979,"definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 295.15 K (the soma defaults; used when unconnected)",no
 V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)",no
 V_den_h_Kv1_5,milliV,3.5,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): h_inf k = 3.5 mV (= value)",yes
 V_den_m_Kv1_5,milliV,6.4,"ChannelpediaKv15; Kv1.5 model 21 (Ranjan; from Philipson1991, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. Wang1993IKur 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): m_inf k = 6.4 mV (= value)",yes
@@ -10,3 +10,7 @@ A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when uncon
 rho_Kv1_5,per_um2,2.508049120338983,"definitional; chosen so that g_Kv1_5 = A rho gamma_Kv1_5 reproduces the previous g_Kv1_5 = 0.0887849 uS at A 3000 um^2, gamma 11.8 pS. That g is an unreferenced placeholder: the previous g_A value (CA_user ad0ce77, 2024-07-21, 'to_be_identified') carried over when Kv1.5 replaced I_A (2025-05-01); a 2026-08 free calibration gave 0.106 uS (sympathetic_neuron 7ab2983)",no
 gamma_Kv1_5,picoS,11.8,Kwan2006; Kv1.5 single-channel conductance 11.8 +- 0.6 pS at pH 7.4 (Abstract),yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_m_Kv1_5,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); cf. Courtemanche et al. 1998 (K_Q10 = 3 for I_Kur, room temperature to 37 degC); Wang1993IKur activation tau 46.7 ms at 16 degC, 7.1 ms at 25 degC (Q10 ~8 over 16-25 degC, likely inflated)",no
+Q10_h_Kv1_5,dimensionless,1,"RichSnyders1998; Abstract: hKv1.5 ""time constants of slow inactivation displayed little temperature and voltage dependence"" (Q10 ~1; temperature changes the extent of inactivation instead)",yes
+T_ref_Kv1_5,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review (Philipson 1991, the source of these kinetics, recorded at room temperature, so this also matches the source)",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

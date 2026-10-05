@@ -1,5 +1,5 @@
 variable_name,units,value,data_reference,sourced
-E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
+E_K,milliV,-96.4979,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected; at 295.15 K)",no
 V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
 V_den_h_Kv4_2,milliV,6.7,SN_simple: Bekkers2000-channelpedia,yes
 V_den_m_Kv4_2,milliV,16.6,SN_simple: Bekkers2000-channelpedia,yes
@@ -11,3 +11,6 @@ rho_Kv4_2,per_um2,4.4444444444444455,definitional; chosen so that g_Kv4_2 = A rh
 gamma_Kv4_2,picoS,7.5,"Kaulin2009; neuronal Kv4.2 (with DPP6, as in cerebellar granule neurons) unitary conductance ~7.5 pS; Kv4.2 alone ~4 pS (Abstract)",yes
 tau_h_Kv4_2,millis,7.0,SN_simple: was_approx_7,yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_Kv4_2,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_Kv4_2,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

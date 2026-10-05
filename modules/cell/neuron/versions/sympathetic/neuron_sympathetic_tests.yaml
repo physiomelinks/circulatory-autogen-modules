@@ -10,6 +10,11 @@ description: 'Sympathetic neuron (SN_simple) built from its parts: a soma (soma,
   are their own versions'' defaults; this version''s default instance holds the axon''s parameters and the globals (SN_simple''s
   values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
   removed; in git history).'
+notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis
+  recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (the Q10_<X>, T_ref_<X>
+  parameters of the soma and varicosity channels). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged;
+  setting T_ref to the source''s recording temperature (on review) scales them, and the model can be run at 37 degC by changing
+  T.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

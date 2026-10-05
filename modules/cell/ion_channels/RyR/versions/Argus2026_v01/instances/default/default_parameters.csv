@@ -10,3 +10,6 @@ rho_RyR,per_um2,576.9514845733909,definitional; chosen so that k_RyR = A rho k_R
 k_RyR_single,um3_per_s,3.0229223886269025,unreferenced_placeholder; per-channel flux coefficient i/(2 F dCa) for a ~0.35 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 3.02 um^3/s,no
 tau_c_RyR,millis,0.01,SN_simple: user_defined,no
 tau_hc_RyR,millis,10,SN_simple: user_defined,no
+Q10_RyR,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_RyR,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

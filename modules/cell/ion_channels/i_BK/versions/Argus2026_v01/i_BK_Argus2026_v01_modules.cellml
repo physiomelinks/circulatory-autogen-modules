@@ -33,6 +33,11 @@
         <variable name="z_BK_coeff" public_interface="in" units="millimolar"/>
         <variable name="z_BK_inf" public_interface="out" units="dimensionless"/>
         <variable name="z_BK_init" public_interface="out" units="dimensionless"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_BK" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_BK" public_interface="in" units="kelvin"/>
+        <variable name="phi_BK" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -308,12 +313,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_m_BK</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_m_BK</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_BK</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -338,12 +347,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_h_BK</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_h_BK</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_BK</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -368,12 +381,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_z_BK</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_z_BK</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_BK</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -422,6 +439,25 @@
         </math>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply><eq/><ci>g_KCa_BK</ci><apply><times/><ci>A_mem</ci><ci>rho_BK</ci><ci>gamma_BK</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_BK</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_BK</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_BK</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
         </math>
     </component>
 </model>

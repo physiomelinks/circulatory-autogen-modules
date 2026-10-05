@@ -7,10 +7,12 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce
   SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_leak_Na = A_mem rho_leak_Na gamma_leak_Na
   (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area;
-  the defaults reproduce the previous g_leak_Na.'
+  the defaults reproduce the previous g_leak_Na. Temperature (review 2026-10-05): the SN model is at room temperature, T =
+  295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; the unconnected Nernst default is computed
+  at 295.15 K.'
 reference_proposals:
   E_Na:
-    reference: definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 310.15 K (used when unconnected)
+    reference: definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 295.15 K (used when unconnected)
     sourced: 'no'
   V:
     reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'

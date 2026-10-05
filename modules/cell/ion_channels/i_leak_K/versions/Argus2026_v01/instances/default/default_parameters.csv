@@ -1,5 +1,5 @@
 variable_name,units,value,data_reference,sourced
-E_K,milliV,-101.402,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected)",no
+E_K,milliV,-96.4979,"definitional; Nernst potential at Ko 4.5 mM, Ki 200 mM (the soma defaults; used when unconnected; at 295.15 K)",no
 V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
 A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
 rho_leak_K,per_um2,0.0006666666666666668,definitional; chosen so that g_leak_K = A rho gamma_leak_K (1e-6 uS/pS) reproduces the previous g_leak_K = 0.0001 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_K = 50 picoS; a density for calibration through gamma_leak_K,no

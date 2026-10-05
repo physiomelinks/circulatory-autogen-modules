@@ -13,7 +13,11 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   Khaliq only with V_mid_m = 6.2, the slope). Deliberate differences from Khaliq: the tau_m constant is 1.505 ms (Khaliq 0.505
   ms); V_mid_h is 26 mV (Khaliq 32); the +5 mV shift of V in Khaliq''s .mod is not applied. Geometry re-parameterisation (2026-10-02):
   the maximal conductance is g_KCa_BK = A_mem rho_BK gamma_BK (membrane area x channel density x single-channel conductance,
-  1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_KCa_BK.'
+  1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_KCa_BK. Temperature (review
+  2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated
+  to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_BK, T_ref_BK). T_ref defaults to 295.15 K,
+  so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them,
+  and the model can be run at 37 degC by changing T.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
@@ -27,7 +31,8 @@ reference_proposals:
       Results, first section; 1e-4 mM = value. (Replaces the CA reference Hagiwara1981, which could not be opened)
     sourced: 'yes'
   E_K:
-    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 310.15 K (the soma defaults; used when unconnected)
+    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 295.15 K (the soma defaults; used when
+      unconnected)
     sourced: 'no'
   V:
     reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
@@ -45,7 +50,8 @@ reference_proposals:
     sourced: 'yes'
   V_rest_approx:
     reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)'
+      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value
+      was read from)'
     sourced: 'yes'
   h_BK_min:
     reference: 'Khaliq2003; Table 1 and bkpkj.mod: BK h y0 = 0.085 (= value)'

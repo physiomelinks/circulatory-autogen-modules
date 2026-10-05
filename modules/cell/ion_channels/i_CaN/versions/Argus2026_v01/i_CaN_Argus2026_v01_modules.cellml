@@ -26,6 +26,11 @@
         <variable name="tau_c_max" public_interface="in" units="millis"/>
         <variable name="tau_c_min" public_interface="in" units="millis"/>
         <variable name="tau_hc" public_interface="in" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_CaN" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_CaN" public_interface="in" units="kelvin"/>
+        <variable name="phi_CaN" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -147,12 +152,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_c</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_c</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaN</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -177,12 +186,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_hc</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_hc</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaN</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -230,6 +243,25 @@
         </math>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply><eq/><ci>g_CaN</ci><apply><times/><ci>A_mem</ci><ci>rho_CaN</ci><ci>gamma_CaN</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_CaN</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_CaN</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_CaN</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
         </math>
     </component>
 </model>

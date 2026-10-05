@@ -14,7 +14,11 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   membrane through membrane_area; the defaults reproduce the previous g_Na. tau_m: owner''s simplification of BelluzziSacchi1986
   Fig. 9A (tau_m = 0.06013 + 1/(42.98 e^{0.08915V} + 0.9230 e^{-0.03351V}) ms, peak 0.27 ms near -40 mV, 37 degC; = Tao2011
   Eq. 88). Offset 0.06 ms = source; numerator 0.4 matched the source peak (CA 837d3aae, 2024-07-21) and was doubled to 0.8
-  (CA 8449bc05, 2025-05-01), so the peak is now ~0.48 ms. tau_h_min/max traced on review (2026-10-05); values kept for recalibration.'
+  (CA 8449bc05, 2025-05-01), so the peak is now ~0.48 ms. tau_h_min/max traced on review (2026-10-05); values kept for recalibration.
+  Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings
+  it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_m_Na, Q10_h_Na, T_ref_Na).
+  T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s recording temperature
+  (on review) scales them, and the model can be run at 37 degC by changing T.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

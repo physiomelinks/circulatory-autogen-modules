@@ -13,5 +13,7 @@ tau_c_max,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0c
 tau_c_min,millis,0.2,"BelluzziSacchi1989; Eq. 4 tau_c = 1/(...) + 0.1 ms (= Tao2011 Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",yes
 tau_hc,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
 R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
-T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_CaL,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_CaL,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no

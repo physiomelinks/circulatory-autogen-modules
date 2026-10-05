@@ -19,6 +19,11 @@
         <variable name="k_RyR_single" public_interface="in" units="um3_per_s"/>
         <variable name="tau_c_RyR" public_interface="in" units="millis"/>
         <variable name="tau_hc_RyR" public_interface="in" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_RyR" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_RyR" public_interface="in" units="kelvin"/>
+        <variable name="phi_RyR" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -92,8 +97,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_c_RyR</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_c_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
                     </apply>
                 </apply>
             </apply>
@@ -115,8 +124,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_hc_RyR</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_hc_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
                     </apply>
                 </apply>
             </apply>
@@ -146,6 +159,25 @@
         </math>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply><eq/><ci>k_RyR</ci><apply><times/><ci>A_ER</ci><ci>rho_RyR</ci><ci>k_RyR_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_RyR</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_RyR</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_RyR</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
         </math>
     </component>
 </model>

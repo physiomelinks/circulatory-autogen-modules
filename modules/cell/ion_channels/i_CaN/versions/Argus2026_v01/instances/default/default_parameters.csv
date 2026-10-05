@@ -1,5 +1,5 @@
 variable_name,units,value,data_reference,sourced
-E_Ca,milliV,132.33666,"definitional; Ca Nernst potential RT/(2F) ln(Cao/Cai) at Cao 2 mM, Cai 1e-4 mM, as SN_varicosity computes it (used when unconnected)",yes
+E_Ca,milliV,125.9364,"definitional; Ca Nernst potential RT/(2F) ln(Cao/Cai) at Cao 2 mM, Cai 1e-4 mM, as SN_varicosity computes it (used when unconnected; at 295.15 K)",yes
 V,milliV,-70,definitional; clamp value when unconnected: the SN resting potential (SN_simple V_rest_approx = -70 mV),no
 V_den_c,milliV,5,SN_simple: Tau2011_was_9.85,yes
 V_mid_c,milliV,8.1,SN_simple: Tau2011_was_8.1,yes
@@ -12,3 +12,6 @@ tau_c_max,millis,3.0,SN_simple: changed_from_belluzi1991_curves,yes
 tau_c_min,millis,0.2,SN_simple: changed_from_belluzi1991_curves,yes
 tau_hc,millis,20.0,SN_simple: changed_from_belluzi1991_curves,yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_CaN,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_CaN,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

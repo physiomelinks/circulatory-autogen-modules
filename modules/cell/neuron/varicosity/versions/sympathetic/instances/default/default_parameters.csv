@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
 R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
-T,kelvin,310.15,"definitional; body temperature, 37 degC",yes
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
 B_Ca_init_Ca,millimolar,7.95,user_defined,no
 B_Ca_total_Ca,millimolar,8,Matveev2002,yes
 Ca_ER_init_Ca,millimolar,0.6,to_be_checked_in_neurons,no
@@ -39,6 +39,8 @@ hc_init_i_CaN,dimensionless,0.9,Tau2011,yes
 tau_c_max_i_CaN,millis,3.0,changed_from_belluzi1991_curves,yes
 tau_c_min_i_CaN,millis,0.2,changed_from_belluzi1991_curves,yes
 tau_hc_i_CaN,millis,20.0,changed_from_belluzi1991_curves,yes
+Q10_CaN_i_CaN,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_CaN_i_CaN,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cao_i_NaCa,millimolar,2,Tau2011,yes
 KmCa_i_NaCa,millimolar,1.38,Paci_2013_CHECK_FOR_SN,no
 KmNai_i_NaCa,millimolar,87.5,Paci_2013_CHECK_FOR_SN,no
@@ -58,6 +60,8 @@ d_5_IP3R,millimolar,0.08234e-3,Li1994Equations,yes
 h_IP3_init_IP3R,dimensionless,0.99,user_defined,no
 rho_IP3R_IP3R,per_um2,0.0,definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0 m3_per_s (user_defined) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_IP3R_single = 0.8637 um3_per_s; a density for calibration through k_IP3R_single,no
 k_IP3R_single_IP3R,um3_per_s,0.8636921110362579,unreferenced_placeholder; per-receptor flux coefficient i/(2 F dCa) for a ~0.1 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 0.864 um^3/s,no
+Q10_IP3R_IP3R,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_IP3R_IP3R,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Ca_ER_RyR_den_RyR,millimolar,0.03,user_defined,no
 Ca_ER_RyR_mid_RyR,millimolar,0.5,user_defined,no
 Cai_RyR_den_RyR,millimolar,1e-4,user_defined,no
@@ -66,6 +70,8 @@ rho_RyR_RyR,per_um2,110.5308411655132,definitional; chosen so that k_RyR = A rho
 k_RyR_single_RyR,um3_per_s,3.0229223886269025,unreferenced_placeholder; per-channel flux coefficient i/(2 F dCa) for a ~0.35 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 3.02 um^3/s,no
 tau_c_RyR_RyR,millis,0.01,user_defined,no
 tau_hc_RyR_RyR,millis,10,user_defined,no
+Q10_RyR_RyR,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_RyR_RyR,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cai_NE_base_NE,millimolar,1e-4,user_defined,no
 NE_init_NE,millimolar,0.0,user_defined,no
 k_NE_NE,per_s,200,user_defined,no

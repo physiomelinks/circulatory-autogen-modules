@@ -1,5 +1,5 @@
 variable_name,units,value,data_reference,sourced
-E_Na,milliV,64.455574,"definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 310.15 K (used when unconnected)",no
+E_Na,milliV,61.3383,"definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 295.15 K (used when unconnected)",no
 V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)",no
 V_den_h_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 8 mV (was 6.5),yes
 V_den_m_Na1_6,milliV,8.0,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 8 mV (was 7.2),yes
@@ -13,3 +13,7 @@ g_Na1_6_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
 tau_h_Na1_6_max,millis,300,"owner's calibration value (CA_user 35f61a8, 2025-05-01: tau_h_max 300 ms, the upper bound of its 50-300 ms calibration range; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'; a 2026-08 free fit gave 1004 ms, sympathetic_neuron 7ab2983). Physiological counterpart: BelluzziSacchi1986 slow Na inactivation, recovery tau_s1 0.13-1.4 s at -100 to -60 mV (27 degC; Fig. 7, Table 1, pp. 282-284). Not a NaV1.6 property: Herzog2003 report Nav1.6 reprimes ~5x faster than Nav1.7",no
 tau_h_Na1_6_min,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21, for i_Na; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_m_Na1_6,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); BelluzziSacchi1986 Table 2 also gives a measured tau_m Q10 (17-27 degC), not re-read",no
+Q10_h_Na1_6,dimensionless,2.37,"BelluzziSacchi1986; Table 2: temperature coefficient of tau_h Q10 = 2.37 (rat sympathetic neurone Na current, 17-27 degC; used there to reconstruct the 37 degC kinetics); the Nav1.6 gate is a copy of the Belluzzi-Sacchi fast Na gate",yes
+T_ref_Na1_6,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

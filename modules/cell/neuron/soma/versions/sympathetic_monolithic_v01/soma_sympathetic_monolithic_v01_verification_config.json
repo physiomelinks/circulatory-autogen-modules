@@ -50,7 +50,14 @@
     "V_shell"
   ],
   "run_parameters": {"I_in": 0.05},
-  "rest_check": {"label": "rest (0 pA, 30 s)", "sim_time": 30, "dt": 0.0001, "window": 10, "voltage": "V", "parameters": {"I_in": 0.0}},
+  "rest_check": {
+    "label": "rest (0 pA, 30 s)",
+    "sim_time": 30,
+    "dt": 0.0001,
+    "window": 10,
+    "voltage": "V",
+    "parameters": {"I_in": 0.0}
+  },
   "invariants": [
     {
       "description": "charge conservation: the change of membrane charge Cm (V - V0) equals the change of ionic charge F [Vol (dNai + dKi) + 2 dN_Ca] plus the charge carried by the currents that change no tracked ion pool (I_in_delayed and I_out)",
@@ -92,9 +99,38 @@
       "rho_IP3R": {"min": 0.0, "max": 0.4038660392013737, "points": 3},
       "d": {
         "values": [19.275732104070492, 24.285900630052804, 30.59831741945869]
-      }
+      },
+      "T": {"min": 273.15, "max": 313.15, "points": 3}
     },
-    "rationale": "injected current I_in from +0.2 nA (strong depolarising drive; the soma model uses I_in > 0 as outward) to +0.05 nA, axial current I_out +/-0.05 nA; zero-valued switches (Delta_V_mid_w, k_thresh_*, delta_gM, rho_IP3R (IP3R density; k_IP3 = A_ER rho_IP3R k_IP3R_single)) over their plausible ranges; all other constants by factors 0.5-2 of their values, except that the free-buffer initial value must not exceed B_Ca_total (B_Ca_init 4-7.95 mM, B_Ca_total 8-16 mM) and h_IP3_init spans [0, 1]. The diameter d spans the cube roots of the factors, so the volume k_V d^3 spans 0.5-2 (as Vol did); k_A, c_m, the densities and the per-protein rates scale their products by 0.5-2 (as Cm and the conductances did)."
+    "bounds": {
+      "Q10_m_Na": [1, 5],
+      "Q10_h_Na": [1, 5],
+      "T_ref_Na": [273.15, 313.15],
+      "Q10_m_Na1_6": [1, 5],
+      "Q10_h_Na1_6": [1, 5],
+      "T_ref_Na1_6": [273.15, 313.15],
+      "Q10_CaL": [1, 5],
+      "T_ref_CaL": [273.15, 313.15],
+      "Q10_Kv2": [1, 5],
+      "T_ref_Kv2": [273.15, 313.15],
+      "Q10_m_Kv1_5": [1, 5],
+      "Q10_h_Kv1_5": [1, 5],
+      "T_ref_Kv1_5": [273.15, 313.15],
+      "Q10_Kv4_2": [1, 5],
+      "T_ref_Kv4_2": [273.15, 313.15],
+      "Q10_BK": [1, 5],
+      "T_ref_BK": [273.15, 313.15],
+      "Q10_SK": [1, 5],
+      "T_ref_SK": [273.15, 313.15],
+      "Q10_M": [1, 5],
+      "T_ref_M": [273.15, 313.15],
+      "Q10_IP3R": [1, 5],
+      "T_ref_IP3R": [273.15, 313.15],
+      "Q10_RyR": [1, 5],
+      "T_ref_RyR": [273.15, 313.15],
+      "T": [273.15, 313.15]
+    },
+    "rationale": "injected current I_in from +0.2 nA (strong depolarising drive; the soma model uses I_in > 0 as outward) to +0.05 nA, axial current I_out +/-0.05 nA; zero-valued switches (Delta_V_mid_w, k_thresh_*, delta_gM, rho_IP3R (IP3R density; k_IP3 = A_ER rho_IP3R k_IP3R_single)) over their plausible ranges; all other constants by factors 0.5-2 of their values, except that the free-buffer initial value must not exceed B_Ca_total (B_Ca_init 4-7.95 mM, B_Ca_total 8-16 mM) and h_IP3_init spans [0, 1]. The diameter d spans the cube roots of the factors, so the volume k_V d^3 spans 0.5-2 (as Vol did); k_A, c_m, the densities and the per-protein rates scale their products by 0.5-2 (as Cm and the conductances did). Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5 and T_ref to 273.15-313.15 K."
   },
   "timestep": {
     "scheme": "rk4",

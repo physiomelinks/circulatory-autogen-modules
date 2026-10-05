@@ -20,6 +20,11 @@
         <variable name="m_SK_init" public_interface="out" units="dimensionless"/>
         <variable name="p_SK" public_interface="in" units="dimensionless"/>
         <variable name="tau_m_SK" public_interface="in" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_SK" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_SK" public_interface="in" units="kelvin"/>
+        <variable name="phi_SK" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -89,8 +94,12 @@
                     </apply>
                     <apply>
                         <divide/>
-                        <ci>tau_m_SK</ci>
-                        <cn cellml:units="millis_per_s">1000</cn>
+                        <apply>
+                            <divide/>
+                            <ci>tau_m_SK</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_SK</ci>
                     </apply>
                 </apply>
             </apply>
@@ -128,6 +137,25 @@
         </math>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply><eq/><ci>g_KCa_SK</ci><apply><times/><ci>A_mem</ci><ci>rho_SK</ci><ci>gamma_SK</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_SK</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_SK</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_SK</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
         </math>
     </component>
 </model>

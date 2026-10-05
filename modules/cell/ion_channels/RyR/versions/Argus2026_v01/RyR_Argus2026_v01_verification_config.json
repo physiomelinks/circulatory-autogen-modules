@@ -19,7 +19,15 @@
   ],
   "bc_sweep": {
     "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
-    "ranges": {}
+    "ranges": {
+      "T": {"min": 273.15, "max": 313.15, "points": 3}
+    },
+    "bounds": {
+      "Q10_RyR": [1, 5],
+      "T_ref_RyR": [273.15, 313.15],
+      "T": [273.15, 313.15]
+    },
+    "rationale": "Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5 and T_ref to 273.15-313.15 K."
   },
   "timestep": {
     "scheme": "rk4",

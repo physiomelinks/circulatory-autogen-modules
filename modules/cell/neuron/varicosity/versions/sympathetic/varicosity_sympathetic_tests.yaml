@@ -7,6 +7,11 @@ description: 'Sympathetic-neuron varicosity (SN_simple''s SN_varicosity) built f
   ["<axon>"]}; NE (synaptic_NE) is available from NE. Default parameters are SN_simple''s (its default instance). Split out
   of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
   in git history). Tested through the neuron sympathetic version.'
+notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis
+  recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_<X>_<submodule>,
+  T_ref_<X>_<submodule> rows per gated channel, as in the channel modules). T_ref defaults to 295.15 K, so phi = 1 and the
+  kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them, and the model can
+  be run at 37 degC by changing T.'
 expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

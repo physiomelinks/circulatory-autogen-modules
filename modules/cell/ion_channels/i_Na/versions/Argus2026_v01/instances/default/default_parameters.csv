@@ -1,5 +1,5 @@
 variable_name,units,value,data_reference,sourced
-E_Na,milliV,64.455574,"definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 310.15 K (used when unconnected)",no
+E_Na,milliV,61.3383,"definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 295.15 K (used when unconnected)",no
 V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)",no
 V_den_h,milliV,4.0,Tao2011; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 4 mV (was 6.5),yes
 V_den_m,milliV,6,Tao2011; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 6 mV (was 7.2),yes
@@ -13,3 +13,7 @@ g_Na_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
 tau_h_max,millis,5,"owner's hand-set value (CA_user 70f2cf7, 2025-05-04: reset from 300 to 5 ms when the slow component was moved to i_Na1_6; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 9B: tau_h bell-shaped, peak ~22 ms near -50 mV at 37 degC (46.1 ms at -50 mV, 2.5 ms at -100 mV at 27 degC, p. 282); = Tao2011 Document S1 Eq. 89 (peak ~23-42 ms near -46 mV); here ~4x faster",no
 tau_h_min,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_m_Na,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); BelluzziSacchi1986 Table 2 also gives a measured tau_m Q10 (17-27 degC), not re-read",no
+Q10_h_Na,dimensionless,2.37,"BelluzziSacchi1986; Table 2: temperature coefficient of tau_h Q10 = 2.37 (rat sympathetic neurone Na current, 17-27 degC; used there to reconstruct the 37 degC kinetics)",yes
+T_ref_Na,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
