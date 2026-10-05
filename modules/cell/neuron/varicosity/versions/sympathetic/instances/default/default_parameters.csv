@@ -76,7 +76,7 @@ i_RyR_init_RyR,dimensionless,0.13725490196078433,definitional; steady-state inac
 l_RyR_init_RyR,dimensionless,0.36585365853658536,definitional; steady-state luminal-site occupancy kon_l Ca_ER/(kon_l Ca_ER + koff_l) at the default Ca_ER (75 uM),no
 Q10_RyR_RyR,dimensionless,3,unreferenced_placeholder; conventional Q10 for the binding rates (no Q10 given by the source),no
 T_ref_RyR_RyR,kelvin,295.65,"HernandezCruz1997; Methods: 'Experiments were carried out at 22-23 degC'; 22.5 degC = 295.65 K, the temperature of the fitted rates",yes
-Cai_NE_base_NE,millimolar,1e-4,user_defined,no
-NE_init_NE,millimolar,0.0,user_defined,no
-k_NE_NE,per_s,200,user_defined,no
-k_NET_NE,per_s,100,user_defined,no
+Cai_NE_base_NE,millimolar,1e-4,"Wanaverbecq2003; resting [Ca2+]i 102 nM in rat SCG neurons: the release threshold is set to resting Ca (owner's model, CA_user b8488ae)",yes
+NE_init_NE,millimolar,0.0,definitional; no NE in the cleft at rest,no
+k_NE_NE,per_s,200,"unreferenced_placeholder; owner's first-order NE release/reuptake model (CA_user b8488ae, 2025-03-31; CA token 'user_defined'); release gain per unit Ca above threshold",no
+k_NET_NE,per_s,100,"unreferenced_placeholder; owner's first-order NE release/reuptake model (CA_user b8488ae, 2025-03-31; CA token 'user_defined'); NET clearance rate (tau 10 ms)",no
