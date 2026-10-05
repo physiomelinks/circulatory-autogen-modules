@@ -15,6 +15,20 @@
     {
       "description": "j_RyR = k_RyR (Ca_ER - Cai) c_RyR^3 hc_RyR^3",
       "expr": "np.max(np.abs(j_RyR - k_RyR*(Ca_ER - Cai)*c_RyR**3*hc_RyR**3)) <= 1e-12*max(1e-30, np.max(np.abs(j_RyR)))"
+    },
+    {
+      "description": "with Cai and Ca_ER fixed, c_RyR follows its exact relaxation c_inf + (c0 - c_inf) exp(-t phi/tau_c), c0 = c_RyR(0)",
+      "expr": "np.max(np.abs(c_RyR - ((1/(1 + np.exp(-(Cai - Cai_RyR_mid)/Cai_RyR_den))) + (c_RyR[0] - (1/(1 + np.exp(-(Cai - Cai_RyR_mid)/Cai_RyR_den))))*np.exp(-t*(Q10_RyR**((T - T_ref_RyR)/10))/(tau_c_RyR/1000))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "with Cai and Ca_ER fixed, hc_RyR follows its exact relaxation hc_inf + (hc0 - hc_inf) exp(-t phi/tau_hc)",
+      "expr": "np.max(np.abs(hc_RyR - ((1/(1 + np.exp(-(Ca_ER - Ca_ER_RyR_mid)/Ca_ER_RyR_den))) + (hc_RyR[0] - (1/(1 + np.exp(-(Ca_ER - Ca_ER_RyR_mid)/Ca_ER_RyR_den))))*np.exp(-t*(Q10_RyR**((T - T_ref_RyR)/10))/(tau_hc_RyR/1000))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "flux direction: release j_RyR has the sign of Ca_ER - Cai",
+      "expr": "np.all(j_RyR*(Ca_ER - Cai) >= -1e-30)"
     }
   ],
   "bc_sweep": {
