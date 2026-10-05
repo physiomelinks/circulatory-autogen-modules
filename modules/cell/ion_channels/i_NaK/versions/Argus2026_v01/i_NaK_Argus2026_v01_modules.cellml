@@ -44,25 +44,9 @@
                                         <cn cellml:units="milliV">200</cn>
                                     </apply>
                                 </apply>
-                                <apply>
-                                    <power/>
-                                    <ci>Nai</ci>
-                                    <ci>Nai_power_NaK</ci>
-                                </apply>
+                                <cn cellml:units="dimensionless">1</cn>
                             </apply>
-                            <apply>
-                                <plus/>
-                                <apply>
-                                    <power/>
-                                    <ci>Nai</ci>
-                                    <ci>Nai_power_NaK</ci>
-                                </apply>
-                                <apply>
-                                    <power/>
-                                    <ci>Nai_mid_NaK</ci>
-                                    <ci>Nai_power_NaK</ci>
-                                </apply>
-                            </apply>
+                            <apply><plus/><cn cellml:units="dimensionless">1</cn><apply><power/><apply><divide/><ci>Nai_mid_NaK</ci><ci>Nai</ci></apply><ci>Nai_power_NaK</ci></apply></apply>
                         </apply>
                         <ci>Ko</ci>
                     </apply>

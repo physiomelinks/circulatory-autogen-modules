@@ -155,11 +155,11 @@ gamma_NaCa_var_SN,dimensionless,0.35,Paci_2013_CHECK_FOR_SN
 rho_NaCa_var_SN,per_um2,38719.23218294793,definitional; chosen so that k_NaCa = A rho r_NaCa e reproduces the previous k_NaCa = 0.15 nanoA (to_be_identified) with A = 4.836 um^2 (the varicosity membrane area) and r_NaCa = 5000 per_s; a density for calibration through r_NaCa
 r_NaCa_var_SN,per_s,5000.0,"Hilgemann1991; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)"
 #,#,#,#
-rho_NaK_soma_SN,per_um2,16644.024198562034,definitional; chosen so that k_NaK = A rho r_NaK e reproduces the previous k_NaK = 0.4 nanoA (user_defined) with A = 3000 um^2 (the soma membrane area) and r_NaK = 50 per_s; a density for calibration through r_NaK
-r_NaK_soma_SN,per_s,50.0,"Landowne1970; Na/K pump turnover 22 cations/s per ouabain site at 20 degC in rabbit vagus C fibres (Abstract, point 5); 50 cycles/s (one net charge each) is an estimate for 37 degC (Q10 ~3), not a measured value"
-Nai_mid_NaK_soma_SN,millimolar,40,lindblad1996Model
-Nai_power_NaK_soma_SN,dimensionless,1.5,lindblad1996Model
-Ko_mid_NaK_soma_SN,millimolar,1,lindblad1996Model
+rho_NaK_soma_SN,per_um2,750.0,"LandowneRitchie1970; Abstract (points 3-4): specific ouabain binding at just-complete pump inhibition gives an upper limit of ~750 Na pump sites per um^2 in desheathed rabbit vagus (mammalian non-myelinated nerve fibres) (= value; an upper limit, mammalian nerve). With A = 3000 um^2 and r_NaK 9 /s, k_NaK = 3.2 pA (was 0.4 nA; set on review 2026-10-05, was 16644 /um^2)"
+r_NaK_soma_SN,per_s,9.0,"LandowneRitchie1970; Abstract (point 5): turnover ~22 cations/s per site at 20 degC in rabbit vagus; = ~7.3 cycles/s (one net charge each) if 3 Na per cycle; ~9 /s at 22 degC (Q10 3). The previous 50 /s was a 37 degC estimate, inconsistent with the model's 22 degC"
+Nai_mid_NaK_soma_SN,millimolar,15.0,"HorisbergerKharoubiHess2002; Fig. 7C: K1/2 for intracellular Na ~15 mM for rat alpha3*beta1 (~16 mM alpha1; Hill coefficient 2.5; Xenopus oocytes, room temperature); cf. Nygren1998/Lindblad1996 11 mM (exponent 1.5, from cardiac data, NakaoGadsby1989 K0.5 11 mM nH 1.4); the previous 40 mM was Paci2013's Km,Na (exponent 1); **exponent 1.5 (Nygren) kept, not the measured Hill coefficient 2.5**"
+Nai_power_NaK_soma_SN,dimensionless,1.5,"Nygren1998; i_NaK Nai exponent 1.5 (= value; human atrial model); the neuronal alpha3 Hill coefficient is 2.5 (HorisbergerKharoubiHess2002, Fig. 7C)"
+Ko_mid_NaK_soma_SN,millimolar,1,"Nygren1998; k_NaK_K = 1 mM (= value); neuronal alpha3 K1/2 ~0.5 mM with 100 mM Nao (HorisbergerKharoubiHess2002, Fig. 5B), cardiac 1.5 mM (NakaoGadsby1989)"
 Na_coop_soma_SN,millimolar,5,user_defined
 #,#,#,#
 Ca_ER_init_soma_SN,millimolar,0.6,to_be_checked_in_neurons
