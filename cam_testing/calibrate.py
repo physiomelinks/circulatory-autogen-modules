@@ -36,6 +36,7 @@ references relative to the version directory, defaulting to the instance's files
     expected_rtol: 0.05
     z_threshold: 2.0                      constant data items: |model - value| <= z_threshold * std
     method: CMA-ES
+    dt: 0.01                              optional: output step (default: the spec dt; series obs_dt caps it)
     optimiser_options: {num_calls_to_function: 3000, seed: 1}
     metric: log_rmse                      log_rmse | nrmse
     threshold: 0.5                        on the prediction window
@@ -145,11 +146,20 @@ def calibration_end(obs):
     return max(ends) if ends else float(obs['protocol_info']['sim_times'][0][-1])
 
 
+def multi_segment(obs):
+    """Whether the protocol has more than one (sub-)experiment, or changes parameters."""
+    pi = obs['protocol_info']
+    return sum(len(s) for s in pi['sim_times']) > 1 or bool(pi.get('params_to_change'))
+
+
 def calibration_obs(obs):
-    """The obs_data CVS0DParamID fits: the data_items only, run to calibration_end."""
+    """The obs_data CVS0DParamID fits: the data_items only, run to calibration_end. A
+    multi-segment protocol (sub-experiments / params_to_change, e.g. a voltage-clamp step) is
+    kept as it is: its data are scalar features of its segments."""
     out = copy.deepcopy(obs)
     out['prediction_items'] = []
-    out['protocol_info']['sim_times'] = [[calibration_end(obs)]]
+    if not multi_segment(obs):
+        out['protocol_info']['sim_times'] = [[calibration_end(obs)]]
     return out
 
 
@@ -188,7 +198,7 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
     by_var = {p.variable_name: p for p in cm.parameters()}
     cal_end = float(obs['protocol_info']['sim_times'][0][-1])
     dts = [float(i['obs_dt']) for i in obs['data_items'] if i.get('data_type') == 'series']
-    dt = min(dts + [float(cm.spec['dt'])])
+    dt = min(dts + [float(v.get('dt', cm.spec['dt']))])   # spec dt: output step of a scalar-feature calibration
     model_path, work_dir = cm.model_path, cm.work_dir
     if start_values:
         # start the optimiser somewhere other than the nominal values: a model generated with them
@@ -212,19 +222,61 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
         pid.run()
         best = np.asarray(pid.get_best_param_vals(), dtype=float).ravel()
         cost = getattr(getattr(pid, 'param_id', None), 'best_cost', None)
+        constants = _constant_features(pid.param_id, best) if multi_segment(obs) else None
     cal = {p['param_name']: float(val) for p, val in zip(params_for_id, best)}
-    return cal, inp['param_id_method'], (float(cost) if cost is not None and np.isfinite(cost) else None)
+    return cal, inp['param_id_method'], (float(cost) if cost is not None and np.isfinite(cost) else None), constants
 
 
-def _evaluate(cm, v, val_obs, calibrated, cal_end):
+def _constant_features(param_id, best):
+    """{data_item_name: value} of the constant data_items at ``best``, evaluated by libcuflynx
+    itself over the whole protocol (each item on its own sub-experiment, cross-segment
+    operation_kwargs references resolved), as the cost was."""
+    from libcuflynx.utilities.obs_data_helpers import obs_item_names
+
+    info = param_id.obs_info
+    names = list(obs_item_names(info))
+    const_idx = {}
+    for JJ, dtype in enumerate(info['data_types']):
+        if dtype == 'constant':
+            const_idx[JJ] = len(const_idx)
+    _, operands_list, _ = param_id.get_cost_obs_and_pred_from_params(best)
+    out, k = {}, 0
+    with param_id.accumulating_temp_results():
+        for exp_idx, n_sub in enumerate(param_id.protocol_info['num_sub_per_exp']):
+            for sub_idx in range(n_sub):
+                operands = operands_list[k]
+                k += 1
+                if operands is None:
+                    continue
+                with param_id.evaluating_segment(exp_idx, sub_idx):
+                    obs = param_id.get_obs_output_dict(operands)
+                for JJ, c in const_idx.items():
+                    if (int(info['experiment_idxs'][JJ]), int(info['subexperiment_idxs'][JJ])) == (exp_idx, sub_idx):
+                        out[names[JJ]] = float(obs['const'][c])
+    return out
+
+
+def _z(model_value, item):
+    return {'model': model_value, 'data': float(item['value']),
+            'z': abs(model_value - float(item['value'])) / float(item['std'])}
+
+
+def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     """Scores of the calibrated model against the validation obs_data: series items by
     ``metric`` (calibration and prediction windows), constant items as |model - value| / std
-    using libcuflynx's own operation functions."""
+    using libcuflynx's own operation functions. ``features``: for a multi-segment protocol, the
+    constant data_items' values libcuflynx evaluated over the whole protocol
+    (_constant_features); they are scored directly, leaving out weight-0 helper items (items
+    another one references, e.g. the two steady states of a step difference)."""
     from libcuflynx.param_id.operation_funcs import get_operation_funcs_dict_for_mode
 
+    constants = [i for i in val_obs['data_items'] if i.get('data_type') == 'constant']
+    if features is not None:
+        z_scores = {i['data_item_name']: _z(features[i['data_item_name']], i) for i in constants
+                    if float(i.get('weight', 1.0)) != 0 and i['data_item_name'] in features}
+        return None, {}, {}, {}, {}, z_scores
     by_var = {p.variable_name: p for p in cm.parameters()}
     series = series_from_obs_data(val_obs)
-    constants = [i for i in val_obs['data_items'] if i.get('data_type') == 'constant']
     t_end = float(val_obs['protocol_info']['sim_times'][0][-1])
     dts = [float(i['obs_dt']) for i in val_obs['data_items'] if i.get('data_type') == 'series']
     wanted = sorted(set(series) | {op.split('/', 1)[1] for i in constants for op in i['operands']})
@@ -249,8 +301,7 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end):
         args = [out[op.split('/', 1)[1]] for op in item['operands']]
         op = item.get('operation')
         model_value = float(ops[op](*args)) if op else float(args[0][-1])
-        z_scores[item['data_item_name']] = {'model': model_value, 'data': float(item['value']),
-                                            'z': abs(model_value - float(item['value'])) / float(item['std'])}
+        z_scores[item['data_item_name']] = _z(model_value, item)
     return tm, out, series, cal_scores, pred_scores, z_scores
 
 
@@ -282,8 +333,8 @@ def run(cm, v, plot_path):
     starts = v.get('starts') or [v.get('initial_parameters') or {}]
     runs, problems, figs = [], [], []
     for n, start_values in enumerate(starts):
-        calibrated, method, cost = _calibrate_once(cm, v, calibration_obs(obs), params_for_id, start_values, n)
-        tm, out, series, cal_s, pred_s, z_s = _evaluate(cm, v, val_obs, calibrated, cal_end)
+        calibrated, method, cost, features = _calibrate_once(cm, v, calibration_obs(obs), params_for_id, start_values, n)
+        tm, out, series, cal_s, pred_s, z_s = _evaluate(cm, v, val_obs, calibrated, cal_end, features)
         label = ', '.join(f'{k}={val:g}' for k, val in start_values.items()) or 'nominal'
         runs.append({'start': start_values, 'calibrated_parameters': calibrated, 'cost': cost, 'calibration_scores': cal_s,
                      'prediction_scores': pred_s, 'constant_items': z_s})

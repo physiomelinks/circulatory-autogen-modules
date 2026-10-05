@@ -1,0 +1,36 @@
+{
+ "instance": "davis2020_wistar",
+ "version": "i_M/Argus2026_v01",
+ "date": "2026-10-05",
+ "passed": true,
+ "summary": "start nominal -> rho_M=0.09467",
+ "method": "CMA-ES",
+ "files": [
+  "instances/davis2020_wistar/davis2020_wistar_obs_data.json",
+  "instances/davis2020_wistar/davis2020_wistar_params_for_id.csv"
+ ],
+ "cost": 6.059283595262976e-11,
+ "calibrated_parameters": {
+  "rho_M": 0.09466978273513613
+ },
+ "runs": [
+  {
+   "start": {},
+   "calibrated_parameters": {
+    "rho_M": 0.09466978273513613
+   },
+   "cost": 6.059283595262976e-11,
+   "calibration_scores": {},
+   "prediction_scores": {},
+   "constant_items": {
+    "XE991_sensitive_I_M_step": {
+     "model": -0.12096011228605125,
+     "data": -0.12096,
+     "z": 1.100843639693029e-05
+    }
+   }
+  }
+ ],
+ "metric": "log_rmse",
+ "threshold": 0.5
+}

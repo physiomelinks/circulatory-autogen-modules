@@ -113,7 +113,7 @@ Delta_V_mid_w_SN_soma_i_M,milliV,0,for_drug_control
 V_den_w_SN_soma_i_M,milliV,10,Martin2023_was_10
 V_mid_w_SN_soma_i_M,milliV,35,Martin2023_was_35
 V_rest_approx_SN_soma_i_M,milliV,-70,Davis2021Thesis_from_traces
-rho_M_SN_soma_i_M,per_um2,0.0974074074074074,definitional; chosen so that g_M = A rho gamma_M (1e-6 uS/pS) reproduces the previous g_M = 0.00263 microS (Davis2020 (was 0.00389; recomputed on review 2026-10-02)) with A = 3000 um^2 (the soma membrane area) and gamma_M = 9 picoS; a density for calibration through gamma_M
+rho_M_SN_soma_i_M,per_um2,0.09466978273513613,"Davis2020; Calibrated (libcuflynx) to i_M Argus2026_v01 instances/davis2020_wistar/davis2020_wistar_obs_data.json: Davis2020 Fig. 3C Wistar XE-991-sensitive I_M -4.03 pA/pF x Cm 30 pF, -25 to -55 mV; E_K -96.5 mV (Ki 200 mM, 22 degC); re-derived on review 2026-10-05 (was 0.00263 uS with E_K -93.7). g_M = A rho gamma_M = 0.002556 uS at A 3000 um^2, gamma_M 9 pS"
 gamma_M_SN_soma_i_M,picoS,9.0,"Selyanko2001; KCNQ2/KCNQ3 (M-type) single-channel conductance 9.0 +- 0.3 pS (Abstract, point 2); native rat SCG M-channels show ~7, 12 and 19 pS levels (Selyanko & Brown 1993)"
 g_M_mod_SN_soma_i_M,dimensionless,1.0,can_be_modified_for_retagabine
 tau_w_min_SN_soma_i_M,millis,30,gupta2016Computational

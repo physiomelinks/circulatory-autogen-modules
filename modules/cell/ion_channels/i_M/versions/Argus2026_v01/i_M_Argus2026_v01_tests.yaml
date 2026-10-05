@@ -1,64 +1,33 @@
 module_type: i_M
 version: Argus2026_v01
 reviewed: false
+description: 'M (KCNQ2/3) K current of the sympathetic-neuron soma: i_M = g_M mod w (V - E_K), g = A rho gamma; w_inf from
+  Martin & Pedersen 2023 with the owner''s slower tau_w; g_M from the Davis 2020 XE-991-sensitive current; its K flux goes
+  to the soma''s K balance.'
 notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
-  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. M-type (KCNQ) K current
-  of the SN soma, i_M = g_M_mod g_M w (V - E_K); Delta_V_mid_w shifts the activation for drug studies. Split out of the monolithic
-  SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history);
-  SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal
-  conductance is g_M = A_mem rho_M gamma_M (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem
-  from the membrane through membrane_area; the defaults reproduce the previous g_M. Temperature (review 2026-10-05): the model
-  is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; every gating
-  time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_M, T_ref_M). T_ref defaults to 295.15 K, so phi = 1 and the
-  kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them, and the model can
-  be run at 37 degC by changing T.'
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. M-type (KCNQ) K current of the SN soma, i_M = g_M_mod g_M w (V - E_K); Delta_V_mid_w shifts the activation
+  for drug studies. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation
+  (2026-10-02): the maximal conductance is g_M = A_mem rho_M gamma_M (membrane area x channel density x single-channel conductance,
+  1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_M. Temperature (review
+  2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated
+  to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_M, T_ref_M). T_ref defaults to 295.15 K,
+  so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them,
+  and the model can be run at 37 degC by changing T. tau_w shape: prefactor 2.0 and slopes 15/25 mV are the owner''s (CA 837d3aae,
+  2024-07-21); MartinPedersen2023 has 3.3 and 10/20 mV; **tau_w peaks at 508 ms (Martin 142 ms at 37 degC) and has a 30 ms
+  floor**. tau_w comparison with the Davis M-current data pending. g_M calibration (2026-10-05): rho_M is calibrated with
+  libcuflynx to instance davis2020_wistar (Davis2020 Fig. 3C, Wistar XE-991-sensitive M current -4.032 pA/pF x an assumed
+  Cm 30 pF, modelled as the change of the steady-state i_M from -25 to -55 mV with E_K -96.4979 mV), giving rho_M 0.09467
+  /um^2, g_M 0.002556 uS; the default, the soma supermodule, the monolithic soma and SN_simple(_flat) use that value. To redo
+  it: edit instances/davis2020_wistar/davis2020_wistar_obs_data.json (value, std, Cm, protocol) or _params_for_id.csv and
+  run venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k ''calibrate and davis2020_wistar''
+  --include-unreviewed, which rewrites davis2020_wistar_calibrated_parameters.csv and _calibration.json; then copy the calibrated
+  rho_M into the default and the supermodule/system rows.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
   (2026-10-03).'
-reference_proposals:
-  Delta_V_mid_w:
-    reference: definitional; shift of the M-current activation for drug studies; 0 = no drug
-    sourced: 'no'
-  E_K:
-    reference: definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 295.15 K (the soma defaults; used when
-      unconnected)
-    sourced: 'no'
-  V:
-    reference: 'definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)'
-    sourced: 'no'
-    value: -70.0
-  V_den_w:
-    reference: 'Martin2024; Eq. 18: slope 10 mV (= value; Zhou2018 Table A.2)'
-    sourced: 'yes'
-    also_cites:
-    - Zhou2018
-  V_mid_w:
-    reference: 'Martin2024; Eq. 18: w_inf = 1/(1+exp(-(V+35)/10)), V1/2 = -35 mV (= value; from Zhou2018 Table A.2; -35 mV
-      is the M-current half-activation of Adams1982)'
-    sourced: 'yes'
-    also_cites:
-    - Zhou2018
-    - Adams1982
-  V_rest_approx:
-    reference: 'Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value
-      was read from)'
-    sourced: 'yes'
-  tau_w_min:
-    reference: unreferenced_placeholder; minimum M-current time constant 30 ms; no source found. Martin2024 / Zhou2018 have
-      no minimum term, and the CA reference gupta2016Computational (an SK channel model of bladder smooth muscle) is wrong
-      for this parameter. Adams1982 report a maximal tau of about 150 ms at -35 mV (bullfrog, 22 C)
-    sourced: 'no'
-    also_cites:
-    - Martin2024
-    - Adams1982
-  tau_w_num:
-    reference: 'Martin2024; Eq. 19: tau_w = 400/(3.3 exp((V+35)/20) + exp(-(V+35)/20)) ms (from Zhou2018); modified here to
-      numerator 1200 ms (was 400), with coefficients 2.0, /15 and /25 instead of 3.3, /20, /20 and an added tau_w_min'
-    sourced: 'yes'
-    also_cites:
-    - Zhou2018
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.

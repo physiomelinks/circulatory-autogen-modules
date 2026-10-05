@@ -22,9 +22,9 @@ V_mid_h_Kv4_2,milliV,81.6,"Bekkers2000; Abstract: steady-state inactivation V1/2
 V_den_h_Kv4_2,milliV,6.7,"Bekkers2000; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",yes
 V_mid_m_Kv2,milliV,6,BelluzziSacchi1988; n_inf V1/2 = -6.54 mV (Abstract); 6 mV here is Tao2011 Document S1 Eq. 96's rounded -6.084 mV (Tao values not relied on for now),yes
 V_den_m_Kv2,milliV,8,BelluzziSacchi1988; n_inf slope k = 8.91 mV (Abstract); 8 mV here is Tao2011 Document S1 Eq. 96's rounded 8.007 mV (Tao values not relied on for now),yes
-V_mid_w,milliV,35,SN_simple: Martin2023_was_35,yes
-Delta_V_mid_w,milliV,0,SN_simple: for_drug_control,yes
-V_den_w,milliV,10,SN_simple: Martin2023_was_10,yes
+V_mid_w,milliV,35,MartinPedersen2023; Methods (p. 16): w_inf V1/2 = -35 mV (= value; from Zhou et al.),yes
+Delta_V_mid_w,milliV,0,definitional; drug-induced shift of the M-channel activation midpoint (0 = control; e.g. retigabine studies),no
+V_den_w,milliV,10,MartinPedersen2023; Methods (p. 16): w_inf k = 10 mV (= value),yes
 V_den_m_BK,milliV,6.2,Khaliq2003; Table 1: BK m k = 6.2 mV (= value),yes
 V_mid_h_BK,milliV,26,"Khaliq2003; Table 1: BK h V1/2 = -32 mV (paper coordinates; ModelDB 48332 adds a +5 mV shift); **modified here to 26 mV (owner's shift, CA_user ad0ce77 2024-07-21): every BK curve 6 mV left of the paper**; m V1/2 follows as V_mid_h - 3.1 (Table 1: -28.9)",yes
 V_den_h_BK,milliV,5.8,Khaliq2003; Table 1: BK h k = -5.8 mV (= value),yes
@@ -34,7 +34,7 @@ tau_h_min,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21; CA t
 tau_h_max,millis,5,"owner's hand-set value (CA_user 70f2cf7, 2025-05-04: reset from 300 to 5 ms when the slow component was moved to i_Na1_6; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 9B: tau_h bell-shaped, peak ~22 ms near -50 mV at 37 degC (46.1 ms at -50 mV, 2.5 ms at -100 mV at 27 degC, p. 282); = Tao2011 Document S1 Eq. 89 (peak ~23-42 ms near -46 mV); here ~4x faster",no
 tau_h_Na1_6_min,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21, for i_Na; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'). Cf. BelluzziSacchi1986 Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); Tao2011 Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
 tau_h_Na1_6_max,millis,300,"owner's calibration value (CA_user 35f61a8, 2025-05-01: tau_h_max 300 ms, the upper bound of its 50-300 ms calibration range; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'; a 2026-08 free fit gave 1004 ms, sympathetic_neuron 7ab2983). Physiological counterpart: BelluzziSacchi1986 slow Na inactivation, recovery tau_s1 0.13-1.4 s at -100 to -60 mV (27 degC; Fig. 7, Table 1, pp. 282-284). Not a NaV1.6 property: Herzog2003 report Nav1.6 reprimes ~5x faster than Nav1.7",no
-tau_w_min,millis,30,SN_simple: gupta2016Computational,yes
+tau_w_min,millis,30,"owner's floor (CA 72f29290, CA_user b8488ae, 2025-03-31); not in MartinPedersen2023 (no offset); the CA token cites Gupta2016, an SK-channel bladder model, **which is unlikely to be the source** (not verified)",no
 tau_c_min,millis,0.2,"BelluzziSacchi1989; Eq. 4 tau_c = 1/(...) + 0.1 ms (= Tao2011 Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",yes
 tau_c_max,millis,3.0,owner's fit to Davis2020 current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. BelluzziSacchi1989 Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); 3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1),no
 tau_hc,millis,20.0,"BelluzziSacchi1989; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = Tao2011 Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",yes
@@ -80,7 +80,7 @@ g_KCa_SK_mod,dimensionless,1.0,SN_simple: to_be_identified,no
 Cao,millimolar,2,SN_simple: Tau2011,yes
 Ko,millimolar,4.5,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular K 4.5 mM,yes
 Nao,millimolar,145,BoronBoulpaep2017; Table 5-2 (interstitium) and Table 5-3: extracellular Na 145 mM,yes
-rho_M,per_um2,0.0974074074074074,"definitional; chosen so that g_M = A rho gamma_M (1e-6 uS/pS) reproduces the previous g_M = 0.00263 microS (Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV and E_K = -93.7 mV the same calculation gives 0.00263 uS) with A = 3000 um^2 (the soma membrane area) and gamma_M = 9 picoS; a density for calibration through gamma_M",no
+rho_M,per_um2,0.09466978273513613,"Davis2020; Calibrated (libcuflynx) to i_M Argus2026_v01 instances/davis2020_wistar/davis2020_wistar_obs_data.json: Davis2020 Fig. 3C Wistar XE-991-sensitive I_M -4.03 pA/pF x Cm 30 pF, -25 to -55 mV; E_K -96.5 mV (Ki 200 mM, 22 degC); re-derived on review 2026-10-05 (was 0.00263 uS with E_K -93.7). g_M = A rho gamma_M = 0.002556 uS at A 3000 um^2, gamma_M 9 pS",yes
 gamma_M,picoS,9.0,"Selyanko2001; KCNQ2/KCNQ3 (M-type) single-channel conductance 9.0 +- 0.3 pS (Abstract, point 2); native rat SCG M-channels show ~7, 12 and 19 pS levels (Selyanko & Brown 1993)",yes
 g_M_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
 rho_leak_Na,per_um2,0.005,definitional; chosen so that g_leak_Na = A rho gamma_leak_Na (1e-6 uS/pS) reproduces the previous g_leak_Na = 0.0003 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_Na = 20 picoS; a density for calibration through gamma_leak_Na,no
@@ -88,7 +88,7 @@ gamma_leak_Na,picoS,20.0,unreferenced_placeholder; no verified single-channel co
 rho_leak_K,per_um2,0.0006666666666666668,definitional; chosen so that g_leak_K = A rho gamma_leak_K (1e-6 uS/pS) reproduces the previous g_leak_K = 0.0001 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_K = 50 picoS; a density for calibration through gamma_leak_K,no
 gamma_leak_K,picoS,50.0,"Kang2006; TREK-2, the major background K channel of rat DRG neurons (69% of the resting K current at 37 degC), ~50 pS in 150 mM KCl (Abstract); a ganglion-neuron proxy for the K leak",yes
 delta_gM,microS,0.000,SN_simple: to_be_identified,no
-tau_w_num,millis,1200,SN_simple: Martin2023Modelling_was_400,yes
+tau_w_num,millis,1200,"MartinPedersen2023; Methods (p. 16): tau_w = 400/(3.3 exp((V+35)/10) + exp(-(V+35)/20)) ms (from Zhou et al.); **numerator modified here to 1200 ms (3x the source)** (owner calibration: 200 -> 800 -> 1200, CA_user ad0ce77/a7a4a58, 2024)",yes
 cAMP,dimensionless,0.01,SN_simple: user_defined,no
 I_in,nanoA,0.00,SN_simple: user_defined,no
 I_out,nanoA,TODO,TODO,no

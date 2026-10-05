@@ -6,7 +6,7 @@ V_den_w,milliV,10,MartinPedersen2023; Methods (p. 16): w_inf k = 10 mV (= value)
 V_mid_w,milliV,35,MartinPedersen2023; Methods (p. 16): w_inf V1/2 = -35 mV (= value; from Zhou et al.),yes
 V_rest_approx,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)",yes
 A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
-rho_M,per_um2,0.09466978273513613,"Davis2020; Calibrated (libcuflynx) to instances/davis2020_wistar/davis2020_wistar_obs_data.json: Davis2020 Fig. 3C Wistar XE-991-sensitive I_M -4.03 pA/pF x Cm 30 pF, -25 to -55 mV; E_K -96.5 mV (Ki 200 mM, 22 degC); re-derived on review 2026-10-05 (was 0.00263 uS with E_K -93.7). g_M = A rho gamma_M = 0.002556 uS at A 3000 um^2, gamma_M 9 pS",yes
+rho_M,per_um2,0.3,definitional; the optimiser start for this instance's calibration (any value in the params_for_id range 0.01-1 /um^2); the calibrated value is in davis2020_wistar_calibrated_parameters.csv,no
 gamma_M,picoS,9.0,"Selyanko2001; KCNQ2/KCNQ3 (M-type) single-channel conductance 9.0 +- 0.3 pS (Abstract, point 2); native rat SCG M-channels show ~7, 12 and 19 pS levels (Selyanko & Brown 1993)",yes
 g_M_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
 tau_w_min,millis,30,"owner's floor (CA 72f29290, CA_user b8488ae, 2025-03-31); not in MartinPedersen2023 (no offset); the CA token cites Gupta2016, an SK-channel bladder model, **which is unlikely to be the source** (not verified)",no

@@ -124,15 +124,15 @@ p_SK_i_SK,dimensionless,4,"Hirschberg1998; Results: Hill coefficient 3.2 +- 1.0 
 tau_m_SK_i_SK,millis,5,"Hirschberg1998; Results, Fig. 13A: rSK2 macroscopic activation tau 4.1 +- 0.6 ms after a jump to 9.5 uM Ca (deactivation 57.3 +- 11.1 ms; model activation ~5 ms at 5 uM, ~50 ms at 0.5 uM Ca); 5 ms ~ value **(one tau used for activation and deactivation: deactivation is ~11x too fast against the measured 57 ms)**. Previously cited to Gupta2016 (bladder SK model, not verified)",yes
 Q10_SK_i_SK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_SK_i_SK,kelvin,295.15,"Hirschberg1998; rSK2 in Xenopus oocytes, inside-out patches at room temperature (kinetics as measured; equal to the model temperature)",yes
-Delta_V_mid_w_i_M,milliV,0,for_drug_control,yes
-V_den_w_i_M,milliV,10,Martin2023_was_10,yes
-V_mid_w_i_M,milliV,35,Martin2023_was_35,yes
-V_rest_approx_i_M,milliV,-70,Davis2021Thesis_from_traces,yes
-rho_M_i_M,per_um2,0.0974074074074074,"definitional; chosen so that g_M = A rho gamma_M (1e-6 uS/pS) reproduces the previous g_M = 0.00263 microS (Davis2020; derived from the Wistar XE-991-sensitive I_M density -4.03 pA/pF (Fig. 3C, -25 to -55 mV step) x Cm 30 pF = 0.12 nA, divided by the w(V)(V - E_K) difference between -25 and -55 mV. The old 0.00389 uS was computed with V_mid_w = 25 mV and E_K = -90 mV (sister repo SN_simple/conductance_calcs.py); with this model's V_mid_w = 35 mV and E_K = -93.7 mV the same calculation gives 0.00263 uS) with A = 3000 um^2 (the soma membrane area) and gamma_M = 9 picoS; a density for calibration through gamma_M",no
+Delta_V_mid_w_i_M,milliV,0,definitional; drug-induced shift of the M-channel activation midpoint (0 = control; e.g. retigabine studies),no
+V_den_w_i_M,milliV,10,MartinPedersen2023; Methods (p. 16): w_inf k = 10 mV (= value),yes
+V_mid_w_i_M,milliV,35,MartinPedersen2023; Methods (p. 16): w_inf V1/2 = -35 mV (= value; from Zhou et al.),yes
+V_rest_approx_i_M,milliV,-70,"Davis2020; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites Davis2021Thesis, whose current-clamp traces the value was read from)",yes
+rho_M_i_M,per_um2,0.09466978273513613,"Davis2020; Calibrated (libcuflynx) to i_M Argus2026_v01 instances/davis2020_wistar/davis2020_wistar_obs_data.json: Davis2020 Fig. 3C Wistar XE-991-sensitive I_M -4.03 pA/pF x Cm 30 pF, -25 to -55 mV; E_K -96.5 mV (Ki 200 mM, 22 degC); re-derived on review 2026-10-05 (was 0.00263 uS with E_K -93.7). g_M = A rho gamma_M = 0.002556 uS at A 3000 um^2, gamma_M 9 pS",yes
 gamma_M_i_M,picoS,9.0,"Selyanko2001; KCNQ2/KCNQ3 (M-type) single-channel conductance 9.0 +- 0.3 pS (Abstract, point 2); native rat SCG M-channels show ~7, 12 and 19 pS levels (Selyanko & Brown 1993)",yes
 g_M_mod_i_M,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
-tau_w_min_i_M,millis,30,gupta2016Computational,yes
-tau_w_num_i_M,millis,1200,Martin2023Modelling_was_400,yes
+tau_w_min_i_M,millis,30,"owner's floor (CA 72f29290, CA_user b8488ae, 2025-03-31); not in MartinPedersen2023 (no offset); the CA token cites Gupta2016, an SK-channel bladder model, **which is unlikely to be the source** (not verified)",no
+tau_w_num_i_M,millis,1200,"MartinPedersen2023; Methods (p. 16): tau_w = 400/(3.3 exp((V+35)/10) + exp(-(V+35)/20)) ms (from Zhou et al.); **numerator modified here to 1200 ms (3x the source)** (owner calibration: 200 -> 800 -> 1200, CA_user ad0ce77/a7a4a58, 2024)",yes
 Q10_M_i_M,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_M_i_M,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Cao_i_NaCa,millimolar,2,Tau2011,yes
