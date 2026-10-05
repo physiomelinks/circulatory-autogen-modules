@@ -18,12 +18,14 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   2024-07-21); MartinPedersen2023 has 3.3 and 10/20 mV; **tau_w peaks at 508 ms (Martin 142 ms at 37 degC) and has a 30 ms
   floor**. tau_w comparison with the Davis M-current data pending. g_M calibration (2026-10-05): rho_M is calibrated with
   libcuflynx to instance davis2020_wistar (Davis2020 Fig. 3C, Wistar XE-991-sensitive M current -4.032 pA/pF x an assumed
-  Cm 30 pF, modelled as the change of the steady-state i_M from -25 to -55 mV with E_K -96.4979 mV), giving rho_M 0.09467
-  /um^2, g_M 0.002556 uS; the default, the soma supermodule, the monolithic soma and SN_simple(_flat) use that value. To redo
-  it: edit instances/davis2020_wistar/davis2020_wistar_obs_data.json (value, std, Cm, protocol) or _params_for_id.csv and
-  run venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k ''calibrate and davis2020_wistar''
-  --include-unreviewed, which rewrites davis2020_wistar_calibrated_parameters.csv and _calibration.json; then copy the calibrated
-  rho_M into the default and the supermodule/system rows.'
+  Cm 30 pF; the measure, per Davis2021Thesis p. 172-173, is the deactivation relaxation in a 1 s step from -25 to -55 mV:
+  the current after the ohmic jump minus that near the end of the step; E_K -96.4979 mV), giving rho_M 0.2029 /um^2, g_M 0.005479
+  uS (2.1x the earlier 0.00263 uS, which divided the density by the -25/-55 mV steady-state difference). The fitted g_M depends
+  on tau_w: the 1 s step leaves the relaxation 87 % complete with the present tau_w (466 ms at -55 mV); refit g_M if tau_w
+  changes. The default, the soma supermodule, the monolithic soma and SN_simple(_flat) use that value. To redo it: edit instances/davis2020_wistar/davis2020_wistar_obs_data.json
+  (value, std, Cm, protocol) or _params_for_id.csv and run venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01
+  -k ''calibrate and davis2020_wistar'' --include-unreviewed, which rewrites davis2020_wistar_calibrated_parameters.csv and
+  _calibration.json; then copy the calibrated rho_M into the default and the supermodule/system rows.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

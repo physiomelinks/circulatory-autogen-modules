@@ -61,13 +61,13 @@
     "davis2020_wistar": {
       "calibrate": {
         "status": "active",
-        "source": "Davis et al. 2020, Hypertension 76:1915, Fig. 3C (Wistar XE-991-sensitive M current, -25 -> -55 mV step); Cm 30 pF assumed",
+        "source": "Davis et al. 2020, Hypertension 76:1915, Fig. 3C, measure defined in Davis 2021 thesis p. 172-173 (Wistar XE-991-sensitive M-current deactivation relaxation, 1 s step -25 -> -55 mV); Cm 30 pF assumed",
         "obs_data": "instances/davis2020_wistar/davis2020_wistar_obs_data.json",
         "params_for_id": "instances/davis2020_wistar/davis2020_wistar_params_for_id.csv",
         "z_threshold": 0.5,
         "method": "CMA-ES",
         "optimiser_options": {"num_calls_to_function": 400, "cost_convergence": 1e-10, "max_patience": 40, "seed": 1},
-        "dt": 0.01
+        "dt": 0.001
       }
     }
   }
