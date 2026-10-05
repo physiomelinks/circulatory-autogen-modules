@@ -54,13 +54,13 @@ rho_IP3R,per_um2,0.0,definitional; chosen so that k_IP3 = A rho k_IP3R_single (1
 k_IP3R_single,um3_per_s,0.8636921110362579,unreferenced_placeholder; per-receptor flux coefficient i/(2 F dCa) for a ~0.1 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 0.864 um^3/s,no
 rho_leak_Ca,per_um2,3.0885062497465667,definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca = 2e-20 m3_per_s (user_defined) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and k_leak_Ca_single = 0.01 um3_per_s; a density for calibration through k_leak_Ca_single,no
 k_leak_Ca_single,um3_per_s,0.01,unreferenced_placeholder; per-protein Ca leak coefficient (flux per concentration difference) of an ER leak pathway; 0.01 um^3/s assumed,no
-h_IP3_init,dimensionless,0.99,SN_simple: user_defined,no
-IP3,millimolar,200e-6,SN_simple: Li1994Equations_from_plot,yes
-a_2,per_millimolar,200,SN_simple: Li1994Equations,yes
-d_1,millimolar,0.13e-3,SN_simple: Li1994Equations,yes
-d_2,millimolar,1.049e-3,SN_simple: Li1994Equations,yes
-d_3,millimolar,0.943e-3,SN_simple: Li1994Equations,yes
-d_5,millimolar,0.08234e-3,SN_simple: Li1994Equations,yes
+h_IP3_init,dimensionless,0.99,unreferenced_placeholder; owner's initial value 0.99 (CA token 'user_defined'),no
+IP3,millimolar,200e-6,"LiRinzel1994; IP3 0.2 uM, read from the paper's figures (they use 0.2-0.6 uM; owner's reading)",yes
+a_2,per_millimolar_per_s,200,"LiRinzel1994; Table 1: a2 = 0.2 /uM/s = 200 /(mM s) (= value); tau_h = 1/(a2 (Q2 + C)) in seconds (~12 s at rest). **Fixed on review 2026-10-05: a_2 had units per_millimolar and tau_hIP3 was computed in ms, 1000x too fast**",yes
+d_1,millimolar,0.13e-3,LiRinzel1994; Table 1: d1 = 0.13 uM (= value),yes
+d_2,millimolar,1.049e-3,LiRinzel1994; Table 1: d2 = 1.049 uM (= value),yes
+d_3,millimolar,0.943e-3,LiRinzel1994; Table 1: d3 = 0.9434 uM (0.943 here) (= value),yes
+d_5,millimolar,0.08234e-3,LiRinzel1994; Table 1: d5 = 0.08234 uM (= value),yes
 c_ER,dimensionless,0.01,SN_simple: Li1994Equations_was_0.185,yes
 c_SL,dimensionless,0.02,SN_simple: user_defined_TO_BE_FOUND,no
 D_Ca,m3_per_s,3e-15,SN_simple: identified_by_hand,no

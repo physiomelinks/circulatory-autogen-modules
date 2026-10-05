@@ -11,6 +11,15 @@
     {
       "description": "every gating variable stays in [0, 1]",
       "expr": "np.all((h_IP3 >= -1e-9) & (h_IP3 <= 1 + 1e-9))"
+    },
+    {
+      "description": "with Cai and IP3 fixed, h_IP3 relaxes exactly: h_inf + (h_IP3_init - h_inf) exp(-t/tau), tau = 1/(a_2 (Q_2 + Cai))/phi in seconds (Li-Rinzel)",
+      "expr": "np.max(np.abs(h_IP3 - (((d_2*(IP3 + d_1)/(IP3 + d_3))/((d_2*(IP3 + d_1)/(IP3 + d_3)) + Cai)) + (h_IP3_init - ((d_2*(IP3 + d_1)/(IP3 + d_3))/((d_2*(IP3 + d_1)/(IP3 + d_3)) + Cai)))*np.exp(-t/(1/(a_2*((d_2*(IP3 + d_1)/(IP3 + d_3)) + Cai))/(Q10_IP3R**((T - T_ref_IP3R)/10))))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "flux direction: ER release j_IP3 has the sign of Ca_ER - Cai (zero when they are equal)",
+      "expr": "np.all(j_IP3*(Ca_ER - Cai) >= -1e-30)"
     }
   ],
   "bc_sweep": {

@@ -6,7 +6,7 @@
         <variable name="Cai" public_interface="in" units="millimolar"/>
         <variable name="IP3" public_interface="in" units="millimolar"/>
         <variable name="Q_2" public_interface="out" units="millimolar"/>
-        <variable name="a_2" public_interface="in" units="per_millimolar"/>
+        <variable name="a_2" public_interface="in" units="per_millimolar_per_s"/>
         <variable name="d_1" public_interface="in" units="millimolar"/>
         <variable name="d_2" public_interface="in" units="millimolar"/>
         <variable name="d_3" public_interface="in" units="millimolar"/>
@@ -78,7 +78,7 @@
                 <ci>tau_hIP3</ci>
                 <apply>
                     <divide/>
-                    <cn cellml:units="millis">1</cn>
+                    <cn cellml:units="millis_per_s">1000</cn>
                     <apply>
                         <times/>
                         <ci>a_2</ci>
