@@ -16,13 +16,13 @@
  {"name": "SN_soma_i_leak_Na", "module_type": "i_leak_Na", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_soma_membrane", "SN_soma_Na_K"], "out_instances": []},
  {"name": "SN_soma_i_leak_K", "module_type": "i_leak_K", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_soma_membrane", "SN_soma_Na_K"], "out_instances": []},
  {"name": "SN_soma_IP3R", "module_type": "IP3R", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_soma_Ca"], "out_instances": []},
- {"name": "SN_soma_RyR", "module_type": "RyR", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_soma_Ca"], "out_instances": []},
+ {"name": "SN_soma_RyR", "module_type": "RyR", "module_subtype": "HernandezCruz1997_v01", "instance": "default", "inp_instances": ["SN_soma_Ca"], "out_instances": []},
  {"name": "SN_axon", "module_type": "axon", "module_subtype": "sympathetic_monolithic_v01", "instance": "default", "inp_instances": ["SN_soma_membrane"], "out_instances": ["SN_varicosity_membrane"]},
  {"name": "SN_varicosity_membrane", "module_type": "SN_varicosity_membrane", "module_subtype": "nn", "instance": "default", "inp_instances": ["SN_axon"], "out_instances": ["SN_varicosity_i_CaN", "SN_varicosity_i_NaCa", "SN_varicosity_Ca"]},
  {"name": "SN_varicosity_Ca", "module_type": "SN_Ca_handling_varicosity", "module_subtype": "nn", "instance": "default", "inp_instances": ["SN_varicosity_membrane"], "out_instances": ["SN_varicosity_i_CaN", "SN_varicosity_i_NaCa", "SN_varicosity_IP3R", "SN_varicosity_RyR", "SN_varicosity_NE"]},
  {"name": "SN_varicosity_i_CaN", "module_type": "i_CaN", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_varicosity_membrane", "SN_varicosity_Ca"], "out_instances": []},
  {"name": "SN_varicosity_i_NaCa", "module_type": "i_NaCa", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_varicosity_membrane", "SN_varicosity_Ca"], "out_instances": []},
  {"name": "SN_varicosity_IP3R", "module_type": "IP3R", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_varicosity_Ca"], "out_instances": []},
- {"name": "SN_varicosity_RyR", "module_type": "RyR", "module_subtype": "Argus2026_v01", "instance": "default", "inp_instances": ["SN_varicosity_Ca"], "out_instances": []},
+ {"name": "SN_varicosity_RyR", "module_type": "RyR", "module_subtype": "HernandezCruz1997_v01", "instance": "default", "inp_instances": ["SN_varicosity_Ca"], "out_instances": []},
  {"name": "SN_varicosity_NE", "module_type": "SN_NE_release", "module_subtype": "nn", "instance": "default", "inp_instances": ["SN_varicosity_Ca"], "out_instances": []}
 ]

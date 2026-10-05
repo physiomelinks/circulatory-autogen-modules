@@ -11,7 +11,12 @@ notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 2
   recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_<X>_<submodule>,
   T_ref_<X>_<submodule> rows per gated channel, as in the channel modules). T_ref defaults to 295.15 K, so phi = 1 and the
   kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them, and the model can
-  be run at 37 degC by changing T.'
+  be run at 37 degC by changing T. RyR (review 2026-10-06): the RyR submodule is HernandezCruz1997_v01, the rat superior
+  cervical ganglion CICR model of Hernandez-Cruz, Escobar & Jimenez 1997 (activating, inactivating and luminal Ca sites;
+  rates times phi = Q10^((T - T_ref)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), with that version''s
+  default-instance values and references (*_RyR rows). It replaced Argus2026_v01 (the owner''s c^3 hc^3 law), which is
+  inconsistent with the rat-SCG CICR data (comparison: reviews/RyR_HernandezCruz1997_comparison.html). The rest of the soma
+  (SERCA, buffers, K(Ca)) was tuned with the old RyR, so the resting balance is to be recalibrated.'
 expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
@@ -201,36 +206,6 @@ reference_proposals:
   h_IP3_init_IP3R:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
-  Ca_ER_RyR_den_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Ca_ER_RyR_mid_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Cai_RyR_den_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Cai_RyR_mid_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  tau_c_RyR_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  tau_hc_RyR_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
   Cai_NE_base_NE:
     reference: 'definitional; release threshold set at the resting Cai (1e-4 mM, cf. Wanaverbecq2003: 102 nM in rat SCG) so
       release is zero at rest'
@@ -328,23 +303,3 @@ reference_proposals:
       flux switched off (0; was 0.03e-15 m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in review): definitional;
       IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in
       review): definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)'
-  rho_RyR_RyR:
-    reference: 'definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 7.5e-17
-      m3_per_s (to_be_identified) with A = 0.2245 um^2 (the varicosity ER membrane area) and k_RyR_single = 3.023 um3_per_s;
-      a density for calibration through k_RyR_single. The previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
-      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants'
-    sourced: 'no'
-    previous: 'previous k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml:
-      ''developed by Finbar Argus''), so it has no literature constants previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
-      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants previous
-      k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token
-      ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed
-      by Finbar Argus''), so it has no literature constants previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
-      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants previous
-      k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token
-      ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed
-      by Finbar Argus''), so it has no literature constants'

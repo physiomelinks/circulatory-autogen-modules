@@ -43,8 +43,10 @@
     "m_SK",
     "w",
     "h_IP3",
-    "c_RyR",
-    "hc_RyR",
+    "a_RyR",
+    "i_RyR",
+    "l_RyR",
+    "P_RyR",
     "Cm",
     "Vol",
     "V_shell"
@@ -69,7 +71,7 @@
     },
     {
       "description": "every gating variable stays in [0, 1]",
-      "expr": "np.all((m >= -1e-6) & (m <= 1 + 1e-6)) & np.all((h >= -1e-6) & (h <= 1 + 1e-6)) & np.all((m_Na1_6 >= -1e-6) & (m_Na1_6 <= 1 + 1e-6)) & np.all((h_Na1_6 >= -1e-6) & (h_Na1_6 <= 1 + 1e-6)) & np.all((c >= -1e-6) & (c <= 1 + 1e-6)) & np.all((hc >= -1e-6) & (hc <= 1 + 1e-6)) & np.all((m_Kv2 >= -1e-6) & (m_Kv2 <= 1 + 1e-6)) & np.all((m_Kv1_5 >= -1e-6) & (m_Kv1_5 <= 1 + 1e-6)) & np.all((h_Kv1_5 >= -1e-6) & (h_Kv1_5 <= 1 + 1e-6)) & np.all((m_Kv4_2 >= -1e-6) & (m_Kv4_2 <= 1 + 1e-6)) & np.all((h_Kv4_2 >= -1e-6) & (h_Kv4_2 <= 1 + 1e-6)) & np.all((m_BK >= -1e-6) & (m_BK <= 1 + 1e-6)) & np.all((h_BK >= -1e-6) & (h_BK <= 1 + 1e-6)) & np.all((z_BK >= -1e-6) & (z_BK <= 1 + 1e-6)) & np.all((m_SK >= -1e-6) & (m_SK <= 1 + 1e-6)) & np.all((w >= -1e-6) & (w <= 1 + 1e-6)) & np.all((h_IP3 >= -1e-6) & (h_IP3 <= 1 + 1e-6)) & np.all((c_RyR >= -1e-6) & (c_RyR <= 1 + 1e-6)) & np.all((hc_RyR >= -1e-6) & (hc_RyR <= 1 + 1e-6))"
+      "expr": "np.all((m >= -1e-6) & (m <= 1 + 1e-6)) & np.all((h >= -1e-6) & (h <= 1 + 1e-6)) & np.all((m_Na1_6 >= -1e-6) & (m_Na1_6 <= 1 + 1e-6)) & np.all((h_Na1_6 >= -1e-6) & (h_Na1_6 <= 1 + 1e-6)) & np.all((c >= -1e-6) & (c <= 1 + 1e-6)) & np.all((hc >= -1e-6) & (hc <= 1 + 1e-6)) & np.all((m_Kv2 >= -1e-6) & (m_Kv2 <= 1 + 1e-6)) & np.all((m_Kv1_5 >= -1e-6) & (m_Kv1_5 <= 1 + 1e-6)) & np.all((h_Kv1_5 >= -1e-6) & (h_Kv1_5 <= 1 + 1e-6)) & np.all((m_Kv4_2 >= -1e-6) & (m_Kv4_2 <= 1 + 1e-6)) & np.all((h_Kv4_2 >= -1e-6) & (h_Kv4_2 <= 1 + 1e-6)) & np.all((m_BK >= -1e-6) & (m_BK <= 1 + 1e-6)) & np.all((h_BK >= -1e-6) & (h_BK <= 1 + 1e-6)) & np.all((z_BK >= -1e-6) & (z_BK <= 1 + 1e-6)) & np.all((m_SK >= -1e-6) & (m_SK <= 1 + 1e-6)) & np.all((w >= -1e-6) & (w <= 1 + 1e-6)) & np.all((h_IP3 >= -1e-6) & (h_IP3 <= 1 + 1e-6)) & np.all((a_RyR >= -1e-6) & (a_RyR <= 1 + 1e-6)) & np.all((i_RyR >= -1e-6) & (i_RyR <= 1 + 1e-6)) & np.all((l_RyR >= -1e-6) & (l_RyR <= 1 + 1e-6)) & np.all((P_RyR >= -1e-6) & (P_RyR <= 1 + 1e-6))"
     },
     {
       "description": "free buffer stays within [0, B_Ca_total]",
@@ -96,6 +98,9 @@
       "B_Ca_init": {"min": 4.0, "max": 7.95, "points": 3},
       "B_Ca_total": {"min": 8.0, "max": 16.0, "points": 3},
       "h_IP3_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "a_RyR_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "i_RyR_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "l_RyR_init": {"min": 0.0, "max": 1.0, "points": 3},
       "rho_IP3R": {"min": 0.0, "max": 0.4038660392013737, "points": 3},
       "d": {
         "values": [19.275732104070492, 24.285900630052804, 30.59831741945869]

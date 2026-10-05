@@ -2,7 +2,7 @@ model: SN_simple_flat
 category: cellular
 reviewed: false
 description: 'SN_simple (sympathetic neuron: soma, axon, varicosity) with SN_soma and SN_varicosity decomposed into their
-  ion channels (cell/ion_channels, versions Argus2026_v01) and the neuron-specific membrane, concentration, Ca-handling and
+  ion channels (cell/ion_channels, versions Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06) and the neuron-specific membrane, concentration, Ca-handling and
   NE-release components (nested in modules/cell/neuron/soma and modules/cell/neuron/varicosity), wired explicitly. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
   by a one-off script (tools/build_sn_modules.py, removed; in git history); the vessel names are those a neuron/sympathetic
   record "SN" expands to (SN_soma_<part>, SN_axon, SN_varicosity_<part>).'
@@ -16,12 +16,11 @@ equivalence:
     soma_SN/Ca_ER: SN_soma_Ca/Ca_ER, soma_SN/Ca_ER_pre: SN_soma_Ca/Ca_ER_pre, soma_SN/Ca_bulk: SN_soma_Ca/Ca_bulk, soma_SN/Cai: SN_soma_Ca/Cai,
     soma_SN/E_K: SN_soma_Na_K/E_K, soma_SN/E_Na: SN_soma_Na_K/E_Na, soma_SN/I_in_delayed: SN_soma_membrane/I_in_delayed, soma_SN/Ki: SN_soma_Na_K/Ki,
     soma_SN/Nai: SN_soma_Na_K/Nai, soma_SN/V: SN_soma_membrane/V, soma_SN/V_sensed: SN_soma_membrane/V_sensed, soma_SN/c: SN_soma_i_CaL/c,
-    soma_SN/c_RyR: SN_soma_RyR/c_RyR, soma_SN/c_RyR_inf: SN_soma_RyR/c_RyR_inf, soma_SN/c_inf: SN_soma_i_CaL/c_inf, soma_SN/h: SN_soma_i_Na/h,
+    soma_SN/a_RyR: SN_soma_RyR/a_RyR, soma_SN/a_RyR_inf: SN_soma_RyR/a_RyR_inf, soma_SN/i_RyR: SN_soma_RyR/i_RyR, soma_SN/i_RyR_inf: SN_soma_RyR/i_RyR_inf, soma_SN/l_RyR: SN_soma_RyR/l_RyR, soma_SN/l_RyR_inf: SN_soma_RyR/l_RyR_inf, soma_SN/P_RyR: SN_soma_RyR/P_RyR, soma_SN/c_inf: SN_soma_i_CaL/c_inf, soma_SN/h: SN_soma_i_Na/h,
     soma_SN/h_BK: SN_soma_i_BK/h_BK, soma_SN/h_BK_inf: SN_soma_i_BK/h_BK_inf, soma_SN/h_IP3: SN_soma_IP3R/h_IP3, soma_SN/h_IP3_inf: SN_soma_IP3R/h_IP3_inf,
     soma_SN/h_Kv1_5: SN_soma_i_Kv1_5/h_Kv1_5, soma_SN/h_Kv1_5_inf: SN_soma_i_Kv1_5/h_Kv1_5_inf, soma_SN/h_Kv4_2: SN_soma_i_Kv4_2/h_Kv4_2,
     soma_SN/h_Kv4_2_inf: SN_soma_i_Kv4_2/h_Kv4_2_inf, soma_SN/h_Na1_6: SN_soma_i_Na1_6/h_Na1_6, soma_SN/h_Na1_6_inf: SN_soma_i_Na1_6/h_Na1_6_inf,
-    soma_SN/h_inf: SN_soma_i_Na/h_inf, soma_SN/hc: SN_soma_i_CaL/hc, soma_SN/hc_RyR: SN_soma_RyR/hc_RyR, soma_SN/hc_RyR_inf: SN_soma_RyR/hc_RyR_inf,
-    soma_SN/hc_inf: SN_soma_i_CaL/hc_inf, soma_SN/i_Ca_L: SN_soma_i_CaL/i_Ca_L, soma_SN/i_KCa_BK: SN_soma_i_BK/i_KCa_BK, soma_SN/i_KCa_SK: SN_soma_i_SK/i_KCa_SK,
+    soma_SN/h_inf: SN_soma_i_Na/h_inf, soma_SN/hc: SN_soma_i_CaL/hc, soma_SN/hc_inf: SN_soma_i_CaL/hc_inf, soma_SN/i_Ca_L: SN_soma_i_CaL/i_Ca_L, soma_SN/i_KCa_BK: SN_soma_i_BK/i_KCa_BK, soma_SN/i_KCa_SK: SN_soma_i_SK/i_KCa_SK,
     soma_SN/i_Kv1_5: SN_soma_i_Kv1_5/i_Kv1_5, soma_SN/i_Kv2: SN_soma_i_Kv2/i_Kv2, soma_SN/i_Kv4_2: SN_soma_i_Kv4_2/i_Kv4_2,
     soma_SN/i_M: SN_soma_i_M/i_M, soma_SN/i_Na: SN_soma_i_Na/i_Na, soma_SN/i_Na1_6: SN_soma_i_Na1_6/i_Na1_6, soma_SN/i_NaCa: SN_soma_i_NaCa/i_NaCa,
     soma_SN/i_NaK: SN_soma_i_NaK/i_NaK, soma_SN/i_leak_K: SN_soma_i_leak_K/i_leak_K, soma_SN/i_leak_Na: SN_soma_i_leak_Na/i_leak_Na,
@@ -45,10 +44,9 @@ equivalence:
     var_SN/B_Cai: SN_varicosity_Ca/B_Cai, var_SN/CaB_Ca_ER_pre: SN_varicosity_Ca/CaB_Ca_ER_pre, var_SN/CaB_Ca_bulk: SN_varicosity_Ca/CaB_Ca_bulk,
     var_SN/CaB_Cai: SN_varicosity_Ca/CaB_Cai, var_SN/Ca_ER: SN_varicosity_Ca/Ca_ER, var_SN/Ca_ER_pre: SN_varicosity_Ca/Ca_ER_pre,
     var_SN/Ca_bulk: SN_varicosity_Ca/Ca_bulk, var_SN/Cai: SN_varicosity_Ca/Cai, var_SN/E_Ca: SN_varicosity_Ca/E_Ca, var_SN/NE: SN_varicosity_NE/NE,
-    var_SN/c: SN_varicosity_i_CaN/c, var_SN/c_RyR: SN_varicosity_RyR/c_RyR, var_SN/c_RyR_inf: SN_varicosity_RyR/c_RyR_inf,
+    var_SN/c: SN_varicosity_i_CaN/c, var_SN/a_RyR: SN_varicosity_RyR/a_RyR, var_SN/a_RyR_inf: SN_varicosity_RyR/a_RyR_inf, var_SN/i_RyR: SN_varicosity_RyR/i_RyR, var_SN/i_RyR_inf: SN_varicosity_RyR/i_RyR_inf, var_SN/l_RyR: SN_varicosity_RyR/l_RyR, var_SN/l_RyR_inf: SN_varicosity_RyR/l_RyR_inf, var_SN/P_RyR: SN_varicosity_RyR/P_RyR,
     var_SN/c_inf: SN_varicosity_i_CaN/c_inf, var_SN/h_IP3: SN_varicosity_IP3R/h_IP3, var_SN/h_IP3_inf: SN_varicosity_IP3R/h_IP3_inf,
-    var_SN/hc: SN_varicosity_i_CaN/hc, var_SN/hc_RyR: SN_varicosity_RyR/hc_RyR, var_SN/hc_RyR_inf: SN_varicosity_RyR/hc_RyR_inf,
-    var_SN/hc_inf: SN_varicosity_i_CaN/hc_inf, var_SN/i_Ca_N: SN_varicosity_i_CaN/i_Ca_N, var_SN/i_NaCa: SN_varicosity_i_NaCa/i_NaCa,
+    var_SN/hc: SN_varicosity_i_CaN/hc, var_SN/hc_inf: SN_varicosity_i_CaN/hc_inf, var_SN/i_Ca_N: SN_varicosity_i_CaN/i_Ca_N, var_SN/i_NaCa: SN_varicosity_i_NaCa/i_NaCa,
     var_SN/j_Ca_N: SN_varicosity_i_CaN/j_Ca_N, var_SN/j_IP3: SN_varicosity_IP3R/j_IP3, var_SN/j_NaCa_Ca: SN_varicosity_i_NaCa/j_NaCa_Ca,
     var_SN/j_RyR: SN_varicosity_RyR/j_RyR, var_SN/j_SERCA: SN_varicosity_Ca/j_SERCA, var_SN/j_diffCa: SN_varicosity_Ca/j_diffCa,
     var_SN/j_diffCa_ER: SN_varicosity_Ca/j_diffCa_ER, var_SN/j_leak_Ca: SN_varicosity_Ca/j_leak_Ca, var_SN/m_IP3_inf: SN_varicosity_IP3R/m_IP3_inf,
@@ -66,4 +64,4 @@ expected_failures: {system_equivalence_test: 'Deliberate differences from circul
     library on 2026-10-02): i_Na1_6''s Na flux enters dNai/dt; the varicosity''s E_Ca has valence 2 (RT/(2F)); epsilon_tau
     is 0.001 ms (was 0.1 ms); BK gating follows Khaliq 2003 (z^2, tau offsets from the midpoints). Reviewed parameter values:
     tau_z_BK 1 ms (Khaliq), Ca_mid_m_SK 0.63 uM (Hirschberg), g_M 0.005479 uS (Davis 2020 deactivation relaxation, libcuflynx-calibrated). The first two fixes are circulatory_autogen
-    PR #537. Since review 2026-10-05 the library''s soma sub-membrane Ca is a Khaliq 2003 membrane shell (V_shell = A_mem d_shell, d_shell 0.1 um; shell-bulk exchange tau_shell 1 ms, was c_SL = 0.02 of Vol and D_Ca = 6e-12 m3/s) and SK reads the shell Ca (was Ca_bulk); circulatory_autogen''s SN_soma has neither. Since review 2026-10-05 the library''s SN model is at room temperature (T 295.15 K, was 310.15 K; the Davis 2021 thesis recordings it is calibrated to were made at room temperature) with a per-channel Q10 (each gating tau divided by Q10^((T - T_ref)/10 K); T_ref = T by default, so the kinetics are unscaled), which shifts E_K, E_Na and E_Ca; circulatory_autogen''s SN_soma is at 310.15 K with no Q10. The decomposition is still checked exactly: neuron/sympathetic reproduces this library''s SN_simple (supermodule_equivalence_test).'}
+    PR #537. Since review 2026-10-05 the library''s soma sub-membrane Ca is a Khaliq 2003 membrane shell (V_shell = A_mem d_shell, d_shell 0.1 um; shell-bulk exchange tau_shell 1 ms, was c_SL = 0.02 of Vol and D_Ca = 6e-12 m3/s) and SK reads the shell Ca (was Ca_bulk); circulatory_autogen''s SN_soma has neither. Since review 2026-10-05 the library''s SN model is at room temperature (T 295.15 K, was 310.15 K; the Davis 2021 thesis recordings it is calibrated to were made at room temperature) with a per-channel Q10 (each gating tau divided by Q10^((T - T_ref)/10 K); T_ref = T by default, so the kinetics are unscaled), which shifts E_K, E_Na and E_Ca; circulatory_autogen''s SN_soma is at 310.15 K with no Q10. The decomposition is still checked exactly: neuron/sympathetic reproduces this library''s SN_simple (supermodule_equivalence_test). RyR is the Hernández-Cruz 1997 rat-SCG model since review 2026-10-06; CA''s SN_soma keeps the owner''s RyR.'}

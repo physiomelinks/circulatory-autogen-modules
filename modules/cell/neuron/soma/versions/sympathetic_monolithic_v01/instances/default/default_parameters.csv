@@ -110,16 +110,20 @@ K_mr,millimolar,0.5,SN_simple: Shannon2004Mathematical_was_1.7,yes
 rho_SERCA,per_um2,36407.132526123205,definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 3e-16 mol_per_s (to_be_identified) with A = 248.1 um^2 (the soma pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration through r_SERCA,no
 r_SERCA,per_s,20.0,"unreferenced_placeholder; maximal Ca transport per SERCA pump, ~10-20 Ca/s at room temperature (Lytton et al. 1992, value not verified from the paper); 20 Ca/s assumed",no
 H_SERCA,dimensionless,1.787,SN_simple: Shannon2004Mathematical,yes
-rho_RyR,per_um2,576.9514845733909,definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 1.5e-13 m3_per_s (to_be_identified) with A = 86.01 um^2 (the soma ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density for calibration through k_RyR_single,no
-k_RyR_single,um3_per_s,3.0229223886269025,unreferenced_placeholder; per-channel flux coefficient i/(2 F dCa) for a ~0.35 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 3.02 um^3/s,no
-tau_c_RyR,millis,0.01,SN_simple: user_defined,no
-tau_hc_RyR,millis,10,SN_simple: user_defined,no
-Cai_RyR_mid,millimolar,8e-4,SN_simple: user_defined,no
-Cai_RyR_den,millimolar,1e-4,SN_simple: user_defined,no
-Ca_ER_RyR_mid,millimolar,0.5,SN_simple: user_defined,no
-Ca_ER_RyR_den,millimolar,0.03,SN_simple: user_defined,no
-Ca_ER_RyR_tau_mid,millimolar,0.3,SN_simple: NOT_USED,no
-Ca_ER_RyR_tau_den,millimolar,0.01,SN_simple: NOT_USED,no
+kon_a_RyR,per_millimolar_per_s,10,"HernandezCruz1997; Fig. 10 legend: k_on-Caff = 0.01 /uM/s = 10 /(mM s) (= value), the activating-site on-rate without caffeine (Eq. A16); with koff_a, Kd = 200 uM at rest. Caffeine (10 mM) is simulated by k_on+Caff = 2.5 /uM/s = 2500 /(mM s) (Kd 0.8 uM; Methods 'Mathematical modeling', Eq. A16), set kon_a_RyR to 2500",yes
+koff_a_RyR,per_s,2,HernandezCruz1997; Fig. 10 legend: k_offaRyR = 2 /s (= value),yes
+kon_i_RyR,per_millimolar_per_s,280,HernandezCruz1997; Fig. 10 legend: k_oniRyR = 0.28 /uM/s = 280 /(mM s) (= value); Kd = 0.176/0.28 = 0.63 uM,yes
+koff_i_RyR,per_s,0.176,HernandezCruz1997; Fig. 10 legend: k_offiRyR = 0.176 /s (= value; the first of two entries printed 'k_offiRyR'),yes
+kon_l_RyR,per_millimolar_per_s,10000,HernandezCruz1997; Fig. 10 legend: k_onlRyR = 10 /uM/s = 1e4 /(mM s) (= value),yes
+koff_l_RyR,per_s,1300,"HernandezCruz1997; Fig. 10 legend: printed 'k_offiRyR = 1,300 s-1' next to k_onlRyR; read as the luminal off-rate k_offlRyR (the inactivating k_off is given separately as 0.176 /s), Kd = 130 uM",yes
+N_l_RyR,dimensionless,7,"HernandezCruz1997; Fig. 10 legend: N = 7, the cooperativity of the luminal site (Appendix, Eq. A12) (= value)",yes
+rho_RyR,per_um2,5403.17859872,"HernandezCruz1997; Fig. 10 legend: RyR_max = 70,000 /(s um^2), acting on the inmost cytosolic shell (Eq. A11) of volume ds dx = 0.8 um^2 x 0.25 um = 0.2 um^3: maximal flux coefficient per ER area RyR_max ds dx = 14,000 um^3/s per um^2, divided by k_RyR_single (2.591 um^3/s) = 5403 /um^2 (derived; a model capacity, not a measured density, and above the packing limit of ~1000 RyR/um^2 for a ~30 nm footprint)",no
+k_RyR_single,um3_per_s,2.5910674141544323,"Kettlun2003; Abstract: unitary RyR Ca current just under 0.5 pA with 1 mM luminal Ca in physiological K+ and Mg2+ (cardiac/amphibian RyR in bilayers, room temperature); flux coefficient i/(2 F dCa) = 0.5 pA/(2 F x 1 mM) = 2.591 um^3/s (derived)",yes
+a_RyR_init,dimensionless,0.0004997501249375313,definitional; steady-state activating-site occupancy kon_a Cai/(kon_a Cai + koff_a) at the default Cai (0.1 uM),no
+i_RyR_init,dimensionless,0.13725490196078433,definitional; steady-state inactivating-site occupancy kon_i Cai/(kon_i Cai + koff_i) at the default Cai (0.1 uM),no
+l_RyR_init,dimensionless,0.36585365853658536,definitional; steady-state luminal-site occupancy kon_l Ca_ER/(kon_l Ca_ER + koff_l) at the default Ca_ER (75 uM),no
+Q10_RyR,dimensionless,3,unreferenced_placeholder; conventional Q10 for the binding rates (no Q10 given by the source),no
+T_ref_RyR,kelvin,295.65,"HernandezCruz1997; Methods: 'Experiments were carried out at 22-23 degC'; 22.5 degC = 295.65 K, the temperature of the fitted rates",yes
 c_ER,dimensionless,0.01,SN_simple: user_defined,no
 d_shell,um,0.1,"Khaliq2003; Ca pool read by BK in ModelDB 48332 cadiff.mod: a shell of depth 0.1 um under the membrane (depth = .1 um). Here V_shell = A_mem d_shell (300 um^3 at A_mem 3,000 um^2). Replaces c_SL = 0.02 (a sub-membrane fraction of Vol: 50 nm at Vol 7,500 um^3); review 2026-10-05",yes
 tau_shell,millis,1.0,"Khaliq2003; ModelDB 48332 cadiff.mod removes shell Ca at beta = 1 /ms (time constant 1 ms); here the shell exchanges with the bulk with this time constant, j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk). Replaces D_Ca = 6e-12 m3/s (the owner's hand-set SN_simple value, a 25 us exchange); review 2026-10-05",yes
@@ -166,5 +170,3 @@ Q10_M,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effe
 T_ref_M,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
 Q10_IP3R,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_IP3R,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
-Q10_RyR,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
-T_ref_RyR,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no

@@ -18,7 +18,12 @@ notes: 'Owner''s sympathetic stellate-ganglion neuron soma ("SN_simple"): Na (Na
   K) (Q10_m_Na, Q10_h_Na, T_ref_Na, Q10_m_Na1_6, Q10_h_Na1_6, T_ref_Na1_6, Q10_CaL, T_ref_CaL, Q10_Kv2, T_ref_Kv2, Q10_m_Kv1_5,
   Q10_h_Kv1_5, T_ref_Kv1_5, Q10_Kv4_2, T_ref_Kv4_2, Q10_BK, T_ref_BK, Q10_SK, T_ref_SK, Q10_M, T_ref_M, Q10_IP3R, T_ref_IP3R,
   Q10_RyR, T_ref_RyR). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
-  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T.'
+  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T. RyR (review 2026-10-06):
+  the inline RyR is now the Hernandez-Cruz, Escobar & Jimenez 1997 rat-SCG CICR model, the same equations and default values
+  as RyR HernandezCruz1997_v01 (states a_RyR, i_RyR, l_RyR; P_RyR = a (1 - i) l^N; j_RyR = k_RyR P_RyR (Ca_ER - Cai); every
+  rate times phi_RyR = Q10_RyR^((T - T_ref_RyR)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), replacing the
+  owner''s c_RyR^3 hc_RyR^3 law (RyR Argus2026_v01), which is inconsistent with the rat-SCG CICR data. It stays the
+  monolithic equivalent of the sympathetic supermodule.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
@@ -342,42 +347,6 @@ reference_proposals:
   H_SERCA:
     reference: Shannon2004; Table 11, SR Ca pump Hill coefficient H = 1.787 (= value)
     sourced: 'yes'
-  tau_c_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  tau_hc_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Cai_RyR_mid:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Cai_RyR_den:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Ca_ER_RyR_mid:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Ca_ER_RyR_den:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Ca_ER_RyR_tau_mid:
-    reference: definitional; not used by any equation (CA token NOT_USED)
-    sourced: 'no'
-  Ca_ER_RyR_tau_den:
-    reference: definitional; not used by any equation (CA token NOT_USED)
-    sourced: 'no'
   c_ER:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); ER volume
       fraction. Li & Rinzel / De Young & Keizer c1 = 0.185 is the ER/cytosol volume ratio, a different quantity and value
@@ -533,13 +502,6 @@ reference_proposals:
       through r_SERCA. The previous k_SERCA (as proposed in review): unreferenced_placeholder; owner''s hand-set value in
       the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (Shannon2004 Vmax = 286 umol/L cytosol/s
       for the myocyte)'
-    sourced: 'no'
-  rho_RyR:
-    reference: 'definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 1.5e-13
-      m3_per_s (to_be_identified) with A = 86.01 um^2 (the soma ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density
-      for calibration through k_RyR_single. The previous k_RyR (as proposed in review): unreferenced_placeholder; owner''s
-      hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
-      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants'
     sourced: 'no'
   rho_IP3R:
     reference: 'definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0

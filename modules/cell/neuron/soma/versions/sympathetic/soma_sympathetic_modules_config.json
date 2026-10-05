@@ -6,7 +6,7 @@
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "Sympathetic-neuron soma (SN_simple's SN_soma) built from its parts: the membrane with the sensing filter, Na/K concentrations with their Nernst potentials, four-compartment Ca handling, and the ion channels i_Na, i_Na1_6, i_CaL, i_Kv2, i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (cell/ion_channels, versions Argus2026_v01). Each submodule becomes <instance>_<submodule> in a model; the membrane couples to the axon: per_submodule_outputs {\"membrane\": [\"<axon>\"]} (VI_port: V out, the axial current I_out in); optional stimulus through membrane's i_stim. Geometry: the membrane computes the area A_mem and volume Vol from the diameter d (membrane_area to the channels, shell_membrane_area to Ca, whose sub-membrane shell has volume A_mem d_shell; compartment_volume to Na_K and Ca); Ca computes the ER area A_ER for IP3R and RyR (ER_membrane_area).",
+    "description": "Sympathetic-neuron soma (SN_simple's SN_soma) built from its parts: the membrane with the sensing filter, Na/K concentrations with their Nernst potentials, four-compartment Ca handling, and the ion channels i_Na, i_Na1_6, i_CaL, i_Kv2, i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (cell/ion_channels, versions Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06). Each submodule becomes <instance>_<submodule> in a model; the membrane couples to the axon: per_submodule_outputs {\"membrane\": [\"<axon>\"]} (VI_port: V out, the axial current I_out in); optional stimulus through membrane's i_stim. Geometry: the membrane computes the area A_mem and volume Vol from the diameter d (membrane_area to the channels, shell_membrane_area to Ca, whose sub-membrane shell has volume A_mem d_shell; compartment_volume to Na_K and Ca); Ca computes the ER area A_ER for IP3R and RyR (ER_membrane_area).",
     "submodules": [
       {
         "name": "membrane",
@@ -231,7 +231,7 @@
       {
         "name": "RyR",
         "module_type": "RyR",
-        "module_subtype": "Argus2026_v01",
+        "module_subtype": "HernandezCruz1997_v01",
         "instance": "default",
         "inp_instances": [
           "Ca"

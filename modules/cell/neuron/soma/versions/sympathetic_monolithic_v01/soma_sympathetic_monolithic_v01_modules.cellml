@@ -3176,161 +3176,43 @@
  ode(Istate, t) = k_iERCa*Cai*Ostate-k_im*Istate-(k_om*Istate-k_oERCa*sqr(Cai)*RIstate);
  ode(RIstate, t) = k_om*Istate-k_oERCa*sqr(Cai)*RIstate-(k_RI_to_R*RIstate-k_iERCa*Cai*Rstate);
  j_RyR = k_RyR*Ostate*(Ca_ER-Cai);-->
-        <!-- Ryanodine receptor model, developed by Finbar Argus-->
+        <!-- Ryanodine receptor: Hernandez-Cruz, Escobar & Jimenez 1997 (J Gen Physiol 109:147, Appendix Eqs. A11-A15, Fig. 10
+             legend), the rat superior cervical ganglion CICR model, as RyR HernandezCruz1997_v01 (since review 2026-10-06; was the
+             owner's c^3 hc^3 law, RyR Argus2026_v01). Activating, inactivating (cytosolic) and luminal (ER) Ca binding sites, each
+             state the fraction of sites occupied; every rate constant is multiplied by phi_RyR. k_RyR = A_ER rho_RyR k_RyR_single. -->
         <variable name="j_RyR" public_interface="out" units="mol_per_s"/>
         <variable name="k_RyR" public_interface="out" units="m3_per_s"/>
         <variable name="rho_RyR" public_interface="in" units="per_um2"/>
         <variable name="k_RyR_single" public_interface="in" units="um3_per_s"/>
-        <variable name="c_RyR_inf" public_interface="out" units="dimensionless"/>
-        <variable name="hc_RyR_inf" public_interface="out" units="dimensionless"/>
-        <variable initial_value="0.0" name="c_RyR" public_interface="out" units="dimensionless"/>
-        <variable initial_value="1.0" name="hc_RyR" public_interface="out" units="dimensionless"/>
-        <variable name="Cai_RyR_mid" public_interface="in" units="millimolar"/>
-        <variable name="Cai_RyR_den" public_interface="in" units="millimolar"/>
-        <variable name="Ca_ER_RyR_mid" public_interface="in" units="millimolar"/>
-        <variable name="Ca_ER_RyR_den" public_interface="in" units="millimolar"/>
-        <variable name="Ca_ER_RyR_tau_mid" public_interface="in" units="millimolar"/>
-        <variable name="Ca_ER_RyR_tau_den" public_interface="in" units="millimolar"/>
-        <variable name="tau_c_RyR" public_interface="in" units="millis"/>
-        <variable name="tau_hc_RyR" public_interface="in" units="millis"/>
-        <!-- activated by Cai-->
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-                <eq/>
-                <ci>c_RyR_inf</ci>
-                <apply>
-                    <divide/>
-                    <cn cellml:units="dimensionless">1</cn>
-                    <apply>
-                        <plus/>
-                        <cn cellml:units="dimensionless">1</cn>
-                        <apply>
-                            <exp/>
-                            <apply>
-                                <divide/>
-                                <apply>
-                                    <minus/>
-                                    <apply>
-                                        <minus/>
-                                        <ci>Cai</ci>
-                                        <ci>Cai_RyR_mid</ci>
-                                    </apply>
-                                </apply>
-                                <ci>Cai_RyR_den</ci>
-                            </apply>
-                        </apply>
-                    </apply>
-                </apply>
-            </apply>
-            <!-- deactivated by Ca_ER decreasing, so also activated by Ca_ER-->
-            <apply>
-                <eq/>
-                <ci>hc_RyR_inf</ci>
-                <apply>
-                    <divide/>
-                    <cn cellml:units="dimensionless">1</cn>
-                    <apply>
-                        <plus/>
-                        <cn cellml:units="dimensionless">1</cn>
-                        <apply>
-                            <exp/>
-                            <apply>
-                                <divide/>
-                                <apply>
-                                    <minus/>
-                                    <apply>
-                                        <minus/>
-                                        <ci>Ca_ER</ci>
-                                        <ci>Ca_ER_RyR_mid</ci>
-                                    </apply>
-                                </apply>
-                                <ci>Ca_ER_RyR_den</ci>
-                            </apply>
-                        </apply>
-                    </apply>
-                </apply>
-            </apply>
-            <apply>
-                <eq/>
-                <apply>
-                    <diff/>
-                    <bvar>
-                        <ci>t</ci>
-                    </bvar>
-                    <ci>c_RyR</ci>
-                </apply>
-                <apply>
-                    <divide/>
-                    <apply>
-                        <minus/>
-                        <ci>c_RyR_inf</ci>
-                        <ci>c_RyR</ci>
-                    </apply>
-                    <apply>
-                        <divide/>
-                        <apply>
-                            <divide/>
-                            <ci>tau_c_RyR</ci>
-                            <cn cellml:units="millis_per_s">1000</cn>
-                        </apply>
-                        <ci>phi_RyR</ci>
-                    </apply>
-                </apply>
-            </apply>
-            <!-- tau_hc_RyR = tau_hc_RyR_min; // + 200{millis}/(exp((Ca_ER-Ca_ER_RyR_tau_mid)/Ca_ER_RyR_tau_den)+exp(-(Ca_ER-Ca_ER_RyR_tau_mid)/Ca_ER_RyR_tau_den));-->
-            <apply>
-                <eq/>
-                <apply>
-                    <diff/>
-                    <bvar>
-                        <ci>t</ci>
-                    </bvar>
-                    <ci>hc_RyR</ci>
-                </apply>
-                <apply>
-                    <divide/>
-                    <apply>
-                        <minus/>
-                        <ci>hc_RyR_inf</ci>
-                        <ci>hc_RyR</ci>
-                    </apply>
-                    <apply>
-                        <divide/>
-                        <apply>
-                            <divide/>
-                            <ci>tau_hc_RyR</ci>
-                            <cn cellml:units="millis_per_s">1000</cn>
-                        </apply>
-                        <ci>phi_RyR</ci>
-                    </apply>
-                </apply>
-            </apply>
-            <!-- TODO include cAMP dependence
- TODO should it be c_RyR^3, to be more similar to -->
-            <apply>
-                <eq/>
-                <ci>j_RyR</ci>
-                <apply>
-                    <times/>
-                    <ci>k_RyR</ci>
-                    <apply>
-                        <minus/>
-                        <ci>Ca_ER</ci>
-                        <ci>Cai</ci>
-                    </apply>
-                    <apply>
-                        <power/>
-                        <ci>c_RyR</ci>
-                        <cn cellml:units="dimensionless">3</cn>
-                    </apply>
-                    <apply>
-                        <power/>
-                        <ci>hc_RyR</ci>
-                        <cn cellml:units="dimensionless">3</cn>
-                    </apply>
-                </apply>
-            </apply>
-        </math>
+        <variable name="kon_a_RyR" public_interface="in" units="per_millimolar_per_s"/>
+        <variable name="koff_a_RyR" public_interface="in" units="per_s"/>
+        <variable name="kon_i_RyR" public_interface="in" units="per_millimolar_per_s"/>
+        <variable name="koff_i_RyR" public_interface="in" units="per_s"/>
+        <variable name="kon_l_RyR" public_interface="in" units="per_millimolar_per_s"/>
+        <variable name="koff_l_RyR" public_interface="in" units="per_s"/>
+        <variable name="N_l_RyR" public_interface="in" units="dimensionless"/>
+        <variable name="a_RyR_init" public_interface="in" units="dimensionless"/>
+        <variable name="i_RyR_init" public_interface="in" units="dimensionless"/>
+        <variable name="l_RyR_init" public_interface="in" units="dimensionless"/>
+        <variable name="a_RyR" public_interface="out" units="dimensionless" initial_value="a_RyR_init"/>
+        <variable name="i_RyR" public_interface="out" units="dimensionless" initial_value="i_RyR_init"/>
+        <variable name="l_RyR" public_interface="out" units="dimensionless" initial_value="l_RyR_init"/>
+        <variable name="a_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="i_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="l_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="P_RyR" public_interface="out" units="dimensionless"/>
+        <!-- Eq. A13 (activating site, fraction aRyR_Ca/aRyR_Tot), rates times phi -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>a_RyR</ci></apply><apply><times/><ci>phi_RyR</ci><apply><minus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>a_RyR</ci></apply></apply><apply><times/><ci>koff_a_RyR</ci><ci>a_RyR</ci></apply></apply></apply></apply></math>
+        <!-- Eq. A14 (inactivating site, fraction iRyR_Ca/iRyR_Tot), rates times phi -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>i_RyR</ci></apply><apply><times/><ci>phi_RyR</ci><apply><minus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>i_RyR</ci></apply></apply><apply><times/><ci>koff_i_RyR</ci><ci>i_RyR</ci></apply></apply></apply></apply></math>
+        <!-- Eq. A15 (luminal site on the releasing ER, fraction lRyR_Ca/lRyR_Tot), rates times phi -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>l_RyR</ci></apply><apply><times/><ci>phi_RyR</ci><apply><minus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>l_RyR</ci></apply></apply><apply><times/><ci>koff_l_RyR</ci><ci>l_RyR</ci></apply></apply></apply></apply></math>
+        <!-- Eq. A12: open fraction P = a (1 - i) l^N -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>P_RyR</ci><apply><times/><ci>a_RyR</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>i_RyR</ci></apply><apply><power/><ci>l_RyR</ci><ci>N_l_RyR</ci></apply></apply></apply></math>
+        <!-- Eq. A11, first term: release flux k P (Ca_ER - Cai), positive from the ER into the cytosol -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>j_RyR</ci><apply><times/><ci>k_RyR</ci><ci>P_RyR</ci><apply><minus/><ci>Ca_ER</ci><ci>Cai</ci></apply></apply></apply></math>
+        <!-- steady-state occupancies at the current Cai, Ca_ER: kon C / (kon C + koff) -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>a_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><ci>koff_a_RyR</ci></apply></apply></apply><apply><eq/><ci>i_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><ci>koff_i_RyR</ci></apply></apply></apply><apply><eq/><ci>l_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><apply><plus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><ci>koff_l_RyR</ci></apply></apply></apply></math>
         <!-- Ca concentration calculations in each region-->
         <variable name="Cai_init" public_interface="in" units="millimolar"/>
         <variable initial_value="Cai_init" name="Cai" public_interface="out" units="millimolar"/>

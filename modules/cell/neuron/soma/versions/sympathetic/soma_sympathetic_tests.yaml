@@ -3,7 +3,7 @@ version: sympathetic
 reviewed: false
 description: 'Sympathetic-neuron soma (SN_simple''s SN_soma) built from its parts: the membrane with the sensing filter, Na/K
   concentrations with their Nernst potentials, four-compartment Ca handling, and the ion channels i_Na, i_Na1_6, i_CaL, i_Kv2,
-  i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (cell/ion_channels, versions Argus2026_v01).
+  i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (cell/ion_channels, versions Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06).
   Each submodule becomes <instance>_<submodule> in a model; the membrane couples to the axon: per_submodule_outputs {"membrane":
   ["<axon>"]} (VI_port: V out, the axial current I_out in); optional stimulus through membrane''s i_stim. Default parameters
   are SN_simple''s (its default instance). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
@@ -12,7 +12,12 @@ notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 2
   recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_<X>_<submodule>,
   T_ref_<X>_<submodule> rows per gated channel, as in the channel modules). T_ref defaults to 295.15 K, so phi = 1 and the
   kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them, and the model can
-  be run at 37 degC by changing T.'
+  be run at 37 degC by changing T. RyR (review 2026-10-06): the RyR submodule is HernandezCruz1997_v01, the rat superior
+  cervical ganglion CICR model of Hernandez-Cruz, Escobar & Jimenez 1997 (activating, inactivating and luminal Ca sites;
+  rates times phi = Q10^((T - T_ref)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), with that version''s
+  default-instance values and references (*_RyR rows). It replaced Argus2026_v01 (the owner''s c^3 hc^3 law), which is
+  inconsistent with the rat-SCG CICR data (comparison: reviews/RyR_HernandezCruz1997_comparison.html). The rest of the soma
+  (SERCA, buffers, K(Ca)) was tuned with the old RyR, so the resting balance is to be recalibrated.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
@@ -253,36 +258,6 @@ reference_proposals:
   h_IP3_init_IP3R:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined')
     sourced: 'no'
-  Ca_ER_RyR_den_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Ca_ER_RyR_mid_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Cai_RyR_den_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  Cai_RyR_mid_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  tau_c_RyR_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
-  tau_hc_RyR_RyR:
-    reference: 'unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token ''user_defined''); the
-      RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''),
-      so it has no literature constants'
-    sourced: 'no'
   k_A_membrane:
     value: 3.141592653589793
     reference: 'Wallis1996; rat stellate (putative cardiac) neurones, mean two-dimensional soma area 463 um^2 (Abstract; the
@@ -409,23 +384,3 @@ reference_proposals:
       flux switched off (0; was 0.03e-15 m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in review): definitional;
       IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version) previous k_IP3_IP3R (as proposed in
       review): definitional; IP3-receptor flux switched off (0; was 0.03e-15 m3/s in an earlier owner version)'
-  rho_RyR_RyR:
-    reference: 'definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 1.5e-13
-      m3_per_s (to_be_identified) with A = 86.01 um^2 (the soma ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density
-      for calibration through k_RyR_single. The previous k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s
-      hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
-      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants'
-    sourced: 'no'
-    previous: 'previous k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
-      model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml:
-      ''developed by Finbar Argus''), so it has no literature constants previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
-      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants previous
-      k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token
-      ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed
-      by Finbar Argus''), so it has no literature constants previous k_RyR_RyR (as proposed in review): unreferenced_placeholder;
-      owner''s hand-set value in the SN_simple model (CA token ''to_be_identified''); the RyR law is the owner''s own phenomenological
-      model (sister repo SNArgus_modules.cellml: ''developed by Finbar Argus''), so it has no literature constants previous
-      k_RyR_RyR (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model (CA token
-      ''to_be_identified''); the RyR law is the owner''s own phenomenological model (sister repo SNArgus_modules.cellml: ''developed
-      by Finbar Argus''), so it has no literature constants'

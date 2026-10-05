@@ -3,6 +3,9 @@ RyR HernandezCruz1997_v01 vs Argus2026_v01 in the soma supermodule (soma sympath
 
     venv/bin/python tools/ryr_hernandezcruz1997_comparison.py    # -> reviews/RyR_HernandezCruz1997_comparison.html
 
+Written before the switch (2026-10-06): the soma now uses HernandezCruz1997_v01 itself, so re-running this
+script compares HC1997 with HC1997; check out a commit before the switch to reproduce the page.
+
 The soma is not changed. The script copies modules/ to a temporary directory, switches the RyR
 submodule of soma/sympathetic to HernandezCruz1997_v01 there (and drops the soma instance's
 Argus-only RyR rows, so the RyR takes its own default instance), and points the library and

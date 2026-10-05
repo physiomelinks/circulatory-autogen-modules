@@ -18,8 +18,9 @@ notes: 'The ryanodine receptor of the rat superior cervical ganglion (sympatheti
   density was found). Temperature: every rate constant is multiplied by phi = Q10^((T - T_ref)/10 K); T_ref = 295.65 K
   (22.5 degC, the recordings), Q10 a placeholder 3; at the model temperature 295.15 K phi = 0.947.
   Same ports as Argus2026_v01 (internal_Ca, ER_Ca, Ca_flux / ER_Ca_release, ER_membrane_area), so it is a drop-in
-  replacement for the RyR submodule of soma sympathetic and varicosity sympathetic; neither uses it yet (the comparison
-  in the soma is reviews/RyR_HernandezCruz1997_comparison.html, tools/ryr_hernandezcruz1997_comparison.py).
+  replacement for the RyR submodule of soma sympathetic and varicosity sympathetic; both use it since review 2026-10-06
+  (with the monolithic equivalents and SN_simple*), replacing Argus2026_v01 (the comparison in the soma, made before the
+  switch, is reviews/RyR_HernandezCruz1997_comparison.html, tools/ryr_hernandezcruz1997_comparison.py).
   Ambiguities in the source: (1) the Fig. 10 legend prints "k_offiRyR" twice, 0.176 /s and 1,300 /s; the second sits
   next to k_onlRyR and is read as the luminal k_off (Kd 130 uM). (2) Eq. A11 and the ERt equation apply the same rate
   RyR(Ca,t) (Ca_ERt - Ca_n) to the cytosolic shell and to the ER compartment (vol_ER = 100 um^3) without a volume
