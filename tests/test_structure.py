@@ -211,8 +211,18 @@ def walk_modules():
         _name_ok('instance', i, d, problems)
         _check_files('instance', d, {'instance': i}, problems)
         rel = os.path.relpath(d, REPO_ROOT)
+        allowed = LEVELS['instance'].get('subdirectories') or {}
         for c in _subdirs(d):
-            problems.append(f'{rel}: unexpected directory {c}')
+            if c not in allowed:
+                problems.append(f'{rel}: unexpected directory {c}')
+                continue
+            sub = allowed[c]
+            for f in sorted(os.listdir(os.path.join(d, c))):
+                if f not in sub.get('required', []) and not re.match(sub['file_pattern'], f):
+                    problems.append(f'{rel}/{c}: unexpected file {f}')
+            for f in sub.get('required', []):
+                if not os.path.isfile(os.path.join(d, c, f)):
+                    problems.append(f'{rel}/{c}: missing {f}')
         pp = os.path.join(d, f'{i}_parameters.csv')
         if os.path.isfile(pp):
             with open(pp, newline='') as f:

@@ -139,7 +139,16 @@
         "data_reference",
         "sourced"
       ],
-      "directories": []
+      "directories": [],
+      "subdirectories": {
+        "source_figures": {
+          "description": "Screenshots of the publication figures/tables the instance's data were extracted from (cropped PNG/JPG) and source_figures.json [{file, source, caption}]; required when the data came from a paper or book (modules/README.md, 'Source figures').",
+          "file_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(png|jpg|jpeg)$",
+          "required": [
+            "source_figures.json"
+          ]
+        }
+      }
     },
     "risk": {
       "description": "The joint failure-risk analysis of the version (make risk), committed.",
