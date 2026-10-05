@@ -18,7 +18,7 @@
   "invariants": [
     {
       "description": "AP transmission: every somatic action potential (upward 0 mV crossing) reaches the axon output, the same spike count",
-      "expr": "int(np.sum((mod_soma_membrane__V[1:] >= 0) & (mod_soma_membrane__V[:-1] < 0))) > 0 and int(np.sum((mod_axon__V[1:] >= 0) & (mod_axon__V[:-1] < 0))) == int(np.sum((mod_soma_membrane__V[1:] >= 0) & (mod_soma_membrane__V[:-1] < 0)))",
+      "expr": "(np.sum((mod_soma_membrane__V[1:] >= 0) & (mod_soma_membrane__V[:-1] < 0))) > 0 and (np.sum((mod_axon__V[1:] >= 0) & (mod_axon__V[:-1] < 0))) == (np.sum((mod_soma_membrane__V[1:] >= 0) & (mod_soma_membrane__V[:-1] < 0)))",
       "applies": "run"
     },
     {
