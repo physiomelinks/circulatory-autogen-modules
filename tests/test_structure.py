@@ -628,6 +628,129 @@ def test_licence_and_creator_rules():
     assert licence_and_creator_problems({'licence': 'MIT'}) == ['no "creator"']
 
 
+# ----------------------------------------------------------------------------------------------
+# required_citations and the bib key convention (2026-10-06; modules/README.md, "Citations")
+# ----------------------------------------------------------------------------------------------
+
+def required_citations_problems(entry, bib_keys):
+    '''The config entry's "required_citations" (a non-empty list of keys in the version's references.bib)
+    and "required_citations_uncertain" (optional: a non-empty subset of them).'''
+    problems = []
+    rc = entry.get('required_citations')
+    if not rc:
+        problems.append('no "required_citations"' if rc is None else '"required_citations" is empty')
+    elif not (isinstance(rc, list) and all(isinstance(k, str) and k for k in rc)):
+        problems.append(f'required_citations {rc!r} is not a list of bib keys')
+    else:
+        if len(set(rc)) != len(rc):
+            problems.append(f'required_citations repeats a key: {rc}')
+        missing = [k for k in rc if k not in bib_keys]
+        if missing:
+            problems.append(f'required_citations not in the references.bib: {missing}')
+    if 'required_citations_uncertain' in entry:
+        unc = entry['required_citations_uncertain']
+        if not (isinstance(unc, list) and unc and all(isinstance(k, str) for k in unc)):
+            problems.append(f'required_citations_uncertain {unc!r} is not a non-empty list of keys (leave it out when none is)')
+        elif not set(unc) <= set(rc or []):
+            problems.append(f'required_citations_uncertain not in required_citations: {sorted(set(unc) - set(rc or []))}')
+    return problems
+
+
+def test_every_version_has_required_citations():
+    '''Every version's config entry names the papers its model is built on: "required_citations", a
+    non-empty list of keys that are in the version's references.bib ("required_citations_uncertain"
+    marks the best guesses among them).'''
+    problems = []
+    for v in _versions():
+        with open(v.path('modules_config.json')) as f:
+            entries = json.load(f)
+        keys = set(bib.read(bib.bib_path(v)))
+        for e in entries:
+            problems += [f'{v.key}: {p}' for p in required_citations_problems(e, keys)]
+    assert not problems, '\n'.join(problems[:40]) + (f'\n... {len(problems)} in all' if len(problems) > 40 else '')
+
+
+def test_required_citations_rules():
+    keys = {'paci2013computational', 'tao2011model'}
+    assert required_citations_problems({'required_citations': ['paci2013computational']}, keys) == []
+    assert required_citations_problems({'required_citations': ['tao2011model', 'paci2013computational'],
+                                        'required_citations_uncertain': ['tao2011model']}, keys) == []
+    assert required_citations_problems({}, keys) == ['no "required_citations"']
+    assert required_citations_problems({'required_citations': []}, keys) == ['"required_citations" is empty']
+    assert 'not in the references.bib' in required_citations_problems({'required_citations': ['Paci2013']}, keys)[0]
+    assert 'not in required_citations' in required_citations_problems(
+        {'required_citations': ['tao2011model'], 'required_citations_uncertain': ['paci2013computational']}, keys)[0]
+    assert 'non-empty' in required_citations_problems(
+        {'required_citations': ['tao2011model'], 'required_citations_uncertain': []}, keys)[0]
+
+
+def test_config_key_lists_match_the_schema():
+    '''The record keys cam_testing checks are the ones directory_schema.json documents.'''
+    assert list(SCHEMA['config_entry_record_keys']) == list(library.RECORD_KEYS) + list(library.CITATION_KEYS)
+
+
+# Keys allowed to break the <surname><year><word> shape, because their entries have no year (web pages
+# without a publication date); each still equals cam_testing.bib.convention_key of its entry. Only add a
+# key here when the source really has no date.
+UNDATED_BIB_KEYS = {
+    'ranjanchannelpedia',                 # Channelpedia Kv1.5 model 21 (no date on the model page)
+    'channelpedia',                       # Channelpedia Kv4.2 model 40 (no author or date on the model page)
+    'usnationallibraryofmedicinerapid',   # MedlinePlus encyclopedia page "Rapid shallow breathing"
+}
+
+
+def _bib_files():
+    return sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_references*.bib'), recursive=True)
+                  if _not_excluded(p))
+
+
+def bib_key_problems(key, raw_fields, n_words_max=4):
+    '''A key follows the convention: lowercase <first author's surname><year><first significant title
+    word> (cam_testing.bib.convention_key), or with further title words when two papers would share it.'''
+    allowed = [bib.convention_key(raw_fields, n) for n in range(1, n_words_max + 1)]
+    if key not in allowed:
+        return [f'{key}: not the convention key of its entry ({allowed[0]})']
+    if not bib.KEY_RE.match(key) and key not in UNDATED_BIB_KEYS:
+        return [f'{key}: not <surname><year><word> (no year in the entry? add one, or list it in UNDATED_BIB_KEYS)']
+    return []
+
+
+def test_bib_keys_follow_the_convention():
+    '''Every key in every references.bib / references_proposed.bib is the lowercase
+    <surname><year><first title word> of its entry (tools/rekey_bib.py rekeyed the library on 2026-10-06).'''
+    problems = []
+    for p in _bib_files():
+        with open(p, encoding='utf-8') as f:
+            text = f.read()
+        problems += [f'{os.path.relpath(p, MODULES_DIR)}: {m}'
+                     for _, key, _, _, raw in bib.entries(text) for m in bib_key_problems(key, raw)]
+    assert not problems, '\n'.join(problems[:40]) + (f'\n... {len(problems)} in all' if len(problems) > 40 else '')
+
+
+def test_one_key_per_paper():
+    '''No two keys cite the same paper (same DOI) anywhere in the library.'''
+    by_doi = {}
+    for p in _bib_files():
+        for key, fields in bib.read(p).items():
+            doi = (fields.get('doi') or '').strip().lower()
+            if doi:
+                by_doi.setdefault(doi, set()).add(key)
+    dup = {d: sorted(k) for d, k in by_doi.items() if len(k) > 1}
+    assert not dup, f'papers cited under two keys (merge them): {dup}'
+
+
+def test_bib_key_rules():
+    raw = {'author': 'Belluzzi, O. and Sacchi, O.', 'year': '1986',
+           'title': 'A quantitative description of the sodium current in the rat sympathetic neurone'}
+    assert bib.convention_key(raw) == 'belluzzi1986quantitative'
+    assert bib.convention_key({'author': 'van der Pol, Balthasar', 'year': '1926', 'title': 'On relaxation-oscillations'}) \
+        == 'vanderpol1926relaxation'
+    assert bib.convention_key({'author': 'Hern{\\\'a}ndez-Cruz, A.', 'year': '1997', 'title': 'Ca2+ release'}) == 'hernandezcruz1997ca'
+    assert bib_key_problems('belluzzi1986quantitative', raw) == []
+    assert bib_key_problems('belluzzi1986quantitativedescription', raw) == []      # disambiguated
+    assert bib_key_problems('BelluzziSacchi1986', raw)
+
+
 @pytest.mark.parametrize('path', OBS_DATA, ids=lambda p: os.path.relpath(p, MODULES_DIR))
 def test_obs_data_matches_libcuflynx_schema(path):
     _validate(path, 'obs_data.schema.json')

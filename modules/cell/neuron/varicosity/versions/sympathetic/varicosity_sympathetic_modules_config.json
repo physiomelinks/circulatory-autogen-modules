@@ -6,6 +6,9 @@
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "required_citations": [
+      "argus2026sympathetic"
+    ],
     "description": "Sympathetic-neuron varicosity (SN_simple's SN_varicosity) built from its parts: a pass-through membrane (the axon sets V), four-compartment Ca handling with E_Ca, N-type Ca channel, NaCa exchanger, IP3R, RyR and NE release. Each submodule becomes <instance>_<submodule> in a model; the membrane takes the axon's potential: per_submodule_inputs {\"membrane\": [\"<axon>\"]}; NE (synaptic_NE) is available from NE. Geometry: the membrane computes the area A_mem and volume Vol from the diameter d (membrane_area to i_CaN and i_NaCa, compartment_volume to Ca); Ca computes the ER area A_ER for IP3R and RyR.",
     "submodules": [
       {

@@ -106,9 +106,9 @@ def title_words(title):
     '''The significant title words (stopwords skipped), lowercase ASCII.'''
     words = []
     for w in _ascii(title or '').split():
-        m = re.match(r'[A-Za-z]+', w)
-        if m and m[0].lower() not in STOPWORDS:
-            words.append(m[0].lower())
+        m = re.match(r'[`\'"]*([A-Za-z]+)', w)       # opening quotes skipped; a word in brackets ([Na]) is not a word
+        if m and m[1].lower() not in STOPWORDS:
+            words.append(m[1].lower())
     return words
 
 

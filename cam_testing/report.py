@@ -643,6 +643,48 @@ def supermodule_structure(version):
             'tree': _structure_tree(version, version.dir)}
 
 
+def required_citations_context(version):
+    """The papers the version's model is built on (config "required_citations"), each linked to its
+    bibliography entry, with the best-guess ones marked uncertain; for a supermodule also its
+    submodules' (linked to their own version pages)."""
+    entries = bib.read(bib.bib_path(version))
+    unc = set(version.uncertain_citations)
+    own = [{'key': k, 'uncertain': k in unc, 'href': f'#ref-{k}' if k in entries else None,
+            'short': _short_citation(entries.get(k))} for k in version.required_citations]
+    subs = []
+    here = os.path.dirname(version.html_path)
+    for sub, k, u in version.submodule_citations():
+        if k in version.required_citations:
+            continue
+        sub_entries = bib.read(bib.bib_path(sub))
+        subs.append({'key': k, 'uncertain': u, 'via': sub.key, 'short': _short_citation(sub_entries.get(k)),
+                     'href': os.path.relpath(sub.html_path, here) + f'#ref-{k}'})
+    # one row per key: a key several submodules cite is listed once, naming them all
+    merged = {}
+    for r in subs:
+        m = merged.setdefault(r['key'], {**r, 'via': []})
+        m['via'].append(r['via'])
+        m['uncertain'] = m['uncertain'] and r['uncertain']
+    return {'own': own, 'submodules': list(merged.values())}
+
+
+def _short_citation(fields):
+    """'Belluzzi & Sacchi 1986' style author-year label from a bib entry (None when there is none)."""
+    if not fields:
+        return None
+    names = [a.strip() for a in (fields.get('author') or '').split(' and ') if a.strip()]
+    surname = lambda a: a.split(',')[0].strip() if ',' in a else a.split()[-1]   # noqa: E731
+    if not names:
+        who = fields.get('title', '')[:40]
+    elif len(names) == 1 or names[-1] == 'others' and len(names) == 2:
+        who = surname(names[0]) + (' et al.' if len(names) == 2 else '')
+    elif len(names) == 2:
+        who = f'{surname(names[0])} & {surname(names[1])}'
+    else:
+        who = f'{surname(names[0])} et al.'
+    return f"{who} {fields.get('year', 'n.d.')}".strip()
+
+
 def component_context(version):
     '''The version page's content (what was a component's section of a module page).'''
     equations, unsupported, cellml_vars = _cellml_equations(version)
@@ -676,6 +718,7 @@ def component_context(version):
                            'note': p.data_reference.split(';', 1)[1].strip() if ';' in p.data_reference else '',
                            'sourced': p.is_sourced, 'proposal': proposals.get(p.variable_name)})
     return {
+        'required_citations': required_citations_context(version),
         'risk': risk_result, 'references': references, 'has_proposals': bool(proposals),
         'id': version.id, 'key': version.key, 'label': version.label, 'vessel_type': version.vessel_type,
         'BC_type': version.BC_type, 'module_type': version.module_type, 'category': version.category,

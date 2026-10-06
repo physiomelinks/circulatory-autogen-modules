@@ -222,6 +222,11 @@ LICENCES = {
 }
 DEFAULT_LICENCE = 'CC0-1.0'
 RECORD_KEYS = ('licence', 'creator')
+# Every config entry also names the papers its model is built on (2026-10-06): "required_citations", a
+# non-empty list of bib keys in the version's references.bib, and "required_citations_uncertain", the
+# keys among them that are a best guess still to confirm (left out when there are none). They follow
+# "creator". libcuflynx's schema allows them as extra keys, and both config formats carry them.
+CITATION_KEYS = ('required_citations', 'required_citations_uncertain')
 
 
 def with_record_keys(entry, licence=DEFAULT_LICENCE, creator=None):
@@ -731,6 +736,36 @@ class Version:
         '''The config entry's creator names ([] until given in review).'''
         c = self.config.get('creator') or []
         return [c] if isinstance(c, str) else list(c)
+
+    @property
+    def required_citations(self):
+        '''The bib keys of the papers the version's model is built on (config "required_citations").'''
+        return list(self.config.get('required_citations') or [])
+
+    @property
+    def uncertain_citations(self):
+        '''The required citations that are a best guess still to confirm ("required_citations_uncertain").'''
+        return list(self.config.get('required_citations_uncertain') or [])
+
+    def submodule_citations(self):
+        '''A supermodule's submodules' required citations, recursively: [(Version, key, uncertain)], each
+        (version, key) once, in submodule order.'''
+        out, seen = [], set()
+
+        def walk(version):
+            for s in version.submodules:
+                try:
+                    sub = _load_version_cached(s['module_type'], s['module_subtype'])
+                except (OSError, ValueError, KeyError):
+                    continue
+                unc = set(sub.uncertain_citations)
+                for k in sub.required_citations:
+                    if (sub.key, k) not in seen:
+                        seen.add((sub.key, k))
+                        out.append((sub, k, k in unc))
+                walk(sub)
+        walk(self)
+        return out
 
     # --- files ------------------------------------------------------------------------------
     def path(self, suffix):

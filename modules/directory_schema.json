@@ -229,7 +229,9 @@
     "version_names": "Versions are named <system>_<compartment>_<Source><Year>_vXX, <system>_<Source><Year>_vXX or <Source><Year>_vXX (Source: the first author's surname in ASCII CamelCase; ArgusUNPUBLISHED for the owner's unpublished or modified models), with _SI for an SI-unit duplicate and _OLD for a superseded formulation. Vessel versions keep their port letters first (pp, pv, vp, vv: libcuflynx reads a vessel's first two letters as its inlet/outlet port kinds) and their descriptive subtypes. No version starts with nn, except the pairs libcuflynx writes itself (nn_versions_allowed).",
     "system_model_records_resolve": "Every record of a system model's vessel array names a (module_type, version) of the library and an instance that version has (records of modules not in this library are listed in the model's spec as known).",
     "version_or_instance": "Different equations (a changed relation, state or port variable) make a version; the same equations with other parameter values make an instance of the existing version.",
-    "port_differences": "Versions of one module_type may expose different ports when the mechanism does not allow common ones (e.g. named-current vs summed-current membrane versions). This is allowed and documented: each such version's tests.yaml notes end with the type's port table ('Ports of the versions of <type>'). No check compares ports across versions."
+    "port_differences": "Versions of one module_type may expose different ports when the mechanism does not allow common ones (e.g. named-current vs summed-current membrane versions). This is allowed and documented: each such version's tests.yaml notes end with the type's port table ('Ports of the versions of <type>'). No check compares ports across versions.",
+    "required_citations": "Every version's config entry has \"required_citations\": a non-empty list of bib keys, each in the version's {module_type}_{version}_references.bib, naming the papers the version's model (its equations) is built on, as distinct from the per-parameter value sources in the instance CSVs' data_reference. \"required_citations_uncertain\" (optional, left out when empty) lists the keys among them that are a best guess still to confirm. Owner-original models cite placeholders (argus2026sympathetic, argus2026unpublished, gee2026unpublished) and generic mechanisms the software (argus2026circulatory). A supermodule lists its own; its report adds its submodules'.",
+    "bib_keys": "Every BibTeX key is <first author's surname><year><first significant title word>, lowercase ASCII (belluzzi1986quantitative; cam_testing.bib.convention_key): particles join the surname (vanderpol), accents and hyphens are dropped (hernandezcruz), stopwords (a, an, the, on, of, ...) are skipped. Two different papers with the same key take further title words. One key per paper. Entries without a year (undated web pages) are listed in tests/test_structure.py UNDATED_BIB_KEYS."
   },
   "spec_keys": {
     "both": [
@@ -268,6 +270,12 @@
       "review",
       "review_scope"
     ]
+  },
+  "config_entry_record_keys": {
+    "licence": "SPDX id of the version's licence (cam_testing.library.LICENCES); default CC0-1.0",
+    "creator": "list of the names of the people who created the version ([] until given in review)",
+    "required_citations": "non-empty list of bib keys in the version's references.bib: the papers its model is built on (rules.required_citations)",
+    "required_citations_uncertain": "optional: the keys of required_citations that are a best guess still to confirm (left out when none)"
   },
   "nn_versions_allowed": {
     "coupling/FV1D_vessel/nn": "libcuflynx's 1D coupling writes FV1D_vessel records with BC_type nn",

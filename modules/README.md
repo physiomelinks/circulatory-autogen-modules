@@ -24,7 +24,7 @@ modules/
           <module_type>_<version>_units.cellml           the units it uses (and what they depend on)
           <module_type>_<version>_verification_config.json   what the checks run (see "The version spec")
           <module_type>_<version>_tests.yaml             review and record-keeping (see "The version spec")
-          <module_type>_<version>_references.bib         BibTeX entries its parameters cite
+          <module_type>_<version>_references.bib         BibTeX entries its parameters and its required_citations cite
           <module_type>_<version>_references_proposed.bib   citations proposed for review (optional)
           <module_type>_<version>.html                   version report (generated)
           risk/                                          joint failure-risk analysis (make risk; committed)
@@ -145,12 +145,12 @@ The rules of 2026-10-06 (approved on `reviews/library_restructure_proposal.html`
    compartments join one type as versions or instances (rule 4). Versions of one type expose
    compatible ports where the mechanism allows; where they cannot (e.g. a bond-graph pump beside
    current-law pumps), the difference is allowed and documented (below).
-6. **required_citations.** Every version's `modules_config.json` entry will have
+6. **required_citations.** Every version's `modules_config.json` entry has
    `"required_citations": [bib keys]`: the papers whose *model* the version's equations come from
    (not the per-parameter value sources, which stay in the CSV `data_reference`). Each key is in the
    version's `references.bib` and follows `<surname><year><first significant title word>`, all
-   lowercase (`belluzzi1986quantitative`). A supermodule lists its own and its report and exports add
-   its submodules'. (Stage 3 of the restructure: not yet in the configs.)
+   lowercase (`belluzzi1986quantitative`). A supermodule lists its own; its report and its OMEX
+   archives add its submodules'. See "Citations" below.
 
 **Version or instance, in short.** Before adding a version, compare its equations with the type's
 existing versions. Identical equations (same variables, same relations) with other parameter values
@@ -224,9 +224,46 @@ version's name is the config entry's `module_subtype`**, so a model picks a vers
   review)" until then.
 
 `tests/test_structure.py` checks both keys in every entry. libcuflynx's config schema allows extra
-keys, and both config formats carry them unchanged (`library.normalise_config_entry`,
+keys (these, and the citation keys below), and both config formats carry them unchanged (`library.normalise_config_entry`,
 `library.to_phlynx_entry`). The tools that write new config entries (`tools/restructure_to_versions.py`,
 `tools/import_from_libcuflynx.py`, `tools/split_module.py`) add them with `library.with_record_keys`.
+
+**Citations.** Every config entry names the papers its model is built on, after `creator`:
+- `"required_citations"`: a non-empty list of BibTeX keys, each with its entry in the version's
+  `<module_type>_<version>_references.bib`. These are the papers whose *model* (equations) the
+  version implements, to be cited by anyone who uses it; the papers its parameter values come from
+  are cited per parameter in the instance CSVs' `data_reference` (`<key>; <note>`) and need not be
+  listed here.
+- `"required_citations_uncertain"`: the keys among them that are a best guess still to confirm
+  (e.g. a primary source not checked equation by equation). Left out when there are none. The
+  version page shows "(uncertain)" next to them.
+- Models with no publication behind them cite placeholders, `@unpublished` entries whose note says
+  they are placeholders: `argus2026sympathetic` (the planned sympathetic-neuron paper),
+  `argus2026unpublished` (the owner's unpublished or modified models) and `gee2026unpublished` (the
+  Gee and Argus respiratory-control work). Generic mechanisms with no model paper (constant
+  boundary conditions, sums, observers, generic vessels) cite the software, `argus2026circulatory`
+  (circulatory_autogen / libcuflynx and this library). Replace a placeholder with the real key when
+  the paper exists.
+- A supermodule lists the citations of its own (often a placeholder); its version page adds "From
+  its submodules:" (each linked to the submodule's page), and its per-instance OMEX archives carry
+  the submodules' configs too.
+
+The version page shows the required citations under the description, each linked to its entry in
+the page's References. The initial lists come from the proposal approved on 2026-10-06
+(`tools/required_citations.py`, which applies its rules and adds the missing .bib entries; re-running
+it fills only entries without citations). A new version needs its own: the tools that write new config
+entries leave `required_citations` out, and the structure test fails until it is given.
+
+**BibTeX keys.** Every key is `<first author's surname><year><first significant title word>`, all
+lowercase ASCII: `belluzzi1986quantitative`, `vanderpol1926relaxation` (particles join the surname),
+`hernandezcruz1997ca` (accents and hyphens dropped); stopwords (a, an, the, on, of, in, for, to, and,
+at, by, with, from, is, are) are skipped (`cam_testing.bib.convention_key`). One key per paper,
+library-wide: the same paper has the same key in every version's .bib. Two different papers with the
+same key take further title words (`<surname><year><first word><second word>`). Undated web pages have no year in
+their key and are listed in `UNDATED_BIB_KEYS` in `tests/test_structure.py`. The library was rekeyed
+to this convention on 2026-10-06 by `tools/rekey_bib.py` (old -> new in `tools/bib_rekey_map.json`;
+four papers that had two keys each now have one). `tests/test_structure.py` checks the
+convention, one key per DOI, and every version's required citations.
 
 ## Instances
 
