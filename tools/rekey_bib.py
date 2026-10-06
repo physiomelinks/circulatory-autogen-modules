@@ -244,6 +244,34 @@ def rekey_text(p, text, new_of, pattern):
     return text2, count
 
 
+
+def load_map(path=MAP_PATH):
+    """{old key: new key} from tools/bib_rekey_map.json (identity entries included)."""
+    with open(path) as f:
+        return json.load(f)['map']
+
+
+def rekey_string(p, text, new_of=None):
+    """``text`` (the contents of file ``p``, whose extension selects the prose rules) with every old
+    bib key replaced by its new key, as the 2026-10-06 rekey did: used to bring circulatory_autogen's
+    original files (system_models/**/reference/) into this library's keys."""
+    new_of = new_of or load_map()
+    changed = {k: v for k, v in new_of.items() if k != v}
+    if not changed:
+        return text
+    return rekey_text(p, text, new_of, token_pattern(changed))[0]
+
+
+def rekey_file(path, new_of=None):
+    """Rekey one file in place (see rekey_string); returns True if it changed."""
+    with open(path, encoding='utf-8') as f:
+        text = f.read()
+    new = rekey_string(path, text, new_of)
+    if new != text:
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(new)
+    return new != text
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--dry-run', action='store_true', help='print the map and the changes; write nothing')

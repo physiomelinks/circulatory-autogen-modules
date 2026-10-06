@@ -824,3 +824,40 @@ def test_missing_source_figures_list_is_current():
     have = {k for k, i in _publication_instances() if not i.source_figures()}
     stale = MISSING_SOURCE_FIGURES - have
     assert not stale, f'remove from MISSING_SOURCE_FIGURES (now has figures or no longer needs them): {sorted(stale)}'
+
+
+def _ca_resources():
+    '''circulatory_autogen's resources/ directory, from the installed libcuflynx (or the sibling clone).'''
+    try:
+        import libcuflynx
+        d = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(libcuflynx.__file__))), 'resources')
+        if os.path.isdir(d):
+            return d
+    except Exception:  # noqa: BLE001
+        pass
+    d = os.path.join(REPO_ROOT, '..', 'circulatory_autogen', 'resources')
+    return d if os.path.isdir(d) else None
+
+
+def _reference_copies():
+    return sorted(p for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', 'reference', '*'))
+                  if p.endswith(('_parameters.csv', '_obs_data.json', '_params_for_id.csv')))
+
+
+@pytest.mark.parametrize('path', _reference_copies(), ids=lambda p: os.path.relpath(p, SYSTEM_MODELS_DIR))
+def test_reference_copies_are_circulatory_autogen_originals_in_library_keys(path):
+    '''system_models/**/reference/ holds circulatory_autogen's original files with only the bib keys
+    changed to this library's (tools/bib_rekey_map.json): each equals the original after the same rekey
+    (tools/rekey_bib.rekey_string), so the copies stay exact and re-importing reproduces them.'''
+    import importlib.util
+    res = _ca_resources()
+    original = os.path.join(res, os.path.basename(path)) if res else None
+    if not original or not os.path.isfile(original):
+        pytest.skip('no circulatory_autogen original to compare with')
+    spec = importlib.util.spec_from_file_location('rekey_bib', os.path.join(REPO_ROOT, 'tools', 'rekey_bib.py'))
+    rekey = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rekey)
+    with open(original, encoding='utf-8') as f:
+        expected = rekey.rekey_string(path, f.read())
+    with open(path, encoding='utf-8') as f:
+        assert f.read() == expected, f'{path} differs from {original} (after rekeying) beyond its bib keys'

@@ -35,6 +35,8 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from cam_testing import module_array  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rekey_bib  # noqa: E402  (tools/rekey_bib.py)
 from cam_testing.library import read_config  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -357,6 +359,8 @@ def import_model(ca_dir, model, category, configs):
     module_array.write_records(os.path.join(ref_dir, f'{model}_module_array.json'), module_array.read_records(va))
     if os.path.isfile(pa):
         shutil.copyfile(pa, os.path.join(ref_dir, f'{model}_parameters.csv'))
+        # the copy keeps circulatory_autogen's values but this library's bib keys (tools/bib_rekey_map.json)
+        rekey_bib.rekey_file(os.path.join(ref_dir, f'{model}_parameters.csv'))
     header, rows = read_rows(va)
     pheader, params = read_rows(pa) if os.path.isfile(pa) else (['variable_name', 'units', 'value', 'data_reference'], [])
     heart_name = next((r['name'] for r in rows if r['vessel_type'].startswith('heart')), 'heart')
@@ -374,6 +378,7 @@ def import_model(ca_dir, model, category, configs):
         if not os.path.isfile(src):
             continue
         shutil.copyfile(src, os.path.join(ref_dir, f'{model}_{extra}'))
+        rekey_bib.rekey_file(os.path.join(ref_dir, f'{model}_{extra}'))
         if extra.endswith('.json'):
             data = rename_operands(json.load(open(src)), mapping)
             json.dump(data, open(os.path.join(dest, f'{model}_{extra}'), 'w'), indent=1)
