@@ -71,7 +71,8 @@ def validated_spread(component):
 
 
 def _module_index():
-    return version_index()
+    # a system model's records may name versions of the extra libraries too
+    return version_index(include_libraries=True)
 
 
 def check(vessel_array_path, parameters_path, out=sys.stdout):

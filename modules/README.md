@@ -540,6 +540,11 @@ An instance with no obs_data or params_for_id still loads and simulates, but CUF
 `tests/test_structure.py` walks `modules/` and `system_models/` and checks all of this. It also checks
 each version's CellML, config and units, and validates the JSON files against libcuflynx's schemas.
 
+`cam_testing/data/directory_schema.json` is a copy of this file, shipped with the package for repos
+that use `cam_testing` without a schema of their own (`tests/test_paths.py` checks the two are
+equal): change both together. Another repo's `modules/` is checked against its own
+`directory_schema.json` when it has one (README.md, "Using cam_testing in another repository").
+
 ## Adding things
 
 - **A new version** of an existing module_type: add

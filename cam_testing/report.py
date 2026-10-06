@@ -24,11 +24,18 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from cam_testing import bib, checks, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
-from cam_testing.library import LICENCES, REPO_ROOT, load_module_type, module_type_names, select_module_types
+from cam_testing import paths
+from cam_testing.library import LICENCES, load_module_type, module_type_names, select_module_types
 from cam_testing.mathml import component_equation_targets, component_equations, component_variables
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
-SITE_DIR = os.path.join(REPO_ROOT, 'site')
+
+
+def __getattr__(name):
+    # the former constant: site/ of the repo under test (cam_testing.paths)
+    if name == 'SITE_DIR':
+        return paths.roots().site_dir
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
 TEST_TITLES = {
     'run_test': 'Run',
@@ -947,11 +954,12 @@ def _href(relpath, page):
 def assemble_site(names, contexts):
     '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page and
     plots; a nested module_type's directory is inside its parent's), as GitHub Pages serves it.'''
-    if os.path.isdir(SITE_DIR):
-        shutil.rmtree(SITE_DIR)
+    site_dir = paths.roots().site_dir
+    if os.path.isdir(site_dir):
+        shutil.rmtree(site_dir)
     for name in names:
         mtype = load_module_type(name)
-        dest = os.path.join(SITE_DIR, 'modules', mtype.relpath)
+        dest = os.path.join(site_dir, 'modules', mtype.relpath)
         os.makedirs(dest, exist_ok=True)
         if not os.path.isfile(mtype.html_path) or any(not os.path.isfile(v.html_path) for v in mtype.versions()):
             build_module(name)
@@ -969,8 +977,8 @@ def assemble_site(names, contexts):
                     idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
                     os.makedirs(idest, exist_ok=True)
                     shutil.copy2(archive, idest)
-    build_review_queue(contexts, os.path.join(SITE_DIR, 'review_queue.html'), _href)
-    return build_index(contexts, os.path.join(SITE_DIR, 'index.html'), _href)
+    build_review_queue(contexts, os.path.join(site_dir, 'review_queue.html'), _href)
+    return build_index(contexts, os.path.join(site_dir, 'index.html'), _href)
 
 
 def main(argv=None):
@@ -985,7 +993,7 @@ def main(argv=None):
     for name in select_module_types(args.module):
         out, ctx = build_module(name)
         contexts[name] = ctx
-        print(f'wrote {os.path.relpath(out, REPO_ROOT)} and {ctx["n_versions"]} version page(s)')
+        print(f'wrote {os.path.relpath(out, paths.roots().repo_root)} and {ctx["n_versions"]} version page(s)')
     if args.site:
         # the index always covers every module_type, even when only some pages were rebuilt
         for name in module_type_names():
@@ -993,7 +1001,7 @@ def main(argv=None):
                 vctx = [version_context(v) for v in load_module_type(name).versions()]
                 contexts[name] = dict(module_context(name, vctx), version_contexts=vctx)
         out = assemble_site(module_type_names(), [contexts[n] for n in module_type_names()])
-        print(f'wrote {os.path.relpath(out, REPO_ROOT)}')
+        print(f'wrote {os.path.relpath(out, paths.roots().repo_root)}')
 
 
 if __name__ == '__main__':

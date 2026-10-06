@@ -39,12 +39,22 @@ from dataclasses import dataclass, field
 
 import yaml
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODULES_DIR = os.path.join(REPO_ROOT, 'modules')
-SYSTEM_MODELS_DIR = os.path.join(REPO_ROOT, 'system_models')
-# reviews shared by several versions (a whole pre-versions module's review): tests.yaml's
-# review: reviews/<name>_review.yaml points to one copy
-REVIEWS_DIR = os.path.join(REPO_ROOT, 'reviews')
+from cam_testing import paths
+
+# The repo root, its modules/ (the primary library), system_models/ and reviews/ come from
+# cam_testing.paths (configurable: CAM_REPO_ROOT, [tool.cam_testing], --cam-root), read when used:
+# library.MODULES_DIR etc. still work as attributes. reviews/ holds reviews shared by several
+# versions (a whole pre-versions module's review): tests.yaml's review: reviews/<name>_review.yaml
+# points to one copy.
+_ROOT_ATTRIBUTES = {'REPO_ROOT': 'repo_root', 'MODULES_DIR': 'modules_dir',
+                    'SYSTEM_MODELS_DIR': 'system_models_dir', 'REVIEWS_DIR': 'reviews_dir'}
+
+
+def __getattr__(name):
+    if name in _ROOT_ATTRIBUTES:
+        return getattr(paths.roots(), _ROOT_ATTRIBUTES[name])
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+
 
 VERSIONS, INSTANCES, DEFAULT_INSTANCE = 'versions', 'instances', 'default'
 SOURCE_FIGURES = 'source_figures'              # instance dir: screenshots of the data's publication figures
@@ -77,15 +87,15 @@ def safe_id(text):
 # ----------------------------------------------------------------------------------------------
 
 @functools.lru_cache(maxsize=None)
-def _discover():
+def _discover_library(modules_dir):
     '''(module_type name -> directory, module_type name -> enclosing module_type name or None), for
-    every modules/**/<name>/ that has versions/, nested module_types included.'''
+    every <modules_dir>/**/<name>/ that has versions/, nested module_types included.'''
     found, parents = {}, {}
-    if not os.path.isdir(MODULES_DIR):
+    if not os.path.isdir(modules_dir):
         return found, parents
-    enclosing = {MODULES_DIR: None}     # directory -> the module_type it is in (None: none)
-    for root, dirs, files in os.walk(MODULES_DIR):
-        rel = os.path.relpath(root, MODULES_DIR)
+    enclosing = {modules_dir: None}     # directory -> the module_type it is in (None: none)
+    for root, dirs, files in os.walk(modules_dir):
+        rel = os.path.relpath(root, modules_dir)
         if rel != '.' and rel.split(os.sep)[0] in UNMIGRATED:
             dirs[:] = []
             continue
@@ -104,14 +114,60 @@ def _discover():
     return found, parents
 
 
+def library_dirs():
+    '''Every module library, primary (this repo's modules/) first, then the extra ones
+    (cam_testing.paths): what libcuflynx gets as module_library_dirs.'''
+    return paths.roots().library_dirs
+
+
+def _discover(include_libraries=True):
+    '''_discover_library for the primary library, or (include_libraries) for every library merged:
+    a module_type name found in several libraries resolves to the first (its versions are looked up in
+    each, see module_type_dirs).'''
+    dirs = library_dirs()
+    if not include_libraries:
+        return _discover_library(dirs[0])
+    found, parents = {}, {}
+    for d in dirs:
+        f, p = _discover_library(d)
+        for name, path in f.items():
+            if name not in found:
+                found[name], parents[name] = path, p[name]
+    return found, parents
+
+
+def clear_caches():
+    '''Forget discovered module_types (after cam_testing.paths.configure, or files moved).'''
+    _discover_library.cache_clear()
+    _load_version_cached.cache_clear()
+    legacy_renames.cache_clear()
+
+
 def _module_type_dirs():
-    '''module_type name -> directory, for every modules/**/<name>/ that has versions/.'''
+    '''module_type name -> directory, for every module_type of every library (primary first).'''
     return _discover()[0]
 
 
-def module_type_names():
-    '''Every module_type (nested ones included), in case-insensitive order.'''
-    return sorted(_module_type_dirs(), key=str.lower)
+def module_type_dirs(name):
+    '''Every directory of a module_type, one per library that has it (primary first).'''
+    out = [_discover_library(d)[0].get(name) for d in library_dirs()]
+    return [d for d in out if d]
+
+
+def library_of(path):
+    '''The library (modules/ directory) a path is in; the primary library for a path in none.'''
+    p = os.path.realpath(path)
+    for d in library_dirs():
+        r = os.path.realpath(d)
+        if p == r or p.startswith(r + os.sep):
+            return d
+    return library_dirs()[0]
+
+
+def module_type_names(include_libraries=False):
+    '''Every module_type of the primary library (nested ones included), or of every library
+    (include_libraries), in case-insensitive order.'''
+    return sorted(_discover(include_libraries)[0], key=str.lower)
 
 
 # the old name: a "module" is now a module_type
@@ -119,7 +175,7 @@ module_names = module_type_names
 
 
 def module_type_dir(name):
-    return _module_type_dirs().get(name) or os.path.join(MODULES_DIR, name)
+    return _module_type_dirs().get(name) or os.path.join(library_dirs()[0], name)
 
 
 module_dir = module_type_dir
@@ -145,8 +201,9 @@ def nested_in(name):
 
 
 def module_relpath(name):
-    '''The module_type directory relative to modules/, e.g. "cell/neuron/soma".'''
-    return os.path.relpath(module_type_dir(name), MODULES_DIR).replace(os.sep, '/')
+    '''The module_type directory relative to its library's modules/, e.g. "cell/neuron/soma".'''
+    d = module_type_dir(name)
+    return os.path.relpath(d, library_of(d)).replace(os.sep, '/')
 
 
 def category_of(name):
@@ -154,7 +211,8 @@ def category_of(name):
     e.g. "cell" for neuron, soma and SN_membrane_soma, "vessels/compartments" for simple, and "" for
     heart (directly under modules/) and the module_types nested in it.'''
     outer = (ancestors_of(name) or [name])[-1]
-    rel = os.path.relpath(os.path.dirname(module_type_dir(outer)), MODULES_DIR).replace(os.sep, '/')
+    d = module_type_dir(outer)
+    rel = os.path.relpath(os.path.dirname(d), library_of(d)).replace(os.sep, '/')
     return '' if rel == '.' else rel
 
 
@@ -187,8 +245,8 @@ def matches_selector(name, selector):
     return rel == sel or rel.startswith(sel + '/')
 
 
-def select_module_types(selectors):
-    names = module_type_names()
+def select_module_types(selectors, include_libraries=False):
+    names = module_type_names(include_libraries)
     if not selectors:
         return names
     return [n for n in names if any(matches_selector(n, s) for s in selectors)]
@@ -526,8 +584,18 @@ class ModuleType:
         return nested_in(self.name)
 
     @property
+    def library(self):
+        '''The library (modules/ directory) it is in.'''
+        return library_of(self.dir)
+
+    @property
+    def is_primary(self):
+        '''In this repo's modules/ (not an extra library).'''
+        return self.library == library_dirs()[0]
+
+    @property
     def relpath(self):
-        return os.path.relpath(self.dir, MODULES_DIR).replace(os.sep, '/')
+        return os.path.relpath(self.dir, self.library).replace(os.sep, '/')
 
     @property
     def location(self):
@@ -868,7 +936,10 @@ def _load_version_cached(mt_name, version):
 
 
 def _load_version(mt_name, version):
-    mtype = load_module_type(mt_name)
+    # a module_type in several libraries: the version is in one of them
+    dirs = module_type_dirs(mt_name)
+    vdir_of = [d for d in dirs if os.path.isdir(os.path.join(d, VERSIONS, version))]
+    mtype = ModuleType(mt_name, vdir_of[0]) if vdir_of else load_module_type(mt_name)
     vdir = os.path.join(mtype.versions_dir, version)
     stem = f'{mt_name}_{version}'
     cfg_path = os.path.join(vdir, f'{stem}_modules_config.json')
@@ -881,13 +952,14 @@ def _load_version(mt_name, version):
     spec = merge_spec(tests, verification)
     if isinstance(spec.get('review'), str):
         spec['review_file'] = spec['review']
-        spec['review'] = read_review(spec['review'])
+        # relative to the root of the repo the version is in (an extra library's version: that library's)
+        spec['review'] = read_review(spec['review'], os.path.dirname(mtype.library))
     return Version(mtype, version, entry, spec, raw[0])
 
 
-def read_review(rel):
+def read_review(rel, repo_root=None):
     '''A shared review (tests.yaml's review: reviews/<name>_review.yaml, relative to the repo root).'''
-    with open(os.path.join(REPO_ROOT, rel)) as f:
+    with open(os.path.join(repo_root or paths.roots().repo_root, rel)) as f:
         return yaml.safe_load(f) or {}
 
 
@@ -896,8 +968,14 @@ def load_version(mt_name, version):
     return _load_version(mt_name, version)
 
 
-def all_versions(selectors=None):
-    return [v for n in select_module_types(selectors) for v in load_module_type(n).versions()]
+def all_versions(selectors=None, include_libraries=False):
+    '''Every version of the primary library's (selected) module_types; include_libraries: of every
+    library's, a module_type in several libraries contributing the versions of each.'''
+    out = []
+    for n in select_module_types(selectors, include_libraries):
+        dirs = module_type_dirs(n) if include_libraries else [load_module_type(n).dir]
+        out += [v for d in dirs for v in ModuleType(n, d).versions()]
+    return out
 
 
 def version_by_key(key):
@@ -912,9 +990,12 @@ def version_by_key(key):
     raise KeyError(key)
 
 
-def version_index():
-    '''(module_type, version) -> Version, for the whole library.'''
-    return {(v.vessel_type, v.name): v for v in all_versions()}
+def version_index(include_libraries=False):
+    '''(module_type, version) -> Version, for the whole (primary) library, or every library.'''
+    out = {}
+    for v in all_versions(include_libraries=include_libraries):
+        out.setdefault((v.vessel_type, v.name), v)
+    return out
 
 
 # The alternative hearts became versions of heart (2026-10, nested module_types). A version name
@@ -936,7 +1017,7 @@ def legacy_renames():
     the move to versions (ion channels, the sympathetic-neuron pieces, the supermodules), from
     tools/restructure_map.yaml, and in the move of the alternative hearts into heart
     (HEART_VERSION_RENAMES). circulatory_autogen's own models still use the old pairs.'''
-    path = os.path.join(REPO_ROOT, 'tools', 'restructure_map.yaml')
+    path = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_map.yaml')
     if not os.path.isfile(path):
         return dict(HEART_VERSION_RENAMES)
     with open(path) as f:

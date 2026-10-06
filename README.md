@@ -106,6 +106,8 @@ The version report shows all of this, regenerating the plots from the committed 
 - the original under `reference/`;
 - a `<model>_system.yaml` spec.
 
+The reference can instead be a ready CellML model, simulated as it is: for example the flattened model PhLynx exports, for a model first built in PhLynx. Set `equivalence.reference_cellml: reference/<file>.cellml` in the spec (a path relative to the model's directory), or put it at `reference/<model>.cellml` with no vessel array beside it. Its outputs are `<component>/<variable>` for every component except `environment`, `global_parameters` and `instance_parameters` (`equivalence.ignore_components` changes the list); `output_map`, `ignore`, `wrapped`, `reciprocal` and `tol` work as for an original. PhLynx names a vessel's component by the vessel's name, so its outputs match the library model's `<vessel>/<variable>` with no `output_map`.
+
 `tests/test_systems.py` checks three things for each model:
 - it runs;
 - it reproduces the original, with every logged output within 1e-6 at the spec's CVODE tolerances;
@@ -131,8 +133,8 @@ The host's own vessels name `heart` in their `inp_instances` / `out_instances`. 
 ## PhLynx → CUFLynx pipeline
 
 `tests/test_phlynx.py` checks that each version works end to end in the web tooling. Its three tests:
-- `phlynx_export_test`: builds the version's test network in PhLynx, using PhLynx's own code from a checkout, run headlessly under Node and jsdom by `tools/phlynx_bridge/export_omex.mjs`. It loads this library's modules and parameters, checks every connection was made, and exports the `.omex` PhLynx sends to CUFLynx.
-- `cuflynx_simulate_test`: imports that archive into a released CUFLynx binary through its HTTP API (`tools/cuflynx_bridge/simulate_omex.py`) and simulates it.
+- `phlynx_export_test`: builds the version's test network in PhLynx, using PhLynx's own code from a checkout, run headlessly under Node and jsdom by `cam_testing/bridges/phlynx/export_omex.mjs`. It loads this library's modules and parameters, checks every connection was made, and exports the `.omex` PhLynx sends to CUFLynx.
+- `cuflynx_simulate_test`: imports that archive into a released CUFLynx binary through its HTTP API (`cam_testing/bridges/cuflynx/simulate_omex.py`) and simulates it.
 - `phlynx_equivalence_test`: compares CUFLynx's run with libcuflynx's model of the same network, within 1e-6 at the output times both runs share.
 
 A version passing all three gets the "PhLynx / CUFLynx compatible" tick in its report, on its module_type's page and in the site index.
@@ -146,6 +148,84 @@ make pipeline PHLYNX_DIR=/path/to/phlynx CUFLYNX_BIN=/path/to/CUFLynx
 The tests skip when Node (22.15 or newer), the PhLynx checkout (with `yarn install` done) or the CUFLynx binary isn't available. CI checks out PhLynx at `PHLYNX_REF` and downloads the latest CUFLynx Ubuntu release.
 
 Parameters are applied with PhLynx's own `applyParametersToNodes` (`src/utils/parameters.js`, from PhLynx #595). For an older PhLynx checkout without it, the bridge falls back to a copy of `loadParametersData`.
+
+## Using cam_testing in another repository
+
+`cam_testing` tests, reports and builds manifests for any repo laid out like this one: a `modules/` directory with the same layout and files (`modules/<category>/<module_type>/versions/<version>/...`, see [`modules/README.md`](modules/README.md)), and optionally `system_models/`, `manifests/` and `reviews/` beside it. That repo's modules (and system models) may use this library's modules, e.g. a harness downstream of `inlet_flow` and `arterial_simple`, by listing this library as an **extra module library**.
+
+**Install** (libcuflynx needs SUNDIALS and MPI, see "Running locally"). The `libcuflynx` extra installs libcuflynx at the git ref `requirements.txt` pins:
+
+```bash
+pip install "cam-testing[libcuflynx] @ git+https://github.com/physiomelinks/circulatory-autogen-modules@<branch or tag>"
+```
+
+The package holds the code, the test suite, the PhLynx/CUFLynx bridges and a copy of the directory schema, not this library's modules. To use them, check out this repo too (a git submodule, or a clone at the same ref in CI) and point to its `modules/` as an extra library.
+
+**Configure** in the repo's `pyproject.toml` (paths relative to that file):
+
+```toml
+[tool.cam_testing]
+# root = "."                                      # the repo under test (default: this file's directory)
+module_library_dirs = ["../circulatory-autogen-modules/modules"]   # a modules/ directory, or a repo holding one
+# [tool.cam_testing.manifests]                   # curated PhLynx manifests besides all.json (optional)
+# "index.json" = ["vessels", "control"]
+```
+
+or with environment variables, which win over `pyproject.toml`: `CAM_REPO_ROOT=/path/to/repo` and `CAM_MODULE_LIBRARY_DIRS=/path/to/circulatory-autogen-modules/modules` (several separated by `:`), or the pytest options `--cam-root` and `--cam-library` (repeatable), which win over both. With none of them, the repo is the nearest directory at or above the working directory that has `modules/`. `python -m cam_testing.paths` prints what is in use and where it came from; pytest prints it in its header.
+
+With extra libraries:
+- only the repo's own `modules/` is tested, reported and put in its manifests;
+- libcuflynx gets `module_library_dirs: [<repo>/modules, <extra libraries>...]` for every model cam_testing generates (a version alone or in its harness, system models, the C++ run, the PhLynx pipeline), so harnesses, supermodules and system models can name versions from any of them. A module_type may be in both (e.g. your own `arterial_simple` versions): each version is found in the library that has it;
+- the structure checks look across all of them: component names, `(module_type, version)` pairs and units must not clash with the extra libraries' (libcuflynx merges them), and system-model records and harnesses may name their versions.
+
+The repo's own `modules/directory_schema.json` is used when it has one, else the copy in the package (`cam_testing/data/directory_schema.json`).
+
+**Tests.** The plugin `cam_testing.pytest_plugin` is registered on install, with the options `--module`, `--component`, `--include-unreviewed`, `--quick-unreviewed`, `--cam-root` and `--cam-library` and the test names (`run_test`, `verification_test_BC`, ...). Run the suite straight from the package:
+
+```bash
+pytest --pyargs cam_testing.suite.test_structure                      # static checks
+pytest --pyargs cam_testing.suite.test_modules -m "not slow" --module control   # V&V (MODULE as here)
+pytest --pyargs cam_testing.suite.test_systems                        # system models
+pytest --pyargs cam_testing.suite                                     # everything, incl. the PhLynx pipeline
+```
+
+or from one-line test files, which keep `pytest tests/...`, `-k` and `testpaths` working as for your own tests:
+
+```python
+# tests/test_cam_modules.py (likewise test_cam_structure.py, test_cam_systems.py, ...)
+from cam_testing.suite.test_modules import *  # noqa: F401,F403
+```
+
+The suite's modules are `test_structure`, `test_modules`, `test_systems`, `test_phlynx` and `test_instance_omex`. A system model's reference can be a ready CellML model, e.g. the model PhLynx exports (see "System models").
+
+**Reports and manifests** for the configured repo: `python -m cam_testing.report [--module X] [--site]` writes the pages into its `modules/` (and `site/`), `python -m cam_testing.manifests` writes its `manifests/*.json`. For the PhLynx/CUFLynx pipeline, the bridges ship in the package: install jsdom next to `cam_testing/bridges/phlynx` (`npm ci` there) or anywhere and set `JSDOM_DIR`, and set `PHLYNX_DIR` and `CUFLYNX_BIN` as here.
+
+A minimal Makefile and CI job:
+
+```make
+PYTHON ?= venv/bin/python
+# a checkout of circulatory-autogen-modules (or set module_library_dirs in pyproject.toml instead)
+CAM_LIB ?= ../circulatory-autogen-modules
+export CAM_MODULE_LIBRARY_DIRS = $(CAM_LIB)/modules
+MODULE_ARGS = $(if $(MODULE),--module $(MODULE),)
+structure: ; $(PYTHON) -m pytest --pyargs cam_testing.suite.test_structure
+test:      ; $(PYTHON) -m pytest --pyargs cam_testing.suite.test_modules -m "not slow" $(MODULE_ARGS)
+systems:   ; $(PYTHON) -m pytest --pyargs cam_testing.suite.test_systems
+report:    ; $(PYTHON) -m cam_testing.report $(MODULE_ARGS)
+manifests: ; $(PYTHON) -m cam_testing.manifests
+```
+
+```yaml
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: { repository: physiomelinks/circulatory-autogen-modules, ref: <branch or tag>, path: _cam }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: sudo apt-get install -y -qq libopenmpi-dev openmpi-bin libsundials-dev build-essential
+      - run: pip install "./_cam[libcuflynx]"     # cam_testing and libcuflynx at that checkout's ref
+      - run: make structure test CAM_LIB=$PWD/_cam PYTHON=python
+```
 
 ## Running locally
 

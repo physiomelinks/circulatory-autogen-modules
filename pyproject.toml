@@ -14,23 +14,37 @@ dependencies = [
     "numpy",
     "pytest",
     "jsonschema>=4.18",  # vessel arrays and module configs against libcuflynx's JSON Schemas
+    "tomli; python_version < '3.11'",  # [tool.cam_testing] in a repo's pyproject.toml
 ]
 
-[tool.setuptools]
-packages = ["cam_testing"]
+[project.optional-dependencies]
+# libcuflynx at the ref requirements.txt pins (keep the two in step): pip install "cam-testing[libcuflynx] @ git+..."
+libcuflynx = ["libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/prediction-item-features"]
+
+[project.entry-points.pytest11]
+# named as the module, so a conftest.py's pytest_plugins naming it too doesn't register it twice
+"cam_testing.pytest_plugin" = "cam_testing.pytest_plugin"
+
+[tool.setuptools.packages.find]
+include = ["cam_testing", "cam_testing.*"]
 
 [tool.setuptools.package-data]
-cam_testing = ["templates/*.html"]
+cam_testing = ["templates/*.html", "data/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
+               "bridges/cuflynx/*.py"]
+
+[tool.cam_testing]
+# this repo is the root (the default); curated PhLynx manifests besides all.json (python -m cam_testing.manifests)
+[tool.cam_testing.manifests]
+"index.json" = ["vessels", "heart"]
+"vitalworkshop.json" = ["vessels", "heart"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# The standard tests keep the names run_test, verification_test_BC, ... rather than test_*.
-python_functions = ["test_*", "run_test", "*_test_*", "stability_test", "system_*_test", "supermodule_*_test",
-                    "phlynx_*_test", "cuflynx_*_test"]
-markers = [
-    "slow: long-running (calibration)",
-    "module_vv: per-version verification and per-instance validation tests",
-    "system_model: system-model tests (system_models/) and supermodule reproduces tests",
-    "phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)",
-]
+# The options (--module, --component, --include-unreviewed, --quick-unreviewed, --cam-root,
+# --cam-library), parametrisation, fixtures, the standard tests' names (run_test,
+# verification_test_BC, ...) and markers come from the plugin cam_testing.pytest_plugin, which
+# installing cam_testing registers for any repo (pytest11 entry point). Named here too, for a run
+# without the install (PYTHONPATH=.); there is no conftest.py: an editable install's other repos
+# would load it.
+addopts = ["-p", "cam_testing.pytest_plugin"]
 filterwarnings = ["ignore::DeprecationWarning"]

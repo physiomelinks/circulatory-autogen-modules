@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-import conftest
+from cam_testing import pytest_plugin
 from cam_testing import checks, harness, phlynx, report
 from cam_testing.library import Parameter, all_versions, load_version
 
@@ -190,9 +190,9 @@ def test_report_links_and_counts_for_calibration_in_super():
 
 def test_supermodule_versions_get_the_verification_tests():
     config = SimpleNamespace(getoption=lambda k: ['soma'] if k == '--module' else ([] if k == '--component' else True))
-    ids = [p.id for p in conftest._selected_versions(config)]
+    ids = [p.id for p in pytest_plugin._selected_versions(config)]
     assert 'soma/sympathetic' in ids and 'soma/sympathetic_monolithic_v01' in ids
-    inst = [p.id for p in conftest._selected_instances(config)]
+    inst = [p.id for p in pytest_plugin._selected_instances(config)]
     assert 'soma/sympathetic/default' in inst
 
 

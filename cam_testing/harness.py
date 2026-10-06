@@ -4,8 +4,9 @@ Builds a single module version into a runnable model with libcuflynx, and runs i
 A version is instantiated alone, as one vessel with no connections, so every
 boundary_condition variable becomes a parameter the tests can set. Its parameter values are
 those of an instance (by default the version's default instance), written to the model's
-parameters file. Models are generated from this repo's modules only
-(``use_builtin_modules: false``), never libcuflynx's bundled copies.
+parameters file. Models are generated from this repo's modules (and the extra libraries of
+cam_testing.paths, which a harness may use) only (``use_builtin_modules: false``), never
+libcuflynx's bundled copies.
 """
 import contextlib
 import csv
@@ -15,7 +16,7 @@ import os
 import numpy as np
 
 from cam_testing import vessel_array
-from cam_testing.library import MODULES_DIR
+from cam_testing.library import library_dirs
 
 # The single vessel's name. Not 'heart': libcuflynx special-cases a vessel called heart.
 VESSEL = 'mod'
@@ -254,7 +255,7 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
         'solver': component.spec.get('solver', 'CVODE_myokit') if model_type == 'cellml' else 'solve_ivp',
         'resources_dir': resources_dir,
         'generated_models_dir': generated_dir,
-        'module_library_dirs': [MODULES_DIR],
+        'module_library_dirs': library_dirs(),     # this repo's modules/, then the extra libraries
         'use_builtin_modules': False,
         'DEBUG': False,
     }
