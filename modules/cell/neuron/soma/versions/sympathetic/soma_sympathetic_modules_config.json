@@ -10,8 +10,8 @@
     "submodules": [
       {
         "name": "membrane",
-        "module_type": "SN_membrane_soma",
-        "module_subtype": "nn",
+        "module_type": "membrane_potential",
+        "module_subtype": "SN_soma_Argus2026_v01",
         "instance": "default",
         "inp_instances": [],
         "out_instances": [
@@ -34,8 +34,8 @@
       },
       {
         "name": "Na_K",
-        "module_type": "SN_Na_K_concentrations_soma",
-        "module_subtype": "nn",
+        "module_type": "ion_concentrations",
+        "module_subtype": "SN_soma_Argus2026_v01",
         "instance": "default",
         "inp_instances": [
           "membrane"
@@ -57,8 +57,8 @@
       },
       {
         "name": "Ca",
-        "module_type": "SN_Ca_handling_soma",
-        "module_subtype": "nn",
+        "module_type": "Ca_handling",
+        "module_subtype": "SN_soma_Argus2026_v01",
         "instance": "default",
         "inp_instances": [
           "membrane"

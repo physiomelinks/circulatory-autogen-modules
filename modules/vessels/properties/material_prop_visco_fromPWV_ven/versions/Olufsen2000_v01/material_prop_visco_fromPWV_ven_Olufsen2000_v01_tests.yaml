@@ -1,0 +1,78 @@
+module_type: material_prop_visco_fromPWV_ven
+version: Olufsen2000_v01
+reviewed: false
+notes: 'material_prop_fromPWV_ven plus K_tube_visco = (2/3) Γ h/(l π r0³). Two defects: r_min/r_max are undeclared (r0_min/r0_max
+  are declared) and h is used but never defined (no hr_ratio input either). See review.proposed_fixes: as written the CellML
+  does not generate. The last invariant uses hr_ratio, which only exists after the proposed fix.'
+expected_failures:
+  run_test: 'CellML defects: undeclared r_min / r_max (declared as r0_min / r0_max) and undeclared h in K_tube_visco, so the
+    model is rejected. In a patched copy (renamed r0_min/r0_max; hr_ratio added as a boundary_condition input and h = hr_ratio
+    r_0) every verification test passes.'
+  verification_test_invariants: 'CellML defects: undeclared r_min / r_max (declared as r0_min / r0_max) and undeclared h in
+    K_tube_visco, so the model is rejected. In a patched copy (renamed r0_min/r0_max; hr_ratio added as a boundary_condition
+    input and h = hr_ratio r_0) every verification test passes.'
+  verification_test_BC: 'CellML defects: undeclared r_min / r_max (declared as r0_min / r0_max) and undeclared h in K_tube_visco,
+    so the model is rejected. In a patched copy (renamed r0_min/r0_max; hr_ratio added as a boundary_condition input and h
+    = hr_ratio r_0) every verification test passes.'
+  verification_test_timestep: 'CellML defects: undeclared r_min / r_max (declared as r0_min / r0_max) and undeclared h in
+    K_tube_visco, so the model is rejected. In a patched copy (renamed r0_min/r0_max; hr_ratio added as a boundary_condition
+    input and h = hr_ratio r_0) every verification test passes.'
+  stability_test: 'CellML defects: undeclared r_min / r_max (declared as r0_min / r0_max) and undeclared h in K_tube_visco,
+    so the model is rejected. In a patched copy (renamed r0_min/r0_max; hr_ratio added as a boundary_condition input and h
+    = hr_ratio r_0) every verification test passes.'
+reference_proposals:
+  l:
+    reference: 'unreferenced_placeholder; test segment length 5 cm. Only a test value: l is supplied by the connected vessel'
+    sourced: 'no'
+    value: 0.05
+  r_0:
+    reference: 'unreferenced_placeholder; test radius of a medium vein (5 mm), inside the [r0_min, r0_max] = [0.8, 8] mm range
+      of Toro2022 Eq. (85). Only a test value: r_0 is supplied by the connected vessel'
+    sourced: 'no'
+    value: 0.005
+  K_m:
+    reference: 'Toro2022; Sec. 2.1.1: venous viscoelastic parameter K_M = 5e4 dyn s/cm^2 = 5e3 Pa s'
+    sourced: 'yes'
+    value: 5000
+  m_tube:
+    reference: 'Toro2022; Eqs. (2)-(5): tube-law exponents m = 10, n = -1.5 for veins (Muller2014 venous tube law)'
+    sourced: 'yes'
+    value: 10
+  n_tube:
+    reference: 'Toro2022; Eqs. (2)-(5): tube-law exponents m = 10, n = -1.5 for veins (Muller2014 venous tube law)'
+    sourced: 'yes'
+    value: -1.5
+  rho:
+    reference: Trudnowski1974; whole-blood specific gravity 1.0506 at 37 C (n = 25) = 1050.6 kg/m^3 (abstract values read
+      via a search rendering, full text not read). 1050 is also used by Alastruey2011; Toro2022 use 1060
+    sourced: 'yes'
+    value: 1050
+    note: (proposed for the vessel_properties global rho under material_prop_fromPWV/Olufsen2000_v01)
+  SMvolfrac_ven:
+    reference: 'Toro2022; Sec. 2.1.1: smooth-muscle volume fraction 8% for veins'
+    sourced: 'yes'
+    value: 0.08
+    note: (proposed for the vessel_properties global SMvolfrac_ven under material_prop_visco_const_ven/Olufsen2000_v01)
+  c0_max:
+    reference: 'Toro2022; Eq. (85) (following Muller2014): c0,max = 400 cm/s = 4.0 m/s'
+    sourced: 'yes'
+    value: 4.0
+    note: (proposed for the vessel_properties global c0_max under material_prop_fromPWV_ven/Olufsen2000_v01)
+  c0_min:
+    reference: 'Toro2022; Eq. (85): c0,min = 150 cm/s = 1.5 m/s'
+    sourced: 'yes'
+    value: 1.5
+    note: (proposed for the vessel_properties global c0_min under material_prop_fromPWV_ven/Olufsen2000_v01)
+  r0_max:
+    reference: 'Toro2022; Eq. (85): r_max = 0.8 cm = 0.008 m (largest vein radius in their network)'
+    sourced: 'yes'
+    value: 0.008
+    note: (proposed for the vessel_properties global r0_max under material_prop_fromPWV_ven/Olufsen2000_v01)
+  r0_min:
+    reference: 'Toro2022; Eq. (85): r_min = 0.08 cm = 0.0008 m (smallest vein radius in their network)'
+    sourced: 'yes'
+    value: 0.0008
+    note: (proposed for the vessel_properties global r0_min under material_prop_fromPWV_ven/Olufsen2000_v01)
+review: reviews/vessel_properties_review.yaml
+review_scope: The review of the whole vessel_properties module (8 entries) before the move to versions; only the parts about
+  this version apply.

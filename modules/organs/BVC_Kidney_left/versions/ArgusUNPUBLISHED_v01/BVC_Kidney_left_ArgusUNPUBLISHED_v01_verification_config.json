@@ -1,0 +1,162 @@
+{
+  "module_type": "BVC_Kidney_left",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-12},
+  "outputs": [
+    "q_pt_W",
+    "q_pt_Na",
+    "q_ptEpi_Na",
+    "u_pt_W",
+    "c_pt_Na",
+    "c_ptEpi_Na",
+    "u_pt_osmotic",
+    "v_gl_W",
+    "v_pt_W",
+    "v_pt_Na",
+    "v_ptEpi_NKE",
+    "v_gl_Na",
+    "naCirc/q_vc_Na",
+    "peri/q",
+    "peri/u"
+  ],
+  "harness": {
+    "vessel_array": [
+      ["pin", "constant", "inlet_pressure", "", "affA", "default"],
+      ["affA", "pp", "arterial_simple", "pin", "peri", "default"],
+      ["peri", "vv", "capillary_simple_vol_ctl_uptake", "affA mod", "venV mod", "default"],
+      ["venV", "pp", "venous", "peri", "pout", "default"],
+      ["pout", "constant", "outlet_pressure", "venV", "", "default"],
+      ["mod", "ArgusUNPUBLISHED_v01", "BVC_Kidney_left", "naCirc peri", "naCirc peri", "default"],
+      ["naCirc", "ArgusUNPUBLISHED_v01", "BVC_Na_circ", "mod", "mod", "default"]
+    ],
+    "parameters": [
+      ["P_pin", "J_per_m3", 13332, "harness: 100 mmHg inflow pressure"],
+      ["P_pout", "J_per_m3", 666, "harness: 5 mmHg outflow pressure"],
+      ["q_0_affA", "m3", 3.509840625e-06, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
+      ["R_affA", "Js_per_m6", 352124180.669857, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
+      ["C_affA", "m6_per_J", 1.56375e-09, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
+      ["u_ext_affA", "J_per_m3", 0, "harness"],
+      ["u_0_affA", "J_per_m3", 0, "harness"],
+      [
+        "I_affA",
+        "Js2_per_m6",
+        1000000.0,
+        "harness: inertance raised from the CA example value 1e-7 so the network is not stiff (I/R about 3 ms) and the RK4 timestep test can run"
+      ],
+      [
+        "q_0_peri",
+        "m3",
+        8e-05,
+        "harness: chosen so q_vc_Na/q_vc_W is about 0.14 mol/L (CA example used 2.81e-05)"
+      ],
+      ["R_peri", "Js_per_m6", 100000000.0, "circulatory_autogen ANS_CVS_BVC example (lPeritubularC)"],
+      ["C_peri", "m6_per_J", 5e-09, "circulatory_autogen ANS_CVS_BVC example (lPeritubularC)"],
+      ["u_ext_peri", "J_per_m3", 0, "harness"],
+      [
+        "I_peri",
+        "Js2_per_m6",
+        1000000.0,
+        "harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)"
+      ],
+      ["u_0_peri", "J_per_m3", 0, "harness"],
+      [
+        "blood_ctl_dir_peri",
+        "dimensionless",
+        1,
+        "circulatory_autogen ANS_CVS_BVC example: reabsorbed water enters the capillary"
+      ],
+      ["q_0_venV", "m3", 1.938375e-05, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
+      ["R_venV", "Js_per_m6", 122477975.885168, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
+      ["C_venV", "m6_per_J", 1.0425e-05, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
+      ["u_ext_venV", "J_per_m3", 0, "harness"],
+      ["u_0_venV", "J_per_m3", 0, "harness"],
+      [
+        "I_venV",
+        "Js2_per_m6",
+        1000000.0,
+        "harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)"
+      ],
+      [
+        "q_vc_Na_init_naCirc",
+        "mole",
+        0.0114979848860844,
+        "P. Hunter BVC model value (CA_user_volume_control ANS_CVS_BVC_parameters.csv)"
+      ],
+      ["v_giEpi_NKE_naCirc", "mol_per_s", 0, "harness: no GI in this network"],
+      ["v_rptEpi_NKE_naCirc", "mol_per_s", 0, "harness: no right kidney in this network"],
+      ["v_rgl_Na_naCirc", "mol_per_s", 0, "harness: no right kidney in this network"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "closed Na balance of the test network (kidney + Na_circ, other Na_circ inputs zero): q_vc_Na + q_pt_Na + q_ptEpi_Na = initial total - v_out2_Na t (exact; no quadrature)",
+      "expr": "np.max(np.abs(naCirc__q_vc_Na + q_pt_Na + q_ptEpi_Na - (naCirc__q_vc_Na[0] + q_pt_Na_init + q_ptEpi_Na_init - v_out2_Na*t))) <= 1e-9*(naCirc__q_vc_Na[0] + q_pt_Na_init + q_ptEpi_Na_init)"
+    },
+    {
+      "description": "tubular water balance: q_pt_W = q_pt_W_init + integral of (v_gl_W - v_pt_W) - v_out2_W t (trapezoid on the output grid; tolerance 1e-5 q_pt_W_init plus the trapezoid error bound dt max|v|/2, which covers initial transients faster than the output step)",
+      "expr": "np.max(np.abs(q_pt_W - q_pt_W_init - np.concatenate([[0.0], np.cumsum(0.5*((v_gl_W - v_pt_W)[1:] + (v_gl_W - v_pt_W)[:-1])*np.diff(t))]) + v_out2_W*t)) <= 1e-5*q_pt_W_init + 0.5*(t[1] - t[0])*np.max(np.abs(v_gl_W - v_pt_W))"
+    },
+    {
+      "description": "constitutive relations: u_pt_W = E_pt (q_pt_W - U_pt_W)/(L_pt_W - q_pt_W)^2, v_gl_W = k_gl_W (u_ac_W - u_pt_W), v_pt_W = k_pt_W RT (c_vc - c_pt), v_gl_Na = kK_gl_Na (q_vc_Na - q_pt_Na), v_pt_Na = kK_pt_Na (q_pt_Na - q_ptEpi_Na), c = q/V, u_pt_osmotic = RT c_pt_Na (q_vc_W is the neighbour capillary volume peri/q converted m3 -> L)",
+      "expr": "np.allclose(u_pt_W, E_pt*(q_pt_W - U_pt_W)/(L_pt_W - q_pt_W)**2, rtol=1e-9, atol=1e-12) and np.allclose(v_gl_W, k_gl_W*(u_ac_W - u_pt_W), rtol=1e-6, atol=1e-9*k_gl_W*max(1.0, abs(u_ac_W))) and np.allclose(v_pt_W, k_pt_W*RT*((naCirc__q_vc_Na/(1000*peri__q)) - c_pt_Na), rtol=1e-6, atol=1e-15) and np.allclose(v_gl_Na, kK_gl_Na*(naCirc__q_vc_Na - q_pt_Na), rtol=1e-6, atol=1e-12) and np.allclose(v_pt_Na, kK_pt_Na*(q_pt_Na - q_ptEpi_Na), rtol=1e-6, atol=1e-12) and np.allclose(c_pt_Na, q_pt_Na/q_pt_W, rtol=1e-9) and np.allclose(c_ptEpi_Na, q_ptEpi_Na/q_ptEpi_W, rtol=1e-9) and np.allclose(u_pt_osmotic, RT*c_pt_Na, rtol=1e-9)"
+    },
+    {
+      "description": "NKE flux equals its closed form 3 k (A^3 B^2 - C^3 D^2 exp(2 F u/RT))/((1+A^3)(1+C^3)(1+B^2)(1+D^2)) with the blood-side volume taken from the neighbour capillary (checks the m3 -> L port conversion)",
+      "expr": "np.allclose(v_ptEpi_NKE, 3*k_ptEpi_NKE*((K_Na*c_ptEpi_Na)**3*(K_K*q_vc_K/(1000*peri__q))**2 - (K_Na*(naCirc__q_vc_Na/(1000*peri__q)))**3*(K_K*q_ptEpi_K/q_ptEpi_W)**2*np.exp(2*F*u_ptEpi_e/RT))/((1 + (K_Na*c_ptEpi_Na)**3)*(1 + (K_Na*(naCirc__q_vc_Na/(1000*peri__q)))**3)*(1 + (K_K*q_vc_K/(1000*peri__q))**2)*(1 + (K_K*q_ptEpi_K/q_ptEpi_W)**2)), rtol=1e-6, atol=1e-12)"
+    },
+    {
+      "description": "tubular volume stays inside (0, L_pt_W) (u_pt_W is singular at L_pt_W) and Na amounts stay positive",
+      "expr": "np.all(q_pt_W > 0) and np.all(q_pt_W < L_pt_W) and np.all(q_pt_Na > 0) and np.all(q_ptEpi_Na > 0) and np.all(naCirc__q_vc_Na > 0)"
+    },
+    {
+      "description": "analytic water steady state at the run point (k_pt_W = 0, v_out2_W = 0): u_pt_W -> u_ac_W, i.e. q_pt_W -> the root in (U, L) of u_ac (L - q)^2 = E (q - U)",
+      "applies": "run",
+      "expr": "abs(q_pt_W[-1] - ((2*u_ac_W*L_pt_W + E_pt) - np.sqrt((2*u_ac_W*L_pt_W + E_pt)**2 - 4*u_ac_W*(u_ac_W*L_pt_W**2 + E_pt*U_pt_W)))/(2*u_ac_W)) < 1e-6 and abs(v_gl_W[-1]) < 1e-9"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "q_pt_W_init": {"min": 0.2, "max": 0.9, "points": 4},
+      "L_pt_W": {"min": 0.6, "max": 2.0, "points": 4},
+      "u_ac_W": {"min": 0.2, "max": 8.0, "points": 5, "scale": "log"},
+      "u_ptEpi_e": {"min": -0.08, "max": 0.0, "points": 5},
+      "RT": {"min": 2400, "max": 2600, "points": 3},
+      "k_pt_W": {"min": 0, "max": 0.001, "points": 3},
+      "k_gl_W": {"min": 0.5, "max": 50, "points": 5, "scale": "log"},
+      "kK_pt_Na": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "kK_gl_Na": {"min": 0.1, "max": 10, "points": 5, "scale": "log"},
+      "k_ptEpi_NKE": {"min": 10000.0, "max": 1000000.0, "points": 5, "scale": "log"},
+      "v_out2_W": {"min": 0, "max": 5e-05, "points": 3},
+      "v_out2_Na": {"min": 0, "max": 5e-06, "points": 3}
+    },
+    "exclude": ["q_vc_Na"],
+    "rationale": "u_ac_W (glomerular capillary pressure, the only swept BC) spans 0.2-8 kPa (source-model 1.8 kPa; physiological glomerular capillary pressure is about 6 kPa); q_pt_W_init and L_pt_W are kept so that q_pt_W < L_pt_W (u_pt_W is singular at L); u_ptEpi_e spans -80..0 mV; RT spans 289-313 K; k_pt_W spans 0 (source value: no tubular water reabsorption) to 1e-3 L/s/kPa; the rate constants span two decades around the source values; urine water/Na outflows span 0 to about 2x daily output (1.5 L/day = 1.7e-5 L/s; 100 mmol/day = 1.16e-6 mol/s); every other constant is swept 0.5-2x. q_vc_Na is excluded because in the test network it is supplied by BVC_Na_circ (its csv value is unused there)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 5.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "Candidate targets: single-kidney GFR (about 60 mL/min), filtered Na load (about 1.5e-4 mol/s per kidney) and proximal fractional Na reabsorption (about 2/3). Not set up: the component has no GFR in L/min terms (k_gl_W only sets the tubular pressure equilibrium, k_pt_W = 0 so no water is reabsorbed) and the source parameters give a glomerular Na flux of about 3.7e-3 mol/s, some 25x physiological, so the parameter set must be re-derived before validation is meaningful."
+      },
+      "calibrate": {"note": "pending: as baseline: needs a physiological re-parameterisation first."}
+    }
+  }
+}

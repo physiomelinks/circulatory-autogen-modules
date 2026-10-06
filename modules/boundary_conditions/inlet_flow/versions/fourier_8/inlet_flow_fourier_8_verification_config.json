@@ -1,0 +1,75 @@
+{
+  "module_type": "inlet_flow",
+  "version": "fourier_8",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-12},
+  "outputs": ["v", "va/v", "va/q", "va/u"],
+  "harness": {
+    "vessel_array": [
+      ["mod", "fourier_8", "inlet_flow", "", "va", "default"],
+      ["va", "vp", "arterial_simple", "mod", "p_out", "default"],
+      ["p_out", "constant", "outlet_pressure", "va", "", "default"]
+    ],
+    "parameters": [
+      ["P_p_out", "J_per_m3", 666, "harness test value (5 mmHg)"],
+      ["R_va", "Js_per_m6", 10000000.0, "harness test value"],
+      ["C_va", "m6_per_J", 1e-08, "harness test value"],
+      ["I_va", "Js2_per_m6", 100000.0, "harness test value"],
+      ["q_0_va", "m3", 0, "harness: zero unstressed volume"],
+      ["u_0_va", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["u_ext_va", "J_per_m3", 0, "harness: zero external pressure"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "v is exactly the 8-harmonic Fourier series Σ A_i cos(2π i t/T + φ_i) (relative 1e-9)",
+      "expr": "np.max(np.abs(v - (A_0*np.cos(2*np.pi*0*t/T + phi_0) + A_1*np.cos(2*np.pi*1*t/T + phi_1) + A_2*np.cos(2*np.pi*2*t/T + phi_2) + A_3*np.cos(2*np.pi*3*t/T + phi_3) + A_4*np.cos(2*np.pi*4*t/T + phi_4) + A_5*np.cos(2*np.pi*5*t/T + phi_5) + A_6*np.cos(2*np.pi*6*t/T + phi_6) + A_7*np.cos(2*np.pi*7*t/T + phi_7) + A_8*np.cos(2*np.pi*8*t/T + phi_8)))) <= 1e-9*max(1e-30, np.max(np.abs(v)))"
+    },
+    {
+      "description": "v is periodic with the heart period T: its mean over the last whole period equals A_0 cos φ_0 (1e-3 of max |v|)",
+      "expr": "abs(np.trapz(v[t >= t[-1] - T], t[t >= t[-1] - T])/T - A_0*np.cos(phi_0)) <= 1e-3*np.max(np.abs(v)) + 1e-12",
+      "applies": "run"
+    },
+    {
+      "description": "vessel volume balance: q(t) − q(0) = ∫(v − v_vessel) dt (trapezoidal, 0.1%)",
+      "expr": "np.max(np.abs((va__q - va__q[0]) - np.concatenate(([0.0], np.cumsum(0.5*(((v) - (va__v))[1:] + ((v) - (va__v))[:-1])*np.diff(t)))))) <= 1e-3*max(1e-12, np.max(np.abs(va__q - va__q[0])))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "phi_0": [-3.14159, 3.14159],
+      "phi_2": [-3.14159, 3.14159],
+      "A_2": {"min": 0.0, "max": 0.0002, "points": 3},
+      "T": [0.5, 2.0]
+    },
+    "exclude": ["P"],
+    "rationale": "Amplitudes are swept by factors 0.5-2 of their nominal values (zero harmonics mostly left at zero, A_2 swept to 2e-4 as a representative), phases over the full circle for a zero and a non-zero harmonic, and T from 0.5 to 2 s (heart rates 30-120 bpm). P is excluded: it is the pressure the connected vessel supplies."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: fit the 8 harmonics to a published measured aortic-root inflow waveform (e.g. the openly available input data of the Boileau et al. 2015 1D benchmark) and compare v(t) with it; not set up because no source with explicit Fourier coefficients was verified."
+      },
+      "calibrate": {
+        "note": "pending: same candidate: calibrate A_i, phi_i to the measured inflow waveform and validate on a held-out cycle."
+      }
+    }
+  }
+}

@@ -1,0 +1,171 @@
+[
+  {
+    "module_type": "neurotransmitter_release",
+    "module_subtype": "SN_varicosity_Tao2011_v01",
+    "module_format": "cellml",
+    "component_file": "neurotransmitter_release_SN_varicosity_Tao2011_v01_modules.cellml",
+    "component_type": "NE_release_Tao_2011",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "Ca_current",
+        "variables": [
+          "i_Ca"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "NE_release",
+        "variables": [
+          "NE"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_Ca",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_Ca",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "V_1Ca",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "V_2Ca",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "V_3Ca",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "V_4Ca",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "V_5Ca",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "NE",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "K_off",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_on",
+        "per_millimolar_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_Ca",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "b",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "E",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "gamma",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "C_m",
+        "picoF",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V_Z",
+        "litre",
+        "access",
+        "constant"
+      ],
+      [
+        "a",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "n",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "V_cleft",
+        "litre",
+        "access",
+        "constant"
+      ],
+      [
+        "P_up",
+        "per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

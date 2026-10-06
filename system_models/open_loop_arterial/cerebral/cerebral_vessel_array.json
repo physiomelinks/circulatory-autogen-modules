@@ -1,7 +1,7 @@
 [
- {"name": "input_flow_basilar", "module_type": "inlet_flow", "module_subtype": "nn_constant_2", "instance": "default", "inp_instances": [], "out_instances": ["basilar_C4"]},
- {"name": "input_flow_internalcarotid_L", "module_type": "inlet_flow", "module_subtype": "nn_constant", "instance": "default", "inp_instances": [], "out_instances": ["ascending_aorta_A"]},
- {"name": "input_flow_internalcarotid_R", "module_type": "inlet_flow", "module_subtype": "nn_constant", "instance": "default", "inp_instances": [], "out_instances": ["ascending_aorta_B"]},
+ {"name": "input_flow_basilar", "module_type": "inlet_flow", "module_subtype": "constant_2", "instance": "default", "inp_instances": [], "out_instances": ["basilar_C4"]},
+ {"name": "input_flow_internalcarotid_L", "module_type": "inlet_flow", "module_subtype": "constant", "instance": "default", "inp_instances": [], "out_instances": ["ascending_aorta_A"]},
+ {"name": "input_flow_internalcarotid_R", "module_type": "inlet_flow", "module_subtype": "constant", "instance": "default", "inp_instances": [], "out_instances": ["ascending_aorta_B"]},
  {"name": "ascending_aorta_A", "module_type": "arterial", "module_subtype": "vv", "instance": "default", "inp_instances": ["input_flow_internalcarotid_L"], "out_instances": ["internal_carotid_L50"]},
  {"name": "ascending_aorta_B", "module_type": "arterial", "module_subtype": "vv", "instance": "default", "inp_instances": ["input_flow_internalcarotid_R"], "out_instances": ["internal_carotid_R8"]},
  {"name": "internal_carotid_R8", "module_type": "split_junction", "module_subtype": "pv", "instance": "default", "inp_instances": ["ascending_aorta_B"], "out_instances": ["posterior_communicating_R206", "internal_carotid_R48"]},

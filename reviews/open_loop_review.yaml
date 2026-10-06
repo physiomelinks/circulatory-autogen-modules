@@ -1,4 +1,4 @@
-summary: 'open_loop holds three prescribed aortic inflow waveforms (inlet_flow nn_adan: 21-harmonic Fourier fit, nn_adan_2:
+summary: 'open_loop holds three prescribed aortic inflow waveforms (inlet_flow adan: 21-harmonic Fourier fit, nn_adan_2:
   linear interpolation, nn_aorticbif: 22-harmonic sine series) and two controlled terminal outlets (terminalOL pp_controller
   / pp_wFB: 3-element-Windkessel-like terminal whose resistance is set by an adaptive controller). I traced all three waveforms
   to the Boileau2015 benchmark inflows (ADAN56 and iliac bifurcation; data added under validation/ and compared as proposed
@@ -52,7 +52,7 @@ proposed_fixes:
   (v/1e-6)^2 in Pa; R_T = check assigns a dimensionless value to Js_per_m6). Give the constants units (or normalise error
   and v) so the CellML is unit-consistent.'
 findings:
-- 'Test summary (real library): inlet_flow nn_adan / nn_adan_2 / nn_aorticbif pass run, invariants (exact Fourier / interpolation
+- 'Test summary (real library): inlet_flow adan / nn_adan_2 / nn_aorticbif pass run, invariants (exact Fourier / interpolation
   / sine-series solutions, period means, periodicity, bounds), BC sweep (T and P), stability; timestep is skipped (no states).
   terminalOL pp_controller / pp_wFB: all tests fail at generation (recorded as expected failures).'
 - 'Patched copy (port variables added): both terminals pass run_test and all 8 invariants (R_T piecewise law, partition of

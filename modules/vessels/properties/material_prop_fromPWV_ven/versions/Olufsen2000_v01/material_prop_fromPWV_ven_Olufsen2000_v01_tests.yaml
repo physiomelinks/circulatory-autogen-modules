@@ -1,0 +1,60 @@
+module_type: material_prop_fromPWV_ven
+version: Olufsen2000_v01
+reviewed: false
+notes: 'Venous stiffness from a radius-dependent wave speed c0 = c0_max − (c0_max − c0_min) sqrt((r0 − r_min)/(r_max − r_min))
+  (Toro2022 Eq. 85, after Muller2014) and K_tube = ρ c0²/(m − n). The equation references r_min and r_max, but the component
+  declares r0_min and r0_max. See review.proposed_fixes: as written the CellML does not generate.'
+expected_failures:
+  run_test: 'CellML defect: the c0 equation references r_min and r_max, which are not declared (the component and config declare
+    r0_min / r0_max), so the model is rejected ("ci element r_min does not correspond with any variable"). With r_min/r_max
+    renamed to r0_min/r0_max in a patched copy every verification test passes.'
+  verification_test_invariants: 'CellML defect: the c0 equation references r_min and r_max, which are not declared (the component
+    and config declare r0_min / r0_max), so the model is rejected ("ci element r_min does not correspond with any variable").
+    With r_min/r_max renamed to r0_min/r0_max in a patched copy every verification test passes.'
+  verification_test_BC: 'CellML defect: the c0 equation references r_min and r_max, which are not declared (the component
+    and config declare r0_min / r0_max), so the model is rejected ("ci element r_min does not correspond with any variable").
+    With r_min/r_max renamed to r0_min/r0_max in a patched copy every verification test passes.'
+  verification_test_timestep: 'CellML defect: the c0 equation references r_min and r_max, which are not declared (the component
+    and config declare r0_min / r0_max), so the model is rejected ("ci element r_min does not correspond with any variable").
+    With r_min/r_max renamed to r0_min/r0_max in a patched copy every verification test passes.'
+  stability_test: 'CellML defect: the c0 equation references r_min and r_max, which are not declared (the component and config
+    declare r0_min / r0_max), so the model is rejected ("ci element r_min does not correspond with any variable"). With r_min/r_max
+    renamed to r0_min/r0_max in a patched copy every verification test passes.'
+reference_proposals:
+  r_0:
+    reference: 'unreferenced_placeholder; test radius of a medium vein (5 mm), inside the [r0_min, r0_max] = [0.8, 8] mm range
+      of Toro2022 Eq. (85). Only a test value: r_0 is supplied by the connected vessel'
+    sourced: 'no'
+    value: 0.005
+  m_tube:
+    reference: 'Toro2022; Eqs. (2)-(5): tube-law exponents m = 10, n = -1.5 for veins (Muller2014 venous tube law)'
+    sourced: 'yes'
+    value: 10
+  n_tube:
+    reference: 'Toro2022; Eqs. (2)-(5): tube-law exponents m = 10, n = -1.5 for veins (Muller2014 venous tube law)'
+    sourced: 'yes'
+    value: -1.5
+  rho:
+    reference: Trudnowski1974; whole-blood specific gravity 1.0506 at 37 C (n = 25) = 1050.6 kg/m^3 (abstract values read
+      via a search rendering, full text not read). 1050 is also used by Alastruey2011; Toro2022 use 1060
+    sourced: 'yes'
+    value: 1050
+  c0_max:
+    reference: 'Toro2022; Eq. (85) (following Muller2014): c0,max = 400 cm/s = 4.0 m/s'
+    sourced: 'yes'
+    value: 4.0
+  c0_min:
+    reference: 'Toro2022; Eq. (85): c0,min = 150 cm/s = 1.5 m/s'
+    sourced: 'yes'
+    value: 1.5
+  r0_max:
+    reference: 'Toro2022; Eq. (85): r_max = 0.8 cm = 0.008 m (largest vein radius in their network)'
+    sourced: 'yes'
+    value: 0.008
+  r0_min:
+    reference: 'Toro2022; Eq. (85): r_min = 0.08 cm = 0.0008 m (smallest vein radius in their network)'
+    sourced: 'yes'
+    value: 0.0008
+review: reviews/vessel_properties_review.yaml
+review_scope: The review of the whole vessel_properties module (8 entries) before the move to versions; only the parts about
+  this version apply.

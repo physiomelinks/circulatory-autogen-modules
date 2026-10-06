@@ -1,0 +1,157 @@
+module_type: BVC_Kidney_left
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'One kidney (glomerulus + proximal tubule + tubular epithelium) of the blood-volume-control system: glomerular water
+  flux v_gl_W = k_gl_W (u_ac_W - u_pt_W) from the glomerular capillary pressure u_ac_W, tubular pressure u_pt_W = E_pt (q_pt_W
+  - U_pt_W)/(L_pt_W - q_pt_W)^2, osmotic reabsorption v_pt_W = k_pt_W RT (c_vc - c_pt) (k_pt_W = 0 in the source), Na filtration
+  v_gl_Na = kK_gl_Na (q_vc_Na - q_pt_Na), tubule-to-epithelium v_pt_Na and a simplified NKE flux to the blood. It cannot run
+  alone: q_vc_W is declared with kind "variable " (known issue), so the test network supplies it: a peritubular capillary
+  (BG capillary_simple_vol_ctl_uptake between an arteriole and a vein with constant 100/5 mmHg pressures, giving q_vc_W (m3
+  -> L) and receiving v_pt_W) and BVC_Na_circ (closing the Na loop, other inputs zero). u_ac_W stays a BC. The glomerular
+  capillary (capillary_simple_vol_ctl_intake) is NOT in the network because libcuflynx names both L_per_s -> m3_per_s unit
+  converters identically and the model fails to import (framework issue). Exact checks: closed Na balance q_vc_Na + q_pt_Na
+  + q_ptEpi_Na = total - v_out2_Na t, tubular water balance, all constitutive laws, NKE closed form through the port unit
+  conversion, bounds, and the analytic pressure steady state.'
+reference_proposals:
+  q_pt_W_init:
+    reference: unreferenced_placeholder; 0.521056165876984 L (proximal tubule water) from P. Hunter's unpublished blood-volume-control
+      parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 0.521056165876984
+  q_pt_Na_init:
+    reference: unreferenced_placeholder; 0.00805209530950799 mol (tubular Na; 15.5 mM) from P. Hunter's unpublished blood-volume-control
+      parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 0.00805209530950799
+  q_ptEpi_Na_init:
+    reference: unreferenced_placeholder; 0.00460774921555305 mol (epithelial Na; 9.2 mM in 0.5 L) from P. Hunter's unpublished
+      blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+      same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+    sourced: 'no'
+    value: 0.00460774921555305
+  u_ptEpi_e:
+    reference: unreferenced_placeholder; -0.04 V (-40 mV) from P. Hunter's unpublished blood-volume-control parameter set
+      (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: -0.04
+  q_vc_K:
+    reference: 'unreferenced_placeholder; 0.03 mol from P. Hunter''s unpublished blood-volume-control parameter set (CA_user_volume_control
+      ANS_CVS_BVC_parameters.csv, data_reference ''Peter_Hunter''; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+      found that reports it; blood-side K amount; with the blood volumes of these modules (0.08-0.2 L) this is 150-380 mM,
+      far above plasma K (about 4-5 mM): looks swapped with / not comparable to intracellular K'
+    sourced: 'no'
+    value: 0.03
+  q_ptEpi_K:
+    reference: unreferenced_placeholder; 0.012 mol (24 mM in 0.5 L) from P. Hunter's unpublished blood-volume-control parameter
+      set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 0.012
+  v_out2_W:
+    reference: unreferenced_placeholder; 0 L/s (no urine water flow) from P. Hunter's unpublished blood-volume-control parameter
+      set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 0
+  v_out2_Na:
+    reference: unreferenced_placeholder; 1.16e-06 mol/s (Na excretion, about 100 mmol/day per kidney) from P. Hunter's unpublished
+      blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+      same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+    sourced: 'no'
+    value: 1.16e-06
+  u_ac_W:
+    reference: unreferenced_placeholder; 1.835 kPa = u_pt_W at q_pt_W_init with E_pt, U_pt_W, L_pt_W (so v_gl_W is close to
+      0 at t = 0); in a network supplied by the glomerular capillarys capillary_extracellular_port (physiological glomerular
+      capillary pressure is about 6 kPa)
+    sourced: 'no'
+    value: 1.835
+  q_vc_Na:
+    reference: unreferenced_placeholder; 0.0114979848860844 mol (BVC_Na_circ q_vc_Na_init, P. Hunter); in a network (and in
+      the test network) supplied by BVC_Na_circ
+    sourced: 'no'
+    value: 0.0114979848860844
+  RT:
+    reference: unreferenced_placeholder; 2500 J/mol from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+      ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+      found that reports it; equals R T with R = 8.314462618 J/(mol K) (CODATA2018) at T = 300.7 K; body temperature (310.15
+      K) gives 2578.8 J/mol
+    sourced: 'no'
+    value: 2500
+  F:
+    reference: CODATA2018; Faraday constant F = N_A e = 96485.33212 C/mol (exact in the 2019 SI); the source model used 0.965e5
+    sourced: 'yes'
+    value: 96485.33212
+  E_pt:
+    reference: unreferenced_placeholder; 1 J (tubular elastance scale of u = E (q - U)/(L - q)^2) from P. Hunter's unpublished
+      blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+      same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+    sourced: 'no'
+    value: 1
+  U_pt_W:
+    reference: unreferenced_placeholder; 0.1 L (tubular volume at zero pressure) from P. Hunter's unpublished blood-volume-control
+      parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 0.1
+  L_pt_W:
+    reference: unreferenced_placeholder; 1 L (tubular volume limit; u_pt_W is singular there) from P. Hunter's unpublished
+      blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter';
+      same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it
+    sourced: 'no'
+    value: 1
+  q_ptEpi_W:
+    reference: unreferenced_placeholder; 0.5 L (epithelial water volume) from P. Hunter's unpublished blood-volume-control
+      parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 0.5
+  k_pt_W:
+    reference: 'unreferenced_placeholder; 0 L/(s kPa): no tubular water reabsorption in the source model from P. Hunter''s
+      unpublished blood-volume-control parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference ''Peter_Hunter'';
+      same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication found that reports it'
+    sourced: 'no'
+    value: 0
+  k_gl_W:
+    reference: unreferenced_placeholder; 5 L/(s kPa) (glomerular water conductance) from P. Hunter's unpublished blood-volume-control
+      parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 5
+  kK_pt_Na:
+    reference: unreferenced_placeholder; 1 1/s from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+      ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+      found that reports it
+    sourced: 'no'
+    value: 1
+  kK_gl_Na:
+    reference: unreferenced_placeholder; 1 1/s (gives a glomerular Na flux of about 3.5e-3 mol/s per kidney, some 20x the
+      physiological filtered Na load of about 1.5e-4 mol/s per kidney) from P. Hunter's unpublished blood-volume-control parameter
+      set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 1
+  k_ptEpi_NKE:
+    reference: unreferenced_placeholder; 100000 mol/s (NKE rate constant) from P. Hunter's unpublished blood-volume-control
+      parameter set (CA_user_volume_control ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml);
+      no publication found that reports it
+    sourced: 'no'
+    value: 100000
+  K_Na:
+    reference: unreferenced_placeholder; 1 L/mol from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+      ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+      found that reports it; a Na binding affinity of 1 L/mol (K_d = 1 M) is far weaker than NKE affinities in the literature
+      (intracellular Na K_d of order 10 mM); treat as a lumped, non-physiological constant
+    sourced: 'no'
+    value: 1
+  K_K:
+    reference: unreferenced_placeholder; 1 L/mol from P. Hunter's unpublished blood-volume-control parameter set (CA_user_volume_control
+      ANS_CVS_BVC_parameters.csv, data_reference 'Peter_Hunter'; same value in ANS_CVS_BVolCtl_FA_MG_PH_v2.cellml); no publication
+      found that reports it; lumped K binding affinity (K_d = 1 M); see K_Na
+    sourced: 'no'
+    value: 1
+review: reviews/BVC_Kidney_review.yaml
+review_scope: The review of the whole BVC_Kidney module (2 entries) before the move to versions; only the parts about this
+  version apply.

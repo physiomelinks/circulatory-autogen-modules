@@ -2,8 +2,8 @@ module_type: Nout_junction
 version: pv_nonlinear_visco
 reviewed: false
 notes: 'pv vessel with a nonlinear tube law. Tested in a harness network (libcuflynx sums the flows at a Min/Nout node only
-  when real vessels are connected there): mod (Nout_junction pv_nonlinear_visco); bcin (inlet_pressure nn_constant); dn1 (arterial_simple
-  pv); bcout1 (outlet_flow nn_constant); dn2 (arterial_simple pv); bcout2 (outlet_flow nn_constant). Jacobian timescales (nominal:
+  when real vessels are connected there): mod (Nout_junction pv_nonlinear_visco); bcin (inlet_pressure constant); dn1 (arterial_simple
+  pv); bcout1 (outlet_flow constant); dn2 (arterial_simple pv); bcout2 (outlet_flow constant). Jacobian timescales (nominal:
   fastest 9.1e-07 s, slowest decay 0.013 s; run: fastest 0.00014 s, slowest decay 0.013 s, shortest oscillation period 0.066
   s).'
 reference_proposals:

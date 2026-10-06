@@ -1,0 +1,6 @@
+module_type: VanDerPol
+version: VanDerPol1926_v01
+reviewed: true
+notes: 'Time-scaled stiff form of the Van der Pol oscillator used in the Hairer & Wanner VDPOL benchmark (Solving Ordinary
+  Differential Equations II, 1996): dy/dt = μ((1 − x²)y − x), i.e. μ = 1/ε. Rescaling time by √μ gives the textbook equation
+  with parameter √μ, so the relaxation period is T ≈ (3 − 2 ln 2) + 7.014 μ^(−2/3) (Dorodnitsyn 1947), about 1.94 at μ = 100.'

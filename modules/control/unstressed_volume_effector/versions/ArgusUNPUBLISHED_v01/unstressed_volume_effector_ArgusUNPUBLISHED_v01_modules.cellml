@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="unstressed_volume_effector_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="unstressed_volume_effector_Gee2023">
+        <variable name="sigma_Vusv" public_interface="out" units="m3"/>
+        <variable name="G_Vusv" public_interface="in" units="m3"/>
+        <variable name="f_esv" public_interface="in" units="Hz"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="f_es_min" public_interface="in" units="Hz"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>sigma_Vusv</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>G_Vusv</ci>
+                            <apply>
+                                <ln/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="second">1</cn>
+                                    <apply>
+                                        <plus/>
+                                        <apply>
+                                            <minus/>
+                                            <ci>f_esv</ci>
+                                            <ci>f_es_min</ci>
+                                        </apply>
+                                        <cn cellml:units="Hz">1</cn>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <geq/>
+                            <ci>f_esv</ci>
+                            <ci>f_es_min</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="m3">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <variable initial_value="0" name="Delta_Vusv" public_interface="out" units="m3"/>
+        <variable name="tau_Vusv" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Delta_Vusv</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>tau_Vusv</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>Delta_Vusv</ci>
+                        </apply>
+                        <ci>sigma_Vusv</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

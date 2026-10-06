@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="zero_flow_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="zero_flow">
+        <variable name="v_zero" public_interface="out" units="m3_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_zero</ci>
+                <cn cellml:units="m3_per_s">0</cn>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,62 @@
+module_type: Ca_handling
+version: SN_varicosity_Argus2026_v01
+reviewed: true
+description: 'Ca handling of a sympathetic-neuron varicosity: sub-membrane (c_SL) and bulk cytosol, pre-ER and ER compartments,
+  a fixed buffer, SERCA uptake and a leak (area x density x per-protein rate), Ca influx from the varicosity''s channels and
+  release to the ER release fluxes; E_Ca for the channels.'
+notes: 'Four-compartment Ca of the SN varicosity, as SN_Ca_handling_soma except that the ER leak j_leak_Ca enters the sub-membrane
+  Cai (not the bulk), as in the original SN_varicosity; also gives E_Ca = RT/F ln(Cao/Cai) (sic, no factor 1/2, as in the
+  original). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry (2026-10-02): Vol
+  is an input (compartment_volume port) from the membrane. The ER volumes are V_ER = c_ER Vol and V_ER_pre = c_ER_pre Vol,
+  with membrane areas A_ER = k_A_ER (V_ER/k_V_ER)^(2/3) and A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3) (shape factors;
+  default a sphere). SERCA and the Ca leak move Ca across the pre-ER membrane, so k_SERCA = A_ER_pre rho_SERCA r_SERCA / N_A
+  and k_leak_Ca = A_ER_pre rho_leak_Ca k_leak_Ca_single (1e-18 m3/um3); A_ER goes to IP3R and RyR (ER_membrane_area), whose
+  release crosses the ER membrane. The diffusion constants D_Ca, D_Ca_ER are unchanged. The defaults reproduce the previous
+  k_SERCA and k_leak_Ca. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the
+  Davis 2021 thesis recordings it is calibrated to (was 310.15 K); this enters the Nernst/GHK terms. Reviewed 2026-10-05:
+  unlike the soma (Khaliq 0.1 um shell) the varicosity keeps the sub-membrane fraction c_SL, since a 0.1 um shell would be
+  about half of a 1.24 um varicosity.
+
+
+  Ports of the versions of Ca_handling (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  entrance internal_Ca: cardiomyocyte_Paci2013_v01 [Cai]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  entrance membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit NaCa_current: cardiomyocyte_Paci2013_v01 [i_NaCa]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit PCa_current: cardiomyocyte_Paci2013_v01 [i_PCa]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit b_Ca_current: cardiomyocyte_Paci2013_v01 [i_b_Ca]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit internal_Ca: cardiomyocyte_Paci2013_v01 [Cai]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit internal_Ca_d_gate_port: cardiomyocyte_Paci2013_v01 [Cai, d]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general Ca_flux: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_Ca_in]; SN_varicosity_Argus2026_v01 [j_Ca_in]
+
+  general Ca_potential: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 [E_Ca]
+
+  general ER_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Ca_ER]; SN_varicosity_Argus2026_v01 [Ca_ER]
+
+  general ER_Ca_release: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_ER_release]; SN_varicosity_Argus2026_v01 [j_ER_release]
+
+  general ER_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_ER]; SN_varicosity_Argus2026_v01 [A_ER]
+
+  general bulk_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Ca_bulk]; SN_varicosity_Argus2026_v01 [Ca_bulk]
+
+  general compartment_volume: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Vol]; SN_varicosity_Argus2026_v01 [Vol]
+
+  general internal_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Cai]; SN_varicosity_Argus2026_v01 [Cai]
+
+  general shell_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_varicosity_Argus2026_v01 -'
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

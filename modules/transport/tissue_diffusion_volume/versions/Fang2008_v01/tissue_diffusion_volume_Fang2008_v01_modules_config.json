@@ -1,0 +1,102 @@
+[
+  {
+    "module_type": "tissue_diffusion_volume",
+    "module_subtype": "Fang2008_v01",
+    "module_format": "cellml",
+    "component_file": "tissue_diffusion_volume_Fang2008_v01_modules.cellml",
+    "component_type": "diffusion_volume",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "diffusion_face_port",
+        "variables": [
+          "C_P",
+          "J_in"
+        ],
+        "multi_port": [
+          "True",
+          "sum"
+        ]
+      },
+      {
+        "port_type": "capillary_to_flux_port",
+        "variables": [
+          "C_P",
+          "flux_c"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "diffusion_face_port",
+        "variables": [
+          "C_P",
+          "J_out"
+        ],
+        "multi_port": [
+          "True",
+          "sum"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "C_P",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "C_P_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "J_in",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_out",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "flux_c",
+        "mol_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "M",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "M_reduced",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "C50",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "V_P",
+        "m3",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

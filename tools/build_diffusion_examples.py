@@ -106,14 +106,14 @@ def write(model, description, cells, faces):
     for n, c in cells.items():
         inp = [f'f{k}' for k, f in enumerate(faces) if f[1] == n]
         out = [f'f{k}' for k, f in enumerate(faces) if f[0] == n]
-        rows.append([n, 'nn', 'tissue_diffusion_volume', ' '.join(inp), ' '.join(out), 'default'])
+        rows.append([n, 'Fang2008_v01', 'tissue_diffusion_volume', ' '.join(inp), ' '.join(out), 'default'])
         params += [[f'C_P_init_{n}', 'millimolar', round(C0[n], 6), 'example: random initial concentration'],
                    [f'V_P_{n}', 'm3', c['V'], 'example mesh: cell volume'],
                    [f'flux_c_{n}', 'mol_per_s', 0, 'example: closed domain, no capillary supply'],
                    [f'M_{n}', 'millimolar_per_s', 0, 'example: no consumption'],
                    [f'C50_{n}', 'millimolar', 0.0133, 'example (unused with M = 0)']]
     for k, (a, b, A, da, db) in enumerate(faces):
-        rows.append([f'f{k}', 'nn', 'tissue_diffusion_face', a, b, 'default'])
+        rows.append([f'f{k}', 'Fang2008_v01', 'tissue_diffusion_face', a, b, 'default'])
         params += [[f'A_f_f{k}', 'm2', A, 'example mesh: face area'],
                    [f'd_up_f{k}', 'metre', da, f'example mesh: centre of {a} to the face'],
                    [f'd_down_f{k}', 'metre', db, f'example mesh: centre of {b} to the face'],

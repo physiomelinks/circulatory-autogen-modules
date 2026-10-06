@@ -2,8 +2,8 @@ module_type: Min_junction
 version: vp_nonlinear_visco
 reviewed: false
 notes: 'vp vessel with a nonlinear tube law. Tested in a harness network (libcuflynx sums the flows at a Min/Nout node only
-  when real vessels are connected there): mod (Min_junction vp_nonlinear_visco); bcin1 (inlet_flow nn_constant); up1 (arterial_simple
-  vp); bcin2 (inlet_flow nn_constant); up2 (arterial_simple vp); bcout (outlet_pressure nn_constant). Jacobian timescales
+  when real vessels are connected there): mod (Min_junction vp_nonlinear_visco); bcin1 (inlet_flow constant); up1 (arterial_simple
+  vp); bcin2 (inlet_flow constant); up2 (arterial_simple vp); bcout (outlet_pressure constant). Jacobian timescales
   (nominal: fastest 9.4e-07 s, slowest decay 0.012 s; run: fastest 0.00017 s, slowest decay 0.01 s, shortest oscillation period
   0.064 s).'
 reference_proposals:

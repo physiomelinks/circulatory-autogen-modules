@@ -188,7 +188,7 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
 
         harness:
           vessel_array:    # [name, module_subtype (version), module_type, inp, out, instance]
-            - [pressure_in, nn_constant, inlet_pressure, '', mod, default]
+            - [pressure_in, constant, inlet_pressure, '', mod, default]
             - [mod, pv_0D_1D, coupler, pressure_in, constant_1D, default]
           parameters:              # values for the neighbours' parameters
             - [P_pressure_in, J_per_m3, 2000, source]

@@ -1,0 +1,807 @@
+[
+  {
+    "from": ["Ca_dynamics_Paci_2013", "nn"],
+    "to": ["Ca_handling", "cardiomyocyte_Paci2013_v01"],
+    "from_path": "cell/cardiomyocytes/Ca_dynamics_Paci_2013/nn",
+    "to_path": "cell/Ca_handling/cardiomyocyte_Paci2013_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["SN_Ca_handling_soma", "nn"],
+    "to": ["Ca_handling", "SN_soma_Argus2026_v01"],
+    "from_path": "cell/neuron/soma/SN_Ca_handling_soma/nn",
+    "to_path": "cell/Ca_handling/SN_soma_Argus2026_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["SN_Ca_handling_varicosity", "nn"],
+    "to": ["Ca_handling", "SN_varicosity_Argus2026_v01"],
+    "from_path": "cell/neuron/varicosity/SN_Ca_handling_varicosity/nn",
+    "to_path": "cell/Ca_handling/SN_varicosity_Argus2026_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["myocyte_membrane_voltage", "nn"],
+    "to": ["membrane_potential", "cardiomyocyte_Paci2013_v01"],
+    "from_path": "cell/cardiomyocytes/myocyte_membrane_voltage/nn",
+    "to_path": "cell/membrane_potential/cardiomyocyte_Paci2013_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["sympathetic_neuron_membrane_voltage", "nn"],
+    "to": ["membrane_potential", "SN_Tao2011_v01"],
+    "from_path": "cell/neuron/sympathetic_neuron_membrane_voltage/nn",
+    "to_path": "cell/membrane_potential/SN_Tao2011_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["SN_membrane_soma", "nn"],
+    "to": ["membrane_potential", "SN_soma_Argus2026_v01"],
+    "from_path": "cell/neuron/soma/SN_membrane_soma/nn",
+    "to_path": "cell/membrane_potential/SN_soma_Argus2026_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["SN_varicosity_membrane", "nn"],
+    "to": ["membrane_potential", "SN_varicosity_Argus2026_v01"],
+    "from_path": "cell/neuron/varicosity/SN_varicosity_membrane/nn",
+    "to_path": "cell/membrane_potential/SN_varicosity_Argus2026_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["Na_dynamics_Paci_2013", "nn"],
+    "to": ["ion_concentrations", "cardiomyocyte_Paci2013_v01"],
+    "from_path": "cell/cardiomyocytes/Na_dynamics_Paci_2013/nn",
+    "to_path": "cell/ion_concentrations/cardiomyocyte_Paci2013_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["SN_Na_K_concentrations_soma", "nn"],
+    "to": ["ion_concentrations", "SN_soma_Argus2026_v01"],
+    "from_path": "cell/neuron/soma/SN_Na_K_concentrations_soma/nn",
+    "to_path": "cell/ion_concentrations/SN_soma_Argus2026_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["electric_potentials_Paci_2013", "nn"],
+    "to": ["reversal_potentials", "cardiomyocyte_Paci2013_v01"],
+    "from_path": "cell/cardiomyocytes/electric_potentials_Paci_2013/nn",
+    "to_path": "cell/reversal_potentials/cardiomyocyte_Paci2013_v01",
+    "why": "page: merge (new type, decision 4)"
+  },
+  {
+    "from": ["NE_release_Tao_2011", "nn"],
+    "to": ["neurotransmitter_release", "SN_varicosity_Tao2011_v01"],
+    "from_path": "cell/neuron/NE_release_Tao_2011/nn",
+    "to_path": "cell/neurotransmitter_release/SN_varicosity_Tao2011_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["SN_NE_release", "nn"],
+    "to": ["neurotransmitter_release", "SN_varicosity_Argus2026_v01"],
+    "from_path": "cell/neuron/varicosity/SN_NE_release/nn",
+    "to_path": "cell/neurotransmitter_release/SN_varicosity_Argus2026_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["NKE_pump", "nn"],
+    "to": ["i_NaK", "ArgusUNPUBLISHED_v01"],
+    "from_path": "cell/NKE_pump/nn",
+    "to_path": "cell/ion_channels/i_NaK/ArgusUNPUBLISHED_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["i_piezo_Na", "Argus_unpublished_v01"],
+    "to": ["i_piezo_Na", "ArgusUNPUBLISHED_v01"],
+    "from_path": "cell/ion_channels/i_piezo_Na/Argus_unpublished_v01",
+    "to_path": "cell/ion_channels/i_piezo_Na/ArgusUNPUBLISHED_v01",
+    "why": "page: version"
+  },
+  {
+    "from": ["electrical_stim_input_Paci_2013", "nn"],
+    "to": ["i_stim_periodic", "cardiomyocyte_Paci2013_v01"],
+    "from_path": "boundary_conditions/electrical_stim_input_Paci_2013/nn",
+    "to_path": "boundary_conditions/i_stim_periodic/cardiomyocyte_Paci2013_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["DMV_Gee2023", "nn"],
+    "to": ["DMV", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/DMV_Gee2023/nn",
+    "to_path": "control/DMV/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["LCN_Gee2023", "nn"],
+    "to": ["LCN", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/LCN_Gee2023/nn",
+    "to_path": "control/LCN/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["NA_Gee2023", "nn"],
+    "to": ["NA", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/NA_Gee2023/nn",
+    "to_path": "control/NA/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["NActr_Gee2023", "nn"],
+    "to": ["NActr", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/NActr_Gee2023/nn",
+    "to_path": "control/NActr/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["NTS_Gee2023", "nn"],
+    "to": ["NTS", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/NTS_Gee2023/nn",
+    "to_path": "control/NTS/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["PNDMV_Gee2023", "nn"],
+    "to": ["PNDMV", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/PNDMV_Gee2023/nn",
+    "to_path": "control/PNDMV/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["PNNA_Gee2023", "nn"],
+    "to": ["PNNA", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/PNNA_Gee2023/nn",
+    "to_path": "control/PNNA/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["cardiopulmonary_receptor_Gee2023", "nn"],
+    "to": ["cardiopulmonary_receptor", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/cardiopulmonary_receptor_Gee2023/nn",
+    "to_path": "control/cardiopulmonary_receptor/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["lung_stretch_receptor_Gee2023", "nn"],
+    "to": ["lung_stretch_receptor", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/lung_stretch_receptor_Gee2023/nn",
+    "to_path": "control/lung_stretch_receptor/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["peripheral_resistance_effector_Gee2023", "nn"],
+    "to": ["peripheral_resistance_effector", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/peripheral_resistance_effector_Gee2023/nn",
+    "to_path": "control/peripheral_resistance_effector/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["sympathetic_afferent_Gee2023", "nn"],
+    "to": ["sympathetic_afferent", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/sympathetic_afferent_Gee2023/nn",
+    "to_path": "control/sympathetic_afferent/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["sympathetic_efferent_Gee2023", "nn"],
+    "to": ["sympathetic_efferent", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/sympathetic_efferent_Gee2023/nn",
+    "to_path": "control/sympathetic_efferent/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["unstressed_volume_effector_Gee2023", "nn"],
+    "to": ["unstressed_volume_effector", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/unstressed_volume_effector_Gee2023/nn",
+    "to_path": "control/unstressed_volume_effector/ArgusUNPUBLISHED_v01",
+    "why": "page: rename"
+  },
+  {
+    "from": ["lung_stretch_receptor_with_threshold_OLD", "nn"],
+    "to": ["lung_stretch_receptor", "ArgusUNPUBLISHED_OLD"],
+    "from_path": "control/lung_stretch_receptor_with_threshold_OLD/nn",
+    "to_path": "control/lung_stretch_receptor/ArgusUNPUBLISHED_OLD",
+    "why": "page: _OLD type folded in"
+  },
+  {
+    "from": ["heart_effector_Gee2023", "nn_lv"],
+    "to": ["heart_effector", "lv_ArgusUNPUBLISHED_v01"],
+    "from_path": "control/heart_effector_Gee2023/nn_lv",
+    "to_path": "control/heart_effector/lv_ArgusUNPUBLISHED_v01",
+    "why": "page: rename (nn_ dropped)"
+  },
+  {
+    "from": ["heart_effector_Gee2023", "nn_rv"],
+    "to": ["heart_effector", "rv_ArgusUNPUBLISHED_v01"],
+    "from_path": "control/heart_effector_Gee2023/nn_rv",
+    "to_path": "control/heart_effector/rv_ArgusUNPUBLISHED_v01",
+    "why": "page: rename (nn_ dropped)"
+  },
+  {
+    "from": ["heart_effector_Gee2023_OLD", "nn_rv"],
+    "to": ["heart_effector", "rv_ArgusUNPUBLISHED_OLD"],
+    "from_path": "control/heart_effector_Gee2023_OLD/nn_rv",
+    "to_path": "control/heart_effector/rv_ArgusUNPUBLISHED_OLD",
+    "why": "page: _OLD type folded in (nn_ dropped)"
+  },
+  {
+    "from": ["efferent_resistance_effector_Ursino", "nn"],
+    "to": ["efferent_resistance_effector", "Ursino1998_v01"],
+    "from_path": "control/efferent_resistance_effector_Ursino/nn",
+    "to_path": "control/efferent_resistance_effector/Ursino1998_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["efferent_respiratory_effector_Gee_Argus_2026", "nn"],
+    "to": ["efferent_respiratory_effector", "GeeArgus2026_v01"],
+    "from_path": "control/efferent_respiratory_effector_Gee_Argus_2026/nn",
+    "to_path": "control/efferent_respiratory_effector/GeeArgus2026_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["simple_lung_bg", "nn"],
+    "to": ["lung_mechanics", "ArgusUNPUBLISHED_v01"],
+    "from_path": "respiratory/simple_lung_bg/nn",
+    "to_path": "respiratory/lung_mechanics/ArgusUNPUBLISHED_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["lung_bg_Argus_Chase", "nn"],
+    "to": ["lung_mechanics", "ventilated_ArgusUNPUBLISHED_v01"],
+    "from_path": "respiratory/lung_bg_Argus_Chase/nn",
+    "to_path": "respiratory/lung_mechanics/ventilated_ArgusUNPUBLISHED_v01",
+    "why": "page: merge"
+  },
+  {
+    "from": ["sum_blood_vol_2", "nn"],
+    "to": ["sum_blood_vol", "ArgusUNPUBLISHED_v01_SI"],
+    "from_path": "coupling/sum_blood_vol_2/nn",
+    "to_path": "coupling/sum_blood_vol/ArgusUNPUBLISHED_v01_SI",
+    "why": "page: _2 type folded in as _SI (page nn_SI; the base nn is now ArgusUNPUBLISHED_v01)"
+  },
+  {
+    "from": ["simple_2", "pp_noI"],
+    "to": ["simple", "pp_noI_SI"],
+    "from_path": "vessels/compartments/simple_2/pp_noI",
+    "to_path": "vessels/compartments/simple/pp_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["simple_2", "pv_noI"],
+    "to": ["simple", "pv_noI_SI"],
+    "from_path": "vessels/compartments/simple_2/pv_noI",
+    "to_path": "vessels/compartments/simple/pv_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["simple_2", "vp_noI"],
+    "to": ["simple", "vp_noI_SI"],
+    "from_path": "vessels/compartments/simple_2/vp_noI",
+    "to_path": "vessels/compartments/simple/vp_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["simple_2", "vv_noI"],
+    "to": ["simple", "vv_noI_SI"],
+    "from_path": "vessels/compartments/simple_2/vv_noI",
+    "to_path": "vessels/compartments/simple/vv_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["Min_junction_2", "vp_noI"],
+    "to": ["Min_junction", "vp_noI_SI"],
+    "from_path": "vessels/junctions/Min_junction_2/vp_noI",
+    "to_path": "vessels/junctions/Min_junction/vp_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["Min_junction_2", "vv_noI"],
+    "to": ["Min_junction", "vv_noI_SI"],
+    "from_path": "vessels/junctions/Min_junction_2/vv_noI",
+    "to_path": "vessels/junctions/Min_junction/vv_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["MinNout_junction_2", "vv_noI"],
+    "to": ["MinNout_junction", "vv_noI_SI"],
+    "from_path": "vessels/junctions/MinNout_junction_2/vv_noI",
+    "to_path": "vessels/junctions/MinNout_junction/vv_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["Nout_junction_2", "pv_noI"],
+    "to": ["Nout_junction", "pv_noI_SI"],
+    "from_path": "vessels/junctions/Nout_junction_2/pv_noI",
+    "to_path": "vessels/junctions/Nout_junction/pv_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["Nout_junction_2", "vv_noI"],
+    "to": ["Nout_junction", "vv_noI_SI"],
+    "from_path": "vessels/junctions/Nout_junction_2/vv_noI",
+    "to_path": "vessels/junctions/Nout_junction/vv_noI_SI",
+    "why": "page: _2 type folded in as _SI"
+  },
+  {
+    "from": ["heart", "vp_simple_2"],
+    "to": ["heart", "vp_simple_SI"],
+    "from_path": "heart/vp_simple_2",
+    "to_path": "heart/vp_simple_SI",
+    "why": "page: version (_2 -> _SI)"
+  },
+  {
+    "from": ["inlet_flow", "nn_adan"],
+    "to": ["inlet_flow", "adan"],
+    "from_path": "boundary_conditions/inlet_flow/nn_adan",
+    "to_path": "boundary_conditions/inlet_flow/adan",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["inlet_flow", "nn_adan_2"],
+    "to": ["inlet_flow", "adan_2"],
+    "from_path": "boundary_conditions/inlet_flow/nn_adan_2",
+    "to_path": "boundary_conditions/inlet_flow/adan_2",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["inlet_flow", "nn_aorticbif"],
+    "to": ["inlet_flow", "aorticbif"],
+    "from_path": "boundary_conditions/inlet_flow/nn_aorticbif",
+    "to_path": "boundary_conditions/inlet_flow/aorticbif",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["inlet_flow", "nn_constant"],
+    "to": ["inlet_flow", "constant"],
+    "from_path": "boundary_conditions/inlet_flow/nn_constant",
+    "to_path": "boundary_conditions/inlet_flow/constant",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["inlet_flow", "nn_constant_2"],
+    "to": ["inlet_flow", "constant_2"],
+    "from_path": "boundary_conditions/inlet_flow/nn_constant_2",
+    "to_path": "boundary_conditions/inlet_flow/constant_2",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["inlet_flow", "nn_constant_flow_port"],
+    "to": ["inlet_flow", "constant_flow_port"],
+    "from_path": "boundary_conditions/inlet_flow/nn_constant_flow_port",
+    "to_path": "boundary_conditions/inlet_flow/constant_flow_port",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["inlet_flow", "nn_fourier_8"],
+    "to": ["inlet_flow", "fourier_8"],
+    "from_path": "boundary_conditions/inlet_flow/nn_fourier_8",
+    "to_path": "boundary_conditions/inlet_flow/fourier_8",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["inlet_pressure", "nn_constant"],
+    "to": ["inlet_pressure", "constant"],
+    "from_path": "boundary_conditions/inlet_pressure/nn_constant",
+    "to_path": "boundary_conditions/inlet_pressure/constant",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["muscle_pressure", "nn_constant"],
+    "to": ["muscle_pressure", "constant"],
+    "from_path": "boundary_conditions/muscle_pressure/nn_constant",
+    "to_path": "boundary_conditions/muscle_pressure/constant",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["outlet_flow", "nn_constant"],
+    "to": ["outlet_flow", "constant"],
+    "from_path": "boundary_conditions/outlet_flow/nn_constant",
+    "to_path": "boundary_conditions/outlet_flow/constant",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["outlet_flow", "nn_constant_flow_port"],
+    "to": ["outlet_flow", "constant_flow_port"],
+    "from_path": "boundary_conditions/outlet_flow/nn_constant_flow_port",
+    "to_path": "boundary_conditions/outlet_flow/constant_flow_port",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["outlet_pressure", "nn_constant"],
+    "to": ["outlet_pressure", "constant"],
+    "from_path": "boundary_conditions/outlet_pressure/nn_constant",
+    "to_path": "boundary_conditions/outlet_pressure/constant",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["efferent_heart_elastance_effector", "nn_lv"],
+    "to": ["efferent_heart_elastance_effector", "lv"],
+    "from_path": "control/efferent_heart_elastance_effector/nn_lv",
+    "to_path": "control/efferent_heart_elastance_effector/lv",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["efferent_heart_elastance_effector", "nn_rv"],
+    "to": ["efferent_heart_elastance_effector", "rv"],
+    "from_path": "control/efferent_heart_elastance_effector/nn_rv",
+    "to_path": "control/efferent_heart_elastance_effector/rv",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["cardiac_clock", "nn_controlled"],
+    "to": ["cardiac_clock", "controlled"],
+    "from_path": "heart/cardiac_clock/nn_controlled",
+    "to_path": "heart/cardiac_clock/controlled",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["pulmonary_GE", "nn_5_lobe"],
+    "to": ["pulmonary_GE", "5_lobe"],
+    "from_path": "respiratory/pulmonary_GE/nn_5_lobe",
+    "to_path": "respiratory/pulmonary_GE/5_lobe",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["P_outlet", "nn_micro"],
+    "to": ["P_outlet", "micro"],
+    "from_path": "vessels/microvasculature/P_outlet/nn_micro",
+    "to_path": "vessels/microvasculature/P_outlet/micro",
+    "why": "decision 3: nn_ prefix dropped"
+  },
+  {
+    "from": ["delay_test", "nn"],
+    "to": ["delay_test", "ArgusUNPUBLISHED_v01"],
+    "from_path": "benchmarks/delay_test/nn",
+    "to_path": "benchmarks/delay_test/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only (test fixture))"
+  },
+  {
+    "from": ["FitzHugh_Nagumo", "nn"],
+    "to": ["FitzHugh_Nagumo", "FitzHugh1961_v01"],
+    "from_path": "benchmarks/FitzHugh_Nagumo/nn",
+    "to_path": "benchmarks/FitzHugh_Nagumo/FitzHugh1961_v01",
+    "why": "decision 3: plain nn named by source (fitzhugh1961impulses)"
+  },
+  {
+    "from": ["Lotka_Volterra", "nn"],
+    "to": ["Lotka_Volterra", "Lotka1925_v01"],
+    "from_path": "benchmarks/Lotka_Volterra/nn",
+    "to_path": "benchmarks/Lotka_Volterra/Lotka1925_v01",
+    "why": "decision 3: plain nn named by source (lotka1925elements)"
+  },
+  {
+    "from": ["TwoMinima", "nn"],
+    "to": ["TwoMinima", "ArgusUNPUBLISHED_v01"],
+    "from_path": "benchmarks/TwoMinima/nn",
+    "to_path": "benchmarks/TwoMinima/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only (test fixture))"
+  },
+  {
+    "from": ["VanDerPol", "nn"],
+    "to": ["VanDerPol", "VanDerPol1926_v01"],
+    "from_path": "benchmarks/VanDerPol/nn",
+    "to_path": "benchmarks/VanDerPol/VanDerPol1926_v01",
+    "why": "decision 3: plain nn named by source (vanderpol1926relaxation)"
+  },
+  {
+    "from": ["CO2_O2_generator", "nn"],
+    "to": ["CO2_O2_generator", "ArgusUNPUBLISHED_v01"],
+    "from_path": "boundary_conditions/CO2_O2_generator/nn",
+    "to_path": "boundary_conditions/CO2_O2_generator/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["i_stim_periodic", "nn"],
+    "to": ["i_stim_periodic", "ArgusUNPUBLISHED_v01"],
+    "from_path": "boundary_conditions/i_stim_periodic/nn",
+    "to_path": "boundary_conditions/i_stim_periodic/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["lung_vol_generator", "nn"],
+    "to": ["lung_vol_generator", "ArgusUNPUBLISHED_v01"],
+    "from_path": "boundary_conditions/lung_vol_generator/nn",
+    "to_path": "boundary_conditions/lung_vol_generator/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["voltage_change", "nn"],
+    "to": ["voltage_change", "ArgusUNPUBLISHED_v01"],
+    "from_path": "boundary_conditions/voltage_change/nn",
+    "to_path": "boundary_conditions/voltage_change/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["zero_flow", "nn"],
+    "to": ["zero_flow", "ArgusUNPUBLISHED_v01"],
+    "from_path": "boundary_conditions/zero_flow/nn",
+    "to_path": "boundary_conditions/zero_flow/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["afferent_to_respiratory_efferent", "nn"],
+    "to": ["afferent_to_respiratory_efferent", "Albanese2016_v01"],
+    "from_path": "control/afferent_to_respiratory_efferent/nn",
+    "to_path": "control/afferent_to_respiratory_efferent/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["afferent_to_sympathetic_efferent", "nn"],
+    "to": ["afferent_to_sympathetic_efferent", "Ursino1998_v01"],
+    "from_path": "control/afferent_to_sympathetic_efferent/nn",
+    "to_path": "control/afferent_to_sympathetic_efferent/Ursino1998_v01",
+    "why": "decision 3: plain nn named by source (ursino1998interaction)"
+  },
+  {
+    "from": ["afferent_to_vagal_efferent", "nn"],
+    "to": ["afferent_to_vagal_efferent", "Ursino1998_v01"],
+    "from_path": "control/afferent_to_vagal_efferent/nn",
+    "to_path": "control/afferent_to_vagal_efferent/Ursino1998_v01",
+    "why": "decision 3: plain nn named by source (ursino1998interaction)"
+  },
+  {
+    "from": ["baroreceptor", "nn"],
+    "to": ["baroreceptor", "Ursino1998_v01"],
+    "from_path": "control/baroreceptor/nn",
+    "to_path": "control/baroreceptor/Ursino1998_v01",
+    "why": "decision 3: plain nn named by source (ursino1998interaction)"
+  },
+  {
+    "from": ["chemoreceptor", "nn"],
+    "to": ["chemoreceptor", "Ursino2000_v01"],
+    "from_path": "control/chemoreceptor/nn",
+    "to_path": "control/chemoreceptor/Ursino2000_v01",
+    "why": "decision 3: plain nn named by source (ursino2000acute)"
+  },
+  {
+    "from": ["efferent_heart_period_effector", "nn"],
+    "to": ["efferent_heart_period_effector", "Ursino1998_v01"],
+    "from_path": "control/efferent_heart_period_effector/nn",
+    "to_path": "control/efferent_heart_period_effector/Ursino1998_v01",
+    "why": "decision 3: plain nn named by source (ursino1998interaction)"
+  },
+  {
+    "from": ["efferent_resistance_effector", "nn"],
+    "to": ["efferent_resistance_effector", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/efferent_resistance_effector/nn",
+    "to_path": "control/efferent_resistance_effector/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (owner's saturating form (ursino1998interaction, argus2026unpublished))"
+  },
+  {
+    "from": ["efferent_respiratory_effector", "nn"],
+    "to": ["efferent_respiratory_effector", "Albanese2016_v01"],
+    "from_path": "control/efferent_respiratory_effector/nn",
+    "to_path": "control/efferent_respiratory_effector/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["efferent_venous_us_volume_and_compliance_effector", "nn"],
+    "to": ["efferent_venous_us_volume_and_compliance_effector", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/efferent_venous_us_volume_and_compliance_effector/nn",
+    "to_path": "control/efferent_venous_us_volume_and_compliance_effector/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (owner's saturating form)"
+  },
+  {
+    "from": ["flow_observer", "nn"],
+    "to": ["flow_observer", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/flow_observer/nn",
+    "to_path": "control/flow_observer/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["local_flow_control_brain", "nn"],
+    "to": ["local_flow_control_brain", "Ursino2000_v01"],
+    "from_path": "control/local_flow_control_brain/nn",
+    "to_path": "control/local_flow_control_brain/Ursino2000_v01",
+    "why": "decision 3: plain nn named by source (ursino2000acute)"
+  },
+  {
+    "from": ["local_flow_control_muscle", "nn"],
+    "to": ["local_flow_control_muscle", "Ursino2000_v01"],
+    "from_path": "control/local_flow_control_muscle/nn",
+    "to_path": "control/local_flow_control_muscle/Ursino2000_v01",
+    "why": "decision 3: plain nn named by source (ursino2000acute)"
+  },
+  {
+    "from": ["pid_control", "nn"],
+    "to": ["pid_control", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/pid_control/nn",
+    "to_path": "control/pid_control/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["pressure_observer", "nn"],
+    "to": ["pressure_observer", "ArgusUNPUBLISHED_v01"],
+    "from_path": "control/pressure_observer/nn",
+    "to_path": "control/pressure_observer/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["imposter_1D", "nn"],
+    "to": ["imposter_1D", "ArgusUNPUBLISHED_v01"],
+    "from_path": "coupling/imposter_1D/nn",
+    "to_path": "coupling/imposter_1D/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["sum_blood_vol", "nn"],
+    "to": ["sum_blood_vol", "ArgusUNPUBLISHED_v01"],
+    "from_path": "coupling/sum_blood_vol/nn",
+    "to_path": "coupling/sum_blood_vol/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["volume_sum", "nn"],
+    "to": ["volume_sum", "ArgusUNPUBLISHED_v01"],
+    "from_path": "coupling/volume_sum/nn",
+    "to_path": "coupling/volume_sum/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (software citation only)"
+  },
+  {
+    "from": ["cardiac_clock", "nn"],
+    "to": ["cardiac_clock", "Liang2009_v01"],
+    "from_path": "heart/cardiac_clock/nn",
+    "to_path": "heart/cardiac_clock/Liang2009_v01",
+    "why": "decision 3: plain nn named by source (liang2009multi)"
+  },
+  {
+    "from": ["BG_volume_control", "nn"],
+    "to": ["BG_volume_control", "ArgusUNPUBLISHED_v01"],
+    "from_path": "organs/BG_volume_control/nn",
+    "to_path": "organs/BG_volume_control/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (argus2026unpublished)"
+  },
+  {
+    "from": ["BVC_GI", "nn"],
+    "to": ["BVC_GI", "ArgusUNPUBLISHED_v01"],
+    "from_path": "organs/BVC_GI/nn",
+    "to_path": "organs/BVC_GI/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (argus2026unpublished)"
+  },
+  {
+    "from": ["BVC_Kidney_left", "nn"],
+    "to": ["BVC_Kidney_left", "ArgusUNPUBLISHED_v01"],
+    "from_path": "organs/BVC_Kidney_left/nn",
+    "to_path": "organs/BVC_Kidney_left/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (argus2026unpublished)"
+  },
+  {
+    "from": ["BVC_Kidney_right", "nn"],
+    "to": ["BVC_Kidney_right", "ArgusUNPUBLISHED_v01"],
+    "from_path": "organs/BVC_Kidney_right/nn",
+    "to_path": "organs/BVC_Kidney_right/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (argus2026unpublished)"
+  },
+  {
+    "from": ["BVC_Na_circ", "nn"],
+    "to": ["BVC_Na_circ", "ArgusUNPUBLISHED_v01"],
+    "from_path": "organs/BVC_Na_circ/nn",
+    "to_path": "organs/BVC_Na_circ/ArgusUNPUBLISHED_v01",
+    "why": "decision 3: plain nn named by source (argus2026unpublished)"
+  },
+  {
+    "from": ["gas_transport_simple", "nn"],
+    "to": ["gas_transport_simple", "Albanese2016_v01"],
+    "from_path": "respiratory/gas_transport_simple/nn",
+    "to_path": "respiratory/gas_transport_simple/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["GE_capillary", "nn"],
+    "to": ["GE_capillary", "Albanese2016_v01"],
+    "from_path": "respiratory/GE_capillary/nn",
+    "to_path": "respiratory/GE_capillary/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["GE_capillary_merge", "nn"],
+    "to": ["GE_capillary_merge", "Albanese2016_v01"],
+    "from_path": "respiratory/GE_capillary_merge/nn",
+    "to_path": "respiratory/GE_capillary_merge/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["pulmonary_GE", "nn"],
+    "to": ["pulmonary_GE", "Albanese2016_v01"],
+    "from_path": "respiratory/pulmonary_GE/nn",
+    "to_path": "respiratory/pulmonary_GE/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["respiratory_gas_transport", "nn"],
+    "to": ["respiratory_gas_transport", "Albanese2016_v01"],
+    "from_path": "respiratory/respiratory_gas_transport/nn",
+    "to_path": "respiratory/respiratory_gas_transport/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["thoracic_cavity", "nn"],
+    "to": ["thoracic_cavity", "Albanese2016_v01"],
+    "from_path": "respiratory/thoracic_cavity/nn",
+    "to_path": "respiratory/thoracic_cavity/Albanese2016_v01",
+    "why": "decision 3: plain nn named by source (albanese2016integrated)"
+  },
+  {
+    "from": ["tissue_GE_simple", "nn"],
+    "to": ["tissue_GE_simple", "Ursino2001_v01"],
+    "from_path": "respiratory/tissue_GE_simple/nn",
+    "to_path": "respiratory/tissue_GE_simple/Ursino2001_v01",
+    "why": "decision 3: plain nn named by source (ursino2001integrated)"
+  },
+  {
+    "from": ["tissue_diffusion_face", "nn"],
+    "to": ["tissue_diffusion_face", "Fang2008_v01"],
+    "from_path": "transport/tissue_diffusion_face/nn",
+    "to_path": "transport/tissue_diffusion_face/Fang2008_v01",
+    "why": "decision 3: plain nn named by source (fang2008oxygen)"
+  },
+  {
+    "from": ["tissue_diffusion_volume", "nn"],
+    "to": ["tissue_diffusion_volume", "Fang2008_v01"],
+    "from_path": "transport/tissue_diffusion_volume/nn",
+    "to_path": "transport/tissue_diffusion_volume/Fang2008_v01",
+    "why": "decision 3: plain nn named by source (fang2008oxygen)"
+  },
+  {
+    "from": ["flow_sum_2", "nn"],
+    "to": ["flow_sum_2", "Safaei2016_v01"],
+    "from_path": "vessels/junctions/flow_sum_2/nn",
+    "to_path": "vessels/junctions/flow_sum_2/Safaei2016_v01",
+    "why": "decision 3: plain nn named by source (safaei2016roadmap)"
+  },
+  {
+    "from": ["material_prop_const", "nn"],
+    "to": ["material_prop_const", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_const/nn",
+    "to_path": "vessels/properties/material_prop_const/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  },
+  {
+    "from": ["material_prop_const_ven", "nn"],
+    "to": ["material_prop_const_ven", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_const_ven/nn",
+    "to_path": "vessels/properties/material_prop_const_ven/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  },
+  {
+    "from": ["material_prop_fromPWV", "nn"],
+    "to": ["material_prop_fromPWV", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_fromPWV/nn",
+    "to_path": "vessels/properties/material_prop_fromPWV/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  },
+  {
+    "from": ["material_prop_fromPWV_ven", "nn"],
+    "to": ["material_prop_fromPWV_ven", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_fromPWV_ven/nn",
+    "to_path": "vessels/properties/material_prop_fromPWV_ven/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  },
+  {
+    "from": ["material_prop_visco_const", "nn"],
+    "to": ["material_prop_visco_const", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_visco_const/nn",
+    "to_path": "vessels/properties/material_prop_visco_const/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  },
+  {
+    "from": ["material_prop_visco_const_ven", "nn"],
+    "to": ["material_prop_visco_const_ven", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_visco_const_ven/nn",
+    "to_path": "vessels/properties/material_prop_visco_const_ven/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  },
+  {
+    "from": ["material_prop_visco_fromPWV", "nn"],
+    "to": ["material_prop_visco_fromPWV", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_visco_fromPWV/nn",
+    "to_path": "vessels/properties/material_prop_visco_fromPWV/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  },
+  {
+    "from": ["material_prop_visco_fromPWV_ven", "nn"],
+    "to": ["material_prop_visco_fromPWV_ven", "Olufsen2000_v01"],
+    "from_path": "vessels/properties/material_prop_visco_fromPWV_ven/nn",
+    "to_path": "vessels/properties/material_prop_visco_fromPWV_ven/Olufsen2000_v01",
+    "why": "decision 3: plain nn named by source (olufsen2000numerical)"
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "module_type": "sum_blood_vol",
+    "module_subtype": "ArgusUNPUBLISHED_v01_SI",
+    "module_format": "cellml",
+    "component_file": "sum_blood_vol_ArgusUNPUBLISHED_v01_SI_modules.cellml",
+    "component_type": "sum_blood_vol_type2",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q_sum"
+        ],
+        "multi_port": "sum"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q_sum",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

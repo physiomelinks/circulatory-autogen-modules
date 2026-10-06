@@ -46,7 +46,7 @@ def test_module_page_columns_are_the_report_columns():
 
 
 def test_supermodule_columns_not_applicable_to_a_component():
-    v = load_version('Lotka_Volterra', 'nn')
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
     tests = {t['key']: t for t in report.version_tests(v)}
     for k in report.SUPERMODULE_TESTS:
         assert tests[k]['status'] == checks.NOT_APPLICABLE
@@ -113,7 +113,7 @@ def test_supermodule_index(tmp_path):
 
 def test_supermodule_index_of_the_library():
     index = checks.supermodule_index()
-    assert 'soma/sympathetic' in [v.key for v in index[('SN_membrane_soma', 'nn')]]
+    assert 'soma/sympathetic' in [v.key for v in index[('membrane_potential', 'SN_soma_Argus2026_v01')]]
     assert 'neuron/sympathetic' in [v.key for v in index[('soma', 'sympathetic')]]
 
 
@@ -174,13 +174,13 @@ def test_not_a_submodule_keeps_the_plain_rule(tmp_path):
 
 
 def test_report_links_and_counts_for_calibration_in_super():
-    v = load_version('SN_membrane_soma', 'nn')
+    v = load_version('membrane_potential', 'SN_soma_Argus2026_v01')
     t = next(t for t in report.version_tests(v) if t['key'] == 'version_calibration')
     assert t['status'] in (checks.PASSED_IN_SUPER, checks.FAILED_IN_SUPER)
     assert t['status_label'] in ('Pass in super', 'Fail in super')
     link = next(l for l in t['links'] if l['key'] == 'soma/sympathetic')
-    assert link['href'] == '../../../versions/sympathetic/soma_sympathetic.html'
-    assert link['href_module'] == '../versions/sympathetic/soma_sympathetic.html'
+    assert link['href'] == '../../../neuron/soma/versions/sympathetic/soma_sympathetic.html'
+    assert link['href_module'] == '../neuron/soma/versions/sympathetic/soma_sympathetic.html'
     counts = report._status_counts([{'tests': [t], 'instances': []}])
     assert counts.get(checks.PASSED_IN_SUPER, 0) == 0 and counts.get(checks.FAILED_IN_SUPER, 0) == 0
     assert counts['passed'] + counts['failed'] == 1
@@ -212,7 +212,7 @@ def test_split_model_name_nested():
     neuron = load_version('neuron', 'sympathetic')
     name, var, path, owner = harness.split_model_name(neuron, 'I_in_mod_soma_membrane')
     assert (name, var, path) == ('I_in_soma_membrane', 'I_in', 'soma_membrane')
-    assert owner.key == 'SN_membrane_soma/nn'
+    assert owner.key == 'membrane_potential/SN_soma_Argus2026_v01'
     assert harness.split_model_name(neuron, 'C_mod_axon')[3].key == 'axon/sympathetic_monolithic_v01'
     assert harness.split_model_name(neuron, 'T') == ('T', 'T', None, None)
 

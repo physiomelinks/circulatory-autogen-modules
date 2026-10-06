@@ -1,0 +1,113 @@
+[
+  {
+    "module_type": "material_prop_visco_fromPWV",
+    "module_subtype": "Olufsen2000_v01",
+    "module_format": "cellml",
+    "component_file": "material_prop_visco_fromPWV_Olufsen2000_v01_modules.cellml",
+    "component_type": "material_prop_visco_fromPWV_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "len_port",
+        "variables": [
+          "l"
+        ]
+      },
+      {
+        "port_type": "radius_port",
+        "variables": [
+          "r_0"
+        ]
+      },
+      {
+        "port_type": "stiffness_port",
+        "variables": [
+          "K_tube"
+        ]
+      },
+      {
+        "port_type": "visco_coeff_port",
+        "variables": [
+          "K_tube_visco"
+        ]
+      }
+    ],
+    "exit_ports": [],
+    "variables_and_units": [
+      [
+        "K_tube",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "K_tube_visco",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "l",
+        "metre",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "K_m",
+        "Js_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "SMvolfrac_art",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "m_tube",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "n_tube",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_1",
+        "J_per_m3",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "k_2",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "k_3",
+        "J_per_m3",
+        "no_access",
+        "global_constant"
+      ]
+    ]
+  }
+]

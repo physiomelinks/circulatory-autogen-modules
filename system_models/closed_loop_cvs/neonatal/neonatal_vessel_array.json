@@ -21,7 +21,7 @@
  {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["head_L_T", "head_R_T", "arm_L_T", "arm_R_T"], "out_instances": ["ra_inflow"]},
  {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "instance": "default", "inp_instances": ["puv"], "out_instances": ["pvn"]},
  {"name": "pvn", "module_type": "arterial_simple", "module_subtype": "vp", "instance": "default", "inp_instances": ["par"], "out_instances": ["la"]},
- {"name": "heart_clock", "module_type": "cardiac_clock", "module_subtype": "nn", "instance": "default", "inp_instances": [], "out_instances": ["ra", "rv", "la", "lv"]},
+ {"name": "heart_clock", "module_type": "cardiac_clock", "module_subtype": "Liang2009_v01", "instance": "default", "inp_instances": [], "out_instances": ["ra", "rv", "la", "lv"]},
  {"name": "ra", "module_type": "chamber", "module_subtype": "vv", "instance": "default", "inp_instances": ["ra_inflow", "heart_clock"], "out_instances": ["trv"]},
  {"name": "rv", "module_type": "chamber", "module_subtype": "vv", "instance": "default", "inp_instances": ["trv", "heart_clock"], "out_instances": ["puv"]},
  {"name": "la", "module_type": "chamber", "module_subtype": "vv", "instance": "default", "inp_instances": ["pvn", "heart_clock"], "out_instances": ["miv"]},

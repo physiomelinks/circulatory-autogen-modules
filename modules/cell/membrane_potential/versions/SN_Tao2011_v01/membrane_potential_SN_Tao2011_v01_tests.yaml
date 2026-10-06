@@ -1,0 +1,131 @@
+module_type: membrane_potential
+version: SN_Tao2011_v01
+reviewed: false
+notes: 'Membrane potential of the Tao 2011 sympathetic neuron: dVm/dt = -(I_Ca + I_Na + I_A + I_KV + I_KCa - i_stim)/C_m (nA,
+  pF, mV, s). Alone with constant currents the solution is exactly linear.
+
+
+  Ports of the versions of membrane_potential (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance i_stim: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [I_in]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  entrance membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [Vm]; SN_varicosity_Argus2026_v01
+  [V_in]
+
+  entrance stim_current: cardiomyocyte_Paci2013_v01 [i_stim]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_stim]; SN_varicosity_Argus2026_v01
+  -
+
+  exit A_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_A]; SN_varicosity_Argus2026_v01
+  -
+
+  exit CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Ca_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_Ca]; SN_varicosity_Argus2026_v01
+  -
+
+  exit K1_current: cardiomyocyte_Paci2013_v01 [i_K1]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit KCa_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_KCa]; SN_varicosity_Argus2026_v01
+  -
+
+  exit KV_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_KV]; SN_varicosity_Argus2026_v01
+  -
+
+  exit Kr_current: cardiomyocyte_Paci2013_v01 [i_Kr]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Ks_current: cardiomyocyte_Paci2013_v01 [i_Ks]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit NaCa_current: cardiomyocyte_Paci2013_v01 [i_NaCa]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit NaK_current: cardiomyocyte_Paci2013_v01 [i_NaK]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Na_current: cardiomyocyte_Paci2013_v01 [i_Na]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_Na]; SN_varicosity_Argus2026_v01
+  -
+
+  exit PCa_current: cardiomyocyte_Paci2013_v01 [i_PCa]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit VI_port: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [V, I_out]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit b_Ca_current: cardiomyocyte_Paci2013_v01 [i_b_Ca]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit b_Na_current: cardiomyocyte_Paci2013_v01 [i_b_Na]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit f_current: cardiomyocyte_Paci2013_v01 [i_f]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 [V]; SN_Tao2011_v01 [Vm]; SN_varicosity_Argus2026_v01
+  [V]
+
+  exit to_current: cardiomyocyte_Paci2013_v01 [i_to]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general compartment_volume: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Vol]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  [Vol]
+
+  general membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  [A_mem]
+
+  general membrane_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [i_ion]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general shell_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -'
+expected_failures:
+  run_test: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix: public_interface=''out''.
+    With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix:
+    public_interface=''out''. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix: public_interface=''out''.
+    With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix:
+    public_interface=''out''. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: Vm_volt is exposed in the config but has no interface in the CellML; fix: public_interface=''out''.
+    With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  i_Ca:
+    reference: definitional; i_Ca is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_Na:
+    reference: definitional; i_Na is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_A:
+    reference: definitional; i_A is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_KV:
+    reference: definitional; i_KV is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_KCa:
+    reference: definitional; i_KCa is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_stim:
+    reference: definitional; i_stim is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  C_m:
+    reference: 'Tao2011; Supporting Material (Document S1) p. 8 parameter table: neuron Cm = 240 pF'
+    sourced: 'yes'
+    value: 240.0
+  Vm_init:
+    reference: unreferenced_placeholder; -60 mV, near the resting potential of rat sympathetic neurones; Tao 2011 lists no
+      initial conditions
+    sourced: 'no'
+    value: -60.0
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

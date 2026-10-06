@@ -5,7 +5,7 @@ notes: 'Flow-in/flow-out artery compartment: one Poiseuille resistance between t
   no inertance. Alone with constant flows the total volume changes linearly and the volume difference relaxes with time constant
   RC/4 (nominal 8.69e-06 s): both are exact invariants. The CellML adds a constant "+ 2 Pa" to u and u_d (remnant of a commented-out
   viscous term 2 R_v (v_in - v) with R_v = 0), recorded as a defect. Test network: the Sum flow_port is closed by a constant
-  outflow (outlet_flow nn_constant_flow_port, vout); since multi_port Sum sums (2026-09-29), an unconnected Sum port is 0,
+  outflow (outlet_flow constant_flow_port, vout); since multi_port Sum sums (2026-09-29), an unconnected Sum port is 0,
   not a parameter.'
 expected_failures:
   verification_test_invariants: 'module defect: u = u_0 + u_C + u_ext + 2 {J_per_m3} (and u_d likewise) in the CellML; the

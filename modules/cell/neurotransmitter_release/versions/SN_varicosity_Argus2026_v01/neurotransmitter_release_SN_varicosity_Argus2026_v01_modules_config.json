@@ -1,0 +1,70 @@
+[
+  {
+    "module_type": "neurotransmitter_release",
+    "module_subtype": "SN_varicosity_Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "neurotransmitter_release_SN_varicosity_Argus2026_v01_modules.cellml",
+    "component_type": "SN_NE_release",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "synaptic_NE",
+        "variables": [
+          "NE"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai_NE_base",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "NE",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "NE_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NE",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NET",
+        "per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

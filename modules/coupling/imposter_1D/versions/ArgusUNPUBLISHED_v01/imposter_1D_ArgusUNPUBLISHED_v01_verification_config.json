@@ -1,0 +1,71 @@
+{
+  "module_type": "imposter_1D",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": ["P_t_star", "A_star", "coupler/flux", "coupler/q_star"],
+  "harness": {
+    "vessel_array": [
+      ["pressure_in", "constant", "inlet_pressure", "", "vessel0d", "default"],
+      ["vessel0d", "pv", "arterial_simple", "pressure_in", "coupler", "default"],
+      ["coupler", "pv_0D_1D", "coupler", "vessel0d", "mod", "default"],
+      ["mod", "ArgusUNPUBLISHED_v01", "imposter_1D", "coupler", "", "default"]
+    ],
+    "parameters": [
+      ["P_pressure_in", "J_per_m3", 2000, "harness test value (circulatory_autogen 0D_1D_coupling_test)"],
+      ["R_vessel0d", "Js_per_m6", 10000000.0, "harness test value"],
+      ["C_vessel0d", "m6_per_J", 1e-08, "harness test value"],
+      ["I_vessel0d", "Js2_per_m6", 100000.0, "harness test value"],
+      ["q_0_vessel0d", "m3", 0, "harness: zero unstressed volume"],
+      ["u_0_vessel0d", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["u_ext_vessel0d", "J_per_m3", 0, "harness: zero external pressure"],
+      ["I_coupler", "Js2_per_m6", 100000.0, "harness test value"],
+      ["rho", "Js2_per_m5", 1050, "harness test value"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "P_t* and A* are constant in time (passed through from the imposter's constants)",
+      "expr": "(np.ptp(P_t_star) == 0) & (np.ptp(A_star) == 0) & (A_star[0] > 0)"
+    },
+    {
+      "description": "the flux the imposter receives is the time integral of ρ q* from the coupler (ρ = 1050 in the harness; relative error < 1e-3)",
+      "expr": "np.max(np.abs(coupler__flux - np.concatenate(([0.0], np.cumsum(0.5*1050*(coupler__q_star[1:] + coupler__q_star[:-1])*np.diff(t)))))) <= 1e-3*max(1e-30, np.max(np.abs(coupler__flux)))"
+    },
+    {
+      "description": "the coupler reaches the analytic steady state set by the imposter's P_t* and A*: R q* = P_in − P_t* + ½ρ(q*/A*)² (R = 1e7, P_in = 2000 Pa, ρ = 1050; residual < 2 Pa)",
+      "expr": "abs(1e7*coupler__q_star[-1] - (2000.0 - P_t_star[-1] + 0.5*1050*(coupler__q_star[-1]/A_star[-1])**2)) <= 2.0"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "P_t_star": {"min": 0.0, "max": 1500.0, "points": 4},
+      "A_star": {"min": 0.0004, "max": 0.001, "points": 4}
+    },
+    "rationale": "P_t* between 0 and 1500 Pa keeps the harness inflow (P_in = 2000 Pa) forward; A* spans 4-10 cm^2 (aorta-size cross-sections). Below ~3 cm^2 the Bernoulli term ½ρ(q/A)² brings the second (unstable) steady-state root of R q − ½ρ(q/A)² = ΔP close enough that the start-up transient escapes (A* = 2 cm^2 fails even with the sign fixed) — a property of the harness, not the imposter."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "test fixture (stand-in for a 1D model) with no physiological counterpart."
+      },
+      "calibrate": {"note": "not_applicable: test fixture with no physiological counterpart."}
+    }
+  }
+}

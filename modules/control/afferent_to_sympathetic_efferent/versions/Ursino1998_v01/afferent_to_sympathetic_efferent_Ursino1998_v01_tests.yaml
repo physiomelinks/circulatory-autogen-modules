@@ -1,0 +1,38 @@
+module_type: afferent_to_sympathetic_efferent
+version: Ursino1998_v01
+reviewed: false
+notes: 'Sympathetic efferent activity (Ursino 1998 exponential): f_s = min(f_es_inf + (f_es_0 - f_es_inf) exp(k_es (W_bs f_ab
+  + W_cs f_apc)), f_es_max). W_bs carries the (negative) baroreceptor sign. Unlike Ursino & Magosso 2000 there is no offset
+  theta_s, so at f_ab = 25, f_apc = 3.7 the output is ~43 spikes/s (Ursino resting value is a few spikes/s).'
+reference_proposals:
+  f_ab:
+    reference: circulatory_autogen; test operating point = f_ab_0
+    sourced: false
+    value: 25.0
+  f_apc:
+    reference: circulatory_autogen; test operating point = f_apc_nom
+    sourced: false
+    value: 3.7
+  W_bs:
+    reference: unreferenced_placeholder; UrsinoMagosso2000 uses W_b,sp = W_b,sh = 1 with a minus sign in the exponent (open
+      reimplementations); -1.14 is not found there
+    sourced: false
+  W_cs:
+    reference: unreferenced_placeholder; UrsinoMagosso2000 uses W_c,sp = 5, W_c,sh = 1 (open reimplementations); 12 is not
+      found there
+    sourced: false
+  f_es_0:
+    reference: Ursino1998; f_es,0 = 16.11 spikes/s (Cheng2010 Table; Gee2023 Simulink f_es0 - f_es_inf = 14.01)
+    sourced: true
+  f_es_inf:
+    reference: Ursino1998; f_es,inf = 2.10 spikes/s (Cheng2010 Table)
+    sourced: true
+  f_es_max:
+    reference: UrsinoMagosso2000; f_es,max = 60 spikes/s (open reimplementations; Gee2023 Simulink saturation 60)
+    sourced: true
+  k_es:
+    reference: Ursino1998; k_es = 0.0675 s (Gee2023 Simulink gain -0.0675; Cheng2010 lists 0.07)
+    sourced: true
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

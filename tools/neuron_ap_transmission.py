@@ -394,7 +394,7 @@ The HH prototype passes the check, but its axon fires first and drives the soma,
 
 <h2>Why it attenuates</h2>
 <ul>
-<li><b>The varicosity is no load.</b> <code>SN_varicosity_membrane</code> is a pass-through: V = V_in (the axon's V). Its ionic
+<li><b>The varicosity is no load.</b> <code>membrane_potential SN_varicosity_Argus2026_v01</code> is a pass-through: V = V_in (the axon's V). Its ionic
 currents (i_CaN, i_NaCa) drive Ca only and never feed back on V. So the axon node <i>is</i> the varicosity; the two traces are
 identical. A real varicosity of d 1.24 um (A 4.84 um<sup>2</sup>) would add only 0.05 pF against the axon's 10 pF, so its load is
 negligible either way (option 4: nothing to fix).</li>

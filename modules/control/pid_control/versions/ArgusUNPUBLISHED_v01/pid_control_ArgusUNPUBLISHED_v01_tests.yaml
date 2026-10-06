@@ -1,0 +1,6 @@
+module_type: pid_control
+version: ArgusUNPUBLISHED_v01
+reviewed: true
+notes: PID controller from arterial pressure (and its derivative) to a nerve-stimulation frequency, saturating at f_stim_max
+  and switching to a high-frequency block (f_stim_HF) when the demand falls below f_stim_min. Alone, with constant P_a, the
+  integral term has the exact solution e_int = e_int_init + e_norm t.

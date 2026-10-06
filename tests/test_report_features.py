@@ -29,7 +29,7 @@ def test_record_keys_inserted_after_default_instance_and_carried_through():
 
 
 def test_version_page_shows_licence_and_unset_creator():
-    v = load_version('Lotka_Volterra', 'nn')
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
     assert v.licence == 'CC0-1.0' and v.creators == []
     ctx = report.version_context(v)
     assert ctx['licence_url'] == 'https://spdx.org/licenses/CC0-1.0.html'
@@ -41,7 +41,7 @@ def test_version_page_shows_licence_and_unset_creator():
 # ---- contents summary ---------------------------------------------------------------------------
 
 def test_contents_of_a_small_version():
-    v = load_version('Lotka_Volterra', 'nn')
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
     c = report.contents(v)
     assert {k: c[k] for k in ('states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations')} == \
         {'states': 2, 'algebraic': 0, 'parameters': 6, 'boundary_conditions': 0, 'ports': 0, 'equations': 2}
@@ -149,4 +149,4 @@ def test_nested_supermodule_shows_its_outside_coupling():
     sv = report.supermodule_structure(load_version('soma', 'sympathetic'))
     assert any(x['part'] == 'membrane' and x['external'] == 'axon' and x['direction'] == 'out'
                and x['where'][0]['name'] == 'neuron/sympathetic' for x in sv['external'])
-    assert report.supermodule_structure(load_version('Lotka_Volterra', 'nn')) is None
+    assert report.supermodule_structure(load_version('Lotka_Volterra', 'Lotka1925_v01')) is None

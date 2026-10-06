@@ -1,0 +1,106 @@
+module_type: pulmonary_GE
+version: 5_lobe
+reviewed: false
+notes: 'Five-lobe variant of pulmonary_GE: the capillary flow is the sum of five lobar flow ports (v = v_1 + ... + v_5); otherwise
+  the same equations without the over-cap solubility term. Harness as for pulmonary_GE with five pp_I terminals (1 L/min each).'
+expected_failures:
+  run_test: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped) without
+    declaring it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library copy
+    (saturation_cap declared public_interface in and added to the config as global_constant) the component generates, runs
+    and all 5 invariants hold.'
+  verification_test_invariants: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped)
+    without declaring it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library
+    copy (saturation_cap declared public_interface in and added to the config as global_constant) the component generates,
+    runs and all 5 invariants hold.'
+  verification_test_BC: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped)
+    without declaring it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library
+    copy (saturation_cap declared public_interface in and added to the config as global_constant) the component generates,
+    runs and all 5 invariants hold.'
+  verification_test_timestep: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped)
+    without declaring it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library
+    copy (saturation_cap declared public_interface in and added to the config as global_constant) the component generates,
+    runs and all 5 invariants hold.'
+  stability_test: 'generation fails: the CellML component uses the global saturation_cap (C_O2_p_capped/C_CO2_p_capped) without
+    declaring it, and the config does not list it (libcellml MATH_CI_VARIABLE_REFERENCE). Evidence: in a patched library copy
+    (saturation_cap declared public_interface in and added to the config as global_constant) the component generates, runs
+    and all 5 invariants hold.'
+reference_proposals:
+  k_1:
+    reference: Spencer1979; K1 = 14.99 mmHg as tabulated in Albanese2014 Table 2-6 (Spencer 1979 full text not accessed);
+      14.99 x 133.322 = 1998.5 Pa
+    sourced: 'yes'
+  k_2:
+    reference: Spencer1979; K2 = 194.4 mmHg (Albanese2014 Table 2-6); 194.4 x 133.322 = 25917.8 Pa (library 25917.4, 0.002%
+      low)
+    sourced: 'yes'
+  h_1:
+    reference: Spencer1979; h1 = 0.3836 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+  h_2:
+    reference: Spencer1979; h2 = 1.819 (Albanese2014 Table 2-6)
+    sourced: 'yes'
+  alpha_1:
+    reference: Spencer1979; alpha1 = 0.03198 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.399e-4 /Pa
+    sourced: 'yes'
+  alpha_2:
+    reference: Spencer1979; alpha2 = 0.05591 /mmHg (Albanese2014 Table 2-6); /133.322 = 4.194e-4 /Pa
+    sourced: 'yes'
+  beta_1:
+    reference: Spencer1979; beta1 = 0.008275 /mmHg (Albanese2014 Table 2-6); /133.322 = 6.207e-5 /Pa
+    sourced: 'yes'
+  beta_2:
+    reference: Spencer1979; beta2 = 0.03255 /mmHg (Albanese2014 Table 2-6); /133.322 = 2.441e-4 /Pa
+    sourced: 'yes'
+  C_O2_sat:
+    reference: Spencer1979; C_sat,O2 = 9 mmol/L (Albanese2014 Table 2-6). Library 0.20448 ml/ml = 9 mmol/L x 22.72 ml/mmol;
+      the STPD molar volume 22.41 ml/mmol would give 0.2017 -- conversion factor to confirm
+    sourced: 'yes'
+  C_CO2_sat:
+    reference: Spencer1979; C_sat,CO2 = 86.11 mmol/L (Albanese2014 Table 2-6). Library 1.9564 = 86.11 x 22.72 ml/mmol (same
+      factor as C_O2_sat; 22.41 would give 1.930)
+    sourced: 'yes'
+  overcap_solubility:
+    reference: 'unreferenced_placeholder; numerical device: steep linear P_O2 rise (Pa per unit content) above the saturation
+      cap so the inverse curve stays finite'
+    sourced: 'no'
+  saturation_cap:
+    reference: 'unreferenced_placeholder; numerical device: content capped at 0.9999 of saturation before inverting the Spencer
+      curve'
+    sourced: 'no'
+  C_CO2_p_init:
+    reference: unreferenced_placeholder; initial condition, same as pulmonary_GE (nn) library value
+    sourced: 'no'
+    value: 0.48
+  C_O2_p_init:
+    reference: unreferenced_placeholder; initial condition, same as pulmonary_GE (nn) library value
+    sourced: 'no'
+    value: 0.2
+  C_CO2_a:
+    reference: definitional; computed by the component (config declares it boundary_condition -- see proposed fix); value
+      only fills the TODO
+    sourced: definitional
+    value: 0.485
+  C_O2_a:
+    reference: definitional; computed by the component (config declares it boundary_condition -- see proposed fix); value
+      only fills the TODO
+    sourced: definitional
+    value: 0.199
+  q_0:
+    reference: unreferenced_placeholder; same as pulmonary_GE (nn) library value 2 L (see the question on q_0 there)
+    sourced: 'no'
+    value: 0.002
+  k_O2:
+    reference: unreferenced_placeholder; same as pulmonary_GE (nn) library value; not in Albanese 2016
+    sourced: 'no'
+    value: 1.7e-08
+  k_CO2:
+    reference: unreferenced_placeholder; same as pulmonary_GE (nn) library value; not in Albanese 2016
+    sourced: 'no'
+    value: 4.9e-07
+  shunt_fraction:
+    reference: Albanese2014; sh = 1.7% (Table 2-6, citing GuytonHall2006)
+    sourced: 'yes'
+    value: 0.017
+review: reviews/gas_exchange_review.yaml
+review_scope: The review of the whole gas_exchange module (7 entries) before the move to versions; only the parts about this
+  version apply.

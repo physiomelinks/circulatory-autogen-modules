@@ -1,0 +1,232 @@
+[
+  {
+    "module_type": "efferent_respiratory_effector",
+    "module_subtype": "GeeArgus2026_v01",
+    "module_format": "cellml",
+    "component_file": "efferent_respiratory_effector_GeeArgus2026_v01_modules.cellml",
+    "component_type": "efferent_respiratory_effector_Gee_Argus_2026_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "efferent_respiratory_port",
+        "variables": [
+          "u_c_resp",
+          "u_p_resp"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "respiratory_rate_port",
+        "variables": [
+          "Delta_RR_resp"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "respiratory_lung_muscle_pressure_port",
+        "variables": [
+          "alpha_P_mus"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "G_pA",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "G_pf",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_pA_min",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_pA_max",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_pA",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_pf_min",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_pf_max",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_pf",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "G_cA_max",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "G_cA",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "G_cf_max",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_cf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_cA_min",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_cA_max",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_cA",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_cf_min",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_cf_max",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_cf",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "u_c_resp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_p_resp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_p_resp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_CO2_c_thresh",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_RR_resp",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "alpha_P_mus",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Delta_RR_resp_max",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "alpha_P_mus_max",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_RR_resp_min",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "alpha_P_mus_min",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_RR_c",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "Delta_RR_p",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "alpha_P_mus_c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "alpha_P_mus_p",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

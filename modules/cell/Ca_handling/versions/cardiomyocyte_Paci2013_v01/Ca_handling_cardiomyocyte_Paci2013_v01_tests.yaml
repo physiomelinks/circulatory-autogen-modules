@@ -1,0 +1,211 @@
+module_type: Ca_handling
+version: cardiomyocyte_Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 intracellular Ca handling: cytosolic Cai and SR Ca_SR with rapid buffering (Buf_C, Buf_SR), SERCA uptake
+  i_up, release i_rel (gated by the L-type d gate and g) and leak. d comes from the I_CaL d gate. With the sarcolemmal currents
+  held constant the total Ca content changes linearly (exact conservation law).
+
+
+  Ports of the versions of Ca_handling (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  entrance internal_Ca: cardiomyocyte_Paci2013_v01 [Cai]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  entrance membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit NaCa_current: cardiomyocyte_Paci2013_v01 [i_NaCa]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit PCa_current: cardiomyocyte_Paci2013_v01 [i_PCa]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit b_Ca_current: cardiomyocyte_Paci2013_v01 [i_b_Ca]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit internal_Ca: cardiomyocyte_Paci2013_v01 [Cai]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit internal_Ca_d_gate_port: cardiomyocyte_Paci2013_v01 [Cai, d]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general Ca_flux: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_Ca_in]; SN_varicosity_Argus2026_v01 [j_Ca_in]
+
+  general Ca_potential: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 [E_Ca]
+
+  general ER_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Ca_ER]; SN_varicosity_Argus2026_v01 [Ca_ER]
+
+  general ER_Ca_release: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_ER_release]; SN_varicosity_Argus2026_v01 [j_ER_release]
+
+  general ER_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_ER]; SN_varicosity_Argus2026_v01 [A_ER]
+
+  general bulk_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Ca_bulk]; SN_varicosity_Argus2026_v01 [Ca_bulk]
+
+  general compartment_volume: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Vol]; SN_varicosity_Argus2026_v01 [Vol]
+
+  general internal_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Cai]; SN_varicosity_Argus2026_v01 [Cai]
+
+  general shell_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_varicosity_Argus2026_v01 -'
+known_issues:
+- 'undefined units: C_per_M'
+- port variable d not in variables_and_units
+expected_failures:
+  run_test: 'generation fails: Vm is ''dimensionless'' in the config/parameters but ''volt'' in the CellML; the port variable
+    d (used in i_rel) is not in variables_and_units (known issue); Ca_SR, g, i_up, i_rel, i_leak are exposed in the config
+    but have no interface in the CellML; and the global constants R and F are in units J_per_MK / C_per_M in cell_parameters.csv
+    and the Paci components, which are not defined anywhere (known issue), while the SN components declare the same globals
+    as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match with units of
+    J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere (CellML, config,
+    parameters) for R and F. Fixes: Vm -> volt, add d as a boundary_condition, public_interface=''out'' for the five variables,
+    unified R/F units. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: Vm is ''dimensionless'' in the config/parameters but ''volt'' in the CellML;
+    the port variable d (used in i_rel) is not in variables_and_units (known issue); Ca_SR, g, i_up, i_rel, i_leak are exposed
+    in the config but have no interface in the CellML; and the global constants R and F are in units J_per_MK / C_per_M in
+    cell_parameters.csv and the Paci components, which are not defined anywhere (known issue), while the SN components declare
+    the same globals as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match
+    with units of J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere
+    (CellML, config, parameters) for R and F. Fixes: Vm -> volt, add d as a boundary_condition, public_interface=''out'' for
+    the five variables, unified R/F units. With the proposed fixes applied to a copy of the library, all tests of this component
+    pass.'
+  verification_test_BC: 'generation fails: Vm is ''dimensionless'' in the config/parameters but ''volt'' in the CellML; the
+    port variable d (used in i_rel) is not in variables_and_units (known issue); Ca_SR, g, i_up, i_rel, i_leak are exposed
+    in the config but have no interface in the CellML; and the global constants R and F are in units J_per_MK / C_per_M in
+    cell_parameters.csv and the Paci components, which are not defined anywhere (known issue), while the SN components declare
+    the same globals as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match
+    with units of J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere
+    (CellML, config, parameters) for R and F. Fixes: Vm -> volt, add d as a boundary_condition, public_interface=''out'' for
+    the five variables, unified R/F units. With the proposed fixes applied to a copy of the library, all tests of this component
+    pass.'
+  verification_test_timestep: 'generation fails: Vm is ''dimensionless'' in the config/parameters but ''volt'' in the CellML;
+    the port variable d (used in i_rel) is not in variables_and_units (known issue); Ca_SR, g, i_up, i_rel, i_leak are exposed
+    in the config but have no interface in the CellML; and the global constants R and F are in units J_per_MK / C_per_M in
+    cell_parameters.csv and the Paci components, which are not defined anywhere (known issue), while the SN components declare
+    the same globals as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match
+    with units of J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere
+    (CellML, config, parameters) for R and F. Fixes: Vm -> volt, add d as a boundary_condition, public_interface=''out'' for
+    the five variables, unified R/F units. With the proposed fixes applied to a copy of the library, all tests of this component
+    pass.'
+  stability_test: 'generation fails: Vm is ''dimensionless'' in the config/parameters but ''volt'' in the CellML; the port
+    variable d (used in i_rel) is not in variables_and_units (known issue); Ca_SR, g, i_up, i_rel, i_leak are exposed in the
+    config but have no interface in the CellML; and the global constants R and F are in units J_per_MK / C_per_M in cell_parameters.csv
+    and the Paci components, which are not defined anywhere (known issue), while the SN components declare the same globals
+    as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match with units of
+    J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere (CellML, config,
+    parameters) for R and F. Fixes: Vm -> volt, add d as a boundary_condition, public_interface=''out'' for the five variables,
+    unified R/F units. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  a_rel:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      a_rel = 16.464'
+    sourced: 'yes'
+    value: 16.464
+  b_rel:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      b_rel = 0.25'
+    sourced: 'yes'
+    value: 0.25
+  c_rel:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      c_rel = 8.232'
+    sourced: 'yes'
+    value: 8.232
+  tau_g:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      tau_g = 0.002'
+    sourced: 'yes'
+    value: 0.002
+  Kup:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Kup = 0.00025'
+    sourced: 'yes'
+    value: 0.00025
+  Buf_C:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Buf_C = 0.25'
+    sourced: 'yes'
+    value: 0.25
+  Buf_SR:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Buf_SR = 10'
+    sourced: 'yes'
+    value: 10
+  Kbuf_C:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Kbuf_C = 0.001'
+    sourced: 'yes'
+    value: 0.001
+  Kbuf_SR:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Kbuf_SR = 0.3'
+    sourced: 'yes'
+    value: 0.3
+  VmaxUp:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      VmaxUp = 0.56064'
+    sourced: 'yes'
+    value: 0.56064
+  V_leak:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      V_leak = 0.00044444'
+    sourced: 'yes'
+    value: 0.00044444
+  Cai_init:
+    reference: 'Paci2013; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cai_init = 1.80774e-05'
+    sourced: 'yes'
+    value: 1.80773974140477e-05
+  Ca_SR_init:
+    reference: 'Paci2013; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Ca_SR_init = -0.273423 mM (NEGATIVE in the original CellML; see review question)'
+    sourced: 'yes'
+    value: -0.2734234751931
+  g_init:
+    reference: 'Paci2013; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): g_init = 1'
+    sourced: 'yes'
+    value: 0.999999981028517
+  Vm:
+    reference: 'Paci2013; resting (initial) Vm in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (clamp input here; declared dimensionless but used as volts)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  i_CaL:
+    reference: definitional; i_CaL is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_PCa:
+    reference: definitional; i_PCa is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_b_Ca:
+    reference: definitional; i_b_Ca is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_NaCa:
+    reference: definitional; i_NaCa is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  Vc:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Vc = 8800 um^3 (Paci 2013 cell; used by the Paci components of this module)'
+    sourced: 'yes'
+    value: 8800.0
+  V_SR:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      V_SR = 583.73 um^3 (Paci 2013 cell; used by the Paci components of this module)'
+    sourced: 'yes'
+    value: 583.73
+  F:
+    reference: CODATA2018; Faraday constant 96485.33212 C/mol, rounded to 96485 C/mol
+    sourced: 'yes'
+  Cm:
+    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Cm = 9.87109e-11 F (Paci 2013 cell; used by the Paci components of this module)'
+    sourced: 'yes'
+    value: 9.87109e-11
+  d:
+    reference: definitional; I_CaL d gate supplied by i_CaL_d_gate_Paci_2013 in a network; Paci2013 initial value 8.96088e-5
+      alone. Only applies once d is added to variables_and_units (proposed fix)
+    sourced: definitional
+    value: 8.96088425225182e-05
+review: reviews/cell_review.yaml
+review_scope: The review of the whole cardiomyocytes module (3 entries) before the move to versions; only the parts about
+  this version apply.

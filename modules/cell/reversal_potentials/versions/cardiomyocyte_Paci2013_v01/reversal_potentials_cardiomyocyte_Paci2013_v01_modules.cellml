@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="reversal_potentials_cardiomyocyte_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="electric_potentials_Paci_2013">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="E_Na" public_interface="out" units="volt"/>
+        <variable name="E_K" public_interface="out" units="volt"/>
+        <variable name="E_Ks" public_interface="out" units="volt"/>
+        <variable name="E_Ca" public_interface="out" units="volt"/>
+        <variable name="R" public_interface="in" units="J_per_MK"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="F" public_interface="in" units="C_per_M"/>
+        <variable name="Nai" public_interface="in" units="millimolar"/>
+        <variable name="Nao" public_interface="in" units="millimolar"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Cao" public_interface="in" units="millimolar"/>
+        <variable name="Ki" public_interface="in" units="millimolar"/>
+        <variable name="Ko" public_interface="in" units="millimolar"/>
+        <variable name="PkNa" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>E_Na</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Nao</ci>
+                            <ci>Nai</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>E_K</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Ko</ci>
+                            <ci>Ki</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>E_Ks</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Ko</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>PkNa</ci>
+                                    <ci>Nao</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>Ki</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>PkNa</ci>
+                                    <ci>Nai</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>E_Ca</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">0.5</cn>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Cao</ci>
+                            <ci>Cai</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

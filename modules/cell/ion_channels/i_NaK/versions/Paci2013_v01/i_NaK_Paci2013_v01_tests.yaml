@@ -3,7 +3,32 @@ version: Paci2013_v01
 reviewed: false
 notes: 'Paci 2013 hiPSC-CM (ventricular-like) Na/K pump I_NaK = PNaK Ko/(Ko+Km_K) Nai/(Nai+Km_Na)/(1 + 0.1245 e^{-0.1VmF/RT}
   + 0.0353 e^{-VmF/RT}); E_Na is declared as an input but unused. Algebraic: all gates, concentrations and the membrane potential
-  are inputs, so alone it is a pure function of its inputs, checked exactly against the original model equations.'
+  are inputs, so alone it is a pure function of its inputs, checked exactly against the original model equations.
+
+
+  Ports of the versions of i_NaK (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance NaK_current: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [i_NaK]
+
+  entrance Na_Nernst_potential: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [E_Na]
+
+  entrance internal_Na: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [Nai]
+
+  entrance membrane_voltage: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [Vm]
+
+  exit NaK_current: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [i_NaK]
+
+  general K_flux: Argus2026_v01 [j_NaK_K]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general Na_flux: Argus2026_v01 [j_NaK_Na]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general internal_Na: Argus2026_v01 [Nai]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general membrane_area: Argus2026_v01 [A_mem]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general membrane_current: Argus2026_v01 [i_NaK]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general membrane_voltage: Argus2026_v01 [V]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -'
 known_issues:
 - 'undefined units: C_per_M'
 - 'undefined units: J_per_MK'

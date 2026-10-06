@@ -250,7 +250,7 @@
  {"name": "feedback_ACAR", "module_type": "flow_observer_terminal", "module_subtype": "nn", "inp_instances": ["anterior_cerebral_R46"], "out_instances": ["callosomarginal_cingular_branch_T105_R250_T", "callosomarginal_intermediomedial_frontal_branch_T106_R242_T", "callosomarginal_paracentral_branch_T107_R254_T", "callosomarginal_posteromedial_frontal_branch_T108_R246_T", "distal_medial_striate_T109_R236_T", "pericallosal_parieto_occipital_branch_T124_R226_T", "pericallosal_precuneal_branch_T125_R230_T"]},
  {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "instance": "default", "inp_instances": ["puv"], "out_instances": ["pvn"]},
  {"name": "pvn", "module_type": "arterial_simple", "module_subtype": "vp", "instance": "default", "inp_instances": ["par"], "out_instances": ["la"]},
- {"name": "heart_clock", "module_type": "cardiac_clock", "module_subtype": "nn", "instance": "default", "inp_instances": [], "out_instances": ["ra", "rv", "la", "lv"]},
+ {"name": "heart_clock", "module_type": "cardiac_clock", "module_subtype": "Liang2009_v01", "instance": "default", "inp_instances": [], "out_instances": ["ra", "rv", "la", "lv"]},
  {"name": "ra", "module_type": "chamber", "module_subtype": "vv", "instance": "default", "inp_instances": ["ra_inflow", "heart_clock"], "out_instances": ["trv"]},
  {"name": "rv", "module_type": "chamber", "module_subtype": "vv", "instance": "default", "inp_instances": ["trv", "heart_clock"], "out_instances": ["puv"]},
  {"name": "la", "module_type": "chamber", "module_subtype": "vv", "instance": "default", "inp_instances": ["pvn", "heart_clock"], "out_instances": ["miv"]},

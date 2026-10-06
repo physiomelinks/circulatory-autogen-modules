@@ -9,9 +9,9 @@
   "outputs": ["u", "u_d", "v", "u_C", "u_C_d", "q_C", "q_C_d", "q_0", "q", "R", "C"],
   "harness": {
     "vessel_array": [
-      ["vin", "nn_constant_flow_port", "inlet_flow", "", "mod", "default"],
+      ["vin", "constant_flow_port", "inlet_flow", "", "mod", "default"],
       ["mod", "vv_micro", "artery_MinNout", "vin", "vout", "default"],
-      ["vout", "nn_constant_flow_port", "outlet_flow", "mod", "", "default"]
+      ["vout", "constant_flow_port", "outlet_flow", "mod", "", "default"]
     ],
     "parameters": [
       [

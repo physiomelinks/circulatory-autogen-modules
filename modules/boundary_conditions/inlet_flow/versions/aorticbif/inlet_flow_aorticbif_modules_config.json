@@ -1,0 +1,42 @@
+[
+  {
+    "module_type": "inlet_flow",
+    "module_subtype": "aorticbif",
+    "module_format": "cellml",
+    "component_file": "inlet_flow_aorticbif_modules.cellml",
+    "component_type": "aorticbif_flow_BC_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "P"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ],
+      [
+        "P",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

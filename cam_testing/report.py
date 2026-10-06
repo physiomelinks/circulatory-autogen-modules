@@ -866,7 +866,7 @@ def build_module(name):
 def build_index(contexts, out_path, href):
     '''The site index: module_types grouped by category (a module_type directly under modules/ and the
     ones nested in it form their own group), each with links to its versions. A nested module_type
-    is listed by its path in the group, e.g. neuron/soma/SN_membrane_soma under cell.'''
+    is listed by its path in the group, e.g. neuron/soma under cell.'''
     groups = {}
     for c in contexts:
         groups.setdefault(c['group'], []).append(c)

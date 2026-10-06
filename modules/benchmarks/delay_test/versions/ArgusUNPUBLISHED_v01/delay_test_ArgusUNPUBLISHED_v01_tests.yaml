@@ -1,0 +1,10 @@
+module_type: delay_test
+version: ArgusUNPUBLISHED_v01
+reviewed: true
+notes: 'Test fixture for libcuflynx''s delayed-variable feature (delay_info in the module config): dV/dt = sin(10t) + sin(t)
+  + 10 − k_e V, and V_delay(t) = V(t − delay).'
+expected_failures:
+  verification_test_invariants: libcuflynx applies delay_info only in the C++ generator (model_type cpp); CellML and Python
+    models silently use V_delay = V, so the delay is missing
+  verification_test_BC: libcuflynx applies delay_info only in the C++ generator (model_type cpp); CellML and Python models
+    silently use V_delay = V, so the delay is missing

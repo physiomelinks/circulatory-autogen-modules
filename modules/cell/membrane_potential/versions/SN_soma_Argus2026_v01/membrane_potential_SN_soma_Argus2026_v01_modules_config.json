@@ -1,0 +1,166 @@
+[
+  {
+    "module_type": "membrane_potential",
+    "module_subtype": "SN_soma_Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "membrane_potential_SN_soma_Argus2026_v01_modules.cellml",
+    "component_type": "SN_membrane_soma",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "i_stim",
+        "variables": [
+          "I_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "VI_port",
+        "variables": [
+          "V",
+          "I_out"
+        ]
+      }
+    ],
+    "general_ports": [
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_ion"
+        ],
+        "multi_port": "sum"
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "compartment_volume",
+        "variables": [
+          "Vol"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "shell_membrane_area",
+        "variables": [
+          "A_mem"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "variables_and_units": [
+      [
+        "C_sensed",
+        "picoF",
+        "access",
+        "constant"
+      ],
+      [
+        "Cm",
+        "picoF",
+        "access",
+        "variable"
+      ],
+      [
+        "c_m",
+        "uF_per_cm2",
+        "access",
+        "constant"
+      ],
+      [
+        "d",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "Vol",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "I_in",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "I_in_delayed",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "I_out",
+        "nanoA",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "R_diffSensed",
+        "megaOhm",
+        "access",
+        "constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_sensed",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "i_ion",
+        "nanoA",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

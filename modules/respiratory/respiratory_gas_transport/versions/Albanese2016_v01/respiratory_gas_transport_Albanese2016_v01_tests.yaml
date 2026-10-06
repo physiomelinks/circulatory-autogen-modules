@@ -1,0 +1,57 @@
+module_type: respiratory_gas_transport
+version: Albanese2016_v01
+reviewed: false
+notes: 'Dead-space and alveolar gas fractions (Albanese 2016 eqs A-61..A-64 form): upwinded convective exchange driven by
+  the lung airflows (v_ml at the mouth, v_bA into the alveoli) and removal of the gas taken up by the blood (K_LOSSES x M
+  from pulmonary_GE); alveolar partial pressures P = F (P_atm - P_ws). Harness: the pulmonary_GE network above with this component
+  as mod and the simple_lung_bg lung supplying v_ml, v_bA, q_D, q_A.'
+reference_proposals:
+  P_atm:
+    reference: Albanese2014; P_atm = 760 mmHg (Table 2-6) = 101325 Pa; library 101300 Pa (0.02% low)
+    sourced: 'yes'
+  P_ws:
+    reference: Albanese2014; P_ws = 47 mmHg at 37 C (Table 2-6); 47 x 133.322 = 6266.1 Pa
+    sourced: 'yes'
+  F_O2_i:
+    reference: Albanese2014; F_IO2 = 21.0379% (Table 2-6); library 0.21
+    sourced: 'yes'
+  F_CO2_i:
+    reference: Albanese2014; F_ICO2 = 0.0421% (Table 2-6)
+    sourced: 'yes'
+  K_LOSSES:
+    reference: 'unreferenced_placeholder; Albanese2014 Table 2-6 uses K = 1.2103 (BTPS/STPD factor: (310/273)(760/(760-47))
+      = 1.2104); library sets 1 without a stated reason'
+    sourced: 'no'
+  F_CO2_D_init:
+    reference: unreferenced_placeholder; initial condition
+    sourced: 'no'
+  F_O2_D_init:
+    reference: unreferenced_placeholder; initial condition
+    sourced: 'no'
+  F_CO2_A_init:
+    reference: unreferenced_placeholder; initial condition
+    sourced: 'no'
+  F_O2_A_init:
+    reference: unreferenced_placeholder; initial condition
+    sourced: 'no'
+  v_ml:
+    reference: unreferenced_placeholder; supplied by the lung module through lung_flow_and_volume_port; value only fills the
+      TODO for standalone use
+    sourced: 'no'
+    value: 0.0
+  v_bA:
+    reference: unreferenced_placeholder; supplied by the lung module; value only fills the TODO
+    sourced: 'no'
+    value: 0.0
+  q_D:
+    reference: Albanese2014; standalone value = larynx+trachea+bronchi unstressed volumes 34.4+6.63+18.7 ml (Table 2-5) ~
+      60 ml; supplied by the lung in use
+    sourced: 'yes'
+    value: 6.0e-05
+  q_A:
+    reference: Albanese2014; standalone value = FRC 2.4 L (Table 2-5) minus dead space; supplied by the lung in use
+    sourced: 'yes'
+    value: 0.0023
+review: reviews/gas_exchange_review.yaml
+review_scope: The review of the whole gas_exchange module (7 entries) before the move to versions; only the parts about this
+  version apply.

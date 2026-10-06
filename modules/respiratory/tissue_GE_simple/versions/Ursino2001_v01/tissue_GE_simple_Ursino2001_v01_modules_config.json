@@ -1,0 +1,105 @@
+[
+  {
+    "module_type": "tissue_GE_simple",
+    "module_subtype": "Ursino2001_v01",
+    "module_format": "cellml",
+    "component_file": "tissue_GE_simple_Ursino2001_v01_modules.cellml",
+    "component_type": "tissue_GE_simple_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "gas_port",
+        "variables": [
+          "C_CO2_a",
+          "C_O2_a"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "gas_port",
+        "variables": [
+          "C_CO2_p",
+          "C_O2_p"
+        ]
+      },
+      {
+        "port_type": "O2_port",
+        "variables": [
+          "C_O2_p"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "C_CO2_p",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "C_O2_p",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "C_CO2_a",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_O2_a",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "C_CO2_p_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C_O2_p_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "M_CO2",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "M_O2",
+        "m3_per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

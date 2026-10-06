@@ -8,7 +8,7 @@
   "outputs": [],
   "harness": {
     "vessel_array": [
-      ["p_in", "nn_constant", "inlet_pressure", "", "ves", "default"],
+      ["p_in", "constant", "inlet_pressure", "", "ves", "default"],
       ["ves", "pv", "arterial_simple", "p_in", "mod", "default"],
       ["mod", "pv", "FV1D_vessel", "ves", "", "default"]
     ],

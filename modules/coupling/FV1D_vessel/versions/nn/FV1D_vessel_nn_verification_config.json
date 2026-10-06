@@ -9,9 +9,9 @@
   "harness": {
     "vessel_array": [
       ["mod", "nn", "FV1D_vessel", "", "", "default"],
-      ["p_in", "nn_constant", "inlet_pressure", "", "ves", "default"],
+      ["p_in", "constant", "inlet_pressure", "", "ves", "default"],
       ["ves", "pv", "arterial_simple", "p_in", "f_out", "default"],
-      ["f_out", "nn_constant", "outlet_flow", "ves", "", "default"]
+      ["f_out", "constant", "outlet_flow", "ves", "", "default"]
     ],
     "parameters": [
       ["P_p_in", "J_per_m3", 12399.0, "library default (module parameters)"],

@@ -631,9 +631,9 @@ def test_module_type_names_listed():
 MISSING_SOURCE_FIGURES = {
     'capillary/pp_micro::default', 'heart/vp::default', 'heart/vp_Ca::default',
     'heart/vp_new_valve::default', 'heart/vp_wCont::default', 'heart/vp_wCont_nonstiff::default',
-    'inlet_flow/nn_adan::boileau2015_adan56_inflow', 'inlet_flow/nn_adan_2::boileau2015_adan56_inflow',
-    'inlet_flow/nn_aorticbif::boileau2015_ibif_inflow', 'Lotka_Volterra/nn::carpenter2018',
-    'Lotka_Volterra/nn::hudson_bay_lynx_hare', 'pulmonary_GE/nn::pulmonary_GE_normal_blood_gases',
+    'inlet_flow/adan::boileau2015_adan56_inflow', 'inlet_flow/adan_2::boileau2015_adan56_inflow',
+    'inlet_flow/aorticbif::boileau2015_ibif_inflow', 'Lotka_Volterra/Lotka1925_v01::carpenter2018',
+    'Lotka_Volterra/Lotka1925_v01::hudson_bay_lynx_hare', 'pulmonary_GE/Albanese2016_v01::pulmonary_GE_normal_blood_gases',
 }
 
 

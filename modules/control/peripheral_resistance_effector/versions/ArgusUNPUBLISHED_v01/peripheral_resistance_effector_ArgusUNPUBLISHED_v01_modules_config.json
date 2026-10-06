@@ -1,0 +1,68 @@
+[
+  {
+    "module_type": "peripheral_resistance_effector",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "peripheral_resistance_effector_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "peripheral_resistance_effector_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "sympathetic_efferent_peripheral_freq",
+        "variables": [
+          "f_esp"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "resistance_delta_port",
+        "variables": [
+          "Delta_Rsp"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Delta_Rsp",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_Rsp",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "sigma_Rsp",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "f_esp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_es_min",
+        "per_s",
+        "access",
+        "global_constant"
+      ],
+      [
+        "G_Rsp",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

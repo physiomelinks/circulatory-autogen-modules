@@ -1,0 +1,104 @@
+[
+  {
+    "module_type": "PNDMV",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "PNDMV_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "PNDMV_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "DMV_freq",
+        "variables": [
+          "f_DMV"
+        ]
+      },
+      {
+        "port_type": "LCN_freq",
+        "variables": [
+          "f_LCN"
+        ]
+      },
+      {
+        "port_type": "NActr_freq",
+        "variables": [
+          "f_NActr"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vagal_efferent_filt_firing_rate_port",
+        "variables": [
+          "f_PNDMV_filt"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_PNDMV",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_PNDMV_filt",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_DMV",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_LCN",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_NActr",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_min_PNDMV",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_PNDMV",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_PNDMV",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "k_PNDMV",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_PNDMV",
+        "second",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

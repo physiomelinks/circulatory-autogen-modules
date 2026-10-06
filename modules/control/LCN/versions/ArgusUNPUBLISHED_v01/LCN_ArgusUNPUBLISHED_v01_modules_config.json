@@ -1,0 +1,152 @@
+[
+  {
+    "module_type": "LCN",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "LCN_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "LCN_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "NActr_freq",
+        "variables": [
+          "f_NActr"
+        ]
+      },
+      {
+        "port_type": "DMV_freq",
+        "variables": [
+          "f_DMV"
+        ]
+      },
+      {
+        "port_type": "baroreceptor_firing_rate_port",
+        "variables": [
+          "f_br"
+        ]
+      },
+      {
+        "port_type": "sympathetic_efferent_heart_freq",
+        "variables": [
+          "f_esh"
+        ]
+      },
+      {
+        "port_type": "cardiopulmonary_firing_rate_port",
+        "variables": [
+          "f_cp"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "LCN_freq",
+        "variables": [
+          "f_LCN"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_LCN",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_input_LCN_sum",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_input_LCN",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NActr",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_DMV",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_esh",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_br",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_cp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_min_LCN",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_LCN",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_LCN",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "k_evEmax_gainLCN",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_br_gainLCN",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_esh_gainLCN",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_cp_gainLCN",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_LCN",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "module_type": "chemoreceptor",
+  "version": "Ursino2000_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": [
+    "S_O2_a",
+    "X_O2",
+    "phi_stat",
+    "phi_CO2_dyn",
+    "f_c_stat",
+    "f_c_dyn",
+    "f_apc",
+    "phi_apc",
+    "P_O2_a",
+    "C_O2_a_diss"
+  ],
+  "invariants": [
+    {
+      "description": "phi_CO2_dyn matches its exact solution dot_C_CO2_a tau_CO2_cc_dyn (1 - exp(-t/tau_cap))",
+      "expr": "np.max(np.abs(phi_CO2_dyn - dot_C_CO2_a*tau_CO2_cc_dyn*(1 - np.exp(-t/tau_cap)))) <= 1e-4*max(1e-6, abs(dot_C_CO2_a*tau_CO2_cc_dyn))"
+    },
+    {
+      "description": "f_c_dyn = K_dyn (1 - exp(-phi_CO2_dyn/K_dyn)) (algebraic)",
+      "expr": "np.max(np.abs(f_c_dyn - K_dyn*(1 - np.exp(-phi_CO2_dyn/K_dyn)))) <= 1e-8*max(1.0, K_dyn)"
+    },
+    {
+      "description": "X_O2 = AA (1 - S_O2_a) + BB (algebraic)",
+      "expr": "np.max(np.abs(X_O2 - (AA*(1 - S_O2_a) + BB))) <= 1e-8*max(1.0, abs(AA) + abs(BB))"
+    },
+    {
+      "description": "phi_stat and f_c_stat follow the static O2-CO2 interaction law (zero below C_CO2_a_nom)",
+      "expr": "np.max(np.abs(f_c_stat - np.where(C_CO2_a >= C_CO2_a_nom, K_stat*(1 - np.exp(-(K_CO2*(C_CO2_a - C_CO2_a_nom)*K_O2*(1 - np.exp(-X_O2/K_O2)))/K_stat)), 0.0))) <= 1e-8*max(1.0, K_stat)"
+    },
+    {
+      "description": "with dC_CO2/dt = 0, phi_apc matches the exact solution f_c_stat (1 - exp(-t/tau_cap))",
+      "expr": "(dot_C_CO2_a != 0) or (np.max(np.abs(phi_apc - f_c_stat*(1 - np.exp(-t/tau_cap)))) <= 1e-4*max(1e-6, np.max(np.abs(f_c_stat))))"
+    },
+    {
+      "description": "f_apc = max(phi_apc, 0)",
+      "expr": "np.max(np.abs(f_apc - np.maximum(phi_apc, 0))) <= 1e-12 + 1e-9*np.max(np.abs(phi_apc))"
+    },
+    {
+      "description": "S_O2_a lies in [0, 1] and P_O2_a is positive at the physiological run point",
+      "expr": "(np.min(S_O2_a) >= 0) & (np.max(S_O2_a) <= 1) & (np.min(P_O2_a) > 0)",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "C_O2_a": {"min": 0.1, "max": 0.204, "points": 6},
+      "C_CO2_a": {"min": 0.3, "max": 0.6, "points": 7},
+      "dot_C_CO2_a": {"min": -0.002, "max": 0.002, "points": 5},
+      "saturation_cap": {"min": 0.99, "max": 0.99999, "points": 3}
+    },
+    "rationale": "C_O2_a 0.10-0.204 ml/ml spans severe hypoxaemia (PaO2 ~ 25 mmHg) to full saturation just below the capping level C_O2_sat*saturation_cap; C_CO2_a 0.30-0.60 ml/ml spans hypocapnia to marked hypercapnia around the normal 0.485; dC_CO2/dt +-0.002 /s (a 0.1 ml/ml change over ~50 s, a fast hypercapnic step); saturation_cap is a numerical guard (<1). Other constants 0.5-2x nominal."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 20.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "Candidate: steady-state carotid-body firing vs PaO2 at several PaCO2 levels (the data MagossoUrsino2001 fitted the O2-CO2 interaction to). Requires the paper/figure (paywalled); not set up."
+      },
+      "calibrate": {"note": "pending: same data would identify AA, BB, K_O2, K_stat"}
+    }
+  }
+}

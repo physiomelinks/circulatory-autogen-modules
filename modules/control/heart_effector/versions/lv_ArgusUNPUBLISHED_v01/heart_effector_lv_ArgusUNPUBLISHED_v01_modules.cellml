@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="heart_effector_lv_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="heart_effector_Gee2023__heart_effector_Gee2023_nn_lv">
+        <variable name="sigma_Es" public_interface="out" units="J_per_m6"/>
+        <variable name="G_Es" public_interface="in" units="J_per_m6"/>
+        <variable name="f_esh" public_interface="in" units="Hz"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="f_es_min" public_interface="in" units="Hz"/>
+        <!-- unit consistancy for ln-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>sigma_Es</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>G_Es</ci>
+                            <apply>
+                                <ln/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="second">1</cn>
+                                    <apply>
+                                        <plus/>
+                                        <apply>
+                                            <minus/>
+                                            <ci>f_esh</ci>
+                                            <ci>f_es_min</ci>
+                                        </apply>
+                                        <cn cellml:units="Hz">1</cn>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <geq/>
+                            <ci>f_esh</ci>
+                            <ci>f_es_min</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="J_per_m6">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <!--s.56-->
+        <variable initial_value="0.0" name="Delta_Es" public_interface="out" units="J_per_m6"/>
+        <variable name="tau_Es" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Delta_Es</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>tau_Es</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>Delta_Es</ci>
+                        </apply>
+                        <ci>sigma_Es</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!-- TODO I think it would be better if we changed the control so that it uses a sigmoid rather than a ln, so
+ that the maximum control can be set. G_Es is now the maximum fraction of increase in E_lv that can occur.-->
+        <!-- ode(sigma_Es, t)         = (max(f_esh-f_esh_min, 0{per_s})-sigma_Es)/tau_Es;
+Delta_Es                 = G_Es*sigma_Es/(f_esh_min+sigma_Es);-->
+        <!-- Emaxlv_vag&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+        <!-- s.57-->
+        <variable name="sigma_Ev" public_interface="out" units="J_per_m6"/>
+        <variable name="G_Ev" public_interface="in" units="Js_per_m6"/>
+        <variable name="f_PNDMV_filt" public_interface="in" units="Hz"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>sigma_Ev</ci>
+                <apply>
+                    <times/>
+                    <ci>G_Ev</ci>
+                    <ci>f_PNDMV_filt</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- s. 58-->
+        <variable initial_value="0.0" name="Delta_Ev" public_interface="out" units="J_per_m6"/>
+        <variable name="tau_Ev" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Delta_Ev</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>tau_Ev</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>Delta_Ev</ci>
+                        </apply>
+                        <ci>sigma_Ev</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <variable name="Delta_Emax" public_interface="out" units="J_per_m6"/>
+        <variable name="scale" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Delta_Emax</ci>
+                <apply>
+                    <times/>
+                    <ci>scale</ci>
+                    <apply>
+                        <plus/>
+                        <ci>Delta_Es</ci>
+                        <ci>Delta_Ev</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

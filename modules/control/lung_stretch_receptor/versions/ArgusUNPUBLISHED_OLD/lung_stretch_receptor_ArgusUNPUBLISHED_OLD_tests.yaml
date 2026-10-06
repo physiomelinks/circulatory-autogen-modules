@@ -1,0 +1,41 @@
+module_type: lung_stretch_receptor
+version: ArgusUNPUBLISHED_OLD
+reviewed: false
+notes: 'Older variant of the lung stretch receptor: the input is the lung volume V_lung = q_A + q_b above a threshold, tau_lung
+  df_ls/dt = -f_ls + G_al max(V_lung - V_lung_stretch_thresh, 0). All parameters were TODO; proposed values (Gee 2023 conversions
+  and typical lung volumes) let it be tested. Exact solution f_ls = G_al max(q_A + q_b - V_thr, 0)(1 - exp(-t/tau_lung)).
+
+
+  Ports of the versions of lung_stretch_receptor (the same port types):
+
+  entrance volume_stretch_port: ArgusUNPUBLISHED_OLD [q_A, q_b]; ArgusUNPUBLISHED_v01 [q_str]
+
+  exit lung_stretch_firing_rate_port: ArgusUNPUBLISHED_OLD [f_ls]; ArgusUNPUBLISHED_v01 [f_ls]'
+reference_proposals:
+  tau_lung:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 1/(2s+1): 2 s'
+    sourced: 'yes'
+    value: 2.0
+  G_al:
+    reference: Gee2023; Supplementary text (github v03 Model_documentation) Table S.8, 23.29 Hz/L converted to 2.329e4 Hz/m3
+      (volume in litres in the source model)
+    sourced: 'yes'
+    value: 23290.0
+  q_A:
+    reference: unreferenced_placeholder; ~FRC-level alveolar volume 2.5 L as a test operating point (normally supplied by
+      the lung model)
+    sourced: 'no'
+    value: 0.0025
+  q_b:
+    reference: unreferenced_placeholder; ~150 mL anatomical dead space as a test operating point (normally supplied by the
+      lung model)
+    sourced: 'no'
+    value: 0.00015
+  V_lung_stretch_thresh:
+    reference: Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 lung volume reference V_ln = 2.54
+      L (stretch is measured above it) converted to 2.54e-3 m3; its use as a threshold here is the module author's choice
+    sourced: 'no'
+    value: 0.00254
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.

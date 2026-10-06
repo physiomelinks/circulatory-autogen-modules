@@ -1,0 +1,20 @@
+module_type: inlet_flow
+version: aorticbif
+reviewed: false
+notes: 'Prescribed periodic inflow: 22-harmonic sine series with mean 7.9853e-6 m3/s. It reproduces the Boileau2015 iliac-bifurcation
+  (aortic bifurcation) benchmark inflow to round-off (max difference 1e-20 m3/s) when T = 1.1 s, the benchmark period; with
+  the module global T = 1 s it is time-compressed (max difference 2.6e-5 m3/s, 30 % of peak). The run point therefore uses
+  T = 1.1 s. No states.'
+reference_proposals:
+  P:
+    reference: unreferenced_placeholder; P is the pressure returned by the downstream vessel through the vessel port and does
+      not enter the flow equation; 13332 Pa (100 mmHg) only lets the component run alone
+    sourced: 'no'
+    value: 13332
+  T:
+    reference: Boileau2015; ADAN56 benchmark cardiac period 1.0 s (inflow data span 0-1 s). NB the aortic-bifurcation inflow
+      (nn_aorticbif) needs T = 1.1 s, the Boileau2015 iliac-bifurcation period, but T is one module-wide global
+    sourced: 'yes'
+review: reviews/open_loop_review.yaml
+review_scope: The review of the whole open_loop module (5 entries) before the move to versions; only the parts about this
+  version apply.

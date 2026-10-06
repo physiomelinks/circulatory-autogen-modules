@@ -1,0 +1,44 @@
+[
+  {
+    "module_type": "volume_sum",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "volume_sum_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "volume_sum",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ],
+        "multi_port": "sum"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q_sum"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_sum",
+        "m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

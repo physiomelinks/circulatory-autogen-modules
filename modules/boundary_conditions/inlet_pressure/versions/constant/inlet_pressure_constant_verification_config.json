@@ -1,0 +1,71 @@
+{
+  "module_type": "inlet_pressure",
+  "version": "constant",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-12},
+  "outputs": ["va/u", "va/v", "va/q"],
+  "harness": {
+    "vessel_array": [
+      ["mod", "constant", "inlet_pressure", "", "va", "default"],
+      ["va", "pv", "arterial_simple", "mod", "flow_out", "default"],
+      ["flow_out", "constant", "outlet_flow", "va", "", "default"]
+    ],
+    "parameters": [
+      ["v_flow_out", "m3_per_s", 0.0001, "harness test value (6 L/min)"],
+      ["R_va", "Js_per_m6", 10000000.0, "harness test value"],
+      ["C_va", "m6_per_J", 1e-08, "harness test value"],
+      ["I_va", "Js2_per_m6", 100000.0, "harness test value"],
+      ["q_0_va", "m3", 0, "harness: zero unstressed volume"],
+      ["u_0_va", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["u_ext_va", "J_per_m3", 0, "harness: zero external pressure"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "the vessels inflow reaches the constant outflow at steady state (v → 1e-4 m^3/s, 0.1%)",
+      "expr": "abs(va__v[-1] - 1e-4) <= 1e-7"
+    },
+    {
+      "description": "the vessel pressure settles at the imposed inlet pressure minus the resistive drop, u → P − R v = P − 1000 Pa (±1 Pa)",
+      "expr": "abs(va__u[-1] - (P - 1e7*1e-4)) <= 1.0"
+    },
+    {
+      "description": "vessel volume balance: q(t) − q(0) = ∫(v − v_out) dt with v_out = 1e-4 (trapezoidal, 0.1%)",
+      "expr": "np.max(np.abs((va__q - va__q[0]) - np.concatenate(([0.0], np.cumsum(0.5*(((va__v) - (1e-4))[1:] + ((va__v) - (1e-4))[:-1])*np.diff(t)))))) <= 1e-3*max(1e-12, np.max(np.abs(va__q - va__q[0])))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "P": {"min": 5000.0, "max": 16000.0, "points": 5}
+    },
+    "exclude": ["v"],
+    "rationale": "Inlet (arterial) pressures from about 40 to 120 mmHg (5000-16000 Pa). v is excluded: it is the flow the connected vessel supplies (a port input)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "prescribed boundary value (a constant pressure); verified against the analytic steady state of a test vessel."
+      },
+      "calibrate": {
+        "note": "not_applicable: prescribed boundary value (a constant pressure); verified against the analytic steady state of a test vessel."
+      }
+    }
+  }
+}

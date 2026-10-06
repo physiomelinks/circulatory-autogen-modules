@@ -2,8 +2,8 @@ module_type: Nout_junction
 version: pv_simple
 reviewed: false
 notes: 'pv lumped linear R-C-I vessel. Tested in a harness network (libcuflynx sums the flows at a Min/Nout node only when
-  real vessels are connected there): mod (Nout_junction pv_simple); bcin (inlet_pressure nn_constant); dn1 (arterial_simple
-  pv); bcout1 (outlet_flow nn_constant); dn2 (arterial_simple pv); bcout2 (outlet_flow nn_constant). Jacobian timescales (nominal:
+  real vessels are connected there): mod (Nout_junction pv_simple); bcin (inlet_pressure constant); dn1 (arterial_simple
+  pv); bcout1 (outlet_flow constant); dn2 (arterial_simple pv); bcout2 (outlet_flow constant). Jacobian timescales (nominal:
   fastest 0.00094 s, slowest decay 0.35 s; run: fastest 0.00094 s, slowest decay 0.35 s).'
 reference_proposals:
   u_in:

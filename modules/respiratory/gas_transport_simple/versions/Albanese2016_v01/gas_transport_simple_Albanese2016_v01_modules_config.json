@@ -1,0 +1,258 @@
+[
+  {
+    "module_type": "gas_transport_simple",
+    "module_subtype": "Albanese2016_v01",
+    "module_format": "cellml",
+    "component_file": "gas_transport_simple_Albanese2016_v01_modules.cellml",
+    "component_type": "gas_transport_simple_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "gas_port",
+        "variables": [
+          "C_CO2_in",
+          "C_O2_in"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "gas_port",
+        "variables": [
+          "C_CO2_out",
+          "C_O2_out"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "arterial_only_gas_port",
+        "variables": [
+          "C_CO2_out",
+          "C_O2_out"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "gas_and_C_CO2_deriv_port",
+        "variables": [
+          "C_O2_out",
+          "C_CO2_out",
+          "dot_C_CO2_out"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "partial_pressure_port",
+        "variables": [
+          "P_CO2_out",
+          "P_O2_out"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "C_CO2_in",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_O2_in",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_CO2_out",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "dot_C_CO2_out",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "C_O2_out",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "C_CO2_out_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C_O2_out_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C_CO2_out_capped",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "C_O2_out_capped",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "C_O2_out_extra_ub",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "overcap_solubility",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "saturation_cap",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "P_CO2_out",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "P_O2_out",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "d_1",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "d_2",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "r_1",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "r_2",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "s_1",
+        "J2_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "s_2",
+        "J2_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "k_1",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "k_2",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "h_1",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "h_2",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "alpha_1",
+        "m3_per_J",
+        "access",
+        "global_constant"
+      ],
+      [
+        "alpha_2",
+        "m3_per_J",
+        "access",
+        "global_constant"
+      ],
+      [
+        "beta_1",
+        "m3_per_J",
+        "access",
+        "global_constant"
+      ],
+      [
+        "beta_2",
+        "m3_per_J",
+        "access",
+        "global_constant"
+      ],
+      [
+        "C_O2_sat",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "C_CO2_sat",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ]
+    ]
+  }
+]

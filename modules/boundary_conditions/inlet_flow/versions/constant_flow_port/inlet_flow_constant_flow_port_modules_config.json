@@ -1,0 +1,36 @@
+[
+  {
+    "module_type": "inlet_flow",
+    "module_subtype": "constant_flow_port",
+    "module_format": "cellml",
+    "component_file": "inlet_flow_constant_flow_port_modules.cellml",
+    "component_type": "constant_flow_BC_type__inlet_flow_nn_constant_flow_port",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "P",
+        "J_per_m3",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

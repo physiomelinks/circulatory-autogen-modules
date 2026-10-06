@@ -10,8 +10,8 @@
     "submodules": [
       {
         "name": "membrane",
-        "module_type": "SN_varicosity_membrane",
-        "module_subtype": "nn",
+        "module_type": "membrane_potential",
+        "module_subtype": "SN_varicosity_Argus2026_v01",
         "instance": "default",
         "inp_instances": [],
         "out_instances": [
@@ -22,8 +22,8 @@
       },
       {
         "name": "Ca",
-        "module_type": "SN_Ca_handling_varicosity",
-        "module_subtype": "nn",
+        "module_type": "Ca_handling",
+        "module_subtype": "SN_varicosity_Argus2026_v01",
         "instance": "default",
         "inp_instances": [
           "membrane"
@@ -80,8 +80,8 @@
       },
       {
         "name": "NE",
-        "module_type": "SN_NE_release",
-        "module_subtype": "nn",
+        "module_type": "neurotransmitter_release",
+        "module_subtype": "SN_varicosity_Argus2026_v01",
         "instance": "default",
         "inp_instances": [
           "Ca"

@@ -1,0 +1,49 @@
+{
+  "module_type": "material_prop_const_ven",
+  "version": "Olufsen2000_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["K_tube"],
+  "invariants": [
+    {
+      "description": "venous (collapsible-tube) stiffness K_tube = E (h/r0)³ / (12 (1 − ν²)) (relative 1e-9)",
+      "expr": "np.max(np.abs((K_tube) - (E/(12*(1 - nu**2))*hr_ratio**3))) <= 1e-9*np.max(np.abs(E/(12*(1 - nu**2))*hr_ratio**3))"
+    },
+    {"description": "K_tube is positive", "expr": "np.all(K_tube > 0)"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "hr_ratio": [0.02, 0.1],
+      "E": {"min": 200000.0, "max": 10000000.0, "points": 4, "scale": "log"},
+      "nu": [0.3, 0.5]
+    },
+    "rationale": "Venous radii 0.8-8 mm (the Toro2022 venous network range, which the c0(r0) law requires: r0_min <= r0 <= r0_max), lengths 0.5-20 cm, h/r0 0.02-0.1, venous E 0.2-10 MPa (Petrova2025 initial to tangent moduli), K_M 1e3-1e5 Pa s, smooth-muscle fraction 0.04-0.2, venous tube-law exponents m 5-12, n -2..-1, c0 bounds 3-5 / 1-2 m/s and radius bounds 6-12 / 0.5-2 mm (r_0 = 5 mm stays inside)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 0.1,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: venous wave speeds vs radius (the Toro2022 / Muller2014 c0 range 1.5-4 m/s is a model choice, not data); no measured venous stiffness-radius dataset identified yet."
+      },
+      "calibrate": {
+        "note": "not_applicable: algebraic constitutive relation with no dynamics; calibrated in the network that uses it."
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "module_type": "efferent_heart_period_effector",
+  "version": "Ursino1998_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["Delta_Ts", "Delta_Tv", "Delta_T", "sigma_Ts", "sigma_Tv"],
+  "invariants": [
+    {
+      "description": "Delta_Ts = sigma_Ts (1 - exp(-t/tau_Ts)), sigma_Ts = G_Ts ln(f_s - f_es_min + 1) above threshold",
+      "expr": "np.max(np.abs(Delta_Ts - (G_Ts*np.log(f_s - f_es_min + 1) if f_s >= f_es_min else 0.0)*(1 - np.exp(-t/tau_Ts)))) <= 1e-5*max(1e-3, abs(G_Ts)*5)"
+    },
+    {
+      "description": "Delta_Tv = G_Tv f_v (1 - exp(-t/tau_Tv))",
+      "expr": "np.max(np.abs(Delta_Tv - G_Tv*f_v*(1 - np.exp(-t/tau_Tv)))) <= 1e-4*max(1e-3, abs(G_Tv*f_v))"
+    },
+    {
+      "description": "Delta_T = Delta_Ts + Delta_Tv",
+      "expr": "np.max(np.abs(Delta_T - (Delta_Ts + Delta_Tv))) <= 1e-12"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_s": {"min": 0.0, "max": 60.0, "points": 7},
+      "f_v": {"min": 0.0, "max": 15.0, "points": 5}
+    },
+    "rationale": "sympathetic from silent to f_es_max; vagal 0-15 spikes/s (Ursino range f_ev,0 3.2 to f_ev,inf 6.3 plus chemoreceptor contribution); gains/time constants 0.5-2x."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.04, 0.02, 0.01, 0.005],
+    "t_end": 20.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "Candidate: heart-period response to vagal/sympathetic stimulation (e.g. the VNS heart-rate data shipped with the Gee2023 BioModels entry, Rajendran 2019 pig data) - needs a network with a heart; not set up."
+      },
+      "calibrate": {"note": "pending: see baseline"}
+    }
+  }
+}

@@ -1,0 +1,578 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="chemoreceptor_Ursino2000_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="chemoreceptor_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!--inp variables-->
+        <variable name="C_CO2_a" public_interface="in" units="dimensionless"/>
+        <variable name="C_O2_a" public_interface="in" units="dimensionless"/>
+        <variable name="dot_C_CO2_a" public_interface="in" units="per_s"/>
+        <!--output variables-->
+        <variable name="X_O2" public_interface="out" units="dimensionless"/>
+        <variable name="phi_stat" public_interface="out" units="per_s"/>
+        <variable initial_value="0.0" name="phi_CO2_dyn" public_interface="out" units="per_s"/>
+        <variable name="f_c_stat" public_interface="out" units="per_s"/>
+        <variable name="f_c_dyn" public_interface="out" units="per_s"/>
+        <variable name="f_apc" public_interface="out" units="per_s"/>
+        <variable initial_value="0.0" name="phi_apc" public_interface="out" units="per_s"/>
+        <variable name="P_O2_a" public_interface="out" units="J_per_m3"/>
+        <!-- Constants-->
+        <variable name="AA" public_interface="in" units="dimensionless"/>
+        <variable name="BB" public_interface="in" units="dimensionless"/>
+        <variable name="C_CO2_a_nom" public_interface="in" units="dimensionless"/>
+        <variable name="K_O2" public_interface="in" units="dimensionless"/>
+        <variable name="K_CO2" public_interface="in" units="per_s"/>
+        <variable name="K_stat" public_interface="in" units="per_s"/>
+        <variable name="K_dyn" public_interface="in" units="per_s"/>
+        <variable name="tau_cap" public_interface="in" units="second"/>
+        <variable name="tau_CO2_cc_dyn" public_interface="in" units="dimensionless"/>
+        <!-- equations-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>X_O2</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>AA</ci>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <ci>S_O2_a</ci>
+                        </apply>
+                    </apply>
+                    <ci>BB</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_stat</ci>
+                <apply>
+                    <times/>
+                    <ci>K_CO2</ci>
+                    <apply>
+                        <minus/>
+                        <ci>C_CO2_a</ci>
+                        <ci>C_CO2_a_nom</ci>
+                    </apply>
+                    <ci>K_O2</ci>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>X_O2</ci>
+                                </apply>
+                                <ci>K_O2</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_c_stat</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>K_stat</ci>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">1</cn>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <minus/>
+                                            <ci>phi_stat</ci>
+                                        </apply>
+                                        <ci>K_stat</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <geq/>
+                            <ci>C_CO2_a</ci>
+                            <ci>C_CO2_a_nom</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="per_s">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>phi_CO2_dyn</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>dot_C_CO2_a</ci>
+                            <ci>tau_CO2_cc_dyn</ci>
+                        </apply>
+                        <ci>phi_CO2_dyn</ci>
+                    </apply>
+                    <ci>tau_cap</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_c_dyn</ci>
+                <apply>
+                    <times/>
+                    <ci>K_dyn</ci>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>phi_CO2_dyn</ci>
+                                </apply>
+                                <ci>K_dyn</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>phi_apc</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>f_c_stat</ci>
+                            <ci>f_c_dyn</ci>
+                        </apply>
+                        <ci>phi_apc</ci>
+                    </apply>
+                    <ci>tau_cap</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_apc</ci>
+                <apply>
+                    <max/>
+                    <ci>phi_apc</ci>
+                    <cn cellml:units="per_s">0</cn>
+                </apply>
+            </apply>
+        </math>
+        <!--Calculate saturation-->
+        <variable name="C_O2_a_diss" public_interface="out" units="dimensionless"/>
+        <variable name="S_O2_a" public_interface="out" units="dimensionless"/>
+        <variable name="Hgb" public_interface="in" units="kg_per_m3"/>
+        <variable name="alpha_O2" public_interface="in" units="m3_per_J"/>
+        <!-- should be handled in parameter.csv  = 2.33e-7 (per_pascal)-->
+        <!-- from inverted dissociation-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>P_O2_a</ci>
+                <apply>
+                    <plus/>
+                    <ci>r_1</ci>
+                    <apply>
+                        <root/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <power/>
+                                <ci>r_1</ci>
+                                <cn cellml:units="dimensionless">2</cn>
+                            </apply>
+                            <ci>s_1</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>overcap_solubility</ci>
+                        <ci>C_O2_a_extra_ub</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <!-- P_CO2_a = d_2*(1{dimensionless}+alpha_2*P_O2_p)/(1{dimensionless}+beta_2*P_O2_p);
+ TODO I need to check this, it is different to the Ursino papers and to the gas exchange modules.-->
+            <apply>
+                <eq/>
+                <ci>C_O2_a_diss</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>P_O2_a</ci>
+                            <ci>alpha_O2</ci>
+                        </apply>
+                        <apply>
+                            <geq/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>C_O2_sat</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>Hgb</ci>
+                                        <cn cellml:units="m3_per_kg" type="e-notation">1.34<sep/>-3</cn>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>P_O2_a</ci>
+                                    <ci>alpha_O2</ci>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">0</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <apply>
+                            <minus/>
+                            <ci>C_O2_sat</ci>
+                            <apply>
+                                <times/>
+                                <ci>Hgb</ci>
+                                <cn cellml:units="m3_per_kg" type="e-notation">1.34<sep/>-3</cn>
+                            </apply>
+                        </apply>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>S_O2_a</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>C_O2_a</ci>
+                        <ci>C_O2_a_diss</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>Hgb</ci>
+                        <cn cellml:units="m3_per_kg" type="e-notation">1.34<sep/>-3</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!--____________ inverted dissociation curve below here___________-->
+        <variable name="k_1" public_interface="in" units="J_per_m3"/>
+        <variable name="k_2" public_interface="in" units="J_per_m3"/>
+        <variable name="h_1" public_interface="in" units="dimensionless"/>
+        <variable name="h_2" public_interface="in" units="dimensionless"/>
+        <variable name="d_1" public_interface="out" units="J_per_m3"/>
+        <variable name="d_2" public_interface="out" units="J_per_m3"/>
+        <variable name="r_1" public_interface="out" units="J_per_m3"/>
+        <variable name="r_2" public_interface="out" units="J_per_m3"/>
+        <variable name="s_1" public_interface="out" units="J2_per_m6"/>
+        <variable name="s_2" public_interface="out" units="J2_per_m6"/>
+        <variable name="alpha_1" public_interface="in" units="m3_per_J"/>
+        <variable name="alpha_2" public_interface="in" units="m3_per_J"/>
+        <variable name="beta_1" public_interface="in" units="m3_per_J"/>
+        <variable name="beta_2" public_interface="in" units="m3_per_J"/>
+        <variable name="C_O2_sat" public_interface="in" units="dimensionless"/>
+        <variable name="C_CO2_sat" public_interface="in" units="dimensionless"/>
+        <!-- including the below to avoid divide by zero problems. This probably isn't needed.-->
+        <variable name="C_O2_a_capped" public_interface="out" units="dimensionless"/>
+        <variable name="C_CO2_a_capped" public_interface="out" units="dimensionless"/>
+        <variable name="C_O2_a_extra_ub" public_interface="out" units="dimensionless"/>
+        <variable name="overcap_solubility" public_interface="in" units="J_per_m3"/>
+        <variable name="saturation_cap" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>C_O2_a_capped</ci>
+                <apply>
+                    <min/>
+                    <apply>
+                        <times/>
+                        <ci>C_O2_sat</ci>
+                        <ci>saturation_cap</ci>
+                    </apply>
+                    <ci>C_O2_a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>C_CO2_a_capped</ci>
+                <apply>
+                    <min/>
+                    <apply>
+                        <times/>
+                        <ci>C_CO2_sat</ci>
+                        <ci>saturation_cap</ci>
+                    </apply>
+                    <ci>C_CO2_a</ci>
+                </apply>
+            </apply>
+            <!-- This is the amount that is extra in the plasma due to capping the amount that can be saturated.-->
+            <apply>
+                <eq/>
+                <ci>C_O2_a_extra_ub</ci>
+                <apply>
+                    <max/>
+                    <apply>
+                        <minus/>
+                        <ci>C_O2_a</ci>
+                        <apply>
+                            <times/>
+                            <ci>C_O2_sat</ci>
+                            <ci>saturation_cap</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>d_1</ci>
+                <apply>
+                    <max/>
+                    <apply>
+                        <times/>
+                        <ci>k_1</ci>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_O2_a_capped</ci>
+                                <apply>
+                                    <minus/>
+                                    <ci>C_O2_sat</ci>
+                                    <ci>C_O2_a_capped</ci>
+                                </apply>
+                            </apply>
+                            <ci>h_1</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="J_per_m3">0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>d_2</ci>
+                <apply>
+                    <max/>
+                    <apply>
+                        <times/>
+                        <ci>k_2</ci>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_CO2_a_capped</ci>
+                                <apply>
+                                    <minus/>
+                                    <ci>C_CO2_sat</ci>
+                                    <ci>C_CO2_a_capped</ci>
+                                </apply>
+                            </apply>
+                            <ci>h_2</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="J_per_m3">0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_1</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">0.5</cn>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <plus/>
+                                    <cn cellml:units="dimensionless">1</cn>
+                                    <apply>
+                                        <times/>
+                                        <ci>beta_1</ci>
+                                        <ci>d_2</ci>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>beta_2</ci>
+                                    <ci>d_1</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>alpha_1</ci>
+                                <ci>alpha_2</ci>
+                                <ci>d_1</ci>
+                                <ci>d_2</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>beta_2</ci>
+                        <apply>
+                            <times/>
+                            <ci>alpha_2</ci>
+                            <ci>beta_1</ci>
+                            <ci>d_2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">0.5</cn>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <plus/>
+                                    <cn cellml:units="dimensionless">1</cn>
+                                    <apply>
+                                        <times/>
+                                        <ci>beta_2</ci>
+                                        <ci>d_1</ci>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>beta_1</ci>
+                                    <ci>d_2</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>alpha_2</ci>
+                                <ci>alpha_1</ci>
+                                <ci>d_2</ci>
+                                <ci>d_1</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>beta_1</ci>
+                        <apply>
+                            <times/>
+                            <ci>alpha_1</ci>
+                            <ci>beta_2</ci>
+                            <ci>d_1</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_1</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>d_1</ci>
+                            <apply>
+                                <times/>
+                                <ci>alpha_1</ci>
+                                <ci>d_1</ci>
+                                <ci>d_2</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>beta_2</ci>
+                        <apply>
+                            <times/>
+                            <ci>alpha_2</ci>
+                            <ci>beta_1</ci>
+                            <ci>d_2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>d_2</ci>
+                            <apply>
+                                <times/>
+                                <ci>alpha_2</ci>
+                                <ci>d_2</ci>
+                                <ci>d_1</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>beta_1</ci>
+                        <apply>
+                            <times/>
+                            <ci>alpha_1</ci>
+                            <ci>beta_2</ci>
+                            <ci>d_1</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

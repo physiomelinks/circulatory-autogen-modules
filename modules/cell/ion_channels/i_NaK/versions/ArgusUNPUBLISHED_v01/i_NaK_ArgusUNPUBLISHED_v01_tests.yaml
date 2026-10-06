@@ -1,0 +1,118 @@
+module_type: i_NaK
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Four-state bond-graph Na+/K+-ATPase cycle, a lumped form of the Post-Albers scheme like the Smith & Crampin (2004)
+  / Terkildsen et al. (2007) 4-state reduction. The reactions are R1: P1 + 2K_o <-> P2 + Pi; R2: P2 + ATP <-> P3 + 2K_i; R3:
+  P3 + 3Na_i <-> P4 + ADP (charge z_1); R4: P4 <-> P1 + 3Na_o (charge z_2 = -1 - z_1). Ions and metabolites are chemostats
+  (constant amounts); u_e = q_mem/C_m is held at -0.12 V (flag_0 = 0) or ramped at 1 mV/s (flag_0 = 1). The ion/metabolite
+  thermodynamic constants (K_Ki, K_Ke, K_Nai, K_Nae, K_ATP, K_ADP, K_Pi) and C_m = 153400 fF are hard-coded and match Pan
+  et al. (2020) Table 2. kappa_1 = kappa_3 = 1e4 fmol/s are hard-coded (fast steps), and v_NKE is an algebraic rapid-equilibrium
+  (kappa_1, kappa_3 -> infinity) steady-state flux. The fast steps (about 4e4 1/s) make the system stiff, (largest Jacobian
+  eigenvalue about -9.2e4 1/s at the nominal point, RK4 limit dt < 3e-5 s), so the RK4 convergence test uses dt <= 1e-5 s
+  over 5 ms.
+
+
+  Ports of the versions of i_NaK (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance NaK_current: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [i_NaK]
+
+  entrance Na_Nernst_potential: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [E_Na]
+
+  entrance internal_Na: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [Nai]
+
+  entrance membrane_voltage: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [Vm]
+
+  exit NaK_current: Argus2026_v01 -; ArgusUNPUBLISHED_v01 -; Paci2013_v01 [i_NaK]
+
+  general K_flux: Argus2026_v01 [j_NaK_K]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general Na_flux: Argus2026_v01 [j_NaK_Na]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general internal_Na: Argus2026_v01 [Nai]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general membrane_area: Argus2026_v01 [A_mem]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general membrane_current: Argus2026_v01 [i_NaK]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -
+
+  general membrane_voltage: Argus2026_v01 [V]; ArgusUNPUBLISHED_v01 -; Paci2013_v01 -'
+expected_failures:
+  verification_test_invariants: v_NKE (algebraic steady-state flux) uses exp(-F u_e/RT) in A_0 where the reaction scheme gives
+    exp(+F u_e/RT) (net charge z_1 + z_2 = -1 per cycle). At the nominal point v_NKE = 627.9 fmol/s, but the exact rapid-equilibrium
+    flux of the same scheme is 0.2758 fmol/s (and the ODE steady state is 0.00714 fmol/s with the finite kappa_1 = kappa_3
+    = 1e4). At u_e = 0 the two agree (0.99577). With the sign flipped in a patched copy the v_NKE invariant holds to 1e-6
+    (checked at the nominal point, and offline for u_e in {-0.2, -0.12, 0, 0.1} V and a second parameter set).
+reference_proposals:
+  K_1:
+    reference: 'unreferenced_placeholder; value 1 per fmol. The seeded source ''NKE_pump: Alfred_database'' could not be identified
+      or checked. The lumped 4-state constants would have to be derived from the 15-state bond graph of Pan2020 (Table 2)
+      by the Smith & Crampin (SmithCrampin2004) lumping'
+    sourced: 'no'
+  K_2:
+    reference: unreferenced_placeholder; value 1 per fmol, no source (see K_1)
+    sourced: 'no'
+  K_3:
+    reference: unreferenced_placeholder; value 1 per fmol, no source (see K_1)
+    sourced: 'no'
+  K_4:
+    reference: unreferenced_placeholder; value 1 per fmol, no source (see K_1)
+    sourced: 'no'
+  kappa_2:
+    reference: unreferenced_placeholder; value 1 fmol/s, no source. With kappa_1 = kappa_3 = 1e4 hard-coded the model is stiff
+      (eigenvalues to -9.2e4 1/s); a lumped rate from Pan2020 / Terkildsen2007 would replace it
+    sourced: 'no'
+  kappa_4:
+    reference: unreferenced_placeholder; value 1 fmol/s, no source (see kappa_2)
+    sourced: 'no'
+  flag_0:
+    reference: definitional; 0 holds u_e at q_mem_init/C_m = -0.12 V, 1 ramps it at 1 mV/s (dq_mem/dt = flag_0 1e-3 C_m)
+    sourced: definitional
+  z_1:
+    reference: unreferenced_placeholder; value 0.5 (so z_2 = -1.5), no source. Pan2020 Table 2 puts charge -0.0550 on R5 (binding
+      of the third intracellular Na+) and -0.9450 on R8 (extracellular Na+ release), which in this module (z_1 on Na_i binding,
+      z_2 = -1 - z_1 on Na_o release) suggests z_1 = -0.055
+    sourced: 'no'
+review:
+  comment: v_NKE/A_0 has the wrong sign on the voltage term (exp(-F u_e/RT) where the reaction scheme needs exp(+F u_e/RT)),
+    and u_equil has the same sign error, so both diagnostics are wrong whenever u_e != 0 (v_NKE = 628 fmol/s vs 0.28 exact
+    at -0.12 V). All eight parameters (K_1..K_4, kappa_2, kappa_4, z_1) are unsourced placeholders (1, 1, 1, 1, 1, 1, 0.5);
+    the seeded 'Alfred_database' reference could not be identified. u_e and the ion/metabolite amounts are hard-coded rather
+    than parameters. The hard-coded kappa_1 = kappa_3 = 1e4 make the model stiff (about 9e4 1/s) but not fast enough for the
+    rapid-equilibrium assumption behind v_NKE at the nominal point.
+  summary: 'Four-state bond-graph Na+/K+-ATPase cycle (R1: 2K_o in / Pi out; R2: ATP in / 2K_i out; R3: 3Na_i in / ADP out,
+    charge z_1; R4: 3Na_o out, charge z_2 = -1 - z_1). Ions and metabolites are chemostats. This is the 4-state lumping of
+    Smith & Crampin (2004) / Terkildsen et al. (2007) written as a bond graph. The hard-coded ion/metabolite constants and
+    C_m = 153400 fF match Pan et al. (2020) Table 2 exactly. I set up 6 invariants: total pump conserved, states >= 0, second
+    law (every reaction dissipates), the exact energy-balance identity P_ext - P_diss = sum u_i dq_i/dt, cycle steady state
+    v_1 = v_2 = v_3 = v_4 (3 Na out : 2 K in : 1 net charge per cycle), and v_NKE vs the exact rapid-equilibrium flux of the
+    same scheme. All hold across the sweep except the v_NKE check, which fails because of a sign bug (expected failure; the
+    fix is checked on a patched copy). The RK4 convergence test needs dt <= 1e-5 s because of the stiffness. The stability
+    matrix passes. Validation is pending (Nakao & Gadsby 1989 I-V data), because no parameter is sourced.'
+  questions:
+  - 'Which paper or database is this 4-state reduction and its K_1..K_4, kappa_2, kappa_4, z_1 from? I could not identify
+    the seeded "NKE_pump: Alfred_database" for K_1. The scheme matches the Smith & Crampin (2004) / Terkildsen (2007) 4-state
+    lumping, but Pan et al. (2020) only has the 15-state bond graph. All eight are proposed as unreferenced_placeholder.'
+  - 'z_1 = 0.5 (z_2 = -1.5): should it follow Pan et al. (2020) Table 2, where the charge on the third intracellular Na+ binding
+    step (R5) is -0.055 and on extracellular Na+ release (R8) is -0.945, i.e. z_1 = -0.055 in this module''s convention?'
+  - Approve the proposed fix to A_0 and u_equil (below)? v_NKE and u_equil are algebraic diagnostics and do not affect the
+    ODEs.
+  - The hard-coded amounts (q_Na_i = 1900 fmol = 50 mM in 38 pL; q_K_i = q_ADP = q_Pi = 0.038 fmol, about 1 uM; q_ATP = 380
+    fmol = 10 mM) look like a K_i-free, product-free experimental protocol, not physiological conditions. Is that intended?
+    Should u_e (q_mem_init) and the ion/metabolite amounts become parameters so they can be swept and validated?
+  - Use the Nakao & Gadsby (1989) pump I-V curves (the data Terkildsen 2007 and Pan 2020 fitted) as the validation baseline
+    once real parameters exist? It needs I_pump = F v_4 and u_e as an input.
+  proposed_fixes:
+  - 'A_0: replace exp(-F u_e/RT) with exp(+F u_e/RT). The overall cycle carries net charge z_1 + z_2 = -1, so the forward/reverse
+    ratio of the rate laws gives (Q_ATP Q_Ko^2 Q_Nai^3)/(Q_ADP Q_Pi Q_Ki^2 Q_Nao^3) exp(+F u_e/RT). Evidence: in a patched
+    copy the invariant "v_NKE = exact rapid-equilibrium flux" holds to 1e-6. Offline, the corrected formula matches the kappa_1
+    = kappa_3 = 1e10 ODE steady state at u_e = -0.2, -0.12, 0 and 0.1 V for two parameter sets. The current formula only agrees
+    at u_e = 0.'
+  - 'u_equil: change to -(RT/F) ln(...) (the same argument), or rename it to say it is the negative of the pump reversal potential.
+    The dynamic cycle flux reverses at u_e = -1.062 V, while the module''s u_equil = +1.062 V.'
+  findings:
+  - 'At the nominal point (all K, kappa = 1, z_1 = 0.5, u_e = -0.12 V) the ODE steady-state turnover is 0.00714 fmol/s per
+    1 fmol of pump. The rapid-equilibrium limit is 0.276 fmol/s: kappa_1 K_1 Q_Ko^2 = 668 1/s is slower than kappa_2 K_2 Q_ATP
+    = 901 1/s, so step 1 is not "fast". Even after the fix, v_NKE will not match the dynamics unless kappa_1 and kappa_3 are
+    much larger.'
+  - Jacobian eigenvalues at the nominal point are about -9.2e4, -4.0e4 and -9.2e2 1/s. RK4 needs dt < 3e-5 s; CVODE handles
+    it at rtol 1e-6.
+  - At steady state Power_external = Power_dissipation = 6.49e-4 nW (second law and energy balance hold exactly).

@@ -3,8 +3,8 @@ version: vv
 reviewed: false
 notes: 'vv linear R-C-I vessel with coefficients from geometry (Poiseuille R, thin-wall C, inertance I). Tested in a harness
   network (libcuflynx sums the flows at a Min/Nout node only when real vessels are connected there): mod (MinNout_junction
-  vv); bcin1 (inlet_flow nn_constant); up1 (arterial_simple vp); bcin2 (inlet_flow nn_constant); up2 (arterial_simple vp);
-  dn1 (arterial_simple pv); bcout1 (outlet_flow nn_constant); dn2 (arterial_simple pv); bcout2 (outlet_flow nn_constant).
+  vv); bcin1 (inlet_flow constant); up1 (arterial_simple vp); bcin2 (inlet_flow constant); up2 (arterial_simple vp);
+  dn1 (arterial_simple pv); bcout1 (outlet_flow constant); dn2 (arterial_simple pv); bcout2 (outlet_flow constant).
   Jacobian timescales (nominal: fastest 1.3e-08 s, slowest decay 0.011 s, shortest oscillation period 1.4e+12 s; run: fastest
   6.3e-05 s, slowest decay 0.01 s, shortest oscillation period 0.08 s).'
 reference_proposals:

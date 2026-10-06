@@ -1,0 +1,75 @@
+[
+  {
+    "module_type": "lung_stretch_receptor",
+    "module_subtype": "ArgusUNPUBLISHED_OLD",
+    "module_format": "cellml",
+    "component_file": "lung_stretch_receptor_ArgusUNPUBLISHED_OLD_modules.cellml",
+    "component_type": "lung_stretch_receptor_with_threshold",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "volume_stretch_port",
+        "variables": [
+          "q_A",
+          "q_b"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "lung_stretch_firing_rate_port",
+        "variables": [
+          "f_ls"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_ls",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_lung",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "G_al",
+        "per_m3_s",
+        "access",
+        "constant"
+      ],
+      [
+        "q_A",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q_b",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_lung_stretch_thresh",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "V_lung",
+        "m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

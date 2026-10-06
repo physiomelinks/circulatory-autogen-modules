@@ -13,7 +13,7 @@ _parameters.csv, plus obs_data / params_for_id when present) into
 
 Heart splitting (a vessel whose vessel_type starts with 'heart' and whose module has the
 v_ivc/v_svc/v_pvn vessel ports):
-  heart_clock (cardiac_clock nn, or nn_controlled for the controlled hearts)
+  heart_clock (cardiac_clock Liang2009_v01, or controlled for the controlled hearts)
   ra, rv, la, lv (chamber vv) and trv, puv, miv, aov (valve pp / pp_linear / pp_rmod)
   ra_inflow (flow_merge) when the right atrium has more than one inflow
   la_outflow (flow_split) + asd_shunt (resistor) for heart_ASD
@@ -187,7 +187,7 @@ def split_heart(rows, params, configs, notes):
     ra_in = systemic + (['asd_shunt'] if asd else [])
     merge = len(ra_in) > 1
     new = []
-    new.append({'name': 'heart_clock', 'BC_type': 'nn_controlled' if controlled else 'nn', 'vessel_type': 'cardiac_clock',
+    new.append({'name': 'heart_clock', 'BC_type': 'controlled' if controlled else 'Liang2009_v01', 'vessel_type': 'cardiac_clock',
                 'inp_vessels': ' '.join(eff_for['heart_clock']), 'out_vessels': 'ra rv la lv'})
     sums = other_out
     new.append({'name': 'ra', 'BC_type': 'vv', 'vessel_type': 'chamber',

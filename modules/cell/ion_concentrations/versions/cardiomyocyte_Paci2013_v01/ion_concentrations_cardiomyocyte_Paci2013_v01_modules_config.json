@@ -1,0 +1,111 @@
+[
+  {
+    "module_type": "ion_concentrations",
+    "module_subtype": "cardiomyocyte_Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "ion_concentrations_cardiomyocyte_Paci2013_v01_modules.cellml",
+    "component_type": "Na_dynamics_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "entrance_ports": [
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Na_current",
+        "variables": [
+          "i_Na"
+        ]
+      },
+      {
+        "port_type": "b_Na_current",
+        "variables": [
+          "i_b_Na"
+        ]
+      },
+      {
+        "port_type": "NaK_current",
+        "variables": [
+          "i_NaK"
+        ]
+      },
+      {
+        "port_type": "NaCa_current",
+        "variables": [
+          "i_NaCa"
+        ]
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Nai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "Cm",
+        "farad",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Vc",
+        "microm3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "i_Na",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_b_Na",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaK",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaCa",
+        "A_per_F",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

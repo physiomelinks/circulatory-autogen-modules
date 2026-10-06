@@ -24,7 +24,7 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
 
 A module_type directory is any directory under modules/ with a versions/ subdirectory. A module_type
 may contain the module_types that only exist within it (nested module_types: its other
-subdirectories with versions/, e.g. cell/neuron/soma/SN_membrane_soma), which may nest again. Every
+subdirectories with versions/, e.g. cell/neuron/soma), which may nest again. Every
 other directory above a module_type is a category. A module_type's category is the category path
 above its outermost enclosing module_type ("cell" for soma; "" for heart and its nested
 module_types, which sit directly under modules/). System models live in system_models/.
@@ -126,12 +126,12 @@ module_dir = module_type_dir
 
 
 def parent_of(name):
-    '''The module_type a nested module_type sits in (e.g. "soma" for SN_membrane_soma), or None.'''
+    '''The module_type a nested module_type sits in (e.g. "neuron" for soma), or None.'''
     return _discover()[1].get(name)
 
 
 def ancestors_of(name):
-    '''The enclosing module_types, innermost first (e.g. ["soma", "neuron"] for SN_membrane_soma).'''
+    '''The enclosing module_types, innermost first (e.g. ["neuron"] for soma).'''
     out, p = [], parent_of(name)
     while p is not None:
         out.append(p)
@@ -151,7 +151,7 @@ def module_relpath(name):
 
 def category_of(name):
     '''The category path of a module_type: the categories above its outermost enclosing module_type,
-    e.g. "cell" for neuron, soma and SN_membrane_soma, "vessels/compartments" for simple, and "" for
+    e.g. "cell" for neuron and soma, "vessels/compartments" for simple, and "" for
     heart (directly under modules/) and the module_types nested in it.'''
     outer = (ancestors_of(name) or [name])[-1]
     rel = os.path.relpath(os.path.dirname(module_type_dir(outer)), MODULES_DIR).replace(os.sep, '/')
@@ -930,33 +930,52 @@ HEART_VERSION_RENAMES = {
 }
 
 
+# The 2026-10-06 restructure (tools/restructure_modules.py): types named by mechanism, versions by
+# source, no nn prefixes; old pair -> new pair, written by the restructure.
+RESTRUCTURE_RENAMES = os.path.join(REPO_ROOT, 'tools', 'restructure_modules_renames.json')
+
+
+@functools.lru_cache(maxsize=None)
+def restructure_renames():
+    '''(module_type, version) before the 2026-10-06 restructure -> (module_type, version) now.'''
+    if not os.path.isfile(RESTRUCTURE_RENAMES):
+        return {}
+    with open(RESTRUCTURE_RENAMES) as f:
+        return {tuple(r['from']): tuple(r['to']) for r in json.load(f)}
+
+
 @functools.lru_cache(maxsize=None)
 def legacy_renames():
     '''(old module_type, old module_subtype) -> (module_type, version) for every pair that changed in
     the move to versions (ion channels, the sympathetic-neuron pieces, the supermodules), from
-    tools/restructure_map.yaml, and in the move of the alternative hearts into heart
-    (HEART_VERSION_RENAMES). circulatory_autogen's own models still use the old pairs.'''
+    tools/restructure_map.yaml, in the move of the alternative hearts into heart
+    (HEART_VERSION_RENAMES), and in the 2026-10-06 restructure (restructure_renames(), applied after
+    the others, so each old pair maps to today's pair). circulatory_autogen's own models still use
+    the old pairs.'''
+    later = restructure_renames()
     path = os.path.join(REPO_ROOT, 'tools', 'restructure_map.yaml')
-    if not os.path.isfile(path):
-        return dict(HEART_VERSION_RENAMES)
-    with open(path) as f:
-        m = yaml.safe_load(f)
     out = {}
-    for mts in m['categories'].values():
-        for mt, node in mts.items():
-            for v, info in node['versions'].items():
-                r = re.match(r'^[\w/]+: \(([^,]+), ([^)]+)\)$', info['from'])
-                if r:
-                    old = (r[1], r[2])
-                else:
-                    r = re.match(r'supermodules/(\w+)', info['from'])
-                    old = (r[1], 'supermodule')
-                new = HEART_VERSION_RENAMES.get((mt, v), (mt, v))
-                if old != new:
-                    out[old] = new
+    if os.path.isfile(path):
+        with open(path) as f:
+            m = yaml.safe_load(f)
+        for mts in m['categories'].values():
+            for mt, node in mts.items():
+                for v, info in node['versions'].items():
+                    r = re.match(r'^[\w/]+: \(([^,]+), ([^)]+)\)$', info['from'])
+                    if r:
+                        old = (r[1], r[2])
+                    else:
+                        r = re.match(r'supermodules/(\w+)', info['from'])
+                        old = (r[1], 'supermodule')
+                    new = HEART_VERSION_RENAMES.get((mt, v), (mt, v))
+                    if old != new:
+                        out[old] = new
     for old, new in HEART_VERSION_RENAMES.items():
         out.setdefault(old, new)
-    return out
+    out = {old: later.get(new, new) for old, new in out.items()}
+    for old, new in later.items():
+        out.setdefault(old, new)
+    return {old: new for old, new in out.items() if old != new}
 
 
 # ----------------------------------------------------------------------------------------------

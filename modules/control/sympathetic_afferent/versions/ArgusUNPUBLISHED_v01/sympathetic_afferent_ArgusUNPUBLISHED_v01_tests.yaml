@@ -1,0 +1,54 @@
+module_type: sympathetic_afferent
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Linear integration of afferent firing into the sympathetic drive to heart (h), peripheral circulation (p) and veins
+  (v) (Gee 2023 eqs. S.46-S.48): f_asj = G_abj f_br +/- G_alj f_ls + G_acj (f_cp - 10). Lung stretch enters the heart pathway
+  with a minus sign (Gee Simulink Gain8 = -1). The 10 Hz offset on f_cp is the Simulink constant fac0 = 10 (not written in
+  the supplementary equations). Algebraic.'
+reference_proposals:
+  G_abh:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.9: G_ab,h = 1'
+    sourced: 'yes'
+  G_alh:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.9: G_al,h = 1.541 (applied with sign
+      -1)'
+    sourced: 'yes'
+  G_ach:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.9: G_ac,h = 2'
+    sourced: 'yes'
+  G_abp:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.10: G_ab,p = 1'
+    sourced: 'yes'
+  G_alp:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.10: G_al,p = 0.33'
+    sourced: 'yes'
+  G_acp:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.10: G_ac,p = 2.5'
+    sourced: 'yes'
+  G_abv:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.11: G_ab,v = 1'
+    sourced: 'yes'
+  G_alv:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.11: G_al,v = 0'
+    sourced: 'yes'
+  G_acv:
+    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.11: G_ac,v = 0'
+    sourced: 'yes'
+  f_br:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (baroreceptor
+      firing, 25 Hz ~ nominal f_ab_0 of Ursino 1998)
+    sourced: 'no'
+    value: 25.0
+  f_ls:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (lung stretch
+      firing, 5 Hz)
+    sourced: 'no'
+    value: 5.0
+  f_cp:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (cardiopulmonary
+      firing, 10 Hz = the offset fac0)
+    sourced: 'no'
+    value: 10.0
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.
