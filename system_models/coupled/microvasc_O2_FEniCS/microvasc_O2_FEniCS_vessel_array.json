@@ -1,0 +1,7 @@
+[
+ {"name": "cap_0", "module_type": "capillary", "module_subtype": "pp", "instance": "default", "inp_instances": [], "out_instances": ["capillary_GE_0"]},
+ {"name": "capillary_GE_0", "module_type": "GE_capillary", "module_subtype": "nn", "instance": "default", "inp_instances": ["cap_0"], "out_instances": ["tissue"]},
+ {"name": "cap_1", "module_type": "capillary", "module_subtype": "pp", "instance": "default", "inp_instances": [], "out_instances": ["capillary_GE_1"]},
+ {"name": "capillary_GE_1", "module_type": "GE_capillary", "module_subtype": "nn", "instance": "default", "inp_instances": ["cap_1"], "out_instances": ["tissue"]},
+ {"name": "tissue", "module_type": "tissue_diffusion_FEniCS", "module_subtype": "box_v01", "instance": "default", "inp_instances": ["capillary_GE_0", "capillary_GE_1"], "out_instances": []}
+]

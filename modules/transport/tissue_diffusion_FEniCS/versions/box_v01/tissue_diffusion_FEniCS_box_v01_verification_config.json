@@ -1,0 +1,24 @@
+{
+  "module_type": "tissue_diffusion_FEniCS",
+  "version": "box_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "external",
+  "outputs": [
+    "C_t"
+  ],
+  "run_inputs": {
+    "J_s": 4.46e-16
+  },
+  "run_steps": 5,
+  "invariants": [],
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "an example external model; tested in the coupled system models"
+      }
+    }
+  }
+}

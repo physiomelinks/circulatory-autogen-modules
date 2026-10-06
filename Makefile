@@ -10,7 +10,7 @@ PYTEST_ARGS ?=
 PHLYNX_DIR ?= ../phlynx
 CUFLYNX_BIN ?= $(HOME)/software/CUFLynx
 
-.PHONY: setup structure test test-all systems pipeline pipeline-setup omex omex-test report site serve clean manifests risk
+.PHONY: setup structure test test-all systems coupled pipeline pipeline-setup omex omex-test report site serve clean manifests risk
 
 setup:
 	python3 -m venv venv
@@ -35,6 +35,12 @@ test-all:
 systems:
 	$(PYTHON) -m pytest tests/test_systems.py $(PYTEST_ARGS)
 	$(PYTHON) -m pytest tests/test_modules.py -k supermodule --include-unreviewed $(PYTEST_ARGS)
+
+# the coupled examples (system_models/coupled): C++ 0D models coupled to the FEniCS model
+# tissue_diffusion_FEniCS, against the same tissue as a CellML grid. Needs dolfinx, CMake, a C++
+# compiler and SUNDIALS in the same environment (conda: fenics-dolfinx cmake cxx-compiler sundials).
+coupled:
+	$(PYTHON) -m pytest tests/test_coupled_systems.py -s $(PYTEST_ARGS)
 
 # PhLynx build & export -> CUFLynx import & simulate -> compare with libcuflynx, per version
 pipeline-setup:

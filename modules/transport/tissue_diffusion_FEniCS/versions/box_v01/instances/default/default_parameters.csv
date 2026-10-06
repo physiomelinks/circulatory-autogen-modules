@@ -1,0 +1,15 @@
+variable_name,units,value,data_reference,sourced
+Lx,metre,1e-4,"unreferenced_placeholder; 100 um cube: 5 x 5 x 5 cells of 20 um, the tissue_diffusion_volume default cell (V_P 8e-15 m3)",no
+Ly,metre,1e-4,"unreferenced_placeholder; as Lx",no
+Lz,metre,1e-4,"unreferenced_placeholder; as Lx",no
+grid_nx,dimensionless,5,"definitional; exchange-region grid (one cell per connected 0D module) and, with fv_scheme 1, the finite-volume grid",yes
+grid_ny,dimensionless,5,"definitional; as grid_nx",yes
+grid_nz,dimensionless,5,"definitional; as grid_nx",yes
+refine,dimensionless,2,"definitional; finite-element cells per grid cell and direction (fv_scheme 0)",yes
+fv_scheme,dimensionless,0,"definitional; 0 = Q1 finite elements, 1 = two-point-flux finite volumes on the grid",yes
+theta,dimensionless,0.5,"definitional; time stepping theta (0.5 = Crank-Nicolson)",yes
+M,millimolar_per_s,-0.0558,"CelayaAlcala2021; maximal O2 consumption, as tissue_diffusion_volume (M0 = 7.5 cm3 O2/100 cm3/min = 0.0558 mM/s, negative: consumption)",yes
+C50,millimolar,0.0133,"CelayaAlcala2021; Michaelis constant P0 = 10.5 mmHg x 1.27 uM/mmHg (Fang2008), as tissue_diffusion_volume",yes
+C_init,millimolar,0.0597,"unreferenced_placeholder; 47 mmHg mean cortical tissue PO2 (CelayaAlcala2021) x 1.27 uM/mmHg (Fang2008), as tissue_diffusion_volume",no
+coupling_dt,second,0.01,"definitional; coupling step with the 0D model (tissue O2 changes over seconds)",yes
+sigma_diff,m2_per_s,2.41e-9,"Secomb2020; tissue O2 diffusivity, as tissue_diffusion_face",yes

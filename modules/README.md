@@ -322,6 +322,38 @@ A model uses one record, e.g.
   it must reproduce: `system_models/closed_loop_cvs/3compartment_supermodules` reproduces
   `3compartment`, and `system_models/cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
+## External model versions
+
+A version whose config entry has `"module_format": "external_api"` is a model that is not CellML,
+for example a FEniCS PDE model. Generated as C++ (`model_type: cpp`), libcuflynx couples it to the
+CellML modules it is connected to; see "Coupling to external models" in the circulatory_autogen
+tutorial.
+- **Files.** The model lives in `{module_type}_{version}_model.py`, a Python class named by the
+  config's `api` block:
+  `{"role": "provider", "transport": "python", "python": {"file": "<module_type>_<version>_model.py", "class": ...}}`.
+  The CellML and units files are placeholders with no component, as for the C++ `FV1D_vessel`
+  versions.
+- **Exchange.** It exchanges its port variables with the connected CellML modules. Each one
+  connected to a boundary condition of a CellML module is set by the model; each one connected
+  to a computed variable is read by it.
+- **Parameters.** Its constants come from its instance, like any version's. A constant
+  `coupling_dt` sets the coupling step for that instance.
+- **Tests.** `run_test` loads the model file and steps the class `run_steps` times with constant
+  inputs (`run_inputs`, default 0). It is skipped when the model's own dependencies, e.g. dolfinx,
+  are not installed. The CellML checks are not applicable. System models in
+  `system_models/coupled` test it in use.
+
+| External model version | What it is |
+|---|---|
+| `transport/tissue_diffusion_FEniCS` `box_v01` | diffusion of one solute in a 3D box (FEniCSx), one exchange region per connected module through `capillary_to_flux_port`, the port of `tissue_diffusion_volume`; instances `default` (tissue O2) and `NE_extracellular` |
+
+**Coupled examples.** `system_models/coupled` is built by `tools/build_coupled_examples.py` and
+run by `tests/test_coupled_systems.py` (`make coupled`). It has capillaries (`capillary` +
+`GE_capillary`) and a sympathetic neuron (varicosity `NEexchange_v01`), each paired with the
+tissue as either the FEniCS model or a finite-volume grid of `tissue_diffusion_volume` cells.
+The tests compare the two variants and record run times in each FEniCS model's
+`results/coupled_comparison.json`.
+
 ## What runs
 
 **Per version** (`tests/test_modules.py`, ids `<module_type>/<version>`), at the default instance's
@@ -470,6 +502,8 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `reference_solver_info` | verification_config | tolerances of the tight CVODE reference (timestep and stability tests) |
 | `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod_<submodule>/<var>`) |
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
+| `run_inputs` | verification_config | an external model's run_test: `{port variable: value}`, the constant inputs it is stepped with (default 0) |
+| `run_steps` | verification_config | an external model's run_test: how many coupling steps to take (default 5) |
 | `rest_check` | verification_config | `{sim_time, window, voltage, parameters, threshold, dt}`: a long run (e.g. 0 pA injected) that run_test reports, not a pass/fail gate: the spikes (upward crossings of `threshold` mV, default 0) of `voltage` and their rate in the last `window` s, in the message, metrics.rest_check and plots/rest.png |
 | `harness` | verification_config | the test network: `vessel_array` rows `[name, module_subtype, module_type, inp, out, instance]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours |
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |

@@ -393,12 +393,82 @@ CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp): libcuflynx g
                       'simulation to check')
 
 
+EXTERNAL_NOT_APPLICABLE = ('external model (module_format external_api, e.g. a FEniCS model): it has no CellML '
+                           'equations, so the CellML simulation checks do not apply; run_test loads its model file and '
+                           'steps it, and the system models that couple it to CellML modules test it in use')
+
+
 def is_cpp(component):
     return component.config.get('module_format', 'cellml') == 'cpp'
 
 
+def is_external_api(component):
+    return component.config.get('module_format', 'cellml') == 'external_api'
+
+
+def is_non_cellml(component):
+    """Not simulated through CellML: a C++ 1D-solver marker or an external (e.g. FEniCS) model."""
+    return is_cpp(component) or is_external_api(component)
+
+
+def non_cellml_reason(component):
+    return EXTERNAL_NOT_APPLICABLE if is_external_api(component) else CPP_NOT_APPLICABLE
+
+
 def _cpp_not_applicable(cm, test):
-    return save(cm.component, Result(test, NOT_APPLICABLE, CPP_NOT_APPLICABLE))
+    return save(cm.component, Result(test, NOT_APPLICABLE, non_cellml_reason(cm.component)))
+
+
+def external_model_check(cm):
+    """
+    run_test for an external model (module_format external_api, api transport python): load the
+    model file the api block names, create the class with the default instance's parameters and
+    one connected 0D module per port variable, and step it a few times with constant inputs
+    (spec 'run_inputs', default 0). Every output must be finite. Skipped when the model's own
+    dependencies (e.g. dolfinx) are not installed.
+    """
+    import importlib.util
+    import numpy as np
+
+    def check():
+        component = cm.component
+        api = component.config.get('api') or {}
+        py = api.get('python') or {}
+        path = os.path.join(os.path.dirname(component.config_path), py.get('file', ''))
+        if not (py.get('file') and os.path.isfile(path)):
+            return Result('run_test', FAILED, f"api.python.file {py.get('file')!r} not found next to the config")
+        spec = importlib.util.spec_from_file_location(f'cam_external_{component.id}', path)
+        module = importlib.util.module_from_spec(spec)
+        try:
+            spec.loader.exec_module(module)
+        except ImportError as e:
+            return Result('run_test', SKIPPED, f'cannot import the model ({e}); install what it needs to run it')
+        cls = getattr(module, py.get('class', ''), None)
+        if cls is None:
+            return Result('run_test', FAILED, f"{os.path.basename(path)} has no class {py.get('class')!r}")
+        values = {p.variable_name: p.value for p in cm.parameters()}
+        variables = component.config.get('variables_and_units', [])
+        params = {v[0]: float(values[v[0]]) for v in variables
+                  if v[3] in ('constant', 'global_constant') and v[0] in values}
+        port_vars = [v for kind in ('entrance_ports', 'exit_ports', 'general_ports')
+                     for p in component.config.get(kind) or [] for v in p['variables']]
+        run_inputs = cm.spec.get('run_inputs') or {}
+        dt = float(api.get('coupling_dt', 1e-3))
+        model = cls(params=params, neighbours={v: ['m0'] for v in port_vars}, comm=None,
+                    info={'units': {v[0]: v[1] for v in variables}, 'coupling_dt': dt, 'row': 'mod',
+                          'output_dir': cm.work_dir})
+        out = model.initial_outputs()
+        inputs = {v: np.array([float(run_inputs.get(v, 0.0))]) for v in port_vars if v not in out}
+        n_steps = int(cm.spec.get('run_steps', 5))
+        for k in range(n_steps):
+            out = model.step(k * dt, dt, inputs)
+        bad = [k for k, v in out.items() if not np.all(np.isfinite(np.asarray(v, dtype=float)))]
+        if bad or not out:
+            return Result('run_test', FAILED, f'outputs not finite: {bad}' if bad else 'step() returned nothing')
+        return Result('run_test', PASSED, f'loaded {os.path.basename(path)} and stepped {py.get("class")} '
+                      f'{n_steps} times; outputs {sorted(out)} finite',
+                      {k: np.asarray(v, dtype=float).tolist() for k, v in out.items()})
+    return _guard(cm.component, 'run_test', check)
 
 
 def cpp_generation_check(cm):
@@ -434,24 +504,30 @@ def cpp_generation_check(cm):
         tail = [l for l in log.getvalue().splitlines() if l.strip()][-6:]
         if not ok:
             return Result('run_test', FAILED, 'C++ 0D-1D generation failed: ' + (tail[-1] if tail else ''), details=tail)
-        src = os.path.join(cfg['cpp_generated_models_dir'], 'model0d.cc')
+        # libcuflynx's template generator writes model0d.cpp (+ model0d_core.c/.h); the previous
+        # generator wrote one model0d.cc
+        out_dir = cfg['cpp_generated_models_dir']
+        src = os.path.join(out_dir, 'model0d.cpp' if os.path.isfile(os.path.join(out_dir, 'model0d.cpp'))
+                           else 'model0d.cc')
         coupler = [f for f in os.listdir(cfg['cpp_generated_models_dir']) if f.endswith('_coupler1d0d.json')]
         metrics = {'generated': sorted(os.listdir(cfg['cpp_generated_models_dir'])), 'coupler': coupler}
         gxx = shutil.which('g++')
         if not gxx:
             return Result('run_test', PASSED, 'generated the C++ 0D model and 0D-1D coupler (g++ not available, '
                           'compilation not checked)', metrics)
-        p = subprocess.run([gxx, '-std=c++17', '-fsyntax-only', src], capture_output=True, text=True)
+        p = subprocess.run([gxx, '-std=c++17', '-fsyntax-only', f'-I{out_dir}', src], capture_output=True, text=True)
         if p.returncode != 0:
-            return Result('run_test', FAILED, 'generated model0d.cc does not compile: '
+            return Result('run_test', FAILED, f'generated {os.path.basename(src)} does not compile: '
                           + (p.stderr.strip().splitlines() or [''])[0][:300], metrics, details=p.stderr.splitlines()[:20])
-        return Result('run_test', PASSED, 'generated the C++ 0D model coupled to the 1D vessel (model0d.cc, '
+        return Result('run_test', PASSED, f'generated the C++ 0D model coupled to the 1D vessel ({os.path.basename(src)}, '
                       f'{", ".join(coupler)}) and it compiles; the 1D solver itself is not runnable here', metrics)
     return _guard(cm.component, 'run_test', check)
 
 
 def run_test(cm):
     """Generates the component with libcuflynx, simulates it, and checks every output is finite."""
+    if is_external_api(cm.component):
+        return external_model_check(cm)
     if is_cpp(cm.component):
         return cpp_generation_check(cm)
 
@@ -524,7 +600,7 @@ def rest_check(cm):
 # ----------------------------------------------------------------------------------------------
 
 def verification_test_invariants(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_invariants')
     """
     Checks the simulation against what the component is supposed to do: the spec's
@@ -991,7 +1067,7 @@ def sweep_parameter_names(cm):
 
 
 def verification_test_BC(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_BC')
     def check():
         component, spec = cm.component, cm.spec
@@ -1136,7 +1212,7 @@ def verification_test_BC(cm):
 # ----------------------------------------------------------------------------------------------
 
 def verification_test_timestep(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_timestep')
     def check():
         component = cm.component
@@ -1261,7 +1337,7 @@ def _matches(declared, cfg):
 
 
 def stability_test(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'stability_test')
     """
     Runs the component with a matrix of solvers and settings and records which work:

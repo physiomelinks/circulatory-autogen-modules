@@ -1,0 +1,133 @@
+[
+  {
+    "module_type": "tissue_diffusion_FEniCS",
+    "module_subtype": "box_v01",
+    "module_format": "external_api",
+    "component_file": "tissue_diffusion_FEniCS_box_v01_modules.cellml",
+    "component_type": "tissue_diffusion_FEniCS_box",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "description": "Diffusion of one solute in a 3D box of tissue, solved with FEniCSx, exchanging a source flux and the local concentration with each connected 0D module (e.g. GE_capillary, varicosity NEexchange_v01) through capillary_to_flux_port, the port of the finite-volume CellML cell tissue_diffusion_volume.",
+    "entrance_ports": [
+      {
+        "port_type": "capillary_to_flux_port",
+        "variables": [
+          "C_t",
+          "J_s"
+        ]
+      }
+    ],
+    "exit_ports": [],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "C_t",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "J_s",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Lx",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "Ly",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "Lz",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "grid_nx",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "grid_ny",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "grid_nz",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "refine",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "fv_scheme",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "M",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "C50",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "C_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "coupling_dt",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "sigma_diff",
+        "m2_per_s",
+        "access",
+        "global_constant"
+      ]
+    ],
+    "api": {
+      "name": "tissue_diffusion_FEniCS",
+      "description": "FEniCSx diffusion in a box; one exchange region per connected 0D module. C_t (region mean concentration) is set in the 0D model, J_s (flux into the region) is read from it.",
+      "role": "provider",
+      "transport": "python",
+      "python": {
+        "file": "tissue_diffusion_FEniCS_box_v01_model.py",
+        "class": "DiffusionBox"
+      },
+      "coupling_dt": 0.01
+    }
+  }
+]

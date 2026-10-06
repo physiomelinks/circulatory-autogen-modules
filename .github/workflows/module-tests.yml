@@ -46,6 +46,28 @@ jobs:
       - uses: ./.github/actions/setup
       - run: make structure PYTHON=python
 
+  # The coupled examples (system_models/coupled): generated C++ coupled to the FEniCS model
+  # tissue_diffusion_FEniCS. FEniCSx is a conda-forge package, and the generated model's shared
+  # library is loaded into that Python, so it is built with the environment's compiler and SUNDIALS.
+  coupled:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-name: fenicsx
+          create-args: >-
+            -c conda-forge python=3.11 fenics-dolfinx=0.9 cmake cxx-compiler sundials nlohmann_json pip
+          cache-environment: true
+      - run: pip install -r requirements.txt
+      - run: python -c "import dolfinx, libcuflynx.coupling; print('dolfinx', dolfinx.__version__)" && cmake --version
+      - run: make structure PYTHON=python
+      - run: make coupled PYTHON=python
+
   category:
     needs: discover
     runs-on: ubuntu-latest

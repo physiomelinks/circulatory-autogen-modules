@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <model name="GE_capillary_nn" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
     <component name="capillary_GE">
+        <variable name="saturation_cap" public_interface="in" units="dimensionless"/>
         <variable name="t" public_interface="in" units="second"/>
         <variable initial_value="C_O2_c_init" name="C_O2_c" public_interface="out" units="millimolar"/>
         <variable name="C_O2_c_init" public_interface="in" units="millimolar"/>

@@ -227,11 +227,11 @@ def not_applicable_reason(version, test):
         return NOT_A_SUPERMODULE
     if test == 'supermodule_equivalence_test' and not (version.spec.get('supermodule') or {}).get('equivalent'):
         return NO_EQUIVALENT
-    if checks.is_cpp(version):
+    if checks.is_non_cellml(version):
         if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test'):
-            return checks.CPP_NOT_APPLICABLE
+            return checks.non_cellml_reason(version)
         if test in phlynx.PIPELINE_TESTS:
-            return phlynx.CPP_REASON
+            return phlynx.EXTERNAL_REASON if checks.is_external_api(version) else phlynx.CPP_REASON
     return None
 
 
