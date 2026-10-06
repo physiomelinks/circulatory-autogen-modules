@@ -67,6 +67,20 @@ jobs:
       - run: python -c "import dolfinx, libcuflynx.coupling; print('dolfinx', dolfinx.__version__)" && cmake --version
       - run: make structure PYTHON=python
       - run: make coupled PYTHON=python
+      # the coupled_validation_test results and heatmaps of the versions the coupled system models
+      # use, for the site (named category-* so the site job merges it with the category reports)
+      - name: Stage coupled validation files
+        if: always()
+        run: |
+          mkdir -p _artifact
+          find modules \( -path '*/results/coupled_validation_test.json' -o -path '*/plots/coupled_*.png' \) -print \
+            | xargs -r -I{} cp --parents {} _artifact/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: category-coupled-validation
+          path: _artifact/
+          if-no-files-found: ignore
 
   category:
     needs: discover
@@ -135,7 +149,7 @@ jobs:
         run: python tools/ci_reviewed_failures.py junit-tests.xml junit-pipeline.xml
 
   site:
-    needs: [category]
+    needs: [category, coupled]
     if: always()
     runs-on: ubuntu-latest
     steps:

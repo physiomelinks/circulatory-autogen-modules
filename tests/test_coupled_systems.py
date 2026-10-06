@@ -11,6 +11,10 @@ problem with the tissue as a finite-volume grid of CellML cells, and timed.
   stepping and coupling error. With Q1 finite elements (fv_scheme 0, refined) it differs by the
   spatial discretisation, which is reported.
 * The run times of both are recorded in results/coupled_comparison.json of each FEniCS model.
+* Each comparison is also a result of the modules' coupled_validation_test (the version's
+  results/coupled_validation_test.json, shown in the module report), with heatmaps of the
+  concentration in the box's mid-plane at a few times (plots/coupled_*.png), whose data are in
+  the system model's results/coupled_fields_*.json.
 
 Needs libcuflynx with libcuflynx.coupling (circulatory_autogen PR #520), CMake, a C++ compiler
 and SUNDIALS; the FEniCS tests also need dolfinx (skipped without it). In a conda environment,
@@ -28,7 +32,8 @@ import time
 import numpy as np
 import pytest
 
-from cam_testing.library import MODULES_DIR
+from cam_testing import checks, plots
+from cam_testing.library import MODULES_DIR, load_version
 from cam_testing.system import generate, load_system, simulate
 
 pytestmark = pytest.mark.system_model
@@ -146,6 +151,79 @@ def _record(name, entry):
         json.dump(data, f, indent=2)
 
 
+COUPLED_TEST = 'coupled_validation_test'
+FENICS = ('tissue_diffusion_FEniCS', 'box_v01')
+VARICOSITY = ('varicosity', 'NEexchange_v01')
+SCHEME_LABEL = {'fv': 'FEniCS DG0', 'fe': 'FEniCS Q1'}
+
+
+def grid_size(values):
+    '''N of the CellML grid c{i}{j}{k} (cells of tissue_diffusion_volume) from its outputs.'''
+    cells = {k.split('/')[0] for k in values if k.endswith('/C_P') and k.split('/')[0][1:].isdigit()}
+    return round(len(cells) ** (1 / 3))
+
+
+def grid_plane(values, idx, n):
+    '''The CellML grid's C_P at output index idx in the mid-plane z = n // 2, as [x, y].'''
+    k = n // 2
+    return np.array([[values[f'c{i}{j}{k}/C_P'][idx] for j in range(n)] for i in range(n)])
+
+
+def snapshots(result, t_ref, values):
+    '''Mid-plane fields of the FEniCS model (saved by its field_times) beside the CellML grid's
+    at the same times: [{t, ref, model, model_on_grid}], arrays [x, y].'''
+    data = np.load(os.path.join(result.output_dir, 'tissue_fields.npz'))
+    n, r = int(data['grid'][0]), int(data['refine'])
+    out = []
+    for t, field in zip(data['times'], data['fields']):
+        kz = (n // 2) * r
+        model = field[:, :, kz:kz + r].mean(axis=2)                 # the mid grid layer
+        on_grid = model.reshape(n, r, n, r).mean(axis=(1, 3))
+        idx = int(np.argmin(np.abs(t_ref - t)))
+        out.append({'t': float(t), 'ref': grid_plane(values, idx, n), 'model': model, 'model_on_grid': on_grid})
+    return out, float(data['L'][0]) * 1e6
+
+
+def exchange_plane_cells(name):
+    '''The (i, j) of the cells the 0D modules exchange with (all in the mid-plane).'''
+    return [(int(c[1]), int(c[2])) for c in coupled_cells(name)]
+
+
+def report(versions, key, passed, message, metrics, plot_paths):
+    '''Adds one comparison to coupled_validation_test of each version: failed if any comparison
+    failed; the plots are those of all comparisons.'''
+    for mt, ver in versions:
+        version = load_version(mt, ver)
+        old = checks.load(version, COUPLED_TEST)
+        comparisons = dict((old.metrics if old else {}).get('comparisons', {}))
+        comparisons[key] = {'status': checks.PASSED if passed else checks.FAILED, 'message': message, **metrics}
+        plot_files = []
+        for path in plot_paths:
+            dest = os.path.join(version.plots_dir, os.path.basename(path))
+            if os.path.abspath(dest) != os.path.abspath(path):
+                os.makedirs(version.plots_dir, exist_ok=True)
+                shutil.copyfile(path, dest)
+            plot_files.append(dest)
+        old_plots = [os.path.join(version.dir, p) for p in (old.plots if old else [])
+                     if os.path.basename(p) not in {os.path.basename(q) for q in plot_paths}]
+        status = checks.PASSED if all(c['status'] == checks.PASSED for c in comparisons.values()) else checks.FAILED
+        lines = [f"{k}: {c['message']}" for k, c in sorted(comparisons.items())]
+        checks.save(version, checks.Result(COUPLED_TEST, status, '; '.join(lines), {'comparisons': comparisons},
+                                           sorted(set(old_plots + plot_files)), lines))
+
+
+def save_fields(name, key, snaps, trace, box_um):
+    '''The plotted data, for reports outside the module library (results/coupled_fields_<key>.json).'''
+    s = load_system(name)
+    os.makedirs(s.results_dir, exist_ok=True)
+    as_list = lambda a: np.round(np.asarray(a, dtype=float), 12).tolist()
+    with open(os.path.join(s.results_dir, f'coupled_fields_{key}.json'), 'w') as f:
+        json.dump({'box_um': box_um, 'exchange_cells': exchange_plane_cells(name.replace('FEniCS', 'FV')),
+                   'trace': {k: as_list(v) for k, v in trace.items()},
+                   'snapshots': [{'t': sn['t'], **{k: as_list(sn[k]) for k in ('ref', 'model', 'model_on_grid')}}
+                                 for sn in snaps]}, f)
+
+
 # ---------------------------------------------------------------------------------------------
 # NE around a varicosity
 # ---------------------------------------------------------------------------------------------
@@ -175,12 +253,16 @@ def test_NE_FEniCS_matches_the_cellml_grid(scheme, ne_fv, tmp_path):
     t_ref, ref_values, ref_time = ne_fv
     (centre,) = coupled_cells('SN_NE_FV')       # the cell the varicosity exchanges with
     ref = ref_values[f'{centre}/C_P']
+    # snapshots: the first release peak, shortly after it, mid-train and the end
+    t_peak = float(t_ref[np.argmax(np.where(t_ref < 0.05, ref, -np.inf))])
+    field_times = [t_peak, t_peak + 0.005, t_peak + 0.05, float(t_ref[-1])]
     # NE is released in ~1 ms pulses, a few coupling steps each: the DG0 comparison iterates
     # each step (second-order coupling) so what is left is the time stepping
     if scheme == 'fv':
-        result, times = run_fenics('SN_NE_FEniCS', tmp_path, {'subiterations': 3, 'tol': 1e-10}, fv_scheme=1.0)
+        result, times = run_fenics('SN_NE_FEniCS', tmp_path, {'subiterations': 3, 'tol': 1e-10}, fv_scheme=1.0,
+                                   field_times=field_times)
     else:
-        result, times = run_fenics('SN_NE_FEniCS', tmp_path, fv_scheme=0.0, refine=2.0)
+        result, times = run_fenics('SN_NE_FEniCS', tmp_path, fv_scheme=0.0, refine=2.0, field_times=field_times)
     ne = result.exchange['tissue/C_t'][:, 0]
     diff = _rel_diff(t_ref, ref, result.times, ne)
     peak_ratio = float(ne.max() / ref.max())
@@ -191,15 +273,31 @@ def test_NE_FEniCS_matches_the_cellml_grid(scheme, ne_fv, tmp_path):
     print(f'\nNE ({scheme}): max difference {diff:.2%} of the peak; CellML grid C++ run {ref_time["run"]:.2f} s '
           f'(+ build {ref_time["build"]:.1f} s, generate {ref_time["generate"]:.1f} s); coupled run '
           f'{times["total"]:.2f} s (0D {times["zero_d"]:.2f} s, FEniCS {times["external"]:.2f} s)')
-    assert np.max(ref) > 1e-6, 'no NE reached the extracellular space'
     if scheme == 'fv':
         # the same discrete equations: equal up to time stepping
-        assert diff < 0.02 and abs(peak_ratio - 1.0) < 0.01, (diff, peak_ratio)
+        passed = diff < 0.02 and abs(peak_ratio - 1.0) < 0.01
+        gate = 'difference < 2 % of the peak, peak within 1 %'
     else:
         # Q1 elements resolve the gradient around the point-like release that the 1 um CellML
         # cells can't (refining the elements moves the peak by ~2 %, the CellML grid is ~25 %
         # higher): the same magnitude, not the same numbers
-        assert 0.6 < peak_ratio < 1.4, peak_ratio
+        passed = 0.6 < peak_ratio < 1.4
+        gate = 'peak ratio within 0.6-1.4 (a different spatial discretisation)'
+    label = SCHEME_LABEL[scheme]
+    snaps, box_um = snapshots(result, t_ref, ref_values)
+    trace = {'t_ref': t_ref, 'ref': ref, 't': result.times, 'value': ne}
+    fig = plots.coupled_heatmaps(
+        os.path.join(load_version(*FENICS).plots_dir, f'coupled_NE_{scheme}.png'),
+        f'NE around a varicosity, {label}', trace, snaps, box_um, exchange_plane_cells('SN_NE_FV'),
+        'NE', 'mM', label)
+    save_fields('SN_NE_FEniCS', f'NE_{scheme}', snaps, trace, box_um)
+    report([FENICS, VARICOSITY], f'NE_{scheme}', passed,
+           f'SN_NE_FEniCS ({label}) vs SN_NE_FV: largest difference {diff:.2%} of the peak, peak ratio '
+           f'{peak_ratio:.3f} ({gate})',
+           {'max_rel_difference': diff, 'peak_ratio': peak_ratio,
+            'run_seconds': {'cellml_grid': ref_time['run'], 'fenics_coupled': times['total']}}, [fig])
+    assert np.max(ref) > 1e-6, 'no NE reached the extracellular space'
+    assert passed, (diff, peak_ratio)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -217,6 +315,7 @@ def test_O2_FEniCS_matches_the_cellml_grid(scheme, o2_fv, tmp_path):
     t_ref, ref_values, ref_time = o2_fv
     cells = coupled_cells('microvasc_O2_FV')    # the cells the two capillaries exchange with
     params = {'fv_scheme': 1.0} if scheme == 'fv' else {'fv_scheme': 0.0, 'refine': 2.0}
+    params['field_times'] = [0.25, 1.0, 2.0, float(t_ref[-1])]   # falling from the initial value, then steady
     result, times = run_fenics('microvasc_O2_FEniCS', tmp_path, **params)
     C = result.exchange['tissue/C_t']
     diffs = [_rel_diff(t_ref, ref_values[f'{c}/C_P'], result.times, C[:, k]) for k, c in enumerate(cells)]
@@ -227,7 +326,22 @@ def test_O2_FEniCS_matches_the_cellml_grid(scheme, o2_fv, tmp_path):
     print(f'\nO2 ({scheme}): max difference {max(diffs):.2%}; CellML grid C++ run {ref_time["run"]:.2f} s '
           f'(+ build {ref_time["build"]:.1f} s, generate {ref_time["generate"]:.1f} s); coupled run '
           f'{times["total"]:.2f} s (0D {times["zero_d"]:.2f} s, FEniCS {times["external"]:.2f} s)')
-    assert max(diffs) < (0.01 if scheme == 'fv' else 0.10), diffs
+    end_ratio = float(C[-1, 0] / ref_values[f'{cells[0]}/C_P'][-1])
+    passed = max(diffs) < (0.01 if scheme == 'fv' else 0.10)
+    label = SCHEME_LABEL[scheme]
+    snaps, box_um = snapshots(result, t_ref, ref_values)
+    trace = {'t_ref': t_ref, 'ref': ref_values[f'{cells[0]}/C_P'], 't': result.times, 'value': C[:, 0]}
+    fig = plots.coupled_heatmaps(
+        os.path.join(load_version(*FENICS).plots_dir, f'coupled_O2_{scheme}.png'),
+        f'Tissue O2 around two capillaries, {label}', trace, snaps, box_um,
+        exchange_plane_cells('microvasc_O2_FV'), 'O2', 'mM', label)
+    save_fields('microvasc_O2_FEniCS', f'O2_{scheme}', snaps, trace, box_um)
+    report([FENICS], f'O2_{scheme}', passed,
+           f'microvasc_O2_FEniCS ({label}) vs microvasc_O2_FV: largest difference {max(diffs):.2%} of the peak '
+           f'(< {1 if scheme == "fv" else 10} %), steady-state ratio {end_ratio:.3f}',
+           {'max_rel_difference': max(diffs), 'steady_state_ratio': end_ratio,
+            'run_seconds': {'cellml_grid': ref_time['run'], 'fenics_coupled': times['total']}}, [fig])
+    assert passed, diffs
 
 
 @pytest.mark.slow

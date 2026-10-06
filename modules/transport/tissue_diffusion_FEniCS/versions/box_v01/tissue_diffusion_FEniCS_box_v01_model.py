@@ -25,7 +25,15 @@ Time stepping: theta method (theta = 1/2 is Crank-Nicolson) for diffusion, with 
 the reaction from the start of the step. The matrix is assembled and factorised once per step
 size. Under MPI the mesh is distributed and the region means are summed over the ranks, so every
 rank returns the same values.
+
+Field snapshots (optional, for plots): with ``field_times`` (a list of times) among the
+parameters, write(t) records the mean concentration in every mesh element at the first output
+time at or after each, as an array (nx, ny, nz) of the mesh (the grid times ``refine``), in
+``self.fields``; close() saves them to <output_dir>/<row>_fields.npz (``times``, ``fields``,
+``L`` the box size in m, ``grid`` and ``refine``).
 """
+import os
+
 import numpy as np
 
 try:
@@ -122,6 +130,17 @@ class DiffusionBox:
         self._solvers = {}
         self.history = []   # (t, region means, total amount) at the output times
 
+        # field snapshots: element means, laid out (nx, ny, nz) on the mesh
+        self.field_times = sorted(float(t) for t in (p.get('field_times') or []))
+        self.fields = []     # (t, array (nx, ny, nz))
+        self.grid, self.refine, self.L = grid, refine, L * self.Lref
+        if self.field_times:
+            n_local = self.Q.dofmap.index_map.size_local
+            centres = self.Q.tabulate_dof_coordinates()[:n_local]
+            n_mesh = grid * refine
+            self._element_index = np.clip(np.floor(centres / (L / n_mesh)).astype(int), 0, n_mesh - 1)
+            self._element_mean = fem.Function(self.Q)
+
     # --- helpers ----------------------------------------------------------------------------------
     def _solver(self, dt):
         key = round(dt, 15)
@@ -164,8 +183,27 @@ class DiffusionBox:
         self.u_n.x.array[:] = self.uh.x.array
         return {'C_t': self.region_means()}
 
+    def element_means(self):
+        """The mean concentration in each mesh element, as an array (nx, ny, nz) of the mesh (on
+        rank 0; None on the others). For Q1 the element mean of a trilinear field is its value
+        at the element's centre."""
+        self._element_mean.interpolate(self.u_n)
+        n_local = self.Q.dofmap.index_map.size_local
+        parts = self.comm.gather((self._element_index, self._element_mean.x.array[:n_local].copy()), root=0)
+        if self.comm.rank != 0:
+            return None
+        out = np.full(tuple(self.grid * self.refine), np.nan)
+        for idx, values in parts:
+            out[idx[:, 0], idx[:, 1], idx[:, 2]] = values
+        return out
+
     def write(self, t):
         self.history.append((t, self.region_means(), self.total_amount()))
+        while self.field_times and t >= self.field_times[0] - 1e-12:
+            self.field_times.pop(0)
+            field = self.element_means()
+            if field is not None:
+                self.fields.append((t, field))
 
     def snapshot(self):
         self._saved = self.u_n.x.array.copy()
@@ -174,6 +212,12 @@ class DiffusionBox:
         self.u_n.x.array[:] = self._saved
 
     def close(self):
+        out_dir = self.info.get('output_dir')
+        if self.fields and out_dir and self.comm.rank == 0:
+            os.makedirs(out_dir, exist_ok=True)
+            np.savez(os.path.join(out_dir, f"{self.info.get('row', 'tissue')}_fields.npz"),
+                     times=np.array([t for t, _ in self.fields]), fields=np.array([f for _, f in self.fields]),
+                     L=self.L, grid=self.grid, refine=self.refine)
         for A, ksp in self._solvers.values():
             ksp.destroy()
             A.destroy()

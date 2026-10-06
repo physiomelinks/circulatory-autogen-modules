@@ -378,7 +378,7 @@ IDENTITY_KEYS = ('module_type', 'version')
 # in this order in the JSON file
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
                      'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
-                     'parameter_ranges', 'validation', 'supermodule')
+                     'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
 # readable order of the nested keys the checks know (others follow in their own order)

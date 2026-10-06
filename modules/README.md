@@ -352,7 +352,9 @@ run by `tests/test_coupled_systems.py` (`make coupled`). It has capillaries (`ca
 `GE_capillary`) and a sympathetic neuron (varicosity `NEexchange_v01`), each paired with the
 tissue as either the FEniCS model or a finite-volume grid of `tissue_diffusion_volume` cells.
 The tests compare the two variants and record run times in each FEniCS model's
-`results/coupled_comparison.json`.
+`results/coupled_comparison.json`. Each comparison is also a result of the coupled_validation_test
+of the versions whose spec lists the model in `coupled_systems` (the FEniCS model and the
+varicosity), with heatmaps of the box's mid-plane at a few times (`plots/coupled_*.png`).
 
 ## What runs
 
@@ -503,6 +505,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod_<submodule>/<var>`) |
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
 | `run_inputs` | verification_config | an external model's run_test: `{port variable: value}`, the constant inputs it is stepped with (default 0) |
+| `coupled_systems` | verification_config | system models in `system_models/coupled` that use the version coupled to an external model; tests/test_coupled_systems.py records them as its coupled_validation_test (with heatmaps) |
 | `run_steps` | verification_config | an external model's run_test: how many coupling steps to take (default 5) |
 | `rest_check` | verification_config | `{sim_time, window, voltage, parameters, threshold, dt}`: a long run (e.g. 0 pA injected) that run_test reports, not a pass/fail gate: the spikes (upward crossings of `threshold` mV, default 0) of `voltage` and their rate in the last `window` s, in the message, metrics.rest_check and plots/rest.png |
 | `harness` | verification_config | the test network: `vessel_array` rows `[name, module_subtype, module_type, inp, out, instance]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours |
