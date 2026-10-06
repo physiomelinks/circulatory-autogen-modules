@@ -9,7 +9,7 @@ diffusion_volume's tissue_diffusion_volume cells and tissue_diffusion_face faces
 Each cell is a volume (V_P); each shared face joins two cells with its area A_f and the distances
 d_up, d_down from the two cell centres (centroids) to the face. The domains are closed, with
 different initial concentrations and no sources or consumption, so the total amount sum V C is
-conserved and every cell tends to the volume-weighted mean. Rewrites the vessel array and
+conserved and every cell tends to the volume-weighted mean. Rewrites the module array and
 parameters, and writes the spec only if there isn't one.
 
     python tools/build_diffusion_examples.py
@@ -23,7 +23,7 @@ import numpy as np
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from cam_testing import vessel_array  # noqa: E402
+from cam_testing import module_array  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, 'system_models', 'diffusion')
@@ -118,7 +118,7 @@ def write(model, description, cells, faces):
                    [f'd_up_f{k}', 'metre', da, f'example mesh: centre of {a} to the face'],
                    [f'd_down_f{k}', 'metre', db, f'example mesh: centre of {b} to the face'],
                    [f'open_flag_f{k}', 'dimensionless', 1, 'open face']]
-    vessel_array.write_records(os.path.join(d, f'{model}_vessel_array.json'), vessel_array.from_rows(rows))
+    module_array.write_records(os.path.join(d, f'{model}_module_array.json'), module_array.from_rows(rows))
     with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(['variable_name', 'units', 'value', 'data_reference'])

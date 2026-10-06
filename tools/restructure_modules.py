@@ -23,8 +23,8 @@ What it does, per renamed version (RENAMES below):
     verification_config.json module_type / version;
   - emptied old type directories (and the category cell/cardiomyocytes) are removed.
 Then, across the library:
-  - supermodule submodule records and verification_config harness vessel_array rows;
-  - system_models/*/*/*_vessel_array.json records (reference/ copies are circulatory_autogen's
+  - supermodule submodule records and verification_config harness module_array rows;
+  - system_models/*/*/*_module_array.json records (reference/ copies are circulatory_autogen's
     originals, left as they are); vessel (record) names do not change, so no parameter row does;
   - text that names a renamed version: "<type>/<version>" keys, "<type> <version>" in prose,
     "(<type>, <version>)" pairs and
@@ -32,7 +32,7 @@ Then, across the library:
     config descriptions, verification configs, SOURCES.md, source_figures.json, reviews/*.yaml and
     system_models/*/*/*_system.yaml;
   - tools/restructure_modules_renames.json: old pair -> new pair, read by
-    cam_testing.library.legacy_renames() so older vessel arrays keep resolving.
+    cam_testing.library.legacy_renames() so older module arrays keep resolving.
 
 Idempotent: a rename whose source is gone and whose target exists is skipped. Another session's
 uncommitted work (modules/system, modules/poiseuille_transport) is never touched.
@@ -468,7 +468,7 @@ def rewrite_supermodules_and_harnesses(pm, dry, changed):
             elif f.endswith('_verification_config.json'):
                 def fix_h(d):
                     hit = False
-                    for row in ((d.get('harness') or {}).get('vessel_array') or []):
+                    for row in ((d.get('harness') or {}).get('module_array') or (d.get('harness') or {}).get('vessel_array') or []):
                         if isinstance(row, list) and len(row) > 2 and (row[2], row[1]) in pm:
                             row[2], row[1] = pm[(row[2], row[1])]
                             hit = True
@@ -478,14 +478,14 @@ def rewrite_supermodules_and_harnesses(pm, dry, changed):
                 rewrite_json(p, fix_h, dry, changed)
 
 
-def rewrite_vessel_arrays(pm, dry, changed):
+def rewrite_module_arrays(pm, dry, changed):
     '''One record per line: each line is edited in place, so the files keep their layout.'''
     for cat in sorted(os.listdir(SYSTEM_MODELS)):
         cdir = os.path.join(SYSTEM_MODELS, cat)
         if not os.path.isdir(cdir):
             continue
         for model in sorted(os.listdir(cdir)):
-            p = os.path.join(cdir, model, f'{model}_vessel_array.json')
+            p = os.path.join(cdir, model, f'{model}_module_array.json')
             if not os.path.isfile(p):
                 continue
             lines = open(p).read().split('\n')
@@ -628,7 +628,7 @@ def main():
     pm = pair_map(rows)
     changed = []
     rewrite_supermodules_and_harnesses(pm, dry, changed)
-    rewrite_vessel_arrays(pm, dry, changed)
+    rewrite_module_arrays(pm, dry, changed)
     rewrite_text(rows, dry, changed)
     if not dry:
         port_notes(dry, changed)

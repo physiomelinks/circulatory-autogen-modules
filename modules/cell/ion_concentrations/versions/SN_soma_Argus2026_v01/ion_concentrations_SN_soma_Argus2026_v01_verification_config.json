@@ -8,7 +8,7 @@
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
   "outputs": ["Nai", "Ki", "E_Na", "E_K", "lNa/j_leak_Na", "lK/j_leak_K"],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["mod", "SN_soma_Argus2026_v01", "ion_concentrations", "", "lNa lK", "default"],
       ["lNa", "Argus2026_v01", "i_leak_Na", "mod", "", "default"],
       ["lK", "Argus2026_v01", "i_leak_K", "mod", "", "default"]

@@ -8,7 +8,7 @@
   "solver_info": {"rtol": 1e-08, "atol": 1e-10, "MaximumStep": 0.0125},
   "outputs": ["q", "u", "v", "b1/v", "b1/q", "b2/v", "b2/q"],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["mod", "pv_noI", "Nout_junction", "", "b1 b2", "default"],
       ["b1", "pv_noI", "simple", "mod", "", "default"],
       ["b2", "pv_noI", "simple", "mod", "", "default"]

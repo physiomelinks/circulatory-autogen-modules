@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from cam_testing import bib, library
+from cam_testing import bib, library, module_array
 from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, MODULES_DIR, REPO_ROOT, SYSTEM_MODELS_DIR,
                                  TESTS_KEYS, VERIFICATION_KEYS, VERSIONS, all_versions, ancestors_of, load_version,
                                  misplaced_spec_keys, module_relpath, module_type_names, parent_of, read_spec_files)
@@ -312,7 +312,7 @@ def test_nested_module_types_found_by_the_library():
 def _uses_of_module_types(version):
     '''(module_type, where) for every module_type a version's supermodule submodules and harness name.'''
     out = [(s.get('module_type') or s.get('vessel_type'), f'submodule {s.get("name")}') for s in version.submodules]
-    for row in ((version.spec.get('harness') or {}).get('vessel_array') or []):
+    for row in (module_array.harness_rows(version.spec.get('harness')) or []):
         if isinstance(row, (list, tuple)) and len(row) > 2:
             out.append((row[2], f'harness record {row[0]}'))
         elif isinstance(row, dict):
@@ -356,7 +356,7 @@ def test_system_models_directory_layout():
     assert not problems, '\n'.join(problems)
 
 
-SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_vessel_array.json')))
+SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_module_array.json')))
 
 
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
@@ -565,7 +565,7 @@ def _not_excluded(p):
     return not any(p.startswith(e + os.sep) for e in EXCLUDED)
 
 
-VESSEL_ARRAYS = SYSTEM_ARRAYS
+MODULE_ARRAYS = SYSTEM_ARRAYS
 MODULE_CONFIGS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules_config.json'), recursive=True)
                         if _not_excluded(p))
 OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'instances', '*', '*obs_data.json'), recursive=True)
@@ -584,8 +584,8 @@ def _validate(path, schema_name, *older_names):
     assert not errors, '\n'.join(f'{list(e.path)}: {e.message}' for e in errors[:20])
 
 
-@pytest.mark.parametrize('path', VESSEL_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
-def test_vessel_array_matches_libcuflynx_schema(path):
+@pytest.mark.parametrize('path', MODULE_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
+def test_module_array_matches_libcuflynx_schema(path):
     _validate(path, 'module_array.schema.json', 'vessel_array.schema.json')
 
 
@@ -756,11 +756,34 @@ def test_obs_data_matches_libcuflynx_schema(path):
     _validate(path, 'obs_data.schema.json')
 
 
-def test_no_csv_vessel_arrays_left():
-    left = [os.path.relpath(p, REPO_ROOT) for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_vessel_array.csv'),
-                                                              recursive=True)
+def test_no_csv_module_arrays_left():
+    left = [os.path.relpath(p, REPO_ROOT) for name in module_array.NAMES
+            for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', f'*_{name}.csv'), recursive=True)
             if os.sep + 'reference' + os.sep not in p]
-    assert not left, f'CSV vessel arrays left (run tools/convert_vessel_arrays.py): {left[:10]}'
+    assert not left, f'CSV module arrays left (run tools/convert_module_arrays.py): {left[:10]}'
+
+
+def test_module_arrays_use_the_new_name():
+    '''Module arrays were called vessel arrays: the library's own files and verification configs use the new
+    name. reference/ keeps circulatory_autogen's originals as they were, and the readers take both.'''
+    old_files = [os.path.relpath(p, REPO_ROOT)
+                 for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_vessel_array.*'), recursive=True)
+                 if os.sep + 'reference' + os.sep not in p]
+    old_keys = [os.path.relpath(p, REPO_ROOT)
+                for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_verification_config.json'), recursive=True)
+                if '"vessel_array"' in open(p).read()]
+    assert not old_files and not old_keys, (f'rename to module_array: files {old_files[:10]}, '
+                                            f'harness keys in {old_keys[:10]}')
+
+
+def test_old_module_array_names_are_still_read(tmp_path):
+    (tmp_path / 'm_vessel_array.json').write_text('[]')
+    assert module_array.find(str(tmp_path), 'm').endswith('m_vessel_array.json')
+    (tmp_path / 'm_module_array.json').write_text('[]')
+    assert module_array.find(str(tmp_path), 'm').endswith('m_module_array.json')
+    rows = [['mod', 'nn', 'x', '', '']]
+    assert module_array.harness_rows({'vessel_array': rows}) == rows
+    assert module_array.harness_rows({'module_array': rows}) == rows
 
 
 def test_module_type_names_listed():

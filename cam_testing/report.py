@@ -465,11 +465,11 @@ def _global_names(version, _depth=0):
 
 
 def _system_model_uses(version):
-    '''(model, record) for every system-model record using this version (system_models/*/*/*_vessel_array.json).'''
+    '''(model, record) for every system-model record using this version (system_models/*/*/*_module_array.json).'''
     import glob
     from cam_testing.library import SYSTEM_MODELS_DIR
     out = []
-    for path in sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_vessel_array.json'))):
+    for path in sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_module_array.json'))):
         try:
             with open(path) as f:
                 rows = json.load(f)

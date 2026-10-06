@@ -7,7 +7,7 @@
   "solver": "CVODE_myokit",
   "outputs": ["q_sum", "sum_blood_volume/q_mod_sum", "va/q", "vb/q", "va/v", "vb/v", "flow_out_a/v", "flow_out_b/v"],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["p_in_a", "constant", "inlet_pressure", "", "va", "default"],
       ["va", "pv", "arterial_simple", "p_in_a", "flow_out_a mod", "default"],
       ["flow_out_a", "constant", "outlet_flow", "va", "", "default"],

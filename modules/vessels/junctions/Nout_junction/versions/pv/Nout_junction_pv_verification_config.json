@@ -10,7 +10,7 @@
   "outputs": ["u", "v", "q", "q_C", "R", "C", "I", "du_C_dt", "dn1/v", "dn2/v"],
   "run_parameters": {},
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["mod", "pv", "Nout_junction", "bcin", "dn1 dn2", "default"],
       ["bcin", "constant", "inlet_pressure", "", "mod", "default"],
       ["dn1", "pv", "arterial_simple", "mod", "bcout1", "default"],

@@ -7,7 +7,7 @@
   "solver": "CVODE_myokit",
   "outputs": ["C_O2_out", "C_CO2_out", "dot_C_CO2_out", "P_O2_out", "P_CO2_out", "C_O2_out_extra_ub", "term/v_T"],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["term", "pp_I", "terminal", "", "mod", "default"],
       ["mod", "Albanese2016_v01", "gas_transport_simple", "term", "", "default"]
     ],
