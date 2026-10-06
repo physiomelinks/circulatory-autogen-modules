@@ -17,7 +17,7 @@ are edited by hand once a module has been reviewed.
 
 Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
 provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
-modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
+modules/README.md); tools/restructure_to_versions.py moves an old-layout tree into it.
 """
 import argparse
 import csv
