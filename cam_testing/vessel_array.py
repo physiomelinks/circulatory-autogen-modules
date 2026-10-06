@@ -94,12 +94,13 @@ def from_rows(rows):
 
 
 def libcuflynx_reads_json():
-    '''Whether the installed libcuflynx reads JSON vessel arrays (its config_schemas.read_vessel_array_records).'''
+    '''Whether the installed libcuflynx reads JSON vessel arrays (its config_schemas.read_module_array_records,
+    called read_vessel_array_records before circulatory_autogen #549).'''
     try:
         from libcuflynx.utilities import config_schemas
     except ImportError:
         return False
-    return hasattr(config_schemas, 'read_vessel_array_records')
+    return hasattr(config_schemas, 'read_module_array_records') or hasattr(config_schemas, 'read_vessel_array_records')
 
 
 def to_library_versions(records, instance='default'):
