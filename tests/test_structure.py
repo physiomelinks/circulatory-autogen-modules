@@ -312,11 +312,16 @@ def test_nested_module_types_found_by_the_library():
 def _uses_of_module_types(version):
     '''(module_type, where) for every module_type a version's supermodule submodules and harness name.'''
     out = [(s.get('module_type') or s.get('vessel_type'), f'submodule {s.get("name")}') for s in version.submodules]
-    for row in (module_array.harness_rows(version.spec.get('harness')) or []):
-        if isinstance(row, (list, tuple)) and len(row) > 2:
-            out.append((row[2], f'harness record {row[0]}'))
-        elif isinstance(row, dict):
-            out.append((row.get('module_type') or row.get('vessel_type'), f'harness record {row.get("name")}'))
+    # the version's harness, and the instances' own (validation.<instance>.harness)
+    networks = [('harness', version.spec.get('harness'))]
+    networks += [(f'validation.{inst}.harness', (kinds or {}).get('harness'))
+                 for inst, kinds in (version.spec.get('validation') or {}).items() if isinstance(kinds, dict)]
+    for where, network in networks:
+        for row in (module_array.harness_rows(network) or []):
+            if isinstance(row, (list, tuple)) and len(row) > 2:
+                out.append((row[2], f'{where} record {row[0]}'))
+            elif isinstance(row, dict):
+                out.append((row.get('module_type') or row.get('vessel_type'), f'{where} record {row.get("name")}'))
     return out
 
 
@@ -798,6 +803,8 @@ MISSING_SOURCE_FIGURES = {
     'inlet_flow/adan::boileau2015_adan56_inflow', 'inlet_flow/adan_2::boileau2015_adan56_inflow',
     'inlet_flow/aorticbif::boileau2015_ibif_inflow', 'Lotka_Volterra/Lotka1925_v01::carpenter2018',
     'Lotka_Volterra/Lotka1925_v01::hudson_bay_lynx_hare', 'pulmonary_GE/Albanese2016_v01::pulmonary_GE_normal_blood_gases',
+    # wanaverbecq2003plasma: no PDF on disk (not in ~/Zotero/storage or ~/Documents/papers; 2026-10-07); values from the full text
+    'PMCA/Colegrove2000_v01::wanaverbecq2003_scg',
 }
 
 

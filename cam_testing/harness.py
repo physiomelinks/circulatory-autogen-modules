@@ -180,7 +180,16 @@ def output_key(variable):
     return variable.replace('/', '__')
 
 
-def _write_resources(component, resources_dir, prefix, overrides, parameters=None, instances=True):
+def network(component, instance=None):
+    '''The test network of ``component`` at ``instance`` (an Instance or its name): the instance's own
+    (validation.<instance>.harness in the verification config, e.g. an experiment's set-up for a
+    calibration) when it has one, else the version's (harness; empty: the version alone).'''
+    name = getattr(instance, 'name', instance)
+    own = (((component.spec.get('validation') or {}).get(name) or {}).get('harness')) if name else None
+    return own if own is not None else (component.spec.get('harness') or {})
+
+
+def _write_resources(component, resources_dir, prefix, overrides, parameters=None, instances=True, instance=None):
     '''
     The test network: by default the version alone. A version that only works with
     neighbours (its inputs are variables another vessel supplies) gives a small network in its
@@ -194,12 +203,14 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
             - [P_pressure_in, J_per_m3, 2000, source]
 
     ``parameters``: the instance parameters to write (default: the version's default instance).
+    An instance may have its own network instead (validation.<instance>.harness, see ``network``);
+    ``instance`` selects it.
     ``instances=False`` leaves "instance" out of the records (each record then gets its version's
     default_instance). libcuflynx before circulatory_autogen #535's baad9e73 needed this for the C++
     0D-1D split, which appended 5-column rows.
     '''
     os.makedirs(resources_dir, exist_ok=True)
-    network = (component.spec.get('harness') or {})
+    network = globals()['network'](component, instance)
     rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
@@ -233,11 +244,12 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
                 writer.writerow([name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
 
 
-def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None):
+def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, instance=None):
     '''
     Generates the version's model in ``work_dir``; returns the path of the .cellml file,
     or of the .py file for ``model_type='python'``. ``parameters``: an instance's parameters
-    (default: the version's default instance).
+    (default: the version's default instance). ``instance``: the instance whose own test network
+    (validation.<instance>.harness) is used, if it has one.
     '''
     from libcuflynx.scripts.script_generate_with_new_architecture import generate_with_new_architecture
 
@@ -247,7 +259,7 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
         work_dir = os.path.join(work_dir, model_type)
     resources_dir = os.path.join(work_dir, 'resources')
     generated_dir = os.path.join(work_dir, 'generated_models')
-    _write_resources(component, resources_dir, prefix, overrides, parameters)
+    _write_resources(component, resources_dir, prefix, overrides, parameters, instance=instance)
     config = {
         'file_prefix': prefix,
         'input_param_file': f'{prefix}_parameters.csv',
