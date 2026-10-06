@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from cam_testing import bib, library
+from cam_testing import bib, library, module_array
 from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, MODULES_DIR, REPO_ROOT, SYSTEM_MODELS_DIR,
                                  TESTS_KEYS, VERIFICATION_KEYS, VERSIONS, all_versions, ancestors_of, load_version,
                                  misplaced_spec_keys, module_relpath, module_type_names, parent_of, read_spec_files)
@@ -270,6 +270,23 @@ def test_no_directory_name_twice():
     assert not problems, '\n'.join(problems)
 
 
+def test_no_nn_versions():
+    '''No version name starts with nn (directory_schema.json rules.version_names): a former nn_<x> is <x>,
+    a former plain nn is named by its source. Only the pairs libcuflynx writes itself are kept
+    (nn_versions_allowed).'''
+    allowed = set(SCHEMA.get('nn_versions_allowed') or {})
+    bad = [f'{module_relpath(v.vessel_type)}/{v.name}' for v in _versions() if v.name.startswith('nn')]
+    assert not [b for b in bad if b not in allowed], f'nn versions: {[b for b in bad if b not in allowed]}'
+    stale = sorted(allowed - set(bad))
+    assert not stale, f'nn_versions_allowed lists versions that are gone: {stale}'
+
+
+def test_type_names_carry_no_year():
+    '''A module_type is named by its mechanism, never by its author or year (rules.placement).'''
+    bad = sorted(n for n in module_type_names() if re.search(r'(19|20)\d\d', n) or n.endswith(('_OLD', '_Gee', '_Ursino')))
+    assert not bad, f'module_type names with a year or source: {bad}'
+
+
 def test_spec_key_lists_match_the_schema():
     '''The key lists cam_testing splits the spec by are the ones directory_schema.json documents.'''
     keys = SCHEMA['spec_keys']
@@ -295,7 +312,7 @@ def test_nested_module_types_found_by_the_library():
 def _uses_of_module_types(version):
     '''(module_type, where) for every module_type a version's supermodule submodules and harness name.'''
     out = [(s.get('module_type') or s.get('vessel_type'), f'submodule {s.get("name")}') for s in version.submodules]
-    for row in ((version.spec.get('harness') or {}).get('vessel_array') or []):
+    for row in (module_array.harness_rows(version.spec.get('harness')) or []):
         if isinstance(row, (list, tuple)) and len(row) > 2:
             out.append((row[2], f'harness record {row[0]}'))
         elif isinstance(row, dict):
@@ -339,7 +356,7 @@ def test_system_models_directory_layout():
     assert not problems, '\n'.join(problems)
 
 
-SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_vessel_array.json')))
+SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_module_array.json')))
 
 
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
@@ -548,16 +565,17 @@ def _not_excluded(p):
     return not any(p.startswith(e + os.sep) for e in EXCLUDED)
 
 
-VESSEL_ARRAYS = SYSTEM_ARRAYS
+MODULE_ARRAYS = SYSTEM_ARRAYS
 MODULE_CONFIGS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules_config.json'), recursive=True)
                         if _not_excluded(p))
 OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'instances', '*', '*obs_data.json'), recursive=True)
                   if _not_excluded(p))
 
 
-def _validate(path, schema_name):
+def _validate(path, schema_name, *older_names):
+    '''older_names: the schema's name in older libcuflynx releases (vessel_array before #549).'''
     jsonschema = pytest.importorskip('jsonschema')
-    schema = _libcuflynx_schema(schema_name)
+    schema = next((s for s in map(_libcuflynx_schema, (schema_name,) + older_names) if s is not None), None)
     if schema is None:
         pytest.skip(f'the installed libcuflynx has no schemas/{schema_name}')
     with open(path) as f:
@@ -566,9 +584,9 @@ def _validate(path, schema_name):
     assert not errors, '\n'.join(f'{list(e.path)}: {e.message}' for e in errors[:20])
 
 
-@pytest.mark.parametrize('path', VESSEL_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
-def test_vessel_array_matches_libcuflynx_schema(path):
-    _validate(path, 'vessel_array.schema.json')
+@pytest.mark.parametrize('path', MODULE_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
+def test_module_array_matches_libcuflynx_schema(path):
+    _validate(path, 'module_array.schema.json', 'vessel_array.schema.json')
 
 
 @pytest.mark.parametrize('path', MODULE_CONFIGS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
@@ -610,16 +628,162 @@ def test_licence_and_creator_rules():
     assert licence_and_creator_problems({'licence': 'MIT'}) == ['no "creator"']
 
 
+# ----------------------------------------------------------------------------------------------
+# required_citations and the bib key convention (2026-10-06; modules/README.md, "Citations")
+# ----------------------------------------------------------------------------------------------
+
+def required_citations_problems(entry, bib_keys):
+    '''The config entry's "required_citations" (a non-empty list of keys in the version's references.bib)
+    and "required_citations_uncertain" (optional: a non-empty subset of them).'''
+    problems = []
+    rc = entry.get('required_citations')
+    if not rc:
+        problems.append('no "required_citations"' if rc is None else '"required_citations" is empty')
+    elif not (isinstance(rc, list) and all(isinstance(k, str) and k for k in rc)):
+        problems.append(f'required_citations {rc!r} is not a list of bib keys')
+    else:
+        if len(set(rc)) != len(rc):
+            problems.append(f'required_citations repeats a key: {rc}')
+        missing = [k for k in rc if k not in bib_keys]
+        if missing:
+            problems.append(f'required_citations not in the references.bib: {missing}')
+    if 'required_citations_uncertain' in entry:
+        unc = entry['required_citations_uncertain']
+        if not (isinstance(unc, list) and unc and all(isinstance(k, str) for k in unc)):
+            problems.append(f'required_citations_uncertain {unc!r} is not a non-empty list of keys (leave it out when none is)')
+        elif not set(unc) <= set(rc or []):
+            problems.append(f'required_citations_uncertain not in required_citations: {sorted(set(unc) - set(rc or []))}')
+    return problems
+
+
+def test_every_version_has_required_citations():
+    '''Every version's config entry names the papers its model is built on: "required_citations", a
+    non-empty list of keys that are in the version's references.bib ("required_citations_uncertain"
+    marks the best guesses among them).'''
+    problems = []
+    for v in _versions():
+        with open(v.path('modules_config.json')) as f:
+            entries = json.load(f)
+        keys = set(bib.read(bib.bib_path(v)))
+        for e in entries:
+            problems += [f'{v.key}: {p}' for p in required_citations_problems(e, keys)]
+    assert not problems, '\n'.join(problems[:40]) + (f'\n... {len(problems)} in all' if len(problems) > 40 else '')
+
+
+def test_required_citations_rules():
+    keys = {'paci2013computational', 'tao2011model'}
+    assert required_citations_problems({'required_citations': ['paci2013computational']}, keys) == []
+    assert required_citations_problems({'required_citations': ['tao2011model', 'paci2013computational'],
+                                        'required_citations_uncertain': ['tao2011model']}, keys) == []
+    assert required_citations_problems({}, keys) == ['no "required_citations"']
+    assert required_citations_problems({'required_citations': []}, keys) == ['"required_citations" is empty']
+    assert 'not in the references.bib' in required_citations_problems({'required_citations': ['Paci2013']}, keys)[0]
+    assert 'not in required_citations' in required_citations_problems(
+        {'required_citations': ['tao2011model'], 'required_citations_uncertain': ['paci2013computational']}, keys)[0]
+    assert 'non-empty' in required_citations_problems(
+        {'required_citations': ['tao2011model'], 'required_citations_uncertain': []}, keys)[0]
+
+
+def test_config_key_lists_match_the_schema():
+    '''The record keys cam_testing checks are the ones directory_schema.json documents.'''
+    assert list(SCHEMA['config_entry_record_keys']) == list(library.RECORD_KEYS) + list(library.CITATION_KEYS)
+
+
+# Keys allowed to break the <surname><year><word> shape, because their entries have no year (web pages
+# without a publication date); each still equals cam_testing.bib.convention_key of its entry. Only add a
+# key here when the source really has no date.
+UNDATED_BIB_KEYS = {
+    'ranjanchannelpedia',                 # Channelpedia Kv1.5 model 21 (no date on the model page)
+    'channelpedia',                       # Channelpedia Kv4.2 model 40 (no author or date on the model page)
+    'usnationallibraryofmedicinerapid',   # MedlinePlus encyclopedia page "Rapid shallow breathing"
+}
+
+
+def _bib_files():
+    return sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_references*.bib'), recursive=True)
+                  if _not_excluded(p))
+
+
+def bib_key_problems(key, raw_fields, n_words_max=4):
+    '''A key follows the convention: lowercase <first author's surname><year><first significant title
+    word> (cam_testing.bib.convention_key), or with further title words when two papers would share it.'''
+    allowed = [bib.convention_key(raw_fields, n) for n in range(1, n_words_max + 1)]
+    if key not in allowed:
+        return [f'{key}: not the convention key of its entry ({allowed[0]})']
+    if not bib.KEY_RE.match(key) and key not in UNDATED_BIB_KEYS:
+        return [f'{key}: not <surname><year><word> (no year in the entry? add one, or list it in UNDATED_BIB_KEYS)']
+    return []
+
+
+def test_bib_keys_follow_the_convention():
+    '''Every key in every references.bib / references_proposed.bib is the lowercase
+    <surname><year><first title word> of its entry (tools/rekey_bib.py rekeyed the library on 2026-10-06).'''
+    problems = []
+    for p in _bib_files():
+        with open(p, encoding='utf-8') as f:
+            text = f.read()
+        problems += [f'{os.path.relpath(p, MODULES_DIR)}: {m}'
+                     for _, key, _, _, raw in bib.entries(text) for m in bib_key_problems(key, raw)]
+    assert not problems, '\n'.join(problems[:40]) + (f'\n... {len(problems)} in all' if len(problems) > 40 else '')
+
+
+def test_one_key_per_paper():
+    '''No two keys cite the same paper (same DOI) anywhere in the library.'''
+    by_doi = {}
+    for p in _bib_files():
+        for key, fields in bib.read(p).items():
+            doi = (fields.get('doi') or '').strip().lower()
+            if doi:
+                by_doi.setdefault(doi, set()).add(key)
+    dup = {d: sorted(k) for d, k in by_doi.items() if len(k) > 1}
+    assert not dup, f'papers cited under two keys (merge them): {dup}'
+
+
+def test_bib_key_rules():
+    raw = {'author': 'Belluzzi, O. and Sacchi, O.', 'year': '1986',
+           'title': 'A quantitative description of the sodium current in the rat sympathetic neurone'}
+    assert bib.convention_key(raw) == 'belluzzi1986quantitative'
+    assert bib.convention_key({'author': 'van der Pol, Balthasar', 'year': '1926', 'title': 'On relaxation-oscillations'}) \
+        == 'vanderpol1926relaxation'
+    assert bib.convention_key({'author': 'Hern{\\\'a}ndez-Cruz, A.', 'year': '1997', 'title': 'Ca2+ release'}) == 'hernandezcruz1997ca'
+    assert bib_key_problems('belluzzi1986quantitative', raw) == []
+    assert bib_key_problems('belluzzi1986quantitativedescription', raw) == []      # disambiguated
+    assert bib_key_problems('BelluzziSacchi1986', raw)
+
+
 @pytest.mark.parametrize('path', OBS_DATA, ids=lambda p: os.path.relpath(p, MODULES_DIR))
 def test_obs_data_matches_libcuflynx_schema(path):
     _validate(path, 'obs_data.schema.json')
 
 
-def test_no_csv_vessel_arrays_left():
-    left = [os.path.relpath(p, REPO_ROOT) for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_vessel_array.csv'),
-                                                              recursive=True)
+def test_no_csv_module_arrays_left():
+    left = [os.path.relpath(p, REPO_ROOT) for name in module_array.NAMES
+            for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', f'*_{name}.csv'), recursive=True)
             if os.sep + 'reference' + os.sep not in p]
-    assert not left, f'CSV vessel arrays left (run tools/convert_vessel_arrays.py): {left[:10]}'
+    assert not left, f'CSV module arrays left (run tools/convert_module_arrays.py): {left[:10]}'
+
+
+def test_module_arrays_use_the_new_name():
+    '''Module arrays were called vessel arrays: the library's own files and verification configs use the new
+    name. reference/ keeps circulatory_autogen's originals as they were, and the readers take both.'''
+    old_files = [os.path.relpath(p, REPO_ROOT)
+                 for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_vessel_array.*'), recursive=True)
+                 if os.sep + 'reference' + os.sep not in p]
+    old_keys = [os.path.relpath(p, REPO_ROOT)
+                for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_verification_config.json'), recursive=True)
+                if '"vessel_array"' in open(p).read()]
+    assert not old_files and not old_keys, (f'rename to module_array: files {old_files[:10]}, '
+                                            f'harness keys in {old_keys[:10]}')
+
+
+def test_old_module_array_names_are_still_read(tmp_path):
+    (tmp_path / 'm_vessel_array.json').write_text('[]')
+    assert module_array.find(str(tmp_path), 'm').endswith('m_vessel_array.json')
+    (tmp_path / 'm_module_array.json').write_text('[]')
+    assert module_array.find(str(tmp_path), 'm').endswith('m_module_array.json')
+    rows = [['mod', 'nn', 'x', '', '']]
+    assert module_array.harness_rows({'vessel_array': rows}) == rows
+    assert module_array.harness_rows({'module_array': rows}) == rows
 
 
 def test_module_type_names_listed():
@@ -631,9 +795,9 @@ def test_module_type_names_listed():
 MISSING_SOURCE_FIGURES = {
     'capillary/pp_micro::default', 'heart/vp::default', 'heart/vp_Ca::default',
     'heart/vp_new_valve::default', 'heart/vp_wCont::default', 'heart/vp_wCont_nonstiff::default',
-    'inlet_flow/nn_adan::boileau2015_adan56_inflow', 'inlet_flow/nn_adan_2::boileau2015_adan56_inflow',
-    'inlet_flow/nn_aorticbif::boileau2015_ibif_inflow', 'Lotka_Volterra/nn::carpenter2018',
-    'Lotka_Volterra/nn::hudson_bay_lynx_hare', 'pulmonary_GE/nn::pulmonary_GE_normal_blood_gases',
+    'inlet_flow/adan::boileau2015_adan56_inflow', 'inlet_flow/adan_2::boileau2015_adan56_inflow',
+    'inlet_flow/aorticbif::boileau2015_ibif_inflow', 'Lotka_Volterra/Lotka1925_v01::carpenter2018',
+    'Lotka_Volterra/Lotka1925_v01::hudson_bay_lynx_hare', 'pulmonary_GE/Albanese2016_v01::pulmonary_GE_normal_blood_gases',
 }
 
 
@@ -660,3 +824,40 @@ def test_missing_source_figures_list_is_current():
     have = {k for k, i in _publication_instances() if not i.source_figures()}
     stale = MISSING_SOURCE_FIGURES - have
     assert not stale, f'remove from MISSING_SOURCE_FIGURES (now has figures or no longer needs them): {sorted(stale)}'
+
+
+def _ca_resources():
+    '''circulatory_autogen's resources/ directory, from the installed libcuflynx (or the sibling clone).'''
+    try:
+        import libcuflynx
+        d = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(libcuflynx.__file__))), 'resources')
+        if os.path.isdir(d):
+            return d
+    except Exception:  # noqa: BLE001
+        pass
+    d = os.path.join(REPO_ROOT, '..', 'circulatory_autogen', 'resources')
+    return d if os.path.isdir(d) else None
+
+
+def _reference_copies():
+    return sorted(p for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', 'reference', '*'))
+                  if p.endswith(('_parameters.csv', '_obs_data.json', '_params_for_id.csv')))
+
+
+@pytest.mark.parametrize('path', _reference_copies(), ids=lambda p: os.path.relpath(p, SYSTEM_MODELS_DIR))
+def test_reference_copies_are_circulatory_autogen_originals_in_library_keys(path):
+    '''system_models/**/reference/ holds circulatory_autogen's original files with only the bib keys
+    changed to this library's (tools/bib_rekey_map.json): each equals the original after the same rekey
+    (tools/rekey_bib.rekey_string), so the copies stay exact and re-importing reproduces them.'''
+    import importlib.util
+    res = _ca_resources()
+    original = os.path.join(res, os.path.basename(path)) if res else None
+    if not original or not os.path.isfile(original):
+        pytest.skip('no circulatory_autogen original to compare with')
+    spec = importlib.util.spec_from_file_location('rekey_bib', os.path.join(REPO_ROOT, 'tools', 'rekey_bib.py'))
+    rekey = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rekey)
+    with open(original, encoding='utf-8') as f:
+        expected = rekey.rekey_string(path, f.read())
+    with open(path, encoding='utf-8') as f:
+        assert f.read() == expected, f'{path} differs from {original} (after rekeying) beyond its bib keys'

@@ -8,6 +8,8 @@
     "default_instance": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "required_citations": ["fang2008oxygen", "baratta2023dolfinx"],
+    "required_citations_uncertain": ["fang2008oxygen"],
     "description": "Diffusion of one solute in a 3D box of tissue, solved with FEniCSx, exchanging a source flux and the local concentration with each connected 0D module (e.g. GE_capillary, varicosity NEexchange_v01) through capillary_to_flux_port, the port of the finite-volume CellML cell tissue_diffusion_volume.",
     "entrance_ports": [
       {

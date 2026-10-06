@@ -44,7 +44,7 @@
       "min_children": 1
     },
     "module_type": {
-      "description": "One module_type: a directory with versions/. Its report across versions is generated next to it. Its other subdirectories are nested module_types: module_types that only exist within it (each with versions/, possibly nesting again), e.g. heart/chamber, cell/neuron/soma/SN_membrane_soma.",
+      "description": "One module_type: a directory with versions/. Its report across versions is generated next to it. Its other subdirectories are nested module_types: module_types that only exist within it (each with versions/, possibly nesting again), e.g. heart/chamber, cell/neuron/soma.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [],
@@ -192,11 +192,11 @@
       ]
     },
     "system_model": {
-      "description": "One model: its vessel array (records name a module_type, a version as module_subtype, and an instance), parameters (which win over the instances'), spec, and circulatory_autogen's original under reference/.",
+      "description": "One model: its module array (records name a module_type, a version as module_subtype, and an instance), parameters (which win over the instances'), spec, and circulatory_autogen's original under reference/.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
-          "{model}_vessel_array.json",
+          "{model}_module_array.json",
           "{model}_system.yaml"
         ],
         "optional": [
@@ -225,10 +225,14 @@
     "instance_is_obs_data_name": "An instance with an obs_data (and a validation obs_data) has \"obs_data_name\" equal to the instance directory's name.",
     "unique_directory_names": "No category or module_type directory name appears twice in modules/, nested module_types included (the generic names above, version names, which repeat across module_types, and instance names, which name data sets, are exempt).",
     "category_is_not_module_type": "No category directory has the name of a module_type.",
-    "nested_module_types": "A module_type's subdirectories other than versions/ are nested module_types. A nested module_type is used only within its parent: every supermodule submodule and every harness record (verification_config harness.vessel_array) that names it belongs to a version of its parent, of a module_type nested (at any depth) in its parent, or of itself. System models are exempt: they may wire a parent's parts explicitly (e.g. SN_simple_flat, 3compartment's chambers and valves).",
-    "placement": "A module_type sits in the most specific place that covers every context it is used in (not as shallow as possible): inside the module_type it is only used within (a nested module_type, e.g. heart/chamber, cell/neuron/soma), otherwise in the most specific category covering its uses (e.g. cell/ion_channels for channels shared by neurons and cardiomyocytes). A category exists only where no module_type of that meaning does (cell, not cell/neurons beside the module_type neuron).",
-    "version_names": "Versions are named <source>_vXX (e.g. Argus2026_v01); existing module_subtypes (vp, nn_constant, ...) are kept. libcuflynx's vessel-port connection rule reads a module_subtype's first two letters as the inlet and outlet port kinds when they are pp, pv, vp or vv (and exempts names starting nn), so a version name starts with one of those four only when it means that port convention, and a module_type folded into another as a version keeps its old module_subtype's prefix first (heart_ASD vp_wCont -> heart vp_wCont_ASD).",
-    "system_model_records_resolve": "Every record of a system model's vessel array names a (module_type, version) of the library and an instance that version has (records of modules not in this library are listed in the model's spec as known)."
+    "nested_module_types": "A module_type's subdirectories other than versions/ are nested module_types. A nested module_type is used only within its parent: every supermodule submodule and every harness record (verification_config harness.module_array) that names it belongs to a version of its parent, of a module_type nested (at any depth) in its parent, or of itself. System models are exempt: they may wire a parent's parts explicitly (e.g. SN_simple_flat, 3compartment's chambers and valves).",
+    "placement": "A module_type is named after the mechanism it models, never after the cell, compartment, system or author it was built for (no surnames or years in type names). It sits in the most general category where its mechanism is meaningful (cell/Ca_handling; cell/ion_channels/<channel> for channels, pumps and exchangers), and is nested only when it is an anatomical part of its parent (cell/neuron/{soma,axon,varicosity}, heart/{chamber,valve,cardiac_clock}). A category exists only where no module_type of that meaning does. Modules of one mechanism built for different cells or compartments are versions (different maths) or instances (same maths, other values) of one type.",
+    "version_names": "Versions are named <system>_<compartment>_<Source><Year>_vXX, <system>_<Source><Year>_vXX or <Source><Year>_vXX (Source: the first author's surname in ASCII CamelCase; ArgusUNPUBLISHED for the owner's unpublished or modified models), with _SI for an SI-unit duplicate and _OLD for a superseded formulation. Vessel versions keep their port letters first (pp, pv, vp, vv: libcuflynx reads a vessel's first two letters as its inlet/outlet port kinds) and their descriptive subtypes. No version starts with nn, except the pairs libcuflynx writes itself (nn_versions_allowed).",
+    "system_model_records_resolve": "Every record of a system model's module array names a (module_type, version) of the library and an instance that version has (records of modules not in this library are listed in the model's spec as known).",
+    "version_or_instance": "Different equations (a changed relation, state or port variable) make a version; the same equations with other parameter values make an instance of the existing version.",
+    "port_differences": "Versions of one module_type may expose different ports when the mechanism does not allow common ones (e.g. named-current vs summed-current membrane versions). This is allowed and documented: each such version's tests.yaml notes end with the type's port table ('Ports of the versions of <type>'). No check compares ports across versions.",
+    "required_citations": "Every version's config entry has \"required_citations\": a non-empty list of bib keys, each in the version's {module_type}_{version}_references.bib, naming the papers the version's model (its equations) is built on, as distinct from the per-parameter value sources in the instance CSVs' data_reference. \"required_citations_uncertain\" (optional, left out when empty) lists the keys among them that are a best guess still to confirm. Owner-original models cite placeholders (argus2026sympathetic, argus2026unpublished, gee2026unpublished) and generic mechanisms the software (argus2026circulatory). A supermodule lists its own; its report adds its submodules'.",
+    "bib_keys": "Every BibTeX key is <first author's surname><year><first significant title word>, lowercase ASCII (belluzzi1986quantitative; cam_testing.bib.convention_key): particles join the surname (vanderpol), accents and hyphens are dropped (hernandezcruz), stopwords (a, an, the, on, of, ...) are skipped. Two different papers with the same key take further title words. One key per paper. Entries without a year (undated web pages) are listed in tests/test_structure.py UNDATED_BIB_KEYS."
   },
   "spec_keys": {
     "both": [
@@ -270,5 +274,15 @@
       "review",
       "review_scope"
     ]
+  },
+  "config_entry_record_keys": {
+    "licence": "SPDX id of the version's licence (cam_testing.library.LICENCES); default CC0-1.0",
+    "creator": "list of the names of the people who created the version ([] until given in review)",
+    "required_citations": "non-empty list of bib keys in the version's references.bib: the papers its model is built on (rules.required_citations)",
+    "required_citations_uncertain": "optional: the keys of required_citations that are a best guess still to confirm (left out when none)"
+  },
+  "nn_versions_allowed": {
+    "coupling/FV1D_vessel/nn": "libcuflynx's 1D coupling writes FV1D_vessel records with BC_type nn",
+    "coupling/FV1D_volume_sum/nn": "libcuflynx's ModelParsers adds a ('FV1D_volume_sum', 'nn') record to 1D-coupled models"
   }
 }

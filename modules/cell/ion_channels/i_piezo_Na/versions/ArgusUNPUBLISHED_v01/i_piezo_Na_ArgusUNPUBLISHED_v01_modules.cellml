@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_piezo_Na_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_piezo_Na_Argus_unpublished">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="Vm" public_interface="in" units="milliV"/>
+        <variable name="g" public_interface="in" units="microS"/>
+        <variable initial_value="m_r_init" name="m_r" public_interface="out" units="dimensionless"/>
+        <variable name="m_r_init" public_interface="in" units="dimensionless"/>
+        <variable name="m_r_inf" public_interface="out" units="dimensionless"/>
+        <variable name="tau_r" public_interface="in" units="second"/>
+        <variable initial_value="m_V_init" name="m_V" public_interface="out" units="dimensionless"/>
+        <variable name="m_V_init" public_interface="in" units="dimensionless"/>
+        <variable name="m_V_inf" public_interface="out" units="dimensionless"/>
+        <variable name="tau_V" public_interface="in" units="second"/>
+        <variable name="V_50" public_interface="in" units="milliV"/>
+        <variable name="I_piezo" public_interface="out" units="nanoA"/>
+        <variable name="E_Na" public_interface="in" units="milliV"/>
+        <variable name="r" public_interface="in" units="dimensionless"/>
+        <variable name="r_50" public_interface="in" units="dimensionless"/>
+        <variable name="k_r" public_interface="in" units="dimensionless"/>
+        <variable name="k_V" public_interface="in" units="milliV"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>I_piezo</ci>
+                <apply>
+                    <times/>
+                    <ci>g</ci>
+                    <ci>m_r</ci>
+                    <ci>m_V</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Vm</ci>
+                        <ci>E_Na</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>m_r</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>m_r_inf</ci>
+                        <ci>m_r</ci>
+                    </apply>
+                    <ci>tau_r</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>m_r_inf</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>r</ci>
+                                        <ci>r_50</ci>
+                                    </apply>
+                                </apply>
+                                <ci>k_r</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>m_V</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>m_V_inf</ci>
+                        <ci>m_V</ci>
+                    </apply>
+                    <ci>tau_V</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>m_V_inf</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>Vm</ci>
+                                        <ci>V_50</ci>
+                                    </apply>
+                                </apply>
+                                <ci>k_V</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

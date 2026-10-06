@@ -1,0 +1,101 @@
+[
+  {
+    "module_type": "afferent_to_respiratory_efferent",
+    "module_subtype": "Albanese2016_v01",
+    "module_format": "cellml",
+    "component_file": "afferent_to_respiratory_efferent_Albanese2016_v01_modules.cellml",
+    "component_type": "afferent_to_respiratory_efferent_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "albanese2016integrated",
+      "ursino2001integrated"
+    ],
+    "required_citations_uncertain": [
+      "albanese2016integrated",
+      "ursino2001integrated"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "partial_pressure_port",
+        "variables": [
+          "P_CO2_a",
+          "P_O2_a"
+        ]
+      },
+      {
+        "port_type": "chemoreceptor_firing_rate_port",
+        "variables": [
+          "f_apc"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "efferent_respiratory_port",
+        "variables": [
+          "u_c_resp",
+          "u_p_resp"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_apc",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_apc_nom",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "P_CO2_a",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "P_CO2_a_nom",
+        "J_per_m3",
+        "access",
+        "global_constant"
+      ],
+      [
+        "P_O2_a",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "K_c_resp",
+        "m3_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "K_p_resp",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_c_resp",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u_p_resp",
+        "per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

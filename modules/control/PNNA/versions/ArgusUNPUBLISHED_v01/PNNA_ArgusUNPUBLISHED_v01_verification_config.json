@@ -1,0 +1,56 @@
+{
+  "module_type": "PNNA",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["f_PNNA_natural", "f_PNNA"],
+  "invariants": [
+    {
+      "description": "f_PNNA = f_PNNA_natural + f_vagal_stim",
+      "expr": "np.max(np.abs(f_PNNA - (f_PNNA_natural + f_vagal_stim))) <= 1e-9 * max(1.0, np.max(np.abs(f_PNNA)))"
+    },
+    {
+      "description": "f_PNNA_natural is the exact Gee 2023 sigmoid of its input",
+      "expr": "np.max(np.abs(f_PNNA_natural - (((f_min_PNNA - f_max_PNNA)/(1 + ((f_NA + f_LCN)/f_mid_PNNA)**k_PNNA) + f_max_PNNA)))) <= 1e-9 * max(1.0, np.max(np.abs(f_PNNA_natural)))"
+    },
+    {
+      "description": "f_PNNA_natural within [f_min_PNNA, f_max_PNNA]",
+      "expr": "np.all((f_PNNA_natural >= min(f_min_PNNA, f_max_PNNA) - 1e-9) & (f_PNNA_natural <= max(f_min_PNNA, f_max_PNNA) + 1e-9))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_NA": {"min": 4.88, "max": 15.78, "points": 4},
+      "f_LCN": {"min": 0.0, "max": 30.5, "points": 4},
+      "f_vagal_stim": {"min": 0.0, "max": 10.0, "points": 3}
+    },
+    "rationale": "inputs over their source populations' output ranges; VNS 0-10 Hz (Gee 2023 used up to 3.5 Hz); constants x0.5-x2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      },
+      "calibrate": {
+        "note": "not_applicable: intermediate neuronal population of the Gee 2023 reflex network: its firing rate is not measured on its own (parameters were identified from whole-system HR/elastance/ICN data), so there is no component-level data; checked against its exact static map. Validation belongs to the assembled closed-loop model (candidate: Gee 2023 Table 2 baseline SBP/DBP/HR/CO/EF and VNS % changes)."
+      }
+    }
+  }
+}

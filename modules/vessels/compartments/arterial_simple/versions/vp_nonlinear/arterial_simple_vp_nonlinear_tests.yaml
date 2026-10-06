@@ -14,27 +14,27 @@ reference_proposals:
     sourced: 'no'
     value: 1.0e-05
   q_0:
-    reference: 'Mynard2015; Supplemental File 1, aortic root: A0 = 6.9419 cm^2, length 1 cm, so A0 l = 6.94 mL = 6.94e-6 m^3
+    reference: 'mynard2015one; Supplemental File 1, aortic root: A0 = 6.9419 cm^2, length 1 cm, so A0 l = 6.94 mL = 6.94e-6 m^3
       (as arterial_simple vv); a zero-pressure segment volume used as a generic unstressed volume'
     sourced: 'yes'
     value: 6.94e-06
   R:
-    reference: Safaei2018; Table S3 R_par = 10.664e6 J s m^-6 (0.08 mmHg s/mL), pulmonary arteries, used here as a generic
+    reference: safaei2018bond; Table S3 R_par = 10.664e6 J s m^-6 (0.08 mmHg s/mL), pulmonary arteries, used here as a generic
       lumped arterial compartment (as the arterial_simple vp sibling does)
     sourced: 'yes'
     value: 10664000.0
   K_tube:
-    reference: Olufsen2000; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
+    reference: olufsen2000numerical; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
       m^-1, k3 = 8.65e4 Pa (converted from g s^-2 cm^-1, cm^-1), r0 = 0.01508 m, rho = 1050 (vessel_properties material_prop_fromPWV
       formula); normally supplied by a vessel_properties module
     sourced: 'no'
     value: 115333.0
   m_tube:
-    reference: Boileau2015; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
+    reference: boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
     sourced: 'yes'
     value: 0.5
   n_tube:
-    reference: Boileau2015; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
+    reference: boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
     sourced: 'yes'
     value: 0.0
   u_ext:
@@ -43,11 +43,11 @@ reference_proposals:
     value: 0.0
   I:
     reference: unreferenced_placeholder; inertance 1e5 Pa s^2 m^-3, order of rho l/(pi r^2) for a large artery (1050 x 0.05/(pi
-      0.0115^2) = 1.3e5); Safaei2018 Table S3 sets I = 0 for the pulmonary arteries, which this ODE module cannot take
+      0.0115^2) = 1.3e5); safaei2018bond Table S3 sets I = 0 for the pulmonary arteries, which this ODE module cannot take
     sourced: 'no'
     value: 100000.0
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   u_out:
     reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 12665.6
       Pa (95 mmHg), typical outlet pressure for this vessel class

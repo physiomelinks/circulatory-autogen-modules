@@ -1,11 +1,11 @@
 """
-Import circulatory_autogen's system models (resources/<model>_vessel_array.csv and
+Import circulatory_autogen's system models (resources/<model>_module_array.csv and
 _parameters.csv, plus obs_data / params_for_id when present) into
 
     system_models/<category>/<model>/
-        <model>_vessel_array.json, <model>_parameters.csv  the model, using the module library;
+        <model>_module_array.json, <model>_parameters.csv  the model, using the module library;
                                                            a heart is split into clock/chambers/valves
-        reference/<model>_vessel_array.json, _parameters.csv  circulatory_autogen's original (vessel array as JSON),
+        reference/<model>_module_array.json, _parameters.csv  circulatory_autogen's original (module array as JSON),
                                                            for the equivalence test
         <model>_system.yaml                                test spec (never overwritten)
 
@@ -13,7 +13,7 @@ _parameters.csv, plus obs_data / params_for_id when present) into
 
 Heart splitting (a vessel whose vessel_type starts with 'heart' and whose module has the
 v_ivc/v_svc/v_pvn vessel ports):
-  heart_clock (cardiac_clock nn, or nn_controlled for the controlled hearts)
+  heart_clock (cardiac_clock Liang2009_v01, or controlled for the controlled hearts)
   ra, rv, la, lv (chamber vv) and trv, puv, miv, aov (valve pp / pp_linear / pp_rmod)
   ra_inflow (flow_merge) when the right atrium has more than one inflow
   la_outflow (flow_split) + asd_shunt (resistor) for heart_ASD
@@ -34,7 +34,9 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from cam_testing import vessel_array  # noqa: E402
+from cam_testing import module_array  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rekey_bib  # noqa: E402  (tools/rekey_bib.py)
 from cam_testing.library import read_config  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -187,7 +189,7 @@ def split_heart(rows, params, configs, notes):
     ra_in = systemic + (['asd_shunt'] if asd else [])
     merge = len(ra_in) > 1
     new = []
-    new.append({'name': 'heart_clock', 'BC_type': 'nn_controlled' if controlled else 'nn', 'vessel_type': 'cardiac_clock',
+    new.append({'name': 'heart_clock', 'BC_type': 'controlled' if controlled else 'Liang2009_v01', 'vessel_type': 'cardiac_clock',
                 'inp_vessels': ' '.join(eff_for['heart_clock']), 'out_vessels': 'ra rv la lv'})
     sums = other_out
     new.append({'name': 'ra', 'BC_type': 'vv', 'vessel_type': 'chamber',
@@ -352,11 +354,13 @@ def import_model(ca_dir, model, category, configs):
     ref_dir = os.path.join(dest, 'reference')
     os.makedirs(ref_dir, exist_ok=True)
     notes = []
-    va = os.path.join(res, f'{model}_vessel_array.csv')
+    va = module_array.find(res, model)     # circulatory_autogen's resources/, either name
     pa = os.path.join(res, f'{model}_parameters.csv')
-    vessel_array.write_records(os.path.join(ref_dir, f'{model}_vessel_array.json'), vessel_array.read_records(va))
+    module_array.write_records(os.path.join(ref_dir, f'{model}_module_array.json'), module_array.read_records(va))
     if os.path.isfile(pa):
         shutil.copyfile(pa, os.path.join(ref_dir, f'{model}_parameters.csv'))
+        # the copy keeps circulatory_autogen's values but this library's bib keys (tools/bib_rekey_map.json)
+        rekey_bib.rekey_file(os.path.join(ref_dir, f'{model}_parameters.csv'))
     header, rows = read_rows(va)
     pheader, params = read_rows(pa) if os.path.isfile(pa) else (['variable_name', 'units', 'value', 'data_reference'], [])
     heart_name = next((r['name'] for r in rows if r['vessel_type'].startswith('heart')), 'heart')
@@ -366,7 +370,7 @@ def import_model(ca_dir, model, category, configs):
     reciprocal = mapping.pop('__reciprocal__', [])
     ignore.update({f'{r["name"]}/t': 'time' for r in rows})
     # this library's (module_type, version) names, each record with its default instance
-    vessel_array.write_records(os.path.join(dest, f'{model}_vessel_array.json'), vessel_array.to_library_versions(rows))
+    module_array.write_records(os.path.join(dest, f'{model}_module_array.json'), module_array.to_library_versions(rows))
     if os.path.isfile(pa):
         write_rows(os.path.join(dest, f'{model}_parameters.csv'), ['variable_name', 'units', 'value', 'data_reference'], params)
     for extra in ('obs_data.json', 'params_for_id.csv'):
@@ -374,6 +378,7 @@ def import_model(ca_dir, model, category, configs):
         if not os.path.isfile(src):
             continue
         shutil.copyfile(src, os.path.join(ref_dir, f'{model}_{extra}'))
+        rekey_bib.rekey_file(os.path.join(ref_dir, f'{model}_{extra}'))
         if extra.endswith('.json'):
             data = rename_operands(json.load(open(src)), mapping)
             json.dump(data, open(os.path.join(dest, f'{model}_{extra}'), 'w'), indent=1)
@@ -407,7 +412,7 @@ def main(argv=None):
         for model in models:
             if args.only and model not in args.only:
                 continue
-            if not os.path.isfile(os.path.join(args.ca_dir, 'resources', f'{model}_vessel_array.csv')):
+            if module_array.find(os.path.join(args.ca_dir, 'resources'), model) is None:
                 print(f'{model}: not in {args.ca_dir}/resources, skipped')
                 continue
             notes = import_model(os.path.abspath(args.ca_dir), model, category, configs)

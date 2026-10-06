@@ -1,0 +1,63 @@
+{
+  "module_type": "inlet_flow",
+  "version": "aorticbif",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.005,
+  "solver": "CVODE_myokit",
+  "outputs": ["v"],
+  "run_parameters": {"T": 1.1},
+  "invariants": [
+    {
+      "description": "v equals the exact 22-harmonic series for the current T",
+      "expr": "np.max(np.abs(v - (1.0*(7.9853e-06 + np.sum(np.array([2.6617e-05, 2.3616e-05, -1.9016e-05, -8.5899e-06, -2.436e-06, 1.4905e-06, 1.3581e-06, -6.3031e-07, -4.5335e-07, -4.5184e-07, -5.6583e-07, 4.9522e-07, 1.3049e-07, -4.1072e-08, -2.4182e-07, -6.6217e-08, -1.5511e-07, 2.2149e-07, 6.7621e-08, 1.0973e-07, -2.5559e-08, -3.5079e-08])[:, None]*np.sin(2*np.pi*np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0])[:, None]*t/T + np.array([0.29498, -1.1403, 0.40435, -1.1892, -1.4918, 1.0536, -0.47666, 0.93768, -0.79472, -1.4095, -1.3629, 0.52495, -0.97261, -0.15685, -1.4052, -1.3785, -1.2927, 0.68178, -0.98825, 1.4327, -1.2372, 0.2328])[:, None]), axis=0))))) <= 1e-9*max(1e-12, np.max(np.abs(v)))"
+    },
+    {
+      "description": "mean over one period is 7.9853e-6 m3/s (run point, T = 1.1 s)",
+      "expr": "abs(np.mean(v[t < T - 1e-9]) - 7.9853e-06) <= 1e-6*7.9853e-06",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "T": {"min": 0.55, "max": 1.65, "points": 3},
+      "P": {"min": 0, "max": 20000, "points": 3}
+    },
+    "rationale": "T spans 0.5x-1.5x the benchmark period 1.1 s (a full period must fit in the 2 s run) (grid multiple of the 5 ms output step); P is unused by the equations."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 2.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "calibrate": {"note": "not_applicable: prescribed input waveform; nothing to identify"}
+    },
+    "boileau2015_ibif_inflow": {
+      "baseline": {
+        "status": "proposed",
+        "source": "Boileau et al. (2015) Int J Numer Method Biomed Eng 31(10):e02732, benchmark inflow waveforms (supplementary material, as redistributed in openBF models/boileau2015), iliac (aortic) bifurcation inflow",
+        "source_short": "boileau2015benchmark aortic-bifurcation inflow",
+        "data": "instances/boileau2015_ibif_inflow/boileau2015_ibif_inflow.csv",
+        "time_column": "t",
+        "time_offset": 0,
+        "variables": {"v": "Q"},
+        "parameters": {"T": 1.1},
+        "sim_time": 1.1,
+        "dt": 0.001,
+        "metric": "nrmse",
+        "threshold": 0.01
+      }
+    }
+  }
+}

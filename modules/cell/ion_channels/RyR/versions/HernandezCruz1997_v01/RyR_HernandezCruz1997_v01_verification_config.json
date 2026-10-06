@@ -112,7 +112,7 @@
         313.15
       ]
     },
-    "rationale": "Factors 0.5-2 on every parameter. kon_a_RyR also covers the caffeine value: 5-20 /(mM s) around rest and 500 and 2500 /(mM s) (2500 = HernandezCruz1997's k_on+Caff, Kd 0.8 uM). Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5, T_ref to 273.15-313.15 K and the initial occupancies to [0, 1]."
+    "rationale": "Factors 0.5-2 on every parameter. kon_a_RyR also covers the caffeine value: 5-20 /(mM s) around rest and 500 and 2500 /(mM s) (2500 = hernandezcruz1997ca's k_on+Caff, Kd 0.8 uM). Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5, T_ref to 273.15-313.15 K and the initial occupancies to [0, 1]."
   },
   "timestep": {
     "scheme": "rk4",
@@ -143,7 +143,7 @@
         "reason": "the source's own validation is its full diffusion model (cytosolic shells, buffers, pumps; Fig. 10-11), whose shell count and pump binding rates are not given in the paper, so its figures can't be reproduced by the RyR alone; the kinetic constants are the published ones (Fig. 10 legend). Validation belongs to the assembled neuron (soma / sympathetic neuron supermodule)."
       },
       "calibrate": {
-        "note": "not_applicable: the constants are HernandezCruz1997's published values; calibration of the flux magnitude (rho_RyR) belongs to the assembled neuron (soma / sympathetic neuron supermodule)."
+        "note": "not_applicable: the constants are hernandezcruz1997ca's published values; calibration of the flux magnitude (rho_RyR) belongs to the assembled neuron (soma / sympathetic neuron supermodule)."
       }
     }
   }

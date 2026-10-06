@@ -1,0 +1,138 @@
+[
+  {
+    "module_type": "NA",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "NA_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "NA_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "gee2023closed",
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "NTS_ls_freq",
+        "variables": [
+          "f_NTS_ls"
+        ]
+      },
+      {
+        "port_type": "NTS_cp_freq",
+        "variables": [
+          "f_NTS_cp"
+        ]
+      },
+      {
+        "port_type": "NTS_br_freq",
+        "variables": [
+          "f_NTS_br"
+        ]
+      },
+      {
+        "port_type": "NTS_ch_freq",
+        "variables": [
+          "f_NTS_ch"
+        ]
+      },
+      {
+        "port_type": "s_gating",
+        "variables": [
+          "s_floor"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "NA_freq",
+        "variables": [
+          "f_NA"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "s_floor",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_NA",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NTS_output",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NA_input",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_NTS_ls",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_NTS_cp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_NTS_br",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_NTS_ch",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_min_NA",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_max_NA",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "f_mid_NA",
+        "Hz",
+        "access",
+        "constant"
+      ],
+      [
+        "k_RSA",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NA",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

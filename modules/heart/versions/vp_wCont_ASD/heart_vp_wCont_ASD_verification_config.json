@@ -33,15 +33,22 @@
     "v_asd"
   ],
   "harness": {
-    "vessel_array": [
-      ["ivc_zero", "nn_constant", "inlet_flow", "", "mod", "default"],
+    "module_array": [
+      ["ivc_zero", "constant", "inlet_flow", "", "mod", "default"],
       ["mod", "vp_wCont_ASD", "heart", "ivc_zero venous_svc pvn", "aortic_root par volume_sum", "default"],
       ["aortic_root", "vv", "arterial_simple", "mod", "systemic_T volume_sum", "default"],
       ["systemic_T", "pp_spec_I", "terminal", "aortic_root", "venous_svc volume_sum", "default"],
       ["venous_svc", "vp", "venous", "systemic_T", "mod volume_sum", "default"],
       ["pvn", "vp", "venous", "par", "mod volume_sum", "default"],
       ["par", "vp", "arterial_simple", "mod", "pvn volume_sum", "default"],
-      ["volume_sum", "nn", "volume_sum", "pvn par mod aortic_root systemic_T venous_svc", "", "default"]
+      [
+        "volume_sum",
+        "ArgusUNPUBLISHED_v01",
+        "volume_sum",
+        "pvn par mod aortic_root systemic_T venous_svc",
+        "",
+        "default"
+      ]
     ],
     "parameters": [
       [
@@ -310,7 +317,7 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "Candidate not yet sourced: a moderate secundum ASD haemodynamic data set (e.g. Qp/Qs, RV/LV volumes); the normal values below apply only with R_ASD -> infinity. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47 +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +- 24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the harness (last cycle after 20 s): LV EDV 139 ml, ESV 57 ml, SV 82 ml, EF 59 %, RV EDV 444 ml, CO 4.8 l/min, aortic 90/53 mmHg, pulmonary artery 113/13 mmHg, mean LA pressure 16 mmHg."
+        "reason": "Candidate not yet sourced: a moderate secundum ASD haemodynamic data set (e.g. Qp/Qs, RV/LV volumes); the normal values below apply only with R_ASD -> infinity. maceira2006normalized Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47 +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; maceira2006reference via kawelboehm2020reference Table 9: RV EDV 163 +- 27 (men) / 127 +- 24 (women) ml, RVEF 66 +- 7 %; kawelboehm2020reference Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; maceira2006normalized Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the harness (last cycle after 20 s): LV EDV 139 ml, ESV 57 ml, SV 82 ml, EF 59 %, RV EDV 444 ml, CO 4.8 l/min, aortic 90/53 mmHg, pulmonary artery 113/13 mmHg, mean LA pressure 16 mmHg."
       },
       "calibrate": {
         "note": "pending: Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate evaluation does not yet honour pre_time (framework need)."

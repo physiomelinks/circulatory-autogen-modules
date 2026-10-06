@@ -1,0 +1,86 @@
+module_type: pulmonary_GE
+version: Albanese2016_v01
+reviewed: false
+notes: 'Pulmonary capillary gas exchange (after Albanese 2016): well-mixed capillary of volume q_0 fed by v (1 - shunt) of
+  mixed-venous blood, diffusive exchange M = k (P_A - P_p) with the alveoli, capillary partial pressures from the analytic
+  inverse of the Spencer (1979) O2/CO2 dissociation curves (Bohr/Haldane coupled), and arterial content = flow-weighted mix
+  of capillary and shunted blood. Albanese assumes instantaneous alveolar-capillary equilibrium; this module adds a finite
+  exchange conductance. Harness: steady pulmonary flow (pp_I terminal, 5 L/min), constant mixed-venous blood (gas_transport_simple
+  held at 15/53 ml/dl), an arterial gas_transport_simple sink (needed: see known config issue), respiratory_gas_transport
+  and the simple_lung_bg lung (library values).'
+reference_proposals:
+  k_1:
+    reference: spencer1979computational; K1 = 14.99 mmHg as tabulated in albanese2014physiology Table 2-6 (Spencer 1979 full text not accessed);
+      14.99 x 133.322 = 1998.5 Pa
+    sourced: 'yes'
+  k_2:
+    reference: spencer1979computational; K2 = 194.4 mmHg (albanese2014physiology Table 2-6); 194.4 x 133.322 = 25917.8 Pa (library 25917.4, 0.002%
+      low)
+    sourced: 'yes'
+  h_1:
+    reference: spencer1979computational; h1 = 0.3836 (albanese2014physiology Table 2-6)
+    sourced: 'yes'
+  h_2:
+    reference: spencer1979computational; h2 = 1.819 (albanese2014physiology Table 2-6)
+    sourced: 'yes'
+  alpha_1:
+    reference: spencer1979computational; alpha1 = 0.03198 /mmHg (albanese2014physiology Table 2-6); /133.322 = 2.399e-4 /Pa
+    sourced: 'yes'
+  alpha_2:
+    reference: spencer1979computational; alpha2 = 0.05591 /mmHg (albanese2014physiology Table 2-6); /133.322 = 4.194e-4 /Pa
+    sourced: 'yes'
+  beta_1:
+    reference: spencer1979computational; beta1 = 0.008275 /mmHg (albanese2014physiology Table 2-6); /133.322 = 6.207e-5 /Pa
+    sourced: 'yes'
+  beta_2:
+    reference: spencer1979computational; beta2 = 0.03255 /mmHg (albanese2014physiology Table 2-6); /133.322 = 2.441e-4 /Pa
+    sourced: 'yes'
+  C_O2_sat:
+    reference: spencer1979computational; C_sat,O2 = 9 mmol/L (albanese2014physiology Table 2-6). Library 0.20448 ml/ml = 9 mmol/L x 22.72 ml/mmol;
+      the STPD molar volume 22.41 ml/mmol would give 0.2017 -- conversion factor to confirm
+    sourced: 'yes'
+  C_CO2_sat:
+    reference: spencer1979computational; C_sat,CO2 = 86.11 mmol/L (albanese2014physiology Table 2-6). Library 1.9564 = 86.11 x 22.72 ml/mmol (same
+      factor as C_O2_sat; 22.41 would give 1.930)
+    sourced: 'yes'
+  overcap_solubility:
+    reference: 'unreferenced_placeholder; numerical device: steep linear P_O2 rise (Pa per unit content) above the saturation
+      cap so the inverse curve stays finite'
+    sourced: 'no'
+  saturation_cap:
+    reference: 'unreferenced_placeholder; numerical device: content capped at 0.9999 of saturation before inverting the Spencer
+      curve'
+    sourced: 'no'
+  C_CO2_p_init:
+    reference: unreferenced_placeholder; initial condition (library 0.48 ml/ml, ~arterial CO2 content)
+    sourced: 'no'
+  C_O2_p_init:
+    reference: unreferenced_placeholder; initial condition (library 0.20 ml/ml, ~arterial O2 content)
+    sourced: 'no'
+  C_CO2_a:
+    reference: 'definitional; not a boundary condition: computed by the component (config declares it boundary_condition --
+      see proposed fix). Value only to fill the TODO'
+    sourced: definitional
+    value: 0.485
+  C_O2_a:
+    reference: 'definitional; not a boundary condition: computed by the component (config declares it boundary_condition --
+      see proposed fix). Value only to fill the TODO'
+    sourced: definitional
+    value: 0.199
+  q_0:
+    reference: unreferenced_placeholder; library 2 L is ~25x a textbook pulmonary capillary blood volume (~70-100 ml at rest);
+      Albanese uses the pulmonary peripheral volume of the CVS model
+    sourced: 'no'
+  k_O2:
+    reference: 'unreferenced_placeholder; NOT in Albanese 2016 (albanese2014physiology eqs A-69/A-70 assume P_capillary = P_alveolar,
+      no conductance). 1.7e-8 m6/(J s) = 136 ml/min/mmHg, ~6x a resting D_LO2 of ~20-25 ml/min/mmHg: effectively near-equilibrium'
+    sourced: 'no'
+  k_CO2:
+    reference: unreferenced_placeholder; NOT in Albanese 2016 (instantaneous equilibrium there). 4.9e-7 m6/(J s) = 3900 ml/min/mmHg
+    sourced: 'no'
+  shunt_fraction:
+    reference: albanese2014physiology; sh = 1.7% (Table 2-6, citing guyton2006textbook)
+    sourced: 'yes'
+review: reviews/gas_exchange_review.yaml
+review_scope: The review of the whole gas_exchange module (7 entries) before the move to versions; only the parts about this
+  version apply.

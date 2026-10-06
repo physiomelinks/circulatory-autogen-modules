@@ -21,9 +21,9 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T
   - T_ref)/10 K) (Q10_BK, T_ref_BK). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref
   to the source''s recording temperature (on review) scales them, and the model can be run at 37 degC by changing T. tau_m:
-  Khaliq2003; Methods Eq. 10: tau_m = 0.505 ms + 1/(exp((Vm+86.4)/10.1) + exp((Vm-33.3)/-10)) s, re-expressed around V_mid_m
+  khaliq2003contribution; Methods Eq. 10: tau_m = 0.505 ms + 1/(exp((Vm+86.4)/10.1) + exp((Vm-33.3)/-10)) s, re-expressed around V_mid_m
   (57.5 = 86.4 - 28.9, 62.2 = 33.3 + 28.9); **offset raised here to 1.505 ms (was 0.505) ''to allow for g_Na to not be instantly
-  blocked'' (CA 837d3aae, 2024-07-21)**. ModelDB 48332 evaluates the same at Vm + 5 mV. tau_h: Khaliq2003; Methods: tau_h
+  blocked'' (CA 837d3aae, 2024-07-21)**. ModelDB 48332 evaluates the same at Vm + 5 mV. tau_h: khaliq2003contribution; Methods: tau_h
   = 1.9 ms + 1/(exp((Vm+48.5)/5.2) + exp((Vm-54.2)/-12.9)) s (= source, re-expressed around V_mid_h: 16.5 = 48.5 - 32, 86.2
   = 54.2 + 32).'
 known_issues:

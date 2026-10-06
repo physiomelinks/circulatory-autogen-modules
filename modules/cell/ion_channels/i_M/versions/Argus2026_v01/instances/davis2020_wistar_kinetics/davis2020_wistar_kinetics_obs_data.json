@@ -1,8 +1,8 @@
 {
  "obs_data_name": "davis2020_wistar_kinetics",
- "reference_key": "Davis2020",
- "calibration_note": "Davis2020 Fig. 3C representative Wistar deactivation trace (n = 1, raw current), digitised; relaxations at -55 mV and back at -25 mV mapped onto w (tools/i_M_davis2020_kinetics.py)",
- "comment": "Davis et al. 2020 (Hypertension 76:1915) Fig. 3C, the representative Wistar M-current deactivation trace (perforated patch, room temperature; raw current, not XE-991-subtracted; n = 1): held at -25 mV, 1 s step to -55 mV (Davis2021Thesis p. 172), back to -25 mV. Digitised and normalised by tools/i_M_davis2020_kinetics.py (see its docstring): each slow relaxation is mapped onto the gate w with the module's fixed w_inf, so the data constrain tau_w only. Protocol: the channel module alone, V clamped: sub-experiment 0 holds -25 mV for 10 s (steady state), 1 steps to -55 mV for 1 s, 2 returns to -25 mV for 0.5 s (the trace ends ~0.5 s after the return). To redo: edit this file (or re-digitise with the tool) and run venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k 'calibrate and davis2020_wistar_kinetics' --include-unreviewed",
+ "reference_key": "davis2020downregulation",
+ "calibration_note": "davis2020downregulation Fig. 3C representative Wistar deactivation trace (n = 1, raw current), digitised; relaxations at -55 mV and back at -25 mV mapped onto w (tools/i_M_davis2020_kinetics.py)",
+ "comment": "Davis et al. 2020 (Hypertension 76:1915) Fig. 3C, the representative Wistar M-current deactivation trace (perforated patch, room temperature; raw current, not XE-991-subtracted; n = 1): held at -25 mV, 1 s step to -55 mV (davis2021transcriptomic p. 172), back to -25 mV. Digitised and normalised by tools/i_M_davis2020_kinetics.py (see its docstring): each slow relaxation is mapped onto the gate w with the module's fixed w_inf, so the data constrain tau_w only. Protocol: the channel module alone, V clamped: sub-experiment 0 holds -25 mV for 10 s (steady state), 1 steps to -55 mV for 1 s, 2 returns to -25 mV for 0.5 s (the trace ends ~0.5 s after the return). To redo: edit this file (or re-digitise with the tool) and run venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k 'calibrate and davis2020_wistar_kinetics' --include-unreviewed",
  "protocol_info": {
   "pre_times": [
    0.0
@@ -24,14 +24,14 @@
    ]
   },
   "experiment_labels": [
-   "Davis2020 Fig. 3C: hold -25 mV, 1 s at -55 mV, back to -25 mV"
+   "davis2020downregulation Fig. 3C: hold -25 mV, 1 s at -55 mV, back to -25 mV"
   ]
  },
  "prediction_items": [],
  "data_items": [
   {
    "data_item_name": "w_deactivation_at_-55mV",
-   "comment": "Davis2020 Fig. 3C Wistar trace, deactivation at -55 mV: digitised (tools/i_M_davis2020_kinetics.py), normalised to the relaxation's own end points and mapped onto w (w_inf(-25) = 0.7311, w_inf(-55) = 0.1192). Sample k at k/172.5 s from the start of the sub-experiment (one raster column). Single-exponential fit of the digitised current: tau 74 +- 4 ms, amplitude 180 pA. std: the residual SD about that fit (0.052 of the relaxation) in w units; the first 1 sample(s), inside the voltage jump, have std 1 (not fitted). n = 1 cell, raw current (not XE-991-subtracted), room temperature.",
+   "comment": "davis2020downregulation Fig. 3C Wistar trace, deactivation at -55 mV: digitised (tools/i_M_davis2020_kinetics.py), normalised to the relaxation's own end points and mapped onto w (w_inf(-25) = 0.7311, w_inf(-55) = 0.1192). Sample k at k/172.5 s from the start of the sub-experiment (one raster column). Single-exponential fit of the digitised current: tau 74 +- 4 ms, amplitude 180 pA. std: the residual SD about that fit (0.052 of the relaxation) in w units; the first 1 sample(s), inside the voltage jump, have std 1 (not fitted). n = 1 cell, raw current (not XE-991-subtracted), room temperature.",
    "trace_name_for_plotting": "w (deactivation at -55 mV)",
    "data_type": "series",
    "operation": null,
@@ -395,7 +395,7 @@
   },
   {
    "data_item_name": "w_reactivation_at_-25mV",
-   "comment": "Davis2020 Fig. 3C Wistar trace, reactivation on return to -25 mV: digitised (tools/i_M_davis2020_kinetics.py), normalised to the relaxation's own end points and mapped onto w (w_inf(-25) = 0.7311, w_inf(-55) = 0.1192). Sample k at k/172.5 s from the start of the sub-experiment (one raster column). Single-exponential fit of the digitised current: tau 159 +- 20 ms, amplitude 203 pA. std: the residual SD about that fit (0.089 of the relaxation) in w units; the first 3 sample(s), inside the voltage jump, have std 1 (not fitted). n = 1 cell, raw current (not XE-991-subtracted), room temperature.",
+   "comment": "davis2020downregulation Fig. 3C Wistar trace, reactivation on return to -25 mV: digitised (tools/i_M_davis2020_kinetics.py), normalised to the relaxation's own end points and mapped onto w (w_inf(-25) = 0.7311, w_inf(-55) = 0.1192). Sample k at k/172.5 s from the start of the sub-experiment (one raster column). Single-exponential fit of the digitised current: tau 159 +- 20 ms, amplitude 203 pA. std: the residual SD about that fit (0.089 of the relaxation) in w units; the first 3 sample(s), inside the voltage jump, have std 1 (not fitted). n = 1 cell, raw current (not XE-991-subtracted), room temperature.",
    "trace_name_for_plotting": "w (reactivation on return to -25 mV)",
    "data_type": "series",
    "operation": null,

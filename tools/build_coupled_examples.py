@@ -59,14 +59,14 @@ def fv_grid(sources, props):
                     if i + di < N and j + dj < N and k + dk < N:
                         up, down = cell(i, j, k), cell(i + di, j + dj, k + dk)
                         f = f'f{"xyz"[axis]}{i}{j}{k}'
-                        faces.append(rec(f, 'tissue_diffusion_face', 'nn', [up], [down]))
+                        faces.append(rec(f, 'tissue_diffusion_face', 'Fang2008_v01', [up], [down]))
                         outputs[up].append(f)
                         inputs[down].append(f)
     records, params = [], []
     for (i, j, k), c in ((key, cell(*key)) for key in sorted({(i, j, k) for i in range(N) for j in range(N)
                                                                  for k in range(N)})):
         src = targets.get((i, j, k))
-        records.append(rec(c, 'tissue_diffusion_volume', 'nn', ([src] if src else []) + inputs[c], outputs[c]))
+        records.append(rec(c, 'tissue_diffusion_volume', 'Fang2008_v01', ([src] if src else []) + inputs[c], outputs[c]))
         params += [(f'V_P_{c}', 'm3', h ** 3, f'grid cell, {h * 1e6:g} um cube'),
                    (f'C_P_init_{c}', 'millimolar', props['C_init'], 'initial concentration (as the FEniCS instance)'),
                    (f'M_{c}', 'millimolar_per_s', props['M'], 'as the FEniCS instance'),
@@ -106,7 +106,7 @@ def capillaries(tissue_names):
     records, params = [], []
     for k, target in enumerate(tissue_names):
         cap, ge = f'cap_{k}', f'capillary_GE_{k}'
-        records += [rec(cap, 'capillary', 'pp', [], [ge]), rec(ge, 'GE_capillary', 'nn', [cap], [target])]
+        records += [rec(cap, 'capillary', 'pp', [], [ge]), rec(ge, 'GE_capillary', 'Albanese2016_v01', [cap], [target])]
         params += [(f'u_in_{cap}', 'J_per_m3', 2000.0, 'capillary inlet ~15 mmHg (chosen for the example)'),
                    (f'u_out_{cap}', 'J_per_m3', 666.6, 'capillary_network u_out_capillary_18'),
                    (f'u_ext_{cap}', 'J_per_m3', 0.0, 'capillary_network'),
@@ -126,7 +126,7 @@ def capillaries(tissue_names):
 
 def neuron(varicosity_subtype, targets):
     """Periodic stimulus -> soma -> axon -> varicosity (library defaults)."""
-    records = [rec('stim', 'i_stim_periodic', 'nn', [], ['soma_SN']),
+    records = [rec('stim', 'i_stim_periodic', 'ArgusUNPUBLISHED_v01', [], ['soma_SN']),
                rec('soma_SN', 'soma', 'sympathetic_monolithic_v01', ['stim'], ['axon_SN']),
                rec('axon_SN', 'axon', 'sympathetic_monolithic_v01', ['soma_SN'], ['var_SN']),
                rec('var_SN', 'varicosity', varicosity_subtype, ['axon_SN'], targets)]
@@ -144,7 +144,7 @@ def single_volume(sources):
     records, params = [], []
     for k, src in enumerate(sources):
         c = f'ecs_{k}'
-        records.append(rec(c, 'tissue_diffusion_volume', 'nn', [src], []))
+        records.append(rec(c, 'tissue_diffusion_volume', 'Fang2008_v01', [src], []))
         params += [(f'V_P_{c}', 'm3', 1e-18, 'the varicosity volume Vol (k_V d^3 at the defaults)'),
                    (f'C_P_init_{c}', 'millimolar', 0.0, 'NE_init of the varicosity'),
                    (f'M_{c}', 'millimolar_per_s', 0.0, 'no clearance but NET (in the varicosity)'),
@@ -155,7 +155,7 @@ def single_volume(sources):
 def write(model, records, params, spec):
     d = os.path.join(OUT, model)
     os.makedirs(d, exist_ok=True)
-    with open(os.path.join(d, f'{model}_vessel_array.json'), 'w') as f:
+    with open(os.path.join(d, f'{model}_module_array.json'), 'w') as f:
         f.write('[\n' + ',\n'.join(' ' + json.dumps(r) for r in records) + '\n]\n')
     with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
         w = csv.writer(f)
@@ -194,7 +194,7 @@ def main(argv=None):
     caps, cap_params = capillaries(['tissue', 'tissue'])
     write('microvasc_O2_FEniCS', caps + fe, cap_params + fe_params + [
         ('saturation_cap', 'dimensionless', 0.9999, 'pulmonary_GE default (numerical stability)'),
-        ('sigma_diff', 'm2_per_s', O2['sigma'], 'tissue O2 diffusivity (Secomb2020)')],
+        ('sigma_diff', 'm2_per_s', O2['sigma'], 'tissue O2 diffusivity (secomb2020mass)')],
         dict(o2_common, description='Two capillaries exchanging O2 with a cube of tissue (20 um cells) modelled in FEniCSx '
              '(tissue_diffusion_FEniCS).', notes=[COUPLED_NOTE]))
 

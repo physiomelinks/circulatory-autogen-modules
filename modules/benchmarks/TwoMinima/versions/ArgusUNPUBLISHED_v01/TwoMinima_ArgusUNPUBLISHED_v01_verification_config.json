@@ -1,0 +1,64 @@
+{
+  "module_type": "TwoMinima",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 5.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["x"],
+  "invariants": [
+    {
+      "description": "matches the exact solution x = a² + (x₀ − a²)e^(−ct) to 1e-5 (relative)",
+      "expr": "np.max(np.abs(x - (a*a + (x_init - a*a)*np.exp(-c*t)))) <= 1e-5 * max(1.0, a*a, abs(x_init))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "a": {"min": -3, "max": 3, "points": 7},
+      "c": {"min": 0.1, "max": 10, "points": 7, "scale": "log"},
+      "x_init": {"min": -5, "max": 5, "points": 5}
+    }
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 5.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "optimiser test fixture with no physiological counterpart; the exact solution is checked as a verification invariant"
+      }
+    },
+    "TwoMinima_data": {
+      "calibrate": {
+        "status": "active",
+        "source": "circulatory_autogen two-minima fixture (resources/TwoMinima_obs_data.json)",
+        "source_kind": "synthetic",
+        "obs_data": "instances/TwoMinima_data/TwoMinima_data_obs_data.json",
+        "params_for_id": "instances/TwoMinima_data/TwoMinima_data_params_for_id.csv",
+        "starts": [
+          {"a": 1.0},
+          {"a": -1.0}
+        ],
+        "expected_parameters": {"a": 2.0},
+        "expected_compare": "abs",
+        "expected_rtol": 0.05,
+        "z_threshold": 2.0,
+        "method": "sp_minimize",
+        "optimiser_options": {"cost_convergence": 1e-08},
+        "do_ad": true
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
 E_K,milliV,-96.4979,"definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 295.15 K (the soma defaults; used when unconnected)",no
-V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. Davis2020)",no
+V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. davis2020downregulation)",no
 A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
 rho_leak_K,per_um2,0.0006666666666666668,definitional; chosen so that g_leak_K = A rho gamma_leak_K (1e-6 uS/pS) reproduces the previous g_leak_K = 0.0001 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_leak_K = 50 picoS; a density for calibration through gamma_leak_K. The previous g_leak_K (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'),no
-gamma_leak_K,picoS,50.0,"Kang2006; TREK-2, the major background K channel of rat DRG neurons (69% of the resting K current at 37 degC), ~50 pS in 150 mM KCl (Abstract); a ganglion-neuron proxy for the K leak",yes
+gamma_leak_K,picoS,50.0,"kang2006trek; TREK-2, the major background K channel of rat DRG neurons (69% of the resting K current at 37 degC), ~50 pS in 150 mM KCl (Abstract); a ganglion-neuron proxy for the K leak",yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes

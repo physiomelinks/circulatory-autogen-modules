@@ -1,6 +1,0 @@
-[
- {"name": "inlet", "module_type": "inlet_flow", "module_subtype": "nn_constant", "instance": "default", "inp_instances": [], "out_instances": ["par"]},
- {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "instance": "default", "inp_instances": ["inlet"], "out_instances": ["pvn"]},
- {"name": "pvn", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["par"], "out_instances": ["outlet"]},
- {"name": "outlet", "module_type": "outlet_pressure", "module_subtype": "nn_constant", "instance": "default", "inp_instances": ["pvn"], "out_instances": []}
-]

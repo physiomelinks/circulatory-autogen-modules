@@ -14,7 +14,7 @@ import os
 
 import numpy as np
 
-from cam_testing import vessel_array
+from cam_testing import module_array
 from cam_testing.library import MODULES_DIR
 
 # The single vessel's name. Not 'heart': libcuflynx special-cases a vessel called heart.
@@ -187,8 +187,8 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     spec, in which the version under test is the vessel named "mod":
 
         harness:
-          vessel_array:    # [name, module_subtype (version), module_type, inp, out, instance]
-            - [pressure_in, nn_constant, inlet_pressure, '', mod, default]
+          module_array:    # [name, module_subtype (version), module_type, inp, out, instance]
+            - [pressure_in, constant, inlet_pressure, '', mod, default]
             - [mod, pv_0D_1D, coupler, pressure_in, constant_1D, default]
           parameters:              # values for the neighbours' parameters
             - [P_pressure_in, J_per_m3, 2000, source]
@@ -200,15 +200,16 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     '''
     os.makedirs(resources_dir, exist_ok=True)
     network = (component.spec.get('harness') or {})
-    rows = network.get('vessel_array') or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
+    rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
     if not any(r[0] == VESSEL for r in rows):
-        raise ValueError(f'harness.vessel_array must contain the component under test as vessel "{VESSEL}"')
-    records = vessel_array.from_rows(rows)
+        raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
+    records = module_array.from_rows(rows)
     if not instances:
         records = [{k: v for k, v in r.items() if k != 'instance'} for r in records]
-    vessel_array.write_records(os.path.join(resources_dir, f'{prefix}_vessel_array.json'), records)
-    if not vessel_array.libcuflynx_reads_json():
-        # a libcuflynx without JSON vessel-array support reads the CSV
+    module_array.write_records(os.path.join(resources_dir, f'{prefix}_module_array.json'), records)
+    if not module_array.libcuflynx_reads_json():
+        # a libcuflynx without JSON module-array support (0.7.3 and older) reads the CSV, under the
+        # old name, the only one it looks for
         with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])

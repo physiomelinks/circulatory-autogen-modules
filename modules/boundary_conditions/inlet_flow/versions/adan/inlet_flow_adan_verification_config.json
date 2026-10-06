@@ -1,0 +1,69 @@
+{
+  "module_type": "inlet_flow",
+  "version": "adan",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.005,
+  "solver": "CVODE_myokit",
+  "outputs": ["v"],
+  "invariants": [
+    {
+      "description": "v equals the exact 21-harmonic Fourier series for the current T",
+      "expr": "np.max(np.abs(v - (0.00022489186656282363/2 + np.sum(np.array([9.633909768092165e-05, -7.852769367977585e-05, -6.56256411598173e-05, -3.9063797995862154e-05, -3.834025472723826e-05, 3.730811423562331e-06, -1.450082470976162e-05, 3.6250730284884227e-06, 6.318310637769048e-06, -3.946773326818484e-06, 1.0630319453341082e-05, -6.3535212692088e-06, 6.19919816172386e-06, 2.505143635406403e-07, -4.66591153037918e-07, 4.015256231101136e-06, -3.858762913119578e-06, 4.966784562267732e-06, -1.878317151718256e-06, 3.5082693067440547e-06, 5.326099554864225e-07])[:, None]*np.cos(2*np.pi*np.arange(1, 22)[:, None]*t/T) + np.array([0.00017947975430472672, 0.00012055254984388979, 7.858307790171534e-06, 8.544198351521843e-06, -2.6091755215466943e-05, -1.6887495411781337e-05, -5.388440045409754e-06, -2.1678893531834397e-05, 2.9740470196050676e-06, -9.541758551229878e-06, -1.0725720704053492e-07, 1.0599723448640184e-06, -6.992592688900836e-06, 5.452877009185239e-06, -5.7487242085398745e-06, 3.3490660127609907e-06, -2.345581984230074e-06, -1.5029842843943853e-06, 1.1979949741347547e-06, -3.1954138733238298e-06, 3.4404467421033775e-06])[:, None]*np.sin(2*np.pi*np.arange(1, 22)[:, None]*t/T), axis=0)))) <= 1e-9*max(1e-12, np.max(np.abs(v)))"
+    },
+    {
+      "description": "mean over one period is a0/2 = 1.12446e-4 m3/s (run point; the uniform periodic grid makes the discrete mean exact; needs T/dt integral, so not applied to sweep/risk samples where the exact-solution invariant covers it)",
+      "expr": "abs(np.mean(v[t < T - 1e-9]) - 0.00011244593328141181) <= 1e-6*0.00011244593328141181",
+      "applies": "run"
+    },
+    {
+      "description": "periodic: v(t + T) = v(t) (run point; index shift needs T/dt integral)",
+      "expr": "np.max(np.abs(v[np.rint(T/(t[1] - t[0])).astype(np.int64):] - v[:len(v) - np.rint(T/(t[1] - t[0])).astype(np.int64)])) <= 1e-9*np.max(np.abs(v))",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "T": {"min": 0.5, "max": 2.0, "points": 4},
+      "P": {"min": 0, "max": 20000, "points": 3}
+    },
+    "rationale": "T spans heart rates 30-120 bpm (grid chosen so T is a whole number of output steps); P is unused by the equations, swept 0-150 mmHg to show that."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 2.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "calibrate": {
+        "note": "not_applicable: prescribed input waveform with no parameters to identify beyond the period T; its fidelity to the published inflow is the baseline test"
+      }
+    },
+    "boileau2015_adan56_inflow": {
+      "baseline": {
+        "status": "proposed",
+        "source": "Boileau et al. (2015) Int J Numer Method Biomed Eng 31(10):e02732, benchmark inflow waveforms (supplementary material, as redistributed in openBF models/boileau2015), ADAN56 aortic-root inflow",
+        "source_short": "boileau2015benchmark ADAN56 inflow",
+        "data": "instances/boileau2015_adan56_inflow/boileau2015_adan56_inflow.csv",
+        "time_column": "t",
+        "time_offset": 0,
+        "variables": {"v": "Q"},
+        "parameters": {"T": 1.0},
+        "sim_time": 1.0,
+        "dt": 0.001,
+        "metric": "nrmse",
+        "threshold": 0.05
+      }
+    }
+  }
+}

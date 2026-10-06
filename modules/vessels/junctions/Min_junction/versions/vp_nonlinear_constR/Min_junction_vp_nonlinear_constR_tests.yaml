@@ -2,8 +2,8 @@ module_type: Min_junction
 version: vp_nonlinear_constR
 reviewed: false
 notes: 'vp vessel with a nonlinear tube law. Tested in a harness network (libcuflynx sums the flows at a Min/Nout node only
-  when real vessels are connected there): mod (Min_junction vp_nonlinear_constR); bcin1 (inlet_flow nn_constant); up1 (arterial_simple
-  vp); bcin2 (inlet_flow nn_constant); up2 (arterial_simple vp); bcout (outlet_pressure nn_constant). Jacobian timescales
+  when real vessels are connected there): mod (Min_junction vp_nonlinear_constR); bcin1 (inlet_flow constant); up1 (arterial_simple
+  vp); bcin2 (inlet_flow constant); up2 (arterial_simple vp); bcout (outlet_pressure constant). Jacobian timescales
   (nominal: fastest 4e-05 s, slowest decay 0.012 s; run: fastest 0.0009 s, slowest decay 0.01 s, shortest oscillation period
   0.0062 s).'
 reference_proposals:
@@ -39,17 +39,17 @@ reference_proposals:
     sourced: 'no'
     value: 0.01508
   K_tube:
-    reference: Olufsen2000; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
+    reference: olufsen2000numerical; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
       m^-1, k3 = 8.65e4 Pa (converted from g s^-2 cm^-1, cm^-1), r0 = 0.01508 m, rho = 1050 (vessel_properties material_prop_fromPWV
       formula); normally supplied by a vessel_properties module
     sourced: 'no'
     value: 115333.0
   m_tube:
-    reference: Boileau2015; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
+    reference: boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
     sourced: 'yes'
     value: 0.5
   n_tube:
-    reference: Boileau2015; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
+    reference: boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
     sourced: 'yes'
     value: 0.0
   I_scale:
@@ -62,19 +62,19 @@ reference_proposals:
     sourced: definitional
     value: 0.0
   rho:
-    reference: Boileau2015; Table II, blood mass density 1050 kg m^-3 (Safaei2018 Sec. 2.2.4 uses 1040). Library value 1 is
+    reference: boileau2015benchmark; Table II, blood mass density 1050 kg m^-3 (safaei2018bond Sec. 2.2.4 uses 1040). Library value 1 is
       a test_fft fixture value
     sourced: 'yes'
     value: 1050.0
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   mu:
-    reference: Boileau2015; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also Safaei2018 Sec. 2.2.4). Library value 1 is
+    reference: boileau2015benchmark; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also safaei2018bond Sec. 2.2.4). Library value 1 is
       a test_fft fixture value
     sourced: 'yes'
     value: 0.004
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   g:
     reference: definitional; standard gravity 9.81 m s^-2 (library value 1 is a test_fft fixture value)
     sourced: definitional

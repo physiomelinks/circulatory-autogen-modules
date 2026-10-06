@@ -1,0 +1,36 @@
+module_type: afferent_to_respiratory_efferent
+version: Albanese2016_v01
+reviewed: false
+notes: Linear central (u_c_resp, from arterial PCO2) and peripheral (u_p_resp, from chemoreceptor firing) respiratory drives.
+  Purely algebraic. P_O2_a is an input but is not used by any equation.
+reference_proposals:
+  P_CO2_a:
+    reference: west2008respiratory; normal arterial PCO2 40 mmHg = 5332.9 Pa
+    sourced: true
+    value: 5332.8
+  P_O2_a:
+    reference: west2008respiratory; normal arterial PO2 ~100 mmHg = 13332 Pa (unused by the equations)
+    sourced: true
+    value: 13332.0
+  f_apc:
+    reference: argus2026circulatory; test operating point = f_apc_nom
+    sourced: false
+    value: 3.7
+  f_apc_nom:
+    reference: unreferenced_placeholder; library cites "Magosso2001_changed_from_3.7" but the value is 3.7 and could not be
+      checked against magosso2001mathematical (paywalled); at the module's nominal inputs the chemoreceptor steady state f_apc is
+      ~2.9, not 3.7
+    sourced: false
+  K_c_resp:
+    reference: unreferenced_placeholder; "to_be_identified" gain (1 per Pa per s)
+    sourced: false
+  K_p_resp:
+    reference: unreferenced_placeholder; "to_be_identified" gain
+    sourced: false
+  P_CO2_a_nom:
+    reference: west2008respiratory; 40 mmHg = 5332.9 Pa (library cites magosso2001mathematical, whose nominal PaCO2 is also 40 mmHg per cheng2010integrative
+      IC 40.4 Torr)
+    sourced: true
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

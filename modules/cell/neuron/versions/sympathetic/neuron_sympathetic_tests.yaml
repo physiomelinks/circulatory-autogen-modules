@@ -30,14 +30,14 @@ reference_proposals:
       found (the sister SN_full parameter files use 1.0)
     sourced: 'no'
   V_rest_approx_axon:
-    reference: unreferenced_placeholder; axon resting potential set equal to the soma's (-70 mV, Davis2020 soma measurements);
+    reference: unreferenced_placeholder; axon resting potential set equal to the soma's (-70 mV, davis2020downregulation soma measurements);
       no axonal measurement
     sourced: 'no'
     also_cites:
-    - Davis2020
+    - davis2020downregulation
   R_i_axon:
     value: 200.0
-    reference: 'Major1994; cytoplasmic resistivity 170-340 ohm cm in rat CA3 pyramidal neurons (Abstract; specific membrane
+    reference: 'major1994detailed; cytoplasmic resistivity 170-340 ohm cm in rat CA3 pyramidal neurons (Abstract; specific membrane
       resistance 120-200 kOhm cm^2, Cm 0.7-0.8 uF/cm^2). A central-neuron proxy: no value for postganglionic sympathetic axons
       was verified. The axon model has no membrane leak, so R_m has no parameter. Proposed R_i = 200 ohm cm (R = 811 MOhm
       at the present d_ax, L_ax)'

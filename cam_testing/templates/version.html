@@ -348,6 +348,19 @@ window.addEventListener('DOMContentLoaded', function () {
         </div>
         {%- if c.config_notes %}<p style="margin:0;max-width:75ch"><strong>{{ c.config_notes }}</strong></p>{% endif %}
         {%- if c.description %}<p style="margin:0;max-width:75ch">{{ c.description }}</p>{% endif %}
+        {%- set rc = c.required_citations %}
+        <p class="required-citations" style="margin:0;max-width:75ch" title="The papers this version's model is built on (config required_citations); cite them when you use it. Per-parameter sources are under References.">
+          <strong>Required citations:</strong>
+          {%- if rc.own %}
+          {%- for r in rc.own %} {% if r.href %}<a href="{{ r.href }}" class="mono">{{ r.key }}</a>{% else %}<span class="mono todo" title="not in the version's references.bib">{{ r.key }}</span>{% endif %}{% if r.short %} ({{ r.short }}){% endif %}{% if r.uncertain %} <span class="todo" title="A best guess still to confirm (config required_citations_uncertain)">(uncertain)</span>{% endif %}{{ ';' if not loop.last }}{% endfor %}
+          {%- else %} <span class="todo">not set (config <code>"required_citations"</code>)</span>{% endif %}
+        </p>
+        {%- if rc.submodules %}
+        <p class="required-citations" style="margin:0;max-width:75ch" title="The required citations of the submodules this supermodule is built from">
+          <strong>From its submodules:</strong>
+          {%- for r in rc.submodules %} <a href="{{ r.href }}" class="mono">{{ r.key }}</a>{% if r.short %} ({{ r.short }}){% endif %}{% if r.uncertain %} <span class="todo" title="A best guess still to confirm in the submodule's config">(uncertain)</span>{% endif %} <span class="muted">via {{ r.via|join(', ') }}</span>{{ ';' if not loop.last }}{% endfor %}
+        </p>
+        {%- endif %}
         {%- if c.notes %}<p style="margin:0;max-width:75ch">{{ c.notes }}</p>{% endif %}
         {%- if c.skip %}<p class="muted" style="margin:0">Not tested: {{ c.skip }}</p>{% endif %}
         {%- if c.unsourced and not c.todo %}<p class="muted" style="margin:0">Unsourced: {{ c.unsourced|join(', ') }}</p>{% endif %}

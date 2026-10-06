@@ -4,18 +4,18 @@ No data files are needed: the proposed baseline uses scalar `targets` in `heart_
 
 ## Normal adult values (baseline / calibrate for heart_simple, _wCont, _Ca_input, _LVprop, _nonstiff, _new_valve)
 
-- **Maceira et al. (2006), J Cardiovasc Magn Reson 8(3):417-426, doi:10.1080/10976640600572889** (`Maceira2006LV`).
+- **Maceira et al. (2006), J Cardiovasc Magn Reson 8(3):417-426, doi:10.1080/10976640600572889** (`maceira2006normalized`).
   - Table 8 (SSFP CMR, n = 120: 60 men, 60 women; mean +- SD):
     - LV EDV: 142 +- 21 ml (men 156 +- 21, women 128 +- 21)
     - LV ESV: 47 +- 10 ml
     - SV: 95 +- 14 ml
     - EF: 67 +- 4.6 %
   - Table 1: brachial cuff pressure 125 +- 7 / 73 +- 5 mmHg for men aged 20-29.
-- **Maceira et al. (2006), Eur Heart J 27(23):2879-2888, doi:10.1093/eurheartj/ehl336** (`Maceira2006RV`). The values were read from the reproduction in Kawel-Boehm et al. (2020), Table 9, because the primary article was paywalled:
+- **Maceira et al. (2006), Eur Heart J 27(23):2879-2888, doi:10.1093/eurheartj/ehl336** (`maceira2006reference`). The values were read from the reproduction in Kawel-Boehm et al. (2020), Table 9, because the primary article was paywalled:
   - RV EDV: 163 +- 27 ml (men), 127 +- 24 ml (women)
   - RV ESV: 57 +- 17 ml (men), 44 +- 15 ml (women)
   - RVEF: 66 +- 7 %
-- **Kawel-Boehm et al. (2020), J Cardiovasc Magn Reson 22:87, doi:10.1186/s12968-020-00683-3** (`KawelBoehm2020`).
+- **Kawel-Boehm et al. (2020), J Cardiovasc Magn Reson 22:87, doi:10.1186/s12968-020-00683-3** (`kawelboehm2020reference`).
   - Table 2: LV cardiac output 5.6 +- 1.1 l/min (men), 4.5 +- 0.9 l/min (women).
 
 **How they would be used:** the comparison is of scalar features of the periodic state (max/min of q_lv and q_rv, max/min of aortic_root/u, mean aortic flow), taken after the 20 s pre-time.

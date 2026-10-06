@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="local_flow_control_muscle_Ursino2000_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="local_flow_control_muscle_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable initial_value="0.0" name="x_O2" public_interface="out" units="dimensionless"/>
+        <variable name="phi_P_CO2_a" public_interface="out" units="dimensionless"/>
+        <variable initial_value="0.0" name="x_CO2" public_interface="out" units="dimensionless"/>
+        <variable name="C_O2_p" public_interface="in" units="dimensionless"/>
+        <variable name="P_CO2_a" public_interface="in" units="J_per_m3"/>
+        <variable name="R_local_multiplier" public_interface="out" units="dimensionless"/>
+        <variable name="P_O2_a" public_interface="in" units="J_per_m3"/>
+        <!-- Constants-->
+        <variable name="P_CO2_a_nom" public_interface="in" units="J_per_m3"/>
+        <variable name="k_CO2_m" public_interface="in" units="J_per_m3"/>
+        <variable name="C_O2_vm_nom" public_interface="in" units="dimensionless"/>
+        <variable name="tau_O2" public_interface="in" units="second"/>
+        <variable name="tau_CO2" public_interface="in" units="second"/>
+        <variable name="g_O2_m" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_O2</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <ci>x_O2</ci>
+                            </apply>
+                            <ci>C_O2_p</ci>
+                        </apply>
+                        <ci>C_O2_vm_nom</ci>
+                    </apply>
+                    <ci>tau_O2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_P_CO2_a</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>P_CO2_a</ci>
+                                    <ci>P_CO2_a_nom</ci>
+                                </apply>
+                                <ci>k_CO2_m</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>P_CO2_a</ci>
+                                    <ci>P_CO2_a_nom</ci>
+                                </apply>
+                                <ci>k_CO2_m</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_CO2</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>x_CO2</ci>
+                        </apply>
+                        <ci>phi_P_CO2_a</ci>
+                    </apply>
+                    <ci>tau_CO2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_local_multiplier</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>x_CO2</ci>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <times/>
+                            <ci>g_O2_m</ci>
+                            <ci>x_O2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

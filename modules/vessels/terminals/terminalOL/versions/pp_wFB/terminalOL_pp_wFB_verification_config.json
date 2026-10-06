@@ -84,7 +84,7 @@
       "meanflow_4dflow": {"min": 2e-06, "max": 2e-05, "points": 3, "scale": "log"},
       "pressure_d": {"min": 8000, "max": 16000, "points": 3}
     },
-    "rationale": "Pressures span 45-135 mmHg inlet / target and 0-15 mmHg venous & external pressure; C_T spans small-terminal to large-outlet compliances around the Boileau2015 iliac value (3.7e-10); meanflow spans ~0.3x-3x the benchmark mean inflow; BFF_ASL spans 10-90 %; I_T two decades around the placeholder. These are claimed working ranges once the config fix is applied."
+    "rationale": "Pressures span 45-135 mmHg inlet / target and 0-15 mmHg venous & external pressure; C_T spans small-terminal to large-outlet compliances around the boileau2015benchmark iliac value (3.7e-10); meanflow spans ~0.3x-3x the benchmark mean inflow; BFF_ASL spans 10-90 %; I_T two decades around the placeholder. These are claimed working ranges once the config fix is applied."
   },
   "timestep": {
     "scheme": "rk4",
@@ -104,7 +104,7 @@
     "default": {
       "baseline": {
         "status": "not_applicable",
-        "reason": "controller-driven boundary condition: its target values (pressure_d, BFF_ASL, meanflow_4dflow) are patient inputs; validation belongs to the closed-loop network that uses it (e.g. controlled terminals of the Boileau2015 bifurcation/ADAN56 benchmarks, whose Windkessel pressures could be compared)"
+        "reason": "controller-driven boundary condition: its target values (pressure_d, BFF_ASL, meanflow_4dflow) are patient inputs; validation belongs to the closed-loop network that uses it (e.g. controlled terminals of the boileau2015benchmark bifurcation/ADAN56 benchmarks, whose Windkessel pressures could be compared)"
       },
       "calibrate": {
         "note": "not_applicable: the controller itself identifies R_T online; nothing to calibrate in isolation"

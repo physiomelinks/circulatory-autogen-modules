@@ -1,0 +1,43 @@
+module_type: CO2_O2_generator
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Prescribed arterial blood-gas contents for driving the chemoreceptor (control module): C_O2_a and C_CO2_a are baseline
+  values stepped by a multiplier inside a time window; dot_C_CO2_a (the CO2-content derivative the chemoreceptors dynamic
+  term uses) is fixed at 0. Run point: O2 × 0.8 (hypoxic step) and CO2 × 1.1 in the windows.'
+reference_proposals:
+  C_O2_a0:
+    reference: demir2025foundations; arterial O2 content CaO2 approximately 20 mL O2/dL = 0.20 mL/mL
+    sourced: 'yes'
+    value: 0.2
+  C_CO2_a0:
+    reference: arthurs2005carbon; total CO2 in arterial blood 48 mL per 100 mL = 0.48 mL/mL (p. 207). Note control/chemoreceptor
+      uses C_CO2_a_nom = 0.36
+    sourced: 'yes'
+    value: 0.48
+  C_O2_multiplier:
+    reference: definitional; 1 = no O2 step
+    sourced: definitional
+    value: 1.0
+  C_CO2_multiplier:
+    reference: definitional; 1 = no CO2 step
+    sourced: definitional
+    value: 1.0
+  t_start_C_O2:
+    reference: unreferenced_placeholder; protocol choice (step window start)
+    sourced: 'no'
+    value: 20.0
+  t_end_C_O2:
+    reference: unreferenced_placeholder; protocol choice (step window end)
+    sourced: 'no'
+    value: 40.0
+  t_start_C_CO2:
+    reference: unreferenced_placeholder; protocol choice (step window start)
+    sourced: 'no'
+    value: 30.0
+  t_end_C_CO2:
+    reference: unreferenced_placeholder; protocol choice (step window end)
+    sourced: 'no'
+    value: 50.0
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

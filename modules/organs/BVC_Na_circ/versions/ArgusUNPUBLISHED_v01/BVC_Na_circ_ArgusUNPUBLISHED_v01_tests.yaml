@@ -1,0 +1,62 @@
+module_type: BVC_Na_circ
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Circulating (extracellular/blood) sodium pool of the blood-volume-control (BVC) system: dq_vc_Na/dt = v_giEpi_NKE
+  + v_lptEpi_NKE + v_rptEpi_NKE - v_lgl_Na - v_rgl_Na. It gains the Na pumped out of the gut and proximal-tubule epithelia
+  by the Na/K-ATPase (NKE) and loses the Na filtered at the two glomeruli; it exports q_vc_Na to BVC_GI and both BVC_Kidney
+  components. Alone, with constant fluxes, the exact solution is linear in t. The nominal fluxes are test values (net +1.16e-6
+  mol/s, the GI Na intake of the source model); in a network they are supplied by the GI and kidney components.'
+reference_proposals:
+  q_vc_Na_init:
+    reference: unreferenced_placeholder; 0.0114979848860844 mol from P. Hunter's unpublished BVC parameter set (CA_user_volume_control
+      ANS_CVS_BVC_parameters.csv, "Peter_Hunter"); it is a steady state of that toy model, not a measured Na pool (about 2
+      mol for 14 L of extracellular fluid at 140 mM)
+    sourced: false
+    value: 0.0114979848860844
+  v_giEpi_NKE:
+    reference: unreferenced_placeholder; test value 1.16e-6 mol/s (about 100 mmol/day, the GI Na intake of the source parameter
+      set); supplied by BVC_GI in a network
+    sourced: false
+    value: 1.16e-06
+  v_lptEpi_NKE:
+    reference: unreferenced_placeholder; test value, of the order of the source model's proximal-tubule NKE flux (3.7e-3 mol/s);
+      supplied by BVC_Kidney_left in a network
+    sourced: false
+    value: 0.0037
+  v_rptEpi_NKE:
+    reference: unreferenced_placeholder; test value (see v_lptEpi_NKE); supplied by BVC_Kidney_right in a network
+    sourced: false
+    value: 0.0037
+  v_lgl_Na:
+    reference: unreferenced_placeholder; test value equal to v_lptEpi_NKE (steady state of a kidney); supplied by BVC_Kidney_left
+      in a network
+    sourced: false
+    value: 0.0037
+  v_rgl_Na:
+    reference: unreferenced_placeholder; test value equal to v_rptEpi_NKE; supplied by BVC_Kidney_right in a network
+    sourced: false
+    value: 0.0037
+review:
+  summary: 'Circulating Na pool of the blood-volume-control system: a pure integrator of the NKE fluxes from gut and both
+    proximal tubules minus the two glomerular filtration fluxes. All 6 parameters were TODO; q_vc_Na_init proposed from P.
+    Hunter''s unpublished parameter set, the five flux BCs as test values (they are supplied by BVC_GI / BVC_Kidney in a network).
+    Verified against its exact linear solution across the flux ranges; all tests pass.'
+  comment: The module is a trivially correct integrator; the questions are about what q_vc_Na means. It is the whole-circulation
+    Na, but BVC_GI and BVC_Kidney divide it by the volume of their local capillary (osmotic_vol_port), so each organ sees
+    a different blood Na concentration. q_vc_Na_init = 11.5 mmol is a toy-model value (a physiological extracellular Na pool
+    is about 2 mol).
+  questions:
+  - 'q_vc_Na_init = 0.0115 mol (P. Hunter''s unpublished set, a steady state of that toy model): keep as an unreferenced placeholder,
+    or re-derive it (extracellular Na is about 140 mM x 14 L = 2 mol)?'
+  - 'In a network, c_vc_Na = q_vc_Na/q_vc_W divides the whole-circulation Na (BVC_Na_circ) by the volume of the LOCAL capillary
+    that supplies osmotic_vol_port (intestinal or peritubular), so the GI and each kidney see different blood Na concentrations
+    (source values: 146 mM at the gut, 55 mM at the kidneys for the same q_vc_Na). Should q_vc_W be the circulating (plasma)
+    volume instead?'
+  - 'The GI flux port is not multi_port while the kidney ports are: intended (a single gut)?'
+  - 'Validation not_applicable (pure mass balance, verified exactly): agree?'
+  proposed_fixes: []
+  findings:
+  - Exact solution q_vc_Na = q_vc_Na_init + (sum of inflows - outflows) t holds to 1e-9 relative over 5 values of each flux
+    (including negative NKE fluxes, which the simplified NKE produces when it runs backwards) and q_vc_Na_init from 1 mmol
+    to 1 mol.
+  - 'Joint failure risk (512 samples): P(fail) = 0.000 [0.000, 0.007].'

@@ -1,0 +1,67 @@
+{
+  "module_type": "sum_blood_vol",
+  "version": "ArgusUNPUBLISHED_v01_SI",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["q", "v1/q", "v2/q"],
+  "harness": {
+    "module_array": [
+      ["v1", "vv_noI_SI", "simple", "", "mod", "default"],
+      ["v2", "vv_noI_SI", "simple", "", "mod", "default"],
+      ["mod", "ArgusUNPUBLISHED_v01_SI", "sum_blood_vol", "v1 v2", "", "default"]
+    ],
+    "parameters": [
+      ["q_init_v1", "m3", 0.000253, "test value"],
+      ["q_0_v1", "m3", 0.0001, "test value"],
+      ["u_0_v1", "J_per_m3", 0.0, "test value"],
+      ["C_v1", "m6_per_J", 1.275e-08, "test value"],
+      ["v_in_v1", "m3_per_s", 4.165e-05, "test value: open inlet"],
+      ["v_out_v1", "m3_per_s", 2.083e-05, "test value: open outlet"],
+      ["q_init_v2", "m3", 0.000253, "test value"],
+      ["q_0_v2", "m3", 0.0001, "test value"],
+      ["u_0_v2", "J_per_m3", 0.0, "test value"],
+      ["C_v2", "m6_per_J", 1.275e-08, "test value"],
+      ["v_in_v2", "m3_per_s", 4.165e-05, "test value: open inlet"],
+      ["v_out_v2", "m3_per_s", 2.083e-05, "test value: open outlet"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "q equals the sum of the connected compartment volumes exactly: q = v1 q + v2 q",
+      "expr": "np.allclose(q, v1__q + v2__q, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "the summed volume changes as the net external flow: q(t) - q(0) = (v_in - v_out) t for each of v1, v2 (0.5 Q in, 0.25 Q out)",
+      "expr": "np.allclose(q - q[0], (q[-1] - q[0])/t[-1]*t, rtol=1e-8, atol=1e-12*abs(q[0]))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {},
+    "exclude": ["q_sum"],
+    "rationale": "q_sum is supplied by the harness volume ports (not a free parameter in the test network) and the component has no constants, so there is nothing to sweep."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "bookkeeping component (sum of volumes); no physiological behaviour of its own"
+      },
+      "calibrate": {"note": "not_applicable: bookkeeping component; nothing to calibrate"}
+    }
+  }
+}

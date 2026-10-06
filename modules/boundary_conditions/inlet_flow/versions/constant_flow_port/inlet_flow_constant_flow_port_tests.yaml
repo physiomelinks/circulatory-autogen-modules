@@ -1,0 +1,9 @@
+module_type: inlet_flow
+version: constant_flow_port
+reviewed: false
+notes: 'A constant flow v on a single-variable flow_port (exit: it supplies a module the flow v), for closing a module''s
+  multi_port Sum flow_port in a test network (e.g. microvasculature_network''s v_out_sum / v_in_sum). Uses the same CellML
+  component as outlet_flow constant; P is unused (no pressure on a flow_port).'
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

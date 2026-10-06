@@ -1,9 +1,9 @@
 variable_name,units,value,data_reference,sourced
 R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
 F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
-T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
 channel_ratio_axon,dimensionless,0.5,user_defined,no
-c_m_axon,uF_per_cm2,1.0,"Gentet2000; specific membrane capacitance 0.9 uF/cm^2 measured directly in nucleated patches of cortical pyramidal, spinal cord and hippocampal neurons (Abstract); 1 uF/cm^2 (0.01 pF/um^2) is the conventional value used here",yes
+c_m_axon,uF_per_cm2,1.0,"gentet2000direct; specific membrane capacitance 0.9 uF/cm^2 measured directly in nucleated patches of cortical pyramidal, spinal cord and hippocampal neurons (Abstract); 1 uF/cm^2 (0.01 pF/um^2) is the conventional value used here",yes
 d_ax_axon,um,1.0,"definitional; axon diameter 1 um, within the 0.3-1.5 um range of unmyelinated postganglionic sympathetic axons; with L_ax and R_i chosen to reproduce the previous C and R",no
 L_ax_axon,um,106.1032953945969,"definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um **Shortened on review 2026-10-06 to L/3 = 106.1 um so the lumped pseudo-axon passes the AP (effective time constant RC/(1+channel_ratio) 2.0 -> 0.22 ms, below the ~0.8 ms spike width; reviews/neuron_sympathetic_ap_transmission.html): L_ax is the electrotonic length of one lumped compartment, not the anatomical axon length**",no
 R_i_axon,ohm_cm,74.02203300817018,definitional; axial (cytoplasmic) resistivity chosen so that R = 4 R_i L_ax/(pi d_ax^2) reproduces the previous R = 300 MOhm (SN_simple to_be_determined R = 300 MOhm): R_i = 74.02 ohm cm (typical axoplasm 70-200 ohm cm),no

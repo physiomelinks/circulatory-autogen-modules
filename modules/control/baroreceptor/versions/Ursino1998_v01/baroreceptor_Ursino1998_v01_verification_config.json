@@ -1,0 +1,60 @@
+{
+  "module_type": "baroreceptor",
+  "version": "Ursino1998_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["P_baro", "f_ab"],
+  "invariants": [
+    {
+      "description": "P_baro matches the exact first-order solution X + (P_baro_init - X) exp(-t/tau_pb), X = P_sys + tau_zb dP_sys_dt",
+      "expr": "np.max(np.abs(P_baro - ((P_sys + tau_zb*dP_sys_dt) + (P_baro_init - (P_sys + tau_zb*dP_sys_dt))*np.exp(-t/tau_pb)))) <= 1e-4*max(abs(P_sys + tau_zb*dP_sys_dt), abs(P_baro_init))"
+    },
+    {
+      "description": "f_ab is the static sigmoid of P_baro (exact algebraic identity)",
+      "expr": "np.max(np.abs(f_ab - (f_ab_min + f_ab_max*np.exp((P_baro - P_nom)/k_ab))/(1 + np.exp((P_baro - P_nom)/k_ab)))) <= 1e-8*max(1.0, f_ab_max)"
+    },
+    {
+      "description": "afferent firing stays between its saturation levels f_ab_min and f_ab_max",
+      "expr": "(np.min(f_ab) >= min(f_ab_min, f_ab_max) - 1e-9) & (np.max(f_ab) <= max(f_ab_min, f_ab_max) + 1e-9)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "P_sys": {"min": 6666, "max": 26664, "points": 7},
+      "dP_sys_dt": {"min": -2000, "max": 2000, "points": 5},
+      "P_baro_init": {"min": 8000, "max": 20000, "points": 5},
+      "P_nom": {"min": 10666, "max": 14666, "points": 5},
+      "tau_zb": {"min": 0.0, "max": 12.0, "points": 5},
+      "tau_pb": {"min": 0.5, "max": 8.0, "points": 5, "scale": "log"},
+      "k_ab": {"min": 800, "max": 3200, "points": 5, "scale": "log"},
+      "f_ab_min": {"min": 0.0, "max": 10.0, "points": 5},
+      "f_ab_max": {"min": 25.0, "max": 80.0, "points": 5}
+    },
+    "rationale": "P_sys 50-200 mmHg (hypotension to severe hypertension, mean or systolic); dP_sys_dt +-2000 Pa/s (15 mmHg/s, slow ramps; pulsatile dP/dt is far larger but the input is meant to be smoothed); P_nom 80-110 mmHg around the Ursino 92 mmHg set point; time constants and slopes 0.5-2x the Ursino values; saturations spanning reported afferent ranges."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.04, 0.02, 0.01, 0.005],
+    "t_end": 20.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "Candidate: the static carotid-sinus afferent firing vs sinus pressure curve that Ursino 1998 fitted (f_min, f_max, P_n, k_a); the underlying data (and the paper) are paywalled and could not be obtained. An open alternative is a human neck-chamber HR-pressure sigmoid, but that validates the whole reflex arc, not this afferent block."
+      },
+      "calibrate": {"note": "pending: same data as baseline would identify P_nom, k_ab, f_ab_min, f_ab_max"}
+    }
+  }
+}

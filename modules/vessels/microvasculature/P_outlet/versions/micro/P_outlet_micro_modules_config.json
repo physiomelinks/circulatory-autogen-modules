@@ -1,0 +1,50 @@
+[
+  {
+    "module_type": "P_outlet",
+    "module_subtype": "micro",
+    "module_format": "cellml",
+    "component_file": "P_outlet_micro_modules.cellml",
+    "component_type": "constant_pressure_BC_type_micro",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "P"
+        ]
+      }
+    ],
+    "exit_ports": [],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "P",
+        "J_per_m3",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

@@ -11,8 +11,8 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat
   checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance
   is g_Na = A_mem rho_Na gamma_Na (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the
-  membrane through membrane_area; the defaults reproduce the previous g_Na. tau_m: owner''s simplification of BelluzziSacchi1986
-  Fig. 9A (tau_m = 0.06013 + 1/(42.98 e^{0.08915V} + 0.9230 e^{-0.03351V}) ms, peak 0.27 ms near -40 mV, 37 degC; = Tao2011
+  membrane through membrane_area; the defaults reproduce the previous g_Na. tau_m: owner''s simplification of belluzzi1986quantitative
+  Fig. 9A (tau_m = 0.06013 + 1/(42.98 e^{0.08915V} + 0.9230 e^{-0.03351V}) ms, peak 0.27 ms near -40 mV, 37 degC; = tao2011model
   Eq. 88). Offset 0.06 ms = source; numerator 0.4 matched the source peak (CA 837d3aae, 2024-07-21) and was doubled to 0.8
   (CA 8449bc05, 2025-05-01), so the peak is now ~0.48 ms. tau_h_min/max traced on review (2026-10-05); values kept for recalibration.
   Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings

@@ -123,7 +123,7 @@ def run_fenics(name, work, settings=None, **params):
 def coupled_cells(name):
     """The grid cells of a CellML-grid system model that 0D modules exchange with, in the order
     of their sources (the order the FEniCS model numbers its regions)."""
-    records = json.load(open(os.path.join(load_system(name).dir, f'{name}_vessel_array.json')))
+    records = json.load(open(os.path.join(load_system(name).dir, f'{name}_module_array.json')))
     by_name = {r['name']: r for r in records}
     cells = {}
     for r in records:

@@ -24,7 +24,7 @@ import tempfile
 
 import numpy as np
 
-from cam_testing import harness, vessel_array
+from cam_testing import harness, module_array
 from cam_testing.library import MODULES_DIR
 
 REPO_DIR = os.path.dirname(MODULES_DIR)
@@ -74,7 +74,7 @@ def component_job(component, work_dir):
     prefix = component.id
     res = os.path.join(work_dir, 'resources', component.id)
     harness._write_resources(component, res, prefix, {})
-    records = vessel_array.read_records(vessel_array.find(res, prefix))
+    records = module_array.read_records(module_array.find(res, prefix))
     # inp/out space-separated, as PhLynx's instance-array importer gives them
     instances = [{'name': r['name'], 'module_type': r['module_type'], 'module_subtype': r['module_subtype'],
                   'inp_instances': ' '.join(r.get('inp_instances', [])),

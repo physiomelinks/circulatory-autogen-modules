@@ -10,13 +10,13 @@
   "outputs": ["u", "v", "q", "q_C", "I", "up1/v", "up2/v"],
   "run_parameters": {},
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["mod", "vp_nonlinear_constR", "Min_junction", "up1 up2", "bcout", "default"],
-      ["bcin1", "nn_constant", "inlet_flow", "", "up1", "default"],
+      ["bcin1", "constant", "inlet_flow", "", "up1", "default"],
       ["up1", "vp", "arterial_simple", "bcin1", "mod", "default"],
-      ["bcin2", "nn_constant", "inlet_flow", "", "up2", "default"],
+      ["bcin2", "constant", "inlet_flow", "", "up2", "default"],
       ["up2", "vp", "arterial_simple", "bcin2", "mod", "default"],
-      ["bcout", "nn_constant", "outlet_pressure", "mod", "", "default"]
+      ["bcout", "constant", "outlet_pressure", "mod", "", "default"]
     ],
     "parameters": [
       ["v_bcin1", "m3_per_s", 7.1442e-05, "harness: constant inflow (half the nominal flow)"],

@@ -31,15 +31,22 @@
     "sum_blood_volume/q_volume_sum_sum"
   ],
   "harness": {
-    "vessel_array": [
-      ["ivc_zero", "nn_constant", "inlet_flow", "", "mod", "default"],
+    "module_array": [
+      ["ivc_zero", "constant", "inlet_flow", "", "mod", "default"],
       ["mod", "vp_LVprop", "heart", "ivc_zero venous_svc pvn", "aortic_root par volume_sum", "default"],
       ["aortic_root", "vv", "arterial_simple", "mod", "systemic_T volume_sum", "default"],
       ["systemic_T", "pp_spec_I", "terminal", "aortic_root", "venous_svc volume_sum", "default"],
       ["venous_svc", "vp", "venous", "systemic_T", "mod volume_sum", "default"],
       ["pvn", "vp", "venous", "par", "mod volume_sum", "default"],
       ["par", "vp", "arterial_simple", "mod", "pvn volume_sum", "default"],
-      ["volume_sum", "nn", "volume_sum", "pvn par mod aortic_root systemic_T venous_svc", "", "default"]
+      [
+        "volume_sum",
+        "ArgusUNPUBLISHED_v01",
+        "volume_sum",
+        "pvn par mod aortic_root systemic_T venous_svc",
+        "",
+        "default"
+      ]
     ],
     "parameters": [
       [
@@ -300,7 +307,7 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "heart_simple_LVprop is used by the circulatory_autogen neonatal model, so adult CMR values (Maceira 2006) are not the right target; a neonatal reference set is needed. Candidate: normal adult values. Maceira2006LV Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47 +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; Maceira2006RV via KawelBoehm2020 Table 9: RV EDV 163 +- 27 (men) / 127 +- 24 (women) ml, RVEF 66 +- 7 %; KawelBoehm2020 Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; Maceira2006LV Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the harness (last cycle after 20 s): LV EDV 116 ml, ESV 49 ml, SV 67 ml, EF 58 %, RV EDV 94 ml, CO 3.9 l/min, aortic 77/46 mmHg, pulmonary artery 48/11 mmHg, mean LA pressure 16 mmHg. These are scalar features of the periodic state; validation_test_baseline only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs from t = 0 with pre_time 0, so max/min features would include the start-up transient (framework need)."
+        "reason": "heart_simple_LVprop is used by the circulatory_autogen neonatal model, so adult CMR values (Maceira 2006) are not the right target; a neonatal reference set is needed. Candidate: normal adult values. maceira2006normalized Table 8 (all subjects, n = 120): LV EDV 142 +- 21 ml, ESV 47 +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %; maceira2006reference via kawelboehm2020reference Table 9: RV EDV 163 +- 27 (men) / 127 +- 24 (women) ml, RVEF 66 +- 7 %; kawelboehm2020reference Table 2: CO 5.6 +- 1.1 (men) / 4.5 +- 0.9 (women) l/min; maceira2006normalized Table 1: brachial BP 125 +- 7 / 73 +- 5 mmHg (men 20-29). Preliminary comparison at the nominal parameters in the harness (last cycle after 20 s): LV EDV 116 ml, ESV 49 ml, SV 67 ml, EF 58 %, RV EDV 94 ml, CO 3.9 l/min, aortic 77/46 mmHg, pulmonary artery 48/11 mmHg, mean LA pressure 16 mmHg. These are scalar features of the periodic state; validation_test_baseline only compares time series from t = 0 (no pre_time) and the calibrate evaluation also runs from t = 0 with pre_time 0, so max/min features would include the start-up transient (framework need)."
       },
       "calibrate": {
         "note": "pending: Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate evaluation does not yet honour pre_time (framework need)."

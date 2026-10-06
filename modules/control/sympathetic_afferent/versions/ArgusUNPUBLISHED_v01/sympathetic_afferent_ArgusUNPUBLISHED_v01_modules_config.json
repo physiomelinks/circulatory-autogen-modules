@@ -1,0 +1,153 @@
+[
+  {
+    "module_type": "sympathetic_afferent",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "sympathetic_afferent_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "sympathetic_afferent_Gee2023",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "gee2023closed",
+      "ursino1998interaction",
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "lung_stretch_firing_rate_port",
+        "variables": [
+          "f_ls"
+        ]
+      },
+      {
+        "port_type": "baroreceptor_firing_rate_port",
+        "variables": [
+          "f_br"
+        ]
+      },
+      {
+        "port_type": "cardiopulmonary_firing_rate_port",
+        "variables": [
+          "f_cp"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "sympathetic_afferent_heart_freq",
+        "variables": [
+          "f_ash"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "sympathetic_afferent_peripheral_freq",
+        "variables": [
+          "f_asp"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "sympathetic_afferent_venous_freq",
+        "variables": [
+          "f_asv"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f_ash",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_asp",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_asv",
+        "Hz",
+        "access",
+        "variable"
+      ],
+      [
+        "f_ls",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_br",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_cp",
+        "Hz",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "G_abh",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_alh",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_ach",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_abp",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_alp",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_acp",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_abv",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_alv",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "G_acv",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

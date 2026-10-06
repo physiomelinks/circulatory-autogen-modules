@@ -7,11 +7,11 @@
   "solver": "CVODE_myokit",
   "outputs": ["q_star", "P_s_star", "flux", "vessel0d/u", "vessel0d/v", "imposter1d/P_t_star", "imposter1d/A_star"],
   "harness": {
-    "vessel_array": [
-      ["pressure_in", "nn_constant", "inlet_pressure", "", "vessel0d", "default"],
+    "module_array": [
+      ["pressure_in", "constant", "inlet_pressure", "", "vessel0d", "default"],
       ["vessel0d", "pv", "arterial_simple", "pressure_in", "mod", "default"],
       ["mod", "pv_0D_1D", "coupler", "vessel0d", "imposter1d", "default"],
-      ["imposter1d", "nn", "imposter_1D", "mod", "", "default"]
+      ["imposter1d", "ArgusUNPUBLISHED_v01", "imposter_1D", "mod", "", "default"]
     ],
     "parameters": [
       ["P_pressure_in", "J_per_m3", 2000, "harness test value (circulatory_autogen 0D_1D_coupling_test)"],

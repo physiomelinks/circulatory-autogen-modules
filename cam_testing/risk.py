@@ -18,7 +18,7 @@ Outputs, per version, committed in versions/<version>/risk/ so they are availabl
   - a logistic-regression classifier on quadratic features of the unit-box coordinates, giving a
     smooth P(fail | parameters) anywhere in the box; its 5-fold cross-validated AUC is stored
 
-    python -m cam_testing.risk --module Lotka_Volterra [--samples 1024] [--component Lotka_Volterra/nn]
+    python -m cam_testing.risk --module Lotka_Volterra [--samples 1024] [--component Lotka_Volterra/Lotka1925_v01]
 """
 import argparse
 import json

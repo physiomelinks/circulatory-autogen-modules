@@ -1,0 +1,61 @@
+{
+  "module_type": "reversal_potentials",
+  "version": "cardiomyocyte_Paci2013_v01",
+  "sim_time": 0.01,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["E_Na", "E_K", "E_Ks", "E_Ca"],
+  "invariants": [
+    {
+      "description": "Nernst: E_Na = RT/F ln(Nao/Nai)",
+      "expr": "np.max(np.abs(E_Na - R*T/F*np.log(Nao/Nai))) <= 1e-12"
+    },
+    {
+      "description": "Nernst: E_K = RT/F ln(Ko/Ki)",
+      "expr": "np.max(np.abs(E_K - R*T/F*np.log(Ko/Ki))) <= 1e-12"
+    },
+    {
+      "description": "GHK-type I_Ks reversal E_Ks = RT/F ln((Ko + PkNa Nao)/(Ki + PkNa Nai))",
+      "expr": "np.max(np.abs(E_Ks - R*T/F*np.log((Ko + PkNa*Nao)/(Ki + PkNa*Nai)))) <= 1e-12"
+    },
+    {
+      "description": "Nernst (z = 2): E_Ca = 0.5 RT/F ln(Cao/Cai)",
+      "expr": "np.max(np.abs(E_Ca - 0.5*R*T/F*np.log(Cao/Cai))) <= 1e-12"
+    },
+    {
+      "description": "E_Ks lies between E_K and E_Na",
+      "expr": "np.all((E_Ks >= E_K - 1e-12) & (E_Ks <= E_Na + 1e-12))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Nai": {"min": 5.0, "max": 20.0, "points": 4},
+      "Cai": {"min": 1e-05, "max": 0.001, "points": 3, "scale": "log"},
+      "T": {"min": 295.0, "max": 310.15, "points": 2},
+      "R": {"min": 8.314, "max": 8.314, "points": 1},
+      "F": {"min": 96485.0, "max": 96485.0, "points": 1}
+    },
+    "rationale": "intracellular Na 5-20 mM, Ca 1e-5 to 1e-3 mM, extracellular/intracellular constants by the default factors 0.5-2, T room to body temperature; R and F are physical constants."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {"status": "not_applicable", "reason": "physical law (Nernst), verified exactly."},
+      "calibrate": {"note": "not_applicable: physical law, no free parameters."}
+    }
+  }
+}

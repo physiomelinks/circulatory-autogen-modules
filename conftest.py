@@ -9,7 +9,7 @@ def pytest_addoption(parser):
                      help='only test this module_type (and the module_types nested in it), or every module_type '
                           'under a path in modules/ (e.g. Lotka_Volterra, neuron, cell, cell/neuron); repeatable')
     parser.addoption('--component', action='append', default=[],
-                     help='only test this version, <module_type>/<version> (e.g. Lotka_Volterra/nn) or '
+                     help='only test this version, <module_type>/<version> (e.g. Lotka_Volterra/Lotka1925_v01) or '
                           '<module_type>__<version>; repeatable')
     parser.addoption('--include-unreviewed', action='store_true',
                      help='also run versions whose spec has reviewed: false')

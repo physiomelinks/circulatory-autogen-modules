@@ -1,0 +1,37 @@
+module_type: cardiopulmonary_receptor
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Cardiopulmonary (low-pressure) receptors (Gee 2023 eqs. S.41-S.42, from Ursino-Magosso): first-order low-pass filter
+  of the transmural pulmonary venous pressure P_pvn - P_mus, then the sigmoid f_cp = f_maxl/(1 + exp((P_tn - P_l)/k_l)). With
+  constant inputs P_l(t) = P_tr + (P_l_init - P_tr) exp(-t/tau_cp) exactly, and f_cp is the exact sigmoid of P_l.'
+reference_proposals:
+  tau_cp:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.7 and Simulink v03 1/(2s+1): 2 s'
+    sourced: 'yes'
+  P_l_init:
+    reference: definitional; filter state starts at 0 Pa (Gee Simulink transfer function with zero initial state)
+    sourced: definitional
+  f_maxl:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.7: f_max,l = 20 Hz'
+    sourced: 'yes'
+  P_tn:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.7: P_tn = 10.80 mmHg = 1439.9 Pa'
+    sourced: 'yes'
+  k_l:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Simulink v03 cardiopulmonary block: k_l = 1.4286
+      mmHg = 190.5 Pa (matches the csv). NOTE: supplementary Table S.7 lists k_l = 11.758 mmHg (1567.6 Pa), and the Simulink
+      baroreceptor block uses k_a = 11.758 while Table S.6 gives 1.43 -- the two slopes appear swapped between table and code;
+      owner to decide'
+    sourced: 'yes'
+  P_pvn:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (pulmonary venous
+      pressure; run point 1100 Pa ~ 8 mmHg)
+    sourced: 'no'
+  P_mus:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (thoracic/respiratory-muscle
+      pressure; the csv note says "TO_BE_SET_THIS_IS_WRONG"; run point -500 Pa ~ -3.75 mmHg (end-expiratory intrathoracic,
+      Gee Table S.16 P_thor,max = -4 mmHg))
+    sourced: 'no'
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.

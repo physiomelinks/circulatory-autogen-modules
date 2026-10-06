@@ -1,0 +1,63 @@
+{
+  "module_type": "FitzHugh_Nagumo",
+  "version": "FitzHugh1961_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.05,
+  "solver": "CVODE_myokit",
+  "outputs": ["V", "R"],
+  "invariants": [
+    {
+      "description": "trajectory stays bounded (|V|, |R| < 10)",
+      "expr": "(np.max(np.abs(V)) < 10) & (np.max(np.abs(R)) < 10)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "a": {"min": 0.0, "max": 1.0, "points": 6},
+      "b": {"min": 0.0, "max": 1.0, "points": 6},
+      "c": {"min": 0.5, "max": 10, "points": 7, "scale": "log"},
+      "V_init": {"min": -2, "max": 2, "points": 5},
+      "R_init": {"min": -2, "max": 2, "points": 5}
+    }
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.01, 0.005, 0.0025, 0.00125],
+    "t_end": 20.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "skipped",
+        "reason": "dimensionless model with no physical measurement data; the Ramsay synthetic benchmark is used for the calibrate test instead"
+      }
+    },
+    "FitzHugh_Nagumo_data": {
+      "calibrate": {
+        "status": "active",
+        "source": "Ramsay, Hooker, Campbell & Cao (2007) J. R. Statist. Soc. B 69(5):741-796, synthetic FitzHugh-Nagumo benchmark (as shipped with circulatory_autogen)",
+        "source_kind": "synthetic",
+        "obs_data": "instances/FitzHugh_Nagumo_data/FitzHugh_Nagumo_data_obs_data.json",
+        "params_for_id": "instances/FitzHugh_Nagumo_data/FitzHugh_Nagumo_data_params_for_id.csv",
+        "prediction_window": [40, 60],
+        "initial_parameters": {"a": 0.8, "b": 0.9, "c": 2.0},
+        "expected_parameters": {"a": 0.2, "b": 0.2, "c": 3.0},
+        "method": "multi_start_sp_minimize",
+        "optimiser_options": {"num_starts": 10, "seed": 0},
+        "do_ad": true,
+        "metric": "nrmse",
+        "threshold": 0.1
+      }
+    }
+  }
+}

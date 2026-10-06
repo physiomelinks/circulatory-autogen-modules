@@ -10,13 +10,13 @@ reference_proposals:
     sourced: 'no'
     value: 10.0
   m_tube:
-    reference: Muller2014; venous tube law exponents m = 10, n = -3/2 (primary text not accessible; confirmed in secondary
+    reference: muller2014global; venous tube law exponents m = 10, n = -3/2 (primary text not accessible; confirmed in secondary
       sources citing it, e.g. Muller et al. 2023 Front Physiol 14:1162391; the exponents are usually attributed to Shapiro-type
       collapsible-tube laws, origin not verified)
     sourced: 'yes'
     value: 10.0
   n_tube:
-    reference: Muller2014; venous tube law exponents m = 10, n = -3/2 (primary text not accessible; confirmed in secondary
+    reference: muller2014global; venous tube law exponents m = 10, n = -3/2 (primary text not accessible; confirmed in secondary
       sources citing it, e.g. Muller et al. 2023 Front Physiol 14:1162391; the exponents are usually attributed to Shapiro-type
       collapsible-tube laws, origin not verified)
     sourced: 'yes'
@@ -67,19 +67,19 @@ reference_proposals:
     sourced: definitional
     value: 0.0
   rho:
-    reference: Boileau2015; Table II, blood mass density 1050 kg m^-3 (Safaei2018 Sec. 2.2.4 uses 1040). Library value 1 is
+    reference: boileau2015benchmark; Table II, blood mass density 1050 kg m^-3 (safaei2018bond Sec. 2.2.4 uses 1040). Library value 1 is
       a test_fft fixture value
     sourced: 'yes'
     value: 1050.0
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   mu:
-    reference: Boileau2015; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also Safaei2018 Sec. 2.2.4). Library value 1 is
+    reference: boileau2015benchmark; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also safaei2018bond Sec. 2.2.4). Library value 1 is
       a test_fft fixture value
     sourced: 'yes'
     value: 0.004
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   g:
     reference: definitional; standard gravity 9.81 m s^-2 (library value 1 is a test_fft fixture value)
     sourced: definitional

@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="afferent_to_respiratory_efferent_Albanese2016_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="afferent_to_respiratory_efferent_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!--constants-->
+        <variable name="P_CO2_a_nom" public_interface="in" units="J_per_m3"/>
+        <variable name="K_c_resp" public_interface="in" units="m3_per_Js"/>
+        <variable name="f_apc_nom" public_interface="in" units="per_s"/>
+        <variable name="K_p_resp" public_interface="in" units="dimensionless"/>
+        <!-- boundary conditions/inputs-->
+        <variable name="P_CO2_a" public_interface="in" units="J_per_m3"/>
+        <variable name="P_O2_a" public_interface="in" units="J_per_m3"/>
+        <variable name="f_apc" public_interface="in" units="per_s"/>
+        <!--variables-->
+        <variable name="u_p_resp" public_interface="out" units="per_s"/>
+        <variable name="u_c_resp" public_interface="out" units="per_s"/>
+        <!-- TODO these need time dynamics to delay them.
+ TODO change these to frequencies to properly model afferent to efferent.-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>u_c_resp</ci>
+                <apply>
+                    <times/>
+                    <ci>K_c_resp</ci>
+                    <apply>
+                        <minus/>
+                        <ci>P_CO2_a</ci>
+                        <ci>P_CO2_a_nom</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u_p_resp</ci>
+                <apply>
+                    <times/>
+                    <ci>K_p_resp</ci>
+                    <apply>
+                        <minus/>
+                        <ci>f_apc</ci>
+                        <ci>f_apc_nom</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -2,7 +2,7 @@ variable_name,units,value,data_reference,sourced
 Ca_ER,millimolar,0.6,definitional; SN_simple Ca_ER_init (used when unconnected),no
 Ca_ER_RyR_den,millimolar,0.03,SN_simple: user_defined,no
 Ca_ER_RyR_mid,millimolar,0.5,SN_simple: user_defined,no
-Cai,millimolar,0.0001,definitional; SN_simple Cai_init (Hagiwara1981; used when unconnected),no
+Cai,millimolar,0.0001,definitional; SN_simple Cai_init (hagiwara1981calcium; used when unconnected),no
 Cai_RyR_den,millimolar,1e-4,SN_simple: user_defined,no
 Cai_RyR_mid,millimolar,8e-4,SN_simple: user_defined,no
 A_ER,um2,86.00525082199546,definitional; the soma ER membrane area 86.01 um^2 of a sphere of volume c_ER Vol (used when unconnected; in a soma it comes from the Ca handling through the ER_membrane_area port),no
@@ -12,4 +12,4 @@ tau_c_RyR,millis,0.01,SN_simple: user_defined,no
 tau_hc_RyR,millis,10,SN_simple: user_defined,no
 Q10_RyR,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
 T_ref_RyR,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
-T,kelvin,295.15,"Davis2021Thesis; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

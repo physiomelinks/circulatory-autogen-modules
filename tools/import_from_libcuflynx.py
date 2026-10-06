@@ -17,7 +17,7 @@ are edited by hand once a module has been reviewed.
 
 Pre-versions tool: it reads and writes the old per-module layout (modules/<name>/...), kept for
 provenance. The library now uses modules/<category>/<module_type>/versions/<version>/ (see
-modules/README.md); tools/restructure_modules.py moves an old-layout tree into it.
+modules/README.md); tools/restructure_to_versions.py moves an old-layout tree into it.
 """
 import argparse
 import csv
@@ -123,13 +123,17 @@ def write_units_file(path, needed, blocks):
 
 def load_ca_parameter_sources(ca_dir):
     '''
-    Every (vessel_array, parameters) pair in CA's resources/, as a list of
+    Every (module_array, parameters) pair in CA's resources/, as a list of
     (prefix, vessels: [(name, vessel_type, BC_type)], params: {variable_name: row}).
     '''
     resources = os.path.join(ca_dir, 'resources')
     sources = []
-    for vessel_path in sorted(glob.glob(os.path.join(resources, '*_vessel_array.csv'))):
-        prefix = os.path.basename(vessel_path)[:-len('_vessel_array.csv')]
+    # circulatory_autogen's module arrays, under either name (vessel_array before its #549)
+    paths = {}
+    for name in ('vessel_array', 'module_array'):
+        for p in glob.glob(os.path.join(resources, f'*_{name}.csv')):
+            paths[os.path.basename(p)[:-len(f'_{name}.csv')]] = p
+    for prefix, vessel_path in sorted(paths.items()):
         param_path = os.path.join(resources, f'{prefix}_parameters.csv')
         if not os.path.isfile(param_path):
             continue

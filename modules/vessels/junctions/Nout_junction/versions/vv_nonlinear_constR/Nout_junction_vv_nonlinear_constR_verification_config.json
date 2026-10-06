@@ -10,13 +10,13 @@
   "outputs": ["u", "v", "q", "u_d", "q_C", "q_C_d", "q_p", "q_d", "I", "dn1/v", "dn2/v"],
   "run_parameters": {},
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["mod", "vv_nonlinear_constR", "Nout_junction", "bcin", "dn1 dn2", "default"],
-      ["bcin", "nn_constant", "inlet_flow", "", "mod", "default"],
+      ["bcin", "constant", "inlet_flow", "", "mod", "default"],
       ["dn1", "pv", "arterial_simple", "mod", "bcout1", "default"],
-      ["bcout1", "nn_constant", "outlet_flow", "dn1", "", "default"],
+      ["bcout1", "constant", "outlet_flow", "dn1", "", "default"],
       ["dn2", "pv", "arterial_simple", "mod", "bcout2", "default"],
-      ["bcout2", "nn_constant", "outlet_flow", "dn2", "", "default"]
+      ["bcout2", "constant", "outlet_flow", "dn2", "", "default"]
     ],
     "parameters": [
       ["v_bcin", "m3_per_s", 0.000142884, "harness: constant inflow"],

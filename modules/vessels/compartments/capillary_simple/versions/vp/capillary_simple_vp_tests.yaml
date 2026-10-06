@@ -18,11 +18,11 @@ reference_proposals:
     value: 1.0e-10
   I:
     reference: unreferenced_placeholder; inertance 1e5 Pa s^2 m^-3, order of rho l/(pi r^2) for a large artery (1050 x 0.05/(pi
-      0.0115^2) = 1.3e5); Safaei2018 Table S3 sets I = 0 for the pulmonary arteries, which this ODE module cannot take
+      0.0115^2) = 1.3e5); safaei2018bond Table S3 sets I = 0 for the pulmonary arteries, which this ODE module cannot take
     sourced: 'no'
     value: 100000.0
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   u_ext:
     reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
     sourced: definitional

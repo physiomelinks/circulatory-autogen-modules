@@ -7,12 +7,12 @@
   "solver": "CVODE_myokit",
   "outputs": [],
   "harness": {
-    "vessel_array": [
-      ["f_in", "nn_constant", "inlet_flow", "", "ves", "default"],
+    "module_array": [
+      ["f_in", "constant", "inlet_flow", "", "ves", "default"],
       ["ves", "vp", "arterial_simple", "f_in", "mod", "default"],
       ["mod", "vv", "FV1D_vessel", "ves", "term", "default"],
       ["term", "pp_R1CR2_wCont", "terminal", "mod", "p_out", "default"],
-      ["p_out", "nn_constant", "outlet_pressure", "term", "", "default"]
+      ["p_out", "constant", "outlet_pressure", "term", "", "default"]
     ],
     "parameters": [
       ["v_f_in", "m3_per_s", 8.3333e-05, "library default (module parameters)"],

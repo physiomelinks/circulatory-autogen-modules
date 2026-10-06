@@ -4,7 +4,7 @@ The standard V&V tests: per version (module_type/version) for verification, and 
 
     pytest                                        # every reviewed version
     pytest --module Lotka_Volterra                # one module_type and those nested in it (or a category: --module cell)
-    pytest --component Lotka_Volterra/nn          # one version
+    pytest --component Lotka_Volterra/Lotka1925_v01          # one version
     pytest -m "not slow"                          # skip calibration
 
 Each test writes its result JSON and plots into the version's results/ and plots/, which the

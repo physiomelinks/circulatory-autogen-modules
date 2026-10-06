@@ -12,9 +12,10 @@ Built by ``python tools/build_instance_omex.py`` (``make omex``); not committed.
   <instance>_obs_data.json                    the instance's calibration data, if it has any
   <instance>_params_for_id.csv                its parameters to identify, if any
   inputs, unchanged: <instance>_parameters.csv, raw data and
-    SOURCES.md; the version's _modules.cellml, _modules_config.json, _units.cellml and
-    _verification_config.json; and the test network the model was generated from
-    (<module_type>_<version>_<instance>_vessel_array.json / _model_parameters.csv)
+    SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
+    _units.cellml and _verification_config.json; a supermodule's submodules' _modules_config.json
+    (their required_citations); and the test network the model was generated from
+    (<module_type>_<version>_<instance>_module_array.json / _model_parameters.csv)
   manifest.xml                                COMBINE manifest (master marked)
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
@@ -88,8 +89,14 @@ def members(version, instance, work_dir):
             add(full)
     for p in (version.cellml_path, version.config_path, version.units_path, version.verification_config_path):
         add(p)
+    # a supermodule's submodules' configs (recursively), so their required_citations travel with it
+    seen = {version.key}
+    for sub, _, _ in version.submodule_citations() if version.is_supermodule else []:
+        if sub.key not in seen:
+            seen.add(sub.key)
+            add(sub.config_path)
     # the test network the model was generated from
-    add(os.path.join(res, f'{prefix}_vessel_array.json'), f'{stem}_vessel_array.json')
+    add(os.path.join(res, f'{prefix}_module_array.json'), f'{stem}_module_array.json')
     add(os.path.join(res, f'{prefix}_parameters.csv'), f'{stem}_model_parameters.csv')
     return out
 
