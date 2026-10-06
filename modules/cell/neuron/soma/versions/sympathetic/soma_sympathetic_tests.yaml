@@ -3,7 +3,7 @@ version: sympathetic
 reviewed: false
 description: 'Sympathetic-neuron soma (SN_simple''s SN_soma) built from its parts: the membrane with the sensing filter, Na/K
   concentrations with their Nernst potentials, four-compartment Ca handling, and the ion channels i_Na, i_Na1_6, i_CaL, i_Kv2,
-  i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (cell/ion_channels, versions Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06).
+  i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, PMCA (Colegrove2000_v01, since review 2026-10-07), i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (cell/ion_channels, versions Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06).
   Each submodule becomes <instance>_<submodule> in a model; the membrane couples to the axon: per_submodule_outputs {"membrane":
   ["<axon>"]} (VI_port: V out, the axial current I_out in); optional stimulus through membrane''s i_stim. Default parameters
   are SN_simple''s (its default instance). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
@@ -17,7 +17,7 @@ notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 2
   rates times phi = Q10^((T - T_ref)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), with that version''s
   default-instance values and references (*_RyR rows). It replaced Argus2026_v01 (the owner''s c^3 hc^3 law), which is
   inconsistent with the rat-SCG CICR data (comparison: reviews/RyR_HernandezCruz1997_comparison.html). The rest of the soma
-  (SERCA, buffers, K(Ca)) was tuned with the old RyR, so the resting balance is to be recalibrated.'
+  (SERCA, buffers, K(Ca)) was tuned with the old RyR, so the resting balance is to be recalibrated. PMCA (review 2026-10-07): a plasma-membrane Ca-ATPase submodule PMCA (cell/ion_channels/PMCA, version Colegrove2000_v01: the Hill pump of Colegrove, Albrecht & Friel 2000, j_PMCA = -j_max Cai^n/(K^n + Cai^n), j_max = A_mem rho_PMCA r_PMCA / N_A) extrudes Ca from the sub-membrane shell, connected like i_NaCa (internal_Ca and Ca_flux with Ca, membrane_area from the membrane; rows *_PMCA). rho_PMCA is the libcuflynx calibration to Wanaverbecq et al. 2003 (rat SCG resting Ca and recovery tau; instance PMCA/Colegrove2000_v01 wanaverbecq2003_scg), a density shared by the soma and the varicosity.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

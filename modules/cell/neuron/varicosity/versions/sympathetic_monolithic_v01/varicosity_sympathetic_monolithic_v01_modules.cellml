@@ -314,6 +314,13 @@ Vol_ER = Vol*c_ER;-->
         <variable name="k_NaCa" public_interface="out" units="nanoA"/>
         <variable name="rho_NaCa" public_interface="in" units="per_um2"/>
         <variable name="r_NaCa" public_interface="in" units="per_s"/>
+        <!-- plasma-membrane Ca-ATPase (PMCA module Colegrove2000_v01: Hill pump of Colegrove, Albrecht & Friel 2000, j_max = A_mem rho_PMCA r_PMCA / N_A; review 2026-10-07) -->
+        <variable name="rho_PMCA" public_interface="in" units="per_um2"/>
+        <variable name="r_PMCA" public_interface="in" units="per_s"/>
+        <variable name="K_PMCA" public_interface="in" units="millimolar"/>
+        <variable name="n_PMCA" public_interface="in" units="dimensionless"/>
+        <variable name="j_max_PMCA" public_interface="out" units="mol_per_s"/>
+        <variable name="j_PMCA" public_interface="out" units="mol_per_s"/>
         <variable name="alpha_NaCa" public_interface="in" units="dimensionless"/>
         <variable name="gamma_NaCa" public_interface="in" units="dimensionless"/>
         <variable name="Ksat" public_interface="in" units="dimensionless"/>
@@ -937,6 +944,7 @@ Vol_ER = Vol*c_ER;-->
                                 <plus/>
                                 <ci>j_Ca_N</ci>
                                 <ci>j_NaCa_Ca</ci>
+                                <ci>j_PMCA</ci>
                                 <ci>j_IP3</ci>
                                 <ci>j_RyR</ci>
                                 <ci>j_leak_Ca</ci>
@@ -1179,6 +1187,8 @@ Vol_ER = Vol*c_ER;-->
             <apply><eq/><ci>A_ER_pre</ci><apply><times/><ci>k_A_ER_pre</ci><apply><power/><apply><root/><degree><cn cellml:units="dimensionless">3.0</cn></degree><apply><divide/><apply><times/><ci>c_ER_pre</ci><ci>Vol</ci><cn cellml:units="um3_per_m3" type="e-notation">1<sep/>18</cn></apply><ci>k_V_ER_pre</ci></apply></apply><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply>
             <apply><eq/><ci>g_CaN</ci><apply><times/><ci>A_mem</ci><ci>rho_CaN</ci><ci>gamma_CaN</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
             <apply><eq/><ci>k_NaCa</ci><apply><times/><ci>A_mem</ci><ci>rho_NaCa</ci><ci>r_NaCa</ci><cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn></apply></apply>
+            <apply><eq/><ci>j_max_PMCA</ci><apply><divide/><apply><times/><ci>A_mem</ci><ci>rho_PMCA</ci><ci>r_PMCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
+            <apply><eq/><ci>j_PMCA</ci><apply><divide/><apply><times/><apply><minus/><ci>j_max_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply><apply><plus/><apply><power/><ci>K_PMCA</ci><ci>n_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply></apply></apply>
             <apply><eq/><ci>k_IP3</ci><apply><times/><ci>A_ER</ci><ci>rho_IP3R</ci><ci>k_IP3R_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
             <apply><eq/><ci>k_RyR</ci><apply><times/><ci>A_ER</ci><ci>rho_RyR</ci><ci>k_RyR_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
             <apply><eq/><ci>k_SERCA</ci><apply><divide/><apply><times/><ci>A_ER_pre</ci><ci>rho_SERCA</ci><ci>r_SERCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
