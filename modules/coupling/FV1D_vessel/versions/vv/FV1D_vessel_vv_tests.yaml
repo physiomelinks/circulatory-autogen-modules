@@ -10,6 +10,8 @@ known_issues:
 - circulatory_autogen's 0D_1D_coupling_test network names a vessel 0D_vessel, not a valid CellML name (starts with a digit);
   the harness here uses vessel0d.
 expected_failures:
-  run_test: 'no valid network found yet: a 1D vessel between two 0D vessels (flow inlet -> 0D vp -> FV1D vv -> terminal pp
-    -> pressure outlet) generates a model libCellML does not analyse as an ODE ("model is not a valid ODE model"). May be
-    the test network rather than the module; needs 0D-1D coupling input.'
+  run_test: 'no valid network found yet: a 1D vessel between two 0D vessels (flow inlet -> 0D vp -> FV1D vv -> terminal pp ->
+    pressure outlet). With circulatory_autogen #520 generation now stops earlier, in libcuflynx''s port-kind check: it reads
+    a version''s first two letters as its port kinds and only skips names starting nn, so the outlet boundary ''constant'' (named
+    nn_constant before the 2026-10-06 restructure) fails it ("term output BC is p, the input BC of p_out should be v"); before
+    #520 libCellML did not analyse the generated model as an ODE.'

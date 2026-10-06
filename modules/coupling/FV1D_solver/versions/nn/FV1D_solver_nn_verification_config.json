@@ -1,5 +1,5 @@
 {
-  "module_type": "FV1D_vessel",
+  "module_type": "FV1D_solver",
   "version": "nn",
   "sim_time": 2.0,
   "pre_time": 0.0,
@@ -8,7 +8,7 @@
   "outputs": [],
   "harness": {
     "module_array": [
-      ["mod", "nn", "FV1D_vessel", "", "", "default"],
+      ["mod", "nn", "FV1D_solver", "", "", "default"],
       ["p_in", "constant", "inlet_pressure", "", "ves", "default"],
       ["ves", "pv", "arterial_simple", "p_in", "ves1d", "default"],
       ["ves1d", "pv", "FV1D_vessel", "ves", "", "default"]
@@ -22,7 +22,8 @@
       ["u_0_ves", "J_per_m3", 0.0, "library default (module parameters)"],
       ["u_in_ves", "J_per_m3", 13332.2, "library default (module parameters)"],
       ["v_out_ves", "m3_per_s", 0.0001, "library default (module parameters)"],
-      ["I_ves", "Js2_per_m6", 100000.0, "library default (module parameters)"]
+      ["I_ves", "Js2_per_m6", 100000.0, "library default (module parameters)"],
+      ["T", "second", 1.0, "the 1D solver's cycle period (global constant)"]
     ]
   },
   "invariants": [],
@@ -46,9 +47,9 @@
     "default": {
       "baseline": {
         "status": "not_applicable",
-        "reason": "C++ 1D finite-volume solver, not a CellML component; validated with the solver itself."
+        "reason": "the FV 1D solver process, not a CellML component; validated with the solver itself."
       },
-      "calibrate": {"note": "not_applicable: C++ component, not testable here."}
+      "calibrate": {"note": "not_applicable: the FV 1D solver process, not testable here."}
     }
   }
 }

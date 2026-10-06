@@ -409,6 +409,13 @@ tutorial.
   are not installed. The CellML checks are not applicable. System models in
   `system_models/coupled` test it in use.
 
+The FV 1D solver's parts are `external_api` too, with api blocks for libcuflynx's C++ 0D-1D
+path instead of a Python class: `coupling/FV1D_vessel` (role consumer: what a 0D model exchanges
+with a 1D vessel over named pipes), `coupling/FV1D_volume_sum` (a CellML placeholder with a
+consumer api for the 1D volume) and `coupling/FV1D_solver` (role process: the 1D solver program
+and its pipes, from which the C++ generator writes `coupler_config.json`). Their run_test
+generates a 0D model coupled to a 1D vessel and compiles it.
+
 | External model version | What it is |
 |---|---|
 | `transport/tissue_diffusion_FEniCS` `box_v01` | diffusion of one solute in a 3D box (FEniCSx), one exchange region per connected module through `capillary_to_flux_port`, the port of `tissue_diffusion_volume`; instances `default` (tissue O2) and `NE_extracellular` |

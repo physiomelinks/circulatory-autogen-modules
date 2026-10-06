@@ -393,21 +393,29 @@ CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp): libcuflynx g
                       'simulation to check')
 
 
-EXTERNAL_NOT_APPLICABLE = ('external model (module_format external_api, e.g. a FEniCS model): it has no CellML '
+EXTERNAL_NOT_APPLICABLE = ('external Python model (module_format external_api, api transport python, e.g. a FEniCS '
+                           'model): it has no CellML '
                            'equations, so the CellML simulation checks do not apply; run_test loads its model file and '
                            'steps it, and the system models that couple it to CellML modules test it in use')
 
 
-def is_cpp(component):
-    return component.config.get('module_format', 'cellml') == 'cpp'
-
-
 def is_external_api(component):
-    return component.config.get('module_format', 'cellml') == 'external_api'
+    """An external Python model (module_format external_api, api transport python, e.g. FEniCS),
+    coupled to the generated C++ through libcuflynx.coupling."""
+    api = component.config.get('api') or {}
+    return component.config.get('module_format', 'cellml') == 'external_api' and api.get('transport') == 'python'
+
+
+def is_cpp(component):
+    """A C++ coupling component: the 1D finite-volume solver's parts (module_format cpp, or
+    external_api coupled over named pipes: FV1D_vessel, FV1D_solver) and other non-Python external
+    APIs. run_test generates the 0D model coupled to it and compiles it."""
+    fmt = component.config.get('module_format', 'cellml')
+    return fmt == 'cpp' or (fmt == 'external_api' and not is_external_api(component))
 
 
 def is_non_cellml(component):
-    """Not simulated through CellML: a C++ 1D-solver marker or an external (e.g. FEniCS) model."""
+    """Not simulated through CellML: a C++ coupling component or an external Python (e.g. FEniCS) model."""
     return is_cpp(component) or is_external_api(component)
 
 

@@ -1,0 +1,11 @@
+module_type: FV1D_solver
+version: nn
+reviewed: false
+notes: 'The FV 1D (Muller) finite-volume solver as a process: the program libcuflynx''s coupler runs beside the generated
+  C++ 0D model (libcuflynx.solver1d main1D.py), with the named pipes the FV1D_vessel and FV1D_volume_sum connections exchange
+  over (api role process, transport named_pipe; channels dt, conn_{i}, volume, message_length 2). No CellML equations and
+  no ports: its only variable is the global cycle period T, which the coupler runs whole cycles of. libcuflynx adds a FV1D_solver
+  nn record to a 1D-coupled model (convert_0d_to_1d), and the C++ generator writes the coupler''s coupler_config.json from
+  this entry. Test network: the solver beside a 1D vessel with no 0D neighbour and an unrelated 0D vessel; run_test generates
+  it through the C++ 0D-1D path and compiles the generated model0d.cpp. The simulation tests are not applicable (the 1D solver
+  is not runnable here).'

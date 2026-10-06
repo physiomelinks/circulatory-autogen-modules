@@ -282,6 +282,7 @@
     "required_citations_uncertain": "optional: the keys of required_citations that are a best guess still to confirm (left out when none)"
   },
   "nn_versions_allowed": {
+    "coupling/FV1D_solver/nn": "libcuflynx's 1D coupling adds a FV1D_solver record with BC_type nn (convert_0d_to_1d; the C++ generator writes coupler_config.json from it)",
     "coupling/FV1D_vessel/nn": "libcuflynx's 1D coupling writes FV1D_vessel records with BC_type nn",
     "coupling/FV1D_volume_sum/nn": "libcuflynx's ModelParsers adds a ('FV1D_volume_sum', 'nn') record to 1D-coupled models"
   }

@@ -224,11 +224,12 @@ EQUIVALENCE_TOL = 1e-6
 SOLVER_INFO = {'rtol': 1e-10, 'atol': 1e-12}
 
 
-CPP_REASON = ('C++ 1D-solver component (module_format cpp): PhLynx builds CellML models only, so it has no '
-              'PhLynx/CUFLynx form')
+CPP_REASON = ('C++ coupling component (module_format cpp, or external_api over named pipes, e.g. the 1D solver\'s '
+              'FV1D_vessel and FV1D_solver): PhLynx builds CellML models only, so it has no PhLynx/CUFLynx form')
 
 
-EXTERNAL_REASON = ('external model (module_format external_api, e.g. a FEniCS model): PhLynx builds CellML models only, '
+EXTERNAL_REASON = ('external Python model (module_format external_api, api transport python, e.g. a FEniCS model): '
+                   'PhLynx builds CellML models only, '
                    'so it has no PhLynx/CUFLynx form')
 
 
@@ -238,7 +239,8 @@ def _cpp(component):
 
 
 def _reason(component):
-    return EXTERNAL_REASON if component.config.get('module_format') == 'external_api' else CPP_REASON
+    python = (component.config.get('api') or {}).get('transport') == 'python'
+    return EXTERNAL_REASON if component.config.get('module_format') == 'external_api' and python else CPP_REASON
 
 
 # PhLynx (src/) has no notion of a supermodule: its configs are CellML modules, so a version of
