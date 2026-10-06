@@ -6,33 +6,33 @@ notes: 'Arterial wall stiffness for a vessels tube law: wall thickness from the 
   as a parameter.'
 reference_proposals:
   r_0:
-    reference: 'circulatory_autogen; ADAN-86 ascending aorta (segment 1) radius used in cvs_model_with_arm_0d (ADAN_86, from
-      Safaei2016 / Blanco2015 geometry); the per-vessel value is not printed in those papers. Only a test value: r_0 is supplied
+    reference: 'argus2026circulatory; ADAN-86 ascending aorta (segment 1) radius used in cvs_model_with_arm_0d (ADAN_86, from
+      safaei2016roadmap / blanco2015anatomically geometry); the per-vessel value is not printed in those papers. Only a test value: r_0 is supplied
       by the connected vessel'
     sourced: 'no'
     value: 0.015642
   E:
     reference: unreferenced_placeholder; same value as material_prop_visco_const E (identified by calibration of cvs_model_0d,
-      07_02_2026). For comparison the ADAN elastin modulus is E_e = 4.0e6 dyn/cm^2 = 0.4 MPa (Muller2023 Sec. 2.4.2.1), 0.34
+      07_02_2026). For comparison the ADAN elastin modulus is E_e = 4.0e6 dyn/cm^2 = 0.4 MPa (muller2023anatomically Sec. 2.4.2.1), 0.34
       MPa for large arteries after the 0.85 elastin weight
     sourced: 'no'
     value: 108067.60432
   nu:
-    reference: 'Alastruey2011; Eq. (3): Poisson ratio sigma = 0.5 (incompressible wall); gives K = E h / ((1 - nu^2) r0) =
+    reference: 'alastruey2011pulse; Eq. (3): Poisson ratio sigma = 0.5 (incompressible wall); gives K = E h / ((1 - nu^2) r0) =
       4Eh/(3r0), Eq. (4)'
     sourced: 'yes'
   a_vessel:
-    reference: 'Muller2023; Eq. (43): h = r0 (a e^{b r0} + c e^{d r0}), a = 0.2802 (fit by Blanco2015 to the wall-thickness
-      data of Avolio1980; Avolio1980 itself not read)'
+    reference: 'muller2023anatomically; Eq. (43): h = r0 (a e^{b r0} + c e^{d r0}), a = 0.2802 (fit by blanco2015anatomically to the wall-thickness
+      data of avolio1980multi; avolio1980multi itself not read)'
     sourced: 'yes'
   b_vessel:
-    reference: 'Muller2023; Eq. (43): b = -5.053 cm^-1 = -505.3 m^-1 (fit by Blanco2015 to Avolio1980 data)'
+    reference: 'muller2023anatomically; Eq. (43): b = -5.053 cm^-1 = -505.3 m^-1 (fit by blanco2015anatomically to avolio1980multi data)'
     sourced: 'yes'
   c_vessel:
-    reference: 'Muller2023; Eq. (43): c = 0.1324 (fit by Blanco2015 to Avolio1980 data)'
+    reference: 'muller2023anatomically; Eq. (43): c = 0.1324 (fit by blanco2015anatomically to avolio1980multi data)'
     sourced: 'yes'
   d_vessel:
-    reference: 'Muller2023; Eq. (43): d = -0.1114 cm^-1 = -11.14 m^-1 (fit by Blanco2015 to Avolio1980 data)'
+    reference: 'muller2023anatomically; Eq. (43): d = -0.1114 cm^-1 = -11.14 m^-1 (fit by blanco2015anatomically to avolio1980multi data)'
     sourced: 'yes'
 review: reviews/vessel_properties_review.yaml
 review_scope: The review of the whole vessel_properties module (8 entries) before the move to versions; only the parts about

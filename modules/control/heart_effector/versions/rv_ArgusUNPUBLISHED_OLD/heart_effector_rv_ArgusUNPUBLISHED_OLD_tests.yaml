@@ -1,7 +1,7 @@
 module_type: heart_effector
 version: rv_ArgusUNPUBLISHED_OLD
 reviewed: false
-notes: 'Compliance (inverse-elastance) form of the Gee2023 effector. The config points at module_type heart_effector_Gee2023
+notes: 'Compliance (inverse-elastance) form of the gee2023closed effector. The config points at module_type heart_effector_Gee2023
   (elastance form, no inv_* variables) instead of heart_effector_Gee2023_INV, so the generated model has no equations for
   the inv_* variables: myokit warns "No value set" and every output is 0. The invariants below are the INV component''s exact
   solution (initial inv_Delta_Es = 1e-7, inv_Delta_Ev = -1e-7).
@@ -32,11 +32,11 @@ reference_proposals:
     sourced: false
     value: -1.0e-07
   tau_Es:
-    reference: Gee2023; tau = 8 s (Simulink sympathetic contractility effector)
+    reference: gee2023closed; tau = 8 s (Simulink sympathetic contractility effector)
     sourced: true
     value: 8.0
   f_esh:
-    reference: circulatory_autogen; test operating point (5 Hz)
+    reference: argus2026circulatory; test operating point (5 Hz)
     sourced: false
     value: 5.0
   inv_G_Ev:
@@ -44,19 +44,19 @@ reference_proposals:
     sourced: false
     value: -2.0e-08
   tau_Ev:
-    reference: Gee2023; tau = 1.5 s (Simulink vagal contractility effector)
+    reference: gee2023closed; tau = 1.5 s (Simulink vagal contractility effector)
     sourced: true
     value: 1.5
   f_PNDMV_filt:
-    reference: circulatory_autogen; test operating point (5 Hz)
+    reference: argus2026circulatory; test operating point (5 Hz)
     sourced: false
     value: 5.0
   scale:
-    reference: Gee2023; RV scaling 0.5903
+    reference: gee2023closed; RV scaling 0.5903
     sourced: true
     value: 0.5903
   f_es_min:
-    reference: Ursino1998; 2.66 spikes/s
+    reference: ursino1998interaction; 2.66 spikes/s
     sourced: true
 review: reviews/control_review.yaml
 review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version

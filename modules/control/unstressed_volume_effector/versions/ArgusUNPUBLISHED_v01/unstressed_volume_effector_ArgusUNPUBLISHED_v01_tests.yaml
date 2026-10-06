@@ -6,11 +6,11 @@ notes: 'Sympathetic effector (Gee 2023 eqs. S.52-S.53, Ursino 1998 form): sigma 
   is Delta_Vusv = sigma (1 - exp(-t/tau_Vusv)). The Ursino/Gee pure time delay is not modelled.'
 reference_proposals:
   G_Vusv:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.13: G_Vu,sv = -265.4 mL per Hz (log map)
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.13: G_Vu,sv = -265.4 mL per Hz (log map)
       (-265.4 mL per ln-unit = -2.654e-4 m3)'
     sourced: 'yes'
   tau_Vusv:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 Vusv block uses tau = 20 s (TransferFcn
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Simulink v03 Vusv block uses tau = 20 s (TransferFcn
       1/(20s+1)) with a separate 5 s transport delay. The csv value 5 s equals the DELAY D_Vu,sv of Table S.14, not the time
       constant. Proposed: tau_Vusv = 20 s'
     sourced: 'no'
@@ -20,7 +20,7 @@ reference_proposals:
     sourced: 'no'
     value: 4.0
   f_es_min:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.12: f_es,min = 2.66 Hz (Simulink constant
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.12: f_es,min = 2.66 Hz (Simulink constant
       2.66 - 1)'
     sourced: 'yes'
 review: reviews/parasympathetic_review.yaml

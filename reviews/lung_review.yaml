@@ -13,10 +13,10 @@ summary: 'Three components. simple_lung_bg (Albanese/Rideout-Fukui airway mechan
   so the declared supported settings are MaximumStep 1e-3 or rtol 1e-8. thoracic_cavity is an identity map and verifies trivially.
   Validation is pending for both lungs (candidates below) and not applicable for thoracic_cavity.'
 questions:
-- 'simple_lung_bg: confirm the proposed references (Albanese2014 thesis Table 2-5, i.e. the parameter source of Albanese2016;
-  Fukui1972 and Rideout1991 via Albanese) for C_l, C_t, C_pl (= Albanese C_cw 0.2445 L/cmH2O), q_l_us, q_t_us, q_b_us, P_plEE,
+- 'simple_lung_bg: confirm the proposed references (albanese2014physiology thesis Table 2-5, i.e. the parameter source of albanese2016integrated;
+  fukui1972study and rideout1991mathematical via Albanese) for C_l, C_t, C_pl (= Albanese C_cw 0.2445 L/cmH2O), q_l_us, q_t_us, q_b_us, P_plEE,
   P_mus_min, T_resp and IE_ratio. All match Albanese after unit conversion. Bizotto2022 (csv source for q_A_us and IE_ratio)
-  could not be identified; I propose Albanese2014 instead.'
+  could not be identified; I propose albanese2014physiology instead.'
 - 'simple_lung_bg: accept the proposed fix for q_A_us, C_A and C_b (below)? The csv note on C_A says "increased to get approx
   3L volume", but with q_A_us 1000x small the model''s end-expiratory lung volume is 14.0 L and VT 0.88 L. With Albanese''s
   C_A, C_b and q_A_us it is 2.48 L, VT 0.67 L, dead space 164 ml.'
@@ -33,7 +33,7 @@ questions:
 - 'lung_bg_Argus_Chase: q_str = 1.0 and alpha_LR = 1.0 are hard-coded in the CellML. q_str goes out on volume_stretch_port,
   so a stretch receptor would see 1 m3. alpha_LR divides only R_bA, not R_mt/R_tb (simple_lung_bg divides all). Intended?'
 - 'Validation candidates (pending). simple_lung_bg: steady quiet-breathing targets (FRC 2.4 L, VT ~500 ml at 12 /min, P_pl,EE
-  -5 cmH2O; Albanese section 2.4.3 citing West2008) as a baseline once the q_A_us/C_A decision is made. For calibration, averaged
+  -5 cmH2O; Albanese section 2.4.3 citing west2008respiratory) as a baseline once the q_A_us/C_A decision is made. For calibration, averaged
   healthy flow/pressure traces (Mecklenburgh & Mapleson 1998, used by Albanese). lung_bg_Argus_Chase: the author''s ventilated-patient
   pressure/flow data. OK to proceed with these?'
 proposed_fixes:

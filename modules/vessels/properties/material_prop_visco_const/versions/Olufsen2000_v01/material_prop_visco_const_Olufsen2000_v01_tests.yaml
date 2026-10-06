@@ -1,48 +1,48 @@
 module_type: material_prop_visco_const
 version: Olufsen2000_v01
 reviewed: false
-notes: 'As material_prop_const, plus a lumped visco-elastic coefficient: wall viscosity Γ = SMvolfrac_art K_m (Toro2022) and
-  K_tube_visco = (2/3) Γ h/(l π r0³) (Pa s m^-3), the 0D (volume-rate) form of the Kelvin-Voigt wall term of Alastruey2011
-  / Toro2022. Used by BG arterial vv_nonlinear_visco vessels in cvs_model_with_arm_0d.'
+notes: 'As material_prop_const, plus a lumped visco-elastic coefficient: wall viscosity Γ = SMvolfrac_art K_m (toro2022cerebrospinal) and
+  K_tube_visco = (2/3) Γ h/(l π r0³) (Pa s m^-3), the 0D (volume-rate) form of the Kelvin-Voigt wall term of alastruey2011pulse
+  / toro2022cerebrospinal. Used by BG arterial vv_nonlinear_visco vessels in cvs_model_with_arm_0d.'
 reference_proposals:
   l:
-    reference: 'circulatory_autogen; ADAN-86 ascending aorta (segment 1) length used in cvs_model_with_arm_0d (ADAN_86); not
+    reference: 'argus2026circulatory; ADAN-86 ascending aorta (segment 1) length used in cvs_model_with_arm_0d (ADAN_86); not
       checkable in the papers. Only a test value: l is supplied by the connected vessel'
     sourced: 'no'
     value: 0.0153234
   r_0:
-    reference: 'circulatory_autogen; ADAN-86 ascending aorta (segment 1) radius used in cvs_model_with_arm_0d (ADAN_86, from
-      Safaei2016 / Blanco2015 geometry); the per-vessel value is not printed in those papers. Only a test value: r_0 is supplied
+    reference: 'argus2026circulatory; ADAN-86 ascending aorta (segment 1) radius used in cvs_model_with_arm_0d (ADAN_86, from
+      safaei2016roadmap / blanco2015anatomically geometry); the per-vessel value is not printed in those papers. Only a test value: r_0 is supplied
       by the connected vessel'
     sourced: 'no'
     value: 0.015642
   E:
     reference: 'unreferenced_placeholder; identified by calibration of cvs_model_0d (07_02_2026); no literature source. ADAN
-      elastin modulus for comparison: 0.4 MPa (Muller2023 Sec. 2.4.2.1)'
+      elastin modulus for comparison: 0.4 MPa (muller2023anatomically Sec. 2.4.2.1)'
     sourced: 'no'
   K_m:
-    reference: 'Toro2022; Sec. 2.1.1: arterial viscoelastic parameter K_M = 3e5 dyn s/cm^2 = 3e4 Pa s (wall viscosity = K_M
+    reference: 'toro2022cerebrospinal; Sec. 2.1.1: arterial viscoelastic parameter K_M = 3e5 dyn s/cm^2 = 3e4 Pa s (wall viscosity = K_M
       x smooth-muscle fraction)'
     sourced: 'yes'
   SMvolfrac_art:
-    reference: 'Toro2022; Sec. 2.1.1: smooth-muscle volume fraction 10% for arteries'
+    reference: 'toro2022cerebrospinal; Sec. 2.1.1: smooth-muscle volume fraction 10% for arteries'
     sourced: 'yes'
   nu:
-    reference: 'Alastruey2011; Eq. (3): Poisson ratio sigma = 0.5 (incompressible wall); gives K = E h / ((1 - nu^2) r0) =
+    reference: 'alastruey2011pulse; Eq. (3): Poisson ratio sigma = 0.5 (incompressible wall); gives K = E h / ((1 - nu^2) r0) =
       4Eh/(3r0), Eq. (4)'
     sourced: 'yes'
   a_vessel:
-    reference: 'Muller2023; Eq. (43): h = r0 (a e^{b r0} + c e^{d r0}), a = 0.2802 (fit by Blanco2015 to the wall-thickness
-      data of Avolio1980; Avolio1980 itself not read)'
+    reference: 'muller2023anatomically; Eq. (43): h = r0 (a e^{b r0} + c e^{d r0}), a = 0.2802 (fit by blanco2015anatomically to the wall-thickness
+      data of avolio1980multi; avolio1980multi itself not read)'
     sourced: 'yes'
   b_vessel:
-    reference: 'Muller2023; Eq. (43): b = -5.053 cm^-1 = -505.3 m^-1 (fit by Blanco2015 to Avolio1980 data)'
+    reference: 'muller2023anatomically; Eq. (43): b = -5.053 cm^-1 = -505.3 m^-1 (fit by blanco2015anatomically to avolio1980multi data)'
     sourced: 'yes'
   c_vessel:
-    reference: 'Muller2023; Eq. (43): c = 0.1324 (fit by Blanco2015 to Avolio1980 data)'
+    reference: 'muller2023anatomically; Eq. (43): c = 0.1324 (fit by blanco2015anatomically to avolio1980multi data)'
     sourced: 'yes'
   d_vessel:
-    reference: 'Muller2023; Eq. (43): d = -0.1114 cm^-1 = -11.14 m^-1 (fit by Blanco2015 to Avolio1980 data)'
+    reference: 'muller2023anatomically; Eq. (43): d = -0.1114 cm^-1 = -11.14 m^-1 (fit by blanco2015anatomically to avolio1980multi data)'
     sourced: 'yes'
 review: reviews/vessel_properties_review.yaml
 review_scope: The review of the whole vessel_properties module (8 entries) before the move to versions; only the parts about

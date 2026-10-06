@@ -14,7 +14,7 @@ summary: '31 components: 25 Paci 2013 hiPSC-CM pieces (12 algebraic currents, 13
   test; the Tao components then run but fail the source-comparison invariants (time units, signs), which is the point of recording
   them.'
 questions:
-- Confirm Paci2013 as the reference for every Paci constant and initial value (values taken from the authors' CellML, ventricular
+- Confirm paci2013computational as the reference for every Paci constant and initial value (values taken from the authors' CellML, ventricular
   version, PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013; the paper's appendix was not accessible). Gate/current
   BC operating points are the CellML initial state; E_x are Nernst values at it.
 - Approve the config/CellML fixes for the Paci components (see proposed_fixes); all were verified on a patched copy of the
@@ -46,7 +46,7 @@ proposed_fixes:
 - 'ion_channel_units.cellml: define C_per_M = coulomb/mole and J_per_MK = joule/(mole kelvin) (or rename to C_per_mol / J_per_mol_K
   as in the cell module).'
 - 'i_NaCa_Paci_2013: add [''Cai'', ''millimolar'', ''access'', ''boundary_condition''] to variables_and_units and a parameters
-  row (value 1.80774e-5 mM, Paci2013 initial Cai).'
+  row (value 1.80774e-5 mM, paci2013computational initial Cai).'
 - 'Tao 2011 components: tau units ms (see question); h_bar = 1/(1+exp((Vm+53.2)/6.5)); hc_bar = 1/(1+exp((Vm+19.91)/4.5));
   kcs_bar = 1/(1+exp(-(Vm+15.18)/4.0)); tau_h without ''+ 17''; GHK exponent with Vm/1000.'
 findings:

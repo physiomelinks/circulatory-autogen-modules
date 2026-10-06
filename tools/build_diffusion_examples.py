@@ -102,7 +102,7 @@ def write(model, description, cells, faces):
     d = os.path.join(OUT, model)
     os.makedirs(d, exist_ok=True)
     C0 = initial(cells)
-    rows, params = [], [['sigma_diff', 'm2_per_s', SIGMA, 'Secomb2020; Table 1 tissue O2 diffusivity 2410 um^2/s']]
+    rows, params = [], [['sigma_diff', 'm2_per_s', SIGMA, 'secomb2020mass; Table 1 tissue O2 diffusivity 2410 um^2/s']]
     for n, c in cells.items():
         inp = [f'f{k}' for k, f in enumerate(faces) if f[1] == n]
         out = [f'f{k}' for k, f in enumerate(faces) if f[0] == n]

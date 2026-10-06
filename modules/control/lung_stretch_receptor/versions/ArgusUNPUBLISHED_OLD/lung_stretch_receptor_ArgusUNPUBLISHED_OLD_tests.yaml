@@ -13,11 +13,11 @@ notes: 'Older variant of the lung stretch receptor: the input is the lung volume
   exit lung_stretch_firing_rate_port: ArgusUNPUBLISHED_OLD [f_ls]; ArgusUNPUBLISHED_v01 [f_ls]'
 reference_proposals:
   tau_lung:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 1/(2s+1): 2 s'
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Simulink v03 1/(2s+1): 2 s'
     sourced: 'yes'
     value: 2.0
   G_al:
-    reference: Gee2023; Supplementary text (github v03 Model_documentation) Table S.8, 23.29 Hz/L converted to 2.329e4 Hz/m3
+    reference: gee2023closed; Supplementary text (github v03 Model_documentation) Table S.8, 23.29 Hz/L converted to 2.329e4 Hz/m3
       (volume in litres in the source model)
     sourced: 'yes'
     value: 23290.0
@@ -32,7 +32,7 @@ reference_proposals:
     sourced: 'no'
     value: 0.00015
   V_lung_stretch_thresh:
-    reference: Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 lung volume reference V_ln = 2.54
+    reference: gee2023closed; Supplementary text (github v03 Model_documentation) Simulink v03 lung volume reference V_ln = 2.54
       L (stretch is measured above it) converted to 2.54e-3 m3; its use as a threshold here is the module author's choice
     sourced: 'no'
     value: 0.00254

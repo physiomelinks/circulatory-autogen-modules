@@ -20,20 +20,20 @@ expected_failures:
   stability_test: generation fails (see run_test)
 reference_proposals:
   f_s:
-    reference: circulatory_autogen; test operating point (10 spikes/s)
+    reference: argus2026circulatory; test operating point (10 spikes/s)
     sourced: false
     value: 10.0
   G_theta:
-    reference: Ursino1998; G_R,sp = 0.695 mmHg s/ml = 0.695 x 133.322 / 1e-6 = 9.266e7 Pa s/m3 (splanchnic peripheral resistance;
-      Gee2023 Simulink Gx(3) = 0.695). Use 0.653 mmHg s/ml (8.706e7) for the extrasplanchnic bed
+    reference: ursino1998interaction; G_R,sp = 0.695 mmHg s/ml = 0.695 x 133.322 / 1e-6 = 9.266e7 Pa s/m3 (splanchnic peripheral resistance;
+      gee2023closed Simulink Gx(3) = 0.695). Use 0.653 mmHg s/ml (8.706e7) for the extrasplanchnic bed
     sourced: true
     value: 9.266e7
   tau_theta:
-    reference: Ursino1998; tau_R = 6 s (Gee2023 Simulink [6 1])
+    reference: ursino1998interaction; tau_R = 6 s (gee2023closed Simulink [6 1])
     sourced: true
     value: 6.0
   f_es_min:
-    reference: Ursino1998; 2.66 spikes/s
+    reference: ursino1998interaction; 2.66 spikes/s
     sourced: true
 review: reviews/control_review.yaml
 review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version

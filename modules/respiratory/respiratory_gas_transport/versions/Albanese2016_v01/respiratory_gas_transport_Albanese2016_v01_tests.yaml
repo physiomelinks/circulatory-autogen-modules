@@ -7,19 +7,19 @@ notes: 'Dead-space and alveolar gas fractions (Albanese 2016 eqs A-61..A-64 form
   as mod and the simple_lung_bg lung supplying v_ml, v_bA, q_D, q_A.'
 reference_proposals:
   P_atm:
-    reference: Albanese2014; P_atm = 760 mmHg (Table 2-6) = 101325 Pa; library 101300 Pa (0.02% low)
+    reference: albanese2014physiology; P_atm = 760 mmHg (Table 2-6) = 101325 Pa; library 101300 Pa (0.02% low)
     sourced: 'yes'
   P_ws:
-    reference: Albanese2014; P_ws = 47 mmHg at 37 C (Table 2-6); 47 x 133.322 = 6266.1 Pa
+    reference: albanese2014physiology; P_ws = 47 mmHg at 37 C (Table 2-6); 47 x 133.322 = 6266.1 Pa
     sourced: 'yes'
   F_O2_i:
-    reference: Albanese2014; F_IO2 = 21.0379% (Table 2-6); library 0.21
+    reference: albanese2014physiology; F_IO2 = 21.0379% (Table 2-6); library 0.21
     sourced: 'yes'
   F_CO2_i:
-    reference: Albanese2014; F_ICO2 = 0.0421% (Table 2-6)
+    reference: albanese2014physiology; F_ICO2 = 0.0421% (Table 2-6)
     sourced: 'yes'
   K_LOSSES:
-    reference: 'unreferenced_placeholder; Albanese2014 Table 2-6 uses K = 1.2103 (BTPS/STPD factor: (310/273)(760/(760-47))
+    reference: 'unreferenced_placeholder; albanese2014physiology Table 2-6 uses K = 1.2103 (BTPS/STPD factor: (310/273)(760/(760-47))
       = 1.2104); library sets 1 without a stated reason'
     sourced: 'no'
   F_CO2_D_init:
@@ -44,12 +44,12 @@ reference_proposals:
     sourced: 'no'
     value: 0.0
   q_D:
-    reference: Albanese2014; standalone value = larynx+trachea+bronchi unstressed volumes 34.4+6.63+18.7 ml (Table 2-5) ~
+    reference: albanese2014physiology; standalone value = larynx+trachea+bronchi unstressed volumes 34.4+6.63+18.7 ml (Table 2-5) ~
       60 ml; supplied by the lung in use
     sourced: 'yes'
     value: 6.0e-05
   q_A:
-    reference: Albanese2014; standalone value = FRC 2.4 L (Table 2-5) minus dead space; supplied by the lung in use
+    reference: albanese2014physiology; standalone value = FRC 2.4 L (Table 2-5) minus dead space; supplied by the lung in use
     sourced: 'yes'
     value: 0.0023
 review: reviews/gas_exchange_review.yaml

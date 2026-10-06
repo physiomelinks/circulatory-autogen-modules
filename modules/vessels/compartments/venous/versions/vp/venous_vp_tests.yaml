@@ -5,15 +5,15 @@ notes: 'vp lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 3.3
   3.3e-13 s, slowest decay 0.018 s).'
 reference_proposals:
   R:
-    reference: Safaei2018; Table S3 R_pvn = 1.333e6 J s m^-6 (0.01 mmHg s/mL), pulmonary veins; Blanco & Feijoo 2013 Table
+    reference: safaei2018bond; Table S3 R_pvn = 1.333e6 J s m^-6 (0.01 mmHg s/mL), pulmonary veins; Blanco & Feijoo 2013 Table
       8 (the circulatory_autogen label) could not be checked (paywalled)
     sourced: 'yes'
   C:
     reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops "to_be_identified". The digits match
-      Safaei2018 Table S3 C_pvn = 0.60015e-6 m^6/J, but this value is 100x smaller: check whether this is intended'
+      safaei2018bond Table S3 C_pvn = 0.60015e-6 m^6/J, but this value is 100x smaller: check whether this is intended'
     sourced: 'no'
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   u_ext:
     reference: 'definitional; u_ext = 0 (circulatory_autogen 3compartment_extra_ops: user_defined)'
     sourced: definitional
@@ -28,12 +28,12 @@ reference_proposals:
     sourced: 'no'
     value: 0.0001
   I:
-    reference: 'unreferenced_placeholder; I = 0.000001 is a small nonzero stand-in: Safaei2018 Table S3 gives I = 0 for the
+    reference: 'unreferenced_placeholder; I = 0.000001 is a small nonzero stand-in: safaei2018bond Table S3 gives I = 0 for the
       pulmonary arteries and veins (circulatory_autogen label Blanco_2013_Table_8 not verifiable). Makes the module very stiff
       (I/R ~ 1e-13 s)'
     sourced: 'no'
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   q_C_init:
     reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "user_defined" (value 0.0001)'
     sourced: 'no'

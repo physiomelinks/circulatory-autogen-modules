@@ -20,30 +20,30 @@ notes: 'Right-ventricular version of heart_effector_Gee2023 (scale = 0.5903).
   exit Elastance_delta_port_rv: lv_ArgusUNPUBLISHED_v01 -; rv_ArgusUNPUBLISHED_OLD [Delta_Emax]; rv_ArgusUNPUBLISHED_v01 [Delta_Emax]'
 reference_proposals:
   f_esh:
-    reference: circulatory_autogen; test operating point (5 Hz)
+    reference: argus2026circulatory; test operating point (5 Hz)
     sourced: false
     value: 5.0
   f_PNDMV_filt:
-    reference: circulatory_autogen; test operating point (1 Hz)
+    reference: argus2026circulatory; test operating point (1 Hz)
     sourced: false
     value: 1.0
   G_Es:
     reference: unreferenced_placeholder; "user_defined"
     sourced: false
   tau_Es:
-    reference: unreferenced_placeholder; Gee2023 Simulink uses 8 s for the RV sympathetic effector (not 2 s)
+    reference: unreferenced_placeholder; gee2023closed Simulink uses 8 s for the RV sympathetic effector (not 2 s)
     sourced: false
   G_Ev:
     reference: unreferenced_placeholder; "user_defined"
     sourced: false
   tau_Ev:
-    reference: unreferenced_placeholder; Gee2023 Simulink uses 1.5 s for the RV vagal effector (not 0.2 s)
+    reference: unreferenced_placeholder; gee2023closed Simulink uses 1.5 s for the RV vagal effector (not 0.2 s)
     sourced: false
   scale:
-    reference: Gee2023; RV/LV scaling 0.5903 (Simulink gain 1/0.5903 on the compliance-domain RV effectors)
+    reference: gee2023closed; RV/LV scaling 0.5903 (Simulink gain 1/0.5903 on the compliance-domain RV effectors)
     sourced: true
   f_es_min:
-    reference: Ursino1998; 2.66 spikes/s
+    reference: ursino1998interaction; 2.66 spikes/s
     sourced: true
 review: reviews/control_review.yaml
 review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version

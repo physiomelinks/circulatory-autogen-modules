@@ -33,47 +33,47 @@ expected_failures:
     for R and F. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
 reference_proposals:
   PkNa:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       PkNa = 0.03'
     sourced: 'yes'
     value: 0.03
   Nai:
-    reference: 'Paci2013; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Nai = 10.9248'
     sourced: 'yes'
     value: 10.9248496211574
   Cai:
-    reference: 'Paci2013; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Cai = 1.80774e-05'
     sourced: 'yes'
     value: 1.80773974140477e-05
   R:
-    reference: CODATA2018; molar gas constant 8.314462618 J/(mol K), rounded to 8.314
+    reference: tiesinga2021codata; molar gas constant 8.314462618 J/(mol K), rounded to 8.314
     sourced: 'yes'
   T:
-    reference: unreferenced_placeholder; 310.15 K = 37 C (body temperature). The CA reference Tao2011 could not be checked
+    reference: unreferenced_placeholder; 310.15 K = 37 C (body temperature). The CA reference tao2011model could not be checked
       for this value (Paci 2013 uses 310 K)
     sourced: 'no'
   F:
-    reference: CODATA2018; Faraday constant 96485.33212 C/mol, rounded to 96485 C/mol
+    reference: tiesinga2021codata; Faraday constant 96485.33212 C/mol, rounded to 96485 C/mol
     sourced: 'yes'
   Nao:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       Nao = 151 mM (Paci 2013 cell; used by the Paci components of this module)'
     sourced: 'yes'
     value: 151.0
   Cao:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       Cao = 1.8 mM (Paci 2013 cell; used by the Paci components of this module)'
     sourced: 'yes'
     value: 1.8
   Ki:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       Ki = 150 mM (Paci 2013 cell; used by the Paci components of this module)'
     sourced: 'yes'
     value: 150.0
   Ko:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       Ko = 5.4 mM (Paci 2013 cell; used by the Paci components of this module)'
     sourced: 'yes'
     value: 5.4

@@ -26,7 +26,7 @@
       "f_esh": {"min": 0.0, "max": 30.0, "points": 6},
       "f_PNDMV_filt": {"min": 0.0, "max": 20.0, "points": 5}
     },
-    "rationale": "sympathetic cardiac drive 0-30 Hz and filtered parasympathetic postganglionic activity 0-20 Hz (Gee2023 network ranges); gains/time constants 0.5-2x."
+    "rationale": "sympathetic cardiac drive 0-30 Hz and filtered parasympathetic postganglionic activity 0-20 Hz (gee2023closed network ranges); gains/time constants 0.5-2x."
   },
   "timestep": {
     "scheme": "rk4",
@@ -45,7 +45,7 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "Candidate: contractility (dP/dt max or Emax) change during vagus nerve stimulation from the data shipped with Gee2023 (BioModels MODEL2402270001, Rajendran 2019 pig data, .mat); needs a heart network; not set up."
+        "reason": "Candidate: contractility (dP/dt max or Emax) change during vagus nerve stimulation from the data shipped with gee2023closed (BioModels MODEL2402270001, Rajendran 2019 pig data, .mat); needs a heart network; not set up."
       },
       "calibrate": {"note": "pending: see baseline"}
     }

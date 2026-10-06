@@ -6,44 +6,44 @@ notes: 'Local control of cerebral resistance: x_O2 as for muscle (nominal C_O2_v
   form: 10570 x 133.322^5.2551 ~ 1.53e15), G_p = 1 - g_O2_b x_O2 + x_CO2, R_mult = 1/G_p.'
 reference_proposals:
   P_CO2_a:
-    reference: West2008; 40 mmHg = 5332.9 Pa
+    reference: west2008respiratory; 40 mmHg = 5332.9 Pa
     sourced: true
     value: 5332.8
   P_O2_a:
-    reference: West2008; 100 mmHg (unused)
+    reference: west2008respiratory; 100 mmHg (unused)
     sourced: true
     value: 13332.0
   C_O2_p:
-    reference: circulatory_autogen; test operating point = C_O2_vb_nom (0.14 ml/ml)
+    reference: argus2026circulatory; test operating point = C_O2_vb_nom (0.14 ml/ml)
     sourced: false
     value: 0.14
   C_O2_vb_nom:
-    reference: UrsinoMagosso2000; nominal cerebral venous O2 content 0.14 ml/ml (not verified against the paper)
+    reference: ursino2000acute; nominal cerebral venous O2 content 0.14 ml/ml (not verified against the paper)
     sourced: true
   g_O2_b:
-    reference: UrsinoMagosso2000; 10 (not verified)
+    reference: ursino2000acute; 10 (not verified)
     sourced: true
   A_b_lc:
-    reference: MagossoUrsino2001; A = 20.9 (CBF-PaCO2 curve; not verified against the paper)
+    reference: magosso2001mathematical; A = 20.9 (CBF-PaCO2 curve; not verified against the paper)
     sourced: true
   B_b_lc:
-    reference: MagossoUrsino2001; B = 92.8 (not verified)
+    reference: magosso2001mathematical; B = 92.8 (not verified)
     sourced: true
   C_b_lc:
-    reference: 'MagossoUrsino2001; C = 10570 (mmHg form) converted to Pa: 10570 x 133.322^(-D) = 1.53e15 (conversion checked;
+    reference: 'magosso2001mathematical; C = 10570 (mmHg form) converted to Pa: 10570 x 133.322^(-D) = 1.53e15 (conversion checked;
       the mmHg value itself not verified)'
     sourced: true
   D_b_lc:
-    reference: MagossoUrsino2001; D = -5.251 (library -5.2551 - owner to check the digits)
+    reference: magosso2001mathematical; D = -5.251 (library -5.2551 - owner to check the digits)
     sourced: true
   tau_O2:
-    reference: UrsinoMagosso2000; 10 s
+    reference: ursino2000acute; 10 s
     sourced: true
   tau_CO2:
-    reference: MagossoUrsino2001; 20 s
+    reference: magosso2001mathematical; 20 s
     sourced: true
   P_CO2_a_nom:
-    reference: West2008; 40 mmHg
+    reference: west2008respiratory; 40 mmHg
     sourced: true
 review: reviews/control_review.yaml
 review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version

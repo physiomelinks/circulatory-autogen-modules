@@ -5,28 +5,28 @@ notes: 'Ursino (1998) heart-period effector: sympathetic sigma_Ts = G_Ts ln(f_s 
   = G_Tv f_v, each first-order filtered (tau_Ts, tau_Tv; delays omitted); Delta_T = Delta_Ts + Delta_Tv.'
 reference_proposals:
   f_s:
-    reference: circulatory_autogen; test operating point (10 spikes/s)
+    reference: argus2026circulatory; test operating point (10 spikes/s)
     sourced: false
     value: 10.0
   f_v:
-    reference: circulatory_autogen; test operating point (5 spikes/s)
+    reference: argus2026circulatory; test operating point (5 spikes/s)
     sourced: false
     value: 5.0
   G_Ts:
-    reference: unreferenced_placeholder; "user_defined" -0.1 s; Ursino1998 G_Ts = -0.13 s (Cheng2010 Table; Gee2023 Simulink
+    reference: unreferenced_placeholder; "user_defined" -0.1 s; ursino1998interaction G_Ts = -0.13 s (cheng2010integrative Table; gee2023closed Simulink
       Gx(7) = -0.13) - propose -0.13 if the Ursino value is intended
     sourced: false
   G_Tv:
-    reference: unreferenced_placeholder; "user_defined" 0.05 s^2; Ursino1998 G_Tv = 0.09 s/(spikes/s) (open reimplementations)
+    reference: unreferenced_placeholder; "user_defined" 0.05 s^2; ursino1998interaction G_Tv = 0.09 s/(spikes/s) (open reimplementations)
     sourced: false
   tau_Ts:
-    reference: Ursino1998; tau_Ts = 2 s (library cites Gee2023, whose Simulink model uses [2 1], copied from Ursino)
+    reference: ursino1998interaction; tau_Ts = 2 s (library cites gee2023closed, whose Simulink model uses [2 1], copied from Ursino)
     sourced: true
   tau_Tv:
-    reference: Ursino1998; tau_Tv = 1.5 s (Gee2023 Simulink [1.5 1])
+    reference: ursino1998interaction; tau_Tv = 1.5 s (gee2023closed Simulink [1.5 1])
     sourced: true
   f_es_min:
-    reference: Ursino1998; 2.66 spikes/s
+    reference: ursino1998interaction; 2.66 spikes/s
     sourced: true
 review: reviews/control_review.yaml
 review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version

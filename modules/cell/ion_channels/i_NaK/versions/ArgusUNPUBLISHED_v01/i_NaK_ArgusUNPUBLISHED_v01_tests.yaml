@@ -44,8 +44,8 @@ expected_failures:
 reference_proposals:
   K_1:
     reference: 'unreferenced_placeholder; value 1 per fmol. The seeded source ''NKE_pump: Alfred_database'' could not be identified
-      or checked. The lumped 4-state constants would have to be derived from the 15-state bond graph of Pan2020 (Table 2)
-      by the Smith & Crampin (SmithCrampin2004) lumping'
+      or checked. The lumped 4-state constants would have to be derived from the 15-state bond graph of pan2020cardiac (Table 2)
+      by the Smith & Crampin (smith2004development) lumping'
     sourced: 'no'
   K_2:
     reference: unreferenced_placeholder; value 1 per fmol, no source (see K_1)
@@ -58,7 +58,7 @@ reference_proposals:
     sourced: 'no'
   kappa_2:
     reference: unreferenced_placeholder; value 1 fmol/s, no source. With kappa_1 = kappa_3 = 1e4 hard-coded the model is stiff
-      (eigenvalues to -9.2e4 1/s); a lumped rate from Pan2020 / Terkildsen2007 would replace it
+      (eigenvalues to -9.2e4 1/s); a lumped rate from pan2020cardiac / terkildsen2007balance would replace it
     sourced: 'no'
   kappa_4:
     reference: unreferenced_placeholder; value 1 fmol/s, no source (see kappa_2)
@@ -67,7 +67,7 @@ reference_proposals:
     reference: definitional; 0 holds u_e at q_mem_init/C_m = -0.12 V, 1 ramps it at 1 mV/s (dq_mem/dt = flag_0 1e-3 C_m)
     sourced: definitional
   z_1:
-    reference: unreferenced_placeholder; value 0.5 (so z_2 = -1.5), no source. Pan2020 Table 2 puts charge -0.0550 on R5 (binding
+    reference: unreferenced_placeholder; value 0.5 (so z_2 = -1.5), no source. pan2020cardiac Table 2 puts charge -0.0550 on R5 (binding
       of the third intracellular Na+) and -0.9450 on R8 (extracellular Na+ release), which in this module (z_1 on Na_i binding,
       z_2 = -1 - z_1 on Na_o release) suggests z_1 = -0.055
     sourced: 'no'

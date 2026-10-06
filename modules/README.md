@@ -290,7 +290,7 @@ extraction and the fit against the original.
 - **Where:** `instances/<instance>/source_figures/`: the images (PNG, cropped to the figure or
   table, readable, e.g. rendered with `pdftoppm -r 200` and cropped) and `source_figures.json`:
   ```json
-  [{"file": "davis2020_fig3c.png", "source": "Davis2020; Fig. 3C",
+  [{"file": "davis2020_fig3c.png", "source": "davis2020downregulation; Fig. 3C",
     "caption": "Wistar XE-991-sensitive I_M, hold -25 mV, step to -55 mV (digitised points in the obs_data)"}]
   ```
   `source` starts with the BibTeX key (in the version's references.bib) and names the figure,

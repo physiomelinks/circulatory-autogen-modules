@@ -60,7 +60,7 @@ expected_failures:
     for R and F. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
 reference_proposals:
   Nai_init:
-    reference: 'Paci2013; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Nai_init = 10.9248'
     sourced: 'yes'
     value: 10.9248496211574
@@ -81,17 +81,17 @@ reference_proposals:
     sourced: definitional
     value: 0.0
   Cm:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       Cm = 9.87109e-11 F (Paci 2013 cell; used by the Paci components of this module)'
     sourced: 'yes'
     value: 9.87109e-11
   Vc:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       Vc = 8800 um^3 (Paci 2013 cell; used by the Paci components of this module)'
     sourced: 'yes'
     value: 8800.0
   F:
-    reference: CODATA2018; Faraday constant 96485.33212 C/mol, rounded to 96485 C/mol
+    reference: tiesinga2021codata; Faraday constant 96485.33212 C/mol, rounded to 96485 C/mol
     sourced: 'yes'
 review: reviews/cell_review.yaml
 review_scope: The review of the whole cardiomyocytes module (3 entries) before the move to versions; only the parts about

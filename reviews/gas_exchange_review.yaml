@@ -18,11 +18,11 @@ summary: 'Seven components: O2/CO2 transport and exchange built on the Spencer (
   patched copies run and their results are in the findings. The pulmonary_GE normal-blood-gas baseline is proposed: it fails
   (P_O2 121 mmHg vs 100) because of the lung parameters.'
 questions:
-- Confirm the Spencer1979 constants (k_1, k_2, h_1, h_2, alpha_1/2, beta_1/2 in Pa units; C_O2_sat, C_CO2_sat). Values are
-  as tabulated in Albanese2014 Table 2-6; the Spencer full text was not accessed. C_O2_sat = 0.20448 and C_CO2_sat = 1.9564
+- Confirm the spencer1979computational constants (k_1, k_2, h_1, h_2, alpha_1/2, beta_1/2 in Pa units; C_O2_sat, C_CO2_sat). Values are
+  as tabulated in albanese2014physiology Table 2-6; the Spencer full text was not accessed. C_O2_sat = 0.20448 and C_CO2_sat = 1.9564
   ml/ml imply 22.72 ml/mmol (9 and 86.11 mmol/L). The STPD molar volume is 22.41 ml/mmol, which would give 0.2017 and 1.930.
   Where does 22.72 come from?
-- 'pulmonary_GE: k_O2 = 1.7e-8 and k_CO2 = 4.9e-7 m6/(J s) are attributed to Albanese2016, but Albanese assumes instantaneous
+- 'pulmonary_GE: k_O2 = 1.7e-8 and k_CO2 = 4.9e-7 m6/(J s) are attributed to albanese2016integrated, but Albanese assumes instantaneous
   alveolar-capillary equilibrium (thesis eqs A-69/A-70) and has no conductance. k_O2 is ~136 ml/min/mmHg, ~6x a resting D_LO2
   of ~20-25 ml/min/mmHg. Source? Otherwise mark unreferenced.'
 - 'pulmonary_GE: q_0 = 2 L (csv user_defined) is ~25x a pulmonary capillary blood volume (~70-100 ml). Intended as a larger
@@ -35,7 +35,7 @@ questions:
   generation, the run shows P_O2 at the venous end (61.8 mmHg) above the capillary mean (35.7 mmHg). C_0 = (C_O2_c - ub_O2_t)/(C_O2_a
   - ub_O2_t) mixes total content with free O2, and the resulting profile is applied to free O2. Is that intended? And should
   exp_threshold (declared millimolar) be dimensionless?'
-- 'Accept the proposed baseline for pulmonary_GE (normal resting blood gases, Albanese2014 Table 2-12: P_aO2 100, P_aCO2 40
+- 'Accept the proposed baseline for pulmonary_GE (normal resting blood gases, albanese2014physiology Table 2-12: P_aO2 100, P_aCO2 40
   mmHg with mixed venous 15/53 ml/dl as input)? It currently fails (nrmse 0.19 for P_O2, 0.06 for P_CO2). The model over-ventilates
   because of the lung parameters (see lung review): P_AO2 123, P_ACO2 37 mmHg.'
 - 'Other validation candidates (pending): the O2 dissociation curve from Severinghaus 1979 eq. 1 (validation/severinghaus1979_odc.csv)

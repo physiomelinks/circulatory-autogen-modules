@@ -6,24 +6,24 @@ notes: 'Nucleus tractus solitarius neuronal subtypes (Gee 2023 eq. 3, from Park 
   an addition of this library (hand-tuned, not in Gee 2023). Algebraic.'
 reference_proposals:
   f_min_br:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 BR cell group alpha = 0.304 Hz (Table
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Simulink v03 BR cell group alpha = 0.304 Hz (Table
       S.17: 0.30)'
     sourced: 'yes'
   f_max_br:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 beta = 21.499 Hz (Table S.17: 21.50)'
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Simulink v03 beta = 21.499 Hz (Table S.17: 21.50)'
     sourced: 'yes'
   f_mid_br:
-    reference: Gee2023; Supplementary text (github v03 Model_documentation) Simulink v03 fcs0 x fmidgain = 25 x 1.765 = 44.125
+    reference: gee2023closed; Supplementary text (github v03 Model_documentation) Simulink v03 fcs0 x fmidgain = 25 x 1.765 = 44.125
       Hz. Table S.17 lists 37.07 Hz -- table and code differ
     sourced: 'yes'
   k_NTS_br:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.17 / Simulink: k = 21'
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.17 / Simulink: k = 21'
     sourced: 'yes'
   f_min_ls:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.19 / Simulink: 2.75 Hz'
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.19 / Simulink: 2.75 Hz'
     sourced: 'yes'
   f_max_ls:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Simulink 2.753 + 28.816 = 31.569 Hz (Table S.19:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Simulink 2.753 + 28.816 = 31.569 Hz (Table S.19:
       31.57)'
     sourced: 'yes'
   f_mid_ls:
@@ -32,20 +32,20 @@ reference_proposals:
       Owner to justify or revert
     sourced: 'no'
   k_NTS_ls:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.19 / Simulink: k = 2'
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.19 / Simulink: k = 2'
     sourced: 'yes'
   f_min_cp:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.18 / Simulink: 0.451 Hz'
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.18 / Simulink: 0.451 Hz'
     sourced: 'yes'
   f_max_cp:
-    reference: Gee2023; Supplementary text (github v03 Model_documentation) Simulink 0.451 + 27.876 = 28.327 Hz
+    reference: gee2023closed; Supplementary text (github v03 Model_documentation) Simulink 0.451 + 27.876 = 28.327 Hz
     sourced: 'yes'
   f_mid_cp:
     reference: 'unreferenced_placeholder; Gee 2023 Simulink uses f_mid,CPR = 10.21 Hz (Table S.18: 10.20, marked as the Park
       2020 alternate value); the csv 20.2 Hz does not appear in Gee 2023 -- source unknown'
     sourced: 'no'
   k_NTS_cp:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.18 / Simulink: k = 7'
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.18 / Simulink: k = 7'
     sourced: 'yes'
   f_min_ch:
     reference: unreferenced_placeholder; chemoreceptor NTS subtype is not in Gee 2023; value identified by the module author
@@ -76,7 +76,7 @@ reference_proposals:
     sourced: 'no'
     value: 10.0
   f_apc:
-    reference: 'MagossoUrsino2001; nominal peripheral chemoreceptor afferent firing f_apc ~ 3.7 Hz as recorded in the csv
+    reference: 'magosso2001mathematical; nominal peripheral chemoreceptor afferent firing f_apc ~ 3.7 Hz as recorded in the csv
       (NOT verified: full text not accessible from here; owner to confirm the table entry)'
     sourced: 'no'
 review: reviews/parasympathetic_review.yaml

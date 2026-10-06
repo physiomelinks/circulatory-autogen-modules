@@ -7,34 +7,34 @@ notes: 'Carotid-sinus baroreceptor afferent (Ursino 1998): a first-order lead-la
   X = P_sys + tau_zb dP_sys_dt.'
 reference_proposals:
   P_sys:
-    reference: circulatory_autogen; test operating point (125 mmHg) for the stand-alone afferent; in a network it is the carotid/aortic
+    reference: argus2026circulatory; test operating point (125 mmHg) for the stand-alone afferent; in a network it is the carotid/aortic
       pressure
     sourced: false
   dP_sys_dt:
-    reference: circulatory_autogen; test operating point (0.2 mmHg/s); in a network it is dP/dt of the sensed pressure
+    reference: argus2026circulatory; test operating point (0.2 mmHg/s); in a network it is dP/dt of the sensed pressure
     sourced: false
   P_baro_init:
     reference: definitional; initial filtered pressure (93 mmHg), chosen near the set point to shorten the transient
     sourced: definitional
   P_nom:
-    reference: Ursino1998; P_n = 92 mmHg (12266 Pa) in the paper (value corroborated by Cheng2010 Table and the Gee2023 Simulink
+    reference: ursino1998interaction; P_n = 92 mmHg (12266 Pa) in the paper (value corroborated by cheng2010integrative Table and the gee2023closed Simulink
       model); the library value 12000 Pa (90 mmHg) is a modification - owner to confirm which to keep
     sourced: true
   tau_zb:
-    reference: Ursino1998; tau_z = 6.37 s (corroborated by Cheng2010 Table, Gee2023 Simulink [6.37 1]); primary table not
+    reference: ursino1998interaction; tau_z = 6.37 s (corroborated by cheng2010integrative Table, gee2023closed Simulink [6.37 1]); primary table not
       accessible (paywall)
     sourced: true
   tau_pb:
-    reference: Ursino1998; tau_p = 2.076 s (corroborated by Cheng2010 Table, Gee2023 Simulink [2.076 1])
+    reference: ursino1998interaction; tau_p = 2.076 s (corroborated by cheng2010integrative Table, gee2023closed Simulink [2.076 1])
     sourced: true
   f_ab_min:
-    reference: Ursino1998; f_min = 2.52 spikes/s (corroborated by Cheng2010 Table)
+    reference: ursino1998interaction; f_min = 2.52 spikes/s (corroborated by cheng2010integrative Table)
     sourced: true
   f_ab_max:
-    reference: Ursino1998; f_max = 47.78 spikes/s (corroborated by Cheng2010 Table)
+    reference: ursino1998interaction; f_max = 47.78 spikes/s (corroborated by cheng2010integrative Table)
     sourced: true
   k_ab:
-    reference: Ursino1998; k_a = 11.758 mmHg = 1567.6 Pa (Cheng2010 Table). The library value 1610 Pa (12.08 mmHg) does NOT
+    reference: ursino1998interaction; k_a = 11.758 mmHg = 1567.6 Pa (cheng2010integrative Table). The library value 1610 Pa (12.08 mmHg) does NOT
       match; propose 1567.6 Pa unless the change was deliberate
     sourced: true
 review: reviews/control_review.yaml

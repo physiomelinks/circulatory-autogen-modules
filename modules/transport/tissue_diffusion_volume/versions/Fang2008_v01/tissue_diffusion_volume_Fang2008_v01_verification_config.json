@@ -77,7 +77,7 @@
         "sigma_diff",
         "m2_per_s",
         2.41e-09,
-        "Secomb2020 tissue O2 diffusivity (the face module's sigma_diff)"
+        "secomb2020mass tissue O2 diffusivity (the face module's sigma_diff)"
       ]
     ]
   },
@@ -134,7 +134,7 @@
     "default": {
       "baseline": {
         "status": "not_applicable",
-        "reason": "a single finite-volume cell has no measurable counterpart on its own; verified against the exact linear solution, mass balance and the steady state. Tissue PO2 data (e.g. CelayaAlcala2021 cortex) apply to an assembled grid of cells with capillaries."
+        "reason": "a single finite-volume cell has no measurable counterpart on its own; verified against the exact linear solution, mass balance and the steady state. Tissue PO2 data (e.g. celayaalcala2021simulation cortex) apply to an assembled grid of cells with capillaries."
       },
       "calibrate": {
         "note": "not_applicable: as baseline: calibration against tissue PO2 maps belongs to an assembled diffusion grid, not one cell"

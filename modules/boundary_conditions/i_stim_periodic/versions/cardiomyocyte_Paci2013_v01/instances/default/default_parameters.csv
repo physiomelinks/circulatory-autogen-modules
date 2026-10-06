@@ -1,8 +1,8 @@
 variable_name,units,value,data_reference,sourced
-stim_flag,dimensionless,1,"definitional; 1 enables pacing (Paci2013 CellML default is 0, i.e. spontaneous beating)",yes
-i_stim_start,second,0.0,Paci2013; CellML stim_mode i_stim_Start = 0 s,yes
-i_stim_end,second,800.0,Paci2013; CellML stim_mode i_stim_End = 800 s,yes
-i_stim_frequency,per_s,1.0,"Paci2013; CellML stim_mode i_stim_frequency = 60 beats per minute (declared per_second there, with period = 60/f); here in Hz, period = 1/f, so 1 Hz",yes
-i_stim_pulse_duration,second,0.005,Paci2013; CellML stim_mode i_stim_PulseDuration = 0.005 s,yes
-i_stim_amplitude,ampere,5.5e-10,Paci2013; CellML stim_mode i_stim_Amplitude = 5.5e-10 A,yes
-Cm,farad,9.87109e-11,Paci2013; CellML model_parameters Cm = 9.87109e-11 F (ventricular-like hiPSC-CM),yes
+stim_flag,dimensionless,1,"definitional; 1 enables pacing (paci2013computational CellML default is 0, i.e. spontaneous beating)",yes
+i_stim_start,second,0.0,paci2013computational; CellML stim_mode i_stim_Start = 0 s,yes
+i_stim_end,second,800.0,paci2013computational; CellML stim_mode i_stim_End = 800 s,yes
+i_stim_frequency,per_s,1.0,"paci2013computational; CellML stim_mode i_stim_frequency = 60 beats per minute (declared per_second there, with period = 60/f); here in Hz, period = 1/f, so 1 Hz",yes
+i_stim_pulse_duration,second,0.005,paci2013computational; CellML stim_mode i_stim_PulseDuration = 0.005 s,yes
+i_stim_amplitude,ampere,5.5e-10,paci2013computational; CellML stim_mode i_stim_Amplitude = 5.5e-10 A,yes
+Cm,farad,9.87109e-11,paci2013computational; CellML model_parameters Cm = 9.87109e-11 F (ventricular-like hiPSC-CM),yes

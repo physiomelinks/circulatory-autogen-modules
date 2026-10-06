@@ -101,13 +101,13 @@ notes: 'Membrane of the SN soma: Cm dV/dt = -(i_ion + I_in_delayed + I_out), i_i
 reference_proposals:
   k_A:
     value: 3.141592653589793
-    reference: 'Wallis1996; rat stellate (putative cardiac) neurones, mean two-dimensional soma area 463 um^2 (Abstract; the
+    reference: 'wallis1996cardiac; rat stellate (putative cardiac) neurones, mean two-dimensional soma area 463 um^2 (Abstract; the
       area is not in the Mo et al. 1994 abstract). A sphere of that projected area has d = sqrt(4 x 463/pi) = 24.28 um, the
       present d (24.29 um, from Vol 7,500 um^3); proposed: a spherical soma, k_A = pi, so A = 1,853 um^2 and Cm = 18.5 pF
       (all conductances x 0.618 at fixed densities; needs re-calibration)'
     sourced: 'yes'
     also_cites:
-    - MoWallisWatson1994
+    - mo1994properties
 review: reviews/cell_review.yaml
 review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
   apply.

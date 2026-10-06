@@ -24,7 +24,7 @@
       "expr": "np.max(np.abs((Gamma) - (SMvolfrac_art*K_m))) <= 1e-12*np.max(np.abs(SMvolfrac_art*K_m))"
     },
     {
-      "description": "lumped visco-elastic coefficient K_tube_visco = (2/3) Γ h / (l π r0³) (the 0D form of the Kelvin-Voigt term, Alastruey2011 Eq. 4) (relative 1e-9)",
+      "description": "lumped visco-elastic coefficient K_tube_visco = (2/3) Γ h / (l π r0³) (the 0D form of the Kelvin-Voigt term, alastruey2011pulse Eq. 4) (relative 1e-9)",
       "expr": "np.max(np.abs((K_tube_visco) - ((2.0/3.0)*Gamma*(h)/(l*np.pi*r_0**3)))) <= 1e-9*np.max(np.abs((2.0/3.0)*Gamma*(h)/(l*np.pi*r_0**3)))"
     }
   ],
@@ -38,7 +38,7 @@
       "K_m": {"min": 1000.0, "max": 100000.0, "points": 3, "scale": "log"},
       "SMvolfrac_art": [0.05, 0.55]
     },
-    "rationale": "Arterial radii 1-16 mm (small arteries to the aorta, ADAN range) and lengths 0.5-20 cm; E 0.05-2 MPa (identified value to above the ADAN elastin/large-artery range); nu 0.3-0.5; wall viscosity K_M 1e3-1e5 Pa s around Toro2022/Muller2023 (3-3.6e4) and smooth-muscle fractions 0.05-0.55 (Muller2023 weights 0.10-0.55); Olufsen-type k1 1e5-3e6 Pa, k2 -2500..-500 m^-1, k3 2e4-1e5 Pa spanning the Toro2022 and Olufsen2000 sets; rho 1040-1060 kg/m^3; tube-law exponents around m = 0.5, n = 0. The Avolio/Blanco thickness-fit coefficients are swept by factors 0.5-2."
+    "rationale": "Arterial radii 1-16 mm (small arteries to the aorta, ADAN range) and lengths 0.5-20 cm; E 0.05-2 MPa (identified value to above the ADAN elastin/large-artery range); nu 0.3-0.5; wall viscosity K_M 1e3-1e5 Pa s around toro2022cerebrospinal/muller2023anatomically (3-3.6e4) and smooth-muscle fractions 0.05-0.55 (muller2023anatomically weights 0.10-0.55); Olufsen-type k1 1e5-3e6 Pa, k2 -2500..-500 m^-1, k3 2e4-1e5 Pa spanning the toro2022cerebrospinal and olufsen2000numerical sets; rho 1040-1060 kg/m^3; tube-law exponents around m = 0.5, n = 0. The Avolio/Blanco thickness-fit coefficients are swept by factors 0.5-2."
   },
   "timestep": {
     "scheme": "rk4",
@@ -57,7 +57,7 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "candidate: compare the implied wave speed c0 = sqrt(K_tube (m - n)/rho) with measured pulse wave velocities of named arteries vs radius (e.g. the Charlton2019 in-silico/in-vivo PWV database or Avolio1980 segment data); needs a network-level geometry table, not set up."
+        "reason": "candidate: compare the implied wave speed c0 = sqrt(K_tube (m - n)/rho) with measured pulse wave velocities of named arteries vs radius (e.g. the charlton2019modeling in-silico/in-vivo PWV database or avolio1980multi segment data); needs a network-level geometry table, not set up."
       },
       "calibrate": {
         "note": "not_applicable: algebraic constitutive relation with no dynamics; parameters are calibrated in the vessel network that uses it."

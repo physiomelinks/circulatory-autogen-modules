@@ -12,11 +12,11 @@ notes: 'Slowly adapting lung stretch receptor (Gee 2023 eq. S.43): first-order l
   exit lung_stretch_firing_rate_port: ArgusUNPUBLISHED_OLD [f_ls]; ArgusUNPUBLISHED_v01 [f_ls]'
 reference_proposals:
   tau_lung:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.8 / Simulink v03 block 1/(2s+1): time
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.8 / Simulink v03 block 1/(2s+1): time
       constant 2 s (the table lists tau_lung = 0.5 as a rate, eq. S.43 multiplies by it)'
     sourced: 'yes'
   G_al:
-    reference: 'Gee2023; Supplementary text (github v03 Model_documentation) Table S.8: G_al = 23.291 (Simulink gain 23.29)
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.8: G_al = 23.291 (Simulink gain 23.29)
       with lung volume in litres (V_lung0 = 1.9, V_ln = 2.54), i.e. 23.29 Hz/L = 2.329e4 Hz/m3. The csv value 2.3291e7 implies
       Hz/mL -- 1000x larger; please confirm the conversion'
     sourced: 'yes'

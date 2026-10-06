@@ -13,7 +13,7 @@ libcuflynx at the copy to generate the second model. The current model is genera
 repository itself.
 
 Protocols (each model): 30 s at 0 pA from the model's initial state (rest); from the end of the
-rest, a 1 s step of 5, 9 or 50 pA followed by 2 s at 0 pA. Caffeine (HernandezCruz1997, Eq. A16):
+rest, a 1 s step of 5, 9 or 50 pA followed by 2 s at 0 pA. Caffeine (hernandezcruz1997ca, Eq. A16):
 the activating-site on-rate kon_a_RyR switched from 10 to 2500 /(mM s) (Kd 200 -> 0.8 uM) at the
 end of the rest, 30 s at 0 pA; then the same steps from the end of that caffeine exposure.
 
@@ -46,7 +46,7 @@ LONG_REST_S = 180
 STEPS_PA = (5, 9, 50)
 STEP_S, POST_S = 1, 2
 ENTRY_MIN = 1e-18      # mol (1 amol): below it the gain is not computed (no Ca entry)
-KON_CAFF = 2500.0          # /(mM s): HernandezCruz1997 k_on+Caff 2.5 /uM/s
+KON_CAFF = 2500.0          # /(mM s): hernandezcruz1997ca k_on+Caff 2.5 /uM/s
 
 V = 'mod_membrane/V'
 CAI = 'mod_Ca/Cai'
@@ -253,7 +253,7 @@ FINDINGS = [
     'release about 2.6 times the L-type entry, again without a regenerative surge.',
     'The current model does not fire during the 50 pA step either. The step starts 1.3 s after a release-driven spike, and the current RyR keeps the '
     'shell Ca near 1 uM at rest (j_RyR about 220 amol/s), so K(Ca) holds the membrane down. HC1997 lowers the resting shell Ca to 0.36-0.43 uM, '
-    'still above the measured 102 nM (Wanaverbecq2003).',
+    'still above the measured 102 nM (wanaverbecq2003plasma).',
     'Caveats. (1) The flux magnitude of HC1997 (rho_RyR 5403 /um^2) is a conversion of the paper\'s RyR_max on its cytosolic shell, not a '
     'measured density. (2) The soma\'s ER Ca (about 0.4 mM) is about 5 times the paper\'s 75 uM, which opens the luminal gate far more than in the '
     'source model. (3) HC1997\'s rest is not at steady state at 30 s (V is still drifting), so the steps start from a slowly changing state. '

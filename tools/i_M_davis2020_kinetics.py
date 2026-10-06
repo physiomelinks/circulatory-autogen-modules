@@ -71,7 +71,7 @@ def tau_w(v, num, tmin, dv=0.0):
 
 
 def tau_martin(v):
-    """MartinPedersen2023 Methods p. 16: 400/(3.3 exp((V+35)/10) + exp(-(V+35)/20)) ms."""
+    """martin2023modelling Methods p. 16: 400/(3.3 exp((V+35)/10) + exp(-(V+35)/20)) ms."""
     return 400.0 / (3.3 * np.exp((v + 35.0) / 10.0) + np.exp(-(v + 35.0) / 20.0))
 
 
@@ -134,7 +134,7 @@ def build_obs_data():
                       'residual_sd_fraction': sd, 'n': n}
         items.append({
             'data_item_name': name,
-            'comment': (f'Davis2020 Fig. 3C Wistar trace, {label}: digitised (tools/i_M_davis2020_kinetics.py), '
+            'comment': (f'davis2020downregulation Fig. 3C Wistar trace, {label}: digitised (tools/i_M_davis2020_kinetics.py), '
                         f'normalised to the relaxation\'s own end points and mapped onto w (w_inf(-25) = {w25:.4f}, '
                         f'w_inf(-55) = {w55:.4f}). Sample k at k/172.5 s from the start of the sub-experiment (one '
                         f'raster column). Single-exponential fit of the digitised current: tau {1e3 * tau:.0f} +- '
@@ -159,7 +159,7 @@ def build_obs_data():
         'obs_data_name': INSTANCE,
         'comment': ('Davis et al. 2020 (Hypertension 76:1915) Fig. 3C, the representative Wistar M-current deactivation '
                     'trace (perforated patch, room temperature; raw current, not XE-991-subtracted; n = 1): held at '
-                    '-25 mV, 1 s step to -55 mV (Davis2021Thesis p. 172), back to -25 mV. Digitised and normalised by '
+                    '-25 mV, 1 s step to -55 mV (davis2021transcriptomic p. 172), back to -25 mV. Digitised and normalised by '
                     'tools/i_M_davis2020_kinetics.py (see its docstring): each slow relaxation is mapped onto the gate '
                     'w with the module\'s fixed w_inf, so the data constrain tau_w only. Protocol: the channel module '
                     'alone, V clamped: sub-experiment 0 holds -25 mV for 10 s (steady state), 1 steps to -55 mV for '
@@ -170,7 +170,7 @@ def build_obs_data():
             'pre_times': [0.0],
             'sim_times': [[T_HOLD, T_STEP, T_RETURN]],
             'params_to_change': {'mod/V': [[HOLD, STEP, HOLD]]},
-            'experiment_labels': ['Davis2020 Fig. 3C: hold -25 mV, 1 s at -55 mV, back to -25 mV'],
+            'experiment_labels': ['davis2020downregulation Fig. 3C: hold -25 mV, 1 s at -55 mV, back to -25 mV'],
         },
         'prediction_items': [],
         'data_items': items,
@@ -183,7 +183,7 @@ def build_obs_data():
     os.makedirs(sdir, exist_ok=True)
     img.crop((0, 495, 1310, 926)).save(os.path.join(sdir, 'davis2020_fig3c.png'), optimize=True)
     with open(os.path.join(sdir, 'source_figures.json'), 'w') as f:
-        json.dump([{'file': 'davis2020_fig3c.png', 'source': 'Davis2020; Fig. 3C',
+        json.dump([{'file': 'davis2020_fig3c.png', 'source': 'davis2020downregulation; Fig. 3C',
                     'caption': ('Left: the representative Wistar deactivation trace (hold -25 mV, 1 s step to -55 mV, '
                                 'raw current, n = 1), digitised column by column; each slow relaxation normalised and '
                                 'mapped onto the gate w (the obs_data series). Scale bar 100 pA / 100 ms.')}],
@@ -322,7 +322,7 @@ def build_report():
     ax = axes[0]
     for name, t, v, sd, keep in data:
         ax.errorbar(t[keep], v[keep], yerr=sd[keep], fmt='o', ms=2.5, color='#1f2937', ecolor='#9ca3af', elinewidth=0.6,
-                    label='Davis2020 Fig. 3C, digitised (w units)' if name.startswith('w_de') else None)
+                    label='davis2020downregulation Fig. 3C, digitised (w units)' if name.startswith('w_de') else None)
     for label, p, c in sets:
         t, o = sims[label]
         ax.plot(t, o['w'], color=c, lw=1.8, label=f'{label}: tau_w_num {fmt(p["tau_w_num"])}, tau_w_min {fmt(p["tau_w_min"])} ms')
@@ -355,7 +355,7 @@ def build_report():
         tau_e = float(c[i:].split('+- ')[1].split(' ')[0])
         taus.append((tau_v, tau_e))
     ax.errorbar([STEP, HOLD], [t for t, e in taus], yerr=[e for t, e in taus], fmt='s', color='#111827', ms=6, capsize=3,
-                label='Davis2020 Fig. 3C trace (single-exp. fits, +- SE)')
+                label='davis2020downregulation Fig. 3C trace (single-exp. fits, +- SE)')
     ax.set_xlabel('V (mV)')
     ax.set_ylabel('tau_w (ms)')
     ax.set_ylim(0, 560)
@@ -519,7 +519,7 @@ THESIS = os.path.expanduser('~/Documents/books/Physiology/Davis_2021_A_transcrip
 GM_INSTANCE = 'davis2020_wistar'
 GM_IDIR = os.path.join(VDIR, 'instances', GM_INSTANCE)
 GM_HTML = os.path.join(REPO, 'reviews', 'i_M_Argus2026_v01_g_M_fit.html')
-# Davis2020 Fig. 3C, Wistar M-current densities (pA/pF), digitised from the PDF (pdftoppm -r 600; the dot
+# davis2020downregulation Fig. 3C, Wistar M-current densities (pA/pF), digitised from the PDF (pdftoppm -r 600; the dot
 # centres against the axis ticks 0/-2/-4/-6, +- about 0.05 pA/pF; six isolated dots confirmed by blob
 # detection on the 200 ppi raster). Their median is -4.01 (Davis: -4.032).
 WISTAR_DENSITIES = [-2.43, -2.38, -2.18, -4.01, -3.99, -3.96, -4.23, -4.35, -4.82, -4.87, -5.64]
@@ -591,7 +591,7 @@ def build_gm_report():
     with open(os.path.join(sdir, 'source_figures.json')) as f:
         figs = json.load(f)
     figs = [x for x in figs if x['file'] != 'davis2021thesis_p172_173.png'] + [{
-        'file': 'davis2021thesis_p172_173.png', 'source': 'Davis2021Thesis; pp. 172-173 (Ch. 4)',
+        'file': 'davis2021thesis_p172_173.png', 'source': 'davis2021transcriptomic; pp. 172-173 (Ch. 4)',
         'caption': ('The definition of the Fig. 3C / Fig. 4.10C measure: XE-991-subtracted deactivation, held at -25 mV, '
                     '1 s hyperpolarisation to -55 mV, "the difference in current following the initial ohmic change, and the '
                     'steady-state current towards the end of the step" (the obs_data operation mean_in_range_minus_initial).')}]

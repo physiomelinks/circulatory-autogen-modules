@@ -15,9 +15,9 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_M, T_ref_M). T_ref defaults to 295.15 K,
   so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s recording temperature (on review) scales them,
   and the model can be run at 37 degC by changing T. tau_w shape: prefactor 2.0 and slopes 15/25 mV are the owner''s (CA 837d3aae,
-  2024-07-21); MartinPedersen2023 has 3.3 and 10/20 mV; **tau_w peaks at 508 ms (Martin 142 ms at 37 degC) and has a 30 ms
-  floor**. g_M calibration (2026-10-05): rho_M is calibrated with libcuflynx to instance davis2020_wistar (Davis2020 Fig.
-  3C, Wistar XE-991-sensitive M current -4.032 pA/pF x an assumed Cm 30 pF; the measure, per Davis2021Thesis p. 172-173, is
+  2024-07-21); martin2023modelling has 3.3 and 10/20 mV; **tau_w peaks at 508 ms (Martin 142 ms at 37 degC) and has a 30 ms
+  floor**. g_M calibration (2026-10-05): rho_M is calibrated with libcuflynx to instance davis2020_wistar (davis2020downregulation Fig.
+  3C, Wistar XE-991-sensitive M current -4.032 pA/pF x an assumed Cm 30 pF; the measure, per davis2021transcriptomic p. 172-173, is
   the deactivation relaxation in a 1 s step from -25 to -55 mV: the current after the ohmic jump minus that near the end of
   the step; E_K -96.4979 mV), giving rho_M 0.2029 /um^2, g_M 0.005479 uS (2.1x the earlier 0.00263 uS, which divided the density
   by the -25/-55 mV steady-state difference). The fitted g_M depends on tau_w: the 1 s step leaves the relaxation 87 % complete
@@ -28,7 +28,7 @@ notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolith
   _calibration.json; then venv/bin/python -m cam_testing.calibrate apply i_M/Argus2026_v01 davis2020_wistar (--dry-run first),
   which copies rho_M into the default, soma sympathetic, the monolithic soma and SN_simple(_flat). Provenance page: reviews/i_M_Argus2026_v01_g_M_fit.html
   (tools/i_M_davis2020_kinetics.py gm-report). tau_w refit (2026-10-05, not applied): instance davis2020_wistar_kinetics calibrates
-  tau_w_num and tau_w_min with libcuflynx to the digitised Davis2020 Fig. 3C Wistar trace (n = 1, raw current; relaxation
+  tau_w_num and tau_w_min with libcuflynx to the digitised davis2020downregulation Fig. 3C Wistar trace (n = 1, raw current; relaxation
   taus ~74 ms at -55 mV and ~160 ms back at -25 mV; tools/i_M_davis2020_kinetics.py). With the shape fixed no values fit both
   phases; the fit gives tau_w_num ~0, tau_w_min 105 ms (a nearly flat tau_w; the present one is 466 ms at -55 mV). The defaults
   are unchanged pending the owner''s decision: reviews/i_M_Argus2026_v01_tau_w_refit.html compares them; to adopt them run

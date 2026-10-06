@@ -8,7 +8,7 @@
   "outputs": ["K_tube", "c0"],
   "invariants": [
     {
-      "description": "venous wave speed c0 = c0_max − (c0_max − c0_min) sqrt((r0 − r_min)/(r_max − r_min)) (Toro2022 Eq. 85) (relative 1e-9)",
+      "description": "venous wave speed c0 = c0_max − (c0_max − c0_min) sqrt((r0 − r_min)/(r_max − r_min)) (toro2022cerebrospinal Eq. 85) (relative 1e-9)",
       "expr": "np.max(np.abs((c0) - (c0_max - (c0_max - c0_min)*np.sqrt((r_0 - r0_min)/(r0_max - r0_min))))) <= 1e-9*np.max(np.abs(c0_max - (c0_max - c0_min)*np.sqrt((r_0 - r0_min)/(r0_max - r0_min))))"
     },
     {
@@ -32,7 +32,7 @@
       "r0_max": [0.006, 0.012],
       "r0_min": [0.0005, 0.002]
     },
-    "rationale": "Venous radii 0.8-8 mm (the Toro2022 venous network range, which the c0(r0) law requires: r0_min <= r0 <= r0_max), lengths 0.5-20 cm, h/r0 0.02-0.1, venous E 0.2-10 MPa (Petrova2025 initial to tangent moduli), K_M 1e3-1e5 Pa s, smooth-muscle fraction 0.04-0.2, venous tube-law exponents m 5-12, n -2..-1, c0 bounds 3-5 / 1-2 m/s and radius bounds 6-12 / 0.5-2 mm (r_0 = 5 mm stays inside)."
+    "rationale": "Venous radii 0.8-8 mm (the toro2022cerebrospinal venous network range, which the c0(r0) law requires: r0_min <= r0 <= r0_max), lengths 0.5-20 cm, h/r0 0.02-0.1, venous E 0.2-10 MPa (petrova2025nonlinear initial to tangent moduli), K_M 1e3-1e5 Pa s, smooth-muscle fraction 0.04-0.2, venous tube-law exponents m 5-12, n -2..-1, c0 bounds 3-5 / 1-2 m/s and radius bounds 6-12 / 0.5-2 mm (r_0 = 5 mm stays inside)."
   },
   "timestep": {
     "scheme": "rk4",
@@ -51,7 +51,7 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "candidate: venous wave speeds vs radius (the Toro2022 / Muller2014 c0 range 1.5-4 m/s is a model choice, not data); no measured venous stiffness-radius dataset identified yet."
+        "reason": "candidate: venous wave speeds vs radius (the toro2022cerebrospinal / muller2014global c0 range 1.5-4 m/s is a model choice, not data); no measured venous stiffness-radius dataset identified yet."
       },
       "calibrate": {
         "note": "not_applicable: algebraic constitutive relation with no dynamics; calibrated in the network that uses it."

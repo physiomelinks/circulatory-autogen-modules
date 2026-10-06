@@ -79,10 +79,10 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "candidate: steady-state Na/K pump current-voltage curves in guinea-pig ventricular myocytes (NakaoGadsby1989, J Gen Physiol 94:539; the data Terkildsen2007 and Pan2020 fitted). This needs sourced K/kappa values first (the current values are all 1) and pump current I = F v_4 per pump. It also needs u_e as a sweepable input: it is hard-coded through q_mem_init."
+        "reason": "candidate: steady-state Na/K pump current-voltage curves in guinea-pig ventricular myocytes (nakao1989dependence, J Gen Physiol 94:539; the data terkildsen2007balance and pan2020cardiac fitted). This needs sourced K/kappa values first (the current values are all 1) and pump current I = F v_4 per pump. It also needs u_e as a sweepable input: it is hard-coded through q_mem_init."
       },
       "calibrate": {
-        "note": "pending: as baseline: fit K_1..K_4, kappa_2, kappa_4, z_1 to the NakaoGadsby1989 I-V data (via Pan2020) once u_e and the ion amounts are exposed as parameters"
+        "note": "pending: as baseline: fit K_1..K_4, kappa_2, kappa_4, z_1 to the nakao1989dependence I-V data (via pan2020cardiac) once u_e and the ion amounts are exposed as parameters"
       }
     }
   }
