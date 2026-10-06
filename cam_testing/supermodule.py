@@ -4,7 +4,7 @@ of other modules' versions. Such a version replaces a monolithic one of the same
 heart version Argus2026_v01, cell/neuron/soma version sympathetic).
 
   <module_type>_<version>_modules_config.json   one entry: module_format "supermodule", the
-                                                submodules (a vessel array of library versions, each
+                                                submodules (a module array of library versions, each
                                                 with its "instance"; internal connections only) and
                                                 "default_instance"
   instances/<instance>/<instance>_parameters.csv  its parameters, {var}_{submodule} or globals

@@ -7,7 +7,7 @@
   "solver": "CVODE_myokit",
   "outputs": [],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["f_in", "constant", "inlet_flow", "", "ves", "default"],
       ["ves", "vp", "arterial_simple", "f_in", "mod", "default"],
       ["mod", "vv", "FV1D_vessel", "ves", "term", "default"],

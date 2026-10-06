@@ -64,7 +64,7 @@ are excluded from the schema (`directory_schema.json`, `excluded`) until they mo
 **A module_type may contain the module_types that only exist within it.** Any directory with a
 `versions/` directory is a module_type. Its other subdirectories that have `versions/` are **nested
 module_types**, which may nest again. A nested module_type is a full module_type: its own versions,
-instances, tests and reports, and it is named in configs and vessel arrays by its name alone
+instances, tests and reports, and it is named in configs and module arrays by its name alone
 (`"module_type": "soma"`), never by its path. Only where it sits on disk says that it belongs to its
 parent.
 
@@ -98,7 +98,7 @@ beside a module_type of the same meaning: there is no category `cell/neurons` ho
 itself.
 
 **Used only within its parent.** A nested module_type is used only inside its parent: every
-supermodule submodule and every test-harness record (`harness.vessel_array` in a verification config)
+supermodule submodule and every test-harness record (`harness.module_array` in a verification config)
 that names it belongs to a version of the parent, of a module_type nested (at any depth) in the
 parent, or of the nested module_type itself. `tests/test_structure.py` checks this. System models are
 exempt: they may wire a parent's parts explicitly, e.g. `system_models/cellular/SN_simple_flat` (the
@@ -174,7 +174,7 @@ libcuflynx writes itself in 1D-coupled models. `tests/test_structure.py` checks 
 **Superseded.** The earlier "most specific place covering its uses" rule (which nested the SN parts
 in soma and varicosity) and the `cell/cardiomyocytes` category. `tools/restructure_modules_renames.json`
 lists every old (module_type, version) and its new pair; `cam_testing.library.legacy_renames()` reads
-it, so circulatory_autogen's own models and older vessel arrays still resolve.
+it, so circulatory_autogen's own models and older module arrays still resolve.
 
 ## Versions
 
@@ -347,7 +347,7 @@ extraction and the fit against the original.
 ## How system models use versions and instances
 
 System models live in `../system_models/<category>/<model>/` (not in `modules/`; they are not
-modules or supermodules). A vessel-array record names a module_type, a version and an instance:
+modules or supermodules). A module-array record names a module_type, a version and an instance:
 
 ```json
 {"name": "aortic_root", "module_type": "arterial_simple", "module_subtype": "vv", "instance": "default",
@@ -537,7 +537,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod_<submodule>/<var>`) |
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
 | `rest_check` | verification_config | `{sim_time, window, voltage, parameters, threshold, dt}`: a long run (e.g. 0 pA injected) that run_test reports, not a pass/fail gate: the spikes (upward crossings of `threshold` mV, default 0) of `voltage` and their rate in the last `window` s, in the message, metrics.rest_check and plots/rest.png |
-| `harness` | verification_config | the test network: `vessel_array` rows `[name, module_subtype, module_type, inp, out, instance]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours |
+| `harness` | verification_config | the test network: `module_array` rows `[name, module_subtype, module_type, inp, out, instance]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours |
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped` |
@@ -572,7 +572,7 @@ What an archive holds, in this order:
 | `<instance>_parameters.csv`, raw data files, `SOURCES.md`, `<instance>_calibrated_parameters.csv`, `<instance>_calibration.json` | The instance's own files, unchanged. |
 | `<module_type>_<version>_modules.cellml`, `_modules_config.json`, `_units.cellml` | The version's math, unchanged. |
 | `<module_type>_<version>_verification_config.json` | The version's verification settings, in preparation for CUFLynx running them. |
-| `<module_type>_<version>_<instance>_vessel_array.json`, `_model_parameters.csv` | The test network and the parameters file the model was generated from. |
+| `<module_type>_<version>_<instance>_module_array.json`, `_model_parameters.csv` | The test network and the parameters file the model was generated from. |
 
 CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the first `.csv` with "param" in its name is the params_for_id. So the study members come first.
 

@@ -79,7 +79,7 @@ Each parameter's **tested range** is set in `<module_type>_<version>_verificatio
 To check a system model's parameters against the modules it uses:
 
 ```bash
-python -m cam_testing.ranges check --vessel-array my_vessel_array.json --parameters my_parameters.csv
+python -m cam_testing.ranges check --module-array my_module_array.json --parameters my_parameters.csv
 ```
 
 This lists each value as inside or outside its tested range and validated spread (over all the version's instances), and estimates the failure risk near the values from the `make risk` samples. It exits non-zero if any value is outside a tested range.
@@ -101,8 +101,8 @@ The version report shows all of this, regenerating the plots from the committed 
 
 ## System models
 
-`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into cardiac clock, chamber and valve vessels (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`). System models are not modules or supermodules: they use the library. Every vessel-array record names a module_type, a version (`module_subtype`) and an instance (`"instance": "default"`); the model's own parameters file wins over the instance values. Each directory contains:
-- the vessel array and parameters;
+`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into cardiac clock, chamber and valve vessels (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`). System models are not modules or supermodules: they use the library. Every module-array record names a module_type, a version (`module_subtype`) and an instance (`"instance": "default"`); the model's own parameters file wins over the instance values. Each directory contains:
+- the module array and parameters;
 - the original under `reference/`;
 - a `<model>_system.yaml` spec.
 
@@ -116,7 +116,7 @@ Models whose original doesn't generate in circulatory_autogen carry `expected_fa
 Some system models are examples built from this library, with no circulatory_autogen original (equivalence `not_applicable`); their invariants check exact solutions instead:
 - `system_models/diffusion/`: finite-volume diffusion meshes (`tools/build_diffusion_examples.py`).
 
-Vessel arrays are JSON (`<model>_vessel_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_vessel_arrays.py` converts CSV files; `cam_testing/vessel_array.py` reads either.
+Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
 
 Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A model uses one through one record:
 

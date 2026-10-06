@@ -10,7 +10,7 @@
   "outputs": ["u", "v", "q", "u_d", "q_C", "q_C_d", "q_p", "q_d", "I", "dn1/v", "dn2/v"],
   "run_parameters": {},
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["mod", "vv_nonlinear_visco", "Nout_junction", "bcin", "dn1 dn2", "default"],
       ["bcin", "constant", "inlet_flow", "", "mod", "default"],
       ["dn1", "pv", "arterial_simple", "mod", "bcout1", "default"],

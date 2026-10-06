@@ -8,7 +8,7 @@
   "solver_info": {"rtol": 1e-10, "atol": 1e-14, "MaximumStep": 0.01},
   "outputs": ["D", "J", "J_up", "J_down", "va/C_P", "vb/C_P", "va/V_P", "vb/V_P"],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["va", "Fang2008_v01", "tissue_diffusion_volume", "", "mod", "default"],
       ["mod", "Fang2008_v01", "tissue_diffusion_face", "va", "vb", "default"],
       ["vb", "Fang2008_v01", "tissue_diffusion_volume", "mod", "", "default"]

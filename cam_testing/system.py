@@ -1,7 +1,7 @@
 """
 System models: system_models/<category>/<model>/ (at the repo root; not modules, not supermodules).
 
-Each system dir holds the model built from this module library (<model>_vessel_array.json, whose
+Each system dir holds the model built from this module library (<model>_module_array.json, whose
 records name a module_type, its version (module_subtype) and an instance, and
 <model>_parameters.csv, whose values win over the instances'), circulatory_autogen's original under reference/, and a spec
 <model>_system.yaml. The tests:

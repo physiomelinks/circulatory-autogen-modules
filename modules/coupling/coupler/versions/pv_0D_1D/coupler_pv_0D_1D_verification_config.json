@@ -7,7 +7,7 @@
   "solver": "CVODE_myokit",
   "outputs": ["q_star", "P_s_star", "flux", "vessel0d/u", "vessel0d/v", "imposter1d/P_t_star", "imposter1d/A_star"],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["pressure_in", "constant", "inlet_pressure", "", "vessel0d", "default"],
       ["vessel0d", "pv", "arterial_simple", "pressure_in", "mod", "default"],
       ["mod", "pv_0D_1D", "coupler", "vessel0d", "imposter1d", "default"],

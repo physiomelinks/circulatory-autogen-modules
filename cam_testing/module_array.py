@@ -1,5 +1,5 @@
 """
-Vessel arrays: <prefix>_vessel_array.json, a JSON list of instance records in PhLynx's key names
+Module arrays: <prefix>_module_array.json, a JSON list of instance records in PhLynx's key names
 
     {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp",
      "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}
@@ -33,7 +33,7 @@ def _as_list(v):
 def normalise_record(rec):
     '''A record in either key style (or a CSV row) -> PhLynx keys, lists as lists, key order kept tidy.'''
     if {'vessel_type', 'BC_type'} & set(rec) and {'module_subtype', 'inp_instances', 'out_instances'} & set(rec):
-        raise ValueError(f'vessel-array record mixes libcuflynx and PhLynx keys: {rec}')
+        raise ValueError(f'module-array record mixes libcuflynx and PhLynx keys: {rec}')
     out = {}
     for k, v in rec.items():
         k = TO_PHLYNX.get(k.strip() if isinstance(k, str) else k, k)
@@ -49,12 +49,12 @@ def normalise_record(rec):
 
 
 def read_records(path):
-    '''A vessel array (.json, or legacy .csv) as a list of PhLynx-key records.'''
+    '''A module array (.json, or legacy .csv) as a list of PhLynx-key records.'''
     if path.endswith('.json'):
         with open(path) as f:
             data = json.load(f)
         if not isinstance(data, list):
-            raise ValueError(f'{path}: a vessel array is a JSON list of instance records')
+            raise ValueError(f'{path}: a module array is a JSON list of instance records')
         return [normalise_record(r) for r in data]
     with open(path, newline='') as f:
         rows = [{(k or '').strip(): (v or '').strip() for k, v in r.items()}
@@ -63,20 +63,33 @@ def read_records(path):
 
 
 def write_records(path, records):
-    '''Writes records as <...>_vessel_array.json, one record per line.'''
+    '''Writes records as <...>_module_array.json, one record per line.'''
     recs = [normalise_record(r) for r in records]
     with open(path, 'w') as f:
         f.write('[\n' + ',\n'.join(' ' + json.dumps(r) for r in recs) + '\n]\n')
     return path
 
 
+# Module arrays were called vessel arrays (circulatory_autogen #549); the old file names are read too,
+# after the new ones: system_models/**/reference/ keeps circulatory_autogen's originals under them.
+NAMES = ('module_array', 'vessel_array')
+
+
 def find(directory, prefix):
-    '''<prefix>_vessel_array.json, else the legacy .csv; None if neither exists.'''
-    for ext in ('.json', '.csv'):
-        p = os.path.join(directory, f'{prefix}_vessel_array{ext}')
-        if os.path.isfile(p):
-            return p
+    '''<prefix>_module_array.json, else .csv, else the same under the old name vessel_array; None if
+    none exists.'''
+    for name in NAMES:
+        for ext in ('.json', '.csv'):
+            p = os.path.join(directory, f'{prefix}_{name}{ext}')
+            if os.path.isfile(p):
+                return p
     return None
+
+
+def harness_rows(harness):
+    '''A verification_config harness's network rows: its "module_array", or the old key "vessel_array".'''
+    harness = harness or {}
+    return harness.get('module_array') or harness.get('vessel_array')
 
 
 def from_rows(rows):
@@ -94,7 +107,7 @@ def from_rows(rows):
 
 
 def libcuflynx_reads_json():
-    '''Whether the installed libcuflynx reads JSON vessel arrays (its config_schemas.read_module_array_records,
+    '''Whether the installed libcuflynx reads JSON module arrays (its config_schemas.read_module_array_records,
     called read_vessel_array_records before circulatory_autogen #549).'''
     try:
         from libcuflynx.utilities import config_schemas

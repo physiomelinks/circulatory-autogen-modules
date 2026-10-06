@@ -459,7 +459,7 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 #   2. every supermodule version using the version's default instance as a submodule, recursively
 #      (row <var>_<submodule path>, outer first: soma/sympathetic rho_M_i_M, a neuron using that
 #      soma as "soma" rho_M_soma_i_M), where the row exists;
-#   3. every system model whose vessel array uses the version, or a supermodule chain over it, at
+#   3. every system model whose module array uses the version, or a supermodule chain over it, at
 #      its default instance (row <var>_<vessel> or <var>_<vessel>_<submodule path>), where the row exists;
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
@@ -478,8 +478,8 @@ def _system_models(root=None):
     out = []
     for d, _dirs, files in os.walk(root):
         for f in files:
-            if f.endswith('_vessel_array.json'):
-                name = f[:-len('_vessel_array.json')]
+            if f.endswith('_module_array.json'):
+                name = f[:-len('_module_array.json')]
                 with open(os.path.join(d, f)) as fh:
                     vessels = json.load(fh)
                 out.append({'key': os.path.relpath(d, root).replace(os.sep, '/'), 'dir': d, 'vessels': vessels,

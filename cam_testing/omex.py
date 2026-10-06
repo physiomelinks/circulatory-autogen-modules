@@ -15,7 +15,7 @@ Built by ``python tools/build_instance_omex.py`` (``make omex``); not committed.
     SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
     _units.cellml and _verification_config.json; a supermodule's submodules' _modules_config.json
     (their required_citations); and the test network the model was generated from
-    (<module_type>_<version>_<instance>_vessel_array.json / _model_parameters.csv)
+    (<module_type>_<version>_<instance>_module_array.json / _model_parameters.csv)
   manifest.xml                                COMBINE manifest (master marked)
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
@@ -96,7 +96,7 @@ def members(version, instance, work_dir):
             seen.add(sub.key)
             add(sub.config_path)
     # the test network the model was generated from
-    add(os.path.join(res, f'{prefix}_vessel_array.json'), f'{stem}_vessel_array.json')
+    add(os.path.join(res, f'{prefix}_module_array.json'), f'{stem}_module_array.json')
     add(os.path.join(res, f'{prefix}_parameters.csv'), f'{stem}_model_parameters.csv')
     return out
 
