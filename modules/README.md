@@ -47,7 +47,7 @@ The top level of `modules/` holds categories and one module_type, `heart`:
 |---|---|
 | `vessels/compartments`, `vessels/junctions`, `vessels/terminals`, `vessels/microvasculature`, `vessels/properties` | 0D vessel segments, junctions, terminal beds, microvascular networks, wall material laws |
 | `heart` (a module_type) | the heart's versions (monolithic: `vp`, `vp_Ca`, `vp_wCont`, `vp_devel` and the former alternative hearts, see below; supermodule: `Argus2026_v01`), with the nested module_types `cardiac_clock`, `chamber` and `valve` |
-| `cell`, `cell/ion_channels`, `cell/cardiomyocytes` | cell models and their parts; `cell/neuron` is the module_type neuron, with its parts nested in it |
+| `cell`, `cell/ion_channels` | cell mechanisms, one module_type each (`Ca_handling`, `membrane_potential`, `ion_concentrations`, `reversal_potentials`, `neurotransmitter_release`; every channel, pump and exchanger in `cell/ion_channels`); `cell/neuron` is the module_type neuron, with its anatomical parts (soma, axon, varicosity) nested in it |
 | `respiratory` | lungs, gas exchange and transport |
 | `control` | baroreflex, autonomic control, effectors, observers, PID control |
 | `boundary_conditions` | inlet/outlet pressures and flows, generators, stimuli |
@@ -72,29 +72,27 @@ parent.
 modules/
   heart/                                  module_type heart (directly in modules/)
     versions/vp/ vp_wCont/ vp_wCont_ASD/ ... Argus2026_v01/
-    cardiac_clock/versions/nn/ nn_controlled/    nested: used only in heart
+    cardiac_clock/versions/Liang2009_v01/ controlled/   nested: used only in heart
     chamber/versions/vv/                         nested: used only in heart
     valve/versions/pp/ pp_linear/ pp_rmod/       nested: used only in heart
   cell/                                   category (there is no module_type "cell")
     neuron/                               module_type neuron
       versions/sympathetic/
-      NE_release_Tao_2011/                nested: a part of the Tao 2011 neuron
-      sympathetic_neuron_membrane_voltage/    nested: a part of the Tao 2011 neuron
-      axon/versions/sympathetic_monolithic_v01/
-      soma/                               nested in neuron
-        versions/sympathetic/ sympathetic_monolithic_v01/
-        SN_membrane_soma/  SN_Na_K_concentrations_soma/  SN_Ca_handling_soma/   nested in soma
-      varicosity/                         nested in neuron
-        versions/sympathetic/ sympathetic_monolithic_v01/
-        SN_varicosity_membrane/  SN_Ca_handling_varicosity/  SN_NE_release/   nested in varicosity
-    ion_channels/                         category: channels shared by neurons and cardiomyocytes
-      i_Na/  i_CaL/  ...
-    cardiomyocytes/                       category: there is no module_type "cardiomyocyte"
-      myocyte_membrane_voltage/  Ca_dynamics_Paci_2013/  ...
+      axon/versions/sympathetic_monolithic_v01/      nested: an anatomical part of the neuron
+      soma/versions/sympathetic/ sympathetic_monolithic_v01/        nested in neuron
+      varicosity/versions/sympathetic/ sympathetic_monolithic_v01/  nested in neuron
+    Ca_handling/versions/SN_soma_Argus2026_v01/ SN_varicosity_Argus2026_v01/ cardiomyocyte_Paci2013_v01/
+    membrane_potential/  ion_concentrations/  reversal_potentials/  neurotransmitter_release/
+    ion_channels/                         category: channels, pumps and exchangers
+      i_Na/  i_CaL/  i_NaK/  ...
 ```
 
+The soma and varicosity supermodules are built from the mechanism types (`Ca_handling`,
+`membrane_potential`, ...) and the channels; those are not nested in them, because every cell has
+them (see "Placement and naming").
+
 **Categories remain only for grouping where no module_type of that meaning exists**: `cell`,
-`cell/ion_channels`, `cell/cardiomyocytes`, `vessels/...`, `control`, ... A category is never put
+`cell/ion_channels`, `vessels/...`, `control`, ... A category is never put
 beside a module_type of the same meaning: there is no category `cell/neurons` holding a module_type
 `neuron`, and no category `cardiac` holding a module_type `heart`. The module_type holds its parts
 itself.
@@ -108,60 +106,91 @@ soma and varicosity parts, wired by hand) and the closed-loop models (the heart 
 chamber and valve records).
 
 The category of a nested module_type is the category path above its outermost enclosing module_type
-(`cell` for neuron, soma and `SN_membrane_soma`; none for heart and its nested module_types, which form
+(`cell` for neuron, soma and varicosity; none for heart and its nested module_types, which form
 their own group, `heart`, in the site index).
 
 Selecting a module_type by name (`--module neuron`, `MODULE=heart`) selects it **and the module_types
-nested in it**. A path under `modules/` selects everything below it (`--module cell/neuron/soma`:
-soma and its three parts).
+nested in it**. A path under `modules/` selects everything below it (`--module cell/neuron`: neuron,
+axon, soma and varicosity).
 
-## Placement rule
+## Placement and naming
 
-A module_type goes in **the most specific place that covers every context it is used in**, not as
-shallow as possible:
-- **Inside the module_type it is only used within**, as a nested module_type, when there is one:
-  - `soma`, `axon` and `varicosity` are only parts of the neuron, so they are in `cell/neuron/`.
-  - The membrane, Na/K and Ca-handling parts of the soma (`SN_membrane_soma`,
-    `SN_Na_K_concentrations_soma`, `SN_Ca_handling_soma`) are only parts of the soma, so they are in
-    `cell/neuron/soma/`, not in `cell/neuron/`.
-  - `SN_varicosity_membrane`, `SN_Ca_handling_varicosity` and `SN_NE_release` are only parts of the
-    varicosity, so they are in `cell/neuron/varicosity/`.
-  - `NE_release_Tao_2011` and `sympathetic_neuron_membrane_voltage` are parts of the Tao 2011 neuron,
-    neither soma- nor varicosity-specific, so they are directly in `cell/neuron/`.
-  - `cardiac_clock`, `chamber` and `valve` are only used to build hearts, so they are in `heart/`.
-- **Otherwise in the most specific category covering all its uses**:
-  - Every ion channel is in `cell/ion_channels/`, one module_type per channel kind (`i_Na`, `i_CaL`,
-    ...), because channels of one kind are used across cell types (the soma's channels by the neuron,
-    the Paci channels by the cardiomyocyte). They are not nested in `soma` even though the soma
-    supermodule uses them. The cell type a version was built for is in its config entry's `"notes"`,
-    e.g. `"Built for: sympathetic neuron (Tao et al. 2011)"`.
-  - A sarcoplasmic reticulum (or a generic Ca store) would belong to several cell types, so it would
-    go in `cell/`, as `NKE_pump` does today.
-  - `myocyte_membrane_voltage` is only used by the Paci cardiomyocyte, which is not a module_type, so it
-    is in the category `cell/cardiomyocytes/`.
-- **One module_type, not several.** A variant of a module_type with the same role and ports is a
-  version of it, not a module_type beside it: the alternative hearts `heart_ASD`, `heart_LVprop`, ...
-  are versions of `heart` (see "Versions").
+The rules of 2026-10-06 (approved on `reviews/library_restructure_proposal.html`, applied by
+`tools/restructure_modules.py`):
 
-**No directory name appears twice** anywhere in `modules/`, among the categories, module_types and
-nested module_types, so a category is never named like a module_type. The generic names (`versions`,
-`instances`, `risk`, `plots`, `results`), version names (which repeat across module_types: `nn`, `vp`,
-...) and instance names (which name data sets, and `default`) are exempt.
+1. **Name by mechanism.** A module type is named after the mechanism it models (`Ca_handling`,
+   `membrane_potential`, `ion_concentrations`, `neurotransmitter_release`, `i_Na`, ...), never after
+   the cell, compartment, system or author it was built for. Type names never carry surnames or years.
+2. **Placement.** A type sits in the most general category where its mechanism is meaningful: Ca
+   handling exists in every cell, so `cell/Ca_handling`; ion channels, pumps and exchangers are
+   `cell/ion_channels/<channel>`.
+3. **Nesting.** Nest a type only when it is an anatomical part of its parent:
+   `cell/neuron/{soma,axon,varicosity}`, `heart/{chamber,valve,cardiac_clock}`. Parts are
+   supermodules whose versions are cell or organ types (`soma/sympathetic`). No directory name
+   appears twice in the tree, and no two sibling categories or types mean the same thing (one
+   `heart/`, no `cardiac/`).
+4. **Version or instance: compare the equations.**
+   - **Different maths is a version**, named `<system>_<compartment>_<Source><Year>_vXX`
+     (`Ca_handling/versions/SN_soma_Argus2026_v01`), or `<system>_<Source><Year>_vXX` without a
+     compartment (`membrane_potential/versions/cardiomyocyte_Paci2013_v01`), or `<Source><Year>_vXX`
+     where the system adds nothing (ion channels: `i_Na/versions/Tao2011_v01`). `Source` is the first
+     author's surname in ASCII CamelCase (`HernandezCruz1997`); the owner's unpublished or modified
+     models use `ArgusUNPUBLISHED`; an SI-unit duplicate adds `_SI`; a superseded formulation ends
+     `_OLD`.
+   - **Same maths with different parameter values is an instance** of the existing version
+     (`versions/<v>/instances/<instance>`).
+   - Vessel-network modules keep their port prefix first (`vp_wCont_ASD`), because libcuflynx reads
+     a vessel's module subtype's first two letters as its inlet/outlet port kinds (see "Versions").
+5. **One mechanism across cell types.** Modules of the same mechanism built for different cells or
+   compartments join one type as versions or instances (rule 4). Versions of one type expose
+   compatible ports where the mechanism allows; where they cannot (e.g. a bond-graph pump beside
+   current-law pumps), the difference is allowed and documented (below).
+6. **required_citations.** Every version's `modules_config.json` entry will have
+   `"required_citations": [bib keys]`: the papers whose *model* the version's equations come from
+   (not the per-parameter value sources, which stay in the CSV `data_reference`). Each key is in the
+   version's `references.bib` and follows `<surname><year><first significant title word>`, all
+   lowercase (`belluzzi1986quantitative`). A supermodule lists its own and its report and exports add
+   its submodules'. (Stage 3 of the restructure: not yet in the configs.)
+
+**Version or instance, in short.** Before adding a version, compare its equations with the type's
+existing versions. Identical equations (same variables, same relations) with other parameter values
+are an instance of that version, even when they were built for another cell or organ; any change to
+an equation, a state or a port's variables is a version.
+
+**Ports may differ between versions of one type.** Versions of a type usually share their ports, so
+one can replace another in a model. When the mechanism does not allow it (the Paci and Tao membrane
+equations take one port per named current, the SN versions one summed membrane-current port; the
+bond-graph Na/K-ATPase cycle has chemostat ports, the current-law pumps a current port), the versions
+keep their own ports. This is allowed, and documented: each version's notes (tests.yaml `notes`) end
+with the type's port table, "Ports of the versions of <type>", listing every (direction, port_type)
+and the variables each version gives it (written by `tools/restructure_modules.py`; update it when a
+version's ports change). No structure check compares ports across versions.
+
+**nn.** No version name starts with `nn` (no boundary condition): a former `nn_<x>` is `<x>`
+(`inlet_flow/constant`, `cardiac_clock/controlled`) and a former plain `nn` is named by its source.
+The exceptions are `coupling/FV1D_vessel/nn` and `coupling/FV1D_volume_sum/nn`, whose pairs
+libcuflynx writes itself in 1D-coupled models. `tests/test_structure.py` checks this.
+
+**Superseded.** The earlier "most specific place covering its uses" rule (which nested the SN parts
+in soma and varicosity) and the `cell/cardiomyocytes` category. `tools/restructure_modules_renames.json`
+lists every old (module_type, version) and its new pair; `cam_testing.library.legacy_renames()` reads
+it, so circulatory_autogen's own models and older vessel arrays still resolve.
 
 ## Versions
 
 A version is one piece of math for a module_type: one CellML component and one config entry. **The
 version's name is the config entry's `module_subtype`**, so a model picks a version with
 `"module_subtype"`.
-- **New versions** are named `<source>_vXX`: `Argus2026_v01`, `Paci2013_v01`, `Tao2011_v01`.
-- **Existing subtypes** (`vp`, `pp_nonlinear`, `nn_constant`, ...) are kept as version names, except
-  the ion channels, which became `Paci2013_v01`, `Tao2011_v01`, `Argus2026_v01` (the former `_SN`
-  channels) and `Argus_unpublished_v01` (Piezo).
-- **The port-letter constraint.** libcuflynx's vessel-port connection rule reads a module_subtype's
-  first two letters as the inlet and outlet port kinds when they are `pp`, `pv`, `vp` or `vv`, and
-  exempts names starting `nn`. So a version name starts with one of those four only when it follows
-  that port convention. `Argus2026_v01` or `sympathetic` are safe; a version called `vp_Smith2027_v01`
-  would be read as a v-in/p-out vessel.
+- **Names** follow "Placement and naming", rule 4: `<Source><Year>_vXX` (`Paci2013_v01`,
+  `Tao2011_v01`, `ArgusUNPUBLISHED_v01`), with `<system>_` and `<compartment>_` in front where they
+  tell versions apart (`SN_soma_Argus2026_v01`, `cardiomyocyte_Paci2013_v01`), `_SI` and `_OLD`
+  suffixes. Vessel versions keep their descriptive subtypes (`vp`, `pp_nonlinear`, `vv_noI_SI`).
+- **The port-letter constraint.** libcuflynx reads a vessel's module_subtype's first two letters as
+  the inlet and outlet port kinds (`pp`, `pv`, `vp`, `vv`), and only a vessel's (a module with vessel
+  ports whose subtype starts with one of the four: `libcuflynx.utilities.vessel_bc`). So a vessel
+  version name starts with its port letters, and any other version may have any name (`lv_...`,
+  `SN_soma_...`); it should still not start with `pp`, `pv`, `vp` or `vv` unless it follows that
+  convention.
 - **A module_type folded into another keeps its port letters first.** When a former module_type
   becomes a version of another, the version is named `<old module_subtype>_<old module_type suffix>`,
   so its first two letters (and so libcuflynx's connection rule) are unchanged. The alternative hearts
@@ -174,7 +203,7 @@ version's name is the config entry's `module_subtype`**, so a model picks a vers
   | `heart_new_valve`, `vp` | `vp_new_valve` |
   | `heart_nonstiff`, `vp_wCont` | `vp_wCont_nonstiff` |
   | `heart_simple`, `vp` | `vp_simple` |
-  | `heart_simple_2`, `vp` | `vp_simple_2` |
+  | `heart_simple_2`, `vp` | `vp_simple_2` (now `vp_simple_SI`) |
   | `heart_simple_OLD`, `vp` | `vp_simple_OLD` |
 
   Their CellML components keep their names (`heart_new_valve`, `heart_nonstiff`, ...), so generated
@@ -196,7 +225,7 @@ version's name is the config entry's `module_subtype`**, so a model picks a vers
 
 `tests/test_structure.py` checks both keys in every entry. libcuflynx's config schema allows extra
 keys, and both config formats carry them unchanged (`library.normalise_config_entry`,
-`library.to_phlynx_entry`). The tools that write new config entries (`tools/restructure_modules.py`,
+`library.to_phlynx_entry`). The tools that write new config entries (`tools/restructure_to_versions.py`,
 `tools/import_from_libcuflynx.py`, `tools/split_module.py`) add them with `library.with_record_keys`.
 
 ## Instances
@@ -224,7 +253,7 @@ An instance is **a parameter set of a version: only the parameters change, never
   the values it has unless a model names another instance. The verification tests run at the
   default instance's parameters.
 - **Data instances.** They currently hold the version's default values, plus their data, e.g.
-  `benchmarks/Lotka_Volterra/versions/nn/instances/hudson_bay_lynx_hare/`. Calibration writes
+  `benchmarks/Lotka_Volterra/versions/Lotka1925_v01/instances/hudson_bay_lynx_hare/`. Calibration writes
   `<instance>_calibrated_parameters.csv` and `<instance>_calibration.json` beside them.
 - **Recalibrating, and applying a calibration.** A calibration to data is always a libcuflynx run on
   a committed obs_data, never a hand calculation, so anyone can change the data and redo it:
@@ -305,8 +334,8 @@ module_type:
 |---|---|
 | `heart` `Argus2026_v01` | cardiac clock, four chambers, four valves (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`) |
 | `cell/neuron` `sympathetic` | soma `sympathetic`, axon `sympathetic_monolithic_v01`, varicosity `sympathetic` |
-| `cell/neuron/soma` `sympathetic` | membrane, Na/K, Ca handling (nested in soma) and 15 `cell/ion_channels` versions |
-| `cell/neuron/varicosity` `sympathetic` | membrane, Ca handling, NE release (nested in varicosity) and channels |
+| `cell/neuron/soma` `sympathetic` | membrane (`membrane_potential`), Na/K (`ion_concentrations`), Ca handling (`Ca_handling`), each version `SN_soma_Argus2026_v01`, and 15 `cell/ion_channels` versions |
+| `cell/neuron/varicosity` `sympathetic` | membrane, Ca handling, NE release (`neurotransmitter_release`), each version `SN_varicosity_Argus2026_v01`, and channels |
 
 The monolithic versions sit beside them. For example, `soma` also has `sympathetic_monolithic_v01`.
 
@@ -401,7 +430,7 @@ Status rules (decided in the Lotka_Volterra review, 2026-10-01):
 - The version's **Calibration** column in the report's test overview fails when **no instance** has
   calibration data, fails when any instance's calibration fails, and passes when they all pass.
 - **Calibration in a supermodule.** A version with no calibration data of its own that is a submodule
-  of one or more supermodule versions (e.g. `SN_membrane_soma/nn`, which can't be validated alone) is
+  of one or more supermodule versions (e.g. `membrane_potential/SN_soma_Argus2026_v01`, which can't be validated alone) is
   calibrated as part of them. Its Calibration column shows **Pass in super** when any of those
   supermodules' calibration passes, and **Fail in super** when none does; a supermodule with no
   calibration data counts as failed. The rule applies transitively: an ion channel takes its status
@@ -443,7 +472,7 @@ The version's spec is described in the next section.
 pytest tests/test_modules.py --module Lotka_Volterra          # a module_type
 pytest tests/test_modules.py --module neuron                  # neuron and the module_types nested in it
 pytest tests/test_modules.py --module cell                    # every module_type in a category
-pytest tests/test_modules.py --component Lotka_Volterra/nn    # one version (and its instances)
+pytest tests/test_modules.py --component Lotka_Volterra/Lotka1925_v01    # one version (and its instances)
 pytest tests/test_modules.py --module Lotka_Volterra -m slow  # calibration
 python -m cam_testing.report --module Lotka_Volterra          # Lotka_Volterra.html + the version pages
 ```
@@ -533,8 +562,9 @@ An instance with no obs_data or params_for_id still loads and simulates, but CUF
 - no directory name repeats (nested module_types included);
 - no category is named like a module_type;
 - a nested module_type is used only within its parent;
-- where a module_type goes (placement);
-- how versions are named (the port letters first);
+- where a module_type goes (placement and nesting);
+- how versions are named (by source; vessels' port letters first; no `nn`);
+- versions of one type may differ in their ports (documented in their notes);
 - every system-model record names an existing version and instance.
 
 `tests/test_structure.py` walks `modules/` and `system_models/` and checks all of this. It also checks
@@ -550,12 +580,14 @@ each version's CellML, config and units, and validates the JSON files against li
 - **A data instance**: add `instances/<name>/` with `<name>_parameters.csv`, the obs_data files
   (`"obs_data_name": "<name>"`), `<name>_params_for_id.csv`, the raw data and `SOURCES.md`. Then add
   `validation.<name>` to the version's verification_config.json.
-- **A new module_type**: put it in the most specific place covering all its uses: inside the
-  module_type it is only used within (a nested module_type), otherwise in the most specific category
-  (create the category if none fits and no module_type of that meaning exists, with a name no
-  module_type has). Then run `make manifests`.
+- **A new module_type**: first check that the mechanism has no type yet (a new cell's Ca handling is
+  a version of `Ca_handling`, not a new type). Name it by its mechanism and put it in the most general
+  category where the mechanism is meaningful; nest it only when it is an anatomical part of its
+  parent (see "Placement and naming"). Then run `make manifests`.
 
-`tools/restructure_modules.py` moved the old per-module layout into this one, driven by
+`tools/restructure_to_versions.py` moved the old per-module layout into this one, driven by
 `tools/restructure_map.yaml` (made by `tools/restructure_map.py`). The later move to nested
 module_types (the category `cell/neurons` and `cardiac` replaced by the module_types `cell/neuron` and
-`heart`, the alternative hearts made versions of `heart`) is not in that map.
+`heart`, the alternative hearts made versions of `heart`) is not in that map. The 2026-10-06
+restructure (mechanism types, source-named versions, no `nn`) is `tools/restructure_modules.py`, with
+its old -> new map in `tools/restructure_modules_renames.json`.

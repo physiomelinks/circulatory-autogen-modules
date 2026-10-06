@@ -16,6 +16,9 @@ Read-only: no module file is moved, renamed or edited. The page is built from th
 - the proposed bib keys follow <surname><year><first significant title word>, all lowercase, and the
   cost of rekeying every existing key is counted.
 
+Historical: the page was generated at commit 9486307 and approved on 2026-10-06; the move itself is
+tools/restructure_modules.py. Run on today's tree, the table's old paths no longer exist.
+
 The libcuflynx boundary-condition checks quoted in the BC-prefix section are located in the editable
 install (LIBCUFLYNX below) when it exists, so their line numbers stay current.
 """

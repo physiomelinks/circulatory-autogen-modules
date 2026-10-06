@@ -270,6 +270,23 @@ def test_no_directory_name_twice():
     assert not problems, '\n'.join(problems)
 
 
+def test_no_nn_versions():
+    '''No version name starts with nn (directory_schema.json rules.version_names): a former nn_<x> is <x>,
+    a former plain nn is named by its source. Only the pairs libcuflynx writes itself are kept
+    (nn_versions_allowed).'''
+    allowed = set(SCHEMA.get('nn_versions_allowed') or {})
+    bad = [f'{module_relpath(v.vessel_type)}/{v.name}' for v in _versions() if v.name.startswith('nn')]
+    assert not [b for b in bad if b not in allowed], f'nn versions: {[b for b in bad if b not in allowed]}'
+    stale = sorted(allowed - set(bad))
+    assert not stale, f'nn_versions_allowed lists versions that are gone: {stale}'
+
+
+def test_type_names_carry_no_year():
+    '''A module_type is named by its mechanism, never by its author or year (rules.placement).'''
+    bad = sorted(n for n in module_type_names() if re.search(r'(19|20)\d\d', n) or n.endswith(('_OLD', '_Gee', '_Ursino')))
+    assert not bad, f'module_type names with a year or source: {bad}'
+
+
 def test_spec_key_lists_match_the_schema():
     '''The key lists cam_testing splits the spec by are the ones directory_schema.json documents.'''
     keys = SCHEMA['spec_keys']
@@ -555,9 +572,10 @@ OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'instance
                   if _not_excluded(p))
 
 
-def _validate(path, schema_name):
+def _validate(path, schema_name, *older_names):
+    '''older_names: the schema's name in older libcuflynx releases (vessel_array before #549).'''
     jsonschema = pytest.importorskip('jsonschema')
-    schema = _libcuflynx_schema(schema_name)
+    schema = next((s for s in map(_libcuflynx_schema, (schema_name,) + older_names) if s is not None), None)
     if schema is None:
         pytest.skip(f'the installed libcuflynx has no schemas/{schema_name}')
     with open(path) as f:
@@ -568,7 +586,7 @@ def _validate(path, schema_name):
 
 @pytest.mark.parametrize('path', VESSEL_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
 def test_vessel_array_matches_libcuflynx_schema(path):
-    _validate(path, 'vessel_array.schema.json')
+    _validate(path, 'module_array.schema.json', 'vessel_array.schema.json')
 
 
 @pytest.mark.parametrize('path', MODULE_CONFIGS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
