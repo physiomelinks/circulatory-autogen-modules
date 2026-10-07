@@ -122,8 +122,8 @@ hc_init_var_SN,dimensionless,0.9,Tau2011
 b_var_SN,dimensionless,0.25,Tau2011
 NE_init_var_SN,millimolar,0.0,user_defined
 Cai_NE_base_var_SN,millimolar,1e-4,user_defined
-k_NE_var_SN,per_s,200,user_defined
-k_NET_var_SN,per_s,100,user_defined
+k_NE_var_SN,per_s,0.1,"unreferenced_placeholder; the owner's fitted values in the SN_full model (sympathetic_neuron repo, SN_full/resources/SN_full_parameters.csv; adopted on review 2026-10-08, were 200 and 100 /s from SN_simple); release gain per unit Ca above threshold"
+k_NET_var_SN,per_s,0.03,"unreferenced_placeholder; the owner's fitted values in the SN_full model (sympathetic_neuron repo, SN_full/resources/SN_full_parameters.csv; adopted on review 2026-10-08, were 200 and 100 /s from SN_simple); NET clearance rate (tau 33 s; NET uptake is reported as Michaelis-Menten kinetics, not a first-order constant)"
 #,#,#,#
 rho_M_soma_SN,per_um2,0.20293752441290494,"davis2020downregulation; Calibrated (libcuflynx) to i_M Argus2026_v01 instances/davis2020_wistar/davis2020_wistar_obs_data.json: davis2020downregulation Fig. 3C Wistar XE-991-sensitive I_M -4.03 pA/pF x Cm 30 pF (assumed), the deactivation relaxation in a 1 s step from -25 to -55 mV (current after the ohmic jump minus that near the end of the step; davis2021transcriptomic p. 172-173); E_K -96.5 mV (Ki 200 mM, 22 degC); re-derived on review 2026-10-05 (was 0.00263 uS with E_K -93.7, from the -25/-55 mV steady-state difference). g_M = A rho gamma_M = 0.005479 uS at A 3000 um^2, gamma_M 9 pS; it depends on tau_w (with the present tau_w the relaxation is 87 % complete at 1 s)"
 gamma_M_soma_SN,picoS,9.0,"selyanko2001properties; KCNQ2/KCNQ3 (M-type) single-channel conductance 9.0 +- 0.3 pS (Abstract, point 2); native rat SCG M-channels show ~7, 12 and 19 pS levels (Selyanko & Brown 1993)"

@@ -242,5 +242,5 @@ i_RyR_init_SN_varicosity_RyR,dimensionless,0.13725490196078433,definitional; ste
 l_RyR_init_SN_varicosity_RyR,dimensionless,0.36585365853658536,definitional; steady-state luminal-site occupancy kon_l Ca_ER/(kon_l Ca_ER + koff_l) at the default Ca_ER (75 uM)
 Cai_NE_base_SN_varicosity_NE,millimolar,1e-4,user_defined
 NE_init_SN_varicosity_NE,millimolar,0.0,user_defined
-k_NE_SN_varicosity_NE,per_s,200,user_defined
-k_NET_SN_varicosity_NE,per_s,100,user_defined
+k_NE_SN_varicosity_NE,per_s,0.1,"unreferenced_placeholder; the owner's fitted values in the SN_full model (sympathetic_neuron repo, SN_full/resources/SN_full_parameters.csv; adopted on review 2026-10-08, were 200 and 100 /s from SN_simple); release gain per unit Ca above threshold"
+k_NET_SN_varicosity_NE,per_s,0.03,"unreferenced_placeholder; the owner's fitted values in the SN_full model (sympathetic_neuron repo, SN_full/resources/SN_full_parameters.csv; adopted on review 2026-10-08, were 200 and 100 /s from SN_simple); NET clearance rate (tau 33 s; NET uptake is reported as Michaelis-Menten kinetics, not a first-order constant)"

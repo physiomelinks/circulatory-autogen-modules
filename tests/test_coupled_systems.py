@@ -237,7 +237,8 @@ def test_varicosity_NEexchange_with_one_volume_is_the_original(tmp_path):
         return simulate(path, s.spec, s.spec['solver_info'], names=names)
     t0, a = run('SN_NE_original', ['var_SN/NE', 'var_SN/Cai'])
     t1, b = run('SN_NE_single_volume', ['ecs_0/C_P', 'var_SN/Cai'])
-    assert np.max(a['var_SN/NE']) > 1e-4, 'no NE released: the stimulus does not fire the neuron'
+    # k_NE 0.1 /s, k_NET 0.03 /s (SN_full's values, review 2026-10-08): the 0.2 s train peaks at ~5e-6 mM
+    assert np.max(a['var_SN/NE']) > 1e-6, 'no NE released: the stimulus does not fire the neuron'
     assert _rel_diff(t0, a['var_SN/NE'], t1, b['ecs_0/C_P']) < 1e-5
     assert _rel_diff(t0, a['var_SN/Cai'], t1, b['var_SN/Cai']) < 1e-5
 
@@ -296,7 +297,8 @@ def test_NE_FEniCS_matches_the_cellml_grid(scheme, ne_fv, tmp_path):
            f'{peak_ratio:.3f} ({gate})',
            {'max_rel_difference': diff, 'peak_ratio': peak_ratio,
             'run_seconds': {'cellml_grid': ref_time['run'], 'fenics_coupled': times['total']}}, [fig])
-    assert np.max(ref) > 1e-6, 'no NE reached the extracellular space'
+    # ~3e-4 mM with k_NE 200 /s; k_NE is 0.1 /s since review 2026-10-08 (expected ~2e-7 mM)
+    assert np.max(ref) > 1e-9, 'no NE reached the extracellular space'
     assert passed, (diff, peak_ratio)
 
 
