@@ -23,7 +23,7 @@ from dataclasses import asdict, dataclass, field
 import numpy as np
 
 from cam_testing import fixed_step, harness, plots
-from cam_testing.library import REPO_ROOT
+from cam_testing.library import library_dirs
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
 # validation.<kind>.status: 'active' (confirmed data) or 'proposed' (run, but the data awaits confirmation)
@@ -422,7 +422,7 @@ def cpp_generation_check(cm):
                'solver': 'RK4', 'couple_to_1d': True, 'resources_dir': res,
                'generated_models_dir': os.path.join(work, 'generated_models'),
                'cpp_generated_models_dir': os.path.join(work, 'cpp_out'), 'cpp_1d_model_config_path': None,
-               'module_library_dirs': [harness.MODULES_DIR], 'use_builtin_modules': False, 'DEBUG': False,
+               'module_library_dirs': library_dirs(), 'use_builtin_modules': False, 'DEBUG': False,
                'dt': float(cm.spec.get('dt', 1e-3)),
                'solver_info': {'dt_solver': 1e-4, 'MaximumNumberOfSteps': 5000, 'solver': 'RK4'}}
         log = io.StringIO()

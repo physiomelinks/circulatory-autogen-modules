@@ -4,8 +4,9 @@ library, exported as PhLynx's CUFLynx .omex, imported into CUFLynx and simulated
 does CUFLynx's run reproduce the model libcuflynx builds from the same test network?
 
 Two bridges, each running the real application code from a checkout:
-  tools/phlynx_bridge/export_omex.mjs    PhLynx's JS under node + jsdom (PHLYNX_DIR)
-  tools/cuflynx_bridge/simulate_omex.py  a released CUFLynx binary (CUFLYNX_BIN, default
+  cam_testing/bridges/phlynx/export_omex.mjs    PhLynx's JS under node + jsdom (PHLYNX_DIR; jsdom
+                                                 installed next to it, or JSDOM_DIR)
+  cam_testing/bridges/cuflynx/simulate_omex.py  a released CUFLynx binary (CUFLYNX_BIN, default
                                          ~/software/CUFLynx; CI downloads the latest Ubuntu
                                          release) driven over its HTTP API
 
@@ -25,12 +26,13 @@ import tempfile
 import numpy as np
 
 from cam_testing import harness, module_array
-from cam_testing.library import MODULES_DIR
+from cam_testing import paths
 
-REPO_DIR = os.path.dirname(MODULES_DIR)
-PHLYNX_BRIDGE = os.path.join(REPO_DIR, 'tools', 'phlynx_bridge', 'export_omex.mjs')
-CUFLYNX_BRIDGE = os.path.join(REPO_DIR, 'tools', 'cuflynx_bridge', 'simulate_omex.py')
-SIBLINGS = os.path.dirname(REPO_DIR)
+# shipped with the package (package data), so they work from an installed cam_testing too
+BRIDGES_DIR = os.path.join(paths.PACKAGE_DIR, 'bridges')
+PHLYNX_BRIDGE_DIR = os.path.join(BRIDGES_DIR, 'phlynx')
+PHLYNX_BRIDGE = os.path.join(PHLYNX_BRIDGE_DIR, 'export_omex.mjs')
+CUFLYNX_BRIDGE = os.path.join(BRIDGES_DIR, 'cuflynx', 'simulate_omex.py')
 
 
 class PipelineUnavailable(Exception):
@@ -38,7 +40,7 @@ class PipelineUnavailable(Exception):
 
 
 def phlynx_dir():
-    d = os.path.abspath(os.environ.get('PHLYNX_DIR') or os.path.join(SIBLINGS, 'phlynx'))
+    d = os.path.abspath(os.environ.get('PHLYNX_DIR') or os.path.join(os.path.dirname(paths.roots().repo_root), 'phlynx'))
     if not os.path.isfile(os.path.join(d, 'src', 'utils', 'cellml.js')):
         raise PipelineUnavailable(f'no PhLynx checkout at {d} (set PHLYNX_DIR)')
     if not os.path.isdir(os.path.join(d, 'node_modules', 'libcellml.js')):
@@ -57,7 +59,7 @@ def library_files():
     '''Every version's CellML, units and config: a harness can use neighbours from other module_types.'''
     cellml, units, configs = [], [], []
     from cam_testing.library import all_versions
-    for v in all_versions():
+    for v in all_versions(include_libraries=True):
         cellml += [p for p in [v.cellml_path] if os.path.isfile(p)]
         units += [p for p in [v.units_path] if os.path.isfile(p)]
         configs.append(v.config_path)

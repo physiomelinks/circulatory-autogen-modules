@@ -473,8 +473,8 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 
 def _system_models(root=None):
     """[{key, dir, vessels, parameters_path}] of every system model under ``root``."""
-    from cam_testing.library import SYSTEM_MODELS_DIR
-    root = root or SYSTEM_MODELS_DIR
+    from cam_testing import paths
+    root = root or paths.roots().system_models_dir
     out = []
     for d, _dirs, files in os.walk(root):
         for f in files:
@@ -644,11 +644,12 @@ def write_plan(plan):
 
 
 def apply_command(version_key, instance_name, dry_run=False, versions=None, systems=None, out=print):
-    from cam_testing.library import REPO_ROOT, version_by_key
+    from cam_testing import paths
+    from cam_testing.library import version_by_key
     version = version_by_key(version_key)
     plan = apply_plan(version, instance_name, versions=versions, systems=systems)
     for c in plan:
-        rel = os.path.relpath(c['path'], REPO_ROOT)
+        rel = os.path.relpath(c['path'], paths.roots().repo_root)
         out(f"{'would set' if dry_run else 'set'} {rel}: {c['row']} {c['old']} -> {c['value']}")
     if not dry_run:
         write_plan(plan)

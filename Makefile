@@ -38,7 +38,7 @@ systems:
 
 # PhLynx build & export -> CUFLynx import & simulate -> compare with libcuflynx, per version
 pipeline-setup:
-	cd tools/phlynx_bridge && npm ci --no-audit --no-fund
+	cd cam_testing/bridges/phlynx && npm ci --no-audit --no-fund
 
 pipeline:
 	PHLYNX_DIR=$(PHLYNX_DIR) CUFLYNX_BIN=$(CUFLYNX_BIN) $(PYTHON) -m pytest tests/test_phlynx.py $(MODULE_ARGS) $(PYTEST_ARGS)
@@ -62,7 +62,7 @@ serve: site
 	$(PYTHON) -m http.server -d site 8000
 
 manifests:
-	$(PYTHON) tools/build_manifests.py
+	$(PYTHON) -m cam_testing.manifests
 
 clean:
 	rm -rf site
