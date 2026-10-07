@@ -1,0 +1,196 @@
+{
+  "module_type": "PMCA",
+  "version": "Colegrove2000_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-08,
+    "atol": 1e-10
+  },
+  "outputs": [
+    "j_PMCA",
+    "j_max_PMCA"
+  ],
+  "run_parameters": {
+    "Cai": 0.0003788
+  },
+  "invariants": [
+    {
+      "description": "the Hill pump: j_PMCA = -j_max_PMCA Cai^n/(K^n + Cai^n) (relative 1e-12)",
+      "expr": "np.max(np.abs(j_PMCA + j_max_PMCA*Cai**n_PMCA/(K_PMCA**n_PMCA + Cai**n_PMCA))) <= 1e-12*max(1e-30, np.max(np.abs(j_max_PMCA)))"
+    },
+    {
+      "description": "the maximal rate j_max_PMCA = A_mem rho_PMCA r_PMCA / N_A (mol/s; N_A = 6.02214076e23 /mol; relative 1e-12)",
+      "expr": "np.max(np.abs(j_max_PMCA - A_mem*rho_PMCA*r_PMCA/6.02214076e23)) <= 1e-12*max(1e-30, abs(A_mem*rho_PMCA*r_PMCA/6.02214076e23))"
+    },
+    {
+      "description": "the sign: the pump only extrudes Ca, -j_max_PMCA <= j_PMCA <= 0 (negative = out of the cell)",
+      "expr": "np.all(j_PMCA <= 0) and np.all(j_PMCA >= -j_max_PMCA*(1 + 1e-12))"
+    },
+    {
+      "description": "half-maximal at K: at the run point Cai = K_PMCA (0.3788 uM), j_PMCA = -j_max_PMCA/2 (relative 1e-12)",
+      "expr": "abs(j_PMCA[-1]/(-j_max_PMCA[-1]) - 0.5) <= 1e-12",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "Cai": {
+        "values": [
+          0.0,
+          1e-05,
+          0.0001,
+          0.0003788,
+          0.001,
+          0.01
+        ]
+      },
+      "n_PMCA": {
+        "values": [
+          1.0,
+          1.4,
+          1.8,
+          2.5,
+          4.0
+        ]
+      }
+    },
+    "bounds": {
+      "Cai": [
+        0.0,
+        null
+      ],
+      "K_PMCA": [
+        1e-09,
+        null
+      ],
+      "n_PMCA": [
+        0.5,
+        6.0
+      ],
+      "rho_PMCA": [
+        0.0,
+        null
+      ],
+      "r_PMCA": [
+        0.0,
+        null
+      ],
+      "A_mem": [
+        0.0,
+        null
+      ]
+    },
+    "rationale": "Cai from 0 through rest (0.1 uM) and K (0.3788 uM) to 10 uM (a large load); the Hill coefficient over 1-4 (one to four cooperative Ca sites; Colegrove's 1.8 in the middle); the other constants by factors 0.5-2. Bounds: concentrations, densities, turnover and area non-negative, K positive (K^n divides), n within 0.5-6."
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "an algebraic pump law; its size (rho_PMCA) is calibrated in instance wanaverbecq2003_scg and its form checked by the invariants."
+      },
+      "calibrate": {
+        "note": "not_applicable here: rho_PMCA is calibrated in instance wanaverbecq2003_scg (wanaverbecq2003plasma) and the default uses its calibrated value."
+      }
+    },
+    "wanaverbecq2003_scg": {
+      "harness": {
+        "module_array": [
+          [
+            "mod",
+            "Colegrove2000_v01",
+            "PMCA",
+            "Ca",
+            "",
+            ""
+          ],
+          [
+            "Ca",
+            "SN_soma_Argus2026_v01",
+            "Ca_handling",
+            "",
+            "mod leak load",
+            "default"
+          ],
+          [
+            "leak",
+            "constant",
+            "Ca_influx",
+            "Ca",
+            "",
+            "default"
+          ],
+          [
+            "load",
+            "constant",
+            "Ca_influx",
+            "Ca",
+            "",
+            "default"
+          ]
+        ],
+        "parameters": [
+          [
+            "j_Ca_influx_leak",
+            "mol_per_s",
+            8.6e-18,
+            "wanaverbecq2003plasma: the tonic (La3+-sensitive) Ca entry that holds resting Ca; a nuisance parameter, fitted with rho_PMCA so that rest is 102 nM (start value: j_max f(102 nM) at j_max 100 amol/s)"
+          ],
+          [
+            "j_Ca_influx_load",
+            "mol_per_s",
+            0.0,
+            "the brief Ca load: zero except in the load sub-experiments (obs_data protocol_info)"
+          ],
+          [
+            "rho_SERCA_Ca",
+            "per_um2",
+            0.0,
+            "wanaverbecq2003plasma: thapsigargin (SERCA block) has no effect on small transients, so the recovery data are those of the PMCA alone: SERCA off"
+          ],
+          [
+            "rho_leak_Ca_Ca",
+            "per_um2",
+            0.0,
+            "with SERCA off, the pre-ER leak off too, so the ER is isolated (no slow Ca source from ER depletion)"
+          ]
+        ]
+      },
+      "calibrate": {
+        "status": "active",
+        "source": "Wanaverbecq, Marsh, Al-Qatari & Brown 2003, J Physiol 550:83 (rat SCG, indo-1, 33 degC): resting [Ca2+]i 102 +- 4 nM (Results) and the recovery tau of small loads, ~5 s at 100 nM and ~2.5 s at 500 nM (Fig. 1C); values from the full text, figure not screenshotted (no PDF on disk)",
+        "obs_data": "instances/wanaverbecq2003_scg/wanaverbecq2003_scg_obs_data.json",
+        "params_for_id": "instances/wanaverbecq2003_scg/wanaverbecq2003_scg_params_for_id.csv",
+        "z_threshold": 2.0,
+        "method": "CMA-ES",
+        "optimiser_options": {
+          "num_calls_to_function": 1000,
+          "cost_convergence": 1e-12,
+          "max_patience": 100,
+          "seed": 1
+        },
+        "metric": "nrmse",
+        "threshold": 0.3,
+        "dt": 0.1
+      }
+    }
+  }
+}

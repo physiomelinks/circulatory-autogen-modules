@@ -2,7 +2,7 @@ module_type: varicosity
 version: sympathetic
 reviewed: false
 description: 'Sympathetic-neuron varicosity (SN_simple''s SN_varicosity) built from its parts: a pass-through membrane (the
-  axon sets V), four-compartment Ca handling with E_Ca, N-type Ca channel, NaCa exchanger, IP3R, RyR and NE release. Each
+  axon sets V), four-compartment Ca handling with E_Ca, N-type Ca channel, NaCa exchanger, plasma-membrane Ca-ATPase (PMCA Colegrove2000_v01, since review 2026-10-07), IP3R, RyR and NE release. Each
   submodule becomes <instance>_<submodule> in a model; the membrane takes the axon''s potential: per_submodule_inputs {"membrane":
   ["<axon>"]}; NE (synaptic_NE) is available from NE. Default parameters are SN_simple''s (its default instance). Split out
   of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
@@ -16,7 +16,7 @@ notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 2
   rates times phi = Q10^((T - T_ref)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), with that version''s
   default-instance values and references (*_RyR rows). It replaced Argus2026_v01 (the owner''s c^3 hc^3 law), which is
   inconsistent with the rat-SCG CICR data (comparison: reviews/RyR_HernandezCruz1997_comparison.html). The rest of the soma
-  (SERCA, buffers, K(Ca)) was tuned with the old RyR, so the resting balance is to be recalibrated.'
+  (SERCA, buffers, K(Ca)) was tuned with the old RyR, so the resting balance is to be recalibrated. PMCA (review 2026-10-07): a plasma-membrane Ca-ATPase submodule PMCA (cell/ion_channels/PMCA, version Colegrove2000_v01: the Hill pump of Colegrove, Albrecht & Friel 2000, j_PMCA = -j_max Cai^n/(K^n + Cai^n), j_max = A_mem rho_PMCA r_PMCA / N_A) extrudes Ca from the sub-membrane shell, connected like i_NaCa (internal_Ca and Ca_flux with Ca, membrane_area from the membrane; rows *_PMCA). rho_PMCA is the libcuflynx calibration to Wanaverbecq et al. 2003 (rat SCG resting Ca and recovery tau; instance PMCA/Colegrove2000_v01 wanaverbecq2003_scg), a density shared by the soma and the varicosity. NCX density (review 2026-10-07): rho_NaCa 400 /um^2 (hilgemann1991charge, cardiac, as in the soma; was 38719 /um^2, which reproduced the old k_NaCa 0.15 nA), so k_NaCa = 1.55 pA on the 4.836 um^2 varicosity.'
 expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

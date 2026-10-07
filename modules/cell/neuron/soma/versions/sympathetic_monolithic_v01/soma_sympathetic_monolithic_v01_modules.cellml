@@ -2719,6 +2719,13 @@
         <variable name="k_NaCa" public_interface="out" units="nanoA"/>
         <variable name="rho_NaCa" public_interface="in" units="per_um2"/>
         <variable name="r_NaCa" public_interface="in" units="per_s"/>
+        <!-- plasma-membrane Ca-ATPase (PMCA module Colegrove2000_v01: Hill pump of Colegrove, Albrecht & Friel 2000, j_max = A_mem rho_PMCA r_PMCA / N_A; review 2026-10-07) -->
+        <variable name="rho_PMCA" public_interface="in" units="per_um2"/>
+        <variable name="r_PMCA" public_interface="in" units="per_s"/>
+        <variable name="K_PMCA" public_interface="in" units="millimolar"/>
+        <variable name="n_PMCA" public_interface="in" units="dimensionless"/>
+        <variable name="j_max_PMCA" public_interface="out" units="mol_per_s"/>
+        <variable name="j_PMCA" public_interface="out" units="mol_per_s"/>
         <variable name="alpha_NaCa" public_interface="in" units="dimensionless"/>
         <variable name="gamma_NaCa" public_interface="in" units="dimensionless"/>
         <variable name="Ksat" public_interface="in" units="dimensionless"/>
@@ -3433,6 +3440,7 @@
                                 <plus/>
                                 <ci>j_Ca_L</ci>
                                 <ci>j_NaCa_Ca</ci>
+                                <ci>j_PMCA</ci>
                                 <ci>j_IP3</ci>
                                 <ci>j_RyR</ci>
                                 <ci>j_diffCa</ci>
@@ -3936,6 +3944,8 @@
             <apply><eq/><ci>g_KCa_SK</ci><apply><times/><ci>A_mem</ci><ci>rho_SK</ci><ci>gamma_SK</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
             <apply><eq/><ci>g_M</ci><apply><times/><ci>A_mem</ci><ci>rho_M</ci><ci>gamma_M</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
             <apply><eq/><ci>k_NaCa</ci><apply><times/><ci>A_mem</ci><ci>rho_NaCa</ci><ci>r_NaCa</ci><cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn></apply></apply>
+            <apply><eq/><ci>j_max_PMCA</ci><apply><divide/><apply><times/><ci>A_mem</ci><ci>rho_PMCA</ci><ci>r_PMCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
+            <apply><eq/><ci>j_PMCA</ci><apply><divide/><apply><times/><apply><minus/><ci>j_max_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply><apply><plus/><apply><power/><ci>K_PMCA</ci><ci>n_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply></apply></apply>
             <apply><eq/><ci>k_NaK</ci><apply><times/><ci>A_mem</ci><ci>rho_NaK</ci><ci>r_NaK</ci><cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn></apply></apply>
             <apply><eq/><ci>g_leak_Na</ci><apply><times/><ci>A_mem</ci><ci>rho_leak_Na</ci><ci>gamma_leak_Na</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
             <apply><eq/><ci>g_leak_K</ci><apply><times/><ci>A_mem</ci><ci>rho_leak_K</ci><ci>gamma_leak_K</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>

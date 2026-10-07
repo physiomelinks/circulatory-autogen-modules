@@ -6,7 +6,7 @@ notes: 'sympathetic_monolithic_v01 with its NE exchanged with the outside, for c
   sends the net NE flux J_NE = Vol (k_NE max(Cai - Cai_NE_base, 0) - k_NET (NE_ext - NE_init)) [mol/s] and receives the extracellular
   NE at the varicosity, NE_ext, through capillary_to_flux_port [NE_ext, J_NE] (the port of tissue_diffusion_volume). Coupled to one
   well-mixed volume equal to Vol it is exactly sympathetic_monolithic_v01 (system model SN_NE_single_volume); everything else is
-  unchanged from that version.'
+  unchanged from that version (the inline PMCA added to it on 2026-10-07 included).'
 reference_proposals:
   c_init:
     reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);

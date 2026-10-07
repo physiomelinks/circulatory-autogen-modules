@@ -202,7 +202,7 @@ class ComponentModel(object):
                 pass
         # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
         # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
-        for name, _units, value, *_ref in (self.spec.get('harness') or {}).get('parameters') or []:
+        for name, _units, value, *_ref in harness.network(self.component, self.instance).get('parameters') or []:
             if name not in nominal:
                 nominal[name] = float(value)
                 var_of[name] = name
@@ -231,7 +231,8 @@ class ComponentModel(object):
             if getattr(self, '_generation_error', None) is not None:
                 raise self._generation_error          # don't regenerate a model that failed to generate
             try:
-                self._model_path = harness.generate(self.component, self.work_dir, parameters=self._instance_params())
+                self._model_path = harness.generate(self.component, self.work_dir, parameters=self._instance_params(),
+                                                    instance=self.instance)
             except harness.GenerationFailed as e:
                 self._generation_error = e
                 raise
@@ -254,7 +255,7 @@ class ComponentModel(object):
 
     def generate(self, work_dir, **kw):
         '''Another model of this version at this instance's parameters (e.g. a python model).'''
-        return harness.generate(self.component, work_dir, parameters=self._instance_params(), **kw)
+        return harness.generate(self.component, work_dir, parameters=self._instance_params(), instance=self.instance, **kw)
 
     def run_point_params(self):
         '''The spec's run_parameters as simulation-helper overrides ({'parameters/<name>': value}).'''

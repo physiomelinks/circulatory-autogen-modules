@@ -7,11 +7,26 @@ notes: 'Single capillary O2 exchange (author''s model): well-mixed capillary O2 
   contents <-> pressures via Spencer curves in mmHg. CO2 is passed through (C_CO2_c = C_CO2_a). All inputs are boundary conditions,
   so it runs alone.'
 expected_failures:
-  run_test: 'the default instance has no parameter values yet (TODO). The two generation bugs recorded here before were fixed on 2026-10-06: the config listed d_1, d_2, r_1, r_2, s_1, s_2 twice (the J_per_m3/J2_per_m6 copies are removed; the CellML declares them in mmHg/mmHg2) and the CellML used the global saturation_cap without declaring it (declared, and added to the config as a global_constant). With the CA_user capillary_network values it generates and runs: system_models/coupled/microvasc_O2_FV and microvasc_O2_FEniCS.'
-  verification_test_invariants: 'the default instance has no parameter values yet (TODO). The two generation bugs recorded here before were fixed on 2026-10-06: the config listed d_1, d_2, r_1, r_2, s_1, s_2 twice (the J_per_m3/J2_per_m6 copies are removed; the CellML declares them in mmHg/mmHg2) and the CellML used the global saturation_cap without declaring it (declared, and added to the config as a global_constant). With the CA_user capillary_network values it generates and runs: system_models/coupled/microvasc_O2_FV and microvasc_O2_FEniCS.'
-  verification_test_BC: 'the default instance has no parameter values yet (TODO). The two generation bugs recorded here before were fixed on 2026-10-06: the config listed d_1, d_2, r_1, r_2, s_1, s_2 twice (the J_per_m3/J2_per_m6 copies are removed; the CellML declares them in mmHg/mmHg2) and the CellML used the global saturation_cap without declaring it (declared, and added to the config as a global_constant). With the CA_user capillary_network values it generates and runs: system_models/coupled/microvasc_O2_FV and microvasc_O2_FEniCS.'
-  verification_test_timestep: 'the default instance has no parameter values yet (TODO). The two generation bugs recorded here before were fixed on 2026-10-06: the config listed d_1, d_2, r_1, r_2, s_1, s_2 twice (the J_per_m3/J2_per_m6 copies are removed; the CellML declares them in mmHg/mmHg2) and the CellML used the global saturation_cap without declaring it (declared, and added to the config as a global_constant). With the CA_user capillary_network values it generates and runs: system_models/coupled/microvasc_O2_FV and microvasc_O2_FEniCS.'
-  stability_test: 'the default instance has no parameter values yet (TODO). The two generation bugs recorded here before were fixed on 2026-10-06: the config listed d_1, d_2, r_1, r_2, s_1, s_2 twice (the J_per_m3/J2_per_m6 copies are removed; the CellML declares them in mmHg/mmHg2) and the CellML used the global saturation_cap without declaring it (declared, and added to the config as a global_constant). With the CA_user capillary_network values it generates and runs: system_models/coupled/microvasc_O2_FV and microvasc_O2_FEniCS.'
+  run_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+    and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap
+    without declaring it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added
+    to the config as global_constant) it generates and runs.'
+  verification_test_invariants: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice
+    (J_per_m3/J2_per_m6 and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML
+    uses the global saturation_cap without declaring it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap
+    declared and added to the config as global_constant) it generates and runs.'
+  verification_test_BC: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+    and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap
+    without declaring it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added
+    to the config as global_constant) it generates and runs.'
+  verification_test_timestep: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice
+    (J_per_m3/J2_per_m6 and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML
+    uses the global saturation_cap without declaring it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap
+    declared and added to the config as global_constant) it generates and runs.'
+  stability_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
+    and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap
+    without declaring it. Evidence: in a patched copy of the library (duplicates removed, saturation_cap declared and added
+    to the config as global_constant) it generates and runs.'
 reference_proposals:
   k_1:
     reference: spencer1979computational; K1 = 14.99 mmHg (albanese2014physiology Table 2-6)

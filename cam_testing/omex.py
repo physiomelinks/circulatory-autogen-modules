@@ -66,7 +66,7 @@ def members(version, instance, work_dir):
     '''[(archive name, bytes, is_master)] in archive order.'''
     from cam_testing import harness
     stem = f'{version.vessel_type}_{version.name}_{instance.name}'
-    model = harness.generate(version, work_dir, parameters=instance.parameters())
+    model = harness.generate(version, work_dir, parameters=instance.parameters(), instance=instance)
     flat = model[:-len('.cellml')] + '_flat.cellml'
     if not os.path.isfile(flat):
         raise FileNotFoundError(f'{version.key}: libcuflynx wrote no flattened model ({flat})')

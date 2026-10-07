@@ -23,7 +23,7 @@ notes: 'Owner''s sympathetic stellate-ganglion neuron soma ("SN_simple"): Na (Na
   as RyR HernandezCruz1997_v01 (states a_RyR, i_RyR, l_RyR; P_RyR = a (1 - i) l^N; j_RyR = k_RyR P_RyR (Ca_ER - Cai); every
   rate times phi_RyR = Q10_RyR^((T - T_ref_RyR)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), replacing the
   owner''s c_RyR^3 hc_RyR^3 law (RyR Argus2026_v01), which is inconsistent with the rat-SCG CICR data. It stays the
-  monolithic equivalent of the sympathetic supermodule.'
+  monolithic equivalent of the sympathetic supermodule. PMCA (review 2026-10-07): the plasma-membrane Ca-ATPase of the supermodule (PMCA Colegrove2000_v01, Hill pump of Colegrove, Albrecht & Friel 2000) is added inline, j_max_PMCA = A_mem rho_PMCA r_PMCA / N_A and j_PMCA = -j_max_PMCA Cai^n_PMCA/(K_PMCA^n_PMCA + Cai^n_PMCA), j_PMCA in the sub-membrane Ca balance after j_NaCa_Ca, so that the supermodule still reproduces this version.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review

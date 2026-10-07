@@ -90,7 +90,7 @@ def cuflynx_instance_omex_test(instance_key, tmp_path_factory):
     metrics = {'imported': imported, 'n_points': cf.get('n_points'), 'cuflynx_version': cf.get('cuflynx_version')}
     if not problems:
         # the same instance through libcuflynx, compared at the times both logged
-        path = harness.generate(v, str(tmp_path_factory.mktemp(f'lib_{key}')), parameters=inst.parameters())
+        path = harness.generate(v, str(tmp_path_factory.mktemp(f'lib_{key}')), parameters=inst.parameters(), instance=inst)
         lib_t, lib = systems.simulate(path, dict(v.spec, pre_time=0.0), phlynx.SOLVER_INFO)
         wanted = [harness.output_name(o) for o in (v.spec.get('outputs') or [])]
         if any(w not in lib for w in wanted):

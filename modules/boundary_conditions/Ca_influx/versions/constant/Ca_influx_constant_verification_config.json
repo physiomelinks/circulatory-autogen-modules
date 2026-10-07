@@ -1,0 +1,35 @@
+{
+  "module_type": "Ca_influx",
+  "version": "constant",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["j_Ca"],
+  "invariants": [
+    {"description": "the flux is the prescribed value: j_Ca = j_Ca_influx", "expr": "np.all(j_Ca == j_Ca_influx)"}
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "j_Ca_influx": {"values": [-1e-15, 0.0, 1e-18, 1e-17, 1e-16, 1e-15]}
+    },
+    "rationale": "Fluxes from -1 fmol/s (an efflux) through 0 to +1 fmol/s (a large Ca load for a soma); the module only passes the value on."
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a prescribed boundary value (a constant Ca flux); nothing to validate."
+      },
+      "calibrate": {
+        "note": "not_applicable: a prescribed boundary value (a constant Ca flux); its value is set by the network that uses it."
+      }
+    }
+  }
+}
