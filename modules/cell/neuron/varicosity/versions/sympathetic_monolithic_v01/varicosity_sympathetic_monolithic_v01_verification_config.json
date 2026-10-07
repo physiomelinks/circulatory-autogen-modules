@@ -25,7 +25,8 @@
     "i_RyR",
     "l_RyR",
     "P_RyR",
-    "Vol"
+    "Vol",
+    "j_PMCA"
   ],
   "run_parameters": {"V": -10.0},
   "invariants": [
@@ -38,8 +39,8 @@
       "expr": "np.max(np.abs(hc - ((1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))) + (hc_init - (1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))))*np.exp(-t/(np.abs(tau_hc/1000)/(Q10_CaN**((T - T_ref_CaN)/10)) + 1e-6))))) <= 1e-6"
     },
     {
-      "description": "total Ca (free + buffered, four compartments) changes only by the plasma-membrane fluxes j_Ca_N + j_NaCa_Ca (trapezoid integral)",
-      "expr": "np.max(np.abs(((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) - np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_N + j_NaCa_Ca)[1:]+(j_Ca_N + j_NaCa_Ca)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_N + j_NaCa_Ca)[1:]+(j_Ca_N + j_NaCa_Ca)[:-1])*np.diff(t)))))) + 1e-23"
+      "description": "total Ca (free + buffered, four compartments) changes only by the plasma-membrane fluxes j_Ca_N + j_NaCa_Ca + j_PMCA (trapezoid integral)",
+      "expr": "np.max(np.abs(((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) - np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_N + j_NaCa_Ca + j_PMCA)[1:]+(j_Ca_N + j_NaCa_Ca + j_PMCA)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_N + j_NaCa_Ca + j_PMCA)[1:]+(j_Ca_N + j_NaCa_Ca + j_PMCA)[:-1])*np.diff(t)))))) + 1e-23"
     },
     {"description": "NE never falls below its baseline NE_init", "expr": "np.all(NE >= NE_init - 1e-12)"},
     {

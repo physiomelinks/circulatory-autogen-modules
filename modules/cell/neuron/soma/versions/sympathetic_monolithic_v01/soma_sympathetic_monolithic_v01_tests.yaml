@@ -21,18 +21,21 @@ notes: 'Owner''s sympathetic stellate-ganglion neuron soma ("SN_simple"): Na (Na
   recording temperature (on review) scales them, and the model can be run at 37 degC by changing T. RyR (review 2026-10-06):
   the inline RyR is now the Hernandez-Cruz, Escobar & Jimenez 1997 rat-SCG CICR model, the same equations and default values
   as RyR HernandezCruz1997_v01 (states a_RyR, i_RyR, l_RyR; P_RyR = a (1 - i) l^N; j_RyR = k_RyR P_RyR (Ca_ER - Cai); every
-  rate times phi_RyR = Q10_RyR^((T - T_ref_RyR)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), replacing the
-  owner''s c_RyR^3 hc_RyR^3 law (RyR Argus2026_v01), which is inconsistent with the rat-SCG CICR data. It stays the
-  monolithic equivalent of the sympathetic supermodule. PMCA (review 2026-10-07): the plasma-membrane Ca-ATPase of the supermodule (PMCA Colegrove2000_v01, Hill pump of Colegrove, Albrecht & Friel 2000) is added inline, j_max_PMCA = A_mem rho_PMCA r_PMCA / N_A and j_PMCA = -j_max_PMCA Cai^n_PMCA/(K_PMCA^n_PMCA + Cai^n_PMCA), j_PMCA in the sub-membrane Ca balance after j_NaCa_Ca, so that the supermodule still reproduces this version.'
+  rate times phi_RyR = Q10_RyR^((T - T_ref_RyR)/10 K), T_ref 295.65 K; k_RyR = A_ER rho_RyR k_RyR_single), replacing the owner''s
+  c_RyR^3 hc_RyR^3 law (RyR Argus2026_v01), which is inconsistent with the rat-SCG CICR data. It stays the monolithic equivalent
+  of the sympathetic supermodule. PMCA (review 2026-10-07): the plasma-membrane Ca-ATPase of the supermodule (PMCA Colegrove2000_v01,
+  Hill pump of Colegrove, Albrecht & Friel 2000) is added inline, j_max_PMCA = A_mem rho_PMCA r_PMCA / N_A and j_PMCA = -j_max_PMCA
+  Cai^n_PMCA/(K_PMCA^n_PMCA + Cai^n_PMCA), j_PMCA in the sub-membrane Ca balance after j_NaCa_Ca, so that the supermodule
+  still reproduces this version.'
 known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
   (2026-10-03).'
 reference_proposals:
   V_rest_approx:
-    reference: 'davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3
-      +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites davis2021transcriptomic, whose current-clamp traces the value
-      was read from)'
+    reference: 'davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig.
+      4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites davis2021transcriptomic, whose current-clamp
+      traces the value was read from)'
     sourced: 'yes'
   h_BK_min:
     reference: 'khaliq2003contribution; Table 1 and bkpkj.mod: BK h y0 = 0.085 (= value)'
@@ -41,14 +44,14 @@ reference_proposals:
     reference: 'khaliq2003contribution; Methods Eq. 13 and bkpkj.mod: z_coef = 0.001 mM (= value)'
     sourced: 'yes'
   V_mid_m:
-    reference: tao2011model; Supporting Material (Document S1) Eq. 86 (Belluzzi-Sacchi I_Na m_inf V1/2 = -36 mV, k = 7.2 mV); modified
-      here to 20 mV (was 36)
+    reference: tao2011model; Supporting Material (Document S1) Eq. 86 (Belluzzi-Sacchi I_Na m_inf V1/2 = -36 mV, k = 7.2 mV);
+      modified here to 20 mV (was 36)
     sourced: 'yes'
     also_cites:
     - belluzzi1991five
   V_mid_h:
-    reference: tao2011model; Supporting Material (Document S1) Eq. 87 (h_inf V1/2 = -53.2 mV, k = 6.5 mV); modified here to 40
-      mV (was 53.2)
+    reference: tao2011model; Supporting Material (Document S1) Eq. 87 (h_inf V1/2 = -53.2 mV, k = 6.5 mV); modified here to
+      40 mV (was 53.2)
     sourced: 'yes'
     also_cites:
     - belluzzi1991five
@@ -63,8 +66,8 @@ reference_proposals:
     also_cites:
     - belluzzi1991five
   V_mid_m_Na1_6:
-    reference: 'tao2011model; Supporting Material (Document S1) Eq. 86: m_inf V1/2 = -36 mV (= value; the Belluzzi-Sacchi I_Na
-      gate reused for the NaV1.6 current; no NaV1.6-specific source)'
+    reference: 'tao2011model; Supporting Material (Document S1) Eq. 86: m_inf V1/2 = -36 mV (= value; the Belluzzi-Sacchi
+      I_Na gate reused for the NaV1.6 current; no NaV1.6-specific source)'
     sourced: 'yes'
     also_cites:
     - belluzzi1991five
@@ -84,8 +87,8 @@ reference_proposals:
     also_cites:
     - belluzzi1991five
   V_mid_c:
-    reference: 'tao2011model; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao''s Ca current is a
-      nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type'
+    reference: 'tao2011model; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao''s Ca current
+      is a nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type'
     sourced: 'yes'
     also_cites:
     - belluzzi1991five
@@ -102,8 +105,8 @@ reference_proposals:
     reference: 'philipson1991sequence; via Channelpedia Kcna5 model 21 (wikipage 5): slope 6.4 mV (= value)'
     sourced: 'yes'
   V_mid_h_Kv1_5:
-    reference: 'philipson1991sequence; via Channelpedia Kcna5 model 21 (wikipage 5): hInf = 1/(1+exp((v+25.3)/3.5)), V1/2 = -25.3
-      mV (= value)'
+    reference: 'philipson1991sequence; via Channelpedia Kcna5 model 21 (wikipage 5): hInf = 1/(1+exp((v+25.3)/3.5)), V1/2
+      = -25.3 mV (= value)'
     sourced: 'yes'
   V_den_h_Kv1_5:
     reference: 'philipson1991sequence; via Channelpedia Kcna5 model 21 (wikipage 5): slope 3.5 mV (= value)'
@@ -116,14 +119,15 @@ reference_proposals:
     reference: 'bekkers2000properties; via Channelpedia Kcnd2 model 40 (wikipage 16): slope 16.6 mV (= value)'
     sourced: 'yes'
   V_mid_h_Kv4_2:
-    reference: 'bekkers2000properties; via Channelpedia Kcnd2 model 40 (wikipage 16): hInf = 1/(1+exp((v+81.6)/6.7)), V1/2 = -81.6 mV
-      (= value)'
+    reference: 'bekkers2000properties; via Channelpedia Kcnd2 model 40 (wikipage 16): hInf = 1/(1+exp((v+81.6)/6.7)), V1/2
+      = -81.6 mV (= value)'
     sourced: 'yes'
   V_den_h_Kv4_2:
     reference: 'bekkers2000properties; via Channelpedia Kcnd2 model 40 (wikipage 16): slope 6.7 mV (= value)'
     sourced: 'yes'
   V_mid_m_Kv2:
-    reference: 'tao2011model; Supporting Material (Document S1) Eq. 96: delayed-rectifier n_inf V1/2 = -6.084 mV (rounded to 6)'
+    reference: 'tao2011model; Supporting Material (Document S1) Eq. 96: delayed-rectifier n_inf V1/2 = -6.084 mV (rounded
+      to 6)'
     sourced: 'yes'
     also_cites:
     - belluzzi1991five
@@ -133,8 +137,8 @@ reference_proposals:
     also_cites:
     - belluzzi1991five
   V_mid_w:
-    reference: 'martin2024modelling; Eq. 18: w_inf = 1/(1+exp(-(V+35)/10)), V1/2 = -35 mV (= value; from zhou2018m Table A.2; -35 mV
-      is the M-current half-activation of adams1982m)'
+    reference: 'martin2024modelling; Eq. 18: w_inf = 1/(1+exp(-(V+35)/10)), V1/2 = -35 mV (= value; from zhou2018m Table A.2;
+      -35 mV is the M-current half-activation of adams1982m)'
     sourced: 'yes'
     also_cites:
     - zhou2018m
@@ -151,8 +155,8 @@ reference_proposals:
     reference: 'khaliq2003contribution; Table 1 and ModelDB 48332 bkpkj.mod: BK m_inf k = 6.2 mV (= value)'
     sourced: 'yes'
   V_mid_h_BK:
-    reference: 'khaliq2003contribution; Table 1: BK h_inf V1/2 = -32 mV (m_inf V1/2 = -28.9 mV = -32 + 3.1); modified here to 26 mV (was
-      32). Note bkpkj.mod also shifts V by +5 mV inside rates()'
+    reference: 'khaliq2003contribution; Table 1: BK h_inf V1/2 = -32 mV (m_inf V1/2 = -28.9 mV = -32 + 3.1); modified here
+      to 26 mV (was 32). Note bkpkj.mod also shifts V by +5 mV inside rates()'
     sourced: 'yes'
   V_den_h_BK:
     reference: 'khaliq2003contribution; Table 1 and bkpkj.mod: BK h_inf k = -5.8 mV (= value in this sign convention)'
@@ -181,9 +185,9 @@ reference_proposals:
       recovery; no NaV1.6 source found
     sourced: 'no'
   tau_w_min:
-    reference: unreferenced_placeholder; minimum M-current time constant 30 ms; no source found. martin2024modelling / zhou2018m have
-      no minimum term, and the CA reference gupta2016Computational (an SK channel model of bladder smooth muscle) is wrong
-      for this parameter. adams1982m report a maximal tau of about 150 ms at -35 mV (bullfrog, 22 C)
+    reference: unreferenced_placeholder; minimum M-current time constant 30 ms; no source found. martin2024modelling / zhou2018m
+      have no minimum term, and the CA reference gupta2016Computational (an SK channel model of bladder smooth muscle) is
+      wrong for this parameter. adams1982m report a maximal tau of about 150 ms at -35 mV (bullfrog, 22 C)
     sourced: 'no'
     also_cites:
     - martin2024modelling
@@ -195,20 +199,20 @@ reference_proposals:
     also_cites:
     - tao2011model
   tau_c_max:
-    reference: unreferenced_placeholder; owner's modification of tao2011model Eq. 92, whose tau_c spans 0.13-0.56 ms; 3 ms is about
-      5x the source maximum (CA token changed_from_belluzi1991_curves)
+    reference: unreferenced_placeholder; owner's modification of tao2011model Eq. 92, whose tau_c spans 0.13-0.56 ms; 3 ms
+      is about 5x the source maximum (CA token changed_from_belluzi1991_curves)
     sourced: 'no'
     also_cites:
     - tao2011model
   tau_hc:
-    reference: 'tao2011model; Supporting Material (Document S1) Eq. 94: tau_hc = 1/(0.242 e^{0.145V} + 0.0434 e^{-0.0201V}) + 17
-      ms, range 17.0-29.9 ms; 20 ms is a constant within that range'
+    reference: 'tao2011model; Supporting Material (Document S1) Eq. 94: tau_hc = 1/(0.242 e^{0.145V} + 0.0434 e^{-0.0201V})
+      + 17 ms, range 17.0-29.9 ms; 20 ms is a constant within that range'
     sourced: 'yes'
     also_cites:
     - belluzzi1991five
   tau_h_Kv4_2:
-    reference: 'bekkers2000properties; via Channelpedia Kcnd2 model 40 (wikipage 16): hTau = 0.01 v + 6.7 ms, 5.7-7.2 ms over -100 to
-      +50 mV; 7 ms approximates it'
+    reference: 'bekkers2000properties; via Channelpedia Kcnd2 model 40 (wikipage 16): hTau = 0.01 v + 6.7 ms, 5.7-7.2 ms over
+      -100 to +50 mV; 7 ms approximates it'
     sourced: 'yes'
   tau_m_SK:
     reference: hirschberg1998gating; SK activation time constant 4.9 ms for a Ca jump to 9.5 uM, mean 4.1 +- 0.6 ms (Discussion,
@@ -224,12 +228,13 @@ reference_proposals:
       of the sensed-voltage (electrode) stage, not a physiological quantity
     sourced: 'no'
   p_SK:
-    reference: hirschberg1998gating; Hill coefficient 3.2 +- 1.0 (single channel), 4.8 +- 1.5 (macropatch), 4.1 (Fig. 7A); 4 is
-      within that range (CA reference gupta2016computational not accessible)
+    reference: hirschberg1998gating; Hill coefficient 3.2 +- 1.0 (single channel), 4.8 +- 1.5 (macropatch), 4.1 (Fig. 7A);
+      4 is within that range (CA reference gupta2016computational not accessible)
     sourced: 'yes'
   Cai_init:
-    reference: wanaverbecq2003plasma; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons (indo-1),
-      Results, first section; 1e-4 mM = value. (Replaces the CA reference hagiwara1981calcium, which could not be opened)
+    reference: wanaverbecq2003plasma; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat superior cervical ganglion neurons
+      (indo-1), Results, first section; 1e-4 mM = value. (Replaces the CA reference hagiwara1981calcium, which could not be
+      opened)
     sourced: 'yes'
   B_Ca_init:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); at equilibrium
@@ -240,8 +245,8 @@ reference_proposals:
       buffer is 0.56 mM (Kd 4 uM); here the 8 mM is used for the model''s buffer'
     sourced: 'yes'
   k_bind_Ca:
-    reference: 'matveev2002new; Table 1: buffer on-rate 0.5 /uM/ms (= 0.5e6 /mM/s, "actual" fixed buffer) and 0.1 /uM/ms in the
-      "quoted" set (Tang et al. 2000); 0.1e6 /mM/s = the quoted value, paired here with the actual-set off-rate (was 0.5e6)'
+    reference: 'matveev2002new; Table 1: buffer on-rate 0.5 /uM/ms (= 0.5e6 /mM/s, "actual" fixed buffer) and 0.1 /uM/ms in
+      the "quoted" set (Tang et al. 2000); 0.1e6 /mM/s = the quoted value, paired here with the actual-set off-rate (was 0.5e6)'
     sourced: 'yes'
   k_unbind_Ca:
     reference: 'matveev2002new; Table 1 ("actual" set): fixed-buffer off-rate 8 /ms = 8e3 /s (= value; Kd 16 uM with kon 0.5
@@ -266,8 +271,8 @@ reference_proposals:
     reference: definitional; scaling factor, 1 = unmodified
     sourced: 'no'
   Cao:
-    reference: 'tao2011model; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no
-      separate neuron value). khaliq2003contribution also uses 2 mM'
+    reference: 'tao2011model; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell;
+      no separate neuron value). khaliq2003contribution also uses 2 mM'
     sourced: 'yes'
     also_cites:
     - khaliq2003contribution
@@ -275,8 +280,8 @@ reference_proposals:
     reference: definitional; additive change of g_M for experiments; 0 = none
     sourced: 'no'
   tau_w_num:
-    reference: 'martin2024modelling; Eq. 19: tau_w = 400/(3.3 exp((V+35)/20) + exp(-(V+35)/20)) ms (from zhou2018m); modified here to
-      numerator 1200 ms (was 400), with coefficients 2.0, /15 and /25 instead of 3.3, /20, /20 and an added tau_w_min'
+    reference: 'martin2024modelling; Eq. 19: tau_w = 400/(3.3 exp((V+35)/20) + exp(-(V+35)/20)) ms (from zhou2018m); modified
+      here to numerator 1200 ms (was 400), with coefficients 2.0, /15 and /25 instead of 3.3, /20, /20 and an added tau_w_min'
     sourced: 'yes'
     also_cites:
     - zhou2018m
@@ -288,13 +293,14 @@ reference_proposals:
     reference: definitional; injected current; 0 = no stimulus
     sourced: 'no'
   alpha_NaCa:
-    reference: paci2013computational; I_NaCa alpha = 2.8571432 in the authors' CellML (tentusscher2004model uses 2.5); reduced here to 1.2 for
-      the neuron
+    reference: paci2013computational; I_NaCa alpha = 2.8571432 in the authors' CellML (tentusscher2004model uses 2.5); reduced
+      here to 1.2 for the neuron
     sourced: 'yes'
     also_cites:
     - tentusscher2004model
   gamma_NaCa:
-    reference: paci2013computational; I_NaCa gamma = 0.35 in the authors' CellML (= value; = tentusscher2004model; cardiomyocyte value)
+    reference: paci2013computational; I_NaCa gamma = 0.35 in the authors' CellML (= value; = tentusscher2004model; cardiomyocyte
+      value)
     sourced: 'yes'
     also_cites:
     - tentusscher2004model
@@ -304,19 +310,21 @@ reference_proposals:
     also_cites:
     - tentusscher2004model
   KmCa:
-    reference: paci2013computational; I_NaCa KmCa = 1.38 mM in the authors' CellML (= value; = tentusscher2004model; cardiomyocyte value)
+    reference: paci2013computational; I_NaCa KmCa = 1.38 mM in the authors' CellML (= value; = tentusscher2004model; cardiomyocyte
+      value)
     sourced: 'yes'
     also_cites:
     - tentusscher2004model
   KmNai:
-    reference: paci2013computational; I_NaCa KmNai = 87.5 mM in the authors' CellML (= value; = tentusscher2004model; cardiomyocyte value)
+    reference: paci2013computational; I_NaCa KmNai = 87.5 mM in the authors' CellML (= value; = tentusscher2004model; cardiomyocyte
+      value)
     sourced: 'yes'
     also_cites:
     - tentusscher2004model
   Nai_mid_NaK:
-    reference: 'paci2013computational; I_NaK Km_Na = 40 mM in the authors'' CellML (= tentusscher2004model K_mNa). NOTE: the CA reference lindblad1996Model
-      is wrong for this value: Lindblad 1996 and Nygren 1998 (whose Nai^1.5 pump form this is) use K_mNa = 11 mM. Keeping
-      40 mM mixes the two models; 11 mM would be consistent with the form'
+    reference: 'paci2013computational; I_NaK Km_Na = 40 mM in the authors'' CellML (= tentusscher2004model K_mNa). NOTE: the
+      CA reference lindblad1996Model is wrong for this value: Lindblad 1996 and Nygren 1998 (whose Nai^1.5 pump form this
+      is) use K_mNa = 11 mM. Keeping 40 mM mixes the two models; 11 mM would be consistent with the form'
     sourced: 'yes'
     also_cites:
     - tentusscher2004model
@@ -327,8 +335,8 @@ reference_proposals:
     also_cites:
     - lindblad1996model
   Ko_mid_NaK:
-    reference: nygren1998mathematical; I_NaK k_NaK_K = 1 mM (PMR CellML; = value). The pump form used here, Nai^1.5/(Nai^1.5 + K^1.5)
-      (V+150)/(V+200), is Nygren 1998's; lindblad1996model has the same K_mK = 1 mM but a different voltage factor
+    reference: nygren1998mathematical; I_NaK k_NaK_K = 1 mM (PMR CellML; = value). The pump form used here, Nai^1.5/(Nai^1.5
+      + K^1.5) (V+150)/(V+200), is Nygren 1998's; lindblad1996model has the same K_mK = 1 mM but a different voltage factor
     sourced: 'yes'
     also_cites:
     - lindblad1996model
@@ -402,35 +410,36 @@ reference_proposals:
     value: 0.0
   k_A:
     value: 3.141592653589793
-    reference: 'wallis1996cardiac; rat stellate (putative cardiac) neurones, mean two-dimensional soma area 463 um^2 (Abstract; the
-      area is not in the Mo et al. 1994 abstract). A sphere of that projected area has d = sqrt(4 x 463/pi) = 24.28 um, the
-      present d (24.29 um, from Vol 7,500 um^3); proposed: a spherical soma, k_A = pi, so A = 1,853 um^2 and Cm = 18.5 pF
-      (all conductances x 0.618 at fixed densities; needs re-calibration)'
+    reference: 'wallis1996cardiac; rat stellate (putative cardiac) neurones, mean two-dimensional soma area 463 um^2 (Abstract;
+      the area is not in the Mo et al. 1994 abstract). A sphere of that projected area has d = sqrt(4 x 463/pi) = 24.28 um,
+      the present d (24.29 um, from Vol 7,500 um^3); proposed: a spherical soma, k_A = pi, so A = 1,853 um^2 and Cm = 18.5
+      pF (all conductances x 0.618 at fixed densities; needs re-calibration)'
     sourced: 'yes'
     also_cites:
     - mo1994properties
-    previous: 'previous Cm (as proposed in review): hong2021macrophage; whole-cell capacitance of rat stellate ganglion neurons 33.4
-      +- 3.0 pF (sham) and 36.3 +- 3.0 pF (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF. The CA
-      token Davis2021Transcriptomic could not be identified'
+    previous: 'previous Cm (as proposed in review): hong2021macrophage; whole-cell capacitance of rat stellate ganglion neurons
+      33.4 +- 3.0 pF (sham) and 36.3 +- 3.0 pF (control), Results with Figs 6-7; 30 pF lies within the reported 25-36 pF.
+      The CA token Davis2021Transcriptomic could not be identified'
   rho_Na:
     value: 75.0
-    reference: keynes1971binding; TTX binding, 75 Na channels/um^2 in rabbit vagus non-myelinated (C) fibres (Abstract, point 6);
-      a saxitoxin re-measurement gave 4-6 x more (Ritchie et al. 1976). An axonal density, used as an estimate for the soma
+    reference: keynes1971binding; TTX binding, 75 Na channels/um^2 in rabbit vagus non-myelinated (C) fibres (Abstract, point
+      6); a saxitoxin re-measurement gave 4-6 x more (Ritchie et al. 1976). An axonal density, used as an estimate for the
+      soma
     sourced: 'yes'
     previous: 'previous g_Na (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple model
       (CA token ''user_defined''); Tao 2011 uses g_Na = 9.28 uS for a 240 pF neuron (parameter table), i.e. 1.16 uS scaled
       to 30 pF'
   rho_NaK:
     value: 750.0
-    reference: landowne1970binding; ouabain binding, at most 750 Na/K pump sites/um^2 in rabbit vagus C fibres (Abstract, point 4;
-      an upper limit)
+    reference: landowne1970binding; ouabain binding, at most 750 Na/K pump sites/um^2 in rabbit vagus C fibres (Abstract,
+      point 4; an upper limit)
     sourced: 'yes'
     previous: 'previous k_NaK (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
       model (CA token ''user_defined'')'
   rho_NaCa:
     value: 400.0
-    reference: hilgemann1991charge; Na/Ca exchanger density ~400 /um^2 in guinea-pig cardiac myocytes (Abstract); no neuronal value
-      found. With the model's exchanger formula this gives a much smaller i_NaCa than the present k_NaCa
+    reference: hilgemann1991charge; Na/Ca exchanger density ~400 /um^2 in guinea-pig cardiac myocytes (Abstract); no neuronal
+      value found. With the model's exchanger formula this gives a much smaller i_NaCa than the present k_NaCa
     sourced: 'yes'
     previous: 'previous k_NaCa (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
       model (CA token ''to_be_identified''); Paci 2013 kNaCa = 4900 A/F (ventricular) is per capacitance'
@@ -473,10 +482,10 @@ reference_proposals:
   rho_BK:
     reference: 'definitional; chosen so that g_KCa_BK = A rho gamma_BK (1e-6 uS/pS) reproduces the previous g_KCa_BK = 0.2
       microS (was70microS_per_cm2_inKhaliq2003) with A = 3000 um^2 (the soma membrane area) and gamma_BK = 120 picoS; a density
-      for calibration through gamma_BK. The previous g_KCa_BK (as proposed in review): khaliq2003contribution; Table 1: BK conductance
-      70 (printed "pS/cm2", meaning pS/um2); ModelDB bkpkj.mod gkbar = 0.007 S/cm2 = 7 mS/cm2, NOT 70 uS/cm2 as the CA token
-      says. 7 mS/cm2 over the membrane area of a 30 pF cell at 1 uF/cm2 (3000 um^2) gives 0.21 uS, consistent with 0.2 uS.
-      Note Khaliq gates BK as m^3 z^2 h; this model uses z^1'
+      for calibration through gamma_BK. The previous g_KCa_BK (as proposed in review): khaliq2003contribution; Table 1: BK
+      conductance 70 (printed "pS/cm2", meaning pS/um2); ModelDB bkpkj.mod gkbar = 0.007 S/cm2 = 7 mS/cm2, NOT 70 uS/cm2 as
+      the CA token says. 7 mS/cm2 over the membrane area of a 30 pF cell at 1 uF/cm2 (3000 um^2) gives 0.21 uS, consistent
+      with 0.2 uS. Note Khaliq gates BK as m^3 z^2 h; this model uses z^1'
     sourced: 'no'
   rho_SK:
     reference: 'definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005
@@ -500,8 +509,8 @@ reference_proposals:
     reference: 'definitional; chosen so that k_SERCA = A rho r_SERCA / N_A reproduces the previous k_SERCA = 3e-16 mol_per_s
       (to_be_identified) with A = 248.1 um^2 (the soma pre-ER membrane area) and r_SERCA = 20 per_s; a density for calibration
       through r_SERCA. The previous k_SERCA (as proposed in review): unreferenced_placeholder; owner''s hand-set value in
-      the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (shannon2004mathematical Vmax = 286 umol/L cytosol/s
-      for the myocyte)'
+      the SN_simple model (CA token ''to_be_identified''); scales with compartment volume (shannon2004mathematical Vmax =
+      286 umol/L cytosol/s for the myocyte)'
     sourced: 'no'
   rho_IP3R:
     reference: 'definitional; chosen so that k_IP3 = A rho k_IP3R_single (1e-18 m3/um3) reproduces the previous k_IP3 = 0
