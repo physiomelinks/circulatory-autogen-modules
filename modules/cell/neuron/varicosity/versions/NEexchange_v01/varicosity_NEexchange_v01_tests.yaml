@@ -7,6 +7,10 @@ notes: 'sympathetic_monolithic_v01 with its NE exchanged with the outside, for c
   NE at the varicosity, NE_ext, through capillary_to_flux_port [NE_ext, J_NE] (the port of tissue_diffusion_volume). Coupled to one
   well-mixed volume equal to Vol it is exactly sympathetic_monolithic_v01 (system model SN_NE_single_volume); everything else is
   unchanged from that version (the inline PMCA added to it on 2026-10-07 included).'
+known_issues:
+- 'Python/C generation unsupported: the RyR site occupancies start from computed initial values (a_RyR_init =
+  kon_a Cai_init/(kon_a Cai_init + koff_a), likewise i_RyR_init and l_RyR_init at Ca_ER_init), which libCellML''s
+  analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Since 2026-10-08.'
 reference_proposals:
   c_init:
     reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);

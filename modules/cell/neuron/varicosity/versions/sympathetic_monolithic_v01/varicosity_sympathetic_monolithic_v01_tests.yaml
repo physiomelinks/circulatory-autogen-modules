@@ -20,6 +20,10 @@ notes: 'Owner''s sympathetic varicosity: N-type Ca current, NCX, four-compartmen
   + Cai^n_PMCA), j_PMCA in the sub-membrane Ca balance after j_NaCa_Ca, so that the supermodule still reproduces this version.
   NCX density (review 2026-10-07): rho_NaCa 400 /um^2 (hilgemann1991charge, cardiac, as in the soma; was 38719 /um^2, which
   reproduced the old k_NaCa 0.15 nA), so k_NaCa = 1.55 pA on the 4.836 um^2 varicosity.'
+known_issues:
+- 'Python/C generation unsupported: the RyR site occupancies start from computed initial values (a_RyR_init =
+  kon_a Cai_init/(kon_a Cai_init + koff_a), likewise i_RyR_init and l_RyR_init at Ca_ER_init), which libCellML''s
+  analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Since 2026-10-08.'
 reference_proposals:
   c_init:
     reference: unreferenced_placeholder; initial c gate; Tao 2011 lists no initial conditions (CA token 'Tau2011' is wrong);

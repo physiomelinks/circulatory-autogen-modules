@@ -19,7 +19,10 @@
     "P_RyR",
     "j_RyR",
     "k_RyR",
-    "phi_RyR"
+    "phi_RyR",
+    "a_RyR_init",
+    "i_RyR_init",
+    "l_RyR_init"
   ],
   "run_parameters": {
     "Cai": 0.001,
@@ -41,6 +44,15 @@
     {
       "description": "steady-state occupancies are the mass-action values kon C/(kon C + koff) (the Kds koff/kon: activating 200 uM at rest, inactivating 0.63 uM, luminal 130 uM)",
       "expr": "(np.max(np.abs(a_RyR_inf - kon_a_RyR*Cai/(kon_a_RyR*Cai + koff_a_RyR))) <= 1e-12) & (np.max(np.abs(i_RyR_inf - kon_i_RyR*Cai/(kon_i_RyR*Cai + koff_i_RyR))) <= 1e-12) & (np.max(np.abs(l_RyR_inf - kon_l_RyR*Ca_ER/(kon_l_RyR*Ca_ER + koff_l_RyR))) <= 1e-12)"
+    },
+    {
+      "description": "the starting occupancies are the steady state at the starting Ca: a_RyR_init = kon_a Cai_init/(kon_a Cai_init + koff_a), i_RyR_init likewise, l_RyR_init = kon_l Ca_ER_init/(kon_l Ca_ER_init + koff_l)",
+      "expr": "(np.max(np.abs(a_RyR_init - kon_a_RyR*Cai_init/(kon_a_RyR*Cai_init + koff_a_RyR))) <= 1e-12) & (np.max(np.abs(i_RyR_init - kon_i_RyR*Cai_init/(kon_i_RyR*Cai_init + koff_i_RyR))) <= 1e-12) & (np.max(np.abs(l_RyR_init - kon_l_RyR*Ca_ER_init/(kon_l_RyR*Ca_ER_init + koff_l_RyR))) <= 1e-12)"
+    },
+    {
+      "description": "each site state starts at its computed starting occupancy (run test only: in a parameter sweep the simulation keeps the starting state computed at the default parameters, see known_issues)",
+      "expr": "(abs(a_RyR[0] - a_RyR_init[0]) <= 1e-12) & (abs(i_RyR[0] - i_RyR_init[0]) <= 1e-12) & (abs(l_RyR[0] - l_RyR_init[0]) <= 1e-12)",
+      "applies": "run"
     },
     {
       "description": "with Cai fixed, a_RyR relaxes exactly (Eq. A13 is linear in a): a_inf + (a_RyR_init - a_inf) exp(-t phi (kon_a Cai + koff_a))",
@@ -87,17 +99,13 @@
       }
     },
     "bounds": {
-      "a_RyR_init": [
+      "Cai_init": [
         0,
-        1
+        null
       ],
-      "i_RyR_init": [
+      "Ca_ER_init": [
         0,
-        1
-      ],
-      "l_RyR_init": [
-        0,
-        1
+        null
       ],
       "Q10_RyR": [
         1,

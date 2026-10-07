@@ -204,9 +204,6 @@ koff_l_RyR_soma_SN,per_s,1300,"hernandezcruz1997ca; Fig. 10 legend: printed 'k_o
 N_l_RyR_soma_SN,dimensionless,7,"hernandezcruz1997ca; Fig. 10 legend: N = 7, the cooperativity of the luminal site (Appendix, Eq. A12) (= value)"
 rho_RyR_soma_SN,per_um2,5403.17859872,"hernandezcruz1997ca; Fig. 10 legend: RyR_max = 70,000 /(s um^2), acting on the inmost cytosolic shell (Eq. A11) of volume ds dx = 0.8 um^2 x 0.25 um = 0.2 um^3: maximal flux coefficient per ER area RyR_max ds dx = 14,000 um^3/s per um^2, divided by k_RyR_single (2.591 um^3/s) = 5403 /um^2 (derived; a model capacity, not a measured density, and above the packing limit of ~1000 RyR/um^2 for a ~30 nm footprint)"
 k_RyR_single_soma_SN,um3_per_s,2.5910674141544323,"kettlun2003unitary; Abstract: unitary RyR Ca current just under 0.5 pA with 1 mM luminal Ca in physiological K+ and Mg2+ (cardiac/amphibian RyR in bilayers, room temperature); flux coefficient i/(2 F dCa) = 0.5 pA/(2 F x 1 mM) = 2.591 um^3/s (derived)"
-a_RyR_init_soma_SN,dimensionless,0.0004997501249375313,definitional; steady-state activating-site occupancy kon_a Cai/(kon_a Cai + koff_a) at the default Cai (0.1 uM)
-i_RyR_init_soma_SN,dimensionless,0.13725490196078433,definitional; steady-state inactivating-site occupancy kon_i Cai/(kon_i Cai + koff_i) at the default Cai (0.1 uM)
-l_RyR_init_soma_SN,dimensionless,0.36585365853658536,definitional; steady-state luminal-site occupancy kon_l Ca_ER/(kon_l Ca_ER + koff_l) at the default Ca_ER (75 uM)
 #,#,#,#
 Ca_ER_init_var_SN,millimolar,0.6,to_be_checked_in_neurons
 h_IP3_init_var_SN,dimensionless,0.99,user_defined
@@ -242,9 +239,6 @@ koff_l_RyR_var_SN,per_s,1300,"hernandezcruz1997ca; Fig. 10 legend: printed 'k_of
 N_l_RyR_var_SN,dimensionless,7,"hernandezcruz1997ca; Fig. 10 legend: N = 7, the cooperativity of the luminal site (Appendix, Eq. A12) (= value)"
 rho_RyR_var_SN,per_um2,5403.17859872,"hernandezcruz1997ca; Fig. 10 legend: RyR_max = 70,000 /(s um^2), acting on the inmost cytosolic shell (Eq. A11) of volume ds dx = 0.8 um^2 x 0.25 um = 0.2 um^3: maximal flux coefficient per ER area RyR_max ds dx = 14,000 um^3/s per um^2, divided by k_RyR_single (2.591 um^3/s) = 5403 /um^2 (derived; a model capacity, not a measured density, and above the packing limit of ~1000 RyR/um^2 for a ~30 nm footprint)"
 k_RyR_single_var_SN,um3_per_s,2.5910674141544323,"kettlun2003unitary; Abstract: unitary RyR Ca current just under 0.5 pA with 1 mM luminal Ca in physiological K+ and Mg2+ (cardiac/amphibian RyR in bilayers, room temperature); flux coefficient i/(2 F dCa) = 0.5 pA/(2 F x 1 mM) = 2.591 um^3/s (derived)"
-a_RyR_init_var_SN,dimensionless,0.0004997501249375313,definitional; steady-state activating-site occupancy kon_a Cai/(kon_a Cai + koff_a) at the default Cai (0.1 uM)
-i_RyR_init_var_SN,dimensionless,0.13725490196078433,definitional; steady-state inactivating-site occupancy kon_i Cai/(kon_i Cai + koff_i) at the default Cai (0.1 uM)
-l_RyR_init_var_SN,dimensionless,0.36585365853658536,definitional; steady-state luminal-site occupancy kon_l Ca_ER/(kon_l Ca_ER + koff_l) at the default Ca_ER (75 uM)
 #,#,#,#
 tau_Ca_soma_SN_OLD,millis,2.0,Tomek2020Development_was_0.2
 tau_shell_soma_SN,millis,1.0,khaliq2003contribution; ModelDB 48332 cadiff.mod: beta = 1 /ms; j_diffCa = -(V_shell/tau_shell)(Cai - Ca_bulk). Replaces D_Ca = 6e-12 m3/s (review 2026-10-05)
