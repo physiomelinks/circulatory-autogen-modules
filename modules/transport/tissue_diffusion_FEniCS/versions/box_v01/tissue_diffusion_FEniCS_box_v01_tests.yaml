@@ -1,0 +1,13 @@
+module_type: tissue_diffusion_FEniCS
+version: box_v01
+reviewed: false
+notes: 'An external model (module_format external_api): diffusion of one solute in a 3D box, dC/dt = sigma_diff lap(C) + sum_k
+  chi_k J_k/V_k + M C/(C + C50), no flux through the box faces, solved with FEniCSx (dolfinx 0.9) in tissue_diffusion_FEniCS_box_v01_model.py.
+  Each connected 0D module k owns one cell of a grid_nx x grid_ny x grid_nz block grid (along x, at the middle of y and z):
+  it sends J_s into that cell as a uniform source and receives the cell''s mean concentration C_t. fv_scheme 0: Q1 elements
+  on the grid refined ''refine'' times; fv_scheme 1: one DG0 value per grid cell with two-point face fluxes, the same equations
+  as a grid of tissue_diffusion_volume cells and tissue_diffusion_face faces. The port is capillary_to_flux_port, as tissue_diffusion_volume,
+  so a model swaps one for the other. Instances: default (tissue O2, the tissue_diffusion_volume defaults on a 100 um cube
+  of 20 um cells) and NE_extracellular (norepinephrine around a varicosity: a 5 um cube of 1 um cells, the varicosity volume).
+  run_test loads the model and steps it (skipped without dolfinx); the system models in system_models/coupled check it against
+  the finite-volume CellML grid.'

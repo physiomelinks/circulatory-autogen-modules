@@ -10,8 +10,8 @@
     "module_array": [
       ["mod", "nn", "FV1D_vessel", "", "", "default"],
       ["p_in", "constant", "inlet_pressure", "", "ves", "default"],
-      ["ves", "pv", "arterial_simple", "p_in", "f_out", "default"],
-      ["f_out", "constant", "outlet_flow", "ves", "", "default"]
+      ["ves", "pv", "arterial_simple", "p_in", "ves1d", "default"],
+      ["ves1d", "pv", "FV1D_vessel", "ves", "", "default"]
     ],
     "parameters": [
       ["P_p_in", "J_per_m3", 12399.0, "library default (module parameters)"],
@@ -22,8 +22,7 @@
       ["u_0_ves", "J_per_m3", 0.0, "library default (module parameters)"],
       ["u_in_ves", "J_per_m3", 13332.2, "library default (module parameters)"],
       ["v_out_ves", "m3_per_s", 0.0001, "library default (module parameters)"],
-      ["I_ves", "Js2_per_m6", 100000.0, "library default (module parameters)"],
-      ["v_f_out", "m3_per_s", 8.3333e-05, "library default (module parameters)"]
+      ["I_ves", "Js2_per_m6", 100000.0, "library default (module parameters)"]
     ]
   },
   "invariants": [],

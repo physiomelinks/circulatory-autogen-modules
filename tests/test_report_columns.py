@@ -20,14 +20,15 @@ from cam_testing.library import Parameter, all_versions, load_version
 
 EXPECTED_COLUMNS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                     'stability_test', 'version_calibration', 'phlynx_export_test', 'cuflynx_simulate_test',
-                    'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test']
+                    'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
+                    'coupled_validation_test']
 
 
 def test_report_columns_in_order():
     assert report.REPORT_TESTS == EXPECTED_COLUMNS
     assert [report.TEST_SHORT[k] for k in EXPECTED_COLUMNS] == [
         'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
-        'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces']
+        'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces', 'Coupled']
 
 
 def test_every_version_has_the_same_test_keys():
@@ -51,6 +52,15 @@ def test_supermodule_columns_not_applicable_to_a_component():
     for k in report.SUPERMODULE_TESTS:
         assert tests[k]['status'] == checks.NOT_APPLICABLE
         assert tests[k]['message'] == report.NOT_A_SUPERMODULE
+
+
+def test_coupled_column_applies_to_versions_with_coupled_systems():
+    assert report.not_applicable_reason(load_version('Lotka_Volterra', 'Lotka1925_v01'), 'coupled_validation_test') == \
+        report.NOT_COUPLED
+    for mt, ver in (('tissue_diffusion_FEniCS', 'box_v01'), ('varicosity', 'NEexchange_v01')):
+        v = load_version(mt, ver)
+        assert v.spec.get('coupled_systems')
+        assert report.not_applicable_reason(v, 'coupled_validation_test') is None
 
 
 def test_supermodule_without_equivalent_is_not_applicable():

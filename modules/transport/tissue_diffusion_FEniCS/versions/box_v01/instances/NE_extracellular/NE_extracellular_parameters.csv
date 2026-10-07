@@ -1,0 +1,15 @@
+variable_name,units,value,data_reference,sourced
+Lx,metre,5e-6,"unreferenced_placeholder; extracellular space around one varicosity: a 5 um cube of 1 um cells, each cell the varicosity volume (Vol 1e-18 m3)",no
+Ly,metre,5e-6,"unreferenced_placeholder; as Lx",no
+Lz,metre,5e-6,"unreferenced_placeholder; as Lx",no
+grid_nx,dimensionless,5,"definitional; the varicosity exchanges NE with the centre cell",yes
+grid_ny,dimensionless,5,"definitional; as grid_nx",yes
+grid_nz,dimensionless,5,"definitional; as grid_nx",yes
+refine,dimensionless,2,"definitional; finite-element cells per grid cell and direction (fv_scheme 0)",yes
+fv_scheme,dimensionless,0,"definitional; 0 = Q1 finite elements, 1 = two-point-flux finite volumes on the grid",yes
+theta,dimensionless,0.5,"definitional; time stepping theta (0.5 = Crank-Nicolson)",yes
+M,millimolar_per_s,0.0,"definitional; no extraneuronal clearance in the box: NE is taken back up by NET in the varicosity (k_NET)",yes
+C50,millimolar,1.0,"definitional; unused with M = 0",yes
+C_init,millimolar,0.0,"definitional; no extracellular NE at rest (NE_init of the varicosity)",yes
+coupling_dt,second,1e-4,"definitional; coupling step with the varicosity (action potentials last ~1 ms)",yes
+sigma_diff,m2_per_s,3.0e-10,"sykova2008diffusion for the tortuosity (lambda ~1.6 in brain extracellular space); unreferenced_placeholder for the free diffusivity of NE (~7.6e-10 m2/s assumed, as for a small monoamine): D/lambda^2 ~3e-10",no

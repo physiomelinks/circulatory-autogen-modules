@@ -51,12 +51,14 @@ TEST_TITLES = {
     'phlynx_equivalence_test': 'PhLynx → CUFLynx vs libcuflynx',
     'supermodule_structure_test': 'Supermodule: structure',
     'supermodule_equivalence_test': 'Supermodule: reproduces',
+    'coupled_validation_test': 'Validation: coupled, against the CellML grid',
 }
 TEST_SHORT = {
     'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
     'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
+    'coupled_validation_test': 'Coupled',
 }
 TEST_ABOUT = {
     'run_test': 'Generates the version alone with libcuflynx (every boundary condition becomes a '
@@ -111,15 +113,23 @@ TEST_ABOUT = {
                                   'submodules or declared globals.',
     'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
                                     'with its submodules written out, output for output.',
+    'coupled_validation_test': 'The version in use in the coupled system models its spec lists (coupled_systems): '
+                               '0D modules generated as C++ and coupled to the FEniCS model tissue_diffusion_FEniCS, '
+                               'against the same problem with the tissue as a finite-volume grid of CellML cells '
+                               '(tests/test_coupled_systems.py). The heatmaps show the mid-plane of the box at a few '
+                               'times, in both, and their difference on the grid.',
 }
 # The test columns of every version, component or supermodule, in this order: verification, the
 # version-level calibration, the PhLynx -> CUFLynx pipeline, then the supermodule tests. A column
 # that doesn't apply to a version is N/A with the reason (not_applicable_reason); one that applies
 # but has no result is "Not run". The validation tests are shown per instance.
 SUPERMODULE_TESTS = ['supermodule_structure_test', 'supermodule_equivalence_test']
-REPORT_TESTS = checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
+COUPLED_TESTS = ['coupled_validation_test']
+REPORT_TESTS = (checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
+                + COUPLED_TESTS)
 INSTANCE_TESTS = checks.INSTANCE_TESTS
 NOT_A_SUPERMODULE = 'not a supermodule'
+NOT_COUPLED = 'not used in a coupled system model (the spec lists no coupled_systems)'
 NO_EQUIVALENT = ('no system model to reproduce: the spec lists no supermodule.equivalent entry (the version is '
                  'checked through the models that use it)')
 STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
@@ -234,11 +244,13 @@ def not_applicable_reason(version, test):
         return NOT_A_SUPERMODULE
     if test == 'supermodule_equivalence_test' and not (version.spec.get('supermodule') or {}).get('equivalent'):
         return NO_EQUIVALENT
-    if checks.is_cpp(version):
+    if test in COUPLED_TESTS and not version.spec.get('coupled_systems'):
+        return NOT_COUPLED
+    if checks.is_non_cellml(version):
         if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test'):
-            return checks.CPP_NOT_APPLICABLE
+            return checks.non_cellml_reason(version)
         if test in phlynx.PIPELINE_TESTS:
-            return phlynx.CPP_REASON
+            return phlynx.EXTERNAL_REASON if checks.is_external_api(version) else phlynx.CPP_REASON
     return None
 
 

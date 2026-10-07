@@ -1,0 +1,7 @@
+variable_name,units,value,data_reference
+t_start_stim,second,0.01,first pulse after 10 ms at rest
+t_end_stim,second,1000.0,pulses throughout
+period_stim,second,0.05,20 Hz train (a high sympathetic firing rate)
+pulse_duration_stim,second,0.002,2 ms current pulse
+i_amplitude_stim,nanoA,-1.0,"suprathreshold: -1 nA (the soma takes I_in as an outward current, so a depolarising pulse is negative) fires one action potential per pulse"
+stim_flag_stim,dimensionless,1,pulse train on

@@ -19,7 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # libcuflynx at the ref requirements.txt pins (keep the two in step): pip install "cam-testing[libcuflynx] @ git+..."
-libcuflynx = ["libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/prediction-item-features"]
+libcuflynx = ["libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-external-coupling"]
 
 [project.entry-points.pytest11]
 # named as the module, so a conftest.py's pytest_plugins naming it too doesn't register it twice

@@ -72,7 +72,7 @@
       "min_children": 1
     },
     "version": {
-      "description": "One version: the math (CellML component, one config entry, units) and its tests. The version name is the config entry's module_subtype. A supermodule version (module_format supermodule) has no CellML or units of its own.",
+      "description": "One version: the math (CellML component, one config entry, units) and its tests. The version name is the config entry's module_subtype. A supermodule version (module_format supermodule) has no CellML or units of its own. A version of an external model (module_format external_api, e.g. a FEniCS model) keeps the model in {module_type}_{version}_model.py, which its api block names, and has a placeholder CellML and units file with no component, like the C++ FV1D_vessel versions.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
@@ -87,7 +87,8 @@
         ],
         "optional": [
           "{module_type}_{version}_references_proposed.bib",
-          "{module_type}_{version}.html"
+          "{module_type}_{version}.html",
+          "{module_type}_{version}_model.py"
         ]
       },
       "directories": [
@@ -248,6 +249,8 @@
       "reference_solver_info",
       "outputs",
       "run_parameters",
+      "run_inputs",
+      "run_steps",
       "rest_check",
       "harness",
       "invariants",
@@ -256,7 +259,8 @@
       "stability",
       "parameter_ranges",
       "validation",
-      "supermodule"
+      "supermodule",
+      "coupled_systems"
     ],
     "tests": [
       "reviewed",
@@ -278,6 +282,7 @@
     "required_citations_uncertain": "optional: the keys of required_citations that are a best guess still to confirm (left out when none)"
   },
   "nn_versions_allowed": {
+    "coupling/FV1D_solver/nn": "libcuflynx's 1D coupling adds a FV1D_solver record with BC_type nn (convert_0d_to_1d; the C++ generator writes coupler_config.json from it)",
     "coupling/FV1D_vessel/nn": "libcuflynx's 1D coupling writes FV1D_vessel records with BC_type nn",
     "coupling/FV1D_volume_sum/nn": "libcuflynx's ModelParsers adds a ('FV1D_volume_sum', 'nn') record to 1D-coupled models"
   }
