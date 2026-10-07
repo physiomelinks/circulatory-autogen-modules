@@ -146,7 +146,7 @@ jobs:
           if-no-files-found: ignore
       - name: Fail if a reviewed version's tests failed
         if: steps.tests.outputs.ok == 'false' || steps.pipeline.outputs.ok == 'false' || steps.omex.outputs.ok == 'false'
-        run: python tools/ci_reviewed_failures.py junit-tests.xml junit-pipeline.xml
+        run: python tools/ci_reviewed_failures.py junit-tests.xml junit-pipeline.xml junit-omex.xml
 
   site:
     needs: [category, coupled]

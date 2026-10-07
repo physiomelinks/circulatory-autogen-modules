@@ -253,7 +253,7 @@ The reports open straight from disk. Plots load by relative path, and MathJax lo
 
 ## CI
 
-`.github/workflows/module-tests.yml` runs the structural checks and then one job per top-level directory of `modules/` (`vessels`, `heart`, `cell`, ...: a category, or a module_type directly under `modules/` with its nested module_types). Each job runs the tests of every version in it, builds their reports and uploads them as an artifact; failures of versions not reviewed yet are warnings (`tools/ci_reviewed_failures.py`). On `main`, the site is assembled and deployed to GitHub Pages (enable Pages with source "GitHub Actions" in the repository settings). The same `make` targets run locally.
+`.github/workflows/module-tests.yml` runs the structural checks and then one job per top-level directory of `modules/` (`vessels`, `heart`, `cell`, ...: a category, or a module_type directly under `modules/` with its nested module_types). Each job runs the tests of every version in it, builds their reports and uploads them as an artifact; failures of versions not reviewed yet are warnings (`tools/ci_reviewed_failures.py`, over the V&V, PhLynx -> CUFLynx pipeline and CUFLynx archive tests). On `main`, the site is assembled and deployed to GitHub Pages (enable Pages with source "GitHub Actions" in the repository settings). The same `make` targets run locally.
 
 ## Importing from libcuflynx
 

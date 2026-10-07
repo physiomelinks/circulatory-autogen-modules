@@ -194,7 +194,7 @@ def pytest_collection_modifyitems(config, items):
             continue
         key = callspec.params.get('component_key') or callspec.params.get('instance_key') \
             or callspec.params.get('supermodule_key') or callspec.params.get('equivalence_key')
-        if key is None:
+        if not isinstance(key, (tuple, list)):  # None, or NOTSET for an empty parameter set
             continue
         vkey = tuple(key[:2])
         if vkey not in reviewed:
