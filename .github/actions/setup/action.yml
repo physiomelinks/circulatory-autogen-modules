@@ -1,21 +1,55 @@
 name: Install libcuflynx and the test package
-description: System libraries libcuflynx needs, then requirements.txt (libcuflynx + cam_testing)
+description: >
+  System libraries libcuflynx needs (ci/apt-packages.txt), then requirements.txt (libcuflynx +
+  cam_testing) in a virtualenv, both cached in ~/.cam-setup under the key of ci/setup_key.sh. The
+  setup-check job compares a fresh install with the cached one.
+outputs:
+  cache-hit:
+    description: whether the setup came from the cache
+    value: ${{ steps.cache.outputs.cache-hit }}
 runs:
   using: composite
   steps:
-    - shell: bash
+    - id: key
+      shell: bash
+      run: echo "key=$(bash ci/setup_key.sh)" >> "$GITHUB_OUTPUT"
+    - id: cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cam-setup
+        key: ${{ steps.key.outputs.key }}
+    - name: System libraries (cached .deb files, no network)
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      # -G: never downgrade a package the runner image already has newer
+      run: sudo dpkg -i -G --skip-same-version ~/.cam-setup/debs/*.deb > /dev/null
+    - name: System libraries (apt; the .deb files kept for the cache)
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
       # apt sometimes hangs on a slow mirror (once a whole 30 min job; a hung try then took 10 min while
       # the retry took 1.5): a normal run takes ~1 min, so each try gets 1.5 + 3 min, three tries
       run: |
+        mkdir -p ~/.cam-setup/debs/partial
         APT="-o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
+        KEEP="-o Dir::Cache::archives=$HOME/.cam-setup/debs -o APT::Keep-Downloaded-Packages=true"
         for i in 1 2 3; do
           timeout 90 sudo apt-get $APT update -qq && \
-            timeout 180 sudo apt-get $APT install -y -qq libopenmpi-dev openmpi-bin libsundials-dev build-essential && break
+            timeout 180 sudo apt-get $APT $KEEP install -y -qq $(cat ci/apt-packages.txt) && break
           echo "::warning::apt try $i failed or timed out; retrying"
           [ $i = 3 ] && exit 1
           sleep 10
         done
-    - shell: bash
+        sudo rm -rf ~/.cam-setup/debs/partial ~/.cam-setup/debs/lock
+        sudo chown -R "$USER" ~/.cam-setup
+    - name: Python packages (virtualenv)
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        python -m venv ~/.cam-setup/venv
+        ~/.cam-setup/venv/bin/python -m pip install -q --upgrade pip
+        ~/.cam-setup/venv/bin/pip install -r requirements.txt
+    - name: Use the virtualenv
+      shell: bash
+      run: |
+        echo "$HOME/.cam-setup/venv/bin" >> "$GITHUB_PATH"
+        echo "VIRTUAL_ENV=$HOME/.cam-setup/venv" >> "$GITHUB_ENV"

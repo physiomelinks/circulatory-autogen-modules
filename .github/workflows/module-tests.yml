@@ -1,7 +1,9 @@
 name: Module tests & reports
 
 on:
+  # pushes to main, and pull requests (a push to a PR branch runs once, as its pull_request run)
   push:
+    branches: [main]
   pull_request:
   schedule:
     - cron: '0 14 * * 1'   # weekly, to catch libcuflynx changes
@@ -39,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11', cache: pip }
+        with: { python-version: '3.11' }
       - uses: ./.github/actions/setup
       - run: make structure PYTHON=python
       # the per-version structure results the reports show (test_version_structure)
@@ -54,6 +56,24 @@ jobs:
           name: category-structure
           path: _artifact/
           if-no-files-found: ignore
+
+  # A fresh install (apt + pip, no cache) compared with the cached setup the other jobs use
+  # (.github/actions/setup, key ci/setup_key.sh): fails, printing the difference, when the cache
+  # is stale, e.g. an unpinned dependency released a new version.
+  setup-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - id: key
+        run: echo "key=$(bash ci/setup_key.sh)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.cam-setup
+          key: ${{ steps.key.outputs.key }}
+      - run: bash ci/setup_check.sh
 
   # The coupled examples (system_models/coupled): generated C++ coupled to the FEniCS model
   # tissue_diffusion_FEniCS. FEniCSx is a conda-forge package, and the generated model's shared
@@ -110,7 +130,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11', cache: pip }
+        with: { python-version: '3.11' }
       - uses: ./.github/actions/setup
       - name: V&V tests
         id: vv
@@ -187,7 +207,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11', cache: pip }
+        with: { python-version: '3.11' }
       - uses: ./.github/actions/setup
       - uses: actions/download-artifact@v4
         with:
