@@ -35,8 +35,9 @@ def _run_module_type(mt, work_dir):
         for inst in v.instances():
             key = f'{v.id}__{inst.name}'
             try:
-                path = omex.build(v, inst, work_dir=os.path.join(work_dir, key),
-                                  path=os.path.join(work_dir, f'{key}.omex'))
+                # at the instance's own archive path (what make omex writes), so the report links
+                # this archive and CI builds each one once
+                path = omex.build(v, inst, work_dir=os.path.join(work_dir, key))
             except Exception as e:  # noqa: BLE001 - recorded per instance
                 built[key] = e
                 continue

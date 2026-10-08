@@ -100,7 +100,7 @@ jobs:
     name: ${{ matrix.label }}
     needs: discover
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -149,7 +149,7 @@ jobs:
         id: omex
         if: matrix.stage == 'omex'
         run: |
-          make omex PYTHON=python MODULE=${{ matrix.category }} OMEX_ARGS="--shard ${{ matrix.shard }} --shard-stage omex" || true
+          # the test builds each instance's archive at its own path (make omex's output) and runs it
           make omex-test PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64 \
             || echo "failed=true" >> "$GITHUB_OUTPUT"
       - name: Failure-risk analysis (on request, reviewed versions)
