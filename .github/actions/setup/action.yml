@@ -4,11 +4,13 @@ runs:
   using: composite
   steps:
     - shell: bash
-      # apt can hang on a slow mirror (a whole 30 min job once); give each try 5 min, three tries
+      # apt sometimes hangs on a slow mirror (once a whole 30 min job; a hung try then took 10 min while
+      # the retry took 1.5): a normal run takes ~1 min, so each try gets 1.5 + 3 min, three tries
       run: |
+        APT="-o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
         for i in 1 2 3; do
-          timeout 300 sudo apt-get update -qq && \
-            timeout 600 sudo apt-get install -y -qq libopenmpi-dev openmpi-bin libsundials-dev build-essential && break
+          timeout 90 sudo apt-get $APT update -qq && \
+            timeout 180 sudo apt-get $APT install -y -qq libopenmpi-dev openmpi-bin libsundials-dev build-essential && break
           echo "::warning::apt try $i failed or timed out; retrying"
           [ $i = 3 ] && exit 1
           sleep 10
