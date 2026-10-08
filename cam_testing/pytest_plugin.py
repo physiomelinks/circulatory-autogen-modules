@@ -56,6 +56,9 @@ def pytest_addoption(parser):
                          'balanced by ci/test_durations.json; see cam_testing/shards.py)')
     group.addoption('--shard-stage', default='vv', choices=('vv', 'pipeline', 'omex'),
                     help='whose durations balance --shard (default vv)')
+    group.addoption('--changed-only', action='store_true',
+                    help='skip versions unchanged since their last run in the ledger ($CAM_LEDGER_DIR; '
+                         'cam_testing/ledger.py), stage --shard-stage; reviewed versions that failed always run')
 
 
 def pytest_configure(config):
@@ -78,6 +81,9 @@ def pytest_report_header(config):
     r = paths.roots()
     lines = [f'cam_testing: repo {r.repo_root} ({r.source.get("repo_root")})']
     lines += [f'cam_testing: extra library {d}' for d in r.extra_library_dirs]
+    if config.getoption('--changed-only', default=False):
+        from cam_testing import ledger
+        lines.append(f'cam_testing: --changed-only, skipping versions unchanged since the ledger in {ledger.ledger_dir()}')
     return lines
 
 
@@ -194,11 +200,17 @@ def instance_model(instance_key, tmp_path_factory):
     return _models[instance_key]
 
 
+# version keys skipped as unchanged (--changed-only): the PhLynx and CUFLynx batches leave them out
+UNCHANGED = set()
+
+
 def pytest_collection_modifyitems(config, items):
-    if not config.getoption('--quick-unreviewed'):
+    quick, changed_only = config.getoption('--quick-unreviewed'), config.getoption('--changed-only')
+    if not (quick or changed_only):
         return
     from cam_testing.library import load_version
-    reviewed = {}
+    stage = config.getoption('--shard-stage')
+    versions, skip_unchanged = {}, {}
     for item in items:
         callspec = getattr(item, 'callspec', None)
         if callspec is None:
@@ -208,8 +220,28 @@ def pytest_collection_modifyitems(config, items):
         if not isinstance(key, (tuple, list)):  # None, or NOTSET for an empty parameter set
             continue
         vkey = tuple(key[:2])
-        if vkey not in reviewed:
-            reviewed[vkey] = load_version(*vkey).reviewed
+        if vkey not in versions:
+            versions[vkey] = load_version(*vkey)
+        version = versions[vkey]
+        if changed_only:
+            if vkey not in skip_unchanged:
+                from cam_testing import ledger
+                skip_unchanged[vkey] = ledger.unchanged(version, stage)
+                if skip_unchanged[vkey][0]:
+                    UNCHANGED.add(version.key)
+            ok, why = skip_unchanged[vkey]
+            if ok:
+                item.add_marker(pytest.mark.skip(reason=why))
+                continue
         # run_test and the (cheap) PhLynx -> CUFLynx pipeline run for every version
-        if not reviewed[vkey] and item.originalname not in QUICK_TESTS:
+        if quick and not version.reviewed and item.originalname not in QUICK_TESTS:
             item.add_marker(pytest.mark.skip(reason=f'{"/".join(vkey)} not reviewed yet: CI runs only run_test'))
+    if changed_only:
+        n = sum(1 for ok, _ in skip_unchanged.values() if ok)
+        config._cam_unchanged = (n, len(skip_unchanged))
+
+
+def pytest_terminal_summary(terminalreporter, config):
+    n = getattr(config, '_cam_unchanged', None)
+    if n:
+        terminalreporter.write_line(f'cam_testing --changed-only: {n[0]} of {n[1]} versions unchanged, skipped')

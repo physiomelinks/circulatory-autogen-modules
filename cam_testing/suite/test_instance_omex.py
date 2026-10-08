@@ -27,9 +27,10 @@ _runs = {}
 
 def _run_module_type(mt, work_dir):
     '''Builds every instance archive of a module_type and simulates them in one CUFLynx run.'''
+    from cam_testing.pytest_plugin import UNCHANGED   # skipped as unchanged (--changed-only): not built
     jobs, reports, built = [], {}, {}
     for v in load_module_type(mt).versions():
-        if v.format != 'cellml' and not v.is_supermodule:
+        if (v.format != 'cellml' and not v.is_supermodule) or v.key in UNCHANGED:
             continue
         spec = v.spec
         for inst in v.instances():

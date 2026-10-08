@@ -32,7 +32,9 @@ def pipeline(component_key, tmp_path_factory):
         # PhLynx has no supermodule form: the checks record that without running the pipeline
         return component, None, None
     if mt not in _runs:
-        versions = [v for v in load_module_type(mt).versions() if not v.is_supermodule]
+        # versions skipped as unchanged (--changed-only) stay out of the batch
+        from cam_testing.pytest_plugin import UNCHANGED
+        versions = [v for v in load_module_type(mt).versions() if not v.is_supermodule and v.key not in UNCHANGED]
         work_dir = str(tmp_path_factory.mktemp(f'phlynx_{mt}'))
         try:
             _runs[mt] = (phlynx.run_versions(mt, versions, keep_dir=work_dir), work_dir)
