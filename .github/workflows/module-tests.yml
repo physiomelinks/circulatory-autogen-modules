@@ -25,17 +25,14 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     outputs:
-      categories: ${{ steps.list.outputs.categories }}
+      matrix: ${{ steps.list.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
       - id: list
-        # one job per top-level directory of modules/ that holds module_types (a versions/ directory
-        # somewhere below it): a category (cell, vessels, ...), or a module_type directly under
-        # modules/ with the module_types nested in it (heart: MODULE=heart selects heart, cardiac_clock,
-        # chamber and valve). Not one per module_type.
-        run: |
-          categories=$(python3 -c "import glob, json, os; print(json.dumps(sorted({p.split(os.sep)[1] for p in glob.glob('modules/*/**/versions', recursive=True)})))")
-          echo "categories=$categories" >> "$GITHUB_OUTPUT"
+        # the test jobs: per top-level directory of modules/ that holds module_types (a category such
+        # as cell or vessels, or a module_type directly under modules/ with the module_types nested in
+        # it: MODULE=heart selects heart, cardiac_clock, chamber and valve), per stage and shard
+        run: echo "matrix=$(python3 -m cam_testing.shards matrix)" >> "$GITHUB_OUTPUT"
 
   structure:
     runs-on: ubuntu-latest
@@ -45,6 +42,18 @@ jobs:
         with: { python-version: '3.11', cache: pip }
       - uses: ./.github/actions/setup
       - run: make structure PYTHON=python
+      # the per-version structure results the reports show (test_version_structure)
+      - name: Stage structure results
+        if: always()
+        run: |
+          mkdir -p _artifact
+          find modules -path '*/results/structure.json' -print | xargs -r -I{} cp --parents {} _artifact/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: category-structure
+          path: _artifact/
+          if-no-files-found: ignore
 
   # The coupled examples (system_models/coupled): generated C++ coupled to the FEniCS model
   # tissue_diffusion_FEniCS. FEniCSx is a conda-forge package, and the generated model's shared
@@ -82,74 +91,97 @@ jobs:
           path: _artifact/
           if-no-files-found: ignore
 
-  category:
+  # One job per category, stage and shard (ci/shards.json, cam_testing/shards.py), each about ten
+  # minutes: vv = tests/test_modules.py, pipeline = PhLynx -> CUFLynx, omex = the CUFLynx archive
+  # per instance. A shard holds whole module_types. Each job uploads its results for the site job,
+  # which builds every report, and its JUnit report (refresh ci/test_durations.json from them with
+  # python -m cam_testing.shards durations <stage> junit-*.xml).
+  test:
+    name: ${{ matrix.label }}
     needs: discover
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        category: ${{ fromJSON(needs.discover.outputs.categories) }}
+        include: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    env:
+      SHARD_ARGS: --quick-unreviewed --shard ${{ matrix.shard }} --shard-stage ${{ matrix.stage }} --junitxml=junit.xml --durations=15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11', cache: pip }
       - uses: ./.github/actions/setup
-      - name: Structural checks (results feed the report)
-        run: python -m pytest tests/test_structure.py -k test_version_structure -q || true
       - name: V&V tests
-        id: tests
+        id: vv
+        if: matrix.stage == 'vv'
         run: |
           target=test
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then target=test-all; fi
-          if make $target PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="--quick-unreviewed --junitxml=junit-tests.xml"; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+          make $target PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" || echo "failed=true" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
+        if: matrix.stage == 'pipeline'
         with: { node-version: '22' }
       - name: PhLynx checkout (pipeline tests)
+        if: matrix.stage == 'pipeline'
         uses: actions/checkout@v4
         with: { repository: physiomelinks/PhLynx, ref: '${{ env.PHLYNX_REF }}', path: _phlynx }
-      - name: CUFLynx (latest Ubuntu release) and pipeline dependencies
-        env: { GH_TOKEN: '${{ github.token }}' }
+      - name: PhLynx and the pipeline bridge
+        if: matrix.stage == 'pipeline'
         run: |
           corepack enable
           (cd _phlynx && yarn install --immutable)
           make pipeline-setup
+      - name: CUFLynx (latest Ubuntu release)
+        if: matrix.stage != 'vv'
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
           gh release download --repo physiomelinks/CUFLynx --pattern 'CUFLynx-linux-x86_64' --dir _cuflynx
           chmod +x _cuflynx/CUFLynx-linux-x86_64
           gh release view --repo physiomelinks/CUFLynx --json tagName --jq .tagName
       - name: PhLynx -> CUFLynx pipeline
         id: pipeline
+        if: matrix.stage == 'pipeline'
         run: |
-          if make pipeline PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="--quick-unreviewed --junitxml=junit-pipeline.xml" PHLYNX_DIR=$PWD/_phlynx CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+          make pipeline PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" PHLYNX_DIR=$PWD/_phlynx CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64 \
+            || echo "failed=true" >> "$GITHUB_OUTPUT"
       - name: CUFLynx archive per instance (built from the library's files, then loaded and run in CUFLynx)
         id: omex
+        if: matrix.stage == 'omex'
         run: |
-          make omex PYTHON=python MODULE=${{ matrix.category }} || true
-          if make omex-test PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="--quick-unreviewed --junitxml=junit-omex.xml" CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+          make omex PYTHON=python MODULE=${{ matrix.category }} OMEX_ARGS="--shard ${{ matrix.shard }} --shard-stage omex" || true
+          make omex-test PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64 \
+            || echo "failed=true" >> "$GITHUB_OUTPUT"
       - name: Failure-risk analysis (on request, reviewed versions)
-        if: github.event_name == 'workflow_dispatch' && inputs.risk
+        if: github.event_name == 'workflow_dispatch' && inputs.risk && matrix.stage == 'vv' && startsWith(matrix.shard, '1/')
         run: make risk PYTHON=python MODULE=${{ matrix.category }} RISK_ARGS=--reviewed-only
-      - name: Report
-        if: always()
-        run: make report PYTHON=python MODULE=${{ matrix.category }}
-      - name: Stage report files
+      - name: Stage result files
         if: always()
         run: |
           mkdir -p _artifact
-          find modules/${{ matrix.category }} \( -type d \( -name plots -o -name results \) -o -type f \( -name '*.html' -o -name '*.omex' \) \) -prune -print \
+          find modules/${{ matrix.category }} \( -type d \( -name plots -o -name results \) -o -type f -name '*.omex' \) -prune -print \
             | xargs -r -I{} cp -r --parents {} _artifact/
+          [ -f junit.xml ] && cp junit.xml "junit-${{ matrix.id }}.xml" || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: category-${{ matrix.category }}
+          name: category-${{ matrix.id }}
           path: _artifact/
           if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-${{ matrix.id }}
+          path: junit-${{ matrix.id }}.xml
+          if-no-files-found: ignore
       - name: Fail if a reviewed version's tests failed
-        if: steps.tests.outputs.ok == 'false' || steps.pipeline.outputs.ok == 'false' || steps.omex.outputs.ok == 'false'
-        run: python tools/ci_reviewed_failures.py junit-tests.xml junit-pipeline.xml junit-omex.xml
+        if: steps.vv.outputs.failed == 'true' || steps.pipeline.outputs.failed == 'true' || steps.omex.outputs.failed == 'true'
+        run: |
+          [ -f junit.xml ] || { echo "::error::the tests wrote no JUnit report (crashed before running)"; exit 1; }
+          python tools/ci_reviewed_failures.py junit.xml
 
   site:
-    needs: [category, coupled]
+    needs: [test, coupled, structure]
     if: always()
     runs-on: ubuntu-latest
     steps:

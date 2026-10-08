@@ -51,6 +51,11 @@ def pytest_addoption(parser):
     group.addoption('--quick-unreviewed', action='store_true',
                     help='for versions not reviewed yet, run only run_test and the PhLynx pipeline (CI uses '
                          'this; the full test set runs once a version is reviewed)')
+    group.addoption('--shard', default=None, metavar='K/N',
+                    help='only the versions of shard K of N of the selected module_types (whole module_types, '
+                         'balanced by ci/test_durations.json; see cam_testing/shards.py)')
+    group.addoption('--shard-stage', default='vv', choices=('vv', 'pipeline', 'omex'),
+                    help='whose durations balance --shard (default vv)')
 
 
 def pytest_configure(config):
@@ -100,9 +105,15 @@ def _versions(config, supermodules=None):
     '''The selected versions of the repo's modules/; supermodules=True/False: only supermodule / only
     component versions.'''
     from cam_testing.library import load_module_type, select_module_types
-    key = (tuple(config.getoption('--module')), _roots_key())
+    shard = config.getoption('--shard')
+    key = (tuple(config.getoption('--module')), _roots_key(), shard)
     if key not in _loaded:     # loaded once per session, not once per test function
-        _loaded[key] = [v for name in select_module_types(key[0]) for v in load_module_type(name).versions()]
+        names = select_module_types(key[0])
+        if shard:
+            from cam_testing.shards import shard_module_types
+            wanted = shard_module_types(key[0], config.getoption('--shard-stage'), shard)
+            names = [n for n in names if n in wanted]
+        _loaded[key] = [v for name in names for v in load_module_type(name).versions()]
     return [v for v in _loaded[key] if (supermodules is None or v.is_supermodule == supermodules) and _wanted(config, v)]
 
 
