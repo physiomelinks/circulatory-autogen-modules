@@ -1,0 +1,25 @@
+module_type: i_CaN
+version: Argus2026_v01
+reviewed: true
+description: 'N-type (CaV2.2) Ca current of the sympathetic-neuron varicosity: ohmic i_Ca_N = g c^2 hc (V - E_Ca), g = A rho
+  gamma (Fox 1987); gating as i_CaL''s (Belluzzi & Sacchi 1989 curves as modified); its Ca flux goes to the varicosity''s
+  Ca balance and NE release.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. N-type Ca current of the SN varicosity, i_Ca_N = g_CaN (V - E_Ca) c^2 hc (the soma''s L-type gating
+  with a linear driving force), with its Ca flux j_Ca_N = -i_Ca_N/(2F). Split out of the monolithic SN_soma / SN_varicosity
+  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
+  that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_CaN
+  = A_mem rho_CaN gamma_CaN (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane
+  through membrane_area; the defaults reproduce the previous g_CaN. Temperature (review 2026-10-05): the model is at room
+  temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; every gating time constant
+  is divided by phi = Q10^((T - T_ref)/10 K) (Q10_CaN, T_ref_CaN). T_ref defaults to 295.15 K, so phi = 1 and the kinetics
+  are unchanged; setting T_ref to the source''s recording temperature (on review) scales them, and the model can be run at
+  37 degC by changing T. Reviewed 2026-10-06: kinetics shared with i_CaL (Belluzzi & Sacchi 1989 measured the mixed N- and
+  L-type I_Ca of rat SCG); V_mid_hc = V_mid_c + 11 = 19.1 mV (belluzzi1989calcium Eq. 5: hc_inf V1/2 -19.91 mV, k 4.50 mV;
+  the slope here is V_den_c = 5 mV). The 2024 note "fit to data from Huang1998" could not be traced (Zotero, papers, git history,
+  Europe PMC); the closest candidate is Huang et al. 1997 (JPET 282:1280, rat DRG HVA Ca currents, 63% N-type). The gate parameters
+  follow Belluzzi & Sacchi 1989, so the Huang fit is not visible in them.'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

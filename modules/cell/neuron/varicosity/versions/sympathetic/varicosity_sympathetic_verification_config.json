@@ -1,0 +1,39 @@
+{
+  "module_type": "varicosity",
+  "version": "sympathetic",
+  "sim_time": 0.2,
+  "pre_time": 0.0,
+  "dt": 2e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "run_parameters": {"V_in_membrane": -10.0},
+  "bc_sweep": {
+    "ranges": {
+      "V_in_membrane": {"min": -90.0, "max": 30.0, "points": 5},
+      "T": {"min": 273.15, "max": 313.15, "points": 3}
+    },
+    "bounds": {
+      "T": [273.15, 313.15]
+    },
+    "rationale": "Supermodule default: the globals (R, F by factors 0.5-2; T over 273.15-313.15 K) and the boundary conditions no internal connection closes: the clamped membrane potential V_in_membrane -90 to +30 mV (rest to action-potential peak, as varicosity sympathetic_monolithic_v01) and the NaCa exchanger's Nai_i_NaCa (factors 0.5-2). Each submodule's own parameters are swept in that submodule version's tests. Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {}
+  },
+  "supermodule": {
+    "globals": ["R", "F", "T"]
+  }
+}

@@ -1,0 +1,28 @@
+module_type: i_Kv2
+version: Argus2026_v01
+reviewed: true
+description: 'Kv2 delayed-rectifier K current of the sympathetic-neuron soma: i_Kv2 = g_Kv2 m (V - E_K), g = A rho gamma;
+  Boltzmann activation (Belluzzi-Sacchi 1988 via Tao 2011) with the owner''s refit time constant; its K flux goes to the soma''s
+  K balance. Its default conductance is about 250x below Belluzzi & Sacchi''s (see rho_Kv2).'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. Kv2 delayed-rectifier K current of the SN soma, i_Kv2 = g_Kv2 (V - E_K) m_Kv2. Split out of the monolithic
+  SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history);
+  SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal
+  conductance is g_Kv2 = A_mem rho_Kv2 gamma_Kv2 (membrane area x channel density x single-channel conductance, 1e-6 uS/pS),
+  A_mem from the membrane through membrane_area; the defaults reproduce the previous g_Kv2. tau_m: owner''s symmetric refit
+  of the Belluzzi-Sacchi delayed-rectifier tau_n (CA 837d3aae, 2024-07-21: ''modified from Belucci but fit to the same data''):
+  offset 2.31 ms = tao2011model Document S1 Eq. 97; amplitude 45 ms gives the source peak 24.8 ms (Tao Eq. 97 peak 24.7 ms at -27.5
+  mV; belluzzi1988interactions tau_n max 25.5 ms at -30 mV, min 1.8 ms at -80/+20 mV, 37 degC, Abstract point 3); the centre is
+  -16 mV, not -30 mV, and the slopes (4 mV) are the owner''s. Temperature (review 2026-10-05): the model is at room temperature,
+  T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided
+  by phi = Q10^((T - T_ref)/10 K) (Q10_Kv2, T_ref_Kv2). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged;
+  setting T_ref to the source''s recording temperature (on review) scales them, and the model can be run at 37 degC by changing
+  T.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

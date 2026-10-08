@@ -1,0 +1,48 @@
+model: generic_junction_test2_closed_loop
+category: closed_loop_cvs
+reviewed: false
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+equivalence:
+  reference: reference
+  output_map: {heart/u_ra: ra/u, heart/u_rv: rv/u, heart/u_la: la/u, heart/u_lv: lv/u, heart/q_ra: ra/q, heart/q_rv: rv/q,
+    heart/q_la: la/q, heart/q_lv: lv/q, heart/v_trv: trv/v, heart/v_puv: puv/v, heart/v_miv: miv/v, heart/v_aov: aov/v, heart/zeta_trv: trv/zeta,
+    heart/zeta_puv: puv/zeta, heart/zeta_miv: miv/zeta, heart/zeta_aov: aov/zeta, heart/zeta_trv_pre: trv/zeta_pre, heart/zeta_puv_pre: puv/zeta_pre,
+    heart/zeta_miv_pre: miv/zeta_pre, heart/zeta_aov_pre: aov/zeta_pre, heart/e_a: ra/e, heart/e_v: lv/e, heart/s: heart_clock/s,
+    heart/mt: heart_clock/mt, heart/chi_a: ra/chi, heart/chi_v: lv/chi, heart/v_asd: asd_shunt/v, heart/T_wCont: heart_clock/T_eff,
+    heart/chi_afloor: ra/chi_floor, heart/chi_vfloor: lv/chi_floor, heart/chi_afloor_final: ra/chi_floor_final, heart/chi_vfloor_final: lv/chi_floor_final,
+    heart/R_lin_trv: trv/R_lin, heart/R_lin_puv: puv/R_lin, heart/R_lin_miv: miv/R_lin, heart/R_lin_aov: aov/R_lin, heart/vel_trv: trv/vel,
+    heart/vel_puv: puv/vel, heart/vel_miv: miv/vel, heart/vel_aov: aov/vel, heart/E_lv_A_wCont: lv/E_A_eff, heart/E_rv_A_wCont: rv/E_A_eff,
+    heart/A_eff_trv: trv/A_eff, heart/B_trv: trv/B, heart/L_trv: trv/L, heart/A_eff_puv: puv/A_eff, heart/B_puv: puv/B, heart/L_puv: puv/L,
+    heart/A_eff_miv: miv/A_eff, heart/B_miv: miv/B, heart/L_miv: miv/L, heart/A_eff_aov: aov/A_eff, heart/B_aov: aov/B, heart/L_aov: aov/L,
+    heart/T_ac_wCont: ra/T_c_eff, heart/T_ar_wCont: ra/T_r_eff, heart/T_vc_wCont: lv/T_c_eff, heart/T_vr_wCont: lv/T_r_eff}
+  ignore: {heart/q_heart: sum of the four chambers (no single variable after the split), ascending_aorta_A/t: time, ascending_aorta_B/t: time,
+    ascending_aorta_C/t: time, ascending_aorta_D/t: time, aortic_arch_C2/t: time, aortic_arch_C46/t: time, aortic_arch_C64/t: time,
+    brachiocephalic_trunk_C4/t: time, common_carotid_L48_A/t: time, common_carotid_R6_A/t: time, subclavian_L66/t: time, subclavian_R28/t: time,
+    head_L_T/t: time, head_R_T/t: time, arm_L_T/t: time, arm_R_T/t: time, aortic_arch_C94/t: time, thoracic_aorta_C96/t: time,
+    thoracic_aorta_C100/t: time, thoracic_aorta_C104/t: time, thoracic_aorta_C108/t: time, thoracic_aorta_C112/t: time, abdominal_aorta_C114/t: time,
+    trunk_C_T/t: time, abdominal_aorta_C136/t: time, abdominal_aorta_C164/t: time, abdominal_aorta_C176/t: time, abdominal_aorta_C188/t: time,
+    abdominal_aorta_C192/t: time, common_iliac_L194/t: time, external_iliac_L198/t: time, common_iliac_R216/t: time, external_iliac_R220/t: time,
+    femoral_L200/t: time, femoral_R222/t: time, leg_L_T/t: time, leg_R_T/t: time, venous_lb/t: time, venous_ub/t: time, venous_ivc/t: time,
+    venous_svc/t: time, K_tube_ascending_aorta_A/t: time, K_tube_ascending_aorta_B/t: time, K_tube_ascending_aorta_C/t: time,
+    K_tube_ascending_aorta_D/t: time, K_tube_aortic_arch_C2/t: time, K_tube_aortic_arch_C46/t: time, K_tube_aortic_arch_C64/t: time,
+    K_tube_brachiocephalic_trunk_C4/t: time, K_tube_common_carotid_L48_A/t: time, K_tube_common_carotid_R6_A/t: time, K_tube_subclavian_L66/t: time,
+    K_tube_subclavian_R28/t: time, K_tube_aortic_arch_C94/t: time, K_tube_thoracic_aorta_C96/t: time, K_tube_thoracic_aorta_C100/t: time,
+    K_tube_thoracic_aorta_C104/t: time, K_tube_thoracic_aorta_C108/t: time, K_tube_thoracic_aorta_C112/t: time, K_tube_abdominal_aorta_C114/t: time,
+    K_tube_abdominal_aorta_C136/t: time, K_tube_abdominal_aorta_C164/t: time, K_tube_abdominal_aorta_C176/t: time, K_tube_abdominal_aorta_C188/t: time,
+    K_tube_abdominal_aorta_C192/t: time, K_tube_common_iliac_L194/t: time, K_tube_external_iliac_L198/t: time, K_tube_common_iliac_R216/t: time,
+    K_tube_external_iliac_R220/t: time, K_tube_femoral_L200/t: time, K_tube_femoral_R222/t: time, par/t: time, pvn/t: time,
+    heart_clock/t: time, ra/t: time, rv/t: time, la/t: time, lv/t: time, trv/t: time, puv/t: time, miv/t: time, aov/t: time,
+    ra_inflow/t: time, heart/q: sum of the four chambers (no single variable after the split)}
+  wrapped: {heart/mt: 1.0, heart/chi_afloor: 1.0, heart/chi_vfloor: 1.0, heart/chi_afloor_final: 1.0, heart/chi_vfloor_final: 1.0}
+  reciprocal: [heart/L_trv, heart/L_puv, heart/L_miv, heart/L_aov, heart/B_trv, heart/B_puv, heart/B_miv, heart/B_aov]
+  tol: 1.0e-06
+  solver_info: {rtol: 1.0e-12, atol: 1.0e-14}
+invariants: []
+notes: ['the original heart had fewer than two outputs, so circulatory_autogen added par/pvn implicitly; they are explicit
+    here', 'no original value for [''E_A_ra'', ''E_B_ra'', ''q_us_ra'', ''q_init_ra'', ''T_c_ra'', ''T_r_ra'', ''t_start_ra'',
+    ''E_A_la'', ''E_B_la'', ''q_us_la'', ''q_init_la'', ''T_c_la'', ''T_r_la'', ''t_start_la'', ''E_A_rv'', ''E_B_rv'', ''q_us_rv'',
+    ''q_init_rv'', ''T_c_rv'', ''T_r_rv'', ''t_start_rv'', ''E_A_lv'', ''E_B_lv'', ''q_us_lv'', ''q_init_lv'', ''T_c_lv'',
+    ''T_r_lv'', ''t_start_lv'']']
+skip: circulatory_autogen has no parameters file for this model (module array only)

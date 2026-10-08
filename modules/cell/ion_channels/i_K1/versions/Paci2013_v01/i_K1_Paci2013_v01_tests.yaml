@@ -1,0 +1,31 @@
+module_type: i_K1
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM (ventricular-like) inward rectifier I_K1 = g_K1 XK1_inf(Vm - E_K) (Vm - E_K) sqrt(Ko/5.4). NOTE:
+  the Paci 2013 beta_K1 has a NEGATIVE term (-1.509 e^{...}), so XK1_inf = alpha/(alpha+beta) is not bounded to [0,1] in general;
+  the invariant checks the formula, not a bound. Algebraic: all gates, concentrations and the membrane potential are inputs,
+  so alone it is a pure function of its inputs, checked exactly against the original model equations.'
+reference_proposals:
+  g_K1:
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      g_K1 = 28.1492'
+    sourced: 'yes'
+    value: 28.1492
+  Vm:
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  E_K:
+    reference: 'definitional; Nernst potential of the paci2013computational electric_potentials at the CellML initial state (R=8.314472,
+      T=310, F=96485.3415, Nao=151, Ko=5.4, Ki=150, Cao=1.8 mM, Nai=10.9248, Cai=1.80774e-5 mM): E_K = -0.0888029 V'
+    sourced: definitional
+    value: -0.08880285397707481
+  Ko:
+    reference: 'paci2013computational; extracellular K in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Ko = 5.4 mM'
+    sourced: 'yes'
+    value: 5.4
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

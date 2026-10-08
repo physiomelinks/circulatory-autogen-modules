@@ -1,0 +1,148 @@
+[
+  {
+    "module_type": "i_NaK",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "i_NaK_Argus2026_v01_modules.cellml",
+    "component_type": "i_NaK_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "nygren1998mathematical",
+      "argus2026sympathetic"
+    ],
+    "required_citations_uncertain": [
+      "nygren1998mathematical"
+    ],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_NaK"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_NaK_Na"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_NaK_K"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Ko",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ko_mid_NaK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nai_mid_NaK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai_power_NaK",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "i_NaK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_K",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_NaK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_NaK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_NaK",
+        "per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

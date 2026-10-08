@@ -1,0 +1,60 @@
+comment: 'Config-only fix already applied: the four constant pressure/flow BCs declared port variables (v for pressure BCs,
+  P for flow BCs) that were missing from variables_and_units, so libcuflynx exited whenever they were connected — please confirm.
+  The nn_fourier_8 coefficients are test values (A_1 = 1e-3 m^3/s gives ~0.9 L/s reverse flow) with no source; T = 1 s ("biobeat_measurement")
+  is unverifiable. lung_vol_generator jumps in volume when T_lung changes (phase 2πt/T uses absolute t), and CO2_O2_generator
+  sets dot_C_CO2_a = 0 even while C_CO2_a steps. C_CO2_a0 = 0.48 (literature) disagrees with the chemoreceptor nominal 0.36.
+  [Round 1 answers applied 2026-09-30: port-variable fix kept; outlet_pressure P = 1066 Pa (CVP 8 mmHg, shah2023physiology); inlet_pressure
+  P = 12399 Pa (MAP 93 mmHg, klabunde2021cardiovascular); inlet/outlet_flow v = 8.3333e-5 m^3/s (5 L/min, demir2025foundations); inlet_flow constant_2
+  v_1 = 4.28e-6 (ICA), v_2 = 1.67e-6 m^3/s (VA), zarrinkoob2015blood; nn_fourier_8 coefficients kept as test values. The generator
+  questions (lung_vol_generator, CO2_O2_generator, muscle_pressure) are still open.]'
+summary: 'Boundary-condition sources for circulatory models: constant pressure/flow inlets and outlets, a two-flow inlet,
+  an 8-harmonic Fourier inflow, and prescribed lung-volume, blood-gas and muscle-pressure generators. Every component now
+  has a test: the constant BCs and the Fourier inflow drive a BG arterial_simple test vessel (R 1e7, C 1e-8, I 1e5) whose
+  steady state and volume balance are analytic; muscle_pressure drives lung/thoracic_cavity (P_thor = P); the generators are
+  checked against their exact closed forms including the perturbation windows. All run/invariant/sweep/stability tests pass
+  (timestep skipped for the algebraic components). References proposed for every parameter (physiology values from Klabunde,
+  Demir 2025, Zarrinkoob 2015, StatPearls, Arthurs 2005); test waveform/protocol values marked unreferenced.'
+questions:
+- Confirm the APPLIED config fix (v added to the pressure BCs, P to the flow BCs as boundary_condition variables; the CellML
+  already declared them).
+- 'outlet_pressure P = 666 Pa: confirm klabunde2021cardiovascular (RA pressure < 5 mmHg). Note StatPearls (Shah & Louis) gives a clinical
+  CVP of 8-12 mmHg; which do you want?'
+- 'inlet_pressure P (TODO): proposed 12399 Pa = 93 mmHg MAP (klabunde2021cardiovascular), the same as the librarys P_baro_init. OK?'
+- 'outlet_flow v (TODO): proposed 8.3333e-5 m^3/s = 5 L/min (demir2025foundations gives ~4.9 L/min at rest). OK, and same reference for
+  inlet_flow v?'
+- 'inlet_flow constant_2 v_1 = v_2 = 3.1e-6 m^3/s (186 mL/min, "cerebral_elic: user_defined"): zarrinkoob2015blood gives ICA
+  257 mL/min (4.28e-6) and VA 100 mL/min (1.67e-6); 3.1e-6 is ~total CBF/4. Keep (sourced no), or use per-artery values?'
+- 'nn_fourier_8: the A_i/phi_i are test values (large reverse flow). Do you have the "Alfred database" waveform they came
+  from, or should they be fitted to a published aortic inflow (validation pending)? Is T = 1 s the intended global heart period?'
+- 'lung_vol_generator: proposed T_lung_0 = 4 s (15/min, MedlinePlus 12-20/min), amplitude 2.5e-4 m^3 (TV/2, StatPearls TV
+  500 mL), baseline 3.25e-3 m^3 (FRC 3 L + TV/2 so the trough is FRC; StatPearls FRC). Is q_lung_baseline meant to be FRC
+  (end-expiratory) or mid-tidal?'
+- 'lung_vol_generator: q_lung_V = amp sin(2πt/T + φ) with absolute t, so switching T at t_start_T_lung/t_end_T_lung makes
+  the volume jump. Intended? (A phase integral dθ/dt = 2π/T would make it continuous.)'
+- 'CO2_O2_generator: C_O2_a0 = 0.20 (demir2025foundations) and C_CO2_a0 = 0.48 (arthurs2005carbon) are content fractions (mL gas per mL blood).
+  The chemoreceptors C_CO2_a_nom is 0.36 (labelled Magosso2001/Ursino2000, not verified here): which convention should the
+  generator use?'
+- 'CO2_O2_generator: dot_C_CO2_a is fixed at 0 even across the C_CO2 step, so the chemoreceptors dynamic CO2 term never sees
+  the step. Intended?'
+- 'muscle_pressure P (TODO): proposed 0 Pa (relaxed muscles), definitional. Or a pleural pressure (about -5 cmH2O = -490 Pa
+  at FRC) if it drives thoracic_cavity P_pl?'
+- Perturbation windows (lung and gas generators) proposed as 20-40 s / 30-50 s placeholders with multipliers 1 (no perturbation).
+  OK as defaults?
+proposed_fixes:
+- 'APPLIED, please confirm: boundary_condition_modules_config.json — added v (m3_per_s, boundary_condition) to outlet_pressure/inlet_pressure
+  nn_constant and P (J_per_m3, boundary_condition) to outlet_flow/inlet_flow constant; they are port variables the CellML
+  already declared, and without them libcuflynx exited whenever the BCs were connected.'
+- 'lung_Vol_generator_type (optional): make the breathing phase continuous across a change of T_lung, e.g. dθ/dt = 2π/T_lung
+  and q_lung_V = amp sin(θ + φ) + q_baseline.'
+- 'CO2_O2_generator_type (optional): if the dynamic chemoreceptor response to a CO2 step matters, provide dot_C_CO2_a consistent
+  with C_CO2_a (e.g. a first-order filtered step and its derivative) instead of 0.'
+findings:
+- The constant BCs have no equations; they are tested through a BG arterial_simple test vessel whose steady state (u = P ±
+  R v, v = imposed flow) and volume balance q(t) − q(0) = ∫(v_in − v_out) dt are checked in every sweep run. This needed CVODE
+  atol 1e-12 (volumes ~1e-5 m^3; the default atol 1e-8 m^3 gives 0.2% balance errors).
+- 'Port inputs (v of the pressure BCs, P of the flow BCs and of the Fourier inflow) are excluded from the sweep: when connected
+  their parameter values are unused.'
+- inlet_flow constant_2 can only be tested alone (its only consumer is BG 2in2out_junction vv, which needs a full cerebral
+  network); its invariants only check the constants.
+- Timestep tests are skipped for the algebraic components (constant_flow_2, lung, CO2/O2, muscle pressure).
+- 'Risk (512 Sobol samples, joint over the sweep box): P(fail) = 0 for all nine components.'

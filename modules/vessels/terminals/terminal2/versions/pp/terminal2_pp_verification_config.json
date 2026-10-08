@@ -1,0 +1,58 @@
+{
+  "module_type": "terminal2",
+  "version": "pp",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-07, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["u", "v", "v_T", "q_T"],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "volume balance: d(q_T)/dt = (v) - (v_T) (trapezoidal integral of the flows from t = 0.02 s, rel. tol 0.005)",
+      "expr": "np.max(np.abs((((q_T) + 0*t)[(t >= 0.02)] - ((q_T) + 0*t)[(t >= 0.02)][0]) - np.concatenate(([0.0], np.cumsum(0.5*((((v) - (v_T) + 0*t))[(t >= 0.02)][1:] + (((v) - (v_T) + 0*t))[(t >= 0.02)][:-1])*np.diff(t[(t >= 0.02)])))))) <= 0.005*np.ptp(((q_T) + 0*t)[(t >= 0.02)]) + 1e-5*np.max(np.abs(((q_T) + 0*t))) + 1e-9*np.max(np.abs(((v) - (v_T) + 0*t)))*t[-1] + 1e-18"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {},
+    "exclude": [],
+    "rationale": "Boundary conditions span physiological operating values for the vessel class (arterial inlet 60-150 mmHg, venous 0-15 mmHg, flows 0-2x the nominal flow; +-0.5% for the nonlinear vv types, whose volume drifts by (v_in - v_out) t and collapses the tube if the imbalance is larger); constants are swept 0.5-2x their value; rho and mu are swept 0.5-2x their library (test_fft fixture) value of 1; beta_g 0-1; g 1-9.81; the wall-thickness constants a-d between the fixture value 1 and the proposed Blanco 2015 values. The physiological rho/mu (1050, 0.004) cannot yet be combined with the others at the run point (framework issue), so the swept regime is the library one. Excluded: tube-law exponents (they define the law), switches (R_flag, blood_ctl_dir)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [5e-15, 2.5e-15, 1.25e-15, 6.25e-16],
+    "t_end": 1e-11,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-07, "atol": 1e-14}
+    ],
+    "cvode": [
+      {"rtol": 0.0001, "atol": 1e-08},
+      {"rtol": 1e-06, "atol": 1e-08},
+      {"rtol": 1e-07, "atol": 1e-14}
+    ],
+    "solve_ivp": ["LSODA"],
+    "fixed_step": {
+      "schemes": ["rk4"],
+      "dt_start": 1e-14
+    },
+    "time_budget": 10.0,
+    "t_end": 2.0
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "cannot be generated until its u_in port variable is declared (known issue)"
+      },
+      "calibrate": {"note": "not_applicable: cannot be generated until its u_in port variable is declared (known issue)"}
+    }
+  }
+}

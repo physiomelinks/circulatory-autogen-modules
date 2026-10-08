@@ -1,0 +1,51 @@
+module_type: capillary_simple_vol_ctl_intake
+version: vv
+reviewed: false
+notes: 'vv lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 0.0002 s, slowest decay 0.012 s; run: fastest
+  0.0002 s, slowest decay 0.012 s).'
+reference_proposals:
+  q_0:
+    reference: unreferenced_placeholder; unstressed volume 1e-05 m^3 (10 mL), order of magnitude for this vessel class
+    sourced: 'no'
+    value: 1.0e-05
+  R:
+    reference: unreferenced_placeholder; resistance 1e8 Pa s m^-3 (0.75 mmHg s/mL), order of magnitude of a peripheral bed
+    sourced: 'no'
+    value: 100000000.0
+  C:
+    reference: unreferenced_placeholder; compliance 1e-10 m^3/Pa (0.013 mL/mmHg), order of magnitude only
+    sourced: 'no'
+    value: 1.0e-10
+  u_ext:
+    reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
+    sourced: definitional
+    value: 0.0
+  I:
+    reference: unreferenced_placeholder; inertance 1e5 Pa s^2 m^-3, order of rho l/(pi r^2) for a large artery (1050 x 0.05/(pi
+      0.0115^2) = 1.3e5); safaei2018bond Table S3 sets I = 0 for the pulmonary arteries, which this ODE module cannot take
+    sourced: 'no'
+    value: 100000.0
+    also_cites:
+    - safaei2018bond
+  u_0:
+    reference: definitional; pressure is 0 at the unstressed volume q_0 (lumped convention u = (q - q_0)/C); u_0 and q_0 are
+      redundant
+    sourced: definitional
+    value: 0.0
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 1e-05
+      m^3/s
+    sourced: 'no'
+    value: 1.0e-05
+  v_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 1e-05
+      m^3/s
+    sourced: 'no'
+    value: 1.0e-05
+  blood_ctl_dir:
+    reference: definitional; direction of the controlled blood exchange (+1 for intake)
+    sourced: definitional
+    value: 1.0
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

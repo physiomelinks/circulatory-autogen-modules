@@ -1,0 +1,100 @@
+module_type: arterial
+version: pv
+reviewed: false
+notes: 'pv linear R-C-I vessel with coefficients from geometry (Poiseuille R, thin-wall C, inertance I). Jacobian timescales
+  (nominal: fastest 4.5e-07 s, slowest decay 0.01 s; run: fastest 0.0092 s, slowest decay 0.017 s, shortest oscillation period
+  0.069 s).'
+reference_proposals:
+  E:
+    reference: 'safaei2018bond; ADAN-86 arterial geometry/material (Safaei et al. build a 218-segment network from ADAN-86 and
+      the ADAN cerebral vessels; E from blanco2015anatomically). The vessel-level value 400000 could not be checked: the ADAN data are
+      in supplementary material not accessible here; 0.4 MPa equals the elastin modulus of the ADAN-family models (Muller
+      et al. 2023, Front Physiol 14:1162391)'
+    sourced: 'no'
+    also_cites:
+    - blanco2015anatomically
+  l:
+    reference: 'safaei2018bond; ADAN-86 arterial geometry/material (Safaei et al. build a 218-segment network from ADAN-86 and
+      the ADAN cerebral vessels; E from blanco2015anatomically). The vessel-level value 0.0432111 could not be checked: the ADAN data
+      are in supplementary material not accessible here'
+    sourced: 'no'
+    also_cites:
+    - blanco2015anatomically
+  r_0:
+    reference: 'safaei2018bond; ADAN-86 arterial geometry/material (Safaei et al. build a 218-segment network from ADAN-86 and
+      the ADAN cerebral vessels; E from blanco2015anatomically). The vessel-level value 0.0117401 could not be checked: the ADAN data
+      are in supplementary material not accessible here'
+    sourced: 'no'
+    also_cites:
+    - blanco2015anatomically
+  u_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen FinalModel: "AssumedRefOf80mmHg" (value 10.64e3)'
+    sourced: 'no'
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen FinalModel: small_chosen)'
+    sourced: definitional
+  theta:
+    reference: 'definitional; inclination angle 90 deg, only used when beta_g = 1 (circulatory_autogen FinalModel: defined_by_user)'
+    sourced: definitional
+  u_in:
+    reference: 'unreferenced_placeholder; circulatory_autogen aortic_bif_hybrid_V2: "WONT_BE_USED" (value 9332.5666)'
+    sourced: 'no'
+  v_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 8.66011e-05
+      m^3/s (mean velocity x lumen area)
+    sourced: 'no'
+    value: 8.66011e-05
+  beta_g:
+    reference: definitional; gravity switch in beta_g rho g l cos(theta) (0 = off, as in the circulatory_autogen models; 1
+      = on). Library value 1 is a test_fft fixture value
+    sourced: definitional
+    value: 0.0
+  rho:
+    reference: boileau2015benchmark; Table II, blood mass density 1050 kg m^-3 (safaei2018bond Sec. 2.2.4 uses 1040). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 1050.0
+    also_cites:
+    - safaei2018bond
+  mu:
+    reference: boileau2015benchmark; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also safaei2018bond Sec. 2.2.4). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 0.004
+    also_cites:
+    - safaei2018bond
+  g:
+    reference: definitional; standard gravity 9.81 m s^-2 (library value 1 is a test_fft fixture value)
+    sourced: definitional
+    value: 9.81
+  a_vessel:
+    reference: blanco2015anatomically; Eq. (2) h/R0 = a e^(b R0) + c e^(d R0), curve fit of the avolio1980multi wall data, a = 0.2802 (SI values
+      also in safaei2018bond Table S3). Library value 1 is a test_fft fixture value
+    sourced: 'yes'
+    value: 0.2802
+    also_cites:
+    - safaei2018bond
+    - avolio1980multi
+  b_vessel:
+    reference: blanco2015anatomically; Eq. (2), b = -5.053 cm^-1 = -505.3 m^-1 (safaei2018bond Table S3). Library value 1 is a test_fft fixture
+      value
+    sourced: 'yes'
+    value: -505.3
+    also_cites:
+    - safaei2018bond
+  c_vessel:
+    reference: blanco2015anatomically; Eq. (2), c = 0.1324 (safaei2018bond Table S3). Library value 1 is a test_fft fixture value
+    sourced: 'yes'
+    value: 0.1324
+    also_cites:
+    - safaei2018bond
+  d_vessel:
+    reference: blanco2015anatomically; Eq. (2), d = -0.1114 cm^-1 = -11.14 m^-1 (safaei2018bond Table S3). Library value 1 is a test_fft fixture
+      value
+    sourced: 'yes'
+    value: -11.14
+    also_cites:
+    - safaei2018bond
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

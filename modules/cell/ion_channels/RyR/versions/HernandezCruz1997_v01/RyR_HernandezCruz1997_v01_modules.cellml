@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="RyR_HernandezCruz1997_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <!-- Ryanodine receptor of rat superior cervical ganglion neurons (22-23 degC): Hernandez-Cruz, Escobar & Jimenez 1997,
+         J Gen Physiol 109:147, Appendix Eqs. A11-A15 and the Fig. 10 legend. Three first-order Ca binding sites (activating and
+         inactivating on the cytosolic side, luminal on the releasing ER), each state the fraction of sites occupied (x = X_Ca/X_Tot).
+         The paper's RyR_max ds_erm (a rate constant on the cytosolic shell) is replaced by the flux coefficient k_RyR = A_ER rho k_single. -->
+    <component name="RyR_HernandezCruz1997">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Ca_ER" public_interface="in" units="millimolar"/>
+        <variable name="A_ER" public_interface="in" units="um2"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="kon_a_RyR" public_interface="in" units="per_millimolar_per_s"/>
+        <variable name="koff_a_RyR" public_interface="in" units="per_s"/>
+        <variable name="kon_i_RyR" public_interface="in" units="per_millimolar_per_s"/>
+        <variable name="koff_i_RyR" public_interface="in" units="per_s"/>
+        <variable name="kon_l_RyR" public_interface="in" units="per_millimolar_per_s"/>
+        <variable name="koff_l_RyR" public_interface="in" units="per_s"/>
+        <variable name="N_l_RyR" public_interface="in" units="dimensionless"/>
+        <variable name="rho_RyR" public_interface="in" units="per_um2"/>
+        <variable name="k_RyR_single" public_interface="in" units="um3_per_s"/>
+        <variable name="Q10_RyR" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_RyR" public_interface="in" units="kelvin"/>
+        <variable name="Cai_init" public_interface="in" units="millimolar"/>
+        <variable name="Ca_ER_init" public_interface="in" units="millimolar"/>
+        <variable name="a_RyR_init" public_interface="out" units="dimensionless"/>
+        <variable name="i_RyR_init" public_interface="out" units="dimensionless"/>
+        <variable name="l_RyR_init" public_interface="out" units="dimensionless"/>
+        <variable name="a_RyR" public_interface="out" units="dimensionless" initial_value="a_RyR_init"/>
+        <variable name="i_RyR" public_interface="out" units="dimensionless" initial_value="i_RyR_init"/>
+        <variable name="l_RyR" public_interface="out" units="dimensionless" initial_value="l_RyR_init"/>
+        <variable name="a_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="i_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="l_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="P_RyR" public_interface="out" units="dimensionless"/>
+        <variable name="k_RyR" public_interface="out" units="m3_per_s"/>
+        <variable name="j_RyR" public_interface="out" units="mol_per_s"/>
+        <variable name="phi_RyR" public_interface="out" units="dimensionless"/>
+        <!-- Eq. A13 (activating site, fraction aRyR_Ca/aRyR_Tot), rates times phi -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>a_RyR</ci></apply><apply><times/><ci>phi_RyR</ci><apply><minus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>a_RyR</ci></apply></apply><apply><times/><ci>koff_a_RyR</ci><ci>a_RyR</ci></apply></apply></apply></apply></math>
+        <!-- Eq. A14 (inactivating site, fraction iRyR_Ca/iRyR_Tot), rates times phi -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>i_RyR</ci></apply><apply><times/><ci>phi_RyR</ci><apply><minus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>i_RyR</ci></apply></apply><apply><times/><ci>koff_i_RyR</ci><ci>i_RyR</ci></apply></apply></apply></apply></math>
+        <!-- Eq. A15 (luminal site on the releasing ER, fraction lRyR_Ca/lRyR_Tot), rates times phi -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>l_RyR</ci></apply><apply><times/><ci>phi_RyR</ci><apply><minus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>l_RyR</ci></apply></apply><apply><times/><ci>koff_l_RyR</ci><ci>l_RyR</ci></apply></apply></apply></apply></math>
+        <!-- Eq. A12: open fraction P = a (1 - i) l^N -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>P_RyR</ci><apply><times/><ci>a_RyR</ci><apply><minus/><cn cellml:units="dimensionless">1</cn><ci>i_RyR</ci></apply><apply><power/><ci>l_RyR</ci><ci>N_l_RyR</ci></apply></apply></apply></math>
+        <!-- maximal flux coefficient: ER membrane area x density x per-channel flux coefficient (1e-18 m3/um3) -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>k_RyR</ci><apply><times/><ci>A_ER</ci><ci>rho_RyR</ci><ci>k_RyR_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply></math>
+        <!-- Eq. A11, first term: release flux k P (Ca_ER - Cai), positive from the ER into the cytosol -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>j_RyR</ci><apply><times/><ci>k_RyR</ci><ci>P_RyR</ci><apply><minus/><ci>Ca_ER</ci><ci>Cai</ci></apply></apply></apply></math>
+        <!-- steady-state occupancies at the current Cai, Ca_ER: kon C / (kon C + koff) -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>a_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><ci>koff_a_RyR</ci></apply></apply></apply><apply><eq/><ci>i_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><ci>koff_i_RyR</ci></apply></apply></apply><apply><eq/><ci>l_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><apply><plus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><ci>koff_l_RyR</ci></apply></apply></apply></math>
+        <!-- starting occupancies: the steady state at the starting Ca (Cai_init, Ca_ER_init); a computed initial value,
+             so libCellML's Python/C generators reject the model (CVODE/Myokit runs it) -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>a_RyR_init</ci><apply><divide/><apply><times/><ci>kon_a_RyR</ci><ci>Cai_init</ci></apply><apply><plus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai_init</ci></apply><ci>koff_a_RyR</ci></apply></apply></apply><apply><eq/><ci>i_RyR_init</ci><apply><divide/><apply><times/><ci>kon_i_RyR</ci><ci>Cai_init</ci></apply><apply><plus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai_init</ci></apply><ci>koff_i_RyR</ci></apply></apply></apply><apply><eq/><ci>l_RyR_init</ci><apply><divide/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER_init</ci></apply><apply><plus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER_init</ci></apply><ci>koff_l_RyR</ci></apply></apply></apply></math>
+        <!-- temperature scaling: every rate constant is multiplied by phi = Q10^((T - T_ref)/10 K) -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>phi_RyR</ci><apply><power/><ci>Q10_RyR</ci><apply><divide/><apply><minus/><ci>T</ci><ci>T_ref_RyR</ci></apply><cn cellml:units="kelvin">10</cn></apply></apply></apply></math>
+    </component>
+</model>

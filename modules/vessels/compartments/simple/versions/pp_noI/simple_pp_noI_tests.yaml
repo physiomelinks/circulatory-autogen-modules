@@ -1,0 +1,23 @@
+module_type: simple
+version: pp_noI
+reviewed: false
+notes: 'Pure resistance (litre / kPa): v = v_d = (u_in - u_out)/R. Algebraic (no state).'
+reference_proposals:
+  R:
+    reference: 'bozkurt2019mathematical; Table 2 (adult): systemic arterioles R = 0.95 mmHg s/mL = 126.7 kPa s/L (used as the representative
+      compartment for this generic component)'
+    sourced: 'yes'
+    value: 126.7
+  u_in:
+    reference: unreferenced_placeholder; isolated-test boundary value (mean pressure + R x mean flow / 2); in a network it
+      is supplied by the neighbouring compartment
+    sourced: 'no'
+    value: 17.28
+  u_out:
+    reference: unreferenced_placeholder; isolated-test boundary value (mean pressure - R x mean flow / 2); in a network it
+      is supplied by the neighbouring compartment
+    sourced: 'no'
+    value: 6.723
+review: reviews/cvs_mvp_review.yaml
+review_scope: The review of the whole cvs_mvp module (23 entries) before the move to versions; only the parts about this version
+  apply.

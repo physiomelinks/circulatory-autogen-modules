@@ -1,0 +1,7 @@
+variable_name,units,value,data_reference,sourced
+Cai,millimolar,0.0001,"wanaverbecq2003plasma; resting [Ca2+]i 102 +- 4 nM (n = 83) in cultured rat SCG neurons (indo-1), Results, first section; 1e-4 mM used when unconnected (in a soma or varicosity Cai is the Ca handling's sub-membrane shell, internal_Ca)",yes
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma or varicosity it comes from the membrane through the membrane_area port),no
+rho_PMCA,per_um2,2577.06262,"calibrated to wanaverbecq2003_scg_obs_data.json (CMA-ES, 2026-10-06)",no
+r_PMCA,per_s,30.0,"unreferenced_placeholder; Ca ions transported per PMCA per second; no verified neuronal turnover found; 30 /s assumed (only the product rho_PMCA r_PMCA matters, and rho_PMCA is calibrated)",no
+K_PMCA,millimolar,0.3788e-3,"colegrove2000quantitative; Fig. 1A and Eq. 1: plasma-membrane Ca extrusion EC50,extru = 378.8 nM (= value; bullfrog sympathetic neurons, 19-22 degC; the fit lumps PMCA with other uphill Ca transport). In rat SCG the PMCA is the principal extruder at rest and for loads <= 500 nM (wanaverbecq2003plasma)",yes
+n_PMCA,dimensionless,1.8,"colegrove2000quantitative; Fig. 1A and Eq. 1: n_extru = 1.8 (= value; bullfrog sympathetic neurons, 19-22 degC)",yes

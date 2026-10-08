@@ -1,0 +1,63 @@
+comment: 'Most components do not generate as committed: every Paci gate declares Vm ''dimensionless'' in the config but ''volt''
+  in the CellML; the Paci current components keep private_interface=''in'' on their gate inputs (leftover of the original
+  encapsulation) and expose TTX/E4031/Chromanol_coeff and V_half without an interface; R/F use the undefined units J_per_MK/C_per_M;
+  i_NaCa lacks Cai. The Tao 2011 neuron currents declare every tau in seconds although the Tao/Belluzzi-Sacchi expressions
+  are in ms (all gates 1000x too slow), have sign errors in h_bar, hc_bar and kcs_bar, a spurious +17 in tau_h, and a GHK
+  I_Ca that is not dimensionally consistent (Vm in mV inside exp(2VF/RT), P_Ca in m/s giving A/m2 not nA). piezo has no source.'
+summary: '31 components: 25 Paci 2013 hiPSC-CM pieces (12 algebraic currents, 13 gating variables), 5 Tao 2011 sympathetic-neuron
+  currents (Belluzzi & Sacchi kinetics) and the owner''s unpublished Piezo-type current. Specs written for all: voltage-clamp
+  exact solutions for every gate (Paci formulae transcribed from the authors'' CellML, Tao formulae from the Tao 2011 Supporting
+  Material), exact algebraic identities for the currents, bounds, sweep ranges with rationale. All TODO values proposed (Paci
+  constants/initial states from the authors'' CellML; Tao conductances/reversals from the Tao 2011 supplement table; piezo
+  placeholders). In the repo only i_K1, i_b_Na, i_b_Ca, i_PCa and i_piezo generate; the rest are recorded expected failures
+  with a proposed fix each. On a patched copy of the library with those fixes, all 25 Paci components and piezo pass every
+  test; the Tao components then run but fail the source-comparison invariants (time units, signs), which is the point of recording
+  them.'
+questions:
+- Confirm paci2013computational as the reference for every Paci constant and initial value (values taken from the authors' CellML, ventricular
+  version, PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013; the paper's appendix was not accessible). Gate/current
+  BC operating points are the CellML initial state; E_x are Nernst values at it.
+- Approve the config/CellML fixes for the Paci components (see proposed_fixes); all were verified on a patched copy of the
+  library, after which all 25 Paci components pass run/invariants/BC/timestep/stability.
+- 'Tao 2011 currents: approve (a) time constants in ms (divide by 1000 or declare tau in millis), (b) h_bar, hc_bar sign +(V+..),
+  kcs_bar sign -(V+15.18)/4, (c) remove ''+ 17'' from tau_h (Tao Suppl. Eqs 87, 89, 93, 106; the published curves match Belluzzi
+  & Sacchi''s measured time constants only in ms).'
+- 'i_Ca_Tao_2011 GHK: Vm (mV) is used directly in exp(2VmF/RT) (1000x too large, overflows above ~+10 mV) and P_Ca in m/s
+  times concentration gives A/m2, not nA. What membrane area / units should P_Ca carry? Proposed P_Ca = 1.1e-15 m/s is Tao''s
+  1.1e-16 cm/ms converted, but the current magnitude is meaningless until this is fixed.'
+- Global Cao is shared by the Paci (1.8 mM) and Tao (neuron) components; Tao lists 2 mM (SA-node table) and Belluzzi & Sacchi
+  used 5 mM. Keep one global at the Paci value?
+- 'i_piezo_Na_Argus_unpublished: all 8 constants are order-of-magnitude placeholders (sourced: no). Is there a data set/source
+  for r_50, k_r, tau_r, V_50, k_V, tau_V, g? Should it use E_Na (Piezo1 is non-selective, E_rev ~0 mV)?'
+- 'i_CaL_Paci_2013: nifedipine switches are inputs but nifed_coeff never multiplies I_CaL - exactly as in the original Paci
+  CellML. Keep (faithful) or apply the block?'
+- 'Validation: all pending. Candidates: hiPSC-CM I-V / activation data of Ma et al. 2011 (used by Paci 2013) for the Paci
+  currents; Belluzzi & Sacchi 1985-1990 J Physiol voltage-clamp data (e.g. tau_hc 17.6-29.3 ms, tau_kcf 0.8-2 ms) for the
+  Tao currents after the fixes. Approve digitising these figures?'
+- i_CaL_d_gate_Paci_2013 declares Cai as an input (entrance port internal_Ca_d_gate_port [Cai, d]) that its equations never
+  use, and d appears in its own entrance port. Intended?
+proposed_fixes:
+- 'ion_channel_modules_config.json + ion_channel_parameters.csv: Vm units ''dimensionless'' -> ''volt'' for the 13 Paci gate
+  components (CellML declares volt; Myokit rejects the connection).'
+- 'ion_channel_modules.cellml: public_interface=''in'' (drop private_interface) for m, h, j (i_Na), f1, f2, fCa (i_CaL), Xr1,
+  Xr2 (i_Kr), Xs (i_Ks), Xf (i_f), q, r (i_to); d in i_CaL: private_interface=''in'' public_interface=''out'' -> public_interface=''in''.'
+- 'ion_channel_modules.cellml: public_interface=''out'' for TTX_coeff, E4031_coeff, Chromanol_coeff, V_half (Xr1 gate) and
+  for the Tao gate/tau variables (m, h, n, a, ha, kcf, kcs, c, hc and their tau_*) that the config exposes.'
+- 'ion_channel_units.cellml: define C_per_M = coulomb/mole and J_per_MK = joule/(mole kelvin) (or rename to C_per_mol / J_per_mol_K
+  as in the cell module).'
+- 'i_NaCa_Paci_2013: add [''Cai'', ''millimolar'', ''access'', ''boundary_condition''] to variables_and_units and a parameters
+  row (value 1.80774e-5 mM, paci2013computational initial Cai).'
+- 'Tao 2011 components: tau units ms (see question); h_bar = 1/(1+exp((Vm+53.2)/6.5)); hc_bar = 1/(1+exp((Vm+19.91)/4.5));
+  kcs_bar = 1/(1+exp(-(Vm+15.18)/4.0)); tau_h without ''+ 17''; GHK exponent with Vm/1000.'
+findings:
+- 'Paci gates: exact voltage-clamp solutions hold to <1e-5 over Vm -100..+50 mV and all initial values; RK4 converges at order
+  ~4; all 9 solver families work (m gate: 6/9 - tau_m falls to ~1e-8 s at -100 mV, very stiff).'
+- Paci currents are algebraic (timestep test skipped); the GHK I_CaL is 0/0 at exactly Vm = 0 (removable singularity, as in
+  the original); sweep points avoid 0 V.
+- 'Paci i_K1: beta_K1 has a negative term (-1.509 e^{...}) as in the original, so XK1_inf is not bounded to [0,1] in general;
+  only the formula is checked.'
+- 'Tao gates (patched copy): the gates follow their own tau exactly, but tau differs from the published ms expressions by
+  1000x everywhere (and tau_h by the extra 17), and h, hc, kcs relax to the mirror-image steady state; I_Ca becomes NaN for
+  Vm >~ +10 mV (exp overflow).'
+- 'Structure checks miss these defects: config-vs-CellML unit mismatches and config variables without a public interface are
+  not detected (see framework needs).'

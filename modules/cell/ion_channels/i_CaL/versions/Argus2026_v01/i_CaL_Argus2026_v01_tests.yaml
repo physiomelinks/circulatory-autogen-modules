@@ -1,0 +1,29 @@
+module_type: i_CaL
+version: Argus2026_v01
+reviewed: true
+description: 'High-voltage-activated (L-type) Ca current of the sympathetic-neuron soma: GHK flux i_Ca_L with permeability
+  p_Ca = A rho_CaL p_Ca_single (1 + cAMP), activation c^2 and voltage-dependent inactivation hc (Belluzzi-Sacchi / Tao 2011
+  gates, modified); its Ca flux j_Ca_L = -i_Ca_L/(2F) goes to the soma''s Ca balance.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. L-type Ca current of the SN soma: GHK flux with permeability p_Ca (1 + cAMP), gates c^2 hc; Ca flux
+  j_Ca_L = -i_Ca_L/(2F) into the sub-membrane Ca. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. Geometry re-parameterisation (2026-10-02): p_Ca = A_mem rho_CaL p_Ca_single (membrane area x density
+  x per-protein permeability, 1e-18 m3/um3), A_mem through the A_mem port; the defaults reproduce the previous p_Ca. The GHK
+  exponent is written V*2e-3*F/(R*T) rather than 2e-3*V*F/(R*T): libcellml (0.6.3-0.7.1, main) wrongly reports the latter
+  as not dimensionless (cellml/libcellml#1485). The GHK expression is 0/0 at exactly V = 0 mV; a piecewise uses its analytic
+  limit 1e6 F p_Ca (1 + cAMP)(Cai - Cao)/(2e-3) c^2 hc for |V| < 1e-6 mV (added on review 2026-10-05; continuous with the
+  GHK branch to 1e-7 relative). The step test clamps at +10 mV. Time constants traced on review (2026-10-05): tau_hc and tau_c_min
+  from Belluzzi & Sacchi 1989 (= Tao 2011 Eqs 92, 94); tau_c_max 3 ms is the owner''s fit to the Davis traces (about 5x the
+  source), kept for recalibration. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC),
+  like the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10
+  K) (Q10_CaL, T_ref_CaL). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
+  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

@@ -1,0 +1,81 @@
+[
+  {
+    "module_type": "i_stim_periodic",
+    "module_subtype": "cardiomyocyte_Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_stim_periodic_cardiomyocyte_Paci2013_v01_modules.cellml",
+    "component_type": "stim_mode_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "paci2013computational"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "stim_current",
+        "variables": [
+          "i_stim"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "Cm",
+        "farad",
+        "access",
+        "global_constant"
+      ],
+      [
+        "stim_flag",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_stim_start",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "i_stim_end",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "i_stim_frequency",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "i_stim_period",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "i_stim_pulse_duration",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "i_stim_amplitude",
+        "ampere",
+        "access",
+        "constant"
+      ],
+      [
+        "i_stim",
+        "A_per_F",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

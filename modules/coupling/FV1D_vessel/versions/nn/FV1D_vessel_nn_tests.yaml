@@ -1,0 +1,12 @@
+module_type: FV1D_vessel
+version: nn
+reviewed: true
+notes: 'Marks a vessel as part of the C++ 1D finite-volume (Muller) solver: no CellML equations and no port variables of its
+  own. Its api block (role consumer, named pipes to the FV1D_solver process) says what the generated 0D model exchanges
+  with the 1D solver. libcuflynx generates the 0D model coupled to it through the C++ 0D-1D path (model_type cpp, couple_to_1d). Test network:
+  a 1D vessel (mod) with no 0D neighbour, beside a 0D vessel feeding a 1D vessel (pv). run_test generates it from this library
+  and compiles the generated model0d.cpp; the simulation tests are not applicable because the 1D solver it couples to is not runnable here
+  (libcuflynx solver1d is in development and circulatory_autogen itself only tests generation).'
+known_issues:
+- circulatory_autogen's 0D_1D_coupling_test network names a vessel 0D_vessel, not a valid CellML name (starts with a digit);
+  the harness here uses vessel0d.

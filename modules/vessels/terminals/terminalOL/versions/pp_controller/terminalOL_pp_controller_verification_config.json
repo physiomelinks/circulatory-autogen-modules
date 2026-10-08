@@ -1,0 +1,120 @@
+{
+  "module_type": "terminalOL",
+  "version": "pp_controller",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "outputs": [
+    "u",
+    "u_C",
+    "v",
+    "v_T",
+    "q",
+    "R_T",
+    "check",
+    "error",
+    "error_flow_percent",
+    "u2",
+    "u5",
+    "u8",
+    "aa2",
+    "cc2",
+    "aa5",
+    "cc5",
+    "aa8",
+    "cc8"
+  ],
+  "harness": {
+    "parameters": [
+      [
+        "u_a_mod",
+        "J_per_m3",
+        11000,
+        "test value: constant observed pressure (u_a is fed by a pressure_observer in a network); needs the proposed config fix"
+      ],
+      [
+        "v_a_mod",
+        "m3_per_s",
+        3e-06,
+        "test value: constant observed flow (v_a is fed by a flow_observer in a network); needs the proposed config fix"
+      ]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "R_T follows the CellML piecewise law: 1 Pa s m^-3 if check <= 0, check if 0 < check <= 1e13, 1e13 above (NB values in (0, 1) pass through unclamped)",
+      "expr": "np.max(np.abs(R_T - np.where(check <= 0, 1.0, np.minimum(check, 1e13)))) <= 1e-9*max(1.0, np.max(np.abs(R_T)))"
+    },
+    {
+      "description": "physical bound: terminal flows stay below 1e-3 m3/s (60 L/min, far above any single terminal) - fails when the learned output goes negative and R_T drops to the 1 Pa s m^-3 floor",
+      "expr": "(np.max(np.abs(v)) <= 1e-3) & (np.max(np.abs(v_T)) <= 1e-3)"
+    },
+    {
+      "description": "the three membership functions (negative / zero / positive pressure error) form a partition of unity: u2 + u5 + u8 = 1",
+      "expr": "np.max(np.abs(u2 + u5 + u8 - 1)) <= 1e-9"
+    },
+    {
+      "description": "with a constant observed pressure u_a the pressure error is constant, so d(aa_i)/dt = error d(cc_i)/dt gives the first integral aa_i - 100 = error (cc_i - 100) (both start at 100), checked for i = 2, 5, 8",
+      "expr": "(np.max(np.abs((aa2 - 100) - error*(cc2 - 100))) <= 1e-6*max(1.0, np.max(np.abs(aa2 - 100)))) & (np.max(np.abs((aa5 - 100) - error*(cc5 - 100))) <= 1e-6*max(1.0, np.max(np.abs(aa5 - 100)))) & (np.max(np.abs((aa8 - 100) - error*(cc8 - 100))) <= 1e-6*max(1.0, np.max(np.abs(aa8 - 100))))"
+    },
+    {
+      "description": "pressure error is pressure_d - u_a with the harness value u_a = 11000 Pa",
+      "expr": "np.max(np.abs(error - (pressure_d - 11000.0))) <= 1e-9*max(1.0, abs(pressure_d))"
+    },
+    {
+      "description": "volume balance: q(t) - q(t0) = integral of (v - v_T) dt from t0 = 10 ms (after the sub-ms inertial start-up transient, which the output grid cannot resolve), trapezoid on the output grid",
+      "expr": "np.max(np.abs((q - q[t >= 0.01][0])[t >= 0.01] - np.concatenate([[0.0], np.cumsum(0.5*np.diff(t[t >= 0.01])*((v - v_T)[t >= 0.01][1:] + (v - v_T)[t >= 0.01][:-1]))]))) <= 1e-3*max(np.max(np.abs(q - q[0])), 1e-15) + 1e-15"
+    },
+    {
+      "description": "pressure law: u_C = (q - q_us)/C_T and u = u_C + u_ext + (0.01/C_T)(v - v_T)",
+      "expr": "(np.max(np.abs(u_C - (q - q_us)/C_T)) <= 1e-6*max(1.0, np.max(np.abs(u_C)))) & (np.max(np.abs(u - (u_C + u_ext + 0.01/C_T*(v - v_T)))) <= 1e-6*max(1.0, np.max(np.abs(u))))"
+    },
+    {
+      "description": "flow-fraction error uses the observed flow (harness v_a = 3e-6 m3/s): error_flow_percent = 100 (BFF_ASL - v_a/meanflow_4dflow)",
+      "expr": "np.max(np.abs(error_flow_percent - 100*(BFF_ASL - 3.0e-6/meanflow_4dflow))) <= 1e-6*max(1.0, np.max(np.abs(error_flow_percent)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "u_in": {"min": 6000, "max": 18000, "points": 4},
+      "u_ext": {"min": 0, "max": 2000, "points": 3},
+      "q_us": {"min": 0, "max": 2e-06, "points": 3},
+      "q_init": {"min": 0, "max": 7e-06, "points": 3},
+      "C_T": {"min": 1e-11, "max": 1e-09, "points": 3, "scale": "log"},
+      "I_T": {"min": 1e-07, "max": 1e-05, "points": 3, "scale": "log"},
+      "BFF_ASL": {"min": 0.1, "max": 0.9, "points": 3},
+      "pressure_venous_dist": {"min": 0, "max": 2000, "points": 3},
+      "meanflow_4dflow": {"min": 2e-06, "max": 2e-05, "points": 3, "scale": "log"},
+      "pressure_d": {"min": 8000, "max": 16000, "points": 3}
+    },
+    "rationale": "Pressures span 45-135 mmHg inlet / target and 0-15 mmHg venous & external pressure; C_T spans small-terminal to large-outlet compliances around the boileau2015benchmark iliac value (3.7e-10); meanflow spans ~0.3x-3x the benchmark mean inflow; BFF_ASL spans 10-90 %; I_T two decades around the placeholder. These are claimed working ranges once the config fix is applied."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [1e-05, 5e-06, 2.5e-06, 1.25e-06],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ],
+    "t_end": 0.5
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "controller-driven boundary condition: its target values (pressure_d, BFF_ASL, meanflow_4dflow) are patient inputs; validation belongs to the closed-loop network that uses it (e.g. controlled terminals of the boileau2015benchmark bifurcation/ADAN56 benchmarks, whose Windkessel pressures could be compared)"
+      },
+      "calibrate": {
+        "note": "not_applicable: the controller itself identifies R_T online; nothing to calibrate in isolation"
+      }
+    }
+  }
+}

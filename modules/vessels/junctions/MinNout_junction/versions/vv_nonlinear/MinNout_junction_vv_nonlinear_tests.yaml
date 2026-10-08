@@ -1,0 +1,88 @@
+module_type: MinNout_junction
+version: vv_nonlinear
+reviewed: false
+notes: 'vv vessel with a nonlinear tube law. Tested in a harness network (libcuflynx sums the flows at a Min/Nout node only
+  when real vessels are connected there): mod (MinNout_junction vv_nonlinear); bcin1 (inlet_flow constant); up1 (arterial_simple
+  vp); bcin2 (inlet_flow constant); up2 (arterial_simple vp); dn1 (arterial_simple pv); bcout1 (outlet_flow constant);
+  dn2 (arterial_simple pv); bcout2 (outlet_flow constant). Jacobian timescales (nominal: fastest 2.9e-05 s, slowest decay
+  0.011 s, shortest oscillation period 0.00023 s; run: fastest 0.00055 s, slowest decay 0.01 s, shortest oscillation period
+  0.0035 s).'
+reference_proposals:
+  v_in_sum:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.000142884
+      m^3/s (mean velocity x lumen area)
+    sourced: 'no'
+    value: 0.000142884
+  v_out_sum:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.000142884
+      m^3/s (mean velocity x lumen area)
+    sourced: 'no'
+    value: 0.000142884
+  u_ext:
+    reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
+    sourced: definitional
+    value: 0.0
+  u_0:
+    reference: unreferenced_placeholder; reference pressure 80 mmHg as used by the ADAN-based siblings in this file ("AssumedRefOf80mmHg")
+    sourced: 'no'
+    value: 10640.0
+  theta:
+    reference: definitional; inclination angle in degrees, only used when beta_g = 1 (the momentum equation has beta_g rho
+      g l cos(theta)); 90 = horizontal, as for most siblings in this file
+    sourced: definitional
+    value: 90.0
+  l:
+    reference: unreferenced_placeholder; geometry copied from a sibling in this file (arterial pv_nonlinear_visco, ADAN_86)
+    sourced: 'no'
+    value: 0.014796
+  r_0:
+    reference: unreferenced_placeholder; geometry copied from a sibling in this file (arterial pv_nonlinear_visco, ADAN_86)
+    sourced: 'no'
+    value: 0.01508
+  K_tube:
+    reference: olufsen2000numerical; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
+      m^-1, k3 = 8.65e4 Pa (converted from g s^-2 cm^-1, cm^-1), r0 = 0.01508 m, rho = 1050 (vessel_properties material_prop_fromPWV
+      formula); normally supplied by a vessel_properties module
+    sourced: 'no'
+    value: 115333.0
+  m_tube:
+    reference: boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
+    sourced: 'yes'
+    value: 0.5
+  n_tube:
+    reference: boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0
+    sourced: 'yes'
+    value: 0.0
+  I_scale:
+    reference: definitional; no scaling of the inertance I = rho l/(pi r0^2)
+    sourced: definitional
+    value: 1.0
+  beta_g:
+    reference: definitional; gravity switch in beta_g rho g l cos(theta) (0 = off, as in the circulatory_autogen models; 1
+      = on). Library value 1 is a test_fft fixture value
+    sourced: definitional
+    value: 0.0
+  rho:
+    reference: boileau2015benchmark; Table II, blood mass density 1050 kg m^-3 (safaei2018bond Sec. 2.2.4 uses 1040). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 1050.0
+    also_cites:
+    - safaei2018bond
+  mu:
+    reference: boileau2015benchmark; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also safaei2018bond Sec. 2.2.4). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 0.004
+    also_cites:
+    - safaei2018bond
+  g:
+    reference: definitional; standard gravity 9.81 m s^-2 (library value 1 is a test_fft fixture value)
+    sourced: definitional
+    value: 9.81
+  R_flag:
+    reference: definitional; switch for the viscous (Poiseuille) resistance, 1 = on
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

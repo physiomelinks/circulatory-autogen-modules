@@ -1,0 +1,36 @@
+module_type: terminal2
+version: pp
+reviewed: false
+notes: 'Terminal RCR with inertance and u_out = 0 hard-coded (W_controller2). Jacobian timescales (nominal: fastest 7.4e-15
+  s, slowest decay 0.27 s; run: fastest 7.4e-15 s, slowest decay 0.27 s).'
+known_issues:
+- port variable u_in not in variables_and_units
+expected_failures:
+  run_test: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type: terminal2, BC_type:
+    pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared in a patched copy the
+    component generates and its tests pass (see review.proposed_fixes)'
+  verification_test_invariants: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel
+    type: terminal2, BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared
+    in a patched copy the component generates and its tests pass (see review.proposed_fixes)'
+  verification_test_BC: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type: terminal2,
+    BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared in a patched
+    copy the component generates and its tests pass (see review.proposed_fixes)'
+  verification_test_timestep: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type:
+    terminal2, BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared
+    in a patched copy the component generates and its tests pass (see review.proposed_fixes)'
+  stability_test: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type: terminal2,
+    BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared in a patched
+    copy the component generates and its tests pass (see review.proposed_fixes)'
+reference_proposals:
+  R_T:
+    reference: unreferenced_placeholder; terminal resistance copied from terminal pp_wCont_no_local (2.6e8 Pa s m^-3 = 1.96
+      mmHg s/mL)
+    sourced: 'no'
+    value: 260870000.0
+  C_T:
+    reference: unreferenced_placeholder; terminal compliance copied from terminal pp_wCont_no_local (4e-9 m^3/Pa = 0.53 mL/mmHg)
+    sourced: 'no'
+    value: 4.0e-09
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

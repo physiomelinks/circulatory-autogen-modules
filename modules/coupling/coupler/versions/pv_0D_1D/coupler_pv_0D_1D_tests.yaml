@@ -1,0 +1,13 @@
+module_type: coupler
+version: pv_0D_1D
+reviewed: true
+notes: '0D-1D coupler: receives the 0D vessel''s static pressure P_s_0D and returns the interface flow q*; receives the 1D
+  side''s total pressure P_t* and area A* (m2) and returns flux, the mass accumulated through the interface (kg). Static pressure
+  at the interface P_s* = P_t* − ½ρ(q*/A*)² (Bernoulli); flow driven through a lumped interface inertance I: dq*/dt = (P_s_0D
+  − P_s*)/I; flux = ∫ρq* dt. Reviewed 2026-09-29: momentum sign fixed (was (P_s* − P_s_0D)/I, which diverges), A_star declared
+  in m2 (was m3) and flux in kg (was m3_per_s). Tested in a harness: constant pressure inlet (2000 Pa) → BG arterial_simple
+  pv vessel (R 1e7, C 1e-8, I 1e5) → coupler → imposter_1D (P_t* = 1000 Pa, A* = 1e-3 m2); R and I differ from circulatory_autogen''s
+  0D_1D_coupling_test (R 1e8, I 1e-6: L/R = 1e-14 s, too stiff for the fixed-step test).'
+known_issues:
+- circulatory_autogen's 0D_1D_coupling_test network names a vessel 0D_vessel, not a valid CellML name (starts with a digit);
+  the harness here uses vessel0d.

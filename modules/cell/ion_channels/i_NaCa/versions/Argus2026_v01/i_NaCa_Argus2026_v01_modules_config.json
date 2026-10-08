@@ -1,0 +1,187 @@
+[
+  {
+    "module_type": "i_NaCa",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "i_NaCa_Argus2026_v01_modules.cellml",
+    "component_type": "i_NaCa_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "paci2013computational",
+      "argus2026sympathetic"
+    ],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_NaCa"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_NaCa_Na"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_NaCa_Ca"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "KmCa",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "KmNai",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ksat",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nao",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "alpha_NaCa",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_NaCa",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_NaCa",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaCa_Ca",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaCa_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_NaCa",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_NaCa",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_NaCa",
+        "per_s",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

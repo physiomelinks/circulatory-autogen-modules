@@ -1,0 +1,16 @@
+variable_name,units,value,data_reference,sourced
+Cai,millimolar,0.0001,"definitional; resting sub-membrane (shell) Ca 1e-4 mM (Cai_init, cf. wanaverbecq2003plasma) used when unconnected",no
+Ca_mid_m_SK,millimolar,0.00063,"hirschberg1998gating; recombinant SK2 Ca EC50 0.62 +- 0.14 uM (single channel) and 0.63 +- 0.23 uM (macropatch), Results with Fig. 1; native SK 0.5-0.7 uM (Introduction). Was 0.3 uM (cited to gupta2016computational, an SK bladder study); set to 0.63 uM on review (2026-10-02)",yes
+Cai_init,millimolar,1e-4,"definitional; resting cytosolic Ca 1e-4 mM (the soma's Cai_init, cf. wanaverbecq2003plasma), the Ca at which m_SK starts",no
+E_K,milliV,-96.4979,"definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 295.15 K (the soma defaults; used when unconnected)",no
+V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. davis2020downregulation)",no
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_SK,per_um2,0.16181229773462782,definitional; chosen so that g_KCa_SK = A rho gamma_SK (1e-6 uS/pS) reproduces the previous g_KCa_SK = 0.005 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_SK = 10.3 picoS; a density for calibration through gamma_SK. The previous g_KCa_SK (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'),no
+gamma_SK,picoS,10.3,"hirschberg1998gating; rSK2 single-channel conductance 10.3 +- 1.3 pS, inside-out (Results)",yes
+g_KCa_SK_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
+p_SK,dimensionless,4,"hirschberg1998gating; Results: Hill coefficient 3.2 +- 1.0 (single channel), 3.6 (effective open probability), 4.8 +- 1.5 in macropatches (Kohler et al. 1996); 4 within the range. Previously cited to gupta2016computational (not verified)",yes
+tau_m_SK,millis,5,"hirschberg1998gating; Results, Fig. 13A: rSK2 macroscopic activation tau 4.1 +- 0.6 ms after a jump to 9.5 uM Ca (deactivation 57.3 +- 11.1 ms; model activation ~5 ms at 5 uM, ~50 ms at 0.5 uM Ca); 5 ms ~ value **(one tau used for activation and deactivation: deactivation is ~11x too fast against the measured 57 ms)**. Previously cited to gupta2016computational (bladder SK model, not verified)",yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_SK,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_SK,kelvin,295.15,"hirschberg1998gating; rSK2 in Xenopus oocytes, inside-out patches at room temperature (kinetics as measured; equal to the model temperature)",yes
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

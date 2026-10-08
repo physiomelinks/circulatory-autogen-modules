@@ -1,0 +1,49 @@
+{
+  "module_type": "afferent_to_sympathetic_efferent",
+  "version": "Ursino1998_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "outputs": ["f_s"],
+  "invariants": [
+    {
+      "description": "f_s equals the saturated exponential law",
+      "expr": "np.max(np.abs(f_s - np.minimum(f_es_inf + (f_es_0 - f_es_inf)*np.exp(k_es*(W_bs*f_ab + W_cs*f_apc)), f_es_max))) <= 1e-9*max(1.0, f_es_max)"
+    },
+    {
+      "description": "f_s never exceeds f_es_max and stays above f_es_inf (when f_es_0 > f_es_inf)",
+      "expr": "(np.max(f_s) <= f_es_max + 1e-9) & ((f_es_0 <= f_es_inf) or (np.min(f_s) >= min(f_es_inf, f_es_max) - 1e-9))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_ab": {"min": 0.0, "max": 50.0, "points": 6},
+      "f_apc": {"min": 0.0, "max": 20.0, "points": 5}
+    },
+    "rationale": "full baroreceptor and chemoreceptor output ranges."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.04, 0.02, 0.01, 0.005],
+    "t_end": 40.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "Candidate: muscle sympathetic nerve activity vs diastolic pressure (human MSNA baroreflex curves, e.g. Kienbaum-type sigmoid data) would test the combined baroreceptor + sympathetic mapping; needs an obtainable dataset and a network with the baroreceptor; not set up."
+      },
+      "calibrate": {"note": "pending: see baseline"}
+    }
+  }
+}

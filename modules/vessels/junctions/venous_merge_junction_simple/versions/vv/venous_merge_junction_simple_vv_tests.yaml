@@ -1,0 +1,61 @@
+module_type: venous_merge_junction_simple
+version: vv
+reviewed: false
+notes: 'vv lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 0.018 s, slowest decay 0.1 s; run: fastest 0.018
+  s, slowest decay 0.1 s).'
+expected_failures:
+  run_test: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond with any
+    variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
+  verification_test_invariants: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not
+    correspond with any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass
+    (see review.proposed_fixes)'
+  verification_test_BC: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond
+    with any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
+  verification_test_timestep: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond
+    with any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
+  stability_test: 'generation fails: libcellml "MathML ci element has the child text q_Cq_C_d which does not correspond with
+    any variable" in vv_merge_simple_type (typo for q_C + q_C_d). Fixed in a patched copy, the tests pass (see review.proposed_fixes)'
+reference_proposals:
+  q_0:
+    reference: unreferenced_placeholder; unstressed volume 0.0001 m^3 (100 mL), order of magnitude for this vessel class
+    sourced: 'no'
+    value: 0.0001
+  R:
+    reference: safaei2018bond; Table S3 R_svn = 3.999e6 J s m^-6 (0.03 mmHg s/mL), systemic veins
+    sourced: 'yes'
+    value: 3999000.0
+  C:
+    reference: safaei2018bond; Table S3 C_svn = 0.1125281e-6 m^6 J^-1 (15 mL/mmHg), systemic veins
+    sourced: 'yes'
+    value: 1.125281e-07
+  u_ext:
+    reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
+    sourced: definitional
+    value: 0.0
+  u_0:
+    reference: definitional; pressure is 0 at the unstressed volume q_0 (lumped convention u = (q - q_0)/C); u_0 and q_0 are
+      redundant
+    sourced: definitional
+    value: 0.0
+  I:
+    reference: safaei2018bond; Table S3 I_svn = 0.06665e6 J s^2 m^-6 (0.0005 mmHg s^2/mL), systemic veins
+    sourced: 'yes'
+    value: 66650.0
+  v_in_1:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 5e-05
+      m^3/s, half of the total for a two-branch port
+    sourced: 'no'
+    value: 5.0e-05
+  v_in_2:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 5e-05
+      m^3/s, half of the total for a two-branch port
+    sourced: 'no'
+    value: 5.0e-05
+  v_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

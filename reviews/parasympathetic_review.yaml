@@ -1,0 +1,64 @@
+comment: 'Several csv values attributed to gee2023closed do not match Gee 2023 (supplementary tables + authors'' Simulink v03):
+  tau_Rsp = 2 s and tau_Vusv = 5 s are the pure DELAYS D_R/D_V (Gee/Ursino time constants are 6 s and 20 s); k_NActr = 23
+  should be 7; G_al = 2.329e7 per m3 s treats Gee''s 23.29 Hz/L as Hz/mL (1000x too large: q_str = 0.3 L gives f_ls ~ 7000
+  Hz). f_mid_ls (0.13), f_mid_cp (20.2), f_mid_NA (30) are unexplained local changes; LCN/PNNA/PNDMV and NTS-chemoreceptor
+  parameters are the author''s own identification (unsourced). The only structural defect is the milliL units in the orphaned
+  v_lung/P_thor/P_abd components, which no config entry uses.'
+summary: 'Gee et al. 2023 (AIChE J 69:e18033) vagal/sympathetic reflex network, broken into 14 components: lung stretch and
+  cardiopulmonary receptors (first-order filters + sigmoid), sympathetic afferent integration and efferent exponential maps,
+  two sympathetic effectors (log map + first-order filter), and the brainstem/ICN neuronal sigmoids (NTS, DMV, NA with RSA
+  gate, NActr, LCN, PNNA, PNDMV with muscarinic filter). All inputs are boundary conditions, so every component runs alone
+  (no harness needed). Each component is verified against its EXACT solution (closed-form first-order step responses for the
+  6 stateful components; exact static maps/identities for the algebraic ones) plus bounds; all 62 non-skipped V&V tests pass,
+  sweeps cover the physiological input ranges, and the 256-sample joint risk run gives P(fail) = 0 for all components. Every
+  parameter value was cross-checked against Gee 2023''s supplementary tables AND the authors'' Simulink model (github Daniel-Baugh-Institute/CardiovascularControl
+  v03), which disagree in places (listed below). Validation: not_applicable for the internal neuronal populations (no component-level
+  data; closed-loop validation candidate is Gee 2023 Table 2), pending for the two receptors.'
+questions:
+- 'Confirm the gee2023closed references for the parameters marked sourced: yes (see references table; values checked against Supplementary
+  Tables S.7-S.24 and the v03 Simulink block constants).'
+- 'tau_Rsp = 2 s and tau_Vusv = 5 s: the Gee Simulink uses 1/(6s+1) with a 2 s transport delay (resistance) and 1/(20s+1)
+  with a 5 s delay (unstressed volume); the csv values equal the delays (Table S.14 lists the D''s under a "time constants"
+  caption). Change to 6 s and 20 s? (The delay itself is not modelled; add one via the delay module if wanted.)'
+- 'G_al: Gee uses 23.29 with lung volume in litres (V_lung0 = 1.9, V_ln = 2.54), i.e. 2.329e4 Hz per m3. The csv 2.3291e7
+  assumes mL. Change to 2.329e4? (At q_str = 0.3 L the current value gives f_ls ~ 7000 Hz.)'
+- k_NActr = 23 (cited gee2023closed) but Gee Table S.21 and the Simulink both give 7 (23 is k_NA). Change to 7?
+- k_l = 190.48 Pa (1.4286 mmHg) matches the Gee Simulink, but Supplementary Table S.7 gives 11.758 mmHg; conversely Gee's
+  baroreceptor k_a is 1.43 mmHg in the table but 11.758 in the Simulink. Which slope do you want for the cardiopulmonary receptor?
+- 'Local modifications with no source: f_mid_ls 0.13 (Gee 11.126), f_mid_cp 20.2 (Gee 10.21), f_mid_NA 30 (Gee 59.83), f_mid_br
+  44.125 (Simulink; table S.17 says 37.07). Keep as identified values (unreferenced_placeholder) or revert to Gee?'
+- 'LCN, PNNA, PNDMV and NTS-chemoreceptor parameters are "identified-11-6-24"/hand-tuned: is there a publication/report to
+  cite, or keep unreferenced_placeholder? (Gee 2023 values are in the proposal notes for comparison.)'
+- f_apc = 3.7 Hz is attributed to Magosso & Ursino 2001; I could not access the full text to verify the table entry. Please
+  confirm.
+- P_mus BC note says "TO_BE_SET_THIS_IS_WRONG" and P_pvn = P_mus = 500 Pa gives zero transmural pressure at the library default.
+  Set physiological defaults (e.g. P_pvn ~ 1100 Pa, P_mus ~ -530 Pa = -4 mmHg)? This would also make the timestep test non-trivial
+  (see findings).
+- The _OLD threshold lung stretch receptor had all-TODO values; proposed values (Gee conversions + typical lung volumes) are
+  in the spec. Keep the component, or remove it from the library?
+proposed_fixes:
+- 'milliL (known issue): the CellML components P_abd, P_thor and v_lung are not used by any entry of parasympathetic_modules_config.json
+  (nor any other module config), and v_lung declares V_lung, V_lung0, V_ln in the undefined unit milliL. Fix: delete the three
+  orphan components; or, if kept, define a litre unit (Gee''s values 1.9 and 2.54 are litres, not mL) and give the 0.16 coefficient
+  units of L/mmHg so V_lung = V_lung0 - 0.16 P_thor - V_ln is dimensionally consistent.'
+- 'parameters csv (owner decision, no CellML change): tau_Rsp 2 -> 6 s; tau_Vusv 5 -> 20 s; k_NActr 23 -> 7; G_al 2.3291e7
+  -> 2.329e4 per_m3_s (evidence: Gee 2023 Simulink v03 block constants and Supplementary Tables S.8, S.14, S.21).'
+findings:
+- All stateful components (lung stretch x2, cardiopulmonary, two effectors, PNDMV) match their closed-form first-order step
+  responses to CVODE tolerance at the run point and across the sweeps; algebraic components match their exact maps to round-off.
+- verification_test_timestep integrates the model at the csv nominal values, not run_parameters. For lung_stretch_receptor_Gee2023
+  (q_str = 0) and cardiopulmonary_receptor_Gee2023 (P_pvn = P_mus, P_l_init = 0) the nominal state is an equilibrium, so the
+  RK4 convergence test is trivially exact (differences 0). The exact-solution invariants at the run point cover the dynamics
+  instead.
+- 'Algebraic components (sympathetic afferent/efferent, NTS, DMV, NA, NActr, LCN, PNNA) have no states: timestep test skipped
+  by design.'
+- 'sympathetic_afferent: the "- 10" offset on f_cp is not in Gee''s supplementary equations S.46-S.48 but is in their Simulink
+  (constant fac0 = 10), so the module matches the code actually used for Gee 2023''s results.'
+- Effector static maps use log(f - f_es_min + 1) only for f >= f_es_min, equal to Gee's Simulink saturation max(., 1); Gee's
+  pure time delays (2 s, 5 s) are not represented.
+- With f_mid_ls = 0.13 Hz the NTS lung-stretch subtype is saturated (> 99% of f_max) for f_ls above ~1.3 Hz, i.e. it is effectively
+  a constant ~31.6 Hz in normal breathing.
+- 'Risk (256 samples, joint uniform over the sweep ranges): P(fail) = 0 [0, 0.015] for every component.'
+- 'Structure-test warnings checked: f_es_min is per_s in the config but Hz in the CellML for peripheral_resistance_effector_Gee2023
+  and unstressed_volume_effector_Gee2023. The units are dimensionally equivalent, both components generate and pass, so harmonising
+  the unit names is cosmetic.'

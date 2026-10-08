@@ -1,0 +1,247 @@
+[
+  {
+    "module_type": "i_Na1_6",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "i_Na1_6_Argus2026_v01_modules.cellml",
+    "component_type": "i_Na1_6_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "belluzzi1986quantitative",
+      "tao2011model",
+      "argus2026sympathetic"
+    ],
+    "required_citations_uncertain": [
+      "belluzzi1986quantitative",
+      "tao2011model",
+      "argus2026sympathetic"
+    ],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Na1_6"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_Na1_6"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_h_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_m_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_h_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_m_Na1_6",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_rest_approx",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Na1_6",
+        "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_Na1_6",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Na1_6",
+        "picoS",
+        "access",
+        "constant"
+      ],
+      [
+        "g_Na1_6_mod",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "h_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_Na1_6_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "h_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_Na1_6",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Na1_6",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_Na1_6_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "m_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_Na1_6",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_h_Na1_6_max",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_h_Na1_6_min",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_m_Na1_6",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_m_Na1_6",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Q10_h_Na1_6",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Na1_6",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_m_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "phi_h_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "module_type": "FV1D_volume_sum",
+  "version": "nn",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "outputs": ["q_sum"],
+  "invariants": [
+    {
+      "description": "unconnected, q_sum is the constant boundary value it is given",
+      "expr": "np.ptp(q_sum) == 0"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "q_sum": {"min": 0.0, "max": 0.005, "points": 3}
+    },
+    "rationale": "from empty to a whole-body blood volume (0-5 L); the component only stores the value."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {"status": "not_applicable", "reason": "bookkeeping component; verified exactly."},
+      "calibrate": {"note": "not_applicable: bookkeeping component; nothing to calibrate."}
+    }
+  }
+}

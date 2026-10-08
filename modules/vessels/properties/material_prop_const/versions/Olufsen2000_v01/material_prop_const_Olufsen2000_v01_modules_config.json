@@ -1,0 +1,85 @@
+[
+  {
+    "module_type": "material_prop_const",
+    "module_subtype": "Olufsen2000_v01",
+    "module_format": "cellml",
+    "component_file": "material_prop_const_Olufsen2000_v01_modules.cellml",
+    "component_type": "material_prop_const_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "olufsen2000numerical",
+      "toro2022cerebrospinal"
+    ],
+    "required_citations_uncertain": [
+      "olufsen2000numerical",
+      "toro2022cerebrospinal"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "radius_port",
+        "variables": [
+          "r_0"
+        ]
+      },
+      {
+        "port_type": "stiffness_port",
+        "variables": [
+          "K_tube"
+        ]
+      }
+    ],
+    "exit_ports": [],
+    "variables_and_units": [
+      [
+        "K_tube",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "nu",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,86 @@
+module_type: terminalOL
+version: pp_controller
+reviewed: false
+notes: 'Terminal 3-element-Windkessel-like outlet (series R_T1 = 0.2 R_T, compliance C_T with viscoelastic damper 0.01/C_T,
+  R_T2 = 0.8 R_T, inertance I_T on both flows, drains to pressure_venous_dist) whose total resistance R_T is set by an adaptive
+  controller: three membership functions of the pressure error (pressure_d - u_a) weight linear consequents aa_i error + cc_i,
+  whose coefficients learn at rate learning_rate (critic - K_a r_a); r_a is the flow-fraction error BFF_ASL - v_a/meanflow_4dflow
+  (v_a from a flow_observer). The 0.2/0.8 split equals the ADAN56 Windkessel R1/(R1+R2) ratio (e.g. vertebral_R 1.81e9/9.05e9
+  in the openBF copy of boileau2015benchmark). Tested alone with constant u_in, u_a, v_a (harness values).'
+known_issues:
+- port variable u_a not in variables_and_units
+- port variable v_a not in variables_and_units
+expected_failures:
+  run_test: 'libcuflynx exits during generation: "the port variable u_a is not a variable for vessel type: terminalOL" (u_a/v_a
+    used in entrance ports but missing from variables_and_units). Evidence: with u_a/v_a added as boundary_condition entries
+    in a patched copy of the config, this component generates and the test result recorded in review.findings is obtained'
+  verification_test_invariants: 'libcuflynx exits during generation: "the port variable u_a is not a variable for vessel type:
+    terminalOL" (u_a/v_a used in entrance ports but missing from variables_and_units). Evidence: with u_a/v_a added as boundary_condition
+    entries in a patched copy of the config, this component generates and the test result recorded in review.findings is obtained'
+  verification_test_BC: 'Generation fails as for run_test (port variables missing from variables_and_units). With the fix
+    (patched copy) the sweep runs, but whenever pressure_d < u_a (observed pressure above target, e.g. pressure_d = 8000 Pa)
+    the critic 1e-6 error (v/v_ref)^2 is negative, the consequent coefficients learn downwards without bound, check < 0 and
+    R_T falls to its 1 Pa s m^-3 floor: the terminal short-circuits (v ~ 1.2e4 m3/s) and the physical-bound invariant fails.
+    See review.proposed_fixes.'
+  verification_test_timestep: 'Generation fails as for run_test (port variables missing from variables_and_units). Even with
+    the fix (patched copy) this test fails: the RK4 reference is evaluated in Python and math.exp overflows in the membership
+    functions x1/x3 = 1/(1 + exp((-/+error + 1)/0.01)) once |error| exceeds ~7 Pa (OverflowError; the same error stops solve_ivp
+    in the stability matrix, where only CVODE works), and the flow equations are extremely stiff anyway (I_T/R_T ~ 1e-6/(1e8-1e13)
+    = 1e-14-1e-19 s), so no explicit fixed-step scheme can run at a practical dt.'
+  stability_test: 'libcuflynx exits during generation: "the port variable u_a is not a variable for vessel type: terminalOL"
+    (u_a/v_a used in entrance ports but missing from variables_and_units). Evidence: with u_a/v_a added as boundary_condition
+    entries in a patched copy of the config, this component generates and the test result recorded in review.findings is obtained'
+reference_proposals:
+  u_in:
+    reference: unreferenced_placeholder; inlet pressure when the terminal runs alone (fed by the parent vessel in a network);
+      12000 Pa (90 mmHg), a typical mean arterial pressure
+    sourced: 'no'
+    value: 12000
+  u_ext:
+    reference: definitional; no external (tissue) pressure on the terminal compliance
+    sourced: definitional
+    value: 0
+  q_us:
+    reference: unreferenced_placeholder; zero unstressed volume, as in the circulatory_autogen aortic_bif_1d / aortic_bif_hybrid
+      examples (user_defined there)
+    sourced: 'no'
+    value: 0
+  q_init:
+    reference: definitional; q_init = C_T x 9332.57 Pa (terminal prestressed to 70 mmHg), as "computed_from_u_0_C_T" in the
+      circulatory_autogen aortic_bif_hybrid examples (3.6664e-10 x 9332.57 = 3.4217e-6 m3)
+    sourced: definitional
+    value: 3.421692218224e-06
+  C_T:
+    reference: boileau2015benchmark; iliac-bifurcation benchmark, 3-element Windkessel compliance of each daughter outlet C = 3.6664e-10
+      m3/Pa (value confirmed in the openBF copy of the benchmark, models/boileau2015/ibif/ibif.yaml; the paper table itself
+      was not accessible)
+    sourced: 'yes'
+    value: 3.6664e-10
+  I_T:
+    reference: unreferenced_placeholder; 1e-6 Pa s^2 m^-3, a negligible inertance used only to give the terminal flows a state
+      equation (user_defined in the circulatory_autogen aortic_bif_hybrid examples)
+    sourced: 'no'
+    value: 1.0e-06
+  BFF_ASL:
+    reference: unreferenced_placeholder; target fraction of meanflow_4dflow for this terminal (a patient ASL measurement in
+      the intended use); 0.5 = one daughter of a symmetric bifurcation
+    sourced: 'no'
+    value: 0.5
+  pressure_venous_dist:
+    reference: unreferenced_placeholder; distal (venous) outflow pressure of the Windkessel; 0 Pa as in zero-outflow-pressure
+      1D benchmarks (not verified against a specific source)
+    sourced: 'no'
+    value: 0
+  meanflow_4dflow:
+    reference: boileau2015benchmark; mean of the iliac-bifurcation inflow waveform, 7.9853e-6 m3/s (computed here from the benchmark
+      inflow data, equal to the mean term of the nn_aorticbif Fourier series); in the intended use a 4D-flow MRI measurement
+    sourced: 'yes'
+    value: 7.9853e-06
+  pressure_d:
+    reference: unreferenced_placeholder; desired pressure at the observed site, 12000 Pa (90 mmHg); a user/patient target
+      in the intended use
+    sourced: 'no'
+    value: 12000
+review: reviews/open_loop_review.yaml
+review_scope: The review of the whole open_loop module (5 entries) before the move to versions; only the parts about this
+  version apply.

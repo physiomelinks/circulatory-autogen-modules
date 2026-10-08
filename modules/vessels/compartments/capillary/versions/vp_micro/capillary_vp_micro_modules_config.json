@@ -1,0 +1,191 @@
+[
+  {
+    "module_type": "capillary",
+    "module_subtype": "vp_micro",
+    "module_format": "cellml",
+    "component_file": "capillary_vp_micro_modules.cellml",
+    "component_type": "vp_capillary_type_micro",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_in"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "length_and_radius_port",
+        "variables": [
+          "l",
+          "r"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      },
+      {
+        "port_type": "flow_in_out_port",
+        "variables": [
+          "v_in",
+          "v"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_us",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "E",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "r",
+        "metre",
+        "no_access",
+        "constant"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "mu",
+        "Js_per_m3",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "a_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "b_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "c_vessel",
+        "dimensionless",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "d_vessel",
+        "per_m",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "R",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "C",
+        "m6_per_J",
+        "access",
+        "variable"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

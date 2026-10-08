@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="IP3R_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="IP3R_SN">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="Ca_ER" public_interface="in" units="millimolar"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="IP3" public_interface="in" units="millimolar"/>
+        <variable name="Q_2" public_interface="out" units="millimolar"/>
+        <variable name="a_2" public_interface="in" units="per_millimolar_per_s"/>
+        <variable name="d_1" public_interface="in" units="millimolar"/>
+        <variable name="d_2" public_interface="in" units="millimolar"/>
+        <variable name="d_3" public_interface="in" units="millimolar"/>
+        <variable name="d_5" public_interface="in" units="millimolar"/>
+        <variable name="h_IP3" public_interface="out" units="dimensionless" initial_value="h_IP3_init"/>
+        <variable name="h_IP3_inf" public_interface="out" units="dimensionless"/>
+        <variable name="h_IP3_init" public_interface="in" units="dimensionless"/>
+        <variable name="j_IP3" public_interface="out" units="mol_per_s"/>
+        <variable name="k_IP3" public_interface="out" units="m3_per_s"/>
+        <variable name="A_ER" public_interface="in" units="um2"/>
+        <variable name="rho_IP3R" public_interface="in" units="per_um2"/>
+        <variable name="k_IP3R_single" public_interface="in" units="um3_per_s"/>
+        <variable name="m_IP3_inf" public_interface="out" units="dimensionless"/>
+        <variable name="tau_hIP3" public_interface="out" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_IP3R" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_IP3R" public_interface="in" units="kelvin"/>
+        <variable name="phi_IP3R" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>m_IP3_inf</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <ci>IP3</ci>
+                            <apply>
+                                <plus/>
+                                <ci>IP3</ci>
+                                <ci>d_1</ci>
+                            </apply>
+                        </apply>
+                        <ci>Cai</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>Cai</ci>
+                        <ci>d_5</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>d_2</ci>
+                        <apply>
+                            <plus/>
+                            <ci>IP3</ci>
+                            <ci>d_1</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>IP3</ci>
+                        <ci>d_3</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_hIP3</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="millis_per_s">1000</cn>
+                    <apply>
+                        <times/>
+                        <ci>a_2</ci>
+                        <apply>
+                            <plus/>
+                            <ci>Q_2</ci>
+                            <ci>Cai</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>h_IP3_inf</ci>
+                <apply>
+                    <divide/>
+                    <ci>Q_2</ci>
+                    <apply>
+                        <plus/>
+                        <ci>Q_2</ci>
+                        <ci>Cai</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>h_IP3</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>h_IP3_inf</ci>
+                        <ci>h_IP3</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <divide/>
+                            <ci>tau_hIP3</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_IP3R</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_IP3</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <ci>k_IP3</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <ci>m_IP3_inf</ci>
+                        <cn cellml:units="dimensionless">3</cn>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <ci>h_IP3</ci>
+                        <cn cellml:units="dimensionless">3</cn>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <ci>Cai</ci>
+                        <ci>Ca_ER</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>k_IP3</ci><apply><times/><ci>A_ER</ci><ci>rho_IP3R</ci><ci>k_IP3R_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_IP3R</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_IP3R</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_IP3R</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

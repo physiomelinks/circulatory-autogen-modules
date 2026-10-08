@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="capillary_pp_micro" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="pp_capillary_type_micro">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- Constitutive parameters-->
+        <variable name="mu" public_interface="in" units="Js_per_m3"/>
+        <variable name="rho" public_interface="in" units="Js2_per_m5"/>
+        <variable name="E" public_interface="in" units="J_per_m3"/>
+        <variable name="l" public_interface="in" units="metre"/>
+        <variable name="h" public_interface="out" units="metre"/>
+        <variable name="r" public_interface="in" units="metre"/>
+        <variable name="C" public_interface="out" units="m6_per_J"/>
+        <variable name="R" public_interface="out" units="Js_per_m6"/>
+        <!-- var I: Js2_per_m6 {pub: out};-->
+        <variable name="a_vessel" public_interface="in" units="dimensionless"/>
+        <variable name="b_vessel" public_interface="in" units="per_m"/>
+        <variable name="c_vessel" public_interface="in" units="dimensionless"/>
+        <variable name="d_vessel" public_interface="in" units="per_m"/>
+        <!-- State Variables-->
+        <variable name="u_ext" public_interface="in" units="J_per_m3"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="v" public_interface="out" units="m3_per_s"/>
+        <variable name="u" public_interface="out" units="J_per_m3"/>
+        <variable name="v_d" public_interface="out" units="m3_per_s"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable name="q_C_init" public_interface="in" units="m3"/>
+        <variable initial_value="q_C_init" name="q_C" public_interface="out" units="m3"/>
+        <variable name="q" public_interface="out" units="m3"/>
+        <variable name="q_us" public_interface="out" units="m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>q_us</ci>
+                <apply>
+                    <times/>
+                    <pi/>
+                    <apply>
+                        <power/>
+                        <ci>r</ci>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
+                    <ci>l</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>q</ci>
+                <apply>
+                    <plus/>
+                    <ci>q_us</ci>
+                    <ci>q_C</ci>
+                </apply>
+            </apply>
+            <!-- Constitutive Relations-->
+            <apply>
+                <eq/>
+                <ci>h</ci>
+                <apply>
+                    <times/>
+                    <ci>r</ci>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>a_vessel</ci>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <times/>
+                                    <ci>b_vessel</ci>
+                                    <ci>r</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>c_vessel</ci>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <times/>
+                                    <ci>d_vessel</ci>
+                                    <ci>r</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <!-- I = rho*l/(pi*sqr(r));-->
+            <apply>
+                <eq/>
+                <ci>C</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2</cn>
+                        <pi/>
+                        <apply>
+                            <power/>
+                            <ci>r</ci>
+                            <cn cellml:units="dimensionless">3</cn>
+                        </apply>
+                        <ci>l</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>E</ci>
+                        <ci>h</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">8</cn>
+                        <ci>mu</ci>
+                        <ci>l</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <pi/>
+                        <apply>
+                            <power/>
+                            <ci>r</ci>
+                            <cn cellml:units="dimensionless">4</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <!-- Conservation Laws-->
+            <!--ode(v, t)   = (u_in-u-v*R/2{dimensionless})/I;-->
+            <apply>
+                <eq/>
+                <ci>v</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>u_in</ci>
+                        <ci>u</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>R</ci>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_C</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v</ci>
+                    <ci>v_d</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <ci>q_C</ci>
+                        <ci>C</ci>
+                    </apply>
+                    <ci>u_ext</ci>
+                </apply>
+            </apply>
+            <!-- ode(v_d, t) = (u-u_out-v_d*R/2{dimensionless})/I;-->
+            <apply>
+                <eq/>
+                <ci>v_d</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>u</ci>
+                        <ci>u_out</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>R</ci>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

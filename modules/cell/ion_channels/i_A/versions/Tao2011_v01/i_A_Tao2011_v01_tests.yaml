@@ -1,0 +1,44 @@
+module_type: i_A
+version: Tao2011_v01
+reviewed: false
+notes: 'Tao 2011 rat sympathetic neuron transient outward (A-type) K current I_A (kinetics from Belluzzi & Sacchi). Gates
+  are internal states starting at 0 (hard-coded initial values), so alone, with Vm clamped, each has the exact solution x_bar(Vm)(1
+  - exp(-t/tau_x)). Invariants compare with the Tao 2011 Supporting Material equations (read from the rendered PDF): they
+  fail on the time units (recorded as expected failures).'
+expected_failures:
+  run_test: 'generation fails: the gate and time-constant variables a, tau_a, ha, tau_ha are exposed in the config but have
+    no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''. With the
+    fix this test passes on a patched copy.'
+  verification_test_invariants: 'generation fails: the gate and time-constant variables a, tau_a, ha, tau_ha are exposed in
+    the config but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    After that fix (patched copy): the module deviates from Tao 2011 Suppl.: every time constant is declared in seconds but
+    the Tao 2011 / Belluzzi & Sacchi expressions give milliseconds (Supplement p. 8 table is in ms; e.g. tau_hc = 17-30 ms
+    matches Belluzzi & Sacchi 1989 J Physiol 412:493 "tau = 29.3-17.6 ms"), so all gates are 1000x too slow'
+  verification_test_BC: 'generation fails: the gate and time-constant variables a, tau_a, ha, tau_ha are exposed in the config
+    but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    After that fix (patched copy): the module deviates from Tao 2011 Suppl.: every time constant is declared in seconds but
+    the Tao 2011 / Belluzzi & Sacchi expressions give milliseconds (Supplement p. 8 table is in ms; e.g. tau_hc = 17-30 ms
+    matches Belluzzi & Sacchi 1989 J Physiol 412:493 "tau = 29.3-17.6 ms"), so all gates are 1000x too slow'
+  verification_test_timestep: 'generation fails: the gate and time-constant variables a, tau_a, ha, tau_ha are exposed in
+    the config but have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''.
+    With the fix this test passes on a patched copy.'
+  stability_test: 'generation fails: the gate and time-constant variables a, tau_a, ha, tau_ha are exposed in the config but
+    have no interface in the CellML (libcellml: ''interface type required is public''); fix: public_interface=''out''. With
+    the fix this test passes on a patched copy.'
+reference_proposals:
+  g_A:
+    reference: 'tao2011model; Supporting Material (Document S1) p. 8 neuron parameter table: gA = 2.11 uS'
+    sourced: 'yes'
+    value: 2.11
+  E_K:
+    reference: 'tao2011model; Supporting Material (Document S1) p. 8 neuron parameter table: EK = -93 mV'
+    sourced: 'yes'
+    value: -93.0
+  Vm:
+    reference: definitional; clamp potential supplied by the membrane module in a network; -60 mV alone (test operating point
+      near rest)
+    sourced: definitional
+    value: -60.0
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

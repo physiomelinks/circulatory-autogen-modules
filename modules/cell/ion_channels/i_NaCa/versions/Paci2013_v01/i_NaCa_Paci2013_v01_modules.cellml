@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_NaCa_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_NaCa_Paci_2013">
+        <variable name="i_NaCa" public_interface="out" units="A_per_F"/>
+        <variable name="Cao" public_interface="in" units="millimolar"/>
+        <variable name="Nao" public_interface="in" units="millimolar"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Nai" public_interface="in" units="millimolar"/>
+        <variable name="R" public_interface="in" units="J_per_MK"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="F" public_interface="in" units="C_per_M"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="Vm" public_interface="in" units="volt"/>
+        <variable name="kNaCa" public_interface="in" units="A_per_F"/>
+        <variable name="alpha" public_interface="in" units="dimensionless"/>
+        <variable name="gamma" public_interface="in" units="dimensionless"/>
+        <variable name="Ksat" public_interface="in" units="dimensionless"/>
+        <variable name="KmCa" public_interface="in" units="millimolar"/>
+        <variable name="KmNai" public_interface="in" units="millimolar"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_NaCa</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kNaCa</ci>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <ci>gamma</ci>
+                                            <ci>Vm</ci>
+                                            <ci>F</ci>
+                                        </apply>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <power/>
+                                    <ci>Nai</ci>
+                                    <cn cellml:units="dimensionless">3</cn>
+                                </apply>
+                                <ci>Cao</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <apply>
+                                                <minus/>
+                                                <ci>gamma</ci>
+                                                <cn cellml:units="dimensionless">1</cn>
+                                            </apply>
+                                            <ci>Vm</ci>
+                                            <ci>F</ci>
+                                        </apply>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <power/>
+                                    <ci>Nao</ci>
+                                    <cn cellml:units="dimensionless">3</cn>
+                                </apply>
+                                <ci>Cai</ci>
+                                <ci>alpha</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <power/>
+                                <ci>KmNai</ci>
+                                <cn cellml:units="dimensionless">3</cn>
+                            </apply>
+                            <apply>
+                                <power/>
+                                <ci>Nao</ci>
+                                <cn cellml:units="dimensionless">3</cn>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>KmCa</ci>
+                            <ci>Cao</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <apply>
+                                <times/>
+                                <ci>Ksat</ci>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <apply>
+                                                <minus/>
+                                                <ci>gamma</ci>
+                                                <cn cellml:units="dimensionless">1</cn>
+                                            </apply>
+                                            <ci>Vm</ci>
+                                            <ci>F</ci>
+                                        </apply>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,58 @@
+comment: 'simple_lung_bg (Albanese 2016 lung mechanics) has two parameter slips that give an unphysiological lung. q_A_us
+  = 1.26e-6 m3 is Albanese''s V_u,A = 1.263 L entered as ml (1000x too small), and C_A and C_b are 10x Albanese''s values.
+  Together they give an end-expiratory lung volume of ~14 L (normal FRC 2.4 L) and a dead space of ~0.96 L. The airway resistances
+  are ~2.5-2.7x Albanese''s with no recorded reason. The hard-coded initial volumes (q_l = 10 L, q_t = q_b = 1 L) cause a
+  violent start-up transient (P_l ~ 7.7e5 Pa). lung_bg_Argus_Chase has no values at all: every value used here is a placeholder,
+  and q_str is hard-coded to 1 m3 (1000 L) on the volume-stretch port.'
+summary: 'Three components. simple_lung_bg (Albanese/Rideout-Fukui airway mechanics driven by the Albanese muscle-pressure
+  profile) passes every verification test: exact P_mus waveform, two volume-conservation laws (airway and thoracic), constitutive
+  identities, 110-run sweep, RK4 order 4.3, solver matrix. Its values were checked against Albanese''s thesis (Table 2-5,
+  the source of the 2016 paper''s parameters). Several library values differ from it (see questions and proposed fixes). lung_bg_Argus_Chase
+  (the author''s ventilated-lung model) had no parameter values. I proposed placeholders so it can be verified: all invariants
+  hold, the sweep passes and RK4 order is 4.7. Its CVODE results are sensitive to the piecewise spline/indicator functions,
+  so the declared supported settings are MaximumStep 1e-3 or rtol 1e-8. thoracic_cavity is an identity map and verifies trivially.
+  Validation is pending for both lungs (candidates below) and not applicable for thoracic_cavity.'
+questions:
+- 'simple_lung_bg: confirm the proposed references (albanese2014physiology thesis Table 2-5, i.e. the parameter source of albanese2016integrated;
+  fukui1972study and rideout1991mathematical via Albanese) for C_l, C_t, C_pl (= Albanese C_cw 0.2445 L/cmH2O), q_l_us, q_t_us, q_b_us, P_plEE,
+  P_mus_min, T_resp and IE_ratio. All match Albanese after unit conversion. Bizotto2022 (csv source for q_A_us and IE_ratio)
+  could not be identified; I propose albanese2014physiology instead.'
+- 'simple_lung_bg: accept the proposed fix for q_A_us, C_A and C_b (below)? The csv note on C_A says "increased to get approx
+  3L volume", but with q_A_us 1000x small the model''s end-expiratory lung volume is 14.0 L and VT 0.88 L. With Albanese''s
+  C_A, C_b and q_A_us it is 2.48 L, VT 0.67 L, dead space 164 ml.'
+- 'simple_lung_bg: R_ml, R_lt, R_tb and R_bA are 2.5-2.7x Albanese''s (1.021, 0.3369, 0.3063, 0.0817 cmH2O s/L). The csv says
+  "changed_from_...". What was the reason? Keep the library values, or return to Albanese''s?'
+- 'simple_lung_bg: R_plwall (chest-wall resistance, 1e4 Pa s/m3) is not in Albanese (who neglects chest-wall viscous resistance).
+  Source, or keep as unreferenced?'
+- 'simple_lung_bg: the chest wall differs from Albanese. There, P_pl follows P_mus through C_cw (eq. A-53). Here P_pl = q_pl/C_pl
+  is charged through R_plwall from P_mus, which adds a first-order lag of R_plwall C_pl = 25 ms. Intended?'
+- 'simple_lung_bg: q_str = q_b + C_b (P_plEE + (P_mus_min - P_plEE)/4) (the lung-stretch-receptor input) is an unusual definition:
+  bronchial volume shifted by a quarter of the effort. Please confirm, or give its source.'
+- 'lung_bg_Argus_Chase: supply the real parameter values (and the paper, if published). All values used here are placeholders
+  chosen only so the component runs (listed in the references table).'
+- 'lung_bg_Argus_Chase: q_str = 1.0 and alpha_LR = 1.0 are hard-coded in the CellML. q_str goes out on volume_stretch_port,
+  so a stretch receptor would see 1 m3. alpha_LR divides only R_bA, not R_mt/R_tb (simple_lung_bg divides all). Intended?'
+- 'Validation candidates (pending). simple_lung_bg: steady quiet-breathing targets (FRC 2.4 L, VT ~500 ml at 12 /min, P_pl,EE
+  -5 cmH2O; Albanese section 2.4.3 citing west2008respiratory) as a baseline once the q_A_us/C_A decision is made. For calibration, averaged
+  healthy flow/pressure traces (Mecklenburgh & Mapleson 1998, used by Albanese). lung_bg_Argus_Chase: the author''s ventilated-patient
+  pressure/flow data. OK to proceed with these?'
+proposed_fixes:
+- 'lung_parameters.csv simple_lung_bg: q_A_us 1.26e-06 -> 1.263e-03 m3 (Albanese V_u,A = 1.263 L); C_A 2.04e-05 -> 2.04e-06
+  m6/J (0.2 L/cmH2O); C_b 1.34e-06 -> 1.34e-07 m6/J (0.0131 L/cmH2O). Evidence: 60 s runs give end-expiratory lung volume
+  14.0 L (library) vs 2.48 L (fix), dead space 958 ml vs 164 ml; normal FRC 2.4 L.'
+- 'lung_modules.cellml simple_lung_bond_graph_type / lung_bond_graph_Argus_Chase_type: initial volumes q_l = 1.0e-2, q_t =
+  q_b = 1.0e-3 m3 are stressed volumes of 10 L / 1 L / 1 L (P_l = 7.7e5 Pa at t = 0). Suggest 0 (all pressures at P_pl,EE
+  as Albanese assumes), or init parameters. All tests pass anyway, but only because they start after the transient or use
+  small steps.'
+findings:
+- 'simple_lung_bg: all 5 invariants hold at nominal and over 110 sweep runs. P_mus matches Albanese eq. 2-6 to 1e-4 of its
+  amplitude. Airway volume (q_l+q_t+q_b+q_A) changes exactly by the integral of v_ml. Thoracic volume (q_pl+q_t+q_b+q_A) changes
+  by the integral of the chest-wall flow.'
+- 'simple_lung_bg timestep: RK4 needs dt <= 1e-3 s (the larynx RC time constant is ~3 ms, and the start-up transient is violent).
+  With dts 5e-4..6.25e-5 over 2 s: order 4.28, agreement with CVODE 8.7e-7.'
+- 'lung_bg_Argus_Chase stability: CVODE rtol 1e-6 without MaximumStep differs from the tight reference by 0.11 (0.93 with
+  MaximumStep 0.01), but works with MaximumStep 1e-3 or rtol 1e-8. The spline indicators use strict inequalities (P_d is exactly
+  0 at the knots) and the leak is a max(). solve_ivp fails in libcuflynx python generation (NameError eq_func), which is framework,
+  not module.'
+- 'thoracic_cavity: P_thor = P_pl to round-off over P_pl in [-2000, 1000] Pa; no states (timestep skipped).'
+- 'Risk: see the risk panel (joint sampling of all parameters within the tested ranges).'

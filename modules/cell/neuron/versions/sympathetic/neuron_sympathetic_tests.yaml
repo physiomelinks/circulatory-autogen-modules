@@ -1,0 +1,64 @@
+module_type: neuron
+version: sympathetic
+reviewed: false
+description: 'Sympathetic neuron (SN_simple) built from its parts: a soma (soma, version sympathetic), an axon cable (axon,
+  version sympathetic_monolithic_v01) and a varicosity (varicosity, version sympathetic), coupled soma -> axon -> varicosity.
+  The soma''s membrane gives the axon V and takes its axial current; the axon sets the varicosity membrane''s potential. The
+  soma and varicosity are themselves built from their parts, with the ion channels as submodules (cell/ion_channels, versions
+  Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06). A model uses one record, e.g. {"name": "SN", "module_type": "neuron", "module_subtype": "sympathetic", "instance":
+  "default"}; the expanded parts are named SN_soma_<part>, SN_axon and SN_varicosity_<part>. The soma and varicosity parameters
+  are their own versions'' defaults; this version''s default instance holds the axon''s parameters and the globals (SN_simple''s
+  values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history).'
+notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis
+  recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (the Q10_<X>, T_ref_<X>
+  parameters of the soma and varicosity channels). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged;
+  setting T_ref to the source''s recording temperature (on review) scales them, and the model can be run at 37 degC by changing
+  T. RyR (review 2026-10-06): the soma and varicosity RyR is HernandezCruz1997_v01 (rat superior cervical ganglion CICR,
+  Hernandez-Cruz 1997), replacing Argus2026_v01; the equivalence output maps compare its states a_RyR, i_RyR, l_RyR, P_RyR
+  (and the *_inf) instead of c_RyR, hc_RyR.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+expected_failures:
+  phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
+    "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
+reference_proposals:
+  channel_ratio_axon:
+    reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source
+      found (the sister SN_full parameter files use 1.0)
+    sourced: 'no'
+  V_rest_approx_axon:
+    reference: unreferenced_placeholder; axon resting potential set equal to the soma's (-70 mV, davis2020downregulation soma measurements);
+      no axonal measurement
+    sourced: 'no'
+    also_cites:
+    - davis2020downregulation
+  R_i_axon:
+    value: 200.0
+    reference: 'major1994detailed; cytoplasmic resistivity 170-340 ohm cm in rat CA3 pyramidal neurons (Abstract; specific membrane
+      resistance 120-200 kOhm cm^2, Cm 0.7-0.8 uF/cm^2). A central-neuron proxy: no value for postganglionic sympathetic axons
+      was verified. The axon model has no membrane leak, so R_m has no parameter. Proposed R_i = 200 ohm cm (R = 811 MOhm
+      at the present d_ax, L_ax)'
+    sourced: 'yes'
+    previous: 'previous R_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axial resistance; no source found (the sister SN_full parameter files
+      use 150 MOhm; somatic input resistance is about 218 MOhm in Wistar stellate neurons, Davis et al. 2019 bioRxiv)'
+  L_ax_axon:
+    reference: 'definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple
+      to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um. The previous C_axon (as proposed in review): unreferenced_placeholder;
+      owner''s hand-set value in the SN_simple model (CA token ''to_be_determined''); lumped axon capacitance; no source found
+      (the sister SN_full parameter files use 8 pF)'
+    sourced: 'no'
+    previous: 'previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF) previous C_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
+      model (CA token ''to_be_determined''); lumped axon capacitance; no source found (the sister SN_full parameter files
+      use 8 pF)'

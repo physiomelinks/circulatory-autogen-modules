@@ -1,0 +1,88 @@
+{
+  "module_type": "i_M",
+  "version": "Argus2026_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["w", "i_M", "j_KM", "tau_w", "w_inf"],
+  "run_parameters": {"V": -30.0},
+  "invariants": [
+    {
+      "description": "the ion flux j_KM = -i_M/F (mol/s; the current in nA, so the factor 1e-9)",
+      "expr": "np.max(np.abs(j_KM - 1e-9*(-i_M/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_KM)))"
+    },
+    {
+      "description": "every gating variable stays in [0, 1]",
+      "expr": "np.all((w >= -1e-9) & (w <= 1 + 1e-9))"
+    },
+    {
+      "description": "voltage step (V clamped at the run value, -30 mV, gate starting at rest V_rest_approx): w follows its exact clamp solution, tau = tau_w(V)/1000/phi",
+      "expr": "np.max(np.abs(w - ((1/(1 + np.exp(-(V + V_mid_w + Delta_V_mid_w)/V_den_w))) + ((1/(1 + np.exp(-(V_rest_approx + V_mid_w + Delta_V_mid_w)/V_den_w))) - (1/(1 + np.exp(-(V + V_mid_w + Delta_V_mid_w)/V_den_w))))*np.exp(-t/((tau_w_min + tau_w_num/(2.0*np.exp((V + V_mid_w + Delta_V_mid_w)/15) + np.exp(-(V + V_mid_w + Delta_V_mid_w)/25)))/1000/(Q10_M**((T - T_ref_M)/10))))))) <= 1e-6",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "T": {"min": 273.15, "max": 313.15, "points": 3}
+    },
+    "bounds": {
+      "Q10_M": [1, 5],
+      "T_ref_M": [273.15, 313.15],
+      "T": [273.15, 313.15]
+    },
+    "rationale": "Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5 and T_ref to 273.15-313.15 K."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable here: g_M (rho_M) is calibrated in instance davis2020_wistar (davis2020downregulation Fig. 3C), and the default uses its calibrated rho_M; the other values are the owner's SN_simple values, validated in the assembled neuron."
+      }
+    },
+    "davis2020_wistar": {
+      "calibrate": {
+        "status": "active",
+        "source": "Davis et al. 2020, Hypertension 76:1915, Fig. 3C, measure defined in Davis 2021 thesis p. 172-173 (Wistar XE-991-sensitive M-current deactivation relaxation, 1 s step -25 -> -55 mV); Cm 30 pF assumed",
+        "obs_data": "instances/davis2020_wistar/davis2020_wistar_obs_data.json",
+        "params_for_id": "instances/davis2020_wistar/davis2020_wistar_params_for_id.csv",
+        "z_threshold": 0.5,
+        "method": "CMA-ES",
+        "optimiser_options": {"num_calls_to_function": 400, "cost_convergence": 1e-10, "max_patience": 40, "seed": 1},
+        "dt": 0.001
+      }
+    },
+    "davis2020_wistar_kinetics": {
+      "calibrate": {
+        "status": "active",
+        "note": "Fits tau_w (tau_w_num, tau_w_min) to the time course of the relaxations; the defaults are NOT changed (the calibrated values are in davis2020_wistar_kinetics_calibrated_parameters.csv, for the owner to decide; comparison: reviews/i_M_Argus2026_v01_tau_w_refit.html).",
+        "source": "Davis et al. 2020, Hypertension 76:1915, Fig. 3C: the representative Wistar deactivation trace (n = 1, raw current), digitised by tools/i_M_davis2020_kinetics.py",
+        "obs_data": "instances/davis2020_wistar_kinetics/davis2020_wistar_kinetics_obs_data.json",
+        "params_for_id": "instances/davis2020_wistar_kinetics/davis2020_wistar_kinetics_params_for_id.csv",
+        "method": "CMA-ES",
+        "optimiser_options": {"num_calls_to_function": 1500, "cost_convergence": 1e-10, "max_patience": 60, "seed": 1},
+        "metric": "nrmse",
+        "threshold": 0.25,
+        "dt": 0.001
+      }
+    }
+  }
+}

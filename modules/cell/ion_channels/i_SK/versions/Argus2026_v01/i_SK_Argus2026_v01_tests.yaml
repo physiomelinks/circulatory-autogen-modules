@@ -1,0 +1,29 @@
+module_type: i_SK
+version: Argus2026_v01
+reviewed: true
+description: 'SK (small-conductance Ca-activated) K current of the sympathetic-neuron soma: i_KCa_SK = g mod m (V - E_K),
+  g = A rho gamma; Hill activation by the shell Ca (Hirschberg 1998 SK2: EC50 0.63 uM, n 4) with one 5 ms time constant; its
+  K flux goes to the soma''s K balance.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. SK (small-conductance Ca-activated K) current of the SN soma, i_KCa_SK = g_KCa_SK g_KCa_SK_mod m_SK
+  (V - E_K), m_SK a Hill function of the sub-membrane (shell) Ca, Cai, through internal_Ca (review 2026-10-05; the original
+  read the bulk cytosolic Ca, Ca_bulk, through bulk_Ca; SK now reads the Khaliq 2003 membrane shell, as BK does). m_SK starts
+  at its steady state at Cai_init. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off
+  script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple.
+  Geometry re-parameterisation (2026-10-02): the maximal conductance is g_KCa_SK = A_mem rho_SK gamma_SK (membrane area x
+  channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce
+  the previous g_KCa_SK. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the
+  Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K)
+  (Q10_SK, T_ref_SK). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s
+  recording temperature (on review) scales them, and the model can be run at 37 degC by changing T. tau_m_SK and p_SK traced
+  to Hirschberg 1998 on review (2026-10-05; previously cited to Gupta 2016, not verified); **a single tau makes deactivation
+  ~11x faster than measured (57 ms)**. m_inf is written 1/(1 + (Ca_mid_m_SK/Cai)^p_SK), identical to the original Cai^p/(Ca_mid^p
+  + Cai^p) for Cai > 0, so libcellml can check its units (a variable exponent needs a dimensionless base).'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

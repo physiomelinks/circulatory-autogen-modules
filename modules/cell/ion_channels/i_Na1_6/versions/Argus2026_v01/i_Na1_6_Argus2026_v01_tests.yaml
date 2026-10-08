@@ -1,0 +1,32 @@
+module_type: i_Na1_6
+version: Argus2026_v01
+reviewed: true
+description: 'NaV1.6 current of the sympathetic-neuron soma: i_Na1_6 = g_Na1_6 g_Na1_6_mod m^3 h (V - E_Na), g = A rho gamma;
+  Belluzzi-Sacchi (Tao 2011) gates with the owner''s midpoints, slopes and slow inactivation (tau_h up to 300 ms); its Na
+  flux goes to the soma''s Na balance.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. NaV1.6 current of the SN soma, i_Na1_6 = g_Na1_6 g_Na1_6_mod (V - E_Na) m_Na1_6^3 h_Na1_6 (the same
+  law as i_Na_SN). Two features of the original are kept so that SN_simple is reproduced: the gates start at i_Na_SN''s steady
+  state (the original sets m_Na1_6''s initial value to m_init, computed from V_mid_m, V_den_m, V_mid_h, V_den_h, the NaV1.7
+  values, which are this component''s own parameters here), and its Na flux j_Na1_6 = -i_Na1_6/F is computed but has no port,
+  as the original leaves it out of dNai/dt. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_Na1_6 = A_mem rho_Na1_6 gamma_Na1_6
+  (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area;
+  the defaults reproduce the previous g_Na1_6. The gates start from their own steady state at V_rest_approx (fixed on review
+  2026-10-05: they used i_Na''s midpoints and slopes, carried here as four extra parameters). tau_m: owner''s simplification
+  of belluzzi1986quantitative Fig. 9A (tau_m = 0.06013 + 1/(42.98 e^{0.08915V} + 0.9230 e^{-0.03351V}) ms, peak 0.27 ms near -40
+  mV, 37 degC; = tao2011model Eq. 88). Offset 0.06 ms = source; numerator 0.4 matched the source peak (CA 837d3aae, 2024-07-21)
+  and was doubled to 0.8 (CA 8449bc05, 2025-05-01), so the peak is now ~0.48 ms. tau_h_min/max traced on review (2026-10-05);
+  values kept for recalibration. Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC),
+  like the Davis 2021 thesis recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10
+  K) (Q10_m_Na1_6, Q10_h_Na1_6, T_ref_Na1_6). T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting
+  T_ref to the source''s recording temperature (on review) scales them, and the model can be run at 37 degC by changing T.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

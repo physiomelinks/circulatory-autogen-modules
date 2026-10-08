@@ -1,0 +1,31 @@
+model: diffusion_3d_boxes
+category: diffusion
+reviewed: false
+description: 'Finite-volume diffusion in 3D: a 2 x 2 x 2 block of box cells of different sizes, joined by faces in x, y and
+  z.'
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+solver_info:
+  rtol: 1.0e-10
+  atol: 1.0e-16
+equivalence:
+  status: not_applicable
+  reason: an example built from this library (tools/build_diffusion_examples.py); there is no circulatory_autogen original
+invariants:
+- description: the total amount sum V_P C_P is conserved in the closed domain (relative 1e-9)
+  expr: np.ptp(3.0000000000000006e-15*b000__C_P + 6.000000000000001e-15*b001__C_P + 4.5000000000000005e-15*b010__C_P + 9.000000000000001e-15*b011__C_P
+    + 5.000000000000001e-15*b100__C_P + 1.0000000000000002e-14*b101__C_P + 7.500000000000001e-15*b110__C_P + 1.5000000000000002e-14*b111__C_P)
+    <= 1e-9*np.max(np.abs(3.0000000000000006e-15*b000__C_P + 6.000000000000001e-15*b001__C_P + 4.5000000000000005e-15*b010__C_P
+    + 9.000000000000001e-15*b011__C_P + 5.000000000000001e-15*b100__C_P + 1.0000000000000002e-14*b101__C_P + 7.500000000000001e-15*b110__C_P
+    + 1.5000000000000002e-14*b111__C_P))
+- description: 'maximum principle: no cell goes above the initial maximum or below the initial minimum'
+  expr: np.max(np.stack([b000__C_P, b001__C_P, b010__C_P, b011__C_P, b100__C_P, b101__C_P, b110__C_P, b111__C_P])) <= np.max(np.stack([b000__C_P,
+    b001__C_P, b010__C_P, b011__C_P, b100__C_P, b101__C_P, b110__C_P, b111__C_P])[:, 0]) + 1e-12 and np.min(np.stack([b000__C_P,
+    b001__C_P, b010__C_P, b011__C_P, b100__C_P, b101__C_P, b110__C_P, b111__C_P])) >= np.min(np.stack([b000__C_P, b001__C_P,
+    b010__C_P, b011__C_P, b100__C_P, b101__C_P, b110__C_P, b111__C_P])[:, 0]) - 1e-12
+- description: every cell tends to the volume-weighted mean 0.0707405 mM (within 1e-6 mM at t_end)
+  expr: np.max(np.abs(np.stack([b000__C_P, b001__C_P, b010__C_P, b011__C_P, b100__C_P, b101__C_P, b110__C_P, b111__C_P])[:,
+    -1] - 0.07074046666666667)) <= 1e-6
+notes:
+- 'Built by tools/build_diffusion_examples.py: re-run it after changing the mesh.'

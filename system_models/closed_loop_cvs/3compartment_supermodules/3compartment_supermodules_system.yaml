@@ -1,0 +1,36 @@
+model: 3compartment_supermodules
+category: closed_loop_cvs
+reviewed: false
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+equivalence:
+  reference: reference
+  output_map: {heart/u_ra: heart_ra/u, heart/u_rv: heart_rv/u, heart/u_la: heart_la/u, heart/u_lv: heart_lv/u, heart/q_ra: heart_ra/q,
+    heart/q_rv: heart_rv/q, heart/q_la: heart_la/q, heart/q_lv: heart_lv/q, heart/v_trv: heart_trv/v, heart/v_puv: heart_puv/v,
+    heart/v_miv: heart_miv/v, heart/v_aov: heart_aov/v, heart/zeta_trv: heart_trv/zeta, heart/zeta_puv: heart_puv/zeta, heart/zeta_miv: heart_miv/zeta,
+    heart/zeta_aov: heart_aov/zeta, heart/zeta_trv_pre: heart_trv/zeta_pre, heart/zeta_puv_pre: heart_puv/zeta_pre, heart/zeta_miv_pre: heart_miv/zeta_pre,
+    heart/zeta_aov_pre: heart_aov/zeta_pre, heart/e_a: heart_ra/e, heart/e_v: heart_lv/e, heart/s: heart_clock/s, heart/mt: heart_clock/mt,
+    heart/chi_a: heart_ra/chi, heart/chi_v: heart_lv/chi, heart/v_asd: asd_shunt/v, heart/T_wCont: heart_clock/T_eff, heart/chi_afloor: heart_ra/chi_floor,
+    heart/chi_vfloor: heart_lv/chi_floor, heart/chi_afloor_final: heart_ra/chi_floor_final, heart/chi_vfloor_final: heart_lv/chi_floor_final,
+    heart/R_lin_trv: heart_trv/R_lin, heart/R_lin_puv: heart_puv/R_lin, heart/R_lin_miv: heart_miv/R_lin, heart/R_lin_aov: heart_aov/R_lin,
+    heart/vel_trv: heart_trv/vel, heart/vel_puv: heart_puv/vel, heart/vel_miv: heart_miv/vel, heart/vel_aov: heart_aov/vel,
+    heart/E_lv_A_wCont: heart_lv/E_A_eff, heart/E_rv_A_wCont: heart_rv/E_A_eff, heart/A_eff_trv: heart_trv/A_eff, heart/B_trv: heart_trv/B,
+    heart/L_trv: heart_trv/L, heart/A_eff_puv: heart_puv/A_eff, heart/B_puv: heart_puv/B, heart/L_puv: heart_puv/L, heart/A_eff_miv: heart_miv/A_eff,
+    heart/B_miv: heart_miv/B, heart/L_miv: heart_miv/L, heart/A_eff_aov: heart_aov/A_eff, heart/B_aov: heart_aov/B, heart/L_aov: heart_aov/L,
+    heart/T_ac_wCont: heart_ra/T_c_eff, heart/T_ar_wCont: heart_ra/T_r_eff, heart/T_vc_wCont: heart_lv/T_c_eff, heart/T_vr_wCont: heart_lv/T_r_eff}
+  ignore: {heart/q_heart: sum of the four chambers (no single variable after the split), pvn/t: time, par/t: time, aortic_root/t: time,
+    systemic_T/t: time, venous_svc/t: time, volume_sum/t: time, heart_clock/t: time, ra/t: time, rv/t: time, la/t: time, lv/t: time,
+    trv/t: time, puv/t: time, miv/t: time, aov/t: time, heart/q: sum of the four chambers (no single variable after the split)}
+  wrapped: {heart/mt: 1.0, heart/chi_afloor: 1.0, heart/chi_vfloor: 1.0, heart/chi_afloor_final: 1.0, heart/chi_vfloor_final: 1.0}
+  reciprocal: [heart/L_trv, heart/L_puv, heart/L_miv, heart/L_aov, heart/B_trv, heart/B_puv, heart/B_miv, heart/B_aov]
+  tol: 1.0e-06
+  solver_info: {rtol: 1.0e-12, atol: 1.0e-14}
+invariants:
+- {description: total blood volume is conserved in the closed loop (relative drift < 1e-6), expr: np.ptp(sum_blood_volume__q_volume_sum_sum)
+    <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))}
+notes: ['3compartment built with the heart supermodule version (heart Argus2026_v01): one "heart" entry in the module array
+    whose per_submodule_inputs/outputs couple its submodules to the circulation; libcuflynx expands it into heart_clock, heart_ra
+    ... heart_aov. Only the circulation parameters are in the parameters file; the heart''s come from the default instance of the supermodule version
+    (modules/heart/versions/Argus2026_v01/instances/default/default_parameters.csv). Must reproduce circulatory_autogen''s 3compartment (equivalence) and
+    the library''s 3compartment model (tests/test_modules.py supermodule_equivalence_test, 1e-9).']

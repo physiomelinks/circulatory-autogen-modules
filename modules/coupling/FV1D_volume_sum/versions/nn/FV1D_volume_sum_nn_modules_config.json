@@ -1,0 +1,62 @@
+[
+  {
+    "module_type": "FV1D_volume_sum",
+    "module_subtype": "nn",
+    "module_format": "cellml",
+    "component_file": "FV1D_volume_sum_nn_modules.cellml",
+    "component_type": "volume_sum_1D",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": []
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "volume_port",
+        "variables": []
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "q_sum",
+        "m3",
+        "access",
+        "boundary_condition"
+      ]
+    ],
+    "api": {
+      "name": "FV_1d_volume_sum",
+      "description": "Blood volume held in the 1D vessels, received from the FV 1D solver at initialisation and after every 0D step.",
+      "role": "consumer",
+      "transport": "named_pipe",
+      "process": "FV1D_solver",
+      "exchange": "per_time_step",
+      "calls": [
+        {
+          "name": "recv_volume",
+          "kind": "recv",
+          "when": [
+            "init",
+            "step_end"
+          ],
+          "channel": "volume",
+          "recv": [
+            "q_sum",
+            "$ignore"
+          ]
+        }
+      ]
+    }
+  }
+]

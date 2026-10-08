@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_Kr_Xr2_gate_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_Kr_Xr2_gate_Paci_2013">
+        <variable name="Xr2_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="Xr2_init" name="Xr2" public_interface="out" units="dimensionless"/>
+        <variable name="Xr2_infinity" units="dimensionless"/>
+        <variable name="alpha_Xr2" units="dimensionless"/>
+        <variable name="beta_Xr2" units="dimensionless"/>
+        <variable name="tau_Xr2" units="second"/>
+        <variable name="Vm" public_interface="in" units="volt"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Xr2_infinity</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <times/>
+                                        <ci>Vm</ci>
+                                        <cn cellml:units="milliV_per_V">1000</cn>
+                                    </apply>
+                                    <cn cellml:units="milliV">88</cn>
+                                </apply>
+                                <cn cellml:units="milliV">50</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>alpha_Xr2</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">3</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <minus/>
+                                        <cn cellml:units="milliV">60</cn>
+                                    </apply>
+                                    <apply>
+                                        <times/>
+                                        <ci>Vm</ci>
+                                        <cn cellml:units="milliV_per_V">1000</cn>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="milliV">20</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>beta_Xr2</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1.12</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <minus/>
+                                        <cn cellml:units="milliV">60</cn>
+                                    </apply>
+                                    <apply>
+                                        <times/>
+                                        <ci>Vm</ci>
+                                        <cn cellml:units="milliV_per_V">1000</cn>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="milliV">20</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tau_Xr2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="second">1</cn>
+                        <ci>alpha_Xr2</ci>
+                        <ci>beta_Xr2</ci>
+                    </apply>
+                    <cn cellml:units="dimensionless">1000</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Xr2</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>Xr2_infinity</ci>
+                        <ci>Xr2</ci>
+                    </apply>
+                    <ci>tau_Xr2</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

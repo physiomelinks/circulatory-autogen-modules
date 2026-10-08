@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_PCa_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_PCa_Paci_2013">
+        <variable name="i_PCa" public_interface="out" units="A_per_F"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="Vm" public_interface="in" units="volt"/>
+        <variable name="g_PCa" public_interface="in" units="A_per_F"/>
+        <variable name="KPCa" public_interface="in" units="millimolar"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>i_PCa</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>g_PCa</ci>
+                        <ci>Cai</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>Cai</ci>
+                        <ci>KPCa</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

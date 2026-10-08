@@ -1,0 +1,72 @@
+module_type: venule
+version: vp_micro
+reviewed: false
+notes: 'venule (vp) entry of this config that points at the BG library type vp_simple_type (defined in modules/BG, resolved
+  because libcuflynx merges the whole library). That type has an inertance I (dv/dt = (Δu - R v)/I) and a viscoelastic term
+  R_v = 0.01/C, but this config entry does not declare I, so the generated model leaves I unset (Myokit: "No value set for
+  I", I = 0 -> division by zero) and the component cannot run. Geometry-free (R, C, q_0 given directly). Invariants (volume
+  balance, pressure law) verified on a patched copy with I declared. After that fix the entry is still extremely stiff: I/R
+  ~ 1.1e-05 s (with I = rho l/(pi r^2)) against a relaxation time (R + 0.01/C) C ~ 0.01 s, so explicit fixed-step schemes
+  (timestep test) are not practical; the _micro types (no inertance) are the natural choice for microvessels.'
+expected_failures:
+  run_test: 'module defect: this config entry uses the BG type vp_simple_type which has an inertance I (dv/dt = (du - R v)/I),
+    but the entry does not declare I in variables_and_units, so the generated model leaves I unset (Myokit: "No value set
+    for I"; I = 0 -> division by zero at t = 0). Verified: adding ["I", "Js2_per_m6", "access", "constant"] to the entry in
+    a patched copy makes it generate and run. See review.proposed_fixes.'
+  verification_test_invariants: 'module defect: this config entry uses the BG type vp_simple_type which has an inertance I
+    (dv/dt = (du - R v)/I), but the entry does not declare I in variables_and_units, so the generated model leaves I unset
+    (Myokit: "No value set for I"; I = 0 -> division by zero at t = 0). Verified: adding ["I", "Js2_per_m6", "access", "constant"]
+    to the entry in a patched copy makes it generate and run. See review.proposed_fixes.'
+  verification_test_BC: 'module defect: this config entry uses the BG type vp_simple_type which has an inertance I (dv/dt
+    = (du - R v)/I), but the entry does not declare I in variables_and_units, so the generated model leaves I unset (Myokit:
+    "No value set for I"; I = 0 -> division by zero at t = 0). Verified: adding ["I", "Js2_per_m6", "access", "constant"]
+    to the entry in a patched copy makes it generate and run. See review.proposed_fixes.'
+  verification_test_timestep: 'module defect: this config entry uses the BG type vp_simple_type which has an inertance I (dv/dt
+    = (du - R v)/I), but the entry does not declare I in variables_and_units, so the generated model leaves I unset (Myokit:
+    "No value set for I"; I = 0 -> division by zero at t = 0). Verified: adding ["I", "Js2_per_m6", "access", "constant"]
+    to the entry in a patched copy makes it generate and run. See review.proposed_fixes.'
+  stability_test: 'module defect: this config entry uses the BG type vp_simple_type which has an inertance I (dv/dt = (du
+    - R v)/I), but the entry does not declare I in variables_and_units, so the generated model leaves I unset (Myokit: "No
+    value set for I"; I = 0 -> division by zero at t = 0). Verified: adding ["I", "Js2_per_m6", "access", "constant"] to the
+    entry in a patched copy makes it generate and run. See review.proposed_fixes.'
+reference_proposals:
+  R:
+    reference: 'unreferenced_placeholder; derived for the test from the proposed venule geometry: R = 8 mu l/(pi r_0^4) (Poiseuille,
+      mu = 0.004 Pa s). In a network this is set per vessel'
+    sourced: 'no'
+    value: 9082000000000.0
+  C:
+    reference: 'unreferenced_placeholder; derived for the test from the proposed venule geometry: C = 2 pi r_0^3 l/(E h),
+      h from the watanabe2013mathematical fit'
+    sourced: 'no'
+    value: 2.851e-17
+  q_0:
+    reference: 'unreferenced_placeholder; derived for the test: q_0 = pi r_0^2 l for the proposed venule geometry'
+    sourced: 'no'
+    value: 1.052e-13
+  u_ext:
+    reference: definitional; no external (tissue) pressure acting on the vessel in the isolated test (0 Pa); in a network
+      this is the surrounding tissue pressure
+    sourced: definitional
+    value: 0.0
+  u_0:
+    reference: boas2008vascular; PV = 25 mmHg for the 35 um venule (model boundary condition) = 3.33 kPa
+    sourced: 'yes'
+    value: 3330.0
+  I:
+    reference: 'unreferenced_placeholder; inertance is NOT declared in the config for this entry (see proposed fix). If added:
+      I = rho l/(pi r_0^2) for the proposed geometry'
+    sourced: 'no'
+  u_out:
+    reference: unreferenced_placeholder; isolated-test boundary value (u_0 - 500 Pa); in a network it is supplied by the neighbouring
+      vessel
+    sourced: 'no'
+    value: 2830.0
+  v_in:
+    reference: unreferenced_placeholder; isolated-test boundary value (equilibrium flow 500 Pa / R); in a network it is supplied
+      by the neighbouring vessel
+    sourced: 'no'
+    value: 5.505e-11
+review: reviews/microvasculature_network_review.yaml
+review_scope: The review of the whole microvasculature_network module (48 entries) before the move to versions; only the parts
+  about this version apply.

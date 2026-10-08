@@ -1,0 +1,361 @@
+{
+  "module_type": "heart",
+  "version": "vp_wCont",
+  "sim_time": 5.0,
+  "pre_time": 20.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-06, "atol": 1e-08, "MaximumStep": 0.001},
+  "outputs": [
+    "q_lv",
+    "q_rv",
+    "q_la",
+    "q_ra",
+    "u_lv",
+    "u_rv",
+    "u_la",
+    "u_ra",
+    "v_aov",
+    "v_miv",
+    "v_trv",
+    "v_puv",
+    "e_a",
+    "e_v",
+    "A_eff_aov",
+    "A_eff_miv",
+    "A_eff_trv",
+    "A_eff_puv",
+    "q_heart",
+    "aortic_root/u",
+    "par/u",
+    "sum_blood_volume/q_volume_sum_sum",
+    "T_wCont"
+  ],
+  "harness": {
+    "module_array": [
+      ["ivc_zero", "constant", "inlet_flow", "", "mod", "default"],
+      ["mod", "vp_wCont", "heart", "ivc_zero venous_svc pvn", "aortic_root par volume_sum", "default"],
+      ["aortic_root", "vv", "arterial_simple", "mod", "systemic_T volume_sum", "default"],
+      ["systemic_T", "pp_spec_I", "terminal", "aortic_root", "venous_svc volume_sum", "default"],
+      ["venous_svc", "vp", "venous", "systemic_T", "mod volume_sum", "default"],
+      ["pvn", "vp", "venous", "par", "mod volume_sum", "default"],
+      ["par", "vp", "arterial_simple", "mod", "pvn volume_sum", "default"],
+      [
+        "volume_sum",
+        "ArgusUNPUBLISHED_v01",
+        "volume_sum",
+        "pvn par mod aortic_root systemic_T venous_svc",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "v_ivc_zero",
+        "m3_per_s",
+        0.0,
+        "harness: IVC inflow set to zero (all systemic return via venous_svc), as circulatory_autogen does for a heart with one vena cava"
+      ],
+      ["R_pvn", "Js_per_m6", 1333000.0, "circulatory_autogen 3compartment example (Blanco_2013_Table_8)"],
+      ["q_C_init_pvn", "m3", 0.0001, "circulatory_autogen 3compartment example (user_defined)"],
+      ["C_pvn", "m6_per_J", 6.0015e-09, "circulatory_autogen 3compartment example (to_be_identified)"],
+      ["u_ext_pvn", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      [
+        "I_pvn",
+        "Js2_per_m6",
+        100000.0,
+        "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.01 (small_chosen), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
+      ],
+      ["q_us_0_pvn", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["Delta_q_us_pvn", "dimensionless", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["Delta_C_pvn", "dimensionless", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["R_par", "Js_per_m6", 10664000.0, "circulatory_autogen 3compartment example (Blanco_2013_Table_8)"],
+      ["C_par", "m6_per_J", 3.09077e-10, "circulatory_autogen 3compartment example (to_be_identified)"],
+      ["u_ext_par", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      [
+        "I_par",
+        "Js2_per_m6",
+        100000.0,
+        "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.000001 (Blanco_2013_Table_8), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
+      ],
+      [
+        "u_0_par",
+        "J_per_m3",
+        1463.0,
+        "circulatory_autogen 3compartment example (Mynard&Smolich_2015_assumedRefOf11mmHg)"
+      ],
+      ["q_0_par", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined_TO_DO)"],
+      [
+        "r_0_par",
+        "metre",
+        0.0135,
+        "circulatory_autogen 3compartment example (Mynard&Smolich_2015_mainPA_NOT_USED)"
+      ],
+      [
+        "l_par",
+        "metre",
+        0.043,
+        "circulatory_autogen 3compartment example (Mynard&Smolich_2015_mainPA_NOT_USED)"
+      ],
+      [
+        "R_aortic_root",
+        "Js_per_m6",
+        1000000.0,
+        "circulatory_autogen 3compartment example (to_be_identified)"
+      ],
+      [
+        "C_aortic_root",
+        "m6_per_J",
+        1.2028e-08,
+        "circulatory_autogen 3compartment example (to_be_identified)"
+      ],
+      ["u_ext_aortic_root", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      [
+        "I_aortic_root",
+        "Js2_per_m6",
+        100000.0,
+        "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 10000 (to_be_identified), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
+      ],
+      [
+        "u_0_aortic_root",
+        "J_per_m3",
+        13300.0,
+        "circulatory_autogen 3compartment example (Mynard&Smolich_2015_assumedRefOf100mmHg)"
+      ],
+      ["q_0_aortic_root", "m3", 6.94e-06, "circulatory_autogen 3compartment example (Mynard&Smolich_2015)"],
+      [
+        "r_0_aortic_root",
+        "metre",
+        0.014865,
+        "circulatory_autogen 3compartment example (Mynard&Smolich_2015_NOT_USED)"
+      ],
+      [
+        "l_aortic_root",
+        "metre",
+        0.01,
+        "circulatory_autogen 3compartment example (Mynard&Smolich_2015_NOT_USED)"
+      ],
+      [
+        "R_T_systemic_T",
+        "Js_per_m6",
+        110000000.0,
+        "circulatory_autogen 3compartment example (calculated_from_mean_P_and_v)"
+      ],
+      [
+        "C_T_systemic_T",
+        "m6_per_J",
+        1e-07,
+        "circulatory_autogen 3compartment example (calculated_from_approx_P_and_q)"
+      ],
+      [
+        "I_T_systemic_T",
+        "Js2_per_m6",
+        100000.0,
+        "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.1 (former_hardcoded_default), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
+      ],
+      ["u_ext_systemic_T", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      [
+        "q_us_systemic_T",
+        "m3",
+        0.00245,
+        "circulatory_autogen 3compartment example (user_defined_70%Of3.5LVenousTotBloodVolume)"
+      ],
+      [
+        "q_init_systemic_T",
+        "m3",
+        0.00245,
+        "circulatory_autogen 3compartment example (user_defined_70%Of3.5LVenousTotBloodVolume)"
+      ],
+      ["R_venous_svc", "Js_per_m6", 1114600.0, "circulatory_autogen 3compartment example (small_chosen)"],
+      ["q_C_init_venous_svc", "m3", 0.0013, "circulatory_autogen 3compartment example (user_defined)"],
+      [
+        "C_venous_svc",
+        "m6_per_J",
+        1e-06,
+        "circulatory_autogen 3compartment example (calculated_from_typical_venous_pressure_init_stressed_vol)"
+      ],
+      ["u_ext_venous_svc", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      [
+        "I_venous_svc",
+        "Js2_per_m6",
+        100000.0,
+        "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.01 (small_chosen), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
+      ],
+      ["q_us_0_venous_svc", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      [
+        "Delta_q_us_venous_svc",
+        "dimensionless",
+        0.0,
+        "circulatory_autogen 3compartment example (user_defined)"
+      ],
+      [
+        "Delta_C_venous_svc",
+        "dimensionless",
+        0.0,
+        "circulatory_autogen 3compartment example (user_defined)"
+      ]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "closed-loop blood volume is conserved: the network total (heart + 5 vessels) stays at its initial value",
+      "expr": "np.ptp(sum_blood_volume__q_volume_sum_sum) <= 1e-6*np.mean(sum_blood_volume__q_volume_sum_sum)"
+    },
+    {
+      "description": "q_heart is the sum of the four chamber volumes",
+      "expr": "np.max(np.abs(q_heart - (q_ra + q_rv + q_la + q_lv))) <= 1e-9*np.max(q_heart)"
+    },
+    {
+      "description": "LV volume balance: q_lv(t) - q_lv(0) = integral of (v_miv - v_aov) (trapezoid on the output grid)",
+      "expr": "np.max(np.abs(q_lv - q_lv[0] - np.concatenate([[0.0], np.cumsum(0.5*((v_miv - v_aov)[1:] + (v_miv - v_aov)[:-1])*np.diff(t))]))) <= 5e-3*np.ptp(q_lv)"
+    },
+    {
+      "description": "RV volume balance: q_rv(t) - q_rv(0) = integral of (v_trv - v_puv)",
+      "expr": "np.max(np.abs(q_rv - q_rv[0] - np.concatenate([[0.0], np.cumsum(0.5*((v_trv - v_puv)[1:] + (v_trv - v_puv)[:-1])*np.diff(t))]))) <= 5e-3*np.ptp(q_rv)"
+    },
+    {
+      "description": "LV pressure-volume law holds exactly: u_lv = (e_v E_lv_A + E_lv_B)(q_lv - q_lv_us) + u_intraThor (E_lv_A + Delta_E_lv)",
+      "expr": "np.max(np.abs(u_lv - ((e_v*(E_lv_A + Delta_E_lv) + E_lv_B)*(q_lv - q_lv_us) + u_intraThor))) <= 1e-6*np.max(np.abs(u_lv))"
+    },
+    {
+      "description": "RA pressure-volume law holds exactly: u_ra = (e_a E_ra_A + E_ra_B)(q_ra - q_ra_us) + u_intraThor",
+      "expr": "np.max(np.abs(u_ra - ((e_a*E_ra_A + E_ra_B)*(q_ra - q_ra_us) + u_intraThor))) <= 1e-6*np.max(np.abs(u_ra)) + 1e-9"
+    },
+    {
+      "description": "activation functions e_a, e_v stay in [0, 1] and both reach full activation (max > 0.99) every run",
+      "expr": "(np.min(e_a) >= 0) & (np.max(e_a) <= 1) & (np.min(e_v) >= 0) & (np.max(e_v) <= 1) & (np.max(e_a) > 0.99) & (np.max(e_v) > 0.99)"
+    },
+    {
+      "description": "all four chamber volumes stay positive",
+      "expr": "(np.min(q_lv) > 0) & (np.min(q_rv) > 0) & (np.min(q_la) > 0) & (np.min(q_ra) > 0)"
+    },
+    {
+      "description": "valve effective areas stay within [M_rg A_nn, M_st A_nn] (valve state 0 <= zeta <= 1; zeta is clamped below by max(zeta_pre, 0) but not above, so 1e-4 relative numerical overshoot is allowed)",
+      "expr": "(np.min(A_eff_aov) >= M_rg_aov*A_nn_aov*(1 - 1e-6) - 1e-12) & (np.max(A_eff_aov) <= M_st_aov*A_nn_aov*(1 + 1e-4)) & (np.min(A_eff_miv) >= M_rg_miv*A_nn_miv*(1 - 1e-6) - 1e-12) & (np.max(A_eff_miv) <= M_st_miv*A_nn_miv*(1 + 1e-4)) & (np.min(A_eff_trv) >= M_rg_trv*A_nn_trv*(1 - 1e-6) - 1e-12) & (np.max(A_eff_trv) <= M_st_trv*A_nn_trv*(1 + 1e-4)) & (np.min(A_eff_puv) >= M_rg_puv*A_nn_puv*(1 - 1e-6) - 1e-12) & (np.max(A_eff_puv) <= M_st_puv*A_nn_puv*(1 + 1e-4))"
+    },
+    {
+      "description": "valves: backflow volume over the last cycle is < 5% of the forward volume, for all four valves (M_rg = 0: closure transients only)",
+      "applies": "run",
+      "expr": "(-np.sum(np.minimum(v_aov, 0)[t >= t[-1] - T_wCont[0]]) <= 0.05*np.sum(np.maximum(v_aov, 0)[t >= t[-1] - T_wCont[0]])) & (-np.sum(np.minimum(v_miv, 0)[t >= t[-1] - T_wCont[0]]) <= 0.05*np.sum(np.maximum(v_miv, 0)[t >= t[-1] - T_wCont[0]])) & (-np.sum(np.minimum(v_trv, 0)[t >= t[-1] - T_wCont[0]]) <= 0.05*np.sum(np.maximum(v_trv, 0)[t >= t[-1] - T_wCont[0]])) & (-np.sum(np.minimum(v_puv, 0)[t >= t[-1] - T_wCont[0]]) <= 0.05*np.sum(np.maximum(v_puv, 0)[t >= t[-1] - T_wCont[0]]))"
+    },
+    {
+      "description": "periodic steady state (after pre_time): q_lv, q_rv, q_la change by < 1% of their range over the last cycle",
+      "applies": "run",
+      "expr": "(abs(q_lv[-1] - q_lv[np.argmin(np.abs(t - (t[-1] - T_wCont[0])))]) <= 0.01*np.ptp(q_lv)) & (abs(q_rv[-1] - q_rv[np.argmin(np.abs(t - (t[-1] - T_wCont[0])))]) <= 0.01*np.ptp(q_rv)) & (abs(q_la[-1] - q_la[np.argmin(np.abs(t - (t[-1] - T_wCont[0])))]) <= 0.01*np.ptp(q_la))"
+    },
+    {
+      "description": "at steady state LV and RV eject the same volume per beat (within 2%)",
+      "applies": "run",
+      "expr": "abs(np.sum(v_aov[t >= t[-1] - T_wCont[0]]) - np.sum(v_puv[t >= t[-1] - T_wCont[0]])) <= 0.02*np.sum(v_aov[t >= t[-1] - T_wCont[0]])"
+    },
+    {
+      "description": "the LV pressure oscillates with the heart period T_wCont = max(T + Delta_T, T_min) (within 1%)",
+      "applies": "run",
+      "expr": "abs(period(t, u_lv) - T_wCont[0]) <= 0.01*T_wCont[0]"
+    },
+    {
+      "description": "heart period T_wCont = max(T + Delta_T, T_min)",
+      "expr": "np.max(np.abs(T_wCont - max(T + Delta_T, T_min))) <= 1e-12"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "T": {"min": 0.6, "max": 1.5, "points": 5},
+      "T_min": {"min": 0.25, "max": 0.5, "points": 3},
+      "t_astart": {"min": 0.6, "max": 0.95, "points": 5},
+      "t_vstart": {"min": 0.0, "max": 0.1, "points": 3},
+      "T_vc": {"min": 0.2, "max": 0.4, "points": 5},
+      "T_vr": {"min": 0.08, "max": 0.25, "points": 5},
+      "T_ac": {"min": 0.08, "max": 0.25, "points": 5},
+      "T_ar": {"min": 0.08, "max": 0.25, "points": 5},
+      "rho": {"min": 1040, "max": 1070, "points": 3},
+      "M_rg_trv": {"min": 0.0, "max": 0.05, "points": 3},
+      "M_rg_puv": {"min": 0.0, "max": 0.05, "points": 3},
+      "M_rg_miv": {"min": 0.0, "max": 0.05, "points": 3},
+      "M_rg_aov": {"min": 0.0, "max": 0.05, "points": 3},
+      "M_st_trv": {"min": 0.5, "max": 1.0, "points": 3},
+      "M_st_puv": {"min": 0.5, "max": 1.0, "points": 3},
+      "M_st_miv": {"min": 0.5, "max": 1.0, "points": 3},
+      "M_st_aov": {"min": 0.5, "max": 1.0, "points": 3},
+      "u_intraThor": {"min": -1000, "max": 1000, "points": 5},
+      "Delta_T": {"min": -0.4, "max": 0.5, "points": 5},
+      "Delta_E_lv": {"min": -100000000.0, "max": 100000000.0, "points": 5},
+      "Delta_E_rv": {"min": -30000000.0, "max": 30000000.0, "points": 5},
+      "R_ASD": {"min": 1000000.0, "max": 100000000.0, "points": 5, "scale": "log"},
+      "beta": {"min": 1.8, "max": 2.2, "points": 3},
+      "A_nn_trv": {"min": 0.0004, "max": 0.001, "points": 4}
+    },
+    "exclude": ["u_root", "u_par", "v_ivc", "v_svc", "v_pvn"],
+    "plot_output": "q_lv",
+    "rationale": "Heart timing: T 0.6-1.5 s (HR 40-100 bpm; T_vc + T_vr = 0.49 s bounds T below), T_vc/T_vr/T_ac/T_ar about their Liang 2009 values within physiological bounds, t_astart 0.6-0.95 s (atrial kick in late diastole), t_vstart 0-0.1 s. Elastances, unstressed and initial volumes, valve rate constants K_vo/K_vc, annulus areas, l_eff, v_ref: x0.5-2 of nominal (covers the healthy spread and the control-driven changes Delta_E). M_rg 0-0.05 (mild regurgitant orifice), M_st 0.5-1 (up to moderate stenosis); A_nn_trv only 4-10 cm2, because above ~10.2 cm2 the RA volume goes negative (linear P-V law allows suction, u_ra < 0; recorded as a finding). rho 1040-1070 kg/m3 (blood). u_intraThor +-1 kPa (+-7.5 mmHg, respiratory swing), Delta_T -0.4..0.5 s (baroreflex period changes; T_min floor), Delta_E_lv +-100 MPa/m3 and Delta_E_rv +-30 MPa/m3 (inotropic control), R_ASD 1e6-1e8 Pa s/m3 (large to small defect). The inputs connected by the harness network (u_root, u_par, v_ivc, v_svc, v_pvn) are not parameters of the network model and are excluded. Invariants marked applies: run (steady state, backflow, period) are checked at the nominal point only, since the sweep deliberately includes regurgitant valves and slow transients."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0002, 0.0001, 5e-05, 2.5e-05],
+    "t_end": 1.0,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08, "MaximumStep": 0.001}
+    ],
+    "fixed_step": {
+      "schemes": ["euler", "heun", "rk4"],
+      "dt_start": 0.0004
+    },
+    "t_end": 2.0
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "proposed",
+        "source": "maceira2006normalized; Table 8, all subjects (n = 120, 60 men / 60 women, SSFP CMR): EDV 142 +- 21 ml, ESV 47 +- 10 ml, SV 95 +- 14 ml, EF 67 +- 4.6 %. Pressures: Table 1 brachial cuff blood pressure, range of the age-decile means of men and women (systolic 115-135, diastolic 68-79 mmHg); brachial, not central aortic, pressure, so the pressure targets are approximate. Checked directly in the scmr.org PDF of the paper. A target passes when |model - mean| <= 2 SD, or the model lies in the range.",
+        "source_short": "Maceira 2006 normal adults",
+        "targets": [
+          {
+            "name": "LV end-diastolic volume",
+            "expr": "np.max(q_lv)*1e6",
+            "value": 142,
+            "std": 21,
+            "units": "ml"
+          },
+          {
+            "name": "LV end-systolic volume",
+            "expr": "np.min(q_lv)*1e6",
+            "value": 47,
+            "std": 10,
+            "units": "ml"
+          },
+          {"name": "LV stroke volume", "expr": "np.ptp(q_lv)*1e6", "value": 95, "std": 14, "units": "ml"},
+          {
+            "name": "LV ejection fraction",
+            "expr": "100*np.ptp(q_lv)/np.max(q_lv)",
+            "value": 67,
+            "std": 4.6,
+            "units": "%"
+          },
+          {
+            "name": "aortic systolic pressure (vs brachial cuff)",
+            "expr": "np.max(aortic_root__u)/133.322",
+            "range": [115, 135],
+            "units": "mmHg"
+          },
+          {
+            "name": "aortic diastolic pressure (vs brachial cuff)",
+            "expr": "np.min(aortic_root__u)/133.322",
+            "range": [68, 79],
+            "units": "mmHg"
+          }
+        ],
+        "pre_time": 20.0,
+        "sim_time": 5.0
+      },
+      "calibrate": {
+        "note": "pending: Candidate: calibrate E_lv_A, E_lv_B, E_rv_A, E_rv_B and q_lv_init (closed-loop blood volume) to the Maceira LV values (constant obs_data items: max/min of q_lv, max/min of aortic_root/u) and predict the RV volumes; the calibrate evaluation does not yet honour pre_time (framework need)."
+      }
+    }
+  }
+}

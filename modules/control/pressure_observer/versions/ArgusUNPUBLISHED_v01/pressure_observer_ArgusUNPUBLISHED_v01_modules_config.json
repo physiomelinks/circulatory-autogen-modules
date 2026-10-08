@@ -1,0 +1,44 @@
+[
+  {
+    "module_type": "pressure_observer",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "pressure_observer_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "p_observer_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "pressure_feedback_port",
+        "variables": [
+          "u"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "pressure_feed_port",
+        "variables": [
+          "u"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "no_access",
+        "variable"
+      ]
+    ]
+  }
+]

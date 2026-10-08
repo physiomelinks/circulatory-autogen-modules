@@ -1,0 +1,26 @@
+variable_name,units,value,data_reference,sourced
+flag_P_mus_control,dimensionless,1.0,control_parasymp: albanese2016integrated,yes
+flag_RR_control,dimensionless,1.0,control_parasymp: albanese2016integrated,yes
+P_mus_min,J_per_m3,-980,control_parasymp: Albanese2016_-980_in_this_formulation_is_-490_in_Albanese,yes
+P_plEE,J_per_m3,-490,control_parasymp: WestPulmonaryPhysiology2008,yes
+q_D_min,m3,1e-05,control_parasymp: user_defined,no
+q_l_us,m3,3.44e-05,control_parasymp: YasuhiroFukui1972,yes
+q_t_us,m3,6.63e-06,control_parasymp: YasuhiroFukui1972,yes
+q_b_us,m3,1.87e-05,control_parasymp: YasuhiroFukui1972,yes
+q_A_us,m3,1.26e-06,control_parasymp: Bizotto2022,yes
+R_ml,Js_per_m6,250000,control_parasymp: changed_from_100058_from_Rideout1991,yes
+R_lt,Js_per_m6,85000,control_parasymp: changed_from_33016_from_Rideout1991,yes
+R_tb,Js_per_m6,80000,control_parasymp: changed_from_30017_from_Rideout1991,yes
+R_bA,Js_per_m6,22000,control_parasymp: changed_from_8006_from_Rideout1991,yes
+R_plwall,Js_per_m6,10000,control_parasymp: changed_from_1.00e+04_fromRideout1991,yes
+alpha_LR,dimensionless,1.0,control_parasymp: user_defined,no
+C_l,m6_per_J,1.30e-08,control_parasymp: YasuhiroFukui1972,yes
+C_t,m6_per_J,2.43e-08,control_parasymp: YasuhiroFukui1972,yes
+C_b,m6_per_J,1.34e-06,control_parasymp: YasuhiroFukui1972,yes
+C_A,m6_per_J,2.04e-05,control_parasymp: YasuhiroFukui1972_increased_to_get_approx_3L_volume,yes
+C_pl,m6_per_J,2.50e-06,control_parasymp: user_defined_to_be_identified,no
+T_resp,second,5,control_parasymp: WestPulmonaryPhysiology2008,yes
+Delta_RR_resp,per_s,0,control_phys_asd: small_chosen,no
+Delta_P_mus,J_per_m3,0,control_phys_asd: small_chosen,no
+IE_ratio,dimensionless,0.6,control_parasymp: Bizotto2022,yes
+P_m,J_per_m3,0,control_parasymp: known,no

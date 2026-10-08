@@ -1,0 +1,309 @@
+name: Module tests & reports
+
+on:
+  # pushes to main, and pull requests (a push to a PR branch runs once, as its pull_request run)
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 14 * * 1'   # weekly, to catch libcuflynx changes
+  workflow_dispatch:
+    inputs:
+      risk:
+        description: 'Also run the joint failure-risk analysis (make risk) for reviewed versions'
+        type: boolean
+        default: false
+      full:
+        description: 'Test every version, not only those changed since their last run (the weekly run does)'
+        type: boolean
+        default: false
+
+env:
+  # PhLynx checkout for the pipeline tests: the branch of physiomelinks/PhLynx#595 (list-form
+  # multi_port, case-insensitive multi_port) until it's merged; then main or a tag.
+  PHLYNX_REF: feat/load-module-library-configs
+
+concurrency:
+  group: module-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        # the test jobs: per top-level directory of modules/ that holds module_types (a category such
+        # as cell or vessels, or a module_type directly under modules/ with the module_types nested in
+        # it: MODULE=heart selects heart, cardiac_clock, chamber and valve), per stage and shard
+        run: echo "matrix=$(python3 -m cam_testing.shards matrix)" >> "$GITHUB_OUTPUT"
+
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - uses: ./.github/actions/setup
+      - run: make structure PYTHON=python
+      # the per-version structure results the reports show (test_version_structure)
+      - name: Stage structure results
+        if: always()
+        run: |
+          mkdir -p _artifact
+          find modules -path '*/results/structure.json' -print | xargs -r -I{} cp --parents {} _artifact/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: category-structure
+          path: _artifact/
+          if-no-files-found: ignore
+
+  # A fresh install (apt + pip, no cache) compared with the cached setup the other jobs use
+  # (.github/actions/setup, key ci/setup_key.sh): fails, printing the difference, when the cache
+  # is stale, e.g. an unpinned dependency released a new version.
+  setup-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - id: key
+        run: echo "key=$(bash ci/setup_key.sh)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.cam-setup
+          key: ${{ steps.key.outputs.key }}
+      - run: bash ci/setup_check.sh
+
+  # The coupled examples (system_models/coupled): generated C++ coupled to the FEniCS model
+  # tissue_diffusion_FEniCS. FEniCSx is a conda-forge package, and the generated model's shared
+  # library is loaded into that Python, so it is built with the environment's compiler and SUNDIALS.
+  coupled:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-name: fenicsx
+          create-args: >-
+            -c conda-forge python=3.11 fenics-dolfinx=0.9 cmake cxx-compiler sundials nlohmann_json pip
+          cache-environment: true
+      - run: pip install -r requirements.txt
+      - run: python -c "import dolfinx, libcuflynx.coupling; print('dolfinx', dolfinx.__version__)" && cmake --version
+      - run: make structure PYTHON=python
+      - run: make coupled PYTHON=python
+      # the coupled_validation_test results and heatmaps of the versions the coupled system models
+      # use, for the site (named category-* so the site job merges it with the category reports)
+      - name: Stage coupled validation files
+        if: always()
+        run: |
+          mkdir -p _artifact
+          find modules \( -path '*/results/coupled_validation_test.json' -o -path '*/plots/coupled_*.png' \) -print \
+            | xargs -r -I{} cp --parents {} _artifact/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: category-coupled-validation
+          path: _artifact/
+          if-no-files-found: ignore
+
+  # One job per category, stage and shard (ci/shards.json, cam_testing/shards.py), each about ten
+  # minutes: vv = tests/test_modules.py, pipeline = PhLynx -> CUFLynx, omex = the CUFLynx archive
+  # per instance. A shard holds whole module_types. Each job uploads its results for the site job,
+  # which builds every report, and its JUnit report (refresh ci/test_durations.json from them with
+  # python -m cam_testing.shards durations <stage> junit-*.xml).
+  test:
+    name: ${{ matrix.label }}
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    env:
+      # --changed-only skips versions unchanged since their last run (cam_testing/ledger.py); the
+      # weekly run and a dispatch with full=true test everything
+      CHANGED_ONLY: ${{ !(github.event_name == 'schedule' || inputs.full) && '--changed-only' || '' }}
+      SHARD_ARGS: >-
+        --quick-unreviewed --shard ${{ matrix.shard }} --shard-stage ${{ matrix.stage }}
+        ${{ !(github.event_name == 'schedule' || inputs.full) && '--changed-only' || '' }}
+        --junitxml=junit.xml --durations=15
+      CAM_LEDGER_DIR: /home/runner/.cam-ledger
+      # where the pipeline and omex stages find PhLynx and CUFLynx (part of their fingerprints)
+      PHLYNX_DIR: ${{ github.workspace }}/_phlynx
+      CUFLYNX_BIN: ${{ github.workspace }}/_cuflynx/CUFLynx-linux-x86_64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - uses: ./.github/actions/setup
+      - name: Ledger of the last runs (change-based selection)
+        if: env.CHANGED_ONLY != ''
+        uses: actions/cache/restore@v4
+        with:
+          path: /home/runner/.cam-ledger/ledger.json
+          key: ledger-json-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            ledger-json-${{ github.head_ref || github.ref_name }}-
+            ledger-json-main-
+      - name: V&V tests
+        id: vv
+        if: matrix.stage == 'vv'
+        run: |
+          target=test
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then target=test-all; fi
+          make $target PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" || echo "failed=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: matrix.stage == 'pipeline'
+        with: { node-version: '22' }
+      - name: PhLynx checkout (pipeline tests)
+        if: matrix.stage == 'pipeline'
+        uses: actions/checkout@v4
+        with: { repository: physiomelinks/PhLynx, ref: '${{ env.PHLYNX_REF }}', path: _phlynx }
+      - name: PhLynx and the pipeline bridge
+        if: matrix.stage == 'pipeline'
+        run: |
+          corepack enable
+          (cd _phlynx && yarn install --immutable)
+          make pipeline-setup
+      - name: CUFLynx (latest Ubuntu release)
+        if: matrix.stage != 'vv'
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          gh release download --repo physiomelinks/CUFLynx --pattern 'CUFLynx-linux-x86_64' --dir _cuflynx
+          chmod +x _cuflynx/CUFLynx-linux-x86_64
+          gh release view --repo physiomelinks/CUFLynx --json tagName --jq .tagName
+      - name: PhLynx -> CUFLynx pipeline
+        id: pipeline
+        if: matrix.stage == 'pipeline'
+        run: |
+          make pipeline PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" PHLYNX_DIR=$PWD/_phlynx CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64 \
+            || echo "failed=true" >> "$GITHUB_OUTPUT"
+      - name: CUFLynx archive per instance (built from the library's files, then loaded and run in CUFLynx)
+        id: omex
+        if: matrix.stage == 'omex'
+        run: |
+          # the test builds each instance's archive at its own path (make omex's output) and runs it
+          make omex-test PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64 \
+            || echo "failed=true" >> "$GITHUB_OUTPUT"
+      - name: Failure-risk analysis (on request, reviewed versions)
+        if: github.event_name == 'workflow_dispatch' && inputs.risk && matrix.stage == 'vv' && startsWith(matrix.shard, '1/')
+        run: make risk PYTHON=python MODULE=${{ matrix.category }} RISK_ARGS=--reviewed-only
+      - name: Stage result files
+        if: always()
+        run: |
+          mkdir -p _artifact
+          find modules/${{ matrix.category }} \( -type d \( -name plots -o -name results \) -o -type f -name '*.omex' \) -prune -print \
+            | xargs -r -I{} cp -r --parents {} _artifact/
+          [ -f junit.xml ] && cp junit.xml "junit-${{ matrix.id }}.xml" || true
+          # the ledger entries of the versions this job ran (fingerprint + outcome)
+          [ -f junit.xml ] && python -m cam_testing.ledger fragment ${{ matrix.stage }} junit.xml "ledger-${{ matrix.id }}.json" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: category-${{ matrix.id }}
+          path: _artifact/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-${{ matrix.id }}
+          path: junit-${{ matrix.id }}.xml
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ledger-${{ matrix.id }}
+          path: ledger-${{ matrix.id }}.json
+          if-no-files-found: ignore
+      - name: Fail if a reviewed version's tests failed
+        if: steps.vv.outputs.failed == 'true' || steps.pipeline.outputs.failed == 'true' || steps.omex.outputs.failed == 'true'
+        run: |
+          [ -f junit.xml ] || { echo "::error::the tests wrote no JUnit report (crashed before running)"; exit 1; }
+          python tools/ci_reviewed_failures.py junit.xml
+
+  # Every report, from this run's results over the ledger's (the versions skipped as unchanged keep
+  # their last results); then the ledger, with this run's entries and results, is saved for the next.
+  site:
+    needs: [test, coupled, structure]
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      CAM_LEDGER_DIR: /home/runner/.cam-ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - uses: ./.github/actions/setup
+      # two caches: ledger.json (every test job reads it) and the results (only this job)
+      - name: Ledger of the last runs
+        uses: actions/cache/restore@v4
+        with:
+          path: /home/runner/.cam-ledger/ledger.json
+          key: ledger-json-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            ledger-json-${{ github.head_ref || github.ref_name }}-
+            ledger-json-main-
+      - name: The ledger's results
+        uses: actions/cache/restore@v4
+        with:
+          path: /home/runner/.cam-ledger/files
+          key: ledger-files-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            ledger-files-${{ github.head_ref || github.ref_name }}-
+            ledger-files-main-
+      - name: The last results of every version
+        run: |
+          if [ -d "$CAM_LEDGER_DIR/files" ]; then cp -r "$CAM_LEDGER_DIR/files/." .; fi
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: category-*
+          path: .
+          merge-multiple: true
+      - run: make site PYTHON=python
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ledger-*
+          path: _ledger_fragments
+          merge-multiple: true
+      - name: Update the ledger
+        run: |
+          shopt -s nullglob
+          python -m cam_testing.ledger merge "$CAM_LEDGER_DIR" _ledger_fragments/*.json
+          rm -rf "$CAM_LEDGER_DIR/files" && mkdir -p "$CAM_LEDGER_DIR/files"
+          find modules \( -type d \( -name plots -o -name results \) -o -type f -name '*.omex' \) -prune -print \
+            | xargs -r -I{} cp -r --parents {} "$CAM_LEDGER_DIR/files/"
+          du -sh "$CAM_LEDGER_DIR"
+      - uses: actions/cache/save@v4
+        with:
+          path: /home/runner/.cam-ledger/ledger.json
+          key: ledger-json-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
+      - uses: actions/cache/save@v4
+        with:
+          path: /home/runner/.cam-ledger/files
+          key: ledger-files-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+
+  deploy:
+    needs: site
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

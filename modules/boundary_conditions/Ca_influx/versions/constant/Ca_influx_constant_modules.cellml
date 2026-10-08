@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="Ca_influx_constant" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="Ca_influx_constant">
+        <variable name="j_Ca_influx" public_interface="in" units="mol_per_s"/>
+        <variable name="j_Ca" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>j_Ca</ci><ci>j_Ca_influx</ci></apply>
+        </math>
+    </component>
+</model>

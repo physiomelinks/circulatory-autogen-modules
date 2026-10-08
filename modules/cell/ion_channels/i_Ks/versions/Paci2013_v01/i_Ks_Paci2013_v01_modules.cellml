@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_Ks_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_Ks_Paci_2013">
+        <variable name="i_Ks" public_interface="out" units="A_per_F"/>
+        <variable name="g_Ks" public_interface="in" units="S_per_F"/>
+        <variable name="E_Ks" public_interface="in" units="volt"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="t" private_interface="out" public_interface="in" units="second"/>
+        <variable name="Vm" private_interface="out" public_interface="in" units="volt"/>
+        <variable name="Xs" private_interface="in" units="dimensionless"/>
+        <variable name="Chromanol_iKs30" public_interface="in" units="dimensionless"/>
+        <variable name="Chromanol_iKs50" public_interface="in" units="dimensionless"/>
+        <variable name="Chromanol_iKs70" public_interface="in" units="dimensionless"/>
+        <variable name="Chromanol_iKs90" public_interface="in" units="dimensionless"/>
+        <variable name="Chromanol_coeff" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Chromanol_coeff</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.7</cn>
+                        <apply>
+                            <eq/>
+                            <ci>Chromanol_iKs30</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.5</cn>
+                        <apply>
+                            <eq/>
+                            <ci>Chromanol_iKs50</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.3</cn>
+                        <apply>
+                            <eq/>
+                            <ci>Chromanol_iKs70</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.1</cn>
+                        <apply>
+                            <eq/>
+                            <ci>Chromanol_iKs90</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">1</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_Ks</ci>
+                <apply>
+                    <times/>
+                    <ci>Chromanol_coeff</ci>
+                    <ci>g_Ks</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Vm</ci>
+                        <ci>E_Ks</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <ci>Xs</ci>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <divide/>
+                            <cn cellml:units="dimensionless">0.6</cn>
+                            <apply>
+                                <plus/>
+                                <cn cellml:units="dimensionless">1</cn>
+                                <apply>
+                                    <power/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <cn cellml:units="millimolar">3.8</cn>
+                                            <cn cellml:units="dimensionless">0.00001</cn>
+                                        </apply>
+                                        <ci>Cai</ci>
+                                    </apply>
+                                    <cn cellml:units="dimensionless">1.4</cn>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

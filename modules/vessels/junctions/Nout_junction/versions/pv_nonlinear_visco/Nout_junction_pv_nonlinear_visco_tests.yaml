@@ -1,0 +1,95 @@
+module_type: Nout_junction
+version: pv_nonlinear_visco
+reviewed: false
+notes: 'pv vessel with a nonlinear tube law. Tested in a harness network (libcuflynx sums the flows at a Min/Nout node only
+  when real vessels are connected there): mod (Nout_junction pv_nonlinear_visco); bcin (inlet_pressure constant); dn1 (arterial_simple
+  pv); bcout1 (outlet_flow constant); dn2 (arterial_simple pv); bcout2 (outlet_flow constant). Jacobian timescales (nominal:
+  fastest 9.1e-07 s, slowest decay 0.013 s; run: fastest 0.00014 s, slowest decay 0.013 s, shortest oscillation period 0.066
+  s).'
+reference_proposals:
+  u_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 13332.2
+      Pa (100 mmHg), typical inlet pressure for this vessel class
+    sourced: 'no'
+    value: 13332.2
+  v_out_sum:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.000111752
+      m^3/s (mean velocity x lumen area)
+    sourced: 'no'
+    value: 0.000111752
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen generic_junction_test_closed_loop: user_defined)'
+    sourced: definitional
+  u_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen generic_junction_test_closed_loop: "assumedRefOf80mmHg" (value
+      10600)'
+    sourced: 'no'
+  theta:
+    reference: 'definitional; inclination angle 0 deg, only used when beta_g = 1 (circulatory_autogen generic_junction_test_closed_loop:
+      defined_by_user)'
+    sourced: definitional
+  l:
+    reference: 'safaei2018bond; ADAN-86 arterial geometry/material (Safaei et al. build a 218-segment network from ADAN-86 and
+      the ADAN cerebral vessels; E from blanco2015anatomically). The vessel-level value 0.014796 could not be checked: the ADAN data are
+      in supplementary material not accessible here'
+    sourced: 'no'
+    also_cites:
+    - blanco2015anatomically
+  r_0:
+    reference: 'safaei2018bond; ADAN-86 arterial geometry/material (Safaei et al. build a 218-segment network from ADAN-86 and
+      the ADAN cerebral vessels; E from blanco2015anatomically). The vessel-level value 0.0133364 could not be checked: the ADAN data
+      are in supplementary material not accessible here'
+    sourced: 'no'
+    also_cites:
+    - blanco2015anatomically
+  m_tube:
+    reference: 'boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0 (circulatory_autogen
+      generic_junction_test_closed_loop: known)'
+    sourced: 'yes'
+  n_tube:
+    reference: 'boileau2015benchmark; Eq. (3) arterial tube law P - Pext = Pd + beta/Ad (sqrt(A) - sqrt(Ad)), i.e. m = 1/2, n = 0 (circulatory_autogen
+      generic_junction_test_closed_loop: known)'
+    sourced: 'yes'
+  I_scale:
+    reference: definitional; no scaling of the inertance
+    sourced: definitional
+  K_tube:
+    reference: olufsen2000numerical; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
+      m^-1, k3 = 8.65e4 Pa (converted from g s^-2 cm^-1, cm^-1), r0 = 0.0133364 m, rho = 1050 (vessel_properties material_prop_fromPWV
+      formula); normally supplied by a vessel_properties module
+    sourced: 'no'
+    value: 115333.0
+  K_tube_visco:
+    reference: unreferenced_placeholder; K_visco = (2/3) Gamma h/(l pi r0^3) (vessel_properties formula) with Gamma = 0.1
+      x K_m, K_m = 3e4 Pa s, h from the a-d wall-thickness fit, r0 = 0.0133364 m, l = 0.014796 m; order of magnitude only
+    sourced: 'no'
+    value: 27687600.0
+  beta_g:
+    reference: definitional; gravity switch in beta_g rho g l cos(theta) (0 = off, as in the circulatory_autogen models; 1
+      = on). Library value 1 is a test_fft fixture value
+    sourced: definitional
+    value: 0.0
+  rho:
+    reference: boileau2015benchmark; Table II, blood mass density 1050 kg m^-3 (safaei2018bond Sec. 2.2.4 uses 1040). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 1050.0
+    also_cites:
+    - safaei2018bond
+  mu:
+    reference: boileau2015benchmark; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also safaei2018bond Sec. 2.2.4). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 0.004
+    also_cites:
+    - safaei2018bond
+  g:
+    reference: definitional; standard gravity 9.81 m s^-2 (library value 1 is a test_fft fixture value)
+    sourced: definitional
+    value: 9.81
+  R_flag:
+    reference: definitional; switch for the viscous (Poiseuille) resistance, 1 = on
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

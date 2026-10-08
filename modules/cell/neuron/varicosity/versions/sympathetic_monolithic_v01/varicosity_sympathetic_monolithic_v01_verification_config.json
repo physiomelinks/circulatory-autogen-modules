@@ -1,0 +1,104 @@
+{
+  "module_type": "varicosity",
+  "version": "sympathetic_monolithic_v01",
+  "sim_time": 0.2,
+  "pre_time": 0.0,
+  "dt": 2e-05,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": [
+    "c",
+    "hc",
+    "i_Ca_N",
+    "Cai",
+    "CaB_Cai",
+    "Ca_bulk",
+    "CaB_Ca_bulk",
+    "Ca_ER_pre",
+    "CaB_Ca_ER_pre",
+    "Ca_ER",
+    "j_Ca_N",
+    "j_NaCa_Ca",
+    "NE",
+    "h_IP3",
+    "a_RyR",
+    "i_RyR",
+    "l_RyR",
+    "P_RyR",
+    "Vol",
+    "j_PMCA"
+  ],
+  "run_parameters": {"V": -10.0},
+  "invariants": [
+    {
+      "description": "N-type Ca activation c matches the exact clamp solution c_inf(V) + (c_init - c_inf) exp(-t/tau), tau = |tau_c(V)|/1000 + epsilon_tau (0.001 ms); tau divided by the temperature factor phi = Q10_CaN^((T - T_ref_CaN)/10)",
+      "expr": "np.max(np.abs(c - ((1/(1 + np.exp(-(V + V_mid_c)/V_den_c))) + (c_init - (1/(1 + np.exp(-(V + V_mid_c)/V_den_c))))*np.exp(-t/(np.abs((tau_c_min + (tau_c_max - tau_c_min)/(1 + np.exp((V_mid_c - 20 + V)/V_den_c)))/1000)/(Q10_CaN**((T - T_ref_CaN)/10)) + 1e-6))))) <= 1e-6"
+    },
+    {
+      "description": "inactivation hc matches its exact clamp solution (V_mid_hc = V_mid_c + 11, V_den_hc = V_den_c); tau divided by the temperature factor phi = Q10_CaN^((T - T_ref_CaN)/10)",
+      "expr": "np.max(np.abs(hc - ((1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))) + (hc_init - (1/(1 + np.exp((V + V_mid_c + 11)/V_den_c))))*np.exp(-t/(np.abs(tau_hc/1000)/(Q10_CaN**((T - T_ref_CaN)/10)) + 1e-6))))) <= 1e-6"
+    },
+    {
+      "description": "total Ca (free + buffered, four compartments) changes only by the plasma-membrane fluxes j_Ca_N + j_NaCa_Ca + j_PMCA (trapezoid integral)",
+      "expr": "np.max(np.abs(((Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER)) - (Vol*(c_SL*(Cai + CaB_Cai) + (1 - c_SL - c_ER - c_ER_pre)*(Ca_bulk + CaB_Ca_bulk) + c_ER_pre*(Ca_ER_pre + CaB_Ca_ER_pre) + c_ER*Ca_ER))[0]) - np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_N + j_NaCa_Ca + j_PMCA)[1:]+(j_Ca_N + j_NaCa_Ca + j_PMCA)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(np.concatenate(([0.0], np.cumsum(0.5*((j_Ca_N + j_NaCa_Ca + j_PMCA)[1:]+(j_Ca_N + j_NaCa_Ca + j_PMCA)[:-1])*np.diff(t)))))) + 1e-23"
+    },
+    {"description": "NE never falls below its baseline NE_init", "expr": "np.all(NE >= NE_init - 1e-12)"},
+    {
+      "description": "gates stay in [0, 1]",
+      "expr": "np.all((c >= -1e-6) & (c <= 1 + 1e-6)) & np.all((hc >= -1e-6) & (hc <= 1 + 1e-6)) & np.all((h_IP3 >= -1e-6) & (h_IP3 <= 1 + 1e-6)) & np.all((a_RyR >= -1e-6) & (a_RyR <= 1 + 1e-6)) & np.all((i_RyR >= -1e-6) & (i_RyR <= 1 + 1e-6)) & np.all((l_RyR >= -1e-6) & (l_RyR <= 1 + 1e-6)) & np.all((P_RyR >= -1e-6) & (P_RyR <= 1 + 1e-6))"
+    },
+    {
+      "description": "concentrations stay positive",
+      "expr": "np.all((Cai > 0) & (Ca_bulk > 0) & (Ca_ER > 0) & (Ca_ER_pre > 0))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 1.0, 2.0],
+    "ranges": {
+      "V": {"min": -90.0, "max": 30.0, "points": 5},
+      "NE_init": {"min": 0.0, "max": 0.001, "points": 3},
+      "B_Ca_init": {"min": 4.0, "max": 7.95, "points": 3},
+      "B_Ca_total": {"min": 8.0, "max": 16.0, "points": 3},
+      "h_IP3_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "c_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "hc_init": {"min": 0.0, "max": 1.0, "points": 3},
+      "rho_IP3R": {"min": 0.0, "max": 0.1547431776317185, "points": 3},
+      "d": {
+        "values": [0.9847450218426967, 1.2407009817988002, 1.5631852835935443]
+      },
+      "T": {"min": 273.15, "max": 313.15, "points": 3}
+    },
+    "bounds": {
+      "Q10_CaN": [1, 5],
+      "T_ref_CaN": [273.15, 313.15],
+      "Q10_IP3R": [1, 5],
+      "T_ref_IP3R": [273.15, 313.15],
+      "Q10_RyR": [1, 5],
+      "T_ref_RyR": [273.15, 313.15],
+      "T": [273.15, 313.15]
+    },
+    "rationale": "clamped varicosity potential -90 to +30 mV (rest to action-potential peak); NE baseline 0-1 uM; rho_IP3R (IP3R density; k_IP3 = A_ER rho_IP3R k_IP3R_single) (0 by default) up to a small value; other constants by factors 0.5-2. Gate initial values over [0, 1]; the free-buffer initial value must not exceed B_Ca_total (the bound buffer would be negative), so B_Ca_init spans 4-7.95 mM and B_Ca_total 8-16 mM. The diameter d spans the cube roots of the factors, so the volume k_V d^3 spans 0.5-2 (as Vol did); k_A, c_m, the densities and the per-protein rates scale their products by 0.5-2 (as Cm and the conductances did). Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5 and T_ref to 273.15-313.15 K."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: varicosity Ca transients / NE overflow per impulse (e.g. Brain & Bennett 1995-type data); needs owner choice."
+      },
+      "calibrate": {"note": "pending: same."}
+    }
+  }
+}

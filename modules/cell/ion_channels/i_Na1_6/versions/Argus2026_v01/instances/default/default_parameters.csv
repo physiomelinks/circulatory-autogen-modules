@@ -1,0 +1,19 @@
+variable_name,units,value,data_reference,sourced
+E_Na,milliV,61.3383,"definitional; Nernst potential RT/F ln(Nao/Nai) at Nao 145, Nai 13 mM, 295.15 K (used when unconnected)",no
+V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. davis2020downregulation)",no
+V_den_h_Na1_6,milliV,8.0,tao2011model; Supporting Material (Document S1) Eq. 87 (k = 6.5 mV); modified here to 8 mV (was 6.5),yes
+V_den_m_Na1_6,milliV,8.0,tao2011model; Supporting Material (Document S1) Eq. 86 (k = 7.2 mV); modified here to 8 mV (was 7.2),yes
+V_mid_h_Na1_6,milliV,53.2,tao2011model; Supporting Material (Document S1) Eq. 87: h_inf V1/2 = -53.2 mV (= value; reused for NaV1.6),yes
+V_mid_m_Na1_6,milliV,36,tao2011model; Supporting Material (Document S1) Eq. 86: m_inf V1/2 = -36 mV (= value; the Belluzzi-Sacchi I_Na gate reused for the NaV1.6 current; no NaV1.6-specific source),yes
+V_rest_approx,milliV,-70,"davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites davis2021transcriptomic, whose current-clamp traces the value was read from)",yes
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_Na1_6,per_um2,11.11111111111111,definitional; chosen so that g_Na1_6 = A rho gamma_Na1_6 (1e-6 uS/pS) reproduces the previous g_Na1_6 = 0.5 microS (user_defined) with A = 3000 um^2 (the soma membrane area) and gamma_Na1_6 = 15 picoS; a density for calibration through gamma_Na1_6. The previous g_Na1_6 (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'),no
+gamma_Na1_6,picoS,15.0,"magee1995characterization; 15 pS, the TTX-sensitive neuronal Na channel conductance (Abstract, point 2), used as a proxy: no Nav1.6 single-channel conductance could be verified (Chatelier et al. 2010 has no value in its abstract)",no
+g_Na1_6_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified",no
+tau_h_Na1_6_max,millis,300,"owner's calibration value (CA_user 35f61a8, 2025-05-01: tau_h_max 300 ms, the upper bound of its 50-300 ms calibration range; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'; a 2026-08 free fit gave 1004 ms, sympathetic_neuron 7ab2983). Physiological counterpart: belluzzi1986quantitative slow Na inactivation, recovery tau_s1 0.13-1.4 s at -100 to -60 mV (27 degC; Fig. 7, Table 1, pp. 282-284). Not a NaV1.6 property: herzog2003distinct report Nav1.6 reprimes ~5x faster than Nav1.7",no
+tau_h_Na1_6_min,millis,0.15,"owner's hand-set floor (CA_user ad0ce77, 2024-07-21, for i_Na; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'). Cf. belluzzi1986quantitative Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); tao2011model Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",no
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_m_Na1_6,dimensionless,3,"unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T); belluzzi1986quantitative Table 2 also gives a measured tau_m Q10 (17-27 degC), not re-read",no
+Q10_h_Na1_6,dimensionless,2.37,"belluzzi1986quantitative; Table 2: temperature coefficient of tau_h Q10 = 2.37 (rat sympathetic neurone Na current, 17-27 degC; used there to reconstruct the 37 degC kinetics); the Nav1.6 gate is a copy of the Belluzzi-Sacchi fast Na gate",yes
+T_ref_Na1_6,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

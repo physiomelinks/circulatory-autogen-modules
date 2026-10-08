@@ -1,0 +1,80 @@
+module_type: i_Na
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM (ventricular-like) fast Na current I_Na = TTX_coeff g_Na m^3 h j (Vm - E_Na). Algebraic: all gates,
+  concentrations and the membrane potential are inputs, so alone it is a pure function of its inputs, checked exactly against
+  the original model equations.'
+expected_failures:
+  run_test: 'generation fails: the gate inputs m, h, j are declared private_interface=''in'' (a leftover of the original Paci
+    encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    Also TTX_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''. With
+    the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: the gate inputs m, h, j are declared private_interface=''in'' (a leftover
+    of the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. Also TTX_coeff is exposed in the config but has no public interface in the CellML; fix:
+    public_interface=''out''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: the gate inputs m, h, j are declared private_interface=''in'' (a leftover of the
+    original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. Also TTX_coeff is exposed in the config but has no public interface in the CellML; fix:
+    public_interface=''out''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: the gate inputs m, h, j are declared private_interface=''in'' (a leftover
+    of the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. Also TTX_coeff is exposed in the config but has no public interface in the CellML; fix:
+    public_interface=''out''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: the gate inputs m, h, j are declared private_interface=''in'' (a leftover of the original
+    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    Also TTX_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''. With
+    the proposed fix applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  g_Na:
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      g_Na = 3671.23'
+    sourced: 'yes'
+    value: 3671.2302
+  Vm:
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  E_Na:
+    reference: 'definitional; Nernst potential of the paci2013computational electric_potentials at the CellML initial state (R=8.314472,
+      T=310, F=96485.3415, Nao=151, Ko=5.4, Ki=150, Cao=1.8 mM, Nai=10.9248, Cai=1.80774e-5 mM): E_Na = 0.0701567 V'
+    sourced: definitional
+    value: 0.07015674307053439
+  m:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): m = 0.102953'
+    sourced: 'yes'
+    value: 0.102953468725004
+  h:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): h = 0.786927'
+    sourced: 'yes'
+    value: 0.786926637881461
+  j:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): j = 0.253943'
+    sourced: 'yes'
+    value: 0.253943221774722
+  T:
+    reference: paci2013computational; temperature in the authors' CellML (310 K)
+    sourced: 'yes'
+    value: 310
+  TTX_3uM:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  TTX_10uM:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  TTX_30uM:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

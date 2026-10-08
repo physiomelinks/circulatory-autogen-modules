@@ -1,0 +1,593 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="terminalOL_pp_controller" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="controller_OL_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- Constitutive parameters-->
+        <!--var I_T: Js2_per_m6 {pub: out};-->
+        <variable name="I_T" public_interface="in" units="Js2_per_m6"/>
+        <!--var I_T_global: Js2_per_m6 {pub: in};-->
+        <variable name="R_v" public_interface="out" units="Js_per_m6"/>
+        <variable name="R_T" public_interface="out" units="Js_per_m6"/>
+        <variable name="R_T1" public_interface="out" units="Js_per_m6"/>
+        <variable name="R_T2" public_interface="out" units="Js_per_m6"/>
+        <variable name="C_T" public_interface="in" units="m6_per_J"/>
+        <variable name="pressure_venous_dist" public_interface="in" units="J_per_m3"/>
+        <!-- State Variables-->
+        <variable initial_value="0.0" name="v" public_interface="out" units="m3_per_s"/>
+        <variable initial_value="0.0" name="v_T" public_interface="out" units="m3_per_s"/>
+        <!-- v_T is the output flow to the venous side-->
+        <variable name="q_us" public_interface="in" units="m3"/>
+        <variable name="q_init" public_interface="in" units="m3"/>
+        <variable initial_value="q_init" name="q" public_interface="out" units="m3"/>
+        <variable name="u" public_interface="out" units="J_per_m3"/>
+        <variable name="u_C" public_interface="out" units="J_per_m3"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="u_ext" public_interface="in" units="J_per_m3"/>
+        <!--var u_out: J_per_m3 {pub: out};
+var R_T_wCont: Js_per_m6 {pub: out};-->
+        <variable name="u_a" public_interface="in" units="J_per_m3"/>
+        <variable name="v_a" public_interface="in" units="m3_per_s"/>
+        <variable name="meanflow_4dflow" public_interface="in" units="m3_per_s"/>
+        <variable name="BFF_ASL" public_interface="in" units="dimensionless"/>
+        <variable name="pressure_d" public_interface="in" units="J_per_m3"/>
+        <variable name="error" public_interface="out" units="J_per_m3"/>
+        <variable name="r_a" public_interface="out" units="dimensionless"/>
+        <variable name="error_flow_percent" public_interface="out" units="dimensionless"/>
+        <variable name="critic" public_interface="out" units="dimensionless"/>
+        <variable name="x1" units="dimensionless"/>
+        <variable name="x2" units="dimensionless"/>
+        <variable name="x3" units="dimensionless"/>
+        <variable name="u2" units="dimensionless"/>
+        <variable name="u5" units="dimensionless"/>
+        <variable name="u8" units="dimensionless"/>
+        <variable initial_value="100" name="aa2" units="dimensionless"/>
+        <variable initial_value="100" name="cc2" units="dimensionless"/>
+        <variable initial_value="100" name="aa5" units="dimensionless"/>
+        <variable initial_value="100" name="cc5" units="dimensionless"/>
+        <variable initial_value="100" name="aa8" public_interface="out" units="dimensionless"/>
+        <variable initial_value="100" name="cc8" units="dimensionless"/>
+        <variable name="check" public_interface="out" units="dimensionless"/>
+        <!-- only change this (speed of convergence, not too high otherwise problem diverges)-->
+        <variable initial_value="1e7" name="learning_rate" units="dimensionless"/>
+        <!-- 1e8 // 1e9-->
+        <!-- old value: 1e6-->
+        <!-- and this, increase if you want to improve the accuracy in the predicted BFF (this is the coefficient/regularizer in the penalty term to control the BFF)-->
+        <variable initial_value="0.9" name="K_a" units="dimensionless"/>
+        <!-- old value: 0.001-->
+        <!-- error in pressure-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>error</ci>
+                <apply>
+                    <minus/>
+                    <ci>pressure_d</ci>
+                    <ci>u_a</ci>
+                </apply>
+            </apply>
+            <!-- error in BFF-->
+            <apply>
+                <eq/>
+                <ci>r_a</ci>
+                <apply>
+                    <minus/>
+                    <ci>BFF_ASL</ci>
+                    <apply>
+                        <divide/>
+                        <ci>v_a</ci>
+                        <ci>meanflow_4dflow</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>critic</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless" type="e-notation">1<sep/>-6</cn>
+                    </apply>
+                    <ci>error</ci>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <ci>v</ci>
+                            <cn cellml:units="dimensionless" type="e-notation">1<sep/>-6</cn>
+                        </apply>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <!-- old value at denominator: 1e-4-->
+            <apply>
+                <eq/>
+                <ci>x1</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>error</ci>
+                                    </apply>
+                                    <cn cellml:units="dimensionless" type="e-notation">1<sep/>0</cn>
+                                </apply>
+                                <cn cellml:units="dimensionless">0.01</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x2</ci>
+                <apply>
+                    <exp/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>error</ci>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>0</cn>
+                            </apply>
+                            <cn cellml:units="dimensionless">2</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x3</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>error</ci>
+                                    <cn cellml:units="dimensionless" type="e-notation">1<sep/>0</cn>
+                                </apply>
+                                <cn cellml:units="dimensionless">0.01</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u2</ci>
+                <apply>
+                    <divide/>
+                    <ci>x1</ci>
+                    <apply>
+                        <plus/>
+                        <ci>x1</ci>
+                        <ci>x2</ci>
+                        <ci>x3</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u5</ci>
+                <apply>
+                    <divide/>
+                    <ci>x2</ci>
+                    <apply>
+                        <plus/>
+                        <ci>x1</ci>
+                        <ci>x2</ci>
+                        <ci>x3</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u8</ci>
+                <apply>
+                    <divide/>
+                    <ci>x3</ci>
+                    <apply>
+                        <plus/>
+                        <ci>x1</ci>
+                        <ci>x2</ci>
+                        <ci>x3</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>aa2</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <ci>learning_rate</ci>
+                    <apply>
+                        <minus/>
+                        <ci>critic</ci>
+                        <apply>
+                            <times/>
+                            <ci>K_a</ci>
+                            <ci>r_a</ci>
+                        </apply>
+                    </apply>
+                    <ci>u2</ci>
+                    <ci>error</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>cc2</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <ci>learning_rate</ci>
+                    <apply>
+                        <minus/>
+                        <ci>critic</ci>
+                        <apply>
+                            <times/>
+                            <ci>K_a</ci>
+                            <ci>r_a</ci>
+                        </apply>
+                    </apply>
+                    <ci>u2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>aa5</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <ci>learning_rate</ci>
+                    <apply>
+                        <minus/>
+                        <ci>critic</ci>
+                        <apply>
+                            <times/>
+                            <ci>K_a</ci>
+                            <ci>r_a</ci>
+                        </apply>
+                    </apply>
+                    <ci>u5</ci>
+                    <ci>error</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>cc5</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <ci>learning_rate</ci>
+                    <apply>
+                        <minus/>
+                        <ci>critic</ci>
+                        <apply>
+                            <times/>
+                            <ci>K_a</ci>
+                            <ci>r_a</ci>
+                        </apply>
+                    </apply>
+                    <ci>u5</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>aa8</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <ci>learning_rate</ci>
+                    <apply>
+                        <minus/>
+                        <ci>critic</ci>
+                        <apply>
+                            <times/>
+                            <ci>K_a</ci>
+                            <ci>r_a</ci>
+                        </apply>
+                    </apply>
+                    <ci>u8</ci>
+                    <ci>error</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>cc8</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <ci>learning_rate</ci>
+                    <apply>
+                        <minus/>
+                        <ci>critic</ci>
+                        <apply>
+                            <times/>
+                            <ci>K_a</ci>
+                            <ci>r_a</ci>
+                        </apply>
+                    </apply>
+                    <ci>u8</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>check</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>u2</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <times/>
+                                <ci>aa2</ci>
+                                <ci>error</ci>
+                            </apply>
+                            <ci>cc2</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>u5</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <times/>
+                                <ci>aa5</ci>
+                                <ci>error</ci>
+                            </apply>
+                            <ci>cc5</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>u8</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <times/>
+                                <ci>aa8</ci>
+                                <ci>error</ci>
+                            </apply>
+                            <ci>cc8</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_T</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <leq/>
+                            <ci>check</ci>
+                            <cn cellml:units="dimensionless">0</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <ci>check</ci>
+                        <apply>
+                            <and/>
+                            <apply>
+                                <gt/>
+                                <ci>check</ci>
+                                <cn cellml:units="dimensionless">0</cn>
+                            </apply>
+                            <apply>
+                                <leq/>
+                                <ci>check</ci>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>13</cn>
+                            </apply>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless" type="e-notation">1<sep/>13</cn>
+                        <apply>
+                            <gt/>
+                            <ci>check</ci>
+                            <cn cellml:units="dimensionless" type="e-notation">1<sep/>13</cn>
+                        </apply>
+                    </piece>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>error_flow_percent</ci>
+                <apply>
+                    <times/>
+                    <ci>r_a</ci>
+                    <cn cellml:units="dimensionless">100</cn>
+                </apply>
+            </apply>
+            <!--I_T = 1e-6{Js2_per_m6};
+ Improve this R_v estimate?-->
+            <apply>
+                <eq/>
+                <ci>R_v</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="second">0.01</cn>
+                    <ci>C_T</ci>
+                </apply>
+            </apply>
+            <!-- proximal resistance -->
+            <apply>
+                <eq/>
+                <ci>R_T1</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">0.2</cn>
+                    <ci>R_T</ci>
+                </apply>
+            </apply>
+            <!-- or 0.15
+ distal resistance-->
+            <apply>
+                <eq/>
+                <ci>R_T2</ci>
+                <apply>
+                    <minus/>
+                    <ci>R_T</ci>
+                    <ci>R_T1</ci>
+                </apply>
+            </apply>
+            <!-- Conservation Laws
+ For now terminals don't have a gravity effect, change this for leg terminals-->
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v</ci>
+                    <ci>v_T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u_C</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>q</ci>
+                        <ci>q_us</ci>
+                    </apply>
+                    <ci>C_T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u</ci>
+                <apply>
+                    <plus/>
+                    <ci>u_C</ci>
+                    <ci>u_ext</ci>
+                    <apply>
+                        <times/>
+                        <ci>R_v</ci>
+                        <apply>
+                            <minus/>
+                            <ci>v</ci>
+                            <ci>v_T</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>v</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>u_in</ci>
+                            <apply>
+                                <times/>
+                                <ci>R_T1</ci>
+                                <ci>v</ci>
+                            </apply>
+                        </apply>
+                        <ci>u</ci>
+                    </apply>
+                    <ci>I_T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>v_T</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>u</ci>
+                            <apply>
+                                <times/>
+                                <ci>R_T2</ci>
+                                <ci>v_T</ci>
+                            </apply>
+                        </apply>
+                        <ci>pressure_venous_dist</ci>
+                    </apply>
+                    <ci>I_T</ci>
+                </apply>
+            </apply>
+        </math>
+        <!--R_T_wCont = R_T;-->
+    </component>
+</model>

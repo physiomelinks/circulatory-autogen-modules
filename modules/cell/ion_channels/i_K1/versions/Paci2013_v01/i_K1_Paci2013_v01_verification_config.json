@@ -1,0 +1,49 @@
+{
+  "module_type": "i_K1",
+  "version": "Paci2013_v01",
+  "sim_time": 0.01,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["i_K1"],
+  "run_parameters": {"Vm": -0.06},
+  "invariants": [
+    {
+      "description": "i_K1 equals the Paci 2013 expression transcribed from the authors' CellML: inward rectifier I_K1 = g_K1 XK1_inf(Vm - E_K) (Vm - E_K) sqrt(Ko/5",
+      "expr": "np.max(np.abs(i_K1 - (g_K1*(3.91/(1+np.exp(0.5942*(Vm*1000-E_K*1000-200))))/((3.91/(1+np.exp(0.5942*(Vm*1000-E_K*1000-200)))) + (-1.509*np.exp(0.0002*(Vm*1000-E_K*1000+100)) + np.exp(0.5886*(Vm*1000-E_K*1000-10)))/(1+np.exp(0.4547*(Vm*1000-E_K*1000))))*(Vm - E_K)*np.sqrt(Ko/5.4)))) <= 1e-9*max(1.0, np.max(np.abs(g_K1*(3.91/(1+np.exp(0.5942*(Vm*1000-E_K*1000-200))))/((3.91/(1+np.exp(0.5942*(Vm*1000-E_K*1000-200)))) + (-1.509*np.exp(0.0002*(Vm*1000-E_K*1000+100)) + np.exp(0.5886*(Vm*1000-E_K*1000-10)))/(1+np.exp(0.4547*(Vm*1000-E_K*1000))))*(Vm - E_K)*np.sqrt(Ko/5.4))))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 6},
+      "E_K": {"min": -0.11880285397707481, "max": -0.05880285397707481, "points": 3},
+      "Ko": {"min": 2.7, "max": 8.100000000000001, "points": 3}
+    },
+    "rationale": "Clamp inputs span the physiological operating range of a hiPSC-CM: Vm -100 to +50 mV, reversal potentials +/-30 mV about their resting values, gates over [0, 1], Cai 1e-5 to 1e-3 mM, Nai 5-20 mM, extracellular concentrations +/-50 %, T room to body temperature; drug switches 0/1; conductances by the default factors 0.5-2. R and F are physical constants (not swept)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the hiPSC-CM I-V / conductance data the current was fitted to (Ma et al. 2011, Am J Physiol Heart Circ Physiol 301:H2006, as used by Paci 2013) could be digitised and compared with the clamped steady-state current (gates at their steady state); needs the gate components composed with this one and owner approval of digitised data."
+      },
+      "calibrate": {
+        "note": "pending: the maximal conductance could be identified from the same I-V data once a baseline is agreed."
+      }
+    }
+  }
+}

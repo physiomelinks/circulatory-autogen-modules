@@ -1,0 +1,80 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root {
+  --paper: #f6f7f5;
+  --panel: #ffffff;
+  --ink: #17201c;
+  --ink-2: #4a5550;
+  --ink-3: #6f7a75;
+  --rule: #dce1dd;
+  --rule-strong: #c3cbc6;
+  --accent: #2b4f7a;
+  --accent-soft: #e6edf5;
+  --pass: #1c7c4a;  --pass-bg: #e3f2e9;
+  --fail: #b42318;  --fail-bg: #fbe6e3;
+  --pend: #8a6412;  --pend-bg: #f8efd9;
+  --skip: #5e6863;  --skip-bg: #eceeed;
+  --todo: #8a6412;
+  --plot-ground: #fcfcfb;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #121614; --panel: #1a201d; --ink: #e8ece9; --ink-2: #b4bdb8; --ink-3: #8d9792;
+    --rule: #2b3330; --rule-strong: #3c4641; --accent: #8fb3dc; --accent-soft: #1f2c3a;
+    --pass: #5cc48a; --pass-bg: #173325; --fail: #f08a7e; --fail-bg: #3a1c19;
+    --pend: #e0b457; --pend-bg: #33291a; --skip: #a3ada8; --skip-bg: #242b28; --todo: #e0b457;
+    --plot-ground: #fcfcfb;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #121614; --panel: #1a201d; --ink: #e8ece9; --ink-2: #b4bdb8; --ink-3: #8d9792;
+  --rule: #2b3330; --rule-strong: #3c4641; --accent: #8fb3dc; --accent-soft: #1f2c3a;
+  --pass: #5cc48a; --pass-bg: #173325; --fail: #f08a7e; --fail-bg: #3a1c19;
+  --pend: #e0b457; --pend-bg: #33291a; --skip: #a3ada8; --skip-bg: #242b28; --todo: #e0b457;
+  --plot-ground: #fcfcfb;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.55 var(--font-body); padding-inline: 16px;
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.1rem; }
+h4 { font-size: 0.95rem; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+.eyebrow { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.muted { color: var(--ink-2); }
+.num { font-variant-numeric: tabular-nums; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; white-space: nowrap; border: 1px solid transparent;
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.passed, .chip.passed_in_super { color: var(--pass); background: var(--pass-bg); }
+.chip.failed, .chip.failed_in_super { color: var(--fail); background: var(--fail-bg); }
+.chip.pending { color: var(--pend); background: var(--pend-bg); }
+.chip.skipped, .chip.none, .chip.not_applicable { color: var(--skip); background: var(--skip-bg); }
+.chip.none::before { background: transparent; border: 1.5px solid currentColor; width: 5px; height: 5px; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--ink-2); font-size: 0.76rem; letter-spacing: 0.04em; text-transform: uppercase; background: var(--paper); }
+tr:last-child td { border-bottom: 0; }
+td.mono, th.mono { font-family: var(--font-mono); font-size: 0.8rem; }
+.todo { color: var(--todo); font-weight: 600; }
+</style>

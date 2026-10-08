@@ -1,0 +1,67 @@
+{
+  "module_type": "i_Kv4_2",
+  "version": "Argus2026_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["m_Kv4_2", "h_Kv4_2", "h_Kv4_2_inf", "i_Kv4_2", "j_Kv4_2", "m_Kv4_2_inf", "tau_m_Kv4_2"],
+  "run_parameters": {"V": 10.0},
+  "invariants": [
+    {
+      "description": "the ion flux j_Kv4_2 = -i_Kv4_2/F (mol/s; the current in nA, so the factor 1e-9)",
+      "expr": "np.max(np.abs(j_Kv4_2 - 1e-9*(-i_Kv4_2/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_Kv4_2)))"
+    },
+    {
+      "description": "every gating variable stays in [0, 1]",
+      "expr": "np.all((m_Kv4_2 >= -1e-9) & (m_Kv4_2 <= 1 + 1e-9)) & np.all((h_Kv4_2 >= -1e-9) & (h_Kv4_2 <= 1 + 1e-9))"
+    },
+    {
+      "description": "voltage step (V clamped at the run value, gates starting at rest V_rest_approx): m_Kv4_2 follows its exact clamp solution, tau = |tau_m(V)|/1000/phi + epsilon_tau (tau_m branch switch at V < -50 mV)",
+      "expr": "np.max(np.abs(m_Kv4_2 - ((1/(1 + np.exp(-(V + V_mid_m_Kv4_2)/V_den_m_Kv4_2))) + ((1/(1 + np.exp(-(V_rest_approx + V_mid_m_Kv4_2)/V_den_m_Kv4_2))) - (1/(1 + np.exp(-(V + V_mid_m_Kv4_2)/V_den_m_Kv4_2))))*np.exp(-t/(np.abs(np.where(V < -50, 1/(0.026*np.exp(-0.026*V) + 35*np.exp(0.136*V)), 1.7/(1 + np.exp((-42 - V)/(-26))) + 0.34))/1000/(Q10_Kv4_2**((T - T_ref_Kv4_2)/10)) + 1e-6))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "h_Kv4_2 follows its exact clamp solution, tau = tau_h_Kv4_2/1000/phi + epsilon_tau",
+      "expr": "np.max(np.abs(h_Kv4_2 - ((1/(1 + np.exp((V + V_mid_h_Kv4_2)/V_den_h_Kv4_2))) + ((1/(1 + np.exp((V_rest_approx + V_mid_h_Kv4_2)/V_den_h_Kv4_2))) - (1/(1 + np.exp((V + V_mid_h_Kv4_2)/V_den_h_Kv4_2))))*np.exp(-t/(np.abs(tau_h_Kv4_2)/1000/(Q10_Kv4_2**((T - T_ref_Kv4_2)/10)) + 1e-6))))) <= 1e-6",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "T": {"min": 273.15, "max": 313.15, "points": 3}
+    },
+    "bounds": {
+      "Q10_Kv4_2": [1, 5],
+      "T_ref_Kv4_2": [273.15, 313.15],
+      "T": [273.15, 313.15]
+    },
+    "rationale": "Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5 and T_ref to 273.15-313.15 K."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      }
+    }
+  }
+}

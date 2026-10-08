@@ -1,0 +1,41 @@
+module_type: RyR
+version: HernandezCruz1997_v01
+reviewed: false
+notes: 'The ryanodine receptor of the rat superior cervical ganglion (sympathetic) neuron CICR model of Hernandez-Cruz,
+  Escobar & Jimenez 1997 (J Gen Physiol 109:147; cultured rat SCG neurons, 22-23 degC), Appendix Eqs. A11-A15 with the
+  constants of the Fig. 10 legend. Three first-order Ca binding sites, each state the fraction of sites occupied
+  (x = X_Ca/X_Tot, the paper''s aRyR_Tot = iRyR_Tot = lRyR_Tot = 0.1 uM divide out):
+  da/dt = phi (kon_a Cai (1 - a) - koff_a a) (activating, Eq. A13); di/dt = phi (kon_i Cai (1 - i) - koff_i i)
+  (inactivating, Eq. A14); dl/dt = phi (kon_l Ca_ER (1 - l) - koff_l l) (luminal, on the releasing ER, Eq. A15);
+  open fraction P = a (1 - i) l^N (Eq. A12); release j_RyR = k_RyR P (Ca_ER - Cai) (Eq. A11, first term).
+  Kds koff/kon: activating 200 uM at rest (0.8 uM with caffeine), inactivating 0.63 uM, luminal 130 uM with N = 7.
+  Caffeine is the paper''s way: kon_a_RyR from 10 to 2500 /(mM s) (k_on-Caff 0.01 -> k_on+Caff 2.5 /uM/s, Eq. A16);
+  the pulse train of Eq. A16 is not built in (set kon_a_RyR, or switch it between runs).
+  Flux magnitude: the paper''s rate constant RyR_max ds_erm acts on the inmost cytosolic shell (Eq. A11); here it is
+  the density x per-channel structure of Argus2026_v01, k_RyR = A_ER rho_RyR k_RyR_single (1e-18 m3/um3), with
+  k_RyR_single from Kettlun 2003 (0.5 pA at 1 mM luminal Ca: 2.591 um^3/s) and rho_RyR = RyR_max x shell volume
+  (ds dx = 0.2 um^3) / k_RyR_single = 5403 /um^2, a model capacity rather than a measured density (no neuronal RyR
+  density was found). Temperature: every rate constant is multiplied by phi = Q10^((T - T_ref)/10 K); T_ref = 295.65 K
+  (22.5 degC, the recordings), Q10 a placeholder 3; at the model temperature 295.15 K phi = 0.947.
+  Same ports as Argus2026_v01 (internal_Ca, ER_Ca, Ca_flux / ER_Ca_release, ER_membrane_area), so it is a drop-in
+  replacement for the RyR submodule of soma sympathetic and varicosity sympathetic; both use it since review 2026-10-06
+  (with the monolithic equivalents and SN_simple*), replacing Argus2026_v01 (the comparison in the soma, made before the
+  switch, is reviews/RyR_HernandezCruz1997_comparison.html, tools/ryr_hernandezcruz1997_comparison.py).
+  Ambiguities in the source: (1) the Fig. 10 legend prints "k_offiRyR" twice, 0.176 /s and 1,300 /s; the second sits
+  next to k_onlRyR and is read as the luminal k_off (Kd 130 uM). (2) Eq. A11 and the ERt equation apply the same rate
+  RyR(Ca,t) (Ca_ERt - Ca_n) to the cytosolic shell and to the ER compartment (vol_ER = 100 um^3) without a volume
+  ratio, so the amount released is not conserved between them; the cytosolic-shell reading (shell volume ds dx) is
+  used for rho_RyR. (3) The number of shells n and the pump binding rates are not given, so Fig. 10 can''t be
+  reproduced. (4) The legend calls all values "initial parameters"; the rates are taken as constant.
+  Starting occupancies (2026-10-08): computed in the model as the steady state at the starting Ca, Cai_init and
+  Ca_ER_init (constants; in a cell, equal to the Ca handling''s Cai_init and Ca_ER_init), as SN_full does. They were
+  constants hand-computed at 0.1 uM and 75 uM, so in the soma and varicosity (Ca_ER_init 0.6 mM) l_RyR started at 0.37
+  instead of its steady state 0.82.'
+known_issues:
+- 'Python/C generation unsupported: the RyR site occupancies start from computed initial values (a_RyR_init =
+  kon_a Cai_init/(kon_a Cai_init + koff_a), likewise i_RyR_init and l_RyR_init at Ca_ER_init), which libCellML''s
+  analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Since 2026-10-08.'
+- 'Starting state not recomputed when a parameter changes on a built simulation: Myokit evaluates the initial-value
+  expressions once, so in the BC sweep the site states start at the occupancies computed with the default rates and
+  starting Ca (a_RyR_init, i_RyR_init, l_RyR_init themselves follow the new values). A calibration that sets
+  parameters on a built simulation would behave the same; rebuild the model to start at the new steady state.'

@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_CaL_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_CaL_Paci_2013">
+        <variable name="i_CaL" public_interface="out" units="A_per_F"/>
+        <variable name="g_CaL" public_interface="in" units="m3_per_Fs"/>
+        <variable name="R" public_interface="in" units="J_per_MK"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="F" public_interface="in" units="C_per_M"/>
+        <variable name="t" private_interface="out" public_interface="in" units="second"/>
+        <variable name="Vm" private_interface="out" public_interface="in" units="volt"/>
+        <variable name="Cai" private_interface="out" public_interface="in" units="millimolar"/>
+        <variable name="Cao" private_interface="out" public_interface="in" units="millimolar"/>
+        <variable name="d" private_interface="in" public_interface="out" units="dimensionless"/>
+        <variable name="f1" private_interface="in" units="dimensionless"/>
+        <variable name="f2" private_interface="in" units="dimensionless"/>
+        <variable name="fCa" private_interface="in" units="dimensionless"/>
+        <variable name="nifed_3nM" public_interface="in" units="dimensionless"/>
+        <variable name="nifed_10nM" public_interface="in" units="dimensionless"/>
+        <variable name="nifed_30nM" public_interface="in" units="dimensionless"/>
+        <variable name="nifed_100nM" public_interface="in" units="dimensionless"/>
+        <variable name="nifed_coeff" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>nifed_coeff</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.93</cn>
+                        <apply>
+                            <eq/>
+                            <ci>nifed_3nM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.79</cn>
+                        <apply>
+                            <eq/>
+                            <ci>nifed_10nM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.56</cn>
+                        <apply>
+                            <eq/>
+                            <ci>nifed_30nM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.28</cn>
+                        <apply>
+                            <eq/>
+                            <ci>nifed_100nM</ci>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">1</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <!-- This could be easily modified to be the same as the Tomek model...-->
+            <apply>
+                <eq/>
+                <ci>i_CaL</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <times/>
+                                    <ci>g_CaL</ci>
+                                    <cn cellml:units="dimensionless">4</cn>
+                                    <ci>Vm</ci>
+                                    <apply>
+                                        <power/>
+                                        <ci>F</ci>
+                                        <cn cellml:units="dimensionless">2</cn>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <times/>
+                                    <ci>Cai</ci>
+                                    <apply>
+                                        <exp/>
+                                        <apply>
+                                            <divide/>
+                                            <apply>
+                                                <times/>
+                                                <cn cellml:units="dimensionless">2</cn>
+                                                <ci>Vm</ci>
+                                                <ci>F</ci>
+                                            </apply>
+                                            <apply>
+                                                <times/>
+                                                <ci>R</ci>
+                                                <ci>T</ci>
+                                            </apply>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.341</cn>
+                                    <ci>Cao</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">2</cn>
+                                        <ci>Vm</ci>
+                                        <ci>F</ci>
+                                    </apply>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">1</cn>
+                        </apply>
+                    </apply>
+                    <ci>d</ci>
+                    <ci>f1</ci>
+                    <ci>f2</ci>
+                    <ci>fCa</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

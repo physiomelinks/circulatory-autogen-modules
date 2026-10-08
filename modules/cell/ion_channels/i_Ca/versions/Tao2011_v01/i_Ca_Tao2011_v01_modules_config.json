@@ -1,0 +1,120 @@
+[
+  {
+    "module_type": "i_Ca",
+    "module_subtype": "Tao2011_v01",
+    "module_format": "cellml",
+    "component_file": "i_Ca_Tao2011_v01_modules.cellml",
+    "component_type": "i_Ca_Tao_2011",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "tao2011model",
+      "belluzzi1989calcium"
+    ],
+    "notes": "Built for: sympathetic neuron (Tao et al. 2011)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "Ca_current",
+        "variables": [
+          "i_Ca"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Ca_current",
+        "variables": [
+          "i_Ca"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_Ca",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "R",
+        "J_per_MK",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "P_Ca",
+        "m_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_c",
+        "second",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_hc",
+        "second",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

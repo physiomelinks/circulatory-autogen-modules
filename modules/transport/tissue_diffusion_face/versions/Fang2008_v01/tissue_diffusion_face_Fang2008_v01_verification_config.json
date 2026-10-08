@@ -1,0 +1,82 @@
+{
+  "module_type": "tissue_diffusion_face",
+  "version": "Fang2008_v01",
+  "sim_time": 5.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-10, "atol": 1e-14, "MaximumStep": 0.01},
+  "outputs": ["D", "J", "J_up", "J_down", "va/C_P", "vb/C_P", "va/V_P", "vb/V_P"],
+  "harness": {
+    "module_array": [
+      ["va", "Fang2008_v01", "tissue_diffusion_volume", "", "mod", "default"],
+      ["mod", "Fang2008_v01", "tissue_diffusion_face", "va", "vb", "default"],
+      ["vb", "Fang2008_v01", "tissue_diffusion_volume", "mod", "", "default"]
+    ],
+    "parameters": [
+      ["C_P_init_va", "millimolar", 0.08, "harness: two cells at different concentrations"],
+      ["flux_c_va", "mol_per_s", 0, "harness: closed cell"],
+      ["M_va", "millimolar_per_s", 0, "harness: no consumption"],
+      ["C50_va", "millimolar", 0.0133, "harness (unused with M = 0)"],
+      ["C_P_init_vb", "millimolar", 0.02, "harness: two cells at different concentrations"],
+      ["flux_c_vb", "mol_per_s", 0, "harness: closed cell"],
+      ["M_vb", "millimolar_per_s", 0, "harness: no consumption"],
+      ["C50_vb", "millimolar", 0.0133, "harness (unused with M = 0)"],
+      ["V_P_va", "m3", 8.000000000000002e-15, "harness: 20 x 20 x 20 um cell"],
+      ["V_P_vb", "m3", 1.2000000000000003e-14, "harness: 30 x 20 x 20 um cell"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "D = open_flag sigma_diff A_f/(d_up + d_down), J = D (C_up - C_down) with C_up, C_down the connected cells' C_P, J_down = J, J_up = -J (exact)",
+      "expr": "np.allclose(D, open_flag*sigma_diff*A_f/(d_up + d_down), rtol=1e-12, atol=0) and np.allclose(J, D*(va__C_P - vb__C_P), rtol=1e-9, atol=1e-30) and np.array_equal(J_down, J) and np.array_equal(J_up, -J)"
+    },
+    {
+      "description": "mass is conserved across the face: V_a C_a + V_b C_b is constant (relative 1e-9)",
+      "expr": "np.ptp(va__V_P*va__C_P + vb__V_P*vb__C_P) <= 1e-9*np.max(np.abs(va__V_P*va__C_P + vb__V_P*vb__C_P))"
+    },
+    {
+      "description": "exact solution: C_a - C_b = (C_a0 - C_b0) exp(-D (1/V_a + 1/V_b) t) (relative 1e-6 of the initial difference)",
+      "expr": "np.max(np.abs((va__C_P - vb__C_P) - (va__C_P[0] - vb__C_P[0])*np.exp(-D[0]*(1/va__V_P[0] + 1/vb__V_P[0])*t))) <= 1e-6*abs(va__C_P[0] - vb__C_P[0]) + 1e-15"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "C_P_init": {"min": 0.0, "max": 0.2, "points": 5},
+      "flux_c": {"min": 0.0, "max": 2e-15, "points": 5},
+      "sigma_diff": {"min": 5e-10, "max": 5e-09, "points": 5, "scale": "log"},
+      "M": {"min": -0.2, "max": 0.0, "points": 5},
+      "A_f": {"min": 1e-10, "max": 2.5e-09, "points": 4, "scale": "log"},
+      "open_flag": {"min": 0, "max": 1, "points": 2},
+      "V_P": {"min": 4e-15, "max": 1.25e-13, "points": 4, "scale": "log"},
+      "d_up": {"min": 5e-06, "max": 2.5e-05, "points": 4, "scale": "log"},
+      "d_down": {"min": 5e-06, "max": 2.5e-05, "points": 4, "scale": "log"},
+      "C50": {"min": 0.0014, "max": 0.14, "points": 5, "scale": "log"}
+    },
+    "exclude": ["C_up", "C_down"],
+    "rationale": "the face constants; C_up and C_down come from the connected cells"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 0.5,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a face is the flux law between two finite-volume cells; verified against the exact two-cell solution and mass conservation. Tissue PO2 data apply to an assembled grid."
+      },
+      "calibrate": {"note": "not_applicable: as baseline"}
+    }
+  }
+}

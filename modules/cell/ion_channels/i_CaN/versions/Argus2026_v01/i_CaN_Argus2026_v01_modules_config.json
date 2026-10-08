@@ -1,0 +1,220 @@
+[
+  {
+    "module_type": "i_CaN",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "i_CaN_Argus2026_v01_modules.cellml",
+    "component_type": "i_CaN_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "belluzzi1989calcium",
+      "argus2026sympathetic"
+    ],
+    "required_citations_uncertain": [
+      "belluzzi1989calcium"
+    ],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Ca_potential",
+        "variables": [
+          "E_Ca"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_Ca_N"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_Ca_N"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_Ca",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_den_c",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_den_hc",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "V_mid_c",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "V_mid_hc",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "c_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "c_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "g_CaN",
+        "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_CaN",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_CaN",
+        "picoS",
+        "access",
+        "constant"
+      ],
+      [
+        "hc",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "i_Ca_N",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Ca_N",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_c",
+        "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "tau_c_max",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_c_min",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_hc",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_CaN",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_CaN",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_CaN",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

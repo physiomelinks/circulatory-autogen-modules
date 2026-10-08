@@ -1,0 +1,41 @@
+module_type: i_to_q_gate
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM I_to inactivation q gate: dq/dt = (q_inf(Vm) - q)/tau_q(Vm). Alone the membrane voltage is a boundary
+  condition, i.e. a voltage clamp, so the gate has the exact solution used as the invariant. The run point steps the clamp
+  from rest (-74.3 mV) to -20 mV.'
+expected_failures:
+  run_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters file)
+    but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy of the library, all
+    tests of this component pass.'
+  verification_test_invariants: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and
+    the parameters file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have
+    compatible units''). Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters
+    file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy of the library, all
+    tests of this component pass.'
+  verification_test_timestep: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and
+    the parameters file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have
+    compatible units''). Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+  stability_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters
+    file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy of the library, all
+    tests of this component pass.'
+reference_proposals:
+  q_init:
+    reference: 'paci2013computational; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): q_init = 0.839296'
+    sourced: 'yes'
+    value: 0.839295925773219
+  Vm:
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Vm = -0.0743340 V; here the clamped voltage (units declared dimensionless but used as volts)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

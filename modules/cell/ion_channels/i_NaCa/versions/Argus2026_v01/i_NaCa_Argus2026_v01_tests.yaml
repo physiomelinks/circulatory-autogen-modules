@@ -1,0 +1,22 @@
+module_type: i_NaCa
+version: Argus2026_v01
+reviewed: true
+description: 'Na/Ca exchanger (3 Na : 1 Ca) of the sympathetic-neuron soma: Luo-Rudy / Paci 2013 form, instantaneous, k_NaCa
+  = A rho r e; its Ca and Na fluxes go to the soma''s Ca and Na balances. Kinetic parameters are Paci 2013''s cardiac values
+  (alpha reduced).'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Na/Ca exchanger of the
+  SN soma and varicosity (the same law in both; Paci 2013 form), with its Ca flux j_NaCa_Ca = i_NaCa/F and Na flux j_NaCa_Na
+  = -3 i_NaCa/F. In the varicosity Nai is a constant (no Na pool is connected). Split out of the monolithic SN_soma / SN_varicosity
+  (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks
+  that the assembled parts reproduce SN_simple. Geometry re-parameterisation (2026-10-02): the maximal current is k_NaCa =
+  A_mem rho_NaCa r_NaCa e (membrane area x density x turnover x elementary charge, one net charge per cycle), A_mem from the
+  membrane through membrane_area; the defaults reproduce the previous k_NaCa. Temperature (review 2026-10-05): the model is
+  at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to (was 310.15 K); this
+  enters the Nernst/GHK terms. The exchanger is instantaneous (no time dynamics), as in Paci 2013; the owner noted in 2024
+  that it may act too quickly. Neuronal check (review 2026-10-05): no neuronal NCX kinetic constants were found; the neuronal
+  isoforms NCX2/NCX3 have Na and Ca affinities "markedly similar" to cardiac NCX1 (linck1998functional), so Paci''s cardiac constants
+  are kept. Density set to 400 /um^2 (Hilgemann, Nicoll & Philipson 1991, cardiac), which lowers k_NaCa 312x to 0.96 nA.'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

@@ -1,0 +1,30 @@
+module_type: i_PCa
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM (ventricular-like) sarcolemmal Ca pump I_PCa = g_PCa Cai/(Cai + KPCa); Vm declared but unused.
+  Algebraic: all gates, concentrations and the membrane potential are inputs, so alone it is a pure function of its inputs,
+  checked exactly against the original model equations.'
+reference_proposals:
+  g_PCa:
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      g_PCa = 0.4125'
+    sourced: 'yes'
+    value: 0.4125
+  KPCa:
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      KPCa = 0.0005'
+    sourced: 'yes'
+    value: 0.0005
+  Vm:
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  Cai:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cai = 1.80774e-05'
+    sourced: 'yes'
+    value: 1.80773974140477e-05
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

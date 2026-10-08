@@ -1,0 +1,50 @@
+{
+  "module_type": "i_Na_m_gate",
+  "version": "Paci2013_v01",
+  "sim_time": 0.0004,
+  "pre_time": 0.0,
+  "dt": 2e-06,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["m"],
+  "run_parameters": {"Vm": -0.02},
+  "invariants": [
+    {
+      "description": "m matches the exact voltage-clamp solution m(t) = m_inf(Vm) + (m_init - m_inf) exp(-t/tau_m(Vm)), with m_inf and tau_m transcribed from the Paci 2013 CellML (not from this module)",
+      "expr": "np.max(np.abs(m - ((1/(1+np.exp((-(Vm*1000)-34.1)/5.9))**(1/3)) + (m_init - (1/(1+np.exp((-(Vm*1000)-34.1)/5.9))**(1/3)))*np.exp(-t/((1/(1+np.exp((-(Vm*1000)-60)/5)))*(0.1/(1+np.exp(((Vm*1000)+35)/5))+0.1/(1+np.exp(((Vm*1000)-50)/200)))/1000))))) <= 1e-5"
+    },
+    {"description": "m stays in [0, 1]", "expr": "np.all((m >= -1e-9) & (m <= 1 + 1e-9))"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Vm": {"min": -0.1, "max": 0.05, "points": 7},
+      "m_init": {"min": 0.0, "max": 1.0, "points": 5}
+    },
+    "rationale": "Vm spans the physiological range of a cardiomyocyte action potential/clamp protocol (-100 to +50 mV); the initial gate value spans its whole range [0, 1]."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2.0000000000000003e-06, 1.0000000000000002e-06, 5.000000000000001e-07, 2.5000000000000004e-07],
+    "t_end": 4e-05,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the steady-state/time-constant curves of the m gate in Paci et al. 2013 (fitted to hiPSC-CM voltage-clamp data, Ma et al. 2011) could be digitised and compared with the clamp steady state; not set up (figure digitisation needs owner approval)."
+      },
+      "calibrate": {
+        "note": "not_applicable: gate kinetics have no free parameters in this module (all constants are hard-coded in the CellML), so there is nothing to identify."
+      }
+    }
+  }
+}

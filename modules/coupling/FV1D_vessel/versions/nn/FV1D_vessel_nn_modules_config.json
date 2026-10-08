@@ -1,0 +1,102 @@
+[
+  {
+    "module_type": "FV1D_vessel",
+    "module_subtype": "nn",
+    "module_format": "external_api",
+    "component_file": "FV1D_vessel_nn_modules.cellml",
+    "component_type": "Muller_1d__FV1D_vessel_nn",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "muller2014global",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "muller2014global",
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": []
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": []
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [],
+    "api": {
+      "name": "FV_1d_pipe",
+      "description": "One end of a 1D vessel coupled to a 0D module: what the 0D side sends and receives, and when. Every 0D right-hand-side evaluation exchanges one message per connection. The pipes, the message length and the 1D program are those of the FV1D_solver process.",
+      "role": "consumer",
+      "transport": "named_pipe",
+      "process": "FV1D_solver",
+      "exchange": "per_rhs",
+      "calls": [
+        {
+          "name": "sync_step",
+          "kind": "send_recv",
+          "when": "step_start",
+          "channel": "dt",
+          "send": [
+            "$voi",
+            "$dt"
+          ],
+          "recv": [
+            "$ignore",
+            "$dt"
+          ]
+        },
+        {
+          "name": "sync_time",
+          "kind": "send",
+          "when": "rhs_start",
+          "channel": "dt",
+          "send": [
+            "$voi",
+            "$dt_stage"
+          ]
+        },
+        {
+          "name": "bc_exchange",
+          "kind": "send_recv",
+          "when": "rhs",
+          "channel": "conn",
+          "per": "connection",
+          "send_by_input": {
+            "flow": [
+              "port.pressure",
+              "control.FV_resistance_port|0"
+            ],
+            "pressure": [
+              "port.flow",
+              0.0
+            ]
+          },
+          "recv": [
+            "port.input"
+          ]
+        },
+        {
+          "name": "step_done",
+          "kind": "send_recv",
+          "when": "step_end",
+          "channel": "dt",
+          "send": [
+            "$voi",
+            -999.0
+          ],
+          "recv": [
+            "$ignore",
+            "$ignore"
+          ]
+        }
+      ]
+    }
+  }
+]

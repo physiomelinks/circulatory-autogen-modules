@@ -1,0 +1,29 @@
+module_type: i_Kv1_5
+version: Argus2026_v01
+reviewed: true
+description: 'Kv1.5 delayed-rectifier K current of the sympathetic-neuron soma: i_Kv1_5 = g_Kv1_5 m h (V - E_K), g = A rho
+  gamma; slowly inactivating (tau_h of seconds); Channelpedia model 21 kinetics (Philipson 1991); its K flux goes to the soma''s
+  K balance.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. Kv1.5 K current of the SN soma, i_Kv1_5 = g_Kv1_5 m h (V - E_K) (Channelpedia Kv1.5 kinetics). Split
+  out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation
+  (2026-10-02): the maximal conductance is g_Kv1_5 = A_mem rho_Kv1_5 gamma_Kv1_5 (membrane area x channel density x single-channel
+  conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_Kv1_5. Time
+  constants: Channelpedia Kv1.5 model 21 = two-point linear fits through Philipson 1991 (p. 55, Fig. 2; room temperature,
+  not the 9 degC Channelpedia lists): tau_m = -0.1163 V + 8.33 ms for V < 50 mV, else 2 ms (8.33 ms at 0, 1.35 ms at +60 mV;
+  was -0.1165, a transcription slip fixed 2026-10-05); tau_h = -15.5 V + 1620 ms for V < 100 mV, else 50 ms (1155 ms at +30,
+  690 ms at +60 mV). **tau_h outside +20 to +60 mV, including 2.7 s at -70 mV, is extrapolated.** Kept unscaled on review
+  (2026-10-05): the calibration data (Davis 2021 thesis) are room-temperature recordings, like these kinetics. Temperature
+  (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it
+  is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_m_Kv1_5, Q10_h_Kv1_5, T_ref_Kv1_5).
+  T_ref defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s recording temperature
+  (on review) scales them, and the model can be run at 37 degC by changing T.'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

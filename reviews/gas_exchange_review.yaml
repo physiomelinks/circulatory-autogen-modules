@@ -1,0 +1,98 @@
+comment: 'Four components cannot be generated or run alone because of config/CellML defects. (1) pulmonary_GE (nn, nn_5_lobe):
+  the config declares the computed C_CO2_a/C_O2_a as boundary_condition, so an unconnected arterial port overdefines them.
+  (2) pulmonary_GE_5_lobe_type and capillary_GE use the global saturation_cap without declaring it; capillary_GE_merge also
+  uses the undeclared C_O2_a_capped/C_CO2_a_capped, whose equations are commented out. (3) capillary_GE and capillary_GE_merge
+  list d_1..s_2 twice in the config (Pa and mmHg units), so the generated variables are duplicated. In patched copies all
+  of them run. Beyond the defects, the capillary models are physically inconsistent: the venous-end P_O2 comes out above the
+  capillary mean, and the Pade Lambert-W is poor near C_0 -> 1. k_O2/k_CO2 are not in Albanese 2016 (instantaneous equilibrium
+  there). pulmonary q_0 = 2 L is ~25x a capillary blood volume. The 22.72 ml/mmol factor behind C_O2_sat/C_CO2_sat and K_LOSSES
+  = 1 (Albanese: 1.2103) need confirmation.'
+summary: 'Seven components: O2/CO2 transport and exchange built on the Spencer (1979) coupled dissociation curves, as used
+  by Albanese et al. (2016). Harness networks were built because libcuflynx special-cases tissue_GE_simple (it must be fed
+  by a terminal) and because pulmonary_GE / respiratory_gas_transport need the lung and blood neighbours. The flow source
+  is a pp_I terminal; the mixed-venous and arterial pools are gas_transport_simple; the lung is simple_lung_bg with library
+  values. Verification uses exact solutions (first-order washout), mass balances integrated on the logged fluxes, exactness
+  of the analytic Spencer inverse (forward curve at the computed pressures returns the content to 1e-6), shunt mixing, flux
+  laws and bounds. tissue_GE_simple, gas_transport_simple, pulmonary_GE (nn) and respiratory_gas_transport verify. The Spencer
+  constants match Albanese''s thesis Table 2-6 after unit conversion. The other three components fail to generate (see comment);
+  patched copies run and their results are in the findings. The pulmonary_GE normal-blood-gas baseline is proposed: it fails
+  (P_O2 121 mmHg vs 100) because of the lung parameters.'
+questions:
+- Confirm the spencer1979computational constants (k_1, k_2, h_1, h_2, alpha_1/2, beta_1/2 in Pa units; C_O2_sat, C_CO2_sat). Values are
+  as tabulated in albanese2014physiology Table 2-6; the Spencer full text was not accessed. C_O2_sat = 0.20448 and C_CO2_sat = 1.9564
+  ml/ml imply 22.72 ml/mmol (9 and 86.11 mmol/L). The STPD molar volume is 22.41 ml/mmol, which would give 0.2017 and 1.930.
+  Where does 22.72 come from?
+- 'pulmonary_GE: k_O2 = 1.7e-8 and k_CO2 = 4.9e-7 m6/(J s) are attributed to albanese2016integrated, but Albanese assumes instantaneous
+  alveolar-capillary equilibrium (thesis eqs A-69/A-70) and has no conductance. k_O2 is ~136 ml/min/mmHg, ~6x a resting D_LO2
+  of ~20-25 ml/min/mmHg. Source? Otherwise mark unreferenced.'
+- 'pulmonary_GE: q_0 = 2 L (csv user_defined) is ~25x a pulmonary capillary blood volume (~70-100 ml). Intended as a larger
+  pool? It sets the arterial response time (q_0/v = 24 s at 5 L/min).'
+- 'respiratory_gas_transport: K_LOSSES = 1, while Albanese uses K = 1.2103 (the BTPS/STPD factor). Why the change?'
+- 'tissue_GE_simple: M_O2 = -10.8 ml/min and M_CO2 = 8.6 ml/min per compartment are "calc_from_user_assumptions". Albanese
+  Table 2-7 gives brain 47.5 / 39.9 ml/min total, i.e. 5.9 / 5.0 ml/min per 1/8 of the brain. Which compartment and assumptions
+  are they for?'
+- 'capillary_GE / capillary_GE_merge (author''s model, all TODO): all values are placeholders (references table). After patching
+  generation, the run shows P_O2 at the venous end (61.8 mmHg) above the capillary mean (35.7 mmHg). C_0 = (C_O2_c - ub_O2_t)/(C_O2_a
+  - ub_O2_t) mixes total content with free O2, and the resulting profile is applied to free O2. Is that intended? And should
+  exp_threshold (declared millimolar) be dimensionless?'
+- 'Accept the proposed baseline for pulmonary_GE (normal resting blood gases, albanese2014physiology Table 2-12: P_aO2 100, P_aCO2 40
+  mmHg with mixed venous 15/53 ml/dl as input)? It currently fails (nrmse 0.19 for P_O2, 0.06 for P_CO2). The model over-ventilates
+  because of the lung parameters (see lung review): P_AO2 123, P_ACO2 37 mmHg.'
+- 'Other validation candidates (pending): the O2 dissociation curve from Severinghaus 1979 eq. 1 (validation/severinghaus1979_odc.csv)
+  for the Spencer inverse (offline, within 0.03 saturation, max at 20-30 mmHg; needs an x-y baseline mode); brain a-v O2 difference
+  for tissue_GE_simple; alveolar/dead-space values of Table 2-12 for respiratory_gas_transport. Proceed?'
+proposed_fixes:
+- 'gas_exchange_modules_config.json pulmonary_GE (nn and nn_5_lobe): C_CO2_a and C_O2_a kind boundary_condition -> variable
+  (they are computed from capillary/shunt mixing). Evidence: when the exit gas_port is unconnected, libcuflynx makes them
+  parameters and Myokit reports "Overdefined variable C_CO2_a"; the harness has to add an arterial gas_transport_simple sink.
+  In a patched copy the component runs without the sink.'
+- 'gas_exchange_modules.cellml pulmonary_GE_5_lobe_type and capillary_GE: declare <variable name="saturation_cap" public_interface="in"
+  units="dimensionless"/>, and add ["saturation_cap","dimensionless","access","global_constant"] to their config entries.
+  Evidence: libcellml MATH_CI_VARIABLE_REFERENCE; the structure test warns "equations use undeclared variable saturation_cap".
+  Patched copies generate and run.'
+- 'gas_exchange_modules.cellml capillary_GE_merge: declare saturation_cap (as above), and restore C_O2_a_capped / C_CO2_a_capped
+  = min(C_sat saturation_cap, C_a) (currently in a comment, with units mol_per_m3, not dimensionless). Note: d_1_a/d_2_a use
+  the uncapped C_O2_a in the numerator and the capped value in the denominator; capillary_GE uses the capped value in both.
+  Evidence: structure warnings for C_O2_a_capped / C_CO2_a_capped / saturation_cap; the patched copy runs.'
+- 'gas_exchange_modules_config.json capillary_GE and capillary_GE_merge: remove the duplicate d_1, d_2, r_1, r_2 (J_per_m3)
+  and s_1, s_2 (J2_per_m6) entries; the CellML uses mmHg. Evidence: generation fails with libcellml VARIABLE_NAME_UNIQUE ("multiple
+  variables with the name ''s_1''").'
+- 'capillary_GE / capillary_GE_merge W_pade_approx: the Pade approximation of Lambert W0 is inaccurate near the branch point
+  (alpha -> -1/e, i.e. C_0 -> 1, low extraction). At C_0 = 0.914 it gives kL = 0.298 vs exact 0.183, and the profile mean
+  is 0.865 instead of 0.914. Use a branch-point expansion (W ~ -1 + p - p^2/3, p = sqrt(2(1 + e alpha))) near -1/e, or a Newton
+  step.'
+- 'pulmonary_GE_type: rename d_C_O2_p_dt, which holds the CO2 derivative (cosmetic). The unused component "temp" in the CellML
+  can be removed.'
+findings:
+- 'tissue_GE_simple: O2/CO2 contents match the exact washout solution (tolerance 0.2% of the step + 5e-5 for the harness flow
+  start-up), and the O2 mass balance holds. The 35-run sweep passes after the tolerance fix. RK4 order 4.25. There is no floor:
+  C_O2 would go negative if |M_O2| > v C_O2_a.'
+- 'pulmonary_GE (nn): the Spencer inverse is exact to 1e-6 of C_sat. The shunt mix is exact, M = k dP holds, and the capillary
+  mass balance holds to 5e-3 of its range; at the default CVODE tolerance (rtol 1e-6, atol 1e-8) it does not (1% error), so
+  solver_info rtol 1e-8 / atol 1e-10 is set for the pulmonary and respiratory components. RK4 converges at order 4.2, but
+  the finest difference is 6e-3 because the harness lung has a violent start-up transient (its hard-coded initial volumes).
+  The timestep tol is therefore 1e-2 for these networks.'
+- 'pulmonary_GE: at t = 0 the terminal flow is 0, so C_O2_a = max((v_p C_p + v_sh C_v)/v, 0) is 0/0 (evaluates to 0 in Myokit).
+  A guard (v + eps, as in the merge component) would avoid NaN in other solvers.'
+- 'pulmonary_GE_5_lobe (patched copy): runs, and all 5 invariants hold (Spencer inverse exact, shunt mixing, flux law, mass
+  balance with the summed lobar flows, bounds).'
+- 'capillary_GE / capillary_GE_merge (patched copies): mass balance, flux law, Spencer inverse (mmHg form) and ub = 133.32
+  P S hold. The Pade-consistency invariant and the physical-ordering invariant (P_O2_v <= P_O2_c) are violated (see questions/fixes).
+  RK4 agrees with CVODE to 4e-9.'
+- 'respiratory_gas_transport: with F_O2_i = 0.12, alveolar F_O2 stays above inspired for > 30 s, because the oversized (2
+  L) capillary pool initialised at arterial content unloads O2 into the alveoli. This is physically consistent, so the F_O2
+  <= F_O2_i bound is checked at the run point only.'
+- 'gas_transport_simple: content matches the exact washout for the logged flow (C_in + (C_init - C_in) exp(-cumint(v)/q_0)),
+  the exported derivative identity holds, and the Spencer inverse is exact (below 99% of saturation, where the inversion is
+  well conditioned); 80-run sweep; RK4 order 4.25. respiratory_gas_transport: P = F (P_atm - P_ws) holds exactly, fractions
+  are bounded, and the alveolar and dead-space O2 balances integrated on the lung flows hold (2% of range: trapezoid on 5
+  ms output of fast airway flows).'
+- 'Joint failure risk (256 Sobol samples): tissue_GE_simple 0.0, gas_transport_simple 0.004, respiratory_gas_transport 0.0,
+  pulmonary_GE 0.012 (driven by C_CO2_sat/k_O2 corners). pulmonary_GE_5_lobe, GE_capillary and GE_capillary_merge are 1.0
+  because they do not generate (see fixes).'
+- 'Structure unit warnings (45): all but the d_1..s_2 duplicates are harmless spelling differences (config mol_per_m3 vs CellML
+  millimolar/mM, which are numerically identical; config Hz vs CellML per_s for dot_C_CO2_out). The config could use the CellML
+  unit names for consistency. The d_1, d_2, r_1, r_2 (J_per_m3) and s_1, s_2 (J2_per_m6) warnings are the real duplicate-entry
+  defect in the proposed fixes.'
+- The structure test does not detect duplicate variable names within one config entry (capillary d_1..s_2); these are only
+  caught at generation.

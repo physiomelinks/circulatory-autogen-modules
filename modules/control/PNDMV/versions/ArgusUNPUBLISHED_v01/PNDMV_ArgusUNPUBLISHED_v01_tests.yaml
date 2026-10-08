@@ -1,0 +1,42 @@
+module_type: PNDMV
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'ICN principal neurons receiving DMV input (Gee 2023 eqs. 2-3): sigmoid of f_DMV + f_NActr + f_LCN, then a first-order
+  filter (muscarinic dynamics) tau_PNDMV df_filt/dt = f_PNDMV - f_filt, f_filt(0) = 0. With constant inputs the exact solution
+  is f_filt = f_PNDMV (1 - exp(-t/tau_PNDMV)). Parameters re-identified by the module author.'
+reference_proposals:
+  f_min_PNDMV:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.27 gives f_min,PNDMV
+      = 2.42 Hz for comparison
+    sourced: 'no'
+  f_max_PNDMV:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.27 gives f_max,PNDMV
+      = 17.72 Hz for comparison
+    sourced: 'no'
+  f_mid_PNDMV:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.27 gives f_mid,PNDMV
+      = 14.18 Hz for comparison
+    sourced: 'no'
+  k_PNDMV:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.27 gives k_PNDMV =
+      13.36 for comparison
+    sourced: 'no'
+  tau_PNDMV:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.27 gives tau_PNDMV
+      = 0.3 s (used as a rate in eq. 2) for comparison
+    sourced: 'no'
+  f_DMV:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (DMV output)
+    sourced: 'no'
+    value: 4.0
+  f_NActr:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (NActr output)
+    sourced: 'no'
+    value: 5.0
+  f_LCN:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (LCN output)
+    sourced: 'no'
+    value: 5.0
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.

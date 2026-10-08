@@ -1,0 +1,86 @@
+{
+  "module_type": "lung_mechanics",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 30.0,
+  "pre_time": 0.0,
+  "dt": 0.005,
+  "solver": "CVODE_myokit",
+  "outputs": [
+    "P_l",
+    "P_t",
+    "P_b",
+    "P_A",
+    "P_pl",
+    "P_mus",
+    "q_l",
+    "q_t",
+    "q_b",
+    "q_A_stressed",
+    "q_pl",
+    "q_A",
+    "q_D",
+    "v_ml"
+  ],
+  "invariants": [
+    {
+      "description": "P_mus equals the exact Albanese (2016, eq. 2-6) waveform evaluated at t (parabolic inspiration, exponential expiration, tau = T_E/5, period 1/(1/T_resp + flag Delta_RR))",
+      "expr": "np.max(np.abs(P_mus - (np.where((np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp) < ((T_resp/(1 + IE_ratio))*IE_ratio), (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)) - ((P_mus_min + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)))/(((T_resp/(1 + IE_ratio))*IE_ratio)*(T_resp/(1 + IE_ratio)))*(np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp)**2 + ((P_mus_min + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)))*T_resp/(((T_resp/(1 + IE_ratio))*IE_ratio)*(T_resp/(1 + IE_ratio)))*(np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp), (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)) + ((P_mus_min + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0)))/(1 - np.exp(-(T_resp/(1 + IE_ratio))/((T_resp/(1 + IE_ratio))/5)))*(np.exp(-((np.mod(t/(1/(1/T_resp + flag_RR_control*Delta_RR_resp)), 1.0)*T_resp) - ((T_resp/(1 + IE_ratio))*IE_ratio))/((T_resp/(1 + IE_ratio))/5)) - np.exp(-(T_resp/(1 + IE_ratio))/((T_resp/(1 + IE_ratio))/5))))))) <= 1e-4*abs((P_mus_min + flag_P_mus_control*Delta_P_mus) - (P_plEE + np.maximum(-flag_P_mus_control*Delta_P_mus, 0))) + 1e-6"
+    },
+    {
+      "description": "airway volume balance: q_l + q_t + q_b + q_A_stressed changes by the time integral of the mouth flow v_ml (trapezoid, after the 0.5 s start-up transient)",
+      "expr": "np.max(np.abs(((q_l + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_ml)[1:] + (v_ml)[:-1])))))[t >= 0.5] - ((q_l + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((v_ml)[1:] + (v_ml)[:-1])))))[t >= 0.5][0])) <= 2e-3*np.ptp((q_l + q_t + q_b + q_A_stressed)[t >= 0.5]) + 1e-9"
+    },
+    {
+      "description": "thoracic volume balance: q_pl + q_t + q_b + q_A_stressed changes only through the chest-wall flow (P_mus - P_pl)/R_plwall",
+      "expr": "np.max(np.abs(((q_pl + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((P_mus - P_pl)/R_plwall)[1:] + ((P_mus - P_pl)/R_plwall)[:-1])))))[t >= 0.5] - ((q_pl + q_t + q_b + q_A_stressed) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*(((P_mus - P_pl)/R_plwall)[1:] + ((P_mus - P_pl)/R_plwall)[:-1])))))[t >= 0.5][0])) <= 2e-3*np.ptp((q_pl + q_t + q_b + q_A_stressed)[t >= 0.5]) + 1e-9"
+    },
+    {
+      "description": "constitutive relations: P_A = q_A_stressed/C_A + P_pl, P_pl = q_pl/C_pl, q_A = q_A_stressed + q_A_us",
+      "expr": "(np.max(np.abs(P_A - (q_A_stressed/C_A + P_pl))) <= 1e-6*np.max(np.abs(P_A)) + 1e-9) & (np.max(np.abs(P_pl - q_pl/C_pl)) <= 1e-6*np.max(np.abs(P_pl)) + 1e-9) & (np.max(np.abs(q_A - q_A_stressed - q_A_us)) <= 1e-12)"
+    },
+    {
+      "description": "dead space q_D = max(q_l + q_t + q_b + unstressed volumes, q_D_min) and alveolar volume stays positive",
+      "expr": "(np.max(np.abs(q_D - np.maximum(q_l + q_t + q_b + q_l_us + q_t_us + q_b_us, q_D_min))) <= 1e-12) & np.all(q_A > 0)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "Delta_RR_resp": {"min": -0.08, "max": 0.3, "points": 5},
+      "Delta_P_mus": {"min": -800, "max": 300, "points": 5},
+      "P_mus_min": {"min": -2000, "max": -600, "points": 5},
+      "P_plEE": {"min": -900, "max": -200, "points": 5},
+      "T_resp": {"min": 2.0, "max": 8.0, "points": 5},
+      "IE_ratio": {"min": 0.3, "max": 1.0, "points": 4},
+      "flag_P_mus_control": {"min": 0, "max": 1, "points": 2},
+      "flag_RR_control": {"min": 0, "max": 1, "points": 2},
+      "q_D_min": {"min": 0.0, "max": 0.0001, "points": 3},
+      "alpha_LR": {"min": 0.5, "max": 3.0, "points": 4}
+    },
+    "rationale": "Breathing rate 7.5-30 /min via T_resp and via the controller input Delta_RR (-0.08..+0.3 /s around 0.2 /s), inspiratory effort 1-15 cmH2O (P_mus_min, Delta_P_mus), end-expiratory pleural pressure -9..-2 cmH2O, I:E 0.3-1, airway resistance multiplier 0.5-3 (bronchoconstriction). Compliances, resistances and unstressed volumes use the default 0.5-2x factors."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0005, 0.00025, 0.000125, 6.25e-05],
+    "t_end": 2.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: normal quiet-breathing values used by Albanese to tune the model (albanese2014physiology section 2.4.3: FRC 2.4 L, tidal volume ~500 ml at 12 /min, P_pl,EE -5 cmH2O, all citing west2008respiratory). With library values the model gives end-expiratory lung volume 14.0 L and VT 0.88 L (with Albanese C_A, C_b, q_A_us: 2.48 L and 0.67 L). Set up as a baseline once the parameter fix is decided."
+      },
+      "calibrate": {
+        "note": "pending: candidate: flow/volume/pleural-pressure traces of healthy quiet breathing (e.g. Mecklenburgh & Mapleson 1998 averaged P_mus/flow, used by Albanese); owner to choose"
+      }
+    }
+  }
+}

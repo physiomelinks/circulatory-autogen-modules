@@ -1,0 +1,227 @@
+[
+  {
+    "module_type": "Nout_junction",
+    "module_subtype": "vv_nonlinear",
+    "module_format": "cellml",
+    "component_file": "Nout_junction_vv_nonlinear_modules.cellml",
+    "component_type": "vv_Nout_nonlinear_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "toro2022cerebrospinal"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "toro2022cerebrospinal"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out_sum",
+          "u_d"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
+        ]
+      },
+      {
+        "port_type": "radius_port",
+        "variables": [
+          "r_0"
+        ]
+      },
+      {
+        "port_type": "stiffness_port",
+        "variables": [
+          "K_tube"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u_d",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out_sum",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_C_d",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_0_2",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_p",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_d",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "mu",
+        "Js_per_m3",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "rho",
+        "Js2_per_m5",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "g",
+        "m_per_s2",
+        "no_access",
+        "global_constant"
+      ],
+      [
+        "beta_g",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "theta",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "l",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "r",
+        "metre",
+        "access",
+        "variable"
+      ],
+      [
+        "r_0",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "K_tube",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m_tube",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "n_tube",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "R_flag",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "I_scale",
+        "dimensionless",
+        "access",
+        "constant"
+      ]
+    ]
+  }
+]

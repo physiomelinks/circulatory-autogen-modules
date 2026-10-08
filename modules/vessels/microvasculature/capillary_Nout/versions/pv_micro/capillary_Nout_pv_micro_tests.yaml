@@ -1,0 +1,88 @@
+module_type: capillary_Nout
+version: pv_micro
+reviewed: false
+notes: 'Pressure-in/flow-out capillary compartment: one Poiseuille resistance R = 8 mu l/(pi r_0^4) and one thin-wall compliance
+  C = 2 pi r_0^3 l/(E h) (h from the Avolio wall-thickness fit), no inertance. u = u_0 + u_ext + q_C/C, q_C(0) = 0. Alone
+  with constant BCs it is a linear first-order system with time constant RC (nominal 0.141 s), so the exact solution is the
+  invariant. Test network: the Sum flow_port is closed by a constant outflow (outlet_flow constant_flow_port, vout); since
+  multi_port Sum sums (2026-09-29), an unconnected Sum port is 0, not a parameter.'
+reference_proposals:
+  E:
+    reference: salipante2022blood; capillary-scale vessel-on-chip Young modulus 3.0-10.0 kPa, 4.3 kPa for one vessel (in vitro,
+      not tissue)
+    sourced: 'yes'
+    value: 4300.0
+  l:
+    reference: boas2008vascular; Table 1, capillary length 250 um (from Vovenko 1999, as cited there)
+    sourced: 'yes'
+    value: 0.00025
+  r_0:
+    reference: 'boas2008vascular; Table 1, capillary diameter 8 um -> r = 4 um (zweifach1977quantitative: true capillaries ~7-8 um)'
+    sourced: 'yes'
+    value: 4.0e-06
+  u_ext:
+    reference: definitional; no external (tissue) pressure acting on the vessel in the isolated test (0 Pa); in a network
+      this is the surrounding tissue pressure
+    sourced: definitional
+    value: 0.0
+  u_0:
+    reference: williams1988dynamic; human nailfold capillary apex mean pressure 19.4 mmHg = 2.59 kPa (arteriolar limb 37.7, venular
+      limb 14.6 mmHg)
+    sourced: 'yes'
+    value: 2590.0
+  theta:
+    reference: 'definitional; vessel inclination angle [deg]: 0 = horizontal. Not used by any equation (the gravity term is
+      commented out in the CellML)'
+    sourced: definitional
+    value: 0.0
+  u_in:
+    reference: unreferenced_placeholder; isolated-test boundary value (upstream pressure = u_0 + 1500 Pa); in a network it
+      is supplied by the neighbouring vessel
+    sourced: 'no'
+    value: 4090.0
+  v_out_sum:
+    reference: unreferenced_placeholder; isolated-test boundary value (outflow = equilibrium flow 1500 Pa / R); in a network
+      it is supplied by the neighbouring vessel
+    sourced: 'no'
+    value: 1.508e-13
+  a_vessel:
+    reference: 'watanabe2013mathematical; Eq. (3.1), p. 969: fit h/r = a e^(b r) + c e^(d r) to the avolio1980multi arterial radius/wall-thickness
+      data, a = 0.2802. Fitted on arteries (r ~0.2-1.4 cm); used here down to capillaries = extrapolation (h/r -> a + c =
+      0.41 as r -> 0)'
+    sourced: 'yes'
+    value: 0.2802
+  b_vessel:
+    reference: 'watanabe2013mathematical; Eq. (3.1): b = -5.053 cm^-1 = -505.3 m^-1 (r in cm, Fig. 2)'
+    sourced: 'yes'
+    value: -505.3
+  beta_g:
+    reference: definitional; gravity switch (0 = off). Not used by any equation (gravity term commented out)
+    sourced: definitional
+    value: 0.0
+  c_vessel:
+    reference: 'watanabe2013mathematical; Eq. (3.1): c = 0.1324'
+    sourced: 'yes'
+    value: 0.1324
+  d_vessel:
+    reference: 'watanabe2013mathematical; Eq. (3.1): d = -0.1114 cm^-1 = -11.14 m^-1'
+    sourced: 'yes'
+    value: -11.14
+  g:
+    reference: definitional; gravitational acceleration 9.81 m/s^2. Not used by any equation (gravity term commented out)
+    sourced: definitional
+    value: 9.81
+  mu:
+    reference: 'watanabe2013mathematical; p. 976, mu = 0.04 P = 0.004 Pa s (whole-blood modelling value for large arteries). NOTE: for
+      microvessels the apparent viscosity is lower in vitro (pries1992blood law via secomb2013blood: rel. viscosity 1.27 at 8 um, 1.78
+      at 30 um, x plasma 1.1-1.3 mPa s -> ~1.5-2.1 mPa s) and higher in vivo (pries1994resistance: 10 um vessels ~4x glass tube). One
+      global value for all vessel classes'
+    sourced: 'yes'
+    value: 0.004
+  rho:
+    reference: watanabe2013mathematical; p. 976, rho = 1.04 g/cm^3 = 1040 kg/m^3 (trudnowski1974specific measured 1050.6 kg/m^3 at 37 C). Not
+      used by any equation (the gravity/inertia terms are commented out)
+    sourced: 'yes'
+    value: 1040.0
+review: reviews/microvasculature_network_review.yaml
+review_scope: The review of the whole microvasculature_network module (48 entries) before the move to versions; only the parts
+  about this version apply.

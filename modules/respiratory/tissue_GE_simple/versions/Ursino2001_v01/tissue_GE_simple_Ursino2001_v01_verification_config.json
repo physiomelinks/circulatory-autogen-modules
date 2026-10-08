@@ -1,0 +1,78 @@
+{
+  "module_type": "tissue_GE_simple",
+  "version": "Ursino2001_v01",
+  "sim_time": 150.0,
+  "pre_time": 0.0,
+  "dt": 0.05,
+  "solver": "CVODE_myokit",
+  "outputs": ["C_O2_p", "C_CO2_p", "term/v_T"],
+  "harness": {
+    "module_array": [
+      ["term", "pp_I", "terminal", "", "mod", "default"],
+      ["mod", "Ursino2001_v01", "tissue_GE_simple", "term", "", "default"]
+    ],
+    "parameters": [
+      ["R_1_T_term", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["R_2_T_term", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["C_T_term", "m6_per_J", 1e-09, "harness flow source"],
+      ["I_T_term", "Js2_per_m6", 250000.0, "harness: I/R = 5 ms"],
+      ["u_ext_term", "J_per_m3", 0.0, "harness"],
+      ["u_in_term", "J_per_m3", 400.0, "harness: gives v_T = 4e-06 m3/s"],
+      ["u_out_term", "J_per_m3", 0.0, "harness"],
+      ["q_us_term", "m3", 0.0, "harness"],
+      ["q_init_term", "m3", 2.0000000000000002e-07, "harness: equilibrium volume"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "O2 content matches the exact solution C_ss + (C_init - C_ss) exp(-v t/q_0) (v = settled terminal flow; tolerance 0.2% of the step plus 5e-5 ml/ml for the ~10 ms flow start-up of the harness)",
+      "expr": "np.max(np.abs(C_O2_p - ((C_O2_a + M_O2/term__v_T[-1]) + (C_O2_p_init - (C_O2_a + M_O2/term__v_T[-1]))*np.exp(-term__v_T[-1]*t/q_0)))) <= 2e-3*abs(C_O2_p_init - (C_O2_a + M_O2/term__v_T[-1])) + 5e-5"
+    },
+    {
+      "description": "CO2 content matches the exact solution",
+      "expr": "np.max(np.abs(C_CO2_p - ((C_CO2_a + M_CO2/term__v_T[-1]) + (C_CO2_p_init - (C_CO2_a + M_CO2/term__v_T[-1]))*np.exp(-term__v_T[-1]*t/q_0)))) <= 2e-3*abs(C_CO2_p_init - (C_CO2_a + M_CO2/term__v_T[-1])) + 5e-5"
+    },
+    {
+      "description": "O2 mass balance: q_0 C changes by the time integral of v (C_a - C) + M_O2 (trapezoid on the logged flow, from t = 0.5 s after the flow start-up)",
+      "expr": "np.max(np.abs((q_0*C_O2_p - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((term__v_T*(C_O2_a - C_O2_p) + M_O2)[1:] + (term__v_T*(C_O2_a - C_O2_p) + M_O2)[:-1])))))[t >= 0.5] - (q_0*C_O2_p - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t)*((term__v_T*(C_O2_a - C_O2_p) + M_O2)[1:] + (term__v_T*(C_O2_a - C_O2_p) + M_O2)[:-1])))))[t >= 0.5][0])) <= 2e-3*max(np.ptp(q_0*C_O2_p), abs(M_O2)*1e-3)"
+    },
+    {"description": "contents stay non-negative", "expr": "np.all(C_O2_p >= 0) & np.all(C_CO2_p >= 0)"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "C_O2_a": {"min": 0.1, "max": 0.21, "points": 5},
+      "C_CO2_a": {"min": 0.4, "max": 0.56, "points": 5},
+      "q_0": {"min": 5e-05, "max": 0.0005, "points": 5, "scale": "log"},
+      "C_O2_p_init": {"min": 0.05, "max": 0.21, "points": 5},
+      "C_CO2_p_init": {"min": 0.4, "max": 0.6, "points": 5},
+      "M_O2": {"min": -3e-07, "max": -2e-08, "points": 5},
+      "M_CO2": {"min": 2e-08, "max": 3e-07, "points": 5}
+    },
+    "rationale": "Arterial contents span hypoxaemic to hyperoxic blood (0.10-0.21 ml/ml O2; 0.40-0.56 ml/ml CO2, Spencer curve at P_CO2 25-60 mmHg); q_0 spans 50-500 ml tissue compartments; M spans 1.2-18 ml/min per compartment. With v = 4e-6 m3/s the lowest steady O2 content in the sweep is 0.10 - 1.8e-7/4e-6 = 0.055 ml/ml, so contents stay positive (the model has no floor: C_O2 would go negative if |M_O2| > v C_O2_a)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 20.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: brain arterio-venous O2 content difference / jugular venous O2 at normal CBF (e.g. albanese2014physiology Table 2-7 consumption rates with a cerebral flow) -- needs a flow value per compartment from the owner"
+      },
+      "calibrate": {
+        "note": "not_applicable: two-parameter linear mixing compartment; nothing to identify beyond the steady state that the exact-solution invariants already check"
+      }
+    }
+  }
+}

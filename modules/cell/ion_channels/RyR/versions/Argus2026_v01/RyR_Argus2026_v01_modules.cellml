@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="RyR_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="RyR_SN">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="Ca_ER" public_interface="in" units="millimolar"/>
+        <variable name="Ca_ER_RyR_den" public_interface="in" units="millimolar"/>
+        <variable name="Ca_ER_RyR_mid" public_interface="in" units="millimolar"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Cai_RyR_den" public_interface="in" units="millimolar"/>
+        <variable name="Cai_RyR_mid" public_interface="in" units="millimolar"/>
+        <variable name="c_RyR" public_interface="out" units="dimensionless" initial_value="0.0"/>
+        <variable name="c_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="hc_RyR" public_interface="out" units="dimensionless" initial_value="1.0"/>
+        <variable name="hc_RyR_inf" public_interface="out" units="dimensionless"/>
+        <variable name="j_RyR" public_interface="out" units="mol_per_s"/>
+        <variable name="k_RyR" public_interface="out" units="m3_per_s"/>
+        <variable name="A_ER" public_interface="in" units="um2"/>
+        <variable name="rho_RyR" public_interface="in" units="per_um2"/>
+        <variable name="k_RyR_single" public_interface="in" units="um3_per_s"/>
+        <variable name="tau_c_RyR" public_interface="in" units="millis"/>
+        <variable name="tau_hc_RyR" public_interface="in" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_RyR" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_RyR" public_interface="in" units="kelvin"/>
+        <variable name="phi_RyR" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>c_RyR_inf</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>Cai</ci>
+                                        <ci>Cai_RyR_mid</ci>
+                                    </apply>
+                                </apply>
+                                <ci>Cai_RyR_den</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>hc_RyR_inf</ci>
+                <apply>
+                    <divide/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>Ca_ER</ci>
+                                        <ci>Ca_ER_RyR_mid</ci>
+                                    </apply>
+                                </apply>
+                                <ci>Ca_ER_RyR_den</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>c_RyR</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>c_RyR_inf</ci>
+                        <ci>c_RyR</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <divide/>
+                            <ci>tau_c_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>hc_RyR</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>hc_RyR_inf</ci>
+                        <ci>hc_RyR</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <divide/>
+                            <ci>tau_hc_RyR</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_RyR</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_RyR</ci>
+                <apply>
+                    <times/>
+                    <ci>k_RyR</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Ca_ER</ci>
+                        <ci>Cai</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <ci>c_RyR</ci>
+                        <cn cellml:units="dimensionless">3</cn>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <ci>hc_RyR</ci>
+                        <cn cellml:units="dimensionless">3</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>k_RyR</ci><apply><times/><ci>A_ER</ci><ci>rho_RyR</ci><ci>k_RyR_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_RyR</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_RyR</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_RyR</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

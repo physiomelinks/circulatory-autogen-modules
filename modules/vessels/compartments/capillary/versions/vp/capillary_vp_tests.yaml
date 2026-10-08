@@ -1,0 +1,83 @@
+module_type: capillary
+version: vp
+reviewed: false
+notes: 'Single resistive-compliant segment with geometry-derived R (Poiseuille) and C (thin wall, wall thickness from the
+  global a-d fit); flows are algebraic (no inertance). Jacobian timescales (nominal: fastest 0.0005 s, slowest decay 0.0005
+  s; run: fastest 1e-05 s, slowest decay 1e-05 s).'
+reference_proposals:
+  q_C_init:
+    reference: definitional; start from zero stressed volume
+    sourced: definitional
+    value: 0.0
+  E:
+    reference: unreferenced_placeholder; Young modulus copied from the ADAN_218 values used for small arteries in this file
+      (1.6 MPa)
+    sourced: 'no'
+    value: 1600000.0
+  l:
+    reference: unreferenced_placeholder; single small-vessel geometry (l = 0.001 m), order of magnitude only
+    sourced: 'no'
+    value: 0.001
+  r:
+    reference: unreferenced_placeholder; single small-vessel geometry (r = 0.0001 m), order of magnitude only
+    sourced: 'no'
+    value: 0.0001
+  u_ext:
+    reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
+    sourced: definitional
+    value: 0.0
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 3.14159e-10
+      m^3/s
+    sourced: 'no'
+    value: 3.14159e-10
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 1333.22
+      Pa (10 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 1333.22
+  rho:
+    reference: boileau2015benchmark; Table II, blood mass density 1050 kg m^-3 (safaei2018bond Sec. 2.2.4 uses 1040). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 1050.0
+    also_cites:
+    - safaei2018bond
+  mu:
+    reference: boileau2015benchmark; Table II, blood viscosity 4 mPa s = 0.004 Pa s (also safaei2018bond Sec. 2.2.4). Library value 1 is
+      a test_fft fixture value
+    sourced: 'yes'
+    value: 0.004
+    also_cites:
+    - safaei2018bond
+  a_vessel:
+    reference: blanco2015anatomically; Eq. (2) h/R0 = a e^(b R0) + c e^(d R0), curve fit of the avolio1980multi wall data, a = 0.2802 (SI values
+      also in safaei2018bond Table S3). Library value 1 is a test_fft fixture value
+    sourced: 'yes'
+    value: 0.2802
+    also_cites:
+    - safaei2018bond
+    - avolio1980multi
+  b_vessel:
+    reference: blanco2015anatomically; Eq. (2), b = -5.053 cm^-1 = -505.3 m^-1 (safaei2018bond Table S3). Library value 1 is a test_fft fixture
+      value
+    sourced: 'yes'
+    value: -505.3
+    also_cites:
+    - safaei2018bond
+  c_vessel:
+    reference: blanco2015anatomically; Eq. (2), c = 0.1324 (safaei2018bond Table S3). Library value 1 is a test_fft fixture value
+    sourced: 'yes'
+    value: 0.1324
+    also_cites:
+    - safaei2018bond
+  d_vessel:
+    reference: blanco2015anatomically; Eq. (2), d = -0.1114 cm^-1 = -11.14 m^-1 (safaei2018bond Table S3). Library value 1 is a test_fft fixture
+      value
+    sourced: 'yes'
+    value: -11.14
+    also_cites:
+    - safaei2018bond
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

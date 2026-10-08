@@ -1,0 +1,46 @@
+module_type: i_CaL_fCa_gate
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 Ca-dependent inactivation of I_CaL: dfCa/dt = constfCa (fCa_inf(Cai) - fCa)/tau_fCa, tau_fCa = 2 ms (hard-coded),
+  with constfCa = 0 (no recovery) when Vm > -60 mV and fCa_inf > fCa. With Vm and Cai clamped the solution is exact (frozen
+  or a single exponential).'
+expected_failures:
+  run_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters file)
+    but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy of the library, all
+    tests of this component pass.'
+  verification_test_invariants: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and
+    the parameters file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have
+    compatible units''). Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters
+    file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy of the library, all
+    tests of this component pass.'
+  verification_test_timestep: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and
+    the parameters file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have
+    compatible units''). Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+  stability_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters
+    file) but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
+    Fix: declare Vm as volt in the config and parameters file. With the proposed fix applied to a copy of the library, all
+    tests of this component pass.'
+reference_proposals:
+  fCa_init:
+    reference: 'paci2013computational; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): fCa_init = 0.998925'
+    sourced: 'yes'
+    value: 0.998925296531804
+  Vm:
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (clamp value; declared dimensionless, used as volts)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  Cai:
+    reference: 'paci2013computational; initial Cai in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): 1.80774e-5 mM (clamp value)'
+    sourced: 'yes'
+    value: 1.80773974140477e-05
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

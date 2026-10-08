@@ -1,0 +1,108 @@
+[
+  {
+    "module_type": "i_leak_Na",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "i_leak_Na_Argus2026_v01_modules.cellml",
+    "component_type": "i_leak_Na_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "argus2026sympathetic"
+    ],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_leak_Na"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_leak_Na"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_leak_Na",
+        "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_leak_Na",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_leak_Na",
+        "picoS",
+        "access",
+        "constant"
+      ],
+      [
+        "i_leak_Na",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_leak_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,69 @@
+[
+  {
+    "module_type": "flow_split",
+    "module_subtype": "pv",
+    "module_format": "cellml",
+    "component_file": "flow_split_pv_modules.cellml",
+    "component_type": "flow_split_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,232 @@
+[
+  {
+    "module_type": "RyR",
+    "module_subtype": "HernandezCruz1997_v01",
+    "module_format": "cellml",
+    "component_file": "RyR_HernandezCruz1997_v01_modules.cellml",
+    "component_type": "RyR_HernandezCruz1997",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "hernandezcruz1997ca"
+    ],
+    "notes": "Built for: rat superior cervical ganglion (sympathetic) neuron, 22-23 degC (Hernandez-Cruz, Escobar & Jimenez 1997, J Gen Physiol 109:147, Appendix Eqs. A11-A15, Fig. 10 legend); the same ports as RyR Argus2026_v01, a drop-in replacement in the soma and varicosity supermodules",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "ER_Ca",
+        "variables": [
+          "Ca_ER"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_RyR"
+        ]
+      },
+      {
+        "port_type": "ER_Ca_release",
+        "variables": [
+          "j_RyR"
+        ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Ca_ER",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "kon_a_RyR",
+        "per_millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "koff_a_RyR",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "kon_i_RyR",
+        "per_millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "koff_i_RyR",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "kon_l_RyR",
+        "per_millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "koff_l_RyR",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "N_l_RyR",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "rho_RyR",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_RyR_single",
+        "um3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ca_ER_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "a_RyR_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_RyR_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "l_RyR_init",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "a_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "l_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "a_RyR_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_RyR_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "l_RyR_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "P_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "k_RyR",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_RyR",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_RyR",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_RyR",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

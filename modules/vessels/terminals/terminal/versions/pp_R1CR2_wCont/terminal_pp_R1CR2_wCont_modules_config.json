@@ -1,0 +1,173 @@
+[
+  {
+    "module_type": "terminal",
+    "module_subtype": "pp_R1CR2_wCont",
+    "module_format": "cellml",
+    "component_file": "terminal_pp_R1CR2_wCont_modules.cellml",
+    "component_type": "pp_T_R1CR2_wCont_type",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "westerhof2009arterial"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "westerhof2009arterial"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      },
+      {
+        "port_type": "resistance_delta_port",
+        "variables": [
+          "Delta_R"
+        ]
+      },
+      {
+        "port_type": "resistance_multiplier_port",
+        "variables": [
+          "R_local_multiplier"
+        ]
+      },
+      {
+        "port_type": "external_pressure_port",
+        "variables": [
+          "u_ext"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_T",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_T"
+        ]
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "u_C",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_T",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_T1",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "R_T1_wCont",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "R_T2",
+        "Js_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "R_T2_wCont",
+        "Js_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "C_T",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "q_us",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_R",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_ext",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "R_local_multiplier",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

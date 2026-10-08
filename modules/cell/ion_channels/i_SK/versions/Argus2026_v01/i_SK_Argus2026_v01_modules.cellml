@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_SK_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_SK_SN">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Ca_mid_m_SK" public_interface="in" units="millimolar"/>
+        <variable name="Cai_init" public_interface="in" units="millimolar"/>
+        <variable name="E_K" public_interface="in" units="milliV"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="g_KCa_SK" public_interface="out" units="microS"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_SK" public_interface="in" units="per_um2"/>
+        <variable name="gamma_SK" public_interface="in" units="picoS"/>
+        <variable name="g_KCa_SK_mod" public_interface="in" units="dimensionless"/>
+        <variable name="i_KCa_SK" public_interface="out" units="nanoA"/>
+        <variable name="j_KCa_SK" public_interface="out" units="mol_per_s"/>
+        <variable name="m_SK" public_interface="out" units="dimensionless" initial_value="m_SK_init"/>
+        <variable name="m_SK_inf" public_interface="out" units="dimensionless"/>
+        <variable name="m_SK_init" public_interface="out" units="dimensionless"/>
+        <variable name="p_SK" public_interface="in" units="dimensionless"/>
+        <variable name="tau_m_SK" public_interface="in" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="Q10_SK" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_SK" public_interface="in" units="kelvin"/>
+        <variable name="phi_SK" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>m_SK_init</ci>
+                <apply><divide/><cn cellml:units="dimensionless">1</cn><apply><plus/><cn cellml:units="dimensionless">1</cn><apply><power/><apply><divide/><ci>Ca_mid_m_SK</ci><ci>Cai_init</ci></apply><ci>p_SK</ci></apply></apply></apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>m_SK_inf</ci>
+                <apply><divide/><cn cellml:units="dimensionless">1</cn><apply><plus/><cn cellml:units="dimensionless">1</cn><apply><power/><apply><divide/><ci>Ca_mid_m_SK</ci><ci>Cai</ci></apply><ci>p_SK</ci></apply></apply></apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>m_SK</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>m_SK_inf</ci>
+                        <ci>m_SK</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <divide/>
+                            <ci>tau_m_SK</ci>
+                            <cn cellml:units="millis_per_s">1000</cn>
+                        </apply>
+                        <ci>phi_SK</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_KCa_SK</ci>
+                <apply>
+                    <times/>
+                    <ci>g_KCa_SK</ci>
+                    <ci>g_KCa_SK_mod</ci>
+                    <ci>m_SK</ci>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_K</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_KCa_SK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>i_KCa_SK</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>g_KCa_SK</ci><apply><times/><ci>A_mem</ci><ci>rho_SK</ci><ci>gamma_SK</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_SK</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_SK</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_SK</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

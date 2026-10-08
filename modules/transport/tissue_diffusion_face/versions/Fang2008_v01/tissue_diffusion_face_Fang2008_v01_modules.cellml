@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="tissue_diffusion_face_Fang2008_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="diffusion_face">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="sigma_diff" public_interface="in" units="m2_per_s"/>
+        <variable name="A_f" public_interface="in" units="m2"/>
+        <variable name="d_up" public_interface="in" units="metre"/>
+        <variable name="d_down" public_interface="in" units="metre"/>
+        <variable name="open_flag" public_interface="in" units="dimensionless"/>
+        <variable name="C_up" public_interface="in" units="millimolar"/>
+        <variable name="C_down" public_interface="in" units="millimolar"/>
+        <variable name="D" public_interface="out" units="m3_per_s"/>
+        <variable name="J" public_interface="out" units="mol_per_s"/>
+        <variable name="J_up" public_interface="out" units="mol_per_s"/>
+        <variable name="J_down" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>D</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>open_flag</ci>
+                        <ci>sigma_diff</ci>
+                        <ci>A_f</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>d_up</ci>
+                        <ci>d_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J</ci>
+                <apply>
+                    <times/>
+                    <ci>D</ci>
+                    <apply>
+                        <minus/>
+                        <ci>C_up</ci>
+                        <ci>C_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_down</ci>
+                <ci>J</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_up</ci>
+                <apply>
+                    <minus/>
+                    <ci>J</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

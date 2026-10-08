@@ -1,0 +1,24 @@
+module_type: rigid_vessel
+version: vv
+reviewed: false
+notes: 'Rigid vessel with both flows imposed: pressure is the algebraic u = (v_in - v_out)/R. NOTE the units of this law do
+  not balance (m^3/s divided by Pa s/m^3 is not Pa); see review.'
+reference_proposals:
+  R:
+    reference: safaei2018bond; Table S3 R_par = 10.664e6 J s m^-6 (0.08 mmHg s/mL), pulmonary arteries, used here as a generic
+      lumped arterial compartment (as the arterial_simple vp sibling does)
+    sourced: 'yes'
+    value: 10664000.0
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+  v_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

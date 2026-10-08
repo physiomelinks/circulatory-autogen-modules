@@ -1,0 +1,51 @@
+module_type: NA
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Nucleus ambiguus (Gee 2023 eqs. 1, 3): input is the summed NTS output, scaled by k_RSA during inspiration (respiratory-phase
+  gate s_floor <= 0.4, i.e. s < T_insp/T_resp) and unscaled otherwise. Algebraic.'
+reference_proposals:
+  f_min_NA:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.20 / Simulink alpha = 4.875: 4.88 Hz'
+    sourced: 'yes'
+  f_max_NA:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.20 / Simulink 4.875 + 10.9 = 15.775:
+      15.78 Hz'
+    sourced: 'yes'
+  f_mid_NA:
+    reference: unreferenced_placeholder; Gee 2023 Table S.20 / Simulink give f_mid,NA = 59.83 Hz; the csv 30 Hz is a local
+      modification ("Gee2023_original59.83") with no stated source
+    sourced: 'no'
+  k_NA:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.20 / Simulink: k = 23'
+    sourced: 'yes'
+  k_RSA:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.24 / Simulink kRSA: 0.5 (estimated by
+      the authors)'
+    sourced: 'yes'
+  s_floor:
+    reference: 'unreferenced_placeholder; respiratory phase gate input, normally supplied by the respiratory model (csv: NEEDS_TO_BE_COUPLED_TO_LUNG);
+      0 = inspiration (gated)'
+    sourced: 'no'
+  f_NTS_br:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (NTS BR-subtype
+      output)
+    sourced: 'no'
+    value: 15.0
+  f_NTS_ls:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (NTS LS-subtype
+      output)
+    sourced: 'no'
+    value: 15.0
+  f_NTS_cp:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (NTS CP-subtype
+      output)
+    sourced: 'no'
+    value: 15.0
+  f_NTS_ch:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (NTS chemoreceptor-subtype
+      output)
+    sourced: 'no'
+    value: 10.0
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.

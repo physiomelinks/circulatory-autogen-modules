@@ -1,0 +1,20 @@
+module_type: IP3R
+version: Argus2026_v01
+reviewed: true
+description: 'IP3 receptor Ca release from the ER (Li-Rinzel 1994 reduction of De Young-Keizer): j_IP3 = -k m_inf^3 h^3 (Cai
+  - Ca_ER), slow h inactivation; switched off by default (rho_IP3R = 0).'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. IP3 receptor Ca release
+  from the ER (Li & Rinzel 1994 reduced form) of the SN soma and varicosity (the same law in both): j_IP3 = -k_IP3 m_inf^3
+  h^3 (Cai - Ca_ER), into the sub-membrane Ca and out of the ER. Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. Geometry re-parameterisation (2026-10-02): k_IP3 = A_ER rho_IP3R k_IP3R_single (membrane area x density
+  x per-protein permeability, 1e-18 m3/um3), A_ER through the A_ER port; the defaults reproduce the previous k_IP3. Temperature
+  (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it
+  is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_IP3R, T_ref_IP3R). T_ref defaults
+  to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s recording temperature (on review)
+  scales them, and the model can be run at 37 degC by changing T. Reviewed 2026-10-05: tau_hIP3 fixed to Li-Rinzel seconds
+  (was 1000x too fast); the receptor stays switched off (rho_IP3R = 0, as k_IP3 = 0 in the original model).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

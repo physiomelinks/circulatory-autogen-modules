@@ -1,0 +1,28 @@
+module_type: i_Kv4_2
+version: Argus2026_v01
+reviewed: true
+description: 'A-type (Kv4.2) transient K current of the sympathetic-neuron soma: i_Kv4_2 = g_Kv4_2 m^3 h (V - E_K), g = A
+  rho gamma; Bekkers 2000 kinetics (rat cortical pyramidal neurons, room temperature) with a constant 7 ms inactivation; its
+  K flux goes to the soma''s K balance.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.001 ms (was 0.1 ms; changed on review 2026-10-02) added,
+  as in the original. Kv4.2 A-type K current of the SN soma, i_Kv4_2 = g_Kv4_2 m^3 h (V - E_K) (Channelpedia Kv4.2 kinetics).
+  Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
+  removed; in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry re-parameterisation
+  (2026-10-02): the maximal conductance is g_Kv4_2 = A_mem rho_Kv4_2 gamma_Kv4_2 (membrane area x channel density x single-channel
+  conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area; the defaults reproduce the previous g_Kv4_2. Temperature
+  (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis recordings it
+  is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (Q10_Kv4_2, T_ref_Kv4_2). T_ref
+  defaults to 295.15 K, so phi = 1 and the kinetics are unchanged; setting T_ref to the source''s recording temperature (on
+  review) scales them, and the model can be run at 37 degC by changing T. Fixed on review 2026-10-05: the tau_m branch switched
+  at V < +50 mV (now -50 mV, as Bekkers 2000 Table 1 and Channelpedia model 40), which made tau_m fall below epsilon_tau above
+  ~+25 mV; m_inf now uses Bekkers'' m^3h fit (V1/2 -56.2, k 19.1) instead of the first-power peak-current values; T_ref =
+  Bekkers'' 23.5 degC. tau_m: (np.abs(np.where(V < -50, 1/(0.026*np.exp(-0.026*V) + 35*np.exp(0.136*V)), 1.7/(1 + np.exp((-42
+  - V)/(-26))) + 0.34))/1000/(Q10_Kv4_2**((T - T_ref_Kv4_2)/10)) + 1e-6).'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

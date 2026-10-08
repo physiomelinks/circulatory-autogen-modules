@@ -1,0 +1,40 @@
+module_type: arterial_simple
+version: vv
+reviewed: false
+notes: 'vv lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 0.003 s, slowest decay 0.01 s; run: fastest 0.003
+  s, slowest decay 0.01 s).'
+reference_proposals:
+  q_0:
+    reference: 'mynard2015one; Supplemental File 1, aortic root: A0 = 6.9419 cm^2, length 1 cm, so A0 l = 6.94 mL = 6.94e-6 m^3'
+    sourced: 'yes'
+  R:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "to_be_identified" (value 1000000)'
+    sourced: 'no'
+  C:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "to_be_identified" (value 0.000000012028)'
+    sourced: 'no'
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen 3compartment_extra_ops: user_defined)'
+    sourced: definitional
+  I:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "to_be_identified" (value 10000)'
+    sourced: 'no'
+  u_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "Mynard&Smolich_2015_assumedRefOf100mmHg"
+      (value 13300); an assumed reference pressure. Not found in the accessible mynard2015one supplementary files'
+    sourced: 'no'
+    also_cites:
+    - mynard2015one
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+  v_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

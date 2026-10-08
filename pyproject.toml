@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cam-testing"
+version = "0.1.0"
+description = "Verification, validation and reports for the circulatory-autogen-modules library"
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml",
+    "jinja2",
+    "matplotlib",
+    "numpy>=2.0",   # np.trapezoid in verification invariants
+    "pytest",
+    "jsonschema>=4.18",  # module arrays and module configs against libcuflynx's JSON Schemas
+    "tomli; python_version < '3.11'",  # [tool.cam_testing] in a repo's pyproject.toml
+]
+
+[project.optional-dependencies]
+# libcuflynx at the ref requirements.txt pins (keep the two in step): pip install "cam-testing[libcuflynx] @ git+..."
+libcuflynx = ["libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-external-coupling"]
+
+[project.entry-points.pytest11]
+# named as the module, so a conftest.py's pytest_plugins naming it too doesn't register it twice
+"cam_testing.pytest_plugin" = "cam_testing.pytest_plugin"
+
+[tool.setuptools.packages.find]
+include = ["cam_testing", "cam_testing.*"]
+
+[tool.setuptools.package-data]
+cam_testing = ["templates/*.html", "data/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
+               "bridges/cuflynx/*.py"]
+
+[tool.cam_testing]
+# this repo is the root (the default); curated PhLynx manifests besides all.json (python -m cam_testing.manifests)
+[tool.cam_testing.manifests]
+"index.json" = ["vessels", "heart"]
+"vitalworkshop.json" = ["vessels", "heart"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The options (--module, --component, --include-unreviewed, --quick-unreviewed, --cam-root,
+# --cam-library), parametrisation, fixtures, the standard tests' names (run_test,
+# verification_test_BC, ...) and markers come from the plugin cam_testing.pytest_plugin, which
+# installing cam_testing registers for any repo (pytest11 entry point). Named here too, for a run
+# without the install (PYTHONPATH=.); there is no conftest.py: an editable install's other repos
+# would load it.
+addopts = ["-p", "cam_testing.pytest_plugin"]
+filterwarnings = ["ignore::DeprecationWarning"]

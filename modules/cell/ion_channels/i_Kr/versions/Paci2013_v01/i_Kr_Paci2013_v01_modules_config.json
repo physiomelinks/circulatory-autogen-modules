@@ -1,0 +1,143 @@
+[
+  {
+    "module_type": "i_Kr",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_Kr_Paci2013_v01_modules.cellml",
+    "component_type": "i_Kr_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "paci2013computational"
+    ],
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      },
+      {
+        "port_type": "Kr_Xr1_gate",
+        "variables": [
+          "Xr1"
+        ]
+      },
+      {
+        "port_type": "Kr_Xr2_gate",
+        "variables": [
+          "Xr2"
+        ]
+      },
+      {
+        "port_type": "Kr_current",
+        "variables": [
+          "i_Kr"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Kr_current",
+        "variables": [
+          "i_Kr"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "i_Kr",
+        "A_per_F",
+        "access",
+        "variable"
+      ],
+      [
+        "g_Kr",
+        "S_per_F",
+        "access",
+        "constant"
+      ],
+      [
+        "Vm",
+        "volt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_K",
+        "volt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Ko",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "R",
+        "J_per_MK",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_M",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Xr1",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Xr2",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "global_constant"
+      ],
+      [
+        "E4031_30nM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "E4031_100nM",
+        "dimensionless",
+        "access",
+        "global_constant"
+      ],
+      [
+        "E4031_coeff",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

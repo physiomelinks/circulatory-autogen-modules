@@ -1,0 +1,70 @@
+{
+  "module_type": "RyR",
+  "version": "Argus2026_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["c_RyR", "hc_RyR", "c_RyR_inf", "hc_RyR_inf", "j_RyR", "k_RyR"],
+  "invariants": [
+    {
+      "description": "every gating variable stays in [0, 1]",
+      "expr": "np.all((c_RyR >= -1e-9) & (c_RyR <= 1 + 1e-9)) & np.all((hc_RyR >= -1e-9) & (hc_RyR <= 1 + 1e-9))"
+    },
+    {
+      "description": "j_RyR = k_RyR (Ca_ER - Cai) c_RyR^3 hc_RyR^3",
+      "expr": "np.max(np.abs(j_RyR - k_RyR*(Ca_ER - Cai)*c_RyR**3*hc_RyR**3)) <= 1e-12*max(1e-30, np.max(np.abs(j_RyR)))"
+    },
+    {
+      "description": "with Cai and Ca_ER fixed, c_RyR follows its exact relaxation c_inf + (c0 - c_inf) exp(-t phi/tau_c), c0 = c_RyR(0)",
+      "expr": "np.max(np.abs(c_RyR - ((1/(1 + np.exp(-(Cai - Cai_RyR_mid)/Cai_RyR_den))) + (c_RyR[0] - (1/(1 + np.exp(-(Cai - Cai_RyR_mid)/Cai_RyR_den))))*np.exp(-t*(Q10_RyR**((T - T_ref_RyR)/10))/(tau_c_RyR/1000))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "with Cai and Ca_ER fixed, hc_RyR follows its exact relaxation hc_inf + (hc0 - hc_inf) exp(-t phi/tau_hc)",
+      "expr": "np.max(np.abs(hc_RyR - ((1/(1 + np.exp(-(Ca_ER - Ca_ER_RyR_mid)/Ca_ER_RyR_den))) + (hc_RyR[0] - (1/(1 + np.exp(-(Ca_ER - Ca_ER_RyR_mid)/Ca_ER_RyR_den))))*np.exp(-t*(Q10_RyR**((T - T_ref_RyR)/10))/(tau_hc_RyR/1000))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "flux direction: release j_RyR has the sign of Ca_ER - Cai",
+      "expr": "np.all(j_RyR*(Ca_ER - Cai) >= -1e-30)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "T": {"min": 273.15, "max": 313.15, "points": 3}
+    },
+    "bounds": {
+      "Q10_RyR": [1, 5],
+      "T_ref_RyR": [273.15, 313.15],
+      "T": [273.15, 313.15]
+    },
+    "rationale": "Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5 and T_ref to 273.15-313.15 K."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      }
+    }
+  }
+}

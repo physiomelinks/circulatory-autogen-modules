@@ -1,0 +1,73 @@
+module_type: Ca_handling
+version: SN_soma_Argus2026_v01
+reviewed: true
+description: 'Four-compartment Ca of the sympathetic-neuron soma: a sub-membrane shell (Cai, volume V_shell = A_mem d_shell), bulk,
+  pre-ER and ER. Cai receives j_Ca_in, the summed Ca flux of the channels on the Ca_flux port; the ER loses j_ER_release (IP3R,
+  RyR). The shell exchanges with the bulk with time constant tau_shell (Khaliq 2003) and pre-ER with ER by diffusion (D_Ca_ER);
+  SERCA (Shannon 2004 form) and a leak move Ca between bulk and pre-ER across the pre-ER membrane (area from its volume fraction).
+  A fixed buffer binds Ca in each of the first three.'
+notes: 'Four-compartment Ca of the SN soma (sub-membrane Cai, bulk, pre-ER, ER) with a fixed (immobile) buffer in each of
+  the first three (no buffer exchange between compartments; Matveev 2002 fixed-buffer values), SERCA and a leak between bulk
+  and pre-ER, and diffusion. Cai receives j_Ca_in, the sum of the Ca fluxes of the channels connected through Ca_flux; the
+  ER loses j_ER_release (IP3R, RyR). Copied verbatim from SN_soma except for those two summed port variables. Split out of
+  the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py, removed;
+  in git history); SN_simple_flat checks that the assembled parts reproduce SN_simple. Geometry (2026-10-02): Vol is an input
+  (compartment_volume port) from the membrane. The ER volumes are V_ER = c_ER Vol and V_ER_pre = c_ER_pre Vol, with membrane
+  areas A_ER = k_A_ER (V_ER/k_V_ER)^(2/3) and A_ER_pre = k_A_ER_pre (V_ER_pre/k_V_ER_pre)^(2/3) (shape factors; default a
+  sphere). SERCA and the Ca leak move Ca across the pre-ER membrane, so k_SERCA = A_ER_pre rho_SERCA r_SERCA / N_A and k_leak_Ca
+  = A_ER_pre rho_leak_Ca k_leak_Ca_single (1e-18 m3/um3); A_ER goes to IP3R and RyR (ER_membrane_area), whose release crosses
+  the ER membrane. The diffusion constant D_Ca_ER is unchanged. The defaults reproduce the previous k_SERCA and k_leak_Ca.
+  Membrane shell (review 2026-10-05, Khaliq et al. 2003, ModelDB 48332 cadiff.mod): the sub-membrane compartment was a fixed
+  fraction c_SL = 0.02 of Vol exchanging with the bulk through D_Ca = 6e-12 m3/s (hand-set). It is now a shell under the membrane,
+  V_shell = A_mem d_shell (1e-18 m3/um3; A_mem from the membrane through shell_membrane_area, not membrane_area, since the
+  channels connect to both the membrane and Ca; d_shell 0.1 um, 300 um^3 at 3,000 um^2), exchanging with the bulk as j_diffCa
+  = -(V_shell/tau_shell)(Cai - Ca_bulk) with tau_shell 1 ms; dCai/dt = (j_Ca_in + j_diffCa)/V_shell + buffer terms, and the
+  bulk is what is left of Vol, c_bulk = 1 - V_shell/Vol - c_ER - c_ER_pre (0.921 -> 0.901), so the compartments still add
+  up. BK and SK read the shell Ca (internal_Ca). The invariants weight the shell by V_shell (an output).
+
+
+  Ports of the versions of Ca_handling (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  entrance internal_Ca: cardiomyocyte_Paci2013_v01 [Cai]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  entrance membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit NaCa_current: cardiomyocyte_Paci2013_v01 [i_NaCa]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit PCa_current: cardiomyocyte_Paci2013_v01 [i_PCa]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit b_Ca_current: cardiomyocyte_Paci2013_v01 [i_b_Ca]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit internal_Ca: cardiomyocyte_Paci2013_v01 [Cai]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 -
+
+  exit internal_Ca_d_gate_port: cardiomyocyte_Paci2013_v01 [Cai, d]; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general Ca_flux: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_Ca_in]; SN_varicosity_Argus2026_v01 [j_Ca_in]
+
+  general Ca_potential: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_varicosity_Argus2026_v01 [E_Ca]
+
+  general ER_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Ca_ER]; SN_varicosity_Argus2026_v01 [Ca_ER]
+
+  general ER_Ca_release: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_ER_release]; SN_varicosity_Argus2026_v01 [j_ER_release]
+
+  general ER_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_ER]; SN_varicosity_Argus2026_v01 [A_ER]
+
+  general bulk_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Ca_bulk]; SN_varicosity_Argus2026_v01 [Ca_bulk]
+
+  general compartment_volume: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Vol]; SN_varicosity_Argus2026_v01 [Vol]
+
+  general internal_Ca: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Cai]; SN_varicosity_Argus2026_v01 [Cai]
+
+  general shell_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_varicosity_Argus2026_v01 -'
+known_issues:
+- 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
+  libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
+  (2026-10-03).'
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

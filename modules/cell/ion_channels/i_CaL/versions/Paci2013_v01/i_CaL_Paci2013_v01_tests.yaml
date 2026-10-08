@@ -1,0 +1,118 @@
+module_type: i_CaL
+version: Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 hiPSC-CM (ventricular-like) L-type Ca current (GHK form, 0.341 Cao activity factor) I_CaL = g_CaL 4 Vm F^2/(RT)
+  (Cai e^{2VmF/RT} - 0.341 Cao)/(e^{2VmF/RT} - 1) d f1 f2 fCa. The nifedipine switches are declared but, exactly as in the
+  original Paci 2013 CellML, nifed_coeff is computed and never multiplies I_CaL. Algebraic: all gates, concentrations and
+  the membrane potential are inputs, so alone it is a pure function of its inputs, checked exactly against the original model
+  equations.'
+known_issues:
+- 'undefined units: C_per_M'
+- 'undefined units: J_per_MK'
+expected_failures:
+  run_test: 'generation fails: the gate inputs f1, f2, fCa are declared private_interface=''in'' (a leftover of the original
+    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
+    d is declared private_interface=''in'' public_interface=''out'' (an output) although it is an input here; fix: public_interface=''in''.
+    Also R and F use the undefined units J_per_MK / C_per_M (known issue); fix: define them (joule/(mole kelvin), coulomb/mole)
+    in ion_channel_units.cellml. With the proposed fix applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: the gate inputs f1, f2, fCa are declared private_interface=''in'' (a leftover
+    of the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. d is declared private_interface=''in'' public_interface=''out'' (an output) although it
+    is an input here; fix: public_interface=''in''. Also R and F use the undefined units J_per_MK / C_per_M (known issue);
+    fix: define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: the gate inputs f1, f2, fCa are declared private_interface=''in'' (a leftover of
+    the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. d is declared private_interface=''in'' public_interface=''out'' (an output) although it
+    is an input here; fix: public_interface=''in''. Also R and F use the undefined units J_per_MK / C_per_M (known issue);
+    fix: define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: the gate inputs f1, f2, fCa are declared private_interface=''in'' (a leftover
+    of the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. d is declared private_interface=''in'' public_interface=''out'' (an output) although it
+    is an input here; fix: public_interface=''in''. Also R and F use the undefined units J_per_MK / C_per_M (known issue);
+    fix: define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+  stability_test: 'generation fails: the gate inputs f1, f2, fCa are declared private_interface=''in'' (a leftover of the
+    original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
+    Fix: public_interface=''in''. d is declared private_interface=''in'' public_interface=''out'' (an output) although it
+    is an input here; fix: public_interface=''in''. Also R and F use the undefined units J_per_MK / C_per_M (known issue);
+    fix: define them (joule/(mole kelvin), coulomb/mole) in ion_channel_units.cellml. With the proposed fix applied to a copy
+    of the library, all tests of this component pass.'
+reference_proposals:
+  g_CaL:
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      g_CaL = 8.6357e-05'
+    sourced: 'yes'
+    value: 8.635702e-05
+  Vm:
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
+    sourced: 'yes'
+    value: -0.0743340057623841
+  d:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): d = 8.96088e-05'
+    sourced: 'yes'
+    value: 8.96088425225182e-05
+  f1:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): f1 = 0.970412'
+    sourced: 'yes'
+    value: 0.970411811263976
+  f2:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): f2 = 0.999966'
+    sourced: 'yes'
+    value: 0.999965815466749
+  fCa:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): fCa = 0.998925'
+    sourced: 'yes'
+    value: 0.998925296531804
+  Cai:
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cai = 1.80774e-05'
+    sourced: 'yes'
+    value: 1.80773974140477e-05
+  R:
+    reference: paci2013computational; gas constant as used in the authors' CellML (8.314472 J/(mol K), CODATA 2006)
+    sourced: 'yes'
+    value: 8.314472
+  T:
+    reference: paci2013computational; temperature in the authors' CellML (310 K)
+    sourced: 'yes'
+    value: 310
+  F:
+    reference: paci2013computational; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+    sourced: 'yes'
+    value: 96485.3415
+  Cao:
+    reference: 'paci2013computational; extracellular Ca in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Cao = 1.8 mM (note: the Tao 2011 neuron currents share this global; Tao 2011 used its own bath
+      value)'
+    sourced: 'yes'
+    value: 1.8
+  nifed_3nM:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  nifed_10nM:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  nifed_30nM:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+  nifed_100nM:
+    reference: definitional; drug-block switch (0 = no drug, 1 = drug applied), 0 as in the authors' CellML (PMR workspace
+      sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion)
+    sourced: definitional
+    value: 0
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

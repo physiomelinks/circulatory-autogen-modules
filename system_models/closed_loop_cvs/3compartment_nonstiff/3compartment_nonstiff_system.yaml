@@ -1,0 +1,31 @@
+model: 3compartment_nonstiff
+category: closed_loop_cvs
+reviewed: false
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+equivalence:
+  reference: reference
+  output_map: {heart/u_ra: ra/u, heart/u_rv: rv/u, heart/u_la: la/u, heart/u_lv: lv/u, heart/q_ra: ra/q, heart/q_rv: rv/q,
+    heart/q_la: la/q, heart/q_lv: lv/q, heart/v_trv: trv/v, heart/v_puv: puv/v, heart/v_miv: miv/v, heart/v_aov: aov/v, heart/zeta_trv: trv/zeta,
+    heart/zeta_puv: puv/zeta, heart/zeta_miv: miv/zeta, heart/zeta_aov: aov/zeta, heart/zeta_trv_pre: trv/zeta_pre, heart/zeta_puv_pre: puv/zeta_pre,
+    heart/zeta_miv_pre: miv/zeta_pre, heart/zeta_aov_pre: aov/zeta_pre, heart/e_a: ra/e, heart/e_v: lv/e, heart/s: heart_clock/s,
+    heart/mt: heart_clock/mt, heart/chi_a: ra/chi, heart/chi_v: lv/chi, heart/v_asd: asd_shunt/v, heart/T_wCont: heart_clock/T_eff,
+    heart/chi_afloor: ra/chi_floor, heart/chi_vfloor: lv/chi_floor, heart/chi_afloor_final: ra/chi_floor_final, heart/chi_vfloor_final: lv/chi_floor_final,
+    heart/R_lin_trv: trv/R_lin, heart/R_lin_puv: puv/R_lin, heart/R_lin_miv: miv/R_lin, heart/R_lin_aov: aov/R_lin, heart/vel_trv: trv/vel,
+    heart/vel_puv: puv/vel, heart/vel_miv: miv/vel, heart/vel_aov: aov/vel, heart/E_lv_A_wCont: lv/E_A_eff, heart/E_rv_A_wCont: rv/E_A_eff,
+    heart/A_eff_trv: trv/A_eff, heart/B_trv: trv/B, heart/L_trv: trv/L, heart/A_eff_puv: puv/A_eff, heart/B_puv: puv/B, heart/L_puv: puv/L,
+    heart/A_eff_miv: miv/A_eff, heart/B_miv: miv/B, heart/L_miv: miv/L, heart/A_eff_aov: aov/A_eff, heart/B_aov: aov/B, heart/L_aov: aov/L,
+    heart/T_ac_wCont: ra/T_c_eff, heart/T_ar_wCont: ra/T_r_eff, heart/T_vc_wCont: lv/T_c_eff, heart/T_vr_wCont: lv/T_r_eff}
+  ignore: {heart/q_heart: sum of the four chambers (no single variable after the split), pvn/t: time, par/t: time, aortic_root/t: time,
+    systemic_T/t: time, venous_svc/t: time, volume_sum/t: time, heart_clock/t: time, ra/t: time, rv/t: time, la/t: time, lv/t: time,
+    trv/t: time, puv/t: time, miv/t: time, aov/t: time, heart/q: sum of the four chambers (no single variable after the split)}
+  wrapped: {heart/mt: 1.0, heart/chi_afloor: 1.0, heart/chi_vfloor: 1.0, heart/chi_afloor_final: 1.0, heart/chi_vfloor_final: 1.0}
+  reciprocal: [heart/L_trv, heart/L_puv, heart/L_miv, heart/L_aov, heart/B_trv, heart/B_puv, heart/B_miv, heart/B_aov]
+  tol: 1.0e-06
+  solver_info: {rtol: 1.0e-12, atol: 1.0e-14}
+invariants:
+- {description: total blood volume is conserved in the closed loop (relative drift < 1e-6), expr: np.ptp(sum_blood_volume__q_volume_sum_sum)
+    <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))}
+notes: ['Equivalence at rtol 1e-12: the linear valves'' R_lin/zeta are stiff near closure; at rtol 1e-10 they differed by
+    up to 6.6e-6 (solver error: 7e-5 at rtol 1e-9, 2.4e-7 at 1e-12).']

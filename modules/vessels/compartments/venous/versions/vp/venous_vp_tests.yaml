@@ -1,0 +1,51 @@
+module_type: venous
+version: vp
+reviewed: false
+notes: 'vp lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 3.3e-13 s, slowest decay 0.018 s; run: fastest
+  3.3e-13 s, slowest decay 0.018 s).'
+reference_proposals:
+  R:
+    reference: safaei2018bond; Table S3 R_pvn = 1.333e6 J s m^-6 (0.01 mmHg s/mL), pulmonary veins; Blanco & Feijoo 2013 Table
+      8 (the circulatory_autogen label) could not be checked (paywalled)
+    sourced: 'yes'
+  C:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops "to_be_identified". The digits match
+      safaei2018bond Table S3 C_pvn = 0.60015e-6 m^6/J, but this value is 100x smaller: check whether this is intended'
+    sourced: 'no'
+    also_cites:
+    - safaei2018bond
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen 3compartment_extra_ops: user_defined)'
+    sourced: definitional
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0
+      Pa (0 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 0.0
+  v_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 0.0001
+      m^3/s
+    sourced: 'no'
+    value: 0.0001
+  I:
+    reference: 'unreferenced_placeholder; I = 0.000001 is a small nonzero stand-in: safaei2018bond Table S3 gives I = 0 for the
+      pulmonary arteries and veins (circulatory_autogen label Blanco_2013_Table_8 not verifiable). Makes the module very stiff
+      (I/R ~ 1e-13 s)'
+    sourced: 'no'
+    also_cites:
+    - safaei2018bond
+  q_C_init:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "user_defined" (value 0.0001)'
+    sourced: 'no'
+  q_us_0:
+    reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "user_defined" (value 0)'
+    sourced: 'no'
+  Delta_q_us:
+    reference: 'definitional; Delta_q_us = 0 (circulatory_autogen 3compartment_extra_ops: user_defined)'
+    sourced: definitional
+  Delta_C:
+    reference: 'definitional; Delta_C = 0 (circulatory_autogen 3compartment_extra_ops: user_defined)'
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

@@ -1,0 +1,18 @@
+module_type: i_leak_Na
+version: Argus2026_v01
+reviewed: true
+description: 'Ohmic background Na leak of the sympathetic-neuron soma: i_leak_Na = g_leak_Na (V - E_Na), g = A rho gamma;
+  its Na flux goes to the soma''s Na balance.'
+notes: 'Copied verbatim from the owner''s SN_soma (now soma sympathetic_monolithic_v01 in modules/cell/neuron/soma, the SN_simple
+  sympathetic neuron); every gating time constant has epsilon_tau = 0.1 ms added, as in the original. Na leak of the SN soma,
+  i_leak_Na = g_leak_Na (V - E_Na). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a
+  one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts reproduce
+  SN_simple. Geometry re-parameterisation (2026-10-02): the maximal conductance is g_leak_Na = A_mem rho_leak_Na gamma_leak_Na
+  (membrane area x channel density x single-channel conductance, 1e-6 uS/pS), A_mem from the membrane through membrane_area;
+  the defaults reproduce the previous g_leak_Na. Temperature (review 2026-10-05): the SN model is at room temperature, T =
+  295.15 K (22 degC), like the Davis 2021 thesis recordings it is calibrated to; the unconnected Nernst default is computed
+  at 295.15 K. Reviewed 2026-10-05: the soma-level g_leak_Na will come from the soma calibration workflow (resting Na/K balance
+  after the realistic Na/K pump), not from this module''s default.'
+review: reviews/ion_channel_review.yaml
+review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
+  version apply.

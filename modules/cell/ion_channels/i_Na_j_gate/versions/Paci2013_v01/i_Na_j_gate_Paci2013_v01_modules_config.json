@@ -1,0 +1,53 @@
+[
+  {
+    "module_type": "i_Na_j_gate",
+    "module_subtype": "Paci2013_v01",
+    "module_format": "cellml",
+    "component_file": "i_Na_j_gate_Paci2013_v01_modules.cellml",
+    "component_type": "i_Na_j_gate_Paci_2013",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "paci2013computational"
+    ],
+    "notes": "Built for: hiPSC-derived ventricular-like cardiomyocyte (Paci et al. 2013)",
+    "entrance_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "Vm"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "Na_j_gate",
+        "variables": [
+          "j"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "j_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "j",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Vm",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ]
+    ]
+  }
+]

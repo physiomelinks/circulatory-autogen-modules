@@ -1,0 +1,16 @@
+model: FitzHugh_Nagumo
+category: benchmarks
+reviewed: false
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+equivalence:
+  reference: reference
+  output_map: {}
+  ignore: {fhn/t: time}
+  wrapped: {}
+  reciprocal: []
+  tol: 1.0e-06
+  solver_info: {rtol: 1.0e-10, atol: 1.0e-12}
+invariants: []
+notes: []

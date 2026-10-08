@@ -1,0 +1,70 @@
+{%- macro chip(status, label) -%}<span class="chip {{ status or 'none' }}">{{ label }}</span>{%- endmacro -%}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Circulatory Autogen Modules</title>
+{% include '_style.html' %}
+<style>
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 28px; }
+header { display: grid; gap: 10px; }
+header p { margin: 0; max-width: 70ch; color: var(--ink-2); }
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+td.name a { font-family: var(--font-mono); font-size: 0.86rem; font-weight: 500; }
+td { white-space: nowrap; }
+td.vers { white-space: normal; font-family: var(--font-mono); font-size: 0.78rem; max-width: 40ch; }
+.tick { color: var(--pass); margin-left: 2px; }
+.cats { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--font-mono); font-size: 0.86rem; }
+footer { color: var(--ink-3); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Module library · verification &amp; validation</div>
+    <h1>Circulatory Autogen Modules</h1>
+    <p>{{ n_module_types }} module types in {{ groups|length }} categories, {{ n_versions }} versions. Each version is generated alone with libcuflynx and put through the same verification tests (run, invariants, boundary-condition sweep, timestep convergence, solver stability) and the PhLynx → CUFLynx pipeline; each of its instances is validated against its baseline and calibration data. A module type's page lists its versions; a version's page has its equations, tests and instances.</p>
+    <p><a href="review_queue.html">Review queue</a>: every version awaiting review, with its potential issues, questions and proposed fixes.</p>
+    <div class="counts">
+      {{ chip('passed', totals.passed ~ ' passed') }} {{ chip('failed', totals.failed ~ ' failed') }}
+      {{ chip('pending', totals.pending ~ ' pending') }} {{ chip('skipped', totals.skipped ~ ' skipped') }}
+      {%- if totals.not_applicable %} {{ chip('not_applicable', totals.not_applicable ~ ' N/A') }}{% endif %}
+      {%- if totals[None] %} {{ chip(None, totals[None] ~ ' not run') }}{% endif %}
+    </div>
+  </header>
+  <nav class="cats" aria-label="Categories">{% for g in groups %}<a href="#{{ g.anchor }}">{{ g.category }}</a>{% endfor %}</nav>
+  {%- for g in groups %}
+  <section id="{{ g.anchor }}" aria-labelledby="{{ g.anchor }}-h" style="display:grid;gap:10px">
+    <h2 id="{{ g.anchor }}-h" class="mono" style="font-size:1.1rem">{{ g.category }} <span class="muted" style="font-weight:400">· {{ g.rows|length }} module_type{{ '' if g.rows|length == 1 else 's' }}, {{ g.n_versions }} version{{ '' if g.n_versions == 1 else 's' }}</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Module type</th><th>Versions</th><th>Instances</th><th>Passed</th><th>Failed</th><th>Pending</th><th>Skipped</th><th>Not run</th><th>Known issues</th><th>Max P(fail)</th><th>Parameters sourced</th><th>PhLynx / CUFLynx</th><th>Status</th></tr></thead>
+        <tbody>
+        {%- for r in g.rows %}
+          <tr>
+            <td class="name"><a href="{{ r.href }}">{{ r.display }}</a></td>
+            <td class="vers">{% for v in r.versions %}<a href="{{ v.href }}" title="{{ v.counts.passed }} passed, {{ v.counts.failed }} failed{{ ', PhLynx / CUFLynx compatible' if v.phlynx_compatible }}">{{ v.name }}</a>{% if v.phlynx_compatible %}<span class="tick" title="PhLynx / CUFLynx compatible">✓</span>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</td>
+            <td class="num">{{ r.n_instances }}</td>
+            <td class="num">{{ r.counts.passed }}</td>
+            <td class="num">{% if r.counts.failed %}<strong style="color:var(--fail)">{{ r.counts.failed }}</strong>{% else %}0{% endif %}</td>
+            <td class="num">{{ r.counts.pending }}</td>
+            <td class="num">{{ r.counts.skipped }}</td>
+            <td class="num">{{ r.counts[None] }}</td>
+            <td class="num">{{ r.known_issues }}</td>
+            <td class="num">{{ '%.2f'|format(r.max_risk) if r.max_risk is not none else '—' }}</td>
+            <td class="num">{{ '✓ all' if r.all_sourced else r.n_sourced ~ ' / ' ~ r.n_parameters }}</td>
+            <td class="num">{{ '✓ all' if r.phlynx.all else (r.phlynx.compatible ~ ' / ' ~ r.phlynx.total if r.phlynx.run else '—') }}</td>
+            <td>{{ 'Reviewed' if r.reviewed else ('Ready for review' if r.ready_for_review else 'Not reviewed yet') }}</td>
+          </tr>
+        {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {%- endfor %}
+  <p class="muted" style="margin:0;font-size:0.84rem">Max P(fail): the highest joint failure probability of any version over its sampled parameter box, from <code>make risk</code> (blank where not run).</p>
+  <footer>libcuflynx {{ libcuflynx_version }} · generated {{ generated }}</footer>
+</div>
+</body>
+</html>

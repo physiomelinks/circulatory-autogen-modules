@@ -1,0 +1,44 @@
+module_type: single_terminal
+version: vp_ZCIR_wCont
+reviewed: false
+notes: 'Terminal (Windkessel-type) module. Jacobian timescales (nominal: fastest 7.2e-16 s, slowest decay 0.34 s; run: fastest
+  7.2e-16 s, slowest decay 0.34 s).'
+reference_proposals:
+  Zc:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 72869803.838006)'
+    sourced: 'no'
+  R_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 1457396076.76012)'
+    sourced: 'no'
+  C_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "calculated_from_assumptions" (value 2.47873591647839E-10)'
+    sourced: 'no'
+  I_T:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_0d: "small_chosen" (value 0.000001)'
+    sourced: 'no'
+  u_ext:
+    reference: 'definitional; u_ext = 0 (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  q_init:
+    reference: 'definitional; zero initial/unstressed volume (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  q_us:
+    reference: 'definitional; zero initial/unstressed volume (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  v_in:
+    reference: 'unreferenced_placeholder; circulatory_autogen cvs_model_with_arm_hybrid: "WONT_BE_USED" (value 0.0)'
+    sourced: 'no'
+  u_out:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 666.61
+      Pa (5 mmHg), typical outlet pressure for this vessel class
+    sourced: 'no'
+    value: 666.61
+  Delta_R:
+    reference: 'definitional; Delta_R = 0 (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+  R_local_multiplier:
+    reference: 'definitional; no local control (circulatory_autogen cvs_model_0d: user_defined)'
+    sourced: definitional
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

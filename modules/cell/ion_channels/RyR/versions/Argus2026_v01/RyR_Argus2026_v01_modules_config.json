@@ -1,0 +1,180 @@
+[
+  {
+    "module_type": "RyR",
+    "module_subtype": "Argus2026_v01",
+    "module_format": "cellml",
+    "component_file": "RyR_Argus2026_v01_modules.cellml",
+    "component_type": "RyR_SN",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "argus2026sympathetic"
+    ],
+    "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "ER_Ca",
+        "variables": [
+          "Ca_ER"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_RyR"
+        ]
+      },
+      {
+        "port_type": "ER_Ca_release",
+        "variables": [
+          "j_RyR"
+        ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Ca_ER",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Ca_ER_RyR_den",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ca_ER_RyR_mid",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai_RyR_den",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai_RyR_mid",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "c_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "c_RyR_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "hc_RyR_inf",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "j_RyR",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "k_RyR",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_RyR",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_RyR_single",
+        "um3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_c_RyR",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_hc_RyR",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_RyR",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_RyR",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_RyR",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]
