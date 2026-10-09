@@ -689,6 +689,125 @@ equal): change both together. Another repo's `modules/` is checked against its o
   category where the mechanism is meaningful; nest it only when it is an anatomical part of its
   parent (see "Placement and naming"). Then run `make manifests`.
 
+### Worked example: a new version of an ion channel
+
+This walks through every file for a small, illustrative case: a background Na⁺ current written as
+channel density × single-channel conductance, from a (hypothetical) paper Smith 2020. Copy an
+existing version as the starting point; here `i_b_Na/Paci2013_v01` and `i_leak_K/Argus2026_v01`.
+
+**1. Version or parameterisation?** `i_b_Na/Paci2013_v01` already computes
+`i_b_Na = g_b_Na (Vm - E_Na)`. If Smith 2020 only gives another `g_b_Na`, that is a
+**parameterisation** of the existing version (step 6 alone). Here Smith 2020 gives a density and a
+unitary conductance and the current in nA, `i_b_Na = A_mem rho_b_Na gamma_b_Na (V - E_Na)`:
+different equations and units, so a **new version**, `Smith2020_v01`. A new module_type is only
+for a mechanism that has none yet (a background Na⁺ current already has `i_b_Na`).
+
+**2. The directory**, `modules/cell/ion_channels/i_b_Na/versions/Smith2020_v01/`:
+
+```
+i_b_Na_Smith2020_v01_modules.cellml           the equations (one component)
+i_b_Na_Smith2020_v01_units.cellml             every unit the component uses
+i_b_Na_Smith2020_v01_modules_config.json      one config entry
+i_b_Na_Smith2020_v01_references.bib           every source cited
+i_b_Na_Smith2020_v01_tests.yaml               review record (reviewed: false until reviewed)
+i_b_Na_Smith2020_v01_verification_config.json what the checks run
+parameterisations/default/default_parameters.csv
+```
+
+**3. The CellML** (`component_type` = the component name, unique in the library):
+
+```xml
+<model name="i_b_Na_Smith2020_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+  <component name="i_b_Na_Smith2020">
+    <variable name="t" public_interface="in" units="second"/>
+    <variable name="V" public_interface="in" units="milliV"/>
+    <variable name="E_Na" public_interface="in" units="milliV"/>
+    <variable name="A_mem" public_interface="in" units="um2"/>
+    <variable name="rho_b_Na" public_interface="in" units="per_um2"/>
+    <variable name="gamma_b_Na" public_interface="in" units="picoS"/>
+    <variable name="i_b_Na" public_interface="out" units="nanoA"/>
+    <!-- i = A rho gamma (V - E): channels x unitary conductance x driving force (1e-6 uS/pS) -->
+    <math xmlns="http://www.w3.org/1998/Math/MathML"> ... </math>
+  </component>
+</model>
+```
+
+**4. The config entry** (`_modules_config.json`, a list with exactly this one entry):
+
+```json
+[{"module_type": "i_b_Na", "module_subtype": "Smith2020_v01", "module_format": "cellml",
+  "component_file": "i_b_Na_Smith2020_v01_modules.cellml", "component_type": "i_b_Na_Smith2020",
+  "default_parameterisation": "default",
+  "licence": "CC0-1.0", "creator": [],
+  "required_citations": ["smith2020background"],
+  "notes": "Built for: <cell type, species, temperature> (Smith 2020)",
+  "entrance_ports": [], "exit_ports": [],
+  "general_ports": [{"port_type": "membrane_voltage", "variables": ["V"]},
+                    {"port_type": "Na_Nernst_potential", "variables": ["E_Na"]},
+                    {"port_type": "membrane_current", "variables": ["i_b_Na"]},
+                    {"port_type": "membrane_area", "variables": ["A_mem"]}],
+  "variables_and_units": [["V", "milliV", "access", "boundary_condition"],
+                          ["E_Na", "milliV", "access", "boundary_condition"],
+                          ["A_mem", "um2", "access", "boundary_condition"],
+                          ["rho_b_Na", "per_um2", "access", "constant"],
+                          ["gamma_b_Na", "picoS", "access", "constant"],
+                          ["i_b_Na", "nanoA", "access", "variable"]]}]
+```
+
+- `creator`: ask the version's owner; never guess (it stays `[]` until the review).
+- `required_citations`: the papers the model is built on, as keys of the version's `.bib`
+  (`<surname><year><firstword>`, lowercase); a best guess goes in `required_citations_uncertain`.
+- Use the port types the neighbours already use (`membrane_voltage`, `membrane_area`, ...), so it
+  connects in a soma without changes.
+
+**5. The default parameterisation** (`parameterisations/default/default_parameters.csv`): one row
+per constant and boundary condition, each with its source and whether that source was checked:
+
+```csv
+variable_name,units,value,data_reference,sourced
+rho_b_Na,per_um2,0.02,"smith2020background; Table 2: 2 channels per 100 um^2 (= value)",yes
+gamma_b_Na,picoS,12,"smith2020background; Results, Fig. 3B: unitary conductance 12 pS (= value)",yes
+V,milliV,-70,"definitional; clamp value when unconnected (the resting potential)",no
+E_Na,milliV,60,"definitional; Nernst potential at the soma's default Na concentrations (used when unconnected)",no
+A_mem,um2,3000,"definitional; the soma membrane area (in a soma it comes through the membrane_area port)",no
+```
+
+`data_reference` is `<bibkey>; <where in the source>: <what it says> (= value)`, or
+`definitional; ...` (follows from other values), or `unreferenced_placeholder; ...` (no source yet:
+`sourced` no). Prefer primary sources to model papers that copied a value; write a large departure
+from the literature in **bold** (`**...**`). A value fitted to data never comes from a hand
+calculation: it comes from a calibration (step 6) and `python -m cam_testing.calibrate apply`.
+
+**6. A parameterisation from data** (optional): `parameterisations/<name>/` with
+`<name>_parameters.csv` (only the rows that differ), the data (`<name>_obs_data.json`, its
+`"obs_data_name": "<name>"`; build it from a CSV with `python -m cam_testing.calibrate from-csv`),
+`<name>_params_for_id.csv` when it is calibrated, and, for data read off a publication's figure,
+`source_figures/` with the cropped screenshot and `source_figures.json` (shown beside the
+validation plots). Then a `validation.<name>` block in the verification config (`baseline` and/or
+`calibrate`: the data, the outputs compared, the metric and threshold).
+
+**7. The tests to run on it** (`_verification_config.json`): `outputs`, `run_parameters`,
+`invariants` (numpy expressions that must hold, e.g. the current equals
+`A_mem*rho_b_Na*gamma_b_Na*1e-6*(V - E_Na)`, and its sign follows `V - E_Na`), `bc_sweep` (ranges
+and a rationale), `timestep` and `stability`. Copy a similar version's blocks and adjust; the spec
+table above lists every key. `_tests.yaml` starts as `module_type`, `version`, `reviewed: false` and
+`notes` (what it is and how it differs from the other versions).
+
+**8. Check and look at it:**
+
+```bash
+make structure                                                     # layout, config <-> CellML, units, names
+pytest tests/test_modules.py --component i_b_Na/Smith2020_v01      # V&V of the version and its parameterisations
+python -m cam_testing.report --module i_b_Na                       # then open .../i_b_Na/versions/Smith2020_v01/*.html
+make manifests                                                     # so PhLynx lists it
+```
+
+Read the version page: every parameter sourced or marked, every test passing or explained (a
+known failure goes under `expected_failures` with its reason; never loosen a tolerance to pass).
+In a pull request, CI runs the tests of the versions it changes. The version shows **Reviewed:
+Failed** until it has been reviewed with its owner (tests.yaml `reviewed: true` and a `review`
+record); until then CI runs only its quick tests.
+
 `tools/restructure_to_versions.py` moved the old per-module layout into this one, driven by
 `tools/restructure_map.yaml` (made by `tools/restructure_map.py`). The later move to nested
 module_types (the category `cell/neurons` and `cardiac` replaced by the module_types `cell/neuron` and

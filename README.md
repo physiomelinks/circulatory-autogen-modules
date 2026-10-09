@@ -2,6 +2,8 @@
 
 The module library for [circulatory_autogen / libcuflynx](https://github.com/physiomelinks/circulatory_autogen) and Phlynx. Every module version is verified, and every parameterisation validated, with libcuflynx; each module_type and each version gets an HTML report covering its equations, parameters and test results.
 
+**Using the library** (browse the reports, use a module from CUFLynx, PhLynx or libcuflynx, cite it): see [USER_GUIDE.md](USER_GUIDE.md). The published reports are at https://physiomelinks.github.io/circulatory-autogen-modules/. **Adding or changing a module**, with a worked example: [modules/README.md](modules/README.md#adding-things).
+
 Phlynx loads the versions listed in `manifests/index.json` (and `vitalworkshop.json`). `manifests/all.json` lists every version. Rebuild the manifests with `make manifests` after adding a version.
 
 ## Layout
