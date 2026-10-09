@@ -11,8 +11,8 @@ It provides:
   - the repo under test (cam_testing.paths): --cam-root, --cam-library (else CAM_REPO_ROOT,
     CAM_MODULE_LIBRARY_DIRS, [tool.cam_testing] in pyproject.toml, or the working directory);
   - the selection options --module, --component, --include-unreviewed, --quick-unreviewed;
-  - the parametrisation over versions, instances and supermodules (component_key, instance_key,
-    supermodule_key, equivalence_key) and the component_model / instance_model fixtures;
+  - the parametrisation over versions, parameterisations and supermodules (component_key,
+    parameterisation_key, supermodule_key, equivalence_key) and the component_model / parameterisation_model fixtures;
   - the standard tests' names (run_test, verification_test_BC, ...) as test functions, and the
     markers the suite uses.
 """
@@ -23,12 +23,12 @@ PYTHON_FUNCTIONS = ['run_test', '*_test_*', 'stability_test', 'system_*_test', '
                     'phlynx_*_test', 'cuflynx_*_test']
 MARKERS = [
     'slow: long-running (calibration)',
-    'module_vv: per-version verification and per-instance validation tests',
+    'module_vv: per-version verification and per-parameterisation validation tests',
     'system_model: system-model tests (system_models/) and supermodule reproduces tests',
     'phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)',
 ]
 QUICK_TESTS = ('run_test', 'supermodule_structure_test', 'phlynx_export_test', 'cuflynx_simulate_test',
-               'phlynx_equivalence_test', 'cuflynx_instance_omex_test')
+               'phlynx_equivalence_test', 'cuflynx_parameterisation_omex_test')
 
 
 def pytest_addoption(parser):
@@ -135,10 +135,13 @@ def _selected_versions(config):
     return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config)]
 
 
-def _selected_instances(config):
-    '''(module_type, version, instance) of every instance of a selected version.'''
+def _selected_parameterisations(config):
+    '''(module_type, version, parameterisation) of every parameterisation of a selected version.'''
     return [pytest.param((v.vessel_type, v.name, i.name), id=i.key, marks=_marks(config, v))
-            for v in _versions(config) for i in v.instances()]
+            for v in _versions(config) for i in v.parameterisations()]
+
+
+_selected_instances = _selected_parameterisations   # the former name
 
 
 def _selected_supermodules(config):
@@ -157,8 +160,8 @@ def _selected_equivalences(config):
 def pytest_generate_tests(metafunc):
     if 'component_key' in metafunc.fixturenames:
         metafunc.parametrize('component_key', _selected_versions(metafunc.config), scope='module')
-    if 'instance_key' in metafunc.fixturenames:
-        metafunc.parametrize('instance_key', _selected_instances(metafunc.config), scope='module')
+    if 'parameterisation_key' in metafunc.fixturenames:
+        metafunc.parametrize('parameterisation_key', _selected_parameterisations(metafunc.config), scope='module')
     if 'supermodule_key' in metafunc.fixturenames:
         metafunc.parametrize('supermodule_key', _selected_supermodules(metafunc.config))
     if 'equivalence_key' in metafunc.fixturenames:
@@ -186,18 +189,19 @@ def component_model(component_key, tmp_path_factory):
 
 
 @pytest.fixture
-def instance_model(instance_key, tmp_path_factory):
-    '''The version's model at the instance's parameters (the default instance shares the version's).'''
+def parameterisation_model(parameterisation_key, tmp_path_factory):
+    '''The version's model at the parameterisation's parameters (the default parameterisation shares
+    the version's).'''
     from cam_testing import checks
     from cam_testing.library import load_version
-    mt, v, inst = instance_key
+    mt, v, inst = parameterisation_key
     version = load_version(mt, v)
-    if inst == version.default_instance_name:
+    if inst == version.default_parameterisation_name:
         return _version_model((mt, v), tmp_path_factory)
-    if instance_key not in _models:
-        _models[instance_key] = checks.ComponentModel(version, str(tmp_path_factory.mktemp(f'{version.id}__{inst}')),
-                                                      version.instance(inst))
-    return _models[instance_key]
+    if parameterisation_key not in _models:
+        _models[parameterisation_key] = checks.ComponentModel(version, str(tmp_path_factory.mktemp(f'{version.id}__{inst}')),
+                                                      version.parameterisation(inst))
+    return _models[parameterisation_key]
 
 
 # version keys skipped as unchanged (--changed-only): the PhLynx and CUFLynx batches leave them out
@@ -215,7 +219,7 @@ def pytest_collection_modifyitems(config, items):
         callspec = getattr(item, 'callspec', None)
         if callspec is None:
             continue
-        key = callspec.params.get('component_key') or callspec.params.get('instance_key') \
+        key = callspec.params.get('component_key') or callspec.params.get('parameterisation_key') \
             or callspec.params.get('supermodule_key') or callspec.params.get('equivalence_key')
         if not isinstance(key, (tuple, list)):  # None, or NOTSET for an empty parameter set
             continue

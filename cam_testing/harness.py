@@ -3,7 +3,7 @@ Builds a single module version into a runnable model with libcuflynx, and runs i
 
 A version is instantiated alone, as one vessel with no connections, so every
 boundary_condition variable becomes a parameter the tests can set. Its parameter values are
-those of an instance (by default the version's default instance), written to the model's
+those of a parameterisation (by default the version's default parameterisation), written to the model's
 parameters file. Models are generated from this repo's modules (and the extra libraries of
 cam_testing.paths, which a harness may use) only (``use_builtin_modules: false``), never
 libcuflynx's bundled copies.
@@ -43,12 +43,12 @@ def parameter_name(param):
 #
 # A supermodule generated alone is the vessel VESSEL ("mod"); libcuflynx expands it into the vessels
 # mod_<submodule> (nested supermodules: mod_<submodule>_<subsubmodule> ...), and names a submodule's
-# parameter <var>_mod_<submodule>. Its own instance names that parameter <var>_<submodule> (the
+# parameter <var>_mod_<submodule>. Its own parameterisation names that parameter <var>_<submodule> (the
 # supermodule-level name used in the spec: run_parameters, bc_sweep, validation); globals keep
 # their names in both.
 
 def supermodule_model_name(version, name, vessel=VESSEL):
-    '''A supermodule instance's parameter name (<var>_<submodule>, or a global) -> its name in a model in
+    '''A supermodule parameterisation's parameter name (<var>_<submodule>, or a global) -> its name in a model in
     which the supermodule is the vessel ``vessel`` (<var>_<vessel>_<submodule>).'''
     if name in version.supermodule_globals:
         return name
@@ -68,7 +68,7 @@ def supermodule_model_name(version, name, vessel=VESSEL):
 
 
 def model_parameter_name(component, param):
-    '''The name an instance's parameter has in the version's generated model.'''
+    '''The name a parameterisation's parameter has in the version's generated model.'''
     if component.is_supermodule and not getattr(param, 'model_name', ''):
         return supermodule_model_name(component, param.variable_name)
     return parameter_name(param)
@@ -123,13 +123,13 @@ def generated_parameters_path(model_path):
 def supermodule_parameters(version, model_path, vessel=VESSEL):
     '''
     Every parameter of a supermodule's generated model (the flattened model: the supermodule's own
-    instance, its submodules' instances, and the boundary conditions no internal connection closes),
+    parameterisation, its submodules' parameterisations, and the boundary conditions no internal connection closes),
     as Parameters named at the supermodule level (<var>_<submodule path>, globals as they are), with
     model_name the generated model's name, and kind from the owning submodule's config
     (global_constant for the globals).
     '''
     from cam_testing.library import Parameter
-    own = {p.variable_name: p for p in version.default_instance.parameters()}
+    own = {p.variable_name: p for p in version.default_parameterisation.parameters()}
     out = []
     with open(generated_parameters_path(model_path), newline='') as f:
         for row in csv.DictReader(f):
@@ -181,43 +181,44 @@ def output_key(variable):
     return variable.replace('/', '__')
 
 
-def network(component, instance=None):
-    '''The test network of ``component`` at ``instance`` (an Instance or its name): the instance's own
-    (validation.<instance>.harness in the verification config, e.g. an experiment's set-up for a
+def network(component, parameterisation=None):
+    '''The test network of ``component`` at ``parameterisation`` (a Parameterisation or its name): the
+    parameterisation's own (validation.<parameterisation>.harness in the verification config, e.g. an experiment's set-up for a
     calibration) when it has one, else the version's (harness; empty: the version alone).'''
-    name = getattr(instance, 'name', instance)
+    name = getattr(parameterisation, 'name', parameterisation)
     own = (((component.spec.get('validation') or {}).get(name) or {}).get('harness')) if name else None
     return own if own is not None else (component.spec.get('harness') or {})
 
 
-def _write_resources(component, resources_dir, prefix, overrides, parameters=None, instances=True, instance=None):
+def _write_resources(component, resources_dir, prefix, overrides, parameters=None, parameterisations=True,
+                     parameterisation=None):
     '''
     The test network: by default the version alone. A version that only works with
     neighbours (its inputs are variables another vessel supplies) gives a small network in its
     spec, in which the version under test is the vessel named "mod":
 
         harness:
-          module_array:    # [name, module_subtype (version), module_type, inp, out, instance]
+          module_array:    # [name, module_subtype (version), module_type, inp, out, parameterisation]
             - [pressure_in, constant, inlet_pressure, '', mod, default]
             - [mod, pv_0D_1D, coupler, pressure_in, constant_1D, default]
           parameters:              # values for the neighbours' parameters
             - [P_pressure_in, J_per_m3, 2000, source]
 
-    ``parameters``: the instance parameters to write (default: the version's default instance).
-    An instance may have its own network instead (validation.<instance>.harness, see ``network``);
-    ``instance`` selects it.
-    ``instances=False`` leaves "instance" out of the records (each record then gets its version's
-    default_instance). libcuflynx before circulatory_autogen #535's baad9e73 needed this for the C++
+    ``parameters``: the parameterisation's parameters to write (default: the version's default
+    parameterisation). A parameterisation may have its own network instead
+    (validation.<parameterisation>.harness, see ``network``); ``parameterisation`` selects it.
+    ``parameterisations=False`` leaves "parameterisation" out of the records (each record then gets its
+    version's default parameterisation). libcuflynx before circulatory_autogen #535's baad9e73 needed this for the C++
     0D-1D split, which appended 5-column rows.
     '''
     os.makedirs(resources_dir, exist_ok=True)
-    network = globals()['network'](component, instance)
+    network = globals()['network'](component, parameterisation)
     rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
     records = module_array.from_rows(rows)
-    if not instances:
-        records = [{k: v for k, v in r.items() if k != 'instance'} for r in records]
+    if not parameterisations:
+        records = [{k: v for k, v in r.items() if k not in ('parameterisation', 'instance')} for r in records]
     module_array.write_records(os.path.join(resources_dir, f'{prefix}_module_array.json'), records)
     if not module_array.libcuflynx_reads_json():
         # a libcuflynx without JSON module-array support (0.7.3 and older) reads the CSV, under the
@@ -230,7 +231,7 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
     if todo:
-        raise MissingParameters(f'parameters still TODO in the instance parameters of {component.key}: {", ".join(todo)}')
+        raise MissingParameters(f'parameters still TODO in the parameterisation parameters of {component.key}: {", ".join(todo)}')
     with open(os.path.join(resources_dir, f'{prefix}_parameters.csv'), 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['variable_name', 'units', 'value', 'data_reference'])
@@ -245,12 +246,14 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
                 writer.writerow([name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
 
 
-def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, instance=None):
+def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None,
+             instance=None):
     '''
     Generates the version's model in ``work_dir``; returns the path of the .cellml file,
-    or of the .py file for ``model_type='python'``. ``parameters``: an instance's parameters
-    (default: the version's default instance). ``instance``: the instance whose own test network
-    (validation.<instance>.harness) is used, if it has one.
+    or of the .py file for ``model_type='python'``. ``parameters``: a parameterisation's
+    parameters (default: the version's default parameterisation). ``parameterisation``: the
+    parameterisation whose own test network (validation.<parameterisation>.harness) is used, if it has
+    one (``instance``: its former name, still accepted).
     '''
     from libcuflynx.scripts.script_generate_with_new_architecture import generate_with_new_architecture
 
@@ -260,7 +263,9 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
         work_dir = os.path.join(work_dir, model_type)
     resources_dir = os.path.join(work_dir, 'resources')
     generated_dir = os.path.join(work_dir, 'generated_models')
-    _write_resources(component, resources_dir, prefix, overrides, parameters, instance=instance)
+    if parameterisation is None:
+        parameterisation = instance
+    _write_resources(component, resources_dir, prefix, overrides, parameters, parameterisation=parameterisation)
     config = {
         'file_prefix': prefix,
         'input_param_file': f'{prefix}_parameters.csv',

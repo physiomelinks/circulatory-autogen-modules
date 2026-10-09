@@ -1,12 +1,12 @@
 # Circulatory Autogen Modules
 
-The module library for [circulatory_autogen / libcuflynx](https://github.com/physiomelinks/circulatory_autogen) and Phlynx. Every module version is verified, and every instance validated, with libcuflynx; each module_type and each version gets an HTML report covering its equations, parameters and test results.
+The module library for [circulatory_autogen / libcuflynx](https://github.com/physiomelinks/circulatory_autogen) and Phlynx. Every module version is verified, and every parameterisation validated, with libcuflynx; each module_type and each version gets an HTML report covering its equations, parameters and test results.
 
 Phlynx loads the versions listed in `manifests/index.json` (and `vitalworkshop.json`). `manifests/all.json` lists every version. Rebuild the manifests with `make manifests` after adding a version.
 
 ## Layout
 
-**[`modules/README.md`](modules/README.md) documents the library in full**: the layout, the placement and naming rules, versions and instances, supermodule versions, what is tested per version and per instance, and the directory schema (`modules/directory_schema.json`, checked by `tests/test_structure.py`). In short:
+**[`modules/README.md`](modules/README.md) documents the library in full**: the layout, the placement and naming rules, versions, parameterisations and instances, supermodule versions, what is tested per version and per parameterisation, and the directory schema (`modules/directory_schema.json`, checked by `tests/test_structure.py`). In short:
 
 ```
 modules/<category>/<module_type>/                    (or modules/<module_type>/, e.g. heart)
@@ -18,11 +18,19 @@ modules/<category>/<module_type>/                    (or modules/<module_type>/,
     <module_type>_<version>_tests.yaml               review and record-keeping
     <module_type>_<version>_references.bib           BibTeX entries the parameters cite
     risk/                                            joint failure-risk samples + classifier (committed)
-    instances/<instance>/                            parameter sets; instance == obs_data_name
-      <instance>_parameters.csv                      variable_name,units,value,data_reference,sourced
-      <instance>_obs_data.json, _params_for_id.csv, ...  calibration data and results
+    parameterisations/<p>/                           parameter sets; p == obs_data_name
+      <p>_parameters.csv                             variable_name,units,value,data_reference,sourced
+      <p>_obs_data.json, _params_for_id.csv, ...     calibration data and results
 system_models/<category>/<model>/                    whole models built from the library
 ```
+
+Three words name what a model is built from:
+
+- a **version** is different maths: its own CellML, config and tests (`versions/<version>/`);
+- a **parameterisation** is the same maths with other values: one named parameter set of a version, with its data, calibration and source figures, in `versions/<version>/parameterisations/<name>/`. The config's `default_parameterisation` names the one used by default;
+- an **instance** is one use of a version in a network: a module-array record (or a supermodule's submodule). It names the parameterisation it uses with `"parameterisation"` (default: the version's `default_parameterisation`); several instances may share one parameterisation.
+
+Parameterisations were called instances before 2026-10-09; the former names (`instances/`, `default_instance`, a record's `"instance"`) are still read.
 
 To use the library from libcuflynx, set these in `user_inputs.yaml` (on circulatory_autogen master; not yet in a release):
 
@@ -33,13 +41,13 @@ use_builtin_modules: false
 
 ## Reports
 
-`python -m cam_testing.report` (`make report` / `make site`, also run by CI) builds the HTML at two levels from repo files alone: `<module_type>/<module_type>.html` lists every version with its test results and instances, and `versions/<v>/<module_type>_<v>.html` is the version's page:
+`python -m cam_testing.report` (`make report` / `make site`, also run by CI) builds the HTML at two levels from repo files alone: `<module_type>/<module_type>.html` lists every version with its test results and parameterisations, and `versions/<v>/<module_type>_<v>.html` is the version's page:
 - equations from the CellML;
 - ports and variables from the config;
-- values, references, sourced flags and ranges from the default instance's parameters;
+- values, references, sourced flags and ranges from the default parameterisation's parameters;
 - the bibliography from `<module_type>_<v>_references.bib`;
 - invariants and validation settings from `<module_type>_<v>_verification_config.json`, notes and review from `<module_type>_<v>_tests.yaml`;
-- an instance table with each instance's data, baseline and calibration results;
+- a parameterisation table with each parameterisation's data, baseline and calibration results;
 - results and plots from the last test run.
 
 The site index (`make site`) groups the module_types by category (heart, directly under `modules/`, is its own group), lists a nested module_type by its path (e.g. `neuron/soma/SN_membrane_soma` under `cell`) and links both levels.
@@ -48,7 +56,7 @@ Nothing else is needed to regenerate them.
 
 ## Tests
 
-Each version (one config entry: `module_type`/`module_subtype`) is generated alone with libcuflynx at its default instance's parameters. Every boundary condition becomes a parameter. The version then goes through the verification tests; each instance goes through the validation tests, for whatever data it has (calibration is not applicable to an instance without obs_data; the version's Calibration in the report overview fails when no instance has calibration data; see `modules/README.md`):
+Each version (one config entry: `module_type`/`module_subtype`) is generated alone with libcuflynx at its default parameterisation's parameters. Every boundary condition becomes a parameter. The version then goes through the verification tests; each parameterisation goes through the validation tests, for whatever data it has (calibration is not applicable to a parameterisation without obs_data; the version's Calibration in the report overview fails when no parameterisation has calibration data; see `modules/README.md`):
 
 | Test | What it checks |
 |---|---|
@@ -57,8 +65,8 @@ Each version (one config entry: `module_type`/`module_subtype`) is generated alo
 | `verification_test_BC` | sweeps each boundary condition and constant over a range (a supermodule: its globals and open boundary conditions); every run finite and invariants hold |
 | `verification_test_timestep` | fixed-step integration of the generated right-hand side at halved steps converges at the scheme's order, and agrees with CVODE at tight tolerances |
 | `stability_test` | a matrix of solvers, tolerances and timesteps (CVODE, SciPy `solve_ivp`, fixed-step Euler/Heun/RK4); reports which work, and requires the declared-supported ones to work |
-| `validation_test_baseline` | per instance: model vs baseline data (NRMSE threshold) or scalar targets |
-| `validation_test_calibrate` | per instance: calibrate to its obs_data with libcuflynx parameter identification, predict held-out data, and write `<instance>_calibrated_parameters.csv` / `<instance>_calibration.json` |
+| `validation_test_baseline` | per parameterisation: model vs baseline data (NRMSE threshold) or scalar targets |
+| `validation_test_calibrate` | per parameterisation: calibrate to its obs_data with libcuflynx parameter identification, predict held-out data, and write `<p>_calibrated_parameters.csv` / `<p>_calibration.json` |
 
 Supermodule versions run the same tests, generated alone and expanded into their submodules, plus `supermodule_structure_test` and `supermodule_equivalence_test` (the system model using them reproduces the one with the submodules written out). Their BC sweep varies only their global constants and the boundary conditions no internal connection closes (`bc_sweep.sweep: globals_and_bcs`, the supermodule default; `all` sweeps every parameter): each submodule's own parameters are swept in that submodule version's tests. PhLynx has no supermodule support, so their PhLynx export test fails as a recorded known issue.
 
@@ -82,7 +90,7 @@ To check a system model's parameters against the modules it uses:
 python -m cam_testing.ranges check --module-array my_module_array.json --parameters my_parameters.csv
 ```
 
-This lists each value as inside or outside its tested range and validated spread (over all the version's instances), and estimates the failure risk near the values from the `make risk` samples. It exits non-zero if any value is outside a tested range.
+This lists each value as inside or outside its tested range and validated spread (over all the version's parameterisations), and estimates the failure risk near the values from the `make risk` samples. It exits non-zero if any value is outside a tested range.
 
 ## Failure risk over the joint parameter space
 
@@ -101,7 +109,7 @@ The version report shows all of this, regenerating the plots from the committed 
 
 ## System models
 
-`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into cardiac clock, chamber and valve vessels (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`). System models are not modules or supermodules: they use the library. Every module-array record names a module_type, a version (`module_subtype`) and an instance (`"instance": "default"`); the model's own parameters file wins over the instance values. Each directory contains:
+`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into cardiac clock, chamber and valve vessels (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`). System models are not modules or supermodules: they use the library. Every module-array record (an instance of a version) names a module_type, a version (`module_subtype`) and the parameterisation it uses (`"parameterisation": "default"`); the model's own parameters file wins over the parameterisation's values. Each directory contains:
 - the module array and parameters;
 - the original under `reference/`: circulatory_autogen's files with only the bib keys changed to this library's (`tools/bib_rekey_map.json`, applied by `tools/import_systems.py`; checked against the originals by `tests/test_structure.py`);
 - a `<model>_system.yaml` spec.
@@ -118,17 +126,17 @@ Models whose original doesn't generate in circulatory_autogen carry `expected_fa
 Some system models are examples built from this library, with no circulatory_autogen original (equivalence `not_applicable`); their invariants check exact solutions instead:
 - `system_models/diffusion/`: finite-volume diffusion meshes (`tools/build_diffusion_examples.py`).
 
-Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
+Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
 
 Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A model uses one through one record:
 
 ```json
-{"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "instance": "default",
+{"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
  "per_submodule_inputs":  {"ra": ["venous_svc"], "la": ["pvn"]},
  "per_submodule_outputs": {"puv": ["par"], "aov": ["aortic_root"], "ra": ["volume_sum"], "rv": ["volume_sum"], "la": ["volume_sum"], "lv": ["volume_sum"]}}
 ```
 
-The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart_<submodule>` (`heart_ra`, `heart_aov`, …), the listed host modules are coupled to it, and the instance's parameters are renamed to match (`E_A_ra` becomes `E_A_heart_ra`), with the model's own values taking precedence. `system_models/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way; its version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that it reproduces `3compartment` to 1e-9, and `cellular/SN_simple_supermodules` reproduces `SN_simple`.
+The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart_<submodule>` (`heart_ra`, `heart_aov`, …), the listed host modules are coupled to it, and the parameterisation's parameters are renamed to match (`E_A_ra` becomes `E_A_heart_ra`), with the model's own values taking precedence. `system_models/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way; its version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that it reproduces `3compartment` to 1e-9, and `cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
 ## PhLynx → CUFLynx pipeline
 
@@ -196,7 +204,7 @@ or from one-line test files, which keep `pytest tests/...`, `-k` and `testpaths`
 from cam_testing.suite.test_modules import *  # noqa: F401,F403
 ```
 
-The suite's modules are `test_structure`, `test_modules`, `test_systems`, `test_phlynx` and `test_instance_omex`. A system model's reference can be a ready CellML model, e.g. the model PhLynx exports (see "System models").
+The suite's modules are `test_structure`, `test_modules`, `test_systems`, `test_phlynx` and `test_parameterisation_omex`. A system model's reference can be a ready CellML model, e.g. the model PhLynx exports (see "System models").
 
 **Reports and manifests** for the configured repo: `python -m cam_testing.report [--module X] [--site]` writes the pages into its `modules/` (and `site/`), `python -m cam_testing.manifests` writes its `manifests/*.json`. For the PhLynx/CUFLynx pipeline, the bridges ship in the package: install jsdom next to `cam_testing/bridges/phlynx` (`npm ci` there) or anywhere and set `JSDOM_DIR`, and set `PHLYNX_DIR` and `CUFLYNX_BIN` as here.
 
@@ -257,4 +265,4 @@ The reports open straight from disk. Plots load by relative path, and MathJax lo
 
 ## Importing from libcuflynx
 
-`tools/import_from_libcuflynx.py --ca-dir ../circulatory_autogen` copies modules from a libcuflynx checkout into the pre-versions per-module layout and extracts each module's units; `tools/restructure_modules.py` then moves such a tree into versions and instances (driven by `tools/restructure_map.yaml`). It seeds parameter values from libcuflynx's example models. It never overwrites a module's test spec, and it only overwrites the parameters with `--reseed-parameters`.
+`tools/import_from_libcuflynx.py --ca-dir ../circulatory_autogen` copies modules from a libcuflynx checkout into the pre-versions per-module layout and extracts each module's units; `tools/restructure_modules.py` then moves such a tree into versions and parameterisations (then called instances; driven by `tools/restructure_map.yaml`). It seeds parameter values from libcuflynx's example models. It never overwrites a module's test spec, and it only overwrites the parameters with `--reseed-parameters`.

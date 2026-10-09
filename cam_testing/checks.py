@@ -1,9 +1,9 @@
 """
 The standard verification & validation tests, run on one module version at a time (the
-validation tests on one of its instances).
+validation tests on one of its parameterisations).
 
-Each check returns a Result and writes it to <version dir>/results/<test>.json (instance tests:
-results/instances/<instance>/<test>.json), with any figures in <version dir>/plots/. The pytest
+Each check returns a Result and writes it to <version dir>/results/<test>.json (parameterisation
+tests: results/parameterisations/<parameterisation>/<test>.json), with any figures in <version dir>/plots/. The pytest
 layer (tests/test_modules.py) turns a Result into pass / fail / skip; the report generator reads
 the JSON files, so the HTML shows exactly what the last test run found.
 """
@@ -32,12 +32,14 @@ PROPOSED = 'proposed'
 # per version
 VERSION_TESTS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                  'stability_test']
-# per instance
-INSTANCE_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
-TESTS = VERSION_TESTS + INSTANCE_TESTS
-NO_CALIBRATION_DATA = 'no calibration data in this instance'
-NO_BASELINE_DATA = 'no baseline data in this instance'
-NO_INSTANCE_CALIBRATION = 'no instance has calibration data'
+# per parameterisation
+PARAMETERISATION_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
+INSTANCE_TESTS = PARAMETERISATION_TESTS   # the former name
+TESTS = VERSION_TESTS + PARAMETERISATION_TESTS
+NO_CALIBRATION_DATA = 'no calibration data in this parameterisation'
+NO_BASELINE_DATA = 'no baseline data in this parameterisation'
+NO_PARAMETERISATION_CALIBRATION = 'no parameterisation has calibration data'
+NO_INSTANCE_CALIBRATION = NO_PARAMETERISATION_CALIBRATION   # the former name
 
 
 # version_calibration of a version calibrated only as part of supermodules (below): pass-styled /
@@ -64,8 +66,8 @@ def supermodule_index(versions=None):
 
 def version_calibration(version, index=None, _seen=()):
     '''
-    The version's calibration, from its instances: failed when no instance has calibration data
-    (obs_data); otherwise failed if any instance's calibration failed, passed if they ran and
+    The version's calibration, from its parameterisations: failed when no parameterisation has
+    calibration data (obs_data); otherwise failed if any parameterisation's calibration failed, passed if they ran and
     passed, pending if not run yet.
 
     A version with no calibration data of its own that is a submodule of supermodule versions
@@ -75,10 +77,10 @@ def version_calibration(version, index=None, _seen=()):
     does (a supermodule with no calibration data counts as failed). tests.yaml
     ``calibration_in_supermodule: false`` opts a version out (the plain rule).
     '''
-    with_data = [i for i in version.instances() if i.has_obs_data]
+    with_data = [i for i in version.parameterisations() if i.has_obs_data]
     if not with_data:
         return _calibration_in_supermodules(version, index, _seen) \
-            or Result('version_calibration', FAILED, NO_INSTANCE_CALIBRATION)
+            or Result('version_calibration', FAILED, NO_PARAMETERISATION_CALIBRATION)
     results = {i.name: load(version, 'validation_test_calibrate', i) for i in with_data}
     failed = [n for n, r in results.items() if r is not None and r.status == FAILED]
     passed = [n for n, r in results.items() if r is not None and r.status == PASSED]
@@ -126,30 +128,30 @@ class Result:
     timestamp: str = ''
 
 
-def result_path(component, test, instance=None):
-    if instance is not None:
-        return os.path.join(instance.results_dir, f'{test}.json')
+def result_path(component, test, parameterisation=None):
+    if parameterisation is not None:
+        return os.path.join(parameterisation.results_dir, f'{test}.json')
     return os.path.join(component.results_dir, f'{test}.json')
 
 
-def plot_path(component, name, instance=None):
-    prefix = f'{instance.name}__' if instance is not None else ''
+def plot_path(component, name, parameterisation=None):
+    prefix = f'{parameterisation.name}__' if parameterisation is not None else ''
     return os.path.join(component.plots_dir, f'{prefix}{name}.png')
 
 
-def save(component, result, instance=None):
+def save(component, result, parameterisation=None):
     result.timestamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     # plots are stored relative to the version dir, which is where the HTML lives
     result.plots = [os.path.relpath(p, component.dir) for p in result.plots]
-    path = result_path(component, result.test, instance)
+    path = result_path(component, result.test, parameterisation)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as f:
         json.dump(asdict(result), f, indent=2, default=_json_default)
     return result
 
 
-def load(component, test, instance=None):
-    path = result_path(component, test, instance)
+def load(component, test, parameterisation=None):
+    path = result_path(component, test, parameterisation)
     if not os.path.isfile(path):
         return None
     with open(path) as f:
@@ -166,22 +168,23 @@ def _json_default(o):
 
 class ComponentModel(object):
     '''A version's generated model and simulation helper, built once and reused. The parameter
-    values are an instance's (default: the version's default instance).'''
+    values are a parameterisation's (default: the version's default parameterisation; ``instance``: its
+    former name, still accepted).'''
 
-    def __init__(self, component, work_dir=None, instance=None):
+    def __init__(self, component, work_dir=None, parameterisation=None, instance=None):
         self.component = component
-        self.instance = instance or component.default_instance
+        self.parameterisation = parameterisation or instance or component.default_parameterisation
         self.spec = component.spec
         self.work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_{component.id}_')
         self._model_path = None
         self._helper = None
-        # the instance's own rows: what the model is generated with
-        self._raw_params = component.parameters() if self.instance.is_default else self.instance.parameters()
+        # the parameterisation's own rows: what the model is generated with
+        self._raw_params = component.parameters() if self.parameterisation.is_default else self.parameterisation.parameters()
         self._params = None
         if not component.is_supermodule:
             self._load_parameters()
         # A supermodule's parameters are those of its generated (flattened) model, read once it is
-        # generated: its own instance's, its submodules' instances' and the boundary conditions no
+        # generated: its own parameterisation's, its submodules' parameterisations' and the boundary conditions no
         # internal connection closes (harness.supermodule_parameters).
 
     def _load_parameters(self):
@@ -202,11 +205,16 @@ class ComponentModel(object):
                 pass
         # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
         # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
-        for name, _units, value, *_ref in harness.network(self.component, self.instance).get('parameters') or []:
+        for name, _units, value, *_ref in harness.network(self.component, self.parameterisation).get('parameters') or []:
             if name not in nominal:
                 nominal[name] = float(value)
                 var_of[name] = name
         self._params, self._nominal, self._var_of_map = params, nominal, var_of
+
+    @property
+    def instance(self):
+        '''The former name of ``parameterisation``.'''
+        return self.parameterisation
 
     @property
     def nominal(self):
@@ -231,8 +239,8 @@ class ComponentModel(object):
             if getattr(self, '_generation_error', None) is not None:
                 raise self._generation_error          # don't regenerate a model that failed to generate
             try:
-                self._model_path = harness.generate(self.component, self.work_dir, parameters=self._instance_params(),
-                                                    instance=self.instance)
+                self._model_path = harness.generate(self.component, self.work_dir, parameters=self._parameterisation_params(),
+                                                    parameterisation=self.parameterisation)
             except harness.GenerationFailed as e:
                 self._generation_error = e
                 raise
@@ -245,17 +253,17 @@ class ComponentModel(object):
         return self._helper
 
     def parameters(self):
-        '''The model's parameters: the instance's (a supermodule's: every parameter of its flattened
+        '''The model's parameters: the parameterisation's (a supermodule's: every parameter of its flattened
         model, named <var>_<submodule path> or as the global it is).'''
         self._load_parameters()
         return self._params
 
-    def _instance_params(self):
-        return None if self.instance.is_default else self._raw_params
+    def _parameterisation_params(self):
+        return None if self.parameterisation.is_default else self._raw_params
 
     def generate(self, work_dir, **kw):
-        '''Another model of this version at this instance's parameters (e.g. a python model).'''
-        return harness.generate(self.component, work_dir, parameters=self._instance_params(), instance=self.instance, **kw)
+        '''Another model of this version at this parameterisation's parameters (e.g. a python model).'''
+        return harness.generate(self.component, work_dir, parameters=self._parameterisation_params(), parameterisation=self.parameterisation, **kw)
 
     def run_point_params(self):
         '''The spec's run_parameters as simulation-helper overrides ({'parameters/<name>': value}).'''
@@ -356,16 +364,16 @@ def _non_finite(outputs):
     return [name for name, y in outputs.items() if not np.all(np.isfinite(y))]
 
 
-def _guard(component, test, fn, instance=None):
+def _guard(component, test, fn, parameterisation=None):
     '''Runs a check; any unexpected exception is a failed Result, not a crash.'''
     plots.TIME_LABEL = component.spec.get('time_label', 'time [s]')
     try:
-        return save(component, fn(), instance)
+        return save(component, fn(), parameterisation)
     except harness.MissingParameters as e:
-        return save(component, Result(test, SKIPPED, str(e)), instance)
+        return save(component, Result(test, SKIPPED, str(e)), parameterisation)
     except Exception as e:
         return save(component, Result(test, FAILED, f'{type(e).__name__}: {e}',
-                                      details=[traceback.format_exc()[-3000:]]), instance)
+                                      details=[traceback.format_exc()[-3000:]]), parameterisation)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -431,7 +439,7 @@ def _cpp_not_applicable(cm, test):
 def external_model_check(cm):
     """
     run_test for an external model (module_format external_api, api transport python): load the
-    model file the api block names, create the class with the default instance's parameters and
+    model file the api block names, create the class with the default parameterisation's parameters and
     one connected 0D module per port variable, and step it a few times with constant inputs
     (spec 'run_inputs', default 0). Every output must be finite. Skipped when the model's own
     dependencies (e.g. dolfinx) are not installed.
@@ -711,7 +719,7 @@ def parameter_bounds(component, params=None):
       2. else a gate's initial value: a dimensionless "<x>_init" whose state x an invariant keeps
          in [0, 1] (unit_interval_states) lies in [0, 1];
       3. else a quantity in NON_NEGATIVE_UNITS with a non-negative value stays >= 0.
-    ``params``: the parameters to bound (default: the version's default instance; a supermodule's
+    ``params``: the parameters to bound (default: the version's default parameterisation; a supermodule's
     model gives its flattened parameters, ComponentModel.parameters()).
     '''
     spec = component.spec
@@ -1522,12 +1530,12 @@ def stability_test(cm):
 # ----------------------------------------------------------------------------------------------
 
 def _validation_status(cm, kind, test):
-    '''(early Result or None, spec block) for validation.<instance>.<kind> of the model's instance.'''
-    inst = cm.instance
+    '''(early Result or None, spec block) for validation.<parameterisation>.<kind> of the model's parameterisation.'''
+    inst = cm.parameterisation
     v = inst.validation.get(kind) or {}
     if kind == 'calibrate' and not inst.has_obs_data:
-        # an instance without obs_data has nothing to calibrate to: not applicable for that
-        # instance. A version with no calibration data in any instance fails the version-level
+        # a parameterisation without obs_data has nothing to calibrate to: not applicable for it.
+        # A version with no calibration data in any parameterisation fails the version-level
         # calibration (version_calibration, in the report's test overview).
         why = v.get('note') or v.get('reason')
         return Result(test, NOT_APPLICABLE, NO_CALIBRATION_DATA, details=[why] if why else []), v
@@ -1541,11 +1549,11 @@ def _validation_status(cm, kind, test):
 
 def validation_test_baseline(cm):
     '''
-    Compare the model, at the instance's parameters, with baseline data. Spec
-    (validation.<instance>.baseline in the version's verification_config.json):
+    Compare the model, at the parameterisation's parameters, with baseline data. Spec
+    (validation.<parameterisation>.baseline in the version's verification_config.json):
         status: active
         source: citation / URL
-        data: instances/<instance>/<file>.csv   time column + one column per compared output
+        data: parameterisations/<p>/<file>.csv   time column + one column per compared output
         time_column: t        time_offset: 0
         variables: {model_output: csv_column}
         parameters: {variable_name: value}  the parameter set the data are compared at
@@ -1560,7 +1568,7 @@ def validation_test_baseline(cm):
             return early
         if v.get('targets'):
             return _baseline_targets(cm, v)
-        # data paths are relative to the version directory (instances/<instance>/<file>)
+        # data paths are relative to the version directory (parameterisations/<parameterisation>/<file>)
         t_data, data = load_data(cm.component.dir, v)
         by_var = {p.variable_name: p for p in cm.parameters()}
         params = {k: float(val) for k, val in (v.get('parameters') or {}).items()}
@@ -1572,9 +1580,9 @@ def validation_test_baseline(cm):
         metric = v.get('metric', 'nrmse')
         threshold = float(v.get('threshold', 0.1))
         errors = {var: score(metric, np.interp(t_data, t, out[var]), data[var]) for var in v['variables']}
-        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline', cm.instance), t, out,
+        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline', cm.parameterisation), t, out,
                                        {k: t_data for k in data}, data, cm.units(),
-                                       f'{component.label} [{cm.instance.name}]: model vs {v.get("source_short", "data")}')
+                                       f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}')
         metrics = {metric: errors, 'threshold': threshold, 'source': v.get('source', ''),
                    'validated_values': params}
         if v.get('kind') == 'fit_check':
@@ -1585,7 +1593,7 @@ def validation_test_baseline(cm):
         if worst > threshold:
             return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, [fig])
         return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, [fig])
-    return _guard(cm.component, 'validation_test_baseline', check, cm.instance)
+    return _guard(cm.component, 'validation_test_baseline', check, cm.parameterisation)
 
 
 FEATURE_OPS = {
@@ -1597,7 +1605,7 @@ FEATURE_OPS = {
 def _baseline_targets(cm, v):
     '''
     Scalar validation targets, e.g. steady-state clinical values, evaluated on the logged run
-    (after pre_time). Spec (validation.<instance>.baseline):
+    (after pre_time). Spec (validation.<parameterisation>.baseline):
         pre_time: 20            sim_time: 5            parameters: {var: value}   (optional)
         targets:
           - {name: LV end-diastolic volume, expr: 'np.max(q_lv)*1e6', value: 142, std: 21, units: ml}
@@ -1642,9 +1650,9 @@ def _baseline_targets(cm, v):
 
 def validation_test_calibrate(cm):
     '''
-    Calibrate to the instance's obs_data with libcuflynx parameter identification, then validate
-    on its held-out data; writes the instance's calibrated parameters. Not applicable to an
-    instance without obs_data ("no calibration data in this instance"); see version_calibration.
+    Calibrate to the parameterisation's obs_data with libcuflynx parameter identification, then
+    validate on its held-out data; writes the parameterisation's calibrated parameters. Not
+    applicable to a parameterisation without obs_data ("no calibration data in this parameterisation"); see version_calibration.
     '''
     def check():
         early, v = _validation_status(cm, 'calibrate', 'validation_test_calibrate')
@@ -1652,7 +1660,7 @@ def validation_test_calibrate(cm):
             return early
         from cam_testing import calibrate
         return calibrate.run(cm, v, plot_path)
-    return _guard(cm.component, 'validation_test_calibrate', check, cm.instance)
+    return _guard(cm.component, 'validation_test_calibrate', check, cm.parameterisation)
 
 
 CHECKS = {

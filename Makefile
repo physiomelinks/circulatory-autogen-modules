@@ -49,13 +49,13 @@ pipeline-setup:
 pipeline:
 	PHLYNX_DIR=$(PHLYNX_DIR) CUFLYNX_BIN=$(CUFLYNX_BIN) $(PYTHON) -m pytest tests/test_phlynx.py $(MODULE_ARGS) $(PYTEST_ARGS)
 
-# a COMBINE archive per instance for CUFLynx, generated from the library's files (not committed)
+# a COMBINE archive per parameterisation for CUFLynx, generated from the library's files (not committed)
 omex:
-	$(PYTHON) tools/build_instance_omex.py $(MODULE_ARGS) $(OMEX_ARGS)
+	$(PYTHON) tools/build_parameterisation_omex.py $(MODULE_ARGS) $(OMEX_ARGS)
 
-# each instance's archive loads and runs in a released CUFLynx and reproduces libcuflynx
+# each parameterisation's archive loads and runs in a released CUFLynx and reproduces libcuflynx
 omex-test:
-	CUFLYNX_BIN=$(CUFLYNX_BIN) $(PYTHON) -m pytest tests/test_instance_omex.py $(MODULE_ARGS) $(PYTEST_ARGS)
+	CUFLYNX_BIN=$(CUFLYNX_BIN) $(PYTHON) -m pytest tests/test_parameterisation_omex.py $(MODULE_ARGS) $(PYTEST_ARGS)
 
 report:
 	$(PYTHON) -m cam_testing.report $(MODULE_ARGS)

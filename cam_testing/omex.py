@@ -1,21 +1,21 @@
 """
-Per-instance COMBINE archives (.omex) for CUFLynx, generated from the library's own files so
+Per-parameterisation COMBINE archives (.omex) for CUFLynx, generated from the library's own files so
 nothing is kept in two places:
 
-    modules/<module_type path>/versions/<version>/instances/<instance>/<module_type>_<version>_<instance>.omex
+    modules/<module_type path>/versions/<version>/parameterisations/<p>/<module_type>_<version>_<p>.omex
 
-Built by ``python tools/build_instance_omex.py`` (``make omex``); not committed. Each archive holds
+Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not committed. Each archive holds
 
-  <module_type>_<version>_<instance>.cellml   master: the flattened model of the version's test
+  <module_type>_<version>_<p>.cellml          master: the flattened model of the version's test
                                               network (its harness, or the version alone) with this
-                                              instance's parameters, as libcuflynx generates it
-  <instance>_obs_data.json                    the instance's calibration data, if it has any
-  <instance>_params_for_id.csv                its parameters to identify, if any
-  inputs, unchanged: <instance>_parameters.csv, raw data and
+                                              parameterisation's parameters, as libcuflynx generates it
+  <p>_obs_data.json                           the parameterisation's calibration data, if it has any
+  <p>_params_for_id.csv                       its parameters to identify, if any
+  inputs, unchanged: <p>_parameters.csv, raw data and
     SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
     _units.cellml and _verification_config.json; a supermodule's submodules' _modules_config.json
     (their required_citations); and the test network the model was generated from
-    (<module_type>_<version>_<instance>_module_array.json / _model_parameters.csv)
+    (<module_type>_<version>_<p>_module_array.json / _model_parameters.csv)
   manifest.xml                                COMBINE manifest (master marked)
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
@@ -41,8 +41,8 @@ OMEX_FORMAT = 'http://identifiers.org/combine.specifications/omex'
 VERIFICATION_CONFIG_FORMAT = 'http://purl.org/NET/mediatypes/application/x.vnd.cam-verification-config+json'
 
 
-def omex_path(version, instance):
-    return os.path.join(instance.dir, f'{version.vessel_type}_{version.name}_{instance.name}.omex')
+def omex_path(version, parameterisation):
+    return os.path.join(parameterisation.dir, f'{version.vessel_type}_{version.name}_{parameterisation.name}.omex')
 
 
 def _manifest(entries):
@@ -62,11 +62,11 @@ def _fmt(name):
     return FORMATS.get(os.path.splitext(name)[1].lower(), 'http://purl.org/NET/mediatypes/application/octet-stream')
 
 
-def members(version, instance, work_dir):
+def members(version, parameterisation, work_dir):
     '''[(archive name, bytes, is_master)] in archive order.'''
     from cam_testing import harness
-    stem = f'{version.vessel_type}_{version.name}_{instance.name}'
-    model = harness.generate(version, work_dir, parameters=instance.parameters(), instance=instance)
+    stem = f'{version.vessel_type}_{version.name}_{parameterisation.name}'
+    model = harness.generate(version, work_dir, parameters=parameterisation.parameters(), parameterisation=parameterisation)
     flat = model[:-len('.cellml')] + '_flat.cellml'
     if not os.path.isfile(flat):
         raise FileNotFoundError(f'{version.key}: libcuflynx wrote no flattened model ({flat})')
@@ -79,12 +79,12 @@ def members(version, instance, work_dir):
             out.append((name or os.path.basename(path), open(path, 'rb').read(), False))
 
     # the study, first: CUFLynx takes the first "obs" JSON and the first "param" CSV
-    add(instance.obs_data_path)
-    add(instance.params_for_id_path)
+    add(parameterisation.obs_data_path)
+    add(parameterisation.params_for_id_path)
     # the inputs, as they are in the library
-    add(instance.parameters_path)
-    for p in sorted(os.listdir(instance.dir)):
-        full = os.path.join(instance.dir, p)
+    add(parameterisation.parameters_path)
+    for p in sorted(os.listdir(parameterisation.dir)):
+        full = os.path.join(parameterisation.dir, p)
         if os.path.isfile(full) and not p.endswith('.omex') and p not in {n for n, _, _ in out}:
             add(full)
     for p in (version.cellml_path, version.config_path, version.units_path, version.verification_config_path):
@@ -101,13 +101,13 @@ def members(version, instance, work_dir):
     return out
 
 
-def build(version, instance, work_dir=None, path=None):
-    '''Writes the instance's .omex; returns its path.'''
+def build(version, parameterisation, work_dir=None, path=None):
+    '''Writes the parameterisation's .omex; returns its path.'''
     own = work_dir is None
-    work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_omex_{version.id}_{instance.name}_')
+    work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_omex_{version.id}_{parameterisation.name}_')
     try:
-        entries = members(version, instance, work_dir)
-        path = path or omex_path(version, instance)
+        entries = members(version, parameterisation, work_dir)
+        path = path or omex_path(version, parameterisation)
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
             for name, data, _ in entries:

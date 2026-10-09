@@ -1,0 +1,35 @@
+{
+ "parameterisation": "davis2020_wistar_kinetics",
+ "version": "i_M/Argus2026_v01",
+ "date": "2026-10-05",
+ "passed": true,
+ "summary": "start nominal -> tau_w_num=2.36e-10, tau_w_min=104.8",
+ "method": "CMA-ES",
+ "files": [
+  "parameterisations/davis2020_wistar_kinetics/davis2020_wistar_kinetics_obs_data.json",
+  "parameterisations/davis2020_wistar_kinetics/davis2020_wistar_kinetics_params_for_id.csv"
+ ],
+ "cost": 1.0520950076002609,
+ "calibrated_parameters": {
+  "tau_w_num": 2.360334150353083e-10,
+  "tau_w_min": 104.79038401092832
+ },
+ "runs": [
+  {
+   "start": {},
+   "calibrated_parameters": {
+    "tau_w_num": 2.360334150353083e-10,
+    "tau_w_min": 104.79038401092832
+   },
+   "cost": 1.0520950076002609,
+   "calibration_scores": {
+    "w_deactivation_at_-55mV": 0.06536464591052232,
+    "w_reactivation_at_-25mV": 0.1127001647088756
+   },
+   "prediction_scores": {},
+   "constant_items": {}
+  }
+ ],
+ "metric": "nrmse",
+ "threshold": 0.25
+}

@@ -3,7 +3,7 @@
     "module_type": "varicosity",
     "module_subtype": "sympathetic",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
     "required_citations": [
@@ -15,7 +15,7 @@
         "name": "membrane",
         "module_type": "membrane_potential",
         "module_subtype": "SN_varicosity_Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "i_CaN",
@@ -28,7 +28,7 @@
         "name": "Ca",
         "module_type": "Ca_handling",
         "module_subtype": "SN_varicosity_Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane"
         ],
@@ -45,7 +45,7 @@
         "name": "i_CaN",
         "module_type": "i_CaN",
         "module_subtype": "Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Ca"
@@ -56,7 +56,7 @@
         "name": "i_NaCa",
         "module_type": "i_NaCa",
         "module_subtype": "Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Ca"
@@ -67,7 +67,7 @@
         "name": "PMCA",
         "module_type": "PMCA",
         "module_subtype": "Colegrove2000_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Ca"
@@ -78,7 +78,7 @@
         "name": "IP3R",
         "module_type": "IP3R",
         "module_subtype": "Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "Ca"
         ],
@@ -88,7 +88,7 @@
         "name": "RyR",
         "module_type": "RyR",
         "module_subtype": "HernandezCruz1997_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "Ca"
         ],
@@ -98,7 +98,7 @@
         "name": "NE",
         "module_type": "neurotransmitter_release",
         "module_subtype": "SN_varicosity_Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "Ca"
         ],

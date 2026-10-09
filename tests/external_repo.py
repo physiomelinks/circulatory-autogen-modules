@@ -18,11 +18,11 @@ NEW_COMPONENT = 'constant_pressure_BC_type__ext_outlet_pressure_constant'
 SYSTEM_CATEGORY, SYSTEM = 'demo', 'ext_chain'
 
 SYSTEM_RECORDS = [
-    {'name': 'flow_in', 'module_type': 'inlet_flow', 'module_subtype': 'constant', 'instance': 'default',
+    {'name': 'flow_in', 'module_type': 'inlet_flow', 'module_subtype': 'constant', 'parameterisation': 'default',
      'inp_instances': [], 'out_instances': ['va']},
-    {'name': 'va', 'module_type': 'arterial_simple', 'module_subtype': 'vp', 'instance': 'default',
+    {'name': 'va', 'module_type': 'arterial_simple', 'module_subtype': 'vp', 'parameterisation': 'default',
      'inp_instances': ['flow_in'], 'out_instances': ['out']},
-    {'name': 'out', 'module_type': MT, 'module_subtype': VERSION, 'instance': 'default',
+    {'name': 'out', 'module_type': MT, 'module_subtype': VERSION, 'parameterisation': 'default',
      'inp_instances': ['va'], 'out_instances': []},
 ]
 
@@ -37,7 +37,7 @@ def make(root, library=None, pyproject=True):
     library = library or library_modules_dir()
     src = os.path.join(library, SOURCE)
     vdir = os.path.join(root, 'modules', 'boundary_conditions', MT, 'versions', VERSION)
-    os.makedirs(os.path.join(vdir, 'instances', 'default'))
+    os.makedirs(os.path.join(vdir, 'parameterisations', 'default'))
     with open(os.path.join(root, 'modules', 'README.md'), 'w') as f:
         f.write('# modules\n')
 
@@ -62,8 +62,8 @@ def make(root, library=None, pyproject=True):
         json.dump(verification, f, indent=2)
     with open(os.path.join(vdir, f'{stem}_tests.yaml'), 'w') as f:
         f.write(f'module_type: {MT}\nversion: {VERSION}\nreviewed: false\nnotes: a test copy of outlet_pressure/constant\n')
-    shutil.copy(os.path.join(src, 'instances', 'default', 'default_parameters.csv'),
-                os.path.join(vdir, 'instances', 'default', 'default_parameters.csv'))
+    shutil.copy(os.path.join(src, 'parameterisations', 'default', 'default_parameters.csv'),
+                os.path.join(vdir, 'parameterisations', 'default', 'default_parameters.csv'))
 
     sdir = os.path.join(root, 'system_models', SYSTEM_CATEGORY, SYSTEM)
     os.makedirs(os.path.join(sdir, 'reference'))

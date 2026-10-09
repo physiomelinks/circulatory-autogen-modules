@@ -3,7 +3,7 @@ HTML reports at two levels, and a site index:
 
     <module_type>/<module_type>.html                        every version, linking to its page
     <module_type>/versions/<v>/<module_type>_<v>.html       the version: equations, variables,
-                                                            tests, references, and its instances
+                                                            tests, references, and its parameterisations
                                                             with their validation / calibration
 
     python -m cam_testing.report                  # every module_type and its versions
@@ -21,7 +21,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, phlynx, ranges, risk
+from cam_testing import bib, checks, module_array, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -45,7 +45,7 @@ TEST_TITLES = {
     'stability_test': 'Stability: solvers & settings',
     'validation_test_baseline': 'Validation: baseline data',
     'validation_test_calibrate': 'Validation: calibrate & predict',
-    'version_calibration': 'Calibration (all instances)',
+    'version_calibration': 'Calibration (all parameterisations)',
     'phlynx_export_test': 'PhLynx: build & export',
     'cuflynx_simulate_test': 'CUFLynx: import & simulate',
     'phlynx_equivalence_test': 'PhLynx → CUFLynx vs libcuflynx',
@@ -62,7 +62,7 @@ TEST_SHORT = {
 }
 TEST_ABOUT = {
     'run_test': 'Generates the version alone with libcuflynx (every boundary condition becomes a '
-                'parameter, valued from the default instance; a supermodule is expanded into its submodules, '
+                'parameter, valued from the default parameterisation; a supermodule is expanded into its submodules, '
                 'and the boundary conditions no internal connection closes become parameters), simulates it, '
                 'and checks every output is finite.',
     'verification_test_invariants': 'Checks the simulation against what the version is supposed to do: '
@@ -86,15 +86,17 @@ TEST_ABOUT = {
     'stability_test': 'Runs the version with a matrix of solvers, tolerances and timesteps. A '
                       'configuration works when it finishes with finite outputs within the tolerance of a '
                       'tight-tolerance reference. Declared-supported configurations must work.',
-    'validation_test_baseline': 'Compares the model, at the instance\'s parameters, with published or '
+    'validation_test_baseline': 'Compares the model, at the parameterisation\'s parameters, with published or '
                                 'experimental baseline data.',
-    'validation_test_calibrate': 'Calibrates parameters to the instance\'s obs_data with libcuflynx parameter '
-                                 'identification, then checks predictions against held-out data; writes the '
-                                 'instance\'s calibrated parameters. Not applicable to an instance without '
-                                 'obs_data ("no calibration data in this instance").',
-    'version_calibration': 'The version\'s calibration over its instances: failed when no instance has '
-                           'calibration data (obs_data), otherwise failed if any instance\'s calibration '
-                           'failed and passed when all of them pass. Each instance\'s result is in Instances. '
+    'validation_test_calibrate': 'Calibrates parameters to the parameterisation\'s obs_data with libcuflynx '
+                                 'parameter identification, then checks predictions against held-out data; '
+                                 'writes the parameterisation\'s calibrated parameters. Not applicable to a '
+                                 'parameterisation without obs_data ("no calibration data in this '
+                                 'parameterisation").',
+    'version_calibration': 'The version\'s calibration over its parameterisations: failed when no '
+                           'parameterisation has calibration data (obs_data), otherwise failed if any '
+                           'parameterisation\'s calibration failed and passed when all of them pass. Each '
+                           'parameterisation\'s result is in Parameterisations. '
                            'A version with no calibration data of its own that is a submodule of supermodule '
                            'versions is calibrated as part of them: "Pass in super" when any of those '
                            'supermodules passes calibration (plainly or, transitively, in its own supermodules), '
@@ -108,8 +110,9 @@ TEST_ABOUT = {
     'phlynx_equivalence_test': 'Compares CUFLynx\'s simulation of the PhLynx-built model with libcuflynx\'s '
                                'model of the same network (outputs matched by instance and variable, '
                                'normalised difference within 1e-6).',
-    'supermodule_structure_test': 'Every submodule is a library version with an existing instance, internal '
-                                  'connections name sibling submodules, and the instance parameters name '
+    'supermodule_structure_test': 'Every submodule is a library version with an existing parameterisation, '
+                                  'internal connections name sibling submodules, and the parameterisation\'s '
+                                  'parameters name '
                                   'submodules or declared globals.',
     'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
                                     'with its submodules written out, output for output.',
@@ -122,12 +125,12 @@ TEST_ABOUT = {
 # The test columns of every version, component or supermodule, in this order: verification, the
 # version-level calibration, the PhLynx -> CUFLynx pipeline, then the supermodule tests. A column
 # that doesn't apply to a version is N/A with the reason (not_applicable_reason); one that applies
-# but has no result is "Not run". The validation tests are shown per instance.
+# but has no result is "Not run". The validation tests are shown per parameterisation.
 SUPERMODULE_TESTS = ['supermodule_structure_test', 'supermodule_equivalence_test']
 COUPLED_TESTS = ['coupled_validation_test']
 REPORT_TESTS = (checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
                 + COUPLED_TESTS)
-INSTANCE_TESTS = checks.INSTANCE_TESTS
+PARAMETERISATION_TESTS = checks.PARAMETERISATION_TESTS
 NOT_A_SUPERMODULE = 'not a supermodule'
 NOT_COUPLED = 'not used in a coupled system model (the spec lists no coupled_systems)'
 NO_EQUIVALENT = ('no system model to reproduce: the spec lists no supermodule.equivalent entry (the version is '
@@ -193,10 +196,10 @@ def _test_entry(version, test, r, spec_block=None, title=None):
     }
 
 
-def instance_context(version, inst):
-    '''One instance: its files, and its validation (baseline) and calibration results.'''
+def parameterisation_context(version, inst):
+    '''One parameterisation: its files, and its validation (baseline) and calibration results.'''
     tests = []
-    for test in INSTANCE_TESTS:
+    for test in PARAMETERISATION_TESTS:
         kind = test.rsplit('_', 1)[1]
         v = inst.validation.get(kind) or {}
         r = checks.load(version, test, inst)
@@ -224,12 +227,13 @@ def instance_context(version, inst):
             calibration = json.load(f)
     from cam_testing import omex as omex_mod
     omex_file = omex_mod.omex_path(version, inst)
-    omex_result = checks.load(version, f'cuflynx_instance_omex_test__{inst.name}')
+    omex_result = (checks.load(version, f'cuflynx_parameterisation_omex_test__{inst.name}')
+                   or checks.load(version, f'cuflynx_instance_omex_test__{inst.name}'))   # the former name
     return {'name': inst.name, 'is_default': inst.is_default, 'files': inst.data_files(),
-            # the generated COMBINE archive for CUFLynx (tools/build_instance_omex.py), and its CUFLynx check
+            # the generated COMBINE archive for CUFLynx (tools/build_parameterisation_omex.py), and its CUFLynx check
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
             'omex_status': omex_result.status if omex_result else None,
-            'omex_message': omex_result.message if omex_result else 'not checked yet (tests/test_instance_omex.py)',
+            'omex_message': omex_result.message if omex_result else 'not checked yet (tests/test_parameterisation_omex.py)',
             'n_parameters': len(inst.parameters()), 'obs_data_name': inst.obs_data_name,
             'has_obs_data': inst.has_obs_data, 'calibration': calibration,
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
@@ -336,7 +340,7 @@ CONTENTS_ABOUT = {
                            'connected module, or a parameter when nothing connects them)',
     'ports': 'Ports: the config\'s entrance, exit and general ports, through which models connect the version',
     'equations': 'Equations: the equations of the CellML component',
-    'instances': 'Instances: the parameter sets of this version (instances/)',
+    'parameterisations': 'Parameterisations: the parameter sets of this version (parameterisations/)',
     'parts': 'Parts: the submodules this supermodule version is built from',
     'levels': 'Nested levels: how deep the supermodule nests (1 when every part is a component)',
 }
@@ -371,9 +375,9 @@ def _sub_version(sub):
 
 def contents(version, _depth=0):
     '''The contents summary bar: {key: count} (states, algebraic, parameters, boundary_conditions, ports,
-    equations, instances; a supermodule adds parts and levels, its other counts summed over its parts).'''
+    equations, parameterisations; a supermodule adds parts and levels, its other counts summed over its parts).'''
     if not version.is_supermodule:
-        return dict(_leaf_contents(version), instances=len(version.instance_names()))
+        return dict(_leaf_contents(version), parameterisations=len(version.parameterisation_names()))
     if _depth > 10:
         raise ValueError(f'{version.key}: supermodules nest more than 10 levels (a cycle?)')
     total = {k: 0 for k in ('states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations')}
@@ -390,8 +394,8 @@ def contents(version, _depth=0):
             leaves += c['components']
         else:
             leaves += 1
-    return dict(total, instances=len(version.instance_names()), parts=len(version.submodules), levels=levels,
-                components=leaves)
+    return dict(total, parameterisations=len(version.parameterisation_names()), parts=len(version.submodules),
+                levels=levels, components=leaves)
 
 
 def contents_bar(version, c, comp_id):
@@ -400,22 +404,23 @@ def contents_bar(version, c, comp_id):
     structure = f'#{comp_id}-structure'
     href = {'states': f'#{comp_id}-variables', 'algebraic': f'#{comp_id}-equations',
             'parameters': f'#{comp_id}-variables', 'boundary_conditions': f'#{comp_id}-variables',
-            'ports': f'#{comp_id}-ports', 'equations': f'#{comp_id}-equations', 'instances': '#instances',
+            'ports': f'#{comp_id}-ports', 'equations': f'#{comp_id}-equations', 'parameterisations': '#parameterisations',
             'parts': structure, 'levels': structure}
     labels = {'states': ('state', 'states'), 'algebraic': ('algebraic', 'algebraic'),
               'parameters': ('parameter', 'parameters'), 'boundary_conditions': ('boundary condition', 'boundary conditions'),
-              'ports': ('port', 'ports'), 'equations': ('equation', 'equations'), 'instances': ('instance', 'instances'),
+              'ports': ('port', 'ports'), 'equations': ('equation', 'equations'),
+              'parameterisations': ('parameterisation', 'parameterisations'),
               'parts': ('part', 'parts'), 'levels': ('nested level', 'nested levels')}
     short = {'states': 'st', 'algebraic': 'alg', 'parameters': 'par', 'boundary_conditions': 'BC', 'ports': 'ports',
-             'equations': 'eq', 'instances': 'inst', 'parts': 'parts', 'levels': 'levels'}
-    keys = ['states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations', 'instances']
+             'equations': 'eq', 'parameterisations': 'psets', 'parts': 'parts', 'levels': 'levels'}
+    keys = ['states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations', 'parameterisations']
     if sup:
         keys = ['parts', 'levels'] + keys
     out = []
     for k in keys:
         n = c.get(k, 0)
         about = CONTENTS_ABOUT[k]
-        if sup and k not in ('instances', 'parts', 'levels'):
+        if sup and k not in ('parameterisations', 'parts', 'levels'):
             about += SUPER_ABOUT_SUFFIX + f' ({c.get("components", 0)} component versions)'
             link = structure        # a supermodule has no equations or variables of its own: its parts do
         else:
@@ -533,10 +538,11 @@ def supermodule_structure(version):
         return None
     subs = version.submodules
     versions = {s['name']: _sub_version(s) for s in subs}
-    # the supermodule's own instance: rows <var>_<part> override the part's instance; others are globals
+    # the supermodule's own parameterisation: rows <var>_<part> override the part's parameterisation;
+    # others are globals
     names = sorted(versions, key=len, reverse=True)
     overrides, global_rows = {}, []
-    for p in version.default_instance.parameters():
+    for p in version.default_parameterisation.parameters():
         owner = next((n for n in names if p.variable_name.endswith('_' + n)), None)
         if owner is None:
             global_rows.append({'name': p.variable_name, 'value': p.value, 'units': p.units})
@@ -612,7 +618,7 @@ def supermodule_structure(version):
         uses = _global_names(sv) if sv is not None else set()
         parts.append({
             'name': s['name'], 'module_type': s['module_type'], 'version': s['module_subtype'],
-            'instance': s.get('instance') or '(default)', 'is_supermodule': bool(sv and sv.is_supermodule),
+            'parameterisation': module_array.parameterisation_of(s, '(default)'), 'is_supermodule': bool(sv and sv.is_supermodule),
             'n_parts': len(sv.submodules) if sv is not None and sv.is_supermodule else 0,
             'href': os.path.relpath(sv.html_path, version.dir) if sv is not None else None,
             'missing': sv is None, 'ports': ports,
@@ -750,7 +756,8 @@ def component_context(version):
         'ports': _ports(version.config), 'variables': variables,
         'todo': version.todo_parameters(), 'unsourced': version.unsourced_parameters(),
         'invariants': version.spec.get('invariants') or [],
-        'tests': tests, 'instances': [instance_context(version, i) for i in version.instances()],
+        'tests': tests,
+        'parameterisations': [parameterisation_context(version, i) for i in version.parameterisations()],
         'phlynx_compatible': _phlynx_compatible(tests),
         'contents': contents_bar(version, contents(version), version.id),
         'unit_consistency': unit_consistency_context(version, equations),
@@ -769,7 +776,7 @@ def _phlynx_compatible(tests):
 def _status_counts(components):
     counts = {'passed': 0, 'failed': 0, 'skipped': 0, 'pending': 0, 'not_applicable': 0, None: 0}
     for c in components:
-        for t in c['tests'] + [t for i in c['instances'] for t in i['tests']]:
+        for t in c['tests'] + [t for i in c['parameterisations'] for t in i['tests']]:
             status = COUNT_AS.get(t['status'], t['status'])
             counts[status] = counts.get(status, 0) + 1
     return counts
@@ -885,7 +892,7 @@ def module_context(name, version_contexts=None):
                      'counts': c['counts'], 'reviewed': c['reviewed'], 'max_risk': c['max_risk'],
                      'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
                      'phlynx': c['phlynx'], 'phlynx_compatible': comp['phlynx_compatible'], 'tests': comp['tests'],
-                     'instances': comp['instances'], 'submodules': comp['submodules'],
+                     'parameterisations': comp['parameterisations'], 'submodules': comp['submodules'],
                      'known_issues': len(c['known_issues']), 'is_supermodule': c['is_supermodule'],
                      'contents': comp['contents'], 'unit_failures': c['unit_failures'],
                      'unit_status': (comp['unit_consistency'] or {}).get('status'),
@@ -899,7 +906,7 @@ def module_context(name, version_contexts=None):
         'location': mtype.location, 'parent': mtype.parent, 'nested': mtype.nested, 'versions': rows,
         'reviewed': bool(rows) and all(r['reviewed'] for r in rows),
         'counts': counts, 'n_versions': len(rows),
-        'n_instances': sum(len(r['instances']) for r in rows),
+        'n_parameterisations': sum(len(r['parameterisations']) for r in rows),
         'all_sourced': all(r['all_sourced'] for r in rows),
         'n_sourced': sum(r['n_sourced'] for r in rows), 'n_parameters': sum(r['n_parameters'] for r in rows),
         'max_risk': max((r['max_risk'] for r in rows if r['max_risk'] is not None), default=None),
@@ -939,7 +946,8 @@ def build_index(contexts, out_path, href):
             c['display'] = c['relpath'][len(c['category']) + 1:] if c['category'] else c['relpath']
         for c in sorted(ctxs, key=lambda c: c['display'].lower()):
             rows.append({'name': c['name'], 'display': c['display'], 'href': href(c['relpath'], f'{c["name"]}.html'),
-                         'n_versions': c['n_versions'], 'n_instances': c['n_instances'], 'counts': c['counts'],
+                         'n_versions': c['n_versions'], 'n_parameterisations': c['n_parameterisations'],
+                         'counts': c['counts'],
                          'reviewed': c['reviewed'], 'known_issues': c['known_issues'], 'max_risk': c['max_risk'],
                          'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
                          'phlynx': c['phlynx'], 'ready_for_review': c['ready_for_review'] and not c['reviewed'],
@@ -1025,8 +1033,8 @@ def assemble_site(names, contexts):
             shutil.copy2(v.html_path, vdest)
             if os.path.isdir(v.plots_dir):
                 shutil.copytree(v.plots_dir, os.path.join(vdest, 'plots'))
-            # the instances' CUFLynx archives, where they have been built (make omex)
-            for inst in v.instances():
+            # the parameterisations' CUFLynx archives, where they have been built (make omex)
+            for inst in v.parameterisations():
                 archive = omex_mod.omex_path(v, inst)
                 if os.path.isfile(archive):
                     idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))

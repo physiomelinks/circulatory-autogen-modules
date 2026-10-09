@@ -6,7 +6,7 @@ What a version's outcome in a stage depends on, hashed into its fingerprint:
   * the version's own files (results/, plots/, *.html and *.omex left out) and the files directly
     in its module_type's directory;
   * the same for every version it depends on, recursively: the neighbours of its test networks
-    (harness, validation.<instance>.harness) and a supermodule's submodules;
+    (harness, validation.<parameterisation>.harness) and a supermodule's submodules;
   * the system models it must reproduce (supermodule.equivalent) or is coupled in (coupled_systems);
   * shared inputs: cam_testing's code, tests/, requirements.txt, pyproject.toml, the Makefile, the
     directory schema and the installed libcuflynx commit; for the pipeline and omex stages also

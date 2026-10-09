@@ -1,0 +1,17 @@
+variable_name,units,value,data_reference,sourced
+Delta_V_mid_w,milliV,0,definitional; drug-induced shift of the M-channel activation midpoint (0 = control; e.g. retigabine studies),no
+E_K,milliV,-96.4979,"definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 295.15 K (the soma defaults; used when unconnected)",no
+V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. davis2020downregulation)",no
+V_den_w,milliV,10,martin2023modelling; Methods (p. 16): w_inf k = 10 mV (= value),yes
+V_mid_w,milliV,35,martin2023modelling; Methods (p. 16): w_inf V1/2 = -35 mV (= value; from Zhou et al.),yes
+V_rest_approx,milliV,-70,"davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites davis2021transcriptomic, whose current-clamp traces the value was read from)",yes
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_M,per_um2,0.20293752441290494,"davis2020downregulation; Calibrated (libcuflynx) to parameterisations/davis2020_wistar/davis2020_wistar_obs_data.json: davis2020downregulation Fig. 3C Wistar XE-991-sensitive I_M -4.03 pA/pF x Cm 30 pF (assumed), the deactivation relaxation in a 1 s step from -25 to -55 mV (current after the ohmic jump minus that near the end of the step; davis2021transcriptomic p. 172-173); E_K -96.5 mV (Ki 200 mM, 22 degC); re-derived on review 2026-10-05 (was 0.00263 uS with E_K -93.7, from the -25/-55 mV steady-state difference). g_M = A rho gamma_M = 0.005479 uS at A 3000 um^2, gamma_M 9 pS; it depends on tau_w (with the present tau_w the relaxation is 87 % complete at 1 s)",yes
+gamma_M,picoS,9.0,"selyanko2001properties; KCNQ2/KCNQ3 (M-type) single-channel conductance 9.0 +- 0.3 pS (Abstract, point 2); native rat SCG M-channels show ~7, 12 and 19 pS levels (Selyanko & Brown 1993)",yes
+g_M_mod,dimensionless,1.0,"definitional; scaling factor, 1 = unmodified (retigabine studies)",no
+tau_w_min,millis,30,"owner's floor (CA 72f29290, CA_user b8488ae, 2025-03-31); not in martin2023modelling (no offset); the CA token cites gupta2016computational, an SK-channel bladder model, **which is unlikely to be the source** (not verified)",no
+tau_w_num,millis,1200,"martin2023modelling; Methods (p. 16): tau_w = 400/(3.3 exp((V+35)/10) + exp(-(V+35)/20)) ms (from Zhou et al.); **numerator modified here to 1200 ms (3x the source)** (owner calibration: 200 -> 800 -> 1200, CA_user ad0ce77/a7a4a58, 2024)",yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_M,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_M,kelvin,295.15,"definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review",no
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

@@ -1,5 +1,5 @@
 """
-i_M Argus2026_v01, instance davis2020_wistar_kinetics: digitise the representative Wistar
+i_M Argus2026_v01, parameterisation davis2020_wistar_kinetics: digitise the representative Wistar
 M-current deactivation trace of Davis et al. 2020 (Hypertension 76:1915) Fig. 3C into a libcuflynx
 obs_data, and build the refit comparison page (current vs calibrated tau_w).
 
@@ -8,7 +8,7 @@ obs_data, and build the refit comparison page (current vs calibrated tau_w).
         -k 'calibrate and davis2020_wistar_kinetics' --include-unreviewed   # calibrate (libcuflynx)
     venv/bin/python tools/i_M_davis2020_kinetics.py report       # -> reviews/i_M_Argus2026_v01_tau_w_refit.html
     venv/bin/python tools/i_M_davis2020_kinetics.py gm-report    # -> reviews/i_M_Argus2026_v01_g_M_fit.html (g_M provenance,
-                                                                 #    instance davis2020_wistar; adds the thesis crop to its source_figures)
+                                                                 #    parameterisation davis2020_wistar; adds the thesis crop to its source_figures)
 
 Digitisation (obs-data). The figure's embedded raster (page 4, 1310 x 926 px at 200 ppi) is read
 with pdfimages; the Wistar trace (columns 0-300, rows 680-840) is traced column by column as the
@@ -43,8 +43,8 @@ import numpy as np
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 VDIR = os.path.join(REPO, 'modules', 'cell', 'ion_channels', 'i_M', 'versions', 'Argus2026_v01')
-INSTANCE = 'davis2020_wistar_kinetics'
-IDIR = os.path.join(VDIR, 'instances', INSTANCE)
+PARAMETERISATION = 'davis2020_wistar_kinetics'
+IDIR = os.path.join(VDIR, 'parameterisations', PARAMETERISATION)
 PDF = os.path.expanduser('~/Zotero/storage/4KCUPWQE/Davis et al. - 2020 - Downregulation of M Current Is Coupled to Membrane.pdf')
 PAGE = 4
 HTML = os.path.join(REPO, 'reviews', 'i_M_Argus2026_v01_tau_w_refit.html')
@@ -156,7 +156,7 @@ def build_obs_data():
             'subexperiment_idx': sub,
         })
     obs = {
-        'obs_data_name': INSTANCE,
+        'obs_data_name': PARAMETERISATION,
         'comment': ('Davis et al. 2020 (Hypertension 76:1915) Fig. 3C, the representative Wistar M-current deactivation '
                     'trace (perforated patch, room temperature; raw current, not XE-991-subtracted; n = 1): held at '
                     '-25 mV, 1 s step to -55 mV (davis2021transcriptomic p. 172), back to -25 mV. Digitised and normalised by '
@@ -176,7 +176,7 @@ def build_obs_data():
         'data_items': items,
     }
     os.makedirs(IDIR, exist_ok=True)
-    with open(os.path.join(IDIR, f'{INSTANCE}_obs_data.json'), 'w') as f:
+    with open(os.path.join(IDIR, f'{PARAMETERISATION}_obs_data.json'), 'w') as f:
         json.dump(obs, f, indent=1, ensure_ascii=False)
     # the source figure: panel C, cropped from the raster at its native 200 ppi
     sdir = os.path.join(IDIR, 'source_figures')
@@ -252,12 +252,12 @@ def build_report():
     from cam_testing import checks, harness
     from cam_testing.library import load_version
 
-    with open(os.path.join(IDIR, f'{INSTANCE}_obs_data.json')) as f:
+    with open(os.path.join(IDIR, f'{PARAMETERISATION}_obs_data.json')) as f:
         obs = json.load(f)
-    with open(os.path.join(IDIR, f'{INSTANCE}_calibration.json')) as f:
+    with open(os.path.join(IDIR, f'{PARAMETERISATION}_calibration.json')) as f:
         cal = json.load(f)
     cur = {'tau_w_num': 1200.0, 'tau_w_min': 30.0}
-    with open(os.path.join(VDIR, 'instances', 'default', 'default_parameters.csv'), newline='') as f:
+    with open(os.path.join(VDIR, 'parameterisations', 'default', 'default_parameters.csv'), newline='') as f:
         for r in csv.DictReader(f):
             if r['variable_name'] in cur:
                 cur[r['variable_name']] = float(r['value'])
@@ -455,7 +455,7 @@ th {{ color:var(--muted); font-weight:600; }}
 code {{ font-size:13px; }}
 </style></head><body><main>
 <h1>i_M tau_w refit to Davis 2020 Fig. 3C</h1>
-<p class="muted">i_M Argus2026_v01, instance <code>{INSTANCE}</code>, libcuflynx {cal['method']} calibration of tau_w_num and tau_w_min ({cal['date']}).
+<p class="muted">i_M Argus2026_v01, parameterisation <code>{PARAMETERISATION}</code>, libcuflynx {cal['method']} calibration of tau_w_num and tau_w_min ({cal['date']}).
 The defaults are <b>not</b> changed; keep or reject on this page. Rebuilt by <code>venv/bin/python tools/i_M_davis2020_kinetics.py report</code>.</p>
 
 <div class="warn"><b>Caveats.</b> The data are one cell (n = 1), the representative trace of Fig. 3C. It is a raw current (not XE-991-subtracted),
@@ -468,7 +468,7 @@ tau(-25) about 2x tau(-55): <b>no parameter values fit both phases</b>, and the 
 <div class="grid">
 <div class="card"><img alt="Davis 2020 Fig. 3C" src="data:image/png;base64,{src}">
 <p class="muted">Davis et al. 2020, Hypertension 76:1915, Fig. 3C (cropped from the PDF raster, 200 ppi). Left: the Wistar deactivation trace that was digitised
-(scale bar 100 pA, 100 ms; step 1 s). The density panel gives the g_M calibration (instance davis2020_wistar).</p></div>
+(scale bar 100 pA, 100 ms; step 1 s). The density panel gives the g_M calibration (parameterisation davis2020_wistar).</p></div>
 <div class="card"><img alt="model vs data" src="data:image/png;base64,{fig_trace}">
 <p class="muted">The module simulated with CVODE through the same protocol (time from the step). Top: the gate w at the current (grey) and calibrated (orange)
 tau_w, over the digitised data in w units (bars: the std used in the fit). Bottom: i_M at the default g_M (0.005479 uS).
@@ -499,8 +499,8 @@ Spikes are upward crossings of 0 mV; the one spike at rest is the start-up trans
 
 <h2>Redo</h2>
 <p><code>venv/bin/python tools/i_M_davis2020_kinetics.py obs-data</code> re-digitises the trace. Alternatively, edit
-<code>instances/{INSTANCE}/{INSTANCE}_obs_data.json</code> or <code>_params_for_id.csv</code> directly. Then run
-<code>venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k 'calibrate and {INSTANCE}' --include-unreviewed</code>
+<code>parameterisations/{PARAMETERISATION}/{PARAMETERISATION}_obs_data.json</code> or <code>_params_for_id.csv</code> directly. Then run
+<code>venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k 'calibrate and {PARAMETERISATION}' --include-unreviewed</code>
 and <code>venv/bin/python tools/i_M_davis2020_kinetics.py report</code>.</p>
 </main></body></html>
 """
@@ -516,8 +516,8 @@ and <code>venv/bin/python tools/i_M_davis2020_kinetics.py report</code>.</p>
 # ---- the g_M provenance page --------------------------------------------------------------------
 
 THESIS = os.path.expanduser('~/Documents/books/Physiology/Davis_2021_A_transcriptomic_and.pdf')
-GM_INSTANCE = 'davis2020_wistar'
-GM_IDIR = os.path.join(VDIR, 'instances', GM_INSTANCE)
+GM_PARAMETERISATION = 'davis2020_wistar'
+GM_IDIR = os.path.join(VDIR, 'parameterisations', GM_PARAMETERISATION)
 GM_HTML = os.path.join(REPO, 'reviews', 'i_M_Argus2026_v01_g_M_fit.html')
 # davis2020downregulation Fig. 3C, Wistar M-current densities (pA/pF), digitised from the PDF (pdftoppm -r 600; the dot
 # centres against the axis ticks 0/-2/-4/-6, +- about 0.05 pA/pF; six isolated dots confirmed by blob
@@ -573,9 +573,9 @@ def build_gm_report():
     from cam_testing import checks, harness
     from cam_testing.library import load_version
 
-    with open(os.path.join(GM_IDIR, f'{GM_INSTANCE}_obs_data.json')) as f:
+    with open(os.path.join(GM_IDIR, f'{GM_PARAMETERISATION}_obs_data.json')) as f:
         obs = json.load(f)
-    with open(os.path.join(GM_IDIR, f'{GM_INSTANCE}_calibration.json')) as f:
+    with open(os.path.join(GM_IDIR, f'{GM_PARAMETERISATION}_calibration.json')) as f:
         cal = json.load(f)
     item = obs['data_items'][0]
     rho = float(cal['calibrated_parameters']['rho_M'])
@@ -674,10 +674,10 @@ def build_gm_report():
         return (ww[int(0.9 * (n - 1)):int(n - 1)].mean() - ww[0]) * (STEP - E_K)
     g_an = item['value'] / relax_per_g(1200, 30)
     try:
-        with open(os.path.join(IDIR, f'{INSTANCE}_calibration.json')) as f:
+        with open(os.path.join(IDIR, f'{PARAMETERISATION}_calibration.json')) as f:
             kin = json.load(f)['calibrated_parameters']
         g_kin = item['value'] / relax_per_g(float(kin['tau_w_num']), float(kin['tau_w_min']))
-        kin_txt = (f"with the refitted tau_w of instance {INSTANCE} (tau_w_num {float(kin['tau_w_num']):.3g}, tau_w_min "
+        kin_txt = (f"with the refitted tau_w of parameterisation {PARAMETERISATION} (tau_w_num {float(kin['tau_w_num']):.3g}, tau_w_min "
                    f"{float(kin['tau_w_min']):.4g} ms) the relaxation is complete within the step and g_M would be "
                    f"<b>{g_kin:.4g} uS</b>")
     except FileNotFoundError:
@@ -694,7 +694,7 @@ def build_gm_report():
     sem = np.std(WISTAR_DENSITIES, ddof=1) / np.sqrt(len(WISTAR_DENSITIES))
     body = f"""
 <h1>i_M g_M: where it comes from</h1>
-<p class="muted">i_M Argus2026_v01, instance <code>{GM_INSTANCE}</code>. g_M = A_mem rho_M gamma_M, with rho_M calibrated by libcuflynx to one
+<p class="muted">i_M Argus2026_v01, parameterisation <code>{GM_PARAMETERISATION}</code>. g_M = A_mem rho_M gamma_M, with rho_M calibrated by libcuflynx to one
 obs_data item. Rebuilt by <code>venv/bin/python tools/i_M_davis2020_kinetics.py gm-report</code>.</p>
 
 <h2>1. The source</h2>
@@ -711,7 +711,7 @@ of the 10 uM XE-991-sensitive current. So the measure is the <b>deactivation rel
 </div>
 
 <h2>2. The obs_data</h2>
-<p><code>instances/{GM_INSTANCE}/{GM_INSTANCE}_obs_data.json</code>: the channel module alone, its boundary conditions set in the instance
+<p><code>parameterisations/{GM_PARAMETERISATION}/{GM_PARAMETERISATION}_obs_data.json</code>: the channel module alone, its boundary conditions set in the parameterisation
 parameters (E_K -96.4979 mV: Nernst at Ko 4.5 / Ki 200 mM, 295.15 K; A_mem 3000 um^2; T 295.15 K). V is changed by <code>params_to_change</code>:</p>
 <div class="grid"><div class="card"><table><tr><th>sub-experiment</th><th>V (mod/V)</th><th>duration</th><th></th></tr>{proto}</table></div>
 <div class="card"><pre>{q(json.dumps(item_show, indent=1))}</pre></div></div>
@@ -752,12 +752,12 @@ The old default 0.00263 uS was a hand calculation of the same steady-state kind 
 </table></div>
 <div class="card"><p><b>Dependence on tau_w.</b> The reading is taken within Davis's 1 s step, so it depends on how far the relaxation has gone.
 With the present tau_w (466 ms at -55 mV) it is {100 * frac:.0f} % complete, and g_M = <b>{g_an:.4g} uS</b>; {kin_txt}.
-If tau_w changes, recalibrate this instance.</p>
-<p><b>Redo.</b> Edit <code>instances/{GM_INSTANCE}/{GM_INSTANCE}_obs_data.json</code> (value, std, Cm, protocol), then:</p>
+If tau_w changes, recalibrate this parameterisation.</p>
+<p><b>Redo.</b> Edit <code>parameterisations/{GM_PARAMETERISATION}/{GM_PARAMETERISATION}_obs_data.json</code> (value, std, Cm, protocol), then:</p>
 <pre>venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 \\
-    -k 'calibrate and {GM_INSTANCE}' --include-unreviewed
-venv/bin/python -m cam_testing.calibrate apply i_M/Argus2026_v01 {GM_INSTANCE} --dry-run
-venv/bin/python -m cam_testing.calibrate apply i_M/Argus2026_v01 {GM_INSTANCE}
+    -k 'calibrate and {GM_PARAMETERISATION}' --include-unreviewed
+venv/bin/python -m cam_testing.calibrate apply i_M/Argus2026_v01 {GM_PARAMETERISATION} --dry-run
+venv/bin/python -m cam_testing.calibrate apply i_M/Argus2026_v01 {GM_PARAMETERISATION}
 venv/bin/python tools/i_M_davis2020_kinetics.py gm-report</pre>
 <p class="muted"><code>apply</code> writes rho_M to the i_M default, soma sympathetic (rho_M_i_M), the monolithic soma (rho_M) and SN_simple / SN_simple_flat.</p></div></div>
 """

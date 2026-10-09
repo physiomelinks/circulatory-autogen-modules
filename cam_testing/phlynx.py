@@ -92,8 +92,8 @@ def component_job(component, work_dir):
 
 def _neighbour_parameters(records, have):
     '''
-    The harness neighbours' instance parameters, named as libcuflynx names them ({var}_{name};
-    globals unsuffixed). libcuflynx reads a neighbour's values from its instance in the library;
+    The harness neighbours' parameterisations' parameters, named as libcuflynx names them ({var}_{name};
+    globals unsuffixed). libcuflynx reads a neighbour's values from its parameterisation in the library;
     PhLynx only gets the parameters it is given, so without these a neighbour's constants are
     empty (e.g. i_CaL's V_den_c, and its computed c_init divides by zero in CUFLynx).
     Names already in ``have`` (the version's own rows and the harness's) win.
@@ -107,7 +107,7 @@ def _neighbour_parameters(records, have):
             version = load_version(r['module_type'], r['module_subtype'])
         except (OSError, ValueError):
             continue
-        for p in version.instance(r.get('instance') or None).parameters():
+        for p in version.parameterisation(module_array.parameterisation_of(r)).parameters():
             name = p.variable_name if p.is_global else f'{p.variable_name}_{r["name"]}'
             if name in have or p.is_todo:
                 continue
