@@ -61,7 +61,7 @@ def make(root, library=None, pyproject=True):
     with open(os.path.join(vdir, f'{stem}_verification_config.json'), 'w') as f:
         json.dump(verification, f, indent=2)
     with open(os.path.join(vdir, f'{stem}_tests.yaml'), 'w') as f:
-        f.write(f'module_type: {MT}\nversion: {VERSION}\nreviewed: false\nnotes: a test copy of outlet_pressure/constant\n')
+        f.write(f'module_type: {MT}\nversion: {VERSION}\nreviewed: true\nnotes: a test copy of outlet_pressure/constant\n')
     shutil.copy(os.path.join(src, 'parameterisations', 'default', 'default_parameters.csv'),
                 os.path.join(vdir, 'parameterisations', 'default', 'default_parameters.csv'))
 
