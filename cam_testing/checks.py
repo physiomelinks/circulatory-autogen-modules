@@ -30,7 +30,10 @@ PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped'
 PROPOSED = 'proposed'
 
 # per version
-VERSION_TESTS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
+# review_test: whether the version has been reviewed (tests.yaml reviewed: true); a version not
+# reviewed yet fails it, so its status never reads as all-passed (it stays public and usable)
+REVIEW_TEST = 'review_test'
+VERSION_TESTS = [REVIEW_TEST, 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                  'stability_test']
 # per parameterisation
 PARAMETERISATION_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
@@ -126,6 +129,20 @@ class Result:
     plots: list = field(default_factory=list)
     details: list = field(default_factory=list)
     timestamp: str = ''
+
+
+def review_check(version):
+    '''Passes for a reviewed version (tests.yaml reviewed: true), fails for one not reviewed yet.'''
+    review = version.spec.get('review')
+    if version.reviewed:
+        where = (f'; the review: {review}' if isinstance(review, str) else
+                 '; the review is in the version\'s tests.yaml' if review else '')
+        return save(version, Result(REVIEW_TEST, PASSED, f'Reviewed (tests.yaml reviewed: true){where}.'))
+    return save(version, Result(
+        REVIEW_TEST, FAILED,
+        'Not reviewed yet: its equations, parameter sources, tests and known issues have not been checked '
+        'with its owner, so treat its values and behaviour as provisional. It is public and usable; CI runs '
+        'only its quick tests (run, PhLynx -> CUFLynx) until it is reviewed.'))
 
 
 def result_path(component, test, parameterisation=None):

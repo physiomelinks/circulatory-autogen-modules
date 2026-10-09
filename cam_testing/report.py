@@ -38,6 +38,7 @@ def __getattr__(name):
     raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
 TEST_TITLES = {
+    'review_test': 'Reviewed',
     'run_test': 'Run',
     'verification_test_invariants': 'Verification: invariants',
     'verification_test_BC': 'Verification: boundary conditions',
@@ -54,13 +55,18 @@ TEST_TITLES = {
     'coupled_validation_test': 'Validation: coupled, against the CellML grid',
 }
 TEST_SHORT = {
-    'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
+    'review_test': 'Reviewed', 'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
     'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
     'coupled_validation_test': 'Coupled',
 }
 TEST_ABOUT = {
+    'review_test': 'Whether the version has been reviewed: its equations, parameter sources (each value traced '
+                   'to its source), tests, data and known issues checked with its owner (tests.yaml reviewed: '
+                   'true). A version not reviewed yet fails this check. It is still published and usable, but '
+                   'its values and behaviour are provisional, and CI runs only its quick tests (Run, the '
+                   'PhLynx -> CUFLynx pipeline) until it is reviewed, so its other columns show Not run.',
     'run_test': 'Generates the version alone with libcuflynx (every boundary condition becomes a '
                 'parameter, valued from the default parameterisation; a supermodule is expanded into its submodules, '
                 'and the boundary conditions no internal connection closes become parameters), simulates it, '
@@ -181,13 +187,23 @@ FIT_CHECK_ABOUT = ('The parameters were fitted to this data, so this shows how w
                    'is not an independent validation.')
 
 
+def _not_run_reason(version, test):
+    '''Why a test that applies to the version has no result.'''
+    from cam_testing.pytest_plugin import QUICK_TESTS
+    if not getattr(version, 'reviewed', True) and test not in QUICK_TESTS:
+        return ('Not run: the version is not reviewed yet, and CI runs only the quick tests (Run, the '
+                'PhLynx -> CUFLynx pipeline) for such versions. It runs the full set once the version is '
+                'reviewed (locally: pytest --include-unreviewed).')
+    return 'This test has not been run yet.'
+
+
 def _test_entry(version, test, r, spec_block=None, title=None):
     base = test.split('__')[0]
     return {
         'key': test, 'title': title or TEST_TITLES.get(base, test), 'short': TEST_SHORT.get(base, test),
         'about': TEST_ABOUT.get(base, ''),
         'status': r.status if r else None, 'status_label': STATUS_LABEL.get(r.status if r else None, 'Not run'),
-        'message': r.message if r else 'This test has not been run yet.',
+        'message': r.message if r else _not_run_reason(version, base),
         'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
         'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
         'known_issue': (version.spec.get('expected_failures') or {}).get(test),

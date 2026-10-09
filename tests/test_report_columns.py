@@ -18,7 +18,7 @@ from cam_testing.library import Parameter, all_versions, load_version
 
 # ---- uniform columns ----------------------------------------------------------------------------
 
-EXPECTED_COLUMNS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
+EXPECTED_COLUMNS = ['review_test', 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                     'stability_test', 'version_calibration', 'phlynx_export_test', 'cuflynx_simulate_test',
                     'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
                     'coupled_validation_test']
@@ -27,7 +27,7 @@ EXPECTED_COLUMNS = ['run_test', 'verification_test_invariants', 'verification_te
 def test_report_columns_in_order():
     assert report.REPORT_TESTS == EXPECTED_COLUMNS
     assert [report.TEST_SHORT[k] for k in EXPECTED_COLUMNS] == [
-        'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
+        'Reviewed', 'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
         'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces', 'Coupled']
 
 
@@ -200,7 +200,8 @@ def test_report_links_and_counts_for_calibration_in_super():
 # ---- supermodule versions in the test parametrisation ---------------------------------------------
 
 def test_supermodule_versions_get_the_verification_tests():
-    config = SimpleNamespace(getoption=lambda k: ['soma'] if k == '--module' else ([] if k == '--component' else True))
+    options = {'--module': ['soma'], '--component': [], '--shard': None, '--shard-stage': 'vv', '--changed-only': False}
+    config = SimpleNamespace(getoption=lambda k: options.get(k, True))
     ids = [p.id for p in pytest_plugin._selected_versions(config)]
     assert 'soma/sympathetic' in ids and 'soma/sympathetic_monolithic_v01' in ids
     params = [p.id for p in pytest_plugin._selected_parameterisations(config)]

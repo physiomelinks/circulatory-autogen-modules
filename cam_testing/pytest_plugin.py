@@ -19,7 +19,7 @@ It provides:
 import pytest
 
 # The standard tests keep the names run_test, verification_test_BC, ... rather than test_*.
-PYTHON_FUNCTIONS = ['run_test', '*_test_*', 'stability_test', 'system_*_test', 'supermodule_*_test',
+PYTHON_FUNCTIONS = ['review_test', 'run_test', '*_test_*', 'stability_test', 'system_*_test', 'supermodule_*_test',
                     'phlynx_*_test', 'cuflynx_*_test']
 MARKERS = [
     'slow: long-running (calibration)',
@@ -27,7 +27,7 @@ MARKERS = [
     'system_model: system-model tests (system_models/) and supermodule reproduces tests',
     'phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)',
 ]
-QUICK_TESTS = ('run_test', 'supermodule_structure_test', 'phlynx_export_test', 'cuflynx_simulate_test',
+QUICK_TESTS = ('review_test', 'run_test', 'supermodule_structure_test', 'phlynx_export_test', 'cuflynx_simulate_test',
                'phlynx_equivalence_test', 'cuflynx_parameterisation_omex_test')
 
 

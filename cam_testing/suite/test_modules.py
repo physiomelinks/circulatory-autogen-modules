@@ -35,6 +35,12 @@ def _assert(result, version):
 
 # ---- per version --------------------------------------------------------------------------------
 
+def review_test(component_key):
+    # no model: whether the version has been reviewed (a version not reviewed yet fails)
+    version = load_version(*component_key)
+    _assert(checks.review_check(version), version)
+
+
 def run_test(component_model):
     _assert(checks.run_test(component_model), component_model.component)
 

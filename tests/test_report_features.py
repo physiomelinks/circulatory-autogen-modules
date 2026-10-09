@@ -138,7 +138,8 @@ def test_supermodule_structure_of_the_sympathetic_neuron():
     assert set(edges) == {('soma', 'membrane', 'axon', None), ('axon', None, 'varicosity', 'membrane')}
     assert edges[('soma', 'membrane', 'axon', None)]['ports'] == ['VI_port']
     # the supermodule's parameterisation overrides the axon's parameters (rows <var>_axon); R, F, T are globals
-    assert {o['name'] for o in parts['axon']['overrides']} >= {'C_axon', 'R_axon'}
+    # the axon is set by its geometry since review 2026-10-06 (was C_axon, R_axon)
+    assert {o['name'] for o in parts['axon']['overrides']} >= {'d_ax_axon', 'L_ax_axon', 'R_i_axon'}
     assert {'R', 'F', 'T'} <= set(sv['globals'])
     assert 'click p_soma' in sv['mermaid'] and 'p_soma -->' in sv['mermaid']
     assert [n['name'] for n in sv['tree']] == ['soma', 'axon', 'varicosity']
