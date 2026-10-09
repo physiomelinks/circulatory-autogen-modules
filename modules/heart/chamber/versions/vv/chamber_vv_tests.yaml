@@ -1,3 +1,17 @@
 module_type: chamber
 version: vv
 reviewed: false
+notes: 'Heart chamber with the time-varying elastance of Liang et al. 2009 (MBEC 47:743). A phase variable chi, gated by the
+  cardiac clock''s mt, rises over contraction (T_c), relaxation (T_r) and diastole; the activation is e = (1 - cos(2 pi
+  chi_final))/2 in [0, 1], and the pressure u = (e E_A_eff + E_B)(q - q_us) + u_ext with E_A_eff = E_A + Delta_E (a
+  controller''s change), dq/dt = v_in - v_out. Tested in a harness with cardiac_clock/Liang2009_v01 driving it (review
+  2026-10-09; it was clamped at mt = 0.5 before, so nothing moved).
+  Solver: the phase rate dchi/dt is piecewise (discontinuous at each phase switch and at the clock gate), so CVODE must be
+  limited to a step well below the clock''s start window (eps_1 = 7 % of a beat) when nothing else in the model limits its
+  step: without a cap, from the second beat systole lasted 0.1 s too long and the beats drifted (the maths, integrated
+  with a fine fixed step, is exact). The spec uses MaximumStep 1 ms; the closed-loop system models are unaffected (their
+  vessels and valves already keep CVODE''s step small).'
+expected_failures:
+  verification_test_timestep: 'the phase rate dchi/dt switches discontinuously (contraction, relaxation, diastole and the
+    clock gate), so fixed-step RK4 converges at first order across a switch (observed order 0.62 < 0.8); a property of
+    the piecewise model, not a defect (review 2026-10-09).'

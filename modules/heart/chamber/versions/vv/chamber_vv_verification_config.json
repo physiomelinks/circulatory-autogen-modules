@@ -1,32 +1,136 @@
 {
   "module_type": "chamber",
   "version": "vv",
-  "sim_time": 2.0,
+  "sim_time": 4.5,
   "pre_time": 0.0,
-  "dt": 0.01,
+  "dt": 0.001,
   "solver": "CVODE_myokit",
-  "outputs": ["u", "q", "e", "E_A_eff"],
-  "invariants": [],
+  "solver_info": {
+    "rtol": 1e-08,
+    "atol": 1e-10,
+    "MaximumStep": 0.001
+  },
+  "reference_solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-12,
+    "MaximumStep": 0.001
+  },
+  "outputs": [
+    "u",
+    "q",
+    "e",
+    "E_A_eff"
+  ],
+  "invariants": [
+    {
+      "description": "pressure law (Liang 2009 time-varying elastance): u = (e E_A_eff + E_B)(q - q_us) + u_ext, with E_A_eff = E_A + Delta_E",
+      "expr": "(np.max(np.abs(u - ((e*E_A_eff + E_B)*(q - q_us) + u_ext))) <= 1e-9*max(1.0, np.max(np.abs(u)))) & (np.max(np.abs(E_A_eff - (E_A + Delta_E))) <= 1e-9*abs(E_A))"
+    },
+    {
+      "description": "the activation stays in [0, 1] and reaches 1 in systole (the chamber contracts)",
+      "expr": "np.all((e >= -1e-9) & (e <= 1 + 1e-9)) & (np.max(e) >= 0.99)"
+    },
+    {
+      "description": "diastole: e = 0 for the fraction 1 - (T_c + T_r)/T of each beat (contraction T_c, relaxation T_r), over the whole beats after the first, within 2 % of a beat",
+      "expr": "abs(np.mean(e[(t >= T) & (t < T*np.floor(t[-1]/T))] < 1e-6) - (1 - (T_c + T_r)/T)) <= 0.02"
+    },
+    {
+      "description": "the activation repeats every beat: e(t + T) = e(t) after the first beat (to the solver tolerance)",
+      "expr": "np.max(np.abs(e[(t >= T) & (t <= t[-1] - T)] - np.interp(t[(t >= T) & (t <= t[-1] - T)] + T, t, e))) <= 1e-3"
+    },
+    {
+      "description": "volume balance: dq/dt = v_in - v_out, so with constant flows q = q_init + (v_in - v_out) t",
+      "expr": "np.max(np.abs(q - (q_init + (v_in - v_out)*t))) <= 1e-6*abs(q_init) + 1e-12"
+    }
+  ],
   "bc_sweep": {
-    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
-    "ranges": {}
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "Delta_E": {
+        "values": [
+          -183287500.0,
+          0.0,
+          183287500.0,
+          366575000.0
+        ]
+      }
+    },
+    "constraints": [
+      "T_c + T_r < T"
+    ],
+    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, flows, u_ext). Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt and T_eff are excluded: the harness clock drives them. The activation switches phase discontinuously, so CVODE needs a step cap below the clock's start window (eps_1 = 7 % of a beat): MaximumStep 1 ms.",
+    "exclude": [
+      "mt",
+      "T_eff"
+    ],
+    "bounds": {
+      "T": [
+        0.4,
+        1.5
+      ]
+    }
   },
   "timestep": {
     "scheme": "rk4",
-    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "dts": [
+      0.004,
+      0.002,
+      0.001,
+      0.0005
+    ],
     "min_order": 0.8,
     "tol": 0.0001,
     "cvode_tol": 0.001
   },
   "stability": {
     "supported": [
-      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08,
+        "MaximumStep": 0.001
+      }
     ]
   },
   "validation": {
     "default": {
-      "baseline": {"status": "pending", "reason": "validation data not chosen yet"},
-      "calibrate": {"note": "pending: validation data not chosen yet"}
+      "baseline": {
+        "status": "pending",
+        "reason": "validation data not chosen yet"
+      },
+      "calibrate": {
+        "note": "pending: validation data not chosen yet"
+      }
     }
+  },
+  "run_parameters": {
+    "v_in": 0.0001,
+    "v_out": 5e-05
+  },
+  "harness": {
+    "module_array": [
+      [
+        "clock",
+        "Liang2009_v01",
+        "cardiac_clock",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "mod",
+        "vv",
+        "chamber",
+        "clock",
+        "",
+        "default"
+      ]
+    ]
   }
 }
