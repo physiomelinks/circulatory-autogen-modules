@@ -8,6 +8,8 @@
 # The external (FEniCS) models and coupled examples also need libcuflynx.coupling and the python
 # api transport (circulatory_autogen PR #520, cpp-template-generator), which is not in the #536
 # stack: until both are merged, FinbarArgus/circulatory_autogen integration/modules-external-coupling
-# is #536's branch merged with #520's.
-libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-external-coupling
+# is #536's branch merged with #520's. integration/modules-parameterisations is that branch plus
+# circulatory_autogen #567 (reads parameterisations/, default_parameterisation and the record key
+# "parameterisation"). Once #520, #536 and #567 are on master, pin physiomelinks master instead.
+libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-parameterisations
 -e .

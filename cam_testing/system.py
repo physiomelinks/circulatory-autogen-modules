@@ -2,8 +2,8 @@
 System models: system_models/<category>/<model>/ (at the repo root; not modules, not supermodules).
 
 Each system dir holds the model built from this module library (<model>_module_array.json, whose
-records name a module_type, its version (module_subtype) and an instance, and
-<model>_parameters.csv, whose values win over the instances'), the reference it must reproduce under
+records (instances) name a module_type, its version (module_subtype) and the parameterisation
+it uses, and <model>_parameters.csv, whose values win over the parameterisations'), the reference it must reproduce under
 reference/, and a spec <model>_system.yaml. The model is generated with every module library
 (cam_testing.paths: this repo's modules/, then the extra ones), so its records may name versions of
 either. The reference is one of:

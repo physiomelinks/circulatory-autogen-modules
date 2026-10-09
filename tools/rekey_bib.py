@@ -18,7 +18,7 @@ What it rewrites (tracked files only, so other sessions' uncommitted work is nev
 
 How a key is recognised outside the .bib files, so that nothing that merely looks like a key changes:
 - a key is matched case-sensitively, as a whole token: not inside a longer word or identifier
-  (Paci2013_v01, the version, and davis2020_wistar, the instance, stay), not a file name or part of one
+  (Paci2013_v01, the version, and davis2020_wistar, the parameterisation, stay), not a file name or part of one
   (no '.', ':', '@', '#', '\\' or '-' before it, no '.<extension>' after it), and not in a whitespace-delimited
   token that is a URL or a DOI. "Key-derived" and "Key1/Key2" are citations and are rewritten;
 - the same rule rewrites keys cited inside .bib entries (notes such as "as tabulated by Albanese2014");

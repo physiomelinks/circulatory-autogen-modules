@@ -24,7 +24,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
   <header>
     <div class="eyebrow">Module library · verification &amp; validation</div>
     <h1>Circulatory Autogen Modules</h1>
-    <p>{{ n_module_types }} module types in {{ groups|length }} categories, {{ n_versions }} versions. Each version is generated alone with libcuflynx and put through the same verification tests (run, invariants, boundary-condition sweep, timestep convergence, solver stability) and the PhLynx → CUFLynx pipeline; each of its instances is validated against its baseline and calibration data. A module type's page lists its versions; a version's page has its equations, tests and instances.</p>
+    <p>{{ n_module_types }} module types in {{ groups|length }} categories, {{ n_versions }} versions. Each version is generated alone with libcuflynx and put through the same verification tests (run, invariants, boundary-condition sweep, timestep convergence, solver stability) and the PhLynx → CUFLynx pipeline; each of its parameterisations is validated against its baseline and calibration data. A module type's page lists its versions; a version's page has its equations, tests and parameterisations.</p>
     <p><a href="review_queue.html">Review queue</a>: every version awaiting review, with its potential issues, questions and proposed fixes.</p>
     <div class="counts">
       {{ chip('passed', totals.passed ~ ' passed') }} {{ chip('failed', totals.failed ~ ' failed') }}
@@ -39,13 +39,13 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
     <h2 id="{{ g.anchor }}-h" class="mono" style="font-size:1.1rem">{{ g.category }} <span class="muted" style="font-weight:400">· {{ g.rows|length }} module_type{{ '' if g.rows|length == 1 else 's' }}, {{ g.n_versions }} version{{ '' if g.n_versions == 1 else 's' }}</span></h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Module type</th><th>Versions</th><th>Instances</th><th>Passed</th><th>Failed</th><th>Pending</th><th>Skipped</th><th>Not run</th><th>Known issues</th><th>Max P(fail)</th><th>Parameters sourced</th><th>PhLynx / CUFLynx</th><th>Status</th></tr></thead>
+        <thead><tr><th>Module type</th><th>Versions</th><th>Parameterisations</th><th>Passed</th><th>Failed</th><th>Pending</th><th>Skipped</th><th>Not run</th><th>Known issues</th><th>Max P(fail)</th><th>Parameters sourced</th><th>PhLynx / CUFLynx</th><th>Status</th></tr></thead>
         <tbody>
         {%- for r in g.rows %}
           <tr>
             <td class="name"><a href="{{ r.href }}">{{ r.display }}</a></td>
             <td class="vers">{% for v in r.versions %}<a href="{{ v.href }}" title="{{ v.counts.passed }} passed, {{ v.counts.failed }} failed{{ ', PhLynx / CUFLynx compatible' if v.phlynx_compatible }}">{{ v.name }}</a>{% if v.phlynx_compatible %}<span class="tick" title="PhLynx / CUFLynx compatible">✓</span>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</td>
-            <td class="num">{{ r.n_instances }}</td>
+            <td class="num">{{ r.n_parameterisations }}</td>
             <td class="num">{{ r.counts.passed }}</td>
             <td class="num">{% if r.counts.failed %}<strong style="color:var(--fail)">{{ r.counts.failed }}</strong>{% else %}0{% endif %}</td>
             <td class="num">{{ r.counts.pending }}</td>
