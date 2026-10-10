@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="Ca_handling_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="Ca_fermenter">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="Cai_init" public_interface="in" units="millimolar"/>
+        <!-- free cytosolic Ca -->
+        <variable initial_value="Cai_init" name="Cai" public_interface="out" units="millimolar"/>
+        <variable name="B_Ca_init" public_interface="in" units="millimolar"/>
+        <!-- free buffer -->
+        <variable initial_value="B_Ca_init" name="B_Cai" public_interface="out" units="millimolar"/>
+        <!-- Ca-bound buffer -->
+        <variable name="CaB_Cai" public_interface="out" units="millimolar"/>
+        <variable name="B_Ca_total" public_interface="in" units="millimolar"/>
+        <variable name="k_bind_Ca" public_interface="in" units="per_millimolar_s"/>
+        <variable name="k_unbind_Ca" public_interface="in" units="per_s"/>
+        <!-- summed Ca fluxes into the cell (Ca_flux port) -->
+        <variable name="j_Ca_in" public_interface="in" units="mol_per_s"/>
+        <variable name="Vol" public_interface="in" units="m3"/>
+        <!-- free + bound -->
+        <variable name="Ca_total" public_interface="out" units="millimolar"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>CaB_Cai</ci>
+                <apply>
+                    <minus/>
+                    <ci>B_Ca_total</ci>
+                    <ci>B_Cai</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>B_Cai</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>k_unbind_Ca</ci>
+                        <ci>CaB_Cai</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>k_bind_Ca</ci>
+                        <ci>Cai</ci>
+                        <ci>B_Cai</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Cai</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <divide/>
+                            <ci>j_Ca_in</ci>
+                            <ci>Vol</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>k_unbind_Ca</ci>
+                            <ci>CaB_Cai</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>k_bind_Ca</ci>
+                        <ci>Cai</ci>
+                        <ci>B_Cai</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Ca_total</ci>
+                <apply>
+                    <plus/>
+                    <ci>Cai</ci>
+                    <ci>CaB_Cai</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

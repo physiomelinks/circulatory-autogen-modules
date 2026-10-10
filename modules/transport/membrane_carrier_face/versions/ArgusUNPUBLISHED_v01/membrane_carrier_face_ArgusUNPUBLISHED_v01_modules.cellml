@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="membrane_carrier_face_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="membrane_carrier_face">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- maximal flux of the carriers in this membrane area -->
+        <variable name="V_max" public_interface="in" units="mol_per_s"/>
+        <variable name="K_m" public_interface="in" units="millimolar"/>
+        <variable name="open_flag" public_interface="in" units="dimensionless"/>
+        <!-- upstream side (by convention extracellular) -->
+        <variable name="C_up" public_interface="in" units="millimolar"/>
+        <!-- downstream side (by convention intracellular) -->
+        <variable name="C_down" public_interface="in" units="millimolar"/>
+        <!-- net flux from upstream to downstream -->
+        <variable name="J" public_interface="out" units="mol_per_s"/>
+        <variable name="J_up" public_interface="out" units="mol_per_s"/>
+        <variable name="J_down" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>J</ci>
+                <apply>
+                    <times/>
+                    <ci>open_flag</ci>
+                    <ci>V_max</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <divide/>
+                            <ci>C_up</ci>
+                            <apply>
+                                <plus/>
+                                <ci>K_m</ci>
+                                <ci>C_up</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <divide/>
+                            <ci>C_down</ci>
+                            <apply>
+                                <plus/>
+                                <ci>K_m</ci>
+                                <ci>C_down</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_up</ci>
+                <apply>
+                    <minus/>
+                    <ci>J</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_down</ci>
+                <ci>J</ci>
+            </apply>
+        </math>
+    </component>
+</model>

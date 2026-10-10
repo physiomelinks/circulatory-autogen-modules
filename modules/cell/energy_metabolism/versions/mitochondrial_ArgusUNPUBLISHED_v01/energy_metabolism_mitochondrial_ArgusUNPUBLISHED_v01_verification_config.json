@@ -1,0 +1,66 @@
+{
+  "module_type": "energy_metabolism",
+  "version": "mitochondrial_ArgusUNPUBLISHED_v01",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14,
+    "MaximumStep": 0.1
+  },
+  "outputs": [
+    "ATP",
+    "ADP",
+    "f_T",
+    "r_ox",
+    "r_gly",
+    "r_dem",
+    "J_ATP",
+    "flux_O2",
+    "flux_glc",
+    "flux_lac",
+    "flux_CO2",
+    "Q_met"
+  ],
+  "run_parameters": {
+    "ATP_init": 2.0
+  },
+  "invariants": [
+    {
+      "description": "carbon is conserved: 6 flux_glc + 3 flux_lac + flux_CO2 = 0 (glucose C6, lactate C3) (exact)",
+      "expr": "np.allclose(6*flux_glc + 3*flux_lac + flux_CO2, 0, rtol=0, atol=1e-12*np.max(np.abs(flux_CO2)))"
+    },
+    {
+      "description": "respiratory quotient 1 for glucose: flux_CO2 = -flux_O2 (exact)",
+      "expr": "np.allclose(flux_CO2, -flux_O2, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "adenine nucleotides conserved: ATP + ADP = A_tot (exact)",
+      "expr": "np.allclose(ATP + ADP, A_tot, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "first law: the enthalpy taken in with glucose minus that leaving with lactate equals the heat released plus the enthalpy stored in ATP: V h_ATP dATP + Q_met dt + (flux_glc h_glc + flux_lac h_lac) dt = 0 integrated over the run, with h_glc = 6 h_O2_ox = 2.82e+06 J/mol and h_lac = h_glc/2 - h_lac_gly = 1.347e+06 J/mol, relative to CO2, H2O and ADP + Pi (relative 1e-6 of the heat released)",
+      "expr": "abs(V_c*h_ATP*(ATP[-1] - ATP[0]) + np.trapz(Q_met + flux_glc*6*h_O2_ox + flux_lac*(3*h_O2_ox - h_lac_gly), t)) <= 1e-6*np.trapz(np.abs(Q_met), t)"
+    },
+    {
+      "description": "second law: every reaction runs forward (irreversible, far from equilibrium), r_ox, r_gly, r_dem >= 0",
+      "expr": "np.all(r_ox >= 0) and np.all(r_gly >= 0) and np.all(r_dem >= 0)"
+    },
+    {
+      "description": "from depleted ATP (run_parameters ATP_init = 2 mM) ATP recovers to the calibrated steady state 3.152 mM by the end of the run (relative 1e-6)",
+      "expr": "abs(ATP[-1] - 3.152) <= 1e-6*3.152",
+      "applies": "run"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

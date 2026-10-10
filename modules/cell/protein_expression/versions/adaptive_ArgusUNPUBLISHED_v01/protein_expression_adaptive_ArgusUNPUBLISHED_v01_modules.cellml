@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="protein_expression_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="protein_expression_adaptive">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- cytosol ATP (ATP_hydrolysis_port), passed to the pools -->
+        <variable name="ATP" public_interface="in" units="millimolar"/>
+        <variable name="ADP" public_interface="in" units="millimolar"/>
+        <variable name="Pi" public_interface="in" units="millimolar"/>
+        <!-- summed build demand of the pools (protein_synthesis port) -->
+        <variable name="J_demand_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_ATP_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_keep_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_build_in" public_interface="in" units="mol_per_s"/>
+        <variable name="M_build_in" public_interface="in" units="mole"/>
+        <variable name="A_protein_in" public_interface="in" units="um2"/>
+        <!-- build demand of all pools -->
+        <variable name="J_demand_total" public_interface="out" units="mol_per_s"/>
+        <!-- ATP use of all pools -->
+        <variable name="J_ATP_total" public_interface="out" units="mol_per_s"/>
+        <!-- turnover cost of all pools -->
+        <variable name="J_keep_total" public_interface="out" units="mol_per_s"/>
+        <!-- build spending of all pools -->
+        <variable name="J_build_total" public_interface="out" units="mol_per_s"/>
+        <!-- ATP to build every pool's copies: the protein share of a daughter -->
+        <variable name="M_build_protein" public_interface="out" units="mole"/>
+        <!-- membrane area of all pools -->
+        <variable name="A_protein_total" public_interface="out" units="um2"/>
+        <!-- resting ATP turnover of the cell: the scale of synthesis and growth -->
+        <variable name="J_ref" public_interface="in" units="mol_per_s"/>
+        <!-- most ATP synthesis can take, in multiples of J_ref -->
+        <variable name="build_capacity" public_interface="in" units="dimensionless"/>
+        <!-- ATP at which synthesis and growth stop -->
+        <variable name="ATP_floor" public_interface="in" units="millimolar"/>
+        <!-- ATP at which synthesis runs at full speed (rest) -->
+        <variable name="ATP_ref" public_interface="in" units="millimolar"/>
+        <!-- numerical floor on the demand (so s_build is defined with nothing to build) -->
+        <variable name="J_eps" public_interface="in" units="mol_per_s"/>
+        <!-- in-plane membrane area (membrane_area port) -->
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <!-- whole cell surface / in-plane membrane area -->
+        <variable name="surface_factor" public_interface="in" units="dimensionless"/>
+        <!-- most of the cell surface the proteins may take -->
+        <variable name="area_max_fraction" public_interface="in" units="dimensionless"/>
+        <!-- (ATP - ATP_floor)/(ATP_ref - ATP_floor) -->
+        <variable name="x_ATP" public_interface="out" units="dimensionless"/>
+        <!-- x_ATP clamped to 0-1 (the stringent response) -->
+        <variable name="throttle" public_interface="out" units="dimensionless"/>
+        <!-- what synthesis can spend now: build_capacity J_ref throttle -->
+        <variable name="J_cap" public_interface="out" units="mol_per_s"/>
+        <!-- share of the demand served: min(1, J_cap/J_demand_total) -->
+        <variable name="s_build" public_interface="out" units="dimensionless"/>
+        <!-- whole cell surface -->
+        <variable name="A_surface" public_interface="out" units="um2"/>
+        <!-- most membrane area the proteins may take -->
+        <variable name="A_protein_max" public_interface="out" units="um2"/>
+        <!-- share of A_protein_max in use -->
+        <variable name="f_area" public_interface="out" units="dimensionless"/>
+        <variable name="j_ATP_prot" public_interface="out" units="mol_per_s"/>
+        <variable name="j_ADP_prot" public_interface="out" units="mol_per_s"/>
+        <variable name="j_Pi_prot" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>J_demand_total</ci>
+                <ci>J_demand_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_total</ci>
+                <ci>J_ATP_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_keep_total</ci>
+                <ci>J_keep_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_build_total</ci>
+                <ci>J_build_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>M_build_protein</ci>
+                <ci>M_build_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_protein_total</ci>
+                <ci>A_protein_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x_ATP</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>ATP</ci>
+                        <ci>ATP_floor</ci>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <ci>ATP_ref</ci>
+                        <ci>ATP_floor</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>throttle</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>x_ATP</ci>
+                                    <apply>
+                                        <abs/>
+                                        <ci>x_ATP</ci>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="dimensionless">2.0</cn>
+                            </apply>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                        </apply>
+                        <apply>
+                            <abs/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>x_ATP</ci>
+                                        <apply>
+                                            <abs/>
+                                            <ci>x_ATP</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_cap</ci>
+                <apply>
+                    <times/>
+                    <ci>build_capacity</ci>
+                    <ci>J_ref</ci>
+                    <ci>throttle</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_build</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>J_cap</ci>
+                        <ci>J_eps</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>J_cap</ci>
+                                <ci>J_demand_total</ci>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>J_cap</ci>
+                                        <ci>J_demand_total</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <ci>J_eps</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_surface</ci>
+                <apply>
+                    <times/>
+                    <ci>A_mem</ci>
+                    <ci>surface_factor</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_protein_max</ci>
+                <apply>
+                    <times/>
+                    <ci>area_max_fraction</ci>
+                    <ci>A_surface</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_area</ci>
+                <apply>
+                    <divide/>
+                    <ci>A_protein_total</ci>
+                    <ci>A_protein_max</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ATP_prot</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_ATP_total</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ADP_prot</ci>
+                <ci>J_ATP_total</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pi_prot</ci>
+                <ci>J_ATP_total</ci>
+            </apply>
+        </math>
+    </component>
+</model>

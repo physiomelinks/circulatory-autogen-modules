@@ -1,0 +1,99 @@
+[
+  {
+    "module_type": "i_leak_H",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "i_leak_H_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "i_leak_H",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "H_Nernst_potential",
+        "variables": [
+          "E_H"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_leak_H"
+        ]
+      },
+      {
+        "port_type": "H_flux",
+        "variables": [
+          "j_leak_H"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_H",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_spec_leak_H",
+        "microS_per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "g_leak_H",
+        "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "i_leak_H",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_leak_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

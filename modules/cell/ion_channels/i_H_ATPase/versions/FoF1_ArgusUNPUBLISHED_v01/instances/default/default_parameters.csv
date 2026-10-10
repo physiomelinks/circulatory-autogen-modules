@@ -1,0 +1,19 @@
+variable_name,units,value,data_reference,sourced
+V,milliV,-105.0,"milo2010bionumbers; BNID 103386: E. coli membrane potential -140 to -105 mV, fermenting at the less negative end",yes
+E_H,milliV,17.449261892231384,"Nernst potential at pH 7.6 in, 7.3 out",no
+H_i,millimolar,2.5118864315095822e-05,"derived: free H+ = 10^-pH_i M (pH_i: slonczewski1981ph, sourced)",yes
+K_act_H,millimolar,2.5118864315095822e-05,"derived: H+ at the half-activation pH (pH_act_H_ATPase: kobayashi1985proton, placeholder)",no
+A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
+m_expr,dimensionless,1.0,definitional; baseline expression (the calibrated cell),no
+rho_H_ATPase,per_um2,226.81614751349176,calibrated: the H+-ATPase uses 25% of the cell's ATP turnover at rest (placeholder share),no
+r_H_ATPase,per_s,100.0,unreferenced_placeholder; ATP hydrolysed per H+-ATPase per second at full activity (order 100),no
+n_H,dimensionless,3.3333333333333335,jiang2001preferred; E. coli c10 ring over 3 catalytic sites: 10/3 H+ per ATP,yes
+ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
+Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+K_m_ATP_H,millimolar,0.2,"unreferenced_placeholder; H+-ATPase affinity for ATP, order 0.1-0.5 mM",no
+R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+F,C_per_mol,96485.0,"definitional; Faraday constant, as the library's SN modules",no
+dG0_hyd,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
+c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no

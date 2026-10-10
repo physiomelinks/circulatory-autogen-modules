@@ -1,0 +1,28 @@
+module_type: protein_pool
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'One protein of an adaptive cell as a pool of copies: n = n_0 m, with expression m approaching the target m_target
+  (set by the game) at rate (m_target - m)/tau. Keeping the copies costs their turnover, J_keep = n L (c_poly + c_deg + c_recycle)
+  k_deg / N_A (as protein_expression did for the whole cell), slowed by f_ATP = ATP/(K_m + ATP) (K_m + ATP_ref)/ATP_ref as
+  ATP runs out. Raising m asks for the ATP to build r_up n_0 copies per second from glucose, J_demand = r_up n_0 L (c_syn
+  + c_poly) / N_A; the cell''s protein synthesis (protein_expression adaptive) serves the share s_build of it, and the copies
+  rise only as fast as the ATP actually spent: dm/dt = r_up s_build min(f_ATP, 1) + r_down. Falling needs no ATP (degradation)
+  and is not refunded. M_build = n L (c_syn + c_poly) / N_A is the ATP to build the present copies: its share of a daughter.
+  A_protein = n footprint is the membrane area the copies take (0 for cytosolic proteins). m goes to the protein it scales
+  on the protein_expression port (its density or capacity times m), or on enzyme_expression to the cytosol''s enzymes; M_build
+  goes to biosynthesis (daughter_share, summed there); the costs, demand, daughter share and area go to protein_expression
+  on protein_synthesis, which returns ATP and s_build. Instances: one per protein of the fermenter cell (copy numbers, lengths
+  and footprints in each; see parameters.json).'
+instances:
+  H_ATPase: 'F1Fo H+-ATPase: rho_H_ATPase x A_mem (calibrated density)'
+  NhaA: 'NhaA: cycles at rest / turnover_NhaA'
+  KefC: 'KefC: cycles at rest / turnover_KefC'
+  Trk: 'TrkH2-TrkA4: K+ entry at rest / turnover_Trk (the channel law lumps conductance)'
+  NCX: 'NCX_Mj-type exchanger: rho_NaCa x A_mem (calibrated density)'
+  Glf: 'Glf glucose facilitator: capacity / turnover_Glf'
+  LacT: 'lactate-/H+ symporter (LldP-sized): capacity / turnover_LacT'
+  Flagellum: 'flagellum (filament, hook, basal body, MotAB stators): one flagellum per unit of expression: m is the number
+    of flagella'
+  Glyc: 'glycolytic enzymes: glycolytic_share x proteome_per_um3 x cell volume'
+  proteome: 'rest of the proteome (ribosomal, nucleoid and other proteins): proteome_per_um3 x cell volume, less the glycolytic
+    enzymes'

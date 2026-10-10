@@ -1,0 +1,37 @@
+{
+  "module_type": "membrane_potential",
+  "version": "adaptive_ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "V",
+    "A_mem",
+    "Vol",
+    "Cm"
+  ],
+  "run_parameters": {
+    "I_in": 1e-06
+  },
+  "invariants": [
+    {
+      "description": "a capacitor: Cm (V - V0) = I_in t with no channels (relative 1e-9); A_mem = 2 pi R h, Vol = pi R^2 h (exact)",
+      "expr": "np.allclose(Cm*(V - V[0]), 1e6*I_in*t, rtol=1e-9, atol=1e-12) and np.allclose(A_mem, 2*np.pi*R_cell*h_cell, rtol=1e-12, atol=0) and np.allclose(Vol, np.pi*R_cell**2*h_cell*1e-18, rtol=1e-12, atol=0)",
+      "applies": "run"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

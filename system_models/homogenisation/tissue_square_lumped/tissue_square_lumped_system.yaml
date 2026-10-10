@@ -1,0 +1,203 @@
+model: tissue_square_lumped
+category: homogenisation
+reviewed: false
+description: 'Level 2: the same patch as one homogenised tissue volume; face to the bath at an effective distance calibrated
+  from the cell level (continuum formula 4 m L, m = 0.0351442).'
+sim_time: 60.0
+pre_time: 0.0
+dt: 0.01
+solver_info:
+  rtol: 1.0e-10
+  atol: 1.0e-16
+equivalence:
+  status: not_applicable
+  reason: a homogenisation example built from this library (tools/build_homogenisation_examples.py); there is no circulatory_autogen
+    original
+invariants:
+- description: 'mass conservation (zero loss): the amount in the cells changes only by bath supply and consumption, sum V
+    C(t) - sum V C(0) = int (supply + sum V M_reduced) dt (relative 1e-6)'
+  expr: np.max(np.abs((5.120000000000001e-13*c0__C_P) - (5.120000000000001e-13*c0__C_P)[0] - np.concatenate([[0.0], np.cumsum(0.5*np.diff(t)*((e0__J
+    + 5.120000000000001e-13*c0__M_reduced)[1:] + (e0__J + 5.120000000000001e-13*c0__M_reduced)[:-1]))]))) <= 1e-6*max(np.max(np.abs(5.120000000000001e-13*c0__C_P)),
+    np.max(np.abs(np.concatenate([[0.0], np.cumsum(0.5*np.diff(t)*((e0__J)[1:] + (e0__J)[:-1]))]))))
+- description: 'second law: every face dissipates, J ln(C_up/C_down) >= 0 (using the connected volumes, so it also checks
+    the couplings)'
+  expr: np.all(e0__J*(np.log(np.maximum(bath__C_P, 1e-300)) - np.log(np.maximum(c0__C_P, 1e-300))) >= -1e-30)
+notes:
+- 'Built by tools/build_homogenisation_examples.py: re-run it after changing the geometry.'
+- 'First law: ideal diffusion releases no heat and no thermal domain is modelled, so enthalpy is conserved exactly when mass
+  is (the mass invariant).'
+homogenisation:
+  fine: homogenisation/tissue_square_cells
+  level: 1->2
+  derivation: 'continuum: d_eff = 4 m L, m = mean of the unit-square Poisson solution; the discrete cell level differs, so
+    d_eff is calibrated to it'
+  upscaling:
+    derived_m: 2.2492288000000002e-05
+    calibrated_m: 2.381433823529411e-05
+    relative_difference: 0.05551488444615933
+    used: calibrated
+    value_m: 2.381433823529411e-05
+  quantities:
+  - name: mean O2 concentration (mM)
+    fine:
+      weighted_mean:
+      - - c0_0/C_P
+        - 0.015625
+      - - c0_1/C_P
+        - 0.015625
+      - - c0_2/C_P
+        - 0.015625
+      - - c0_3/C_P
+        - 0.015625
+      - - c0_4/C_P
+        - 0.015625
+      - - c0_5/C_P
+        - 0.015625
+      - - c0_6/C_P
+        - 0.015625
+      - - c0_7/C_P
+        - 0.015625
+      - - c1_0/C_P
+        - 0.015625
+      - - c1_1/C_P
+        - 0.015625
+      - - c1_2/C_P
+        - 0.015625
+      - - c1_3/C_P
+        - 0.015625
+      - - c1_4/C_P
+        - 0.015625
+      - - c1_5/C_P
+        - 0.015625
+      - - c1_6/C_P
+        - 0.015625
+      - - c1_7/C_P
+        - 0.015625
+      - - c2_0/C_P
+        - 0.015625
+      - - c2_1/C_P
+        - 0.015625
+      - - c2_2/C_P
+        - 0.015625
+      - - c2_3/C_P
+        - 0.015625
+      - - c2_4/C_P
+        - 0.015625
+      - - c2_5/C_P
+        - 0.015625
+      - - c2_6/C_P
+        - 0.015625
+      - - c2_7/C_P
+        - 0.015625
+      - - c3_0/C_P
+        - 0.015625
+      - - c3_1/C_P
+        - 0.015625
+      - - c3_2/C_P
+        - 0.015625
+      - - c3_3/C_P
+        - 0.015625
+      - - c3_4/C_P
+        - 0.015625
+      - - c3_5/C_P
+        - 0.015625
+      - - c3_6/C_P
+        - 0.015625
+      - - c3_7/C_P
+        - 0.015625
+      - - c4_0/C_P
+        - 0.015625
+      - - c4_1/C_P
+        - 0.015625
+      - - c4_2/C_P
+        - 0.015625
+      - - c4_3/C_P
+        - 0.015625
+      - - c4_4/C_P
+        - 0.015625
+      - - c4_5/C_P
+        - 0.015625
+      - - c4_6/C_P
+        - 0.015625
+      - - c4_7/C_P
+        - 0.015625
+      - - c5_0/C_P
+        - 0.015625
+      - - c5_1/C_P
+        - 0.015625
+      - - c5_2/C_P
+        - 0.015625
+      - - c5_3/C_P
+        - 0.015625
+      - - c5_4/C_P
+        - 0.015625
+      - - c5_5/C_P
+        - 0.015625
+      - - c5_6/C_P
+        - 0.015625
+      - - c5_7/C_P
+        - 0.015625
+      - - c6_0/C_P
+        - 0.015625
+      - - c6_1/C_P
+        - 0.015625
+      - - c6_2/C_P
+        - 0.015625
+      - - c6_3/C_P
+        - 0.015625
+      - - c6_4/C_P
+        - 0.015625
+      - - c6_5/C_P
+        - 0.015625
+      - - c6_6/C_P
+        - 0.015625
+      - - c6_7/C_P
+        - 0.015625
+      - - c7_0/C_P
+        - 0.015625
+      - - c7_1/C_P
+        - 0.015625
+      - - c7_2/C_P
+        - 0.015625
+      - - c7_3/C_P
+        - 0.015625
+      - - c7_4/C_P
+        - 0.015625
+      - - c7_5/C_P
+        - 0.015625
+      - - c7_6/C_P
+        - 0.015625
+      - - c7_7/C_P
+        - 0.015625
+    coarse:
+      weighted_mean:
+      - - c0/C_P
+        - 1.0
+  - name: total uptake from the bath (mol/s)
+    fine:
+      sum_matching: e*/J
+    coarse:
+      sum_matching: e*/J
+  steady_state_tol: 0.01
+  transient_nrmse_tol: 0.05
+  sweep:
+    parameters:
+      bath_O2:
+        pattern: C_P_init_bath
+        units: millimolar
+      M:
+        pattern: M_c*
+        units: millimolar_per_s
+    points:
+    - bath_O2: 0.2
+      M: -0.0558
+    - bath_O2: 0.3
+      M: -0.0558
+    - bath_O2: 0.05
+      M: -0.0558
+    - bath_O2: 0.02
+      M: -0.0558
+    - bath_O2: 0.2
+      M: -0.02
+    - bath_O2: 0.2
+      M: -0.15

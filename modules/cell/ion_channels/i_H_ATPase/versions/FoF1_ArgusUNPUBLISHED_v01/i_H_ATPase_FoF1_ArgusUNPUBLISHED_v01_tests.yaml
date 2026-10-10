@@ -1,0 +1,10 @@
+module_type: i_H_ATPase
+version: FoF1_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The F1Fo ATPase of a fermenting bacterium, which hydrolyses the ATP made by glycolysis to pump protons out and so
+  sets the proton motive force and regulates cytoplasmic pH (Enterococcus hirae / Streptococcus faecalis, kobayashi1985proton).
+  n_H = 10/3 H+ per ATP (the E. coli c10 rotor over 3 catalytic sites, jiang2001preferred). Rate i = k ATP/(K_m + ATP) H_i/(K_act
+  + H_i) f_thermo with f_thermo = 1 - exp(-(A_ATP - W_H)/RT), W_H = n_H F (E_H - V): the same thermodynamic brake as the Na/K
+  pump (i_NaK ATP_ArgusUNPUBLISHED_v01), so below equilibrium it runs backwards and synthesises ATP, as the enzyme is reversible.
+  The H+ activation term is a placeholder for the pH regulation Kobayashi reports. Each ATP hydrolysed also releases one H+,
+  which the cytosol (energy_metabolism) accounts for.'

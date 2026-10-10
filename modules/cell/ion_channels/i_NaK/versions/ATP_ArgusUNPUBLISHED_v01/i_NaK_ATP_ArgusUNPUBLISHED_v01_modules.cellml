@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_NaK_ATP_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_NaK_ATP">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="Nai" public_interface="in" units="millimolar"/>
+        <variable name="Ko" public_interface="in" units="millimolar"/>
+        <variable name="Ko_mid_NaK" public_interface="in" units="millimolar"/>
+        <variable name="Nai_mid_NaK" public_interface="in" units="millimolar"/>
+        <variable name="Nai_power_NaK" public_interface="in" units="dimensionless"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_NaK" public_interface="in" units="per_um2"/>
+        <variable name="r_NaK" public_interface="in" units="per_s"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <!-- cytosolic ATP (ATP_hydrolysis_port) -->
+        <variable name="ATP" public_interface="in" units="millimolar"/>
+        <variable name="ADP" public_interface="in" units="millimolar"/>
+        <variable name="Pi" public_interface="in" units="millimolar"/>
+        <variable name="K_m_ATP_NaK" public_interface="in" units="millimolar"/>
+        <variable name="k_NaK" public_interface="out" units="nanoA"/>
+        <variable name="i_NaK" public_interface="out" units="nanoA"/>
+        <variable name="j_NaK_Na" public_interface="out" units="mol_per_s"/>
+        <variable name="j_NaK_K" public_interface="out" units="mol_per_s"/>
+        <!-- 1 ATP hydrolysed per cycle -->
+        <variable name="j_NaK_ATP" public_interface="out" units="mol_per_s"/>
+        <variable name="j_NaK_ADP" public_interface="out" units="mol_per_s"/>
+        <variable name="j_NaK_Pi" public_interface="out" units="mol_per_s"/>
+        <!-- Nernst potentials (from ion_concentrations), for the ion work per cycle -->
+        <variable name="E_Na" public_interface="in" units="milliV"/>
+        <variable name="E_K" public_interface="in" units="milliV"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="dG0_hyd" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std" public_interface="in" units="millimolar"/>
+        <!-- free energy of ATP hydrolysis available per cycle -->
+        <variable name="A_ATP" public_interface="out" units="J_per_mol"/>
+        <!-- electrochemical work per cycle: 3 Na out, 2 K in -->
+        <variable name="W_ion" public_interface="out" units="J_per_mol"/>
+        <!-- thermodynamic factor: 0 at equilibrium, negative (reverse) below it -->
+        <variable name="f_thermo" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>k_NaK</ci>
+                <apply>
+                    <times/>
+                    <ci>A_mem</ci>
+                    <ci>rho_NaK</ci>
+                    <ci>r_NaK</ci>
+                    <cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_ATP</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>dG0_hyd</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>R</ci>
+                        <ci>T</ci>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <apply>
+                                                <divide/>
+                                                <ci>ADP</ci>
+                                                <ci>c_std</ci>
+                                            </apply>
+                                            <apply>
+                                                <divide/>
+                                                <ci>Pi</ci>
+                                                <ci>c_std</ci>
+                                            </apply>
+                                        </apply>
+                                        <apply>
+                                            <divide/>
+                                            <ci>ATP</ci>
+                                            <ci>c_std</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>W_ion</ci>
+                <apply>
+                    <times/>
+                    <ci>F</ci>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                            <apply>
+                                <minus/>
+                                <ci>E_Na</ci>
+                                <ci>V</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <apply>
+                                <minus/>
+                                <ci>V</ci>
+                                <ci>E_K</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="V_per_milliV">0.001</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_thermo</ci>
+                <apply>
+                    <minus/>
+                    <cn cellml:units="dimensionless">1.0</cn>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>A_ATP</ci>
+                                    <ci>W_ion</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_NaK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <times/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <ci>k_NaK</ci>
+                                            <apply>
+                                                <divide/>
+                                                <apply>
+                                                    <plus/>
+                                                    <ci>V</ci>
+                                                    <cn cellml:units="milliV">150.0</cn>
+                                                </apply>
+                                                <apply>
+                                                    <plus/>
+                                                    <ci>V</ci>
+                                                    <cn cellml:units="milliV">200.0</cn>
+                                                </apply>
+                                            </apply>
+                                        </apply>
+                                        <apply>
+                                            <plus/>
+                                            <cn cellml:units="dimensionless">1.0</cn>
+                                            <apply>
+                                                <power/>
+                                                <apply>
+                                                    <divide/>
+                                                    <ci>Nai_mid_NaK</ci>
+                                                    <ci>Nai</ci>
+                                                </apply>
+                                                <ci>Nai_power_NaK</ci>
+                                            </apply>
+                                        </apply>
+                                    </apply>
+                                    <ci>Ko</ci>
+                                </apply>
+                                <apply>
+                                    <plus/>
+                                    <ci>Ko</ci>
+                                    <ci>Ko_mid_NaK</ci>
+                                </apply>
+                            </apply>
+                            <ci>ATP</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>K_m_ATP_NaK</ci>
+                            <ci>ATP</ci>
+                        </apply>
+                    </apply>
+                    <ci>f_thermo</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaK_Na</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">3.0</cn>
+                            </apply>
+                            <ci>i_NaK</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaK_K</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <ci>i_NaK</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaK_ATP</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>i_NaK</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaK_ADP</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <ci>i_NaK</ci>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaK_Pi</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <ci>i_NaK</ci>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

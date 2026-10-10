@@ -1,0 +1,16 @@
+variable_name,units,value,data_reference
+sigma_diff,m2_per_s,2.41e-09,secomb2020mass; Table 1 tissue O2 diffusivity 2410 um^2/s
+C_P_init_bath,millimolar,0.2,"homogenisation example: well-mixed bath, no consumption"
+V_P_bath,m3,1.0,"homogenisation example: well-mixed bath, no consumption"
+flux_c_bath,mol_per_s,0,no capillary supply
+M_bath,millimolar_per_s,0,"homogenisation example: well-mixed bath, no consumption"
+C50_bath,millimolar,0.0133,CelayaAlcala2021 via the default instance
+C_P_init_c0,millimolar,0,homogenisation example: geometry and default consumption
+V_P_c0,m3,5.120000000000001e-13,homogenisation example: geometry and default consumption
+flux_c_c0,mol_per_s,0,no capillary supply
+M_c0,millimolar_per_s,-0.0558,homogenisation example: geometry and default consumption
+C50_c0,millimolar,0.0133,CelayaAlcala2021 via the default instance
+A_f_e0,m2,1.2800000000000002e-08,mesh geometry: face area
+d_up_e0,metre,0.0,derived effective distance (see tools/build_homogenisation_examples.py)
+d_down_e0,metre,2.381433823529411e-05,derived effective distance (see tools/build_homogenisation_examples.py)
+open_flag_e0,dimensionless,1,open face

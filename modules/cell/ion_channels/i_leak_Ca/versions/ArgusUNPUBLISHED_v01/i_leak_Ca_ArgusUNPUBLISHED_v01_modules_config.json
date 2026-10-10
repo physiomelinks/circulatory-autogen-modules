@@ -1,0 +1,129 @@
+[
+  {
+    "module_type": "i_leak_Ca",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "i_leak_Ca_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "i_leak_Ca",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_leak_Ca"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_leak_Ca"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Cao",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_leak_Ca",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_leak_Ca",
+        "picoS",
+        "access",
+        "constant"
+      ],
+      [
+        "g_leak_Ca",
+        "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "E_Ca",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "i_leak_Ca",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_leak_Ca",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

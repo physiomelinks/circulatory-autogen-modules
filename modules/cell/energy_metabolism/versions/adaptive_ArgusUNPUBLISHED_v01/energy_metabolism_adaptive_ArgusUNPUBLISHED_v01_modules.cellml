@@ -1,0 +1,1220 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="energy_metabolism_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="energy_metabolism_fermenter">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="C_glc_init" public_interface="in" units="millimolar"/>
+        <variable name="C_lac_init" public_interface="in" units="millimolar"/>
+        <variable name="C_ATP_init" public_interface="in" units="millimolar"/>
+        <variable name="C_ADP_init" public_interface="in" units="millimolar"/>
+        <variable name="C_Pi_init" public_interface="in" units="millimolar"/>
+        <!-- species stores (bond-graph C elements): mu = mu0 + RT ln(C/c_std) -->
+        <variable initial_value="C_glc_init" name="C_glc" public_interface="out" units="millimolar"/>
+        <variable initial_value="C_lac_init" name="C_lac" public_interface="out" units="millimolar"/>
+        <variable initial_value="C_ATP_init" name="C_ATP" public_interface="out" units="millimolar"/>
+        <variable initial_value="C_ADP_init" name="C_ADP" public_interface="out" units="millimolar"/>
+        <variable initial_value="C_Pi_init" name="C_Pi" public_interface="out" units="millimolar"/>
+        <!-- summed fluxes of the faces on the entrance and exit cytosol_face_ports -->
+        <variable name="J_glc_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_lac_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_ATP_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_ADP_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_Pi_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_glc_out" public_interface="in" units="mol_per_s"/>
+        <variable name="J_lac_out" public_interface="in" units="mol_per_s"/>
+        <variable name="J_ATP_out" public_interface="in" units="mol_per_s"/>
+        <variable name="J_ADP_out" public_interface="in" units="mol_per_s"/>
+        <variable name="J_Pi_out" public_interface="in" units="mol_per_s"/>
+        <!-- summed ATP-consuming transporters (ATP_hydrolysis_port) -->
+        <variable name="j_ATP_ext" public_interface="in" units="mol_per_s"/>
+        <variable name="j_ADP_ext" public_interface="in" units="mol_per_s"/>
+        <variable name="j_Pi_ext" public_interface="in" units="mol_per_s"/>
+        <!-- volume (compartment_volume port) -->
+        <variable name="V_c" public_interface="in" units="m3"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T_ref" public_interface="in" units="kelvin"/>
+        <variable name="dT_Q10" public_interface="in" units="kelvin"/>
+        <variable name="Q10" public_interface="in" units="dimensionless"/>
+        <variable name="c_std" public_interface="in" units="millimolar"/>
+        <!-- standard Gibbs energies (glucose -&gt; 2 lactate; ATP hydrolysis) -->
+        <variable name="dG0_ferm" public_interface="in" units="J_per_mol"/>
+        <variable name="dG0_hyd" public_interface="in" units="J_per_mol"/>
+        <variable name="V_gly" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_glc" public_interface="in" units="millimolar"/>
+        <variable name="K_ADP_gly" public_interface="in" units="millimolar"/>
+        <variable name="K_Pi_gly" public_interface="in" units="millimolar"/>
+        <variable name="K_lac" public_interface="in" units="millimolar"/>
+        <variable name="K_ATP_gly" public_interface="in" units="millimolar"/>
+        <variable name="V_hyd" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_ATP_hyd" public_interface="in" units="millimolar"/>
+        <variable name="K_ADP_hyd" public_interface="in" units="millimolar"/>
+        <variable name="K_Pi_hyd" public_interface="in" units="millimolar"/>
+        <!-- enthalpies released (positive = heat out) -->
+        <variable name="h_lac_gly" public_interface="in" units="J_per_mol"/>
+        <variable name="h_ATP" public_interface="in" units="J_per_mol"/>
+        <variable name="f_T" public_interface="out" units="dimensionless"/>
+        <variable name="K_eq_gly" public_interface="out" units="dimensionless"/>
+        <variable name="K_eq_hyd" public_interface="out" units="dimensionless"/>
+        <!-- mass-action ratios -->
+        <variable name="Gamma_gly" public_interface="out" units="dimensionless"/>
+        <variable name="Gamma_hyd" public_interface="out" units="dimensionless"/>
+        <!-- glucose + 2 ADP + 2 Pi &lt;=&gt; 2 lactate + 2 ATP (common modular rate law) -->
+        <variable name="v_gly" public_interface="out" units="millimolar_per_s"/>
+        <!-- ATP &lt;=&gt; ADP + Pi, the cell's maintenance work -->
+        <variable name="v_hyd" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinities A = RT ln(K_eq/Gamma) -->
+        <variable name="A_gly" public_interface="out" units="J_per_mol"/>
+        <variable name="A_hyd" public_interface="out" units="J_per_mol"/>
+        <!-- free energy dissipated by the reactions (&gt;= 0, second law) -->
+        <variable name="P_diss" public_interface="out" units="watt"/>
+        <!-- heat released: reaction enthalpies, including ATP hydrolysed by transporters -->
+        <variable name="Q_met" public_interface="out" units="watt"/>
+        <!-- ATP hydrolysed by the ATPase and transporters -->
+        <variable name="J_ATP_turnover" public_interface="out" units="mol_per_s"/>
+        <!-- H+ released into the cytosol by all ATP hydrolysed, the maintenance ATPase and the ATP_hydrolysis_port users (H_production port): ATP4- + H2O -&gt; ADP3- + HPO4 2- + H+ -->
+        <variable name="j_H_met" public_interface="out" units="mol_per_s"/>
+        <variable name="C_glyc_init" public_interface="in" units="millimolar"/>
+        <!-- glycogen, as mM of glucose units -->
+        <variable initial_value="C_glyc_init" name="C_glyc" public_interface="out" units="millimolar"/>
+        <!-- fraction of the storage capacity in use (set by the game, 0-1) -->
+        <variable name="store_alloc" public_interface="in" units="dimensionless"/>
+        <variable name="V_store_max" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_glc_store" public_interface="in" units="millimolar"/>
+        <variable name="K_ATP_store" public_interface="in" units="millimolar"/>
+        <!-- storage ceiling -->
+        <variable name="C_glyc_max" public_interface="in" units="millimolar"/>
+        <variable name="V_mob" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_glyc_mob" public_interface="in" units="millimolar"/>
+        <variable name="K_ADP_mob" public_interface="in" units="millimolar"/>
+        <variable name="K_Pi_mob" public_interface="in" units="millimolar"/>
+        <!-- ATP inhibition of mobilisation (phosphorylase) -->
+        <variable name="K_i_ATP_mob" public_interface="in" units="millimolar"/>
+        <!-- glucose + 2 ATP -&gt; glycogen unit + 2 ADP + 2 Pi -->
+        <variable name="dG0_store" public_interface="in" units="J_per_mol"/>
+        <!-- enthalpy released by adding a glucose to glycogen -->
+        <variable name="h_glyc_poly" public_interface="in" units="J_per_mol"/>
+        <variable name="K_eq_store" public_interface="out" units="dimensionless"/>
+        <variable name="K_eq_mob" public_interface="out" units="dimensionless"/>
+        <variable name="Gamma_store" public_interface="out" units="dimensionless"/>
+        <variable name="Gamma_mob" public_interface="out" units="dimensionless"/>
+        <!-- glycogen synthesis: glucose + 2 ATP -&gt; glycogen + 2 ADP + 2 Pi -->
+        <variable name="v_store" public_interface="out" units="millimolar_per_s"/>
+        <!-- glycogenolysis to lactate: glycogen + 3 ADP + 3 Pi -&gt; 2 lactate + 3 ATP -->
+        <variable name="v_mob" public_interface="out" units="millimolar_per_s"/>
+        <variable name="A_store" public_interface="out" units="J_per_mol"/>
+        <variable name="A_mob" public_interface="out" units="J_per_mol"/>
+        <!-- expression of the glycolytic enzymes, 1 = the calibrated cell (enzyme_expression port, from their protein_pool) -->
+        <variable name="m_gly" public_interface="in" units="dimensionless"/>
+        <!-- ATP made by glycolysis (2 per glucose) -->
+        <variable name="J_ATP_gly" public_interface="out" units="mol_per_s"/>
+        <!-- ATP made from glycogen (3 per glucose unit) -->
+        <variable name="J_ATP_mob" public_interface="out" units="mol_per_s"/>
+        <!-- ATP spent storing glucose as glycogen (2 per glucose) -->
+        <variable name="J_ATP_store" public_interface="out" units="mol_per_s"/>
+        <!-- ATP hydrolysed by the maintenance ATPase (everything not itemised) -->
+        <variable name="J_ATP_maint" public_interface="out" units="mol_per_s"/>
+        <!-- ATP the glycogen store would give if spent (3 per glucose unit; glycogen_store port) -->
+        <variable name="M_glyc_ATP" public_interface="out" units="mole"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_T</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref</ci>
+                        </apply>
+                        <ci>dT_Q10</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_eq_gly</ci>
+                <apply>
+                    <exp/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <ci>dG0_ferm</ci>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                    <ci>dG0_hyd</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_eq_hyd</ci>
+                <apply>
+                    <exp/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>dG0_hyd</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Gamma_gly</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_lac</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ATP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <ci>C_glc</ci>
+                            <ci>c_std</ci>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ADP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_Pi</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Gamma_hyd</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <ci>C_ADP</ci>
+                            <ci>c_std</ci>
+                        </apply>
+                        <apply>
+                            <divide/>
+                            <ci>C_Pi</ci>
+                            <ci>c_std</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>C_ATP</ci>
+                        <ci>c_std</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_gly</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>V_gly</ci>
+                        <ci>m_gly</ci>
+                        <ci>f_T</ci>
+                        <apply>
+                            <divide/>
+                            <ci>C_glc</ci>
+                            <ci>K_glc</ci>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ADP</ci>
+                                <ci>K_ADP_gly</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_Pi</ci>
+                                <ci>K_Pi_gly</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <apply>
+                                <divide/>
+                                <ci>Gamma_gly</ci>
+                                <ci>K_eq_gly</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <plus/>
+                                    <cn cellml:units="dimensionless">1.0</cn>
+                                    <apply>
+                                        <divide/>
+                                        <ci>C_glc</ci>
+                                        <ci>K_glc</ci>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <power/>
+                                    <apply>
+                                        <plus/>
+                                        <cn cellml:units="dimensionless">1.0</cn>
+                                        <apply>
+                                            <divide/>
+                                            <ci>C_ADP</ci>
+                                            <ci>K_ADP_gly</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                                <apply>
+                                    <power/>
+                                    <apply>
+                                        <plus/>
+                                        <cn cellml:units="dimensionless">1.0</cn>
+                                        <apply>
+                                            <divide/>
+                                            <ci>C_Pi</ci>
+                                            <ci>K_Pi_gly</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <power/>
+                                    <apply>
+                                        <plus/>
+                                        <cn cellml:units="dimensionless">1.0</cn>
+                                        <apply>
+                                            <divide/>
+                                            <ci>C_lac</ci>
+                                            <ci>K_lac</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                                <apply>
+                                    <power/>
+                                    <apply>
+                                        <plus/>
+                                        <cn cellml:units="dimensionless">1.0</cn>
+                                        <apply>
+                                            <divide/>
+                                            <ci>C_ATP</ci>
+                                            <ci>K_ATP_gly</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_hyd</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>V_hyd</ci>
+                        <ci>f_T</ci>
+                        <apply>
+                            <divide/>
+                            <ci>C_ATP</ci>
+                            <ci>K_ATP_hyd</ci>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <apply>
+                                <divide/>
+                                <ci>Gamma_hyd</ci>
+                                <ci>K_eq_hyd</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <apply>
+                                <divide/>
+                                <ci>C_ATP</ci>
+                                <ci>K_ATP_hyd</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <plus/>
+                                    <cn cellml:units="dimensionless">1.0</cn>
+                                    <apply>
+                                        <divide/>
+                                        <ci>C_ADP</ci>
+                                        <ci>K_ADP_hyd</ci>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <plus/>
+                                    <cn cellml:units="dimensionless">1.0</cn>
+                                    <apply>
+                                        <divide/>
+                                        <ci>C_Pi</ci>
+                                        <ci>K_Pi_hyd</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_gly</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>K_eq_gly</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <abs/>
+                                    <ci>Gamma_gly</ci>
+                                </apply>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_hyd</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>K_eq_hyd</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <abs/>
+                                    <ci>Gamma_hyd</ci>
+                                </apply>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_eq_store</ci>
+                <apply>
+                    <exp/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>dG0_store</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_eq_mob</ci>
+                <apply>
+                    <exp/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>dG0_ferm</ci>
+                                    <ci>dG0_store</ci>
+                                </apply>
+                                <ci>dG0_hyd</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Gamma_store</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ADP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_Pi</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <ci>C_glc</ci>
+                            <ci>c_std</ci>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ATP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Gamma_mob</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_lac</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ATP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ADP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_Pi</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_store</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <times/>
+                                        <ci>V_store_max</ci>
+                                        <ci>store_alloc</ci>
+                                        <ci>f_T</ci>
+                                        <ci>C_glc</ci>
+                                    </apply>
+                                    <apply>
+                                        <plus/>
+                                        <ci>K_glc_store</ci>
+                                        <ci>C_glc</ci>
+                                    </apply>
+                                </apply>
+                                <ci>C_ATP</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>K_ATP_store</ci>
+                                <ci>C_ATP</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <apply>
+                                <power/>
+                                <apply>
+                                    <divide/>
+                                    <ci>C_glyc</ci>
+                                    <ci>C_glyc_max</ci>
+                                </apply>
+                                <cn cellml:units="dimensionless">8.0</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <ci>Gamma_store</ci>
+                            <ci>K_eq_store</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_mob</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <times/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <apply>
+                                                <divide/>
+                                                <apply>
+                                                    <times/>
+                                                    <ci>V_mob</ci>
+                                                    <ci>f_T</ci>
+                                                    <ci>C_glyc</ci>
+                                                </apply>
+                                                <apply>
+                                                    <plus/>
+                                                    <ci>K_glyc_mob</ci>
+                                                    <ci>C_glyc</ci>
+                                                </apply>
+                                            </apply>
+                                            <ci>C_ADP</ci>
+                                        </apply>
+                                        <apply>
+                                            <plus/>
+                                            <ci>K_ADP_mob</ci>
+                                            <ci>C_ADP</ci>
+                                        </apply>
+                                    </apply>
+                                    <ci>C_Pi</ci>
+                                </apply>
+                                <apply>
+                                    <plus/>
+                                    <ci>K_Pi_mob</ci>
+                                    <ci>C_Pi</ci>
+                                </apply>
+                            </apply>
+                            <ci>K_i_ATP_mob</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>K_i_ATP_mob</ci>
+                            <ci>C_ATP</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <ci>Gamma_mob</ci>
+                            <ci>K_eq_mob</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_store</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>K_eq_store</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <abs/>
+                                    <ci>Gamma_store</ci>
+                                </apply>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_mob</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>K_eq_mob</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <abs/>
+                                    <ci>Gamma_mob</ci>
+                                </apply>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_diss</ci>
+                <apply>
+                    <times/>
+                    <ci>V_c</ci>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>v_gly</ci>
+                            <ci>A_gly</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>v_hyd</ci>
+                            <ci>A_hyd</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>v_store</ci>
+                            <ci>A_store</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>v_mob</ci>
+                            <ci>A_mob</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_turnover</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>V_c</ci>
+                        <ci>v_hyd</ci>
+                    </apply>
+                    <ci>j_ATP_ext</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H_met</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>V_c</ci>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <plus/>
+                                <ci>v_hyd</ci>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                    <ci>v_store</ci>
+                                </apply>
+                            </apply>
+                            <ci>v_mob</ci>
+                        </apply>
+                    </apply>
+                    <ci>j_ATP_ext</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_met</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>V_c</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <times/>
+                                <ci>v_gly</ci>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">2.0</cn>
+                                        <ci>h_lac_gly</ci>
+                                    </apply>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">2.0</cn>
+                                        <ci>h_ATP</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>v_hyd</ci>
+                                <ci>h_ATP</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>v_store</ci>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">2.0</cn>
+                                        <ci>h_ATP</ci>
+                                    </apply>
+                                    <ci>h_glyc_poly</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>v_mob</ci>
+                                <apply>
+                                    <minus/>
+                                    <apply>
+                                        <minus/>
+                                        <apply>
+                                            <times/>
+                                            <cn cellml:units="dimensionless">2.0</cn>
+                                            <ci>h_lac_gly</ci>
+                                        </apply>
+                                        <ci>h_glyc_poly</ci>
+                                    </apply>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">3.0</cn>
+                                        <ci>h_ATP</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>j_ATP_ext</ci>
+                        <ci>h_ATP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_glc</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>J_glc_in</ci>
+                                <ci>J_glc_out</ci>
+                            </apply>
+                            <ci>V_c</ci>
+                        </apply>
+                        <ci>v_gly</ci>
+                    </apply>
+                    <ci>v_store</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_lac</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>J_lac_in</ci>
+                            <ci>J_lac_out</ci>
+                        </apply>
+                        <ci>V_c</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>v_gly</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>v_mob</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_ATP</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>J_ATP_in</ci>
+                                        <ci>J_ATP_out</ci>
+                                        <ci>j_ATP_ext</ci>
+                                    </apply>
+                                    <ci>V_c</ci>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                    <ci>v_gly</ci>
+                                </apply>
+                            </apply>
+                            <ci>v_hyd</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <ci>v_store</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">3.0</cn>
+                        <ci>v_mob</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_ADP</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>J_ADP_in</ci>
+                                    <ci>J_ADP_out</ci>
+                                    <ci>j_ADP_ext</ci>
+                                </apply>
+                                <ci>V_c</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">2.0</cn>
+                                <ci>v_gly</ci>
+                            </apply>
+                        </apply>
+                        <ci>v_hyd</ci>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <ci>v_store</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">3.0</cn>
+                        <ci>v_mob</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Pi</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>J_Pi_in</ci>
+                                    <ci>J_Pi_out</ci>
+                                    <ci>j_Pi_ext</ci>
+                                </apply>
+                                <ci>V_c</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">2.0</cn>
+                                <ci>v_gly</ci>
+                            </apply>
+                        </apply>
+                        <ci>v_hyd</ci>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <ci>v_store</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">3.0</cn>
+                        <ci>v_mob</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_glyc</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_store</ci>
+                    <ci>v_mob</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_gly</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                    <ci>V_c</ci>
+                    <ci>v_gly</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_mob</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                    <ci>V_c</ci>
+                    <ci>v_mob</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_store</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                    <ci>V_c</ci>
+                    <ci>v_store</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_maint</ci>
+                <apply>
+                    <times/>
+                    <ci>V_c</ci>
+                    <ci>v_hyd</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>M_glyc_ATP</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                    <ci>V_c</ci>
+                    <ci>C_glyc</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

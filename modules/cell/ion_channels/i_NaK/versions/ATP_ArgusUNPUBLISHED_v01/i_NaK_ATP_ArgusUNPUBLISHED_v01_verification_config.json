@@ -1,0 +1,43 @@
+{
+  "module_type": "i_NaK",
+  "version": "ATP_ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "i_NaK",
+    "j_NaK_Na",
+    "j_NaK_K",
+    "j_NaK_ATP",
+    "j_NaK_ADP",
+    "j_NaK_Pi",
+    "A_ATP",
+    "W_ion",
+    "f_thermo"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "stoichiometry: 3 Na out, 2 K in, 1 ATP -> ADP + Pi per cycle; the current is the net charge, j_Na + j_K = -i/F (exact)",
+      "expr": "np.allclose(j_NaK_Na, 3*j_NaK_ATP, rtol=1e-12, atol=0) and np.allclose(j_NaK_K, -2*j_NaK_ATP, rtol=1e-12, atol=0) and np.allclose(j_NaK_ADP, -j_NaK_ATP, rtol=1e-12, atol=0) and np.allclose(j_NaK_Pi, -j_NaK_ATP, rtol=1e-12, atol=0) and np.allclose(j_NaK_Na + j_NaK_K, -i_NaK/F*1e-9, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "second law: the pump runs forward only while the ATP free energy exceeds the ion work per cycle, i_NaK (A_ATP - W_ion) >= 0",
+      "expr": "np.all(i_NaK*(A_ATP - W_ion) >= 0)"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

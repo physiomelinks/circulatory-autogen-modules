@@ -1,0 +1,11 @@
+module_type: protein_expression
+version: adaptive_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The protein synthesis of an adaptive cell, serving its protein_pools (one per protein, on the protein_synthesis port:
+  their ATP use, turnover, build spending, daughter share and membrane area are summed here, and each receives the cytosol
+  ATP and s_build). Building is limited to J_cap = build_capacity J_ref throttle: a growing cell builds protein at several
+  times its maintenance rate, and building backs off linearly as ATP falls from rest (ATP_ref) to ATP_floor (the stringent
+  response), so it never starves the cell. When the pools ask for more, each gets the same share s_build = J_cap/J_demand_total.
+  The summed ATP goes to the cytosol on the ATP_hydrolysis_port. The membrane area the pools take is compared with the most
+  the cell surface allows (area_max_fraction of it); the game keeps targets within it. Biosynthesis throttles growth the same
+  way (its own ATP_floor and J_ref, the same values of parameters.json).'

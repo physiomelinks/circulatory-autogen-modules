@@ -1,0 +1,10 @@
+module_type: H_handling
+version: adaptive_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Cytosolic protons of a prokaryote: free H+ with a fixed linear buffer of capacity beta_H (mM of H+ bound per pH unit),
+  in rapid equilibrium, so the total H_i + beta_H (pH_ref - pH_i) changes only by the summed fluxes: dH_i/dt = ((j_H_in +
+  j_H_prod)/Vol)/(1 + beta_H/(ln10 H_i)), with membrane fluxes on H_flux and protons released by cytosolic reactions on H_production
+  (separate port types, because a membrane carrier and the cytosol are themselves connected). Outputs pH_i, the medium pH_o
+  and the H+ Nernst potential E_H = (RT/F) ln(H_o/H_i) for the proton pathways. The buffer is algebraic, so unlike a kinetic
+  buffer it adds no stiffness. Its fluxes come from the H+-ATPase, NhaA, KefC, the H+ leak, the lactate-/H+ symporter (H_flux)
+  and ATP hydrolysis in the cytosol (H_production).'

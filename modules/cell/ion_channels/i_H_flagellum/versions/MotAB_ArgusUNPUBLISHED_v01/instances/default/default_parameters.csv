@@ -1,0 +1,16 @@
+variable_name,units,value,data_reference,sourced
+V,milliV,-105.0,"milo2010bionumbers; BNID 103386: E. coli membrane potential -140 to -105 mV, fermenting at the less negative end",yes
+E_H,milliV,17.449261892231384,"Nernst potential at pH 7.6 in, 7.3 out",no
+m_expr,dimensionless,1.0,definitional; the starting cell has one flagellum (user decision 2026-10-09),no
+a_motor,dimensionless,0.0,definitional; motor off until the game runs it,no
+tau_bundle,second,0.3,"unreferenced_placeholder; time for the flagella to spin up into a bundle when the motors switch on, or to unwind when they stop (E. coli bundles form in a few tenths of a second; Turner, Ryu and Berg 2000, to cite): thrust follows the motor switch with this time constant",no
+a_init,dimensionless,0.0,definitional; at rest the motors are still,no
+f_ref,per_s,100.0,unreferenced_placeholder; flagellar rotation at the resting proton motive force: ~100 Hz in swimming E. coli (motor speed is proportional to the PMF),no
+pmf_ref,milliV,122.44926189223139,calibrated: the proton motive force of the fermenter at rest (E_H - V),no
+n_H_rev,dimensionless,1200.0,"meister1987proton; about 1,200 H+ per revolution of the E. coli/Streptococcus flagellar motor",yes
+v_one,m_per_s,1.5e-05,unreferenced_placeholder; swimming speed with one flagellum turning at f_flag_ref (E. coli with 4-6 flagella swims 20-30 um/s),no
+n_half,dimensionless,2.0,unreferenced_placeholder; flagella at which extra flagella add half as much again: speed saturates with the number (thrust and drag both grow),no
+eta,pascal_second,0.00108,"unreferenced_placeholder; dynamic viscosity of seawater at 20 C and 35 g/kg salinity, about 1.08 mPa s (Sharqawy et al. 2010 tables; to cite)",no
+R_body,um,1.0,unreferenced_placeholder; a 2 um cell (typical prokaryote): disc radius,no
+N_A,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+F,C_per_mol,96485.0,"definitional; Faraday constant, as the library's SN modules",no

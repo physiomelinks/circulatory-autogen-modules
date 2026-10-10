@@ -1,0 +1,21 @@
+variable_name,units,value,data_reference,sourced
+V,milliV,-70.0,unreferenced_placeholder; operating point of the eukaryotic Na/K pump module's own instance,no
+Nai,millimolar,20.0,unreferenced_placeholder; cytosolic Na+ in a marine prokaryote,no
+Ko,millimolar,10.21,millero2008composition; standard seawater K 10.21 mmol/kg,yes
+Ko_mid_NaK,millimolar,1.0,argus2026unpublished; as i_NaK Argus2026_v01 (default instance),no
+Nai_mid_NaK,millimolar,15.0,argus2026unpublished; as i_NaK Argus2026_v01 (default instance),no
+Nai_power_NaK,dimensionless,1.5,argus2026unpublished; as i_NaK Argus2026_v01 (default instance),no
+A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
+rho_NaK,per_um2,4365.407445209914,"calibrated: the pump uses 25% of a 2 um cell's maintenance ATP at -70 mV (rolfe1997cellular, mammals 19-28%)",no
+r_NaK,per_s,9.0,argus2026unpublished; as i_NaK Argus2026_v01 (default instance),no
+F,C_per_mol,96485.0,"definitional; Faraday constant, as the library's SN modules",no
+ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
+Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+K_m_ATP_NaK,millimolar,0.2,"unreferenced_placeholder; Na/K pump affinity for ATP, order 0.1-0.5 mM",no
+E_Na,milliV,79.69327122654074,Nernst potential at the default concentrations,no
+E_K,milliV,-75.14840195514417,Nernst potential at the default concentrations,no
+R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+dG0_hyd,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
+c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no

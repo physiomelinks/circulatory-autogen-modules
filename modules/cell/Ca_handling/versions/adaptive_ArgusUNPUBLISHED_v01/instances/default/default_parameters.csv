@@ -1,0 +1,8 @@
+variable_name,units,value,data_reference,sourced
+Cai_init,millimolar,9e-05,gangola1987maintenance; free cytosolic Ca2+ in E. coli 90 +- 10 nM,yes
+B_Ca_init,millimolar,7.991010113622174,"definitional; free buffer in equilibrium with Cai_init: B_tot Kd/(Kd + Cai), Kd = k_unbind/k_bind = 80 uM",no
+B_Ca_total,millimolar,8.0,unreferenced_placeholder; the SN soma's fixed buffer (matveev2002new); bacterial Ca buffering not characterised here,no
+k_bind_Ca,per_millimolar_s,100000.0,"unreferenced_placeholder; the SN soma's buffer on-rate (matveev2002new, quoted set)",no
+k_unbind_Ca,per_s,8000.0,"unreferenced_placeholder; the SN soma's buffer off-rate (matveev2002new, actual set)",no
+j_Ca_in,mol_per_s,0.0,no Ca pathway connected,no
+Vol,m3,6.283185307179586e-18,"geometry: disc of radius 1 um, 2 um deep",no

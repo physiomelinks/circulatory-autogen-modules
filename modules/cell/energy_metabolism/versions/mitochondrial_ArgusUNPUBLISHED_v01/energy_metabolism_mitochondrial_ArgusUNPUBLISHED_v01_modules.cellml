@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="energy_metabolism_mitochondrial_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="energy_metabolism_mitochondrial">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- temperature of the volume (heat_source_port) -->
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="T_ref" public_interface="in" units="kelvin"/>
+        <variable name="dT_Q10" public_interface="in" units="kelvin"/>
+        <variable name="Q10" public_interface="in" units="dimensionless"/>
+        <!-- volume this metabolism occupies: a cell, part of a cell, or a tissue volume -->
+        <variable name="V_c" public_interface="in" units="m3"/>
+        <!-- concentrations in the volume's pools (exchange ports) -->
+        <variable name="C_O2" public_interface="in" units="millimolar"/>
+        <variable name="C_glc" public_interface="in" units="millimolar"/>
+        <variable name="C_lac" public_interface="in" units="millimolar"/>
+        <variable name="C_CO2" public_interface="in" units="millimolar"/>
+        <variable name="ATP_init" public_interface="in" units="millimolar"/>
+        <!-- adenine nucleotides: ATP + ADP = A_tot (AMP and Pi not modelled) -->
+        <variable initial_value="ATP_init" name="ATP" public_interface="out" units="millimolar"/>
+        <variable name="A_tot" public_interface="in" units="millimolar"/>
+        <variable name="ADP" public_interface="out" units="millimolar"/>
+        <!-- Q10 temperature factor on every rate -->
+        <variable name="f_T" public_interface="out" units="dimensionless"/>
+        <variable name="V_ox" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_O2" public_interface="in" units="millimolar"/>
+        <variable name="K_glc" public_interface="in" units="millimolar"/>
+        <variable name="K_ADP" public_interface="in" units="millimolar"/>
+        <variable name="V_gly" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_i_O2" public_interface="in" units="millimolar"/>
+        <variable name="k_dem" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_ATP" public_interface="in" units="millimolar"/>
+        <variable name="n_ATP_ox" public_interface="in" units="dimensionless"/>
+        <variable name="n_ATP_gly" public_interface="in" units="dimensionless"/>
+        <!-- enthalpies released (positive = heat out), see notes -->
+        <variable name="h_O2_ox" public_interface="in" units="J_per_mol"/>
+        <variable name="h_lac_gly" public_interface="in" units="J_per_mol"/>
+        <variable name="h_ATP" public_interface="in" units="J_per_mol"/>
+        <!-- glucose oxidised (aerobic, coupled to ATP synthesis) -->
+        <variable name="r_ox" public_interface="out" units="millimolar_per_s"/>
+        <!-- glucose to lactate (anaerobic glycolysis, coupled to ATP synthesis) -->
+        <variable name="r_gly" public_interface="out" units="millimolar_per_s"/>
+        <!-- ATP hydrolysed by the cell's work (maintenance) -->
+        <variable name="r_dem" public_interface="out" units="millimolar_per_s"/>
+        <!-- ATP synthesis rate -->
+        <variable name="J_ATP" public_interface="out" units="millimolar_per_s"/>
+        <!-- sources into the pools (negative = taken up) -->
+        <variable name="flux_O2" public_interface="out" units="mol_per_s"/>
+        <variable name="flux_glc" public_interface="out" units="mol_per_s"/>
+        <variable name="flux_lac" public_interface="out" units="mol_per_s"/>
+        <variable name="flux_CO2" public_interface="out" units="mol_per_s"/>
+        <!-- heat released into the volume (heat_source_port) -->
+        <variable name="Q_met" public_interface="out" units="watt"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>ADP</ci>
+                <apply>
+                    <minus/>
+                    <ci>A_tot</ci>
+                    <ci>ATP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_T</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref</ci>
+                        </apply>
+                        <ci>dT_Q10</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_ox</ci>
+                <apply>
+                    <times/>
+                    <ci>V_ox</ci>
+                    <ci>f_T</ci>
+                    <apply>
+                        <divide/>
+                        <ci>C_O2</ci>
+                        <apply>
+                            <plus/>
+                            <ci>K_O2</ci>
+                            <ci>C_O2</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>C_glc</ci>
+                        <apply>
+                            <plus/>
+                            <ci>K_glc</ci>
+                            <ci>C_glc</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>ADP</ci>
+                        <apply>
+                            <plus/>
+                            <ci>K_ADP</ci>
+                            <ci>ADP</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_gly</ci>
+                <apply>
+                    <times/>
+                    <ci>V_gly</ci>
+                    <ci>f_T</ci>
+                    <apply>
+                        <divide/>
+                        <ci>C_glc</ci>
+                        <apply>
+                            <plus/>
+                            <ci>K_glc</ci>
+                            <ci>C_glc</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>ADP</ci>
+                        <apply>
+                            <plus/>
+                            <ci>K_ADP</ci>
+                            <ci>ADP</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>K_i_O2</ci>
+                        <apply>
+                            <plus/>
+                            <ci>K_i_O2</ci>
+                            <ci>C_O2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_dem</ci>
+                <apply>
+                    <times/>
+                    <ci>k_dem</ci>
+                    <ci>f_T</ci>
+                    <apply>
+                        <divide/>
+                        <ci>ATP</ci>
+                        <apply>
+                            <plus/>
+                            <ci>K_ATP</ci>
+                            <ci>ATP</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>n_ATP_ox</ci>
+                        <ci>r_ox</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>n_ATP_gly</ci>
+                        <ci>r_gly</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>ATP</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>J_ATP</ci>
+                    <ci>r_dem</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>flux_O2</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">6.0</cn>
+                    </apply>
+                    <ci>r_ox</ci>
+                    <ci>V_c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>flux_CO2</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">6.0</cn>
+                    <ci>r_ox</ci>
+                    <ci>V_c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>flux_glc</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>r_ox</ci>
+                            <ci>r_gly</ci>
+                        </apply>
+                    </apply>
+                    <ci>V_c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>flux_lac</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                    <ci>r_gly</ci>
+                    <ci>V_c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_met</ci>
+                <apply>
+                    <times/>
+                    <ci>V_c</ci>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>r_ox</ci>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">6.0</cn>
+                                    <ci>h_O2_ox</ci>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>n_ATP_ox</ci>
+                                    <ci>h_ATP</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>r_gly</ci>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                    <ci>h_lac_gly</ci>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>n_ATP_gly</ci>
+                                    <ci>h_ATP</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>r_dem</ci>
+                            <ci>h_ATP</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

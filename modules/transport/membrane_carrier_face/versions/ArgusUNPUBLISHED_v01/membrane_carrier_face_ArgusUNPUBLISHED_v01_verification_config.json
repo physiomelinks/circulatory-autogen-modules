@@ -1,0 +1,38 @@
+{
+  "module_type": "membrane_carrier_face",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14,
+    "MaximumStep": 0.1
+  },
+  "outputs": [
+    "J",
+    "J_up",
+    "J_down"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "symmetric carrier: J = open_flag V_max (C_up/(K_m + C_up) - C_down/(K_m + C_down)), J_down = J, J_up = -J (mass conserved across the membrane) (exact)",
+      "expr": "np.allclose(J, open_flag*V_max*(C_up/(K_m + C_up) - C_down/(K_m + C_down)), rtol=1e-12, atol=0) and np.array_equal(J_down, J) and np.array_equal(J_up, -J)"
+    },
+    {
+      "description": "second law: facilitated transport runs down its gradient, J ln(C_up/C_down) >= 0",
+      "expr": "np.all(J*np.log(C_up/C_down) >= 0)"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

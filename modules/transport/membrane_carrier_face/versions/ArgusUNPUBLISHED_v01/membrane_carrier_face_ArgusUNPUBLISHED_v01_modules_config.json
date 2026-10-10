@@ -1,0 +1,84 @@
+[
+  {
+    "module_type": "membrane_carrier_face",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "membrane_carrier_face_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "membrane_carrier_face",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "diffusion_face_port",
+        "variables": [
+          "C_up",
+          "J_up"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "diffusion_face_port",
+        "variables": [
+          "C_down",
+          "J_down"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "V_max",
+        "mol_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_m",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "open_flag",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C_up",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_down",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "J",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_up",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_down",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "module_type": "i_leak_H",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "g_leak_H",
+    "i_leak_H",
+    "j_leak_H"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "Ohmic leak at the H+ Nernst potential; j = -i/F (exact)",
+      "expr": "np.allclose(i_leak_H, g_leak_H*(V - E_H), rtol=1e-12, atol=0) and np.allclose(j_leak_H, -i_leak_H/F*1e-9, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "second law: i (V - E_H) >= 0",
+      "expr": "np.all(i_leak_H*(V - E_H) >= 0)"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

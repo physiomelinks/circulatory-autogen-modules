@@ -1,0 +1,207 @@
+[
+  {
+    "module_type": "i_H_flagellum",
+    "module_subtype": "MotAB_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "i_H_flagellum_MotAB_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "i_H_flagellum_MotAB",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "H_Nernst_potential",
+        "variables": [
+          "E_H"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_flag"
+        ]
+      },
+      {
+        "port_type": "H_flux",
+        "variables": [
+          "j_H_flag"
+        ]
+      },
+      {
+        "port_type": "protein_expression",
+        "variables": [
+          "m_expr"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_H",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m_expr",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "a_motor",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "tau_bundle",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "a_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "a_eff",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_ref",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "pmf_ref",
+        "milliV",
+        "access",
+        "constant"
+      ],
+      [
+        "n_H_rev",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "v_one",
+        "m_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "n_half",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "eta",
+        "pascal_second",
+        "access",
+        "constant"
+      ],
+      [
+        "R_body",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "N_A",
+        "per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "xi",
+        "newton_s_per_m",
+        "access",
+        "variable"
+      ],
+      [
+        "F_one",
+        "newton",
+        "access",
+        "variable"
+      ],
+      [
+        "F_thrust",
+        "newton",
+        "access",
+        "variable"
+      ],
+      [
+        "P_mech",
+        "watt",
+        "access",
+        "variable"
+      ],
+      [
+        "pmf",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "f_rot",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_H_flag",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "i_flag",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "P_flag",
+        "watt",
+        "access",
+        "variable"
+      ],
+      [
+        "v_swim",
+        "m_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

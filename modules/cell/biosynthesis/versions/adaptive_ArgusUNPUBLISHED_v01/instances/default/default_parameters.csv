@@ -1,0 +1,37 @@
+variable_name,units,value,data_reference,sourced
+ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
+Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
+surface_factor,dimensionless,1.5,geometry: a disc of radius 1 um and depth 2 um has 1.5x its in-plane area as surface,no
+n_mRNA,dimensionless,8670.79572390783,"derived: mRNA_per_um3 x cell volume (mRNA_per_um3: milo2010bionumbers, sourced)",yes
+L_mRNA,dimensionless,1000.0,"unreferenced_placeholder; mean mRNA length about 1,000 nt",no
+t_half_mRNA,second,300.0,bernstein2002global; 80% of E. coli mRNA half-lives 3-8 min (median ~5 min),yes
+n_ribo,dimensionless,43982.2971502571,"derived: ribosomes_per_um3 x cell volume (ribosomes_per_um3: unreferenced_placeholder, placeholder)",no
+L_rRNA,dimensionless,4566.0,definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt,yes
+k_ribo,per_s,2.777777777777778e-06,unreferenced_placeholder; rRNA is stable in growing cells; 1%/h,no
+c_nt_recycle,dimensionless,2.0,definitional; NMP -> NDP -> NTP costs 2 ~P,no
+c_nt_denovo,dimensionless,50.0,lynch2015bioenergetic; of order 50 ~P per nucleotide made from glucose,no
+area_per_lipid,um2,5e-07,milo2010bionumbers; BNID 106993: about 0.5 nm2 per lipid,yes
+c_lipid,dimensionless,100.0,unreferenced_placeholder; two C16 acyl chains (ATP and NADPH counted as ~P) plus head group: ~100 ~P per phospholipid,no
+k_lipid,per_s,2.777777777777778e-06,unreferenced_placeholder; phospholipid turnover 1%/h,no
+genome_nt,dimensionless,9200000.0,"unreferenced_placeholder; an E. coli-sized genome, 4.6 Mb, both strands",no
+N_A,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+K_m_ATP_bio,millimolar,0.1,"unreferenced_placeholder; polymerase and synthetase ATP affinity, order 0.1 mM",no
+ATP_ref,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+T_ref_dmg,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+dT_Q10,kelvin,10.0,definitional; definition of Q10 (rate ratio per 10 K),no
+Q10_dmg,dimensionless,2.0,unreferenced_placeholder; damage doubles per 10 K,no
+r_dmg,per_s,1.1574074074074074e-06,"derived: 1 / damage_lifetime (damage_lifetime: unreferenced_placeholder, placeholder)",no
+r_rep_max,per_s,1.1574074074074073e-05,"derived: repair_capacity_ratio / damage_lifetime (repair_capacity_ratio: unreferenced_placeholder, placeholder; damage_lifetime: unreferenced_placeholder, placeholder)",no
+K_D,dimensionless,0.1,unreferenced_placeholder; repair is half-maximal at a tenth of a lethal load,no
+C_repair,mole,3.0028924454486115e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
+repair_level,dimensionless,1.0,definitional; full repair by default,no
+growth_level,dimensionless,0.0,definitional; no growth until the player puts energy into it,no
+J_ref,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
+ATP_floor,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
+M_build_in,mole,0.0,no pool connected (an open sum port is 0),no
+M_glyc_ATP,mole,0.0,definitional; no glycogen (used when unconnected),no
+D_init,dimensionless,0.011111111111111112,calibrated: steady damage at full repair,no
+P_init,mole,0.0,definitional; no daughter under way,no

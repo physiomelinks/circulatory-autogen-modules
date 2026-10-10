@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="membrane_potential_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="membrane_fermenter">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- disc radius -->
+        <variable name="R_cell" public_interface="in" units="um"/>
+        <!-- disc depth -->
+        <variable name="h_cell" public_interface="in" units="um"/>
+        <variable name="c_m" public_interface="in" units="uF_per_cm2"/>
+        <!-- in-plane membrane area 2 pi R h (top and bottom exchange nothing in AdaptOrDeity) -->
+        <variable name="A_mem" public_interface="out" units="um2"/>
+        <variable name="Vol" public_interface="out" units="m3"/>
+        <variable name="Cm" public_interface="out" units="picoF"/>
+        <variable name="V_rest_approx" public_interface="in" units="milliV"/>
+        <variable initial_value="V_rest_approx" name="V" public_interface="out" units="milliV"/>
+        <!-- summed membrane currents (positive outward) -->
+        <variable name="i_ion" public_interface="in" units="nanoA"/>
+        <!-- injected current (positive depolarises) -->
+        <variable name="I_in" public_interface="in" units="nanoA"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>A_mem</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                    <pi/>
+                    <ci>R_cell</ci>
+                    <ci>h_cell</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Vol</ci>
+                <apply>
+                    <times/>
+                    <pi/>
+                    <apply>
+                        <power/>
+                        <ci>R_cell</ci>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <ci>h_cell</ci>
+                    <cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Cm</ci>
+                <apply>
+                    <times/>
+                    <ci>c_m</ci>
+                    <ci>A_mem</ci>
+                    <cn cellml:units="picoF_cm2_per_uF_um2">0.01</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>V</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="milliV_per_kiloV">1000000.0</cn>
+                        <apply>
+                            <minus/>
+                            <ci>I_in</ci>
+                            <ci>i_ion</ci>
+                        </apply>
+                    </apply>
+                    <ci>Cm</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

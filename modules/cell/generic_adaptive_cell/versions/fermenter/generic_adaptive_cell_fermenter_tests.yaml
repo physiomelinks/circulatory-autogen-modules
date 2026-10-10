@@ -1,0 +1,18 @@
+module_type: generic_adaptive_cell
+version: fermenter
+reviewed: false
+description: 'AdaptOrDeity''s starting organism: generic_adaptive_cell empty_membrane plus the proteins of a ~2 um prokaryote
+  in a Proterozoic sea (pH 7.3) that makes its ATP by homolactic fermentation and spends a quarter of it on an F1Fo H+-ATPase,
+  which pumps protons out and so powers the membrane potential and the other ion gradients. Each protein is a protein_pool
+  (its expression, costs, daughter share and membrane area) and the module it scales: i_flagellum (i_H_flagellum MotAB: the
+  proton-driven flagellar motor; one flagellum at start), i_H_ATPase (FoF1, 10/3 H+ per ATP), i_NaH (NhaA, 2 H+ in per Na+
+  out), i_KH (KefC, K+/H+), i_K_Trk (i_leak_K adaptive as the Trk K+ uptake channel), i_NaCa (adaptive; archaeal NCX_Mj is
+  the prokaryotic equivalent) and membrane_face (cell_membrane_face adaptive: the Glf glucose facilitator and a lactate-/H+
+  symporter). The default instance is an exact steady state at -105 mV and pH 7.6 with total ATP turnover equal to Lynch &
+  Marinov''s maintenance cost at 20 C.'
+extends: empty_membrane
+notes: 'Assembled by tools/build_adaptive_cell.py from modules/cell/generic_adaptive_cell/parameters.json: its parameter rows
+  are its submodules'' default instances (every value with its source there) with the overrides the cell sets. It extends
+  generic_adaptive_cell empty_membrane with: i_H_ATPase, i_NaH, i_KH, i_K_Trk, i_NaCa, membrane_face, i_flagellum, pool_H_ATPase,
+  pool_NhaA, pool_KefC, pool_Trk, pool_NCX, pool_Glf, pool_LacT, pool_Flagellum. Protein expression: each protein_pool has
+  a target m_target set by the game.'

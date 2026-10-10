@@ -1,0 +1,248 @@
+[
+  {
+    "module_type": "i_H_ATPase",
+    "module_subtype": "FoF1_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "i_H_ATPase_FoF1_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "i_H_ATPase_FoF1",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "protein_expression",
+        "variables": [
+          "m_expr"
+        ]
+      },
+      {
+        "port_type": "ATP_hydrolysis_port",
+        "variables": [
+          "ATP",
+          "ADP",
+          "Pi",
+          "j_ATP_H",
+          "j_ADP_H",
+          "j_Pi_H"
+        ]
+      },
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "H_Nernst_potential",
+        "variables": [
+          "E_H"
+        ]
+      },
+      {
+        "port_type": "internal_H",
+        "variables": [
+          "H_i"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_H_ATPase"
+        ]
+      },
+      {
+        "port_type": "H_flux",
+        "variables": [
+          "j_H_ATPase"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_H",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "H_i",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "K_act_H",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_H_ATPase",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "m_expr",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "r_H_ATPase",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "n_H",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "ATP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "ADP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Pi",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "K_m_ATP_H",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "dG0_hyd",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "c_std",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "k_H_ATPase",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ATP",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "W_H",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "f_thermo",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "i_H_ATPase",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "v_ATP_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_H_pumped",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_H_ATPase",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_ATP_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_ADP_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Pi_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+variable_name,units,value,data_reference,sourced
+H_i_init,millimolar,2.5118864315095822e-05,"derived: free H+ = 10^-pH_i M (pH_i: slonczewski1981ph, sourced)",yes
+H_o,millimolar,5.011872336272725e-05,"derived: free H+ = 10^-pH_o M (pH_o: halevy2017geologic, placeholder)",no
+beta_H,millimolar,50.0,slonczewski1982effects; E. coli cytoplasmic buffering about 50 mM per pH unit,yes
+c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
+j_H_in,mol_per_s,0.0,no H+ pathway connected,no
+j_H_prod,mol_per_s,0.0,no reaction connected,no
+Vol,m3,6.283185307179586e-18,"geometry: disc of radius 1 um, 2 um deep",no
+R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+F,C_per_mol,96485.0,"definitional; Faraday constant, as the library's SN modules",no

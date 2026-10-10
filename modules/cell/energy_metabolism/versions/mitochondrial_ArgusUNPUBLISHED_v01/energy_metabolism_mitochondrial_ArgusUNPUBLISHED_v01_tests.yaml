@@ -1,0 +1,17 @@
+module_type: energy_metabolism
+version: mitochondrial_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'For cells with mitochondria (a later stage of AdaptOrDeity; the starting fermenter is fermenter_ArgusUNPUBLISHED_v01).
+  Energy metabolism of a well-mixed volume (a cell, part of a cell or a tissue volume): the local kinetics only. It reads
+  the concentrations of the volume''s O2, glucose, lactate and CO2 pools and its temperature, holds ATP (ATP + ADP = A_tot),
+  and returns sources into the pools (mol/s, negative = uptake) and the heat it releases (W). Transport between volumes is
+  done by face modules (diffusion faces, membrane carriers, heat faces), so the same version serves every level of detail.
+  Three lumped reactions, each with Michaelis-Menten dependences and a Q10 temperature factor f_T: glucose oxidation r_ox
+  (6 O2 in, 6 CO2 out, n_ATP_ox ATP made; respiratory control by ADP), anaerobic glycolysis r_gly (glucose to 2 lactate, 2
+  ATP; inhibited by O2: the Pasteur effect) and ATP demand r_dem. Heat is the enthalpy each reaction releases (first law;
+  the free energy that only becomes entropy is not heat): oxidation 6 h_O2_ox - n_ATP_ox h_ATP, glycolysis 2 h_lac_gly - n_ATP_gly
+  h_ATP, hydrolysis h_ATP per mol, so at steady ATP the heat is 470 kJ per mol O2 used plus 63 kJ per mol lactate made (Gnaiger
+  and Kemp 1990). V_ox and k_dem are calibrated so the default point is a steady state at ATP = 3.152 mM using O2 at the library''s
+  tissue rate. Ports: general O2/glucose/lactate/CO2 exchange ports (C, flux) to the pools, and heat_source_port (T, Q_met)
+  to a thermal_volume. Not modelled yet: pH/bicarbonate, AMP and adenylate kinase, phosphocreatine, the temperature dependence
+  of the enthalpies (Delta Cp).'

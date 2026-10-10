@@ -1,0 +1,141 @@
+[
+  {
+    "module_type": "i_NaH",
+    "module_subtype": "NhaA_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "i_NaH_NhaA_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "i_NaH_NhaA",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "H_Nernst_potential",
+        "variables": [
+          "E_H"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_NaH"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_NaH_Na"
+        ]
+      },
+      {
+        "port_type": "H_flux",
+        "variables": [
+          "j_NaH_H"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      },
+      {
+        "port_type": "protein_expression",
+        "variables": [
+          "m_expr"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_H",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m_expr",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_spec",
+        "microS_per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "drive",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "r_cycle",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "i_NaH",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaH_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaH_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

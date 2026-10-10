@@ -1,0 +1,106 @@
+[
+  {
+    "module_type": "thermal_volume",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "thermal_volume_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "thermal_volume",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "heat_face_port",
+        "variables": [
+          "T",
+          "Q_in"
+        ],
+        "multi_port": [
+          "True",
+          "sum"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "heat_face_port",
+        "variables": [
+          "T",
+          "Q_out"
+        ],
+        "multi_port": [
+          "True",
+          "sum"
+        ]
+      }
+    ],
+    "general_ports": [
+      {
+        "port_type": "heat_source_port",
+        "variables": [
+          "T",
+          "Q_src"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "T_init",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "variable"
+      ],
+      [
+        "rho",
+        "kg_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "c_p",
+        "J_per_kg_K",
+        "access",
+        "constant"
+      ],
+      [
+        "V_th",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "Q_in",
+        "watt",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_out",
+        "watt",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_src",
+        "watt",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_th",
+        "J_per_K",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

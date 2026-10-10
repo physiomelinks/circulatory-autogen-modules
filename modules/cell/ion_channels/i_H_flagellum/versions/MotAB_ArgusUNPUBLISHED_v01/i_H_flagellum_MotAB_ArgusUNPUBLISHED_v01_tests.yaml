@@ -1,0 +1,15 @@
+module_type: i_H_flagellum
+version: MotAB_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The bacterial flagellar motor as a proton-driven rotor. The game switches the motors on or off (a_motor); the motors
+  and the bundle follow with time constant tau_bundle (a_eff), so thrust rises and falls smoothly. Each flagellum turns at
+  f = a_eff f_ref pmf/pmf_ref (rotation proportional to the proton motive force, as measured in E. coli) and passes n_H_rev
+  H+ per revolution into the cell (Meister et al. 1987: about 1,200), on the H_flux port to the proton pool and as an inward
+  membrane current. The power is that proton flux times the PMF. Swimming speed: one flagellum at f_ref gives v_one; more
+  flagella add with diminishing returns, v = v_one (f/f_ref) m (1 + n_half)/(m + n_half), as a thrust: each flagellum pushes
+  F_one, all of them F_thrust = xi v_swim against the Stokes drag xi = 6 pi eta R of the body (the game moves the whole creature
+  as one rigid body with these forces). Its mechanical power F v is far below the proton-motive power P_flag (~0.2%, as flagellar
+  propulsion is ~0.1-2% efficient): the rest is heat in the motor, filament and water. The number of flagella m comes from
+  the Flagellum protein_pool (expression = count), so building one costs its ~1e7 amino acids. Placeholders: f_ref, v_one,
+  n_half. Tumbling, chemotaxis and the bundle are not modelled; the game decides when the motor runs and in which direction
+  the cell swims.'

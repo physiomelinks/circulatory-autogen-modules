@@ -1,0 +1,15 @@
+module_type: i_NaK
+version: ATP_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The Na/K pump of i_NaK Argus2026_v01 (same voltage, Na and K dependence) made to spend ATP and obey the second law:
+  the rate is multiplied by ATP/(K_m_ATP + ATP) and by the thermodynamic factor f_thermo = 1 - exp(-(A_ATP - W_ion)/RT), where
+  A_ATP is the free energy of ATP hydrolysis and W_ion = F(3(E_Na - V) + 2(V - E_K)) the electrochemical work of one cycle,
+  so the pump stops at equilibrium and can never run forward against it (the Argus2026_v01 law alone keeps pumping when ATP
+  runs low, which creates energy). Every cycle hydrolyses one ATP to ADP + Pi, taken from the cytosol through the ATP_hydrolysis_port.
+  So keeping the membrane potential has an energy cost, and the pump slows as ATP runs out. The Na/K-ATPase is a eukaryotic
+  protein (AdaptOrDeity unlocks it with eukaryotes; the prokaryotic fermenter cell uses an F1Fo H+-ATPase, NhaA and Trk/KefC
+  instead). The default instance is calibrated at -70 mV with the pump using 25% of a 2 um cell''s maintenance ATP (rolfe1997cellular).
+
+
+  Ports of the versions of i_NaK (they differ): ATP_ArgusUNPUBLISHED_v01 adds ATP_hydrolysis_port, Na_Nernst_potential and
+  E_K_potential to Argus2026_v01''s ports.'

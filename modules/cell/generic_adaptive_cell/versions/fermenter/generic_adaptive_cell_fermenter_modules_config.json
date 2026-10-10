@@ -1,0 +1,390 @@
+[
+  {
+    "module_type": "generic_adaptive_cell",
+    "module_subtype": "fermenter",
+    "module_format": "supermodule",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "description": "AdaptOrDeity's starting organism: generic_adaptive_cell empty_membrane plus the proteins of a ~2 um prokaryote in a Proterozoic sea (pH 7.3) that makes its ATP by homolactic fermentation and spends a quarter of it on an F1Fo H+-ATPase, which pumps protons out and so powers the membrane potential and the other ion gradients. Each protein is a protein_pool (its expression, costs, daughter share and membrane area) and the module it scales: i_flagellum (i_H_flagellum MotAB: the proton-driven flagellar motor; one flagellum at start), i_H_ATPase (FoF1, 10/3 H+ per ATP), i_NaH (NhaA, 2 H+ in per Na+ out), i_KH (KefC, K+/H+), i_K_Trk (i_leak_K adaptive as the Trk K+ uptake channel), i_NaCa (adaptive; archaeal NCX_Mj is the prokaryotic equivalent) and membrane_face (cell_membrane_face adaptive: the Glf glucose facilitator and a lactate-/H+ symporter). The default instance is an exact steady state at -105 mV and pH 7.6 with total ATP turnover equal to Lynch & Marinov's maintenance cost at 20 C.",
+    "submodules": [
+      {
+        "name": "membrane",
+        "module_type": "membrane_potential",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "Na_K",
+          "Ca",
+          "H",
+          "cytosol",
+          "bio",
+          "protein",
+          "i_leak_Na",
+          "i_leak_Ca",
+          "i_leak_H",
+          "i_H_ATPase",
+          "i_NaH",
+          "i_KH",
+          "i_K_Trk",
+          "i_NaCa",
+          "membrane_face",
+          "i_flagellum"
+        ]
+      },
+      {
+        "name": "Na_K",
+        "module_type": "ion_concentrations",
+        "module_subtype": "SN_soma_Argus2026_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane"
+        ],
+        "out_instances": [
+          "i_leak_Na",
+          "i_K_Trk",
+          "i_NaH",
+          "i_KH",
+          "i_NaCa"
+        ]
+      },
+      {
+        "name": "Ca",
+        "module_type": "Ca_handling",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane"
+        ],
+        "out_instances": [
+          "i_leak_Ca",
+          "i_NaCa"
+        ]
+      },
+      {
+        "name": "H",
+        "module_type": "H_handling",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "cytosol",
+          "membrane_face"
+        ],
+        "out_instances": [
+          "i_leak_H",
+          "i_H_ATPase",
+          "i_NaH",
+          "i_KH",
+          "i_flagellum"
+        ]
+      },
+      {
+        "name": "cytosol",
+        "module_type": "energy_metabolism",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "pool_Glyc",
+          "membrane_face"
+        ],
+        "out_instances": [
+          "H",
+          "protein",
+          "bio",
+          "i_H_ATPase"
+        ]
+      },
+      {
+        "name": "bio",
+        "module_type": "biosynthesis",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "cytosol",
+          "pool_proteome",
+          "pool_Glyc",
+          "pool_H_ATPase",
+          "pool_NhaA",
+          "pool_KefC",
+          "pool_Trk",
+          "pool_NCX",
+          "pool_Glf",
+          "pool_LacT",
+          "pool_Flagellum"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "protein",
+        "module_type": "protein_expression",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "cytosol",
+          "pool_proteome",
+          "pool_Glyc",
+          "pool_H_ATPase",
+          "pool_NhaA",
+          "pool_KefC",
+          "pool_Trk",
+          "pool_NCX",
+          "pool_Glf",
+          "pool_LacT",
+          "pool_Flagellum"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "pool_proteome",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "proteome",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio"
+        ]
+      },
+      {
+        "name": "pool_Glyc",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "Glyc",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "cytosol"
+        ]
+      },
+      {
+        "name": "i_leak_Na",
+        "module_type": "i_leak_Na",
+        "module_subtype": "Argus2026_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Na_K"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_leak_Ca",
+        "module_type": "i_leak_Ca",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Ca"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_leak_H",
+        "module_type": "i_leak_H",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "H"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_H_ATPase",
+        "module_type": "i_H_ATPase",
+        "module_subtype": "FoF1_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "H",
+          "cytosol",
+          "pool_H_ATPase"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_NaH",
+        "module_type": "i_NaH",
+        "module_subtype": "NhaA_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Na_K",
+          "H",
+          "pool_NhaA"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_KH",
+        "module_type": "i_KH",
+        "module_subtype": "KefC_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Na_K",
+          "H",
+          "pool_KefC"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_K_Trk",
+        "module_type": "i_leak_K",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Na_K",
+          "pool_Trk"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "i_NaCa",
+        "module_type": "i_NaCa",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "Na_K",
+          "Ca",
+          "pool_NCX"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "membrane_face",
+        "module_type": "cell_membrane_face",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "pool_Glf",
+          "pool_LacT"
+        ],
+        "out_instances": [
+          "cytosol",
+          "H"
+        ]
+      },
+      {
+        "name": "i_flagellum",
+        "module_type": "i_H_flagellum",
+        "module_subtype": "MotAB_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "membrane",
+          "H",
+          "pool_Flagellum"
+        ],
+        "out_instances": []
+      },
+      {
+        "name": "pool_H_ATPase",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "H_ATPase",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "i_H_ATPase"
+        ]
+      },
+      {
+        "name": "pool_NhaA",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "NhaA",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "i_NaH"
+        ]
+      },
+      {
+        "name": "pool_KefC",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "KefC",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "i_KH"
+        ]
+      },
+      {
+        "name": "pool_Trk",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "Trk",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "i_K_Trk"
+        ]
+      },
+      {
+        "name": "pool_NCX",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "NCX",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "i_NaCa"
+        ]
+      },
+      {
+        "name": "pool_Glf",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "Glf",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "membrane_face"
+        ]
+      },
+      {
+        "name": "pool_LacT",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "LacT",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "membrane_face"
+        ]
+      },
+      {
+        "name": "pool_Flagellum",
+        "module_type": "protein_pool",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "Flagellum",
+        "inp_instances": [],
+        "out_instances": [
+          "protein",
+          "bio",
+          "i_flagellum"
+        ]
+      }
+    ]
+  }
+]

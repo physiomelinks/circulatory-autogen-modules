@@ -1,0 +1,166 @@
+{
+  "module_type": "generic_adaptive_cell",
+  "version": "empty_membrane",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-16
+  },
+  "outputs": [
+    "mod_membrane/V",
+    "mod_membrane/Cm",
+    "mod_membrane/Vol",
+    "mod_Na_K/Nai",
+    "mod_Na_K/Ki",
+    "mod_Na_K/E_Na",
+    "mod_Na_K/E_K",
+    "mod_Ca/Cai",
+    "mod_Ca/CaB_Cai",
+    "mod_H/H_i",
+    "mod_H/pH_i",
+    "mod_H/E_H",
+    "mod_H/H_total_rel",
+    "mod_cytosol/C_glc",
+    "mod_cytosol/C_lac",
+    "mod_cytosol/C_ATP",
+    "mod_cytosol/C_ADP",
+    "mod_cytosol/C_Pi",
+    "mod_cytosol/C_glyc",
+    "mod_cytosol/v_gly",
+    "mod_cytosol/v_hyd",
+    "mod_cytosol/v_store",
+    "mod_cytosol/v_mob",
+    "mod_cytosol/A_hyd",
+    "mod_cytosol/P_diss",
+    "mod_cytosol/Q_met",
+    "mod_cytosol/j_H_met",
+    "mod_cytosol/J_ATP_turnover",
+    "mod_cytosol/J_ATP_gly",
+    "mod_cytosol/J_ATP_maint",
+    "mod_i_leak_Na/i_leak_Na",
+    "mod_i_leak_Ca/i_leak_Ca",
+    "mod_i_leak_Ca/E_Ca",
+    "mod_i_leak_H/i_leak_H",
+    "mod_protein/J_ATP_total",
+    "mod_protein/J_keep_total",
+    "mod_protein/J_build_total",
+    "mod_protein/J_cap",
+    "mod_protein/M_build_protein",
+    "mod_protein/f_area",
+    "mod_bio/D",
+    "mod_bio/P_growth",
+    "mod_bio/J_ATP_bio",
+    "mod_bio/M_build_bio",
+    "mod_bio/M_daughter",
+    "mod_bio/growth_progress",
+    "mod_pool_proteome/m",
+    "mod_pool_Glyc/m"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "charge conservation across modules: the charge on the membrane changes by exactly the cation charge that crossed it, Cm dV = F Vol d(Na_i + K_i + 2 Ca_total + H_total - lactate + ATP): protons from ATP hydrolysis and those leaving with lactate carry no membrane charge (relative 1e-6)",
+      "expr": "abs(mod_membrane__Cm[0]*1e-12*(mod_membrane__V[-1] - mod_membrane__V[0])*1e-3 - 96485*mod_membrane__Vol[0]*((mod_Na_K__Nai[-1] - mod_Na_K__Nai[0]) + (mod_Na_K__Ki[-1] - mod_Na_K__Ki[0]) + 2*((mod_Ca__Cai + mod_Ca__CaB_Cai)[-1] - (mod_Ca__Cai + mod_Ca__CaB_Cai)[0]) + (mod_H__H_total_rel[-1] - mod_H__H_total_rel[0]) - (mod_cytosol__C_lac[-1] - mod_cytosol__C_lac[0]) + (mod_cytosol__C_ATP[-1] - mod_cytosol__C_ATP[0]))) <= 1e-6*96485*mod_membrane__Vol[0]*(abs((mod_Na_K__Nai[-1] - mod_Na_K__Nai[0])) + abs((mod_Na_K__Ki[-1] - mod_Na_K__Ki[0])) + abs((mod_H__H_total_rel[-1] - mod_H__H_total_rel[0]))) + 1e-21"
+    },
+    {
+      "description": "adenine and phosphoryl groups are conserved through every ATP user: ATP + ADP and ATP + Pi constant (relative 1e-9)",
+      "expr": "np.ptp(mod_cytosol__C_ATP + mod_cytosol__C_ADP) <= 1e-9*np.max(mod_cytosol__C_ATP + mod_cytosol__C_ADP) and np.ptp(mod_cytosol__C_ATP + mod_cytosol__C_Pi) <= 1e-9*np.max(mod_cytosol__C_ATP + mod_cytosol__C_Pi)"
+    },
+    {
+      "description": "the ATP budget closes: the cytosol's external ATP use equals what the H+-ATPase (if present), protein synthesis and biosynthesis take (relative 1e-9)",
+      "expr": "np.allclose(mod_cytosol__J_ATP_turnover - mod_cytosol__J_ATP_maint, mod_protein__J_ATP_total + mod_bio__J_ATP_bio, rtol=1e-9, atol=1e-30)"
+    },
+    {
+      "description": "second law for the leaks: each runs down its electrochemical gradient, i (V - E) >= 0",
+      "expr": "np.all(mod_i_leak_Na__i_leak_Na*(mod_membrane__V - mod_Na_K__E_Na) >= 0) and np.all(mod_i_leak_Ca__i_leak_Ca*(mod_membrane__V - mod_i_leak_Ca__E_Ca) >= 0) and np.all(mod_i_leak_H__i_leak_H*(mod_membrane__V - mod_H__E_H) >= 0)"
+    },
+    {
+      "description": "concentrations stay non-negative: ATP, ADP, Pi, glucose, lactate and glycogen >= -1e-9 mM",
+      "expr": "np.all(mod_cytosol__C_glc >= -1e-9) and np.all(mod_cytosol__C_lac >= -1e-9) and np.all(mod_cytosol__C_ATP >= -1e-9) and np.all(mod_cytosol__C_ADP >= -1e-9) and np.all(mod_cytosol__C_Pi >= -1e-9) and np.all(mod_cytosol__C_glyc >= -1e-9)"
+    },
+    {
+      "description": "second law for the reactions: dissipation P_diss >= 0",
+      "expr": "np.all(mod_cytosol__P_diss >= -1e-30)"
+    },
+    {
+      "description": "protein synthesis never spends more than its capacity: J_build_total <= J_cap (relative 1e-9)",
+      "expr": "np.all(mod_protein__J_build_total <= mod_protein__J_cap*(1 + 1e-9) + 1e-30)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "T": [
+        273.15,
+        313.15
+      ],
+      "T_ref_cytosol": [
+        283.15,
+        303.15
+      ],
+      "growth_level_bio": [
+        0.0,
+        20.0
+      ],
+      "repair_level_bio": [
+        0.0,
+        1.0
+      ],
+      "store_alloc_cytosol": [
+        0.0,
+        1.0
+      ],
+      "m_target_pool_Glyc": [
+        0.25,
+        4.0
+      ]
+    },
+    "extra_parameters": [
+      "T_ref_cytosol",
+      "growth_level_bio",
+      "repair_level_bio",
+      "store_alloc_cytosol",
+      "m_target_pool_Glyc"
+    ],
+    "exclude": [
+      "R",
+      "F"
+    ],
+    "rationale": "temperatures from 0 to 40 C (the default factors of 0.5 and 2 would put the cell at 147 K and 586 K, where Q10 = 2 changes every rate by 2^15 to 2^29 and nothing physical remains to check); R and F are physical constants, not swept; protein expression targets x0.25-4, growth 0-20x the resting turnover, repair and storage 0-1: the ranges AdaptOrDeity lets a player choose"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      2e-06,
+      1e-06,
+      5e-07
+    ],
+    "t_end": 0.001,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-08,
+        "atol": 1e-14
+      }
+    ],
+    "t_end": 1.0,
+    "time_budget": 10
+  },
+  "validation": {
+    "default": {}
+  },
+  "supermodule": {
+    "globals": [
+      "R",
+      "F",
+      "T"
+    ]
+  }
+}

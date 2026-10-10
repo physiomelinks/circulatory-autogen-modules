@@ -1,0 +1,25 @@
+variable_name,units,value,data_reference,sourced
+T,kelvin,310.15,operating point: 37 C,no
+T_ref,kelvin,310.15,reference temperature of the rate constants (37 C),no
+dT_Q10,kelvin,10.0,definition of Q10 (rate ratio per 10 K),yes
+Q10,dimensionless,2.0,unreferenced_placeholder; metabolic Q10 is typically 2-3; 2 chosen pending a source,no
+V_c,m3,6.2831853071795875e-15,"geometry: 20 um diameter disc cell, 20 um deep (the game's starting cell)",no
+C_O2,millimolar,0.0597,celayaalcala2021simulation; mean tissue PO2 47 mmHg x 1.27 uM/mmHg (fang2008oxygen),yes
+C_glc,millimolar,1.0,unreferenced_placeholder; intracellular glucose of order 1 mM (below plasma ~5 mM),no
+C_lac,millimolar,1.0,unreferenced_placeholder; resting lactate of order 1 mM,no
+C_CO2,millimolar,1.2,unreferenced_placeholder; dissolved CO2 at 40 mmHg x 0.03 mM/mmHg (textbook solubility),no
+ATP_init,millimolar,3.152,traut1994physiological; mean ATP in mammalian cells 3152 uM,yes
+A_tot,millimolar,3.5,unreferenced_placeholder; ATP + ADP with ATP/ADP about 9,no
+K_O2,millimolar,0.0133,"celayaalcala2021simulation; P0 = 10.5 mmHg x 1.27 uM/mmHg, the library's tissue value",yes
+K_glc,millimolar,0.05,"unreferenced_placeholder; hexokinase I affinity for glucose, order 0.03-0.1 mM",no
+K_ADP,millimolar,0.35,"unreferenced_placeholder; apparent ADP affinity of respiration in tissue, order 0.3 mM",no
+V_ox,millimolar_per_s,0.01958612068965518,calibrated: at the default point the steady state has ATP = ATP_init and O2 use M0 C/(C + P0) = 0.0456 mM/s (celayaalcala2021simulation),no
+V_gly,millimolar_per_s,0.05,unreferenced_placeholder; anaerobic capacity: 2 V_gly is about 40% of resting ATP demand,no
+K_i_O2,millimolar,0.0133,unreferenced_placeholder; Pasteur effect: glycolysis half-inhibited at K_O2,no
+k_dem,millimolar_per_s,0.2480893935512453,calibrated with V_ox (same conditions),no
+K_ATP,millimolar,0.15,"unreferenced_placeholder; ATPase affinity for ATP, order 0.1-0.5 mM",no
+n_ATP_ox,dimensionless,30.0,hinkle2005p; about 30 ATP per glucose oxidised,yes
+n_ATP_gly,dimensionless,2.0,stoichiometry of glycolysis: 2 ATP per glucose to 2 lactate,yes
+h_O2_ox,J_per_mol,470000.0,gnaiger1990anaerobic; oxycaloric equivalent -470 kJ/mol O2 (glucose oxidation),yes
+h_lac_gly,J_per_mol,63000.0,gnaiger1990anaerobic; glucose to lactate in bicarbonate buffer -63 kJ/mol lactate,yes
+h_ATP,J_per_mol,20500.0,gajewski1986thermodynamics; Delta H of ATP hydrolysis -20.5 kJ/mol at 25 C,yes

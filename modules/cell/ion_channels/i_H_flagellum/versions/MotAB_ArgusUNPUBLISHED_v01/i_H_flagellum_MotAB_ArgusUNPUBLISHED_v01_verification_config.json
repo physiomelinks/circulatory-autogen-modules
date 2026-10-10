@@ -1,0 +1,93 @@
+{
+  "module_type": "i_H_flagellum",
+  "version": "MotAB_ArgusUNPUBLISHED_v01",
+  "sim_time": 3.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "pmf",
+    "a_eff",
+    "f_rot",
+    "j_H_flag",
+    "i_flag",
+    "P_flag",
+    "v_swim",
+    "xi",
+    "F_one",
+    "F_thrust",
+    "P_mech"
+  ],
+  "run_parameters": {
+    "a_motor": 1.0
+  },
+  "invariants": [
+    {
+      "description": "motor law (exact): f = a f_ref pmf/pmf_ref, j = m f n_H_rev / N_A, i = -F j, v = v_one (f/f_ref) m (1 + n_half)/(m + n_half)",
+      "expr": "np.allclose(f_rot, a_eff*f_ref*(E_H - V)/pmf_ref, rtol=1e-12, atol=0) and np.allclose(j_H_flag, m_expr*f_rot*n_H_rev/N_A, rtol=1e-12, atol=0) and np.allclose(i_flag, -j_H_flag*F*1e9, rtol=1e-12, atol=0) and np.allclose(v_swim, v_one*f_rot/f_ref*m_expr*(1 + n_half)/(m_expr + n_half), rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "the motors spin up smoothly: from rest a_eff = a_motor (1 - exp(-t/tau_bundle)) (relative 1e-6), and stays within 0-1",
+      "expr": "np.allclose(a_eff, a_motor*(1 - np.exp(-t/tau_bundle)), rtol=1e-6, atol=1e-9) and np.all(a_eff >= -1e-12) and np.all(a_eff <= 1 + 1e-12)",
+      "applies": "run"
+    },
+    {
+      "description": "second law: protons only run down the proton motive force, j pmf >= 0; the power used is never negative",
+      "expr": "np.all(j_H_flag*pmf >= 0) and np.all(P_flag >= 0)"
+    },
+    {
+      "description": "one flagellum at the reference PMF swims at v_one; speed rises with the number but saturates below v_one (1 + n_half)",
+      "expr": "np.all(v_swim <= v_one*(1 + n_half)*np.abs(f_rot)/f_ref*(1 + 1e-12))"
+    },
+    {
+      "description": "thrust and drag balance for a free cell: F_thrust = xi v_swim with xi = 6 pi eta R (Stokes), F_thrust = m F_one",
+      "expr": "np.allclose(xi, 6*np.pi*eta*R_body*1e-6, rtol=1e-12, atol=0) and np.allclose(F_thrust, xi*v_swim, rtol=1e-12, atol=0) and np.allclose(F_thrust, m_expr*F_one, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "energy: swimming never does more work than the motors take from the proton motive force, P_mech <= P_flag (flagellar propulsion is ~0.1-2% efficient; the rest is heat)",
+      "expr": "np.all(P_mech <= P_flag*(1 + 1e-12) + 1e-30)"
+    }
+  ],
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.04,
+      0.02,
+      0.01
+    ],
+    "t_end": 1.0,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "bc_sweep": {
+    "ranges": {
+      "m_expr": [
+        0.0,
+        8.0
+      ],
+      "a_motor": [
+        0.0,
+        1.0
+      ],
+      "V": [
+        -150.0,
+        -60.0
+      ]
+    },
+    "rationale": "zero to eight flagella, motor off to on, membrane potentials from hyperpolarised to a cell running down"
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "module_type": "H_handling",
+  "version": "adaptive_ArgusUNPUBLISHED_v01",
+  "sim_time": 10.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-18
+  },
+  "outputs": [
+    "H_i",
+    "pH_i",
+    "pH_o",
+    "E_H",
+    "H_total_rel",
+    "leak/j_leak_H"
+  ],
+  "run_parameters": {},
+  "harness": {
+    "module_array": [
+      [
+        "leak",
+        "ArgusUNPUBLISHED_v01",
+        "i_leak_H",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "mod",
+        "adaptive_ArgusUNPUBLISHED_v01",
+        "H_handling",
+        "leak",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "V_leak",
+        "milliV",
+        -105.0,
+        "harness: the fermenter cell's resting potential"
+      ],
+      [
+        "A_mem_leak",
+        "um2",
+        12.566370614359172,
+        "harness: in-plane membrane of the 2 um cell"
+      ]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "proton conservation with the buffer: Vol d(H_i - beta_H pH_i) = int j_H dt (relative 1e-6)",
+      "expr": "abs(Vol*(H_total_rel[-1] - H_total_rel[0]) - np.trapz(leak__j_leak_H, t)) <= 1e-6*np.trapz(np.abs(leak__j_leak_H), t) + 1e-30"
+    },
+    {
+      "description": "pH and Nernst potential definitions (exact)",
+      "expr": "np.allclose(pH_i, -np.log10(H_i/c_std), rtol=1e-12, atol=0) and np.allclose(E_H, 1000*R*T/F*np.log(H_o/H_i), rtol=1e-10, atol=1e-12)"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

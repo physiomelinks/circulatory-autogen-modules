@@ -1,0 +1,102 @@
+[
+  {
+    "module_type": "heat_conduction_face",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "heat_conduction_face_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "heat_conduction_face",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "heat_face_port",
+        "variables": [
+          "T_up",
+          "Q_up"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "heat_face_port",
+        "variables": [
+          "T_down",
+          "Q_down"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "k_th",
+        "W_per_m_K",
+        "access",
+        "constant"
+      ],
+      [
+        "A_f",
+        "m2",
+        "access",
+        "constant"
+      ],
+      [
+        "d_up",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "d_down",
+        "metre",
+        "access",
+        "constant"
+      ],
+      [
+        "open_flag",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_up",
+        "kelvin",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "T_down",
+        "kelvin",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "G_th",
+        "W_per_K",
+        "access",
+        "variable"
+      ],
+      [
+        "Q",
+        "watt",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_up",
+        "watt",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_down",
+        "watt",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

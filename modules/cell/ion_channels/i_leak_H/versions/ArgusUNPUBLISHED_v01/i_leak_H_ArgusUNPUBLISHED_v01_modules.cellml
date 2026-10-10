@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_leak_H_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_leak_H">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="E_H" public_interface="in" units="milliV"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <!-- conductance per membrane area -->
+        <variable name="g_spec_leak_H" public_interface="in" units="microS_per_um2"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="g_leak_H" public_interface="out" units="microS"/>
+        <variable name="i_leak_H" public_interface="out" units="nanoA"/>
+        <!-- H+ into the cell -->
+        <variable name="j_leak_H" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>g_leak_H</ci>
+                <apply>
+                    <times/>
+                    <ci>A_mem</ci>
+                    <ci>g_spec_leak_H</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_leak_H</ci>
+                <apply>
+                    <times/>
+                    <ci>g_leak_H</ci>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_leak_H</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>i_leak_H</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

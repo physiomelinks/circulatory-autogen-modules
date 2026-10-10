@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="thermal_volume_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="thermal_volume">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="T_init" public_interface="in" units="kelvin"/>
+        <!-- temperature of the volume, well mixed -->
+        <variable initial_value="T_init" name="T" public_interface="out" units="kelvin"/>
+        <variable name="rho" public_interface="in" units="kg_per_m3"/>
+        <variable name="c_p" public_interface="in" units="J_per_kg_K"/>
+        <variable name="V_th" public_interface="in" units="m3"/>
+        <!-- heat in through the faces on the entrance and exit heat_face_ports (summed) -->
+        <variable name="Q_in" public_interface="in" units="watt"/>
+        <variable name="Q_out" public_interface="in" units="watt"/>
+        <!-- heat released inside the volume (heat_source_port, e.g. energy_metabolism Q_met) -->
+        <variable name="Q_src" public_interface="in" units="watt"/>
+        <!-- heat capacity -->
+        <variable name="C_th" public_interface="out" units="J_per_K"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>C_th</ci>
+                <apply>
+                    <times/>
+                    <ci>rho</ci>
+                    <ci>c_p</ci>
+                    <ci>V_th</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>T</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>Q_in</ci>
+                        <ci>Q_out</ci>
+                        <ci>Q_src</ci>
+                    </apply>
+                    <ci>C_th</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

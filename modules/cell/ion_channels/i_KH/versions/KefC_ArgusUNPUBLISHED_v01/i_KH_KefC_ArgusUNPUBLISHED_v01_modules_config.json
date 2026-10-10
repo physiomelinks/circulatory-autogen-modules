@@ -1,0 +1,117 @@
+[
+  {
+    "module_type": "i_KH",
+    "module_subtype": "KefC_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "i_KH_KefC_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "i_KH_KefC",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      },
+      {
+        "port_type": "H_Nernst_potential",
+        "variables": [
+          "E_H"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_KH_K"
+        ]
+      },
+      {
+        "port_type": "H_flux",
+        "variables": [
+          "j_KH_H"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      },
+      {
+        "port_type": "protein_expression",
+        "variables": [
+          "m_expr"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_H",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m_expr",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "g_spec",
+        "microS_per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "drive",
+        "milliV",
+        "access",
+        "variable"
+      ],
+      [
+        "r_cycle",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_KH_K",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_KH_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+variable_name,units,value,data_reference,sourced
+ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
+Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+J_demand_in,mol_per_s,0.0,no pool connected (an open sum port is 0),no
+J_ATP_in,mol_per_s,0.0,no pool connected,no
+J_keep_in,mol_per_s,0.0,no pool connected,no
+J_build_in,mol_per_s,0.0,no pool connected,no
+M_build_in,mole,0.0,no pool connected,no
+A_protein_in,um2,0.0,no pool connected,no
+J_ref,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C) (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
+build_capacity,dimensionless,5.0,"unreferenced_placeholder; most ATP one protein's synthesis can take, as a multiple of the resting ATP turnover",no
+ATP_floor,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
+ATP_ref,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+J_eps,mol_per_s,1e-30,"definitional; numerical floor, 1e-30 mol/s (12 orders below the resting turnover)",no
+A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
+surface_factor,dimensionless,1.5,"derived: (2 pi R^2 + 2 pi R h)/(2 pi R h): a disc's whole surface over its rim (R_cell: unreferenced_placeholder, design; h_cell: unreferenced_placeholder, design)",no
+area_max_fraction,dimensionless,0.15,"unreferenced_placeholder; most of the cell surface the adaptable proteins may take (placeholder; membrane proteins cover 30-50% of a bacterial membrane, transporters part of that)",no

@@ -1,0 +1,107 @@
+[
+  {
+    "module_type": "Ca_handling",
+    "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "Ca_handling_adaptive_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "Ca_fermenter",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_Ca_in"
+        ],
+        "multi_port": "sum"
+      },
+      {
+        "port_type": "compartment_volume",
+        "variables": [
+          "Vol"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "Cai_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "B_Ca_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "B_Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "CaB_Cai",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "B_Ca_total",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "k_bind_Ca",
+        "per_millimolar_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_unbind_Ca",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "j_Ca_in",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Vol",
+        "m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Ca_total",
+        "millimolar",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

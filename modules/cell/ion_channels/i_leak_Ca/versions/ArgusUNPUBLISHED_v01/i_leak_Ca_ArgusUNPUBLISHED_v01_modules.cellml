@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_leak_Ca_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_leak_Ca">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Cao" public_interface="in" units="millimolar"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_leak_Ca" public_interface="in" units="per_um2"/>
+        <variable name="gamma_leak_Ca" public_interface="in" units="picoS"/>
+        <variable name="g_leak_Ca" public_interface="out" units="microS"/>
+        <!-- Ca Nernst potential -->
+        <variable name="E_Ca" public_interface="out" units="milliV"/>
+        <variable name="i_leak_Ca" public_interface="out" units="nanoA"/>
+        <!-- Ca into the cell -->
+        <variable name="j_leak_Ca" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>g_leak_Ca</ci>
+                <apply>
+                    <times/>
+                    <ci>A_mem</ci>
+                    <ci>rho_leak_Ca</ci>
+                    <ci>gamma_leak_Ca</ci>
+                    <cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>E_Ca</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <ci>F</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>Cao</ci>
+                            <ci>Cai</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="milliV_per_V">1000.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_leak_Ca</ci>
+                <apply>
+                    <times/>
+                    <ci>g_leak_Ca</ci>
+                    <apply>
+                        <minus/>
+                        <ci>V</ci>
+                        <ci>E_Ca</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_leak_Ca</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>i_leak_Ca</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <ci>F</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

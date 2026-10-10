@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_NaH_NhaA_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_NaH_NhaA">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="E_Na" public_interface="in" units="milliV"/>
+        <variable name="E_H" public_interface="in" units="milliV"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <!-- flux-force coefficient per area -->
+        <variable name="g_spec" public_interface="in" units="microS_per_um2"/>
+        <!-- expression, 1 = the calibrated cell (protein_expression port) -->
+        <variable name="m_expr" public_interface="in" units="dimensionless"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <!-- free energy released per cycle over F: -(V + E_Na - 2 E_H) -->
+        <variable name="drive" public_interface="out" units="milliV"/>
+        <!-- exchange cycles per second (forward positive) -->
+        <variable name="r_cycle" public_interface="out" units="mol_per_s"/>
+        <!-- net +1 charge in per cycle (outward positive) -->
+        <variable name="i_NaH" public_interface="out" units="nanoA"/>
+        <!-- Na+ into the cell -->
+        <variable name="j_NaH_Na" public_interface="out" units="mol_per_s"/>
+        <!-- H+ into the cell -->
+        <variable name="j_NaH_H" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>drive</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>V</ci>
+                            <ci>E_Na</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                            <ci>E_H</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_cycle</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>A_mem</ci>
+                            <ci>g_spec</ci>
+                            <ci>m_expr</ci>
+                            <ci>drive</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_NaH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <ci>r_cycle</ci>
+                    </apply>
+                    <ci>F</ci>
+                    <cn cellml:units="nanoA_per_A">1000000000.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaH_Na</ci>
+                <apply>
+                    <minus/>
+                    <ci>r_cycle</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NaH_H</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                    <ci>r_cycle</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,260 @@
+[
+  {
+    "module_type": "i_NaK",
+    "module_subtype": "ATP_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "i_NaK_ATP_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "i_NaK_ATP",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "internal_Na",
+        "variables": [
+          "Nai"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_NaK"
+        ]
+      },
+      {
+        "port_type": "Na_flux",
+        "variables": [
+          "j_NaK_Na"
+        ]
+      },
+      {
+        "port_type": "K_flux",
+        "variables": [
+          "j_NaK_K"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      },
+      {
+        "port_type": "ATP_hydrolysis_port",
+        "variables": [
+          "ATP",
+          "ADP",
+          "Pi",
+          "j_NaK_ATP",
+          "j_NaK_ADP",
+          "j_NaK_Pi"
+        ]
+      },
+      {
+        "port_type": "Na_Nernst_potential",
+        "variables": [
+          "E_Na"
+        ]
+      },
+      {
+        "port_type": "E_K_potential",
+        "variables": [
+          "E_K"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Nai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Ko",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Ko_mid_NaK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai_mid_NaK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "Nai_power_NaK",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_NaK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_NaK",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "ATP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "ADP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Pi",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "K_m_ATP_NaK",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "k_NaK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "i_NaK",
+        "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_Na",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_K",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_ATP",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_ADP",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_NaK_Pi",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "E_Na",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_K",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "dG0_hyd",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "c_std",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "A_ATP",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "W_ion",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "f_thermo",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

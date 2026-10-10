@@ -1,0 +1,123 @@
+{
+  "module_type": "protein_expression",
+  "version": "adaptive_ArgusUNPUBLISHED_v01",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "throttle",
+    "J_cap",
+    "s_build",
+    "J_demand_total",
+    "J_build_total",
+    "J_keep_total",
+    "J_ATP_total",
+    "j_ATP_prot",
+    "M_build_protein",
+    "A_protein_total",
+    "f_area",
+    "x_ATP",
+    "pool_a/m",
+    "pool_b/m",
+    "cyto/C_ATP"
+  ],
+  "harness": {
+    "module_array": [
+      [
+        "pool_a",
+        "ArgusUNPUBLISHED_v01",
+        "protein_pool",
+        "",
+        "mod",
+        "H_ATPase"
+      ],
+      [
+        "pool_b",
+        "ArgusUNPUBLISHED_v01",
+        "protein_pool",
+        "",
+        "mod",
+        "proteome"
+      ],
+      [
+        "cyto",
+        "adaptive_ArgusUNPUBLISHED_v01",
+        "energy_metabolism",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "mod",
+        "adaptive_ArgusUNPUBLISHED_v01",
+        "protein_expression",
+        "pool_a pool_b cyto",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "m_target_pool_a",
+        "dimensionless",
+        3.0,
+        "harness: triple the H+-ATPase"
+      ],
+      [
+        "m_target_pool_b",
+        "dimensionless",
+        1.2,
+        "harness: a fifth more of the proteome"
+      ]
+    ]
+  },
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "throttle = clamp((ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1); J_cap = build_capacity J_ref throttle; s_build = min(1, J_cap/J_demand_total) (exact up to the 1e-30 mol/s floor)",
+      "expr": "np.allclose(throttle, np.clip((cyto__C_ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1), rtol=1e-12, atol=1e-15) and np.allclose(J_cap, build_capacity*J_ref*throttle, rtol=1e-12, atol=0) and np.allclose(s_build, np.where(J_demand_total > J_cap, (J_cap + J_eps)/(J_demand_total + J_eps), 1.0), rtol=1e-9, atol=1e-12)"
+    },
+    {
+      "description": "the pools never spend more than synthesis can: J_build_total <= J_cap (relative 1e-9)",
+      "expr": "np.all(J_build_total <= J_cap*(1 + 1e-9) + 1e-30)",
+      "applies": "run"
+    },
+    {
+      "description": "the ATP port takes exactly what the pools use: j_ATP = -J_ATP_total = -(J_keep_total + J_build_total) (exact; relative 1e-9 with pools)",
+      "expr": "np.allclose(j_ATP_prot, -J_ATP_total, rtol=1e-12, atol=0) and np.allclose(J_ATP_total, J_keep_total + J_build_total, rtol=1e-9, atol=1e-30)",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "build_capacity": [
+        0.5,
+        10.0
+      ],
+      "ATP_floor": [
+        1.0,
+        8.0
+      ]
+    },
+    "exclude": [
+      "ATP",
+      "ADP",
+      "Pi"
+    ],
+    "rationale": "synthesis capacity from below to well above the two pools' demand; the ATP floor over the range where the cytosol's falling ATP crosses it"
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

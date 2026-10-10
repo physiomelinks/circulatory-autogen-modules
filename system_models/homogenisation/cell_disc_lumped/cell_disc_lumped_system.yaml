@@ -1,0 +1,137 @@
+model: cell_disc_lumped
+category: homogenisation
+reviewed: false
+description: 'Level 1: the same disc cell as one well-mixed volume; face to the bath at the derived effective distance R/4.'
+sim_time: 1.0
+pre_time: 0.0
+dt: 0.01
+solver_info:
+  rtol: 1.0e-10
+  atol: 1.0e-16
+equivalence:
+  status: not_applicable
+  reason: a homogenisation example built from this library (tools/build_homogenisation_examples.py); there is no circulatory_autogen
+    original
+invariants:
+- description: 'mass conservation (zero loss): the amount in the cells changes only by bath supply and consumption, sum V
+    C(t) - sum V C(0) = int (supply + sum V M_reduced) dt (relative 1e-6)'
+  expr: np.max(np.abs((6.2831853071795875e-15*c0__C_P) - (6.2831853071795875e-15*c0__C_P)[0] - np.concatenate([[0.0], np.cumsum(0.5*np.diff(t)*((e0__J
+    + 6.2831853071795875e-15*c0__M_reduced)[1:] + (e0__J + 6.2831853071795875e-15*c0__M_reduced)[:-1]))]))) <= 1e-6*max(np.max(np.abs(6.2831853071795875e-15*c0__C_P)),
+    np.max(np.abs(np.concatenate([[0.0], np.cumsum(0.5*np.diff(t)*((e0__J)[1:] + (e0__J)[:-1]))]))))
+- description: 'second law: every face dissipates, J ln(C_up/C_down) >= 0 (using the connected volumes, so it also checks
+    the couplings)'
+  expr: np.all(e0__J*(np.log(np.maximum(bath__C_P, 1e-300)) - np.log(np.maximum(c0__C_P, 1e-300))) >= -1e-30)
+notes:
+- 'Built by tools/build_homogenisation_examples.py: re-run it after changing the geometry.'
+- 'First law: ideal diffusion releases no heat and no thermal domain is modelled, so enthalpy is conserved exactly when mass
+  is (the mass invariant).'
+homogenisation:
+  fine: homogenisation/cell_disc_fv
+  level: 0->1
+  derivation: d_eff = R/4 from the steady profile of uniform consumption in a disc
+  upscaling:
+    derived_m: 2.5e-06
+    calibrated_m: 2.5024461746215955e-06
+    relative_difference: 0.0009775133812679104
+    used: derived
+    value_m: 2.5e-06
+  quantities:
+  - name: mean O2 concentration (mM)
+    fine:
+      weighted_mean:
+      - - c0/C_P
+        - 0.0009765625
+      - - c1/C_P
+        - 0.0029296875
+      - - c2/C_P
+        - 0.004882812500000001
+      - - c3/C_P
+        - 0.006835937499999999
+      - - c4/C_P
+        - 0.008789062499999998
+      - - c5/C_P
+        - 0.010742187500000007
+      - - c6/C_P
+        - 0.0126953125
+      - - c7/C_P
+        - 0.014648437499999998
+      - - c8/C_P
+        - 0.0166015625
+      - - c9/C_P
+        - 0.018554687499999986
+      - - c10/C_P
+        - 0.020507812500000007
+      - - c11/C_P
+        - 0.02246093750000002
+      - - c12/C_P
+        - 0.024414062499999993
+      - - c13/C_P
+        - 0.026367187500000007
+      - - c14/C_P
+        - 0.028320312499999993
+      - - c15/C_P
+        - 0.030273437500000007
+      - - c16/C_P
+        - 0.03222656249999999
+      - - c17/C_P
+        - 0.03417968750000001
+      - - c18/C_P
+        - 0.03613281249999999
+      - - c19/C_P
+        - 0.03808593749999995
+      - - c20/C_P
+        - 0.04003906250000003
+      - - c21/C_P
+        - 0.041992187499999986
+      - - c22/C_P
+        - 0.04394531250000001
+      - - c23/C_P
+        - 0.04589843750000008
+      - - c24/C_P
+        - 0.04785156249999985
+      - - c25/C_P
+        - 0.04980468750000011
+      - - c26/C_P
+        - 0.051757812499999875
+      - - c27/C_P
+        - 0.05371093750000016
+      - - c28/C_P
+        - 0.0556640624999999
+      - - c29/C_P
+        - 0.057617187500000056
+      - - c30/C_P
+        - 0.05957031249999982
+      - - c31/C_P
+        - 0.061523437500000215
+    coarse:
+      weighted_mean:
+      - - c0/C_P
+        - 1.0
+  - name: total uptake from the bath (mol/s)
+    fine:
+      sum_matching: e*/J
+    coarse:
+      sum_matching: e*/J
+  steady_state_tol: 0.01
+  transient_nrmse_tol: 0.05
+  sweep:
+    parameters:
+      bath_O2:
+        pattern: C_P_init_bath
+        units: millimolar
+      M:
+        pattern: M_c*
+        units: millimolar_per_s
+    points:
+    - bath_O2: 0.2
+      M: -0.0558
+    - bath_O2: 0.3
+      M: -0.0558
+    - bath_O2: 0.05
+      M: -0.0558
+    - bath_O2: 0.02
+      M: -0.0558
+    - bath_O2: 0.2
+      M: -0.02
+    - bath_O2: 0.2
+      M: -0.15

@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_H_flagellum_MotAB_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_H_flagellum_MotAB">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="E_H" public_interface="in" units="milliV"/>
+        <!-- number of flagella (protein_expression port, from the Flagellum pool) -->
+        <variable name="m_expr" public_interface="in" units="dimensionless"/>
+        <!-- motor switch: on (1) or off (0), set by the game -->
+        <variable name="a_motor" public_interface="in" units="dimensionless"/>
+        <!-- time constant of spinning up into a bundle or unwinding -->
+        <variable name="tau_bundle" public_interface="in" units="second"/>
+        <variable name="a_init" public_interface="in" units="dimensionless"/>
+        <!-- motor and bundle activity: follows the switch with tau_bundle -->
+        <variable initial_value="a_init" name="a_eff" public_interface="out" units="dimensionless"/>
+        <!-- rotation rate at the reference proton motive force -->
+        <variable name="f_ref" public_interface="in" units="per_s"/>
+        <!-- reference proton motive force -->
+        <variable name="pmf_ref" public_interface="in" units="milliV"/>
+        <!-- H+ through the stators per revolution -->
+        <variable name="n_H_rev" public_interface="in" units="dimensionless"/>
+        <!-- swimming speed with one flagellum at f_ref -->
+        <variable name="v_one" public_interface="in" units="m_per_s"/>
+        <!-- flagella at which extra flagella add half as much again -->
+        <variable name="n_half" public_interface="in" units="dimensionless"/>
+        <!-- viscosity of the water -->
+        <variable name="eta" public_interface="in" units="pascal_second"/>
+        <!-- radius of the cell body (Stokes drag) -->
+        <variable name="R_body" public_interface="in" units="um"/>
+        <variable name="N_A" public_interface="in" units="per_mol"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <!-- Stokes drag coefficient of the cell body, 6 pi eta R -->
+        <variable name="xi" public_interface="out" units="newton_s_per_m"/>
+        <!-- thrust of each flagellum (its share falls as flagella crowd: n_half) -->
+        <variable name="F_one" public_interface="out" units="newton"/>
+        <!-- thrust of all the flagella -->
+        <variable name="F_thrust" public_interface="out" units="newton"/>
+        <!-- mechanical power of swimming alone, F_thrust v_swim (all of it ends as heat in the water) -->
+        <variable name="P_mech" public_interface="out" units="watt"/>
+        <!-- proton motive force driving H+ in: E_H - V -->
+        <variable name="pmf" public_interface="out" units="milliV"/>
+        <!-- rotation rate: proportional to the PMF (E. coli motors) -->
+        <variable name="f_rot" public_interface="out" units="per_s"/>
+        <!-- H+ into the cell through the motors (H_flux port) -->
+        <variable name="j_H_flag" public_interface="out" units="mol_per_s"/>
+        <!-- membrane current of those H+ (outward positive) -->
+        <variable name="i_flag" public_interface="out" units="nanoA"/>
+        <!-- proton-motive power the motors use -->
+        <variable name="P_flag" public_interface="out" units="watt"/>
+        <!-- swimming speed: one flagellum gives v_one at f_ref; more saturate -->
+        <variable name="v_swim" public_interface="out" units="m_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>pmf</ci>
+                <apply>
+                    <minus/>
+                    <ci>E_H</ci>
+                    <ci>V</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>a_eff</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>a_motor</ci>
+                        <ci>a_eff</ci>
+                    </apply>
+                    <ci>tau_bundle</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_rot</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>a_eff</ci>
+                        <ci>f_ref</ci>
+                        <ci>pmf</ci>
+                    </apply>
+                    <ci>pmf_ref</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H_flag</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>m_expr</ci>
+                        <ci>f_rot</ci>
+                        <ci>n_H_rev</ci>
+                    </apply>
+                    <ci>N_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_flag</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <ci>j_H_flag</ci>
+                    </apply>
+                    <ci>F</ci>
+                    <cn cellml:units="nanoA_per_A">1000000000.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_flag</ci>
+                <apply>
+                    <times/>
+                    <ci>j_H_flag</ci>
+                    <ci>F</ci>
+                    <ci>pmf</ci>
+                    <cn cellml:units="V_per_milliV">0.001</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>xi</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">6.0</cn>
+                    <pi/>
+                    <ci>eta</ci>
+                    <ci>R_body</ci>
+                    <cn cellml:units="m_per_um" type="e-notation">1<sep/>-6</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>F_one</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>xi</ci>
+                                <ci>v_one</ci>
+                                <ci>f_rot</ci>
+                            </apply>
+                            <ci>f_ref</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>n_half</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>m_expr</ci>
+                        <ci>n_half</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>F_thrust</ci>
+                <apply>
+                    <times/>
+                    <ci>m_expr</ci>
+                    <ci>F_one</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_swim</ci>
+                <apply>
+                    <divide/>
+                    <ci>F_thrust</ci>
+                    <ci>xi</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_mech</ci>
+                <apply>
+                    <times/>
+                    <ci>F_thrust</ci>
+                    <ci>v_swim</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

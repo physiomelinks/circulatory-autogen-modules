@@ -1,0 +1,44 @@
+{
+  "module_type": "i_H_ATPase",
+  "version": "FoF1_ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "i_H_ATPase",
+    "v_ATP_H",
+    "j_H_pumped",
+    "j_H_ATPase",
+    "j_ATP_H",
+    "j_ADP_H",
+    "j_Pi_H",
+    "A_ATP",
+    "W_H",
+    "f_thermo"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "stoichiometry: n_H H+ out and 1 ATP -> ADP + Pi per turnover; the current is the pumped charge, i = -F j_H_pumped (exact)",
+      "expr": "np.allclose(j_H_pumped, n_H*j_ATP_H, rtol=1e-12, atol=0) and np.allclose(j_ADP_H, -j_ATP_H, rtol=1e-12, atol=0) and np.allclose(j_Pi_H, -j_ATP_H, rtol=1e-12, atol=0) and np.allclose(i_H_ATPase, -F*j_H_pumped*1e9, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "second law: it hydrolyses ATP only while the ATP free energy exceeds the proton work, v (A_ATP - W_H) >= 0 (and synthesises ATP otherwise)",
+      "expr": "np.all(v_ATP_H*(A_ATP - W_H) >= 0)"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}
