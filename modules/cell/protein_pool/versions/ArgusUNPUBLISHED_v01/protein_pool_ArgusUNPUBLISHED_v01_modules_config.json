@@ -44,6 +44,12 @@
           "M_build",
           "A_protein"
         ]
+      },
+      {
+        "port_type": "membrane_ceiling",
+        "variables": [
+          "A_ceiling"
+        ]
       }
     ],
     "variables_and_units": [
@@ -224,6 +230,24 @@
       [
         "A_protein",
         "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ceiling",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "share",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "s_unit",
+        "dimensionless",
         "access",
         "variable"
       ]

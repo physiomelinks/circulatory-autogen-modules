@@ -13,6 +13,7 @@
     "m",
     "m_target",
     "share",
+    "s_unit",
     "n",
     "r_up",
     "r_down",
@@ -37,8 +38,8 @@
       "expr": "np.all(np.diff(share)*np.sign(s_target - share[0]) >= -1e-12) and np.all((share - s_target)*(share[0] - s_target) >= -1e-12)"
     },
     {
-      "description": "costs (exact): J_keep = n L (c_poly + c_deg + c_recycle) k_deg f_ATP / N_A, J_demand = r_up n_0 L (c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1), M_build = n L (c_syn + c_poly) / N_A, A_protein = n_0 footprint m",
-      "expr": "np.allclose(J_keep, n_0*m*L*(c_poly + c_deg + c_recycle)*k_deg/N_A*f_ATP, rtol=1e-12, atol=0) and np.allclose(J_demand, np.maximum(m_target - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0)"
+      "description": "costs (exact): J_keep = n L (c_poly + c_deg + c_recycle) k_deg f_ATP / N_A, J_demand = r_up n_0 L (c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1), M_build = n L (c_syn + c_poly) / N_A, A_protein = n_0 footprint m, share = A_protein / A_ceiling, s_unit = n_0 footprint / A_ceiling",
+      "expr": "np.allclose(J_keep, n_0*m*L*(c_poly + c_deg + c_recycle)*k_deg/N_A*f_ATP, rtol=1e-12, atol=0) and np.allclose(J_demand, np.maximum(m_target - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0) and np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0) and np.allclose(s_unit, n_0*footprint*1e-6/A_ceiling, rtol=1e-12, atol=0)"
     },
     {
       "description": "the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0)) = int J_build dt while m rises (relative 1e-4: trapezoid integration of the logged flux)",

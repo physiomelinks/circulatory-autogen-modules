@@ -11,7 +11,7 @@ K_Pi_PEP,millimolar,1.0,unreferenced_placeholder; lumped glycolysis affinity for
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
 Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
-C_G6P,millimolar,0.0003344481605351171,"derived: steady state of the lower glycolysis at rest: K_G6P_lg/(headroom - 1) (K_G6P_lg: unreferenced_placeholder, placeholder; lower_glycolysis_headroom: unreferenced_placeholder, placeholder)",no
+C_G6P,millimolar,1.0,"chassagnole2002dynamic; glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)",no
 dG0_hk,J_per_mol,-16700.0,unreferenced_placeholder; standard Gibbs energy of glucose + ATP -> glucose 6-phosphate + ADP (textbook -16.7 kJ/mol: G6P hydrolysis -13.8 against ATP hydrolysis -30.5),no
 c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
 R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no

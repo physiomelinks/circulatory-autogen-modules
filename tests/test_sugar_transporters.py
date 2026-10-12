@@ -7,10 +7,12 @@ split glycolysis (hexokinase step and lower glycolysis) must keep while their po
 
     pytest tests/test_sugar_transporters.py --include-unreviewed
 
-tests/data/generic_adaptive_cell_fermenter_level1.json holds the fermenter's traces from before the carriers were added
-(the record() function below wrote it): every output of the level-1 cell at 0, 5, ..., 60 s in three scenarios. The
-cell then had one lumped glycolysis and expression targets m_target for every pool; the scenarios are translated to the
-membrane proteins' shares (s_target = m_target x the share at rest).
+tests/data/generic_adaptive_cell_fermenter_level1.json holds the level-1 fermenter's traces (the record() function below
+writes it): every output of the cell at 0, 5, ..., 60 s in three scenarios, with the split glycolysis holding 1 mM G6P
+at rest, the surface hydrolase and the flagellum's membrane share. The scenarios set expression targets m_target as
+multiples of the baseline; for the membrane proteins they are translated to shares (s_target = m_target x the share at
+rest). tests/data/generic_adaptive_cell_fermenter_level1_lumped.json holds the same scenarios from before the carriers,
+with one lumped glycolysis: test_level1_shift_from_lumped_glycolysis records how far the realistic G6P pool moved them.
 """
 import json
 import math
@@ -26,6 +28,7 @@ pytestmark = pytest.mark.module_vv
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEVEL1 = os.path.join(HERE, 'data', 'generic_adaptive_cell_fermenter_level1.json')
+LEVEL1_LUMPED = os.path.join(HERE, 'data', 'generic_adaptive_cell_fermenter_level1_lumped.json')
 GC = 'glucose_carrier'
 CARRIERS = {   # instance key: (version, instance, ATP equivalents per glucose, H+ per glucose)
     'PTS': ('PTS_ArgusUNPUBLISHED_v01', 'default', 1.0, 0.0),
@@ -33,7 +36,7 @@ CARRIERS = {   # instance key: (version, instance, ATP equivalents per glucose, 
     'GalP': ('H_symport_ArgusUNPUBLISHED_v01', 'default', 0.0, 1.0),
 }
 INSIDE = {'PTS': 'C_G6P_mod', 'ABC': 'C_glc_mod', 'GalP': 'C_glc_mod'}   # what the carrier delivers into the cell
-# relative tolerance of the level-1 traces on each output's scale: the split glycolysis holds ~0.3 uM G6P at rest
+# relative tolerance of the level-1 traces on each output's scale
 LEVEL1_RTOL = 1e-3
 SCENARIOS = {   # the level-1 runs recorded in LEVEL1 (fermenter parameters by their generated-model names)
     'rest': {},
@@ -207,20 +210,20 @@ def _run(cm, params, outputs=None):
 
 
 def record(path=LEVEL1):
-    '''Writes LEVEL1 from the current fermenter (run at the commit before the carriers were added).'''
+    '''Writes LEVEL1 from the current fermenter.'''
     import tempfile
     cm = checks.ComponentModel(load_version('generic_adaptive_cell', 'fermenter'), work_dir=tempfile.mkdtemp())
     ref = {'times': list(range(0, 61, 5)), 'scenarios': {}}
     for name, p in SCENARIOS.items():
-        t, out = cm.run(p)
+        t, out = cm.run(_translated(cm, p))
         idx = [int(np.argmin(np.abs(t - x))) for x in ref['times']]
         ref['scenarios'][name] = {'parameters': p, 'outputs': {k: [float(out[k][i]) for i in idx] for k in sorted(out)}}
     json.dump(ref, open(path, 'w'), indent=1)
 
 
-def level1_differences(cm, scenario):
+def level1_differences(cm, scenario, path=LEVEL1):
     '''max |new - level 1| / max |level 1| of every recorded output in a scenario, largest first.'''
-    ref = json.load(open(LEVEL1))
+    ref = json.load(open(path))
     case = ref['scenarios'][scenario]
     t, out = cm.run(_translated(cm, case['parameters']))
     idx = [int(np.argmin(np.abs(t - x))) for x in ref['times']]
@@ -236,19 +239,34 @@ def level1_differences(cm, scenario):
 @pytest.mark.parametrize('scenario', sorted(SCENARIOS))
 def test_level1_unchanged(scenario, fermenter):
     '''With the carriers' pools at 0 the fermenter reproduces its level-1 traces within LEVEL1_RTOL of each output's
-    scale (outputs that are zero in level 1, round-off, are not compared). The surface hydrolase, added after the
-    reference, takes its share of the membrane ceiling: f_area is higher by exactly that share.'''
+    scale (outputs that are zero in level 1, round-off, are not compared).'''
     diffs = level1_differences(fermenter, scenario)
     bad = [f'{name}: differs by {d:.3g} of its scale ({scale:.3g})' for d, name, scale in diffs
-           if d > LEVEL1_RTOL and scale > 1e-30 and name != 'mod_protein__f_area']
+           if d > LEVEL1_RTOL and scale > 1e-30]
     assert not bad, '\n'.join(bad)
-    ref = json.load(open(LEVEL1))
-    case = ref['scenarios'][scenario]
-    t, out = fermenter.run(_translated(fermenter, case['parameters']))
-    idx = [int(np.argmin(np.abs(t - x))) for x in ref['times']]
-    hydrolase_share = out['mod_pool_Hydrolase__share'][idx]
-    assert np.allclose(np.asarray(out['mod_protein__f_area'])[idx] - case['outputs']['mod_protein__f_area'],
-                       hydrolase_share, rtol=LEVEL1_RTOL, atol=0)
+
+
+# how far the realistic G6P pool (1 mM at rest, Hill kinetics in the lower glycolysis) moved the level-1 cell from the
+# lumped glycolysis: the largest relative difference allowed in each main output (measured, rounded up)
+LUMPED_SHIFT = {
+    'rest': {'mod_membrane__V': 1e-9, 'mod_cytosol__C_ATP': 1e-9, 'mod_cytosol__C_lac': 1e-9, 'mod_H__pH_i': 1e-9,
+             'mod_membrane_face__J_glc': 1e-9},
+    'famine': {'mod_membrane__V': 0.01, 'mod_cytosol__C_ATP': 0.12, 'mod_cytosol__C_lac': 0.45, 'mod_H__pH_i': 0.003,
+               'mod_membrane_face__J_glc': 0.08},
+    'feast': {'mod_membrane__V': 0.005, 'mod_cytosol__C_ATP': 1e-4, 'mod_cytosol__C_lac': 0.1, 'mod_H__pH_i': 1e-3,
+              'mod_membrane_face__J_glc': 0.05},
+}
+
+
+@pytest.mark.parametrize('scenario', sorted(SCENARIOS))
+def test_level1_shift_from_lumped_glycolysis(scenario, fermenter):
+    '''Against the lumped glycolysis' traces: at rest the cell is the same steady state (V, ATP, lactate, pH, uptake);
+    in famine the 1 mM of G6P is a reserve (3 ATP each), so ATP runs down later (half gone at ~57 s instead of ~45 s);
+    in a feast G6P rises to ~2 mM and holds that much more of the cell's phosphate (Pi falls by as much), while ATP, V
+    and pH stay within 0.5%.'''
+    diffs = {name: d for d, name, scale in level1_differences(fermenter, scenario, LEVEL1_LUMPED)}
+    for name, bound in LUMPED_SHIFT[scenario].items():
+        assert diffs[name] <= bound, f'{name}: moved by {diffs[name]:.3g} of its scale'
 
 
 def test_PTS_uptake_far_above_Glf_at_10uM(fermenter):
@@ -321,24 +339,27 @@ def _alone(cm, key, m=1.0):
 
 @pytest.mark.parametrize('key,net', [('Glf', 2.0), ('PTS', 2.0), ('ABC', 0.0), ('GalP', 2.0)])
 def test_net_ATP_per_glucose(key, net, fermenter):
-    '''With one carrier and glucose at 1 mM, per glucose taken up and used (less what accumulates as glucose or G6P
-    inside, from the logged pools): glycolysis makes 2 ATP net per free glucose (3 from the lower glycolysis less the
-    hexokinase ATP) and 3 per G6P the PTS delivers, of which the PTS spent 1 (its PEP); the ABC importer spends 2. Net:
-    Glf 2, PTS 2, ABC 0, GalP 2 in ATP, plus 1 H+ that the H+-ATPase pumps out for 3/10 ATP (10/3 H+ per ATP), 1.7 in
-    all.'''
+    '''With one carrier and glucose at 1 mM, per glucose taken up, counting the sugar banked inside at the ATP it will
+    make (2 per free glucose, 3 per G6P: the cell need not be at steady state, and its G6P pool holds mM): glycolysis
+    makes 2 ATP net per free glucose (3 from the lower glycolysis less the hexokinase ATP) and 3 per G6P the PTS
+    delivers, of which the PTS spent 1 (its PEP); the ABC importer spends 2. Net: Glf 2, PTS 2, ABC 0, GalP 2 in ATP,
+    plus 1 H+ that the H+-ATPase pumps out for 3/10 ATP (10/3 H+ per ATP), 1.7 in all.'''
     carrier = {'Glf': 'membrane_face', 'PTS': 'glc_PTS', 'ABC': 'glc_ABC', 'GalP': 'glc_GalP'}[key]
     outs = [f'mod_{carrier}/J_glc', 'mod_cytosol/J_ATP_gly', 'mod_cytosol/J_ATP_hk', 'mod_cytosol/J_ATP_lg',
             'mod_cytosol/C_G6P', 'mod_cytosol/C_glc', 'mod_membrane/Vol']
     outs += [f'mod_{carrier}/J_ATP_cost'] if key in ('PTS', 'ABC') else []
     outs += ['mod_glc_GalP/j_H'] if key == 'GalP' else []
     t, o = _run(fermenter, {**_glucose(1.0), **_alone(fermenter, key, 4.0)}, outs)
-    assert o[f'mod_{carrier}/J_glc'][-1] > 0
-    # glucose used at the end: taken up less what accumulates inside (as glucose or G6P)
+    J_up = o[f'mod_{carrier}/J_glc'][-1]
+    assert J_up > 0
+    # the sugar banked inside at the end (mol/s): free glucose and G6P accumulating
     vol = o['mod_membrane/Vol'][0]
-    J = o[f'mod_{carrier}/J_glc'][-1] - vol * (np.gradient(o['mod_cytosol/C_glc'], t)[-1] +
-                                               np.gradient(o['mod_cytosol/C_G6P'], t)[-1])
+    d_glc = vol * np.gradient(o['mod_cytosol/C_glc'], t, edge_order=2)[-1]
+    d_g6p = vol * np.gradient(o['mod_cytosol/C_G6P'], t, edge_order=2)[-1]
     cost = o[f'mod_{carrier}/J_ATP_cost'][-1] if key in ('PTS', 'ABC') else 0.0
-    assert (o['mod_cytosol/J_ATP_gly'][-1] - cost) / J == pytest.approx(net, rel=1e-3, abs=1e-3)
+    assert (o['mod_cytosol/J_ATP_gly'][-1] + 2 * d_glc + 3 * d_g6p - cost) / J_up == pytest.approx(net, rel=1e-4,
+                                                                                                    abs=1e-4)
+    J = J_up - d_glc - d_g6p   # glucose used
     if key == 'PTS':   # no hexokinase: the G6P comes from the carrier
         assert o['mod_cytosol/J_ATP_hk'][-1] <= 1e-6 * o['mod_cytosol/J_ATP_lg'][-1]
         assert o['mod_cytosol/J_ATP_lg'][-1] / J == pytest.approx(3.0, rel=1e-4)
@@ -362,15 +383,16 @@ def test_PTS_delivers_G6P_and_skips_hexokinase(fermenter):
 
 
 def test_G6P_is_trapped(fermenter):
-    '''A cell loaded with 1 mM G6P in a medium without glucose spends it as lactate: G6P has no way out, and the
-    glucose Glf lets out is only what reverse hexokinase makes at equilibrium (G6P ADP/(K_eq_hk ATP), ~5e-5 mM).'''
+    '''A cell loaded with 4 mM G6P (3 mM above rest) in a medium without glucose spends it as lactate: G6P has no way
+    out, and the glucose Glf lets out is only what reverse hexokinase makes at equilibrium (G6P ADP/(K_eq_hk ATP),
+    ~2e-4 mM).'''
     outs = ['mod_membrane_face/J_glc', 'mod_membrane_face/J_lac', 'mod_cytosol/C_G6P', 'mod_cytosol/C_glc',
             'mod_cytosol/C_lac', 'mod_cytosol/C_glyc', 'mod_membrane/Vol']
-    t, o = _run(fermenter, {**_glucose(0.0), 'C_G6P_init_mod_cytosol': 1.0, 'C_glc_init_mod_cytosol': 0.0}, outs)
+    t, o = _run(fermenter, {**_glucose(0.0), 'C_G6P_init_mod_cytosol': 4.0, 'C_glc_init_mod_cytosol': 0.0}, outs)
     vol = o['mod_membrane/Vol'][0]
     g6p_spent = vol * (o['mod_cytosol/C_G6P'][0] - o['mod_cytosol/C_G6P'][-1])
     glc_out = -np.trapz(np.minimum(o['mod_membrane_face/J_glc'], 0.0), t)
-    assert g6p_spent > 0.9 * vol * 1.0
+    assert g6p_spent > 0.9 * vol * 3.0
     assert glc_out <= 1e-3 * g6p_spent
     # the carbon of the G6P left as lactate (2 per G6P), not as G6P
     lac_out = -np.trapz(o['mod_membrane_face/J_lac'], t) + vol * (o['mod_cytosol/C_lac'][-1] - o['mod_cytosol/C_lac'][0])
@@ -379,13 +401,15 @@ def test_G6P_is_trapped(fermenter):
 
 def test_membrane_shares(fermenter):
     '''A membrane protein's target is its share of the membrane's protein ceiling: copies = s A_ceiling / footprint.
-    At rest every transporter holds its share at rest (m = 1); with the three glucose carriers given the rest of the
-    ceiling the shares sum to 1 and the copies fill the ceiling exactly (the flagellum, counted by number, comes on top).'''
+    At rest every transporter holds its share at rest (m = 1); with the three glucose carriers given what the
+    transporters and the flagellum leave of the ceiling, the shares sum to 1 and the copies and the flagellum fill the
+    ceiling exactly.'''
     nominal = fermenter.nominal
     shares = {k: nominal[f's_target_mod_pool_{k}'] for k in SHARE_POOLS}
     for k in SHARE_POOLS:
         assert shares[k] == pytest.approx(_share_of(fermenter, k, 0.0 if k in CARRIERS else 1.0), rel=1e-12, abs=0)
-    free = 1.0 - sum(shares.values())
+    flagellum = _share_of(fermenter, 'Flagellum', nominal['m_init_mod_pool_Flagellum'])
+    free = 1.0 - sum(shares.values()) - flagellum
     assert 0 < free < 1
     fill = {k: free / 3 for k in CARRIERS}
     params = {**{f's_target_mod_pool_{k}': s for k, s in fill.items()},
@@ -393,28 +417,69 @@ def test_membrane_shares(fermenter):
                                                                    nominal[f'footprint_mod_pool_{k}'] * 1e-6)
                  for k, s in fill.items()}}
     outs = [f'mod_pool_{k}/{v}' for k in SHARE_POOLS for v in ('share', 'm', 'm_target')] + [
-        'mod_protein/A_protein_max', 'mod_protein/A_protein_total', 'mod_pool_Flagellum/A_protein']
+        'mod_protein/A_protein_max', 'mod_protein/A_protein_total', 'mod_protein/f_area', 'mod_pool_Flagellum/share']
     t, o = _run(fermenter, params, outs)
     assert np.allclose(o['mod_protein/A_protein_max'], _ceiling(fermenter), rtol=1e-12, atol=0)
-    total = sum(o[f'mod_pool_{k}/share'] for k in SHARE_POOLS)
+    assert np.allclose(o['mod_pool_Flagellum/share'], flagellum, rtol=1e-12, atol=0)
+    total = sum(o[f'mod_pool_{k}/share'] for k in SHARE_POOLS) + o['mod_pool_Flagellum/share']
     assert np.allclose(total, 1.0, rtol=1e-9, atol=0)
-    assert np.allclose(o['mod_protein/A_protein_total'] - o['mod_pool_Flagellum/A_protein'],
-                       o['mod_protein/A_protein_max'], rtol=1e-9, atol=0)
+    assert np.allclose(o['mod_protein/A_protein_total'], o['mod_protein/A_protein_max'], rtol=1e-9, atol=0)
+    assert np.allclose(o['mod_protein/f_area'], 1.0, rtol=1e-9, atol=0)
     for k in SHARE_POOLS:
         assert np.allclose(o[f'mod_pool_{k}/share'], {**shares, **fill}[k], rtol=1e-9, atol=1e-15), k
 
 
+@pytest.mark.parametrize('n', [1.0, 3.0, 8.0])
+def test_flagellum_takes_membrane_per_flagellum(n, fermenter):
+    '''Each flagellum's motor takes footprint_Flagellum of the membrane (its stator ring and basal body, ~1,700 nm2),
+    counted against the same ceiling as the transporters: share = m s_unit with s_unit = footprint / A_ceiling, so n
+    flagella take n times one's share, and protein_expression's f_area counts them.'''
+    p = fermenter.nominal
+    outs = ['mod_pool_Flagellum/share', 'mod_pool_Flagellum/s_unit', 'mod_pool_Flagellum/m', 'mod_protein/f_area']
+    _, o = _run(fermenter, _express(fermenter, 'Flagellum', n), outs)
+    _, one = _run(fermenter, {}, outs)
+    s_unit = p['n_0_mod_pool_Flagellum'] * p['footprint_mod_pool_Flagellum'] * 1e-6 / _ceiling(fermenter)
+    assert p['n_0_mod_pool_Flagellum'] == 1.0 and p['footprint_mod_pool_Flagellum'] == 1700.0
+    assert np.allclose(o['mod_pool_Flagellum/s_unit'], s_unit, rtol=1e-12, atol=0)
+    assert np.allclose(o['mod_pool_Flagellum/share'], n * s_unit, rtol=1e-9, atol=0)
+    assert np.allclose(o['mod_protein/f_area'] - one['mod_protein/f_area'], (n - 1.0) * s_unit, rtol=1e-6, atol=1e-15)
+
+
 @pytest.mark.parametrize('c_e,share', [(1.0, 0.25), (50.0, 1.0)])
 def test_PTS_cell_keeps_its_phosphate(c_e, share, fermenter):
-    '''A PTS-only cell on rich glucose takes up what its ATP use needs: G6P settles where the PTS and lower glycolysis
-    capacities balance, far below the cell's phosphate, and ATP stays up (no sugar-phosphate trap), up to a PTS
-    filling the whole membrane ceiling in 50 mM glucose.'''
+    '''A PTS-only cell on rich glucose, with its glycolytic enzymes at baseline, takes up what its ATP use needs: G6P
+    settles where the PTS and lower glycolysis capacities balance (a few mM, below a quarter of the cell's phosphate),
+    and ATP and Pi stay up, up to a PTS filling the whole membrane ceiling in 50 mM glucose.'''
     outs = ['mod_cytosol/C_G6P', 'mod_cytosol/C_ATP', 'mod_cytosol/C_Pi', 'mod_glc_PTS/J_glc']
     m = share / _share_of(fermenter, 'PTS', 1.0)
     t, o = _run(fermenter, {**_glucose(c_e), **_alone(fermenter, 'PTS', m)}, outs)
-    assert np.max(o['mod_cytosol/C_G6P']) < 0.1
-    assert np.min(o['mod_cytosol/C_ATP']) > 0.9 * o['mod_cytosol/C_ATP'][0]
-    assert np.min(o['mod_cytosol/C_Pi']) > 0.9 * o['mod_cytosol/C_Pi'][0]
+    phosphoryl = o['mod_cytosol/C_ATP'][0] + o['mod_cytosol/C_Pi'][0] + o['mod_cytosol/C_G6P'][0]
+    assert np.max(o['mod_cytosol/C_G6P']) < 0.25 * phosphoryl
+    assert np.min(o['mod_cytosol/C_ATP']) > 0.85 * o['mod_cytosol/C_ATP'][0]
+    assert np.min(o['mod_cytosol/C_Pi']) > 0.6 * o['mod_cytosol/C_Pi'][0]
+
+
+@pytest.mark.parametrize('glycolytic', [1.0, 0.05])
+def test_PTS_phosphate_trap(glycolytic, fermenter):
+    '''Kept on purpose (designer decision 2026-10-12, no cap): a cell whose PTS takes half the membrane ceiling and
+    whose glycolytic enzymes are cut to 5% traps its phosphate as G6P. The PTS charges ATP for each glucose it
+    phosphorylates faster than the lower glycolysis can return it, so within a minute in 10 mM glucose nearly all the
+    cell's phosphoryl groups sit in G6P and ATP is gone; with its enzymes at baseline the same PTS cell keeps its ATP.
+    Either way the cell's invariants (phosphoryl and adenine conservation, carbon, charge, the second law) hold.'''
+    outs = ['mod_cytosol/C_G6P', 'mod_cytosol/C_ATP', 'mod_cytosol/C_Pi']
+    params = {**_glucose(10.0), **_alone(fermenter, 'PTS', 0.5 / _share_of(fermenter, 'PTS', 1.0)),
+              **_express(fermenter, 'Glyc', glycolytic)}
+    t, o = _run(fermenter, params, outs)
+    atp, g6p = o['mod_cytosol/C_ATP'], o['mod_cytosol/C_G6P']
+    phosphoryl = atp[0] + o['mod_cytosol/C_Pi'][0] + g6p[0]
+    if glycolytic < 1.0:
+        assert atp[-1] < 0.05 * atp[0]
+        assert g6p[-1] > 0.9 * phosphoryl
+    else:
+        assert np.min(atp) > 0.9 * atp[0]
+        assert np.max(g6p) < 0.5 * phosphoryl
+    failures = _cell_invariant_failures(fermenter, params)
+    assert not failures, '\n'.join(failures)
 
 
 # ---- the cell-surface polysaccharide hydrolase -------------------------------------------------------------------------

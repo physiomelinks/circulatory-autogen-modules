@@ -387,12 +387,19 @@
    "status": "placeholder",
    "note": "enthalpy released by glucose + ATP -> glucose 6-phosphate + ADP (about -24 kJ/mol reported for the hexokinase reaction; to confirm and cite)"
   },
-  "K_G6P_lg": {
-   "value": 0.1,
+  "G6P_i": {
+   "value": 1.0,
    "units": "millimolar",
+   "source": "chassagnole2002dynamic",
+   "status": "design",
+   "note": "glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)"
+  },
+  "n_G6P_lg": {
+   "value": 4.0,
+   "units": "dimensionless",
    "source": "unreferenced_placeholder",
    "status": "placeholder",
-   "note": "lower glycolysis (glucose 6-phosphate to lactate) affinity for G6P, phosphoglucose isomerase/phosphofructokinase order 0.1 mM"
+   "note": "Hill coefficient of the lumped lower glycolysis in G6P, from its committed step: E. coli phosphofructokinase (PFK-1, a tetramer) is cooperative in fructose 6-phosphate with a Hill coefficient of about 4 (Blangy, Buc and Monod 1968, J Mol Biol 31:13-35, doi 10.1016/0022-2836(68)90051-x: the paper is confirmed, the value is from memory, to check). With 4, G6P rises from 1 mM at rest to ~3 mM at 50x the resting flux and a cell with a large PTS keeps its phosphate; with 2 it would rise to ~8 mM and a full-ceiling PTS would run Pi down to ~0"
   },
   "K_ATP_hk": {
    "value": 0.1,
@@ -406,7 +413,7 @@
    "units": "dimensionless",
    "source": "unreferenced_placeholder",
    "status": "placeholder",
-   "note": "capacity of the lower glycolysis (G6P to lactate) as a multiple of the resting flux, six times the hexokinase step's 52x: a Glf cell's flux stays set at the entry step and G6P stays low (about 0.3 uM at rest, K_G6P_lg/(headroom - 1); ~0.02 mM at 50x), so the level-1 traces move by less than 1e-3 (G6P holds phosphate and carbon); a PTS cell, which delivers G6P, can run up to it. Real cells hold mM G6P: a designer trade-off"
+   "note": "capacity of the lower glycolysis (G6P to lactate) as a multiple of the resting flux, six times the hexokinase step's 52x, so a Glf cell's flux stays set at the entry step and a PTS cell can run up to it; with G6P_i and n_G6P_lg it sets the lumped G6P constant K_G6P_lg = G6P_i (headroom - 1)^(1/n) (4.2 mM: G6P 1 mM at rest, ~3 mM at 50x the resting flux)"
   },
   "K_ATP_hyd": {
    "value": 0.5,
@@ -1004,11 +1011,11 @@
    "note": "one flagellum: ~20,000 flagellin (FliC, 498 aa) in the filament, ~120 hook FlgE (402 aa) and ~300 basal-body, rotor and stator proteins (~400 aa each)"
   },
   "footprint_Flagellum": {
-   "value": 2000.0,
+   "value": 1700.0,
    "units": "nm2",
-   "source": "unreferenced_placeholder",
+   "source": "beeby2016diverse",
    "status": "placeholder",
-   "note": "membrane area of a basal body (~45 nm ring) with its stators"
+   "note": "membrane area one flagellar motor takes: the disc out to its stators' outer edge, pi (20 + 3.5)^2 nm2 = 1,735 nm2, taken as 1,700. The 11 MotA5MotB2 stators of the enteric (Salmonella) motor exert force at a radius of 20 nm, around a C ring of 22 nm radius (Beeby et al. 2016, cryo-ET); each stator's MotA pentamer is ~6-7 nm across in the membrane (Santiveri et al. 2020, Deme et al. 2020 cryo-EM; the width from a secondary summary, to check), half of it 3.5 nm. Inside the stator ring sit the MS ring and export gate, so no other protein uses that membrane (confidence: medium: the radius is measured, the exclusion disc is an estimate; the proteins alone cover ~1,000 nm2)"
   },
   "n_H_rev": {
    "value": 1200.0,

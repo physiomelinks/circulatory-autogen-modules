@@ -54,7 +54,10 @@
         <variable name="h_hk" public_interface="in" units="J_per_mol"/>
         <!-- capacity of the lower glycolysis -->
         <variable name="V_lg" public_interface="in" units="millimolar_per_s"/>
+        <!-- G6P for half the lower glycolysis' capacity -->
         <variable name="K_G6P_lg" public_interface="in" units="millimolar"/>
+        <!-- Hill coefficient of the lower glycolysis in G6P -->
+        <variable name="n_G6P_lg" public_interface="in" units="dimensionless"/>
         <variable name="C_G6P_init" public_interface="in" units="millimolar"/>
         <!-- glucose 6-phosphate: trapped in the cell (no carrier takes it) -->
         <variable initial_value="C_G6P_init" name="C_G6P" public_interface="out" units="millimolar"/>
@@ -492,6 +495,18 @@
                                         <ci>m_gly</ci>
                                         <ci>f_T</ci>
                                         <apply>
+                                            <power/>
+                                            <apply>
+                                                <abs/>
+                                                <ci>C_G6P</ci>
+                                            </apply>
+                                            <apply>
+                                                <minus/>
+                                                <ci>n_G6P_lg</ci>
+                                                <cn cellml:units="dimensionless">1.0</cn>
+                                            </apply>
+                                        </apply>
+                                        <apply>
                                             <minus/>
                                             <ci>C_G6P</ci>
                                             <apply>
@@ -529,8 +544,19 @@
                                     </apply>
                                     <apply>
                                         <plus/>
-                                        <ci>K_G6P_lg</ci>
-                                        <ci>C_G6P</ci>
+                                        <apply>
+                                            <power/>
+                                            <ci>K_G6P_lg</ci>
+                                            <ci>n_G6P_lg</ci>
+                                        </apply>
+                                        <apply>
+                                            <power/>
+                                            <apply>
+                                                <abs/>
+                                                <ci>C_G6P</ci>
+                                            </apply>
+                                            <ci>n_G6P_lg</ci>
+                                        </apply>
                                     </apply>
                                 </apply>
                                 <ci>C_ADP</ci>
