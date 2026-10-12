@@ -80,6 +80,7 @@
         ],
         "out_instances": [
           "i_leak_H",
+          "reg",
           "i_H_ATPase",
           "i_NaH",
           "i_KH",
@@ -104,6 +105,7 @@
           "H",
           "protein",
           "bio",
+          "reg",
           "i_H_ATPase"
         ]
       },
@@ -117,6 +119,7 @@
           "cytosol",
           "pool_proteome",
           "pool_Glyc",
+          "reg",
           "pool_H_ATPase",
           "pool_NhaA",
           "pool_KefC",
@@ -162,7 +165,9 @@
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
         "instance": "proteome",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio"
@@ -173,11 +178,40 @@
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
         "instance": "Glyc",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
           "cytosol"
+        ]
+      },
+      {
+        "name": "reg",
+        "module_type": "expression_regulation",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "cytosol",
+          "H"
+        ],
+        "out_instances": [
+          "bio",
+          "pool_proteome",
+          "pool_Glyc",
+          "pool_H_ATPase",
+          "pool_NhaA",
+          "pool_KefC",
+          "pool_Trk",
+          "pool_NCX",
+          "pool_Glf",
+          "pool_LacT",
+          "pool_Flagellum",
+          "pool_Hydrolase",
+          "pool_PTS",
+          "pool_ABC",
+          "pool_GalP"
         ]
       },
       {
@@ -359,7 +393,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "H_ATPase",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -371,7 +407,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "NhaA",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -383,7 +421,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "KefC",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -395,7 +435,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "Trk",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -407,7 +449,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "NCX",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -419,7 +463,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "Glf",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -431,7 +477,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "LacT",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -443,7 +491,9 @@
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
         "instance": "Flagellum",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -455,7 +505,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "Hydrolase",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -467,7 +519,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "PTS",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -479,7 +533,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "ABC",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
@@ -491,7 +547,9 @@
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
         "instance": "GalP",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",

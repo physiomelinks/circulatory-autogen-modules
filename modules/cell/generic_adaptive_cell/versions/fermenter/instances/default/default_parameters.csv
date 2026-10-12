@@ -103,6 +103,10 @@ J_ref_bio,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cel
 ATP_floor_bio,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
 D_init_bio,dimensionless,0.011111111111111112,calibrated: steady damage at full repair,no
 P_init_bio,mole,0.0,definitional; no daughter under way,no
+reg_on_ATP_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 J_ref_protein,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C) (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
 build_capacity_protein,dimensionless,5.0,"unreferenced_placeholder; most ATP one protein's synthesis can take, as a multiple of the resting ATP turnover",no
 ATP_floor_protein,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
@@ -124,6 +128,10 @@ k_deg_pool_proteome,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924:
 N_A_pool_proteome,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_proteome,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_proteome,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 m_init_pool_Glyc,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_Glyc,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
 tau_pool_Glyc,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -138,6 +146,15 @@ k_deg_pool_Glyc,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bul
 N_A_pool_Glyc,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Glyc,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Glyc,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+n_reg_reg,dimensionless,4.0,"definitional; steepness n of the hardcoded regulation function f = x^n/(1 + x^n) by which a falling metabolite lowers an expression or growth target (designer 2026-10-12: hardcoded for now, experts will choose the function); a steep, switch-like fall, as the stringent response (ppGpp) cuts ribosome and protein synthesis sharply on energy or carbon downshift (Potrykus & Cashel 2008; confidence: medium for the qualitative behaviour, the value itself is a design choice)",no
+K_ATP_reg_reg,millimolar,4.8,"derived: regulation_K_fraction x the resting ATP (regulation_K_fraction: definitional, design; ATP: bennett2009absolute, sourced)",no
+K_G6P_reg_reg,millimolar,0.5,"derived: regulation_K_fraction x the resting G6P (regulation_K_fraction: definitional, design; G6P_i: chassagnole2002dynamic, design)",no
+K_glc_reg_reg,millimolar,0.001,"derived: regulation_K_fraction x the resting glucose inside (regulation_K_fraction: definitional, design; glc_i: unreferenced_placeholder, placeholder)",no
+K_H_reg_reg,millimolar,5.0237728630191644e-05,"derived: the resting H+ / regulation_K_fraction (pH log10(1/fraction) below rest) (regulation_K_fraction: definitional, design; pH_i: slonczewski1981ph, sourced)",no
 rho_leak_Na_i_leak_Na,per_um2,0.00016924908710165128,calibrated: Na+ entry balances NhaA less Na/Ca exchange at rest (the fermenter cell),no
 gamma_leak_Na_i_leak_Na,picoS,27.0,argus2026unpublished; as i_leak_Na Argus2026_v01 (SN default instance),no
 Cao_i_leak_Ca,millimolar,10.28,millero2008composition; standard seawater Ca 10.28 mmol/kg,yes
@@ -223,6 +240,10 @@ k_deg_pool_H_ATPase,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924:
 N_A_pool_H_ATPase,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_H_ATPase,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_H_ATPase,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_H_ATPase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_H_ATPase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_H_ATPase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_H_ATPase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_H_ATPase,dimensionless,0.10080717667266298,"derived: the calibrated cell's copies x footprint_H_ATPase / A_ceiling: m_target = 1 (its share at rest) (footprint_H_ATPase: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_NhaA,dimensionless,1.0,definitional; the calibrated cell,no
 tau_pool_NhaA,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -237,6 +258,10 @@ k_deg_pool_NhaA,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bul
 N_A_pool_NhaA,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_NhaA,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_NhaA,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_NhaA,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_NhaA,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_NhaA,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_NhaA,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_NhaA,dimensionless,0.00362050607338596,"derived: the calibrated cell's copies x footprint_NhaA / A_ceiling: m_target = 1 (its share at rest) (footprint_NhaA: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_KefC,dimensionless,1.0,definitional; the calibrated cell,no
 tau_pool_KefC,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -251,6 +276,10 @@ k_deg_pool_KefC,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bul
 N_A_pool_KefC,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_KefC,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_KefC,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_KefC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_KefC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_KefC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_KefC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_KefC,dimensionless,0.006436455241575042,"derived: the calibrated cell's copies x footprint_KefC / A_ceiling: m_target = 1 (its share at rest) (footprint_KefC: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_Trk,dimensionless,1.0,definitional; the calibrated cell,no
 tau_pool_Trk,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -265,6 +294,10 @@ k_deg_pool_Trk,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk
 N_A_pool_Trk,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Trk,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Trk,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_Trk,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_Trk,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_Trk,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_Trk,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_Trk,dimensionless,0.0019309365724725122,"derived: the calibrated cell's copies x footprint_Trk / A_ceiling: m_target = 1 (its share at rest) (footprint_Trk: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_NCX,dimensionless,1.0,definitional; the calibrated cell,no
 tau_pool_NCX,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -279,6 +312,10 @@ k_deg_pool_NCX,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk
 N_A_pool_NCX,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_NCX,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_NCX,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_NCX,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_NCX,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_NCX,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_NCX,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_NCX,dimensionless,0.011891721776026404,"derived: the calibrated cell's copies x footprint_NCX / A_ceiling: m_target = 1 (its share at rest) (footprint_NCX: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_Glf,dimensionless,1.0,definitional; the calibrated cell,no
 tau_pool_Glf,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -293,6 +330,10 @@ k_deg_pool_Glf,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk
 N_A_pool_Glf,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Glf,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Glf,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_Glf,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_Glf,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_Glf,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_Glf,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_Glf,dimensionless,0.049676875527902564,"derived: the calibrated cell's copies x footprint_Glf / A_ceiling: m_target = 1 (its share at rest) (footprint_Glf: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_LacT,dimensionless,1.0,definitional; the calibrated cell,no
 tau_pool_LacT,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -307,6 +348,10 @@ k_deg_pool_LacT,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bul
 N_A_pool_LacT,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_LacT,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_LacT,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_LacT,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_LacT,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_LacT,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_LacT,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_LacT,dimensionless,0.17378429152252606,"derived: the calibrated cell's copies x footprint_LacT / A_ceiling: m_target = 1 (its share at rest) (footprint_LacT: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_Flagellum,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_Flagellum,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
@@ -322,6 +367,10 @@ k_deg_pool_Flagellum,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924
 N_A_pool_Flagellum,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Flagellum,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Flagellum,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_Flagellum,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_Flagellum,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_Flagellum,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_Flagellum,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 m_init_pool_Hydrolase,dimensionless,1.0,definitional; the calibrated cell,no
 tau_pool_Hydrolase,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
 n_0_pool_Hydrolase,dimensionless,2729.797267782374,"derived: hydrolysis_capacity x resting glucose flux / kcat_Hydrolase (hydrolysis_capacity: definitional, design; kcat_Hydrolase: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
@@ -335,6 +384,10 @@ k_deg_pool_Hydrolase,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924
 N_A_pool_Hydrolase,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Hydrolase,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Hydrolase,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_Hydrolase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_Hydrolase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_Hydrolase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_Hydrolase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_Hydrolase,dimensionless,0.01930936572472512,"derived: the calibrated cell's copies x footprint_Hydrolase / A_ceiling: m_target = 1 (its share at rest) (footprint_Hydrolase: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_PTS,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
 tau_pool_PTS,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -349,6 +402,10 @@ k_deg_pool_PTS,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk
 N_A_pool_PTS,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_PTS,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_PTS,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_PTS,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_PTS,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_PTS,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_PTS,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_PTS,dimensionless,0.0,definitional; none until the game sets a share,no
 m_init_pool_ABC,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
 tau_pool_ABC,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -363,6 +420,10 @@ k_deg_pool_ABC,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk
 N_A_pool_ABC,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_ABC,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_ABC,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_ABC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_ABC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_ABC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_ABC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_ABC,dimensionless,0.0,definitional; none until the game sets a share,no
 m_init_pool_GalP,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
 tau_pool_GalP,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -377,4 +438,8 @@ k_deg_pool_GalP,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bul
 N_A_pool_GalP,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_GalP,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_GalP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_GalP,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_GalP,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_GalP,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_GalP,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_GalP,dimensionless,0.0,definitional; none until the game sets a share,no

@@ -104,6 +104,24 @@
         <variable name="j_ATP_bio" public_interface="out" units="mol_per_s"/>
         <variable name="j_ADP_bio" public_interface="out" units="mol_per_s"/>
         <variable name="j_Pi_bio" public_interface="out" units="mol_per_s"/>
+        <!-- regulation by ATP, 0-1 (growth_regulation port) -->
+        <variable name="f_ATP_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by G6P, 0-1 (growth_regulation port) -->
+        <variable name="f_G6P_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by glucose inside, 0-1 (growth_regulation port) -->
+        <variable name="f_glc_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by H+ (falling pH), 0-1 (growth_regulation port) -->
+        <variable name="f_H_reg" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling ATP lowers growth (set by the game); 0: it does not -->
+        <variable name="reg_on_ATP" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling G6P lowers growth (set by the game); 0: it does not -->
+        <variable name="reg_on_G6P" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling glucose inside lowers growth (set by the game); 0: it does not -->
+        <variable name="reg_on_glc" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling H+ (falling pH) lowers growth (set by the game); 0: it does not -->
+        <variable name="reg_on_H" public_interface="in" units="dimensionless"/>
+        <!-- regulation factor on growth: prod (1 - reg_on + reg_on f) -->
+        <variable name="R_reg" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -325,12 +343,72 @@
             </apply>
             <apply>
                 <eq/>
+                <ci>R_reg</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_ATP</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_ATP</ci>
+                            <ci>f_ATP_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_G6P</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_G6P</ci>
+                            <ci>f_G6P_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_glc</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_glc</ci>
+                            <ci>f_glc_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_H</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_H</ci>
+                            <ci>f_H_reg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
                 <ci>J_growth</ci>
                 <apply>
                     <times/>
                     <ci>growth_level</ci>
                     <ci>J_ref</ci>
                     <ci>throttle</ci>
+                    <ci>R_reg</ci>
                 </apply>
             </apply>
             <apply>

@@ -1,0 +1,127 @@
+{
+  "module_type": "expression_regulation",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "x_ATP_reg",
+    "x_G6P_reg",
+    "x_glc_reg",
+    "x_H_reg",
+    "f_ATP_reg",
+    "f_G6P_reg",
+    "f_glc_reg",
+    "f_H_reg",
+    "cyto/C_ATP",
+    "cyto/C_G6P",
+    "cyto/C_glc",
+    "H/H_i",
+    "pool_a/m",
+    "pool_a/m_goal",
+    "pool_a/R_reg"
+  ],
+  "harness": {
+    "module_array": [
+      [
+        "cyto",
+        "adaptive_ArgusUNPUBLISHED_v01",
+        "energy_metabolism",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "H",
+        "adaptive_ArgusUNPUBLISHED_v01",
+        "H_handling",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "mod",
+        "ArgusUNPUBLISHED_v01",
+        "expression_regulation",
+        "cyto H",
+        "pool_a",
+        "default"
+      ],
+      [
+        "pool_a",
+        "ArgusUNPUBLISHED_v01",
+        "protein_pool",
+        "mod",
+        "",
+        "H_ATPase"
+      ]
+    ],
+    "parameters": [
+      [
+        "reg_on_ATP_pool_a",
+        "dimensionless",
+        1.0,
+        "harness: ATP regulates the H+-ATPase"
+      ],
+      [
+        "m_target_pool_a",
+        "dimensionless",
+        1.0,
+        "harness: the resting target"
+      ]
+    ]
+  },
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "the regulation function (exact): f = x^n/(1 + x^n), x = C/K for ATP, G6P and glucose, x = K_H/H_i for H+",
+      "expr": "np.allclose(f_ATP_reg, (np.maximum(cyto__C_ATP, 0)/K_ATP_reg)**n_reg/(1 + (np.maximum(cyto__C_ATP, 0)/K_ATP_reg)**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_G6P_reg, (np.maximum(cyto__C_G6P, 0)/K_G6P_reg)**n_reg/(1 + (np.maximum(cyto__C_G6P, 0)/K_G6P_reg)**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_glc_reg, (np.maximum(cyto__C_glc, 0)/K_glc_reg)**n_reg/(1 + (np.maximum(cyto__C_glc, 0)/K_glc_reg)**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_H_reg, ((K_H_reg/H__H_i))**n_reg/(1 + ((K_H_reg/H__H_i))**n_reg), rtol=1e-12, atol=1e-15)"
+    },
+    {
+      "description": "f stays within 0-1",
+      "expr": "np.all((f_ATP_reg >= 0) & (f_ATP_reg <= 1)) and np.all((f_G6P_reg >= 0) & (f_G6P_reg <= 1)) and np.all((f_glc_reg >= 0) & (f_glc_reg <= 1)) and np.all((f_H_reg >= 0) & (f_H_reg <= 1))"
+    },
+    {
+      "description": "the pool switched to ATP regulation (target 1) goes to f_ATP (exact), and while the cytosol's ATP runs down, f_ATP and the target fall with it",
+      "expr": "np.allclose(pool_a__R_reg, f_ATP_reg, rtol=1e-12, atol=0) and np.allclose(pool_a__m_goal, f_ATP_reg, rtol=1e-12, atol=0) and np.all(np.diff(f_ATP_reg)*np.diff(cyto__C_ATP) >= -1e-15)",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "n_reg": [
+        1.0,
+        8.0
+      ],
+      "K_ATP_reg": [
+        1.0,
+        9.6
+      ],
+      "K_H_reg": [
+        2.5e-05,
+        0.0001
+      ]
+    },
+    "exclude": [
+      "C_ATP",
+      "C_G6P",
+      "C_glc",
+      "H_i"
+    ],
+    "rationale": "steepness from graded to switch-like; half-way points from a tenth of the resting ATP to rest, and for H+ from rest to 0.6 pH units below"
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

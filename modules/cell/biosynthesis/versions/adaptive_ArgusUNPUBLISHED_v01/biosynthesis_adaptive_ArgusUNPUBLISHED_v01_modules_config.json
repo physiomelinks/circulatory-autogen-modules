@@ -43,6 +43,15 @@
         "variables": [
           "M_glyc_ATP"
         ]
+      },
+      {
+        "port_type": "growth_regulation",
+        "variables": [
+          "f_ATP_reg",
+          "f_G6P_reg",
+          "f_glc_reg",
+          "f_H_reg"
+        ]
       }
     ],
     "variables_and_units": [
@@ -397,6 +406,60 @@
       [
         "j_Pi_bio",
         "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "f_ATP_reg",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_G6P_reg",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_glc_reg",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_H_reg",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "reg_on_ATP",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "reg_on_G6P",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "reg_on_glc",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "reg_on_H",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "R_reg",
+        "dimensionless",
         "access",
         "variable"
       ]

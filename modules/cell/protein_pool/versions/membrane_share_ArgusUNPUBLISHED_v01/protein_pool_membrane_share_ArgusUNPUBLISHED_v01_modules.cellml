@@ -7,6 +7,8 @@
         <variable initial_value="m_init" name="m" public_interface="out" units="dimensionless"/>
         <!-- expression the cell is moving to: s_target A_ceiling / a_unit -->
         <variable name="m_target" public_interface="out" units="dimensionless"/>
+        <!-- the target after regulation: m_target R_reg -->
+        <variable name="m_goal" public_interface="out" units="dimensionless"/>
         <!-- time constant of the approach -->
         <variable name="tau" public_interface="in" units="second"/>
         <!-- copies per cell at m = 1 -->
@@ -36,7 +38,7 @@
         <variable name="s_build" public_interface="in" units="dimensionless"/>
         <!-- copies per cell -->
         <variable name="n" public_interface="out" units="dimensionless"/>
-        <!-- (m_target - m)/tau -->
+        <!-- (m_goal - m)/tau -->
         <variable name="r_rel" public_interface="out" units="per_s"/>
         <!-- rising part of r_rel (copies to build) -->
         <variable name="r_up" public_interface="out" units="per_s"/>
@@ -66,6 +68,24 @@
         <variable name="share" public_interface="out" units="dimensionless"/>
         <!-- share of the ceiling one unit of m takes (one flagellum for the Flagellum) -->
         <variable name="s_unit" public_interface="out" units="dimensionless"/>
+        <!-- regulation by ATP, 0-1 (regulation_signals port) -->
+        <variable name="f_ATP_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by G6P, 0-1 (regulation_signals port) -->
+        <variable name="f_G6P_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by glucose inside, 0-1 (regulation_signals port) -->
+        <variable name="f_glc_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by H+ (falling pH), 0-1 (regulation_signals port) -->
+        <variable name="f_H_reg" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling ATP lowers the expression target (set by the game); 0: it does not -->
+        <variable name="reg_on_ATP" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling G6P lowers the expression target (set by the game); 0: it does not -->
+        <variable name="reg_on_G6P" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling glucose inside lowers the expression target (set by the game); 0: it does not -->
+        <variable name="reg_on_glc" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling H+ (falling pH) lowers the expression target (set by the game); 0: it does not -->
+        <variable name="reg_on_H" public_interface="in" units="dimensionless"/>
+        <!-- regulation factor on the expression target: prod (1 - reg_on + reg_on f) -->
+        <variable name="R_reg" public_interface="out" units="dimensionless"/>
         <!-- share of the membrane's protein ceiling the copies are to take (set by the game; a cell's shares sum to at most 1) -->
         <variable name="s_target" public_interface="in" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -93,12 +113,80 @@
             </apply>
             <apply>
                 <eq/>
+                <ci>R_reg</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_ATP</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_ATP</ci>
+                            <ci>f_ATP_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_G6P</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_G6P</ci>
+                            <ci>f_G6P_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_glc</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_glc</ci>
+                            <ci>f_glc_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_H</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_H</ci>
+                            <ci>f_H_reg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>m_goal</ci>
+                <apply>
+                    <times/>
+                    <ci>m_target</ci>
+                    <ci>R_reg</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
                 <ci>r_rel</ci>
                 <apply>
                     <divide/>
                     <apply>
                         <minus/>
-                        <ci>m_target</ci>
+                        <ci>m_goal</ci>
                         <ci>m</ci>
                     </apply>
                     <ci>tau</ci>

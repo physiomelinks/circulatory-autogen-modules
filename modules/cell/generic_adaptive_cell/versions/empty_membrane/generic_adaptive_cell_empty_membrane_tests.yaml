@@ -6,11 +6,12 @@ description: 'The base of every AdaptOrDeity cell: the general mechanisms with n
   maintenance ATPase and glycogen), its Na+/K+ (ion_concentrations SN_soma_Argus2026_v01), Ca2+ (Ca_handling adaptive, fixed
   buffer) and H+ (H_handling adaptive, buffered, pH and E_H) pools, the passive leaks of a lipid membrane (i_leak_Na, i_leak_Ca,
   i_leak_H), biosynthesis (RNA, ribosomes, lipids, damage and repair, growth towards a daughter), protein synthesis (protein_expression
-  adaptive) and two protein_pools every cell has: the proteome (ribosomal, nucleoid and other unmodelled proteins) and the
-  glycolytic enzymes (scaling V_gly). Its default values are the fermenter cell''s, so a cell type that adds its proteins
-  starts calibrated; alone it has no carriers or pumps, so it runs down (its glucose is spent and its gradients leak away).
-  Cell types extend it: fermenter (generic_adaptive_cell fermenter); later bases add the proteins a class shares (an animal
-  cell: the Na+/K+-ATPase, NCX, ...).'
+  adaptive), its regulation by falling ATP, G6P, glucose and pH (expression_regulation: every pool''s target and growth, each
+  switched on by the game, all off by default) and two protein_pools every cell has: the proteome (ribosomal, nucleoid and
+  other unmodelled proteins) and the glycolytic enzymes (scaling V_gly). Its default values are the fermenter cell''s, so
+  a cell type that adds its proteins starts calibrated; alone it has no carriers or pumps, so it runs down (its glucose is
+  spent and its gradients leak away). Cell types extend it: fermenter (generic_adaptive_cell fermenter); later bases add the
+  proteins a class shares (an animal cell: the Na+/K+-ATPase, NCX, ...).'
 extends: null
 notes: 'Assembled by tools/build_adaptive_cell.py from modules/cell/generic_adaptive_cell/parameters.json: its parameter rows
   are its submodules'' default instances (every value with its source there) with the overrides the cell sets. Protein expression:

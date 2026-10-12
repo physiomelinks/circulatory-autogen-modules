@@ -22,15 +22,19 @@
     "M_build",
     "A_protein",
     "share",
-    "s_unit"
+    "s_unit",
+    "m_goal",
+    "R_reg"
   ],
   "run_parameters": {
-    "m_target": 2.0
+    "m_target": 2.0,
+    "reg_on_ATP": 1.0,
+    "f_ATP_reg": 0.8
   },
   "invariants": [
     {
       "description": "costs (exact): J_keep = n L (c_poly + c_deg + c_recycle) k_deg f_ATP / N_A, J_demand = r_up n_0 L (c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1), M_build = n L (c_syn + c_poly) / N_A, A_protein = n_0 footprint m, share = A_protein / A_ceiling, s_unit = n_0 footprint / A_ceiling",
-      "expr": "np.allclose(J_keep, n_0*m*L*(c_poly + c_deg + c_recycle)*k_deg/N_A*f_ATP, rtol=1e-12, atol=0) and np.allclose(J_demand, np.maximum(m_target - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0) and np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0) and np.allclose(s_unit, n_0*footprint*1e-6/A_ceiling, rtol=1e-12, atol=0)"
+      "expr": "np.allclose(J_keep, n_0*m*L*(c_poly + c_deg + c_recycle)*k_deg/N_A*f_ATP, rtol=1e-12, atol=0) and np.allclose(J_demand, np.maximum(m_goal - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0) and np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0) and np.allclose(s_unit, n_0*footprint*1e-6/A_ceiling, rtol=1e-12, atol=0)"
     },
     {
       "description": "the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0)) = int J_build dt while m rises (relative 1e-4: trapezoid integration of the logged flux)",
@@ -38,12 +42,16 @@
       "applies": "run"
     },
     {
-      "description": "expression approaches its target and never overshoots: m moves monotonically towards m_target",
-      "expr": "np.all(np.diff(m)*np.sign(m_target - m[0]) >= -1e-12) and np.all((m - m_target)*(m[0] - m_target) >= -1e-12)"
+      "description": "expression approaches its regulated target and never overshoots: m moves monotonically towards m_goal (constant in these tests)",
+      "expr": "np.all(np.diff(m)*np.sign(m_goal[0] - m[0]) >= -1e-12) and np.all((m - m_goal)*(m[0] - m_goal) >= -1e-12)"
     },
     {
       "description": "costs are never negative",
       "expr": "np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(M_build >= 0)"
+    },
+    {
+      "description": "regulation (exact): R_reg = prod (1 - reg_on + reg_on f) and m_goal = m_target R_reg; with every switch off R_reg is exactly 1",
+      "expr": "np.allclose(R_reg, (1 - reg_on_ATP + reg_on_ATP*f_ATP_reg)*(1 - reg_on_G6P + reg_on_G6P*f_G6P_reg)*(1 - reg_on_glc + reg_on_glc*f_glc_reg)*(1 - reg_on_H + reg_on_H*f_H_reg), rtol=1e-12, atol=0) and np.allclose(m_goal, m_target*R_reg, rtol=1e-12, atol=0) and (reg_on_ATP or reg_on_G6P or reg_on_glc or reg_on_H or np.all(R_reg == 1.0))"
     }
   ],
   "bc_sweep": {
@@ -59,9 +67,13 @@
       "s_build": [
         0.0,
         1.0
+      ],
+      "f_ATP_reg": [
+        0.0,
+        1.0
       ]
     },
-    "rationale": "expression over the range the game offers (x0.25-4); ATP from near exhaustion to above rest; synthesis from stalled to unconstrained"
+    "rationale": "expression over the range the game offers (x0.25-4); ATP from near exhaustion to above rest; synthesis from stalled to unconstrained; the ATP regulation from full repression to none"
   },
   "timestep": {
     "scheme": "rk4",

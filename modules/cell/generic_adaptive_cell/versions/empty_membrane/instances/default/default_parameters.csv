@@ -109,6 +109,10 @@ J_ref_bio,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cel
 ATP_floor_bio,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
 D_init_bio,dimensionless,0.011111111111111112,calibrated: steady damage at full repair,no
 P_init_bio,mole,0.0,definitional; no daughter under way,no
+reg_on_ATP_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 J_ref_protein,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C) (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
 build_capacity_protein,dimensionless,5.0,"unreferenced_placeholder; most ATP one protein's synthesis can take, as a multiple of the resting ATP turnover",no
 ATP_floor_protein,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
@@ -130,6 +134,10 @@ k_deg_pool_proteome,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924:
 N_A_pool_proteome,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_proteome,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_proteome,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 m_init_pool_Glyc,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_Glyc,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
 tau_pool_Glyc,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -144,6 +152,15 @@ k_deg_pool_Glyc,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bul
 N_A_pool_Glyc,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Glyc,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Glyc,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+reg_on_ATP_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+n_reg_reg,dimensionless,4.0,"definitional; steepness n of the hardcoded regulation function f = x^n/(1 + x^n) by which a falling metabolite lowers an expression or growth target (designer 2026-10-12: hardcoded for now, experts will choose the function); a steep, switch-like fall, as the stringent response (ppGpp) cuts ribosome and protein synthesis sharply on energy or carbon downshift (Potrykus & Cashel 2008; confidence: medium for the qualitative behaviour, the value itself is a design choice)",no
+K_ATP_reg_reg,millimolar,4.8,"derived: regulation_K_fraction x the resting ATP (regulation_K_fraction: definitional, design; ATP: bennett2009absolute, sourced)",no
+K_G6P_reg_reg,millimolar,0.5,"derived: regulation_K_fraction x the resting G6P (regulation_K_fraction: definitional, design; G6P_i: chassagnole2002dynamic, design)",no
+K_glc_reg_reg,millimolar,0.001,"derived: regulation_K_fraction x the resting glucose inside (regulation_K_fraction: definitional, design; glc_i: unreferenced_placeholder, placeholder)",no
+K_H_reg_reg,millimolar,5.0237728630191644e-05,"derived: the resting H+ / regulation_K_fraction (pH log10(1/fraction) below rest) (regulation_K_fraction: definitional, design; pH_i: slonczewski1981ph, sourced)",no
 rho_leak_Na_i_leak_Na,per_um2,0.00016924908710165128,calibrated: Na+ entry balances NhaA less Na/Ca exchange at rest (the fermenter cell),no
 gamma_leak_Na_i_leak_Na,picoS,27.0,argus2026unpublished; as i_leak_Na Argus2026_v01 (SN default instance),no
 Cao_i_leak_Ca,millimolar,10.28,millero2008composition; standard seawater Ca 10.28 mmol/kg,yes

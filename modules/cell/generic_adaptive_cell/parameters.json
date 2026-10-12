@@ -1338,6 +1338,20 @@
    "source": "unreferenced_placeholder",
    "status": "design",
    "note": "gap between neighbouring cells of a colony (the game's colony.cell_gap), for the example volume and faces"
+  },
+  "regulation_hill_n": {
+   "value": 4.0,
+   "units": "dimensionless",
+   "source": "definitional",
+   "status": "design",
+   "note": "steepness n of the hardcoded regulation function f = x^n/(1 + x^n) by which a falling metabolite lowers an expression or growth target (designer 2026-10-12: hardcoded for now, experts will choose the function); a steep, switch-like fall, as the stringent response (ppGpp) cuts ribosome and protein synthesis sharply on energy or carbon downshift (Potrykus & Cashel 2008; confidence: medium for the qualitative behaviour, the value itself is a design choice)"
+  },
+  "regulation_K_fraction": {
+   "value": 0.5,
+   "units": "dimensionless",
+   "source": "definitional",
+   "status": "design",
+   "note": "the regulation function is half-way down when a species falls to this fraction of its resting level (x = C/(fraction x C_rest)); for H+ it is half-way down when H+ rises to the resting H+ / fraction (pH 0.3 below rest). Designer 2026-10-12; rRNA promoters sense ATP directly at mM concentrations (Schneider, Gaal & Gourse 2002), so halving ATP slows ribosome synthesis (confidence: medium for the order of magnitude)"
   }
  }
 }

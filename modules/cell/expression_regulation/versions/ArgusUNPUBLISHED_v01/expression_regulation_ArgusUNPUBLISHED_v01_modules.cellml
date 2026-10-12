@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="expression_regulation_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="expression_regulation">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- cytosol ATP (metabolite_levels port) -->
+        <variable name="C_ATP" public_interface="in" units="millimolar"/>
+        <!-- cytosol glucose 6-phosphate (metabolite_levels port) -->
+        <variable name="C_G6P" public_interface="in" units="millimolar"/>
+        <!-- cytosol glucose (metabolite_levels port) -->
+        <variable name="C_glc" public_interface="in" units="millimolar"/>
+        <!-- free cytosolic H+ (internal_H port) -->
+        <variable name="H_i" public_interface="in" units="millimolar"/>
+        <!-- steepness of the regulation function -->
+        <variable name="n_reg" public_interface="in" units="dimensionless"/>
+        <!-- ATP at which f_ATP is half-way down -->
+        <variable name="K_ATP_reg" public_interface="in" units="millimolar"/>
+        <!-- G6P at which f_G6P is half-way down -->
+        <variable name="K_G6P_reg" public_interface="in" units="millimolar"/>
+        <!-- glucose at which f_glc is half-way down -->
+        <variable name="K_glc_reg" public_interface="in" units="millimolar"/>
+        <!-- H+ at which f_H is half-way down (pH below rest) -->
+        <variable name="K_H_reg" public_interface="in" units="millimolar"/>
+        <!-- C_ATP/K_ATP_reg (0 for a negative round-off value) -->
+        <variable name="x_ATP_reg" public_interface="out" units="dimensionless"/>
+        <!-- regulation by ATP: falls from 1 as it falls -->
+        <variable name="f_ATP_reg" public_interface="out" units="dimensionless"/>
+        <!-- C_G6P/K_G6P_reg (0 for a negative round-off value) -->
+        <variable name="x_G6P_reg" public_interface="out" units="dimensionless"/>
+        <!-- regulation by G6P: falls from 1 as it falls -->
+        <variable name="f_G6P_reg" public_interface="out" units="dimensionless"/>
+        <!-- C_glc/K_glc_reg (0 for a negative round-off value) -->
+        <variable name="x_glc_reg" public_interface="out" units="dimensionless"/>
+        <!-- regulation by glucose inside: falls from 1 as it falls -->
+        <variable name="f_glc_reg" public_interface="out" units="dimensionless"/>
+        <!-- K_H_reg/H_i -->
+        <variable name="x_H_reg" public_interface="out" units="dimensionless"/>
+        <!-- regulation by H+: falls from 1 as H+ rises (pH falls) -->
+        <variable name="f_H_reg" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>x_ATP_reg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>C_ATP</ci>
+                        <apply>
+                            <abs/>
+                            <ci>C_ATP</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>K_ATP_reg</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_ATP_reg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <power/>
+                        <ci>x_ATP_reg</ci>
+                        <ci>n_reg</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <power/>
+                            <ci>x_ATP_reg</ci>
+                            <ci>n_reg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x_G6P_reg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>C_G6P</ci>
+                        <apply>
+                            <abs/>
+                            <ci>C_G6P</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>K_G6P_reg</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_G6P_reg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <power/>
+                        <ci>x_G6P_reg</ci>
+                        <ci>n_reg</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <power/>
+                            <ci>x_G6P_reg</ci>
+                            <ci>n_reg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x_glc_reg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>C_glc</ci>
+                        <apply>
+                            <abs/>
+                            <ci>C_glc</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>K_glc_reg</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_glc_reg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <power/>
+                        <ci>x_glc_reg</ci>
+                        <ci>n_reg</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <power/>
+                            <ci>x_glc_reg</ci>
+                            <ci>n_reg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x_H_reg</ci>
+                <apply>
+                    <divide/>
+                    <ci>K_H_reg</ci>
+                    <ci>H_i</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_H_reg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <power/>
+                        <ci>x_H_reg</ci>
+                        <ci>n_reg</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <power/>
+                            <ci>x_H_reg</ci>
+                            <ci>n_reg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

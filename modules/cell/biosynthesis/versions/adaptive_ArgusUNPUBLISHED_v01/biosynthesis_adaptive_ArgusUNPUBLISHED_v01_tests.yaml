@@ -11,4 +11,6 @@ notes: 'The rest of a cell''s energy budget besides pumps and protein turnover. 
   protein_pool''s M_build, summed on daughter_share). glycogen_progress is the share of a daughter the glycogen store (M_glyc_ATP
   from the cytosol) could finish. Everything slows as ATP runs out (f_ATP = 1 at the resting ATP). At rest the cell builds
   a daughter for 1.8e11 ATP, close to Lynch & Marinov''s growth cost 2.66e10 V^0.97 (1.6e11 for 6.28 um3); proteins are 89%
-  of it.'
+  of it. Regulation: J_growth is also multiplied by R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose and
+  H+ (f_s from cell/expression_regulation on growth_regulation, 1 when unconnected; the switches reg_on_s set by the game,
+  all 0 by default so R_reg = 1 exactly).'

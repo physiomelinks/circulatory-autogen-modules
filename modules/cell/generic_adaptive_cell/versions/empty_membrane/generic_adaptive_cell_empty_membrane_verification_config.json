@@ -62,6 +62,11 @@
     "mod_bio/M_build_bio",
     "mod_bio/M_daughter",
     "mod_bio/growth_progress",
+    "mod_bio/R_reg",
+    "mod_reg/f_ATP_reg",
+    "mod_reg/f_G6P_reg",
+    "mod_reg/f_glc_reg",
+    "mod_reg/f_H_reg",
     "mod_pool_proteome/m",
     "mod_pool_Glyc/m",
     "mod_protein/A_protein_max"
@@ -91,6 +96,10 @@
     {
       "description": "second law for the reactions: dissipation P_diss >= 0",
       "expr": "np.all(mod_cytosol__P_diss >= -1e-30)"
+    },
+    {
+      "description": "regulation stays within 0-1 and, with its switches off (the default), leaves growth's target exactly as asked: R_reg = 1",
+      "expr": "np.all((mod_reg__f_ATP_reg >= 0) & (mod_reg__f_ATP_reg <= 1)) and np.all((mod_reg__f_G6P_reg >= 0) & (mod_reg__f_G6P_reg <= 1)) and np.all((mod_reg__f_glc_reg >= 0) & (mod_reg__f_glc_reg <= 1)) and np.all((mod_reg__f_H_reg >= 0) & (mod_reg__f_H_reg <= 1)) and (reg_on_ATP_bio or reg_on_G6P_bio or reg_on_glc_bio or reg_on_H_bio or np.all(mod_bio__R_reg == 1.0))"
     },
     {
       "description": "protein synthesis never spends more than its capacity: J_build_total <= J_cap (relative 1e-9)",

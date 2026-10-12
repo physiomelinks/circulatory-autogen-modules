@@ -1,0 +1,156 @@
+[
+  {
+    "module_type": "expression_regulation",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "expression_regulation_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "expression_regulation",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "metabolite_levels",
+        "variables": [
+          "C_ATP",
+          "C_G6P",
+          "C_glc"
+        ]
+      },
+      {
+        "port_type": "internal_H",
+        "variables": [
+          "H_i"
+        ]
+      },
+      {
+        "port_type": "regulation_signals",
+        "variables": [
+          "f_ATP_reg",
+          "f_G6P_reg",
+          "f_glc_reg",
+          "f_H_reg"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "growth_regulation",
+        "variables": [
+          "f_ATP_reg",
+          "f_G6P_reg",
+          "f_glc_reg",
+          "f_H_reg"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "C_ATP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_G6P",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_glc",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "H_i",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "n_reg",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "K_ATP_reg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_G6P_reg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_glc_reg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_H_reg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "x_ATP_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_ATP_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "x_G6P_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_G6P_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "x_glc_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_glc_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "x_H_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_H_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

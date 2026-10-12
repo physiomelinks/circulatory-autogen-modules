@@ -9,7 +9,7 @@
     "required_citations": [
       "argus2026unpublished"
     ],
-    "description": "The base of every AdaptOrDeity cell: the general mechanisms with no transport proteins. A ~2 um disc of membrane (membrane_potential adaptive: capacitor, disc geometry) around a cytosol (energy_metabolism adaptive: bond-graph glycolysis, maintenance ATPase and glycogen), its Na+/K+ (ion_concentrations SN_soma_Argus2026_v01), Ca2+ (Ca_handling adaptive, fixed buffer) and H+ (H_handling adaptive, buffered, pH and E_H) pools, the passive leaks of a lipid membrane (i_leak_Na, i_leak_Ca, i_leak_H), biosynthesis (RNA, ribosomes, lipids, damage and repair, growth towards a daughter), protein synthesis (protein_expression adaptive) and two protein_pools every cell has: the proteome (ribosomal, nucleoid and other unmodelled proteins) and the glycolytic enzymes (scaling V_gly). Its default values are the fermenter cell's, so a cell type that adds its proteins starts calibrated; alone it has no carriers or pumps, so it runs down (its glucose is spent and its gradients leak away). Cell types extend it: fermenter (generic_adaptive_cell fermenter); later bases add the proteins a class shares (an animal cell: the Na+/K+-ATPase, NCX, ...).",
+    "description": "The base of every AdaptOrDeity cell: the general mechanisms with no transport proteins. A ~2 um disc of membrane (membrane_potential adaptive: capacitor, disc geometry) around a cytosol (energy_metabolism adaptive: bond-graph glycolysis, maintenance ATPase and glycogen), its Na+/K+ (ion_concentrations SN_soma_Argus2026_v01), Ca2+ (Ca_handling adaptive, fixed buffer) and H+ (H_handling adaptive, buffered, pH and E_H) pools, the passive leaks of a lipid membrane (i_leak_Na, i_leak_Ca, i_leak_H), biosynthesis (RNA, ribosomes, lipids, damage and repair, growth towards a daughter), protein synthesis (protein_expression adaptive), its regulation by falling ATP, G6P, glucose and pH (expression_regulation: every pool's target and growth, each switched on by the game, all off by default) and two protein_pools every cell has: the proteome (ribosomal, nucleoid and other unmodelled proteins) and the glycolytic enzymes (scaling V_gly). Its default values are the fermenter cell's, so a cell type that adds its proteins starts calibrated; alone it has no carriers or pumps, so it runs down (its glucose is spent and its gradients leak away). Cell types extend it: fermenter (generic_adaptive_cell fermenter); later bases add the proteins a class shares (an animal cell: the Na+/K+-ATPase, NCX, ...).",
     "submodules": [
       {
         "name": "membrane",
@@ -63,7 +63,8 @@
           "cytosol"
         ],
         "out_instances": [
-          "i_leak_H"
+          "i_leak_H",
+          "reg"
         ]
       },
       {
@@ -78,7 +79,8 @@
         "out_instances": [
           "H",
           "protein",
-          "bio"
+          "bio",
+          "reg"
         ]
       },
       {
@@ -90,7 +92,8 @@
           "membrane",
           "cytosol",
           "pool_proteome",
-          "pool_Glyc"
+          "pool_Glyc",
+          "reg"
         ],
         "out_instances": []
       },
@@ -112,7 +115,9 @@
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
         "instance": "proteome",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio"
@@ -123,11 +128,28 @@
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
         "instance": "Glyc",
-        "inp_instances": [],
+        "inp_instances": [
+          "reg"
+        ],
         "out_instances": [
           "protein",
           "bio",
           "cytosol"
+        ]
+      },
+      {
+        "name": "reg",
+        "module_type": "expression_regulation",
+        "module_subtype": "ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "cytosol",
+          "H"
+        ],
+        "out_instances": [
+          "bio",
+          "pool_proteome",
+          "pool_Glyc"
         ]
       },
       {
