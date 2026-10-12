@@ -137,7 +137,9 @@ COUPLED_TESTS = ['coupled_validation_test']
 REPORT_TESTS = (checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
                 + COUPLED_TESTS)
 PARAMETERISATION_TESTS = checks.PARAMETERISATION_TESTS
-NOT_A_SUPERMODULE = 'not a supermodule'
+# the test overview's parameterisation columns: each parameterisation's validation tests and its CUFLynx archive
+PARAM_COLS = [TEST_SHORT[t] for t in PARAMETERISATION_TESTS] + ['CUFLynx archive']
+NOT_A_SUPERMODULE = 'not a supermodule, and no supermodule version uses it'
 NOT_COUPLED = 'not used in a coupled system model (the spec lists no coupled_systems)'
 NO_EQUIVALENT = ('no system model to reproduce: the spec lists no supermodule.equivalent entry (the version is '
                  'checked through the models that use it)')
@@ -304,7 +306,10 @@ def version_tests(version):
     tests = []
     for test in REPORT_TESTS:
         reason = not_applicable_reason(version, test)
-        if reason:
+        if test in SUPERMODULE_TESTS and not version.is_supermodule:
+            # a component: the result of the supermodule versions that use it, if any
+            r = _in_supermodules(version, test) or checks.Result(test, checks.NOT_APPLICABLE, reason)
+        elif reason:
             r = checks.Result(test, checks.NOT_APPLICABLE, reason)
         elif test == 'version_calibration':
             r = checks.version_calibration(version, _supermodule_index())
@@ -324,6 +329,41 @@ def version_tests(version):
 
 
 _index_cache = []
+
+
+def _in_supermodules(version, test):
+    '''A component's supermodule_structure_test / supermodule_equivalence_test column: the results of
+    the supermodule versions that use it as a submodule. "passed_in_super" when all of them pass,
+    "failed_in_super" when any fails, pending when some haven't run, None when none has run or no
+    supermodule uses it; for the equivalence only the supermodules that have a system model to
+    reproduce count.'''
+    users = _supermodule_index().get((version.vessel_type, version.name)) or []
+    if not users:
+        return None
+    rows = []
+    for s in users:
+        if test == 'supermodule_equivalence_test':
+            if not (s.spec.get('supermodule') or {}).get('equivalent'):
+                continue
+            r = _equivalence_result(s)
+        else:
+            r = checks.load(s, test)
+        rows.append({'key': s.key, 'module_type': s.vessel_type, 'version': s.name,
+                     'status': r.status if r else None, 'message': r.message if r else 'not run yet'})
+    if not rows:
+        return checks.Result(test, checks.NOT_APPLICABLE,
+                             'not a supermodule; the supermodules using it (' + ', '.join(s.key for s in users)
+                             + ') have no system model to reproduce')
+    listed = '; '.join(f'{r["key"]}: {r["status"] or "not run"} ({r["message"]})' for r in rows)
+    metrics = {'supermodules': rows}
+    statuses = [r['status'] for r in rows]
+    if any(st in (checks.FAILED, checks.FAILED_IN_SUPER) for st in statuses):
+        return checks.Result(test, checks.FAILED_IN_SUPER, f'in its supermodules: {listed}', metrics)
+    if all(st in (checks.PASSED, checks.PASSED_IN_SUPER) for st in statuses):
+        return checks.Result(test, checks.PASSED_IN_SUPER, f'passes in its supermodules: {listed}', metrics)
+    if all(st is None for st in statuses):
+        return None
+    return checks.Result(test, checks.PENDING, f'not every supermodule using it has run: {listed}', metrics)
 
 
 def _supermodule_index():
@@ -886,6 +926,7 @@ def version_context(version):
         'known_issues': (version.spec.get('known_issues') or [])
                         + [f'{t}: {why}' for t, why in (version.spec.get('expected_failures') or {}).items()],
         'test_keys': [t['key'] for t in comp['tests']], 'test_short': {t['key']: t['short'] for t in comp['tests']},
+        'param_cols': PARAM_COLS,
         'phlynx': _module_phlynx([comp]), 'bc_summary': _bc_summary(comp),
         'licence': version.licence, 'licence_url': LICENCES.get(version.licence), 'creators': version.creators,
         'unit_failures': (comp['unit_consistency'] or {}).get('n_failures', 0),
@@ -937,7 +978,7 @@ def module_context(name, version_contexts=None):
                    'total': len(rows),
                    'all': bool(rows) and all(r['phlynx']['all'] for r in rows)},
         'ready_for_review': any(c.get('review') and not c['reviewed'] for c in vctx),
-        'test_keys': REPORT_TESTS, 'test_short': TEST_SHORT,
+        'test_keys': REPORT_TESTS, 'test_short': TEST_SHORT, 'param_cols': PARAM_COLS,
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
     }
 
@@ -1018,7 +1059,7 @@ def build_review_queue(contexts, out_path, href, standalone=True):
         q['anchor'] = vs[0]['key'].replace('/', '--')
         q['href'] = vs[0]['href']
         q['n_components'] = len(vs)
-        q['counts'] = {k: sum(v['counts'].get(k, 0) for v in vs) for k in ('passed', 'failed')}
+        q['counts'] = {k: sum(v['counts'].get(k, 0) for v in vs) for k in ('passed', 'partial', 'failed')}
         q['n_known'] = sum(v['n_known'] for v in vs)
         q['n_sourced'] = sum(v['n_sourced'] for v in vs)
         q['n_parameters'] = sum(v['n_parameters'] for v in vs)

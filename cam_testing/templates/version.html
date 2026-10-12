@@ -303,7 +303,6 @@ window.addEventListener('DOMContentLoaded', function () {
     <section class="block" aria-labelledby="overview">
       <h2 id="overview">Test overview</h2>
       {%- set ps = components[0].parameterisations %}
-      {%- set p_cols = (ps[0].tests|map(attribute='short')|list if ps else []) %}
       {%- macro p_cells(i) -%}
         {%- for t in i.tests %}<td title="{{ t.message }}"><a href="#{{ t.anchor }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}
         <td title="{{ i.omex_known_issue or i.omex_message }}">{% if i.omex_known_issue and i.omex_status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(i.omex_status) }}{% endif %}</td>
@@ -311,14 +310,14 @@ window.addEventListener('DOMContentLoaded', function () {
       <div class="table-wrap">
         <table class="grid-table">
           <thead><tr><th>Version</th><th>Parameterisation</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}
-            {%- for h in p_cols %}<th>{{ h }}</th>{% endfor %}{% if ps %}<th>CUFLynx archive</th>{% endif %}</tr></thead>
+            {%- if ps %}{% for h in param_cols %}<th>{{ h }}</th>{% endfor %}{% endif %}</tr></thead>
           <tbody>
           {%- for c in components %}
             {%- set default = (c.parameterisations|selectattr('is_default')|first) if c.parameterisations else None %}
             <tr><th scope="row" class="rowhead"><a href="#{{ c.id }}">{{ c.label }}</a></th>
             <th scope="row" class="rowhead mono">{% if default %}<a href="#parameterisations">{{ default.name }}</a> <span class="muted">(default)</span>{% endif %}</th>
             {%- for t in c.tests %}<td title="{{ t.message }}"><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a>{% for l in t.links %}<br><a href="{{ l.href }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}
-            {%- if default %}{{ p_cells(default) }}{% elif ps %}{% for h in p_cols %}<td></td>{% endfor %}<td></td>{% endif %}</tr>
+            {%- if default %}{{ p_cells(default) }}{% elif ps %}{% for h in param_cols %}<td></td>{% endfor %}{% endif %}</tr>
             {%- for i in c.parameterisations if not i.is_default %}
             <tr><th scope="row" class="rowhead"></th><th scope="row" class="rowhead mono"><a href="#parameterisations">{{ i.name }}</a></th>
             {%- for k in test_keys %}<td></td>{% endfor %}{{ p_cells(i) }}</tr>
@@ -327,7 +326,7 @@ window.addEventListener('DOMContentLoaded', function () {
           </tbody>
         </table>
       </div>
-      <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has these columns. {{ chip('not_applicable') }} the test doesn't apply to this version; {{ chip(None) }} it applies but has no result yet; only a test that ran and passed shows {{ chip('passed') }}.</p>
+      <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has these columns. {{ chip('not_applicable') }} the test doesn't apply to this version; {{ chip(None) }} it applies but has no result yet; only a test that ran and passed shows {{ chip('passed') }}. {{ chip('partial') }} the test ran and its result is usable but short of the full criterion (e.g. a time-step order below the scheme's across a switch); it isn't a failure. The first row is the version with its default parameterisation (the one the version tests run with); each other parameterisation has a row filled only in its own columns (Baseline, Calibrate, CUFLynx archive). A component's Supermodule columns show the results of the supermodule versions that use it ({{ chip('passed_in_super') }} / {{ chip('failed_in_super') }}, linked); N/A when none does.</p>
       {%- set na = components[0].tests|selectattr('status', 'equalto', 'not_applicable')|list %}
       {%- if na %}
       <ul class="muted" style="margin:0;font-size:0.84rem">{% for t in na %}<li>{{ t.short }}: N/A, {{ t.message }}</li>{% endfor %}</ul>

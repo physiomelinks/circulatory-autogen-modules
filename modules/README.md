@@ -510,14 +510,30 @@ How the boundary-condition sweep treats impossible values and failures:
   mean run time, failures n/N), which you may adopt into the version's `solver_info`.
 
 **The report's test overview has the same columns for every version**, component or supermodule,
-in this order: Run, Invariants, BC sweep, Timestep, Stability, Calibration (the version's), PhLynx
-export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces. The
-module_type page and the status counts use the same columns. A cell shows:
+in this order: Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Calibration (the version's),
+PhLynx export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces,
+Coupled; then the parameterisation columns Baseline, Calibrate and CUFLynx archive. The module_type
+page uses the same layout, and the status counts count every cell.
+- **Rows.** The first two columns are headings (tinted): Version and Parameterisation. A version's
+  first row is the version with its **default parameterisation** (the one the version tests run with),
+  filled in every column. Each other parameterisation follows in a row of its own, filled only in the
+  parameterisation columns; the version's columns (Run, Timestep, ...) aren't repeated.
+
+A cell shows:
 - **N/A** when the test doesn't apply to the version, with the reason (hover the cell; the reasons
-  are also listed under the overview). For example "not a supermodule" for the last two columns of a
-  component, a C++ version's simulation tests, or a supermodule with no `supermodule.equivalent`.
+  are also listed under the overview). For example a C++ version's simulation tests, or a supermodule
+  with no `supermodule.equivalent`.
 - **Not run** (grey) when the test applies but has no result yet.
 - Passed only when the test ran and passed. A test is never shown as passing because it didn't run.
+- **Partial** (blue) when the test ran and its result is usable but short of the full criterion, e.g.
+  the time-step test when the solutions converge monotonically and agree with CVODE but slower than
+  the scheme's order (a piecewise right-hand side). It isn't a failure: CI passes it with a warning.
+  The status counts list it separately.
+- **Known issue** for a failure listed in the spec's `expected_failures` (it counts as failed).
+- **Supermodule columns of a component.** A component (not a supermodule) used as a submodule of
+  supermodule versions shows their Supermodule structure and Supermodule reproduces results: **Pass
+  in super** when all of them pass, **Fail in super** when any fails (linked to them); N/A when no
+  supermodule version uses it, or (reproduces) when none of those has a system model to reproduce.
 
 Status rules (decided in the Lotka_Volterra review, 2026-10-01):
 - A parameterisation without obs_data has calibration **not applicable** ("no calibration data in
