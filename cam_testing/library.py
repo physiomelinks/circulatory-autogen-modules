@@ -445,7 +445,7 @@ def write_parameters(path, parameters):
 IDENTITY_KEYS = ('module_type', 'version')
 # in this order in the JSON file
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
-                     'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
+                     'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
                      'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
@@ -453,7 +453,7 @@ TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expec
 NESTED_ORDER = {
     'harness': ('module_array', 'parameters'),
     'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'bounds', 'constraints', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
-    'timestep': ('scheme', 'dts', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
+    'timestep': ('scheme', 'dts', 'pre_time', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
                   'tol'),
     'supermodule': ('globals', 'equivalent'),
@@ -568,6 +568,16 @@ def misplaced_spec_keys(tests, verification):
 # module_type / version / parameterisation
 # ----------------------------------------------------------------------------------------------
 
+# what the tests and the report generator write into a version directory (git-ignored)
+GENERATED = ('results', 'plots')
+
+
+def _has_source(path):
+    '''Whether a version directory holds more than generated output: a renamed or removed version can
+    leave its results/, plots/ or report behind (e.g. restored from CI's results cache).'''
+    return any(e not in GENERATED and not e.endswith('.html') and not e.startswith('.') for e in os.listdir(path))
+
+
 @dataclass
 class ModuleType:
     name: str
@@ -624,7 +634,8 @@ class ModuleType:
         if not os.path.isdir(self.versions_dir):
             return []
         return sorted((d for d in os.listdir(self.versions_dir)
-                       if os.path.isdir(os.path.join(self.versions_dir, d)) and not d.startswith('.')), key=str.lower)
+                       if os.path.isdir(os.path.join(self.versions_dir, d)) and not d.startswith('.')
+                       and _has_source(os.path.join(self.versions_dir, d))), key=str.lower)
 
     def versions(self):
         return [load_version(self.name, v) for v in self.version_names()]

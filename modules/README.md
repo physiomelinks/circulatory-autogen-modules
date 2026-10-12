@@ -510,14 +510,30 @@ How the boundary-condition sweep treats impossible values and failures:
   mean run time, failures n/N), which you may adopt into the version's `solver_info`.
 
 **The report's test overview has the same columns for every version**, component or supermodule,
-in this order: Run, Invariants, BC sweep, Timestep, Stability, Calibration (the version's), PhLynx
-export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces. The
-module_type page and the status counts use the same columns. A cell shows:
+in this order: Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Calibration (the version's),
+PhLynx export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces,
+Coupled; then the parameterisation columns Baseline, Calibrate and CUFLynx archive. The module_type
+page uses the same layout, and the status counts count every cell.
+- **Rows.** The first two columns are headings (tinted): Version and Parameterisation. A version's
+  first row is the version with its **default parameterisation** (the one the version tests run with),
+  filled in every column. Each other parameterisation follows in a row of its own, filled only in the
+  parameterisation columns; the version's columns (Run, Timestep, ...) aren't repeated.
+
+A cell shows:
 - **N/A** when the test doesn't apply to the version, with the reason (hover the cell; the reasons
-  are also listed under the overview). For example "not a supermodule" for the last two columns of a
-  component, a C++ version's simulation tests, or a supermodule with no `supermodule.equivalent`.
+  are also listed under the overview). For example a C++ version's simulation tests, or a supermodule
+  with no `supermodule.equivalent`.
 - **Not run** (grey) when the test applies but has no result yet.
 - Passed only when the test ran and passed. A test is never shown as passing because it didn't run.
+- **Partial** (blue) when the test ran and its result is usable but short of the full criterion, e.g.
+  the time-step test when the solutions converge monotonically and agree with CVODE but slower than
+  the scheme's order (a piecewise right-hand side). It isn't a failure: CI passes it with a warning.
+  The status counts list it separately.
+- **Known issue** for a failure listed in the spec's `expected_failures` (it counts as failed).
+- **Supermodule columns of a component.** A component (not a supermodule) used as a submodule of
+  supermodule versions shows their Supermodule structure and Supermodule reproduces results: **Pass
+  in super** when all of them pass, **Fail in super** when any fails (linked to them); N/A when no
+  supermodule version uses it, or (reproduces) when none of those has a system model to reproduce.
 
 Status rules (decided in the Lotka_Volterra review, 2026-10-01):
 - A parameterisation without obs_data has calibration **not applicable** ("no calibration data in
@@ -599,10 +615,11 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `coupled_systems` | verification_config | system models in `system_models/coupled` that use the version coupled to an external model; tests/test_coupled_systems.py records them as its coupled_validation_test (with heatmaps) |
 | `run_steps` | verification_config | an external model's run_test: how many coupling steps to take (default 5) |
 | `rest_check` | verification_config | `{sim_time, window, voltage, parameters, threshold, dt}`: a long run (e.g. 0 pA injected) that run_test reports, not a pass/fail gate: the spikes (upward crossings of `threshold` mV, default 0) of `voltage` and their rate in the last `window` s, in the message, metrics.rest_check and plots/rest.png |
+| `periodic_steady_state` | verification_config | `{period, rtol}` (period in s, or a parameter's name, e.g. `T`; rtol default 1e-3): the model oscillates with this period and must reach periodic steady state before it is scored. Every calibration and baseline run that has a warm-up (`pre_time`) then checks that each scored output repeats over one more period (max change <= rtol x its range) and fails, naming the output, if it doesn't (e.g. a heart chamber in a loop whose arterial time constant is longer than the warm-up) |
 | `harness` | verification_config | the test network: `module_array` rows `[name, module_subtype, module_type, inp, out, parameterisation]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours; a parameterisation may have its own, `validation.<p>.harness` (same form), used for that parameterisation's model, calibration and archive instead (e.g. an experiment's set-up: `PMCA/Colegrove2000_v01` parameterisation `wanaverbecq2003_scg` puts the pump on the soma Ca handling with a Ca leak and a load, while the version's own tests run the pump alone) |
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
-| `timestep` | verification_config | the convergence test: `scheme`, `dts`, `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped` |
+| `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget`, `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`), variables, targets, metric, threshold, optimiser settings |
