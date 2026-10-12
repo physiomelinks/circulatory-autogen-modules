@@ -128,6 +128,12 @@
         "multi_port": "True"
       },
       {
+        "port_type": "matrix_export",
+        "variables": [
+          "J_mx"
+        ]
+      },
+      {
         "port_type": "enzyme_expression",
         "variables": [
           "m_gly"
@@ -732,6 +738,84 @@
       [
         "M_glyc_ATP",
         "mole",
+        "access",
+        "variable"
+      ],
+      [
+        "mx_alloc",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_mx_max",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_G6P_mx",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_ATP_mx",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "n_ATP_mx",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "dG0_mx",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "h_mx_poly",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "K_eq_mx",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Gamma_mx",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "v_mx",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mx",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "J_mx",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ATP_mx",
+        "mol_per_s",
         "access",
         "variable"
       ]

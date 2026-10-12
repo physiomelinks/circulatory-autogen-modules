@@ -1,0 +1,20 @@
+module_type: extracellular_volume
+version: biofilm_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'One finite volume of the water between the cells of a colony (AdaptOrDeity level 4: a prokaryote biofilm, unsealed):
+  glucose, lactate, H+ and O2 as concentrations, and the matrix (exopolysaccharide, EPS) as mM of glucose units. dC_s/dt =
+  (J_s_in + J_s_out + j_s_cell)/V_e for each species: J_s_in and J_s_out sum the extracellular faces on the entrance and exit
+  ports (list-form multi_port, as tissue_diffusion_volume), j_s_cell is the exchange with the cells around it (extracellular_exchange_port,
+  a single port so that unconnected the exchange stays a parameter its host sets; positive into the volume). H+ is buffered
+  by the seawater (a linear buffer, b_H bound per free H+, so its capacity is V_e (1 + b_H) and its pH = -log10(C_H/c_std));
+  the faces carry the buffer''s share of the protons in their D_H. Na+, K+ and Ca2+ stay at seawater values and are not carried.
+  The matrix does not diffuse: dC_mx/dt = j_mx_cell/V_e - k_mx C_mx - k_ovf C_mx (C_mx/C_mx_max)^8. The cells deliver it (their
+  matrix_export, energy_metabolism adaptive_ArgusUNPUBLISHED_v01); the colony''s hydrolases break it down at k_mx, releasing
+  f_mx_glc of it as glucose in the volume (EPS is biodegradable, a reserve in starvation: Zhang and Bishop 2003); matrix above
+  the densest gel C_mx_max (biofilm EPS of order 10-100 g/L, Flemming and Wingender 2010) is squeezed out into open water.
+  J_mx_lost is what leaves the colony, and N_mx_lost its running total. The polymer volume fraction phi = v_mx C_mx slows
+  diffusion by f_hind = ((1 - phi)/(1 + phi))^2 (Mackie and Meares 1955), shared with the faces; valid for phi < 1, and the
+  ceiling keeps phi about 0.03. Default instance: the gap between three cells of radius 1 um, 0.3 um apart on a triangular
+  lattice, 2 um deep (1.44 um3), filled with Proterozoic seawater. Tested between two open-water faces with a cell taking
+  glucose and releasing lactic acid and matrix: the balance of each species, of the matrix and of carbon, the steady state,
+  the definitions, the ceiling and the second law across the faces.'

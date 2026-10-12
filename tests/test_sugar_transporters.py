@@ -521,3 +521,22 @@ def test_fermenter_invariants_with_more_hydrolase(fermenter):
     second-law invariants hold as before (it costs only protein).'''
     failures = _cell_invariant_failures(fermenter, {**_glucose(1.0), **_express(fermenter, 'Hydrolase', 4.0)})
     assert not failures, '\n'.join(failures)
+
+
+# ---- the extracellular matrix, made from G6P ----------------------------------------------------------------------------
+
+@pytest.mark.parametrize('key', ['Glf', 'PTS'])
+def test_matrix_from_G6P_costs_glucose_and_three_ATP(key, fermenter):
+    '''With matrix production on (mx_alloc 1) in 1 mM glucose, the cell makes matrix from its G6P: J_ATP_mx = 3 J_mx
+    (two in the matrix reaction, one for the G6P's phosphorylation: the hexokinase ATP for Glf glucose, the PEP for PTS
+    glucose), so a glucose unit of matrix costs 1 glucose + 3 ATP either way; every invariant of the cell (carbon with
+    the matrix exported, phosphoryl groups, the ATP budget, the second law) holds.'''
+    outs = ['mod_cytosol/J_mx', 'mod_cytosol/J_ATP_mx', 'mod_cytosol/C_G6P']
+    params = {**_glucose(1.0), **_alone(fermenter, key, 4.0), 'mx_alloc_mod_cytosol': 1.0}
+    t, o = _run(fermenter, params, outs)
+    assert np.all(o['mod_cytosol/J_mx'] > 0)
+    assert np.allclose(o['mod_cytosol/J_ATP_mx'], 3.0 * o['mod_cytosol/J_mx'], rtol=1e-12, atol=0)
+    failures = _cell_invariant_failures(fermenter, params)
+    assert not failures, '\n'.join(failures)
+    _, off = _run(fermenter, {**_glucose(1.0), **_alone(fermenter, key, 4.0)}, outs)
+    assert np.all(off['mod_cytosol/J_mx'] == 0)

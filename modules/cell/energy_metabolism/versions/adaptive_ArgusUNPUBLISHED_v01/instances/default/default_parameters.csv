@@ -59,3 +59,10 @@ K_i_ATP_mob,millimolar,1.0,"unreferenced_placeholder; ATP inhibits mobilisation,
 dG0_store,J_per_mol,-42000.0,"unreferenced_placeholder; glucose + 2 ATP -> glycogen unit: textbook steps via G6P, G1P, UDP-glucose with PPi hydrolysis",no
 h_glyc_poly,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose to glycogen, taken as zero",no
 m_gly,dimensionless,1.0,definitional; baseline expression of the glycolytic enzymes (the calibrated cell),no
+mx_alloc,dimensionless,0.0,definitional; no matrix until the player allocates energy to it,no
+V_mx_max,millimolar_per_s,0.0072143901333570825,"derived: matrix_production_rate x resting glycolytic flux (matrix_production_rate: welman2003exopolysaccharides, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+K_G6P_mx,millimolar,50.0,"derived: K_glc_matrix x G6P_i / glc_i: matrix synthesis saturated at rest as if it took free glucose (K_glc_matrix: unreferenced_placeholder, placeholder; glc_i: unreferenced_placeholder, placeholder; G6P_i: chassagnole2002dynamic, design)",no
+K_ATP_mx,millimolar,1.0,"unreferenced_placeholder; ATP affinity of matrix synthesis (nucleotide-sugar pyrophosphorylase order 1 mM, as glycogen synthesis)",no
+n_ATP_mx,dimensionless,2.0,"derived: matrix_ATP_per_unit - 1: the first ATP phosphorylated the glucose to G6P (hexokinase, or the PTS's PEP) (matrix_ATP_per_unit: sutherland2001biofilm, placeholder)",no
+dG0_mx,J_per_mol,-55800.0,"derived: (dG0_store - 2 dG0_hyd) + matrix_ATP_per_unit x dG0_hyd - dG0_hk: the bond as in glycogen, paid by n + 1 ATP, from G6P (dG0_store: unreferenced_placeholder, placeholder; dG0_hyd: unreferenced_placeholder, placeholder; matrix_ATP_per_unit: sutherland2001biofilm, placeholder; dG0_hk: unreferenced_placeholder, placeholder)",no
+h_mx_poly,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose unit to the matrix polymer, taken as zero (as glycogen)",no
