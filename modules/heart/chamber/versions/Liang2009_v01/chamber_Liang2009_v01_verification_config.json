@@ -247,14 +247,14 @@
           [
             "R_aortic_root",
             "Js_per_m6",
-            "5.26276e+06",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+            "102598",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "C_aortic_root",
             "m6_per_J",
-            "1.92523e-08",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+            "9.99986e-09",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "u_ext_aortic_root",
@@ -295,14 +295,14 @@
           [
             "R_T_systemic_T",
             "Js_per_m6",
-            "2.64191e+08",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+            "1.87418e+08",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "C_T_systemic_T",
             "m6_per_J",
-            "1.80192e-07",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+            "1.06705e-08",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "I_T_systemic_T",
@@ -331,8 +331,8 @@
           [
             "P_pv_p",
             "J_per_m3",
-            "1099.68",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+            "1111.97",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "M_rg_pvc",
@@ -359,7 +359,7 @@
         "source": "Liang et al. 2009 (MBEC 47:743) Fig. 4a (normal LV pressure) and Fig. 4e (normal LV P-V loop), digitised",
         "source_short": "liang2009multi Fig. 4a/4e",
         "data": "parameterisations/lv/liang2009_fig4a_lv_pressure.csv",
-        "pre_time": 10.0,
+        "pre_time": 30.0,
         "sim_time": 1.0,
         "dt": 0.001,
         "targets": [
@@ -392,28 +392,9 @@
             ],
             "units": "mmHg",
             "source": "liang2009multi Fig. 4a: 7.29 mmHg at the start of contraction, +-2 mmHg (the digitising uncertainty, as in the calibration)"
-          },
-          {
-            "name": "LV end-diastolic volume",
-            "expr": "np.max(q)*1e6",
-            "range": [
-              105.84,
-              129.36
-            ],
-            "units": "ml",
-            "source": "liang2009multi Fig. 4e: 117.6 ml"
-          },
-          {
-            "name": "LV end-systolic volume",
-            "expr": "np.min(q)*1e6",
-            "range": [
-              37.62,
-              45.98
-            ],
-            "units": "ml",
-            "source": "liang2009multi Fig. 4e: 41.8 ml"
           }
-        ]
+        ],
+        "note": "Held-out checks only: the LV pressure features of Liang Fig. 4a (peak, early-diastolic minimum, end-diastolic pressure). The P-V loop volumes (Fig. 4e EDV, ESV) and the aortic pressure (Fig. 4b) are calibration features (validation.lv.calibrate), so they are not validation targets here."
       },
       "calibrate": {
         "status": "active",
@@ -468,6 +449,10 @@
   "run_parameters": {
     "v_in": 0.0001,
     "v_out": 5e-05
+  },
+  "periodic_steady_state": {
+    "period": "T",
+    "rtol": 0.001
   },
   "harness": {
     "module_array": [

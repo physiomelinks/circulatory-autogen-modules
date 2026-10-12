@@ -1567,6 +1567,41 @@ def _validation_status(cm, kind, test):
     return None, v
 
 
+def periodic_steady_state(cm, pre_time, outputs, params=None):
+    """
+    Whether the model, after ``pre_time`` s with ``params`` (model parameter names -> values),
+    is at periodic steady state: each of ``outputs`` repeats over one more period, its largest
+    change from one period to the next <= rtol x its range. None when the spec declares no
+    ``periodic_steady_state: {period, rtol}`` or there is no warm-up; else (ok, message, metrics).
+    ``period`` is in seconds, or the name of a parameter holding it (e.g. the cardiac period T).
+    """
+    pss = cm.spec.get('periodic_steady_state')
+    if not pss or not pre_time:
+        return None
+    period = pss.get('period', 1.0)
+    if isinstance(period, str):
+        values = {p.variable_name: p for p in cm.parameters()}
+        period = float((params or {}).get('parameters/' + harness.parameter_name(values[period]), values[period].float_value))
+    period, rtol = float(period), float(pss.get('rtol', 1e-3))
+    run_spec = dict(cm.spec, pre_time=float(pre_time), sim_time=2 * period, dt=min(float(cm.spec['dt']), period / 200))
+    helper = harness.simulation_helper(cm.model_path, run_spec)
+    t, out = harness.run(helper, list(outputs), params=params)
+    t = np.asarray(t, dtype=float)
+    first = t < t[0] + period - 1e-9
+    changes = {}
+    for name, y in out.items():
+        y = np.asarray(y, dtype=float)
+        scale = np.ptp(y) or (abs(float(np.mean(y))) or 1.0)
+        changes[name] = float(np.max(np.abs(np.interp(t[first] + period, t, y) - y[first])) / scale)
+    bad = sorted(((c, n) for n, c in changes.items() if c > rtol), reverse=True)
+    metrics = {'period': period, 'rtol': rtol, 'pre_time': float(pre_time), 'changes': changes}
+    if not bad:
+        return True, f'at periodic steady state after {pre_time:g} s (every output repeats to {rtol:g} of its range)', metrics
+    return False, (f'not at periodic steady state after a {pre_time:g} s warm-up: '
+                   + ', '.join(f'{n} still changes {c:.2g} of its range per period' for c, n in bad)
+                   + ' (lengthen pre_time)'), metrics
+
+
 def validation_test_baseline(cm):
     '''
     Compare the model, at the parameterisation's parameters, with baseline data. Spec
@@ -1645,6 +1680,9 @@ def _baseline_targets(cm, v):
     env.update(out)
     z = float(v.get('z_threshold', 2.0))
     rows, problems = [], []
+    pss = periodic_steady_state(cm, float(run_spec.get('pre_time') or 0.0), cm.outputs(), overrides)
+    if pss is not None and not pss[0]:
+        problems.append(pss[1])
     for tg in v['targets']:
         try:
             model = float(eval(tg['expr'], env))  # noqa: S307 - expressions come from the repo's own yaml
@@ -1662,8 +1700,11 @@ def _baseline_targets(cm, v):
         if not ok:
             problems.append(f"{tg['name']}: model {model:.4g} vs {target} {tg.get('units', '')}")
     metrics = {'targets': rows, 'z_threshold': z, 'source': v.get('source', ''), 'validated_values': params}
+    if pss is not None:
+        metrics['periodic_steady_state'] = pss[2]
     if problems:
-        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(v["targets"])} targets missed',
+        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(v["targets"])} targets missed'
+                      + ('' if pss is None or pss[0] else '; ' + pss[1]),
                       metrics, [], problems)
     return Result('validation_test_baseline', PASSED, f'all {len(rows)} targets met', metrics)
 

@@ -348,7 +348,7 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
 
 
 def run(cm, v, plot_path):
-    from cam_testing.checks import FAILED, PASSED, Result
+    from cam_testing.checks import FAILED, PASSED, Result, periodic_steady_state
 
     component = cm.component
     inst = cm.parameterisation
@@ -377,8 +377,17 @@ def run(cm, v, plot_path):
     for n, start_values in enumerate(starts):
         calibrated, method, cost, features = _calibrate_once(cm, v, calibration_obs(obs), params_for_id, start_values, n)
         tm, out, series, cal_s, pred_s, z_s = _evaluate(cm, v, val_obs, calibrated, cal_end, features)
+        # spec periodic_steady_state: the calibrated model must have reached it in the protocol's warm-up
+        by_var = {p.variable_name: p for p in cm.parameters()}
+        pss = periodic_steady_state(
+            cm, float(obs['protocol_info'].get('pre_times', [0.0])[0]),
+            sorted({output_of(op) for i in obs['data_items'] + (obs.get('prediction_items') or []) for op in i['operands']}),
+            {'parameters/' + _model_name(k, by_var): x for k, x in calibrated.items()})
+        if pss is not None and not pss[0]:
+            problems.append(f'start {n}: {pss[1]}')
         label = ', '.join(f'{k}={val:g}' for k, val in start_values.items()) or 'nominal'
-        runs.append({'start': start_values, 'calibrated_parameters': calibrated, 'cost': cost, 'calibration_scores': cal_s,
+        runs.append({'periodic_steady_state': pss[2] if pss is not None else None,
+                     'start': start_values, 'calibrated_parameters': calibrated, 'cost': cost, 'calibration_scores': cal_s,
                      'prediction_scores': pred_s, 'constant_items': z_s})
         for var, sc in pred_s.items():
             if sc > threshold:

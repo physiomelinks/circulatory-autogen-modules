@@ -1,10 +1,10 @@
 {
  "obs_data_name": "lv",
  "reference_key": "liang2009multi",
- "comment": "Liang et al. 2009 (MBEC 47:743) Fig. 4: the normal ascending-aortic pressure (b), fitted, and the normal LV pressure (a) and P-V loop volumes (e), held out. Set-up (validation.lv.harness): a minimal left-heart loop, pulmonary-venous pressure source -> open conduit -> left atrium (chamber vv, parameterisation la, so it contracts at 0.80-0.97 s as in Liang) -> mitral valve -> this chamber (lv) driven by cardiac_clock Liang2009_v01 -> aortic valve -> aortic root (arterial_simple vv) -> systemic terminal (terminal pp_spec_I) -> venous outlet pressure. Liang's own model has a 55-artery 1-D tree; the loop stands in for it with an afterload (aortic root and systemic terminal R and C) and the pulmonary-venous pressure calibrated to Liang's aortic pressure, so the LV pressure curve (Fig. 4a) is then the held-out check of the chamber. The LV dead volume q_us is fitted too, with the P-V loop features (end-diastolic and end-systolic volumes, Fig. 4e): Liang states no dead volume, and with his E_B and end-diastolic pressure his EDV implies ~26 ml, not Korakianitis's 5 ml (review 2026-10-12). std 2 mmHg (digitising). To redo: pytest tests/test_modules.py --component chamber/vv -k \"calibrate and lv\" --include-unreviewed",
+ "comment": "Liang et al. 2009 (MBEC 47:743) Fig. 4: the normal ascending-aortic pressure (b), fitted, and the normal LV pressure (a) and P-V loop volumes (e), held out. Set-up (validation.lv.harness): a minimal left-heart loop, pulmonary-venous pressure source -> open conduit -> left atrium (chamber vv, parameterisation la, so it contracts at 0.80-0.97 s as in Liang) -> mitral valve -> this chamber (lv) driven by cardiac_clock Liang2009_v01 -> aortic valve -> aortic root (arterial_simple vv) -> systemic terminal (terminal pp_spec_I) -> venous outlet pressure. Liang's own model has a 55-artery 1-D tree; the loop stands in for it with an afterload (aortic root and systemic terminal R and C) and the pulmonary-venous pressure calibrated to Liang's aortic pressure, so the LV pressure curve (Fig. 4a) is then the held-out check of the chamber. The LV dead volume q_us is fitted too, with the P-V loop features (end-diastolic and end-systolic volumes, Fig. 4e): Liang states no dead volume, and with his E_B and end-diastolic pressure his EDV implies ~26 ml, not Korakianitis's 5 ml (review 2026-10-12). std 2 mmHg (digitising). To redo: pytest tests/test_modules.py --component chamber/vv -k \"calibrate and lv\" --include-unreviewed Warm-up 30 s (review 2026-10-12; the earlier 10 s calibrated a transient): the spec's periodic_steady_state flag checks that the calibrated loop has reached periodic steady state (every scored output repeats to 0.1 % of its range per beat). Compliance bounds (review 2026-10-12): the afterload compliance is calibrated within Liang's stated total arterial compliance (~1.5 ml/mmHg, Sec. 2.4): C_T 0.5-3 ml/mmHg, the root below 1.3; unbounded, the fit chose 27-34 ml/mmHg, a 40-53 s time constant that a 30 s warm-up could not settle.",
  "protocol_info": {
   "pre_times": [
-   10.0
+   30.0
   ],
   "sim_times": [
    [
@@ -13,13 +13,13 @@
   ],
   "params_to_change": {},
   "experiment_labels": [
-   "liang2009multi Fig. 4: one beat at periodic steady state"
+   "liang2009multi Fig. 4: one beat at periodic steady state (after a 30 s warm-up; spec periodic_steady_state checks it)"
   ]
  },
  "data_items": [
   {
    "data_item_name": "aortic_pressure",
-   "comment": "liang2009multi Fig. 4b: liang2009multi Fig. 4 (p. 751), normal case, digitised every 0.01 s (source_figures/); time 0 = the start of ventricular contraction, as in the model after its 10 s warm-up (10 beats of 1 s)",
+   "comment": "liang2009multi Fig. 4b: liang2009multi Fig. 4 (p. 751), normal case, digitised every 0.01 s (source_figures/); time 0 = the start of ventricular contraction, as in the model after its 30 s warm-up",
    "trace_name_for_plotting": "P_ao",
    "data_type": "series",
    "operation": null,
@@ -277,7 +277,7 @@
  "prediction_items": [
   {
    "data_item_name": "lv_pressure",
-   "comment": "held out; liang2009multi Fig. 4a: liang2009multi Fig. 4 (p. 751), normal case, digitised every 0.01 s (source_figures/); time 0 = the start of ventricular contraction, as in the model after its 10 s warm-up (10 beats of 1 s)",
+   "comment": "held out; liang2009multi Fig. 4a: liang2009multi Fig. 4 (p. 751), normal case, digitised every 0.01 s (source_figures/); time 0 = the start of ventricular contraction, as in the model after its 30 s warm-up",
    "trace_name_for_plotting": "P_lv",
    "data_type": "series",
    "operation": null,

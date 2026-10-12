@@ -22,9 +22,9 @@ notes: 'Heart chamber with the time-varying elastance of Liang et al. 2009 (MBEC
   Liang2009NoVisco_v01) and 4.3 ml (Liang2009_v01), confirming it; q_us stays in the calibration as a check, not applied
   (review 2026-10-12).'
 expected_failures:
-  validation_test_baseline: 'lv: the peak LV pressure is 122 mmHg vs Liang''s 108 (target 97-119): without Liang''s
+  validation_test_baseline: 'lv: the peak LV pressure is 120.6 mmHg vs Liang''s 108 (target 97-119) at periodic steady state: without Liang''s
     viscoelastic S dV/dt term (Eq. 9) the ejection pressure is 13 % high; chamber/Liang2009_v01, with the term, peaks at
-    112 mmHg and passes. The other targets (EDV, ESV, minimum and end-diastolic pressure) and the calibration pass
+    115.6 mmHg and passes. The other held-out targets (minimum and end-diastolic pressure) and the calibration pass
     (review 2026-10-12).'
   verification_test_timestep: 'the phase rate dchi/dt switches discontinuously (contraction, relaxation, diastole and the
     clock gate), so fixed-step RK4 converges at first order across a switch (observed order 0.62 < 0.8); a property of
