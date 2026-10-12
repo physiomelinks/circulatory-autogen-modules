@@ -1,33 +1,33 @@
 """
-validation_test_calibrate: calibrate a version, at one of its instances, with libcuflynx parameter
-identification on that instance's data, then score its prediction of held-out data.
+validation_test_calibrate: calibrate a version, at one of its parameterisations, with libcuflynx
+parameter identification on that parameterisation's data, then score its prediction of held-out data.
 
-The inputs are ordinary libcuflynx files, committed in the instance directory
-(versions/<version>/instances/<instance>/), so the same calibration can be run with libcuflynx
+The inputs are ordinary libcuflynx files, committed in the parameterisation's
+directory (versions/<version>/parameterisations/<p>/), so the same calibration can be run with libcuflynx
 directly:
 
-    <instance>_obs_data.json              obs_data ("obs_data_name": "<instance>"): its data_items
+    <p>_obs_data.json                     obs_data ("obs_data_name": "<p>"): its data_items
                                           are fitted by CVS0DParamID; its prediction_items that
                                           carry a value are the held-out data the calibrated
                                           model is validated against, scored on
                                           prediction_window (without any, the data_items are)
-    <instance>_params_for_id.csv          parameters calibrated, with bounds
+    <p>_params_for_id.csv                 parameters calibrated, with bounds
 
 and the results are written there too, and committed:
 
-    <instance>_calibrated_parameters.csv  the instance's parameters with the calibrated values
-    <instance>_calibration.json           summary: method, cost, fitted values, scores, date
+    <p>_calibrated_parameters.csv         the parameterisation's parameters with the calibrated values
+    <p>_calibration.json                  summary: method, cost, fitted values, scores, date
 
 The version is generated alone as a single vessel named "mod" (cam_testing.harness.VESSEL),
 so operands are "mod/<variable>" and params_for_id vessel_name is "mod".
 
-Spec (validation.<instance>.calibrate in <module_type>_<version>_verification_config.json; file
-references relative to the version directory, defaulting to the instance's files):
+Spec (validation.<p>.calibrate in <module_type>_<version>_verification_config.json; file
+references relative to the version directory, defaulting to the parameterisation's files):
 
     status: active
     source: citation / URL
-    obs_data: instances/<instance>/<instance>_obs_data.json
-    params_for_id: instances/<instance>/<instance>_params_for_id.csv
+    obs_data: parameterisations/<p>/<p>_obs_data.json
+    params_for_id: parameterisations/<p>/<p>_params_for_id.csv
     prediction_window: [15, 20]           model time scored for series predictions (optional)
     initial_parameters: {a: 0.8}          optional optimiser start (default: nominal values)
     starts: [{a: 1}, {a: -1}]             optional: several starts, each calibrated and checked
@@ -42,9 +42,9 @@ references relative to the version directory, defaulting to the instance's files
     threshold: 0.5                        on the prediction window
 
 The obs_data files for tabular data are made with
-    python -m cam_testing.calibrate from-csv --csv instances/<instance>/data.csv --time-column Year \
+    python -m cam_testing.calibrate from-csv --csv parameterisations/<p>/data.csv --time-column Year \
         --time-offset 1900 --variables x=Hare y=Lynx --window 0 15 --noise relative 0.25 \
-        --name <instance> --out instances/<instance>/<instance>_obs_data.json
+        --name <p> --out parameterisations/<p>/<p>_obs_data.json
 and held-out data is added to it as prediction_items with --validation-window (the protocol
 then runs to the end of the held-out data).
 """
@@ -57,7 +57,7 @@ import os
 
 import numpy as np
 
-from cam_testing import harness, plots
+from cam_testing import harness, module_array, plots
 
 
 def load_data(data_dir, v):
@@ -330,11 +330,11 @@ def run(cm, v, plot_path):
     from cam_testing.checks import FAILED, PASSED, Result
 
     component = cm.component
-    inst = cm.instance
+    inst = cm.parameterisation
     vdir = component.dir
 
     def path(key, default):
-        # the spec's file reference (relative to the version directory), else the instance's convention
+        # the spec's file reference (relative to the version directory), else the parameterisation's convention
         return os.path.join(vdir, v[key]) if v.get(key) else default
     obs_path = path('obs_data', inst.obs_data_path)
     with open(obs_path) as f:
@@ -420,11 +420,11 @@ def run(cm, v, plot_path):
 
 
 def write_calibrated(cm, calibrated, metrics, passed, summary):
-    '''<instance>_calibrated_parameters.csv (the instance's rows, calibrated values replaced, the
-    reference noting the calibration) and <instance>_calibration.json (the summary).'''
+    '''<p>_calibrated_parameters.csv (the parameterisation's rows, calibrated values replaced,
+    the reference noting the calibration) and <p>_calibration.json (the summary).'''
     import datetime
     from cam_testing.library import write_parameters
-    inst = cm.instance
+    inst = cm.parameterisation
     date = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
     params = []
     for p in cm.parameters():
@@ -436,7 +436,7 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
             p.sourced = 'no'
         params.append(p)
     write_parameters(inst.calibrated_parameters_path, params)
-    summary_json = {'instance': inst.name, 'version': cm.component.key, 'date': date, 'passed': passed,
+    summary_json = {'parameterisation': inst.name, 'version': cm.component.key, 'date': date, 'passed': passed,
                     'summary': summary, 'method': metrics.get('method'), 'files': metrics.get('files'),
                     'cost': (metrics.get('runs') or [{}])[0].get('cost'),
                     'calibrated_parameters': calibrated, 'runs': metrics.get('runs'),
@@ -448,24 +448,24 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 
 
 # ----------------------------------------------------------------------------------------------
-# calibrate apply: copy an instance's calibrated values to every place that uses the version
+# calibrate apply: copy a parameterisation's calibrated values to every place that uses the version
 # ----------------------------------------------------------------------------------------------
 #
-#     python -m cam_testing.calibrate apply <module_type>/<version> <instance> [--dry-run]
+#     python -m cam_testing.calibrate apply <module_type>/<version> <parameterisation> [--dry-run]
 #
-# The calibrated parameters (those in <instance>_params_for_id.csv, with their values from
-# <instance>_calibrated_parameters.csv) are written to:
-#   1. the version's default instance (row <var>);
-#   2. every supermodule version using the version's default instance as a submodule, recursively
+# The calibrated parameters (those in <p>_params_for_id.csv, with their values from
+# <p>_calibrated_parameters.csv) are written to:
+#   1. the version's default parameterisation (row <var>);
+#   2. every supermodule version using the version's default parameterisation as a submodule, recursively
 #      (row <var>_<submodule path>, outer first: soma/sympathetic rho_M_i_M, a neuron using that
 #      soma as "soma" rho_M_soma_i_M), where the row exists;
 #   3. every system model whose module array uses the version, or a supermodule chain over it, at
-#      its default instance (row <var>_<vessel> or <var>_<vessel>_<submodule path>), where the row exists;
+#      its default parameterisation (row <var>_<vessel> or <var>_<vessel>_<submodule path>), where the row exists;
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
 #      to the vessel of `reproduces` ("soma_SN/w": "SN_soma_i_M/w" -> soma_SN), giving row
-#      <var>_<that vessel> in that system model and row <var> in that vessel's version's default instance.
-# Each rewritten reference reads "Calibrated (libcuflynx) to instances/<instance>/<instance>_obs_data.json:
+#      <var>_<that vessel> in that system model and row <var> in that vessel's version's default parameterisation.
+# Each rewritten reference reads "Calibrated (libcuflynx) to parameterisations/<p>/<p>_obs_data.json:
 # <note>" (with the version named when it is written elsewhere), and keeps the old value. <note> is the
 # obs_data's "calibration_note" (else its obs_data_name); an obs_data "reference_key" (a BibTeX key of
 # the version) prefixes the reference and marks the row sourced.
@@ -511,12 +511,12 @@ def _row_values(path, names):
     return out
 
 
-def apply_plan(version, instance_name, versions=None, systems=None):
+def apply_plan(version, parameterisation_name, versions=None, systems=None):
     """The changes ``apply`` would make: [{path, row, variable, value, old, reference, sourced}].
     ``versions`` (default: the library) and ``systems`` (default: _system_models()) are what is
     searched for users of the version."""
     from cam_testing.library import all_versions, read_parameters
-    inst = version.instance(instance_name)
+    inst = version.parameterisation(parameterisation_name)
     names = [p['param_name'] for p in read_params_for_id(inst.params_for_id_path)]
     if not os.path.isfile(inst.calibrated_parameters_path):
         raise FileNotFoundError(f'{inst.calibrated_parameters_path}: run the calibration first')
@@ -532,7 +532,7 @@ def apply_plan(version, instance_name, versions=None, systems=None):
         raise KeyError(f'{inst.calibrated_parameters_path} has no row for {missing}')
     with open(inst.obs_data_path) as f:
         obs = json.load(f)
-    note = obs.get('calibration_note') or obs.get('obs_data_name') or instance_name
+    note = obs.get('calibration_note') or obs.get('obs_data_name') or parameterisation_name
     key = obs.get('reference_key')
     versions = all_versions() if versions is None else versions
     systems = _system_models() if systems is None else systems
@@ -541,9 +541,9 @@ def apply_plan(version, instance_name, versions=None, systems=None):
 
     def default_of(mt, sub):
         v = by_key.get(f'{mt}/{sub}')
-        return v.default_instance_name if v is not None else 'default'
+        return v.default_parameterisation_name if v is not None else 'default'
 
-    # (version, submodule path) of every supermodule chain over the version's default instance
+    # (version, submodule path) of every supermodule chain over the version's default parameterisation
     chain, todo = [], [(version.mtype.name, version.name, '')]
     while todo:
         mt, vname, sfx = todo.pop(0)
@@ -553,7 +553,7 @@ def apply_plan(version, instance_name, versions=None, systems=None):
             for sub in S.submodules:
                 if (sub.get('module_type'), sub.get('module_subtype')) != (mt, vname):
                     continue
-                if (sub.get('instance') or 'default') != default_of(mt, vname):
+                if module_array.parameterisation_of(sub, 'default') != default_of(mt, vname):
                     continue
                 path = sub['name'] + ('_' + sfx if sfx else '')
                 if all((c[0].key, c[1]) != (S.key, path) for c in chain):
@@ -561,9 +561,9 @@ def apply_plan(version, instance_name, versions=None, systems=None):
                     todo.append((S.mtype.name, S.name, path))
 
     targets = []          # (csv path, suffix, where, own)
-    targets.append((version.default_instance.parameters_path, '', f'{version.key} default instance', True))
+    targets.append((version.default_parameterisation.parameters_path, '', f'{version.key} default parameterisation', True))
     for S, path in chain:
-        targets.append((S.default_instance.parameters_path, '_' + path, f'{S.key} default instance', False))
+        targets.append((S.default_parameterisation.parameters_path, '_' + path, f'{S.key} default parameterisation', False))
     flattened = {}        # system key -> [flattened vessel names]
     systems_by_key = {m['key']: m for m in systems}
     chain_by_key = {}
@@ -572,8 +572,8 @@ def apply_plan(version, instance_name, versions=None, systems=None):
     for m in systems:
         for ves in m['vessels']:
             vk = f"{ves.get('module_type')}/{ves.get('module_subtype')}"
-            inst_name = ves.get('instance') or 'default'
-            if inst_name != default_of(ves.get('module_type'), ves.get('module_subtype')):
+            p_name = module_array.parameterisation_of(ves, 'default')
+            if p_name != default_of(ves.get('module_type'), ves.get('module_subtype')):
                 continue
             if vk == version.key:
                 flattened.setdefault(m['key'], []).append(ves['name'])
@@ -597,11 +597,11 @@ def apply_plan(version, instance_name, versions=None, systems=None):
                 ves = next((x for x in rep['vessels'] if x['name'] == mono[0]), None)
                 mv = by_key.get(f"{ves.get('module_type')}/{ves.get('module_subtype')}") if ves else None
                 if mv is not None:
-                    targets.append((mv.default_instance.parameters_path, '', f'{mv.key} default instance', False))
+                    targets.append((mv.default_parameterisation.parameters_path, '', f'{mv.key} default parameterisation', False))
 
     import datetime
     today = datetime.date.today().isoformat()
-    obs_rel = f'instances/{instance_name}/{instance_name}_obs_data.json'
+    obs_rel = os.path.relpath(inst.obs_data_path, version.dir).replace(os.sep, '/')
     plan, seen = [], set()
     for path, sfx, where, own in targets:
         rows = _row_values(path, {n + sfx for n in names})
@@ -643,11 +643,11 @@ def write_plan(plan):
             f.write(eol.join(lines))
 
 
-def apply_command(version_key, instance_name, dry_run=False, versions=None, systems=None, out=print):
+def apply_command(version_key, parameterisation_name, dry_run=False, versions=None, systems=None, out=print):
     from cam_testing import paths
     from cam_testing.library import version_by_key
     version = version_by_key(version_key)
-    plan = apply_plan(version, instance_name, versions=versions, systems=systems)
+    plan = apply_plan(version, parameterisation_name, versions=versions, systems=systems)
     for c in plan:
         rel = os.path.relpath(c['path'], paths.roots().repo_root)
         out(f"{'would set' if dry_run else 'set'} {rel}: {c['row']} {c['old']} -> {c['value']}")
@@ -667,21 +667,22 @@ def main(argv=None):
     fc.add_argument('--variables', nargs='+', required=True, help='model_var=csv_column')
     fc.add_argument('--window', nargs=2, type=float, required=True)
     fc.add_argument('--noise', nargs=2, default=['relative', '0.1'], help='relative|absolute VALUE')
-    fc.add_argument('--name', help='obs_data_name (the instance the file belongs to)')
+    fc.add_argument('--name', help='obs_data_name (the parameterisation the file belongs to)')
     fc.add_argument('--validation-window', nargs=2, type=float,
                     help='also add this window of the data as held-out prediction_items')
     fc.add_argument('--validation-features', nargs='*', default=list(FEATURE_OPERATIONS),
                     help='scalar features of each held-out series added as prediction_items '
                          f'(default {" ".join(FEATURE_OPERATIONS)}; none: --validation-features)')
     fc.add_argument('--out', required=True)
-    ap = sub.add_parser('apply', help="copy an instance's calibrated values into the version's default "
-                                      'instance, its supermodules, monolithic counterparts and system models')
+    ap = sub.add_parser('apply', help="copy a parameterisation's calibrated values into the version's "
+                                      'default parameterisation, its supermodules, monolithic counterparts and system models')
     ap.add_argument('version', help='<module_type>/<version>')
-    ap.add_argument('instance')
+    ap.add_argument('parameterisation', help="the parameterisation's name (its directory under "
+                    'parameterisations/)')
     ap.add_argument('--dry-run', action='store_true', help='print the changes without writing them')
     args = parser.parse_args(argv)
     if args.cmd == 'apply':
-        apply_command(args.version, args.instance, dry_run=args.dry_run)
+        apply_command(args.version, args.parameterisation, dry_run=args.dry_run)
         return
     spec = {'data': os.path.abspath(args.csv), 'time_column': args.time_column, 'time_offset': args.time_offset,
             'variables': dict(x.split('=', 1) for x in args.variables)}

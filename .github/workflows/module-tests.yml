@@ -117,7 +117,7 @@ jobs:
 
   # One job per category, stage and shard (ci/shards.json, cam_testing/shards.py), each about ten
   # minutes: vv = tests/test_modules.py, pipeline = PhLynx -> CUFLynx, omex = the CUFLynx archive
-  # per instance. A shard holds whole module_types. Each job uploads its results for the site job,
+  # per parameterisation. A shard holds whole module_types. Each job uploads its results for the site job,
   # which builds every report, and its JUnit report (refresh ci/test_durations.json from them with
   # python -m cam_testing.shards durations <stage> junit-*.xml).
   test:
@@ -188,11 +188,11 @@ jobs:
         run: |
           make pipeline PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" PHLYNX_DIR=$PWD/_phlynx CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64 \
             || echo "failed=true" >> "$GITHUB_OUTPUT"
-      - name: CUFLynx archive per instance (built from the library's files, then loaded and run in CUFLynx)
+      - name: CUFLynx archive per parameterisation (built from the library's files, then loaded and run in CUFLynx)
         id: omex
         if: matrix.stage == 'omex'
         run: |
-          # the test builds each instance's archive at its own path (make omex's output) and runs it
+          # the test builds each parameterisation's archive at its own path (make omex's output) and runs it
           make omex-test PYTHON=python MODULE=${{ matrix.category }} PYTEST_ARGS="$SHARD_ARGS" CUFLYNX_BIN=$PWD/_cuflynx/CUFLynx-linux-x86_64 \
             || echo "failed=true" >> "$GITHUB_OUTPUT"
       - name: Failure-risk analysis (on request, reviewed versions)

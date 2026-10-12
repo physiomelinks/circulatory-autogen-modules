@@ -18,7 +18,7 @@ from cam_testing.library import Parameter, all_versions, load_version
 
 # ---- uniform columns ----------------------------------------------------------------------------
 
-EXPECTED_COLUMNS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
+EXPECTED_COLUMNS = ['review_test', 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                     'stability_test', 'version_calibration', 'phlynx_export_test', 'cuflynx_simulate_test',
                     'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
                     'coupled_validation_test']
@@ -27,7 +27,7 @@ EXPECTED_COLUMNS = ['run_test', 'verification_test_invariants', 'verification_te
 def test_report_columns_in_order():
     assert report.REPORT_TESTS == EXPECTED_COLUMNS
     assert [report.TEST_SHORT[k] for k in EXPECTED_COLUMNS] == [
-        'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
+        'Reviewed', 'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
         'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces', 'Coupled']
 
 
@@ -78,19 +78,20 @@ def test_cpp_reasons():
     assert report.not_applicable_reason(cpp, 'run_test') is None
 
 
-def _fake_version(tmp_path, name='v', supermodule=False, spec=None, instances=(), submodules=()):
+def _fake_version(tmp_path, name='v', supermodule=False, spec=None, parameterisations=(), submodules=()):
     vdir = tmp_path / name
     v = SimpleNamespace(name=name, vessel_type=f'mt_{name}', key=f'mt_{name}/{name}', id=f'mt_{name}__{name}',
                         dir=str(vdir), results_dir=str(vdir / 'results'), plots_dir=str(vdir / 'plots'),
                         is_supermodule=supermodule, spec=dict(spec or {}), config={'module_format': 'cellml'},
                         submodules=list(submodules))
-    v.instances = lambda: [SimpleNamespace(name=i, has_obs_data=data, results_dir=str(vdir / 'results' / 'instances' / i))
-                           for i, data in instances]
+    v.parameterisations = lambda: [SimpleNamespace(name=i, has_obs_data=data,
+                                                   results_dir=str(vdir / 'results' / 'parameterisations' / i))
+                                   for i, data in parameterisations]
     return v
 
 
 def test_a_test_that_did_not_run_is_not_run(tmp_path):
-    v = _fake_version(tmp_path, instances=[('default', False)])
+    v = _fake_version(tmp_path, parameterisations=[('default', False)])
     tests = {t['key']: t for t in report.version_tests(v)}
     for k in ('run_test', 'verification_test_BC', 'stability_test', 'phlynx_export_test'):
         assert tests[k]['status'] is None and tests[k]['status_label'] == 'Not run'
@@ -103,8 +104,8 @@ def _sub(v):
     return {'name': v.name, 'module_type': v.vessel_type, 'module_subtype': v.name}
 
 
-def _save_calibration(v, instance, status):
-    path = os.path.join(v.results_dir, 'instances', instance, 'validation_test_calibrate.json')
+def _save_calibration(v, parameterisation, status):
+    path = os.path.join(v.results_dir, 'parameterisations', parameterisation, 'validation_test_calibrate.json')
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as f:
         json.dump({'test': 'validation_test_calibrate', 'status': status, 'message': status}, f)
@@ -128,9 +129,9 @@ def test_supermodule_index_of_the_library():
 
 
 def test_calibration_in_super_is_transitive(tmp_path):
-    chan = _fake_version(tmp_path, 'chan', instances=[('default', False)])
-    soma = _fake_version(tmp_path, 'soma', True, instances=[('default', False)], submodules=[_sub(chan)])
-    neuron = _fake_version(tmp_path, 'neuron', True, instances=[('default', True)], submodules=[_sub(soma)])
+    chan = _fake_version(tmp_path, 'chan', parameterisations=[('default', False)])
+    soma = _fake_version(tmp_path, 'soma', True, parameterisations=[('default', False)], submodules=[_sub(chan)])
+    neuron = _fake_version(tmp_path, 'neuron', True, parameterisations=[('default', True)], submodules=[_sub(soma)])
     index = checks.supermodule_index([chan, soma, neuron])
 
     # neuron has no result yet: pending, which is not a pass
@@ -148,9 +149,9 @@ def test_calibration_in_super_is_transitive(tmp_path):
 
 
 def test_calibration_in_super_any_passing_supermodule(tmp_path):
-    chan = _fake_version(tmp_path, 'chan', instances=[('default', False)])
-    s_nodata = _fake_version(tmp_path, 's_nodata', True, instances=[('default', False)], submodules=[_sub(chan)])
-    s_pass = _fake_version(tmp_path, 's_pass', True, instances=[('default', True)], submodules=[_sub(chan)])
+    chan = _fake_version(tmp_path, 'chan', parameterisations=[('default', False)])
+    s_nodata = _fake_version(tmp_path, 's_nodata', True, parameterisations=[('default', False)], submodules=[_sub(chan)])
+    s_pass = _fake_version(tmp_path, 's_pass', True, parameterisations=[('default', True)], submodules=[_sub(chan)])
     index = checks.supermodule_index([chan, s_nodata, s_pass])
     # a supermodule without calibration data counts as failed
     assert checks.version_calibration(s_nodata, index).status == checks.FAILED
@@ -161,8 +162,8 @@ def test_calibration_in_super_any_passing_supermodule(tmp_path):
 
 
 def test_own_calibration_data_wins(tmp_path):
-    chan = _fake_version(tmp_path, 'chan', instances=[('default', True)])
-    sup = _fake_version(tmp_path, 'sup', True, instances=[('default', True)], submodules=[_sub(chan)])
+    chan = _fake_version(tmp_path, 'chan', parameterisations=[('default', True)])
+    sup = _fake_version(tmp_path, 'sup', True, parameterisations=[('default', True)], submodules=[_sub(chan)])
     index = checks.supermodule_index([chan, sup])
     _save_calibration(sup, 'default', checks.PASSED)
     _save_calibration(chan, 'default', checks.FAILED)
@@ -170,16 +171,16 @@ def test_own_calibration_data_wins(tmp_path):
 
 
 def test_calibration_in_supermodule_opt_out(tmp_path):
-    chan = _fake_version(tmp_path, 'chan', spec={'calibration_in_supermodule': False}, instances=[('default', False)])
-    sup = _fake_version(tmp_path, 'sup', True, instances=[('default', True)], submodules=[_sub(chan)])
+    chan = _fake_version(tmp_path, 'chan', spec={'calibration_in_supermodule': False}, parameterisations=[('default', False)])
+    sup = _fake_version(tmp_path, 'sup', True, parameterisations=[('default', True)], submodules=[_sub(chan)])
     index = checks.supermodule_index([chan, sup])
     _save_calibration(sup, 'default', checks.PASSED)
     r = checks.version_calibration(chan, index)
-    assert r.status == checks.FAILED and r.message == checks.NO_INSTANCE_CALIBRATION
+    assert r.status == checks.FAILED and r.message == checks.NO_PARAMETERISATION_CALIBRATION
 
 
 def test_not_a_submodule_keeps_the_plain_rule(tmp_path):
-    v = _fake_version(tmp_path, 'v', instances=[('default', False)])
+    v = _fake_version(tmp_path, 'v', parameterisations=[('default', False)])
     assert checks.version_calibration(v, {}).status == checks.FAILED
 
 
@@ -191,7 +192,7 @@ def test_report_links_and_counts_for_calibration_in_super():
     link = next(l for l in t['links'] if l['key'] == 'soma/sympathetic')
     assert link['href'] == '../../../neuron/soma/versions/sympathetic/soma_sympathetic.html'
     assert link['href_module'] == '../neuron/soma/versions/sympathetic/soma_sympathetic.html'
-    counts = report._status_counts([{'tests': [t], 'instances': []}])
+    counts = report._status_counts([{'tests': [t], 'parameterisations': []}])
     assert counts.get(checks.PASSED_IN_SUPER, 0) == 0 and counts.get(checks.FAILED_IN_SUPER, 0) == 0
     assert counts['passed'] + counts['failed'] == 1
 
@@ -199,11 +200,12 @@ def test_report_links_and_counts_for_calibration_in_super():
 # ---- supermodule versions in the test parametrisation ---------------------------------------------
 
 def test_supermodule_versions_get_the_verification_tests():
-    config = SimpleNamespace(getoption=lambda k: ['soma'] if k == '--module' else ([] if k == '--component' else True))
+    options = {'--module': ['soma'], '--component': [], '--shard': None, '--shard-stage': 'vv', '--changed-only': False}
+    config = SimpleNamespace(getoption=lambda k: options.get(k, True))
     ids = [p.id for p in pytest_plugin._selected_versions(config)]
     assert 'soma/sympathetic' in ids and 'soma/sympathetic_monolithic_v01' in ids
-    inst = [p.id for p in pytest_plugin._selected_instances(config)]
-    assert 'soma/sympathetic/default' in inst
+    params = [p.id for p in pytest_plugin._selected_parameterisations(config)]
+    assert 'soma/sympathetic/default' in params
 
 
 # ---- supermodule parameter names ----------------------------------------------------------------

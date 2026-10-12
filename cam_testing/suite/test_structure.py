@@ -2,7 +2,7 @@
 Fast static checks on the module library (no libcuflynx generation needed).
 
   - the directory layout of modules/ and system_models/ against modules/directory_schema.json
-    and its rules (version == module_subtype, default_instance, obs_data_name, unique names,
+    and its rules (version == module_subtype, default_parameterisation, obs_data_name, unique names,
     nested module_types used only within their parent, system-model records resolve);
   - each version's CellML, config and units (test_version_structure);
   - library-wide uniqueness, manifests, and the JSON files against libcuflynx's schemas.
@@ -197,11 +197,14 @@ def walk_modules():
                 if e.get('module_type') != mt or e.get('module_subtype') != v:
                     problems.append(f'{rel}: config entry is ({e.get("module_type")}, {e.get("module_subtype")}), '
                                     f'not ({mt}, {v}): the version is its module_subtype')
-                di = e.get('default_instance')
+                di = e.get('default_parameterisation')
+                if 'default_instance' in e:
+                    problems.append(f'{rel}: config entry has "default_instance" (the former name): rename it '
+                                    f'"default_parameterisation"')
                 if not di:
-                    problems.append(f'{rel}: config entry has no default_instance')
-                elif not os.path.isfile(os.path.join(d, 'instances', di, f'{di}_parameters.csv')):
-                    problems.append(f'{rel}: default_instance {di} has no instances/{di}/{di}_parameters.csv')
+                    problems.append(f'{rel}: config entry has no default_parameterisation')
+                elif not os.path.isfile(os.path.join(d, 'parameterisations', di, f'{di}_parameters.csv')):
+                    problems.append(f'{rel}: default_parameterisation {di} has no parameterisations/{di}/{di}_parameters.csv')
         _check_files('version', d, names, problems, supermodule)
         # the spec's two files: every key in its own file, identity keys matching the directories
         tests, verification = read_spec_files(d, f'{mt}_{v}')
@@ -217,24 +220,25 @@ def walk_modules():
         for c in _subdirs(d):
             if c not in allowed:
                 problems.append(f'{rel}: unexpected directory {c}')
-        if not os.path.isdir(os.path.join(d, 'instances')):
-            problems.append(f'{rel}: missing instances/')
+        if not os.path.isdir(os.path.join(d, 'parameterisations')):
+            problems.append(f'{rel}: missing parameterisations/'
+                            + (' (instances/ is the former name: rename it)' if os.path.isdir(os.path.join(d, 'instances')) else ''))
             return
         if os.path.isdir(os.path.join(d, 'risk')):
             _check_files('risk', os.path.join(d, 'risk'), names, problems)
-        iroot = os.path.join(d, 'instances')
-        _check_files('instances', iroot, {}, problems)
+        iroot = os.path.join(d, 'parameterisations')
+        _check_files('parameterisations', iroot, {}, problems)
         if not _subdirs(iroot):
-            problems.append(f'{rel}: no instances')
+            problems.append(f'{rel}: no parameterisations')
         for i in _subdirs(iroot):
-            instance(os.path.join(iroot, i))
+            parameterisation(os.path.join(iroot, i))
 
-    def instance(d):
+    def parameterisation(d):
         i = os.path.basename(d)
-        _name_ok('instance', i, d, problems)
-        _check_files('instance', d, {'instance': i}, problems)
+        _name_ok('parameterisation', i, d, problems)
+        _check_files('parameterisation', d, {'parameterisation': i}, problems)
         rel = os.path.relpath(d, REPO_ROOT)
-        allowed = LEVELS['instance'].get('subdirectories') or {}
+        allowed = LEVELS['parameterisation'].get('subdirectories') or {}
         for c in _subdirs(d):
             if c not in allowed:
                 problems.append(f'{rel}: unexpected directory {c}')
@@ -250,13 +254,13 @@ def walk_modules():
         if os.path.isfile(pp):
             with open(pp, newline='') as f:
                 header = next(csv.reader(f), [])
-            if [h.strip() for h in header] != LEVELS['instance']['parameters_columns']:
+            if [h.strip() for h in header] != LEVELS['parameterisation']['parameters_columns']:
                 problems.append(f'{rel}: {i}_parameters.csv columns are {header}, not {INSTANCE_COLUMNS}')
         p = os.path.join(d, f'{i}_obs_data.json')
         if os.path.isfile(p):
             name = json.load(open(p)).get('obs_data_name')
             if name != i:
-                problems.append(f'{rel}: {i}_obs_data.json has obs_data_name {name!r}; the instance is named by it ({i!r})')
+                problems.append(f'{rel}: {i}_obs_data.json has obs_data_name {name!r}; the parameterisation is named by it ({i!r})')
 
     for c in _subdirs(MODULES_DIR):
         p = os.path.join(MODULES_DIR, c)
@@ -336,7 +340,7 @@ def test_nested_module_types_found_by_the_library():
 def _uses_of_module_types(version):
     '''(module_type, where) for every module_type a version's supermodule submodules and harness name.'''
     out = [(s.get('module_type') or s.get('vessel_type'), f'submodule {s.get("name")}') for s in version.submodules]
-    # the version's harness, and the instances' own (validation.<instance>.harness)
+    # the version's harness, and the parameterisations' own (validation.<parameterisation>.harness)
     networks = [('harness', version.spec.get('harness'))]
     networks += [(f'validation.{inst}.harness', (kinds or {}).get('harness'))
                  for inst, kinds in (version.spec.get('validation') or {}).items() if isinstance(kinds, dict)]
@@ -392,7 +396,8 @@ SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_mo
 
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
 def test_system_model_records_resolve(path):
-    '''Every record names a (module_type, version) of the library and an instance of it. A model
+    '''Every record (an instance) names a (module_type, version) of the library and a
+    parameterisation of it. A model
     listing modules that are not in this library (known.not_in_library in its spec) is exempt for those.'''
     import yaml
     model_dir = os.path.dirname(path)
@@ -408,11 +413,11 @@ def test_system_model_records_resolve(path):
         if v is None:
             outside.append(f'{r["name"]}: ({key[0]}, {key[1]}) is not a version in the library')
             continue
-        inst = r.get('instance')
+        inst = module_array.parameterisation_of(r)
         if inst is None:
-            problems.append(f'{r["name"]}: names no instance')
-        elif inst not in v.instance_names():
-            problems.append(f'{r["name"]}: {v.key} has no instance {inst} (it has {v.instance_names()})')
+            problems.append(f'{r["name"]}: names no parameterisation')
+        elif inst not in v.parameterisation_names():
+            problems.append(f'{r["name"]}: {v.key} has no parameterisation {inst} (it has {v.parameterisation_names()})')
     if outside and not (spec.get('expected_failures') or spec.get('skip')):
         problems += outside
     assert not problems, '\n'.join(problems)
@@ -470,7 +475,7 @@ def version_problems(version, library_components=None):
     # a reviewed version's sourced parameters must cite an entry of its references.bib
     if version.reviewed:
         keys = set(bib.read(bib.bib_path(version)))
-        for inst in version.instances():
+        for inst in version.parameterisations():
             for p in inst.parameters():
                 if not p.is_sourced or p.data_reference.lower().startswith('definitional'):
                     continue
@@ -479,12 +484,12 @@ def version_problems(version, library_components=None):
                     errors.append(f'{inst.name}/{p.variable_name}: sourced, but its reference '
                                   f'"{p.data_reference[:40]}" is not a key in {os.path.basename(bib.bib_path(version))}')
 
-    # every instance's parameters are variables of the version
+    # every parameterisation's parameters are variables of the version
     kinds = version.kinds
-    for inst in version.instances():
+    for inst in version.parameterisations():
         for p in inst.parameters():
             if p.variable_name not in kinds:
-                warnings.append(f'instance {inst.name}: parameter {p.variable_name} is not a variable of the config entry')
+                warnings.append(f'parameterisation {inst.name}: parameter {p.variable_name} is not a variable of the config entry')
 
     root = ET.parse(version.cellml_path).getroot()
     for comp in root.iter(f'{{{CELLML_NS}}}component'):
@@ -612,7 +617,7 @@ def _not_excluded(p):
 MODULE_ARRAYS = SYSTEM_ARRAYS
 MODULE_CONFIGS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules_config.json'), recursive=True)
                         if _not_excluded(p))
-OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'instances', '*', '*obs_data.json'), recursive=True)
+OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'parameterisations', '*', '*obs_data.json'), recursive=True)
                   if _not_excluded(p))
 
 
@@ -834,8 +839,8 @@ def test_module_type_names_listed():
     assert module_type_names(), 'no module_types found under modules/'
 
 
-# Instances whose data were extracted from a publication but have no source screenshot yet.
-# Remove an entry when its instances/<i>/source_figures/ is added; never add new ones.
+# Parameterisations whose data were extracted from a publication but have no source screenshot yet.
+# Remove an entry when its parameterisations/<p>/source_figures/ is added; never add new ones.
 MISSING_SOURCE_FIGURES = {
     'capillary/pp_micro::default', 'heart/vp::default', 'heart/vp_Ca::default',
     'heart/vp_new_valve::default', 'heart/vp_wCont::default', 'heart/vp_wCont_nonstiff::default',
@@ -847,14 +852,14 @@ MISSING_SOURCE_FIGURES = {
 }
 
 
-def _publication_instances():
-    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.instances() if i.needs_source_figures()]
+def _publication_parameterisations():
+    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.parameterisations() if i.needs_source_figures()]
 
 
-@pytest.mark.parametrize('key,inst', _publication_instances(), ids=lambda x: x if isinstance(x, str) else '')
+@pytest.mark.parametrize('key,inst', _publication_parameterisations(), ids=lambda x: x if isinstance(x, str) else '')
 def test_publication_data_has_source_figures(key, inst):
     '''Validation or calibration data extracted from a paper or book carries a screenshot of the
-    figure/table it came from (instances/<i>/source_figures/, listed in source_figures.json), shown
+    figure/table it came from (parameterisations/<p>/source_figures/, listed in source_figures.json), shown
     in the report beside the validation plots (modules/README.md, "Source figures").'''
     if key in MISSING_SOURCE_FIGURES:
         pytest.xfail('source screenshot not added yet')
@@ -868,7 +873,7 @@ def test_publication_data_has_source_figures(key, inst):
 def test_missing_source_figures_list_is_current():
     '''The known-gap list only shrinks: every entry still needs figures and still lacks them. (Entries
     are this library's versions; another repo's run ignores them.)'''
-    have = {k for k, i in _publication_instances() if not i.source_figures()}
+    have = {k for k, i in _publication_parameterisations() if not i.source_figures()}
     if os.path.realpath(REPO_ROOT) != os.path.realpath(paths.PACKAGE_CHECKOUT):
         pytest.skip('the known-gap list is circulatory-autogen-modules\' own')
     stale = MISSING_SOURCE_FIGURES - have

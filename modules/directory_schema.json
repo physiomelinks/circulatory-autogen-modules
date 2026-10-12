@@ -1,6 +1,6 @@
 {
   "title": "circulatory-autogen-modules directory layout",
-  "description": "Every level of modules/ and system_models/: the directories and files each may hold, their name patterns, and the rules across levels. tests/test_structure.py walks both trees and checks them against this file; modules/README.md explains it. In a file or directory name, {module_type}, {version}, {instance}, {model} and {category} stand for the enclosing directories' names.",
+  "description": "Every level of modules/ and system_models/: the directories and files each may hold, their name patterns, and the rules across levels. tests/test_structure.py walks both trees and checks them against this file; modules/README.md explains it. In a file or directory name, {module_type}, {version}, {parameterisation}, {model} and {category} stand for the enclosing directories' names.",
   "version": 1,
   "excluded": {
     "modules/poiseuille_transport": "another session's module in the pre-versions layout; moves to transport/ when that work is committed",
@@ -8,7 +8,7 @@
   },
   "generic_directory_names": [
     "versions",
-    "instances",
+    "parameterisations",
     "risk",
     "plots",
     "results",
@@ -92,46 +92,46 @@
         ]
       },
       "directories": [
-        "instances",
+        "parameterisations",
         "risk",
         "plots",
         "results"
       ],
       "required_directories": [
-        "instances"
+        "parameterisations"
       ]
     },
-    "instances": {
-      "description": "One directory per instance of the version.",
+    "parameterisations": {
+      "description": "One directory per parameterisation of the version.",
       "files": {
         "required": [],
         "optional": []
       },
       "directories": [
-        "instance"
+        "parameterisation"
       ],
       "min_children": 1
     },
-    "instance": {
-      "description": "One parameter set of the version (never different math). Named by its obs_data's obs_data_name; 'default' is the parameters a version has unless a model names another instance.",
+    "parameterisation": {
+      "description": "One parameter set of the version (never different math). Named by its obs_data's obs_data_name; 'default' is the parameters a version has unless a model names another parameterisation.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
-          "{instance}_parameters.csv"
+          "{parameterisation}_parameters.csv"
         ],
         "optional": [
-          "{instance}_obs_data.json",
-          "{instance}_params_for_id.csv",
-          "{instance}_calibrated_parameters.csv",
-          "{instance}_calibration.json",
+          "{parameterisation}_obs_data.json",
+          "{parameterisation}_params_for_id.csv",
+          "{parameterisation}_calibrated_parameters.csv",
+          "{parameterisation}_calibration.json",
           "SOURCES.md"
         ],
         "data_file_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(csv|json|txt|md)$",
         "generated": [
-          "{module_type}_{version}_{instance}.omex"
+          "{module_type}_{version}_{parameterisation}.omex"
         ],
         "ignored_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.omex$",
-        "generated_note": "Built by tools/build_instance_omex.py (make omex) from the files above and the version's files; not committed. A COMBINE archive for CUFLynx: the flattened model of the version's test network with this instance's parameters as master, the obs_data and params_for_id, and every input incl. the verification config."
+        "generated_note": "Built by tools/build_parameterisation_omex.py (make omex) from the files above and the version's files; not committed. A COMBINE archive for CUFLynx: the flattened model of the version's test network with this parameterisation's parameters as master, the obs_data and params_for_id, and every input incl. the verification config."
       },
       "parameters_columns": [
         "variable_name",
@@ -143,7 +143,7 @@
       "directories": [],
       "subdirectories": {
         "source_figures": {
-          "description": "Screenshots of the publication figures/tables the instance's data were extracted from (cropped PNG/JPG) and source_figures.json [{file, source, caption}]; required when the data came from a paper or book (modules/README.md, 'Source figures').",
+          "description": "Screenshots of the publication figures/tables the parameterisation's data were extracted from (cropped PNG/JPG) and source_figures.json [{file, source, caption}]; required when the data came from a paper or book (modules/README.md, 'Source figures').",
           "file_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(png|jpg|jpeg)$",
           "required": [
             "source_figures.json"
@@ -192,7 +192,7 @@
       ]
     },
     "system_model": {
-      "description": "One model: its module array (records name a module_type, a version as module_subtype, and an instance), parameters (which win over the instances'), spec, and under reference/ what it must reproduce: circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
+      "description": "One model: its module array (records name a module_type, a version as module_subtype, and a parameterisation), parameters (which win over the parameterisations'), spec, and under reference/ what it must reproduce: circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
@@ -221,17 +221,17 @@
   "rules": {
     "version_is_module_subtype": "A version directory's config file has exactly one entry, whose module_type is the module_type directory's name and whose module_subtype is the version directory's name.",
     "spec_files": "A version's spec is two files. {module_type}_{version}_verification_config.json holds what the checks run: the keys in spec_keys.verification_config. {module_type}_{version}_tests.yaml holds review and record-keeping: the keys in spec_keys.tests. module_type and version (equal to the directory names) are in both. Any other key, or a key in the wrong file, is an error.",
-    "default_instance_exists": "The config entry's default_instance names an instance directory of the version.",
-    "instance_is_obs_data_name": "An instance with an obs_data (and a validation obs_data) has \"obs_data_name\" equal to the instance directory's name.",
-    "unique_directory_names": "No category or module_type directory name appears twice in modules/, nested module_types included (the generic names above, version names, which repeat across module_types, and instance names, which name data sets, are exempt).",
+    "default_parameterisation_exists": "The config entry's default_parameterisation names a parameterisation directory of the version.",
+    "parameterisation_is_obs_data_name": "A parameterisation with an obs_data (and a validation obs_data) has \"obs_data_name\" equal to the parameterisation directory's name.",
+    "unique_directory_names": "No category or module_type directory name appears twice in modules/, nested module_types included (the generic names above, version names, which repeat across module_types, and parameterisation names, which name data sets, are exempt).",
     "category_is_not_module_type": "No category directory has the name of a module_type.",
     "nested_module_types": "A module_type's subdirectories other than versions/ are nested module_types. A nested module_type is used only within its parent: every supermodule submodule and every harness record (verification_config harness.module_array) that names it belongs to a version of its parent, of a module_type nested (at any depth) in its parent, or of itself. System models are exempt: they may wire a parent's parts explicitly (e.g. SN_simple_flat, 3compartment's chambers and valves).",
-    "placement": "A module_type is named after the mechanism it models, never after the cell, compartment, system or author it was built for (no surnames or years in type names). It sits in the most general category where its mechanism is meaningful (cell/Ca_handling; cell/ion_channels/<channel> for channels, pumps and exchangers), and is nested only when it is an anatomical part of its parent (cell/neuron/{soma,axon,varicosity}, heart/{chamber,valve,cardiac_clock}). A category exists only where no module_type of that meaning does. Modules of one mechanism built for different cells or compartments are versions (different maths) or instances (same maths, other values) of one type.",
+    "placement": "A module_type is named after the mechanism it models, never after the cell, compartment, system or author it was built for (no surnames or years in type names). It sits in the most general category where its mechanism is meaningful (cell/Ca_handling; cell/ion_channels/<channel> for channels, pumps and exchangers), and is nested only when it is an anatomical part of its parent (cell/neuron/{soma,axon,varicosity}, heart/{chamber,valve,cardiac_clock}). A category exists only where no module_type of that meaning does. Modules of one mechanism built for different cells or compartments are versions (different maths) or parameterisations (same maths, other values) of one type.",
     "version_names": "Versions are named <system>_<compartment>_<Source><Year>_vXX, <system>_<Source><Year>_vXX or <Source><Year>_vXX (Source: the first author's surname in ASCII CamelCase; ArgusUNPUBLISHED for the owner's unpublished or modified models), with _SI for an SI-unit duplicate and _OLD for a superseded formulation. Vessel versions keep their port letters first (pp, pv, vp, vv: libcuflynx reads a vessel's first two letters as its inlet/outlet port kinds) and their descriptive subtypes. No version starts with nn, except the pairs libcuflynx writes itself (nn_versions_allowed).",
-    "system_model_records_resolve": "Every record of a system model's module array names a (module_type, version) of the library and an instance that version has (records of modules not in this library are listed in the model's spec as known).",
-    "version_or_instance": "Different equations (a changed relation, state or port variable) make a version; the same equations with other parameter values make an instance of the existing version.",
+    "system_model_records_resolve": "Every record of a system model's module array names a (module_type, version) of the library and a parameterisation that version has (records of modules not in this library are listed in the model's spec as known).",
+    "version_or_parameterisation": "Different equations (a changed relation, state or port variable) make a version; the same equations with other parameter values make a parameterisation of the existing version.",
     "port_differences": "Versions of one module_type may expose different ports when the mechanism does not allow common ones (e.g. named-current vs summed-current membrane versions). This is allowed and documented: each such version's tests.yaml notes end with the type's port table ('Ports of the versions of <type>'). No check compares ports across versions.",
-    "required_citations": "Every version's config entry has \"required_citations\": a non-empty list of bib keys, each in the version's {module_type}_{version}_references.bib, naming the papers the version's model (its equations) is built on, as distinct from the per-parameter value sources in the instance CSVs' data_reference. \"required_citations_uncertain\" (optional, left out when empty) lists the keys among them that are a best guess still to confirm. Owner-original models cite placeholders (argus2026sympathetic, argus2026unpublished, gee2026unpublished) and generic mechanisms the software (argus2026circulatory). A supermodule lists its own; its report adds its submodules'.",
+    "required_citations": "Every version's config entry has \"required_citations\": a non-empty list of bib keys, each in the version's {module_type}_{version}_references.bib, naming the papers the version's model (its equations) is built on, as distinct from the per-parameter value sources in the parameterisation CSVs' data_reference. \"required_citations_uncertain\" (optional, left out when empty) lists the keys among them that are a best guess still to confirm. Owner-original models cite placeholders (argus2026sympathetic, argus2026unpublished, gee2026unpublished) and generic mechanisms the software (argus2026circulatory). A supermodule lists its own; its report adds its submodules'.",
     "bib_keys": "Every BibTeX key is <first author's surname><year><first significant title word>, lowercase ASCII (belluzzi1986quantitative; cam_testing.bib.convention_key): particles join the surname (vanderpol), accents and hyphens are dropped (hernandezcruz), stopwords (a, an, the, on, of, ...) are skipped. Two different papers with the same key take further title words. One key per paper. Entries without a year (undated web pages) are listed in tests/test_structure.py UNDATED_BIB_KEYS."
   },
   "spec_keys": {

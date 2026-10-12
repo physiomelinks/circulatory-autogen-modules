@@ -1,5 +1,5 @@
 """
-The module library on disk: module_types, their versions and each version's instances.
+The module library on disk: module_types, their versions and each version's parameterisations.
 
 Layout (modules/README.md and modules/directory_schema.json describe it in full):
 
@@ -7,20 +7,20 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
         <module_type>.html                          report across the versions (generated)
         versions/<version>/                         version == the config entry's module_subtype
             <module_type>_<version>_modules.cellml
-            <module_type>_<version>_modules_config.json   one entry; "default_instance"
+            <module_type>_<version>_modules_config.json   one entry; "default_parameterisation"
             <module_type>_<version>_units.cellml
             <module_type>_<version>_verification_config.json   what the checks run
             <module_type>_<version>_tests.yaml            review and record-keeping
             <module_type>_<version>_references.bib        (+ _references_proposed.bib)
             <module_type>_<version>.html                  version report (generated)
             risk/  plots/  results/                       (plots, results generated)
-            instances/<instance>/                         instance == obs_data_name
-                <instance>_parameters.csv                 variable_name,units,value,data_reference,sourced
-                <instance>_obs_data.json                  optional: calibration data (data_items) and
+            parameterisations/<p>/                        p == obs_data_name (a parameterisation)
+                <p>_parameters.csv                        variable_name,units,value,data_reference,sourced
+                <p>_obs_data.json                         optional: calibration data (data_items) and
                                                           held-out data (prediction_items with a value)
-                <instance>_params_for_id.csv              optional
-                <instance>_calibrated_parameters.csv      written by calibration (committed)
-                <instance>_calibration.json               written by calibration (committed)
+                <p>_params_for_id.csv                     optional
+                <p>_calibrated_parameters.csv             written by calibration (committed)
+                <p>_calibration.json                      written by calibration (committed)
 
 A module_type directory is any directory under modules/ with a versions/ subdirectory. A module_type
 may contain the module_types that only exist within it (nested module_types: its other
@@ -56,8 +56,13 @@ def __getattr__(name):
     raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
 
-VERSIONS, INSTANCES, DEFAULT_INSTANCE = 'versions', 'instances', 'default'
-SOURCE_FIGURES = 'source_figures'              # instance dir: screenshots of the data's publication figures
+VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameterisations', 'default'
+# a version's parameter sets were called instances (instances/, default_instance) before
+# 2026-10-09; "instance" now means one use of a version in a network. The old names are read too.
+LEGACY_PARAMETERISATIONS, LEGACY_DEFAULT_KEY = 'instances', 'default_instance'
+DEFAULT_KEY = 'default_parameterisation'
+INSTANCES, DEFAULT_INSTANCE = PARAMETERISATIONS, DEFAULT_PARAMETERISATION   # the former names
+SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
 # directories under modules/ that are not categories or module_types (another session's work in
 # the old layout, until it is moved)
@@ -289,12 +294,12 @@ CITATION_KEYS = ('required_citations', 'required_citations_uncertain')
 
 def with_record_keys(entry, licence=DEFAULT_LICENCE, creator=None):
     '''The entry with "licence" and "creator" (the defaults where missing; existing values kept),
-    placed after "default_instance" (or after the subtype key when it has none), other keys in order.'''
+    placed after "default_parameterisation" (or after the subtype key when it has none), other keys in order.'''
     values = {'licence': entry.get('licence', licence),
               'creator': list(entry.get('creator', creator if creator is not None else []))}
     rest = [(k, v) for k, v in entry.items() if k not in RECORD_KEYS]
     keys = [k for k, _ in rest]
-    anchor = next((k for k in ('default_instance', 'module_subtype', 'BC_type') if k in keys), None)
+    anchor = next((k for k in (DEFAULT_KEY, LEGACY_DEFAULT_KEY, 'module_subtype', 'BC_type') if k in keys), None)
     out = {}
     if anchor is None:
         out.update(values)
@@ -404,7 +409,7 @@ class Parameter:
 
 
 def read_parameters(path, kinds=None):
-    '''An instance's parameters (kind from the config's variables_and_units, where it has one).'''
+    '''A parameterisation's parameters (kind from the config's variables_and_units, where it has one).'''
     kinds = kinds or {}
     out = []
     if not os.path.isfile(path):
@@ -560,7 +565,7 @@ def misplaced_spec_keys(tests, verification):
 
 
 # ----------------------------------------------------------------------------------------------
-# module_type / version / instance
+# module_type / version / parameterisation
 # ----------------------------------------------------------------------------------------------
 
 @dataclass
@@ -634,13 +639,15 @@ class ModuleType:
 
 
 @dataclass
-class Instance:
+class Parameterisation:
+    '''A named parameter set of a version (same maths, its own values, data and set-ups):
+    <version>/parameterisations/<name>/. Formerly called an instance.'''
     version: 'Version'
     name: str
 
     @property
     def dir(self):
-        return os.path.join(self.version.dir, INSTANCES, self.name)
+        return os.path.join(self.version.parameterisations_dir, self.name)
 
     @property
     def key(self):
@@ -686,11 +693,11 @@ class Instance:
 
     @property
     def is_default(self):
-        return self.name == self.version.default_instance_name
+        return self.name == self.version.default_parameterisation_name
 
     @property
     def validation(self):
-        '''This instance's validation spec: {baseline: {...}, calibrate: {...}}.'''
+        '''This parameterisation's validation spec: {baseline: {...}, calibrate: {...}}.'''
         return ((self.version.spec.get('validation') or {}).get(self.name)) or {}
 
     @property
@@ -698,7 +705,7 @@ class Instance:
         return os.path.join(self.dir, SOURCE_FIGURES)
 
     def source_figures(self):
-        '''Screenshots of the publication figures/tables the instance's data were extracted from:
+        '''Screenshots of the publication figures/tables the parameterisation's data were extracted from:
         source_figures/source_figures.json lists [{"file", "source", "caption"}], file relative to
         source_figures/. Returned with file relative to the version directory.'''
         index = os.path.join(self.source_figures_dir, SOURCE_FIGURES_INDEX)
@@ -710,22 +717,22 @@ class Instance:
                 for e in entries]
 
     def needs_source_figures(self):
-        '''True when the instance's validation data were extracted from a publication (a paper or a
+        '''True when the parameterisation's validation data were extracted from a publication (a paper or a
         book): a validation entry with a source and source_kind "publication" (the default when a
         source is given; "dataset" and "synthetic" are exempt).'''
         return any(isinstance(e, dict) and e.get('source') and e.get('source_kind', 'publication') == 'publication'
                    for e in self.validation.values())
 
     def parameters(self):
-        '''The instance's own rows, then the version's globals, TODO values filled from review proposals.'''
+        '''The parameterisation's own rows, then the version's globals, TODO values filled from review proposals.'''
         return self.version._apply_proposals(read_parameters(self.parameters_path, self.version.kinds))
 
     @property
     def results_dir(self):
-        return os.path.join(self.version.results_dir, INSTANCES, self.name)
+        return os.path.join(self.version.results_dir, PARAMETERISATIONS, self.name)
 
     def data_files(self):
-        '''Every file of the instance except its parameters.'''
+        '''Every file of the parameterisation except its parameters.'''
         if not os.path.isdir(self.dir):
             return []
         return sorted(f for f in os.listdir(self.dir)
@@ -733,9 +740,12 @@ class Instance:
                       and f != SOURCE_FIGURES)   # .omex: generated
 
 
+Instance = Parameterisation   # the former name
+
+
 @dataclass
 class Version:
-    '''One version of a module_type: its config entry, spec and instances. It is what the tests
+    '''One version of a module_type: its config entry, spec and parameterisations. It is what the tests
     run (the old Module + Component in one).'''
     mtype: ModuleType
     name: str
@@ -878,46 +888,57 @@ class Version:
         return os.path.join(self.dir, 'risk')
 
     @property
-    def instances_dir(self):
-        return os.path.join(self.dir, INSTANCES)
+    def parameterisations_dir(self):
+        '''<version>/parameterisations/ (or a library still on the old layout's instances/).'''
+        new = os.path.join(self.dir, PARAMETERISATIONS)
+        old = os.path.join(self.dir, LEGACY_PARAMETERISATIONS)
+        return old if not os.path.isdir(new) and os.path.isdir(old) else new
 
-    # --- instances --------------------------------------------------------------------------
+    # --- parameterisations ------------------------------------------------------------------
     @property
-    def default_instance_name(self):
-        return self.config.get('default_instance') or DEFAULT_INSTANCE
+    def default_parameterisation_name(self):
+        return self.config.get(DEFAULT_KEY) or self.config.get(LEGACY_DEFAULT_KEY) or DEFAULT_PARAMETERISATION
 
-    def instance_names(self):
-        if not os.path.isdir(self.instances_dir):
+    def parameterisation_names(self):
+        root = self.parameterisations_dir
+        if not os.path.isdir(root):
             return []
-        names = sorted(d for d in os.listdir(self.instances_dir)
-                       if os.path.isdir(os.path.join(self.instances_dir, d)) and not d.startswith('.'))
-        # the default instance first
-        return sorted(names, key=lambda n: (n != self.default_instance_name, n.lower()))
+        names = sorted(d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d)) and not d.startswith('.'))
+        # the default parameterisation first
+        return sorted(names, key=lambda n: (n != self.default_parameterisation_name, n.lower()))
 
-    def instances(self):
-        return [Instance(self, n) for n in self.instance_names()]
+    def parameterisations(self):
+        return [Parameterisation(self, n) for n in self.parameterisation_names()]
 
-    def instance(self, name=None):
-        return Instance(self, name or self.default_instance_name)
+    def parameterisation(self, name=None):
+        return Parameterisation(self, name or self.default_parameterisation_name)
 
     @property
-    def default_instance(self):
-        return self.instance()
+    def default_parameterisation(self):
+        return self.parameterisation()
+
+    # the former names (instance = parameterisation)
+    instances_dir = parameterisations_dir
+    default_instance_name = default_parameterisation_name
+    instance_names = parameterisation_names
+    instances = parameterisations
+    instance = parameterisation
+    default_instance = default_parameterisation
 
     # --- parameters -------------------------------------------------------------------------
     @property
     def kinds(self):
         if self.is_supermodule:
-            # no variables_and_units: its instance rows are {var}_{submodule} or the declared globals
+            # no variables_and_units: its parameterisation rows are {var}_{submodule} or the declared globals
             return {g: 'global_constant' for g in self.supermodule_globals}
         return {v[0]: v[3].strip() for v in self.config.get('variables_and_units') or []}
 
     @functools.cached_property
     def _parameters(self):
-        return self.default_instance.parameters()
+        return self.default_parameterisation.parameters()
 
     def parameters(self):
-        '''The default instance's parameters: the version's own constants / BCs, then globals.'''
+        '''The default parameterisation's parameters: the version's own constants / BCs, then globals.'''
         return self._parameters
 
     def _apply_proposals(self, params):
@@ -957,7 +978,7 @@ class Version:
 
     @property
     def supermodule_globals(self):
-        '''The global constants a supermodule's instance may set (spec supermodule.globals).'''
+        '''The global constants a supermodule's parameterisation may set (spec supermodule.globals).'''
         return list((self.spec.get('supermodule') or {}).get('globals') or SUPERMODULE_DEFAULT_GLOBALS)
 
 
