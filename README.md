@@ -266,9 +266,9 @@ The reports open straight from disk. Plots load by relative path, and MathJax lo
 Every pull request is either a **module PR** or another PR, so a module review is a review of modules alone.
 
 - **Module PR**: the title starts with `Module:` (e.g. `Module: heart chamber review`). It changes only module content: the module versions under `modules/` (their CellML, configs, tests.yaml, parameterisations, data, references and results), the system models in `system_models/`, the manifests generated from them in `manifests/` and the review records in `reviews/`.
-- **Other PRs**: everything else (`cam_testing`, `tests/`, `tools/`, CI, documentation including `modules/README.md`, `modules/directory_schema.json`, the setup). No `Module:` prefix. A change of this kind found during a module review goes in a PR of its own, and the module PR follows it (merge it first, then merge `main` into the module PR).
+- **Other PRs**: everything else (`cam_testing`, `tests/`, `tools/`, CI, documentation including `modules/README.md`, `modules/directory_schema.json`, the setup), and no module content. No `Module:` prefix. A change of this kind found during a module review goes in a PR of its own, and the module PR follows it (merge it first, then merge `main` into the module PR).
 
-The `PR scope` workflow (`tools/pr_scope.py`) fails a module PR that changes anything else and lists the files to move; `python tools/pr_scope.py "<title>" origin/main` checks a branch locally.
+The `PR scope` workflow (`tools/pr_scope.py`) fails a module PR that changes anything but module content, and any other PR that changes module content, and lists the files to move; `python tools/pr_scope.py "<title>" origin/main` checks a branch locally.
 
 ## CI
 

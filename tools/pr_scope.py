@@ -4,12 +4,13 @@ A pull request is either a module PR or another PR (README "Pull requests").
 A module PR's title starts with "Module:" and it changes only module content, so its review is a
 review of modules alone: the library's module versions under modules/ (not modules/README.md or
 modules/directory_schema.json), the system models in system_models/, the manifests generated from
-them in manifests/ and the review records in reviews/. Every other change (cam_testing, tests, CI,
-tools, documentation, the schema, the setup) goes in a PR of its own, without the prefix.
+them in manifests/ and the review records in reviews/. Any other PR (no prefix) changes only the
+rest: cam_testing, tests, CI, tools, documentation, the schema, the setup.
 
     python tools/pr_scope.py "<PR title>" <base ref>     # changed files from git diff <base>...HEAD
 
-exits 1 and lists the files that don't belong when a module PR changes anything but module content.
+exits 1 and lists the files that don't belong: anything but module content in a module PR, module
+content in any other PR.
 '''
 import subprocess
 import sys
@@ -30,10 +31,9 @@ def is_module_content(path):
 
 def out_of_scope(title, paths):
     '''The changed paths a PR titled ``title`` may not change: for a module PR, every path that isn't
-    module content; nothing for any other PR.'''
-    if not is_module_pr(title):
-        return []
-    return sorted(p for p in paths if not is_module_content(p))
+    module content; for any other PR, every path that is.'''
+    module_pr = is_module_pr(title)
+    return sorted(p for p in paths if is_module_content(p) != module_pr)
 
 
 def changed_files(base):
@@ -48,16 +48,19 @@ def main(argv):
         return 2
     title, base = argv[1], argv[2]
     bad = out_of_scope(title, changed_files(base))
-    if not is_module_pr(title):
-        print(f'Not a module PR (the title doesn\'t start with "{MODULE_PREFIX}"): any files may change.')
-        return 0
+    content = f'module content ({", ".join(MODULE_DIRS)}, apart from {", ".join(NOT_MODULE_CONTENT)})'
+    if is_module_pr(title):
+        rule, ok = f'A module PR changes only {content}.', 'Module PR: every changed file is module content.'
+    else:
+        rule = (f'A PR whose title doesn\'t start with "{MODULE_PREFIX}" changes no {content}; '
+                f'module changes go in a module PR.')
+        ok = 'Not a module PR: no changed file is module content.'
     if bad:
-        print(f'A module PR changes only module content ({", ".join(MODULE_DIRS)}, apart from '
-              f'{", ".join(NOT_MODULE_CONTENT)}). Move these {len(bad)} file(s) to a PR of their own:')
+        print(f'{rule} Move these {len(bad)} file(s) to a PR of their own:')
         for p in bad:
             print(f'  {p}')
         return 1
-    print('Module PR: every changed file is module content.')
+    print(ok)
     return 0
 
 
