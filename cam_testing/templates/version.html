@@ -130,7 +130,7 @@
               {%- for p in t.plots %}<figure><img src="{{ p }}" alt="{{ t.title }} plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}
             </div>
             {%- endif %}
-            {%- if t.source_figures_missing %}<p class="muted" style="font-size:0.84rem"><strong>No source screenshot.</strong> This instance's data were extracted from a publication; add the figure or table to <code>source_figures/</code> (modules/README.md, "Source figures").</p>{% endif %}
+            {%- if t.source_figures_missing %}<p class="muted" style="font-size:0.84rem"><strong>No source screenshot.</strong> This parameterisation's data were extracted from a publication; add the figure or table to <code>source_figures/</code> (modules/README.md, "Source figures").</p>{% endif %}
             {%- if t.details %}
             <details><summary>{{ t.details|length }} detail{{ '' if t.details|length == 1 else 's' }}</summary><pre>{{ t.details|join('\n') }}</pre></details>
             {%- endif %}
@@ -234,11 +234,11 @@ window.addEventListener('DOMContentLoaded', function () {
       <li><a href="#overview"><span class="mono">Test overview</span></a></li>
       {%- if components[0].structure_view %}<li><a href="#{{ components[0].id }}-structure"><span class="mono">Structure</span></a></li>{% endif %}
       {%- if components[0].unit_consistency %}<li><a href="#unit-consistency"><span class="dot failed"></span><span class="mono">Unit consistency</span></a></li>{% endif %}
-      <li><a href="#instances"><span class="mono">Instances</span></a></li>
+      <li><a href="#parameterisations"><span class="mono">Parameterisations</span></a></li>
       {%- for t in components[0].tests %}
       <li><a href="#{{ components[0].id }}--{{ t.key }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ t.short }}</span></a></li>
       {%- endfor %}
-      {%- for i in components[0].instances %}{% for t in i.tests %}
+      {%- for i in components[0].parameterisations %}{% for t in i.tests %}
       <li><a href="#{{ t.anchor }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ i.name }}: {{ t.short }}</span></a></li>
       {%- endfor %}{% endfor %}
       {%- if bibliography %}<li><a href="#bibliography"><span class="mono">References</span></a></li>{% endif %}
@@ -256,7 +256,7 @@ window.addEventListener('DOMContentLoaded', function () {
       </ul>
       <div class="meta">
         <span><a href="{{ module_type_href }}">All versions of {{ module_type }}</a></span>
-        <span class="num">{{ components[0].instances|length }} instance{{ '' if components[0].instances|length == 1 else 's' }}</span>
+        <span class="num">{{ components[0].parameterisations|length }} parameterisation{{ '' if components[0].parameterisations|length == 1 else 's' }}</span>
         <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
         <span title="The config entry's licence (SPDX id)">Licence: {% if licence_url %}<a href="{{ licence_url }}">{{ licence }}</a>{% else %}<span class="todo">{{ licence or 'not set' }}</span>{% endif %}</span>
         <span title="The config entry's creator list">{% if creators %}Creator{{ 's' if creators|length > 1 }}: {{ creators|join(', ') }}{% else %}<span class="todo">Creator: not set (to be given in review)</span>{% endif %}</span>
@@ -370,15 +370,15 @@ window.addEventListener('DOMContentLoaded', function () {
       {%- if c.structure_view %}{% set sv = c.structure_view %}
       <div class="block" id="{{ c.id }}-structure">
         <h3>Structure</h3>
-        <p class="muted" style="margin:0;font-size:0.84rem">The parts of this supermodule version and how they connect. In a model, each part becomes <code>&lt;record name&gt;_&lt;part&gt;</code>; the instance's parameters are renamed the same way. Precedence: the model's parameters file, then this version's instance, then each part's instance. Solid arrows are the internal connections (<code>inp_instances</code> / <code>out_instances</code>, and a part's <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code> naming a sibling, labelled <code>part/inner part</code>), with the port types the configs connect{% if not sv.labelled %} (listed in the table: too many connections to label){% endif %}; dashed boxes are the modules outside that couple to a part, from the supermodule versions and system models that use this one. Click a part to open its version page.</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">The parts of this supermodule version and how they connect. In a model, each part becomes <code>&lt;record name&gt;_&lt;part&gt;</code>; the parameterisation's parameters are renamed the same way. Precedence: the model's parameters file, then this version's parameterisation, then each part's parameterisation. Solid arrows are the internal connections (<code>inp_instances</code> / <code>out_instances</code>, and a part's <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code> naming a sibling, labelled <code>part/inner part</code>), with the port types the configs connect{% if not sv.labelled %} (listed in the table: too many connections to label){% endif %}; dashed boxes are the modules outside that couple to a part, from the supermodule versions and system models that use this one. Click a part to open its version page.</p>
         <div class="diagram"><pre class="mermaid">{{ sv.mermaid }}</pre></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Part</th><th>module_type</th><th>Version</th><th>Instance</th><th>Ports</th><th>Connections</th><th>Set by this supermodule's instance</th><th>Globals shared</th></tr></thead>
+          <thead><tr><th>Part</th><th>module_type</th><th>Version</th><th>Parameterisation</th><th>Ports</th><th>Connections</th><th>Set by this supermodule's parameterisation</th><th>Globals shared</th></tr></thead>
           <tbody>
           {%- for p in sv.parts %}
             <tr><td class="mono">{{ p.name }}</td><td class="mono">{{ p.module_type }}</td>
             <td class="mono">{% if p.href %}<a href="{{ p.href }}">{{ p.version }}</a>{% else %}{{ p.version }} <span class="todo">(not in the library)</span>{% endif %}{% if p.is_supermodule %}<br><span class="muted">supermodule, {{ p.n_parts }} parts</span>{% endif %}</td>
-            <td class="mono">{{ p.instance }}</td>
+            <td class="mono">{{ p.parameterisation }}</td>
             <td class="mono" style="font-size:0.78rem">{% if p.is_supermodule %}<span class="muted">its parts' (see its page)</span>{% else %}{{ p.ports|join('; ') or '—' }}{% endif %}</td>
             <td class="mono" style="font-size:0.78rem">
               {%- for e in p.inputs %}← {{ e.label }}{% if e.ports %} <span class="muted">({{ e.ports|join(', ') }})</span>{% endif %}<br>{% endfor %}
@@ -390,7 +390,7 @@ window.addEventListener('DOMContentLoaded', function () {
           {%- endfor %}
           </tbody>
         </table></div>
-        <p class="muted" style="margin:0;font-size:0.84rem">Globals of this supermodule (<code>supermodule.globals</code>): {{ sv.globals|join(', ') or 'none' }}{% if sv.global_rows %}; set by its instance: {% for g in sv.global_rows %}<code>{{ g.name }} = {{ g.value }}</code>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. "Set by this supermodule's instance" lists its instance's rows <code>&lt;var&gt;_&lt;part&gt;</code>, which override the part's own instance.</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">Globals of this supermodule (<code>supermodule.globals</code>): {{ sv.globals|join(', ') or 'none' }}{% if sv.global_rows %}; set by its parameterisation: {% for g in sv.global_rows %}<code>{{ g.name }} = {{ g.value }}</code>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. "Set by this supermodule's parameterisation" lists its parameterisation's rows <code>&lt;var&gt;_&lt;part&gt;</code>, which override the part's own parameterisation.</p>
         {%- if sv.external %}
         <p class="muted" style="margin:0;font-size:0.84rem">Outside couplings: {% for x in sv.external %}<code>{{ x.part }} {{ '←' if x.direction == 'in' else '→' }} ‹{{ x.external }}›</code>{% if not loop.last %}, {% endif %}{% endfor %}.</p>
         {%- else %}
@@ -536,13 +536,13 @@ window.addEventListener('DOMContentLoaded', function () {
         </table></div>
       </div>
 
-      <div class="block" id="instances">
-        <h3>Instances</h3>
-        <p class="muted" style="margin:0;font-size:0.84rem">An instance is a parameter set of this version (never different math), in <code>instances/&lt;instance&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. The verification tests above run at the default instance's parameters; validation runs per instance, for whatever data the instance has. An instance without obs_data is N/A for calibration ("no calibration data in this instance") and stays usable in models; the version's Calibration column fails when no instance has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the instance's parameters, its obs_data and params_for_id, and every input file including the verification config: open it in CUFLynx to investigate the instance.</p>
+      <div class="block" id="parameterisations">
+        <h3>Parameterisations</h3>
+        <p class="muted" style="margin:0;font-size:0.84rem">A parameterisation is a parameter set of this version (the same maths, other values, with its own data and calibration), in <code>parameterisations/&lt;parameterisation&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. Each use of the version in a network (an instance: a module-array record) names the parameterisation it uses, by default the version's <code>default_parameterisation</code>. The verification tests above run at the default parameterisation's parameters; validation runs per parameterisation, for whatever data it has. A parameterisation without obs_data is N/A for calibration ("no calibration data in this parameterisation") and stays usable in models; the version's Calibration column fails when no parameterisation has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the parameterisation's parameters, its obs_data and params_for_id, and every input file including the verification config: open it in CUFLynx to investigate the parameterisation.</p>
         <div class="table-wrap"><table>
-          <thead><tr><th>Instance</th><th>Parameters</th><th>Data files</th><th>CUFLynx archive</th><th>Baseline</th><th>Calibration</th><th>Calibrated values</th></tr></thead>
+          <thead><tr><th>Parameterisation</th><th>Parameters</th><th>Data files</th><th>CUFLynx archive</th><th>Baseline</th><th>Calibration</th><th>Calibrated values</th></tr></thead>
           <tbody>
-          {%- for i in c.instances %}
+          {%- for i in c.parameterisations %}
             <tr><td class="mono">{{ i.name }}{% if i.is_default %} <span class="muted">(default)</span>{% endif %}</td>
             <td class="mono num">{{ i.n_parameters }}</td>
             <td class="mono" style="white-space:normal;font-size:0.78rem">{{ i.files|join(', ') or '—' }}</td>
@@ -553,8 +553,8 @@ window.addEventListener('DOMContentLoaded', function () {
           {%- endfor %}
           </tbody>
         </table></div>
-        {%- for i in c.instances %}{% for t in i.tests %}
-        {%- if t.status not in (none, 'not_applicable') or t.message != 'no baseline data in this instance' %}
+        {%- for i in c.parameterisations %}{% for t in i.tests %}
+        {%- if t.status not in (none, 'not_applicable') or t.message not in ('no baseline data in this parameterisation', 'no baseline data in this instance') %}
         <h4 style="margin:8px 0 0">{{ i.name }}</h4>
         {{ test_article(c, t, t.anchor) }}
         {%- endif %}

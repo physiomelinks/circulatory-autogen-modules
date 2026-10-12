@@ -13,7 +13,7 @@
     },
     {
       "description": "charge per period: over the first two full periods the integral of i equals 2 (-stim_flag i_amplitude pulse_duration) to within one output step of samples (trapezoid)",
-      "expr": "(t_start + 2*period > t[-1]) or (t_end < t_start + 2*period) or (abs(np.trapz(np.where((t >= t_start) & (t < t_start + 2*period), i, 0.0), t) - 2*(-stim_flag*i_amplitude*pulse_duration)) <= 2*stim_flag*abs(i_amplitude)*(t[1] - t[0]) + 1e-15)"
+      "expr": "(t_start + 2*period > t[-1]) or (t_end < t_start + 2*period) or (abs(np.trapezoid(np.where((t >= t_start) & (t < t_start + 2*period), i, 0.0), t) - 2*(-stim_flag*i_amplitude*pulse_duration)) <= 2*stim_flag*abs(i_amplitude)*(t[1] - t[0]) + 1e-15)"
     }
   ],
   "bc_sweep": {

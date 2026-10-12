@@ -705,9 +705,9 @@ Vol_ER = Vol*c_ER;-->
         <variable name="kon_l_RyR" public_interface="in" units="per_millimolar_per_s"/>
         <variable name="koff_l_RyR" public_interface="in" units="per_s"/>
         <variable name="N_l_RyR" public_interface="in" units="dimensionless"/>
-        <variable name="a_RyR_init" public_interface="in" units="dimensionless"/>
-        <variable name="i_RyR_init" public_interface="in" units="dimensionless"/>
-        <variable name="l_RyR_init" public_interface="in" units="dimensionless"/>
+        <variable name="a_RyR_init" public_interface="out" units="dimensionless"/>
+        <variable name="i_RyR_init" public_interface="out" units="dimensionless"/>
+        <variable name="l_RyR_init" public_interface="out" units="dimensionless"/>
         <variable name="a_RyR" public_interface="out" units="dimensionless" initial_value="a_RyR_init"/>
         <variable name="i_RyR" public_interface="out" units="dimensionless" initial_value="i_RyR_init"/>
         <variable name="l_RyR" public_interface="out" units="dimensionless" initial_value="l_RyR_init"/>
@@ -727,6 +727,9 @@ Vol_ER = Vol*c_ER;-->
         <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>j_RyR</ci><apply><times/><ci>k_RyR</ci><ci>P_RyR</ci><apply><minus/><ci>Ca_ER</ci><ci>Cai</ci></apply></apply></apply></math>
         <!-- steady-state occupancies at the current Cai, Ca_ER: kon C / (kon C + koff) -->
         <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>a_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><ci>koff_a_RyR</ci></apply></apply></apply><apply><eq/><ci>i_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><ci>koff_i_RyR</ci></apply></apply></apply><apply><eq/><ci>l_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><apply><plus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><ci>koff_l_RyR</ci></apply></apply></apply></math>
+        <!-- starting occupancies: the steady state at the starting Ca (Cai_init, Ca_ER_init); a computed initial value,
+             so libCellML's Python/C generators reject the model (CVODE/Myokit runs it) -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>a_RyR_init</ci><apply><divide/><apply><times/><ci>kon_a_RyR</ci><ci>Cai_init</ci></apply><apply><plus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai_init</ci></apply><ci>koff_a_RyR</ci></apply></apply></apply><apply><eq/><ci>i_RyR_init</ci><apply><divide/><apply><times/><ci>kon_i_RyR</ci><ci>Cai_init</ci></apply><apply><plus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai_init</ci></apply><ci>koff_i_RyR</ci></apply></apply></apply><apply><eq/><ci>l_RyR_init</ci><apply><divide/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER_init</ci></apply><apply><plus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER_init</ci></apply><ci>koff_l_RyR</ci></apply></apply></apply></math>
         <!-- Ca concentration calculations in each region-->
         <variable name="Cai_init" public_interface="in" units="millimolar"/>
         <variable initial_value="Cai_init" name="Cai" public_interface="out" units="millimolar"/>

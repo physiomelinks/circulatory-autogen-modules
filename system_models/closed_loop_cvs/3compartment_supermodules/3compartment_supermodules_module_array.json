@@ -1,9 +1,9 @@
 [
- {"name": "pvn", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["par"], "out_instances": ["heart", "volume_sum"]},
- {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "instance": "default", "inp_instances": ["heart"], "out_instances": ["pvn", "volume_sum"]},
- {"name": "aortic_root", "module_type": "arterial_simple", "module_subtype": "vv", "instance": "default", "inp_instances": ["heart"], "out_instances": ["systemic_T", "volume_sum"]},
- {"name": "systemic_T", "module_type": "terminal", "module_subtype": "pp_spec_I", "instance": "default", "inp_instances": ["aortic_root"], "out_instances": ["venous_svc", "volume_sum"]},
- {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "instance": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]},
- {"name": "volume_sum", "module_type": "volume_sum", "module_subtype": "ArgusUNPUBLISHED_v01", "instance": "default", "inp_instances": ["pvn", "par", "heart", "aortic_root", "systemic_T", "venous_svc"], "out_instances": []},
- {"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "instance": "default", "per_submodule_inputs": {"ra": ["venous_svc"], "la": ["pvn"]}, "per_submodule_outputs": {"puv": ["par"], "aov": ["aortic_root"], "ra": ["volume_sum"], "rv": ["volume_sum"], "la": ["volume_sum"], "lv": ["volume_sum"]}}
+ {"name": "pvn", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["par"], "out_instances": ["heart", "volume_sum"]},
+ {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["heart"], "out_instances": ["pvn", "volume_sum"]},
+ {"name": "aortic_root", "module_type": "arterial_simple", "module_subtype": "vv", "parameterisation": "default", "inp_instances": ["heart"], "out_instances": ["systemic_T", "volume_sum"]},
+ {"name": "systemic_T", "module_type": "terminal", "module_subtype": "pp_spec_I", "parameterisation": "default", "inp_instances": ["aortic_root"], "out_instances": ["venous_svc", "volume_sum"]},
+ {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]},
+ {"name": "volume_sum", "module_type": "volume_sum", "module_subtype": "ArgusUNPUBLISHED_v01", "parameterisation": "default", "inp_instances": ["pvn", "par", "heart", "aortic_root", "systemic_T", "venous_svc"], "out_instances": []},
+ {"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default", "per_submodule_inputs": {"ra": ["venous_svc"], "la": ["pvn"]}, "per_submodule_outputs": {"puv": ["par"], "aov": ["aortic_root"], "ra": ["volume_sum"], "rv": ["volume_sum"], "la": ["volume_sum"], "lv": ["volume_sum"]}}
 ]

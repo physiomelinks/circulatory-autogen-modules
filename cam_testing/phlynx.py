@@ -4,8 +4,9 @@ library, exported as PhLynx's CUFLynx .omex, imported into CUFLynx and simulated
 does CUFLynx's run reproduce the model libcuflynx builds from the same test network?
 
 Two bridges, each running the real application code from a checkout:
-  tools/phlynx_bridge/export_omex.mjs    PhLynx's JS under node + jsdom (PHLYNX_DIR)
-  tools/cuflynx_bridge/simulate_omex.py  a released CUFLynx binary (CUFLYNX_BIN, default
+  cam_testing/bridges/phlynx/export_omex.mjs    PhLynx's JS under node + jsdom (PHLYNX_DIR; jsdom
+                                                 installed next to it, or JSDOM_DIR)
+  cam_testing/bridges/cuflynx/simulate_omex.py  a released CUFLynx binary (CUFLYNX_BIN, default
                                          ~/software/CUFLynx; CI downloads the latest Ubuntu
                                          release) driven over its HTTP API
 
@@ -25,12 +26,13 @@ import tempfile
 import numpy as np
 
 from cam_testing import harness, module_array
-from cam_testing.library import MODULES_DIR
+from cam_testing import paths
 
-REPO_DIR = os.path.dirname(MODULES_DIR)
-PHLYNX_BRIDGE = os.path.join(REPO_DIR, 'tools', 'phlynx_bridge', 'export_omex.mjs')
-CUFLYNX_BRIDGE = os.path.join(REPO_DIR, 'tools', 'cuflynx_bridge', 'simulate_omex.py')
-SIBLINGS = os.path.dirname(REPO_DIR)
+# shipped with the package (package data), so they work from an installed cam_testing too
+BRIDGES_DIR = os.path.join(paths.PACKAGE_DIR, 'bridges')
+PHLYNX_BRIDGE_DIR = os.path.join(BRIDGES_DIR, 'phlynx')
+PHLYNX_BRIDGE = os.path.join(PHLYNX_BRIDGE_DIR, 'export_omex.mjs')
+CUFLYNX_BRIDGE = os.path.join(BRIDGES_DIR, 'cuflynx', 'simulate_omex.py')
 
 
 class PipelineUnavailable(Exception):
@@ -38,7 +40,7 @@ class PipelineUnavailable(Exception):
 
 
 def phlynx_dir():
-    d = os.path.abspath(os.environ.get('PHLYNX_DIR') or os.path.join(SIBLINGS, 'phlynx'))
+    d = os.path.abspath(os.environ.get('PHLYNX_DIR') or os.path.join(os.path.dirname(paths.roots().repo_root), 'phlynx'))
     if not os.path.isfile(os.path.join(d, 'src', 'utils', 'cellml.js')):
         raise PipelineUnavailable(f'no PhLynx checkout at {d} (set PHLYNX_DIR)')
     if not os.path.isdir(os.path.join(d, 'node_modules', 'libcellml.js')):
@@ -57,7 +59,7 @@ def library_files():
     '''Every version's CellML, units and config: a harness can use neighbours from other module_types.'''
     cellml, units, configs = [], [], []
     from cam_testing.library import all_versions
-    for v in all_versions():
+    for v in all_versions(include_libraries=True):
         cellml += [p for p in [v.cellml_path] if os.path.isfile(p)]
         units += [p for p in [v.units_path] if os.path.isfile(p)]
         configs.append(v.config_path)
@@ -80,11 +82,39 @@ def component_job(component, work_dir):
                   'inp_instances': ' '.join(r.get('inp_instances', [])),
                   'out_instances': ' '.join(r.get('out_instances', []))} for r in records]
     params = [{k: (v or '') for k, v in r.items()} for r in _read_csv(os.path.join(res, f'{prefix}_parameters.csv'))]
+    params += _neighbour_parameters(records, {p['variable_name'] for p in params})
     spec = component.spec
     extra = [harness.output_name(o) for o in (spec.get('outputs') or [])]
     return {'id': component.id, 'instances': instances, 'parameters': params, 'extra_outputs': extra,
             'sim_time': float(spec.get('sim_time', 1.0)), 'dt': float(spec.get('dt', 0.01)),
             'resources': res, 'prefix': prefix}
+
+
+def _neighbour_parameters(records, have):
+    '''
+    The harness neighbours' parameterisations' parameters, named as libcuflynx names them ({var}_{name};
+    globals unsuffixed). libcuflynx reads a neighbour's values from its parameterisation in the library;
+    PhLynx only gets the parameters it is given, so without these a neighbour's constants are
+    empty (e.g. i_CaL's V_den_c, and its computed c_init divides by zero in CUFLynx).
+    Names already in ``have`` (the version's own rows and the harness's) win.
+    '''
+    from cam_testing.library import load_version
+    rows = []
+    for r in records:
+        if r['name'] == harness.VESSEL:
+            continue
+        try:
+            version = load_version(r['module_type'], r['module_subtype'])
+        except (OSError, ValueError):
+            continue
+        for p in version.parameterisation(module_array.parameterisation_of(r)).parameters():
+            name = p.variable_name if p.is_global else f'{p.variable_name}_{r["name"]}'
+            if name in have or p.is_todo:
+                continue
+            rows.append({'variable_name': name, 'units': p.units, 'value': str(p.value),
+                         'data_reference': p.data_reference or ''})
+            have.add(name)
+    return rows
 
 
 def _node():
@@ -224,12 +254,23 @@ EQUIVALENCE_TOL = 1e-6
 SOLVER_INFO = {'rtol': 1e-10, 'atol': 1e-12}
 
 
-CPP_REASON = ('C++ 1D-solver component (module_format cpp): PhLynx builds CellML models only, so it has no '
-              'PhLynx/CUFLynx form')
+CPP_REASON = ('C++ coupling component (module_format cpp, or external_api over named pipes, e.g. the 1D solver\'s '
+              'FV1D_vessel and FV1D_solver): PhLynx builds CellML models only, so it has no PhLynx/CUFLynx form')
+
+
+EXTERNAL_REASON = ('external Python model (module_format external_api, api transport python, e.g. a FEniCS model): '
+                   'PhLynx builds CellML models only, '
+                   'so it has no PhLynx/CUFLynx form')
 
 
 def _cpp(component):
-    return component.config.get('module_format', 'cellml') == 'cpp'
+    """Not a CellML component (a C++ 1D-solver marker or an external model): PhLynx can't build it."""
+    return component.config.get('module_format', 'cellml') in ('cpp', 'external_api')
+
+
+def _reason(component):
+    python = (component.config.get('api') or {}).get('transport') == 'python'
+    return EXTERNAL_REASON if component.config.get('module_format') == 'external_api' and python else CPP_REASON
 
 
 # PhLynx (src/) has no notion of a supermodule: its configs are CellML modules, so a version of
@@ -243,7 +284,7 @@ NO_SUPERMODULE_SUPPORT = ('PhLynx has no supermodule support: it builds models f
 def export_check(component, res):
     from cam_testing.checks import FAILED, NOT_APPLICABLE, PASSED, Result
     if _cpp(component):
-        return Result('phlynx_export_test', NOT_APPLICABLE, CPP_REASON)
+        return Result('phlynx_export_test', NOT_APPLICABLE, _reason(component))
     if component.is_supermodule:
         return Result('phlynx_export_test', FAILED, NO_SUPERMODULE_SUPPORT,
                       details=[f'submodules: {", ".join(component.submodule_names)}'])
@@ -271,7 +312,7 @@ def export_check(component, res):
 def simulate_check(component, res):
     from cam_testing.checks import FAILED, NOT_APPLICABLE, PASSED, SKIPPED, Result
     if _cpp(component):
-        return Result('cuflynx_simulate_test', NOT_APPLICABLE, CPP_REASON)
+        return Result('cuflynx_simulate_test', NOT_APPLICABLE, _reason(component))
     if component.is_supermodule:
         return Result('cuflynx_simulate_test', SKIPPED, 'no .omex: the PhLynx export failed (PhLynx has no supermodule support)')
     if not ((res or {}).get('export') or {}).get('ok'):
@@ -298,7 +339,7 @@ def equivalence_check(component, res, work_dir):
     from cam_testing import system as systems
     from cam_testing.checks import FAILED, NOT_APPLICABLE, PASSED, SKIPPED, Result
     if _cpp(component):
-        return Result('phlynx_equivalence_test', NOT_APPLICABLE, CPP_REASON)
+        return Result('phlynx_equivalence_test', NOT_APPLICABLE, _reason(component))
     if component.is_supermodule:
         return Result('phlynx_equivalence_test', SKIPPED, 'no CUFLynx run to compare (PhLynx has no supermodule support)')
     cf = (res or {}).get('cuflynx') or {}

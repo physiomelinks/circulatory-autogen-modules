@@ -84,7 +84,7 @@
   "invariants": [
     {
       "description": "mass balance: C_P(t_end) - C_P(0) = integral of (sum of face fluxes + flux_c)/V_P + M_reduced dt (trapezoid; 1e-3 of the total change plus 1e-8 of |C_P|)",
-      "expr": "abs((C_P[-1] - C_P[0]) - np.trapz(((fN__J_down + fW__J_down + fS__J_up + fE__J_up) + flux_c)/V_P + M*C_P/(C_P + C50), t)) <= 1e-3*np.ptp(C_P) + 1e-8*np.max(np.abs(C_P)) + 1e-15"
+      "expr": "abs((C_P[-1] - C_P[0]) - np.trapezoid(((fN__J_down + fW__J_down + fS__J_up + fE__J_up) + flux_c)/V_P + M*C_P/(C_P + C50), t)) <= 1e-3*np.ptp(C_P) + 1e-8*np.max(np.abs(C_P)) + 1e-15"
     },
     {
       "applies": "run",
