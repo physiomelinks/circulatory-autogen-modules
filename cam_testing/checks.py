@@ -191,6 +191,9 @@ class ComponentModel(object):
     def __init__(self, component, work_dir=None, parameterisation=None, instance=None):
         self.component = component
         self.parameterisation = parameterisation or instance or component.default_parameterisation
+        # the test network: the version's own for the version tests (no parameterisation given), else the
+        # parameterisation's (validation.<p>.harness) if it has one -- even for the default parameterisation
+        self._network_of = parameterisation or instance
         self.spec = component.spec
         self.work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_{component.id}_')
         self._model_path = None
@@ -222,7 +225,7 @@ class ComponentModel(object):
                 pass
         # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
         # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
-        for name, _units, value, *_ref in harness.network(self.component, self.parameterisation).get('parameters') or []:
+        for name, _units, value, *_ref in harness.network(self.component, self._network_of).get('parameters') or []:
             if name not in nominal:
                 nominal[name] = float(value)
                 var_of[name] = name
@@ -257,7 +260,7 @@ class ComponentModel(object):
                 raise self._generation_error          # don't regenerate a model that failed to generate
             try:
                 self._model_path = harness.generate(self.component, self.work_dir, parameters=self._parameterisation_params(),
-                                                    parameterisation=self.parameterisation)
+                                                    parameterisation=self._network_of)
             except harness.GenerationFailed as e:
                 self._generation_error = e
                 raise
@@ -280,7 +283,7 @@ class ComponentModel(object):
 
     def generate(self, work_dir, **kw):
         '''Another model of this version at this parameterisation's parameters (e.g. a python model).'''
-        return harness.generate(self.component, work_dir, parameters=self._parameterisation_params(), parameterisation=self.parameterisation, **kw)
+        return harness.generate(self.component, work_dir, parameters=self._parameterisation_params(), parameterisation=self._network_of, **kw)
 
     def run_point_params(self):
         '''The spec's run_parameters as simulation-helper overrides ({'parameters/<name>': value}).'''

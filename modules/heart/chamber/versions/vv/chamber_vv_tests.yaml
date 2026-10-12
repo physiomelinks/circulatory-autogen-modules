@@ -10,7 +10,13 @@ notes: 'Heart chamber with the time-varying elastance of Liang et al. 2009 (MBEC
   limited to a step well below the clock''s start window (eps_1 = 7 % of a beat) when nothing else in the model limits its
   step: without a cap, from the second beat systole lasted 0.1 s too long and the beats drifted (the maths, integrated
   with a fine fixed step, is exact). The spec uses MaximumStep 1 ms; the closed-loop system models are unaffected (their
-  vessels and valves already keep CVODE''s step small).'
+  vessels and valves already keep CVODE''s step small).
+  Parameterisations (review 2026-10-12): lv (the default), rv, la and ra, from Liang 2009 Table 2 (E_A, E_B, T_cp, T_rp,
+  t_c; mmHg/ml converted at 133.322368e6 J/m^6) and Korakianitis & Shi 2006 Table 1 (unstressed volumes V_x,0 = q_us).
+  lv starts at its end-diastolic volume (Liang Fig. 4e, digitised), the others at their unstressed volumes.
+  **Departure from Liang 2009: the chamber pressure omits the viscoelastic term S dV/dt of Liang Eq. 9 (S = P x 0.0005
+  s/ml), as the circulatory_autogen model does, so the pressure differs from Liang''s where dV/dt is large (ejection and
+  rapid filling).**'
 expected_failures:
   verification_test_timestep: 'the phase rate dchi/dt switches discontinuously (contraction, relaxation, diastole and the
     clock gate), so fixed-step RK4 converges at first order across a switch (observed order 0.62 < 0.8); a property of

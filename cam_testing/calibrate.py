@@ -170,13 +170,22 @@ def validation_view(obs):
     return {'protocol_info': obs['protocol_info'], 'data_items': held or obs['data_items']}
 
 
+def output_of(operand):
+    """The model output an obs_data operand names: the version's own "mod/x" is "x"; a test-network
+    neighbour's "record/x" stays "record/x" (what harness.run is asked for; it returns it as
+    harness.output_key, "record__x"), so that two records' variables of one name (an LV's and an
+    aorta's pressure u) stay apart."""
+    record, var = operand.split('/', 1)
+    return var if record == harness.VESSEL else operand
+
+
 def series_from_obs_data(obs):
-    """{variable: (t, values)} from the series items of an obs_data dict."""
+    """{output: (t, values)} from the series items of an obs_data dict (output_of)."""
     out = {}
     for item in obs['data_items']:
         if item.get('data_type') != 'series':
             continue
-        var = item['operands'][0].split('/', 1)[1]
+        var = output_of(item['operands'][0])
         values = np.asarray(item['value'], dtype=float)
         out[var] = (np.arange(len(values)) * float(item['obs_dt']), values)
     return out
@@ -223,7 +232,10 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
         best = np.asarray(pid.get_best_param_vals(), dtype=float).ravel()
         cost = getattr(getattr(pid, 'param_id', None), 'best_cost', None)
         constants = _constant_features(pid.param_id, best) if multi_segment(obs) else None
-    cal = {p['param_name']: float(val) for p, val in zip(params_for_id, best)}
+    # the version's own parameters by name; a test-network neighbour's (e.g. a validation loop's
+    # afterload) as '<record>/<param>'
+    cal = {(p['param_name'] if p['vessel_name'] == harness.VESSEL else f"{p['vessel_name']}/{p['param_name']}"): float(val)
+           for p, val in zip(params_for_id, best)}
     return cal, inp['param_id_method'], (float(cost) if cost is not None and np.isfinite(cost) else None), constants
 
 
@@ -275,6 +287,15 @@ def _z(model_value, item):
             'z': abs(model_value - float(item['value'])) / float(item['std'])}
 
 
+def _model_name(key, by_var):
+    """A calibrated value's parameter name in the generated model: the version's own
+    (harness.parameter_name), or a neighbour's '<record>/<param>' as libcuflynx names it, <param>_<record>."""
+    if '/' in key:
+        record, name = key.split('/', 1)
+        return f'{name}_{record}'
+    return harness.parameter_name(by_var[key])
+
+
 def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     """Scores of the calibrated model against the validation obs_data: series items by
     ``metric`` (calibration and prediction windows), constant items as |model - value| / std
@@ -300,18 +321,18 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     series = series_from_obs_data(val_obs)
     t_end = float(val_obs['protocol_info']['sim_times'][0][-1])
     dts = [float(i['obs_dt']) for i in val_obs['data_items'] if i.get('data_type') == 'series']
-    wanted = sorted(set(series) | {op.split('/', 1)[1] for i in constants for op in i['operands']})
+    wanted = sorted(set(series) | {output_of(op) for i in constants for op in i['operands']})
     pre = float(val_obs['protocol_info'].get('pre_times', [0.0])[0])   # e.g. reach periodic steady state first
     run_spec = dict(cm.spec, sim_time=t_end, pre_time=pre, dt=min(dts + [float(cm.spec['dt'])]))
     helper = harness.simulation_helper(cm.model_path, run_spec, solver_info={'rtol': 1e-8, 'atol': 1e-10})
-    overrides = {'parameters/' + harness.parameter_name(by_var[k]): val for k, val in calibrated.items()}
+    overrides = {'parameters/' + _model_name(k, by_var): val for k, val in calibrated.items()}
     tm, out = harness.run(helper, wanted, params=overrides)
 
     metric = v.get('metric', 'log_rmse')
     pred_window = v.get('prediction_window')
     cal_scores, pred_scores, z_scores = {}, {}, {}
     for var, (t, d) in series.items():
-        m_at = np.interp(t, tm, out[var])
+        m_at = np.interp(t, tm, out[harness.output_key(var)])
         in_cal = t <= cal_end + 1e-9
         cal_scores[var] = score(metric, m_at[in_cal], d[in_cal])
         if pred_window:
@@ -319,7 +340,7 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
             pred_scores[var] = score(metric, m_at[in_pred], d[in_pred])
     ops = get_operation_funcs_dict_for_mode('numpy')
     for item in constants:
-        args = [out[op.split('/', 1)[1]] for op in item['operands']]
+        args = [out[harness.output_key(output_of(op))] for op in item['operands']]
         op = item.get('operation')
         model_value = float(ops[op](*args)) if op else float(args[0][-1])
         z_scores[item['data_item_name']] = _z(model_value, item)
@@ -391,7 +412,7 @@ def run(cm, v, plot_path):
                 title += f', predicting {v["prediction_window"][0]:g} < t ≤ {v["prediction_window"][1]:g}'
             figs.append(plots.plot_model_vs_data(
                 plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst), tm,
-                {k: out[k] for k in series}, {k: ts for k, (ts, _) in series.items()},
+                {k: out[harness.output_key(k)] for k in series}, {k: ts for k, (ts, _) in series.items()},
                 {k: d for k, (_, d) in series.items()}, cm.units(),
                 title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end))
 

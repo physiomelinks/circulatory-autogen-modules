@@ -1,0 +1,42 @@
+{
+ "parameterisation": "lv",
+ "version": "chamber/vv",
+ "date": "2026-10-12",
+ "passed": true,
+ "summary": "start nominal -> systemic_T/R_T=3.036e+08, systemic_T/C_T=1.209e-07, aortic_root/R=3.036e+06, aortic_root/C=3.116e-08, q_us=1.386e-05 (prediction nrmse 0.0418)",
+ "method": "CMA-ES",
+ "files": [
+  "parameterisations/lv/lv_obs_data.json",
+  "parameterisations/lv/lv_params_for_id.csv"
+ ],
+ "cost": 3.556478712789403,
+ "calibrated_parameters": {
+  "systemic_T/R_T": 303645989.23642534,
+  "systemic_T/C_T": 1.2086623314460688e-07,
+  "aortic_root/R": 3035898.205407891,
+  "aortic_root/C": 3.116365135491948e-08,
+  "q_us": 1.3860983861324396e-05
+ },
+ "runs": [
+  {
+   "start": {},
+   "calibrated_parameters": {
+    "systemic_T/R_T": 303645989.23642534,
+    "systemic_T/C_T": 1.2086623314460688e-07,
+    "aortic_root/R": 3035898.205407891,
+    "aortic_root/C": 3.116365135491948e-08,
+    "q_us": 1.3860983861324396e-05
+   },
+   "cost": 3.556478712789403,
+   "calibration_scores": {
+    "u": 0.041641855513968304
+   },
+   "prediction_scores": {
+    "u": 0.04184705631594763
+   },
+   "constant_items": {}
+  }
+ ],
+ "metric": "nrmse",
+ "threshold": 0.15
+}
