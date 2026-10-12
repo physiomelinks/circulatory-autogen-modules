@@ -1,0 +1,73 @@
+{
+  "module_type": "glucose_carrier",
+  "version": "H_symport_ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "J_glc",
+    "A_glc",
+    "W_H",
+    "j_H",
+    "i_glc_H",
+    "J_glc_e",
+    "J_lac_e",
+    "J_glc_c",
+    "J_lac_c",
+    "J_ATP_c",
+    "J_ADP_c",
+    "J_Pi_c"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "rate law (relative 1e-9): J = jmax m A_mem (C_e - C_i exp(-W_H/RT))/(K + C_e), W_H = n_H F (E_H - V)",
+      "expr": "np.allclose(J_glc, jmax_glc*m_expr*A_mem*(C_glc_e - C_glc*np.exp(-n_H*F*(E_H - V)*1e-3/(R*T)))/(K_glc_t + C_glc_e), rtol=1e-9, atol=1e-12*abs(jmax_glc*A_mem*max(m_expr, 1e-30)))"
+    },
+    {
+      "description": "stoichiometry (exact): n_H H+ per glucose, carrying the current i = -F j_H; glucose is conserved across the membrane; lactate, ATP, ADP and Pi do not cross",
+      "expr": "np.array_equal(j_H, n_H*J_glc) and np.allclose(i_glc_H, -F*j_H*1e9, rtol=1e-12, atol=0) and np.array_equal(J_glc_e, -J_glc) and np.array_equal(J_glc_c, J_glc) and np.all(J_lac_e == 0) and np.all(J_lac_c == 0) and np.all(J_ATP_c == 0) and np.all(J_ADP_c == 0) and np.all(J_Pi_c == 0)"
+    },
+    {
+      "description": "second law: J A >= 0, A = RT ln(C_e/C_i) + n_H F (E_H - V)",
+      "expr": "np.all(J_glc*A_glc >= 0)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "C_glc_e": {
+        "min": 0.0001,
+        "max": 50.0,
+        "points": 7,
+        "scale": "log"
+      },
+      "C_glc": [
+        0.0,
+        5.0
+      ],
+      "m_expr": [
+        0.0,
+        4.0
+      ],
+      "V": [
+        -200.0,
+        50.0
+      ]
+    },
+    "rationale": "glucose outside from 0.1 uM to 50 mM (the game's range, both sides of every Km), inside from empty to above the outside at the low end (so the carrier runs backwards there), expression from none to the game's maximum; membrane potential from hyperpolarised to depolarised past E_H, where the carrier reverses"
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

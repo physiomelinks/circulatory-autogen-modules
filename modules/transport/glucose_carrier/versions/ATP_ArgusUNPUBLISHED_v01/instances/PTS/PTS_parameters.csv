@@ -1,0 +1,21 @@
+variable_name,units,value,data_reference,sourced
+C_glc_e,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
+C_lac_e,millimolar,0.0,definitional; no lactate in the medium,no
+C_glc,millimolar,0.002,"unreferenced_placeholder; glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)",no
+C_lac,millimolar,0.26990316647694707,the fermenter cell's calibrated steady state,no
+C_ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+C_ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
+C_Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
+m_expr,dimensionless,1.0,"definitional; n_0 copies, as many as the calibrated cell has Glf",no
+jmax_glc,mol_per_s_per_um2,3.0933897205955476e-19,"derived: n_0 x turnover_PTS / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_PTS: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
+K_glc_t,millimolar,0.005,"deutscher2006how; glucose PTS (PtsG/EIICB-Glc) Km ~3-10 uM; 5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
+R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+n_P,dimensionless,1.0,deutscher2006how; one PEP phosphoryl per glucose taken up (and phosphorylated); charged to the lumped cytosol as one ATP equivalent,yes
+K_m_ATP,millimolar,0.1,"unreferenced_placeholder; ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM",no
+ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
+Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+dG0_hyd,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
+c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no

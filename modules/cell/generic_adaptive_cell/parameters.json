@@ -1030,6 +1030,118 @@
    "source": "unreferenced_placeholder",
    "status": "placeholder",
    "note": "time for the flagella to spin up into a bundle when the motors switch on, or to unwind when they stop (E. coli bundles form in a few tenths of a second; Turner, Ryu and Berg 2000, to cite): thrust follows the motor switch with this time constant"
+  },
+  "K_glc_PTS": {
+   "value": 0.005,
+   "units": "millimolar",
+   "source": "deutscher2006how",
+   "status": "sourced",
+   "note": "glucose PTS (PtsG/EIICB-Glc) Km ~3-10 uM; 5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "K_glc_ABC": {
+   "value": 0.0005,
+   "units": "millimolar",
+   "source": "ferenci1996adaptation",
+   "status": "sourced",
+   "note": "binding-protein (Mgl) glucose transport Km ~0.1-1 uM; 0.5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "K_glc_GalP": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "pao1998major",
+   "status": "sourced",
+   "note": "MFS sugar/H+ symporters (GalP, LacY) Km ~10 uM-1 mM; 0.1 mM, the geometric middle of the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "n_P_PTS": {
+   "value": 1.0,
+   "units": "dimensionless",
+   "source": "deutscher2006how",
+   "status": "sourced",
+   "note": "one PEP phosphoryl per glucose taken up (and phosphorylated); charged to the lumped cytosol as one ATP equivalent"
+  },
+  "n_ATP_ABC": {
+   "value": 2.0,
+   "units": "dimensionless",
+   "source": "davidson2008structure",
+   "status": "sourced",
+   "note": "two ATP hydrolysed per transport cycle of a binding-protein-dependent ABC importer"
+  },
+  "n_H_GalP": {
+   "value": 1.0,
+   "units": "dimensionless",
+   "source": "pao1998major",
+   "status": "sourced",
+   "note": "one H+ per sugar in MFS sugar/H+ symport"
+  },
+  "K_m_ATP_carrier": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM"
+  },
+  "turnover_PTS": {
+   "value": 200.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose taken up per PTS unit per second at capacity (transporters ~10-1000 /s, AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "turnover_ABC": {
+   "value": 20.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose taken up per ABC importer per second at capacity (ABC importers are slow; transporters ~10-1000 /s, AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "turnover_GalP": {
+   "value": 50.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose taken up per GalP copy per second at capacity (transporters ~10-1000 /s, AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "L_PTS": {
+   "value": 1306.0,
+   "units": "dimensionless",
+   "source": "uniprot",
+   "status": "sourced",
+   "note": "one glucose PTS unit: E. coli PtsG EIICB-Glc (P69786, 477 aa) + Crr EIIA-Glc (P69783, 169) + PtsI enzyme I (P08839, 575) + PtsH HPr (P0AA04, 85); one of each per unit (EI and HPr are shared by every PTS of a real cell)"
+  },
+  "L_ABC": {
+   "value": 1510.0,
+   "units": "dimensionless",
+   "source": "uniprot",
+   "status": "sourced",
+   "note": "one Mgl ABC importer: E. coli MglA ATPase (P0AAG8, 506 aa) + 2 MglC permease (P23200, 336) + MglB binding protein (P0AEE5, 332); real cells keep binding protein in excess, not counted here"
+  },
+  "L_GalP": {
+   "value": 464.0,
+   "units": "dimensionless",
+   "source": "uniprot",
+   "status": "sourced",
+   "note": "E. coli GalP galactose(glucose)/H+ symporter (P0AEP1)"
+  },
+  "footprint_PTS": {
+   "value": 12.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane area one PtsG (EIIC) copy takes, as an MFS-sized carrier (0: cytosolic)"
+  },
+  "footprint_ABC": {
+   "value": 25.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane area one MglC2 permease dimer takes (0: cytosolic)"
+  },
+  "footprint_GalP": {
+   "value": 12.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane area one GalP copy takes (12 transmembrane helices, as Glf)"
   }
  }
 }

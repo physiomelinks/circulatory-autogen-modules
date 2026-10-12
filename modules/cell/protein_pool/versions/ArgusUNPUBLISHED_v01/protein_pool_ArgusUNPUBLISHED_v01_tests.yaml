@@ -26,3 +26,6 @@ instances:
   Glyc: 'glycolytic enzymes: glycolytic_share x proteome_per_um3 x cell volume'
   proteome: 'rest of the proteome (ribosomal, nucleoid and other proteins): proteome_per_um3 x cell volume, less the glycolytic
     enzymes'
+  PTS: 'glucose phosphotransferase system (PtsG, EIIA-Glc, EI, HPr): none at start; n_0 = the calibrated cell''s Glf copies'
+  ABC: 'binding-protein ABC glucose importer (MglABC): none at start; n_0 = the calibrated cell''s Glf copies'
+  GalP: 'GalP-type glucose/H+ symporter (MFS): none at start; n_0 = the calibrated cell''s Glf copies'

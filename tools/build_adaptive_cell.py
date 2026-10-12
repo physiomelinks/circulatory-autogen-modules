@@ -30,6 +30,10 @@ Module versions (equations as infix text, tools/cellml_writer.py):
   cell/ion_channels/i_NaK/ATP_ArgusUNPUBLISHED_v01       the Argus2026_v01 pump plus ATP use (eukaryotic; not in the
                                                          fermenter, kept for later bases)
   transport/cell_membrane_face/adaptive_ArgusUNPUBLISHED_v01  Glf glucose facilitator and lactate-/H+ symporter
+  transport/glucose_carrier/ATP_ArgusUNPUBLISHED_v01     glucose uptake driven by n ATP equivalents (instances PTS: the
+                                                         phosphotransferase system, 1 PEP; ABC: binding-protein importer,
+                                                         2 ATP)
+  transport/glucose_carrier/H_symport_ArgusUNPUBLISHED_v01  glucose/H+ symport (GalP-type MFS carrier, 1 H+)
 
 and reuses, unchanged, the sympathetic-neuron maths for the Na/K concentrations (ion_concentrations
 SN_soma_Argus2026_v01) and the Na leak (i_leak_Na Argus2026_v01), through the supermodules' parameters.
@@ -501,6 +505,30 @@ register_bib({
                            title='Crystal structure of a potassium ion transporter, TrkH', journal='Nature', year='2011',
                            volume='471', number='7338', pages='336--340', doi='10.1038/nature09731',
                            note='TrkH, the bacterial K+ uptake protein, has a channel-like selectivity filter'),
+    'deutscher2006how': dict(type='article', author='Deutscher, Josef and Francke, Christof and Postma, Pieter W.',
+                             title='How phosphotransferase system-related protein phosphorylation regulates carbohydrate '
+                                   'metabolism in bacteria',
+                             journal='Microbiology and Molecular Biology Reviews', year='2006', volume='70', number='4',
+                             pages='939--1031', doi='10.1128/MMBR.00024-06',
+                             note='The PTS: one PEP per sugar taken up and phosphorylated; glucose PTS Km in the '
+                                  'micromolar range'),
+    'davidson2008structure': dict(type='article',
+                                  author='Davidson, Amy L. and Dassa, Elie and Orelle, Cedric and Chen, Jue',
+                                  title='Structure, function, and evolution of bacterial ATP-binding cassette systems',
+                                  journal='Microbiology and Molecular Biology Reviews', year='2008', volume='72',
+                                  number='2', pages='317--364', doi='10.1128/MMBR.00031-07',
+                                  note='Binding-protein-dependent ABC importers hydrolyse two ATP per transport cycle'),
+    'pao1998major': dict(type='article', author='Pao, Stephanie S. and Paulsen, Ian T. and Saier, Milton H., Jr.',
+                         title='Major facilitator superfamily', journal='Microbiology and Molecular Biology Reviews',
+                         year='1998', volume='62', number='1', pages='1--34', doi='10.1128/MMBR.62.1.1-34.1998',
+                         note='MFS uniporters, symporters and antiporters; sugar/H+ symporters (GalP, LacY)'),
+    'ferenci1996adaptation': dict(type='article', author='Ferenci, Thomas',
+                                  title='Adaptation to life at micromolar nutrient levels: the regulation of Escherichia '
+                                        'coli glucose transport by endoinduction and cAMP',
+                                  journal='FEMS Microbiology Reviews', year='1996', volume='18', number='4',
+                                  pages='301--317', doi='10.1111/j.1574-6976.1996.tb00226.x',
+                                  note='E. coli glucose uptake at micromolar glucose: the Mgl binding-protein system has '
+                                       'sub-micromolar affinity'),
 })
 
 
@@ -1567,6 +1595,235 @@ write_version('cell/ion_channels', 'i_H_flagellum', 'i_H_flagellum_MotAB', fl_va
                   'decides when the motor runs and in which direction the cell swims.')},
               ['argus2026unpublished', 'meister1987proton'], 'MotAB_ArgusUNPUBLISHED_v01')
 
+# ------------------------------------------------------------------ 6b2. glucose carriers the cell can evolve (after level 1)
+# Each sits between the medium (medium_face_port) and the cytosol (cytosol_face_port), like the Glf face, with its
+# capacity per membrane area times the expression of its protein_pool. m = 1 is as many copies as the calibrated cell has
+# Glf (n_0 below), so the carriers compare at equal copy number: capacity n_0 turnover / N_A. In the fermenter their pools
+# start at 0, so the level-1 cell is unchanged.
+GC = 'glucose_carrier'
+V_GC_ATP, V_GC_H = 'ATP_ArgusUNPUBLISHED_v01', 'H_symport_ArgusUNPUBLISHED_v01'
+N0_CARRIER = der(PROTEINS['Glf'][2], 'the calibrated cell\'s Glf copies (Glf capacity / turnover_Glf)', 'turnover_Glf')
+# key: (label, module version, instance, turnover key, length key, footprint key)
+CARRIERS = {
+    'PTS': ('glucose phosphotransferase system (PtsG, EIIA-Glc, EI, HPr)', V_GC_ATP, 'PTS'),
+    'ABC': ('binding-protein ABC glucose importer (MglABC)', V_GC_ATP, 'ABC'),
+    'GalP': ('GalP-type glucose/H+ symporter (MFS)', V_GC_H, 'default'),
+}
+
+
+def carrier_jmax(key):
+    return der(N0_CARRIER * par(f'turnover_{key}') / NA / A_MEM,
+               f'n_0 x turnover_{key} / N_A / A_mem: m = 1 has as many copies as the calibrated cell\'s Glf',
+               f'turnover_{key}', 'turnover_Glf')
+
+
+face_side_vars = [
+    ('t', 'second', 'in', None, None),
+    ('C_glc_e', 'millimolar', 'in', None, 'medium side (entrance medium_face_port)'),
+    ('C_lac_e', 'millimolar', 'in', None, 'carried for the port'),
+    ('C_glc', 'millimolar', 'in', None, 'cytosol side (exit cytosol_face_port)'),
+    ('C_lac', 'millimolar', 'in', None, 'carried for the port'), ('C_ATP', 'millimolar', 'in', None, None),
+    ('C_ADP', 'millimolar', 'in', None, None), ('C_Pi', 'millimolar', 'in', None, None),
+    ('A_mem', 'um2', 'in', None, None),
+    ('m_expr', 'dimensionless', 'in', None, 'expression (protein_expression port): n_0 copies at 1'),
+    ('jmax_glc', 'mol_per_s_per_um2', 'in', None, 'capacity per membrane area at m_expr = 1'),
+    ('K_glc_t', 'millimolar', 'in', None, 'affinity for glucose outside'),
+    ('R', 'J_per_mol_K', 'in', None, None), ('T', 'kelvin', 'in', None, None),
+    ('J_glc', 'mol_per_s', 'out', None, 'glucose into the cell'),
+    ('A_glc', 'J_per_mol', 'out', None, 'affinity of one transport cycle (> 0 drives glucose in)'),
+    ('J_glc_e', 'mol_per_s', 'out', None, None), ('J_lac_e', 'mol_per_s', 'out', None, None),
+    ('J_glc_c', 'mol_per_s', 'out', None, None), ('J_lac_c', 'mol_per_s', 'out', None, None),
+    ('J_ATP_c', 'mol_per_s', 'out', None, 'ATP, ADP and Pi do not cross'), ('J_ADP_c', 'mol_per_s', 'out', None, None),
+    ('J_Pi_c', 'mol_per_s', 'out', None, None),
+]
+face_side_eqs = [
+    ('J_glc_e', '-J_glc'), ('J_lac_e', 'u(0.0, mol_per_s)'), ('J_glc_c', 'J_glc'), ('J_lac_c', 'u(0.0, mol_per_s)'),
+    ('J_ATP_c', 'u(0.0, mol_per_s)'), ('J_ADP_c', 'u(0.0, mol_per_s)'), ('J_Pi_c', 'u(0.0, mol_per_s)'),
+]
+face_side_ports = {
+    'entrance_ports': [{'port_type': 'medium_face_port', 'variables': ['C_glc_e', 'C_lac_e', 'J_glc_e', 'J_lac_e']}],
+    'exit_ports': [{'port_type': 'cytosol_face_port',
+                    'variables': ['C_glc', 'C_lac', 'C_ATP', 'C_ADP', 'C_Pi', 'J_glc_c', 'J_lac_c', 'J_ATP_c', 'J_ADP_c',
+                                  'J_Pi_c']}],
+}
+
+
+def face_side_roles(extra_bcs, extra_constants):
+    roles = {n: 'boundary_condition' for n in ('C_glc_e', 'C_lac_e', 'C_glc', 'C_lac', 'C_ATP', 'C_ADP', 'C_Pi', 'A_mem',
+                                               'm_expr', *extra_bcs)}
+    roles.update({n: 'constant' for n in ('jmax_glc', 'K_glc_t', *extra_constants)})
+    roles.update({'R': 'global_constant', 'T': 'global_constant'})
+    roles.update({n: 'variable' for n in ('J_glc', 'A_glc', 'J_glc_e', 'J_lac_e', 'J_glc_c', 'J_lac_c', 'J_ATP_c',
+                                          'J_ADP_c', 'J_Pi_c')})
+    return roles
+
+
+def face_side_rows(key):
+    return [('C_glc_e', GLC_E, '', False), ('C_lac_e', LAC_E, 'no lactate in the medium', False),
+            ('C_glc', GLC_I, 'the fermenter cell\'s calibrated steady state', False),
+            ('C_lac', LAC_I, 'the fermenter cell\'s calibrated steady state', False),
+            ('C_ATP', ATP, '', False), ('C_ADP', ADP, '', False), ('C_Pi', PI, '', False),
+            ('A_mem', A_MEM, 'geometry: in-plane membrane of the 2 um cell', False),
+            ('m_expr', 1.0, 'definitional; n_0 copies, as many as the calibrated cell has Glf', False),
+            ('jmax_glc', carrier_jmax(key), '', False), ('K_glc_t', par(f'K_glc_{key}'), '', False),
+            ('R', R, 'definitional; gas constant, as the library\'s SN modules', True),
+            ('T', T, 'operating point: 20 C', False)]
+
+
+FACE_SIDE_INV = ('np.array_equal(J_glc_e, -J_glc) and np.array_equal(J_glc_c, J_glc) and np.all(J_lac_e == 0) and '
+                 'np.all(J_lac_c == 0) and np.all(J_ATP_c == 0) and np.all(J_ADP_c == 0) and np.all(J_Pi_c == 0)')
+# ln of |C/c_std| + 1e-300, as the cytosol's affinities: an empty side sits at round-off
+A_GLC_EXPR = 'R * T * (ln(abs(C_glc_e / c_std) + 1e-300) - ln(abs(C_glc / c_std) + 1e-300))'
+CARRIER_SWEEP = {'ranges': {'C_glc_e': {'min': 1e-4, 'max': 50.0, 'points': 7, 'scale': 'log'},
+                            'C_glc': [0.0, 5.0], 'm_expr': [0.0, 4.0]},
+                 'rationale': 'glucose outside from 0.1 uM to 50 mM (the game\'s range, both sides of every Km), inside '
+                              'from empty to above the outside at the low end (so the carrier runs backwards there), '
+                              'expression from none to the game\'s maximum'}
+
+# --- glucose_carrier ATP: uptake driven by n_P ATP equivalents (PTS: 1 PEP; ABC: 2 ATP)
+gca_vars = face_side_vars + [
+    ('n_P', 'dimensionless', 'in', None, 'ATP equivalents hydrolysed per glucose taken up'),
+    ('K_m_ATP', 'millimolar', 'in', None, 'ATP for half-rate'),
+    ('ATP', 'millimolar', 'in', None, 'cytosol ATP (ATP_hydrolysis_port)'), ('ADP', 'millimolar', 'in', None, None),
+    ('Pi', 'millimolar', 'in', None, None),
+    ('dG0_hyd', 'J_per_mol', 'in', None, None), ('c_std', 'millimolar', 'in', None, None),
+    ('ATP_eq', 'millimolar', 'out', None, 'ATP at which hydrolysis would be at equilibrium with the present ADP and Pi'),
+    ('A_ATP', 'J_per_mol', 'out', None, 'free energy of ATP hydrolysis'),
+    ('J_ATP_cost', 'mol_per_s', 'out', None, 'ATP hydrolysed, n_P per glucose'),
+    ('j_ATP', 'mol_per_s', 'out', None, None), ('j_ADP', 'mol_per_s', 'out', None, None),
+    ('j_Pi', 'mol_per_s', 'out', None, None),
+]
+gca_eqs = [
+    ('ATP_eq', 'ADP * Pi / c_std * exp(dG0_hyd / (R * T))'),
+    ('A_ATP', '-dG0_hyd - R * T * ln(abs((ADP / c_std) * (Pi / c_std) / (ATP / c_std)) + 1e-300)'),
+    # glc_e + n_P ATP <=> glc_i + n_P (ADP + Pi): saturating in glucose outside and in ATP, zero at equilibrium
+    ('J_glc', 'jmax_glc * m_expr * A_mem * (C_glc_e * (ATP / K_m_ATP) ** n_P - C_glc * (ATP_eq / K_m_ATP) ** n_P) '
+              '/ ((K_glc_t + C_glc_e) * (1.0 + ATP / K_m_ATP) ** n_P)'),
+    ('A_glc', f'{A_GLC_EXPR} + n_P * A_ATP'),
+    ('J_ATP_cost', 'n_P * J_glc'), ('j_ATP', '-J_ATP_cost'), ('j_ADP', 'J_ATP_cost'), ('j_Pi', 'J_ATP_cost'),
+] + face_side_eqs
+gca_roles = face_side_roles(('ATP', 'ADP', 'Pi'), ('n_P', 'K_m_ATP', 'dG0_hyd', 'c_std'))
+gca_roles.update({n: 'variable' for n in ('ATP_eq', 'A_ATP', 'J_ATP_cost', 'j_ATP', 'j_ADP', 'j_Pi')})
+
+
+def gca_rows(key, n_key):
+    return face_side_rows(key) + [
+        ('n_P', par(n_key), '', True), ('K_m_ATP', par('K_m_ATP_carrier'), '', False),
+        ('ATP', ATP, '', False), ('ADP', ADP, '', False), ('Pi', PI, '', False),
+        ('dG0_hyd', DG0_HYD, f'{PH}; textbook standard Gibbs energy of ATP hydrolysis (-30.5 kJ/mol)', False),
+        ('c_std', C_STD, 'definitional; standard concentration 1 M', True)]
+
+
+write_version('transport', GC, 'glucose_carrier_ATP', gca_vars, gca_eqs,
+              {'required_citations': ['argus2026unpublished'], **face_side_ports,
+               'general_ports': [{'port_type': 'membrane_area', 'variables': ['A_mem']},
+                                 {'port_type': 'protein_expression', 'variables': ['m_expr']},
+                                 {'port_type': 'ATP_hydrolysis_port',
+                                  'variables': ['ATP', 'ADP', 'Pi', 'j_ATP', 'j_ADP', 'j_Pi']}],
+               'roles': gca_roles},
+              gca_rows('PTS', 'n_P_PTS'),
+              {**RUN1, 'outputs': ['J_glc', 'A_glc', 'A_ATP', 'ATP_eq', 'J_ATP_cost', 'j_ATP', 'j_ADP', 'j_Pi', 'J_glc_e',
+                                   'J_lac_e', 'J_glc_c', 'J_lac_c', 'J_ATP_c', 'J_ADP_c', 'J_Pi_c'],
+               'run_parameters': {},
+               'invariants': [
+                   {'description': 'rate law (relative 1e-9): J = jmax m A_mem (C_e a^n - C_i a_eq^n)/((K + C_e)(1 + '
+                                   'a)^n), a = ATP/K_m_ATP, a_eq = ATP_eq/K_m_ATP, ATP_eq = ADP Pi/(c_std K_eq_hyd)',
+                    'expr': 'np.allclose(J_glc, jmax_glc*m_expr*A_mem*(C_glc_e*(ATP/K_m_ATP)**n_P - C_glc*(ADP*Pi/c_std*'
+                            'np.exp(dG0_hyd/(R*T))/K_m_ATP)**n_P)/((K_glc_t + C_glc_e)*(1 + ATP/K_m_ATP)**n_P), '
+                            'rtol=1e-9, atol=1e-12*abs(jmax_glc*A_mem*max(m_expr, 1e-30)))'},
+                   {'description': 'stoichiometry (exact): n_P ATP -> ADP + Pi per glucose; glucose is conserved across '
+                                   'the membrane; lactate, ATP, ADP and Pi do not cross',
+                    'expr': 'np.array_equal(J_ATP_cost, n_P*J_glc) and np.array_equal(j_ATP, -J_ATP_cost) and '
+                            'np.array_equal(j_ADP, J_ATP_cost) and np.array_equal(j_Pi, J_ATP_cost) and ' + FACE_SIDE_INV},
+                   {'description': 'second law: glucose moves down the affinity of the coupled reaction, J A >= 0, A = '
+                                   'RT ln(C_e/C_i) + n_P A_ATP',
+                    'expr': 'np.all(J_glc*A_glc >= 0)'}],
+               'bc_sweep': CARRIER_SWEEP, 'stability': STAB},
+              {'reviewed': False, 'notes': (
+                  'A glucose carrier driven by n_P ATP equivalents, between the medium (entrance medium_face_port) and '
+                  'the cytosol (exit cytosol_face_port, as the Glf face cell_membrane_face adaptive), the ATP taken from '
+                  'and ADP and Pi returned to the cytosol on the ATP_hydrolysis_port. Reaction glc_e + n_P ATP <=> glc_i '
+                  '+ n_P (ADP + Pi), affinity A = RT ln(C_e/C_i) + n_P A_ATP, rate J = jmax m A_mem (C_e a^n - C_i '
+                  'a_eq^n)/((K + C_e)(1 + a)^n) with a = ATP/K_m_ATP and a_eq = ATP_eq/K_m_ATP, ATP_eq = ADP Pi/(c_std '
+                  'K_eq_hyd): Michaelis-Menten in glucose outside (J = jmax m A_mem C_e/(K + C_e) (a/(1 + a))^n with '
+                  'nothing inside), saturating in ATP, zero at equilibrium and always of the sign of A, so J A >= 0. At '
+                  'the cell\'s ATP (A_ATP ~49 kJ/mol) one ATP holds a 10^8-fold gradient: the carrier is irreversible in '
+                  'practice. J_ATP_cost = n_P J is the ATP it spends; the cytosol counts the H+ and heat of that '
+                  'hydrolysis. Instances: PTS (phosphotransferase system, Km 5 uM, n_P = 1: one PEP per glucose, '
+                  'deutscher2006how) and ABC (binding-protein importer, Km 0.5 uM, ferenci1996adaptation; n_P = 2 ATP, '
+                  'davidson2008structure). The lumped cytosol has no PEP or glucose 6-phosphate: the PTS PEP is '
+                  'charged as one ATP, and its glucose enters as free glucose, which the lumped glycolysis phosphorylates '
+                  'again (hexokinase), so a PTS glucose nets 1 ATP here where a real PTS cell keeps 2 (the PEP replaces '
+                  'the hexokinase ATP). The driving forces agree: PEP to pyruvate with glucose phosphorylation releases '
+                  'about 48 kJ/mol, one ATP at the cell\'s ratios about 49. m = 1 is as many copies as the calibrated '
+                  'cell\'s Glf; turnover numbers and K_m_ATP are placeholders.')},
+              ['argus2026unpublished', 'deutscher2006how', 'davidson2008structure', 'ferenci1996adaptation'], V_GC_ATP,
+              extra_instances={'PTS': gca_rows('PTS', 'n_P_PTS'), 'ABC': gca_rows('ABC', 'n_ATP_ABC')})
+
+# --- glucose_carrier H_symport: glucose with n_H H+ down the proton motive force (GalP-type MFS)
+gch_vars = face_side_vars + [
+    ('n_H', 'dimensionless', 'in', None, 'H+ per glucose'),
+    ('V', 'milliV', 'in', None, None), ('E_H', 'milliV', 'in', None, 'H+ Nernst potential (H_Nernst_potential port)'),
+    ('F', 'C_per_mol', 'in', None, None), ('c_std', 'millimolar', 'in', None, None),
+    ('W_H', 'J_per_mol', 'out', None, 'free energy released by n_H H+ entering: n_H F (E_H - V)'),
+    ('j_H', 'mol_per_s', 'out', None, 'H+ into the cell (H_flux port)'),
+    ('i_glc_H', 'nanoA', 'out', None, 'current of the H+ carried in (positive outward)'),
+]
+gch_eqs = [
+    ('W_H', 'n_H * F * (E_H - V) * u(1e-3, V_per_milliV)'),
+    # glc_e + n_H H_e <=> glc_i + n_H H_i: Michaelis-Menten in glucose outside, zero at equilibrium
+    ('J_glc', 'jmax_glc * m_expr * A_mem * (C_glc_e - C_glc * exp(-W_H / (R * T))) / (K_glc_t + C_glc_e)'),
+    ('A_glc', f'{A_GLC_EXPR} + W_H'),
+    ('j_H', 'n_H * J_glc'), ('i_glc_H', '-F * j_H * u(1e9, nanoA_per_A)'),
+] + face_side_eqs
+gch_roles = face_side_roles(('V', 'E_H'), ('n_H', 'c_std'))
+gch_roles.update({'F': 'global_constant', 'W_H': 'variable', 'j_H': 'variable', 'i_glc_H': 'variable'})
+write_version('transport', GC, 'glucose_carrier_H_symport', gch_vars, gch_eqs,
+              {'required_citations': ['argus2026unpublished'], **face_side_ports,
+               'general_ports': [{'port_type': 'membrane_area', 'variables': ['A_mem']},
+                                 {'port_type': 'protein_expression', 'variables': ['m_expr']},
+                                 {'port_type': 'membrane_voltage', 'variables': ['V']},
+                                 {'port_type': 'H_Nernst_potential', 'variables': ['E_H']},
+                                 {'port_type': 'membrane_current', 'variables': ['i_glc_H']},
+                                 {'port_type': 'H_flux', 'variables': ['j_H']}],
+               'roles': gch_roles},
+              face_side_rows('GalP') + [
+                  ('n_H', par('n_H_GalP'), '', True), OP('V'),
+                  ('E_H', E_H, 'Nernst potential at pH 7.6 in, 7.3 out', False),
+                  ('F', F, 'definitional; as the library\'s SN modules', True),
+                  ('c_std', C_STD, 'definitional; standard concentration 1 M', True)],
+              {**RUN1, 'outputs': ['J_glc', 'A_glc', 'W_H', 'j_H', 'i_glc_H', 'J_glc_e', 'J_lac_e', 'J_glc_c', 'J_lac_c',
+                                   'J_ATP_c', 'J_ADP_c', 'J_Pi_c'],
+               'run_parameters': {},
+               'invariants': [
+                   {'description': 'rate law (relative 1e-9): J = jmax m A_mem (C_e - C_i exp(-W_H/RT))/(K + C_e), W_H = '
+                                   'n_H F (E_H - V)',
+                    'expr': 'np.allclose(J_glc, jmax_glc*m_expr*A_mem*(C_glc_e - C_glc*np.exp(-n_H*F*(E_H - V)*1e-3/'
+                            '(R*T)))/(K_glc_t + C_glc_e), rtol=1e-9, atol=1e-12*abs(jmax_glc*A_mem*max(m_expr, 1e-30)))'},
+                   {'description': 'stoichiometry (exact): n_H H+ per glucose, carrying the current i = -F j_H; glucose is '
+                                   'conserved across the membrane; lactate, ATP, ADP and Pi do not cross',
+                    'expr': 'np.array_equal(j_H, n_H*J_glc) and np.allclose(i_glc_H, -F*j_H*1e9, rtol=1e-12, atol=0) and '
+                            + FACE_SIDE_INV},
+                   {'description': 'second law: J A >= 0, A = RT ln(C_e/C_i) + n_H F (E_H - V)',
+                    'expr': 'np.all(J_glc*A_glc >= 0)'}],
+               'bc_sweep': {**CARRIER_SWEEP, 'ranges': {**CARRIER_SWEEP['ranges'], 'V': [-200.0, 50.0]},
+                            'rationale': CARRIER_SWEEP['rationale'] + '; membrane potential from hyperpolarised to '
+                                                                      'depolarised past E_H, where the carrier reverses'},
+               'stability': STAB},
+              {'reviewed': False, 'notes': (
+                  'A glucose/H+ symporter of the major facilitator superfamily (GalP, LacY type; pao1998major), between '
+                  'the medium (entrance medium_face_port) and the cytosol (exit cytosol_face_port, as the Glf face '
+                  'cell_membrane_face adaptive). Reaction glc_e + n_H H_e <=> glc_i + n_H H_i, affinity A = RT '
+                  'ln(C_e/C_i) + W_H with W_H = n_H F (E_H - V) the proton motive force it uses (about 12 kJ/mol at '
+                  '-105 mV and pH 7.6 in, 7.3 out: a 130-fold glucose gradient). Rate J = jmax m A_mem (C_e - C_i '
+                  'exp(-W_H/RT))/(K + C_e): Michaelis-Menten in glucose outside with nothing inside, zero at '
+                  'equilibrium and of the sign of A, so J A >= 0. The protons go to the cytosolic pool (j_H on H_flux, '
+                  'E_H from H_Nernst_potential) and carry a membrane current i = -F j_H (membrane_current): the '
+                  'H+-ATPase pumps them out again, about 0.3 ATP per glucose (3 ATP per 10 H+). Km 0.1 mM, the middle of '
+                  'the MFS sugar/H+ symporters\' 10 uM-1 mM; m = 1 is as many copies as the calibrated cell\'s Glf; the '
+                  'turnover number is a placeholder.')},
+              ['argus2026unpublished', 'pao1998major'], V_GC_H)
+
 # ------------------------------------------------------------------ 6c. proteins: one protein_pool per protein, and their synthesis
 # Each protein of the cell is a protein_pool: its expression m (copies n = n_0 m) approaches the game's target m_target
 # with time constant tau. Keeping the copies costs their turnover; raising m costs building the new copies, at most what the
@@ -1629,12 +1886,18 @@ pool_roles.update({n: 'boundary_condition' for n in ('m_target', 'ATP', 's_build
 
 
 def pool_rows(key):
-    label, L, n, how = PROTEINS[key]
-    return [
-        ('m_init', 1.0, 'definitional; the calibrated cell', False),
-        ('m_target', 1.0, 'definitional; at rest the cell keeps its baseline', False),
-        ('tau', par('tau_expression'), '', False),
-        ('n_0', n, f'calibrated: {how}', False), ('L', L, '', False),
+    if key in CARRIERS:   # a carrier the level-1 cell lacks: none expressed until the game sets a target
+        start = [('m_init', 0.0, 'definitional; the level-1 cell has none (the game unlocks it)', False),
+                 ('m_target', 0.0, 'definitional; none until the game sets a target', False),
+                 ('tau', par('tau_expression'), '', False), ('n_0', N0_CARRIER, '', False),
+                 ('L', par(f'L_{key}'), '', False)]
+    else:
+        label, L, n, how = PROTEINS[key]
+        start = [('m_init', 1.0, 'definitional; the calibrated cell', False),
+                 ('m_target', 1.0, 'definitional; at rest the cell keeps its baseline', False),
+                 ('tau', par('tau_expression'), '', False),
+                 ('n_0', n, f'calibrated: {how}', False), ('L', L, '', False)]
+    return start + [
         ('footprint', par(f'footprint_{key}'), '', False),
         ('c_syn', C_SYN, '', False), ('c_poly', C_POLY, '', False), ('c_deg', C_DEG, '', False),
         ('c_recycle', C_RECYCLE, '', False), ('k_deg', K_DEG, '', False), ('N_A', NA, '', False),
@@ -1661,7 +1924,7 @@ pool_inv = [
      'expr': 'np.all(np.diff(m)*np.sign(m_target - m[0]) >= -1e-12) and np.all((m - m_target)*(m[0] - m_target) >= -1e-12)'},
     {'description': 'costs are never negative', 'expr': 'np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(M_build >= 0)'},
 ]
-pool_extra = {k: pool_rows(k) for k in PROTEINS}
+pool_extra = {k: pool_rows(k) for k in [*PROTEINS, *CARRIERS]}
 write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
               {'required_citations': ['argus2026unpublished'],
                'entrance_ports': [], 'exit_ports': [],
@@ -1700,7 +1963,8 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                   'goes to biosynthesis (daughter_share, summed there); the costs, demand, daughter share and area go to '
                   'protein_expression on protein_synthesis, which returns ATP and s_build. Instances: one per protein of '
                   'the fermenter cell (copy numbers, lengths and footprints in each; see parameters.json).'),
-               'instances': {k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS}},
+               'instances': {**{k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS},
+                             **{k: f'{CARRIERS[k][0]}: none at start; n_0 = the calibrated cell\'s Glf copies' for k in CARRIERS}}},
               ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers'], POOL_V,
               extra_instances=pool_extra)
 
@@ -2163,7 +2427,13 @@ FERM_PROTEINS = [  # (pool key, the submodule it scales, (module_type, version))
     ('Glf', 'membrane_face', ('cell_membrane_face', V_NEW)),
     ('LacT', 'membrane_face', None),   # the face's second protein_expression port (pools connect in submodule order)
     ('Flagellum', 'i_flagellum', ('i_H_flagellum', 'MotAB_ArgusUNPUBLISHED_v01')),
+    # glucose carriers the game unlocks after level 1 (pools start at 0)
+    ('PTS', 'glc_PTS', (GC, V_GC_ATP, 'PTS')),
+    ('ABC', 'glc_ABC', (GC, V_GC_ATP, 'ABC')),
+    ('GalP', 'glc_GalP', (GC, V_GC_H)),
 ]
+GLC_CARRIERS = ['glc_PTS', 'glc_ABC', 'glc_GalP']
+ATP_CARRIERS = {'glc_PTS': 'n_P_glc_PTS', 'glc_ABC': 'n_P_glc_ABC'}   # submodule: its n_P parameter
 _targets = []
 for key, target, mod in FERM_PROTEINS:
     if mod and target not in [t['name'] for t in _targets]:
@@ -2175,6 +2445,7 @@ define_cell(
           + [('Na_K', x) for x in ('i_K_Trk', 'i_NaH', 'i_KH', 'i_NaCa')] + [('Ca', 'i_NaCa')]
           + [('H', x) for x in ('i_H_ATPase', 'i_NaH', 'i_KH', 'i_flagellum')]
           + [('cytosol', 'i_H_ATPase'), ('membrane_face', 'cytosol'), ('membrane_face', 'H')]
+          + [(c, 'cytosol') for c in GLC_CARRIERS] + [('H', 'glc_GalP')]
           + [l for key, target, _ in FERM_PROTEINS
              for l in ((f'pool_{key}', 'protein'), (f'pool_{key}', 'bio'), (f'pool_{key}', target))],
     overrides={
@@ -2194,7 +2465,12 @@ define_cell(
         'adaptive as the Trk K+ uptake channel), i_NaCa (adaptive; archaeal NCX_Mj is the prokaryotic equivalent) and '
         'membrane_face (cell_membrane_face adaptive: the Glf glucose facilitator and a lactate-/H+ symporter). The '
         'default instance is an exact steady state at -105 mV and pH 7.6 with total ATP turnover equal to Lynch & '
-        'Marinov\'s maintenance cost at 20 C.'))
+        'Marinov\'s maintenance cost at 20 C. Three glucose carriers the game unlocks after level 1 sit beside Glf with '
+        'their pools at 0 (m_init and m_target 0), so the level-1 cell is unchanged until the game sets a target: '
+        'glc_PTS (glucose_carrier ATP, instance PTS: the phosphotransferase system, Km 5 uM, one PEP charged as one '
+        'ATP per glucose), glc_ABC (instance ABC: binding-protein importer, Km 0.5 uM, 2 ATP per glucose) and glc_GalP '
+        '(glucose_carrier H_symport: Km 0.1 mM, one H+ per glucose). Each takes its medium glucose from its own '
+        'C_glc_e parameter, set to the same value as membrane_face\'s.'))
 
 m = lambda sub_name, var: f'mod_{sub_name}__{var}'
 D = lambda x: f'({x}[-1] - {x}[0])'
@@ -2224,7 +2500,8 @@ def cell_invariants(names, steady):
                         'protein synthesis and biosynthesis take (relative 1e-9)',
          'expr': f'np.allclose({m("cytosol", "J_ATP_turnover")} - {m("cytosol", "J_ATP_maint")}, ' + ' + '.join(
              [f'{m("i_H_ATPase", "v_ATP_H")}'] * ('i_H_ATPase' in names) +
-             [f'{m("protein", "J_ATP_total")}', f'{m("bio", "J_ATP_bio")}']) + ', rtol=1e-9, atol=1e-30)'},
+             [f'{m("protein", "J_ATP_total")}', f'{m("bio", "J_ATP_bio")}'] +
+             [f'{m(c, "J_ATP_cost")}' for c in ATP_CARRIERS if c in names]) + ', rtol=1e-9, atol=1e-30)'},
         {'description': 'second law for the leaks: each runs down its electrochemical gradient, i (V - E) >= 0',
          'expr': ' and '.join(
              [f'np.all({m("i_leak_Na", "i_leak_Na")}*({m("membrane", "V")} - {m("Na_K", "E_Na")}) >= 0)',
@@ -2249,6 +2526,30 @@ def cell_invariants(names, steady):
             {'description': 'second law for the exchangers: NhaA and KefC run down their free energy, r drive >= 0',
              'expr': f'np.all({m("i_NaH", "r_cycle")}*-({m("membrane", "V")} + {m("Na_K", "E_Na")} - 2*{m("H", "E_H")}) '
                      f'>= 0) and np.all({m("i_KH", "r_cycle")}*({m("H", "E_H")} - {m("Na_K", "E_K")}) >= 0)'}]
+    carriers = [c for c in GLC_CARRIERS if c in names]
+    if carriers:
+        glc_in = ' + '.join([m('membrane_face', 'J_glc')] + [m(c, 'J_glc') for c in carriers])
+        inv += [
+            {'description': 'carbon is conserved through every glucose carrier: Vol d(6 glc + 3 lac + 6 glycogen) = '
+                            'int (6 sum J_glc + 3 J_lac) dt (relative 1e-5: trapezoid integration of the logged fluxes)',
+             'expr': f'abs({VOL0}*(6*{D(m("cytosol", "C_glc"))} + 3*{D(m("cytosol", "C_lac"))} + '
+                     f'6*{D(m("cytosol", "C_glyc"))}) - np.trapz(6*({glc_in}) + 3*{m("membrane_face", "J_lac")}, t)) '
+                     f'<= 1e-5*np.trapz(np.abs(6*({glc_in})) + np.abs(3*{m("membrane_face", "J_lac")}), t) + 1e-30'},
+            {'description': 'the carriers\' costs follow their stoichiometry (exact): n_P ATP per glucose for the '
+                            'ATP-driven ones, one H+ per glucose for the symporter',
+             'expr': ' and '.join([f'np.allclose({m(c, "J_ATP_cost")}, {n}*{m(c, "J_glc")}, rtol=1e-12, atol=0)'
+                                   for c, n in ATP_CARRIERS.items() if c in names] +
+                                  [f'np.allclose({m("glc_GalP", "j_H")}, n_H_glc_GalP*{m("glc_GalP", "J_glc")}, '
+                                   'rtol=1e-12, atol=0)'] * ('glc_GalP' in names))},
+            {'description': 'second law for the glucose carriers, each against the cytosol\'s own state: J (RT '
+                            'ln(C_e/C_glc) + n_P A_hyd) >= 0 (ATP-driven), J (RT ln(C_e/C_glc) + n_H F (E_H - V)) >= 0 '
+                            '(symporter)',
+             'expr': ' and '.join(
+                 [f'np.all({m(c, "J_glc")}*(R*T*np.log(C_glc_e_{c}/np.abs({m("cytosol", "C_glc")})) + '
+                  f'{n}*{m("cytosol", "A_hyd")}) >= -1e-30)' for c, n in ATP_CARRIERS.items() if c in names] +
+                 [f'np.all({m("glc_GalP", "J_glc")}*(R*T*np.log(C_glc_e_glc_GalP/np.abs({m("cytosol", "C_glc")})) + '
+                  f'n_H_glc_GalP*F*({m("H", "E_H")} - {m("membrane", "V")})*1e-3) >= -1e-30)'] * ('glc_GalP' in names))},
+        ]
     if steady:
         inv.append({'description': 'the default point is a steady state: V stays at -105 mV (1e-6 mV), pH at 7.6 (1e-9) '
                                    'and ATP at 9.6 mM (relative 1e-9)',
@@ -2275,6 +2576,9 @@ def cell_outputs(names):
                  ('i_NaCa', 'i_NaCa'), ('membrane_face', 'J_glc'), ('membrane_face', 'J_lac'),
                  ('membrane_face', 'J_H_lac'), ('i_flagellum', 'j_H_flag'), ('i_flagellum', 'pmf'),
                  ('i_flagellum', 'v_swim')]
+    for c in GLC_CARRIERS:
+        if c in names:
+            base += [(c, 'J_glc')] + ([(c, 'J_ATP_cost')] if c in ATP_CARRIERS else [(c, 'j_H')])
     base += [(n, 'm') for n in names if n.startswith('pool_')]
     return [m(s, v).replace('__', '/') for s, v in base]
 
@@ -2400,7 +2704,8 @@ for d in [os.path.join(REPO, 'modules', *parts) for parts in [
         ('cell', 'biosynthesis', 'versions', V_NEW), ('cell', 'protein_expression', 'versions', V_NEW),
         ('cell', 'protein_pool', 'versions', POOL_V), ('cell', 'ion_channels', 'i_leak_K', 'versions', V_NEW),
         ('cell', 'ion_channels', 'i_NaCa', 'versions', V_NEW),
-        ('cell', 'ion_channels', 'i_H_flagellum', 'versions', 'MotAB_ArgusUNPUBLISHED_v01')]] + CELL_DIRS:
+        ('cell', 'ion_channels', 'i_H_flagellum', 'versions', 'MotAB_ArgusUNPUBLISHED_v01'),
+        ('transport', GC, 'versions', V_GC_ATP), ('transport', GC, 'versions', V_GC_H)]] + CELL_DIRS:
     added = complete_bib(d)
     if added:
         print(f'{os.path.relpath(d, REPO)}: added {added}')

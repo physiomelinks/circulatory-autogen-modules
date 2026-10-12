@@ -70,6 +70,12 @@
     "mod_i_flagellum/j_H_flag",
     "mod_i_flagellum/pmf",
     "mod_i_flagellum/v_swim",
+    "mod_glc_PTS/J_glc",
+    "mod_glc_PTS/J_ATP_cost",
+    "mod_glc_ABC/J_glc",
+    "mod_glc_ABC/J_ATP_cost",
+    "mod_glc_GalP/J_glc",
+    "mod_glc_GalP/j_H",
     "mod_pool_proteome/m",
     "mod_pool_Glyc/m",
     "mod_pool_H_ATPase/m",
@@ -79,7 +85,10 @@
     "mod_pool_NCX/m",
     "mod_pool_Glf/m",
     "mod_pool_LacT/m",
-    "mod_pool_Flagellum/m"
+    "mod_pool_Flagellum/m",
+    "mod_pool_PTS/m",
+    "mod_pool_ABC/m",
+    "mod_pool_GalP/m"
   ],
   "run_parameters": {},
   "invariants": [
@@ -93,7 +102,7 @@
     },
     {
       "description": "the ATP budget closes: the cytosol's external ATP use equals what the H+-ATPase (if present), protein synthesis and biosynthesis take (relative 1e-9)",
-      "expr": "np.allclose(mod_cytosol__J_ATP_turnover - mod_cytosol__J_ATP_maint, mod_i_H_ATPase__v_ATP_H + mod_protein__J_ATP_total + mod_bio__J_ATP_bio, rtol=1e-9, atol=1e-30)"
+      "expr": "np.allclose(mod_cytosol__J_ATP_turnover - mod_cytosol__J_ATP_maint, mod_i_H_ATPase__v_ATP_H + mod_protein__J_ATP_total + mod_bio__J_ATP_bio + mod_glc_PTS__J_ATP_cost + mod_glc_ABC__J_ATP_cost, rtol=1e-9, atol=1e-30)"
     },
     {
       "description": "second law for the leaks: each runs down its electrochemical gradient, i (V - E) >= 0",
@@ -122,6 +131,18 @@
     {
       "description": "second law for the exchangers: NhaA and KefC run down their free energy, r drive >= 0",
       "expr": "np.all(mod_i_NaH__r_cycle*-(mod_membrane__V + mod_Na_K__E_Na - 2*mod_H__E_H) >= 0) and np.all(mod_i_KH__r_cycle*(mod_H__E_H - mod_Na_K__E_K) >= 0)"
+    },
+    {
+      "description": "carbon is conserved through every glucose carrier: Vol d(6 glc + 3 lac + 6 glycogen) = int (6 sum J_glc + 3 J_lac) dt (relative 1e-5: trapezoid integration of the logged fluxes)",
+      "expr": "abs(mod_membrane__Vol[0]*(6*(mod_cytosol__C_glc[-1] - mod_cytosol__C_glc[0]) + 3*(mod_cytosol__C_lac[-1] - mod_cytosol__C_lac[0]) + 6*(mod_cytosol__C_glyc[-1] - mod_cytosol__C_glyc[0])) - np.trapz(6*(mod_membrane_face__J_glc + mod_glc_PTS__J_glc + mod_glc_ABC__J_glc + mod_glc_GalP__J_glc) + 3*mod_membrane_face__J_lac, t)) <= 1e-5*np.trapz(np.abs(6*(mod_membrane_face__J_glc + mod_glc_PTS__J_glc + mod_glc_ABC__J_glc + mod_glc_GalP__J_glc)) + np.abs(3*mod_membrane_face__J_lac), t) + 1e-30"
+    },
+    {
+      "description": "the carriers' costs follow their stoichiometry (exact): n_P ATP per glucose for the ATP-driven ones, one H+ per glucose for the symporter",
+      "expr": "np.allclose(mod_glc_PTS__J_ATP_cost, n_P_glc_PTS*mod_glc_PTS__J_glc, rtol=1e-12, atol=0) and np.allclose(mod_glc_ABC__J_ATP_cost, n_P_glc_ABC*mod_glc_ABC__J_glc, rtol=1e-12, atol=0) and np.allclose(mod_glc_GalP__j_H, n_H_glc_GalP*mod_glc_GalP__J_glc, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "second law for the glucose carriers, each against the cytosol's own state: J (RT ln(C_e/C_glc) + n_P A_hyd) >= 0 (ATP-driven), J (RT ln(C_e/C_glc) + n_H F (E_H - V)) >= 0 (symporter)",
+      "expr": "np.all(mod_glc_PTS__J_glc*(R*T*np.log(C_glc_e_glc_PTS/np.abs(mod_cytosol__C_glc)) + n_P_glc_PTS*mod_cytosol__A_hyd) >= -1e-30) and np.all(mod_glc_ABC__J_glc*(R*T*np.log(C_glc_e_glc_ABC/np.abs(mod_cytosol__C_glc)) + n_P_glc_ABC*mod_cytosol__A_hyd) >= -1e-30) and np.all(mod_glc_GalP__J_glc*(R*T*np.log(C_glc_e_glc_GalP/np.abs(mod_cytosol__C_glc)) + n_H_glc_GalP*F*(mod_H__E_H - mod_membrane__V)*1e-3) >= -1e-30)"
     },
     {
       "description": "the default point is a steady state: V stays at -105 mV (1e-6 mV), pH at 7.6 (1e-9) and ATP at 9.6 mM (relative 1e-9)",
@@ -187,6 +208,18 @@
         1.0,
         8.0
       ],
+      "m_target_pool_PTS": [
+        0.25,
+        4.0
+      ],
+      "m_target_pool_ABC": [
+        0.25,
+        4.0
+      ],
+      "m_target_pool_GalP": [
+        0.25,
+        4.0
+      ],
       "C_glc_e_membrane_face": [
         0.0,
         50.0
@@ -210,6 +243,9 @@
       "m_target_pool_Glf",
       "m_target_pool_LacT",
       "m_target_pool_Flagellum",
+      "m_target_pool_PTS",
+      "m_target_pool_ABC",
+      "m_target_pool_GalP",
       "C_glc_e_membrane_face",
       "a_motor_i_flagellum"
     ],

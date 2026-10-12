@@ -170,6 +170,28 @@ n_half_i_flagellum,dimensionless,2.0,unreferenced_placeholder; flagella at which
 eta_i_flagellum,pascal_second,0.00108,"unreferenced_placeholder; dynamic viscosity of seawater at 20 C and 35 g/kg salinity, about 1.08 mPa s (Sharqawy et al. 2010 tables; to cite)",no
 R_body_i_flagellum,um,1.0,unreferenced_placeholder; a 2 um cell (typical prokaryote): disc radius,no
 N_A_i_flagellum,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+C_glc_e_glc_PTS,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
+C_lac_e_glc_PTS,millimolar,0.0,definitional; no lactate in the medium,no
+jmax_glc_glc_PTS,mol_per_s_per_um2,3.0933897205955476e-19,"derived: n_0 x turnover_PTS / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_PTS: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
+K_glc_t_glc_PTS,millimolar,0.005,"deutscher2006how; glucose PTS (PtsG/EIICB-Glc) Km ~3-10 uM; 5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
+n_P_glc_PTS,dimensionless,1.0,deutscher2006how; one PEP phosphoryl per glucose taken up (and phosphorylated); charged to the lumped cytosol as one ATP equivalent,yes
+K_m_ATP_glc_PTS,millimolar,0.1,"unreferenced_placeholder; ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM",no
+dG0_hyd_glc_PTS,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
+c_std_glc_PTS,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
+C_glc_e_glc_ABC,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
+C_lac_e_glc_ABC,millimolar,0.0,definitional; no lactate in the medium,no
+jmax_glc_glc_ABC,mol_per_s_per_um2,3.0933897205955483e-20,"derived: n_0 x turnover_ABC / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_ABC: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
+K_glc_t_glc_ABC,millimolar,0.0005,"ferenci1996adaptation; binding-protein (Mgl) glucose transport Km ~0.1-1 uM; 0.5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
+n_P_glc_ABC,dimensionless,2.0,davidson2008structure; two ATP hydrolysed per transport cycle of a binding-protein-dependent ABC importer,yes
+K_m_ATP_glc_ABC,millimolar,0.1,"unreferenced_placeholder; ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM",no
+dG0_hyd_glc_ABC,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
+c_std_glc_ABC,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
+C_glc_e_glc_GalP,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
+C_lac_e_glc_GalP,millimolar,0.0,definitional; no lactate in the medium,no
+jmax_glc_glc_GalP,mol_per_s_per_um2,7.733474301488869e-20,"derived: n_0 x turnover_GalP / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_GalP: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
+K_glc_t_glc_GalP,millimolar,0.1,"pao1998major; MFS sugar/H+ symporters (GalP, LacY) Km ~10 uM-1 mM; 0.1 mM, the geometric middle of the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
+n_H_glc_GalP,dimensionless,1.0,pao1998major; one H+ per sugar in MFS sugar/H+ symport,yes
+c_std_glc_GalP,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
 m_init_pool_H_ATPase,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_H_ATPase,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
 tau_pool_H_ATPase,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
@@ -282,3 +304,45 @@ k_deg_pool_Flagellum,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924
 N_A_pool_Flagellum,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Flagellum,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Flagellum,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+m_init_pool_PTS,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
+m_target_pool_PTS,dimensionless,0.0,definitional; none until the game sets a target,no
+tau_pool_PTS,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+n_0_pool_PTS,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no
+L_pool_PTS,dimensionless,1306.0,"definitional; one glucose PTS unit: E. coli PtsG EIICB-Glc (P69786, 477 aa) + Crr EIIA-Glc (P69783, 169) + PtsI enzyme I (P08839, 575) + PtsH HPr (P0AA04, 85); one of each per unit (EI and HPr are shared by every PTS of a real cell)",yes
+footprint_pool_PTS,nm2,12.0,"unreferenced_placeholder; membrane area one PtsG (EIIC) copy takes, as an MFS-sized carrier (0: cytosolic)",no
+c_syn_pool_PTS,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
+c_poly_pool_PTS,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
+c_deg_pool_PTS,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
+c_recycle_pool_PTS,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
+k_deg_pool_PTS,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+N_A_pool_PTS,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+K_m_ATP_pool_PTS,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
+ATP_ref_pool_PTS,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+m_init_pool_ABC,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
+m_target_pool_ABC,dimensionless,0.0,definitional; none until the game sets a target,no
+tau_pool_ABC,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+n_0_pool_ABC,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no
+L_pool_ABC,dimensionless,1510.0,"definitional; one Mgl ABC importer: E. coli MglA ATPase (P0AAG8, 506 aa) + 2 MglC permease (P23200, 336) + MglB binding protein (P0AEE5, 332); real cells keep binding protein in excess, not counted here",yes
+footprint_pool_ABC,nm2,25.0,unreferenced_placeholder; membrane area one MglC2 permease dimer takes (0: cytosolic),no
+c_syn_pool_ABC,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
+c_poly_pool_ABC,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
+c_deg_pool_ABC,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
+c_recycle_pool_ABC,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
+k_deg_pool_ABC,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+N_A_pool_ABC,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+K_m_ATP_pool_ABC,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
+ATP_ref_pool_ABC,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+m_init_pool_GalP,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
+m_target_pool_GalP,dimensionless,0.0,definitional; none until the game sets a target,no
+tau_pool_GalP,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+n_0_pool_GalP,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no
+L_pool_GalP,dimensionless,464.0,definitional; E. coli GalP galactose(glucose)/H+ symporter (P0AEP1),yes
+footprint_pool_GalP,nm2,12.0,"unreferenced_placeholder; membrane area one GalP copy takes (12 transmembrane helices, as Glf)",no
+c_syn_pool_GalP,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
+c_poly_pool_GalP,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
+c_deg_pool_GalP,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
+c_recycle_pool_GalP,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
+k_deg_pool_GalP,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+N_A_pool_GalP,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+K_m_ATP_pool_GalP,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
+ATP_ref_pool_GalP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
