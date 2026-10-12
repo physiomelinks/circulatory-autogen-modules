@@ -23,8 +23,20 @@
     "f_area",
     "x_ATP",
     "R_reg",
+    "s_prot",
+    "phi_aa",
+    "N_aa",
+    "r_aa_cat",
+    "J_cat",
+    "Q_prot_demand_total",
+    "Q_aa_rel_total",
+    "Q_aa_use_total",
+    "J_prot_total",
+    "J_saved_total",
+    "J_recycled",
     "pool_a/m",
     "pool_b/m",
+    "pool_c/m",
     "cyto/C_ATP"
   ],
   "harness": {
@@ -46,6 +58,14 @@
         "proteome"
       ],
       [
+        "pool_c",
+        "ArgusUNPUBLISHED_v01",
+        "protein_pool",
+        "",
+        "mod",
+        "Glyc"
+      ],
+      [
         "cyto",
         "adaptive_ArgusUNPUBLISHED_v01",
         "energy_metabolism",
@@ -57,7 +77,7 @@
         "mod",
         "adaptive_ArgusUNPUBLISHED_v01",
         "protein_expression",
-        "pool_a pool_b cyto",
+        "pool_a pool_b pool_c cyto",
         "",
         "default"
       ]
@@ -74,6 +94,12 @@
         "dimensionless",
         1.2,
         "harness: a fifth more of the proteome"
+      ],
+      [
+        "m_target_pool_c",
+        "dimensionless",
+        0.5,
+        "harness: half the glycolytic enzymes"
       ]
     ]
   },
@@ -89,8 +115,17 @@
       "applies": "run"
     },
     {
-      "description": "the ATP port takes exactly what the pools use: j_ATP = -J_ATP_total = -(J_keep_total + J_build_total) (exact; relative 1e-9 with pools)",
-      "expr": "np.allclose(j_ATP_prot, -J_ATP_total, rtol=1e-12, atol=0) and np.allclose(J_ATP_total, J_keep_total + J_build_total, rtol=1e-9, atol=1e-30)",
+      "description": "the ATP port takes exactly what the pools use less what catabolism makes: j_ATP = -J_ATP_total = -(J_keep_total + J_build_total + J_prot_total - J_cat) (exact; relative 1e-9 with pools)",
+      "expr": "np.allclose(j_ATP_prot, -J_ATP_total, rtol=1e-12, atol=0) and np.allclose(J_ATP_total, J_keep_total + J_build_total + J_prot_total - J_cat, rtol=1e-9, atol=1e-30)",
+      "applies": "run"
+    },
+    {
+      "description": "proteolysis and the recycled pool (exact): s_prot = min(1, Q_prot_max/Q_prot_demand_total), phi_aa = N_aa/(K_aa + N_aa), r_aa_cat = N_aa/tau_aa_cat, J_cat = y_aa_cat r_aa_cat / N_A, J_recycled = J_saved_total + J_cat",
+      "expr": "np.allclose(s_prot, np.where(Q_prot_demand_total > Q_prot_max, (Q_prot_max + Q_eps)/(Q_prot_demand_total + Q_eps), 1.0), rtol=1e-9, atol=1e-12) and np.allclose(phi_aa, np.maximum(N_aa, 0)/(K_aa + np.maximum(N_aa, 0)), rtol=1e-12, atol=1e-15) and np.allclose(J_cat, y_aa_cat*np.maximum(N_aa, 0)/tau_aa_cat/N_A, rtol=1e-12, atol=0) and np.allclose(J_recycled, J_saved_total + J_cat, rtol=1e-12, atol=1e-30)"
+    },
+    {
+      "description": "amino acids are conserved: N_aa(t) - N_aa(0) = int (Q_aa_rel_total - Q_aa_use_total - r_aa_cat) dt (relative 1e-4: trapezoid integration of the logged fluxes); the proteases never remove more than their capacity, Q_prot_demand_total s_prot <= Q_prot_max",
+      "expr": "abs(N_aa[-1] - N_aa[0] - np.trapz(Q_aa_rel_total - Q_aa_use_total - r_aa_cat, t)) <= 1e-4*np.trapz(np.abs(Q_aa_rel_total) + np.abs(Q_aa_use_total) + np.abs(r_aa_cat), t) + 1e-9 and np.all(Q_prot_demand_total*s_prot <= Q_prot_max*(1 + 1e-9) + 1e-9)",
       "applies": "run"
     }
   ],
@@ -107,6 +142,22 @@
       "f_ATP_reg": [
         0.0,
         1.0
+      ],
+      "Q_prot_max": [
+        1000.0,
+        10000000.0
+      ],
+      "K_aa": [
+        100000.0,
+        100000000.0
+      ],
+      "tau_aa_cat": [
+        60.0,
+        36000.0
+      ],
+      "y_aa_cat": [
+        0.0,
+        2.0
       ]
     },
     "exclude": [

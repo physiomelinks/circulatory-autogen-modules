@@ -125,6 +125,13 @@ reg_on_ATP_repair_bio,dimensionless,0.0,"definitional; off until the player swit
 reg_on_G6P_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_glc_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_H_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+Q_prot_max_protein,per_s,80564.18321852955,"derived: proteolysis_capacity x the amino acids in the resting cell's proteins (sum of n_0 L over its pools) (proteolysis_capacity: willetts1967intracellular, placeholder; proteome_per_um3: milo2010bionumbers, sourced; L_proteome: unreferenced_placeholder, placeholder)",no
+Q_eps_protein,per_s,1e-09,"definitional; numerical floor, 1e-9 amino acids/s (13 orders below the proteases' capacity)",no
+N_aa_init_protein,dimensionless,0.0,definitional; no recycled amino acids at rest,no
+K_aa_protein,dimensionless,3783822.6340999305,"derived: aa_reuse_K x cell volume x N_A (aa_reuse_K: unreferenced_placeholder, placeholder)",no
+tau_aa_cat_protein,second,1800.0,unreferenced_placeholder; time constant with which recycled amino acids the cell does not reuse are catabolised (deaminated and their carbon fermented or excreted); 30 min assumed,no
+y_aa_cat_protein,dimensionless,0.5,"unreferenced_placeholder; ATP a fermenting cell makes per amino acid catabolised: 1 per arginine by the arginine deiminase pathway, about 1 for serine, threonine or alanine through pyruvate to acetate, none for most others without respiration; 0.5 assumed as the mean",no
+N_A_protein,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 J_ref_protein,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C) (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
 build_capacity_protein,dimensionless,9.02267970403271,"derived: ribosomes x k_elong x ribosome_active_fraction x (c_syn + c_poly) / N_A / the resting ATP turnover (ribosomes_per_um3: unreferenced_placeholder, placeholder; k_elong: farewell1998effect, sourced; ribosome_active_fraction: dai2016reduction, sourced; c_syn: akashi2002metabolic, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
 ATP_floor_protein,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
@@ -139,12 +146,13 @@ reg_on_H_protein,dimensionless,0.0,"definitional; off until the player switches 
 m_init_pool_proteome,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_proteome,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
 tau_pool_proteome,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
+tau_prot_pool_proteome,second,432.80851226668904,"derived: t_half_proteolysis / ln 2: the mean lifetime of a protein marked for removal (t_half_proteolysis: purcell2012temperature, placeholder)",no
 n_0_pool_proteome,dimensionless,16964600.329384882,"derived: (1 - glycolytic_share) x proteome_per_um3 x cell volume (glycolytic_share: unreferenced_placeholder, placeholder; proteome_per_um3: milo2010bionumbers, sourced)",no
 L_pool_proteome,dimensionless,300.0,unreferenced_placeholder; mean protein length about 300 amino acids,no
 footprint_pool_proteome,nm2,0.0,unreferenced_placeholder; membrane area one proteome copy takes (0: cytosolic),no
 c_syn_pool_proteome,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
 c_poly_pool_proteome,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
-c_deg_pool_proteome,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
+c_deg_pool_proteome,dimensionless,1.0,"kenniston2003linkage; ATP per amino acid for ATP-dependent proteolysis: ClpXP hydrolyses about 1 ATP per residue it translocates, plus 10 to over 500 ATP per substrate to unfold it, more for more stable proteins (Kenniston et al. 2003; single-molecule steps of 5-8 residues per power stroke, Maillard et al. 2011, put translocation nearer 0.2-0.5); 1 taken (confidence: medium, the unfolding share varies with the protein)",yes
 c_recycle_pool_proteome,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
 k_deg_pool_proteome,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_proteome,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
@@ -157,12 +165,13 @@ reg_on_H_pool_proteome,dimensionless,0.0,"definitional; off until the player swi
 m_init_pool_Glyc,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_Glyc,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
 tau_pool_Glyc,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
+tau_prot_pool_Glyc,second,432.80851226668904,"derived: t_half_proteolysis / ln 2: the mean lifetime of a protein marked for removal (t_half_proteolysis: purcell2012temperature, placeholder)",no
 n_0_pool_Glyc,dimensionless,1884955.592153876,"derived: glycolytic_share x proteome_per_um3 x cell volume (glycolytic_share: unreferenced_placeholder, placeholder; proteome_per_um3: milo2010bionumbers, sourced)",no
 L_pool_Glyc,dimensionless,350.0,unreferenced_placeholder; mean length of the glycolytic enzymes,no
 footprint_pool_Glyc,nm2,0.0,unreferenced_placeholder; membrane area one Glyc copy takes (0: cytosolic),no
 c_syn_pool_Glyc,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
 c_poly_pool_Glyc,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
-c_deg_pool_Glyc,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
+c_deg_pool_Glyc,dimensionless,1.0,"kenniston2003linkage; ATP per amino acid for ATP-dependent proteolysis: ClpXP hydrolyses about 1 ATP per residue it translocates, plus 10 to over 500 ATP per substrate to unfold it, more for more stable proteins (Kenniston et al. 2003; single-molecule steps of 5-8 residues per power stroke, Maillard et al. 2011, put translocation nearer 0.2-0.5); 1 taken (confidence: medium, the unfolding share varies with the protein)",yes
 c_recycle_pool_Glyc,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
 k_deg_pool_Glyc,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_Glyc,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no

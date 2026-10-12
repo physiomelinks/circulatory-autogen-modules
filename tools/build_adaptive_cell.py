@@ -414,6 +414,35 @@ print(f'H+-ATPase thermodynamics: ATP affinity {A_HYD / 1e3:.2f} kJ/mol vs H+ wo
 # ------------------------------------------------------------------ references
 register_bib(MATRIX_BIB)
 register_bib({
+    # regulated proteolysis: its ATP cost and speed
+    'kenniston2003linkage': dict(type='article',
+                                 author='Kenniston, Jon A. and Baker, Tania A. and Fernandez, Julio M. and Sauer, Robert T.',
+                                 title='Linkage between ATP consumption and mechanical unfolding during the protein '
+                                       'processing reactions of an AAA+ degradation machine',
+                                 journal='Cell', year='2003', volume='114', number='4', pages='511--520',
+                                 doi='10.1016/S0092-8674(03)00612-3',
+                                 note='ClpXP: about 1 ATP per residue translocated; unfolding costs more ATP the more '
+                                      'stable the substrate'),
+    'purcell2012temperature': dict(type='article',
+                                   author='Purcell, Oliver and Grierson, Claire S. and di Bernardo, Mario and Savery, '
+                                          'Nigel J.',
+                                   title='Temperature dependence of ssrA-tag mediated protein degradation',
+                                   journal='Journal of Biological Engineering', year='2012', volume='6', pages='10',
+                                   doi='10.1186/1754-1611-6-10',
+                                   note='ssrA(LAA)-tagged LacI half-life about 8 min at 37 C and 38 min at 25 C'),
+    'herman1995degradation': dict(type='article',
+                                  author='Herman, Christophe and Thevenet, Danielle and D\'Ari, Richard and Bouloc, '
+                                         'Philippe',
+                                  title='Degradation of sigma 32, the heat shock regulator in Escherichia coli, is '
+                                        'governed by HflB',
+                                  journal='Proceedings of the National Academy of Sciences USA', year='1995',
+                                  volume='92', number='8', pages='3516--3520', doi='10.1073/pnas.92.8.3516',
+                                  note='sigma32 half-life under a minute in growing cells, degraded by FtsH (HflB)'),
+    'zhou1998regulation': dict(type='article', author='Zhou, Yanning and Gottesman, Susan',
+                               title='Regulation of proteolysis of the stationary-phase sigma factor RpoS',
+                               journal='Journal of Bacteriology', year='1998', volume='180', number='5',
+                               pages='1154--1158', doi='10.1128/JB.180.5.1154-1158.1998',
+                               note='RpoS half-life about 2 min in exponential growth (ClpXP with RssB)'),
     # protein turnover, protein synthesis capacity and maintenance in famine (2026-10-13)
     'maurizi1992proteases': dict(type='article', author='Maurizi, Michael R.',
                                  title='Proteases and protein degradation in Escherichia coli', journal='Experientia',
@@ -2386,8 +2415,10 @@ write_version('cell', 'polysaccharide_hydrolase', 'polysaccharide_hydrolase_surf
 # Each protein of the cell is a protein_pool: its expression m (copies n = n_0 m) rises towards the game's target m_target
 # with time constant tau (the mean lifetime of its mRNA: how fast the cell can change a protein's synthesis), at most as
 # fast as the cell's protein synthesis allows (protein_expression: its ribosomes' capacity, throttled as ATP falls). The
-# copies are degraded at k_deg (about 1%/h) and replaced up to the target, so the turnover costs ATP and a protein above
-# its target falls only as fast as it is degraded (most bacterial proteins are stable). The pool passes m to the
+# copies are degraded at k_deg (about 1%/h) and replaced up to the target, so the turnover costs ATP. Copies above the
+# target are removed by regulated (ATP-dependent) proteolysis with time constant tau_prot, within the proteases' capacity
+# (protein_expression), and their amino acids go to the cell's recycled pool, from which new copies are built first. The
+# pool passes m to the
 # protein it scales (a transporter's density or capacity, or the glycolytic enzymes' V_gly) on its protein_expression
 # port, and its costs, build demand, daughter share and membrane area to protein_expression on protein_synthesis.
 POOL_V = 'ArgusUNPUBLISHED_v01'
@@ -2396,6 +2427,9 @@ C_BUILD_EXPR = '(c_syn + c_poly)'
 # how fast a protein's synthesis follows a new target: its mRNA's mean lifetime
 TAU_EXPRESSION = der(BIO['t_half_mRNA'] / math.log(2), 't_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time '
                      'constant with which a protein\'s synthesis follows its target', 't_half_mRNA')
+# how fast copies above a lowered target are removed: the mean lifetime of a protein marked for proteolysis
+TAU_PROTEOLYSIS = der(par('t_half_proteolysis') / math.log(2), 't_half_proteolysis / ln 2: the mean lifetime of a protein '
+                      'marked for removal', 't_half_proteolysis')
 # the most membrane area the cell's proteins may take (protein_expression's A_protein_max, membrane_ceiling port)
 A_PROTEIN_MAX = der(par('protein_area_max_fraction') * A_SURFACE, 'protein_area_max_fraction x the whole cell surface',
                     'protein_area_max_fraction', 'R_cell', 'h_cell')
@@ -2406,6 +2440,7 @@ pool_vars = [
     ('m_target', 'dimensionless', 'in', None, 'expression the cell is moving to (set by the game)'),
     ('m_goal', 'dimensionless', 'out', None, 'the target after regulation: m_target R_reg'),
     ('tau', 'second', 'in', None, 'time constant of the rise (the mRNA\'s mean lifetime)'),
+    ('tau_prot', 'second', 'in', None, 'time constant of the regulated proteolysis of copies above the goal'),
     ('n_0', 'dimensionless', 'in', None, 'copies per cell at m = 1'), ('L', 'dimensionless', 'in', None,
                                                                        'amino acids per functional unit'),
     ('footprint', 'nm2', 'in', None, 'membrane area one copy takes (0 for a cytosolic protein)'),
@@ -2421,6 +2456,10 @@ pool_vars = [
     ('s_build', 'dimensionless', 'in', None, 'share of the build demand the cell can serve (protein_synthesis port)'),
     ('R_syn', 'dimensionless', 'in', None, 'regulation of the cell\'s protein synthesis: the share of the degraded copies '
                                             'it replaces (protein_synthesis port)'),
+    ('s_prot', 'dimensionless', 'in', None, 'share of the proteolysis demand the cell\'s proteases serve (protein_synthesis '
+                                            'port)'),
+    ('phi_aa', 'dimensionless', 'in', None, 'share of a new copy\'s amino acids taken from the recycled pool '
+                                            '(protein_synthesis port)'),
     ('n', 'dimensionless', 'out', None, 'copies per cell'),
     ('r_rel', 'per_s', 'out', None, '(m_goal - m)/tau'),
     ('r_up', 'per_s', 'out', None, 'rising part of r_rel (copies to build)'),
@@ -2428,12 +2467,20 @@ pool_vars = [
     ('r_rep', 'per_s', 'out', None, 'replacement synthesis: k_deg R_syn m_kept, slowed as ATP runs out'),
     ('r_deg', 'per_s', 'out', None, 'degradation: k_deg m, slowed as ATP runs out'),
     ('r_down', 'per_s', 'out', None, 'net loss: copies degraded and not replaced (r_rep - r_deg, never positive)'),
+    ('r_prot', 'per_s', 'out', None, 'regulated proteolysis: copies above the goal removed per second'),
+    ('r_build', 'per_s', 'out', None, 'copies built per second'),
+    ('Q_prot_demand', 'per_s', 'out', None, 'amino acids per second the proteolysis of the copies above the goal asks for'),
+    ('Q_aa_rel', 'per_s', 'out', None, 'amino acids per second returned to the recycled pool: the copies removed by '
+                                       'proteolysis and those degraded and not replaced'),
+    ('Q_aa_use', 'per_s', 'out', None, 'amino acids per second taken from the recycled pool to build'),
+    ('J_prot', 'mol_per_s', 'out', None, 'ATP for the regulated proteolysis'),
+    ('J_saved', 'mol_per_s', 'out', None, 'ATP the recycled amino acids save the build: (c_syn - c_recycle) per amino acid'),
     ('f_ATP', 'dimensionless', 'out', None, 'synthesis slows as ATP runs out: 1 at ATP_ref'),
     ('f_build', 'dimensionless', 'out', None, 'f_ATP capped at 1: building never runs faster than asked'),
     ('J_keep', 'mol_per_s', 'out', None, 'ATP to keep the copies: replacement synthesis and degradation'),
     ('J_demand', 'mol_per_s', 'out', None, 'ATP the rise asks for: building r_up n_0 copies per second'),
-    ('J_build', 'mol_per_s', 'out', None, 'ATP spent building'),
-    ('J_ATP', 'mol_per_s', 'out', None, 'all ATP this protein uses'),
+    ('J_build', 'mol_per_s', 'out', None, 'ATP spent building (net of what recycled amino acids save)'),
+    ('J_ATP', 'mol_per_s', 'out', None, 'all ATP this protein uses: J_keep + J_build + J_prot'),
     ('M_build', 'mole', 'out', None, 'ATP to build the present copies from scratch (its share of a daughter)'),
     ('a_unit', 'um2', 'out', None, 'membrane area per unit of m'),
     ('A_protein', 'um2', 'out', None, 'membrane area the copies take'),
@@ -2457,17 +2504,29 @@ pool_eqs = [
     # replacement remakes a degraded copy from its recycled amino acids (c_poly + c_recycle); degradation costs c_deg
     ('J_keep', 'n_0 * L * ((c_poly + c_recycle) * r_rep + c_deg * r_deg) / N_A'),
     ('J_demand', f'r_up * n_0 * L * {C_BUILD_EXPR} / N_A'),
-    ('J_build', 'J_demand * s_build * f_build'),
-    ('J_ATP', 'J_keep + J_build'),
+    ('r_build', 'r_up * s_build * f_build'),
+    # copies above the goal are removed by ATP-dependent proteolysis, within the proteases' share s_prot
+    ('Q_prot_demand', 'n_0 * L * (m - m_goal + abs(m - m_goal)) / 2.0 / tau_prot'),
+    ('r_prot', '(m - m_goal + abs(m - m_goal)) / 2.0 / tau_prot * s_prot * f_build'),
+    ('J_prot', 'c_deg * n_0 * L * r_prot / N_A'),
+    # their amino acids, and those of copies degraded and not replaced, go to the cell's recycled pool; a share phi_aa
+    # of a new copy's amino acids comes from it at c_recycle each instead of c_syn
+    ('Q_aa_rel', 'n_0 * L * (r_prot - r_down)'),
+    ('Q_aa_use', 'n_0 * L * phi_aa * r_build'),
+    ('J_saved', '(c_syn - c_recycle) * Q_aa_use / N_A'),
+    ('J_build', f'r_build * n_0 * L * {C_BUILD_EXPR} / N_A - J_saved'),
+    ('J_ATP', 'J_keep + J_build + J_prot'),
     ('M_build', f'n * L * {C_BUILD_EXPR} / N_A'),
     ('a_unit', 'n_0 * footprint * u(1e-6, um2_per_nm2)'),
     ('A_protein', 'a_unit * m'),
     ('share', 'A_protein / A_ceiling'), ('s_unit', 'a_unit / A_ceiling'),
-    # copies rise as fast as the ATP actually spent builds them, and fall as they are degraded and not replaced
-    ('d/dt m', 'r_up * s_build * f_build + r_down'),
+    # copies rise as fast as the ATP actually spent builds them, and fall as they are degraded and not replaced or
+    # removed by proteolysis
+    ('d/dt m', 'r_build + r_down - r_prot'),
 ]
 pool_roles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in pool_vars if v[0] != 't'}
-pool_roles.update({n: 'boundary_condition' for n in ('m_target', 'ATP', 's_build', 'A_ceiling', 'R_syn')})
+pool_roles.update({n: 'boundary_condition' for n in ('m_target', 'ATP', 's_build', 'A_ceiling', 'R_syn', 's_prot',
+                                                     'phi_aa')})
 pool_roles.update(REG_ROLES)
 
 
@@ -2475,13 +2534,14 @@ def pool_rows(key):
     if key in CARRIERS:   # a carrier the level-1 cell lacks: none expressed until the game sets a target
         start = [('m_init', 0.0, 'definitional; the level-1 cell has none (the game unlocks it)', False),
                  ('m_target', 0.0, 'definitional; none until the game sets a target', False),
-                 ('tau', TAU_EXPRESSION, '', False), ('n_0', N0_CARRIER, '', False),
+                 ('tau', TAU_EXPRESSION, '', False), ('tau_prot', TAU_PROTEOLYSIS, '', False),
+                 ('n_0', N0_CARRIER, '', False),
                  ('L', par(f'L_{key}'), '', False)]
     else:
         label, L, n, how = PROTEINS[key]
         start = [('m_init', 1.0, 'definitional; the calibrated cell', False),
                  ('m_target', 1.0, 'definitional; at rest the cell keeps its baseline', False),
-                 ('tau', TAU_EXPRESSION, '', False),
+                 ('tau', TAU_EXPRESSION, '', False), ('tau_prot', TAU_PROTEOLYSIS, '', False),
                  ('n_0', n, f'calibrated: {how}', False), ('L', L, '', False)]
     return start + [
         ('footprint', par(f'footprint_{key}'), '', False),
@@ -2491,6 +2551,8 @@ def pool_rows(key):
         ('ATP_ref', ATP, '', False), ('ATP', ATP, '', False),
         ('s_build', 1.0, 'definitional; synthesis serves the whole demand when unconnected', False),
         ('R_syn', 1.0, 'definitional; every degraded copy is replaced when unconnected', False),
+        ('s_prot', 1.0, 'definitional; the proteases serve the whole demand when unconnected', False),
+        ('phi_aa', 0.0, 'definitional; no recycled amino acids when unconnected (every copy built from glucose)', False),
         ('A_ceiling', A_PROTEIN_MAX, '', False),
     ] + REG_ROWS
 
@@ -2504,24 +2566,38 @@ pool_inv = [
              'np.allclose(r_down, r_rep - r_deg, rtol=1e-12, atol=1e-18) and np.all(r_down <= 1e-18)'},
     {'description': 'costs (exact): J_keep = n_0 L ((c_poly + c_recycle) r_rep + c_deg r_deg) / N_A (at the goal n L '
                     '(c_poly + c_deg + c_recycle) k_deg min(f_ATP, 1) / N_A), J_demand = r_up n_0 L '
-                    '(c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1), M_build = n L (c_syn + c_poly) / '
+                    '(c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1) - J_saved with J_saved = (c_syn - '
+                    'c_recycle) phi_aa n_0 L r_build / N_A, J_prot = c_deg n_0 L r_prot / N_A, J_ATP = J_keep + J_build + '
+                    'J_prot, M_build = n L (c_syn + c_poly) / '
                     'N_A, A_protein = n_0 footprint m, share = A_protein / A_ceiling, s_unit = n_0 footprint / A_ceiling',
      'expr': 'np.allclose(J_keep, n_0*L*((c_poly + c_recycle)*r_rep + c_deg*r_deg)/N_A, rtol=1e-12, atol=0) and '
              'np.allclose(J_demand, np.maximum(m_goal - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and '
-             'np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and '
+             'np.allclose(J_saved, (c_syn - c_recycle)*phi_aa*n_0*L*r_build/N_A, rtol=1e-9, atol=1e-30) and '
+             'np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1) - J_saved, rtol=1e-9, atol=1e-30) and '
+             'np.allclose(J_prot, c_deg*n_0*L*r_prot/N_A, rtol=1e-12, atol=0) and '
+             'np.allclose(J_ATP, J_keep + J_build + J_prot, rtol=1e-12, atol=1e-30) and '
              'np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and '
              'np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0) and '
              'np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0) and '
              'np.allclose(s_unit, n_0*footprint*1e-6/A_ceiling, rtol=1e-12, atol=0)'},
-    {'description': 'the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0) - int r_down dt) = int '
-                    'J_build dt (relative 1e-4: trapezoid integration of the logged fluxes)',
-     'expr': 'abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapz(r_down, t)) - np.trapz(J_build, t)) <= '
-             '1e-4*abs(np.trapz(J_build, t)) + 1e-30', 'applies': 'run'},
+    {'description': 'proteolysis and recycling (exact): r_prot = max(m - m_goal, 0) / tau_prot s_prot min(f_ATP, 1), '
+                    'Q_prot_demand = n_0 L max(m - m_goal, 0) / tau_prot, Q_aa_rel = n_0 L (r_prot - r_down) >= 0, '
+                    'Q_aa_use = n_0 L phi_aa r_build',
+     'expr': 'np.allclose(r_prot, np.maximum(m - m_goal, 0)/tau_prot*s_prot*np.minimum(f_ATP, 1), rtol=1e-12, '
+             'atol=1e-18) and np.allclose(Q_prot_demand, n_0*L*np.maximum(m - m_goal, 0)/tau_prot, rtol=1e-12, '
+             'atol=1e-12) and np.allclose(Q_aa_rel, n_0*L*(r_prot - r_down), rtol=1e-12, atol=1e-12) and '
+             'np.all(Q_aa_rel >= 0) and np.allclose(Q_aa_use, n_0*L*phi_aa*r_build, rtol=1e-12, atol=1e-12)'},
+    {'description': 'the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0) - int (r_down - r_prot) '
+                    'dt) = int (J_build + J_saved) dt (relative 1e-4: trapezoid integration of the logged fluxes)',
+     'expr': 'abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapz(r_down - r_prot, t)) - np.trapz(J_build + '
+             'J_saved, t)) <= 1e-4*abs(np.trapz(J_build + J_saved, t)) + 1e-4*n_0*L*(c_syn + c_poly)/N_A*np.trapz('
+             'r_prot, t) + 1e-30', 'applies': 'run'},
     {'description': 'with synthesis unregulated (R_syn = 1) expression approaches its regulated target and never '
                     'overshoots: m moves monotonically towards m_goal (constant in these tests)',
      'expr': 'np.all(R_syn < 1) or (np.all(np.diff(m)*np.sign(m_goal[0] - m[0]) >= -1e-12) and '
              'np.all((m - m_goal)*(m[0] - m_goal) >= -1e-12))'},
-    {'description': 'costs are never negative', 'expr': 'np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(M_build >= 0)'},
+    {'description': 'costs are never negative', 'expr': 'np.all(J_keep >= 0) and np.all(J_build >= 0) and '
+                                                      'np.all(J_prot >= 0) and np.all(J_saved >= 0) and np.all(M_build >= 0)'},
     reg_invariant('m_target', 'm_goal'),
 ]
 pool_extra = {k: pool_rows(k) for k in PROTEINS}
@@ -2533,22 +2609,27 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                                  {'port_type': 'daughter_share', 'variables': ['M_build']},
                                  {'port_type': 'protein_synthesis',
                                   'variables': ['ATP', 's_build', 'J_demand', 'J_ATP', 'J_keep', 'J_build', 'M_build',
-                                                'A_protein', 'R_syn']},
+                                                'A_protein', 'R_syn', 's_prot', 'phi_aa', 'Q_prot_demand', 'Q_aa_rel',
+                                                'Q_aa_use', 'J_prot', 'J_saved']},
                                  {'port_type': 'membrane_ceiling', 'variables': ['A_ceiling']}, REG_PORT],
                'roles': pool_roles},
               pool_rows('NhaA'),
               {'sim_time': 3600.0, 'pre_time': 0.0, 'dt': 10.0, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
                'outputs': ['m', 'n', 'r_up', 'r_down', 'r_rep', 'r_deg', 'm_kept', 'f_ATP', 'J_keep', 'J_demand', 'J_build', 'J_ATP', 'M_build',
+                           'r_prot', 'r_build', 'Q_prot_demand', 'Q_aa_rel', 'Q_aa_use', 'J_prot', 'J_saved',
                            'A_protein', 'share', 's_unit', 'm_goal', 'R_reg'],
                # ATP regulation switched on, at f = 0.8: the pool goes to 0.8 of its target
                'run_parameters': {'m_target': 2.0, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8},
                'invariants': pool_inv,
                'bc_sweep': {'ranges': {'m_target': [0.25, 4.0], 'ATP': [0.5, 12.0], 's_build': [0.0, 1.0],
-                                       'f_ATP_reg': [0.0, 1.0], 'R_syn': [0.0, 1.0]},
+                                       'f_ATP_reg': [0.0, 1.0], 'R_syn': [0.0, 1.0], 's_prot': [0.0, 1.0],
+                                       'phi_aa': [0.0, 1.0]},
                             'rationale': 'expression over the range the game offers (x0.25-4); ATP from near exhaustion '
                                          'to above rest; synthesis from stalled to unconstrained; the ATP regulation '
-                                         'from full repression to none; replacement synthesis from stopped to full'},
+                                         'from full repression to none; replacement synthesis from stopped to full; '
+                                         'proteolysis from stalled to unconstrained; new copies from glucose only to '
+                                         'recycled amino acids only'},
                # slow (tau ~7 min): at small steps RK4 errors are round-off, so test convergence where they are not
                'timestep': {'scheme': 'rk4', 'dts': [400.0, 200.0, 100.0], 't_end': 3600.0, 'min_order': 0.8,
                             'tol': 1e-3, 'cvode_tol': 1e-2},
@@ -2560,15 +2641,23 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                   'fast as the cell\'s protein synthesis allows (below). Turnover: the copies are degraded at r_deg = '
                   'k_deg m (k_deg about 1%/h: most bacterial proteins are stable, Maurizi 1992, Gupta et al. 2024) and '
                   'replaced up to the goal at r_rep = k_deg R_syn min(m, m_goal), both slowed by min(f_ATP, 1), f_ATP = '
-                  'ATP/(K_m + ATP) (K_m + ATP_ref)/ATP_ref, as ATP runs out; dm/dt = r_up s_build min(f_ATP, 1) + r_down, '
-                  'r_down = r_rep - r_deg <= 0. So a protein above its target falls only as fast as it is degraded (an '
-                  'e-fold in about 100 h; growing bacteria lose protein mainly by dilution, which this non-growing pool '
-                  'has not), and if the cell\'s synthesis is regulated down (R_syn < 1, from protein_expression) its '
-                  'copies are lost at k_deg (1 - R_syn). Keeping the copies costs J_keep = n_0 L ((c_poly + c_recycle) '
-                  'r_rep + c_deg r_deg) / N_A: at the goal n L (c_poly + c_deg + c_recycle) k_deg / N_A. Raising m asks for the '
-                  'ATP to build r_up n_0 copies per second from glucose, J_demand = r_up n_0 L (c_syn + c_poly) / N_A; the '
+                  'ATP/(K_m + ATP) (K_m + ATP_ref)/ATP_ref, as ATP runs out; r_down = r_rep - r_deg <= 0, and if the '
+                  'cell\'s synthesis is regulated down (R_syn < 1, from protein_expression) its copies are lost at k_deg '
+                  '(1 - R_syn). Copies above the goal are removed by regulated, ATP-dependent proteolysis (ClpXP, Lon, '
+                  'FtsH acting on a protein the cell has marked for removal): r_prot = max(m - m_goal, 0) / tau_prot '
+                  's_prot min(f_ATP, 1), tau_prot = t_half_proteolysis / ln 2 (about 7 min at 20 C), s_prot the share of '
+                  'the demand Q_prot_demand = n_0 L max(m - m_goal, 0) / tau_prot the cell\'s proteases serve '
+                  '(protein_expression), at c_deg ATP per amino acid: J_prot = c_deg n_0 L r_prot / N_A. dm/dt = r_build '
+                  '+ r_down - r_prot, r_build = r_up s_build min(f_ATP, 1). Keeping the copies costs J_keep = n_0 L '
+                  '((c_poly + c_recycle) r_rep + c_deg r_deg) / N_A: at the goal n L (c_poly + c_deg + c_recycle) k_deg / '
+                  'N_A. The amino acids of the copies removed, and of those degraded and not replaced, go to the cell\'s '
+                  'recycled pool (protein_expression): Q_aa_rel = n_0 L (r_prot - r_down). Raising m asks for the ATP to '
+                  'build r_up n_0 copies per second from glucose, J_demand = r_up n_0 L (c_syn + c_poly) / N_A; the '
                   'cell\'s protein synthesis (protein_expression adaptive) serves the share s_build of it, and the copies '
-                  'rise only as fast as the ATP actually spent. Degraded copies are not refunded. M_build = n L (c_syn + c_poly) / N_A is the ATP to '
+                  'rise only as fast as the ribosomes allow. A share phi_aa of the new copies\' amino acids comes from the '
+                  'recycled pool (Q_aa_use = n_0 L phi_aa r_build) at c_recycle ATP each instead of c_syn, saving J_saved '
+                  '= (c_syn - c_recycle) Q_aa_use / N_A: J_build = r_build n_0 L (c_syn + c_poly) / N_A - J_saved; the '
+                  'peptide bonds (c_poly) are paid again. M_build = n L (c_syn + c_poly) / N_A is the ATP to '
                   'build the present copies: its share of a daughter. A_protein = n footprint is the membrane area the '
                   'copies take (0 for cytosolic proteins), share = A_protein / A_ceiling the share of the membrane\'s '
                   'protein ceiling they take (A_ceiling: protein_expression\'s A_protein_max, on the membrane_ceiling '
@@ -2585,7 +2674,8 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                   'the target is the player\'s). Regulation changes the target, and through it what is replaced.'),
                'instances': {k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS}},
               ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers',
-               'maurizi1992proteases', 'willetts1967intracellular', 'gupta2024global', 'bernstein2002global'], POOL_V,
+               'maurizi1992proteases', 'willetts1967intracellular', 'gupta2024global', 'bernstein2002global',
+               'kenniston2003linkage', 'purcell2012temperature', 'herman1995degradation', 'zhou1998regulation'], POOL_V,
               extra_instances=pool_extra)
 
 # --- protein_pool membrane_share: a membrane protein whose target is a share of the membrane's protein ceiling
@@ -2624,13 +2714,15 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                                  {'port_type': 'daughter_share', 'variables': ['M_build']},
                                  {'port_type': 'protein_synthesis',
                                   'variables': ['ATP', 's_build', 'J_demand', 'J_ATP', 'J_keep', 'J_build', 'M_build',
-                                                'A_protein', 'R_syn']},
+                                                'A_protein', 'R_syn', 's_prot', 'phi_aa', 'Q_prot_demand', 'Q_aa_rel',
+                                                'Q_aa_use', 'J_prot', 'J_saved']},
                                  {'port_type': 'membrane_ceiling', 'variables': ['A_ceiling']}, REG_PORT],
                'roles': share_roles},
               share_rows('Glf'),
               {'sim_time': 3600.0, 'pre_time': 0.0, 'dt': 10.0, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
                'outputs': ['m', 'm_target', 'share', 's_unit', 'n', 'r_up', 'r_down', 'r_rep', 'r_deg', 'm_kept', 'f_ATP', 'J_keep', 'J_demand', 'J_build',
+                           'r_prot', 'r_build', 'Q_prot_demand', 'Q_aa_rel', 'Q_aa_use', 'J_prot', 'J_saved',
                            'J_ATP', 'M_build', 'A_protein', 'm_goal', 'R_reg'],
                'run_parameters': {'s_target': 2.0 * S0_GLF, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8},
                'invariants': [
@@ -2647,10 +2739,12 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
               # the pool's invariants (m_target an output here, constant in time)
               + pool_inv,
                'bc_sweep': {'ranges': {'s_target': [0.0, 1.0], 'ATP': [0.5, 12.0], 's_build': [0.0, 1.0],
-                                       'f_ATP_reg': [0.0, 1.0], 'R_syn': [0.0, 1.0]},
+                                       'f_ATP_reg': [0.0, 1.0], 'R_syn': [0.0, 1.0], 's_prot': [0.0, 1.0],
+                                       'phi_aa': [0.0, 1.0]},
                             'rationale': 'shares from none to the whole ceiling; ATP from near exhaustion to above rest; '
                                          'synthesis from stalled to unconstrained; the ATP regulation from full '
-                                         'repression to none'},
+                                         'repression to none; proteolysis from stalled to unconstrained; new copies from '
+                                         'glucose only to recycled amino acids only'},
                'timestep': {'scheme': 'rk4', 'dts': [400.0, 200.0, 100.0], 't_end': 3600.0, 'min_order': 0.8,
                             'tol': 1e-3, 'cvode_tol': 1e-2},
                'stability': STAB},
@@ -2661,7 +2755,7 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                   'port, a fixed fraction of the cell surface, so it scales with membrane area) the copies are to take. '
                   'The target copies are s_target A_ceiling / footprint, m_target = s_target A_ceiling / (n_0 '
                   'footprint); everything else (regulation to m_goal = m_target R_reg, rise with tau, degradation and '
-                  'replacement, upkeep, build cost and its limits, daughter share, area) is the ArgusUNPUBLISHED_v01 maths. share = A_protein / A_ceiling is the share the present '
+                  'replacement, regulated proteolysis of copies above the goal and the recycling of their amino acids, upkeep, build cost and its limits, daughter share, area) is the ArgusUNPUBLISHED_v01 maths. share = A_protein / A_ceiling is the share the present '
                   'copies take. The game keeps a cell\'s shares summing to at most 1. Instances: the fermenter cell\'s '
                   'transporters, each with s_target at its share at rest (m_target = 1), and the glucose carriers the '
                   'game unlocks after level 1 (PTS, ABC, GalP: none at start, n_0 = the calibrated cell\'s Glf '
@@ -2671,7 +2765,8 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                              **{k: f'{CARRIERS[k][0]}: none at start; n_0 = the calibrated cell\'s Glf copies'
                                 for k in CARRIERS}}},
               ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers',
-               'maurizi1992proteases', 'gupta2024global', 'bernstein2002global'], POOL_SHARE_V,
+               'maurizi1992proteases', 'gupta2024global', 'bernstein2002global', 'willetts1967intracellular',
+               'kenniston2003linkage', 'purcell2012temperature', 'herman1995degradation', 'zhou1998regulation'], POOL_SHARE_V,
               extra_instances=share_extra)
 
 # --- protein_expression adaptive: the cell's protein synthesis, serving its pools
@@ -2679,6 +2774,12 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
 BUILD_CAPACITY = der(BIO['n_ribo'] * par('k_elong') * par('ribosome_active_fraction') * C_BUILD / NA / R_TOT,
                      'ribosomes x k_elong x ribosome_active_fraction x (c_syn + c_poly) / N_A / the resting ATP turnover',
                      'ribosomes_per_um3', 'k_elong', 'ribosome_active_fraction', 'c_syn', 'maintenance_coefficient')
+# the most amino acids per second the cell's proteases can remove: proteolysis_capacity x the resting cell's protein
+AA_REST = sum(n * L for _, L, n, _ in PROTEINS.values())
+Q_PROT_MAX = der(par('proteolysis_capacity') * AA_REST, 'proteolysis_capacity x the amino acids in the resting cell\'s '
+                 'proteins (sum of n_0 L over its pools)', 'proteolysis_capacity', 'proteome_per_um3', 'L_proteome')
+# recycled amino acids at which half of a new copy's amino acids come from them, as a count in the cell
+K_AA = der(par('aa_reuse_K') * VOL * NA, 'aa_reuse_K x cell volume x N_A', 'aa_reuse_K')
 pe_vars = [
     ('t', 'second', 'in', None, None),
     ('ATP', 'millimolar', 'in', None, 'cytosol ATP (ATP_hydrolysis_port), passed to the pools'),
@@ -2688,8 +2789,33 @@ pe_vars = [
     ('J_ATP_in', 'mol_per_s', 'in', None, None), ('J_keep_in', 'mol_per_s', 'in', None, None),
     ('J_build_in', 'mol_per_s', 'in', None, None), ('M_build_in', 'mole', 'in', None, None),
     ('A_protein_in', 'um2', 'in', None, None),
+    ('Q_prot_demand_in', 'per_s', 'in', None, 'summed proteolysis demand of the pools, amino acids per second'),
+    ('Q_aa_rel_in', 'per_s', 'in', None, 'amino acids per second the pools return to the recycled pool'),
+    ('Q_aa_use_in', 'per_s', 'in', None, 'amino acids per second the pools take from the recycled pool'),
+    ('J_prot_in', 'mol_per_s', 'in', None, None), ('J_saved_in', 'mol_per_s', 'in', None, None),
+    ('Q_prot_max', 'per_s', 'in', None, 'most amino acids per second the cell\'s proteases can remove'),
+    ('Q_eps', 'per_s', 'in', None, 'numerical floor on the proteolysis demand (so s_prot is defined with nothing to '
+                                   'remove)'),
+    ('N_aa_init', 'dimensionless', 'in', None, None),
+    ('N_aa', 'dimensionless', 'out', 'N_aa_init', 'recycled amino acids: free amino acids from proteolysis, above the '
+                                                  'cell\'s usual pool (count per cell)'),
+    ('K_aa', 'dimensionless', 'in', None, 'recycled amino acids at which half of a new copy\'s amino acids come from them'),
+    ('tau_aa_cat', 'second', 'in', None, 'time constant of the catabolism of recycled amino acids not reused'),
+    ('y_aa_cat', 'dimensionless', 'in', None, 'ATP made per amino acid catabolised'),
+    ('N_A', 'per_mol', 'in', None, None),
+    ('s_prot', 'dimensionless', 'out', None, 'share of the proteolysis demand served: min(1, Q_prot_max/Q_prot_demand)'),
+    ('phi_aa', 'dimensionless', 'out', None, 'share of new copies\' amino acids taken from the recycled pool: N_aa/(K_aa + '
+                                             'N_aa)'),
+    ('r_aa_cat', 'per_s', 'out', None, 'recycled amino acids catabolised per second'),
+    ('J_cat', 'mol_per_s', 'out', None, 'ATP made by catabolising recycled amino acids'),
+    ('Q_prot_demand_total', 'per_s', 'out', None, None), ('Q_aa_rel_total', 'per_s', 'out', None, None),
+    ('Q_aa_use_total', 'per_s', 'out', None, None),
+    ('J_prot_total', 'mol_per_s', 'out', None, 'ATP for regulated proteolysis, all pools'),
+    ('J_saved_total', 'mol_per_s', 'out', None, 'ATP recycled amino acids save the pools\' building'),
+    ('J_recycled', 'mol_per_s', 'out', None, 'ATP returned by recycled protein: saved in building plus made by catabolism'),
     ('J_demand_total', 'mol_per_s', 'out', None, 'build demand of all pools'),
-    ('J_ATP_total', 'mol_per_s', 'out', None, 'ATP use of all pools'),
+    ('J_ATP_total', 'mol_per_s', 'out', None, 'net ATP use of protein synthesis and breakdown: the pools\' use less the '
+                                              'ATP made by catabolising recycled amino acids'),
     ('J_keep_total', 'mol_per_s', 'out', None, 'turnover cost of all pools'),
     ('J_build_total', 'mol_per_s', 'out', None, 'build spending of all pools'),
     ('M_build_protein', 'mole', 'out', None, 'ATP to build every pool\'s copies: the protein share of a daughter'),
@@ -2714,7 +2840,20 @@ pe_vars = [
 ] + reg_vars('the cell\'s protein synthesis (replacing degraded copies and building new ones)', 'synthesis_regulation')
 pe_eqs = [
     ('R_reg', REG_EXPR),
-    ('J_demand_total', 'J_demand_in'), ('J_ATP_total', 'J_ATP_in'), ('J_keep_total', 'J_keep_in'),
+    ('J_demand_total', 'J_demand_in'), ('J_keep_total', 'J_keep_in'),
+    ('Q_prot_demand_total', 'Q_prot_demand_in'), ('Q_aa_rel_total', 'Q_aa_rel_in'), ('Q_aa_use_total', 'Q_aa_use_in'),
+    ('J_prot_total', 'J_prot_in'), ('J_saved_total', 'J_saved_in'),
+    # min(1, Q_prot_max/Q_prot_demand) as for s_build
+    ('s_prot', '(Q_prot_max + Q_eps) / ((Q_prot_max + Q_prot_demand_total + abs(Q_prot_max - Q_prot_demand_total)) / 2.0 '
+               '+ Q_eps)'),
+    # the recycled pool: filled by proteolysis, drawn by building, the rest catabolised (a negative round-off N_aa
+    # counts as 0)
+    ('phi_aa', '(N_aa + abs(N_aa)) / 2.0 / (K_aa + (N_aa + abs(N_aa)) / 2.0)'),
+    ('r_aa_cat', '(N_aa + abs(N_aa)) / 2.0 / tau_aa_cat'),
+    ('J_cat', 'y_aa_cat * r_aa_cat / N_A'),
+    ('d/dt N_aa', 'Q_aa_rel_in - Q_aa_use_in - r_aa_cat'),
+    ('J_recycled', 'J_saved_in + J_cat'),
+    ('J_ATP_total', 'J_ATP_in - J_cat'),
     ('J_build_total', 'J_build_in'), ('M_build_protein', 'M_build_in'), ('A_protein_total', 'A_protein_in'),
     ('x_ATP', '(ATP - ATP_floor) / (ATP_ref - ATP_floor)'),
     ('throttle', '((x_ATP + abs(x_ATP)) / 2.0 + 1.0 - abs((x_ATP + abs(x_ATP)) / 2.0 - 1.0)) / 2.0'),
@@ -2729,7 +2868,8 @@ pe_eqs = [
 pe_roles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in pe_vars if v[0] != 't'}
 pe_roles.update({n: 'boundary_condition' for n in ('ATP', 'ADP', 'Pi', 'A_mem')})
 pe_roles.update({n: 'variable' for n in ('J_demand_in', 'J_ATP_in', 'J_keep_in', 'J_build_in', 'M_build_in',
-                                         'A_protein_in')})
+                                         'A_protein_in', 'Q_prot_demand_in', 'Q_aa_rel_in', 'Q_aa_use_in', 'J_prot_in',
+                                         'J_saved_in')})
 pe_roles.update(REG_ROLES)
 pe_params = [
     ('ATP', ATP, '', False), ('ADP', ADP, '', False), ('Pi', PI, '', False),
@@ -2737,6 +2877,15 @@ pe_params = [
     ('J_ATP_in', 0.0, 'no pool connected', False), ('J_keep_in', 0.0, 'no pool connected', False),
     ('J_build_in', 0.0, 'no pool connected', False), ('M_build_in', 0.0, 'no pool connected', False),
     ('A_protein_in', 0.0, 'no pool connected', False),
+    ('Q_prot_demand_in', 0.0, 'no pool connected', False), ('Q_aa_rel_in', 0.0, 'no pool connected', False),
+    ('Q_aa_use_in', 0.0, 'no pool connected', False), ('J_prot_in', 0.0, 'no pool connected', False),
+    ('J_saved_in', 0.0, 'no pool connected', False),
+    ('Q_prot_max', Q_PROT_MAX, '', False),
+    ('Q_eps', 1e-9, 'definitional; numerical floor, 1e-9 amino acids/s (13 orders below the proteases\' capacity)', False),
+    ('N_aa_init', 0.0, 'definitional; no recycled amino acids at rest', False),
+    ('K_aa', K_AA, '', False),
+    ('tau_aa_cat', par('tau_aa_catabolism'), '', False), ('y_aa_cat', par('y_aa_catabolism'), '', False),
+    ('N_A', NA, '', False),
     ('J_ref', der(R_TOT, 'maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C)',
                   'maintenance_coefficient', 'maintenance_exponent'), '', False),
     ('build_capacity', BUILD_CAPACITY, '', False),
@@ -2757,10 +2906,23 @@ pe_inv = [
              'rtol=1e-9, atol=1e-12)'},
     {'description': 'the pools never spend more than synthesis can: J_build_total <= J_cap (relative 1e-9)',
      'expr': 'np.all(J_build_total <= J_cap*(1 + 1e-9) + 1e-30)', 'applies': 'run'},
-    {'description': 'the ATP port takes exactly what the pools use: j_ATP = -J_ATP_total = -(J_keep_total + '
-                    'J_build_total) (exact; relative 1e-9 with pools)',
+    {'description': 'the ATP port takes exactly what the pools use less what catabolism makes: j_ATP = -J_ATP_total = '
+                    '-(J_keep_total + J_build_total + J_prot_total - J_cat) (exact; relative 1e-9 with pools)',
      'expr': 'np.allclose(j_ATP_prot, -J_ATP_total, rtol=1e-12, atol=0) and np.allclose(J_ATP_total, J_keep_total + '
-             'J_build_total, rtol=1e-9, atol=1e-30)', 'applies': 'run'},
+             'J_build_total + J_prot_total - J_cat, rtol=1e-9, atol=1e-30)', 'applies': 'run'},
+    {'description': 'proteolysis and the recycled pool (exact): s_prot = min(1, Q_prot_max/Q_prot_demand_total), phi_aa = '
+                    'N_aa/(K_aa + N_aa), r_aa_cat = N_aa/tau_aa_cat, J_cat = y_aa_cat r_aa_cat / N_A, J_recycled = '
+                    'J_saved_total + J_cat',
+     'expr': 'np.allclose(s_prot, np.where(Q_prot_demand_total > Q_prot_max, (Q_prot_max + Q_eps)/(Q_prot_demand_total '
+             '+ Q_eps), 1.0), rtol=1e-9, atol=1e-12) and np.allclose(phi_aa, np.maximum(N_aa, 0)/(K_aa + '
+             'np.maximum(N_aa, 0)), rtol=1e-12, atol=1e-15) and np.allclose(J_cat, y_aa_cat*np.maximum(N_aa, 0)/tau_aa_cat'
+             '/N_A, rtol=1e-12, atol=0) and np.allclose(J_recycled, J_saved_total + J_cat, rtol=1e-12, atol=1e-30)'},
+    {'description': 'amino acids are conserved: N_aa(t) - N_aa(0) = int (Q_aa_rel_total - Q_aa_use_total - r_aa_cat) dt '
+                    '(relative 1e-4: trapezoid integration of the logged fluxes); the proteases never remove more than '
+                    'their capacity, Q_prot_demand_total s_prot <= Q_prot_max',
+     'expr': 'abs(N_aa[-1] - N_aa[0] - np.trapz(Q_aa_rel_total - Q_aa_use_total - r_aa_cat, t)) <= 1e-4*np.trapz('
+             'np.abs(Q_aa_rel_total) + np.abs(Q_aa_use_total) + np.abs(r_aa_cat), t) + 1e-9 and np.all(Q_prot_demand_total*s_prot '
+             '<= Q_prot_max*(1 + 1e-9) + 1e-9)', 'applies': 'run'},
 ]
 write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_vars, pe_eqs,
               {'required_citations': ['argus2026unpublished'],
@@ -2772,8 +2934,11 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                                  {'port_type': 'membrane_ceiling', 'variables': ['A_protein_max'], 'multi_port': 'True'},
                                  {'port_type': 'protein_synthesis',
                                   'variables': ['ATP', 's_build', 'J_demand_in', 'J_ATP_in', 'J_keep_in', 'J_build_in',
-                                                'M_build_in', 'A_protein_in', 'R_reg'],
-                                  'multi_port': ['True', 'True', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'True']},
+                                                'M_build_in', 'A_protein_in', 'R_reg', 's_prot', 'phi_aa',
+                                                'Q_prot_demand_in', 'Q_aa_rel_in', 'Q_aa_use_in', 'J_prot_in',
+                                                'J_saved_in'],
+                                  'multi_port': ['True', 'True', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'True', 'True',
+                                                 'True', 'sum', 'sum', 'sum', 'sum', 'sum']},
                                  SYNTH_REG_PORT],
                'roles': pe_roles},
               pe_params,
@@ -2781,20 +2946,28 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
                'outputs': ['throttle', 'J_cap', 's_build', 'J_demand_total', 'J_build_total', 'J_keep_total',
                            'J_ATP_total', 'j_ATP_prot', 'M_build_protein', 'A_protein_total', 'f_area', 'x_ATP', 'R_reg',
-                           'pool_a/m', 'pool_b/m', 'cyto/C_ATP'],
+                           's_prot', 'phi_aa', 'N_aa', 'r_aa_cat', 'J_cat', 'Q_prot_demand_total', 'Q_aa_rel_total',
+                           'Q_aa_use_total', 'J_prot_total', 'J_saved_total', 'J_recycled',
+                           'pool_a/m', 'pool_b/m', 'pool_c/m', 'cyto/C_ATP'],
                # two pools rising at once ask for more than synthesis can give: both are served the same share. A
-               # cytosol supplies the ATP (the pools read it through this module); with nothing feeding it, its ATP
-               # runs down over the minute, so the throttle is exercised from full speed to stopped
+               # third, the glycolytic enzymes halved, is removed by proteolysis faster than the proteases can serve,
+               # and its amino acids feed the other two. A cytosol supplies the ATP (the pools read it through this
+               # module); with nothing feeding it, its ATP runs down over the minute, so the throttle is exercised from
+               # full speed to stopped
                'harness': {
                    'module_array': [['pool_a', POOL_V, 'protein_pool', '', 'mod', 'H_ATPase'],
                                     ['pool_b', POOL_V, 'protein_pool', '', 'mod', 'proteome'],
+                                    ['pool_c', POOL_V, 'protein_pool', '', 'mod', 'Glyc'],
                                     ['cyto', V_NEW, 'energy_metabolism', '', 'mod', 'default'],
-                                    ['mod', V_NEW, 'protein_expression', 'pool_a pool_b cyto', '', 'default']],
+                                    ['mod', V_NEW, 'protein_expression', 'pool_a pool_b pool_c cyto', '', 'default']],
                    'parameters': [['m_target_pool_a', 'dimensionless', 3.0, 'harness: triple the H+-ATPase'],
-                                  ['m_target_pool_b', 'dimensionless', 1.2, 'harness: a fifth more of the proteome']]},
+                                  ['m_target_pool_b', 'dimensionless', 1.2, 'harness: a fifth more of the proteome'],
+                                  ['m_target_pool_c', 'dimensionless', 0.5, 'harness: half the glycolytic enzymes']]},
                'run_parameters': {},
                'invariants': pe_inv,
-               'bc_sweep': {'ranges': {'build_capacity': [0.5, 20.0], 'ATP_floor': [1.0, 8.0], 'f_ATP_reg': [0.0, 1.0]},
+               'bc_sweep': {'ranges': {'build_capacity': [0.5, 20.0], 'ATP_floor': [1.0, 8.0], 'f_ATP_reg': [0.0, 1.0],
+                                       'Q_prot_max': [1e3, 1e7], 'K_aa': [1e5, 1e8], 'tau_aa_cat': [60.0, 36000.0],
+                                       'y_aa_cat': [0.0, 2.0]},
                             'exclude': ['ATP', 'ADP', 'Pi'],   # supplied by the harness cytosol
                             'rationale': 'synthesis capacity from below to well above the two pools\' demand; the ATP '
                                          'floor over the range where the cytosol\'s falling ATP crosses it'},
@@ -2816,9 +2989,21 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                   'from cell/expression_regulation on synthesis_regulation (1 at and above rest; switches set by the game, '
                   'all 0 by default), scales the whole of protein synthesis, as the stringent response does: J_cap, and '
                   'on protein_synthesis each pool\'s replacement of its degraded copies (R_syn there), so a cell that '
-                  'cuts it saves the turnover cost and loses protein at k_deg (1 - R_reg).')},
+                  'cuts it saves the turnover cost and loses protein at k_deg (1 - R_reg). Proteolysis and recycling: '
+                  'the pools\' copies above their goals are removed by the cell\'s ATP-dependent proteases, at most '
+                  'Q_prot_max amino acids per second (proteolysis_capacity, 5%/h of the resting cell\'s protein, the '
+                  'breakdown rate of starving E. coli, Willetts 1967); when they ask for more each is served the same '
+                  'share s_prot = Q_prot_max/Q_prot_demand_total. The amino acids freed go to the recycled pool N_aa (a '
+                  'count per cell, above the cell\'s usual free pool): dN_aa/dt = Q_aa_rel - Q_aa_use - N_aa/tau_aa_cat. '
+                  'New copies take the share phi_aa = N_aa/(K_aa + N_aa) of their amino acids from it (biosynthesis is '
+                  'feedback-inhibited as amino acids accumulate), each saving c_syn - c_recycle ATP; what is not reused is '
+                  'catabolised with time constant tau_aa_cat, making y_aa_cat ATP per amino acid (J_cat, little in a '
+                  'fermenter). J_recycled = J_saved_total + J_cat is the ATP the recycled protein returns; J_ATP_total = '
+                  'J_keep + J_build + J_prot - J_cat, net. Protein carbon is counted in ATP equivalents, not as carbon: the '
+                  'amino acids are conserved as a count (released = reused + catabolised + change in N_aa), and the '
+                  'carbon of those catabolised leaves the model as protein carbon does.')},
               ['argus2026unpublished', 'lynch2015bioenergetic', 'farewell1998effect', 'dai2016reduction',
-               'stouthamer1973theoretical', 'potrykus2008still'], V_NEW)
+               'stouthamer1973theoretical', 'potrykus2008still', 'willetts1967intracellular'], V_NEW)
 
 # --- expression_regulation: falling metabolites lower expression, growth and maintenance targets (the stringent
 # response, simplified). For each species, x = C/C_rest for ATP, G6P and glucose (falls as C falls) and x = H_rest/H_i for
@@ -3414,6 +3599,13 @@ def cell_invariants(names, steady):
                  + f' and ({" or ".join(on + "_bio" for on in REG_ON)} or np.all({m("bio", "R_reg")} == 1.0))'},
         {'description': 'protein synthesis never spends more than its capacity: J_build_total <= J_cap (relative 1e-9)',
          'expr': f'np.all({m("protein", "J_build_total")} <= {m("protein", "J_cap")}*(1 + 1e-9) + 1e-30)'},
+        {'description': 'amino acids are conserved through proteolysis and recycling: N_aa(t) - N_aa(0) = int (released '
+                        '- reused - catabolised) dt (relative 1e-4: trapezoid integration of the logged fluxes), and N_aa '
+                        'stays non-negative',
+         'expr': f'abs({D(m("protein", "N_aa"))} - np.trapz({m("protein", "Q_aa_rel_total")} - '
+                 f'{m("protein", "Q_aa_use_total")} - {m("protein", "r_aa_cat")}, t)) <= 1e-4*np.trapz('
+                 f'np.abs({m("protein", "Q_aa_rel_total")}) + np.abs({m("protein", "Q_aa_use_total")}) + '
+                 f'np.abs({m("protein", "r_aa_cat")}), t) + 1e-6 and np.all({m("protein", "N_aa")} >= -1e-6)'},
     ]
     if 'i_H_ATPase' in names:
         inv += [
@@ -3478,6 +3670,9 @@ def cell_outputs(names):
             ('i_leak_Ca', 'i_leak_Ca'), ('i_leak_Ca', 'E_Ca'),
             ('i_leak_H', 'i_leak_H'), ('protein', 'J_ATP_total'), ('protein', 'J_keep_total'),
             ('protein', 'J_build_total'), ('protein', 'J_cap'), ('protein', 'M_build_protein'), ('protein', 'f_area'),
+            ('protein', 'J_prot_total'), ('protein', 'J_saved_total'), ('protein', 'J_cat'), ('protein', 'J_recycled'),
+            ('protein', 'N_aa'), ('protein', 'phi_aa'), ('protein', 's_prot'), ('protein', 'Q_aa_rel_total'),
+            ('protein', 'Q_aa_use_total'), ('protein', 'r_aa_cat'),
             ('bio', 'D'), ('bio', 'P_growth'), ('bio', 'J_ATP_bio'), ('bio', 'M_build_bio'), ('bio', 'M_daughter'),
             ('bio', 'growth_progress'), ('bio', 'R_reg')] + [('reg', f_) for f_ in REG_F]
     if 'i_H_ATPase' in names:

@@ -13,9 +13,48 @@
         <variable name="J_build_in" public_interface="in" units="mol_per_s"/>
         <variable name="M_build_in" public_interface="in" units="mole"/>
         <variable name="A_protein_in" public_interface="in" units="um2"/>
+        <!-- summed proteolysis demand of the pools, amino acids per second -->
+        <variable name="Q_prot_demand_in" public_interface="in" units="per_s"/>
+        <!-- amino acids per second the pools return to the recycled pool -->
+        <variable name="Q_aa_rel_in" public_interface="in" units="per_s"/>
+        <!-- amino acids per second the pools take from the recycled pool -->
+        <variable name="Q_aa_use_in" public_interface="in" units="per_s"/>
+        <variable name="J_prot_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_saved_in" public_interface="in" units="mol_per_s"/>
+        <!-- most amino acids per second the cell's proteases can remove -->
+        <variable name="Q_prot_max" public_interface="in" units="per_s"/>
+        <!-- numerical floor on the proteolysis demand (so s_prot is defined with nothing to remove) -->
+        <variable name="Q_eps" public_interface="in" units="per_s"/>
+        <variable name="N_aa_init" public_interface="in" units="dimensionless"/>
+        <!-- recycled amino acids: free amino acids from proteolysis, above the cell's usual pool (count per cell) -->
+        <variable initial_value="N_aa_init" name="N_aa" public_interface="out" units="dimensionless"/>
+        <!-- recycled amino acids at which half of a new copy's amino acids come from them -->
+        <variable name="K_aa" public_interface="in" units="dimensionless"/>
+        <!-- time constant of the catabolism of recycled amino acids not reused -->
+        <variable name="tau_aa_cat" public_interface="in" units="second"/>
+        <!-- ATP made per amino acid catabolised -->
+        <variable name="y_aa_cat" public_interface="in" units="dimensionless"/>
+        <variable name="N_A" public_interface="in" units="per_mol"/>
+        <!-- share of the proteolysis demand served: min(1, Q_prot_max/Q_prot_demand) -->
+        <variable name="s_prot" public_interface="out" units="dimensionless"/>
+        <!-- share of new copies' amino acids taken from the recycled pool: N_aa/(K_aa + N_aa) -->
+        <variable name="phi_aa" public_interface="out" units="dimensionless"/>
+        <!-- recycled amino acids catabolised per second -->
+        <variable name="r_aa_cat" public_interface="out" units="per_s"/>
+        <!-- ATP made by catabolising recycled amino acids -->
+        <variable name="J_cat" public_interface="out" units="mol_per_s"/>
+        <variable name="Q_prot_demand_total" public_interface="out" units="per_s"/>
+        <variable name="Q_aa_rel_total" public_interface="out" units="per_s"/>
+        <variable name="Q_aa_use_total" public_interface="out" units="per_s"/>
+        <!-- ATP for regulated proteolysis, all pools -->
+        <variable name="J_prot_total" public_interface="out" units="mol_per_s"/>
+        <!-- ATP recycled amino acids save the pools' building -->
+        <variable name="J_saved_total" public_interface="out" units="mol_per_s"/>
+        <!-- ATP returned by recycled protein: saved in building plus made by catabolism -->
+        <variable name="J_recycled" public_interface="out" units="mol_per_s"/>
         <!-- build demand of all pools -->
         <variable name="J_demand_total" public_interface="out" units="mol_per_s"/>
-        <!-- ATP use of all pools -->
+        <!-- net ATP use of protein synthesis and breakdown: the pools' use less the ATP made by catabolising recycled amino acids -->
         <variable name="J_ATP_total" public_interface="out" units="mol_per_s"/>
         <!-- turnover cost of all pools -->
         <variable name="J_keep_total" public_interface="out" units="mol_per_s"/>
@@ -143,13 +182,171 @@
             </apply>
             <apply>
                 <eq/>
-                <ci>J_ATP_total</ci>
-                <ci>J_ATP_in</ci>
+                <ci>J_keep_total</ci>
+                <ci>J_keep_in</ci>
             </apply>
             <apply>
                 <eq/>
-                <ci>J_keep_total</ci>
-                <ci>J_keep_in</ci>
+                <ci>Q_prot_demand_total</ci>
+                <ci>Q_prot_demand_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_aa_rel_total</ci>
+                <ci>Q_aa_rel_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_aa_use_total</ci>
+                <ci>Q_aa_use_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_prot_total</ci>
+                <ci>J_prot_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_saved_total</ci>
+                <ci>J_saved_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_prot</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>Q_prot_max</ci>
+                        <ci>Q_eps</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Q_prot_max</ci>
+                                <ci>Q_prot_demand_total</ci>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>Q_prot_max</ci>
+                                        <ci>Q_prot_demand_total</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <ci>Q_eps</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_aa</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>N_aa</ci>
+                            <apply>
+                                <abs/>
+                                <ci>N_aa</ci>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>K_aa</ci>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>N_aa</ci>
+                                <apply>
+                                    <abs/>
+                                    <ci>N_aa</ci>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_aa_cat</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>N_aa</ci>
+                            <apply>
+                                <abs/>
+                                <ci>N_aa</ci>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <ci>tau_aa_cat</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_cat</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>y_aa_cat</ci>
+                        <ci>r_aa_cat</ci>
+                    </apply>
+                    <ci>N_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>N_aa</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>Q_aa_rel_in</ci>
+                        <ci>Q_aa_use_in</ci>
+                    </apply>
+                    <ci>r_aa_cat</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_recycled</ci>
+                <apply>
+                    <plus/>
+                    <ci>J_saved_in</ci>
+                    <ci>J_cat</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_total</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_ATP_in</ci>
+                    <ci>J_cat</ci>
+                </apply>
             </apply>
             <apply>
                 <eq/>

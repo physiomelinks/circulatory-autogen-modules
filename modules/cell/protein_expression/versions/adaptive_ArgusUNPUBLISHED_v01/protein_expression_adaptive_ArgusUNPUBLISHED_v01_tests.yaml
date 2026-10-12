@@ -14,4 +14,14 @@ notes: 'The protein synthesis of an adaptive cell, serving its protein_pools (on
   values of parameters.json). Regulation: R_reg = prod_s (1 - reg_on_s + reg_on_s f_s), the f_s from cell/expression_regulation
   on synthesis_regulation (1 at and above rest; switches set by the game, all 0 by default), scales the whole of protein synthesis,
   as the stringent response does: J_cap, and on protein_synthesis each pool''s replacement of its degraded copies (R_syn there),
-  so a cell that cuts it saves the turnover cost and loses protein at k_deg (1 - R_reg).'
+  so a cell that cuts it saves the turnover cost and loses protein at k_deg (1 - R_reg). Proteolysis and recycling: the pools''
+  copies above their goals are removed by the cell''s ATP-dependent proteases, at most Q_prot_max amino acids per second (proteolysis_capacity,
+  5%/h of the resting cell''s protein, the breakdown rate of starving E. coli, Willetts 1967); when they ask for more each
+  is served the same share s_prot = Q_prot_max/Q_prot_demand_total. The amino acids freed go to the recycled pool N_aa (a
+  count per cell, above the cell''s usual free pool): dN_aa/dt = Q_aa_rel - Q_aa_use - N_aa/tau_aa_cat. New copies take the
+  share phi_aa = N_aa/(K_aa + N_aa) of their amino acids from it (biosynthesis is feedback-inhibited as amino acids accumulate),
+  each saving c_syn - c_recycle ATP; what is not reused is catabolised with time constant tau_aa_cat, making y_aa_cat ATP
+  per amino acid (J_cat, little in a fermenter). J_recycled = J_saved_total + J_cat is the ATP the recycled protein returns;
+  J_ATP_total = J_keep + J_build + J_prot - J_cat, net. Protein carbon is counted in ATP equivalents, not as carbon: the amino
+  acids are conserved as a count (released = reused + catabolised + change in N_aa), and the carbon of those catabolised leaves
+  the model as protein carbon does.'

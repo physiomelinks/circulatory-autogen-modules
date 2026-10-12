@@ -37,7 +37,14 @@
           "J_build",
           "M_build",
           "A_protein",
-          "R_syn"
+          "R_syn",
+          "s_prot",
+          "phi_aa",
+          "Q_prot_demand",
+          "Q_aa_rel",
+          "Q_aa_use",
+          "J_prot",
+          "J_saved"
         ]
       },
       {
@@ -83,6 +90,12 @@
       ],
       [
         "tau",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_prot",
         "second",
         "access",
         "constant"
@@ -172,6 +185,18 @@
         "boundary_condition"
       ],
       [
+        "s_prot",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "phi_aa",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
         "n",
         "dimensionless",
         "access",
@@ -210,6 +235,48 @@
       [
         "r_down",
         "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "r_prot",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "r_build",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_prot_demand",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_aa_rel",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_aa_use",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_prot",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_saved",
+        "mol_per_s",
         "access",
         "variable"
       ],

@@ -6,25 +6,32 @@ notes: 'One protein of an adaptive cell as a pool of copies: n = n_0 m, with exp
   fast the cell can change the protein''s synthesis), at most as fast as the cell''s protein synthesis allows (below). Turnover:
   the copies are degraded at r_deg = k_deg m (k_deg about 1%/h: most bacterial proteins are stable, Maurizi 1992, Gupta et
   al. 2024) and replaced up to the goal at r_rep = k_deg R_syn min(m, m_goal), both slowed by min(f_ATP, 1), f_ATP = ATP/(K_m
-  + ATP) (K_m + ATP_ref)/ATP_ref, as ATP runs out; dm/dt = r_up s_build min(f_ATP, 1) + r_down, r_down = r_rep - r_deg <=
-  0. So a protein above its target falls only as fast as it is degraded (an e-fold in about 100 h; growing bacteria lose protein
-  mainly by dilution, which this non-growing pool has not), and if the cell''s synthesis is regulated down (R_syn < 1, from
-  protein_expression) its copies are lost at k_deg (1 - R_syn). Keeping the copies costs J_keep = n_0 L ((c_poly + c_recycle)
-  r_rep + c_deg r_deg) / N_A: at the goal n L (c_poly + c_deg + c_recycle) k_deg / N_A. Raising m asks for the ATP to build
-  r_up n_0 copies per second from glucose, J_demand = r_up n_0 L (c_syn + c_poly) / N_A; the cell''s protein synthesis (protein_expression
-  adaptive) serves the share s_build of it, and the copies rise only as fast as the ATP actually spent. Degraded copies are
-  not refunded. M_build = n L (c_syn + c_poly) / N_A is the ATP to build the present copies: its share of a daughter. A_protein
-  = n footprint is the membrane area the copies take (0 for cytosolic proteins), share = A_protein / A_ceiling the share of
-  the membrane''s protein ceiling they take (A_ceiling: protein_expression''s A_protein_max, on the membrane_ceiling port)
-  and s_unit = n_0 footprint / A_ceiling the share one unit of m takes: a protein counted by number (the flagellum: m flagella)
-  takes s_unit of the ceiling per unit, which the game counts with the membrane_share pools'' shares (a cell''s shares sum
-  to at most 1). m goes to the protein it scales on the protein_expression port (its density or capacity times m), or on enzyme_expression
-  to the cytosol''s enzymes; M_build goes to biosynthesis (daughter_share, summed there); the costs, demand, daughter share
-  and area go to protein_expression on protein_synthesis, which returns ATP and s_build. Instances: one per protein of the
-  fermenter cell (copy numbers, lengths and footprints in each; see parameters.json). Regulation: the pool moves to m_goal
-  = m_target R_reg, R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose and H+, the f_s from cell/expression_regulation
-  on the regulation_signals port (1 when unconnected); the game sets the switches reg_on_s (0 or 1; all 0 by default, so R_reg
-  = 1 exactly and the target is the player''s). Regulation changes the target, and through it what is replaced.'
+  + ATP) (K_m + ATP_ref)/ATP_ref, as ATP runs out; r_down = r_rep - r_deg <= 0, and if the cell''s synthesis is regulated
+  down (R_syn < 1, from protein_expression) its copies are lost at k_deg (1 - R_syn). Copies above the goal are removed by
+  regulated, ATP-dependent proteolysis (ClpXP, Lon, FtsH acting on a protein the cell has marked for removal): r_prot = max(m
+  - m_goal, 0) / tau_prot s_prot min(f_ATP, 1), tau_prot = t_half_proteolysis / ln 2 (about 7 min at 20 C), s_prot the share
+  of the demand Q_prot_demand = n_0 L max(m - m_goal, 0) / tau_prot the cell''s proteases serve (protein_expression), at c_deg
+  ATP per amino acid: J_prot = c_deg n_0 L r_prot / N_A. dm/dt = r_build + r_down - r_prot, r_build = r_up s_build min(f_ATP,
+  1). Keeping the copies costs J_keep = n_0 L ((c_poly + c_recycle) r_rep + c_deg r_deg) / N_A: at the goal n L (c_poly +
+  c_deg + c_recycle) k_deg / N_A. The amino acids of the copies removed, and of those degraded and not replaced, go to the
+  cell''s recycled pool (protein_expression): Q_aa_rel = n_0 L (r_prot - r_down). Raising m asks for the ATP to build r_up
+  n_0 copies per second from glucose, J_demand = r_up n_0 L (c_syn + c_poly) / N_A; the cell''s protein synthesis (protein_expression
+  adaptive) serves the share s_build of it, and the copies rise only as fast as the ribosomes allow. A share phi_aa of the
+  new copies'' amino acids comes from the recycled pool (Q_aa_use = n_0 L phi_aa r_build) at c_recycle ATP each instead of
+  c_syn, saving J_saved = (c_syn - c_recycle) Q_aa_use / N_A: J_build = r_build n_0 L (c_syn + c_poly) / N_A - J_saved; the
+  peptide bonds (c_poly) are paid again. M_build = n L (c_syn + c_poly) / N_A is the ATP to build the present copies: its
+  share of a daughter. A_protein = n footprint is the membrane area the copies take (0 for cytosolic proteins), share = A_protein
+  / A_ceiling the share of the membrane''s protein ceiling they take (A_ceiling: protein_expression''s A_protein_max, on the
+  membrane_ceiling port) and s_unit = n_0 footprint / A_ceiling the share one unit of m takes: a protein counted by number
+  (the flagellum: m flagella) takes s_unit of the ceiling per unit, which the game counts with the membrane_share pools''
+  shares (a cell''s shares sum to at most 1). m goes to the protein it scales on the protein_expression port (its density
+  or capacity times m), or on enzyme_expression to the cytosol''s enzymes; M_build goes to biosynthesis (daughter_share, summed
+  there); the costs, demand, daughter share and area go to protein_expression on protein_synthesis, which returns ATP and
+  s_build. Instances: one per protein of the fermenter cell (copy numbers, lengths and footprints in each; see parameters.json).
+  Regulation: the pool moves to m_goal = m_target R_reg, R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose
+  and H+, the f_s from cell/expression_regulation on the regulation_signals port (1 when unconnected); the game sets the switches
+  reg_on_s (0 or 1; all 0 by default, so R_reg = 1 exactly and the target is the player''s). Regulation changes the target,
+  and through it what is replaced.'
 instances:
   H_ATPase: 'F1Fo H+-ATPase: rho_H_ATPase x A_mem (calibrated density)'
   NhaA: 'NhaA: cycles at rest / turnover_NhaA'

@@ -24,6 +24,13 @@
     "J_keep",
     "J_demand",
     "J_build",
+    "r_prot",
+    "r_build",
+    "Q_prot_demand",
+    "Q_aa_rel",
+    "Q_aa_use",
+    "J_prot",
+    "J_saved",
     "J_ATP",
     "M_build",
     "A_protein",
@@ -49,12 +56,16 @@
       "expr": "np.allclose(r_deg, k_deg*m*np.minimum(f_ATP, 1), rtol=1e-12, atol=0) and np.allclose(r_rep, k_deg*R_syn*np.minimum(m, m_goal)*np.minimum(f_ATP, 1), rtol=1e-12, atol=1e-18) and np.allclose(r_down, r_rep - r_deg, rtol=1e-12, atol=1e-18) and np.all(r_down <= 1e-18)"
     },
     {
-      "description": "costs (exact): J_keep = n_0 L ((c_poly + c_recycle) r_rep + c_deg r_deg) / N_A (at the goal n L (c_poly + c_deg + c_recycle) k_deg min(f_ATP, 1) / N_A), J_demand = r_up n_0 L (c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1), M_build = n L (c_syn + c_poly) / N_A, A_protein = n_0 footprint m, share = A_protein / A_ceiling, s_unit = n_0 footprint / A_ceiling",
-      "expr": "np.allclose(J_keep, n_0*L*((c_poly + c_recycle)*r_rep + c_deg*r_deg)/N_A, rtol=1e-12, atol=0) and np.allclose(J_demand, np.maximum(m_goal - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0) and np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0) and np.allclose(s_unit, n_0*footprint*1e-6/A_ceiling, rtol=1e-12, atol=0)"
+      "description": "costs (exact): J_keep = n_0 L ((c_poly + c_recycle) r_rep + c_deg r_deg) / N_A (at the goal n L (c_poly + c_deg + c_recycle) k_deg min(f_ATP, 1) / N_A), J_demand = r_up n_0 L (c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1) - J_saved with J_saved = (c_syn - c_recycle) phi_aa n_0 L r_build / N_A, J_prot = c_deg n_0 L r_prot / N_A, J_ATP = J_keep + J_build + J_prot, M_build = n L (c_syn + c_poly) / N_A, A_protein = n_0 footprint m, share = A_protein / A_ceiling, s_unit = n_0 footprint / A_ceiling",
+      "expr": "np.allclose(J_keep, n_0*L*((c_poly + c_recycle)*r_rep + c_deg*r_deg)/N_A, rtol=1e-12, atol=0) and np.allclose(J_demand, np.maximum(m_goal - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_saved, (c_syn - c_recycle)*phi_aa*n_0*L*r_build/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1) - J_saved, rtol=1e-9, atol=1e-30) and np.allclose(J_prot, c_deg*n_0*L*r_prot/N_A, rtol=1e-12, atol=0) and np.allclose(J_ATP, J_keep + J_build + J_prot, rtol=1e-12, atol=1e-30) and np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0) and np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0) and np.allclose(s_unit, n_0*footprint*1e-6/A_ceiling, rtol=1e-12, atol=0)"
     },
     {
-      "description": "the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0) - int r_down dt) = int J_build dt (relative 1e-4: trapezoid integration of the logged fluxes)",
-      "expr": "abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapz(r_down, t)) - np.trapz(J_build, t)) <= 1e-4*abs(np.trapz(J_build, t)) + 1e-30",
+      "description": "proteolysis and recycling (exact): r_prot = max(m - m_goal, 0) / tau_prot s_prot min(f_ATP, 1), Q_prot_demand = n_0 L max(m - m_goal, 0) / tau_prot, Q_aa_rel = n_0 L (r_prot - r_down) >= 0, Q_aa_use = n_0 L phi_aa r_build",
+      "expr": "np.allclose(r_prot, np.maximum(m - m_goal, 0)/tau_prot*s_prot*np.minimum(f_ATP, 1), rtol=1e-12, atol=1e-18) and np.allclose(Q_prot_demand, n_0*L*np.maximum(m - m_goal, 0)/tau_prot, rtol=1e-12, atol=1e-12) and np.allclose(Q_aa_rel, n_0*L*(r_prot - r_down), rtol=1e-12, atol=1e-12) and np.all(Q_aa_rel >= 0) and np.allclose(Q_aa_use, n_0*L*phi_aa*r_build, rtol=1e-12, atol=1e-12)"
+    },
+    {
+      "description": "the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0) - int (r_down - r_prot) dt) = int (J_build + J_saved) dt (relative 1e-4: trapezoid integration of the logged fluxes)",
+      "expr": "abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapz(r_down - r_prot, t)) - np.trapz(J_build + J_saved, t)) <= 1e-4*abs(np.trapz(J_build + J_saved, t)) + 1e-4*n_0*L*(c_syn + c_poly)/N_A*np.trapz(r_prot, t) + 1e-30",
       "applies": "run"
     },
     {
@@ -63,7 +74,7 @@
     },
     {
       "description": "costs are never negative",
-      "expr": "np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(M_build >= 0)"
+      "expr": "np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(J_prot >= 0) and np.all(J_saved >= 0) and np.all(M_build >= 0)"
     },
     {
       "description": "regulation (exact): R_reg = prod (1 - reg_on + reg_on f) and m_goal = m_target R_reg; with every switch off R_reg is exactly 1",
@@ -91,9 +102,17 @@
       "R_syn": [
         0.0,
         1.0
+      ],
+      "s_prot": [
+        0.0,
+        1.0
+      ],
+      "phi_aa": [
+        0.0,
+        1.0
       ]
     },
-    "rationale": "shares from none to the whole ceiling; ATP from near exhaustion to above rest; synthesis from stalled to unconstrained; the ATP regulation from full repression to none"
+    "rationale": "shares from none to the whole ceiling; ATP from near exhaustion to above rest; synthesis from stalled to unconstrained; the ATP regulation from full repression to none; proteolysis from stalled to unconstrained; new copies from glucose only to recycled amino acids only"
   },
   "timestep": {
     "scheme": "rk4",

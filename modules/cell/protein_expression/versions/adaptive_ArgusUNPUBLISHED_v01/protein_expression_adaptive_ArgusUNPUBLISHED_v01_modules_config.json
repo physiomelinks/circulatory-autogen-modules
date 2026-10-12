@@ -49,7 +49,14 @@
           "J_build_in",
           "M_build_in",
           "A_protein_in",
-          "R_reg"
+          "R_reg",
+          "s_prot",
+          "phi_aa",
+          "Q_prot_demand_in",
+          "Q_aa_rel_in",
+          "Q_aa_use_in",
+          "J_prot_in",
+          "J_saved_in"
         ],
         "multi_port": [
           "True",
@@ -60,7 +67,14 @@
           "sum",
           "sum",
           "sum",
-          "True"
+          "True",
+          "True",
+          "True",
+          "sum",
+          "sum",
+          "sum",
+          "sum",
+          "sum"
         ]
       },
       {
@@ -125,6 +139,144 @@
       [
         "A_protein_in",
         "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_prot_demand_in",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_aa_rel_in",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_aa_use_in",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_prot_in",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_saved_in",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_prot_max",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "Q_eps",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "N_aa_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "N_aa",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "K_aa",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "tau_aa_cat",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "y_aa_cat",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "N_A",
+        "per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "s_prot",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "phi_aa",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "r_aa_cat",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_cat",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_prot_demand_total",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_aa_rel_total",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "Q_aa_use_total",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_prot_total",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_saved_total",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_recycled",
+        "mol_per_s",
         "access",
         "variable"
       ],

@@ -56,6 +56,16 @@
     "mod_protein/J_cap",
     "mod_protein/M_build_protein",
     "mod_protein/f_area",
+    "mod_protein/J_prot_total",
+    "mod_protein/J_saved_total",
+    "mod_protein/J_cat",
+    "mod_protein/J_recycled",
+    "mod_protein/N_aa",
+    "mod_protein/phi_aa",
+    "mod_protein/s_prot",
+    "mod_protein/Q_aa_rel_total",
+    "mod_protein/Q_aa_use_total",
+    "mod_protein/r_aa_cat",
     "mod_bio/D",
     "mod_bio/P_growth",
     "mod_bio/J_ATP_bio",
@@ -163,6 +173,10 @@
     {
       "description": "protein synthesis never spends more than its capacity: J_build_total <= J_cap (relative 1e-9)",
       "expr": "np.all(mod_protein__J_build_total <= mod_protein__J_cap*(1 + 1e-9) + 1e-30)"
+    },
+    {
+      "description": "amino acids are conserved through proteolysis and recycling: N_aa(t) - N_aa(0) = int (released - reused - catabolised) dt (relative 1e-4: trapezoid integration of the logged fluxes), and N_aa stays non-negative",
+      "expr": "abs((mod_protein__N_aa[-1] - mod_protein__N_aa[0]) - np.trapz(mod_protein__Q_aa_rel_total - mod_protein__Q_aa_use_total - mod_protein__r_aa_cat, t)) <= 1e-4*np.trapz(np.abs(mod_protein__Q_aa_rel_total) + np.abs(mod_protein__Q_aa_use_total) + np.abs(mod_protein__r_aa_cat), t) + 1e-6 and np.all(mod_protein__N_aa >= -1e-6)"
     },
     {
       "description": "second law for the H+-ATPase: it hydrolyses ATP only while the ATP affinity exceeds the proton work, v (A_hyd - n_H F (E_H - V)) >= 0",
