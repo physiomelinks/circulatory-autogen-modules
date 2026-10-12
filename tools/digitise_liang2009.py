@@ -1,13 +1,17 @@
 """Digitise Liang 2009 Fig. 4a (normal LV pressure) and Fig. 4e (normal LV P-V loop) from the 300 dpi page render.
 
 The "Normal" curves are the thick black lines (the thin black femoral-stenosis curve lies on them).
-Axes are calibrated from the tick marks found in the image."""
+Axes are calibrated from the tick marks found in the image. The digitised curves are
+modules/heart/chamber/versions/Liang2009NoVisco_v01/parameterisations/lv/liang2009_fig4*.csv.
+
+    python tools/digitise_liang2009.py <page 751 at 300 dpi, e.g. pdftoppm -r 300 -f 9 -l 9 -png> <out.json>
+"""
 import json, sys
 import numpy as np
 from PIL import Image
 
-D = '/home/farg967/.claude/jobs/3ade3515/tmp/fig'
-page = np.asarray(Image.open(f'{D}/p751-09.png').convert('RGB')).astype(int)
+PAGE, OUT = sys.argv[1], sys.argv[2]
+page = np.asarray(Image.open(PAGE).convert('RGB')).astype(int)
 
 
 def black(a):
@@ -72,7 +76,7 @@ txe = ticks_x(ye, xe - 5, 100 + 1080)
 tye = ticks_y(xe, 1660 + 120, ye + 5)
 print('4e axis col/row', xe, ye, 'x ticks', [round(t) for t in txe], 'y ticks', [round(t) for t in tye])
 json.dump({'4a': {'t': tg.tolist(), 'p': pg.round(2).tolist(), 'xticks': tx, 'yticks': ty},
-           '4e_axes': {'xticks': txe, 'yticks': tye, 'axis': [xe, ye]}}, open(f'{D}/digitised.json', 'w'))
+           '4e_axes': {'xticks': txe, 'yticks': tye, 'axis': [xe, ye]}}, open(OUT, 'w'))
 
 # P-V loop: the normal loop's vertical edges (ESV left, EDV right), below the legend (< 160 mmHg)
 v_of = lambda px: np.interp(px, [txe[0], txe[-1]], [40.0, 140.0])

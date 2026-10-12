@@ -1333,21 +1333,8 @@ def verification_test_timestep(cm):
         metrics = {'scheme': scheme, 'dts': dts, 'successive_differences': diffs, 'observed_orders': observed,
                    'expected_order': order, 'cvode_tight_vs_finest': cvode_diff, 't_end': t_end, 'pre_time': pre}
 
-        # hard problems fail; the order and finest-step criteria alone (convergent, monotone, agreeing
-        # with CVODE, but slower than the scheme's order, e.g. a piecewise right-hand side) give partial
-        problems, order_problems = [], []
-        if not all(np.isfinite(diffs)):
-            problems.append('non-finite solution at some step size (explicit scheme unstable? use smaller dts)')
-        else:
-            if any(diffs[k + 1] > diffs[k] and diffs[k + 1] > roundoff for k in range(len(diffs) - 1)):
-                problems.append(f'differences do not decrease with dt: {["%.2e" % d for d in diffs]}')
-            last = next((o for o in reversed(observed) if o is not None), None)
-            if last is not None and last < min_order:
-                order_problems.append(f'observed order {last:.2f} < {min_order}')
-            if diffs[-1] > tol:
-                order_problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
-            if cvode_diff > cvode_tol:
-                problems.append(f'fixed-step and CVODE solutions differ by {cvode_diff:.2e} > {cvode_tol:.1e}')
+        problems, order_problems = timestep_problems(diffs, observed, cvode_diff, min_order=min_order, tol=tol,
+                                                     cvode_tol=cvode_tol, roundoff=roundoff)
         last = next((o for o in reversed(observed) if o is not None), None)
         summary = (f'{scheme}: differences {diffs[0]:.1e} -> {diffs[-1]:.1e}'
                    + (f', observed order {last:.2f} (expected {order})' if last is not None else ', at round-off')
@@ -1591,6 +1578,43 @@ def _validation_status(cm, kind, test):
     return None, v
 
 
+def period_changes(t, out, period):
+    '''{output: its largest change from one period to the next, as a fraction of its range} over a run
+    ``t`` (from the start of the first period, at least two periods long) of the outputs ``out``.'''
+    t = np.asarray(t, dtype=float)
+    first = t < t[0] + period - 1e-9
+    changes = {}
+    for name, y in out.items():
+        y = np.asarray(y, dtype=float)
+        scale = np.ptp(y) or (abs(float(np.mean(y))) or 1.0)
+        changes[name] = float(np.max(np.abs(np.interp(t[first] + period, t, y) - y[first])) / scale)
+    return changes
+
+
+def timestep_problems(diffs, observed, cvode_diff, min_order, tol, cvode_tol, roundoff):
+    '''
+    The time-step test's verdict from its successive differences ``diffs`` (coarsest first), the
+    ``observed`` orders and the finest fixed-step solution's difference from CVODE: (problems,
+    order_problems). Problems (non-finite, not decreasing, disagreeing with CVODE) fail the test; the
+    order and finest-step criteria alone (convergent, monotone, agreeing with CVODE, but slower than
+    the scheme's order, e.g. a piecewise right-hand side) make it partial.
+    '''
+    problems, order_problems = [], []
+    if not all(np.isfinite(diffs)):
+        problems.append('non-finite solution at some step size (explicit scheme unstable? use smaller dts)')
+        return problems, order_problems
+    if any(diffs[k + 1] > diffs[k] and diffs[k + 1] > roundoff for k in range(len(diffs) - 1)):
+        problems.append(f'differences do not decrease with dt: {["%.2e" % d for d in diffs]}')
+    last = next((o for o in reversed(observed) if o is not None), None)
+    if last is not None and last < min_order:
+        order_problems.append(f'observed order {last:.2f} < {min_order}')
+    if diffs[-1] > tol:
+        order_problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
+    if cvode_diff > cvode_tol:
+        problems.append(f'fixed-step and CVODE solutions differ by {cvode_diff:.2e} > {cvode_tol:.1e}')
+    return problems, order_problems
+
+
 def periodic_steady_state(cm, pre_time, outputs, params=None):
     """
     Whether the model, after ``pre_time`` s with ``params`` (model parameter names -> values),
@@ -1610,13 +1634,7 @@ def periodic_steady_state(cm, pre_time, outputs, params=None):
     run_spec = dict(cm.spec, pre_time=float(pre_time), sim_time=2 * period, dt=min(float(cm.spec['dt']), period / 200))
     helper = harness.simulation_helper(cm.model_path, run_spec)
     t, out = harness.run(helper, list(outputs), params=params)
-    t = np.asarray(t, dtype=float)
-    first = t < t[0] + period - 1e-9
-    changes = {}
-    for name, y in out.items():
-        y = np.asarray(y, dtype=float)
-        scale = np.ptp(y) or (abs(float(np.mean(y))) or 1.0)
-        changes[name] = float(np.max(np.abs(np.interp(t[first] + period, t, y) - y[first])) / scale)
+    changes = period_changes(t, out, period)
     bad = sorted(((c, n) for n, c in changes.items() if c > rtol), reverse=True)
     metrics = {'period': period, 'rtol': rtol, 'pre_time': float(pre_time), 'changes': changes}
     if not bad:
