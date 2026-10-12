@@ -304,21 +304,25 @@ window.addEventListener('DOMContentLoaded', function () {
       <h2 id="overview">Test overview</h2>
       {%- set ps = components[0].parameterisations %}
       {%- set p_cols = (ps[0].tests|map(attribute='short')|list if ps else []) %}
+      {%- macro p_cells(i) -%}
+        {%- for t in i.tests %}<td title="{{ t.message }}"><a href="#{{ t.anchor }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}
+        <td title="{{ i.omex_known_issue or i.omex_message }}">{% if i.omex_known_issue and i.omex_status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(i.omex_status) }}{% endif %}</td>
+      {%- endmacro %}
       <div class="table-wrap">
         <table class="grid-table">
-          <thead><tr><th>Version / parameterisation</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}
+          <thead><tr><th>Version</th><th>Parameterisation</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}
             {%- for h in p_cols %}<th>{{ h }}</th>{% endfor %}{% if ps %}<th>CUFLynx archive</th>{% endif %}</tr></thead>
           <tbody>
           {%- for c in components %}
-            <tr><td><a href="#{{ c.id }}">{{ c.label }}</a></td>
+            {%- set default = (c.parameterisations|selectattr('is_default')|first) if c.parameterisations else None %}
+            <tr><th scope="row" class="rowhead"><a href="#{{ c.id }}">{{ c.label }}</a></th>
+            <th scope="row" class="rowhead mono">{% if default %}<a href="#parameterisations">{{ default.name }}</a> <span class="muted">(default)</span>{% endif %}</th>
             {%- for t in c.tests %}<td title="{{ t.message }}"><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a>{% for l in t.links %}<br><a href="{{ l.href }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}
-            {%- for h in p_cols %}<td></td>{% endfor %}{% if ps %}<td></td>{% endif %}</tr>
-          {%- endfor %}
-          {%- for i in ps %}
-            <tr><td><a href="#parameterisations" class="mono">{{ i.name }}</a>{% if i.is_default %} <span class="muted">(default)</span>{% endif %}</td>
-            {%- for k in test_keys %}<td></td>{% endfor %}
-            {%- for t in i.tests %}<td title="{{ t.message }}"><a href="#{{ t.anchor }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}
-            <td title="{{ i.omex_known_issue or i.omex_message }}">{% if i.omex_known_issue and i.omex_status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(i.omex_status) }}{% endif %}</td></tr>
+            {%- if default %}{{ p_cells(default) }}{% elif ps %}{% for h in p_cols %}<td></td>{% endfor %}<td></td>{% endif %}</tr>
+            {%- for i in c.parameterisations if not i.is_default %}
+            <tr><th scope="row" class="rowhead"></th><th scope="row" class="rowhead mono"><a href="#parameterisations">{{ i.name }}</a></th>
+            {%- for k in test_keys %}<td></td>{% endfor %}{{ p_cells(i) }}</tr>
+            {%- endfor %}
           {%- endfor %}
           </tbody>
         </table>
