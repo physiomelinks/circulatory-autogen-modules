@@ -1,0 +1,235 @@
+[
+  {
+    "module_type": "glucose_carrier",
+    "module_subtype": "PTS_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "glucose_carrier_PTS_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "glucose_carrier_PTS",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "medium_face_port",
+        "variables": [
+          "C_glc_e",
+          "C_lac_e",
+          "J_glc_e",
+          "J_lac_e"
+        ]
+      }
+    ],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      },
+      {
+        "port_type": "protein_expression",
+        "variables": [
+          "m_expr"
+        ]
+      },
+      {
+        "port_type": "ATP_hydrolysis_port",
+        "variables": [
+          "ATP",
+          "ADP",
+          "Pi",
+          "j_ATP",
+          "j_ADP",
+          "j_Pi"
+        ]
+      },
+      {
+        "port_type": "G6P_port",
+        "variables": [
+          "C_G6P",
+          "J_G6P"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "C_glc_e",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_lac_e",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m_expr",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "ATP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "ADP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Pi",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_G6P",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "jmax_glc",
+        "mol_per_s_per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "K_glc_t",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_m_ATP",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_ADP_PEP",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_Pi_PEP",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "dG0_hk",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "c_std",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "f_PEP",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "K_eq",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Gamma",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "J_glc",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_glc",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "J_glc_e",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_lac_e",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_G6P",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ATP_cost",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_ATP",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_ADP",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_Pi",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

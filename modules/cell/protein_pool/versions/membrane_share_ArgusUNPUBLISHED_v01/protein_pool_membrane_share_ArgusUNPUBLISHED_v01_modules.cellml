@@ -1,0 +1,327 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="protein_pool_membrane_share_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="protein_pool_membrane_share">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="m_init" public_interface="in" units="dimensionless"/>
+        <!-- expression: copies relative to n_0 (protein_expression port) -->
+        <variable initial_value="m_init" name="m" public_interface="out" units="dimensionless"/>
+        <!-- expression the cell is moving to: s_target A_ceiling / a_unit -->
+        <variable name="m_target" public_interface="out" units="dimensionless"/>
+        <!-- time constant of the approach -->
+        <variable name="tau" public_interface="in" units="second"/>
+        <!-- copies per cell at m = 1 -->
+        <variable name="n_0" public_interface="in" units="dimensionless"/>
+        <!-- amino acids per functional unit -->
+        <variable name="L" public_interface="in" units="dimensionless"/>
+        <!-- membrane area one copy takes (0 for a cytosolic protein) -->
+        <variable name="footprint" public_interface="in" units="nm2"/>
+        <!-- ~P per amino acid made from glucose -->
+        <variable name="c_syn" public_interface="in" units="dimensionless"/>
+        <!-- ~P per peptide bond -->
+        <variable name="c_poly" public_interface="in" units="dimensionless"/>
+        <!-- ~P per residue for ATP-dependent proteolysis -->
+        <variable name="c_deg" public_interface="in" units="dimensionless"/>
+        <!-- ~P per amino acid returned to the pool -->
+        <variable name="c_recycle" public_interface="in" units="dimensionless"/>
+        <!-- fraction of the protein degraded and remade per second -->
+        <variable name="k_deg" public_interface="in" units="per_s"/>
+        <variable name="N_A" public_interface="in" units="per_mol"/>
+        <!-- ATP for half-rate synthesis -->
+        <variable name="K_m_ATP" public_interface="in" units="millimolar"/>
+        <!-- ATP at which the costs are stated (rest) -->
+        <variable name="ATP_ref" public_interface="in" units="millimolar"/>
+        <!-- cytosol ATP (protein_synthesis port) -->
+        <variable name="ATP" public_interface="in" units="millimolar"/>
+        <!-- share of the build demand the cell can serve (protein_synthesis port) -->
+        <variable name="s_build" public_interface="in" units="dimensionless"/>
+        <!-- copies per cell -->
+        <variable name="n" public_interface="out" units="dimensionless"/>
+        <!-- (m_target - m)/tau -->
+        <variable name="r_rel" public_interface="out" units="per_s"/>
+        <!-- rising part of r_rel (copies to build) -->
+        <variable name="r_up" public_interface="out" units="per_s"/>
+        <!-- falling part of r_rel (copies left to degrade, no ATP) -->
+        <variable name="r_down" public_interface="out" units="per_s"/>
+        <!-- synthesis slows as ATP runs out: 1 at ATP_ref -->
+        <variable name="f_ATP" public_interface="out" units="dimensionless"/>
+        <!-- f_ATP capped at 1: building never runs faster than asked -->
+        <variable name="f_build" public_interface="out" units="dimensionless"/>
+        <!-- ATP to keep the copies (turnover) -->
+        <variable name="J_keep" public_interface="out" units="mol_per_s"/>
+        <!-- ATP the rise asks for: building r_up n_0 copies per second -->
+        <variable name="J_demand" public_interface="out" units="mol_per_s"/>
+        <!-- ATP spent building -->
+        <variable name="J_build" public_interface="out" units="mol_per_s"/>
+        <!-- all ATP this protein uses -->
+        <variable name="J_ATP" public_interface="out" units="mol_per_s"/>
+        <!-- ATP to build the present copies from scratch (its share of a daughter) -->
+        <variable name="M_build" public_interface="out" units="mole"/>
+        <!-- membrane area per unit of m -->
+        <variable name="a_unit" public_interface="out" units="um2"/>
+        <!-- membrane area the copies take -->
+        <variable name="A_protein" public_interface="out" units="um2"/>
+        <!-- most membrane area the proteins may take (membrane_ceiling port) -->
+        <variable name="A_ceiling" public_interface="in" units="um2"/>
+        <!-- share of the ceiling the present copies take -->
+        <variable name="share" public_interface="out" units="dimensionless"/>
+        <!-- share of the ceiling one unit of m takes (one flagellum for the Flagellum) -->
+        <variable name="s_unit" public_interface="out" units="dimensionless"/>
+        <!-- share of the membrane's protein ceiling the copies are to take (set by the game; a cell's shares sum to at most 1) -->
+        <variable name="s_target" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>m_target</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>s_target</ci>
+                        <ci>A_ceiling</ci>
+                    </apply>
+                    <ci>a_unit</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>n</ci>
+                <apply>
+                    <times/>
+                    <ci>n_0</ci>
+                    <ci>m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_rel</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>m_target</ci>
+                        <ci>m</ci>
+                    </apply>
+                    <ci>tau</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_up</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>r_rel</ci>
+                        <apply>
+                            <abs/>
+                            <ci>r_rel</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_down</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>r_rel</ci>
+                        <apply>
+                            <abs/>
+                            <ci>r_rel</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_ATP</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <ci>ATP</ci>
+                            <apply>
+                                <plus/>
+                                <ci>K_m_ATP</ci>
+                                <ci>ATP</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>K_m_ATP</ci>
+                            <ci>ATP_ref</ci>
+                        </apply>
+                    </apply>
+                    <ci>ATP_ref</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_build</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>f_ATP</ci>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                        </apply>
+                        <apply>
+                            <abs/>
+                            <apply>
+                                <minus/>
+                                <ci>f_ATP</ci>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_keep</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>n</ci>
+                            <ci>L</ci>
+                            <apply>
+                                <plus/>
+                                <ci>c_poly</ci>
+                                <ci>c_deg</ci>
+                                <ci>c_recycle</ci>
+                            </apply>
+                            <ci>k_deg</ci>
+                        </apply>
+                        <ci>N_A</ci>
+                    </apply>
+                    <ci>f_ATP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_demand</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>r_up</ci>
+                        <ci>n_0</ci>
+                        <ci>L</ci>
+                        <apply>
+                            <plus/>
+                            <ci>c_syn</ci>
+                            <ci>c_poly</ci>
+                        </apply>
+                    </apply>
+                    <ci>N_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_build</ci>
+                <apply>
+                    <times/>
+                    <ci>J_demand</ci>
+                    <ci>s_build</ci>
+                    <ci>f_build</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP</ci>
+                <apply>
+                    <plus/>
+                    <ci>J_keep</ci>
+                    <ci>J_build</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>M_build</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>n</ci>
+                        <ci>L</ci>
+                        <apply>
+                            <plus/>
+                            <ci>c_syn</ci>
+                            <ci>c_poly</ci>
+                        </apply>
+                    </apply>
+                    <ci>N_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>a_unit</ci>
+                <apply>
+                    <times/>
+                    <ci>n_0</ci>
+                    <ci>footprint</ci>
+                    <cn cellml:units="um2_per_nm2" type="e-notation">1<sep/>-6</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_protein</ci>
+                <apply>
+                    <times/>
+                    <ci>a_unit</ci>
+                    <ci>m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>share</ci>
+                <apply>
+                    <divide/>
+                    <ci>A_protein</ci>
+                    <ci>A_ceiling</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_unit</ci>
+                <apply>
+                    <divide/>
+                    <ci>a_unit</ci>
+                    <ci>A_ceiling</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>m</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>r_up</ci>
+                        <ci>s_build</ci>
+                        <ci>f_build</ci>
+                    </apply>
+                    <ci>r_down</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

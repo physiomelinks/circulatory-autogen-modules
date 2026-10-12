@@ -1,0 +1,14 @@
+module_type: glucose_carrier
+version: ATP_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A glucose carrier driven by n_P ATP hydrolysed, between the medium (entrance medium_face_port) and the cytosol (exit
+  cytosol_face_port, as the Glf face cell_membrane_face adaptive), the ATP taken from and ADP and Pi returned to the cytosol
+  on the ATP_hydrolysis_port. Reaction glc_e + n_P ATP <=> glc_i + n_P (ADP + Pi), affinity A = RT ln(C_e/C_i) + n_P A_ATP,
+  rate J = jmax m A_mem (C_e a^n - C_i a_eq^n)/((K + C_e)(1 + a)^n) with a = ATP/K_m_ATP and a_eq = ATP_eq/K_m_ATP, ATP_eq
+  = ADP Pi/(c_std K_eq_hyd): Michaelis-Menten in glucose outside (J = jmax m A_mem C_e/(K + C_e) (a/(1 + a))^n with nothing
+  inside), saturating in ATP, zero at equilibrium and always of the sign of A, so J A >= 0. At the cell''s ATP (A_ATP ~49
+  kJ/mol) one ATP holds a 10^8-fold gradient: the carrier is irreversible in practice. J_ATP_cost = n_P J is the ATP it spends;
+  the cytosol counts the H+ and heat of that hydrolysis. Default instance: a binding-protein ABC importer (Mgl type; Km 0.5
+  uM, ferenci1996adaptation; n_P = 2 ATP, davidson2008structure); the glucose enters free and the cytosol''s hexokinase step
+  phosphorylates it, so a fermenter nets 0 ATP per ABC glucose. m = 1 is as many copies as the calibrated cell''s Glf; the
+  turnover number and K_m_ATP are placeholders.'

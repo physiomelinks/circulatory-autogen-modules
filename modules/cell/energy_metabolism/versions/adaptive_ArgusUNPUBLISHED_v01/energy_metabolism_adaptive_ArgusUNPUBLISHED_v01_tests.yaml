@@ -3,26 +3,48 @@ version: adaptive_ArgusUNPUBLISHED_v01
 reviewed: false
 notes: 'The cytosol of a fermenting prokaryote-grade cell (AdaptOrDeity''s starting organism) as a bond graph in concentration
   form: species stores (C elements, mu = mu0 + RT ln(C/c_std)) for glucose, lactate, ATP, ADP and Pi, joined by two reactions
-  (R elements): homolactic glycolysis, glucose + 2 ADP + 2 Pi <=> 2 lactate + 2 ATP, and the maintenance ATPase, ATP <=> ADP
-  + Pi; plus a glycogen store (a polymer of glucose units, activity 1): synthesis, glucose + 2 ATP -> glycogen + 2 ADP + 2
-  Pi (scaled by the game''s store_alloc and slowed near the ceiling C_glyc_max), and glycogenolysis to lactate, glycogen +
-  3 ADP + 3 Pi -> 2 lactate + 3 ATP, inhibited by ATP so the store is spent when ATP falls. Storing a glucose costs 2 ATP
-  and gives 3 later (instead of 2 now): about 75% round trip. The junction structure is the stoichiometry, so carbon (6 glc
-  + 3 lac), adenine (ATP + ADP) and phosphoryl groups (ATP + Pi) are conserved by construction. Each rate is the common modular
-  rate law (Liebermeister et al. 2010) written with the thermodynamic factor (1 - Gamma/K_eq): it saturates in each reactant
-  and its sign is always that of the affinity A = RT ln(K_eq/Gamma), so the dissipation v A is never negative. Heat is the
-  reaction enthalpy released: 2 h_lac_gly - 2 h_ATP per glycolysis turnover, h_ATP per ATP hydrolysed (including ATP hydrolysed
-  by transporters on the ATP_hydrolysis_port, e.g. the H+-ATPase), so at steady ATP the heat is 63 kJ per mol lactate (Gnaiger
-  and Kemp 1990). Protons: glycolysis to lactate written with the ionised species (glucose + 2 ADP3- + 2 HPO4 2- -> 2 lactate-
-  + 2 ATP4-) releases none, and each ATP hydrolysed releases one H+ (ATP4- + H2O -> ADP3- + HPO4 2- + H+), so the cytosol
-  exports j_H_met = V_c v_hyd - j_ATP_ext on the H_production port for all ATP hydrolysed, its own and that of the ATP_hydrolysis_port
-  users (transporters, protein turnover); at steady ATP the cell makes 2 H+ per glucose, which leave with lactate. Ports:
-  cytosol_face_port (entrance and exit; the five concentrations shared, the five fluxes summed) for diffusion faces and the
-  cell membrane; ATP_hydrolysis_port for ATP-driven transporters; compartment_volume (from the membrane); heat_source_port
-  to a thermal_volume. The default instance is the steady state of the whole fermenter cell (generic_adaptive_cell fermenter)
-  with total ATP turnover at the Lynch & Marinov (2015) maintenance cost for its volume at 20 C. Its tests feed it through
-  cell_membrane_face from a 1 mM glucose medium. When a substrate runs out its concentration sits at solver round-off, so
-  the affinities use ln(|Gamma| + 1e-300).
+  (R elements): homolactic glycolysis in two steps, the hexokinase step, glucose + ATP <=> glucose 6-phosphate (G6P) + ADP,
+  and the lower glycolysis, G6P + 3 ADP + 2 Pi <=> 2 lactate + 3 ATP (net glucose + 2 ADP + 2 Pi -> 2 lactate + 2 ATP), and
+  the maintenance ATPase, ATP <=> ADP + Pi; plus a glycogen store (a polymer of glucose units, activity 1): synthesis by the
+  bacterial ADP-glucose route, G6P + ATP -> glycogen + ADP + 2 Pi (scaled by the game''s store_alloc and slowed near the ceiling
+  C_glyc_max), and the phosphorylase, glycogen + Pi -> G6P, inhibited by ATP so the store is spent when ATP falls; the store
+  cannot run backwards without glycogen (its reverse takes glycogen at the activity a_glyc = C_glyc/(K_glyc_mob + C_glyc)).
+  Storing a glucose costs 2 ATP (the hexokinase step and ADP-glucose) and gives 3 later through the lower glycolysis (the
+  phosphorylase saves the hexokinase ATP), instead of 2 now. Extracellular matrix (exopolysaccharide, the biofilm''s EPS),
+  made like glycogen from G6P by the nucleotide-sugar route (phosphoglucomutase to G1P, UDP-glucose with PPi hydrolysed, polymerisation
+  and export): G6P + n ATP -> a glucose unit of matrix outside the cell + n ADP + (n + 1) Pi, n = n_ATP_mx = 2, so with the
+  G6P''s own phosphorylation (the hexokinase ATP, or the PTS''s PEP) a unit costs 1 glucose + 3 ATP (matrix_ATP_per_unit;
+  2-4 by pathway accounting, Sutherland 2001), scaled by the game''s mx_alloc; the matrix leaves on the matrix_export port
+  as J_mx (mol glucose units/s) for the volumes of the space between cells (transport/extracellular_volume), and J_ATP_mx
+  = (n + 1) J_mx is its cost. Export is irreversible: the rate is the thermodynamic factor clipped at zero, max(0, 1 - Gamma_mx/K_eq_mx),
+  so a starving cell stops making matrix and never takes it back. The glucose it takes also misses the 2 ATP glycolysis would
+  have made of it. G6P is trapped: no carrier takes it out, and a group-translocating carrier (the PTS) delivers it on the
+  G6P_port. The hexokinase step carries the pathway''s control: the lumped pathway''s common modular kinetics in glucose,
+  ADP, Pi, lactate and ATP (as the cell had before the split), saturating in its substrate ATP (K_ATP_hk), with the hexokinase
+  reaction''s thermodynamic factor; the lower glycolysis has lower_glycolysis_headroom (300) times the resting flux as capacity,
+  Hill kinetics in G6P (n_G6P_lg, cooperative as phosphofructokinase: v_lg = V_lg G6P^(n-1) (G6P - G6P_eq)/(K^n + G6P^n),
+  G6P_eq the G6P at which the lower glycolysis is at equilibrium) and saturates in ADP and Pi, so G6P sits at 1 mM at rest
+  (G6P_i; E. coli holds ~1-9 mM hexose phosphates, Chassagnole et al. 2002, Bennett et al. 2009) and rises to ~3 mM at 50
+  times the resting flux, holding part of the cell''s phosphate. The junction structure is the stoichiometry, so carbon (6
+  glc + 6 G6P + 3 lac + 6 glycogen, and 6 per matrix unit exported), adenine (ATP + ADP) and phosphoryl groups (ATP + Pi +
+  G6P) are conserved by construction. Each rate is written with the thermodynamic factor (1 - Gamma/K_eq) of its reaction
+  (the common modular rate law of Liebermeister et al. 2010 for the hexokinase step, saturating factors for the others), as
+  a difference of products so it stays finite when a substrate runs out: it saturates in each reactant and its sign is always
+  that of the affinity A = RT ln(K_eq/Gamma), so the dissipation v A is never negative. Heat is the reaction enthalpy released:
+  h_hk per hexokinase turnover, 2 h_lac_gly - 2 h_ATP - h_hk per lower glycolysis turnover, h_ATP per ATP hydrolysed (including
+  ATP hydrolysed by transporters on the ATP_hydrolysis_port, e.g. the H+-ATPase, counted by the Pi they return) and h_hk per
+  glucose a carrier phosphorylates (counted by the G6P it delivers), so at steady ATP the heat is 63 kJ per mol lactate (Gnaiger
+  and Kemp 1990). Protons, with the ionised species: each ATP hydrolysed releases one H+ (ATP4- + H2O -> ADP3- + HPO4 2- +
+  H+), so does each sugar phosphorylated by ATP (glucose + ATP4- -> G6P2- + ADP3- + H+: the hexokinase step, the PTS, ADP-glucose
+  synthesis, the matrix''s n ATP), the lower glycolysis takes one up and the phosphorylase none; the cytosol exports j_H_met
+  = V_c (v_hyd + v_gly - v_lg + v_store + n_ATP_mx v_mx) - j_ATP_ext on the H_production port; at steady ATP the cell makes
+  2 H+ per glucose, which leave with lactate. Ports: cytosol_face_port (entrance and exit; the five concentrations shared,
+  the five fluxes summed) for diffusion faces and the cell membrane; ATP_hydrolysis_port for ATP-driven transporters; G6P_port
+  (C_G6P shared, j_G6P_ext summed) for carriers that deliver G6P; matrix_export (J_mx); compartment_volume (from the membrane);
+  heat_source_port to a thermal_volume. The default instance is the steady state of the whole fermenter cell (generic_adaptive_cell
+  fermenter) with total ATP turnover at the Lynch & Marinov (2015) maintenance cost for its volume at 20 C. Its tests feed
+  it through cell_membrane_face from a 1 mM glucose medium. When a substrate runs out its concentration sits at solver round-off,
+  so the affinities use ln(|Gamma| + 1e-300).
 
 
   Ports of the versions of energy_metabolism (they differ; allowed and documented, see modules/README.md, Versions):

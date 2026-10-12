@@ -8,11 +8,14 @@ notes: 'One protein of an adaptive cell as a pool of copies: n = n_0 m, with exp
   + c_poly) / N_A; the cell''s protein synthesis (protein_expression adaptive) serves the share s_build of it, and the copies
   rise only as fast as the ATP actually spent: dm/dt = r_up s_build min(f_ATP, 1) + r_down. Falling needs no ATP (degradation)
   and is not refunded. M_build = n L (c_syn + c_poly) / N_A is the ATP to build the present copies: its share of a daughter.
-  A_protein = n footprint is the membrane area the copies take (0 for cytosolic proteins). m goes to the protein it scales
-  on the protein_expression port (its density or capacity times m), or on enzyme_expression to the cytosol''s enzymes; M_build
-  goes to biosynthesis (daughter_share, summed there); the costs, demand, daughter share and area go to protein_expression
-  on protein_synthesis, which returns ATP and s_build. Instances: one per protein of the fermenter cell (copy numbers, lengths
-  and footprints in each; see parameters.json).'
+  A_protein = n footprint is the membrane area the copies take (0 for cytosolic proteins), share = A_protein / A_ceiling the
+  share of the membrane''s protein ceiling they take (A_ceiling: protein_expression''s A_protein_max, on the membrane_ceiling
+  port) and s_unit = n_0 footprint / A_ceiling the share one unit of m takes: a protein counted by number (the flagellum:
+  m flagella) takes s_unit of the ceiling per unit, which the game counts with the membrane_share pools'' shares (a cell''s
+  shares sum to at most 1). m goes to the protein it scales on the protein_expression port (its density or capacity times
+  m), or on enzyme_expression to the cytosol''s enzymes; M_build goes to biosynthesis (daughter_share, summed there); the
+  costs, demand, daughter share and area go to protein_expression on protein_synthesis, which returns ATP and s_build. Instances:
+  one per protein of the fermenter cell (copy numbers, lengths and footprints in each; see parameters.json).'
 instances:
   H_ATPase: 'F1Fo H+-ATPase: rho_H_ATPase x A_mem (calibrated density)'
   NhaA: 'NhaA: cycles at rest / turnover_NhaA'
@@ -21,6 +24,8 @@ instances:
   NCX: 'NCX_Mj-type exchanger: rho_NaCa x A_mem (calibrated density)'
   Glf: 'Glf glucose facilitator: capacity / turnover_Glf'
   LacT: 'lactate-/H+ symporter (LldP-sized): capacity / turnover_LacT'
+  Hydrolase: 'cell-surface polysaccharide hydrolase (lipid-anchored alpha-amylase, SusG type): hydrolysis_capacity x resting
+    glucose flux / kcat_Hydrolase'
   Flagellum: 'flagellum (filament, hook, basal body, MotAB stators): one flagellum per unit of expression: m is the number
     of flagella'
   Glyc: 'glycolytic enzymes: glycolytic_share x proteome_per_um3 x cell volume'

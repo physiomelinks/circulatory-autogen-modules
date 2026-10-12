@@ -1,6 +1,8 @@
 variable_name,units,value,data_reference,sourced
 C_glc_init,millimolar,0.002,"unreferenced_placeholder; glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)",no
 C_lac_init,millimolar,0.26990316647694707,calibrated: steady state of the lumped cell (export by the membrane carrier = production),no
+C_G6P_init,millimolar,1.0,"chassagnole2002dynamic; glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)",no
+j_G6P_ext,mol_per_s,0.0,no G6P-delivering carrier connected,no
 C_ATP_init,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 C_ADP_init,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
 C_Pi_init,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
@@ -26,13 +28,19 @@ Q10,dimensionless,2.0,unreferenced_placeholder; metabolic Q10 typically 2-3,no
 c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
 dG0_ferm,J_per_mol,-196000.0,unreferenced_placeholder; textbook standard Gibbs energy of glucose -> 2 lactate (BioNumbers BNID 106539 lists -183.6 kJ/mol),no
 dG0_hyd,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
-V_gly,millimolar_per_s,6.319127470321385,calibrated: glycolysis supplies the total ATP turnover (lynch2015bioenergetic maintenance at 20 C) at the default steady state,no
+V_gly,millimolar_per_s,6.588125835191758,calibrated: glycolysis supplies the total ATP turnover (lynch2015bioenergetic maintenance at 20 C) at the default steady state,no
 K_glc,millimolar,0.1,unreferenced_placeholder; lumped glycolysis affinity for glucose (glucokinase order 0.1 mM),no
+K_ATP_hk,millimolar,0.1,"unreferenced_placeholder; ATP for half-rate of the hexokinase step, order 0.1 mM (far below the cell's 9.6 mM, so it acts only as ATP runs out)",no
+dG0_hk,J_per_mol,-16700.0,unreferenced_placeholder; standard Gibbs energy of glucose + ATP -> glucose 6-phosphate + ADP (textbook -16.7 kJ/mol: G6P hydrolysis -13.8 against ATP hydrolysis -30.5),no
+h_hk,J_per_mol,23800.0,unreferenced_placeholder; enthalpy released by glucose + ATP -> glucose 6-phosphate + ADP (about -24 kJ/mol reported for the hexokinase reaction; to confirm and cite),no
+V_lg,millimolar_per_s,28.05882448294951,"derived: lower_glycolysis_headroom x resting glycolytic flux / its ADP and Pi saturation at rest (lower_glycolysis_headroom: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced; K_ADP_gly: unreferenced_placeholder, placeholder; K_Pi_gly: unreferenced_placeholder, placeholder)",no
+K_G6P_lg,millimolar,4.158318947097563,"derived: steady state of the lower glycolysis at rest: G6P_i (headroom - 1)^(1/n_G6P_lg) (G6P_i: chassagnole2002dynamic, design; lower_glycolysis_headroom: unreferenced_placeholder, placeholder; n_G6P_lg: unreferenced_placeholder, placeholder)",no
+n_G6P_lg,dimensionless,4.0,"unreferenced_placeholder; Hill coefficient of the lumped lower glycolysis in G6P, from its committed step: E. coli phosphofructokinase (PFK-1, a tetramer) is cooperative in fructose 6-phosphate with a Hill coefficient of about 4 (Blangy, Buc and Monod 1968, J Mol Biol 31:13-35, doi 10.1016/0022-2836(68)90051-x: the paper is confirmed, the value is from memory, to check). With 4, G6P rises from 1 mM at rest to ~3 mM at 50x the resting flux and a cell with a large PTS keeps its phosphate; with 2 it would rise to ~8 mM and a full-ceiling PTS would run Pi down to ~0",no
 K_ADP_gly,millimolar,0.1,unreferenced_placeholder; lumped glycolysis affinity for ADP,no
 K_Pi_gly,millimolar,1.0,unreferenced_placeholder; lumped glycolysis affinity for Pi,no
 K_lac,millimolar,10.0,unreferenced_placeholder; lumped glycolysis product constant for lactate,no
 K_ATP_gly,millimolar,1.0,unreferenced_placeholder; lumped glycolysis product constant for ATP,no
-V_hyd,millimolar_per_s,0.08367164468728808,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
+V_hyd,millimolar_per_s,0.0836591948542882,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
 K_ATP_hyd,millimolar,0.5,unreferenced_placeholder; maintenance ATPase affinity for ATP,no
 K_ADP_hyd,millimolar,0.5,unreferenced_placeholder; maintenance ATPase product constant for ADP,no
 K_Pi_hyd,millimolar,5.0,unreferenced_placeholder; maintenance ATPase product constant for Pi,no
@@ -41,14 +49,20 @@ h_ATP,J_per_mol,20500.0,gajewski1986thermodynamics; enthalpy of ATP hydrolysis -
 C_glyc_init,millimolar,0.0,definitional; the starting cell stores nothing,no
 store_alloc,dimensionless,0.0,definitional; storage off until the player allocates energy to it,no
 V_store_max,millimolar_per_s,0.05050073093349957,"derived: glycogen_store_rate x resting glycolytic flux (glycogen_store_rate: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
-K_glc_store,millimolar,0.1,unreferenced_placeholder; glucokinase-order affinity of glycogen synthesis,no
+K_G6P_store,millimolar,50.0,"derived: K_glc_store x G6P_i / glc_i: the store saturated at rest as when it took free glucose (K_glc_store: unreferenced_placeholder, placeholder; glc_i: unreferenced_placeholder, placeholder; G6P_i: chassagnole2002dynamic, design)",no
 K_ATP_store,millimolar,1.0,"unreferenced_placeholder; ADP-glucose pyrophosphorylase ATP affinity, order 1 mM",no
 C_glyc_max,millimolar,200.0,"unreferenced_placeholder; glycogen ceiling: about 10% of dry weight (cell 1.1 g/mL, 30% dry), in mM glucose units",no
 V_mob,millimolar_per_s,0.14428780266714164,"derived: glycogen_mobilise_rate x resting glycolytic flux (glycogen_mobilise_rate: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
 K_glyc_mob,millimolar,10.0,unreferenced_placeholder; phosphorylase affinity for glycogen,no
-K_ADP_mob,millimolar,0.5,unreferenced_placeholder; lumped mobilisation affinity for ADP,no
 K_Pi_mob,millimolar,5.0,"unreferenced_placeholder; phosphorylase affinity for Pi, order 5 mM",no
 K_i_ATP_mob,millimolar,1.0,"unreferenced_placeholder; ATP inhibits mobilisation, so glycogen is spent when ATP falls",no
 dG0_store,J_per_mol,-42000.0,"unreferenced_placeholder; glucose + 2 ATP -> glycogen unit: textbook steps via G6P, G1P, UDP-glucose with PPi hydrolysis",no
 h_glyc_poly,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose to glycogen, taken as zero",no
 m_gly,dimensionless,1.0,definitional; baseline expression of the glycolytic enzymes (the calibrated cell),no
+mx_alloc,dimensionless,0.0,definitional; no matrix until the player allocates energy to it,no
+V_mx_max,millimolar_per_s,0.0072143901333570825,"derived: matrix_production_rate x resting glycolytic flux (matrix_production_rate: welman2003exopolysaccharides, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+K_G6P_mx,millimolar,50.0,"derived: K_glc_matrix x G6P_i / glc_i: matrix synthesis saturated at rest as if it took free glucose (K_glc_matrix: unreferenced_placeholder, placeholder; glc_i: unreferenced_placeholder, placeholder; G6P_i: chassagnole2002dynamic, design)",no
+K_ATP_mx,millimolar,1.0,"unreferenced_placeholder; ATP affinity of matrix synthesis (nucleotide-sugar pyrophosphorylase order 1 mM, as glycogen synthesis)",no
+n_ATP_mx,dimensionless,2.0,"derived: matrix_ATP_per_unit - 1: the first ATP phosphorylated the glucose to G6P (hexokinase, or the PTS's PEP) (matrix_ATP_per_unit: sutherland2001biofilm, placeholder)",no
+dG0_mx,J_per_mol,-55800.0,"derived: (dG0_store - 2 dG0_hyd) + matrix_ATP_per_unit x dG0_hyd - dG0_hk: the bond as in glycogen, paid by n + 1 ATP, from G6P (dG0_store: unreferenced_placeholder, placeholder; dG0_hyd: unreferenced_placeholder, placeholder; matrix_ATP_per_unit: sutherland2001biofilm, placeholder; dG0_hk: unreferenced_placeholder, placeholder)",no
+h_mx_poly,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose unit to the matrix polymer, taken as zero (as glycogen)",no

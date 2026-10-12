@@ -1,0 +1,23 @@
+module_type: protein_pool
+version: membrane_share_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'protein_pool ArgusUNPUBLISHED_v01 for a membrane protein whose target is set as a share of the membrane''s protein
+  ceiling: the game sets s_target in [0, 1], the share of A_ceiling (the most membrane area the proteins may take: protein_expression''s
+  A_protein_max on the membrane_ceiling port, a fixed fraction of the cell surface, so it scales with membrane area) the copies
+  are to take. The target copies are s_target A_ceiling / footprint, m_target = s_target A_ceiling / (n_0 footprint); everything
+  else (approach with tau, upkeep, build cost and its limits, daughter share, area) is the ArgusUNPUBLISHED_v01 maths. share
+  = A_protein / A_ceiling is the share the present copies take. The game keeps a cell''s shares summing to at most 1. Instances:
+  the fermenter cell''s transporters, each with s_target at its share at rest (m_target = 1), and the glucose carriers the
+  game unlocks after level 1 (PTS, ABC, GalP: none at start, n_0 = the calibrated cell''s Glf copies).'
+instances:
+  H_ATPase: 'F1Fo H+-ATPase: s_target = its share at rest'
+  NhaA: 'NhaA: s_target = its share at rest'
+  KefC: 'KefC: s_target = its share at rest'
+  Trk: 'TrkH2-TrkA4: s_target = its share at rest'
+  NCX: 'NCX_Mj-type exchanger: s_target = its share at rest'
+  Glf: 'Glf glucose facilitator: s_target = its share at rest'
+  LacT: 'lactate-/H+ symporter (LldP-sized): s_target = its share at rest'
+  Hydrolase: 'cell-surface polysaccharide hydrolase (lipid-anchored alpha-amylase, SusG type): s_target = its share at rest'
+  PTS: 'glucose phosphotransferase system (PtsG, EIIA-Glc, EI, HPr): none at start; n_0 = the calibrated cell''s Glf copies'
+  ABC: 'binding-protein ABC glucose importer (MglABC): none at start; n_0 = the calibrated cell''s Glf copies'
+  GalP: 'GalP-type glucose/H+ symporter (MFS): none at start; n_0 = the calibrated cell''s Glf copies'

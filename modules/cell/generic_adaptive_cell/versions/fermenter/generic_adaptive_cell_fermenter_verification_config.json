@@ -31,6 +31,10 @@
     "mod_cytosol/C_glyc",
     "mod_cytosol/v_gly",
     "mod_cytosol/v_hyd",
+    "mod_cytosol/C_G6P",
+    "mod_cytosol/v_lg",
+    "mod_cytosol/J_ATP_hk",
+    "mod_cytosol/J_ATP_lg",
     "mod_cytosol/v_store",
     "mod_cytosol/v_mob",
     "mod_cytosol/A_hyd",
@@ -40,6 +44,8 @@
     "mod_cytosol/J_ATP_turnover",
     "mod_cytosol/J_ATP_gly",
     "mod_cytosol/J_ATP_maint",
+    "mod_cytosol/J_mx",
+    "mod_cytosol/J_ATP_mx",
     "mod_i_leak_Na/i_leak_Na",
     "mod_i_leak_Ca/i_leak_Ca",
     "mod_i_leak_Ca/E_Ca",
@@ -70,6 +76,12 @@
     "mod_i_flagellum/j_H_flag",
     "mod_i_flagellum/pmf",
     "mod_i_flagellum/v_swim",
+    "mod_glc_PTS/J_glc",
+    "mod_glc_PTS/J_ATP_cost",
+    "mod_glc_ABC/J_glc",
+    "mod_glc_ABC/J_ATP_cost",
+    "mod_glc_GalP/J_glc",
+    "mod_glc_GalP/j_H",
     "mod_pool_proteome/m",
     "mod_pool_Glyc/m",
     "mod_pool_H_ATPase/m",
@@ -79,7 +91,39 @@
     "mod_pool_NCX/m",
     "mod_pool_Glf/m",
     "mod_pool_LacT/m",
-    "mod_pool_Flagellum/m"
+    "mod_pool_Flagellum/m",
+    "mod_pool_Hydrolase/m",
+    "mod_pool_PTS/m",
+    "mod_pool_ABC/m",
+    "mod_pool_GalP/m",
+    "mod_pool_H_ATPase/m_target",
+    "mod_pool_H_ATPase/share",
+    "mod_pool_NhaA/m_target",
+    "mod_pool_NhaA/share",
+    "mod_pool_KefC/m_target",
+    "mod_pool_KefC/share",
+    "mod_pool_Trk/m_target",
+    "mod_pool_Trk/share",
+    "mod_pool_NCX/m_target",
+    "mod_pool_NCX/share",
+    "mod_pool_Glf/m_target",
+    "mod_pool_Glf/share",
+    "mod_pool_LacT/m_target",
+    "mod_pool_LacT/share",
+    "mod_pool_Hydrolase/m_target",
+    "mod_pool_Hydrolase/share",
+    "mod_pool_PTS/m_target",
+    "mod_pool_PTS/share",
+    "mod_pool_ABC/m_target",
+    "mod_pool_ABC/share",
+    "mod_pool_GalP/m_target",
+    "mod_pool_GalP/share",
+    "mod_pool_Flagellum/share",
+    "mod_pool_Flagellum/s_unit",
+    "mod_protein/A_protein_max",
+    "mod_hydrolase/V_hydrolysis_max",
+    "mod_hydrolase/n_copies",
+    "mod_glc_PTS/J_G6P"
   ],
   "run_parameters": {},
   "invariants": [
@@ -88,20 +132,20 @@
       "expr": "abs(mod_membrane__Cm[0]*1e-12*(mod_membrane__V[-1] - mod_membrane__V[0])*1e-3 - 96485*mod_membrane__Vol[0]*((mod_Na_K__Nai[-1] - mod_Na_K__Nai[0]) + (mod_Na_K__Ki[-1] - mod_Na_K__Ki[0]) + 2*((mod_Ca__Cai + mod_Ca__CaB_Cai)[-1] - (mod_Ca__Cai + mod_Ca__CaB_Cai)[0]) + (mod_H__H_total_rel[-1] - mod_H__H_total_rel[0]) - (mod_cytosol__C_lac[-1] - mod_cytosol__C_lac[0]) + (mod_cytosol__C_ATP[-1] - mod_cytosol__C_ATP[0]))) <= 1e-6*96485*mod_membrane__Vol[0]*(abs((mod_Na_K__Nai[-1] - mod_Na_K__Nai[0])) + abs((mod_Na_K__Ki[-1] - mod_Na_K__Ki[0])) + abs((mod_H__H_total_rel[-1] - mod_H__H_total_rel[0]))) + 1e-21"
     },
     {
-      "description": "adenine and phosphoryl groups are conserved through every ATP user: ATP + ADP and ATP + Pi constant (relative 1e-9)",
-      "expr": "np.ptp(mod_cytosol__C_ATP + mod_cytosol__C_ADP) <= 1e-9*np.max(mod_cytosol__C_ATP + mod_cytosol__C_ADP) and np.ptp(mod_cytosol__C_ATP + mod_cytosol__C_Pi) <= 1e-9*np.max(mod_cytosol__C_ATP + mod_cytosol__C_Pi)"
+      "description": "adenine and phosphoryl groups are conserved through every ATP user and the PTS: ATP + ADP and ATP + Pi + G6P constant (relative 1e-9)",
+      "expr": "np.ptp(mod_cytosol__C_ATP + mod_cytosol__C_ADP) <= 1e-9*np.max(mod_cytosol__C_ATP + mod_cytosol__C_ADP) and np.ptp(mod_cytosol__C_ATP + mod_cytosol__C_Pi + mod_cytosol__C_G6P) <= 1e-9*np.max(mod_cytosol__C_ATP + mod_cytosol__C_Pi + mod_cytosol__C_G6P)"
     },
     {
       "description": "the ATP budget closes: the cytosol's external ATP use equals what the H+-ATPase (if present), protein synthesis and biosynthesis take (relative 1e-9)",
-      "expr": "np.allclose(mod_cytosol__J_ATP_turnover - mod_cytosol__J_ATP_maint, mod_i_H_ATPase__v_ATP_H + mod_protein__J_ATP_total + mod_bio__J_ATP_bio, rtol=1e-9, atol=1e-30)"
+      "expr": "np.allclose(mod_cytosol__J_ATP_turnover - mod_cytosol__J_ATP_maint, mod_i_H_ATPase__v_ATP_H + mod_protein__J_ATP_total + mod_bio__J_ATP_bio + mod_glc_PTS__J_ATP_cost + mod_glc_ABC__J_ATP_cost, rtol=1e-9, atol=1e-30)"
     },
     {
       "description": "second law for the leaks: each runs down its electrochemical gradient, i (V - E) >= 0",
       "expr": "np.all(mod_i_leak_Na__i_leak_Na*(mod_membrane__V - mod_Na_K__E_Na) >= 0) and np.all(mod_i_leak_Ca__i_leak_Ca*(mod_membrane__V - mod_i_leak_Ca__E_Ca) >= 0) and np.all(mod_i_leak_H__i_leak_H*(mod_membrane__V - mod_H__E_H) >= 0) and np.all(mod_i_K_Trk__i_leak_K*(mod_membrane__V - mod_Na_K__E_K) >= 0)"
     },
     {
-      "description": "concentrations stay non-negative: ATP, ADP, Pi, glucose, lactate and glycogen >= -1e-9 mM",
-      "expr": "np.all(mod_cytosol__C_glc >= -1e-9) and np.all(mod_cytosol__C_lac >= -1e-9) and np.all(mod_cytosol__C_ATP >= -1e-9) and np.all(mod_cytosol__C_ADP >= -1e-9) and np.all(mod_cytosol__C_Pi >= -1e-9) and np.all(mod_cytosol__C_glyc >= -1e-9)"
+      "description": "concentrations stay non-negative: ATP, ADP, Pi, glucose, G6P, lactate and glycogen >= -1e-9 mM",
+      "expr": "np.all(mod_cytosol__C_glc >= -1e-9) and np.all(mod_cytosol__C_lac >= -1e-9) and np.all(mod_cytosol__C_ATP >= -1e-9) and np.all(mod_cytosol__C_ADP >= -1e-9) and np.all(mod_cytosol__C_Pi >= -1e-9) and np.all(mod_cytosol__C_G6P >= -1e-9) and np.all(mod_cytosol__C_glyc >= -1e-9)"
     },
     {
       "description": "second law for the reactions: dissipation P_diss >= 0",
@@ -122,6 +166,18 @@
     {
       "description": "second law for the exchangers: NhaA and KefC run down their free energy, r drive >= 0",
       "expr": "np.all(mod_i_NaH__r_cycle*-(mod_membrane__V + mod_Na_K__E_Na - 2*mod_H__E_H) >= 0) and np.all(mod_i_KH__r_cycle*(mod_H__E_H - mod_Na_K__E_K) >= 0)"
+    },
+    {
+      "description": "carbon is conserved through every glucose carrier and the matrix exported: Vol d(6 glc + 6 G6P + 3 lac + 6 glycogen) = int (6 sum J_glc + 3 J_lac - 6 J_mx) dt (relative 1e-5: trapezoid integration of the logged fluxes)",
+      "expr": "abs(mod_membrane__Vol[0]*(6*(mod_cytosol__C_glc[-1] - mod_cytosol__C_glc[0]) + 6*(mod_cytosol__C_G6P[-1] - mod_cytosol__C_G6P[0]) + 3*(mod_cytosol__C_lac[-1] - mod_cytosol__C_lac[0]) + 6*(mod_cytosol__C_glyc[-1] - mod_cytosol__C_glyc[0])) - np.trapz(6*(mod_membrane_face__J_glc + mod_glc_PTS__J_glc + mod_glc_ABC__J_glc + mod_glc_GalP__J_glc) + 3*mod_membrane_face__J_lac - 6*mod_cytosol__J_mx, t)) <= 1e-5*np.trapz(np.abs(6*(mod_membrane_face__J_glc + mod_glc_PTS__J_glc + mod_glc_ABC__J_glc + mod_glc_GalP__J_glc)) + np.abs(3*mod_membrane_face__J_lac) + np.abs(6*mod_cytosol__J_mx), t) + 1e-30"
+    },
+    {
+      "description": "the carriers' costs follow their stoichiometry (exact): one PEP (ATP equivalent) per glucose for the PTS, which delivers it as G6P, n_P ATP per glucose for the ABC importer, one H+ per glucose for the symporter",
+      "expr": "np.allclose(mod_glc_PTS__J_ATP_cost, 1*mod_glc_PTS__J_glc, rtol=1e-12, atol=0) and np.allclose(mod_glc_ABC__J_ATP_cost, n_P_glc_ABC*mod_glc_ABC__J_glc, rtol=1e-12, atol=0) and np.array_equal(mod_glc_PTS__J_G6P, mod_glc_PTS__J_glc) and np.allclose(mod_glc_GalP__j_H, n_H_glc_GalP*mod_glc_GalP__J_glc, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "second law for the glucose carriers, each against the cytosol's own state: J (RT ln(C_e/C_glc) + n_P A_hyd) >= 0 (ABC), J (RT ln(K_eq_hk C_e ATP/(G6P ADP))) >= 0 (PTS), J (RT ln(C_e/C_glc) + n_H F (E_H - V)) >= 0 (symporter)",
+      "expr": "np.all(mod_glc_ABC__J_glc*(R*T*np.log(C_glc_e_glc_ABC/np.abs(mod_cytosol__C_glc)) + n_P_glc_ABC*mod_cytosol__A_hyd) >= -1e-30) and np.all(mod_glc_PTS__J_glc*(-dG0_hk_glc_PTS + R*T*np.log(C_glc_e_glc_PTS*mod_cytosol__C_ATP/np.abs(mod_cytosol__C_G6P*mod_cytosol__C_ADP) + 1e-300)) >= -1e-30) and np.all(mod_glc_GalP__J_glc*(R*T*np.log(C_glc_e_glc_GalP/np.abs(mod_cytosol__C_glc)) + n_H_glc_GalP*F*(mod_H__E_H - mod_membrane__V)*1e-3) >= -1e-30)"
     },
     {
       "description": "the default point is a steady state: V stays at -105 mV (1e-6 mV), pH at 7.6 (1e-9) and ATP at 9.6 mM (relative 1e-9)",
@@ -155,43 +211,63 @@
         0.25,
         4.0
       ],
-      "m_target_pool_H_ATPase": [
-        0.25,
-        4.0
-      ],
-      "m_target_pool_NhaA": [
-        0.25,
-        4.0
-      ],
-      "m_target_pool_KefC": [
-        0.25,
-        4.0
-      ],
-      "m_target_pool_Trk": [
-        0.25,
-        4.0
-      ],
-      "m_target_pool_NCX": [
-        0.25,
-        4.0
-      ],
-      "m_target_pool_Glf": [
-        0.25,
-        4.0
-      ],
-      "m_target_pool_LacT": [
-        0.25,
-        4.0
-      ],
       "m_target_pool_Flagellum": [
         1.0,
         8.0
+      ],
+      "s_target_pool_H_ATPase": [
+        0.025201794168165745,
+        0.4032287066906519
+      ],
+      "s_target_pool_NhaA": [
+        0.00090512651834649,
+        0.01448202429354384
+      ],
+      "s_target_pool_KefC": [
+        0.0016091138103937605,
+        0.025745820966300167
+      ],
+      "s_target_pool_Trk": [
+        0.00048273414311812804,
+        0.007723746289890049
+      ],
+      "s_target_pool_NCX": [
+        0.002972930444006601,
+        0.047566887104105615
+      ],
+      "s_target_pool_Glf": [
+        0.012419218881975641,
+        0.19870750211161026
+      ],
+      "s_target_pool_LacT": [
+        0.043446072880631514,
+        0.6951371660901042
+      ],
+      "s_target_pool_Hydrolase": [
+        0.00482734143118128,
+        0.07723746289890047
+      ],
+      "s_target_pool_PTS": [
+        0.012419218881975641,
+        0.19870750211161026
+      ],
+      "s_target_pool_ABC": [
+        0.02587337267078258,
+        0.4139739627325213
+      ],
+      "s_target_pool_GalP": [
+        0.012419218881975641,
+        0.19870750211161026
       ],
       "C_glc_e_membrane_face": [
         0.0,
         50.0
       ],
       "a_motor_i_flagellum": [
+        0.0,
+        1.0
+      ],
+      "mx_alloc_cytosol": [
         0.0,
         1.0
       ]
@@ -202,16 +278,21 @@
       "repair_level_bio",
       "store_alloc_cytosol",
       "m_target_pool_Glyc",
-      "m_target_pool_H_ATPase",
-      "m_target_pool_NhaA",
-      "m_target_pool_KefC",
-      "m_target_pool_Trk",
-      "m_target_pool_NCX",
-      "m_target_pool_Glf",
-      "m_target_pool_LacT",
       "m_target_pool_Flagellum",
+      "s_target_pool_H_ATPase",
+      "s_target_pool_NhaA",
+      "s_target_pool_KefC",
+      "s_target_pool_Trk",
+      "s_target_pool_NCX",
+      "s_target_pool_Glf",
+      "s_target_pool_LacT",
+      "s_target_pool_Hydrolase",
+      "s_target_pool_PTS",
+      "s_target_pool_ABC",
+      "s_target_pool_GalP",
       "C_glc_e_membrane_face",
-      "a_motor_i_flagellum"
+      "a_motor_i_flagellum",
+      "mx_alloc_cytosol"
     ],
     "exclude": [
       "R",

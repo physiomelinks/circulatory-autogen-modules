@@ -373,6 +373,48 @@
    "status": "placeholder",
    "note": "lumped glycolysis product constant for ATP"
   },
+  "dG0_hk": {
+   "value": -16700.0,
+   "units": "J_per_mol",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "standard Gibbs energy of glucose + ATP -> glucose 6-phosphate + ADP (textbook -16.7 kJ/mol: G6P hydrolysis -13.8 against ATP hydrolysis -30.5)"
+  },
+  "h_hk": {
+   "value": 23800.0,
+   "units": "J_per_mol",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "enthalpy released by glucose + ATP -> glucose 6-phosphate + ADP (about -24 kJ/mol reported for the hexokinase reaction; to confirm and cite)"
+  },
+  "G6P_i": {
+   "value": 1.0,
+   "units": "millimolar",
+   "source": "chassagnole2002dynamic",
+   "status": "design",
+   "note": "glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)"
+  },
+  "n_G6P_lg": {
+   "value": 4.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "Hill coefficient of the lumped lower glycolysis in G6P, from its committed step: E. coli phosphofructokinase (PFK-1, a tetramer) is cooperative in fructose 6-phosphate with a Hill coefficient of about 4 (Blangy, Buc and Monod 1968, J Mol Biol 31:13-35, doi 10.1016/0022-2836(68)90051-x: the paper is confirmed, the value is from memory, to check). With 4, G6P rises from 1 mM at rest to ~3 mM at 50x the resting flux and a cell with a large PTS keeps its phosphate; with 2 it would rise to ~8 mM and a full-ceiling PTS would run Pi down to ~0"
+  },
+  "K_ATP_hk": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "ATP for half-rate of the hexokinase step, order 0.1 mM (far below the cell's 9.6 mM, so it acts only as ATP runs out)"
+  },
+  "lower_glycolysis_headroom": {
+   "value": 300.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "capacity of the lower glycolysis (G6P to lactate) as a multiple of the resting flux, six times the hexokinase step's 52x, so a Glf cell's flux stays set at the entry step and a PTS cell can run up to it; with G6P_i and n_G6P_lg it sets the lumped G6P constant K_G6P_lg = G6P_i (headroom - 1)^(1/n) (4.2 mM: G6P 1 mM at rest, ~3 mM at 50x the resting flux)"
+  },
   "K_ATP_hyd": {
    "value": 0.5,
    "units": "millimolar",
@@ -413,7 +455,7 @@
    "units": "millimolar",
    "source": "unreferenced_placeholder",
    "status": "placeholder",
-   "note": "glucokinase-order affinity of glycogen synthesis"
+   "note": "glucokinase-order affinity of glycogen synthesis for free glucose; the store takes glucose 6-phosphate, and its G6P affinity is this times G6P_i/glc_i (the same saturation at rest)"
   },
   "K_ATP_store": {
    "value": 1.0,
@@ -435,13 +477,6 @@
    "source": "unreferenced_placeholder",
    "status": "placeholder",
    "note": "phosphorylase affinity for glycogen"
-  },
-  "K_ADP_mob": {
-   "value": 0.5,
-   "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "lumped mobilisation affinity for ADP"
   },
   "K_Pi_mob": {
    "value": 5.0,
@@ -976,11 +1011,11 @@
    "note": "one flagellum: ~20,000 flagellin (FliC, 498 aa) in the filament, ~120 hook FlgE (402 aa) and ~300 basal-body, rotor and stator proteins (~400 aa each)"
   },
   "footprint_Flagellum": {
-   "value": 2000.0,
+   "value": 1700.0,
    "units": "nm2",
-   "source": "unreferenced_placeholder",
+   "source": "beeby2016diverse",
    "status": "placeholder",
-   "note": "membrane area of a basal body (~45 nm ring) with its stators"
+   "note": "membrane area one flagellar motor takes: the disc out to its stators' outer edge, pi (20 + 3.5)^2 nm2 = 1,735 nm2, taken as 1,700. The 11 MotA5MotB2 stators of the enteric (Salmonella) motor exert force at a radius of 20 nm, around a C ring of 22 nm radius (Beeby et al. 2016, cryo-ET); each stator's MotA pentamer is ~6-7 nm across in the membrane (Santiveri et al. 2020, Deme et al. 2020 cryo-EM; the width from a secondary summary, to check), half of it 3.5 nm. Inside the stator ring sit the MS ring and export gate, so no other protein uses that membrane (confidence: medium: the radius is measured, the exclusion disc is an estimate; the proteins alone cover ~1,000 nm2)"
   },
   "n_H_rev": {
    "value": 1200.0,
@@ -1030,6 +1065,279 @@
    "source": "unreferenced_placeholder",
    "status": "placeholder",
    "note": "time for the flagella to spin up into a bundle when the motors switch on, or to unwind when they stop (E. coli bundles form in a few tenths of a second; Turner, Ryu and Berg 2000, to cite): thrust follows the motor switch with this time constant"
+  },
+  "K_glc_PTS": {
+   "value": 0.005,
+   "units": "millimolar",
+   "source": "deutscher2006how",
+   "status": "sourced",
+   "note": "glucose PTS (PtsG/EIICB-Glc) Km ~3-10 uM; 5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "K_glc_ABC": {
+   "value": 0.0005,
+   "units": "millimolar",
+   "source": "ferenci1996adaptation",
+   "status": "sourced",
+   "note": "binding-protein (Mgl) glucose transport Km ~0.1-1 uM; 0.5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "K_glc_GalP": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "pao1998major",
+   "status": "sourced",
+   "note": "MFS sugar/H+ symporters (GalP, LacY) Km ~10 uM-1 mM; 0.1 mM, the geometric middle of the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "n_ATP_ABC": {
+   "value": 2.0,
+   "units": "dimensionless",
+   "source": "davidson2008structure",
+   "status": "sourced",
+   "note": "two ATP hydrolysed per transport cycle of a binding-protein-dependent ABC importer"
+  },
+  "n_H_GalP": {
+   "value": 1.0,
+   "units": "dimensionless",
+   "source": "pao1998major",
+   "status": "sourced",
+   "note": "one H+ per sugar in MFS sugar/H+ symport"
+  },
+  "K_m_ATP_carrier": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM"
+  },
+  "turnover_PTS": {
+   "value": 200.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose taken up per PTS unit per second at capacity (transporters ~10-1000 /s, AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "turnover_ABC": {
+   "value": 20.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose taken up per ABC importer per second at capacity (ABC importers are slow; transporters ~10-1000 /s, AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "turnover_GalP": {
+   "value": 50.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose taken up per GalP copy per second at capacity (transporters ~10-1000 /s, AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
+  },
+  "L_PTS": {
+   "value": 1306.0,
+   "units": "dimensionless",
+   "source": "uniprot",
+   "status": "sourced",
+   "note": "one glucose PTS unit: E. coli PtsG EIICB-Glc (P69786, 477 aa) + Crr EIIA-Glc (P69783, 169) + PtsI enzyme I (P08839, 575) + PtsH HPr (P0AA04, 85); one of each per unit (EI and HPr are shared by every PTS of a real cell)"
+  },
+  "L_ABC": {
+   "value": 1510.0,
+   "units": "dimensionless",
+   "source": "uniprot",
+   "status": "sourced",
+   "note": "one Mgl ABC importer: E. coli MglA ATPase (P0AAG8, 506 aa) + 2 MglC permease (P23200, 336) + MglB binding protein (P0AEE5, 332); real cells keep binding protein in excess, not counted here"
+  },
+  "L_GalP": {
+   "value": 464.0,
+   "units": "dimensionless",
+   "source": "uniprot",
+   "status": "sourced",
+   "note": "E. coli GalP galactose(glucose)/H+ symporter (P0AEP1)"
+  },
+  "footprint_PTS": {
+   "value": 12.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane area one PtsG (EIIC) copy takes, as an MFS-sized carrier (0: cytosolic)"
+  },
+  "footprint_ABC": {
+   "value": 25.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane area one MglC2 permease dimer takes (0: cytosolic)"
+  },
+  "footprint_GalP": {
+   "value": 12.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane area one GalP copy takes (12 transmembrane helices, as Glf)"
+  },
+  "kcat_Hydrolase": {
+   "value": 1000.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose units released per surface hydrolase copy per second on polysaccharide at saturation, lumping the endo-cleavage and the exo-steps to glucose: bacterial alpha-amylases on starch reach ~1e3 /s (a Bacillus licheniformis alpha-amylase: kcat 2e3 /s, Km 6.2 mg/mL; to cite), on short oligosaccharides ~10 /s"
+  },
+  "K_m_poly_Hydrolase": {
+   "value": 20.0,
+   "units": "millimolar",
+   "source": "shipman1999physiological",
+   "status": "placeholder",
+   "note": "polymer for half-rate, in mM glucose units: SusG (B. thetaiotaomicron surface amylase) Km 3.1 mM p-nitrophenyl maltoheptaoside, ~22 mM glucose units; alpha-amylases on starch ~6 mg/mL, ~38 mM glucose units"
+  },
+  "hydrolysis_capacity": {
+   "value": 10.0,
+   "units": "dimensionless",
+   "source": "definitional",
+   "status": "design",
+   "note": "the level-1 cell's surface hydrolysis at saturating polymer, as a multiple of its resting glucose need: enough to grow on a food packet (maintenance is 1x), a third of what Glf can take up from a 10 mM packet (30x), so more enzyme is a trait worth evolving (sets its copy number with kcat_Hydrolase)"
+  },
+  "L_Hydrolase": {
+   "value": 700.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "amino acids of one surface alpha-amylase (a ~75-80 kDa lipoprotein, SusG-sized)"
+  },
+  "footprint_Hydrolase": {
+   "value": 20.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane (surface) area one lipid-anchored hydrolase copy takes"
+  },
+  "matrix_ATP_per_unit": {
+   "value": 3.0,
+   "units": "dimensionless",
+   "source": "sutherland2001biofilm",
+   "status": "placeholder",
+   "note": "ATP-equivalents per glucose unit of matrix exported, above the glucose itself: sugar phosphorylation (1), nucleotide-sugar activation with PPi hydrolysis (1-2), lipid-carrier recycling and export for Wzx/Wzy polymers (0.2-1); 2-4 by pathway accounting (Sutherland 2001; Welman and Maddox 2003; De Vuyst and Degeest 1999), no measured value found. Excludes the 2 ATP glycolysis would have made from the glucose, which the model accounts for itself. The cytosol makes the matrix from G6P: the sugar phosphorylation is the hexokinase step's ATP (or the PTS's PEP), and the matrix reaction spends the other matrix_ATP_per_unit - 1"
+  },
+  "matrix_production_rate": {
+   "value": 0.1,
+   "units": "dimensionless",
+   "source": "welman2003exopolysaccharides",
+   "status": "placeholder",
+   "note": "matrix capacity at full allocation, as a multiple of the resting glycolytic flux; lactic acid bacteria divert about 0.5-3% of the sugar they ferment to exopolysaccharide (Welman and Maddox 2003), biofilm formers more; 0.1 chosen for play"
+  },
+  "K_glc_matrix": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose affinity of matrix synthesis (glucokinase order, as glycogen synthesis); the matrix is made from glucose 6-phosphate, and its G6P affinity is this times G6P_i/glc_i (the same saturation at rest)"
+  },
+  "K_ATP_matrix": {
+   "value": 1.0,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "ATP affinity of matrix synthesis (nucleotide-sugar pyrophosphorylase order 1 mM, as glycogen synthesis)"
+  },
+  "h_matrix_poly": {
+   "value": 0.0,
+   "units": "J_per_mol",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "enthalpy of adding a glucose unit to the matrix polymer, taken as zero (as glycogen)"
+  },
+  "matrix_decay_rate": {
+   "value": 1e-06,
+   "units": "per_s",
+   "source": "zhang2003biodegradability",
+   "status": "placeholder",
+   "note": "first-order breakdown of matrix by the colony's hydrolases (half-life about 8 days); EPS is biodegradable and used as a reserve in starvation (Zhang and Bishop 2003; Flemming and Wingender 2010), no rate found that applies"
+  },
+  "matrix_glucose_return": {
+   "value": 0.5,
+   "units": "dimensionless",
+   "source": "zhang2003biodegradability",
+   "status": "placeholder",
+   "note": "share of the broken-down matrix released as glucose in the volume; the rest is lost (oxidised or washed out)"
+  },
+  "matrix_gel_density_max": {
+   "value": 50.0,
+   "units": "kg_per_m3",
+   "source": "flemming2010biofilm",
+   "status": "placeholder",
+   "note": "densest matrix gel the space between cells holds (biofilm EPS of order 10-100 g/L; alginate gels 10-20 g/L); matrix above it is squeezed out into the open water"
+  },
+  "matrix_overflow_rate": {
+   "value": 0.001,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "design",
+   "note": "rate at which matrix above the densest gel leaves the volume (fast against production: the ceiling holds)"
+  },
+  "polysaccharide_specific_volume": {
+   "value": 0.0006,
+   "units": "m3_per_kg",
+   "source": "amsden1998solute",
+   "status": "placeholder",
+   "note": "partial specific volume of polysaccharides, 0.6-0.65 mL/g (dextran 0.61), for the polymer volume fraction phi of Mackie and Meares (1955)"
+  },
+  "M_glucose_unit": {
+   "value": 0.162,
+   "units": "kg_per_mol",
+   "source": "definitional",
+   "status": "definitional",
+   "note": "molar mass of an anhydroglucose unit, C6H10O5"
+  },
+  "D_glc_water": {
+   "value": 5.9e-10,
+   "units": "m2_per_s",
+   "source": "stewart2003diffusion",
+   "status": "sourced",
+   "note": "glucose in water 6.7e-10 m2/s at 25 C (Stewart 2003, Table 1), scaled to 20 C by T/viscosity (x 0.873)"
+  },
+  "D_lac_water": {
+   "value": 9e-10,
+   "units": "m2_per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "lactate in water: 1.03e-9 m2/s at 25 C from its limiting ionic conductivity 38.8 S cm2/mol (Nernst-Einstein), x 0.873 to 20 C (CRC Handbook, to cite)"
+  },
+  "D_O2_water": {
+   "value": 1.75e-09,
+   "units": "m2_per_s",
+   "source": "stewart2003diffusion",
+   "status": "sourced",
+   "note": "O2 in water 2.0e-9 m2/s at 25 C (Stewart 2003, Table 1), scaled to 20 C by T/viscosity (x 0.873)"
+  },
+  "D_H_water": {
+   "value": 8e-09,
+   "units": "m2_per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "free H+ in water: 9.3e-9 m2/s at 25 C from its limiting ionic conductivity 349.8 S cm2/mol, x 0.873 to 20 C (CRC Handbook, to cite)"
+  },
+  "D_buffer_water": {
+   "value": 1e-09,
+   "units": "m2_per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "the seawater buffer that carries most protons (bicarbonate, 1.18e-9 m2/s at 25 C, x 0.873 to 20 C; to cite)"
+  },
+  "beta_seawater": {
+   "value": 0.3,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "buffer capacity of seawater, mM of H+ bound per pH unit near pH 7.3-8 (carbonate and borate; of order 0.1-0.5 mM, to cite, e.g. Egleston et al. 2010)"
+  },
+  "C_O2_proterozoic": {
+   "value": 0.003,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "dissolved O2 at about 1% of present atmospheric levels at 1.8 Ga (surface seawater at full air saturation holds about 0.28 mM at 20 C); range 0.1-10% PAL debated"
+  },
+  "colony_gap": {
+   "value": 0.3,
+   "units": "um",
+   "source": "unreferenced_placeholder",
+   "status": "design",
+   "note": "gap between neighbouring cells of a colony (the game's colony.cell_gap), for the example volume and faces"
   }
  }
 }

@@ -1,0 +1,332 @@
+{
+  "module_type": "extracellular_volume",
+  "version": "biofilm_ArgusUNPUBLISHED_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-16,
+    "MaximumStep": 0.0001
+  },
+  "outputs": [
+    "C_glc",
+    "C_lac",
+    "C_H",
+    "C_O2",
+    "C_mx",
+    "N_mx_lost",
+    "phi",
+    "f_hind",
+    "r_mx",
+    "r_ovf",
+    "J_mx_lost",
+    "pH",
+    "V_e",
+    "fN/J_glc_down",
+    "fN/J_lac_down",
+    "fN/J_H_down",
+    "fN/J_O2_down",
+    "fS/J_glc_up",
+    "fS/J_lac_up",
+    "fS/J_H_up",
+    "fS/J_O2_up",
+    "fN/C_glc_up",
+    "fN/C_lac_up",
+    "fN/C_H_up",
+    "fN/C_O2_up",
+    "fS/C_glc_down",
+    "fS/C_lac_down",
+    "fS/C_H_down",
+    "fS/C_O2_down"
+  ],
+  "run_parameters": {
+    "j_glc_cell": -2e-20,
+    "j_lac_cell": 4e-20,
+    "j_H_cell": 4e-20,
+    "j_O2_cell": 0.0,
+    "j_mx_cell": 1e-20,
+    "C_mx_init": 339.5061728395062
+  },
+  "harness": {
+    "module_array": [
+      [
+        "mod",
+        "biofilm_ArgusUNPUBLISHED_v01",
+        "extracellular_volume",
+        "fN",
+        "fS",
+        "default"
+      ],
+      [
+        "fN",
+        "biofilm_ArgusUNPUBLISHED_v01",
+        "extracellular_face",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "fS",
+        "biofilm_ArgusUNPUBLISHED_v01",
+        "extracellular_face",
+        "mod",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "A_f_fN",
+        "m2",
+        6e-13,
+        "harness: one cell-cell gap, h deep"
+      ],
+      [
+        "d_up_fN",
+        "metre",
+        6.639528095680696e-07,
+        "harness: centroid to the gap"
+      ],
+      [
+        "d_down_fN",
+        "metre",
+        6.639528095680696e-07,
+        "harness: the open side"
+      ],
+      [
+        "open_flag_fN",
+        "dimensionless",
+        1,
+        "harness: open face"
+      ],
+      [
+        "f_up_fN",
+        "dimensionless",
+        1.0,
+        "harness: open water, no matrix"
+      ],
+      [
+        "C_glc_up_fN",
+        "millimolar",
+        0.15000000000000002,
+        "harness: open water"
+      ],
+      [
+        "C_lac_up_fN",
+        "millimolar",
+        0.01,
+        "harness: open water"
+      ],
+      [
+        "C_H_up_fN",
+        "millimolar",
+        7.517808504409087e-05,
+        "harness: open water"
+      ],
+      [
+        "C_O2_up_fN",
+        "millimolar",
+        0.0045000000000000005,
+        "harness: open water"
+      ],
+      [
+        "A_f_fS",
+        "m2",
+        6e-13,
+        "harness: one cell-cell gap, h deep"
+      ],
+      [
+        "d_up_fS",
+        "metre",
+        6.639528095680696e-07,
+        "harness: centroid to the gap"
+      ],
+      [
+        "d_down_fS",
+        "metre",
+        0.0,
+        "harness: the open side"
+      ],
+      [
+        "open_flag_fS",
+        "dimensionless",
+        1,
+        "harness: open face"
+      ],
+      [
+        "f_down_fS",
+        "dimensionless",
+        1.0,
+        "harness: open water, no matrix"
+      ],
+      [
+        "C_glc_down_fS",
+        "millimolar",
+        0.1,
+        "harness: open water"
+      ],
+      [
+        "C_lac_down_fS",
+        "millimolar",
+        0.0,
+        "harness: open water"
+      ],
+      [
+        "C_H_down_fS",
+        "millimolar",
+        5.011872336272725e-05,
+        "harness: open water"
+      ],
+      [
+        "C_O2_down_fS",
+        "millimolar",
+        0.003,
+        "harness: open water"
+      ]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "glc balance: V_e dC_glc = integral of the face fluxes and the cells' exchange plus the glucose released by matrix breakdown (trapezoid; 1e-3 of the amount moved)",
+      "expr": "abs(V_e*(C_glc[-1] - C_glc[0]) - np.trapz((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + V_e*f_mx_glc*k_mx*C_mx, t)) <= 1e-3*np.trapz(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell), t) + 1e-30"
+    },
+    {
+      "description": "lac balance: V_e dC_lac = integral of the face fluxes and the cells' exchange (trapezoid; 1e-3 of the amount moved)",
+      "expr": "abs(V_e*(C_lac[-1] - C_lac[0]) - np.trapz((fN__J_lac_down + fS__J_lac_up) + j_lac_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_lac_down) + np.abs(fS__J_lac_up) + abs(j_lac_cell), t) + 1e-30"
+    },
+    {
+      "description": "H balance: V_e*(1 + b_H) dC_H = integral of the face fluxes and the cells' exchange (trapezoid; 1e-3 of the amount moved)",
+      "expr": "abs(V_e*(1 + b_H)*(C_H[-1] - C_H[0]) - np.trapz((fN__J_H_down + fS__J_H_up) + j_H_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_H_down) + np.abs(fS__J_H_up) + abs(j_H_cell), t) + 1e-30"
+    },
+    {
+      "description": "O2 balance: V_e dC_O2 = integral of the face fluxes and the cells' exchange (trapezoid; 1e-3 of the amount moved)",
+      "expr": "abs(V_e*(C_O2[-1] - C_O2[0]) - np.trapz((fN__J_O2_down + fS__J_O2_up) + j_O2_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_O2_down) + np.abs(fS__J_O2_up) + abs(j_O2_cell), t) + 1e-30"
+    },
+    {
+      "description": "matrix balance: V_e dC_mx = integral of the matrix delivered less breakdown and overflow (trapezoid; 1e-3 of the amount moved)",
+      "expr": "abs(V_e*(C_mx[-1] - C_mx[0]) - np.trapz(j_mx_cell - V_e*(r_mx + r_ovf), t)) <= 1e-3*np.trapz(j_mx_cell + V_e*(r_mx + r_ovf), t) + 1e-30"
+    },
+    {
+      "description": "carbon (glucose units): V_e (C_glc + C_mx) changes by the face and cell glucose fluxes and the matrix delivered, less J_mx_lost (trapezoid; 1e-3 of the amount moved)",
+      "expr": "abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) - np.trapz((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + j_mx_cell - J_mx_lost, t)) <= 1e-3*np.trapz(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t) + 1e-30"
+    },
+    {
+      "description": "carbon held: V_e (C_glc + C_mx) + N_mx_lost changes only by the face and cell glucose fluxes and the matrix delivered (trapezoid; 1e-3 of the amount moved)",
+      "expr": "abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) + N_mx_lost[-1] - N_mx_lost[0] - np.trapz((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + j_mx_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t) + 1e-30"
+    },
+    {
+      "description": "definitions (exact): phi = v_mx C_mx, f_hind = ((1 - phi)/(1 + phi))^2, pH = -log10(C_H/c_std), J_mx_lost = V_e ((1 - f_mx_glc) k_mx C_mx + k_ovf C_mx (C_mx/C_mx_max)^8)",
+      "expr": "np.allclose(phi, v_mx*C_mx, rtol=1e-12, atol=0) and np.allclose(f_hind, ((1 - phi)/(1 + phi))**2, rtol=1e-12, atol=0) and np.allclose(pH, -np.log10(C_H/c_std), rtol=1e-12, atol=0) and np.allclose(J_mx_lost, V_e*((1 - f_mx_glc)*k_mx*C_mx + k_ovf*C_mx*(C_mx/C_mx_max)**8), rtol=1e-12, atol=0)"
+    },
+    {
+      "applies": "run",
+      "description": "steady state of the lactate and O2 by t_end (no source in the volume): the face fluxes balance the cells' exchange (1e-6 of the largest term)",
+      "expr": "abs((fN__J_lac_down + fS__J_lac_up)[-1] + j_lac_cell) <= 1e-6*max(np.max(np.abs(fN__J_lac_down)), abs(j_lac_cell), 1e-30) and abs((fN__J_O2_down + fS__J_O2_up)[-1] + j_O2_cell) <= 1e-6*max(np.max(np.abs(fN__J_O2_down)), abs(j_O2_cell), 1e-30)"
+    },
+    {
+      "description": "with no cell exchange the concentrations stay between the open-water values and their start (maximum principle; glucose may rise by the matrix it releases)",
+      "expr": "(j_lac_cell != 0) or (np.all(C_lac >= min(C_lac[0], fN__C_lac_up[0], fS__C_lac_down[0]) - 1e-12) and np.all(C_lac <= max(C_lac[0], fN__C_lac_up[0], fS__C_lac_down[0]) + 1e-12))"
+    },
+    {
+      "description": "the matrix stays between 0 and its densest gel plus 15% (overflow holds the ceiling)",
+      "expr": "np.all(C_mx >= -1e-12) and np.all(C_mx <= 1.15*max(C_mx_max, C_mx[0]))"
+    },
+    {
+      "description": "second law: each species diffuses down its gradient across both faces, J (C_upstream - C_downstream) >= 0",
+      "expr": "np.all(fN__J_glc_down*(fN__C_glc_up - C_glc) >= -1e-30) and np.all(fS__J_glc_up*(fS__C_glc_down - C_glc) >= -1e-30) and np.all(fN__J_lac_down*(fN__C_lac_up - C_lac) >= -1e-30) and np.all(fS__J_lac_up*(fS__C_lac_down - C_lac) >= -1e-30) and np.all(fN__J_H_down*(fN__C_H_up - C_H) >= -1e-30) and np.all(fS__J_H_up*(fS__C_H_down - C_H) >= -1e-30) and np.all(fN__J_O2_down*(fN__C_O2_up - C_O2) >= -1e-30) and np.all(fS__J_O2_up*(fS__C_O2_down - C_O2) >= -1e-30)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "C_mx_init": {
+        "min": 0.0,
+        "max": 339.5061728395062,
+        "points": 4
+      },
+      "j_glc_cell": {
+        "min": -4e-20,
+        "max": 0.0,
+        "points": 3
+      },
+      "j_lac_cell": {
+        "min": 0.0,
+        "max": 8e-20,
+        "points": 3
+      },
+      "j_mx_cell": {
+        "min": 0.0,
+        "max": 4.5e-20,
+        "points": 3
+      },
+      "V_e": {
+        "min": 4.3190451972896607e-19,
+        "max": 4.319045197289661e-18,
+        "points": 3,
+        "scale": "log"
+      },
+      "f_mx_glc": {
+        "min": 0.0,
+        "max": 1.0,
+        "points": 3
+      },
+      "k_mx": {
+        "min": 0.0,
+        "max": 0.0001,
+        "points": 3
+      }
+    },
+    "exclude": [
+      "J_glc_in",
+      "J_glc_out",
+      "J_lac_in",
+      "J_lac_out",
+      "J_H_in",
+      "J_H_out",
+      "J_O2_in",
+      "J_O2_out"
+    ],
+    "rationale": "the cells' exchange over the range a 2 um fermenter gives (resting glucose flux 4.5e-19 mol/s over its 6 volumes, up to 10x when fed), the matrix from none to above the densest gel, the volume from tight to loose packing; J_in and J_out are the summed face fluxes"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      4e-05,
+      2e-05,
+      1e-05,
+      5e-06
+    ],
+    "t_end": 0.004,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-12
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "one volume of the space between cells has no measured counterpart on its own; verified by the balances, the steady state and the definitions. Biofilm diffusion data (Stewart 2003: De/Daq 0.25 for organic solutes, 0.6 for gases, cells and matrix together) apply to an assembled colony."
+      },
+      "calibrate": {
+        "note": "not_applicable: as baseline"
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ m_target,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
 tau,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
 n_0,dimensionless,1.0,"derived: the starting number of flagella (n_flagella_init: definitional, design)",no
 L,dimensionless,10128240.0,"unreferenced_placeholder; one flagellum: ~20,000 flagellin (FliC, 498 aa) in the filament, ~120 hook FlgE (402 aa) and ~300 basal-body, rotor and stator proteins (~400 aa each)",no
-footprint,nm2,2000.0,unreferenced_placeholder; membrane area of a basal body (~45 nm ring) with its stators,no
+footprint,nm2,1700.0,"beeby2016diverse; membrane area one flagellar motor takes: the disc out to its stators' outer edge, pi (20 + 3.5)^2 nm2 = 1,735 nm2, taken as 1,700. The 11 MotA5MotB2 stators of the enteric (Salmonella) motor exert force at a radius of 20 nm, around a C ring of 22 nm radius (Beeby et al. 2016, cryo-ET); each stator's MotA pentamer is ~6-7 nm across in the membrane (Santiveri et al. 2020, Deme et al. 2020 cryo-EM; the width from a secondary summary, to check), half of it 3.5 nm. Inside the stator ring sit the MS ring and export gate, so no other protein uses that membrane (confidence: medium: the radius is measured, the exclusion disc is an estimate; the proteins alone cover ~1,000 nm2)",no
 c_syn,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
 c_poly,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
@@ -15,3 +15,4 @@ K_m_ATP,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP af
 ATP_ref,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 s_build,dimensionless,1.0,definitional; synthesis serves the whole demand when unconnected,no
+A_ceiling,um2,2.827433388230814,"derived: protein_area_max_fraction x the whole cell surface (protein_area_max_fraction: unreferenced_placeholder, placeholder; R_cell: unreferenced_placeholder, design; h_cell: unreferenced_placeholder, design)",no

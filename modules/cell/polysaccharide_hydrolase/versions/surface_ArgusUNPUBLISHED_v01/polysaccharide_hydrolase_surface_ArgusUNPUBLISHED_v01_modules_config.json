@@ -1,0 +1,69 @@
+[
+  {
+    "module_type": "polysaccharide_hydrolase",
+    "module_subtype": "surface_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "polysaccharide_hydrolase_surface_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "polysaccharide_hydrolase_surface",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "protein_expression",
+        "variables": [
+          "m_expr"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "m_expr",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "n_0",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "kcat",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_m_poly",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "N_A",
+        "per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "n_copies",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "V_hydrolysis_max",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

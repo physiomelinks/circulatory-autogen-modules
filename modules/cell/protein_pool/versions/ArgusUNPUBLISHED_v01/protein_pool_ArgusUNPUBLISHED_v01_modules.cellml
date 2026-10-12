@@ -60,6 +60,12 @@
         <variable name="a_unit" public_interface="out" units="um2"/>
         <!-- membrane area the copies take -->
         <variable name="A_protein" public_interface="out" units="um2"/>
+        <!-- most membrane area the proteins may take (membrane_ceiling port) -->
+        <variable name="A_ceiling" public_interface="in" units="um2"/>
+        <!-- share of the ceiling the present copies take -->
+        <variable name="share" public_interface="out" units="dimensionless"/>
+        <!-- share of the ceiling one unit of m takes (one flagellum for the Flagellum) -->
+        <variable name="s_unit" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -261,6 +267,24 @@
                     <times/>
                     <ci>a_unit</ci>
                     <ci>m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>share</ci>
+                <apply>
+                    <divide/>
+                    <ci>A_protein</ci>
+                    <ci>A_ceiling</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_unit</ci>
+                <apply>
+                    <divide/>
+                    <ci>a_unit</ci>
+                    <ci>A_ceiling</ci>
                 </apply>
             </apply>
             <apply>

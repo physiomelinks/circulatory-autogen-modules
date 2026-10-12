@@ -91,6 +91,17 @@
         ]
       },
       {
+        "port_type": "G6P_port",
+        "variables": [
+          "C_G6P",
+          "j_G6P_ext"
+        ],
+        "multi_port": [
+          "True",
+          "sum"
+        ]
+      },
+      {
         "port_type": "compartment_volume",
         "variables": [
           "V_c"
@@ -115,6 +126,12 @@
           "M_glyc_ATP"
         ],
         "multi_port": "True"
+      },
+      {
+        "port_type": "matrix_export",
+        "variables": [
+          "J_mx"
+        ]
       },
       {
         "port_type": "enzyme_expression",
@@ -353,6 +370,60 @@
         "constant"
       ],
       [
+        "K_ATP_hk",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "dG0_hk",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "h_hk",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "V_lg",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_G6P_lg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "n_G6P_lg",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C_G6P_init",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "C_G6P",
+        "millimolar",
+        "access",
+        "variable"
+      ],
+      [
+        "j_G6P_ext",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
         "V_hyd",
         "millimolar_per_s",
         "access",
@@ -395,7 +466,13 @@
         "variable"
       ],
       [
-        "K_eq_gly",
+        "K_eq_hk",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "K_eq_lg",
         "dimensionless",
         "access",
         "variable"
@@ -407,7 +484,13 @@
         "variable"
       ],
       [
-        "Gamma_gly",
+        "Gamma_hk",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Gamma_lg",
         "dimensionless",
         "access",
         "variable"
@@ -425,13 +508,25 @@
         "variable"
       ],
       [
+        "v_lg",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
         "v_hyd",
         "millimolar_per_s",
         "access",
         "variable"
       ],
       [
-        "A_gly",
+        "A_hk",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "A_lg",
         "J_per_mol",
         "access",
         "variable"
@@ -491,7 +586,7 @@
         "constant"
       ],
       [
-        "K_glc_store",
+        "K_G6P_store",
         "millimolar",
         "access",
         "constant"
@@ -516,12 +611,6 @@
       ],
       [
         "K_glyc_mob",
-        "millimolar",
-        "access",
-        "constant"
-      ],
-      [
-        "K_ADP_mob",
         "millimolar",
         "access",
         "constant"
@@ -575,6 +664,12 @@
         "variable"
       ],
       [
+        "a_glyc",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
         "v_store",
         "millimolar_per_s",
         "access",
@@ -623,6 +718,18 @@
         "variable"
       ],
       [
+        "J_ATP_hk",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ATP_lg",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
         "J_ATP_maint",
         "mol_per_s",
         "access",
@@ -631,6 +738,84 @@
       [
         "M_glyc_ATP",
         "mole",
+        "access",
+        "variable"
+      ],
+      [
+        "mx_alloc",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V_mx_max",
+        "millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_G6P_mx",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "K_ATP_mx",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "n_ATP_mx",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "dG0_mx",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "h_mx_poly",
+        "J_per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "K_eq_mx",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Gamma_mx",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "v_mx",
+        "millimolar_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mx",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "J_mx",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ATP_mx",
+        "mol_per_s",
         "access",
         "variable"
       ]

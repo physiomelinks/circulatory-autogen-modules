@@ -1,0 +1,263 @@
+[
+  {
+    "module_type": "glucose_carrier",
+    "module_subtype": "H_symport_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "glucose_carrier_H_symport_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "glucose_carrier_H_symport",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "medium_face_port",
+        "variables": [
+          "C_glc_e",
+          "C_lac_e",
+          "J_glc_e",
+          "J_lac_e"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "cytosol_face_port",
+        "variables": [
+          "C_glc",
+          "C_lac",
+          "C_ATP",
+          "C_ADP",
+          "C_Pi",
+          "J_glc_c",
+          "J_lac_c",
+          "J_ATP_c",
+          "J_ADP_c",
+          "J_Pi_c"
+        ]
+      }
+    ],
+    "general_ports": [
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      },
+      {
+        "port_type": "protein_expression",
+        "variables": [
+          "m_expr"
+        ]
+      },
+      {
+        "port_type": "membrane_voltage",
+        "variables": [
+          "V"
+        ]
+      },
+      {
+        "port_type": "H_Nernst_potential",
+        "variables": [
+          "E_H"
+        ]
+      },
+      {
+        "port_type": "membrane_current",
+        "variables": [
+          "i_glc_H"
+        ]
+      },
+      {
+        "port_type": "H_flux",
+        "variables": [
+          "j_H"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "C_glc_e",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_lac_e",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_glc",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_lac",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_ATP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_ADP",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_Pi",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "m_expr",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "V",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_H",
+        "milliV",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "jmax_glc",
+        "mol_per_s_per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "K_glc_t",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "n_H",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_std",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "R",
+        "J_per_mol_K",
+        "access",
+        "global_constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "J_glc",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "A_glc",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "J_glc_e",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_lac_e",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_glc_c",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_lac_c",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ATP_c",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ADP_c",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_Pi_c",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "F",
+        "C_per_mol",
+        "access",
+        "global_constant"
+      ],
+      [
+        "W_H",
+        "J_per_mol",
+        "access",
+        "variable"
+      ],
+      [
+        "j_H",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "i_glc_H",
+        "nanoA",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

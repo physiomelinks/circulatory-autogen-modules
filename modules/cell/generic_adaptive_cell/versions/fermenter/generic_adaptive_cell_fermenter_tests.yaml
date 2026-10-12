@@ -9,10 +9,20 @@ description: 'AdaptOrDeity''s starting organism: generic_adaptive_cell empty_mem
   out), i_KH (KefC, K+/H+), i_K_Trk (i_leak_K adaptive as the Trk K+ uptake channel), i_NaCa (adaptive; archaeal NCX_Mj is
   the prokaryotic equivalent) and membrane_face (cell_membrane_face adaptive: the Glf glucose facilitator and a lactate-/H+
   symporter). The default instance is an exact steady state at -105 mV and pH 7.6 with total ATP turnover equal to Lynch &
-  Marinov''s maintenance cost at 20 C.'
+  Marinov''s maintenance cost at 20 C. hydrolase (polysaccharide_hydrolase surface: a lipid-anchored alpha-amylase) gives
+  the game the cell''s capacity to dissolve food polymer, V_hydrolysis_max, and its K_m_poly: the game releases the glucose
+  outside the cell, where the carriers take it up. The membrane proteins'' pools (protein_pool membrane_share) take their
+  target as a share s_target of the membrane''s protein ceiling (protein''s A_protein_max), each at its share at rest; the
+  game keeps the shares, with the flagella''s (pool_Flagellum share: s_unit, the motor''s stator ring and basal body, per
+  flagellum), summing to at most 1. Three glucose carriers the game unlocks after level 1 sit beside Glf with their pools
+  at 0 (m_init and s_target 0), so the level-1 cell is unchanged until the game sets a share: glc_PTS (glucose_carrier PTS:
+  the phosphotransferase system, Km 5 uM, delivering glucose 6-phosphate for one PEP charged as one ATP, so 2 ATP net per
+  glucose), glc_ABC (glucose_carrier ATP: binding-protein importer, Km 0.5 uM, 2 ATP per glucose, 0 net) and glc_GalP (glucose_carrier
+  H_symport: Km 0.1 mM, one H+ per glucose, about 1.7 ATP net once the H+-ATPase pumps it out). Each takes its medium glucose
+  from its own C_glc_e parameter, set to the same value as membrane_face''s.'
 extends: empty_membrane
 notes: 'Assembled by tools/build_adaptive_cell.py from modules/cell/generic_adaptive_cell/parameters.json: its parameter rows
   are its submodules'' default instances (every value with its source there) with the overrides the cell sets. It extends
-  generic_adaptive_cell empty_membrane with: i_H_ATPase, i_NaH, i_KH, i_K_Trk, i_NaCa, membrane_face, i_flagellum, pool_H_ATPase,
-  pool_NhaA, pool_KefC, pool_Trk, pool_NCX, pool_Glf, pool_LacT, pool_Flagellum. Protein expression: each protein_pool has
-  a target m_target set by the game.'
+  generic_adaptive_cell empty_membrane with: i_H_ATPase, i_NaH, i_KH, i_K_Trk, i_NaCa, membrane_face, i_flagellum, hydrolase,
+  glc_PTS, glc_ABC, glc_GalP, pool_H_ATPase, pool_NhaA, pool_KefC, pool_Trk, pool_NCX, pool_Glf, pool_LacT, pool_Flagellum,
+  pool_Hydrolase, pool_PTS, pool_ABC, pool_GalP. Protein expression: each protein_pool has a target m_target set by the game.'

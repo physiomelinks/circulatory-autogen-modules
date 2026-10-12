@@ -1,0 +1,291 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="extracellular_volume_biofilm_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="extracellular_volume">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="C_glc_init" public_interface="in" units="millimolar"/>
+        <variable initial_value="C_glc_init" name="C_glc" public_interface="out" units="millimolar"/>
+        <!-- summed fluxes of the faces on the entrance and exit extracellular_face_ports -->
+        <variable name="J_glc_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_glc_out" public_interface="in" units="mol_per_s"/>
+        <!-- summed exchange with the cells around the volume, positive into it -->
+        <variable name="j_glc_cell" public_interface="in" units="mol_per_s"/>
+        <variable name="C_lac_init" public_interface="in" units="millimolar"/>
+        <variable initial_value="C_lac_init" name="C_lac" public_interface="out" units="millimolar"/>
+        <variable name="J_lac_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_lac_out" public_interface="in" units="mol_per_s"/>
+        <variable name="j_lac_cell" public_interface="in" units="mol_per_s"/>
+        <variable name="C_H_init" public_interface="in" units="millimolar"/>
+        <!-- free H+ (the bound share is b_H C_H) -->
+        <variable initial_value="C_H_init" name="C_H" public_interface="out" units="millimolar"/>
+        <variable name="J_H_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_H_out" public_interface="in" units="mol_per_s"/>
+        <variable name="j_H_cell" public_interface="in" units="mol_per_s"/>
+        <variable name="C_O2_init" public_interface="in" units="millimolar"/>
+        <variable initial_value="C_O2_init" name="C_O2" public_interface="out" units="millimolar"/>
+        <variable name="J_O2_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_O2_out" public_interface="in" units="mol_per_s"/>
+        <variable name="j_O2_cell" public_interface="in" units="mol_per_s"/>
+        <variable name="C_mx_init" public_interface="in" units="millimolar"/>
+        <!-- matrix (exopolysaccharide) as mM of glucose units; it does not diffuse -->
+        <variable initial_value="C_mx_init" name="C_mx" public_interface="out" units="millimolar"/>
+        <!-- matrix the cells deliver into the volume (their matrix_export, summed) -->
+        <variable name="j_mx_cell" public_interface="in" units="mol_per_s"/>
+        <!-- water volume between the cells -->
+        <variable name="V_e" public_interface="in" units="m3"/>
+        <!-- buffered H+ per free H+ (a linear buffer: capacity V_e (1 + b_H)) -->
+        <variable name="b_H" public_interface="in" units="dimensionless"/>
+        <variable name="c_std" public_interface="in" units="millimolar"/>
+        <!-- polymer volume per mol of glucose units (partial specific volume x molar mass) -->
+        <variable name="v_mx" public_interface="in" units="m3_per_mol"/>
+        <!-- breakdown rate of the matrix -->
+        <variable name="k_mx" public_interface="in" units="per_s"/>
+        <!-- share of the broken-down matrix released as glucose -->
+        <variable name="f_mx_glc" public_interface="in" units="dimensionless"/>
+        <!-- densest matrix gel the volume holds -->
+        <variable name="C_mx_max" public_interface="in" units="millimolar"/>
+        <!-- rate at which matrix above C_mx_max leaves for open water -->
+        <variable name="k_ovf" public_interface="in" units="per_s"/>
+        <!-- polymer volume fraction -->
+        <variable name="phi" public_interface="out" units="dimensionless"/>
+        <!-- diffusion in the matrix over diffusion in water (Mackie and Meares 1955) -->
+        <variable name="f_hind" public_interface="out" units="dimensionless"/>
+        <!-- matrix broken down -->
+        <variable name="r_mx" public_interface="out" units="millimolar_per_s"/>
+        <!-- matrix squeezed out above the densest gel -->
+        <variable name="r_ovf" public_interface="out" units="millimolar_per_s"/>
+        <!-- glucose units of matrix leaving the colony (not released as glucose, or squeezed out) -->
+        <variable name="J_mx_lost" public_interface="out" units="mol_per_s"/>
+        <!-- glucose units of matrix that have left the colony since the start (the running total of J_mx_lost, for carbon accounting) -->
+        <variable initial_value="0.0" name="N_mx_lost" public_interface="out" units="mole"/>
+        <variable name="pH" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi</ci>
+                <apply>
+                    <times/>
+                    <ci>v_mx</ci>
+                    <ci>C_mx</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_hind</ci>
+                <apply>
+                    <power/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>phi</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>phi</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_mx</ci>
+                <apply>
+                    <times/>
+                    <ci>k_mx</ci>
+                    <ci>C_mx</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_ovf</ci>
+                <apply>
+                    <times/>
+                    <ci>k_ovf</ci>
+                    <ci>C_mx</ci>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <ci>C_mx</ci>
+                            <ci>C_mx_max</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">8.0</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_mx_lost</ci>
+                <apply>
+                    <times/>
+                    <ci>V_e</ci>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <ci>f_mx_glc</ci>
+                            </apply>
+                            <ci>r_mx</ci>
+                        </apply>
+                        <ci>r_ovf</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>pH</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <divide/>
+                                <ci>C_H</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.302585092994046</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_glc</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>J_glc_in</ci>
+                            <ci>J_glc_out</ci>
+                            <ci>j_glc_cell</ci>
+                        </apply>
+                        <ci>V_e</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>f_mx_glc</ci>
+                        <ci>r_mx</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_lac</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>J_lac_in</ci>
+                        <ci>J_lac_out</ci>
+                        <ci>j_lac_cell</ci>
+                    </apply>
+                    <ci>V_e</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_H</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>J_H_in</ci>
+                        <ci>J_H_out</ci>
+                        <ci>j_H_cell</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>V_e</ci>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>b_H</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_O2</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>J_O2_in</ci>
+                        <ci>J_O2_out</ci>
+                        <ci>j_O2_cell</ci>
+                    </apply>
+                    <ci>V_e</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_mx</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <divide/>
+                            <ci>j_mx_cell</ci>
+                            <ci>V_e</ci>
+                        </apply>
+                        <ci>r_mx</ci>
+                    </apply>
+                    <ci>r_ovf</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>N_mx_lost</ci>
+                </apply>
+                <ci>J_mx_lost</ci>
+            </apply>
+        </math>
+    </component>
+</model>

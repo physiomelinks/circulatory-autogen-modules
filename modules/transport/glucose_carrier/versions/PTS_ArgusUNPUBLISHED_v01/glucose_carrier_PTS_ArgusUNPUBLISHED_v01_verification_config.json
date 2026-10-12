@@ -1,0 +1,73 @@
+{
+  "module_type": "glucose_carrier",
+  "version": "PTS_ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "J_glc",
+    "A_glc",
+    "f_PEP",
+    "K_eq",
+    "Gamma",
+    "J_G6P",
+    "J_ATP_cost",
+    "j_ATP",
+    "j_ADP",
+    "j_Pi",
+    "J_glc_e",
+    "J_lac_e"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "rate law (relative 1e-9): J = jmax m A_mem f_PEP (C_e ATP - G6P ADP/K_eq)/((K_m_ATP + ATP)(K + C_e)), f_PEP = ADP/(K_ADP_PEP + ADP) Pi/(K_Pi_PEP + Pi), K_eq = exp(-dG0_hk/RT)",
+      "expr": "np.allclose(J_glc, jmax_glc*m_expr*A_mem*ADP/(K_ADP_PEP + ADP)*Pi/(K_Pi_PEP + Pi)*(C_glc_e*ATP - C_G6P*ADP*np.exp(dG0_hk/(R*T)))/((K_m_ATP + ATP)*(K_glc_t + C_glc_e)), rtol=1e-9, atol=1e-12*abs(jmax_glc*A_mem*max(m_expr, 1e-30)))"
+    },
+    {
+      "description": "stoichiometry (exact): glucose leaves the medium and arrives as G6P, one ATP equivalent becomes ADP per glucose and no Pi is released; lactate does not cross",
+      "expr": "np.array_equal(J_glc_e, -J_glc) and np.array_equal(J_G6P, J_glc) and np.array_equal(J_ATP_cost, J_glc) and np.array_equal(j_ATP, -J_glc) and np.array_equal(j_ADP, J_glc) and np.all(j_Pi == 0) and np.all(J_lac_e == 0)"
+    },
+    {
+      "description": "second law: glucose moves down the affinity of the coupled reaction, J A >= 0, A = RT ln(K_eq C_e ATP/(G6P ADP))",
+      "expr": "np.all(J_glc*A_glc >= 0)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "C_glc_e": {
+        "min": 0.0001,
+        "max": 50.0,
+        "points": 7,
+        "scale": "log"
+      },
+      "C_G6P": [
+        0.0,
+        10.0
+      ],
+      "ATP": [
+        0.001,
+        12.0
+      ],
+      "m_expr": [
+        0.0,
+        4.0
+      ]
+    },
+    "rationale": "glucose outside from 0.1 uM to 50 mM (the game's range, both sides of the Km), G6P inside from none to a real cell's ~10 mM, ATP from exhaustion (where the carrier can run backwards) to above rest, expression from none to the game's maximum"
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}
