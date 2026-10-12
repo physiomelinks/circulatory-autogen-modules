@@ -1,0 +1,12 @@
+module_type: extracellular_face
+version: biofilm_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Diffusion of glucose, lactate, H+ and O2 through the gap between two neighbouring cells, from one volume of the space
+  between cells to the next (or to open water: with one side unconnected its concentrations are fixed open-water values and
+  its f is 1). Each half of the path is slowed by its volume''s matrix (f_hind, Mackie and Meares 1955), the two halves in
+  series: G_s = open_flag A_f D_s / (d_up/f_up + d_down/f_down), written as A_f D_s f_up f_down/(d_up f_down + d_down f_up)
+  so a half of length 0 (open water at the mouth) is allowed. J_s = G_s (C_up - C_down) into the downstream volume (J_down
+  = J, J_up = -J), so the pair conserves mass. D_H is the protons'' effective diffusivity in buffered seawater (free H+ plus
+  the buffer''s share, D_H_water + b_H D_buffer_water), matching the volume''s buffered capacity. Diffusivities in water at
+  20 C: Stewart 2003 (glucose, O2) and limiting ionic conductivities (lactate, H+). Tested between two closed volumes of different
+  sizes, one holding matrix: the flux law, conservation of every species, the exact two-volume solution and the second law.'

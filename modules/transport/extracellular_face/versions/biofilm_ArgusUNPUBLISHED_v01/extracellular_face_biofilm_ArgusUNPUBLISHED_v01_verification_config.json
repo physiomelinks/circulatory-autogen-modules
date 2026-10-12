@@ -1,0 +1,273 @@
+{
+  "module_type": "extracellular_face",
+  "version": "biofilm_ArgusUNPUBLISHED_v01",
+  "sim_time": 0.05,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-11,
+    "atol": 1e-18,
+    "MaximumStep": 0.0005
+  },
+  "outputs": [
+    "G_glc",
+    "J_glc",
+    "J_glc_up",
+    "J_glc_down",
+    "va/C_glc",
+    "vb/C_glc",
+    "G_lac",
+    "J_lac",
+    "J_lac_up",
+    "J_lac_down",
+    "va/C_lac",
+    "vb/C_lac",
+    "G_H",
+    "J_H",
+    "J_H_up",
+    "J_H_down",
+    "va/C_H",
+    "vb/C_H",
+    "G_O2",
+    "J_O2",
+    "J_O2_up",
+    "J_O2_down",
+    "va/C_O2",
+    "vb/C_O2",
+    "va/V_e",
+    "vb/V_e",
+    "va/f_hind",
+    "vb/f_hind",
+    "va/b_H",
+    "D_glc",
+    "D_lac",
+    "D_H",
+    "D_O2"
+  ],
+  "harness": {
+    "module_array": [
+      [
+        "va",
+        "biofilm_ArgusUNPUBLISHED_v01",
+        "extracellular_volume",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "mod",
+        "biofilm_ArgusUNPUBLISHED_v01",
+        "extracellular_face",
+        "va",
+        "vb",
+        "default"
+      ],
+      [
+        "vb",
+        "biofilm_ArgusUNPUBLISHED_v01",
+        "extracellular_volume",
+        "mod",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "C_glc_init_va",
+        "millimolar",
+        0.1,
+        "harness: two volumes at different concentrations"
+      ],
+      [
+        "C_lac_init_va",
+        "millimolar",
+        0.5,
+        "harness"
+      ],
+      [
+        "C_H_init_va",
+        "millimolar",
+        0.0001002374467254545,
+        "harness"
+      ],
+      [
+        "C_O2_init_va",
+        "millimolar",
+        0.003,
+        "harness"
+      ],
+      [
+        "C_mx_init_va",
+        "millimolar",
+        0.0,
+        "harness: matrix in one volume"
+      ],
+      [
+        "k_mx_va",
+        "per_s",
+        0.0,
+        "harness: matrix held, so the hindrance is constant"
+      ],
+      [
+        "V_e_va",
+        "m3",
+        1.4396817324298869e-18,
+        "harness: two volumes of different size"
+      ],
+      [
+        "C_glc_init_vb",
+        "millimolar",
+        0.020000000000000004,
+        "harness: two volumes at different concentrations"
+      ],
+      [
+        "C_lac_init_vb",
+        "millimolar",
+        0.1,
+        "harness"
+      ],
+      [
+        "C_H_init_vb",
+        "millimolar",
+        6.0142468035272696e-05,
+        "harness"
+      ],
+      [
+        "C_O2_init_vb",
+        "millimolar",
+        0.0006000000000000001,
+        "harness"
+      ],
+      [
+        "C_mx_init_vb",
+        "millimolar",
+        154.320987654321,
+        "harness: matrix in one volume"
+      ],
+      [
+        "k_mx_vb",
+        "per_s",
+        0.0,
+        "harness: matrix held, so the hindrance is constant"
+      ],
+      [
+        "V_e_vb",
+        "m3",
+        2.1595225986448303e-18,
+        "harness: two volumes of different size"
+      ]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "G_s = open_flag A_f D_s f_up f_down/(d_up f_down + d_down f_up) (two half-cells in series), J_s = G_s (C_up - C_down) with C_up, C_down and f_up, f_down from the connected volumes, J_down = J, J_up = -J (exact)",
+      "expr": "np.allclose(G_glc, open_flag*A_f*D_glc*va__f_hind*vb__f_hind/(d_up*vb__f_hind + d_down*va__f_hind), rtol=1e-12, atol=0) and np.allclose(J_glc, G_glc*(va__C_glc - vb__C_glc), rtol=1e-9, atol=1e-35) and np.array_equal(J_glc_down, J_glc) and np.array_equal(J_glc_up, -J_glc) and np.allclose(G_lac, open_flag*A_f*D_lac*va__f_hind*vb__f_hind/(d_up*vb__f_hind + d_down*va__f_hind), rtol=1e-12, atol=0) and np.allclose(J_lac, G_lac*(va__C_lac - vb__C_lac), rtol=1e-9, atol=1e-35) and np.array_equal(J_lac_down, J_lac) and np.array_equal(J_lac_up, -J_lac) and np.allclose(G_H, open_flag*A_f*D_H*va__f_hind*vb__f_hind/(d_up*vb__f_hind + d_down*va__f_hind), rtol=1e-12, atol=0) and np.allclose(J_H, G_H*(va__C_H - vb__C_H), rtol=1e-9, atol=1e-35) and np.array_equal(J_H_down, J_H) and np.array_equal(J_H_up, -J_H) and np.allclose(G_O2, open_flag*A_f*D_O2*va__f_hind*vb__f_hind/(d_up*vb__f_hind + d_down*va__f_hind), rtol=1e-12, atol=0) and np.allclose(J_O2, G_O2*(va__C_O2 - vb__C_O2), rtol=1e-9, atol=1e-35) and np.array_equal(J_O2_down, J_O2) and np.array_equal(J_O2_up, -J_O2)"
+    },
+    {
+      "description": "mass is conserved across the face for every species: V_a C_a + V_b C_b constant (H+ with its buffer, V (1 + b_H) C_H; relative 1e-9)",
+      "expr": "np.ptp(va__V_e*va__C_glc + vb__V_e*vb__C_glc) <= 1e-9*np.max(np.abs(va__V_e*va__C_glc + vb__V_e*vb__C_glc)) and np.ptp(va__V_e*va__C_lac + vb__V_e*vb__C_lac) <= 1e-9*np.max(np.abs(va__V_e*va__C_lac + vb__V_e*vb__C_lac)) and np.ptp((1 + va__b_H)*va__V_e*va__C_H + (1 + va__b_H)*vb__V_e*vb__C_H) <= 1e-9*np.max(np.abs((1 + va__b_H)*va__V_e*va__C_H + (1 + va__b_H)*vb__V_e*vb__C_H)) and np.ptp(va__V_e*va__C_O2 + vb__V_e*vb__C_O2) <= 1e-9*np.max(np.abs(va__V_e*va__C_O2 + vb__V_e*vb__C_O2))"
+    },
+    {
+      "description": "exact solution with the matrix held: C_a - C_b = (C_a0 - C_b0) exp(-G (1/K_a + 1/K_b) t), K the capacity (V, or V (1 + b_H) for H+) (relative 1e-6 of the initial difference)",
+      "expr": "np.max(np.abs((va__C_glc - vb__C_glc) - (va__C_glc[0] - vb__C_glc[0])*np.exp(-G_glc[0]*(1/(va__V_e[0]) + 1/(vb__V_e[0]))*t))) <= 1e-6*abs(va__C_glc[0] - vb__C_glc[0]) + 1e-18 and np.max(np.abs((va__C_lac - vb__C_lac) - (va__C_lac[0] - vb__C_lac[0])*np.exp(-G_lac[0]*(1/(va__V_e[0]) + 1/(vb__V_e[0]))*t))) <= 1e-6*abs(va__C_lac[0] - vb__C_lac[0]) + 1e-18 and np.max(np.abs((va__C_H - vb__C_H) - (va__C_H[0] - vb__C_H[0])*np.exp(-G_H[0]*(1/((1 + va__b_H)*va__V_e[0]) + 1/((1 + va__b_H)*vb__V_e[0]))*t))) <= 1e-6*abs(va__C_H[0] - vb__C_H[0]) + 1e-18 and np.max(np.abs((va__C_O2 - vb__C_O2) - (va__C_O2[0] - vb__C_O2[0])*np.exp(-G_O2[0]*(1/(va__V_e[0]) + 1/(vb__V_e[0]))*t))) <= 1e-6*abs(va__C_O2[0] - vb__C_O2[0]) + 1e-18"
+    },
+    {
+      "description": "second law: each species flows down its gradient, J_s (C_up - C_down) >= 0, so the entropy produced, sum J_s R ln(C_up/C_down) / T, is never negative",
+      "expr": "np.all(J_glc*(va__C_glc - vb__C_glc) >= 0) and np.all(J_lac*(va__C_lac - vb__C_lac) >= 0) and np.all(J_H*(va__C_H - vb__C_H) >= 0) and np.all(J_O2*(va__C_O2 - vb__C_O2) >= 0)"
+    },
+    {
+      "description": "the matrix slows diffusion: with matrix on one side G_s is below the open-water conductance A_f D_s/(d_up + d_down)",
+      "expr": "np.all(G_glc <= open_flag*A_f*D_glc/(d_up + d_down)*(1 + 1e-12)) and np.all(G_lac <= open_flag*A_f*D_lac/(d_up + d_down)*(1 + 1e-12)) and np.all(G_H <= open_flag*A_f*D_H/(d_up + d_down)*(1 + 1e-12)) and np.all(G_O2 <= open_flag*A_f*D_O2/(d_up + d_down)*(1 + 1e-12))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "A_f": {
+        "min": 1.2e-13,
+        "max": 2.9999999999999997e-12,
+        "points": 3,
+        "scale": "log"
+      },
+      "d_up": {
+        "min": 3.319764047840348e-07,
+        "max": 1.3279056191361391e-06,
+        "points": 3
+      },
+      "d_down": {
+        "min": 3.319764047840348e-07,
+        "max": 1.3279056191361391e-06,
+        "points": 3
+      },
+      "open_flag": {
+        "min": 0,
+        "max": 1,
+        "points": 2
+      },
+      "D_glc": {
+        "min": 1e-10,
+        "max": 1e-09,
+        "points": 3,
+        "scale": "log"
+      },
+      "C_mx_init": {
+        "min": 0.0,
+        "max": 308.641975308642,
+        "points": 3
+      }
+    },
+    "exclude": [
+      "C_glc_up",
+      "C_glc_down",
+      "C_lac_up",
+      "C_lac_down",
+      "C_H_up",
+      "C_H_down",
+      "C_O2_up",
+      "C_O2_down",
+      "f_up",
+      "f_down"
+    ],
+    "rationale": "the face geometry from tight to loose packing, the diffusivity over the species' range and the matrix from none to the densest gel; concentrations and hindrance come from the volumes"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      4e-05,
+      2e-05,
+      1e-05,
+      5e-06
+    ],
+    "t_end": 0.004,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-12
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a face is the flux law between two volumes; verified against the exact two-volume solution, conservation and the second law. Biofilm diffusion data apply to an assembled colony."
+      },
+      "calibrate": {
+        "note": "not_applicable: as baseline"
+      }
+    }
+  }
+}

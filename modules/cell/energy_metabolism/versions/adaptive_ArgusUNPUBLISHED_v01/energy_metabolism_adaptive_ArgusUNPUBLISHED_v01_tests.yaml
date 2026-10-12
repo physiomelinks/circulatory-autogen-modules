@@ -7,22 +7,27 @@ notes: 'The cytosol of a fermenting prokaryote-grade cell (AdaptOrDeity''s start
   + Pi; plus a glycogen store (a polymer of glucose units, activity 1): synthesis, glucose + 2 ATP -> glycogen + 2 ADP + 2
   Pi (scaled by the game''s store_alloc and slowed near the ceiling C_glyc_max), and glycogenolysis to lactate, glycogen +
   3 ADP + 3 Pi -> 2 lactate + 3 ATP, inhibited by ATP so the store is spent when ATP falls. Storing a glucose costs 2 ATP
-  and gives 3 later (instead of 2 now): about 75% round trip. The junction structure is the stoichiometry, so carbon (6 glc
-  + 3 lac), adenine (ATP + ADP) and phosphoryl groups (ATP + Pi) are conserved by construction. Each rate is the common modular
-  rate law (Liebermeister et al. 2010) written with the thermodynamic factor (1 - Gamma/K_eq): it saturates in each reactant
-  and its sign is always that of the affinity A = RT ln(K_eq/Gamma), so the dissipation v A is never negative. Heat is the
-  reaction enthalpy released: 2 h_lac_gly - 2 h_ATP per glycolysis turnover, h_ATP per ATP hydrolysed (including ATP hydrolysed
-  by transporters on the ATP_hydrolysis_port, e.g. the H+-ATPase), so at steady ATP the heat is 63 kJ per mol lactate (Gnaiger
-  and Kemp 1990). Protons: glycolysis to lactate written with the ionised species (glucose + 2 ADP3- + 2 HPO4 2- -> 2 lactate-
-  + 2 ATP4-) releases none, and each ATP hydrolysed releases one H+ (ATP4- + H2O -> ADP3- + HPO4 2- + H+), so the cytosol
-  exports j_H_met = V_c v_hyd - j_ATP_ext on the H_production port for all ATP hydrolysed, its own and that of the ATP_hydrolysis_port
-  users (transporters, protein turnover); at steady ATP the cell makes 2 H+ per glucose, which leave with lactate. Ports:
-  cytosol_face_port (entrance and exit; the five concentrations shared, the five fluxes summed) for diffusion faces and the
-  cell membrane; ATP_hydrolysis_port for ATP-driven transporters; compartment_volume (from the membrane); heat_source_port
-  to a thermal_volume. The default instance is the steady state of the whole fermenter cell (generic_adaptive_cell fermenter)
-  with total ATP turnover at the Lynch & Marinov (2015) maintenance cost for its volume at 20 C. Its tests feed it through
-  cell_membrane_face from a 1 mM glucose medium. When a substrate runs out its concentration sits at solver round-off, so
-  the affinities use ln(|Gamma| + 1e-300).
+  and gives 3 later (instead of 2 now): about 75% round trip. Extracellular matrix (exopolysaccharide, the biofilm''s EPS):
+  glucose + n ATP -> a glucose unit of matrix outside the cell + n ADP + n Pi (n = n_ATP_mx, about 3: sugar phosphorylation,
+  nucleotide-sugar activation, carrier and export; Sutherland 2001), scaled by the game''s mx_alloc; the matrix leaves on
+  the matrix_export port as J_mx (mol glucose units/s) for the volumes of the space between cells (transport/extracellular_volume).
+  Export is irreversible: the rate is the thermodynamic factor clipped at zero, max(0, 1 - Gamma_mx/K_eq_mx), so a starving
+  cell stops making matrix and never takes it back. The glucose it takes also misses the 2 ATP glycolysis would have made
+  of it. The junction structure is the stoichiometry, so carbon (6 glc + 3 lac), adenine (ATP + ADP) and phosphoryl groups
+  (ATP + Pi) are conserved by construction. Each rate is the common modular rate law (Liebermeister et al. 2010) written with
+  the thermodynamic factor (1 - Gamma/K_eq): it saturates in each reactant and its sign is always that of the affinity A =
+  RT ln(K_eq/Gamma), so the dissipation v A is never negative. Heat is the reaction enthalpy released: 2 h_lac_gly - 2 h_ATP
+  per glycolysis turnover, h_ATP per ATP hydrolysed (including ATP hydrolysed by transporters on the ATP_hydrolysis_port,
+  e.g. the H+-ATPase), so at steady ATP the heat is 63 kJ per mol lactate (Gnaiger and Kemp 1990). Protons: glycolysis to
+  lactate written with the ionised species (glucose + 2 ADP3- + 2 HPO4 2- -> 2 lactate- + 2 ATP4-) releases none, and each
+  ATP hydrolysed releases one H+ (ATP4- + H2O -> ADP3- + HPO4 2- + H+), so the cytosol exports j_H_met = V_c v_hyd - j_ATP_ext
+  on the H_production port for all ATP hydrolysed, its own and that of the ATP_hydrolysis_port users (transporters, protein
+  turnover); at steady ATP the cell makes 2 H+ per glucose, which leave with lactate. Ports: cytosol_face_port (entrance and
+  exit; the five concentrations shared, the five fluxes summed) for diffusion faces and the cell membrane; ATP_hydrolysis_port
+  for ATP-driven transporters; compartment_volume (from the membrane); heat_source_port to a thermal_volume. The default instance
+  is the steady state of the whole fermenter cell (generic_adaptive_cell fermenter) with total ATP turnover at the Lynch &
+  Marinov (2015) maintenance cost for its volume at 20 C. Its tests feed it through cell_membrane_face from a 1 mM glucose
+  medium. When a substrate runs out its concentration sits at solver round-off, so the affinities use ln(|Gamma| + 1e-300).
 
 
   Ports of the versions of energy_metabolism (they differ; allowed and documented, see modules/README.md, Versions):

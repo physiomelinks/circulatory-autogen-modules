@@ -66,6 +66,13 @@ K_Pi_mob_cytosol,millimolar,5.0,"unreferenced_placeholder; phosphorylase affinit
 K_i_ATP_mob_cytosol,millimolar,1.0,"unreferenced_placeholder; ATP inhibits mobilisation, so glycogen is spent when ATP falls",no
 dG0_store_cytosol,J_per_mol,-42000.0,"unreferenced_placeholder; glucose + 2 ATP -> glycogen unit: textbook steps via G6P, G1P, UDP-glucose with PPi hydrolysis",no
 h_glyc_poly_cytosol,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose to glycogen, taken as zero",no
+mx_alloc_cytosol,dimensionless,0.0,definitional; no matrix until the player allocates energy to it,no
+V_mx_max_cytosol,millimolar_per_s,0.0072143901333570825,"derived: matrix_production_rate x resting glycolytic flux (matrix_production_rate: welman2003exopolysaccharides, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+K_glc_mx_cytosol,millimolar,0.1,"unreferenced_placeholder; glucose affinity of matrix synthesis (glucokinase order, as glycogen synthesis)",no
+K_ATP_mx_cytosol,millimolar,1.0,"unreferenced_placeholder; ATP affinity of matrix synthesis (nucleotide-sugar pyrophosphorylase order 1 mM, as glycogen synthesis)",no
+n_ATP_mx_cytosol,dimensionless,3.0,"sutherland2001biofilm; ATP-equivalents per glucose unit of matrix exported, above the glucose itself: sugar phosphorylation (1), nucleotide-sugar activation with PPi hydrolysis (1-2), lipid-carrier recycling and export for Wzx/Wzy polymers (0.2-1); 2-4 by pathway accounting (Sutherland 2001; Welman and Maddox 2003; De Vuyst and Degeest 1999), no measured value found. Excludes the 2 ATP glycolysis would have made from the glucose, which the model accounts for itself",no
+dG0_mx_cytosol,J_per_mol,-72500.0,"derived: (dG0_store - 2 dG0_hyd) + matrix_ATP_per_unit x dG0_hyd: the bond as in glycogen, paid by n ATP (dG0_store: unreferenced_placeholder, placeholder; dG0_hyd: unreferenced_placeholder, placeholder; matrix_ATP_per_unit: sutherland2001biofilm, placeholder)",no
+h_mx_poly_cytosol,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose unit to the matrix polymer, taken as zero (as glycogen)",no
 surface_factor_bio,dimensionless,1.5,geometry: a disc of radius 1 um and depth 2 um has 1.5x its in-plane area as surface,no
 n_mRNA_bio,dimensionless,8670.79572390783,"derived: mRNA_per_um3 x cell volume (mRNA_per_um3: milo2010bionumbers, sourced)",yes
 L_mRNA_bio,dimensionless,1000.0,"unreferenced_placeholder; mean mRNA length about 1,000 nt",no

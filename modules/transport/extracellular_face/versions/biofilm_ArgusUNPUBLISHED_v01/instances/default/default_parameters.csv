@@ -1,0 +1,19 @@
+variable_name,units,value,data_reference,sourced
+C_glc_up,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
+C_glc_down,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
+C_lac_up,millimolar,0.0,definitional; no lactate in the sea,no
+C_lac_down,millimolar,0.0,definitional; no lactate in the sea,no
+C_H_up,millimolar,5.011872336272725e-05,"derived: free H+ = 10^-pH_o M: open water when this side is unconnected (pH_o: halevy2017geologic, placeholder)",no
+C_H_down,millimolar,5.011872336272725e-05,"derived: free H+ = 10^-pH_o M: open water when this side is unconnected (pH_o: halevy2017geologic, placeholder)",no
+C_O2_up,millimolar,0.003,unreferenced_placeholder; dissolved O2 at about 1% of present atmospheric levels at 1.8 Ga (surface seawater at full air saturation holds about 0.28 mM at 20 C); range 0.1-10% PAL debated,no
+C_O2_down,millimolar,0.003,unreferenced_placeholder; dissolved O2 at about 1% of present atmospheric levels at 1.8 Ga (surface seawater at full air saturation holds about 0.28 mM at 20 C); range 0.1-10% PAL debated,no
+D_glc,m2_per_s,5.9e-10,"stewart2003diffusion; glucose in water 6.7e-10 m2/s at 25 C (Stewart 2003, Table 1), scaled to 20 C by T/viscosity (x 0.873)",yes
+D_lac,m2_per_s,9e-10,"unreferenced_placeholder; lactate in water: 1.03e-9 m2/s at 25 C from its limiting ionic conductivity 38.8 S cm2/mol (Nernst-Einstein), x 0.873 to 20 C (CRC Handbook, to cite)",no
+D_H,m2_per_s,2.607594240021476e-06,"derived: D_H_water + b_H x D_buffer_water: free protons plus those the seawater buffer carries (b_H = beta_seawater/(ln 10 H+)) (D_H_water: unreferenced_placeholder, placeholder; D_buffer_water: unreferenced_placeholder, placeholder; beta_seawater: unreferenced_placeholder, placeholder; pH_o: halevy2017geologic, placeholder)",no
+D_O2,m2_per_s,1.75e-09,"stewart2003diffusion; O2 in water 2.0e-9 m2/s at 25 C (Stewart 2003, Table 1), scaled to 20 C by T/viscosity (x 0.873)",yes
+f_up,dimensionless,1.0,definitional; no matrix (open water) when unconnected,no
+f_down,dimensionless,1.0,definitional; no matrix (open water) when unconnected,no
+A_f,m2,6e-13,"geometry: cells of radius 1 um, 0.3 um apart on a triangular lattice, 2 um deep (R_cell, h_cell, colony_gap): gap x depth",no
+d_up,metre,6.639528095680696e-07,"geometry: cells of radius 1 um, 0.3 um apart on a triangular lattice, 2 um deep (R_cell, h_cell, colony_gap): lattice-triangle centroid to the gap, s/(2 sqrt 3)",no
+d_down,metre,6.639528095680696e-07,"geometry: cells of radius 1 um, 0.3 um apart on a triangular lattice, 2 um deep (R_cell, h_cell, colony_gap): lattice-triangle centroid to the gap, s/(2 sqrt 3)",no
+open_flag,dimensionless,1.0,definitional; open face,no

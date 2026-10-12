@@ -33,12 +33,17 @@
     "J_ATP_store",
     "J_ATP_maint",
     "M_glyc_ATP",
+    "v_mx",
+    "A_mx",
+    "J_mx",
+    "J_ATP_mx",
     "mf/J_glc",
     "mf/J_lac"
   ],
   "run_parameters": {
     "store_alloc": 0.5,
-    "C_glyc_init": 50.0
+    "C_glyc_init": 50.0,
+    "mx_alloc": 0.5
   },
   "harness": {
     "module_array": [
@@ -82,8 +87,8 @@
   },
   "invariants": [
     {
-      "description": "carbon balance with the membrane carriers: d/dt V_c (6 C_glc + 3 C_lac + 6 C_glyc) = 6 J_glc + 3 J_lac, integrated (relative 1e-6)",
-      "expr": "abs(V_c*((6*C_glc[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 3*C_lac[0] + 6*C_glyc[0])) - np.trapz(6*mf__J_glc + 3*mf__J_lac, t)) <= 1e-6*np.trapz(np.abs(6*mf__J_glc) + np.abs(3*mf__J_lac), t)"
+      "description": "carbon balance with the membrane carriers and the matrix exported: d/dt V_c (6 C_glc + 3 C_lac + 6 C_glyc) = 6 J_glc + 3 J_lac - 6 J_mx, integrated (relative 1e-6)",
+      "expr": "abs(V_c*((6*C_glc[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 3*C_lac[0] + 6*C_glyc[0])) - np.trapz(6*mf__J_glc + 3*mf__J_lac - 6*J_mx, t)) <= 1e-6*np.trapz(np.abs(6*mf__J_glc) + np.abs(3*mf__J_lac) + np.abs(6*J_mx), t)"
     },
     {
       "description": "adenine is conserved (bond-graph structure; ATP, ADP do not cross): C_ATP + C_ADP constant (relative 1e-9)",
@@ -94,16 +99,16 @@
       "expr": "np.ptp(C_ATP + C_Pi) <= 1e-9*np.max(C_ATP + C_Pi)"
     },
     {
-      "description": "first law: the enthalpy brought in with glucose equals the change in stored enthalpy plus the heat, h_glc int J_glc dt = V_c (h_glc dC_glc + h_ATP dC_ATP) + int Q_met dt, h_glc = 2 h_lac_gly = 126000 J/mol relative to lactate, ADP + Pi (relative 2e-5 of the heat: trapezoid integration of the output)",
-      "expr": "abs(2*h_lac_gly*np.trapz(mf__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + h_ATP*(C_ATP[-1] - C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - C_glyc[0])) - np.trapz(Q_met, t)) <= 2e-5*np.trapz(np.abs(Q_met), t)"
+      "description": "first law: the enthalpy brought in with glucose equals the change in stored enthalpy plus the heat, h_glc int J_glc dt = V_c (h_glc dC_glc + h_ATP dC_ATP) + int Q_met dt + (h_glc - h_mx_poly) int J_mx dt (the enthalpy the matrix carries out), h_glc = 2 h_lac_gly = 126000 J/mol relative to lactate, ADP + Pi (relative 2e-5 of the heat: trapezoid integration of the output)",
+      "expr": "abs(2*h_lac_gly*np.trapz(mf__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + h_ATP*(C_ATP[-1] - C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - C_glyc[0])) - np.trapz(Q_met, t) - (2*h_lac_gly - h_mx_poly)*np.trapz(J_mx, t)) <= 2e-5*np.trapz(np.abs(Q_met), t)"
     },
     {
-      "description": "second law: each reaction runs down its affinity, v A >= 0, so P_diss >= 0",
-      "expr": "np.all(v_gly*A_gly >= 0) and np.all(v_hyd*A_hyd >= 0) and np.all(v_store*A_store >= 0) and np.all(v_mob*A_mob >= 0) and np.all(P_diss >= 0)"
+      "description": "second law: each reaction runs down its affinity, v A >= 0, so P_diss >= 0; matrix export never runs backwards (v_mx >= 0)",
+      "expr": "np.all(v_gly*A_gly >= 0) and np.all(v_hyd*A_hyd >= 0) and np.all(v_store*A_store >= 0) and np.all(v_mob*A_mob >= 0) and np.all(v_mx*A_mx >= 0) and np.all(v_mx >= 0) and np.all(P_diss >= 0)"
     },
     {
-      "description": "the ATP budget by reaction follows the stoichiometry (exact): 2 per glycolysis, 3 per glycogen unit mobilised, 2 per glucose stored, 1 per maintenance turnover; M_glyc_ATP = 3 V_c C_glyc",
-      "expr": "np.allclose(J_ATP_gly, 2*V_c*v_gly, rtol=1e-12, atol=0) and np.allclose(J_ATP_mob, 3*V_c*v_mob, rtol=1e-12, atol=0) and np.allclose(J_ATP_store, 2*V_c*v_store, rtol=1e-12, atol=0) and np.allclose(J_ATP_maint, V_c*v_hyd, rtol=1e-12, atol=0) and np.allclose(M_glyc_ATP, 3*V_c*C_glyc, rtol=1e-12, atol=0)"
+      "description": "the ATP budget by reaction follows the stoichiometry (exact): 2 per glycolysis, 3 per glycogen unit mobilised, 2 per glucose stored, 1 per maintenance turnover, n_ATP_mx per matrix unit; M_glyc_ATP = 3 V_c C_glyc, J_mx = V_c v_mx",
+      "expr": "np.allclose(J_ATP_gly, 2*V_c*v_gly, rtol=1e-12, atol=0) and np.allclose(J_ATP_mob, 3*V_c*v_mob, rtol=1e-12, atol=0) and np.allclose(J_ATP_store, 2*V_c*v_store, rtol=1e-12, atol=0) and np.allclose(J_ATP_maint, V_c*v_hyd, rtol=1e-12, atol=0) and np.allclose(M_glyc_ATP, 3*V_c*C_glyc, rtol=1e-12, atol=0) and np.allclose(J_mx, V_c*v_mx, rtol=1e-12, atol=0) and np.allclose(J_ATP_mx, n_ATP_mx*V_c*v_mx, rtol=1e-12, atol=0)"
     },
     {
       "description": "glycogen stays between 0 and its ceiling (plus 5%)",
@@ -119,9 +124,13 @@
       "T_ref": [
         283.15,
         303.15
+      ],
+      "mx_alloc": [
+        0.0,
+        1.0
       ]
     },
-    "rationale": "temperatures from 0 to 40 C (the default factors of 0.5 and 2 would put the cell at 147 K and 586 K, where Q10 = 2 changes every rate by 2^15 to 2^29 and nothing physical remains to check)"
+    "rationale": "temperatures from 0 to 40 C (the default factors of 0.5 and 2 would put the cell at 147 K and 586 K, where Q10 = 2 changes every rate by 2^15 to 2^29 and nothing physical remains to check); mx_alloc over its whole range (0-1)"
   },
   "stability": {
     "supported": [

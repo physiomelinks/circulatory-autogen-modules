@@ -115,6 +115,26 @@
         <variable name="J_ATP_maint" public_interface="out" units="mol_per_s"/>
         <!-- ATP the glycogen store would give if spent (3 per glucose unit; glycogen_store port) -->
         <variable name="M_glyc_ATP" public_interface="out" units="mole"/>
+        <!-- fraction of the matrix-making capacity in use (set by the game, 0-1) -->
+        <variable name="mx_alloc" public_interface="in" units="dimensionless"/>
+        <variable name="V_mx_max" public_interface="in" units="millimolar_per_s"/>
+        <variable name="K_glc_mx" public_interface="in" units="millimolar"/>
+        <variable name="K_ATP_mx" public_interface="in" units="millimolar"/>
+        <!-- ATP per glucose unit of matrix, above the glucose (activation, carrier, export) -->
+        <variable name="n_ATP_mx" public_interface="in" units="dimensionless"/>
+        <!-- glucose + n ATP -&gt; matrix unit (outside) + n ADP + n Pi -->
+        <variable name="dG0_mx" public_interface="in" units="J_per_mol"/>
+        <!-- enthalpy released by adding a glucose unit to the matrix -->
+        <variable name="h_mx_poly" public_interface="in" units="J_per_mol"/>
+        <variable name="K_eq_mx" public_interface="out" units="dimensionless"/>
+        <variable name="Gamma_mx" public_interface="out" units="dimensionless"/>
+        <!-- matrix synthesis and export: glucose + n ATP -&gt; matrix + n ADP + n Pi -->
+        <variable name="v_mx" public_interface="out" units="millimolar_per_s"/>
+        <variable name="A_mx" public_interface="out" units="J_per_mol"/>
+        <!-- glucose units of matrix exported (matrix_export port) -->
+        <variable name="J_mx" public_interface="out" units="mol_per_s"/>
+        <!-- ATP spent making matrix (n per glucose unit) -->
+        <variable name="J_ATP_mx" public_interface="out" units="mol_per_s"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -812,6 +832,155 @@
             </apply>
             <apply>
                 <eq/>
+                <ci>K_eq_mx</ci>
+                <apply>
+                    <exp/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>dG0_mx</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Gamma_mx</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ADP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <apply>
+                                <divide/>
+                                <ci>C_Pi</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                        </apply>
+                        <ci>n_ATP_mx</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <ci>C_glc</ci>
+                            <ci>c_std</ci>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <apply>
+                                <divide/>
+                                <ci>C_ATP</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                            <ci>n_ATP_mx</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_mx</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <times/>
+                                        <ci>V_mx_max</ci>
+                                        <ci>mx_alloc</ci>
+                                        <ci>f_T</ci>
+                                        <ci>C_glc</ci>
+                                    </apply>
+                                    <apply>
+                                        <plus/>
+                                        <ci>K_glc_mx</ci>
+                                        <ci>C_glc</ci>
+                                    </apply>
+                                </apply>
+                                <ci>C_ATP</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>K_ATP_mx</ci>
+                                <ci>C_ATP</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <apply>
+                                    <divide/>
+                                    <ci>Gamma_mx</ci>
+                                    <ci>K_eq_mx</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <abs/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">1.0</cn>
+                                    <apply>
+                                        <divide/>
+                                        <ci>Gamma_mx</ci>
+                                        <ci>K_eq_mx</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_mx</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>K_eq_mx</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <abs/>
+                                    <ci>Gamma_mx</ci>
+                                </apply>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
                 <ci>P_diss</ci>
                 <apply>
                     <times/>
@@ -838,6 +1007,11 @@
                             <ci>v_mob</ci>
                             <ci>A_mob</ci>
                         </apply>
+                        <apply>
+                            <times/>
+                            <ci>v_mx</ci>
+                            <ci>A_mx</ci>
+                        </apply>
                     </apply>
                 </apply>
             </apply>
@@ -863,17 +1037,25 @@
                         <times/>
                         <ci>V_c</ci>
                         <apply>
-                            <minus/>
+                            <plus/>
                             <apply>
-                                <plus/>
-                                <ci>v_hyd</ci>
+                                <minus/>
                                 <apply>
-                                    <times/>
-                                    <cn cellml:units="dimensionless">2.0</cn>
-                                    <ci>v_store</ci>
+                                    <plus/>
+                                    <ci>v_hyd</ci>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">2.0</cn>
+                                        <ci>v_store</ci>
+                                    </apply>
                                 </apply>
+                                <ci>v_mob</ci>
                             </apply>
-                            <ci>v_mob</ci>
+                            <apply>
+                                <times/>
+                                <ci>n_ATP_mx</ci>
+                                <ci>v_mx</ci>
+                            </apply>
                         </apply>
                     </apply>
                     <ci>j_ATP_ext</ci>
@@ -945,6 +1127,19 @@
                                     </apply>
                                 </apply>
                             </apply>
+                            <apply>
+                                <times/>
+                                <ci>v_mx</ci>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <times/>
+                                        <ci>n_ATP_mx</ci>
+                                        <ci>h_ATP</ci>
+                                    </apply>
+                                    <ci>h_mx_poly</ci>
+                                </apply>
+                            </apply>
                         </apply>
                     </apply>
                     <apply>
@@ -968,17 +1163,21 @@
                     <apply>
                         <minus/>
                         <apply>
-                            <divide/>
+                            <minus/>
                             <apply>
-                                <plus/>
-                                <ci>J_glc_in</ci>
-                                <ci>J_glc_out</ci>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>J_glc_in</ci>
+                                    <ci>J_glc_out</ci>
+                                </apply>
+                                <ci>V_c</ci>
                             </apply>
-                            <ci>V_c</ci>
+                            <ci>v_gly</ci>
                         </apply>
-                        <ci>v_gly</ci>
+                        <ci>v_store</ci>
                     </apply>
-                    <ci>v_store</ci>
+                    <ci>v_mx</ci>
                 </apply>
             </apply>
             <apply>
@@ -1023,41 +1222,49 @@
                     <ci>C_ATP</ci>
                 </apply>
                 <apply>
-                    <plus/>
+                    <minus/>
                     <apply>
-                        <minus/>
+                        <plus/>
                         <apply>
                             <minus/>
                             <apply>
-                                <plus/>
+                                <minus/>
                                 <apply>
-                                    <divide/>
+                                    <plus/>
                                     <apply>
-                                        <plus/>
-                                        <ci>J_ATP_in</ci>
-                                        <ci>J_ATP_out</ci>
-                                        <ci>j_ATP_ext</ci>
+                                        <divide/>
+                                        <apply>
+                                            <plus/>
+                                            <ci>J_ATP_in</ci>
+                                            <ci>J_ATP_out</ci>
+                                            <ci>j_ATP_ext</ci>
+                                        </apply>
+                                        <ci>V_c</ci>
                                     </apply>
-                                    <ci>V_c</ci>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">2.0</cn>
+                                        <ci>v_gly</ci>
+                                    </apply>
                                 </apply>
-                                <apply>
-                                    <times/>
-                                    <cn cellml:units="dimensionless">2.0</cn>
-                                    <ci>v_gly</ci>
-                                </apply>
+                                <ci>v_hyd</ci>
                             </apply>
-                            <ci>v_hyd</ci>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">2.0</cn>
+                                <ci>v_store</ci>
+                            </apply>
                         </apply>
                         <apply>
                             <times/>
-                            <cn cellml:units="dimensionless">2.0</cn>
-                            <ci>v_store</ci>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                            <ci>v_mob</ci>
                         </apply>
                     </apply>
                     <apply>
                         <times/>
-                        <cn cellml:units="dimensionless">3.0</cn>
-                        <ci>v_mob</ci>
+                        <ci>n_ATP_mx</ci>
+                        <ci>v_mx</ci>
                     </apply>
                 </apply>
             </apply>
@@ -1071,38 +1278,46 @@
                     <ci>C_ADP</ci>
                 </apply>
                 <apply>
-                    <minus/>
+                    <plus/>
                     <apply>
-                        <plus/>
+                        <minus/>
                         <apply>
-                            <minus/>
+                            <plus/>
                             <apply>
-                                <divide/>
+                                <minus/>
                                 <apply>
-                                    <plus/>
-                                    <ci>J_ADP_in</ci>
-                                    <ci>J_ADP_out</ci>
-                                    <ci>j_ADP_ext</ci>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>J_ADP_in</ci>
+                                        <ci>J_ADP_out</ci>
+                                        <ci>j_ADP_ext</ci>
+                                    </apply>
+                                    <ci>V_c</ci>
                                 </apply>
-                                <ci>V_c</ci>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                    <ci>v_gly</ci>
+                                </apply>
                             </apply>
+                            <ci>v_hyd</ci>
                             <apply>
                                 <times/>
                                 <cn cellml:units="dimensionless">2.0</cn>
-                                <ci>v_gly</ci>
+                                <ci>v_store</ci>
                             </apply>
                         </apply>
-                        <ci>v_hyd</ci>
                         <apply>
                             <times/>
-                            <cn cellml:units="dimensionless">2.0</cn>
-                            <ci>v_store</ci>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                            <ci>v_mob</ci>
                         </apply>
                     </apply>
                     <apply>
                         <times/>
-                        <cn cellml:units="dimensionless">3.0</cn>
-                        <ci>v_mob</ci>
+                        <ci>n_ATP_mx</ci>
+                        <ci>v_mx</ci>
                     </apply>
                 </apply>
             </apply>
@@ -1116,38 +1331,46 @@
                     <ci>C_Pi</ci>
                 </apply>
                 <apply>
-                    <minus/>
+                    <plus/>
                     <apply>
-                        <plus/>
+                        <minus/>
                         <apply>
-                            <minus/>
+                            <plus/>
                             <apply>
-                                <divide/>
+                                <minus/>
                                 <apply>
-                                    <plus/>
-                                    <ci>J_Pi_in</ci>
-                                    <ci>J_Pi_out</ci>
-                                    <ci>j_Pi_ext</ci>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>J_Pi_in</ci>
+                                        <ci>J_Pi_out</ci>
+                                        <ci>j_Pi_ext</ci>
+                                    </apply>
+                                    <ci>V_c</ci>
                                 </apply>
-                                <ci>V_c</ci>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                    <ci>v_gly</ci>
+                                </apply>
                             </apply>
+                            <ci>v_hyd</ci>
                             <apply>
                                 <times/>
                                 <cn cellml:units="dimensionless">2.0</cn>
-                                <ci>v_gly</ci>
+                                <ci>v_store</ci>
                             </apply>
                         </apply>
-                        <ci>v_hyd</ci>
                         <apply>
                             <times/>
-                            <cn cellml:units="dimensionless">2.0</cn>
-                            <ci>v_store</ci>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                            <ci>v_mob</ci>
                         </apply>
                     </apply>
                     <apply>
                         <times/>
-                        <cn cellml:units="dimensionless">3.0</cn>
-                        <ci>v_mob</ci>
+                        <ci>n_ATP_mx</ci>
+                        <ci>v_mx</ci>
                     </apply>
                 </apply>
             </apply>
@@ -1213,6 +1436,25 @@
                     <cn cellml:units="dimensionless">3.0</cn>
                     <ci>V_c</ci>
                     <ci>C_glyc</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_mx</ci>
+                <apply>
+                    <times/>
+                    <ci>V_c</ci>
+                    <ci>v_mx</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_mx</ci>
+                <apply>
+                    <times/>
+                    <ci>n_ATP_mx</ci>
+                    <ci>V_c</ci>
+                    <ci>v_mx</ci>
                 </apply>
             </apply>
         </math>

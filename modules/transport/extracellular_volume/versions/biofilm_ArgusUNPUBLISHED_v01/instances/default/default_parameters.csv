@@ -1,0 +1,27 @@
+variable_name,units,value,data_reference,sourced
+C_glc_init,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
+C_lac_init,millimolar,0.0,definitional; no lactate in the sea,no
+C_H_init,millimolar,5.011872336272725e-05,"derived: free H+ = 10^-pH_o M (pH_o: halevy2017geologic, placeholder)",no
+C_O2_init,millimolar,0.003,unreferenced_placeholder; dissolved O2 at about 1% of present atmospheric levels at 1.8 Ga (surface seawater at full air saturation holds about 0.28 mM at 20 C); range 0.1-10% PAL debated,no
+J_glc_in,mol_per_s,0.0,no face connected,no
+J_glc_out,mol_per_s,0.0,no face connected,no
+J_lac_in,mol_per_s,0.0,no face connected,no
+J_lac_out,mol_per_s,0.0,no face connected,no
+J_H_in,mol_per_s,0.0,no face connected,no
+J_H_out,mol_per_s,0.0,no face connected,no
+J_O2_in,mol_per_s,0.0,no face connected,no
+J_O2_out,mol_per_s,0.0,no face connected,no
+j_glc_cell,mol_per_s,0.0,no cell connected,no
+j_lac_cell,mol_per_s,0.0,no cell connected,no
+j_H_cell,mol_per_s,0.0,no cell connected,no
+j_O2_cell,mol_per_s,0.0,no cell connected,no
+j_mx_cell,mol_per_s,0.0,no cell connected,no
+C_mx_init,millimolar,0.0,definitional; no matrix until the cells make it,no
+V_e,m3,1.4396817324298869e-18,"geometry: cells of radius 1 um, 0.3 um apart on a triangular lattice, 2 um deep (R_cell, h_cell, colony_gap): triangle of side 2.3 um less three 60 degree sectors, x depth",no
+b_H,dimensionless,2599.594240021476,"derived: beta_seawater / (ln 10 x free H+ at pH_o): bound per free H+ of a linear buffer (beta_seawater: unreferenced_placeholder, placeholder; pH_o: halevy2017geologic, placeholder)",no
+c_std,millimolar,1000.0,definitional; standard concentration 1 M (for pH),yes
+v_mx,m3_per_mol,9.719999999999999e-05,"derived: M_glucose_unit x polysaccharide_specific_volume (M_glucose_unit: definitional, definitional; polysaccharide_specific_volume: amsden1998solute, placeholder)",no
+k_mx,per_s,1e-06,"zhang2003biodegradability; first-order breakdown of matrix by the colony's hydrolases (half-life about 8 days); EPS is biodegradable and used as a reserve in starvation (Zhang and Bishop 2003; Flemming and Wingender 2010), no rate found that applies",no
+f_mx_glc,dimensionless,0.5,zhang2003biodegradability; share of the broken-down matrix released as glucose in the volume; the rest is lost (oxidised or washed out),no
+C_mx_max,millimolar,308.641975308642,"derived: matrix_gel_density_max / M_glucose_unit (matrix_gel_density_max: flemming2010biofilm, placeholder; M_glucose_unit: definitional, definitional)",no
+k_ovf,per_s,0.001,unreferenced_placeholder; rate at which matrix above the densest gel leaves the volume (fast against production: the ceiling holds),no
