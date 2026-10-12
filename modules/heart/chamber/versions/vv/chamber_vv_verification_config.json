@@ -103,19 +103,19 @@
       "harness": {
         "module_array": [
           [
-            "la_p",
+            "pv_p",
             "constant",
             "inlet_pressure",
             "",
-            "miv",
+            "pvc",
             "default"
           ],
           [
-            "miv",
-            "pp",
+            "pvc",
+            "pp_linear",
             "valve",
-            "la_p",
-            "mod",
+            "pv_p",
+            "la",
             "default"
           ],
           [
@@ -123,6 +123,22 @@
             "Liang2009_v01",
             "cardiac_clock",
             "",
+            "la mod",
+            "default"
+          ],
+          [
+            "la",
+            "vv",
+            "chamber",
+            "pvc clock",
+            "miv",
+            "la"
+          ],
+          [
+            "miv",
+            "pp",
+            "valve",
+            "la",
             "mod",
             "default"
           ],
@@ -231,14 +247,14 @@
           [
             "R_aortic_root",
             "Js_per_m6",
-            "2.96447e+06",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) to liang2009multi Fig. 4b, the normal ascending-aortic pressure (parameterisations/lv/lv_obs_data.json; lv_calibration.json)"
+            "2.35147e+06",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "C_aortic_root",
             "m6_per_J",
-            "1.52986e-08",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) to liang2009multi Fig. 4b, the normal ascending-aortic pressure (parameterisations/lv/lv_obs_data.json; lv_calibration.json)"
+            "1.86772e-08",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "u_ext_aortic_root",
@@ -279,14 +295,14 @@
           [
             "R_T_systemic_T",
             "Js_per_m6",
-            "2.35895e+08",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) to liang2009multi Fig. 4b, the normal ascending-aortic pressure (parameterisations/lv/lv_obs_data.json; lv_calibration.json)"
+            "2.54111e+08",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "C_T_systemic_T",
             "m6_per_J",
-            "2.56891e-08",
-            "calibrated (libcuflynx CMA-ES, 2026-10-12) to liang2009multi Fig. 4b, the normal ascending-aortic pressure (parameterisations/lv/lv_obs_data.json; lv_calibration.json)"
+            "1.445e-07",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
             "I_T_systemic_T",
@@ -313,10 +329,28 @@
             "3compartment system model (user_defined_70%Of3.5LVenousTotBloodVolume)"
           ],
           [
-            "P_la_p",
+            "P_pv_p",
             "J_per_m3",
-            "971.92",
-            "liang2009multi; Fig. 4a: LV end-diastolic pressure 7.29 mmHg (digitised, liang2009_fig4a_lv_pressure.csv t = 0), the left-atrial pressure through the open mitral valve"
+            "1055.48",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV): parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+          ],
+          [
+            "M_rg_pvc",
+            "dimensionless",
+            "1",
+            "definitional; always open (A_eff = A_nn): the pulmonary veins have no valve, so the conduit is a resistance and inertance that allows reverse flow (the atrial a-wave)"
+          ],
+          [
+            "M_st_pvc",
+            "dimensionless",
+            "1",
+            "definitional; no stenosis"
+          ],
+          [
+            "A_nn_pvc",
+            "m2",
+            "0.0006",
+            "harness choice: the conduit area, the mitral annulus area of the 3compartment system model (A_nn_miv)"
           ]
         ]
       },
