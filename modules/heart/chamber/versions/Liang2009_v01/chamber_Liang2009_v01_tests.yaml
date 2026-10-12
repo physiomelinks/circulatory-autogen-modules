@@ -1,14 +1,18 @@
 module_type: chamber
 version: Liang2009_v01
 reviewed: false
-notes: 'chamber/vv with the viscoelastic term of Liang et al. 2009 Eq. 9, P = E(t)(V - V0) + S dV/dt, where S = k_S P (Table 2:
+notes: 'chamber/Liang_2009_noVisco_v01 with the viscoelastic term of Liang et al. 2009 Eq. 9, P = E(t)(V - V0) + S dV/dt, where S = k_S P (Table 2:
   S = P x 0.0005, k_S = 0.0005 s/ml = 500 s/m^3), solved for P: u = (e E_A_eff + E_B)(q - q_us)/(1 - k_S (v_in - v_out)) + u_ext.
   The term raises the pressure while the chamber fills and lowers it during ejection. Everything else (activation, ports,
-  parameterisations lv/rv/la/ra from Liang Table 2 and Korakianitis & Shi 2006 Table 1) is chamber/vv''s.
-  Made in the review of chamber/vv (2026-10-12) to test whether the omitted term is why chamber/vv''s lv P-V loop is narrower
+  parameterisations lv/rv/la/ra from Liang Table 2 and Korakianitis & Shi 2006 Table 1) is chamber/Liang_2009_noVisco_v01''s.
+  Made in the review of chamber/Liang_2009_noVisco_v01 (2026-10-12) to test whether the omitted term is why chamber/Liang_2009_noVisco_v01''s lv P-V loop is narrower
   than Liang''s (stroke volume ~60 vs 76 ml): both versions are calibrated the same way in the same minimal LV loop.
-  Solver: as chamber/vv, the phase rate is piecewise, so CVODE runs with MaximumStep 1 ms.'
+  Solver: as chamber/Liang_2009_noVisco_v01, the phase rate is piecewise, so CVODE runs with MaximumStep 1 ms.
+  The lv dead volume q_us stays Korakianitis''s 5 ml: calibrated with the afterload and preload to Liang''s P-V loop
+  (Fig. 4e EDV and ESV) in the validation loop with a contracting left atrium, it comes out at 5.3 ml (chamber
+  Liang_2009_noVisco_v01) and 4.3 ml (Liang2009_v01), confirming it; q_us stays in the calibration as a check, not applied
+  (review 2026-10-12).'
 expected_failures:
   verification_test_timestep: 'the phase rate dchi/dt switches discontinuously (contraction, relaxation, diastole and the
     clock gate), so fixed-step RK4 converges at first order across a switch; a property of the piecewise model, as in
-    chamber/vv (review 2026-10-12).'
+    chamber/Liang_2009_noVisco_v01 (review 2026-10-12).'
