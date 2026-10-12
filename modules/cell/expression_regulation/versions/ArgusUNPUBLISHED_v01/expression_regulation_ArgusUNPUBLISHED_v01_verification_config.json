@@ -14,6 +14,10 @@
     "x_G6P_reg",
     "x_glc_reg",
     "x_H_reg",
+    "u_ATP_reg",
+    "u_G6P_reg",
+    "u_glc_reg",
+    "u_H_reg",
     "f_ATP_reg",
     "f_G6P_reg",
     "f_glc_reg",
@@ -79,12 +83,12 @@
   "run_parameters": {},
   "invariants": [
     {
-      "description": "the regulation function (exact): f = x^n/(1 + x^n), x = C/K for ATP, G6P and glucose, x = K_H/H_i for H+",
-      "expr": "np.allclose(f_ATP_reg, (np.maximum(cyto__C_ATP, 0)/K_ATP_reg)**n_reg/(1 + (np.maximum(cyto__C_ATP, 0)/K_ATP_reg)**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_G6P_reg, (np.maximum(cyto__C_G6P, 0)/K_G6P_reg)**n_reg/(1 + (np.maximum(cyto__C_G6P, 0)/K_G6P_reg)**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_glc_reg, (np.maximum(cyto__C_glc, 0)/K_glc_reg)**n_reg/(1 + (np.maximum(cyto__C_glc, 0)/K_glc_reg)**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_H_reg, ((K_H_reg/H__H_i))**n_reg/(1 + ((K_H_reg/H__H_i))**n_reg), rtol=1e-12, atol=1e-15)"
+      "description": "the regulation function (exact): f = 1/(1 + u^n), u = max(0, 1 - x)/(1 - x_half), x = C/C_rest for ATP, G6P and glucose, x = H_rest/H_i for H+",
+      "expr": "np.allclose(f_ATP_reg, 1/(1 + (np.maximum(0, 1 - np.maximum(cyto__C_ATP, 0)/C_ATP_rest)/(1 - K_ATP_reg/C_ATP_rest))**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_G6P_reg, 1/(1 + (np.maximum(0, 1 - np.maximum(cyto__C_G6P, 0)/C_G6P_rest)/(1 - K_G6P_reg/C_G6P_rest))**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_glc_reg, 1/(1 + (np.maximum(0, 1 - np.maximum(cyto__C_glc, 0)/C_glc_rest)/(1 - K_glc_reg/C_glc_rest))**n_reg), rtol=1e-12, atol=1e-15) and np.allclose(f_H_reg, 1/(1 + (np.maximum(0, 1 - H_rest/H__H_i)/(1 - H_rest/K_H_reg))**n_reg), rtol=1e-12, atol=1e-15)"
     },
     {
-      "description": "f stays within 0-1",
-      "expr": "np.all((f_ATP_reg >= 0) & (f_ATP_reg <= 1)) and np.all((f_G6P_reg >= 0) & (f_G6P_reg <= 1)) and np.all((f_glc_reg >= 0) & (f_glc_reg <= 1)) and np.all((f_H_reg >= 0) & (f_H_reg <= 1))"
+      "description": "f stays within 0-1, and is exactly 1 at and above rest (for H+ at and below the resting H+)",
+      "expr": "np.all((f_ATP_reg >= 0) & (f_ATP_reg <= 1)) and np.all((f_G6P_reg >= 0) & (f_G6P_reg <= 1)) and np.all((f_glc_reg >= 0) & (f_glc_reg <= 1)) and np.all((f_H_reg >= 0) & (f_H_reg <= 1)) and np.all(f_ATP_reg[x_ATP_reg >= 1] == 1.0) and np.all(f_G6P_reg[x_G6P_reg >= 1] == 1.0) and np.all(f_glc_reg[x_glc_reg >= 1] == 1.0) and np.all(f_H_reg[x_H_reg >= 1] == 1.0)"
     },
     {
       "description": "the pool switched to ATP regulation (target 1) goes to f_ATP (exact), and while the cytosol's ATP runs down, f_ATP and the target fall with it",
@@ -95,25 +99,37 @@
   "bc_sweep": {
     "ranges": {
       "n_reg": [
-        1.0,
+        2.0,
         8.0
       ],
       "K_ATP_reg": [
         1.0,
-        9.6
+        8.0
       ],
       "K_H_reg": [
-        2.5e-05,
+        3e-05,
         0.0001
+      ],
+      "K_G6P_reg": [
+        0.1,
+        0.8
+      ],
+      "K_glc_reg": [
+        0.0002,
+        0.0016
       ]
     },
     "exclude": [
       "C_ATP",
       "C_G6P",
       "C_glc",
-      "H_i"
+      "H_i",
+      "C_ATP_rest",
+      "C_G6P_rest",
+      "C_glc_rest",
+      "H_rest"
     ],
-    "rationale": "steepness from graded to switch-like; half-way points from a tenth of the resting ATP to rest, and for H+ from rest to 0.6 pH units below"
+    "rationale": "steepness from graded (n = 2, still smooth at rest) to switch-like; half-way points from a tenth of the resting ATP to 83% of it, and for H+ from 0.08 to 0.6 pH units below rest (at rest itself u is undefined)"
   },
   "stability": {
     "supported": [

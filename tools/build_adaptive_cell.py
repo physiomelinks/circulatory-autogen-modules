@@ -414,6 +414,82 @@ print(f'H+-ATPase thermodynamics: ATP affinity {A_HYD / 1e3:.2f} kJ/mol vs H+ wo
 # ------------------------------------------------------------------ references
 register_bib(MATRIX_BIB)
 register_bib({
+    # protein turnover, protein synthesis capacity and maintenance in famine (2026-10-13)
+    'maurizi1992proteases': dict(type='article', author='Maurizi, Michael R.',
+                                 title='Proteases and protein degradation in Escherichia coli', journal='Experientia',
+                                 year='1992', volume='48', number='2', pages='178--201', doi='10.1007/BF01923511',
+                                 note='Bulk degradation of the stable protein of growing E. coli about 1%/h (after Pine '
+                                      '1970; BioNumbers BNID 109924); Lon and Clp do most energy-dependent degradation'),
+    'willetts1967intracellular': dict(type='article', author='Willetts, N. S.',
+                                      title='Intracellular protein breakdown in non-growing cells of Escherichia coli',
+                                      journal='Biochemical Journal', year='1967', volume='103', number='2',
+                                      pages='453--461', doi='10.1042/bj1030453',
+                                      note='Protein breakdown about 5%/h in cells starved of carbon, nitrogen or '
+                                           'phosphate (0.6%/h in growing cells, the companion paper)'),
+    'gupta2024global': dict(type='article',
+                            author='Gupta, Meera and Johnson, Alex N. T. and Cruz, Edward R. and Costa, Eli J. and '
+                                   'Guest, Randi L. and Li, Sophia Hsin-Jung and Hart, Elizabeth M. and Nguyen, Thao and '
+                                   'Stadlmeier, Michael and Bratton, Benjamin P. and Silhavy, Thomas J. and Wingreen, '
+                                   'Ned S. and Gitai, Zemer and Wuhr, Martin',
+                            title='Global protein-turnover quantification in Escherichia coli reveals cytoplasmic '
+                                  'recycling under nitrogen limitation',
+                            journal='Nature Communications', year='2024', volume='15', pages='5890',
+                            doi='10.1038/s41467-024-49920-8',
+                            note='Most proteins are not actively degraded and leave growing cells by dilution (15% '
+                                 'degraded under carbon limitation, 43% under nitrogen limitation)'),
+    'dai2016reduction': dict(type='article',
+                             author='Dai, Xiongfeng and Zhu, Manlu and Warren, Mya and Balakrishnan, Rohan and Patsalo, '
+                                    'Vadim and Okano, Hiroyuki and Williamson, James R. and Fredrick, Kurt and Wang, '
+                                    'Yi-Ping and Hwa, Terence',
+                             title='Reduction of translating ribosomes enables Escherichia coli to maintain elongation '
+                                   'rates during slow growth',
+                             journal='Nature Microbiology', year='2016', volume='2', pages='16231',
+                             doi='10.1038/nmicrobiol.2016.231',
+                             note='Elongation 16-17 aa/s at fast growth, 8 aa/s in stationary phase (37 C); over 80% of '
+                                  'ribosomes translate above 0.5/h, under 20% at slow growth'),
+    'farewell1998effect': dict(type='article', author='Farewell, Anne and Neidhardt, Frederick C.',
+                               title='Effect of temperature on in vivo protein synthetic capacity in Escherichia coli',
+                               journal='Journal of Bacteriology', year='1998', volume='180', number='17',
+                               pages='4704--4710', doi='10.1128/JB.180.17.4704-4710.1998',
+                               note='Peptide elongation 7.5 aa/s at 28 C, 12.9 at 37 C, 16.9 at 42 C (Table 1)'),
+    'stouthamer1973theoretical': dict(type='article', author='Stouthamer, A. H.',
+                                      title='A theoretical study on the amount of ATP required for synthesis of '
+                                            'microbial cell material',
+                                      journal='Antonie van Leeuwenhoek', year='1973', volume='39', pages='545--565',
+                                      doi='10.1007/BF02578899',
+                                      note='4 ATP per amino acid polymerised (2 for aminoacylation, 2 GTP for '
+                                           'elongation); protein synthesis is most of a cell\'s ATP for growth'),
+    'russell1995energetics': dict(type='article', author='Russell, James B. and Cook, Gregory M.',
+                                  title='Energetics of bacterial growth: balance of anabolic and catabolic reactions',
+                                  journal='Microbiological Reviews', year='1995', volume='59', number='1', pages='48--62',
+                                  doi='10.1128/mr.59.1.48-62.1995',
+                                  note='Maintenance is not a constant: energy-excess cells spill ATP through futile '
+                                       'ion cycles, which stops under energy limitation'),
+    'hoehler2013microbial': dict(type='article', author='Hoehler, Tori M. and Jorgensen, Bo Barker',
+                                 title='Microbial life under extreme energy limitation',
+                                 journal='Nature Reviews Microbiology', year='2013', volume='11', number='2',
+                                 pages='83--94', doi='10.1038/nrmicro2939',
+                                 note='Cells in energy-starved sediments live on about a thousandth of the maintenance '
+                                      'power measured in cultures (the basal power requirement)'),
+    'kempes2017drivers': dict(type='article',
+                              author='Kempes, Christopher P. and van Bodegom, Peter M. and Wolpert, David and Libby, '
+                                     'Eric and Amend, Jan and Hoehler, Tori',
+                              title='Drivers of bacterial maintenance and minimal energy requirements',
+                              journal='Frontiers in Microbiology', year='2017', volume='8', pages='31',
+                              doi='10.3389/fmicb.2017.00031',
+                              note='The basal power requirement lies about three orders of magnitude below laboratory '
+                                   'maintenance; protein repair and turnover dominate maintenance in small cells'),
+    'price2004temperature': dict(type='article', author='Price, P. Buford and Sowers, Todd',
+                                 title='Temperature dependence of metabolic rates for microbial growth, maintenance, '
+                                       'and survival',
+                                 journal='Proceedings of the National Academy of Sciences', year='2004', volume='101',
+                                 number='13', pages='4631--4636', doi='10.1073/pnas.0400522101',
+                                 note='Growth, maintenance and survival metabolic rates in the ratio about 1e6 : 1e3 : 1'),
+    'novitsky1977survival': dict(type='article', author='Novitsky, J. A. and Morita, R. Y.',
+                                 title='Survival of a psychrophilic marine vibrio under long-term nutrient starvation',
+                                 journal='Applied and Environmental Microbiology', year='1977', volume='33', number='3',
+                                 pages='635--641', doi='10.1128/aem.33.3.635-641.1977',
+                                 note='Endogenous respiration fell by over 80% in the first two days of starvation'),
     'potrykus2008still': dict(type='article', author='Potrykus, Katarzyna and Cashel, Michael',
                               title='(p)ppGpp: still magical?', journal='Annual Review of Microbiology', year='2008',
                               volume='62', pages='35--51', doi='10.1146/annurev.micro.62.081307.162903',
@@ -632,6 +708,77 @@ TEMPERATURE_SWEEP = {
                  'where Q10 = 2 changes every rate by 2^15 to 2^29 and nothing physical remains to check)',
 }
 
+# Regulation of a target by falling metabolites (cell/expression_regulation sends f_s, 0-1, on regulation_signals and
+# the other regulation ports): a target is multiplied by R_reg = prod_s (1 - reg_on_s + reg_on_s f_s), so a switch
+# reg_on_s = 1 makes species s lower it, and with every switch at 0 (the default) R_reg = 1 exactly. f_s is exactly 1 at
+# and above the species' resting level, so a switch has no effect at rest. A module with several regulated targets
+# names each set of switches with a suffix: reg_on_<s>_<suffix> and R_reg_<suffix>.
+REG_SPECIES = ['ATP', 'G6P', 'glc', 'H']
+REG_F = [f'f_{s}_reg' for s in REG_SPECIES]
+REG_ON = [f'reg_on_{s}' for s in REG_SPECIES]
+REG_LABEL = {'ATP': 'ATP', 'G6P': 'G6P', 'glc': 'glucose inside', 'H': 'H+ (falling pH)'}
+
+
+def reg_on(suffix=''):
+    return [f'reg_on_{s}{suffix}' for s in REG_SPECIES]
+
+
+def reg_expr(suffix=''):
+    return ' * '.join(f'(1.0 - {on} + {on} * {f_})' for on, f_ in zip(reg_on(suffix), REG_F))
+
+
+def reg_np(suffix=''):
+    return '*'.join(f'(1 - {on} + {on}*{f_})' for on, f_ in zip(reg_on(suffix), REG_F))
+
+
+REG_EXPR, REG_NP = reg_expr(), reg_np()
+REG_PORT = {'port_type': 'regulation_signals', 'variables': REG_F}
+# biosynthesis, protein synthesis and the cytosol take the same signals on port types of their own: each is linked to
+# modules (the pools, one another) that have regulation_signals or another of these as inputs
+GROWTH_REG_PORT = {'port_type': 'growth_regulation', 'variables': REG_F}
+SYNTH_REG_PORT = {'port_type': 'synthesis_regulation', 'variables': REG_F}
+MAINT_REG_PORT = {'port_type': 'maintenance_regulation', 'variables': REG_F}
+
+
+def reg_f_vars(port):
+    return [(f_, 'dimensionless', 'in', None, f'regulation by {REG_LABEL[s]}, 0-1, 1 at and above rest ({port} port)')
+            for s, f_ in zip(REG_SPECIES, REG_F)]
+
+
+def reg_switch_vars(what, suffix=''):
+    return ([(on, 'dimensionless', 'in', None, f'1: falling {REG_LABEL[s]} lowers {what} (set by the game); 0: it does not')
+             for s, on in zip(REG_SPECIES, reg_on(suffix))]
+            + [(f'R_reg{suffix}', 'dimensionless', 'out', None, f'regulation factor on {what}: prod (1 - reg_on + reg_on f)')])
+
+
+def reg_vars(what, port='regulation_signals'):
+    return reg_f_vars(port) + reg_switch_vars(what)
+
+
+REG_F_ROWS = [(f_, 1.0, 'definitional; no regulation connected (f = 1)', False) for f_ in REG_F]
+
+
+def reg_switch_rows(suffix=''):
+    return [(on, 0.0, 'definitional; off until the player switches it on (design, 2026-10-12)', False)
+            for on in reg_on(suffix)]
+
+
+def reg_switch_roles(suffix=''):
+    return {**{on: 'constant' for on in reg_on(suffix)}, f'R_reg{suffix}': 'variable'}
+
+
+REG_ROWS = REG_F_ROWS + reg_switch_rows()
+REG_ROLES = {**{f_: 'boundary_condition' for f_ in REG_F}, **reg_switch_roles()}
+
+
+def reg_invariant(target, regulated, suffix=''):
+    return {'description': f'regulation (exact): R_reg{suffix} = prod (1 - reg_on + reg_on f) and {regulated} = {target} '
+                           f'R_reg{suffix}; with every switch off R_reg{suffix} is exactly 1',
+            'expr': f'np.allclose(R_reg{suffix}, {reg_np(suffix)}, rtol=1e-12, atol=0) and np.allclose({regulated}, '
+                    f'{target}*R_reg{suffix}, rtol=1e-12, atol=0) and ({" or ".join(reg_on(suffix))} or '
+                    f'np.all(R_reg{suffix} == 1.0))'}
+
+
 # ------------------------------------------------------------------ 1. bond-graph cytosol (energy_metabolism)
 cyto_species = ['glc', 'lac', 'ATP', 'ADP', 'Pi']
 cyto_vars = [('t', 'second', 'in', None, None)]
@@ -726,8 +873,9 @@ cyto_vars += [
     ('A_mx', 'J_per_mol', 'out', None, None),
     ('J_mx', 'mol_per_s', 'out', None, 'glucose units of matrix exported (matrix_export port)'),
     ('J_ATP_mx', 'mol_per_s', 'out', None, 'ATP spent making matrix (n per glucose unit)'),
-]
+] + reg_vars('the maintenance ATPase', 'maintenance_regulation')
 cyto_eqs = [
+    ('R_reg', REG_EXPR),
     ('f_T', 'Q10 ** ((T - T_ref) / dT_Q10)'),
     ('K_eq_hk', 'exp(-dG0_hk / (R * T))'),
     ('K_eq_lg', 'exp(-(dG0_ferm - 2.0 * dG0_hyd - dG0_hk) / (R * T))'),
@@ -749,7 +897,7 @@ cyto_eqs = [
     ('v_lg', 'V_lg * m_gly * f_T * abs(C_G6P) ** (n_G6P_lg - 1.0) * (C_G6P - C_lac ** 2.0 * C_ATP ** 3.0 * c_std / '
              '(C_ADP ** 3.0 * C_Pi ** 2.0 * K_eq_lg)) / (K_G6P_lg ** n_G6P_lg + abs(C_G6P) ** n_G6P_lg) '
              '* C_ADP / (K_ADP_gly + C_ADP) * C_Pi / (K_Pi_gly + C_Pi)'),
-    ('v_hyd', 'V_hyd * f_T * (C_ATP / K_ATP_hyd) * (1.0 - Gamma_hyd / K_eq_hyd) / ((1.0 + C_ATP / K_ATP_hyd) '
+    ('v_hyd', 'V_hyd * R_reg * f_T * (C_ATP / K_ATP_hyd) * (1.0 - Gamma_hyd / K_eq_hyd) / ((1.0 + C_ATP / K_ATP_hyd) '
               '+ (1.0 + C_ADP / K_ADP_hyd) * (1.0 + C_Pi / K_Pi_hyd) - 1.0)'),
     # ln of |Gamma| + 1e-300: a substrate that runs out sits at round-off (about 1e-14 mM, either sign) and its ratio
     # would make ln undefined; the rate law itself self-corrects (its sign follows 1 - Gamma/K_eq)
@@ -825,6 +973,7 @@ cyto_roles.update({n: 'variable' for n in ('f_T', 'K_eq_hk', 'K_eq_lg', 'K_eq_hy
 cyto_roles['store_alloc'] = 'boundary_condition'   # set by the game
 cyto_roles['mx_alloc'] = 'boundary_condition'   # set by the game
 cyto_roles['m_gly'] = 'boundary_condition'   # from the glycolytic enzymes' protein_pool
+cyto_roles.update(REG_ROLES)
 cyto_roles.update({n: 'global_constant' for n in ('T', 'R')})
 cyto_roles['V_c'] = 'boundary_condition'   # a single port input, as the library's SN modules
 face_vars_in = [f'C_{s}' for s in cyto_species]
@@ -849,6 +998,8 @@ cyto_ports = {
         # the glycolytic enzymes' pool (a port type of its own: the membrane face, linked to the cytosol, has
         # protein_expression ports)
         {'port_type': 'enzyme_expression', 'variables': ['m_gly']},
+        # regulation of the maintenance ATPase by falling metabolites (cell/expression_regulation)
+        MAINT_REG_PORT,
     ],
 }
 cyto_params = [
@@ -913,7 +1064,7 @@ cyto_params = [
     ('V_mx_max', MX['V_mx_max'], None, False), ('K_G6P_mx', MX['K_G6P_mx'], None, False),
     ('K_ATP_mx', MX['K_ATP_matrix'], None, False), ('n_ATP_mx', MX['n_ATP_mx'], None, False),
     ('dG0_mx', MX['dG0_mx'], None, False), ('h_mx_poly', MX['h_matrix_poly'], None, False),
-]
+] + REG_ROWS
 h_glc = 2 * H_LAC_GLY
 cyto_invariants = [
     {'description': 'carbon balance with the membrane carriers and the matrix exported: d/dt V_c (6 C_glc + 6 C_G6P + '
@@ -955,13 +1106,22 @@ cyto_invariants = [
              'atol=0)'},
     {'description': 'glycogen stays between 0 and its ceiling (plus 5%)',
      'expr': 'np.all(C_glyc >= -1e-9) and np.all(C_glyc <= 1.05*C_glyc_max)'},
+    {'description': 'regulation of the maintenance ATPase (exact): R_reg = prod (1 - reg_on + reg_on f); 1 with every '
+                    'switch off',
+     'expr': f'np.allclose(R_reg, {REG_NP}, rtol=1e-12, atol=0) and ({" or ".join(REG_ON)} or np.all(R_reg == 1.0))'},
 ]
 cyto_notes = (
     'The cytosol of a fermenting prokaryote-grade cell (AdaptOrDeity\'s starting organism) as a bond graph in concentration '
     'form: species stores (C elements, mu = mu0 + RT ln(C/c_std)) for glucose, lactate, ATP, ADP and Pi, joined by two '
     'reactions (R elements): homolactic glycolysis in two steps, the hexokinase step, glucose + ATP <=> glucose '
     '6-phosphate (G6P) + ADP, and the lower glycolysis, G6P + 3 ADP + 2 Pi <=> 2 lactate + 3 ATP (net glucose + 2 ADP + 2 '
-    'Pi -> 2 lactate + 2 ATP), and the maintenance ATPase, ATP <=> ADP + Pi; plus a glycogen store (a polymer of glucose '
+    'Pi -> 2 lactate + 2 ATP), and the maintenance ATPase, ATP <=> ADP + Pi (everything the cell spends that is not '
+    'itemised elsewhere; its capacity is multiplied by R_reg = prod_s (1 - reg_on_s + reg_on_s f_s), the f_s from '
+    'cell/expression_regulation on the maintenance_regulation port, 1 at and above rest, the switches set by the game and '
+    'all 0 by default: a famine-adapted cell can cut its maintenance, as starving bacteria do: their endogenous '
+    'metabolism falls by most of itself within days, Novitsky & Morita 1977, towards a survival rate about a thousandth '
+    'of maintenance, Price & Sowers 2004, Hoehler & Jorgensen 2013, and energy spilling stops under limitation, Russell & '
+    'Cook 1995); plus a glycogen store (a polymer of glucose '
     'units, activity 1): synthesis by the bacterial ADP-glucose route, G6P + ATP -> glycogen + ADP + 2 Pi (scaled by the '
     'game\'s store_alloc and slowed near the ceiling C_glyc_max), and the phosphorylase, glycogen + Pi -> G6P, inhibited by '
     'ATP so the store is spent when ATP falls; the store cannot run backwards without glycogen (its reverse takes glycogen at '
@@ -1014,10 +1174,11 @@ cyto_verif = {
     'outputs': [f'C_{s}' for s in cyto_species] + ['C_G6P', 'C_glyc', 'v_store', 'v_mob', 'A_store', 'A_mob'] +
                ['v_gly', 'v_lg', 'v_hyd', 'A_hk', 'A_lg', 'A_hyd', 'P_diss', 'Q_met', 'f_T', 'J_ATP_gly', 'J_ATP_mob',
                 'J_ATP_store', 'J_ATP_maint', 'J_ATP_hk', 'J_ATP_lg', 'M_glyc_ATP', 'j_H_met', 'v_mx', 'A_mx', 'J_mx',
-                'J_ATP_mx',
+                'J_ATP_mx', 'R_reg',
                                                      'mf/J_glc', 'mf/J_lac'],
     # exercise storage, mobilisation and the matrix
-    'run_parameters': {'store_alloc': 0.5, 'C_glyc_init': 50.0, 'mx_alloc': 0.5},
+    # ATP regulation of the maintenance ATPase switched on, at f = 0.8
+    'run_parameters': {'store_alloc': 0.5, 'C_glyc_init': 50.0, 'mx_alloc': 0.5, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8},
     # fed through the cell membrane from the background glucose of the medium (the medium side is open: C_glc_e, C_lac_e parameters);
     # without the H+-ATPase the maintenance ATPase is the only ATP user, so ATP settles a little above its whole-cell value
     'harness': {
@@ -1041,7 +1202,8 @@ write_version('cell', 'energy_metabolism', 'energy_metabolism_fermenter', cyto_v
               cyto_params, cyto_verif, {'reviewed': False, 'notes': cyto_notes},
               ['argus2026unpublished', 'liebermeister2010modular', 'lynch2015bioenergetic', 'rolfe1997cellular',
                'bennett2009absolute', 'gnaiger1990anaerobic', 'gajewski1986thermodynamics', 'sutherland2001biofilm',
-               'welman2003exopolysaccharides'], V_NEW)
+               'welman2003exopolysaccharides', 'hoehler2013microbial', 'russell1995energetics', 'novitsky1977survival',
+               'price2004temperature'], V_NEW)
 
 # ------------------------------------------------------------------ 2. membrane potential (capacitor, disc geometry)
 mem_vars = [
@@ -2221,47 +2383,19 @@ write_version('cell', 'polysaccharide_hydrolase', 'polysaccharide_hydrolase_surf
               ['argus2026unpublished', 'shipman1999physiological', 'arnosti2011microbial'], V_HYDROLASE)
 
 # ------------------------------------------------------------------ 6c. proteins: one protein_pool per protein, and their synthesis
-# Each protein of the cell is a protein_pool: its expression m (copies n = n_0 m) approaches the game's target m_target
-# with time constant tau. Keeping the copies costs their turnover; raising m costs building the new copies, at most what the
-# cell's protein synthesis allows (protein_expression: a capacity, throttled as ATP falls). The pool passes m to the
+# Each protein of the cell is a protein_pool: its expression m (copies n = n_0 m) rises towards the game's target m_target
+# with time constant tau (the mean lifetime of its mRNA: how fast the cell can change a protein's synthesis), at most as
+# fast as the cell's protein synthesis allows (protein_expression: its ribosomes' capacity, throttled as ATP falls). The
+# copies are degraded at k_deg (about 1%/h) and replaced up to the target, so the turnover costs ATP and a protein above
+# its target falls only as fast as it is degraded (most bacterial proteins are stable). The pool passes m to the
 # protein it scales (a transporter's density or capacity, or the glycolytic enzymes' V_gly) on its protein_expression
 # port, and its costs, build demand, daughter share and membrane area to protein_expression on protein_synthesis.
 POOL_V = 'ArgusUNPUBLISHED_v01'
 C_BUILD_EXPR = '(c_syn + c_poly)'
 
-# Regulation of a target by falling metabolites (cell/expression_regulation sends f_s, 0-1, on regulation_signals): the
-# target is multiplied by R_reg = prod_s (1 - reg_on_s + reg_on_s f_s), so a switch reg_on_s = 1 makes species s lower it
-# and with every switch at 0 (the default) R_reg = 1 exactly. Only targets change: no flux, cost or balance does.
-REG_SPECIES = ['ATP', 'G6P', 'glc', 'H']
-REG_F = [f'f_{s}_reg' for s in REG_SPECIES]
-REG_ON = [f'reg_on_{s}' for s in REG_SPECIES]
-REG_LABEL = {'ATP': 'ATP', 'G6P': 'G6P', 'glc': 'glucose inside', 'H': 'H+ (falling pH)'}
-REG_EXPR = ' * '.join(f'(1.0 - {on} + {on} * {f_})' for on, f_ in zip(REG_ON, REG_F))
-REG_NP = '*'.join(f'(1 - {on} + {on}*{f_})' for on, f_ in zip(REG_ON, REG_F))
-REG_PORT = {'port_type': 'regulation_signals', 'variables': REG_F}
-# biosynthesis takes the same signals on a port type of its own: it is linked to every pool, which has regulation_signals
-GROWTH_REG_PORT = {'port_type': 'growth_regulation', 'variables': REG_F}
-
-
-def reg_vars(what, port='regulation_signals'):
-    return ([(f_, 'dimensionless', 'in', None, f'regulation by {REG_LABEL[s]}, 0-1 ({port} port)')
-             for s, f_ in zip(REG_SPECIES, REG_F)]
-            + [(on, 'dimensionless', 'in', None, f'1: falling {REG_LABEL[s]} lowers {what} (set by the game); 0: it does not')
-               for s, on in zip(REG_SPECIES, REG_ON)]
-            + [('R_reg', 'dimensionless', 'out', None, f'regulation factor on {what}: prod (1 - reg_on + reg_on f)')])
-
-
-REG_ROWS = ([(f_, 1.0, 'definitional; no regulation connected (f = 1)', False) for f_ in REG_F]
-            + [(on, 0.0, 'definitional; off until the player switches it on (design, 2026-10-12)', False) for on in REG_ON])
-REG_ROLES = {**{f_: 'boundary_condition' for f_ in REG_F}, **{on: 'constant' for on in REG_ON}, 'R_reg': 'variable'}
-
-
-def reg_invariant(target, regulated):
-    return {'description': f'regulation (exact): R_reg = prod (1 - reg_on + reg_on f) and {regulated} = {target} R_reg; with '
-                           'every switch off R_reg is exactly 1',
-            'expr': f'np.allclose(R_reg, {REG_NP}, rtol=1e-12, atol=0) and np.allclose({regulated}, {target}*R_reg, '
-                    f'rtol=1e-12, atol=0) and ({" or ".join(REG_ON)} or np.all(R_reg == 1.0))'}
-
+# how fast a protein's synthesis follows a new target: its mRNA's mean lifetime
+TAU_EXPRESSION = der(BIO['t_half_mRNA'] / math.log(2), 't_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time '
+                     'constant with which a protein\'s synthesis follows its target', 't_half_mRNA')
 # the most membrane area the cell's proteins may take (protein_expression's A_protein_max, membrane_ceiling port)
 A_PROTEIN_MAX = der(par('protein_area_max_fraction') * A_SURFACE, 'protein_area_max_fraction x the whole cell surface',
                     'protein_area_max_fraction', 'R_cell', 'h_cell')
@@ -2271,7 +2405,7 @@ pool_vars = [
     ('m', 'dimensionless', 'out', 'm_init', 'expression: copies relative to n_0 (protein_expression port)'),
     ('m_target', 'dimensionless', 'in', None, 'expression the cell is moving to (set by the game)'),
     ('m_goal', 'dimensionless', 'out', None, 'the target after regulation: m_target R_reg'),
-    ('tau', 'second', 'in', None, 'time constant of the approach'),
+    ('tau', 'second', 'in', None, 'time constant of the rise (the mRNA\'s mean lifetime)'),
     ('n_0', 'dimensionless', 'in', None, 'copies per cell at m = 1'), ('L', 'dimensionless', 'in', None,
                                                                        'amino acids per functional unit'),
     ('footprint', 'nm2', 'in', None, 'membrane area one copy takes (0 for a cytosolic protein)'),
@@ -2279,19 +2413,24 @@ pool_vars = [
     ('c_poly', 'dimensionless', 'in', None, '~P per peptide bond'),
     ('c_deg', 'dimensionless', 'in', None, '~P per residue for ATP-dependent proteolysis'),
     ('c_recycle', 'dimensionless', 'in', None, '~P per amino acid returned to the pool'),
-    ('k_deg', 'per_s', 'in', None, 'fraction of the protein degraded and remade per second'),
+    ('k_deg', 'per_s', 'in', None, 'fraction of the protein degraded per second'),
     ('N_A', 'per_mol', 'in', None, None),
     ('K_m_ATP', 'millimolar', 'in', None, 'ATP for half-rate synthesis'),
     ('ATP_ref', 'millimolar', 'in', None, 'ATP at which the costs are stated (rest)'),
     ('ATP', 'millimolar', 'in', None, 'cytosol ATP (protein_synthesis port)'),
     ('s_build', 'dimensionless', 'in', None, 'share of the build demand the cell can serve (protein_synthesis port)'),
+    ('R_syn', 'dimensionless', 'in', None, 'regulation of the cell\'s protein synthesis: the share of the degraded copies '
+                                            'it replaces (protein_synthesis port)'),
     ('n', 'dimensionless', 'out', None, 'copies per cell'),
     ('r_rel', 'per_s', 'out', None, '(m_goal - m)/tau'),
     ('r_up', 'per_s', 'out', None, 'rising part of r_rel (copies to build)'),
-    ('r_down', 'per_s', 'out', None, 'falling part of r_rel (copies left to degrade, no ATP)'),
+    ('m_kept', 'dimensionless', 'out', None, 'the copies the cell replaces as they are degraded: min(m, m_goal)'),
+    ('r_rep', 'per_s', 'out', None, 'replacement synthesis: k_deg R_syn m_kept, slowed as ATP runs out'),
+    ('r_deg', 'per_s', 'out', None, 'degradation: k_deg m, slowed as ATP runs out'),
+    ('r_down', 'per_s', 'out', None, 'net loss: copies degraded and not replaced (r_rep - r_deg, never positive)'),
     ('f_ATP', 'dimensionless', 'out', None, 'synthesis slows as ATP runs out: 1 at ATP_ref'),
     ('f_build', 'dimensionless', 'out', None, 'f_ATP capped at 1: building never runs faster than asked'),
-    ('J_keep', 'mol_per_s', 'out', None, 'ATP to keep the copies (turnover)'),
+    ('J_keep', 'mol_per_s', 'out', None, 'ATP to keep the copies: replacement synthesis and degradation'),
     ('J_demand', 'mol_per_s', 'out', None, 'ATP the rise asks for: building r_up n_0 copies per second'),
     ('J_build', 'mol_per_s', 'out', None, 'ATP spent building'),
     ('J_ATP', 'mol_per_s', 'out', None, 'all ATP this protein uses'),
@@ -2306,10 +2445,17 @@ pool_eqs = [
     ('n', 'n_0 * m'),
     ('R_reg', REG_EXPR), ('m_goal', 'm_target * R_reg'),
     ('r_rel', '(m_goal - m) / tau'),
-    ('r_up', '(r_rel + abs(r_rel)) / 2.0'), ('r_down', '(r_rel - abs(r_rel)) / 2.0'),
+    ('r_up', '(r_rel + abs(r_rel)) / 2.0'),
     ('f_ATP', 'ATP / (K_m_ATP + ATP) * (K_m_ATP + ATP_ref) / ATP_ref'),
     ('f_build', '(f_ATP + 1.0 - abs(f_ATP - 1.0)) / 2.0'),
-    ('J_keep', 'n * L * (c_poly + c_deg + c_recycle) * k_deg / N_A * f_ATP'),
+    ('m_kept', '(m + m_goal - abs(m - m_goal)) / 2.0'),
+    ('r_deg', 'k_deg * m * f_build'),
+    # the copies above the goal, and the share of the rest synthesis does not replace (exactly 0 at or below the goal
+    # with synthesis unregulated)
+    ('r_down', '-k_deg * f_build * ((m - m_goal + abs(m - m_goal)) / 2.0 + (1.0 - R_syn) * m_kept)'),
+    ('r_rep', 'r_deg + r_down'),
+    # replacement remakes a degraded copy from its recycled amino acids (c_poly + c_recycle); degradation costs c_deg
+    ('J_keep', 'n_0 * L * ((c_poly + c_recycle) * r_rep + c_deg * r_deg) / N_A'),
     ('J_demand', f'r_up * n_0 * L * {C_BUILD_EXPR} / N_A'),
     ('J_build', 'J_demand * s_build * f_build'),
     ('J_ATP', 'J_keep + J_build'),
@@ -2317,11 +2463,11 @@ pool_eqs = [
     ('a_unit', 'n_0 * footprint * u(1e-6, um2_per_nm2)'),
     ('A_protein', 'a_unit * m'),
     ('share', 'A_protein / A_ceiling'), ('s_unit', 'a_unit / A_ceiling'),
-    # copies rise as fast as the ATP actually spent builds them; falling needs no ATP (degradation, not refunded)
+    # copies rise as fast as the ATP actually spent builds them, and fall as they are degraded and not replaced
     ('d/dt m', 'r_up * s_build * f_build + r_down'),
 ]
 pool_roles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in pool_vars if v[0] != 't'}
-pool_roles.update({n: 'boundary_condition' for n in ('m_target', 'ATP', 's_build', 'A_ceiling')})
+pool_roles.update({n: 'boundary_condition' for n in ('m_target', 'ATP', 's_build', 'A_ceiling', 'R_syn')})
 pool_roles.update(REG_ROLES)
 
 
@@ -2329,13 +2475,13 @@ def pool_rows(key):
     if key in CARRIERS:   # a carrier the level-1 cell lacks: none expressed until the game sets a target
         start = [('m_init', 0.0, 'definitional; the level-1 cell has none (the game unlocks it)', False),
                  ('m_target', 0.0, 'definitional; none until the game sets a target', False),
-                 ('tau', par('tau_expression'), '', False), ('n_0', N0_CARRIER, '', False),
+                 ('tau', TAU_EXPRESSION, '', False), ('n_0', N0_CARRIER, '', False),
                  ('L', par(f'L_{key}'), '', False)]
     else:
         label, L, n, how = PROTEINS[key]
         start = [('m_init', 1.0, 'definitional; the calibrated cell', False),
                  ('m_target', 1.0, 'definitional; at rest the cell keeps its baseline', False),
-                 ('tau', par('tau_expression'), '', False),
+                 ('tau', TAU_EXPRESSION, '', False),
                  ('n_0', n, f'calibrated: {how}', False), ('L', L, '', False)]
     return start + [
         ('footprint', par(f'footprint_{key}'), '', False),
@@ -2344,28 +2490,37 @@ def pool_rows(key):
         ('K_m_ATP', par('K_m_ATP_prot'), '', False),
         ('ATP_ref', ATP, '', False), ('ATP', ATP, '', False),
         ('s_build', 1.0, 'definitional; synthesis serves the whole demand when unconnected', False),
+        ('R_syn', 1.0, 'definitional; every degraded copy is replaced when unconnected', False),
         ('A_ceiling', A_PROTEIN_MAX, '', False),
     ] + REG_ROWS
 
 
 pool_inv = [
-    {'description': 'costs (exact): J_keep = n L (c_poly + c_deg + c_recycle) k_deg f_ATP / N_A, J_demand = r_up n_0 L '
+    {'description': 'turnover (exact): copies are degraded at r_deg = k_deg m min(f_ATP, 1) and replaced up to the goal '
+                    'at r_rep = k_deg R_syn min(m, m_goal) min(f_ATP, 1); r_down = r_rep - r_deg is never positive, and is '
+                    '0 at the goal with synthesis unregulated',
+     'expr': 'np.allclose(r_deg, k_deg*m*np.minimum(f_ATP, 1), rtol=1e-12, atol=0) and np.allclose(r_rep, '
+             'k_deg*R_syn*np.minimum(m, m_goal)*np.minimum(f_ATP, 1), rtol=1e-12, atol=1e-18) and '
+             'np.allclose(r_down, r_rep - r_deg, rtol=1e-12, atol=1e-18) and np.all(r_down <= 1e-18)'},
+    {'description': 'costs (exact): J_keep = n_0 L ((c_poly + c_recycle) r_rep + c_deg r_deg) / N_A (at the goal n L '
+                    '(c_poly + c_deg + c_recycle) k_deg min(f_ATP, 1) / N_A), J_demand = r_up n_0 L '
                     '(c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1), M_build = n L (c_syn + c_poly) / '
                     'N_A, A_protein = n_0 footprint m, share = A_protein / A_ceiling, s_unit = n_0 footprint / A_ceiling',
-     'expr': 'np.allclose(J_keep, n_0*m*L*(c_poly + c_deg + c_recycle)*k_deg/N_A*f_ATP, rtol=1e-12, atol=0) and '
+     'expr': 'np.allclose(J_keep, n_0*L*((c_poly + c_recycle)*r_rep + c_deg*r_deg)/N_A, rtol=1e-12, atol=0) and '
              'np.allclose(J_demand, np.maximum(m_goal - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and '
              'np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and '
              'np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and '
              'np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0) and '
              'np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0) and '
              'np.allclose(s_unit, n_0*footprint*1e-6/A_ceiling, rtol=1e-12, atol=0)'},
-    {'description': 'the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0)) = int J_build dt while m '
-                    'rises (relative 1e-4: trapezoid integration of the logged flux)',
-     'expr': 'abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0]) - np.trapz(J_build, t)) <= 1e-4*abs(np.trapz(J_build, t)) + '
-             '1e-30', 'applies': 'run'},
-    {'description': 'expression approaches its regulated target and never overshoots: m moves monotonically towards '
-                    'm_goal (constant in these tests)',
-     'expr': 'np.all(np.diff(m)*np.sign(m_goal[0] - m[0]) >= -1e-12) and np.all((m - m_goal)*(m[0] - m_goal) >= -1e-12)'},
+    {'description': 'the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0) - int r_down dt) = int '
+                    'J_build dt (relative 1e-4: trapezoid integration of the logged fluxes)',
+     'expr': 'abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapz(r_down, t)) - np.trapz(J_build, t)) <= '
+             '1e-4*abs(np.trapz(J_build, t)) + 1e-30', 'applies': 'run'},
+    {'description': 'with synthesis unregulated (R_syn = 1) expression approaches its regulated target and never '
+                    'overshoots: m moves monotonically towards m_goal (constant in these tests)',
+     'expr': 'np.all(R_syn < 1) or (np.all(np.diff(m)*np.sign(m_goal[0] - m[0]) >= -1e-12) and '
+             'np.all((m - m_goal)*(m[0] - m_goal) >= -1e-12))'},
     {'description': 'costs are never negative', 'expr': 'np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(M_build >= 0)'},
     reg_invariant('m_target', 'm_goal'),
 ]
@@ -2378,34 +2533,42 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                                  {'port_type': 'daughter_share', 'variables': ['M_build']},
                                  {'port_type': 'protein_synthesis',
                                   'variables': ['ATP', 's_build', 'J_demand', 'J_ATP', 'J_keep', 'J_build', 'M_build',
-                                                'A_protein']},
+                                                'A_protein', 'R_syn']},
                                  {'port_type': 'membrane_ceiling', 'variables': ['A_ceiling']}, REG_PORT],
                'roles': pool_roles},
               pool_rows('NhaA'),
-              {'sim_time': 60.0, 'pre_time': 0.0, 'dt': 0.1, 'solver': 'CVODE_myokit',
+              {'sim_time': 3600.0, 'pre_time': 0.0, 'dt': 10.0, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
-               'outputs': ['m', 'n', 'r_up', 'r_down', 'f_ATP', 'J_keep', 'J_demand', 'J_build', 'J_ATP', 'M_build',
+               'outputs': ['m', 'n', 'r_up', 'r_down', 'r_rep', 'r_deg', 'm_kept', 'f_ATP', 'J_keep', 'J_demand', 'J_build', 'J_ATP', 'M_build',
                            'A_protein', 'share', 's_unit', 'm_goal', 'R_reg'],
                # ATP regulation switched on, at f = 0.8: the pool goes to 0.8 of its target
                'run_parameters': {'m_target': 2.0, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8},
                'invariants': pool_inv,
                'bc_sweep': {'ranges': {'m_target': [0.25, 4.0], 'ATP': [0.5, 12.0], 's_build': [0.0, 1.0],
-                                       'f_ATP_reg': [0.0, 1.0]},
+                                       'f_ATP_reg': [0.0, 1.0], 'R_syn': [0.0, 1.0]},
                             'rationale': 'expression over the range the game offers (x0.25-4); ATP from near exhaustion '
                                          'to above rest; synthesis from stalled to unconstrained; the ATP regulation '
-                                         'from full repression to none'},
-               'timestep': {'scheme': 'rk4', 'dts': [2.0, 1.0, 0.5], 't_end': 20.0, 'min_order': 0.8, 'tol': 1e-3,
-                            'cvode_tol': 1e-2},
+                                         'from full repression to none; replacement synthesis from stopped to full'},
+               # slow (tau ~7 min): at small steps RK4 errors are round-off, so test convergence where they are not
+               'timestep': {'scheme': 'rk4', 'dts': [400.0, 200.0, 100.0], 't_end': 3600.0, 'min_order': 0.8,
+                            'tol': 1e-3, 'cvode_tol': 1e-2},
                'stability': STAB},
               {'reviewed': False, 'notes': (
-                  'One protein of an adaptive cell as a pool of copies: n = n_0 m, with expression m approaching the '
-                  'target m_target (set by the game) at rate (m_target - m)/tau. Keeping the copies costs their turnover, '
-                  'J_keep = n L (c_poly + c_deg + c_recycle) k_deg / N_A (as protein_expression did for the whole cell), '
-                  'slowed by f_ATP = ATP/(K_m + ATP) (K_m + ATP_ref)/ATP_ref as ATP runs out. Raising m asks for the '
+                  'One protein of an adaptive cell as a pool of copies: n = n_0 m, with expression m rising towards the '
+                  'target m_target (set by the game) at rate (m_target - m)/tau, tau = t_half_mRNA / ln 2 (about 7 min: '
+                  'the mean lifetime of its mRNA, so how fast the cell can change the protein\'s synthesis), at most as '
+                  'fast as the cell\'s protein synthesis allows (below). Turnover: the copies are degraded at r_deg = '
+                  'k_deg m (k_deg about 1%/h: most bacterial proteins are stable, Maurizi 1992, Gupta et al. 2024) and '
+                  'replaced up to the goal at r_rep = k_deg R_syn min(m, m_goal), both slowed by min(f_ATP, 1), f_ATP = '
+                  'ATP/(K_m + ATP) (K_m + ATP_ref)/ATP_ref, as ATP runs out; dm/dt = r_up s_build min(f_ATP, 1) + r_down, '
+                  'r_down = r_rep - r_deg <= 0. So a protein above its target falls only as fast as it is degraded (an '
+                  'e-fold in about 100 h; growing bacteria lose protein mainly by dilution, which this non-growing pool '
+                  'has not), and if the cell\'s synthesis is regulated down (R_syn < 1, from protein_expression) its '
+                  'copies are lost at k_deg (1 - R_syn). Keeping the copies costs J_keep = n_0 L ((c_poly + c_recycle) '
+                  'r_rep + c_deg r_deg) / N_A: at the goal n L (c_poly + c_deg + c_recycle) k_deg / N_A. Raising m asks for the '
                   'ATP to build r_up n_0 copies per second from glucose, J_demand = r_up n_0 L (c_syn + c_poly) / N_A; the '
                   'cell\'s protein synthesis (protein_expression adaptive) serves the share s_build of it, and the copies '
-                  'rise only as fast as the ATP actually spent: dm/dt = r_up s_build min(f_ATP, 1) + r_down. Falling '
-                  'needs no ATP (degradation) and is not refunded. M_build = n L (c_syn + c_poly) / N_A is the ATP to '
+                  'rise only as fast as the ATP actually spent. Degraded copies are not refunded. M_build = n L (c_syn + c_poly) / N_A is the ATP to '
                   'build the present copies: its share of a daughter. A_protein = n footprint is the membrane area the '
                   'copies take (0 for cytosolic proteins), share = A_protein / A_ceiling the share of the membrane\'s '
                   'protein ceiling they take (A_ceiling: protein_expression\'s A_protein_max, on the membrane_ceiling '
@@ -2419,9 +2582,10 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                   'pool moves to m_goal = m_target R_reg, R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, '
                   'glucose and H+, the f_s from cell/expression_regulation on the regulation_signals port (1 when '
                   'unconnected); the game sets the switches reg_on_s (0 or 1; all 0 by default, so R_reg = 1 exactly and '
-                  'the target is the player\'s). Regulation changes only the target, never a cost or a flux.'),
+                  'the target is the player\'s). Regulation changes the target, and through it what is replaced.'),
                'instances': {k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS}},
-              ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers'], POOL_V,
+              ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers',
+               'maurizi1992proteases', 'willetts1967intracellular', 'gupta2024global', 'bernstein2002global'], POOL_V,
               extra_instances=pool_extra)
 
 # --- protein_pool membrane_share: a membrane protein whose target is a share of the membrane's protein ceiling
@@ -2460,13 +2624,13 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                                  {'port_type': 'daughter_share', 'variables': ['M_build']},
                                  {'port_type': 'protein_synthesis',
                                   'variables': ['ATP', 's_build', 'J_demand', 'J_ATP', 'J_keep', 'J_build', 'M_build',
-                                                'A_protein']},
+                                                'A_protein', 'R_syn']},
                                  {'port_type': 'membrane_ceiling', 'variables': ['A_ceiling']}, REG_PORT],
                'roles': share_roles},
               share_rows('Glf'),
-              {'sim_time': 60.0, 'pre_time': 0.0, 'dt': 0.1, 'solver': 'CVODE_myokit',
+              {'sim_time': 3600.0, 'pre_time': 0.0, 'dt': 10.0, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
-               'outputs': ['m', 'm_target', 'share', 's_unit', 'n', 'r_up', 'r_down', 'f_ATP', 'J_keep', 'J_demand', 'J_build',
+               'outputs': ['m', 'm_target', 'share', 's_unit', 'n', 'r_up', 'r_down', 'r_rep', 'r_deg', 'm_kept', 'f_ATP', 'J_keep', 'J_demand', 'J_build',
                            'J_ATP', 'M_build', 'A_protein', 'm_goal', 'R_reg'],
                'run_parameters': {'s_target': 2.0 * S0_GLF, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8},
                'invariants': [
@@ -2476,19 +2640,19 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                     'expr': 'np.allclose(m_target, s_target*A_ceiling/(n_0*footprint*1e-6), rtol=1e-12, atol=0) and '
                             'np.allclose(n_0*m_target*footprint*1e-6, s_target*A_ceiling, rtol=1e-12, atol=0) and '
                             'np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0)'},
-                   {'description': 'the share moves monotonically to its regulated target s_target R_reg and never '
-                                   'overshoots',
-                    'expr': 'np.all(np.diff(share)*np.sign(s_target*R_reg[0] - share[0]) >= -1e-12) and '
-                            'np.all((share - s_target*R_reg)*(share[0] - s_target*R_reg) >= -1e-12)'}]
+                   {'description': 'with synthesis unregulated (R_syn = 1) the share moves monotonically to its '
+                                   'regulated target s_target R_reg and never overshoots',
+                    'expr': 'np.all(R_syn < 1) or (np.all(np.diff(share)*np.sign(s_target*R_reg[0] - share[0]) >= '
+                            '-1e-12) and np.all((share - s_target*R_reg)*(share[0] - s_target*R_reg) >= -1e-12))'}]
               # the pool's invariants (m_target an output here, constant in time)
               + pool_inv,
                'bc_sweep': {'ranges': {'s_target': [0.0, 1.0], 'ATP': [0.5, 12.0], 's_build': [0.0, 1.0],
-                                       'f_ATP_reg': [0.0, 1.0]},
+                                       'f_ATP_reg': [0.0, 1.0], 'R_syn': [0.0, 1.0]},
                             'rationale': 'shares from none to the whole ceiling; ATP from near exhaustion to above rest; '
                                          'synthesis from stalled to unconstrained; the ATP regulation from full '
                                          'repression to none'},
-               'timestep': {'scheme': 'rk4', 'dts': [2.0, 1.0, 0.5], 't_end': 20.0, 'min_order': 0.8, 'tol': 1e-3,
-                            'cvode_tol': 1e-2},
+               'timestep': {'scheme': 'rk4', 'dts': [400.0, 200.0, 100.0], 't_end': 3600.0, 'min_order': 0.8,
+                            'tol': 1e-3, 'cvode_tol': 1e-2},
                'stability': STAB},
               {'reviewed': False, 'notes': (
                   'protein_pool ArgusUNPUBLISHED_v01 for a membrane protein whose target is set as a share of the '
@@ -2496,8 +2660,8 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                   'membrane area the proteins may take: protein_expression\'s A_protein_max on the membrane_ceiling '
                   'port, a fixed fraction of the cell surface, so it scales with membrane area) the copies are to take. '
                   'The target copies are s_target A_ceiling / footprint, m_target = s_target A_ceiling / (n_0 '
-                  'footprint); everything else (regulation to m_goal = m_target R_reg, approach with tau, upkeep, build '
-                  'cost and its limits, daughter share, area) is the ArgusUNPUBLISHED_v01 maths. share = A_protein / A_ceiling is the share the present '
+                  'footprint); everything else (regulation to m_goal = m_target R_reg, rise with tau, degradation and '
+                  'replacement, upkeep, build cost and its limits, daughter share, area) is the ArgusUNPUBLISHED_v01 maths. share = A_protein / A_ceiling is the share the present '
                   'copies take. The game keeps a cell\'s shares summing to at most 1. Instances: the fermenter cell\'s '
                   'transporters, each with s_target at its share at rest (m_target = 1), and the glucose carriers the '
                   'game unlocks after level 1 (PTS, ABC, GalP: none at start, n_0 = the calibrated cell\'s Glf '
@@ -2506,10 +2670,15 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                                 if k in PROTEINS},
                              **{k: f'{CARRIERS[k][0]}: none at start; n_0 = the calibrated cell\'s Glf copies'
                                 for k in CARRIERS}}},
-              ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers'], POOL_SHARE_V,
+              ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers',
+               'maurizi1992proteases', 'gupta2024global', 'bernstein2002global'], POOL_SHARE_V,
               extra_instances=share_extra)
 
 # --- protein_expression adaptive: the cell's protein synthesis, serving its pools
+# the most ATP the ribosomes can turn into new protein, in multiples of the resting turnover
+BUILD_CAPACITY = der(BIO['n_ribo'] * par('k_elong') * par('ribosome_active_fraction') * C_BUILD / NA / R_TOT,
+                     'ribosomes x k_elong x ribosome_active_fraction x (c_syn + c_poly) / N_A / the resting ATP turnover',
+                     'ribosomes_per_um3', 'k_elong', 'ribosome_active_fraction', 'c_syn', 'maintenance_coefficient')
 pe_vars = [
     ('t', 'second', 'in', None, None),
     ('ATP', 'millimolar', 'in', None, 'cytosol ATP (ATP_hydrolysis_port), passed to the pools'),
@@ -2535,20 +2704,21 @@ pe_vars = [
     ('area_max_fraction', 'dimensionless', 'in', None, 'most of the cell surface the proteins may take'),
     ('x_ATP', 'dimensionless', 'out', None, '(ATP - ATP_floor)/(ATP_ref - ATP_floor)'),
     ('throttle', 'dimensionless', 'out', None, 'x_ATP clamped to 0-1 (the stringent response)'),
-    ('J_cap', 'mol_per_s', 'out', None, 'what synthesis can spend now: build_capacity J_ref throttle'),
+    ('J_cap', 'mol_per_s', 'out', None, 'what synthesis can spend now: build_capacity J_ref throttle R_reg'),
     ('s_build', 'dimensionless', 'out', None, 'share of the demand served: min(1, J_cap/J_demand_total)'),
     ('A_surface', 'um2', 'out', None, 'whole cell surface'),
     ('A_protein_max', 'um2', 'out', None, 'most membrane area the proteins may take'),
     ('f_area', 'dimensionless', 'out', None, 'share of A_protein_max in use'),
     ('j_ATP_prot', 'mol_per_s', 'out', None, None), ('j_ADP_prot', 'mol_per_s', 'out', None, None),
     ('j_Pi_prot', 'mol_per_s', 'out', None, None),
-]
+] + reg_vars('the cell\'s protein synthesis (replacing degraded copies and building new ones)', 'synthesis_regulation')
 pe_eqs = [
+    ('R_reg', REG_EXPR),
     ('J_demand_total', 'J_demand_in'), ('J_ATP_total', 'J_ATP_in'), ('J_keep_total', 'J_keep_in'),
     ('J_build_total', 'J_build_in'), ('M_build_protein', 'M_build_in'), ('A_protein_total', 'A_protein_in'),
     ('x_ATP', '(ATP - ATP_floor) / (ATP_ref - ATP_floor)'),
     ('throttle', '((x_ATP + abs(x_ATP)) / 2.0 + 1.0 - abs((x_ATP + abs(x_ATP)) / 2.0 - 1.0)) / 2.0'),
-    ('J_cap', 'build_capacity * J_ref * throttle'),
+    ('J_cap', 'build_capacity * J_ref * throttle * R_reg'),
     # min(1, J_cap/J_demand) as (J_cap + eps)/(max(J_cap, J_demand) + eps): 1 with nothing to build, 0 with no capacity
     ('s_build', '(J_cap + J_eps) / ((J_cap + J_demand_total + abs(J_cap - J_demand_total)) / 2.0 + J_eps)'),
     ('A_surface', 'A_mem * surface_factor'),
@@ -2560,6 +2730,7 @@ pe_roles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in pe_vars
 pe_roles.update({n: 'boundary_condition' for n in ('ATP', 'ADP', 'Pi', 'A_mem')})
 pe_roles.update({n: 'variable' for n in ('J_demand_in', 'J_ATP_in', 'J_keep_in', 'J_build_in', 'M_build_in',
                                          'A_protein_in')})
+pe_roles.update(REG_ROLES)
 pe_params = [
     ('ATP', ATP, '', False), ('ADP', ADP, '', False), ('Pi', PI, '', False),
     ('J_demand_in', 0.0, 'no pool connected (an open sum port is 0)', False),
@@ -2568,7 +2739,7 @@ pe_params = [
     ('A_protein_in', 0.0, 'no pool connected', False),
     ('J_ref', der(R_TOT, 'maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C)',
                   'maintenance_coefficient', 'maintenance_exponent'), '', False),
-    ('build_capacity', par('build_capacity'), '', False),
+    ('build_capacity', BUILD_CAPACITY, '', False),
     ('ATP_floor', par('build_ATP_floor'), '', False),
     ('ATP_ref', ATP, '', False),
     ('J_eps', 1e-30, 'definitional; numerical floor, 1e-30 mol/s (12 orders below the resting turnover)', False),
@@ -2576,12 +2747,12 @@ pe_params = [
     ('surface_factor', der(A_SURFACE / A_MEM, '(2 pi R^2 + 2 pi R h)/(2 pi R h): a disc\'s whole surface over its rim',
                            'R_cell', 'h_cell'), '', False),
     ('area_max_fraction', par('protein_area_max_fraction'), '', False),
-]
+] + REG_ROWS
 pe_inv = [
     {'description': 'throttle = clamp((ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1); J_cap = build_capacity J_ref '
-                    'throttle; s_build = min(1, J_cap/J_demand_total) (exact up to the 1e-30 mol/s floor)',
+                    'throttle R_reg; s_build = min(1, J_cap/J_demand_total) (exact up to the 1e-30 mol/s floor)',
      'expr': 'np.allclose(throttle, np.clip((cyto__C_ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1), rtol=1e-12, '
-             'atol=1e-15) and np.allclose(J_cap, build_capacity*J_ref*throttle, rtol=1e-12, atol=0) and '
+             'atol=1e-15) and np.allclose(J_cap, build_capacity*J_ref*throttle*R_reg, rtol=1e-12, atol=0) and '
              'np.allclose(s_build, np.where(J_demand_total > J_cap, (J_cap + J_eps)/(J_demand_total + J_eps), 1.0), '
              'rtol=1e-9, atol=1e-12)'},
     {'description': 'the pools never spend more than synthesis can: J_build_total <= J_cap (relative 1e-9)',
@@ -2601,14 +2772,15 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                                  {'port_type': 'membrane_ceiling', 'variables': ['A_protein_max'], 'multi_port': 'True'},
                                  {'port_type': 'protein_synthesis',
                                   'variables': ['ATP', 's_build', 'J_demand_in', 'J_ATP_in', 'J_keep_in', 'J_build_in',
-                                                'M_build_in', 'A_protein_in'],
-                                  'multi_port': ['True', 'True', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum']}],
+                                                'M_build_in', 'A_protein_in', 'R_reg'],
+                                  'multi_port': ['True', 'True', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'True']},
+                                 SYNTH_REG_PORT],
                'roles': pe_roles},
               pe_params,
               {'sim_time': 60.0, 'pre_time': 0.0, 'dt': 0.1, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
                'outputs': ['throttle', 'J_cap', 's_build', 'J_demand_total', 'J_build_total', 'J_keep_total',
-                           'J_ATP_total', 'j_ATP_prot', 'M_build_protein', 'A_protein_total', 'f_area', 'x_ATP',
+                           'J_ATP_total', 'j_ATP_prot', 'M_build_protein', 'A_protein_total', 'f_area', 'x_ATP', 'R_reg',
                            'pool_a/m', 'pool_b/m', 'cyto/C_ATP'],
                # two pools rising at once ask for more than synthesis can give: both are served the same share. A
                # cytosol supplies the ATP (the pools read it through this module); with nothing feeding it, its ATP
@@ -2622,7 +2794,7 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                                   ['m_target_pool_b', 'dimensionless', 1.2, 'harness: a fifth more of the proteome']]},
                'run_parameters': {},
                'invariants': pe_inv,
-               'bc_sweep': {'ranges': {'build_capacity': [0.5, 10.0], 'ATP_floor': [1.0, 8.0]},
+               'bc_sweep': {'ranges': {'build_capacity': [0.5, 20.0], 'ATP_floor': [1.0, 8.0], 'f_ATP_reg': [0.0, 1.0]},
                             'exclude': ['ATP', 'ADP', 'Pi'],   # supplied by the harness cytosol
                             'rationale': 'synthesis capacity from below to well above the two pools\' demand; the ATP '
                                          'floor over the range where the cytosol\'s falling ATP crosses it'},
@@ -2630,22 +2802,32 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
               {'reviewed': False, 'notes': (
                   'The protein synthesis of an adaptive cell, serving its protein_pools (one per protein, on the '
                   'protein_synthesis port: their ATP use, turnover, build spending, daughter share and membrane area are '
-                  'summed here, and each receives the cytosol ATP and s_build). Building is limited to J_cap = '
-                  'build_capacity J_ref throttle: a growing cell builds protein at several times its maintenance rate, '
-                  'and building backs off linearly as ATP falls from rest (ATP_ref) to ATP_floor (the stringent '
+                  'summed here, and each receives the cytosol ATP, s_build and R_reg). Building is limited to J_cap = '
+                  'build_capacity J_ref throttle R_reg. build_capacity is what the cell\'s ribosomes can make, in '
+                  'multiples of the resting ATP turnover J_ref: n_ribo k_elong f_active (c_syn + c_poly) / N_A / J_ref, '
+                  'with k_elong about 5 aa/s at 20 C (Farewell & Neidhardt 1998, extrapolated) and f_active 0.8 of the '
+                  'ribosomes translating (Dai et al. 2016), 4 ~P per peptide bond (Stouthamer 1973) plus the amino '
+                  'acids\' synthesis from glucose; building backs off linearly as ATP falls from rest (ATP_ref) to ATP_floor (the stringent '
                   'response), so it never starves the cell. When the pools ask for more, each gets the same share s_build '
                   '= J_cap/J_demand_total. The summed ATP goes to the cytosol on the ATP_hydrolysis_port. The membrane '
                   'area the pools take is compared with the most the cell surface allows (area_max_fraction of it); the '
                   'game keeps targets within it. Biosynthesis throttles growth the same way (its own ATP_floor and J_ref, '
-                  'the same values of parameters.json).')},
-              ['argus2026unpublished', 'lynch2015bioenergetic'], V_NEW)
+                  'the same values of parameters.json). Regulation: R_reg = prod_s (1 - reg_on_s + reg_on_s f_s), the f_s '
+                  'from cell/expression_regulation on synthesis_regulation (1 at and above rest; switches set by the game, '
+                  'all 0 by default), scales the whole of protein synthesis, as the stringent response does: J_cap, and '
+                  'on protein_synthesis each pool\'s replacement of its degraded copies (R_syn there), so a cell that '
+                  'cuts it saves the turnover cost and loses protein at k_deg (1 - R_reg).')},
+              ['argus2026unpublished', 'lynch2015bioenergetic', 'farewell1998effect', 'dai2016reduction',
+               'stouthamer1973theoretical', 'potrykus2008still'], V_NEW)
 
-# --- expression_regulation: falling metabolites lower expression and growth targets (the stringent response, simplified)
-# f = x^n/(1 + x^n) of x = C/K for ATP, G6P and glucose (falls as C falls; half-way at C = K) and of x = K_H/H_i for H+
-# (falls as H+ rises, i.e. as pH falls; half-way at H_i = K_H). K is regulation_K_fraction of the resting level (for H+:
-# the resting H+ over it), n regulation_hill_n: a hardcoded function the designer chose; experts will choose others (a
-# version of this module per function). The pools and biosynthesis multiply their targets by the f of the species the
-# game switches on.
+# --- expression_regulation: falling metabolites lower expression, growth and maintenance targets (the stringent
+# response, simplified). For each species, x = C/C_rest for ATP, G6P and glucose (falls as C falls) and x = H_rest/H_i for
+# H+ (falls as H+ rises, i.e. as pH falls); the shortfall below rest u = max(0, 1 - x)/(1 - x_half), x_half = K/C_rest
+# the level at which f is half-way down (regulation_K_fraction: K = fraction x the resting level; for H+ K_H = the resting
+# H+ / fraction), and f = 1/(1 + u^n), n = regulation_hill_n. So f = 1 exactly at and above rest (no effect at rest), 1/2
+# at K, 1/(1 + (1/(1 - fraction))^n) = 1/17 at C = 0, and smooth at rest (u^n with n = 4 is C^3 there). A hardcoded
+# function the designer chose; experts will choose others (a version of this module per function). The pools,
+# biosynthesis, protein synthesis and the cytosol multiply their targets by the f of the species the game switches on.
 V_REG = 'ArgusUNPUBLISHED_v01'
 REG_FRAC = par('regulation_K_fraction')
 reg_cvars = [('t', 'second', 'in', None, None),
@@ -2654,24 +2836,38 @@ reg_cvars = [('t', 'second', 'in', None, None),
              ('C_glc', 'millimolar', 'in', None, 'cytosol glucose (metabolite_levels port)'),
              ('H_i', 'millimolar', 'in', None, 'free cytosolic H+ (internal_H port)'),
              ('n_reg', 'dimensionless', 'in', None, 'steepness of the regulation function'),
+             ('C_ATP_rest', 'millimolar', 'in', None, 'resting ATP: f_ATP is 1 at and above it'),
+             ('C_G6P_rest', 'millimolar', 'in', None, 'resting G6P'),
+             ('C_glc_rest', 'millimolar', 'in', None, 'resting glucose inside'),
+             ('H_rest', 'millimolar', 'in', None, 'resting free H+: f_H is 1 at and below it'),
              ('K_ATP_reg', 'millimolar', 'in', None, 'ATP at which f_ATP is half-way down'),
              ('K_G6P_reg', 'millimolar', 'in', None, 'G6P at which f_G6P is half-way down'),
              ('K_glc_reg', 'millimolar', 'in', None, 'glucose at which f_glc is half-way down'),
              ('K_H_reg', 'millimolar', 'in', None, 'H+ at which f_H is half-way down (pH below rest)')]
 reg_ceqs = []
-for s_, c_ in (('ATP', 'C_ATP'), ('G6P', 'C_G6P'), ('glc', 'C_glc')):
-    reg_cvars += [(f'x_{s_}_reg', 'dimensionless', 'out', None, f'{c_}/K_{s_}_reg (0 for a negative round-off value)'),
-                  (f'f_{s_}_reg', 'dimensionless', 'out', None, f'regulation by {REG_LABEL[s_]}: falls from 1 as it falls')]
-    reg_ceqs += [(f'x_{s_}_reg', f'({c_} + abs({c_})) / (2.0 * K_{s_}_reg)'),
-                 (f'f_{s_}_reg', f'x_{s_}_reg ** n_reg / (1.0 + x_{s_}_reg ** n_reg)')]
-reg_cvars += [('x_H_reg', 'dimensionless', 'out', None, 'K_H_reg/H_i'),
-              ('f_H_reg', 'dimensionless', 'out', None, 'regulation by H+: falls from 1 as H+ rises (pH falls)')]
-reg_ceqs += [('x_H_reg', 'K_H_reg / H_i'), ('f_H_reg', 'x_H_reg ** n_reg / (1.0 + x_H_reg ** n_reg)')]
+for s_, c_ in (('ATP', 'C_ATP'), ('G6P', 'C_G6P'), ('glc', 'C_glc'), ('H', 'H_i')):
+    rest = 'H_rest' if s_ == 'H' else f'{c_}_rest'
+    if s_ == 'H':
+        x_desc, x_eq, half = 'H_rest/H_i', 'H_rest / H_i', 'H_rest / K_H_reg'
+    else:
+        x_desc = f'{c_}/{rest} (0 for a negative round-off value)'
+        x_eq, half = f'({c_} + abs({c_})) / (2.0 * {rest})', f'K_{s_}_reg / {rest}'
+    reg_cvars += [(f'x_{s_}_reg', 'dimensionless', 'out', None, x_desc),
+                  (f'u_{s_}_reg', 'dimensionless', 'out', None, 'shortfall below rest, 1 at the half-way level: '
+                                                                'max(0, 1 - x)/(1 - x_half)'),
+                  (f'f_{s_}_reg', 'dimensionless', 'out', None,
+                   f'regulation by {REG_LABEL[s_]}: 1 at and {"below" if s_ == "H" else "above"} rest, falls as it '
+                   f'{"rises" if s_ == "H" else "falls"}')]
+    reg_ceqs += [(f'x_{s_}_reg', x_eq),
+                 (f'u_{s_}_reg', f'((1.0 - x_{s_}_reg) + abs(1.0 - x_{s_}_reg)) / (2.0 * (1.0 - {half}))'),
+                 (f'f_{s_}_reg', f'1.0 / (1.0 + u_{s_}_reg ** n_reg)')]
 reg_croles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in reg_cvars if v[0] != 't'}
 reg_croles.update({n: 'boundary_condition' for n in ('C_ATP', 'C_G6P', 'C_glc', 'H_i')})
 reg_cparams = [
     ('C_ATP', ATP, '', False), ('C_G6P', G6P_I, '', False), ('C_glc', GLC_I, '', False), ('H_i', H_I, '', False),
     ('n_reg', par('regulation_hill_n'), '', False),
+    ('C_ATP_rest', ATP, '', False), ('C_G6P_rest', G6P_I, '', False), ('C_glc_rest', GLC_I, '', False),
+    ('H_rest', H_I, '', False),
     ('K_ATP_reg', der(REG_FRAC * ATP, 'regulation_K_fraction x the resting ATP', 'regulation_K_fraction', 'ATP'), '',
      False),
     ('K_G6P_reg', der(REG_FRAC * G6P_I, 'regulation_K_fraction x the resting G6P', 'regulation_K_fraction', 'G6P_i'), '',
@@ -2681,15 +2877,17 @@ reg_cparams = [
     ('K_H_reg', der(float(H_I) / REG_FRAC, 'the resting H+ / regulation_K_fraction (pH log10(1/fraction) below rest)',
                     'regulation_K_fraction', 'pH_i'), '', False),
 ]
-_hill = lambda x: f'({x})**n_reg/(1 + ({x})**n_reg)'
+_x = {'ATP': 'np.maximum(cyto__C_ATP, 0)/C_ATP_rest', 'G6P': 'np.maximum(cyto__C_G6P, 0)/C_G6P_rest',
+      'glc': 'np.maximum(cyto__C_glc, 0)/C_glc_rest', 'H': 'H_rest/H__H_i'}
+_half = {'ATP': 'K_ATP_reg/C_ATP_rest', 'G6P': 'K_G6P_reg/C_G6P_rest', 'glc': 'K_glc_reg/C_glc_rest', 'H': 'H_rest/K_H_reg'}
+_f = lambda s_: f'1/(1 + (np.maximum(0, 1 - {_x[s_]})/(1 - {_half[s_]}))**n_reg)'
 reg_cinv = [
-    {'description': 'the regulation function (exact): f = x^n/(1 + x^n), x = C/K for ATP, G6P and glucose, x = K_H/H_i '
-                    'for H+',
-     'expr': ' and '.join([f'np.allclose(f_{s_}_reg, {_hill(f"np.maximum(cyto__{c_}, 0)/K_{s_}_reg")}, rtol=1e-12, '
-                           f'atol=1e-15)' for s_, c_ in (('ATP', 'C_ATP'), ('G6P', 'C_G6P'), ('glc', 'C_glc'))]
-                          + [f'np.allclose(f_H_reg, {_hill("(K_H_reg/H__H_i)")}, rtol=1e-12, atol=1e-15)'])},
-    {'description': 'f stays within 0-1',
-     'expr': ' and '.join(f'np.all(({f_} >= 0) & ({f_} <= 1))' for f_ in REG_F)},
+    {'description': 'the regulation function (exact): f = 1/(1 + u^n), u = max(0, 1 - x)/(1 - x_half), x = C/C_rest for '
+                    'ATP, G6P and glucose, x = H_rest/H_i for H+',
+     'expr': ' and '.join(f'np.allclose(f_{s_}_reg, {_f(s_)}, rtol=1e-12, atol=1e-15)' for s_ in REG_SPECIES)},
+    {'description': 'f stays within 0-1, and is exactly 1 at and above rest (for H+ at and below the resting H+)',
+     'expr': ' and '.join(f'np.all(({f_} >= 0) & ({f_} <= 1))' for f_ in REG_F) + ' and '
+             + ' and '.join(f'np.all(f_{s_}_reg[x_{s_}_reg >= 1] == 1.0)' for s_ in REG_SPECIES)},
     {'description': 'the pool switched to ATP regulation (target 1) goes to f_ATP (exact), and while the cytosol\'s ATP runs '
                     'down, f_ATP and the target fall with it',
      'expr': 'np.allclose(pool_a__R_reg, f_ATP_reg, rtol=1e-12, atol=0) and np.allclose(pool_a__m_goal, '
@@ -2701,12 +2899,14 @@ write_version('cell', 'expression_regulation', 'expression_regulation', reg_cvar
                'entrance_ports': [], 'exit_ports': [],
                'general_ports': [{'port_type': 'metabolite_levels', 'variables': ['C_ATP', 'C_G6P', 'C_glc']},
                                  {'port_type': 'internal_H', 'variables': ['H_i']},
-                                 {**REG_PORT, 'multi_port': 'True'}, GROWTH_REG_PORT],
+                                 {**REG_PORT, 'multi_port': 'True'}, GROWTH_REG_PORT, SYNTH_REG_PORT,
+                                 MAINT_REG_PORT],
                'roles': reg_croles},
               reg_cparams,
               {'sim_time': 60.0, 'pre_time': 0.0, 'dt': 0.1, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
-               'outputs': ['x_ATP_reg', 'x_G6P_reg', 'x_glc_reg', 'x_H_reg', *REG_F, 'cyto/C_ATP', 'cyto/C_G6P',
+               'outputs': ['x_ATP_reg', 'x_G6P_reg', 'x_glc_reg', 'x_H_reg', 'u_ATP_reg', 'u_G6P_reg', 'u_glc_reg',
+                           'u_H_reg', *REG_F, 'cyto/C_ATP', 'cyto/C_G6P',
                            'cyto/C_glc', 'H/H_i', 'pool_a/m', 'pool_a/m_goal', 'pool_a/R_reg'],
                # a cytosol with nothing feeding it runs its ATP down over the minute (as in protein_expression's
                # tests), so f_ATP falls; one pool, switched to ATP regulation, follows it
@@ -2719,26 +2919,37 @@ write_version('cell', 'expression_regulation', 'expression_regulation', reg_cvar
                                   ['m_target_pool_a', 'dimensionless', 1.0, 'harness: the resting target']]},
                'run_parameters': {},
                'invariants': reg_cinv,
-               'bc_sweep': {'ranges': {'n_reg': [1.0, 8.0], 'K_ATP_reg': [1.0, 9.6], 'K_H_reg': [2.5e-5, 1e-4]},
-                            'exclude': ['C_ATP', 'C_G6P', 'C_glc', 'H_i'],   # supplied by the harness
-                            'rationale': 'steepness from graded to switch-like; half-way points from a tenth of the '
-                                         'resting ATP to rest, and for H+ from rest to 0.6 pH units below'},
+               'bc_sweep': {'ranges': {'n_reg': [2.0, 8.0], 'K_ATP_reg': [1.0, 8.0], 'K_H_reg': [3e-5, 1e-4],
+                                       'K_G6P_reg': [0.1, 0.8], 'K_glc_reg': [2e-4, 1.6e-3]},
+                            # supplied by the harness; the resting levels are the cell's (a half-way level must lie
+                            # below its resting level, so they are not swept independently)
+                            'exclude': ['C_ATP', 'C_G6P', 'C_glc', 'H_i', 'C_ATP_rest', 'C_G6P_rest', 'C_glc_rest',
+                                        'H_rest'],
+                            'rationale': 'steepness from graded (n = 2, still smooth at rest) to switch-like; half-way '
+                                         'points from a tenth of the resting ATP to 83% of it, and for H+ from 0.08 to '
+                                         '0.6 pH units below rest (at rest itself u is undefined)'},
                'stability': STAB},
               {'reviewed': False, 'notes': (
-                  'How falling metabolites lower an adaptive cell\'s protein expression and growth targets: a simplified '
-                  'stringent response. Bacteria cut ribosome and protein synthesis, and growth, as energy and carbon fall '
-                  '((p)ppGpp, Potrykus & Cashel 2008; rRNA promoters also sense ATP directly, Schneider, Gaal & Gourse '
-                  '2002), which keeps ATP from collapsing. For each species s this module gives f_s = x^n/(1 + x^n): x = '
-                  'C/K for ATP, G6P and glucose inside (f falls as C falls; a negative round-off C counts as 0), x = '
-                  'K_H/H_i for H+ (f falls as H+ rises, i.e. as pH falls). K is regulation_K_fraction (0.5) of the '
-                  'resting level (for H+, the resting H+ over it: half-way 0.3 pH units below rest) and n = 4: a '
-                  'hardcoded function (design, AdaptOrDeity 2026-10-12; experts will be able to choose the function, '
-                  'a version of this module each). At rest f = 2^4/(1 + 2^4) = 16/17. The f_s go to every protein_pool '
-                  '(regulation_signals) and to biosynthesis (growth_regulation); each multiplies its target (m_target, or growth\'s J_growth) '
-                  'by prod_s (1 - reg_on_s + reg_on_s f_s), with the switches reg_on_s set by the game (all 0 by default: '
-                  'no effect). Only targets change, so the cell\'s balances are untouched. Ports: metabolite_levels '
+                  'How falling metabolites lower an adaptive cell\'s protein expression, growth and maintenance '
+                  'targets: a simplified stringent response. Bacteria cut ribosome and protein synthesis, and growth, as '
+                  'energy and carbon fall ((p)ppGpp, Potrykus & Cashel 2008; rRNA promoters also sense ATP directly, '
+                  'Schneider, Gaal & Gourse 2002), which keeps ATP from collapsing, and starving cells run on far less '
+                  'than their maintenance power (Hoehler & Jorgensen 2013; Kempes et al. 2017). For each species s this '
+                  'module gives f_s = 1/(1 + u_s^n), u_s = max(0, 1 - x_s)/(1 - x_half): x = C/C_rest for ATP, G6P and '
+                  'glucose inside (a negative round-off C counts as 0), x = H_rest/H_i for H+ (falls as H+ rises, i.e. as '
+                  'pH falls); x_half = K/C_rest is where f is half-way down, K regulation_K_fraction (0.5) of the resting '
+                  'level (for H+, the resting H+ over it: half-way 0.3 pH units below rest), n = 4. So f = 1 exactly at '
+                  'and above the resting level (for H+ at and below the resting H+): switching a species on has no effect '
+                  'at rest; f = 1/2 at K and 1/17 at C = 0, and (max(0, z))^4 makes f smooth (C^3) at rest, which the '
+                  'solver needs. A hardcoded function (design, AdaptOrDeity 2026-10-12, normalised 2026-10-13; experts '
+                  'will be able to choose the function, a version of this module each). The f_s go to every '
+                  'protein_pool (regulation_signals), to biosynthesis (growth_regulation: growth, and the RNA/lipid '
+                  'upkeep and repair), to protein synthesis (synthesis_regulation) and to the cytosol\'s maintenance '
+                  'ATPase (maintenance_regulation); each multiplies its target by prod_s (1 - reg_on_s + reg_on_s f_s), '
+                  'with switches of its own set by the game (all 0 by default: no effect). Ports: metabolite_levels '
                   '(C_ATP, C_G6P, C_glc from the cytosol), internal_H (H_i).')},
-              ['argus2026unpublished', 'potrykus2008still', 'schneider2002ntp'], V_REG)
+              ['argus2026unpublished', 'potrykus2008still', 'schneider2002ntp', 'hoehler2013microbial',
+               'kempes2017drivers'], V_REG)
 
 
 # --- adaptive versions of library channels: their density times the expression m_expr (protein_expression port)
@@ -2863,15 +3074,18 @@ bio_vars = [
     ('M_build_bio', 'mole', 'out', None, 'ATP to build a daughter\'s RNA, lipids and DNA (proteins: protein_expression)'),
     ('j_ATP_bio', 'mol_per_s', 'out', None, None), ('j_ADP_bio', 'mol_per_s', 'out', None, None),
     ('j_Pi_bio', 'mol_per_s', 'out', None, None),
-] + reg_vars('growth', 'growth_regulation')
+] + (reg_vars('growth', 'growth_regulation')
+     + reg_switch_vars('RNA and lipid upkeep (mRNA and rRNA turnover, lipid turnover)', '_upkeep')
+     + reg_switch_vars('repair', '_repair'))
 bio_eqs = [
+    ('R_reg_upkeep', reg_expr('_upkeep')), ('R_reg_repair', reg_expr('_repair')),
     ('n_lipid', '2.0 * A_mem * surface_factor / area_per_lipid'),
     ('f_ATP_bio', 'ATP / (K_m_ATP_bio + ATP) * (K_m_ATP_bio + ATP_ref) / ATP_ref'),
     ('f_T_dmg', 'Q10_dmg ** ((T - T_ref_dmg) / dT_Q10)'),
-    ('J_RNA', 'n_mRNA * L_mRNA * c_nt_recycle * ln(2.0) / t_half_mRNA / N_A * f_ATP_bio'),
-    ('J_ribo', 'n_ribo * L_rRNA * c_nt_recycle * k_ribo / N_A * f_ATP_bio'),
-    ('J_lipid', 'n_lipid * c_lipid * k_lipid / N_A * f_ATP_bio'),
-    ('R_repair', 'repair_level * r_rep_max * D / (K_D + D) * f_ATP_bio'),
+    ('J_RNA', 'n_mRNA * L_mRNA * c_nt_recycle * ln(2.0) / t_half_mRNA / N_A * f_ATP_bio * R_reg_upkeep'),
+    ('J_ribo', 'n_ribo * L_rRNA * c_nt_recycle * k_ribo / N_A * f_ATP_bio * R_reg_upkeep'),
+    ('J_lipid', 'n_lipid * c_lipid * k_lipid / N_A * f_ATP_bio * R_reg_upkeep'),
+    ('R_repair', 'repair_level * r_rep_max * D / (K_D + D) * f_ATP_bio * R_reg_repair'),
     ('J_repair', 'R_repair * C_repair'),
     ('x_ATP', '(ATP - ATP_floor) / (ATP_ref - ATP_floor)'),
     ('throttle', '((x_ATP + abs(x_ATP)) / 2.0 + 1.0 - abs((x_ATP + abs(x_ATP)) / 2.0 - 1.0)) / 2.0'),
@@ -2893,6 +3107,7 @@ bio_roles.update({n: 'boundary_condition' for n in ('ATP', 'ADP', 'Pi', 'A_mem',
 bio_roles['M_build_in'] = 'variable'   # summed from the pools
 bio_roles['T'] = 'global_constant'
 bio_roles.update(REG_ROLES)
+bio_roles.update({**reg_switch_roles('_upkeep'), **reg_switch_roles('_repair')})
 bio_params = [
     ('ATP', ATP, 'bennett2009absolute; 9.6 mM', True), ('ADP', ADP, f'{PH}; port only', False),
     ('Pi', PI, f'{PH}; port only', False),
@@ -2930,12 +3145,14 @@ bio_params = [
     ('M_glyc_ATP', 0.0, 'definitional; no glycogen (used when unconnected)', False),
     ('D_init', D_REST, 'calibrated: steady damage at full repair', False),
     ('P_init', 0.0, 'definitional; no daughter under way', False),
-] + REG_ROWS
+] + REG_ROWS + reg_switch_rows('_upkeep') + reg_switch_rows('_repair')
 bio_inv = [
     {'description': 'costs and the ATP port balance (exact): J_RNA, J_ribo, J_lipid from their counts; repair; growth',
-     'expr': 'np.allclose(J_RNA, n_mRNA*L_mRNA*c_nt_recycle*np.log(2)/t_half_mRNA/N_A*f_ATP_bio, rtol=1e-12, atol=0) and '
-             'np.allclose(J_lipid, 2*A_mem*surface_factor/area_per_lipid*c_lipid*k_lipid/N_A*f_ATP_bio, rtol=1e-12, '
-             'atol=0) and np.allclose(J_repair, R_repair*C_repair, rtol=1e-12, atol=0) and '
+     'expr': 'np.allclose(J_RNA, n_mRNA*L_mRNA*c_nt_recycle*np.log(2)/t_half_mRNA/N_A*f_ATP_bio*R_reg_upkeep, rtol=1e-12, '
+             'atol=0) and np.allclose(J_lipid, 2*A_mem*surface_factor/area_per_lipid*c_lipid*k_lipid/N_A*f_ATP_bio'
+             '*R_reg_upkeep, rtol=1e-12, atol=0) and np.allclose(J_ribo, n_ribo*L_rRNA*c_nt_recycle*k_ribo/N_A*f_ATP_bio'
+             '*R_reg_upkeep, rtol=1e-12, atol=0) and np.allclose(R_repair, repair_level*r_rep_max*D/(K_D + D)*f_ATP_bio'
+             '*R_reg_repair, rtol=1e-12, atol=1e-30) and np.allclose(J_repair, R_repair*C_repair, rtol=1e-12, atol=0) and '
              'np.allclose(j_ATP_bio, -J_ATP_bio, rtol=1e-12, atol=0) and np.allclose(j_ADP_bio, J_ATP_bio, rtol=1e-12, atol=0)'},
     {'description': 'growth is asked in multiples of the resting turnover, throttled and regulated: J_growth = '
                     'growth_level J_ref throttle R_reg; the daughter costs M_build_bio + M_build_protein; progress = P_growth / M_daughter, glycogen '
@@ -2950,6 +3167,14 @@ bio_inv = [
      'expr': 'abs(D[-1] - D[0] - np.trapz(r_dmg*f_T_dmg - R_repair, t)) <= 1e-6*np.trapz(np.abs(r_dmg*f_T_dmg) + '
              'np.abs(R_repair), t) + 1e-15 and np.all(D >= 0)'},
     reg_invariant('growth_level*J_ref*throttle', 'J_growth'),
+    {'description': 'regulation of the upkeep (exact): R_reg_upkeep = prod (1 - reg_on_upkeep + reg_on_upkeep f); 1 '
+                    'with every switch off',
+     'expr': f'np.allclose(R_reg_upkeep, {reg_np("_upkeep")}, rtol=1e-12, atol=0) and '
+             f'({" or ".join(reg_on("_upkeep"))} or np.all(R_reg_upkeep == 1.0))'},
+    {'description': 'regulation of repair (exact): R_reg_repair = prod (1 - reg_on_repair + reg_on_repair f); 1 with '
+                    'every switch off',
+     'expr': f'np.allclose(R_reg_repair, {reg_np("_repair")}, rtol=1e-12, atol=0) and '
+             f'({" or ".join(reg_on("_repair"))} or np.all(R_reg_repair == 1.0))'},
 ]
 write_version('cell', 'biosynthesis', 'biosynthesis_fermenter', bio_vars, bio_eqs,
               {'required_citations': ['argus2026unpublished'], 'exit_ports': [], 'entrance_ports': [],
@@ -2964,8 +3189,10 @@ write_version('cell', 'biosynthesis', 'biosynthesis_fermenter', bio_vars, bio_eq
                'solver_info': {'rtol': 1e-10, 'atol': 1e-20},
                'outputs': ['D', 'P_growth', 'J_RNA', 'J_ribo', 'J_lipid', 'R_repair', 'J_repair', 'J_growth', 'J_growth_used',
                            'M_daughter', 'growth_progress', 'glycogen_progress', 'throttle', 'x_ATP', 'M_build_protein',
-                           'J_ATP_bio', 'M_build_bio', 'j_ATP_bio', 'j_ADP_bio', 'f_ATP_bio', 'f_T_dmg', 'n_lipid', 'R_reg'],
-               'run_parameters': {'growth_level': 1.0, 'repair_level': 0.5, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8},
+                           'J_ATP_bio', 'M_build_bio', 'j_ATP_bio', 'j_ADP_bio', 'f_ATP_bio', 'f_T_dmg', 'n_lipid', 'R_reg',
+                           'R_reg_upkeep', 'R_reg_repair'],
+               'run_parameters': {'growth_level': 1.0, 'repair_level': 0.5, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8,
+                                  'reg_on_ATP_upkeep': 1.0, 'reg_on_ATP_repair': 1.0},
                'invariants': bio_inv,
                'bc_sweep': {'ranges': {'T': [273.15, 313.15], 'repair_level': [0.0, 1.0], 'growth_level': [0.0, 20.0],
                                        'ATP': [0.5, 12.0], 'f_ATP_reg': [0.0, 1.0]},
@@ -2989,9 +3216,13 @@ write_version('cell', 'biosynthesis', 'biosynthesis_fermenter', bio_vars, bio_eq
                   '(1.6e11 for 6.28 um3); proteins are 89% of it. Regulation: J_growth is also multiplied by R_reg = '
                   'prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose and H+ (f_s from cell/expression_regulation '
                   'on growth_regulation, 1 when unconnected; the switches reg_on_s set by the game, all 0 by default so '
-                  'R_reg = 1 exactly).')},
+                  'R_reg = 1 exactly). Maintenance regulation, by the same signals and switches of its own (all 0 by '
+                  'default): the upkeep (mRNA, rRNA and lipid turnover) is multiplied by R_reg_upkeep and repair by '
+                  'R_reg_repair, so a famine-adapted cell can cut them, as the stringent response cuts rRNA and '
+                  'phospholipid synthesis (Potrykus & Cashel 2008). Cutting repair lets damage accumulate; cutting the '
+                  'upkeep has no modelled downside here (the mRNA, ribosome and lipid counts are fixed).')},
               ['argus2026unpublished', 'milo2010bionumbers', 'bernstein2002global', 'lynch2015bioenergetic',
-               'bennett2009absolute'], V_NEW)
+               'bennett2009absolute', 'potrykus2008still'], V_NEW)
 
 # ------------------------------------------------------------------ 7. the generic adaptive cell: a hierarchy of supermodules
 # Module type cell/generic_adaptive_cell. Each version is a flat supermodule (libcuflynx has no nested supermodules): a
@@ -3048,7 +3279,8 @@ define_cell(
              ('cytosol', 'H'), ('cytosol', 'protein'), ('cytosol', 'bio'),
              ('pool_proteome', 'protein'), ('pool_proteome', 'bio'),
              ('pool_Glyc', 'protein'), ('pool_Glyc', 'bio'), ('pool_Glyc', 'cytosol'),
-             ('cytosol', 'reg'), ('H', 'reg'), ('reg', 'bio'), ('reg', 'pool_proteome'), ('reg', 'pool_Glyc')],
+             ('cytosol', 'reg'), ('H', 'reg'), ('reg', 'bio'), ('reg', 'protein'), ('reg', 'pool_proteome'),
+             ('reg', 'pool_Glyc')],
     overrides={
         'T': O(T, 'operating point: 20 C, the temperature Lynch & Marinov normalise maintenance costs to'),
         'Nai_init_Na_K': O(NAI, par_ref('Nai')), 'Ki_init_Na_K': O(KI, par_ref('Ki'), True),
@@ -3064,7 +3296,8 @@ define_cell(
         'Ca2+ (Ca_handling adaptive, fixed buffer) and H+ (H_handling adaptive, buffered, pH and E_H) pools, the passive '
         'leaks of a lipid membrane (i_leak_Na, i_leak_Ca, i_leak_H), biosynthesis (RNA, ribosomes, lipids, damage and '
         'repair, growth towards a daughter), protein synthesis (protein_expression adaptive), its regulation by falling '
-        'ATP, G6P, glucose and pH (expression_regulation: every pool\'s target and growth, each switched on by the game, '
+        'ATP, G6P, glucose and pH (expression_regulation: every pool\'s target, growth, and the maintenance: protein '
+        'synthesis, RNA and lipid upkeep, repair and the maintenance ATPase, each switched on by the game, '
         'all off by default) and two protein_pools every '
         'cell has: the proteome (ribosomal, nucleoid and other unmodelled proteins) and the glycolytic enzymes (scaling '
         'V_gly). Its default values are the fermenter cell\'s, so a cell type that adds its proteins starts calibrated; '

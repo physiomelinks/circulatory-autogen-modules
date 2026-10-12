@@ -9,7 +9,7 @@
         <variable name="m_target" public_interface="out" units="dimensionless"/>
         <!-- the target after regulation: m_target R_reg -->
         <variable name="m_goal" public_interface="out" units="dimensionless"/>
-        <!-- time constant of the approach -->
+        <!-- time constant of the rise (the mRNA's mean lifetime) -->
         <variable name="tau" public_interface="in" units="second"/>
         <!-- copies per cell at m = 1 -->
         <variable name="n_0" public_interface="in" units="dimensionless"/>
@@ -25,7 +25,7 @@
         <variable name="c_deg" public_interface="in" units="dimensionless"/>
         <!-- ~P per amino acid returned to the pool -->
         <variable name="c_recycle" public_interface="in" units="dimensionless"/>
-        <!-- fraction of the protein degraded and remade per second -->
+        <!-- fraction of the protein degraded per second -->
         <variable name="k_deg" public_interface="in" units="per_s"/>
         <variable name="N_A" public_interface="in" units="per_mol"/>
         <!-- ATP for half-rate synthesis -->
@@ -36,19 +36,27 @@
         <variable name="ATP" public_interface="in" units="millimolar"/>
         <!-- share of the build demand the cell can serve (protein_synthesis port) -->
         <variable name="s_build" public_interface="in" units="dimensionless"/>
+        <!-- regulation of the cell's protein synthesis: the share of the degraded copies it replaces (protein_synthesis port) -->
+        <variable name="R_syn" public_interface="in" units="dimensionless"/>
         <!-- copies per cell -->
         <variable name="n" public_interface="out" units="dimensionless"/>
         <!-- (m_goal - m)/tau -->
         <variable name="r_rel" public_interface="out" units="per_s"/>
         <!-- rising part of r_rel (copies to build) -->
         <variable name="r_up" public_interface="out" units="per_s"/>
-        <!-- falling part of r_rel (copies left to degrade, no ATP) -->
+        <!-- the copies the cell replaces as they are degraded: min(m, m_goal) -->
+        <variable name="m_kept" public_interface="out" units="dimensionless"/>
+        <!-- replacement synthesis: k_deg R_syn m_kept, slowed as ATP runs out -->
+        <variable name="r_rep" public_interface="out" units="per_s"/>
+        <!-- degradation: k_deg m, slowed as ATP runs out -->
+        <variable name="r_deg" public_interface="out" units="per_s"/>
+        <!-- net loss: copies degraded and not replaced (r_rep - r_deg, never positive) -->
         <variable name="r_down" public_interface="out" units="per_s"/>
         <!-- synthesis slows as ATP runs out: 1 at ATP_ref -->
         <variable name="f_ATP" public_interface="out" units="dimensionless"/>
         <!-- f_ATP capped at 1: building never runs faster than asked -->
         <variable name="f_build" public_interface="out" units="dimensionless"/>
-        <!-- ATP to keep the copies (turnover) -->
+        <!-- ATP to keep the copies: replacement synthesis and degradation -->
         <variable name="J_keep" public_interface="out" units="mol_per_s"/>
         <!-- ATP the rise asks for: building r_up n_0 copies per second -->
         <variable name="J_demand" public_interface="out" units="mol_per_s"/>
@@ -68,13 +76,13 @@
         <variable name="share" public_interface="out" units="dimensionless"/>
         <!-- share of the ceiling one unit of m takes (one flagellum for the Flagellum) -->
         <variable name="s_unit" public_interface="out" units="dimensionless"/>
-        <!-- regulation by ATP, 0-1 (regulation_signals port) -->
+        <!-- regulation by ATP, 0-1, 1 at and above rest (regulation_signals port) -->
         <variable name="f_ATP_reg" public_interface="in" units="dimensionless"/>
-        <!-- regulation by G6P, 0-1 (regulation_signals port) -->
+        <!-- regulation by G6P, 0-1, 1 at and above rest (regulation_signals port) -->
         <variable name="f_G6P_reg" public_interface="in" units="dimensionless"/>
-        <!-- regulation by glucose inside, 0-1 (regulation_signals port) -->
+        <!-- regulation by glucose inside, 0-1, 1 at and above rest (regulation_signals port) -->
         <variable name="f_glc_reg" public_interface="in" units="dimensionless"/>
-        <!-- regulation by H+ (falling pH), 0-1 (regulation_signals port) -->
+        <!-- regulation by H+ (falling pH), 0-1, 1 at and above rest (regulation_signals port) -->
         <variable name="f_H_reg" public_interface="in" units="dimensionless"/>
         <!-- 1: falling ATP lowers the expression target (set by the game); 0: it does not -->
         <variable name="reg_on_ATP" public_interface="in" units="dimensionless"/>
@@ -210,22 +218,6 @@
             </apply>
             <apply>
                 <eq/>
-                <ci>r_down</ci>
-                <apply>
-                    <divide/>
-                    <apply>
-                        <minus/>
-                        <ci>r_rel</ci>
-                        <apply>
-                            <abs/>
-                            <ci>r_rel</ci>
-                        </apply>
-                    </apply>
-                    <cn cellml:units="dimensionless">2.0</cn>
-                </apply>
-            </apply>
-            <apply>
-                <eq/>
                 <ci>f_ATP</ci>
                 <apply>
                     <divide/>
@@ -275,26 +267,119 @@
             </apply>
             <apply>
                 <eq/>
-                <ci>J_keep</ci>
+                <ci>m_kept</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>m</ci>
+                            <ci>m_goal</ci>
+                        </apply>
+                        <apply>
+                            <abs/>
+                            <apply>
+                                <minus/>
+                                <ci>m</ci>
+                                <ci>m_goal</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_deg</ci>
+                <apply>
+                    <times/>
+                    <ci>k_deg</ci>
+                    <ci>m</ci>
+                    <ci>f_build</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_down</ci>
                 <apply>
                     <times/>
                     <apply>
-                        <divide/>
+                        <minus/>
+                        <ci>k_deg</ci>
+                    </apply>
+                    <ci>f_build</ci>
+                    <apply>
+                        <plus/>
                         <apply>
-                            <times/>
-                            <ci>n</ci>
-                            <ci>L</ci>
+                            <divide/>
                             <apply>
                                 <plus/>
-                                <ci>c_poly</ci>
-                                <ci>c_deg</ci>
-                                <ci>c_recycle</ci>
+                                <apply>
+                                    <minus/>
+                                    <ci>m</ci>
+                                    <ci>m_goal</ci>
+                                </apply>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>m</ci>
+                                        <ci>m_goal</ci>
+                                    </apply>
+                                </apply>
                             </apply>
-                            <ci>k_deg</ci>
+                            <cn cellml:units="dimensionless">2.0</cn>
                         </apply>
-                        <ci>N_A</ci>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <ci>R_syn</ci>
+                            </apply>
+                            <ci>m_kept</ci>
+                        </apply>
                     </apply>
-                    <ci>f_ATP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_rep</ci>
+                <apply>
+                    <plus/>
+                    <ci>r_deg</ci>
+                    <ci>r_down</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_keep</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>n_0</ci>
+                        <ci>L</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <plus/>
+                                    <ci>c_poly</ci>
+                                    <ci>c_recycle</ci>
+                                </apply>
+                                <ci>r_rep</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>c_deg</ci>
+                                <ci>r_deg</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>N_A</ci>
                 </apply>
             </apply>
             <apply>

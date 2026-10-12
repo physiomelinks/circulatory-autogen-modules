@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
 m_init,dimensionless,1.0,definitional; the calibrated cell,no
 m_target,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
-tau,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0,dimensionless,16964600.329384882,"derived: (1 - glycolytic_share) x proteome_per_um3 x cell volume (glycolytic_share: unreferenced_placeholder, placeholder; proteome_per_um3: milo2010bionumbers, sourced)",no
 L,dimensionless,300.0,unreferenced_placeholder; mean protein length about 300 amino acids,no
 footprint,nm2,0.0,unreferenced_placeholder; membrane area one proteome copy takes (0: cytosolic),no
@@ -9,12 +9,13 @@ c_syn,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from gluco
 c_poly,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 s_build,dimensionless,1.0,definitional; synthesis serves the whole demand when unconnected,no
+R_syn,dimensionless,1.0,definitional; every degraded copy is replaced when unconnected,no
 A_ceiling,um2,2.827433388230814,"derived: protein_area_max_fraction x the whole cell surface (protein_area_max_fraction: unreferenced_placeholder, placeholder; R_cell: unreferenced_placeholder, design; h_cell: unreferenced_placeholder, design)",no
 f_ATP_reg,dimensionless,1.0,definitional; no regulation connected (f = 1),no
 f_G6P_reg,dimensionless,1.0,definitional; no regulation connected (f = 1),no

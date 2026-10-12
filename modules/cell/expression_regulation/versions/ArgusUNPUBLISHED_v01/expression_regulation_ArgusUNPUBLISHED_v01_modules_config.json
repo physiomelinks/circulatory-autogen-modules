@@ -46,6 +46,24 @@
           "f_glc_reg",
           "f_H_reg"
         ]
+      },
+      {
+        "port_type": "synthesis_regulation",
+        "variables": [
+          "f_ATP_reg",
+          "f_G6P_reg",
+          "f_glc_reg",
+          "f_H_reg"
+        ]
+      },
+      {
+        "port_type": "maintenance_regulation",
+        "variables": [
+          "f_ATP_reg",
+          "f_G6P_reg",
+          "f_glc_reg",
+          "f_H_reg"
+        ]
       }
     ],
     "variables_and_units": [
@@ -80,6 +98,30 @@
         "constant"
       ],
       [
+        "C_ATP_rest",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "C_G6P_rest",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "C_glc_rest",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "H_rest",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
         "K_ATP_reg",
         "millimolar",
         "access",
@@ -110,6 +152,12 @@
         "variable"
       ],
       [
+        "u_ATP_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
         "f_ATP_reg",
         "dimensionless",
         "access",
@@ -117,6 +165,12 @@
       ],
       [
         "x_G6P_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "u_G6P_reg",
         "dimensionless",
         "access",
         "variable"
@@ -134,6 +188,12 @@
         "variable"
       ],
       [
+        "u_glc_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
         "f_glc_reg",
         "dimensionless",
         "access",
@@ -141,6 +201,12 @@
       ],
       [
         "x_H_reg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "u_H_reg",
         "dimensionless",
         "access",
         "variable"

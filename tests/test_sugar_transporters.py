@@ -253,7 +253,9 @@ LUMPED_SHIFT = {
              'mod_membrane_face__J_glc': 1e-9},
     'famine': {'mod_membrane__V': 0.01, 'mod_cytosol__C_ATP': 0.12, 'mod_cytosol__C_lac': 0.45, 'mod_H__pH_i': 0.003,
                'mod_membrane_face__J_glc': 0.08},
-    'feast': {'mod_membrane__V': 0.005, 'mod_cytosol__C_ATP': 1e-4, 'mod_cytosol__C_lac': 0.1, 'mod_H__pH_i': 1e-3,
+    # feast: the proteins rise with their mRNA's lifetime (~7 min, 2026-10-13) instead of 10 s, so the cell moves less
+    # in the minute (V 1.4%, ATP 0.05%, lactate 15%)
+    'feast': {'mod_membrane__V': 0.02, 'mod_cytosol__C_ATP': 1e-3, 'mod_cytosol__C_lac': 0.2, 'mod_H__pH_i': 1e-3,
               'mod_membrane_face__J_glc': 0.05},
 }
 
@@ -262,8 +264,8 @@ LUMPED_SHIFT = {
 def test_level1_shift_from_lumped_glycolysis(scenario, fermenter):
     '''Against the lumped glycolysis' traces: at rest the cell is the same steady state (V, ATP, lactate, pH, uptake);
     in famine the 1 mM of G6P is a reserve (3 ATP each), so ATP runs down later (half gone at ~57 s instead of ~45 s);
-    in a feast G6P rises to ~2 mM and holds that much more of the cell's phosphate (Pi falls by as much), while ATP, V
-    and pH stay within 0.5%.'''
+    in a feast G6P rises to ~2 mM and holds that much more of the cell's phosphate (Pi falls by as much), while ATP and
+    pH stay within 0.5% and V within 2% (its H+-ATPase now rises over minutes, not seconds: 1.4%).'''
     diffs = {name: d for d, name, scale in level1_differences(fermenter, scenario, LEVEL1_LUMPED)}
     for name, bound in LUMPED_SHIFT[scenario].items():
         assert diffs[name] <= bound, f'{name}: moved by {diffs[name]:.3g} of its scale'
@@ -501,7 +503,8 @@ def test_hydrolase_capacity_scales_with_expression(m, fermenter):
 
 def test_hydrolase_pool_costs(fermenter):
     '''Keeping the hydrolase costs its turnover, n L (c_poly + c_deg + c_recycle) k_deg / N_A, and quadrupling it costs
-    building copies, n_0 L (c_syn + c_poly) / N_A per unit of m: raised to 1.5, what is built is paid for.'''
+    building copies, n_0 L (c_syn + c_poly) / N_A per unit of m: raised to 1.5, what is built is paid for. Over the
+    minute it rises by (1.5 - 1)(1 - exp(-60 s / tau)), tau = the mRNA's mean lifetime (about 7 min; 5%).'''
     outs = ['mod_pool_Hydrolase/J_keep', 'mod_pool_Hydrolase/J_build', 'mod_pool_Hydrolase/m', 'mod_pool_Hydrolase/f_ATP',
             'mod_pool_Hydrolase/M_build']
     p = {k.replace('_mod_pool_Hydrolase', ''): v for k, v in fermenter.nominal.items() if k.endswith('_mod_pool_Hydrolase')}
@@ -511,7 +514,7 @@ def test_hydrolase_pool_costs(fermenter):
     assert np.allclose(o['mod_pool_Hydrolase/J_keep'], keep, rtol=1e-12, atol=0)
     unit = p['n_0'] * p['L'] * (p['c_syn'] + p['c_poly']) / fermenter.nominal['N_A_mod_pool_Hydrolase']
     built = o['mod_pool_Hydrolase/m'][-1] - o['mod_pool_Hydrolase/m'][0]
-    assert built > 0.4
+    assert built == pytest.approx(0.5 * (1.0 - np.exp(-t[-1] / p['tau'])), rel=0.05)
     assert np.trapz(o['mod_pool_Hydrolase/J_build'], t) == pytest.approx(unit * built, rel=1e-4)
     assert o['mod_pool_Hydrolase/M_build'][-1] == pytest.approx(unit * o['mod_pool_Hydrolase/m'][-1], rel=1e-12)
 

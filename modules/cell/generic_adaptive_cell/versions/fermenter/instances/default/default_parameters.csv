@@ -74,6 +74,10 @@ K_ATP_mx_cytosol,millimolar,1.0,"unreferenced_placeholder; ATP affinity of matri
 n_ATP_mx_cytosol,dimensionless,2.0,"derived: matrix_ATP_per_unit - 1: the first ATP phosphorylated the glucose to G6P (hexokinase, or the PTS's PEP) (matrix_ATP_per_unit: sutherland2001biofilm, placeholder)",no
 dG0_mx_cytosol,J_per_mol,-55800.0,"derived: (dG0_store - 2 dG0_hyd) + matrix_ATP_per_unit x dG0_hyd - dG0_hk: the bond as in glycogen, paid by n + 1 ATP, from G6P (dG0_store: unreferenced_placeholder, placeholder; dG0_hyd: unreferenced_placeholder, placeholder; matrix_ATP_per_unit: sutherland2001biofilm, placeholder; dG0_hk: unreferenced_placeholder, placeholder)",no
 h_mx_poly_cytosol,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose unit to the matrix polymer, taken as zero (as glycogen)",no
+reg_on_ATP_cytosol,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_cytosol,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_cytosol,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_cytosol,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 surface_factor_bio,dimensionless,1.5,geometry: a disc of radius 1 um and depth 2 um has 1.5x its in-plane area as surface,no
 n_mRNA_bio,dimensionless,8670.79572390783,"derived: mRNA_per_um3 x cell volume (mRNA_per_um3: milo2010bionumbers, sourced)",yes
 L_mRNA_bio,dimensionless,1000.0,"unreferenced_placeholder; mean mRNA length about 1,000 nt",no
@@ -107,16 +111,28 @@ reg_on_ATP_bio,dimensionless,0.0,"definitional; off until the player switches it
 reg_on_G6P_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_glc_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_H_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_ATP_upkeep_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_upkeep_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_upkeep_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_upkeep_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_ATP_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 J_ref_protein,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C) (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
-build_capacity_protein,dimensionless,5.0,"unreferenced_placeholder; most ATP one protein's synthesis can take, as a multiple of the resting ATP turnover",no
+build_capacity_protein,dimensionless,9.02267970403271,"derived: ribosomes x k_elong x ribosome_active_fraction x (c_syn + c_poly) / N_A / the resting ATP turnover (ribosomes_per_um3: unreferenced_placeholder, placeholder; k_elong: farewell1998effect, sourced; ribosome_active_fraction: dai2016reduction, sourced; c_syn: akashi2002metabolic, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
 ATP_floor_protein,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
 ATP_ref_protein,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 J_eps_protein,mol_per_s,1e-30,"definitional; numerical floor, 1e-30 mol/s (12 orders below the resting turnover)",no
 surface_factor_protein,dimensionless,1.5,"derived: (2 pi R^2 + 2 pi R h)/(2 pi R h): a disc's whole surface over its rim (R_cell: unreferenced_placeholder, design; h_cell: unreferenced_placeholder, design)",no
 area_max_fraction_protein,dimensionless,0.15,"unreferenced_placeholder; most of the cell surface the adaptable proteins may take (placeholder; membrane proteins cover 30-50% of a bacterial membrane, transporters part of that)",no
+reg_on_ATP_protein,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P_protein,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc_protein,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H_protein,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 m_init_pool_proteome,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_proteome,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
-tau_pool_proteome,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_proteome,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_proteome,dimensionless,16964600.329384882,"derived: (1 - glycolytic_share) x proteome_per_um3 x cell volume (glycolytic_share: unreferenced_placeholder, placeholder; proteome_per_um3: milo2010bionumbers, sourced)",no
 L_pool_proteome,dimensionless,300.0,unreferenced_placeholder; mean protein length about 300 amino acids,no
 footprint_pool_proteome,nm2,0.0,unreferenced_placeholder; membrane area one proteome copy takes (0: cytosolic),no
@@ -124,7 +140,7 @@ c_syn_pool_proteome,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid m
 c_poly_pool_proteome,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_proteome,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_proteome,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_proteome,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_proteome,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_proteome,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_proteome,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_proteome,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -134,7 +150,7 @@ reg_on_glc_pool_proteome,dimensionless,0.0,"definitional; off until the player s
 reg_on_H_pool_proteome,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 m_init_pool_Glyc,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_Glyc,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
-tau_pool_Glyc,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_Glyc,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_Glyc,dimensionless,1884955.592153876,"derived: glycolytic_share x proteome_per_um3 x cell volume (glycolytic_share: unreferenced_placeholder, placeholder; proteome_per_um3: milo2010bionumbers, sourced)",no
 L_pool_Glyc,dimensionless,350.0,unreferenced_placeholder; mean length of the glycolytic enzymes,no
 footprint_pool_Glyc,nm2,0.0,unreferenced_placeholder; membrane area one Glyc copy takes (0: cytosolic),no
@@ -142,7 +158,7 @@ c_syn_pool_Glyc,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made 
 c_poly_pool_Glyc,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_Glyc,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_Glyc,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_Glyc,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_Glyc,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_Glyc,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Glyc,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Glyc,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -150,7 +166,11 @@ reg_on_ATP_pool_Glyc,dimensionless,0.0,"definitional; off until the player switc
 reg_on_G6P_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_glc_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_H_pool_Glyc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
-n_reg_reg,dimensionless,4.0,"definitional; steepness n of the hardcoded regulation function f = x^n/(1 + x^n) by which a falling metabolite lowers an expression or growth target (designer 2026-10-12: hardcoded for now, experts will choose the function); a steep, switch-like fall, as the stringent response (ppGpp) cuts ribosome and protein synthesis sharply on energy or carbon downshift (Potrykus & Cashel 2008; confidence: medium for the qualitative behaviour, the value itself is a design choice)",no
+n_reg_reg,dimensionless,4.0,"definitional; steepness n of the hardcoded regulation function f = 1/(1 + u^n) of the shortfall u below rest (u = 1 half-way) by which a falling metabolite lowers an expression, growth or maintenance target (designer 2026-10-12: hardcoded for now, experts will choose the function); a steep, switch-like fall, as the stringent response (ppGpp) cuts ribosome and protein synthesis sharply on energy or carbon downshift (Potrykus & Cashel 2008; confidence: medium for the qualitative behaviour, the value itself is a design choice). n > 1 keeps f smooth at rest (C^3 for n = 4)",no
+C_ATP_rest_reg,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+C_G6P_rest_reg,millimolar,1.0,"chassagnole2002dynamic; glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)",no
+C_glc_rest_reg,millimolar,0.002,"unreferenced_placeholder; glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)",no
+H_rest_reg,millimolar,2.5118864315095822e-05,"derived: free H+ = 10^-pH_i M (pH_i: slonczewski1981ph, sourced)",yes
 K_ATP_reg_reg,millimolar,4.8,"derived: regulation_K_fraction x the resting ATP (regulation_K_fraction: definitional, design; ATP: bennett2009absolute, sourced)",no
 K_G6P_reg_reg,millimolar,0.5,"derived: regulation_K_fraction x the resting G6P (regulation_K_fraction: definitional, design; G6P_i: chassagnole2002dynamic, design)",no
 K_glc_reg_reg,millimolar,0.001,"derived: regulation_K_fraction x the resting glucose inside (regulation_K_fraction: definitional, design; glc_i: unreferenced_placeholder, placeholder)",no
@@ -228,7 +248,7 @@ K_glc_t_glc_GalP,millimolar,0.1,"pao1998major; MFS sugar/H+ symporters (GalP, La
 n_H_glc_GalP,dimensionless,1.0,pao1998major; one H+ per sugar in MFS sugar/H+ symport,yes
 c_std_glc_GalP,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
 m_init_pool_H_ATPase,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_H_ATPase,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_H_ATPase,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_H_ATPase,dimensionless,2850.255770975698,calibrated: rho_H_ATPase x A_mem (calibrated density),no
 L_pool_H_ATPase,dimensionless,4895.0,"definitional; E. coli F1Fo: alpha3 beta3 gamma delta epsilon a b2 c10 (UniProt P0ABB0, P0ABB4, P0ABA6, P0ABA4, P0A6E6, P0AB98, P0ABA0, P68699)",yes
 footprint_pool_H_ATPase,nm2,100.0,unreferenced_placeholder; membrane area one H_ATPase copy takes (0: cytosolic),no
@@ -236,7 +256,7 @@ c_syn_pool_H_ATPase,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid m
 c_poly_pool_H_ATPase,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_H_ATPase,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_H_ATPase,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_H_ATPase,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_H_ATPase,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_H_ATPase,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_H_ATPase,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_H_ATPase,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -246,7 +266,7 @@ reg_on_glc_pool_H_ATPase,dimensionless,0.0,"definitional; off until the player s
 reg_on_H_pool_H_ATPase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_H_ATPase,dimensionless,0.10080717667266298,"derived: the calibrated cell's copies x footprint_H_ATPase / A_ceiling: m_target = 1 (its share at rest) (footprint_H_ATPase: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_NhaA,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_NhaA,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_NhaA,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_NhaA,dimensionless,682.4493169455936,calibrated: cycles at rest / turnover_NhaA,no
 L_pool_NhaA,dimensionless,388.0,definitional; E. coli NhaA (UniProt P13738),yes
 footprint_pool_NhaA,nm2,15.0,unreferenced_placeholder; membrane area one NhaA copy takes (0: cytosolic),no
@@ -254,7 +274,7 @@ c_syn_pool_NhaA,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made 
 c_poly_pool_NhaA,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_NhaA,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_NhaA,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_NhaA,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_NhaA,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_NhaA,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_NhaA,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_NhaA,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -264,7 +284,7 @@ reg_on_glc_pool_NhaA,dimensionless,0.0,"definitional; off until the player switc
 reg_on_H_pool_NhaA,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_NhaA,dimensionless,0.00362050607338596,"derived: the calibrated cell's copies x footprint_NhaA / A_ceiling: m_target = 1 (its share at rest) (footprint_NhaA: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_KefC,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_KefC,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_KefC,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_KefC,dimensionless,909.932422594125,calibrated: cycles at rest / turnover_KefC,no
 L_pool_KefC,dimensionless,620.0,definitional; E. coli KefC (UniProt P03819),yes
 footprint_pool_KefC,nm2,20.0,unreferenced_placeholder; membrane area one KefC copy takes (0: cytosolic),no
@@ -272,7 +292,7 @@ c_syn_pool_KefC,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made 
 c_poly_pool_KefC,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_KefC,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_KefC,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_KefC,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_KefC,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_KefC,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_KefC,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_KefC,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -282,7 +302,7 @@ reg_on_glc_pool_KefC,dimensionless,0.0,"definitional; off until the player switc
 reg_on_H_pool_KefC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_KefC,dimensionless,0.006436455241575042,"derived: the calibrated cell's copies x footprint_KefC / A_ceiling: m_target = 1 (its share at rest) (footprint_KefC: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_Trk,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_Trk,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_Trk,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_Trk,dimensionless,90.9932422594125,calibrated: K+ entry at rest / turnover_Trk (the channel law lumps conductance),no
 L_pool_Trk,dimensionless,2798.0,"definitional; E. coli TrkH2-TrkA4 (UniProt P0AFZ7, P0AGI8)",yes
 footprint_pool_Trk,nm2,60.0,unreferenced_placeholder; membrane area one Trk copy takes (0: cytosolic),no
@@ -290,7 +310,7 @@ c_syn_pool_Trk,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made f
 c_poly_pool_Trk,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_Trk,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_Trk,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_Trk,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_Trk,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_Trk,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Trk,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Trk,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -300,7 +320,7 @@ reg_on_glc_pool_Trk,dimensionless,0.0,"definitional; off until the player switch
 reg_on_H_pool_Trk,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_Trk,dimensionless,0.0019309365724725122,"derived: the calibrated cell's copies x footprint_Trk / A_ceiling: m_target = 1 (its share at rest) (footprint_Trk: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_NCX,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_NCX,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_NCX,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_NCX,dimensionless,2801.9209327573735,calibrated: rho_NaCa x A_mem (calibrated density),no
 L_pool_NCX,dimensionless,302.0,definitional; M. jannaschii NCX_Mj MJ0091 (UniProt Q57556),yes
 footprint_pool_NCX,nm2,12.0,unreferenced_placeholder; membrane area one NCX copy takes (0: cytosolic),no
@@ -308,7 +328,7 @@ c_syn_pool_NCX,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made f
 c_poly_pool_NCX,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_NCX,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_NCX,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_NCX,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_NCX,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_NCX,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_NCX,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_NCX,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -318,7 +338,7 @@ reg_on_glc_pool_NCX,dimensionless,0.0,"definitional; off until the player switch
 reg_on_H_pool_NCX,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_NCX,dimensionless,0.011891721776026404,"derived: the calibrated cell's copies x footprint_NCX / A_ceiling: m_target = 1 (its share at rest) (footprint_NCX: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_Glf,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_Glf,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_Glf,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_Glf,dimensionless,11704.838040881496,calibrated: capacity / turnover_Glf,no
 L_pool_Glf,dimensionless,473.0,definitional; Z. mobilis Glf (UniProt P21906),yes
 footprint_pool_Glf,nm2,12.0,unreferenced_placeholder; membrane area one Glf copy takes (0: cytosolic),no
@@ -326,7 +346,7 @@ c_syn_pool_Glf,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made f
 c_poly_pool_Glf,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_Glf,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_Glf,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_Glf,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_Glf,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_Glf,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Glf,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Glf,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -336,7 +356,7 @@ reg_on_glc_pool_Glf,dimensionless,0.0,"definitional; off until the player switch
 reg_on_H_pool_Glf,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_Glf,dimensionless,0.049676875527902564,"derived: the calibrated cell's copies x footprint_Glf / A_ceiling: m_target = 1 (its share at rest) (footprint_Glf: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_LacT,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_LacT,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_LacT,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_LacT,dimensionless,32757.567213388495,calibrated: capacity / turnover_LacT,no
 L_pool_LacT,dimensionless,551.0,definitional; E. coli LldP as the size of a lactate carrier (UniProt P33231),yes
 footprint_pool_LacT,nm2,15.0,unreferenced_placeholder; membrane area one LacT copy takes (0: cytosolic),no
@@ -344,7 +364,7 @@ c_syn_pool_LacT,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made 
 c_poly_pool_LacT,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_LacT,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_LacT,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_LacT,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_LacT,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_LacT,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_LacT,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_LacT,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -355,7 +375,7 @@ reg_on_H_pool_LacT,dimensionless,0.0,"definitional; off until the player switche
 s_target_pool_LacT,dimensionless,0.17378429152252606,"derived: the calibrated cell's copies x footprint_LacT / A_ceiling: m_target = 1 (its share at rest) (footprint_LacT: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_Flagellum,dimensionless,1.0,definitional; the calibrated cell,no
 m_target_pool_Flagellum,dimensionless,1.0,definitional; at rest the cell keeps its baseline,no
-tau_pool_Flagellum,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_Flagellum,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_Flagellum,dimensionless,1.0,"derived: the starting number of flagella (n_flagella_init: definitional, design)",no
 L_pool_Flagellum,dimensionless,10128240.0,"unreferenced_placeholder; one flagellum: ~20,000 flagellin (FliC, 498 aa) in the filament, ~120 hook FlgE (402 aa) and ~300 basal-body, rotor and stator proteins (~400 aa each)",no
 footprint_pool_Flagellum,nm2,1700.0,"beeby2016diverse; membrane area one flagellar motor takes: the disc out to its stators' outer edge, pi (20 + 3.5)^2 nm2 = 1,735 nm2, taken as 1,700. The 11 MotA5MotB2 stators of the enteric (Salmonella) motor exert force at a radius of 20 nm, around a C ring of 22 nm radius (Beeby et al. 2016, cryo-ET); each stator's MotA pentamer is ~6-7 nm across in the membrane (Santiveri et al. 2020, Deme et al. 2020 cryo-EM; the width from a secondary summary, to check), half of it 3.5 nm. Inside the stator ring sit the MS ring and export gate, so no other protein uses that membrane (confidence: medium: the radius is measured, the exclusion disc is an estimate; the proteins alone cover ~1,000 nm2)",no
@@ -363,7 +383,7 @@ c_syn_pool_Flagellum,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid 
 c_poly_pool_Flagellum,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_Flagellum,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_Flagellum,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_Flagellum,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_Flagellum,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_Flagellum,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Flagellum,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Flagellum,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -372,7 +392,7 @@ reg_on_G6P_pool_Flagellum,dimensionless,0.0,"definitional; off until the player 
 reg_on_glc_pool_Flagellum,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_H_pool_Flagellum,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 m_init_pool_Hydrolase,dimensionless,1.0,definitional; the calibrated cell,no
-tau_pool_Hydrolase,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_Hydrolase,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_Hydrolase,dimensionless,2729.797267782374,"derived: hydrolysis_capacity x resting glucose flux / kcat_Hydrolase (hydrolysis_capacity: definitional, design; kcat_Hydrolase: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
 L_pool_Hydrolase,dimensionless,700.0,"definitional; amino acids of one surface alpha-amylase, SusG-sized: B. thetaiotaomicron SusG, a surface lipoprotein, 692 aa (UniProt Q8A1G3); B. subtilis AmyE, secreted, 659 aa (P00691); K. pneumoniae pullulanase PulA, a surface lipoprotein, 1090 aa (P07206); B. licheniformis alpha-amylase, secreted, 512 aa (P06278). 700 is SusG rounded (checked 2026-10-12)",yes
 footprint_pool_Hydrolase,nm2,20.0,"unreferenced_placeholder; membrane (surface) area one lipid-anchored hydrolase copy takes: a 75-80 kDa globular protein at 1.21 A^3/Da is ~91 nm^3, a sphere of radius 2.8 nm and 25 nm^2 in cross-section; 20 nm^2 is within that estimate's uncertainty (SusG is elongated) and is kept",no
@@ -380,7 +400,7 @@ c_syn_pool_Hydrolase,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid 
 c_poly_pool_Hydrolase,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_Hydrolase,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_Hydrolase,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_Hydrolase,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_Hydrolase,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_Hydrolase,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Hydrolase,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Hydrolase,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -390,7 +410,7 @@ reg_on_glc_pool_Hydrolase,dimensionless,0.0,"definitional; off until the player 
 reg_on_H_pool_Hydrolase,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_Hydrolase,dimensionless,0.01930936572472512,"derived: the calibrated cell's copies x footprint_Hydrolase / A_ceiling: m_target = 1 (its share at rest) (footprint_Hydrolase: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_PTS,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
-tau_pool_PTS,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_PTS,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_PTS,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no
 L_pool_PTS,dimensionless,1306.0,"definitional; one glucose PTS unit: E. coli PtsG EIICB-Glc (P69786, 477 aa) + Crr EIIA-Glc (P69783, 169) + PtsI enzyme I (P08839, 575) + PtsH HPr (P0AA04, 85); one of each per unit (EI and HPr are shared by every PTS of a real cell)",yes
 footprint_pool_PTS,nm2,12.0,"unreferenced_placeholder; membrane area one PtsG (EIIC) copy takes, as an MFS-sized carrier (0: cytosolic)",no
@@ -398,7 +418,7 @@ c_syn_pool_PTS,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made f
 c_poly_pool_PTS,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_PTS,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_PTS,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_PTS,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_PTS,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_PTS,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_PTS,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_PTS,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -408,7 +428,7 @@ reg_on_glc_pool_PTS,dimensionless,0.0,"definitional; off until the player switch
 reg_on_H_pool_PTS,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_PTS,dimensionless,0.0,definitional; none until the game sets a share,no
 m_init_pool_ABC,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
-tau_pool_ABC,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_ABC,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_ABC,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no
 L_pool_ABC,dimensionless,1510.0,"definitional; one Mgl ABC importer: E. coli MglA ATPase (P0AAG8, 506 aa) + 2 MglC permease (P23200, 336) + MglB binding protein (P0AEE5, 332); real cells keep binding protein in excess, not counted here",yes
 footprint_pool_ABC,nm2,25.0,unreferenced_placeholder; membrane area one MglC2 permease dimer takes (0: cytosolic),no
@@ -416,7 +436,7 @@ c_syn_pool_ABC,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made f
 c_poly_pool_ABC,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_ABC,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_ABC,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_ABC,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_ABC,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_ABC,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_ABC,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_ABC,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
@@ -426,7 +446,7 @@ reg_on_glc_pool_ABC,dimensionless,0.0,"definitional; off until the player switch
 reg_on_H_pool_ABC,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 s_target_pool_ABC,dimensionless,0.0,definitional; none until the game sets a share,no
 m_init_pool_GalP,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
-tau_pool_GalP,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+tau_pool_GalP,second,432.80851226668904,"derived: t_half_mRNA / ln 2: the mean lifetime of an mRNA, so the time constant with which a protein's synthesis follows its target (t_half_mRNA: bernstein2002global, sourced)",yes
 n_0_pool_GalP,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no
 L_pool_GalP,dimensionless,464.0,definitional; E. coli GalP galactose(glucose)/H+ symporter (P0AEP1),yes
 footprint_pool_GalP,nm2,12.0,"unreferenced_placeholder; membrane area one GalP copy takes (12 transmembrane helices, as Glf)",no
@@ -434,7 +454,7 @@ c_syn_pool_GalP,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made 
 c_poly_pool_GalP,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg_pool_GalP,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
 c_recycle_pool_GalP,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
-k_deg_pool_GalP,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+k_deg_pool_GalP,per_s,2.777777777777778e-06,"maurizi1992proteases; bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)",yes
 N_A_pool_GalP,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_GalP,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_GalP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes

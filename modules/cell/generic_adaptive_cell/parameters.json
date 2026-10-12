@@ -663,9 +663,9 @@
   "k_deg": {
    "value": 2.777777777777778e-06,
    "units": "per_s",
-   "source": "milo2010bionumbers",
+   "source": "maurizi1992proteases",
    "status": "sourced",
-   "note": "BNID 109924: bulk protein degradation about 1%/h in E. coli"
+   "note": "bulk degradation of the stable protein in growing E. coli about 1%/h (Maurizi 1992 after Pine 1970; BioNumbers BNID 109924); 0.6%/h in Willetts 1967 (growing cells); most proteins are stable and leave growing cells by dilution (Gupta et al. 2024). Rises to about 5%/h in carbon, nitrogen or phosphate starvation (Willetts 1967, non-growing cells), not modelled (confidence: high)"
   },
   "K_m_ATP_prot": {
    "value": 0.1,
@@ -856,19 +856,19 @@
    "status": "placeholder",
    "note": "most of the cell surface the adaptable proteins may take (placeholder; membrane proteins cover 30-50% of a bacterial membrane, transporters part of that)"
   },
-  "tau_expression": {
-   "value": 10.0,
-   "units": "second",
-   "source": "definitional",
-   "status": "design",
-   "note": "time constant with which expression approaches its target (user decision 2026-10-08)"
-  },
-  "build_capacity": {
+  "k_elong": {
    "value": 5.0,
+   "units": "per_s",
+   "source": "farewell1998effect",
+   "status": "sourced",
+   "note": "translation elongation, amino acids per second per translating ribosome, at 20 C: Farewell & Neidhardt 1998 (Table 1) measured 7.5 aa/s at 28 C and 12.9 at 37 C in E. coli; an Arrhenius fit through them (Ea about 47 kJ/mol) gives 4.5 aa/s at 20 C, 5.5 when scaled to Dai et al. 2016's 16 aa/s at 37 C (confidence: medium, an extrapolation of measured rates)"
+  },
+  "ribosome_active_fraction": {
+   "value": 0.8,
    "units": "dimensionless",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "most ATP one protein's synthesis can take, as a multiple of the resting ATP turnover"
+   "source": "dai2016reduction",
+   "status": "sourced",
+   "note": "share of ribosomes translating when the cell builds at full speed: above 80% at growth rates over 0.5/h, below 20% at slow growth (Dai et al. 2016; confidence: high for the measurement, medium for applying the growing cell's value to the build capacity)"
   },
   "build_ATP_floor": {
    "value": 4.0,
@@ -1344,14 +1344,14 @@
    "units": "dimensionless",
    "source": "definitional",
    "status": "design",
-   "note": "steepness n of the hardcoded regulation function f = x^n/(1 + x^n) by which a falling metabolite lowers an expression or growth target (designer 2026-10-12: hardcoded for now, experts will choose the function); a steep, switch-like fall, as the stringent response (ppGpp) cuts ribosome and protein synthesis sharply on energy or carbon downshift (Potrykus & Cashel 2008; confidence: medium for the qualitative behaviour, the value itself is a design choice)"
+   "note": "steepness n of the hardcoded regulation function f = 1/(1 + u^n) of the shortfall u below rest (u = 1 half-way) by which a falling metabolite lowers an expression, growth or maintenance target (designer 2026-10-12: hardcoded for now, experts will choose the function); a steep, switch-like fall, as the stringent response (ppGpp) cuts ribosome and protein synthesis sharply on energy or carbon downshift (Potrykus & Cashel 2008; confidence: medium for the qualitative behaviour, the value itself is a design choice). n > 1 keeps f smooth at rest (C^3 for n = 4)"
   },
   "regulation_K_fraction": {
    "value": 0.5,
    "units": "dimensionless",
    "source": "definitional",
    "status": "design",
-   "note": "the regulation function is half-way down when a species falls to this fraction of its resting level (x = C/(fraction x C_rest)); for H+ it is half-way down when H+ rises to the resting H+ / fraction (pH 0.3 below rest). Designer 2026-10-12; rRNA promoters sense ATP directly at mM concentrations (Schneider, Gaal & Gourse 2002), so halving ATP slows ribosome synthesis (confidence: medium for the order of magnitude)"
+   "note": "the regulation function is half-way down when a species falls to this fraction of its resting level; for H+ when H+ rises to the resting H+ / fraction (pH 0.3 below rest). f = 1/(1 + u^n), u = max(0, 1 - C/C_rest)/(1 - fraction): exactly 1 at and above rest. Designer 2026-10-12 and 2026-10-13 (no effect at rest); rRNA promoters sense ATP directly at mM concentrations (Schneider, Gaal & Gourse 2002), so halving ATP slows ribosome synthesis (confidence: medium for the order of magnitude)"
   }
  }
 }

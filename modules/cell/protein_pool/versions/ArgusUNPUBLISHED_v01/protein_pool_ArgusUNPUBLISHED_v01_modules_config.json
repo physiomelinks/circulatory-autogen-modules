@@ -42,7 +42,8 @@
           "J_keep",
           "J_build",
           "M_build",
-          "A_protein"
+          "A_protein",
+          "R_syn"
         ]
       },
       {
@@ -171,6 +172,12 @@
         "boundary_condition"
       ],
       [
+        "R_syn",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
         "n",
         "dimensionless",
         "access",
@@ -184,6 +191,24 @@
       ],
       [
         "r_up",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "m_kept",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "r_rep",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "r_deg",
         "per_s",
         "access",
         "variable"

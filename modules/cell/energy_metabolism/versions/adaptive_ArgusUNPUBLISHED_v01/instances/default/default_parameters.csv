@@ -66,3 +66,11 @@ K_ATP_mx,millimolar,1.0,"unreferenced_placeholder; ATP affinity of matrix synthe
 n_ATP_mx,dimensionless,2.0,"derived: matrix_ATP_per_unit - 1: the first ATP phosphorylated the glucose to G6P (hexokinase, or the PTS's PEP) (matrix_ATP_per_unit: sutherland2001biofilm, placeholder)",no
 dG0_mx,J_per_mol,-55800.0,"derived: (dG0_store - 2 dG0_hyd) + matrix_ATP_per_unit x dG0_hyd - dG0_hk: the bond as in glycogen, paid by n + 1 ATP, from G6P (dG0_store: unreferenced_placeholder, placeholder; dG0_hyd: unreferenced_placeholder, placeholder; matrix_ATP_per_unit: sutherland2001biofilm, placeholder; dG0_hk: unreferenced_placeholder, placeholder)",no
 h_mx_poly,J_per_mol,0.0,"unreferenced_placeholder; enthalpy of adding a glucose unit to the matrix polymer, taken as zero (as glycogen)",no
+f_ATP_reg,dimensionless,1.0,definitional; no regulation connected (f = 1),no
+f_G6P_reg,dimensionless,1.0,definitional; no regulation connected (f = 1),no
+f_glc_reg,dimensionless,1.0,definitional; no regulation connected (f = 1),no
+f_H_reg,dimensionless,1.0,definitional; no regulation connected (f = 1),no
+reg_on_ATP,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_G6P,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_glc,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+reg_on_H,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no

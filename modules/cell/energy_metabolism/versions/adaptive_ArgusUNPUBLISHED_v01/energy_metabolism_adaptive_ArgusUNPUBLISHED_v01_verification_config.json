@@ -43,13 +43,16 @@
     "A_mx",
     "J_mx",
     "J_ATP_mx",
+    "R_reg",
     "mf/J_glc",
     "mf/J_lac"
   ],
   "run_parameters": {
     "store_alloc": 0.5,
     "C_glyc_init": 50.0,
-    "mx_alloc": 0.5
+    "mx_alloc": 0.5,
+    "reg_on_ATP": 1.0,
+    "f_ATP_reg": 0.8
   },
   "harness": {
     "module_array": [
@@ -119,6 +122,10 @@
     {
       "description": "glycogen stays between 0 and its ceiling (plus 5%)",
       "expr": "np.all(C_glyc >= -1e-9) and np.all(C_glyc <= 1.05*C_glyc_max)"
+    },
+    {
+      "description": "regulation of the maintenance ATPase (exact): R_reg = prod (1 - reg_on + reg_on f); 1 with every switch off",
+      "expr": "np.allclose(R_reg, (1 - reg_on_ATP + reg_on_ATP*f_ATP_reg)*(1 - reg_on_G6P + reg_on_G6P*f_G6P_reg)*(1 - reg_on_glc + reg_on_glc*f_glc_reg)*(1 - reg_on_H + reg_on_H*f_H_reg), rtol=1e-12, atol=0) and (reg_on_ATP or reg_on_G6P or reg_on_glc or reg_on_H or np.all(R_reg == 1.0))"
     }
   ],
   "bc_sweep": {

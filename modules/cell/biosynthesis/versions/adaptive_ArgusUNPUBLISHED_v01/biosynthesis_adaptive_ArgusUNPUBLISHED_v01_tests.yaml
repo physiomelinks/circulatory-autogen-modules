@@ -13,4 +13,7 @@ notes: 'The rest of a cell''s energy budget besides pumps and protein turnover. 
   a daughter for 1.8e11 ATP, close to Lynch & Marinov''s growth cost 2.66e10 V^0.97 (1.6e11 for 6.28 um3); proteins are 89%
   of it. Regulation: J_growth is also multiplied by R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose and
   H+ (f_s from cell/expression_regulation on growth_regulation, 1 when unconnected; the switches reg_on_s set by the game,
-  all 0 by default so R_reg = 1 exactly).'
+  all 0 by default so R_reg = 1 exactly). Maintenance regulation, by the same signals and switches of its own (all 0 by default):
+  the upkeep (mRNA, rRNA and lipid turnover) is multiplied by R_reg_upkeep and repair by R_reg_repair, so a famine-adapted
+  cell can cut them, as the stringent response cuts rRNA and phospholipid synthesis (Potrykus & Cashel 2008). Cutting repair
+  lets damage accumulate; cutting the upkeep has no modelled downside here (the mRNA, ribosome and lipid counts are fixed).'

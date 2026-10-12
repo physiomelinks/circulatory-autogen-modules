@@ -1,14 +1,18 @@
 module_type: expression_regulation
 version: ArgusUNPUBLISHED_v01
 reviewed: false
-notes: 'How falling metabolites lower an adaptive cell''s protein expression and growth targets: a simplified stringent response.
-  Bacteria cut ribosome and protein synthesis, and growth, as energy and carbon fall ((p)ppGpp, Potrykus & Cashel 2008; rRNA
-  promoters also sense ATP directly, Schneider, Gaal & Gourse 2002), which keeps ATP from collapsing. For each species s this
-  module gives f_s = x^n/(1 + x^n): x = C/K for ATP, G6P and glucose inside (f falls as C falls; a negative round-off C counts
-  as 0), x = K_H/H_i for H+ (f falls as H+ rises, i.e. as pH falls). K is regulation_K_fraction (0.5) of the resting level
-  (for H+, the resting H+ over it: half-way 0.3 pH units below rest) and n = 4: a hardcoded function (design, AdaptOrDeity
-  2026-10-12; experts will be able to choose the function, a version of this module each). At rest f = 2^4/(1 + 2^4) = 16/17.
-  The f_s go to every protein_pool (regulation_signals) and to biosynthesis (growth_regulation); each multiplies its target
-  (m_target, or growth''s J_growth) by prod_s (1 - reg_on_s + reg_on_s f_s), with the switches reg_on_s set by the game (all
-  0 by default: no effect). Only targets change, so the cell''s balances are untouched. Ports: metabolite_levels (C_ATP, C_G6P,
-  C_glc from the cytosol), internal_H (H_i).'
+notes: 'How falling metabolites lower an adaptive cell''s protein expression, growth and maintenance targets: a simplified
+  stringent response. Bacteria cut ribosome and protein synthesis, and growth, as energy and carbon fall ((p)ppGpp, Potrykus
+  & Cashel 2008; rRNA promoters also sense ATP directly, Schneider, Gaal & Gourse 2002), which keeps ATP from collapsing,
+  and starving cells run on far less than their maintenance power (Hoehler & Jorgensen 2013; Kempes et al. 2017). For each
+  species s this module gives f_s = 1/(1 + u_s^n), u_s = max(0, 1 - x_s)/(1 - x_half): x = C/C_rest for ATP, G6P and glucose
+  inside (a negative round-off C counts as 0), x = H_rest/H_i for H+ (falls as H+ rises, i.e. as pH falls); x_half = K/C_rest
+  is where f is half-way down, K regulation_K_fraction (0.5) of the resting level (for H+, the resting H+ over it: half-way
+  0.3 pH units below rest), n = 4. So f = 1 exactly at and above the resting level (for H+ at and below the resting H+): switching
+  a species on has no effect at rest; f = 1/2 at K and 1/17 at C = 0, and (max(0, z))^4 makes f smooth (C^3) at rest, which
+  the solver needs. A hardcoded function (design, AdaptOrDeity 2026-10-12, normalised 2026-10-13; experts will be able to
+  choose the function, a version of this module each). The f_s go to every protein_pool (regulation_signals), to biosynthesis
+  (growth_regulation: growth, and the RNA/lipid upkeep and repair), to protein synthesis (synthesis_regulation) and to the
+  cytosol''s maintenance ATPase (maintenance_regulation); each multiplies its target by prod_s (1 - reg_on_s + reg_on_s f_s),
+  with switches of its own set by the game (all 0 by default: no effect). Ports: metabolite_levels (C_ATP, C_G6P, C_glc from
+  the cytosol), internal_H (H_i).'

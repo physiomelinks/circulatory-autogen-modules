@@ -22,6 +22,7 @@
     "A_protein_total",
     "f_area",
     "x_ATP",
+    "R_reg",
     "pool_a/m",
     "pool_b/m",
     "cyto/C_ATP"
@@ -79,8 +80,8 @@
   "run_parameters": {},
   "invariants": [
     {
-      "description": "throttle = clamp((ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1); J_cap = build_capacity J_ref throttle; s_build = min(1, J_cap/J_demand_total) (exact up to the 1e-30 mol/s floor)",
-      "expr": "np.allclose(throttle, np.clip((cyto__C_ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1), rtol=1e-12, atol=1e-15) and np.allclose(J_cap, build_capacity*J_ref*throttle, rtol=1e-12, atol=0) and np.allclose(s_build, np.where(J_demand_total > J_cap, (J_cap + J_eps)/(J_demand_total + J_eps), 1.0), rtol=1e-9, atol=1e-12)"
+      "description": "throttle = clamp((ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1); J_cap = build_capacity J_ref throttle R_reg; s_build = min(1, J_cap/J_demand_total) (exact up to the 1e-30 mol/s floor)",
+      "expr": "np.allclose(throttle, np.clip((cyto__C_ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1), rtol=1e-12, atol=1e-15) and np.allclose(J_cap, build_capacity*J_ref*throttle*R_reg, rtol=1e-12, atol=0) and np.allclose(s_build, np.where(J_demand_total > J_cap, (J_cap + J_eps)/(J_demand_total + J_eps), 1.0), rtol=1e-9, atol=1e-12)"
     },
     {
       "description": "the pools never spend more than synthesis can: J_build_total <= J_cap (relative 1e-9)",
@@ -97,11 +98,15 @@
     "ranges": {
       "build_capacity": [
         0.5,
-        10.0
+        20.0
       ],
       "ATP_floor": [
         1.0,
         8.0
+      ],
+      "f_ATP_reg": [
+        0.0,
+        1.0
       ]
     },
     "exclude": [
