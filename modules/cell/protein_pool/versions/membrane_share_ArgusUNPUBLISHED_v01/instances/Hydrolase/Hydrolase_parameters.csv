@@ -2,8 +2,8 @@ variable_name,units,value,data_reference,sourced
 m_init,dimensionless,1.0,definitional; the calibrated cell,no
 tau,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
 n_0,dimensionless,2729.797267782374,"derived: hydrolysis_capacity x resting glucose flux / kcat_Hydrolase (hydrolysis_capacity: definitional, design; kcat_Hydrolase: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
-L,dimensionless,700.0,"unreferenced_placeholder; amino acids of one surface alpha-amylase (a ~75-80 kDa lipoprotein, SusG-sized)",no
-footprint,nm2,20.0,unreferenced_placeholder; membrane (surface) area one lipid-anchored hydrolase copy takes,no
+L,dimensionless,700.0,"definitional; amino acids of one surface alpha-amylase, SusG-sized: B. thetaiotaomicron SusG, a surface lipoprotein, 692 aa (UniProt Q8A1G3); B. subtilis AmyE, secreted, 659 aa (P00691); K. pneumoniae pullulanase PulA, a surface lipoprotein, 1090 aa (P07206); B. licheniformis alpha-amylase, secreted, 512 aa (P06278). 700 is SusG rounded (checked 2026-10-12)",yes
+footprint,nm2,20.0,"unreferenced_placeholder; membrane (surface) area one lipid-anchored hydrolase copy takes: a 75-80 kDa globular protein at 1.21 A^3/Da is ~91 nm^3, a sphere of radius 2.8 nm and 25 nm^2 in cross-section; 20 nm^2 is within that estimate's uncertainty (SusG is elongated) and is kept",no
 c_syn,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
 c_poly,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
 c_deg,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
