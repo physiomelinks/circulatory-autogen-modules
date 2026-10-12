@@ -12,7 +12,7 @@
   --rule-strong: #c3cbc6;
   --accent: #2b4f7a;
   --accent-soft: #e6edf5;
-  --pass: #1c7c4a;  --pass-bg: #e3f2e9;
+  --pass: #1c7c4a;  --pass-bg: #e3f2e9;  --partial: #1d4f91; --partial-bg: #dde9fb;
   --fail: #b42318;  --fail-bg: #fbe6e3;
   --pend: #8a6412;  --pend-bg: #f8efd9;
   --skip: #5e6863;  --skip-bg: #eceeed;
@@ -27,7 +27,7 @@
     color-scheme: dark;
     --paper: #121614; --panel: #1a201d; --ink: #e8ece9; --ink-2: #b4bdb8; --ink-3: #8d9792;
     --rule: #2b3330; --rule-strong: #3c4641; --accent: #8fb3dc; --accent-soft: #1f2c3a;
-    --pass: #5cc48a; --pass-bg: #173325; --fail: #f08a7e; --fail-bg: #3a1c19;
+    --pass: #5cc48a; --pass-bg: #173325; --partial: #8ab4f8; --partial-bg: #172a45; --fail: #f08a7e; --fail-bg: #3a1c19;
     --pend: #e0b457; --pend-bg: #33291a; --skip: #a3ada8; --skip-bg: #242b28; --todo: #e0b457;
     --plot-ground: #fcfcfb;
   }
@@ -36,7 +36,7 @@
   color-scheme: dark;
   --paper: #121614; --panel: #1a201d; --ink: #e8ece9; --ink-2: #b4bdb8; --ink-3: #8d9792;
   --rule: #2b3330; --rule-strong: #3c4641; --accent: #8fb3dc; --accent-soft: #1f2c3a;
-  --pass: #5cc48a; --pass-bg: #173325; --fail: #f08a7e; --fail-bg: #3a1c19;
+  --pass: #5cc48a; --pass-bg: #173325; --partial: #8ab4f8; --partial-bg: #172a45; --fail: #f08a7e; --fail-bg: #3a1c19;
   --pend: #e0b457; --pend-bg: #33291a; --skip: #a3ada8; --skip-bg: #242b28; --todo: #e0b457;
   --plot-ground: #fcfcfb;
 }
@@ -65,7 +65,7 @@ code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
 }
 .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .chip.passed, .chip.passed_in_super { color: var(--pass); background: var(--pass-bg); }
-.chip.partial { color: #8a5a00; background: #fff1d6; }
+.chip.partial { color: var(--partial); background: var(--partial-bg); }
 .chip.failed, .chip.failed_in_super { color: var(--fail); background: var(--fail-bg); }
 .chip.pending { color: var(--pend); background: var(--pend-bg); }
 .chip.skipped, .chip.none, .chip.not_applicable { color: var(--skip); background: var(--skip-bg); }

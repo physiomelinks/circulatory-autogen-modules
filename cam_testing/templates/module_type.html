@@ -41,7 +41,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
       <span>Report generated {{ generated }}</span>
     </div>
     <div class="counts">
-      {{ chip('passed', counts.passed ~ ' passed') }} {{ chip('failed', counts.failed ~ ' failed') }}
+      {{ chip('passed', counts.passed ~ ' passed') }} {{ chip('partial', (counts.partial or 0) ~ ' partial') }} {{ chip('failed', counts.failed ~ ' failed') }}
       {{ chip('pending', counts.pending ~ ' pending') }} {{ chip('skipped', counts.skipped ~ ' skipped') }}
       {%- if counts.not_applicable %} {{ chip('not_applicable', counts.not_applicable ~ ' N/A') }}{% endif %}
       {%- if counts[None] %} {{ chip(None, counts[None] ~ ' not run') }}{% endif %}

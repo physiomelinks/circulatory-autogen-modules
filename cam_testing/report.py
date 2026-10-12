@@ -250,6 +250,7 @@ def parameterisation_context(version, inst):
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
             'omex_status': omex_result.status if omex_result else None,
             'omex_message': omex_result.message if omex_result else 'not checked yet (tests/test_parameterisation_omex.py)',
+            'omex_known_issue': (version.spec.get('expected_failures') or {}).get('cuflynx_parameterisation_omex_test'),
             'n_parameters': len(inst.parameters()), 'obs_data_name': inst.obs_data_name,
             'has_obs_data': inst.has_obs_data, 'calibration': calibration,
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
@@ -795,6 +796,10 @@ def _status_counts(components):
         for t in c['tests'] + [t for i in c['parameterisations'] for t in i['tests']]:
             status = COUNT_AS.get(t['status'], t['status'])
             counts[status] = counts.get(status, 0) + 1
+        # each parameterisation's CUFLynx archive check (shown in the overview's parameterisation table)
+        for i in c['parameterisations']:
+            if i.get('omex_status') is not None:
+                counts[i['omex_status']] = counts.get(i['omex_status'], 0) + 1
     return counts
 
 

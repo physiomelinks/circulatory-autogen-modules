@@ -154,7 +154,7 @@
 .toc a { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 4px; color: var(--ink-2); text-decoration: none; }
 .toc a:hover { background: var(--accent-soft); color: var(--ink); }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--skip); }
-.dot.failed, .dot.failed_in_super { background: var(--fail); } .dot.partial { background: #e0a020; } .dot.passed, .dot.passed_in_super { background: var(--pass); } .dot.pending { background: var(--pend); }
+.dot.failed, .dot.failed_in_super { background: var(--fail); } .dot.partial { background: var(--partial); } .dot.passed, .dot.passed_in_super { background: var(--pass); } .dot.pending { background: var(--pend); }
 main { display: grid; gap: 40px; min-width: 0; }
 header.module { display: grid; gap: 10px; }
 .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 0.88rem; }
@@ -269,6 +269,7 @@ window.addEventListener('DOMContentLoaded', function () {
       </div>
       <div class="counts">
         {{ chip('passed', counts.passed ~ ' passed') }}
+        {{ chip('partial', (counts.partial or 0) ~ ' partial') }}
         {{ chip('failed', counts.failed ~ ' failed') }}
         {{ chip('pending', counts.pending ~ ' pending') }}
         {{ chip('skipped', counts.skipped ~ ' skipped') }}
@@ -312,6 +313,21 @@ window.addEventListener('DOMContentLoaded', function () {
           </tbody>
         </table>
       </div>
+      {%- set ps = components[0].parameterisations %}
+      {%- if ps %}
+      <div class="table-wrap">
+        <table class="grid-table">
+          <thead><tr><th>Parameterisation</th>{% for t in ps[0].tests %}<th>{{ t.short }}</th>{% endfor %}<th>CUFLynx archive</th></tr></thead>
+          <tbody>
+          {%- for i in ps %}
+            <tr><td><a href="#parameterisations" class="mono">{{ i.name }}</a>{% if i.is_default %} <span class="muted">(default)</span>{% endif %}</td>
+            {%- for t in i.tests %}<td title="{{ t.message }}"><a href="#{{ t.anchor }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}
+            <td title="{{ i.omex_known_issue or i.omex_message }}">{% if i.omex_known_issue and i.omex_status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(i.omex_status) }}{% endif %}</td></tr>
+          {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {%- endif %}
       <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has these columns. {{ chip('not_applicable') }} the test doesn't apply to this version; {{ chip(None) }} it applies but has no result yet; only a test that ran and passed shows {{ chip('passed') }}.</p>
       {%- set na = components[0].tests|selectattr('status', 'equalto', 'not_applicable')|list %}
       {%- if na %}
