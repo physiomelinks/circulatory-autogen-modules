@@ -1,0 +1,18 @@
+variable_name,units,value,data_reference,sourced
+m_init,dimensionless,1.0,definitional; the calibrated cell,no
+tau,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+n_0,dimensionless,2729.797267782374,"derived: hydrolysis_capacity x resting glucose flux / kcat_Hydrolase (hydrolysis_capacity: definitional, design; kcat_Hydrolase: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+L,dimensionless,700.0,"unreferenced_placeholder; amino acids of one surface alpha-amylase (a ~75-80 kDa lipoprotein, SusG-sized)",no
+footprint,nm2,20.0,unreferenced_placeholder; membrane (surface) area one lipid-anchored hydrolase copy takes,no
+c_syn,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
+c_poly,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
+c_deg,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
+c_recycle,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
+k_deg,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+N_A,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+K_m_ATP,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
+ATP_ref,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+s_build,dimensionless,1.0,definitional; synthesis serves the whole demand when unconnected,no
+s_target,dimensionless,0.01930936572472512,"derived: the calibrated cell's copies x footprint_Hydrolase / A_ceiling: m_target = 1 (its share at rest) (footprint_Hydrolase: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
+A_ceiling,um2,2.827433388230814,"derived: protein_area_max_fraction x the whole cell surface (protein_area_max_fraction: unreferenced_placeholder, placeholder; R_cell: unreferenced_placeholder, design; h_cell: unreferenced_placeholder, design)",no

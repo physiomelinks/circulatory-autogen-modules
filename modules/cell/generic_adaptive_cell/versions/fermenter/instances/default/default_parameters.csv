@@ -48,7 +48,7 @@ K_ADP_gly_cytosol,millimolar,0.1,unreferenced_placeholder; lumped glycolysis aff
 K_Pi_gly_cytosol,millimolar,1.0,unreferenced_placeholder; lumped glycolysis affinity for Pi,no
 K_lac_cytosol,millimolar,10.0,unreferenced_placeholder; lumped glycolysis product constant for lactate,no
 K_ATP_gly_cytosol,millimolar,1.0,unreferenced_placeholder; lumped glycolysis product constant for ATP,no
-V_hyd_cytosol,millimolar_per_s,0.08367164468728808,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
+V_hyd_cytosol,millimolar_per_s,0.0836591948542882,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
 K_ATP_hyd_cytosol,millimolar,0.5,unreferenced_placeholder; maintenance ATPase affinity for ATP,no
 K_ADP_hyd_cytosol,millimolar,0.5,unreferenced_placeholder; maintenance ATPase product constant for ADP,no
 K_Pi_hyd_cytosol,millimolar,5.0,unreferenced_placeholder; maintenance ATPase product constant for Pi,no
@@ -88,7 +88,7 @@ Q10_dmg_bio,dimensionless,2.0,unreferenced_placeholder; damage doubles per 10 K,
 r_dmg_bio,per_s,1.1574074074074074e-06,"derived: 1 / damage_lifetime (damage_lifetime: unreferenced_placeholder, placeholder)",no
 r_rep_max_bio,per_s,1.1574074074074073e-05,"derived: repair_capacity_ratio / damage_lifetime (repair_capacity_ratio: unreferenced_placeholder, placeholder; damage_lifetime: unreferenced_placeholder, placeholder)",no
 K_D_bio,dimensionless,0.1,unreferenced_placeholder; repair is half-maximal at a tenth of a lethal load,no
-C_repair_bio,mole,3.0028924454486115e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
+C_repair_bio,mole,3.0037809007103e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
 repair_level_bio,dimensionless,1.0,definitional; full repair by default,no
 growth_level_bio,dimensionless,0.0,definitional; no growth until the player puts energy into it,no
 J_ref_bio,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
@@ -175,6 +175,10 @@ n_half_i_flagellum,dimensionless,2.0,unreferenced_placeholder; flagella at which
 eta_i_flagellum,pascal_second,0.00108,"unreferenced_placeholder; dynamic viscosity of seawater at 20 C and 35 g/kg salinity, about 1.08 mPa s (Sharqawy et al. 2010 tables; to cite)",no
 R_body_i_flagellum,um,1.0,unreferenced_placeholder; a 2 um cell (typical prokaryote): disc radius,no
 N_A_i_flagellum,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+n_0_hydrolase,dimensionless,2729.797267782374,"derived: hydrolysis_capacity x resting glucose flux / kcat_Hydrolase (hydrolysis_capacity: definitional, design; kcat_Hydrolase: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+kcat_hydrolase,per_s,1000.0,"unreferenced_placeholder; glucose units released per surface hydrolase copy per second on polysaccharide at saturation, lumping the endo-cleavage and the exo-steps to glucose: bacterial alpha-amylases on starch reach ~1e3 /s (a Bacillus licheniformis alpha-amylase: kcat 2e3 /s, Km 6.2 mg/mL; to cite), on short oligosaccharides ~10 /s",no
+K_m_poly_hydrolase,millimolar,20.0,"shipman1999physiological; polymer for half-rate, in mM glucose units: SusG (B. thetaiotaomicron surface amylase) Km 3.1 mM p-nitrophenyl maltoheptaoside, ~22 mM glucose units; alpha-amylases on starch ~6 mg/mL, ~38 mM glucose units",no
+N_A_hydrolase,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 C_glc_e_glc_PTS,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
 C_lac_e_glc_PTS,millimolar,0.0,definitional; no lactate in the medium,no
 jmax_glc_glc_PTS,mol_per_s_per_um2,3.0933897205955476e-19,"derived: n_0 x turnover_PTS / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_PTS: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
@@ -310,6 +314,20 @@ k_deg_pool_Flagellum,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924
 N_A_pool_Flagellum,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_pool_Flagellum,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref_pool_Flagellum,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+m_init_pool_Hydrolase,dimensionless,1.0,definitional; the calibrated cell,no
+tau_pool_Hydrolase,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
+n_0_pool_Hydrolase,dimensionless,2729.797267782374,"derived: hydrolysis_capacity x resting glucose flux / kcat_Hydrolase (hydrolysis_capacity: definitional, design; kcat_Hydrolase: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+L_pool_Hydrolase,dimensionless,700.0,"unreferenced_placeholder; amino acids of one surface alpha-amylase (a ~75-80 kDa lipoprotein, SusG-sized)",no
+footprint_pool_Hydrolase,nm2,20.0,unreferenced_placeholder; membrane (surface) area one lipid-anchored hydrolase copy takes,no
+c_syn_pool_Hydrolase,dimensionless,24.0,"akashi2002metabolic; ~P per amino acid made from glucose; Akashi & Gojobori give 12-74, 24 assumed as the proteome mean",no
+c_poly_pool_Hydrolase,dimensionless,4.0,definitional; textbook: 2 ~P to charge the tRNA (ATP -> AMP) and 2 GTP for elongation,no
+c_deg_pool_Hydrolase,dimensionless,1.0,unreferenced_placeholder; ClpXP-type proteolysis about 1 ATP per residue translocated (reported 0.15-1),no
+c_recycle_pool_Hydrolase,dimensionless,0.5,lynch2015bioenergetic; 0.25-1 ATP per amino acid recycled (Lynch & Marinov 2015 supplement),no
+k_deg_pool_Hydrolase,per_s,2.777777777777778e-06,milo2010bionumbers; BNID 109924: bulk protein degradation about 1%/h in E. coli,yes
+N_A_pool_Hydrolase,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
+K_m_ATP_pool_Hydrolase,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP affinity, order 0.1 mM",no
+ATP_ref_pool_Hydrolase,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
+s_target_pool_Hydrolase,dimensionless,0.01930936572472512,"derived: the calibrated cell's copies x footprint_Hydrolase / A_ceiling: m_target = 1 (its share at rest) (footprint_Hydrolase: unreferenced_placeholder, placeholder; protein_area_max_fraction: unreferenced_placeholder, placeholder)",no
 m_init_pool_PTS,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
 tau_pool_PTS,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
 n_0_pool_PTS,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no

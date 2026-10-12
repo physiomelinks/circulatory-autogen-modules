@@ -1163,6 +1163,41 @@
    "source": "unreferenced_placeholder",
    "status": "placeholder",
    "note": "membrane area one GalP copy takes (12 transmembrane helices, as Glf)"
+  },
+  "kcat_Hydrolase": {
+   "value": 1000.0,
+   "units": "per_s",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "glucose units released per surface hydrolase copy per second on polysaccharide at saturation, lumping the endo-cleavage and the exo-steps to glucose: bacterial alpha-amylases on starch reach ~1e3 /s (a Bacillus licheniformis alpha-amylase: kcat 2e3 /s, Km 6.2 mg/mL; to cite), on short oligosaccharides ~10 /s"
+  },
+  "K_m_poly_Hydrolase": {
+   "value": 20.0,
+   "units": "millimolar",
+   "source": "shipman1999physiological",
+   "status": "placeholder",
+   "note": "polymer for half-rate, in mM glucose units: SusG (B. thetaiotaomicron surface amylase) Km 3.1 mM p-nitrophenyl maltoheptaoside, ~22 mM glucose units; alpha-amylases on starch ~6 mg/mL, ~38 mM glucose units"
+  },
+  "hydrolysis_capacity": {
+   "value": 10.0,
+   "units": "dimensionless",
+   "source": "definitional",
+   "status": "design",
+   "note": "the level-1 cell's surface hydrolysis at saturating polymer, as a multiple of its resting glucose need: enough to grow on a food packet (maintenance is 1x), a third of what Glf can take up from a 10 mM packet (30x), so more enzyme is a trait worth evolving (sets its copy number with kcat_Hydrolase)"
+  },
+  "L_Hydrolase": {
+   "value": 700.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "amino acids of one surface alpha-amylase (a ~75-80 kDa lipoprotein, SusG-sized)"
+  },
+  "footprint_Hydrolase": {
+   "value": 20.0,
+   "units": "nm2",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "membrane (surface) area one lipid-anchored hydrolase copy takes"
   }
  }
 }

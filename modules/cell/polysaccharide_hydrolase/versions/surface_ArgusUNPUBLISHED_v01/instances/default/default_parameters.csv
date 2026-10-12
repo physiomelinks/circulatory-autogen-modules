@@ -1,0 +1,6 @@
+variable_name,units,value,data_reference,sourced
+m_expr,dimensionless,1.0,definitional; baseline expression (the calibrated cell),no
+n_0,dimensionless,2729.797267782374,"derived: hydrolysis_capacity x resting glucose flux / kcat_Hydrolase (hydrolysis_capacity: definitional, design; kcat_Hydrolase: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+kcat,per_s,1000.0,"unreferenced_placeholder; glucose units released per surface hydrolase copy per second on polysaccharide at saturation, lumping the endo-cleavage and the exo-steps to glucose: bacterial alpha-amylases on starch reach ~1e3 /s (a Bacillus licheniformis alpha-amylase: kcat 2e3 /s, Km 6.2 mg/mL; to cite), on short oligosaccharides ~10 /s",no
+K_m_poly,millimolar,20.0,"shipman1999physiological; polymer for half-rate, in mM glucose units: SusG (B. thetaiotaomicron surface amylase) Km 3.1 mM p-nitrophenyl maltoheptaoside, ~22 mM glucose units; alpha-amylases on starch ~6 mg/mL, ~38 mM glucose units",no
+N_A,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no

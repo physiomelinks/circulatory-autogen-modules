@@ -156,7 +156,8 @@ def fermenter(tmp_path_factory):
     return checks.ComponentModel(v, work_dir=str(tmp_path_factory.mktemp('fermenter')))
 
 
-SHARE_POOLS = ['H_ATPase', 'NhaA', 'KefC', 'Trk', 'NCX', 'Glf', 'LacT', 'PTS', 'ABC', 'GalP']   # protein_pool membrane_share
+SHARE_POOLS = ['H_ATPase', 'NhaA', 'KefC', 'Trk', 'NCX', 'Glf', 'LacT', 'Hydrolase', 'PTS', 'ABC',
+               'GalP']   # protein_pool membrane_share
 
 
 def _glucose(c):
@@ -235,10 +236,19 @@ def level1_differences(cm, scenario):
 @pytest.mark.parametrize('scenario', sorted(SCENARIOS))
 def test_level1_unchanged(scenario, fermenter):
     '''With the carriers' pools at 0 the fermenter reproduces its level-1 traces within LEVEL1_RTOL of each output's
-    scale (outputs that are zero in level 1, round-off, are not compared).'''
-    bad = [f'{name}: differs by {d:.3g} of its scale ({scale:.3g})' for d, name, scale in level1_differences(fermenter, scenario)
-           if d > LEVEL1_RTOL and scale > 1e-30]
+    scale (outputs that are zero in level 1, round-off, are not compared). The surface hydrolase, added after the
+    reference, takes its share of the membrane ceiling: f_area is higher by exactly that share.'''
+    diffs = level1_differences(fermenter, scenario)
+    bad = [f'{name}: differs by {d:.3g} of its scale ({scale:.3g})' for d, name, scale in diffs
+           if d > LEVEL1_RTOL and scale > 1e-30 and name != 'mod_protein__f_area']
     assert not bad, '\n'.join(bad)
+    ref = json.load(open(LEVEL1))
+    case = ref['scenarios'][scenario]
+    t, out = fermenter.run(_translated(fermenter, case['parameters']))
+    idx = [int(np.argmin(np.abs(t - x))) for x in ref['times']]
+    hydrolase_share = out['mod_pool_Hydrolase__share'][idx]
+    assert np.allclose(np.asarray(out['mod_protein__f_area'])[idx] - case['outputs']['mod_protein__f_area'],
+                       hydrolase_share, rtol=LEVEL1_RTOL, atol=0)
 
 
 def test_PTS_uptake_far_above_Glf_at_10uM(fermenter):
@@ -406,3 +416,43 @@ def test_PTS_cell_keeps_its_phosphate(c_e, share, fermenter):
     assert np.min(o['mod_cytosol/C_ATP']) > 0.9 * o['mod_cytosol/C_ATP'][0]
     assert np.min(o['mod_cytosol/C_Pi']) > 0.9 * o['mod_cytosol/C_Pi'][0]
 
+
+# ---- the cell-surface polysaccharide hydrolase -------------------------------------------------------------------------
+
+@pytest.mark.parametrize('m', [0.0, 1.0, 3.0])
+def test_hydrolase_capacity_scales_with_expression(m, fermenter):
+    '''The hydrolase's capacity V_hydrolysis_max = kcat n_0 m / N_A follows its expression; at the level-1 baseline it
+    is hydrolysis_capacity (10) times the cell's resting glucose uptake.'''
+    outs = ['mod_hydrolase/V_hydrolysis_max', 'mod_hydrolase/n_copies', 'mod_pool_Hydrolase/m',
+            'mod_membrane_face/J_glc']
+    t, o = _run(fermenter, _express(fermenter, 'Hydrolase', m), outs)
+    p = fermenter.nominal
+    assert np.allclose(o['mod_pool_Hydrolase/m'], m, rtol=1e-9, atol=1e-12)
+    assert np.allclose(o['mod_hydrolase/V_hydrolysis_max'], p['kcat_mod_hydrolase'] * p['n_0_mod_hydrolase'] *
+                       o['mod_pool_Hydrolase/m'] / p['N_A_mod_hydrolase'], rtol=1e-12, atol=0)
+    if m == 1.0:   # the calibrated cell at rest
+        assert o['mod_hydrolase/V_hydrolysis_max'][0] == pytest.approx(10.0 * o['mod_membrane_face/J_glc'][0], rel=1e-9)
+
+
+def test_hydrolase_pool_costs(fermenter):
+    '''Keeping the hydrolase costs its turnover, n L (c_poly + c_deg + c_recycle) k_deg / N_A, and quadrupling it costs
+    building copies, n_0 L (c_syn + c_poly) / N_A per unit of m: raised to 1.5, what is built is paid for.'''
+    outs = ['mod_pool_Hydrolase/J_keep', 'mod_pool_Hydrolase/J_build', 'mod_pool_Hydrolase/m', 'mod_pool_Hydrolase/f_ATP',
+            'mod_pool_Hydrolase/M_build']
+    p = {k.replace('_mod_pool_Hydrolase', ''): v for k, v in fermenter.nominal.items() if k.endswith('_mod_pool_Hydrolase')}
+    t, o = _run(fermenter, {'s_target_mod_pool_Hydrolase': 1.5 * _share_of(fermenter, 'Hydrolase', 1.0)}, outs)
+    keep = o['mod_pool_Hydrolase/m'] * p['n_0'] * p['L'] * (p['c_poly'] + p['c_deg'] + p['c_recycle']) * p['k_deg'] / \
+        fermenter.nominal['N_A_mod_pool_Hydrolase'] * o['mod_pool_Hydrolase/f_ATP']
+    assert np.allclose(o['mod_pool_Hydrolase/J_keep'], keep, rtol=1e-12, atol=0)
+    unit = p['n_0'] * p['L'] * (p['c_syn'] + p['c_poly']) / fermenter.nominal['N_A_mod_pool_Hydrolase']
+    built = o['mod_pool_Hydrolase/m'][-1] - o['mod_pool_Hydrolase/m'][0]
+    assert built > 0.4
+    assert np.trapz(o['mod_pool_Hydrolase/J_build'], t) == pytest.approx(unit * built, rel=1e-4)
+    assert o['mod_pool_Hydrolase/M_build'][-1] == pytest.approx(unit * o['mod_pool_Hydrolase/m'][-1], rel=1e-12)
+
+
+def test_fermenter_invariants_with_more_hydrolase(fermenter):
+    '''The hydrolase imports nothing: with four times the enzyme the cell's charge, mass, carbon, ATP-budget and
+    second-law invariants hold as before (it costs only protein).'''
+    failures = _cell_invariant_failures(fermenter, {**_glucose(1.0), **_express(fermenter, 'Hydrolase', 4.0)})
+    assert not failures, '\n'.join(failures)

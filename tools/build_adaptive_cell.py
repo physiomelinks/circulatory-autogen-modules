@@ -270,6 +270,10 @@ PROTEINS = {
     'Glf': ('Glf glucose facilitator', par('L_Glf'), VMAX_GLC * NA / par('turnover_Glf'), 'capacity / turnover_Glf'),
     'LacT': ('lactate-/H+ symporter (LldP-sized)', par('L_LacT'), VMAX_LAC * NA / par('turnover_LacT'),
              'capacity / turnover_LacT'),
+    'Hydrolase': ('cell-surface polysaccharide hydrolase (lipid-anchored alpha-amylase, SusG type)', par('L_Hydrolase'),
+                  der(par('hydrolysis_capacity') * J_GLC * NA / par('kcat_Hydrolase'), 'hydrolysis_capacity x resting '
+                      'glucose flux / kcat_Hydrolase', 'hydrolysis_capacity', 'kcat_Hydrolase', 'maintenance_coefficient'),
+                  'hydrolysis_capacity x resting glucose flux / kcat_Hydrolase'),
     'Flagellum': ('flagellum (filament, hook, basal body, MotAB stators)', par('L_Flagellum'),
                   der(par('n_flagella_init'), 'the starting number of flagella', 'n_flagella_init'),
                   'one flagellum per unit of expression: m is the number of flagella'),
@@ -547,6 +551,21 @@ register_bib({
                          title='Major facilitator superfamily', journal='Microbiology and Molecular Biology Reviews',
                          year='1998', volume='62', number='1', pages='1--34', doi='10.1128/MMBR.62.1.1-34.1998',
                          note='MFS uniporters, symporters and antiporters; sugar/H+ symporters (GalP, LacY)'),
+    'shipman1999physiological': dict(type='article',
+                                     author='Shipman, Joseph A. and Cho, Kyu Hong and Siegel, Hilary A. and Salyers, '
+                                            'Abigail A.',
+                                     title='Physiological characterization of SusG, an outer membrane protein essential '
+                                           'for starch utilization by Bacteroides thetaiotaomicron',
+                                     journal='Journal of Bacteriology', year='1999', volume='181', number='23',
+                                     pages='7206--7211', doi='10.1128/jb.181.23.7206-7211.1999',
+                                     note='SusG, the surface amylase of the Sus system: Km 3.1 mM for p-nitrophenyl '
+                                          'maltoheptaoside'),
+    'arnosti2011microbial': dict(type='article', author='Arnosti, Carol',
+                                 title='Microbial extracellular enzymes and the marine carbon cycle',
+                                 journal='Annual Review of Marine Science', year='2011', volume='3', pages='401--425',
+                                 doi='10.1146/annurev-marine-120709-142731',
+                                 note='Polysaccharides are hydrolysed outside the cell, by cell-surface or released '
+                                      'enzymes, before the products are taken up'),
     'ferenci1996adaptation': dict(type='article', author='Ferenci, Thomas',
                                   title='Adaptation to life at micromolar nutrient levels: the regulation of Escherichia '
                                         'coli glucose transport by endoinduction and cAMP',
@@ -2036,6 +2055,54 @@ write_version('transport', GC, 'glucose_carrier_H_symport', gch_vars, gch_eqs,
                   'turnover number is a placeholder.')},
               ['argus2026unpublished', 'pao1998major'], V_GC_H)
 
+# ------------------------------------------------------------------ 6b3. the cell-surface polysaccharide hydrolase
+# Food packets are polymer (polysaccharide): it dissolves only where enzymes cut it. The hydrolase sits on the cell
+# surface; its capacity V_hydrolysis_max = kcat n / N_A (mol glucose units/s at saturating polymer) and its K_m (mM glucose
+# units) go to the game, which applies the saturation from the particle the cell touches and releases the glucose
+# outside the cell, where the carriers take it up. The module carries no flux into the cell.
+V_HYDROLASE = 'surface_ArgusUNPUBLISHED_v01'
+hyd_vars = [
+    ('t', 'second', 'in', None, None),
+    ('m_expr', 'dimensionless', 'in', None, 'expression (protein_expression port): n_0 copies at 1'),
+    ('n_0', 'dimensionless', 'in', None, 'copies at m_expr = 1'),
+    ('kcat', 'per_s', 'in', None, 'glucose units released per copy per second at saturating polymer'),
+    ('K_m_poly', 'millimolar', 'in', None, 'polymer for half-rate, in glucose units (for the game\'s saturation)'),
+    ('N_A', 'per_mol', 'in', None, None),
+    ('n_copies', 'dimensionless', 'out', None, 'copies on the surface'),
+    ('V_hydrolysis_max', 'mol_per_s', 'out', None, 'glucose units the copies release per second at saturating polymer'),
+]
+hyd_eqs = [('n_copies', 'n_0 * m_expr'), ('V_hydrolysis_max', 'kcat * n_copies / N_A')]
+hyd_roles = {'m_expr': 'boundary_condition', 'n_0': 'constant', 'kcat': 'constant', 'K_m_poly': 'constant',
+             'N_A': 'constant', 'n_copies': 'variable', 'V_hydrolysis_max': 'variable'}
+write_version('cell', 'polysaccharide_hydrolase', 'polysaccharide_hydrolase_surface', hyd_vars, hyd_eqs,
+              {'required_citations': ['argus2026unpublished'], 'entrance_ports': [], 'exit_ports': [],
+               'general_ports': [{'port_type': 'protein_expression', 'variables': ['m_expr']}], 'roles': hyd_roles},
+              [('m_expr', 1.0, 'definitional; baseline expression (the calibrated cell)', False),
+               ('n_0', PROTEINS['Hydrolase'][2], '', False),
+               ('kcat', par('kcat_Hydrolase'), '', False), ('K_m_poly', par('K_m_poly_Hydrolase'), '', False),
+               ('N_A', NA, '', False)],
+              {**RUN1, 'outputs': ['n_copies', 'V_hydrolysis_max'], 'run_parameters': {},
+               'invariants': [
+                   {'description': 'capacity (exact): V_hydrolysis_max = kcat n_0 m_expr / N_A, proportional to expression',
+                    'expr': 'np.allclose(V_hydrolysis_max, kcat*n_0*m_expr/N_A, rtol=1e-12, atol=0) and '
+                            'np.allclose(n_copies, n_0*m_expr, rtol=1e-12, atol=0)'},
+                   {'description': 'the capacity is never negative', 'expr': 'np.all(V_hydrolysis_max >= 0)'}],
+               'bc_sweep': {'ranges': {'m_expr': [0.0, 4.0]},
+                            'rationale': 'expression from none to the game\'s maximum'},
+               'stability': STAB},
+              {'reviewed': False, 'notes': (
+                  'A polysaccharide hydrolase on the cell surface (a lipid-anchored alpha-amylase, as SusG of the '
+                  'Bacteroides starch utilisation system, shipman1999physiological; polymer is hydrolysed outside the '
+                  'cell and the products taken up, arnosti2011microbial). Its copies n_copies = n_0 m_expr (m_expr from '
+                  'its protein_pool on the protein_expression port) release at most V_hydrolysis_max = kcat n_copies / '
+                  'N_A glucose units per second. The rate on a food particle is V_hydrolysis_max S/(K_m_poly + S), S the '
+                  'polymer the enzyme reaches in mM glucose units: the game computes S from the particle touching or '
+                  'near the cell and releases the glucose outside the cell, where the cell\'s carriers take it up; the '
+                  'enzyme imports nothing, so the cell\'s mass and energy balances do not change with it. kcat, K_m_poly '
+                  'and the length are placeholders; n_0 is set so the level-1 cell can feed on a packet '
+                  '(hydrolysis_capacity times its resting glucose need).')},
+              ['argus2026unpublished', 'shipman1999physiological', 'arnosti2011microbial'], V_HYDROLASE)
+
 # ------------------------------------------------------------------ 6c. proteins: one protein_pool per protein, and their synthesis
 # Each protein of the cell is a protein_pool: its expression m (copies n = n_0 m) approaches the game's target m_target
 # with time constant tau. Keeping the copies costs their turnover; raising m costs building the new copies, at most what the
@@ -2184,7 +2251,7 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
 # on the membrane_ceiling port, which scales with membrane area); the target copies are s_target A_ceiling / footprint,
 # m_target = s_target A_ceiling / a_unit. The game keeps the shares of a cell's pools summing to at most 1.
 POOL_SHARE_V = 'membrane_share_ArgusUNPUBLISHED_v01'
-MEMBRANE_SHARE_KEYS = ['H_ATPase', 'NhaA', 'KefC', 'Trk', 'NCX', 'Glf', 'LacT', *CARRIERS]
+MEMBRANE_SHARE_KEYS = ['H_ATPase', 'NhaA', 'KefC', 'Trk', 'NCX', 'Glf', 'LacT', 'Hydrolase', *CARRIERS]
 A_PROTEIN_MAX = der(par('protein_area_max_fraction') * A_SURFACE, 'protein_area_max_fraction x the whole cell surface',
                     'protein_area_max_fraction', 'R_cell', 'h_cell')
 share_vars = [v if v[0] != 'm_target' else ('m_target', 'dimensionless', 'out', None,
@@ -2728,6 +2795,7 @@ FERM_PROTEINS = [  # (pool key, the submodule it scales, (module_type, version))
     ('Glf', 'membrane_face', ('cell_membrane_face', V_NEW)),
     ('LacT', 'membrane_face', None),   # the face's second protein_expression port (pools connect in submodule order)
     ('Flagellum', 'i_flagellum', ('i_H_flagellum', 'MotAB_ArgusUNPUBLISHED_v01')),
+    ('Hydrolase', 'hydrolase', ('polysaccharide_hydrolase', V_HYDROLASE)),
     # glucose carriers the game unlocks after level 1 (pools start at 0)
     ('PTS', 'glc_PTS', (GC, V_GC_PTS)),
     ('ABC', 'glc_ABC', (GC, V_GC_ATP)),
@@ -2743,7 +2811,7 @@ define_cell(
     'fermenter', extends='empty_membrane',
     submodules=_targets + [S(f'pool_{key}', 'protein_pool', POOL_SHARE_V if key in MEMBRANE_SHARE_KEYS else POOL_V, key)
                            for key, _, _ in FERM_PROTEINS],
-    links=[('membrane', t['name']) for t in _targets]
+    links=[('membrane', t['name']) for t in _targets if t['name'] != 'hydrolase']
           + [('Na_K', x) for x in ('i_K_Trk', 'i_NaH', 'i_KH', 'i_NaCa')] + [('Ca', 'i_NaCa')]
           + [('H', x) for x in ('i_H_ATPase', 'i_NaH', 'i_KH', 'i_flagellum')]
           + [('cytosol', 'i_H_ATPase'), ('membrane_face', 'cytosol'), ('membrane_face', 'H')]
@@ -2767,7 +2835,9 @@ define_cell(
         'adaptive as the Trk K+ uptake channel), i_NaCa (adaptive; archaeal NCX_Mj is the prokaryotic equivalent) and '
         'membrane_face (cell_membrane_face adaptive: the Glf glucose facilitator and a lactate-/H+ symporter). The '
         'default instance is an exact steady state at -105 mV and pH 7.6 with total ATP turnover equal to Lynch & '
-        'Marinov\'s maintenance cost at 20 C. The membrane proteins\' pools (protein_pool membrane_share) take their '
+        'Marinov\'s maintenance cost at 20 C. hydrolase (polysaccharide_hydrolase surface: a lipid-anchored alpha-amylase) '
+        'gives the game the cell\'s capacity to dissolve food polymer, V_hydrolysis_max, and its K_m_poly: the game '
+        'releases the glucose outside the cell, where the carriers take it up. The membrane proteins\' pools (protein_pool membrane_share) take their '
         'target as a share s_target of the membrane\'s protein ceiling (protein\'s A_protein_max), each at its share at '
         'rest; the game keeps the shares summing to at most 1. Three glucose carriers the game unlocks after level 1 '
         'sit beside Glf with their pools at 0 (m_init and s_target 0), so the level-1 cell is unchanged until the game '
@@ -2895,7 +2965,8 @@ def cell_outputs(names):
             base += [(c, 'J_glc')] + ([(c, 'J_ATP_cost')] if c in ATP_CARRIERS else [(c, 'j_H')])
     base += [(n, 'm') for n in names if n.startswith('pool_')]
     base += [(n, v) for n in names if n[5:] in MEMBRANE_SHARE_KEYS for v in ('m_target', 'share')]
-    base += [('protein', 'A_protein_max')] + [('glc_PTS', 'J_G6P')] * ('glc_PTS' in names)
+    base += [('protein', 'A_protein_max')]
+    base += [('hydrolase', 'V_hydrolysis_max'), ('hydrolase', 'n_copies')] * ('hydrolase' in names) + [('glc_PTS', 'J_G6P')] * ('glc_PTS' in names)
     return [m(s, v).replace('__', '/') for s, v in base]
 
 
@@ -3031,7 +3102,8 @@ for d in [os.path.join(REPO, 'modules', *parts) for parts in [
         ('cell', 'ion_channels', 'i_NaCa', 'versions', V_NEW),
         ('cell', 'ion_channels', 'i_H_flagellum', 'versions', 'MotAB_ArgusUNPUBLISHED_v01'),
         ('transport', GC, 'versions', V_GC_ATP), ('transport', GC, 'versions', V_GC_H),
-        ('transport', GC, 'versions', V_GC_PTS), ('cell', 'protein_pool', 'versions', POOL_SHARE_V)]] + CELL_DIRS:
+        ('transport', GC, 'versions', V_GC_PTS), ('cell', 'protein_pool', 'versions', POOL_SHARE_V),
+        ('cell', 'polysaccharide_hydrolase', 'versions', V_HYDROLASE)]] + CELL_DIRS:
     added = complete_bib(d)
     if added:
         print(f'{os.path.relpath(d, REPO)}: added {added}')

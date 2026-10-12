@@ -54,7 +54,7 @@ K_ADP_gly_cytosol,millimolar,0.1,unreferenced_placeholder; lumped glycolysis aff
 K_Pi_gly_cytosol,millimolar,1.0,unreferenced_placeholder; lumped glycolysis affinity for Pi,no
 K_lac_cytosol,millimolar,10.0,unreferenced_placeholder; lumped glycolysis product constant for lactate,no
 K_ATP_gly_cytosol,millimolar,1.0,unreferenced_placeholder; lumped glycolysis product constant for ATP,no
-V_hyd_cytosol,millimolar_per_s,0.08367164468728808,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
+V_hyd_cytosol,millimolar_per_s,0.0836591948542882,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
 K_ATP_hyd_cytosol,millimolar,0.5,unreferenced_placeholder; maintenance ATPase affinity for ATP,no
 K_ADP_hyd_cytosol,millimolar,0.5,unreferenced_placeholder; maintenance ATPase product constant for ADP,no
 K_Pi_hyd_cytosol,millimolar,5.0,unreferenced_placeholder; maintenance ATPase product constant for Pi,no
@@ -94,7 +94,7 @@ Q10_dmg_bio,dimensionless,2.0,unreferenced_placeholder; damage doubles per 10 K,
 r_dmg_bio,per_s,1.1574074074074074e-06,"derived: 1 / damage_lifetime (damage_lifetime: unreferenced_placeholder, placeholder)",no
 r_rep_max_bio,per_s,1.1574074074074073e-05,"derived: repair_capacity_ratio / damage_lifetime (repair_capacity_ratio: unreferenced_placeholder, placeholder; damage_lifetime: unreferenced_placeholder, placeholder)",no
 K_D_bio,dimensionless,0.1,unreferenced_placeholder; repair is half-maximal at a tenth of a lethal load,no
-C_repair_bio,mole,3.0028924454486115e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
+C_repair_bio,mole,3.0037809007103e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
 repair_level_bio,dimensionless,1.0,definitional; full repair by default,no
 growth_level_bio,dimensionless,0.0,definitional; no growth until the player puts energy into it,no
 J_ref_bio,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
