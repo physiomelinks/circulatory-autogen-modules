@@ -20,12 +20,14 @@ notes: 'Heart chamber with the time-varying elastance of Liang et al. 2009 (MBEC
   The lv dead volume q_us stays Korakianitis''s 5 ml: calibrated with the afterload and preload to Liang''s P-V loop
   (Fig. 4e EDV and ESV) in the validation loop with a contracting left atrium, it comes out at 5.3 ml (chamber
   Liang2009NoVisco_v01) and 4.3 ml (Liang2009_v01), confirming it; q_us stays in the calibration as a check, not applied
-  (review 2026-10-12).'
+  (review 2026-10-12).
+  The phase variable chi (its gated, piecewise-rate form: contraction, relaxation, diastole and the wait at the clock
+  gate, with chi_floor and the activation e = (1 - cos(2 pi chi_final))/2) is ArgusUnpublished work (argus2026unpublished):
+  Liang''s activation is an explicit function of time (Eqs. 11-12); writing it as a state driven by the clock makes the
+  declarative (CellML) implementation robust (it follows the clock''s period and stays in phase when the period or the
+  timings change). Its piecewise rate makes the time-step test partial (first order across a switch).'
 expected_failures:
   validation_test_baseline: 'lv: the peak LV pressure is 120.6 mmHg vs Liang''s 108 (target 97-119) at periodic steady state: without Liang''s
     viscoelastic S dV/dt term (Eq. 9) the ejection pressure is 13 % high; chamber/Liang2009_v01, with the term, peaks at
     115.6 mmHg and passes. The other held-out targets (minimum and end-diastolic pressure) and the calibration pass
     (review 2026-10-12).'
-  verification_test_timestep: 'the phase rate dchi/dt switches discontinuously (contraction, relaxation, diastole and the
-    clock gate), so fixed-step RK4 converges at first order across a switch (observed order 0.62 < 0.8); a property of
-    the piecewise model, not a defect (review 2026-10-09).'

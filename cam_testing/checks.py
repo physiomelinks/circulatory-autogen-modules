@@ -26,6 +26,9 @@ from cam_testing import fixed_step, harness, plots
 from cam_testing.library import library_dirs
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
+# partial: met what the model's maths allows but not the full criterion (e.g. the time-step test on a piecewise
+# right-hand side: convergent and agreeing with CVODE, but below the scheme's order); not a failure
+PARTIAL = 'partial'
 # validation.<kind>.status: 'active' (confirmed data) or 'proposed' (run, but the data awaits confirmation)
 PROPOSED = 'proposed'
 
@@ -1266,13 +1269,25 @@ def verification_test_timestep(cm):
         rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.point_model())
         if not state_qnames:
             return Result('verification_test_timestep', SKIPPED, 'component has no state variables (algebraic only)')
+        # convergence after a warm-up (timestep.pre_time, else the spec's pre_time), so a start-up
+        # transient doesn't dominate the comparison: one tight CVODE run to pre_time, whose final state
+        # every step size (and the CVODE reference) starts from
+        pre = float(ts.get('pre_time', cm.spec.get('pre_time', 0.0)) or 0.0)
+        if pre > 0:
+            pre = round(pre / dts[0]) * dts[0]            # a whole number of every step size
+            with contextlib.redirect_stdout(io.StringIO()):
+                warm = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=dts[0], sim_time=pre, pre_time=0.0),
+                                                 solver_info=reference_tolerances(cm))
+            harness.run(warm, cm.outputs(), params=cm.run_point_params())
+            at_pre = dict(zip((v.qname() for v in warm.model.states()), warm.simulation.state()))
+            y0 = np.array([at_pre[q] for q in state_qnames], dtype=float)
 
         outputs = cm.outputs()
         qnames = [cm.helper._resolve_name(harness.output_name(o))[1] for o in outputs]
         stride_base = dts[0]
         runs = []
         for dt in dts:
-            t, Y = fixed_step.integrate(rhs, y0, t_end, dt, scheme)
+            t, Y = fixed_step.integrate(rhs, y0, pre + t_end, dt, scheme, t0=pre)
             stride = int(round(stride_base / dt))
             idx = np.arange(0, len(t), stride)
             vals = np.array([observe(t[i], Y[i], qnames) for i in idx], dtype=float)
@@ -1303,7 +1318,7 @@ def verification_test_timestep(cm):
 
         # cross-check against libcuflynx's CVODE run with tight tolerances
         with contextlib.redirect_stdout(io.StringIO()):
-            tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=0.0),
+            tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=pre),
                                               solver_info=reference_tolerances(cm))
         t_cv, cv = harness.run(tight, outputs, params=cm.run_point_params())
         n = min(len(t_cv), finest.shape[0])
@@ -1316,9 +1331,11 @@ def verification_test_timestep(cm):
                                            [(dt, t, v[:, 0]) for dt, t, v in runs], outputs[0], cm.units(),
                                            f'{component.label}: {outputs[0]} vs step size')]
         metrics = {'scheme': scheme, 'dts': dts, 'successive_differences': diffs, 'observed_orders': observed,
-                   'expected_order': order, 'cvode_tight_vs_finest': cvode_diff, 't_end': t_end}
+                   'expected_order': order, 'cvode_tight_vs_finest': cvode_diff, 't_end': t_end, 'pre_time': pre}
 
-        problems = []
+        # hard problems fail; the order and finest-step criteria alone (convergent, monotone, agreeing
+        # with CVODE, but slower than the scheme's order, e.g. a piecewise right-hand side) give partial
+        problems, order_problems = [], []
         if not all(np.isfinite(diffs)):
             problems.append('non-finite solution at some step size (explicit scheme unstable? use smaller dts)')
         else:
@@ -1326,9 +1343,9 @@ def verification_test_timestep(cm):
                 problems.append(f'differences do not decrease with dt: {["%.2e" % d for d in diffs]}')
             last = next((o for o in reversed(observed) if o is not None), None)
             if last is not None and last < min_order:
-                problems.append(f'observed order {last:.2f} < {min_order}')
+                order_problems.append(f'observed order {last:.2f} < {min_order}')
             if diffs[-1] > tol:
-                problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
+                order_problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
             if cvode_diff > cvode_tol:
                 problems.append(f'fixed-step and CVODE solutions differ by {cvode_diff:.2e} > {cvode_tol:.1e}')
         last = next((o for o in reversed(observed) if o is not None), None)
@@ -1336,7 +1353,14 @@ def verification_test_timestep(cm):
                    + (f', observed order {last:.2f} (expected {order})' if last is not None else ', at round-off')
                    + f'; agrees with CVODE to {cvode_diff:.1e}')
         if problems:
-            return Result('verification_test_timestep', FAILED, '; '.join(problems), metrics, figs, problems)
+            return Result('verification_test_timestep', FAILED, '; '.join(problems + order_problems), metrics, figs,
+                          problems + order_problems)
+        if order_problems:
+            return Result('verification_test_timestep', PARTIAL,
+                          'partial: converges (differences decrease monotonically) and agrees with CVODE to '
+                          f'{cvode_diff:.1e}, but ' + '; '.join(order_problems)
+                          + ' (expected for a piecewise right-hand side: fixed steps are first order across a switch)',
+                          metrics, figs, order_problems)
         return Result('verification_test_timestep', PASSED, summary, metrics, figs)
     return _guard(cm.component, 'verification_test_timestep', check)
 

@@ -1,5 +1,5 @@
 {%- macro chip(status, label=None) -%}
-<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
+<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','partial':'Partial','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
 {%- endmacro -%}
 <!doctype html>
 <html lang="en">

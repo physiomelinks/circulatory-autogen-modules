@@ -453,7 +453,7 @@ TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expec
 NESTED_ORDER = {
     'harness': ('module_array', 'parameters'),
     'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'bounds', 'constraints', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
-    'timestep': ('scheme', 'dts', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
+    'timestep': ('scheme', 'dts', 'pre_time', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
                   'tol'),
     'supermodule': ('globals', 'equivalent'),

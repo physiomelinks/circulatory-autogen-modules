@@ -141,7 +141,7 @@ NOT_A_SUPERMODULE = 'not a supermodule'
 NOT_COUPLED = 'not used in a coupled system model (the spec lists no coupled_systems)'
 NO_EQUIVALENT = ('no system model to reproduce: the spec lists no supermodule.equivalent entry (the version is '
                  'checked through the models that use it)')
-STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
+STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending', 'partial': 'Partial',
                 'not_applicable': 'N/A', checks.PASSED_IN_SUPER: 'Pass in super', checks.FAILED_IN_SUPER: 'Fail in super',
                 None: 'Not run'}
 # in the status counts, a pass / fail in a supermodule counts as a pass / fail
@@ -790,7 +790,7 @@ def _phlynx_compatible(tests):
 
 
 def _status_counts(components):
-    counts = {'passed': 0, 'failed': 0, 'skipped': 0, 'pending': 0, 'not_applicable': 0, None: 0}
+    counts = {'passed': 0, 'partial': 0, 'failed': 0, 'skipped': 0, 'pending': 0, 'not_applicable': 0, None: 0}
     for c in components:
         for t in c['tests'] + [t for i in c['parameterisations'] for t in i['tests']]:
             status = COUNT_AS.get(t['status'], t['status'])
@@ -975,7 +975,7 @@ def build_index(contexts, out_path, href):
                            'n_versions': sum(r['n_versions'] for r in rows)})
     all_rows = [r for g in out_groups for r in g['rows']]
     totals = {k: sum(r['counts'].get(k, 0) for r in all_rows)
-              for k in ('passed', 'failed', 'skipped', 'pending', 'not_applicable', None)}
+              for k in ('passed', 'partial', 'failed', 'skipped', 'pending', 'not_applicable', None)}
     html_text = _env().get_template('index.html').render(
         groups=out_groups, totals=totals, n_module_types=len(all_rows), n_versions=sum(r['n_versions'] for r in all_rows),
         generated=_now(), libcuflynx_version=_libcuflynx_version())
