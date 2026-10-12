@@ -8,11 +8,11 @@ C_ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (
 C_Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
 A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
 m_expr,dimensionless,1.0,"definitional; n_0 copies, as many as the calibrated cell has Glf",no
-jmax_glc,mol_per_s_per_um2,3.0933897205955476e-19,"derived: n_0 x turnover_PTS / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_PTS: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
-K_glc_t,millimolar,0.005,"deutscher2006how; glucose PTS (PtsG/EIICB-Glc) Km ~3-10 uM; 5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
+jmax_glc,mol_per_s_per_um2,3.0933897205955483e-20,"derived: n_0 x turnover_ABC / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_ABC: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
+K_glc_t,millimolar,0.0005,"ferenci1996adaptation; binding-protein (Mgl) glucose transport Km ~0.1-1 uM; 0.5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
 R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
 T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
-n_P,dimensionless,1.0,deutscher2006how; one PEP phosphoryl per glucose taken up (and phosphorylated); charged to the lumped cytosol as one ATP equivalent,yes
+n_P,dimensionless,2.0,davidson2008structure; two ATP hydrolysed per transport cycle of a binding-protein-dependent ABC importer,yes
 K_m_ATP,millimolar,0.1,"unreferenced_placeholder; ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM",no
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no

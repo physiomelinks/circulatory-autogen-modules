@@ -1,6 +1,5 @@
 variable_name,units,value,data_reference,sourced
 m_init,dimensionless,0.0,definitional; the level-1 cell has none (the game unlocks it),no
-m_target,dimensionless,0.0,definitional; none until the game sets a target,no
 tau,second,10.0,definitional; time constant with which expression approaches its target (user decision 2026-10-08),no
 n_0,dimensionless,11704.838040881496,"derived: the calibrated cell's Glf copies (Glf capacity / turnover_Glf) (turnover_Glf: unreferenced_placeholder, placeholder)",no
 L,dimensionless,1510.0,"definitional; one Mgl ABC importer: E. coli MglA ATPase (P0AAG8, 506 aa) + 2 MglC permease (P23200, 336) + MglB binding protein (P0AEE5, 332); real cells keep binding protein in excess, not counted here",yes
@@ -15,3 +14,5 @@ K_m_ATP,millimolar,0.1,"unreferenced_placeholder; ribosome and synthetase ATP af
 ATP_ref,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 s_build,dimensionless,1.0,definitional; synthesis serves the whole demand when unconnected,no
+s_target,dimensionless,0.0,definitional; none until the game sets a share,no
+A_ceiling,um2,2.827433388230814,"derived: protein_area_max_fraction x the whole cell surface (protein_area_max_fraction: unreferenced_placeholder, placeholder; R_cell: unreferenced_placeholder, design; h_cell: unreferenced_placeholder, design)",no

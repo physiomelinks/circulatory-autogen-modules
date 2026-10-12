@@ -232,10 +232,11 @@ RHO_NCX = I_NCX / ncx_factor / (A_MEM * NCX['r_NaCa'] * E_CHARGE_NC)
 Q10, T_REF, DT_Q10 = par('Q10'), T, par('dT_Q10')
 V_GLY_SS = R_TOT / (2 * VOL)                # glycolysis makes all the ATP
 V_HYD_SS = None                              # set below, after the protein costs
-GLY = {k: par(k) for k in ('K_glc', 'K_ADP_gly', 'K_Pi_gly', 'K_lac', 'K_ATP_gly')}
+GLY = {k: par(k) for k in ('K_glc', 'K_ADP_gly', 'K_Pi_gly', 'K_lac', 'K_ATP_gly', 'K_G6P_lg', 'K_ATP_hk')}
+DG0_HK, H_HK = par('dG0_hk'), par('h_hk')
 HYD = {k: par(k) for k in ('K_ATP_hyd', 'K_ADP_hyd', 'K_Pi_hyd')}
-GLYC = {k: par(k) for k in ('K_glc_store', 'K_ATP_store', 'C_glyc_max', 'K_glyc_mob', 'K_ADP_mob', 'K_Pi_mob', 'K_i_ATP_mob',
-                            'dG0_store', 'h_glyc_poly')}
+GLYC = {k: par(k) for k in ('K_ATP_store', 'C_glyc_max', 'K_glyc_mob', 'K_Pi_mob', 'K_i_ATP_mob', 'dG0_store',
+                            'h_glyc_poly')}
 GLYC['V_store_max'] = der(par('glycogen_store_rate') * V_GLY_SS, 'glycogen_store_rate x resting glycolytic flux', 'glycogen_store_rate', 'maintenance_coefficient')
 GLYC['V_mob'] = der(par('glycogen_mobilise_rate') * V_GLY_SS, 'glycogen_mobilise_rate x resting glycolytic flux', 'glycogen_mobilise_rate', 'maintenance_coefficient')
 # Membrane carriers and glycolytic capacity. A growing fermenter runs glycolysis 10-30x faster than its maintenance flux
@@ -314,17 +315,24 @@ def keq(dg0):
     return math.exp(-dg0 / RT)
 
 
-KEQ_GLY = keq(DG0_FERM - 2 * DG0_HYD)
+KEQ_HK = keq(DG0_HK)                          # glucose + ATP -> G6P + ADP
+KEQ_LG = keq(DG0_FERM - 2 * DG0_HYD - DG0_HK)  # G6P + 3 ADP + 2 Pi -> 2 lactate + 3 ATP
 KEQ_HYD = keq(DG0_HYD)
 
 
-def cm_gly(glc, lac, atp, adp, pi):
+def cm_gly(glc, lac, atp, adp, pi, g6p):
+    '''The hexokinase step per unit V_gly: the lumped pathway's kinetics (glucose, ADP, Pi, lactate, ATP), saturating
+    in its substrate ATP, with the hexokinase reaction's thermodynamic factor.'''
     g = lambda c, k: c / k
-    s = g(glc, GLY['K_glc']) * g(adp, GLY['K_ADP_gly']) ** 2 * g(pi, GLY['K_Pi_gly']) ** 2
-    gamma = (lac / C_STD) ** 2 * (atp / C_STD) ** 2 / ((glc / C_STD) * (adp / C_STD) ** 2 * (pi / C_STD) ** 2)
+    s = g(adp, GLY['K_ADP_gly']) ** 2 * g(pi, GLY['K_Pi_gly']) ** 2 / GLY['K_glc']
     d = ((1 + g(glc, GLY['K_glc'])) * (1 + g(adp, GLY['K_ADP_gly'])) ** 2 * (1 + g(pi, GLY['K_Pi_gly'])) ** 2
          + (1 + g(lac, GLY['K_lac'])) ** 2 * (1 + g(atp, GLY['K_ATP_gly'])) ** 2 - 1)
-    return s * (1 - gamma / KEQ_GLY) / d
+    return s * (glc * atp - g6p * adp / KEQ_HK) / (GLY['K_ATP_hk'] + atp) / d
+
+
+def lg_sat(adp, pi):
+    '''The lower glycolysis' saturation in ADP and Pi.'''
+    return adp / (GLY['K_ADP_gly'] + adp) * pi / (GLY['K_Pi_gly'] + pi)
 
 
 def cm_hyd(atp, adp, pi):
@@ -334,8 +342,22 @@ def cm_hyd(atp, adp, pi):
     return s * (1 - gamma / KEQ_HYD) / d
 
 
-V_GLY = V_GLY_SS / cm_gly(GLC_I, LAC_I, ATP, ADP, PI)
-GLY_HEADROOM = V_GLY * cm_gly(1e3, LAC_I, ATP, ADP, PI) / V_GLY_SS   # glycolysis if glucose inside were saturating
+# Lower glycolysis: capacity (saturating G6P, the resting ADP and Pi) lower_glycolysis_headroom x the resting flux, so
+# G6P sits at K_G6P_lg/(headroom - 1)
+LG_HEADROOM = par('lower_glycolysis_headroom')
+V_LG = der(LG_HEADROOM * V_GLY_SS / lg_sat(ADP, PI),
+           'lower_glycolysis_headroom x resting glycolytic flux / its ADP and Pi saturation at rest',
+           'lower_glycolysis_headroom', 'maintenance_coefficient', 'K_ADP_gly', 'K_Pi_gly')
+_x = V_GLY_SS / (V_LG * lg_sat(ADP, PI))      # G6P saturation at rest (thermodynamic factor 1 to 1e-15)
+G6P_I = der(GLY['K_G6P_lg'] * _x / (1 - _x), 'steady state of the lower glycolysis at rest: K_G6P_lg/(headroom - 1)',
+            'K_G6P_lg', 'lower_glycolysis_headroom')
+_gamma_lg = (LAC_I / C_STD) ** 2 * (ATP / C_STD) ** 3 / ((G6P_I / C_STD) * (ADP / C_STD) ** 3 * (PI / C_STD) ** 2)
+assert _gamma_lg / KEQ_LG < 1e-12, 'the lower glycolysis must be far from equilibrium at rest'
+V_GLY = V_GLY_SS / cm_gly(GLC_I, LAC_I, ATP, ADP, PI, G6P_I)
+GLY_HEADROOM = V_GLY * cm_gly(1e3, LAC_I, ATP, ADP, PI, G6P_I) / V_GLY_SS   # if glucose inside were saturating
+# glycogen synthesis takes G6P: its affinity scaled so it runs at the same share of its capacity at rest
+GLYC['K_G6P_store'] = der(par('K_glc_store') * G6P_I / GLC_I, 'K_glc_store x G6P_i / glc_i: the store saturated at rest '
+                          'as when it took free glucose', 'K_glc_store', 'glc_i', 'K_G6P_lg', 'lower_glycolysis_headroom')
 V_HYD = V_HYD_SS / cm_hyd(ATP, ADP, PI)
 H_GLC = 2 * H_LAC_GLY                        # J/mol relative to lactate (lactate is this cell's end product)
 A_HYD = RT * math.log(KEQ_HYD / ((ADP / C_STD) * (PI / C_STD) / (ATP / C_STD)))
@@ -357,6 +379,9 @@ print(f'biosynthesis: mRNA {J_RNA * NA:.4g}, ribosomes {J_RIBO * NA:.4g}, lipids
       f'{V_HYD_SS * VOL / R_TOT:.1%}')
 print(f'glycolytic headroom {GLY_HEADROOM:.3g}x the resting flux; Glf capacity from the background ({GLC_E} mM): '
       f'{VMAX_GLC * GLC_E / (K_GLC_T + GLC_E) / J_GLC:.3g}x, from a 10 mM packet: {VMAX_GLC * 10 / (K_GLC_T + 10) / J_GLC:.3g}x')
+print(f'G6P at rest {G6P_I:.4g} mM; lower glycolysis V_lg {V_LG:.4g} mM/s ({LG_HEADROOM:g}x the resting flux); '
+      f'hexokinase thermodynamic factor at rest {1 - G6P_I * ADP / (GLC_I * ATP) / KEQ_HK:.6f}, ATP saturation '
+      f'{ATP / (GLY["K_ATP_hk"] + ATP):.5f}')
 print(f'glycolysis {V_GLY_SS:.4g} mM/s (V_gly {V_GLY:.4g}), ATPase {V_HYD_SS:.4g} mM/s (V_hyd {V_HYD:.4g}); '
       f'glc_i {GLC_I:.4g} mM, lac_i {LAC_I:.4g} mM; heat {Q_SS:.4g} W ({Q_SS / VOL:.4g} W/m3)')
 print(f'H+-ATPase thermodynamics: ATP affinity {A_HYD / 1e3:.2f} kJ/mol vs H+ work {W_H_REST / 1e3:.2f} kJ/mol per ATP; '
@@ -558,21 +583,35 @@ cyto_vars += [
     ('c_std', 'millimolar', 'in', None, None),
     ('dG0_ferm', 'J_per_mol', 'in', None, 'standard Gibbs energies (glucose -> 2 lactate; ATP hydrolysis)'),
     ('dG0_hyd', 'J_per_mol', 'in', None, None),
-    ('V_gly', 'millimolar_per_s', 'in', None, None), ('K_glc', 'millimolar', 'in', None, None),
+    ('V_gly', 'millimolar_per_s', 'in', None, 'capacity of the hexokinase step'), ('K_glc', 'millimolar', 'in', None, None),
     ('K_ADP_gly', 'millimolar', 'in', None, None), ('K_Pi_gly', 'millimolar', 'in', None, None),
     ('K_lac', 'millimolar', 'in', None, None), ('K_ATP_gly', 'millimolar', 'in', None, None),
+    ('K_ATP_hk', 'millimolar', 'in', None, 'ATP for half-rate of the hexokinase step'),
+    ('dG0_hk', 'J_per_mol', 'in', None, 'standard Gibbs energy of glucose + ATP -> G6P + ADP'),
+    ('h_hk', 'J_per_mol', 'in', None, 'enthalpy released by glucose + ATP -> G6P + ADP'),
+    ('V_lg', 'millimolar_per_s', 'in', None, 'capacity of the lower glycolysis'),
+    ('K_G6P_lg', 'millimolar', 'in', None, None),
+    ('C_G6P_init', 'millimolar', 'in', None, None),
+    ('C_G6P', 'millimolar', 'out', 'C_G6P_init', 'glucose 6-phosphate: trapped in the cell (no carrier takes it)'),
+    ('j_G6P_ext', 'mol_per_s', 'in', None, 'G6P delivered by group-translocating carriers, the PTS (G6P_port, summed)'),
     ('V_hyd', 'millimolar_per_s', 'in', None, None), ('K_ATP_hyd', 'millimolar', 'in', None, None),
     ('K_ADP_hyd', 'millimolar', 'in', None, None), ('K_Pi_hyd', 'millimolar', 'in', None, None),
     ('h_lac_gly', 'J_per_mol', 'in', None, 'enthalpies released (positive = heat out)'), ('h_ATP', 'J_per_mol', 'in', None, None),
     ('f_T', 'dimensionless', 'out', None, None),
-    ('K_eq_gly', 'dimensionless', 'out', None, None), ('K_eq_hyd', 'dimensionless', 'out', None, None),
-    ('Gamma_gly', 'dimensionless', 'out', None, 'mass-action ratios'), ('Gamma_hyd', 'dimensionless', 'out', None, None),
-    ('v_gly', 'millimolar_per_s', 'out', None, 'glucose + 2 ADP + 2 Pi <=> 2 lactate + 2 ATP (common modular rate law)'),
+    ('K_eq_hk', 'dimensionless', 'out', None, None), ('K_eq_lg', 'dimensionless', 'out', None, None),
+    ('K_eq_hyd', 'dimensionless', 'out', None, None),
+    ('Gamma_hk', 'dimensionless', 'out', None, 'mass-action ratios'), ('Gamma_lg', 'dimensionless', 'out', None, None),
+    ('Gamma_hyd', 'dimensionless', 'out', None, None),
+    ('v_gly', 'millimolar_per_s', 'out', None, 'glucose entering glycolysis, the hexokinase step: glucose + ATP <=> G6P + '
+                                               'ADP (the lumped pathway\'s common modular kinetics)'),
+    ('v_lg', 'millimolar_per_s', 'out', None, 'lower glycolysis: G6P + 3 ADP + 2 Pi <=> 2 lactate + 3 ATP'),
     ('v_hyd', 'millimolar_per_s', 'out', None, 'ATP <=> ADP + Pi, the cell\'s maintenance work'),
-    ('A_gly', 'J_per_mol', 'out', None, 'affinities A = RT ln(K_eq/Gamma)'), ('A_hyd', 'J_per_mol', 'out', None, None),
+    ('A_hk', 'J_per_mol', 'out', None, 'affinities A = RT ln(K_eq/Gamma)'), ('A_lg', 'J_per_mol', 'out', None, None),
+    ('A_hyd', 'J_per_mol', 'out', None, None),
     ('P_diss', 'watt', 'out', None, 'free energy dissipated by the reactions (>= 0, second law)'),
     ('Q_met', 'watt', 'out', None, 'heat released: reaction enthalpies, including ATP hydrolysed by transporters'),
-    ('J_ATP_turnover', 'mol_per_s', 'out', None, 'ATP hydrolysed by the ATPase and transporters'),
+    ('J_ATP_turnover', 'mol_per_s', 'out', None, 'ATP used by the ATPase and the ATP_hydrolysis_port users (the PTS\'s '
+                                                'PEP equivalent included)'),
     ('j_H_met', 'mol_per_s', 'out', None, 'H+ released into the cytosol by all ATP hydrolysed, the maintenance ATPase and '
                                           'the ATP_hydrolysis_port users (H_production port): '
                                           'ATP4- + H2O -> ADP3- + HPO4 2- + H+'),
@@ -580,78 +619,109 @@ cyto_vars += [
     ('C_glyc_init', 'millimolar', 'in', None, None),
     ('C_glyc', 'millimolar', 'out', 'C_glyc_init', 'glycogen, as mM of glucose units'),
     ('store_alloc', 'dimensionless', 'in', None, 'fraction of the storage capacity in use (set by the game, 0-1)'),
-    ('V_store_max', 'millimolar_per_s', 'in', None, None), ('K_glc_store', 'millimolar', 'in', None, None),
+    ('V_store_max', 'millimolar_per_s', 'in', None, None), ('K_G6P_store', 'millimolar', 'in', None, None),
     ('K_ATP_store', 'millimolar', 'in', None, None), ('C_glyc_max', 'millimolar', 'in', None, 'storage ceiling'),
     ('V_mob', 'millimolar_per_s', 'in', None, None), ('K_glyc_mob', 'millimolar', 'in', None, None),
-    ('K_ADP_mob', 'millimolar', 'in', None, None), ('K_Pi_mob', 'millimolar', 'in', None, None),
+    ('K_Pi_mob', 'millimolar', 'in', None, None),
     ('K_i_ATP_mob', 'millimolar', 'in', None, 'ATP inhibition of mobilisation (phosphorylase)'),
     ('dG0_store', 'J_per_mol', 'in', None, 'glucose + 2 ATP -> glycogen unit + 2 ADP + 2 Pi'),
     ('h_glyc_poly', 'J_per_mol', 'in', None, 'enthalpy released by adding a glucose to glycogen'),
     ('K_eq_store', 'dimensionless', 'out', None, None), ('K_eq_mob', 'dimensionless', 'out', None, None),
     ('Gamma_store', 'dimensionless', 'out', None, None), ('Gamma_mob', 'dimensionless', 'out', None, None),
-    ('v_store', 'millimolar_per_s', 'out', None, 'glycogen synthesis: glucose + 2 ATP -> glycogen + 2 ADP + 2 Pi'),
-    ('v_mob', 'millimolar_per_s', 'out', None, 'glycogenolysis to lactate: glycogen + 3 ADP + 3 Pi -> 2 lactate + 3 ATP'),
+    ('a_glyc', 'dimensionless', 'out', None, 'glycogen\'s activity in the store\'s reverse (none without glycogen)'),
+    ('v_store', 'millimolar_per_s', 'out', None, 'glycogen synthesis (ADP-glucose route): G6P + ATP -> glycogen + ADP + '
+                                                 '2 Pi'),
+    ('v_mob', 'millimolar_per_s', 'out', None, 'glycogen phosphorylase (and phosphoglucomutase): glycogen + Pi -> G6P'),
     ('A_store', 'J_per_mol', 'out', None, None), ('A_mob', 'J_per_mol', 'out', None, None),
     ('m_gly', 'dimensionless', 'in', None, 'expression of the glycolytic enzymes, 1 = the calibrated cell (enzyme_expression '
                                           'port, from their protein_pool)'),
-    ('J_ATP_gly', 'mol_per_s', 'out', None, 'ATP made by glycolysis (2 per glucose)'),
-    ('J_ATP_mob', 'mol_per_s', 'out', None, 'ATP made from glycogen (3 per glucose unit)'),
-    ('J_ATP_store', 'mol_per_s', 'out', None, 'ATP spent storing glucose as glycogen (2 per glucose)'),
+    ('J_ATP_gly', 'mol_per_s', 'out', None, 'net ATP glycolysis makes from the sugar it takes in: 2 per glucose (the '
+                                              'hexokinase ATP spent), 3 per G6P a carrier delivers'),
+    ('J_ATP_mob', 'mol_per_s', 'out', None, 'ATP made from glycogen (3 per glucose unit, through the lower glycolysis)'),
+    ('J_ATP_store', 'mol_per_s', 'out', None, 'ATP spent storing glucose as glycogen (2 per glucose: the hexokinase step '
+                                                'and ADP-glucose synthesis)'),
+    ('J_ATP_hk', 'mol_per_s', 'out', None, 'ATP the hexokinase step spends'),
+    ('J_ATP_lg', 'mol_per_s', 'out', None, 'ATP the lower glycolysis makes (3 per G6P)'),
     ('J_ATP_maint', 'mol_per_s', 'out', None, 'ATP hydrolysed by the maintenance ATPase (everything not itemised)'),
     ('M_glyc_ATP', 'mole', 'out', None, 'ATP the glycogen store would give if spent (3 per glucose unit; glycogen_store port)'),
 ]
 cyto_eqs = [
     ('f_T', 'Q10 ** ((T - T_ref) / dT_Q10)'),
-    ('K_eq_gly', 'exp(-(dG0_ferm - 2.0 * dG0_hyd) / (R * T))'),
+    ('K_eq_hk', 'exp(-dG0_hk / (R * T))'),
+    ('K_eq_lg', 'exp(-(dG0_ferm - 2.0 * dG0_hyd - dG0_hk) / (R * T))'),
     ('K_eq_hyd', 'exp(-dG0_hyd / (R * T))'),
-    ('Gamma_gly', '((C_lac / c_std) ** 2.0 * (C_ATP / c_std) ** 2.0) / '
-                  '((C_glc / c_std) * (C_ADP / c_std) ** 2.0 * (C_Pi / c_std) ** 2.0)'),
+    ('Gamma_hk', '((C_G6P / c_std) * (C_ADP / c_std)) / ((C_glc / c_std) * (C_ATP / c_std))'),
+    ('Gamma_lg', '((C_lac / c_std) ** 2.0 * (C_ATP / c_std) ** 3.0) / '
+                 '((C_G6P / c_std) * (C_ADP / c_std) ** 3.0 * (C_Pi / c_std) ** 2.0)'),
     ('Gamma_hyd', '((C_ADP / c_std) * (C_Pi / c_std)) / (C_ATP / c_std)'),
-    ('v_gly', 'V_gly * m_gly * f_T * (C_glc / K_glc) * (C_ADP / K_ADP_gly) ** 2.0 * (C_Pi / K_Pi_gly) ** 2.0 '
-              '* (1.0 - Gamma_gly / K_eq_gly) / ((1.0 + C_glc / K_glc) * (1.0 + C_ADP / K_ADP_gly) ** 2.0 '
-              '* (1.0 + C_Pi / K_Pi_gly) ** 2.0 + (1.0 + C_lac / K_lac) ** 2.0 * (1.0 + C_ATP / K_ATP_gly) ** 2.0 - 1.0)'),
+    # the hexokinase step carries the pathway's control: the lumped pathway's common modular kinetics in glucose,
+    # ADP, Pi, lactate and ATP, saturating in its substrate ATP, with the thermodynamic factor of its own reaction
+    # (written (C_glc C_ATP - C_G6P C_ADP/K_eq) so it stays finite as glucose or ATP run out)
+    ('v_gly', 'V_gly * m_gly * f_T * (C_ADP / K_ADP_gly) ** 2.0 * (C_Pi / K_Pi_gly) ** 2.0 '
+              '* (C_glc * C_ATP - C_G6P * C_ADP / K_eq_hk) / (K_glc * (K_ATP_hk + C_ATP)) / ((1.0 + C_glc / K_glc) '
+              '* (1.0 + C_ADP / K_ADP_gly) ** 2.0 * (1.0 + C_Pi / K_Pi_gly) ** 2.0 + (1.0 + C_lac / K_lac) ** 2.0 '
+              '* (1.0 + C_ATP / K_ATP_gly) ** 2.0 - 1.0)'),
+    # the lower glycolysis: fast (G6P stays low), saturating in G6P, ADP and Pi (first order in each, so it does not
+    # stall as ADP falls); its thermodynamic factor (1 - Gamma_lg/K_eq_lg) is ~1e-15 from 1 in the cell
+    ('v_lg', 'V_lg * m_gly * f_T * (C_G6P - C_lac ** 2.0 * C_ATP ** 3.0 * c_std / (C_ADP ** 3.0 * C_Pi ** 2.0 * '
+             'K_eq_lg)) / (K_G6P_lg + C_G6P) * C_ADP / (K_ADP_gly + C_ADP) * C_Pi / (K_Pi_gly + C_Pi)'),
     ('v_hyd', 'V_hyd * f_T * (C_ATP / K_ATP_hyd) * (1.0 - Gamma_hyd / K_eq_hyd) / ((1.0 + C_ATP / K_ATP_hyd) '
               '+ (1.0 + C_ADP / K_ADP_hyd) * (1.0 + C_Pi / K_Pi_hyd) - 1.0)'),
     # ln of |Gamma| + 1e-300: a substrate that runs out sits at round-off (about 1e-14 mM, either sign) and its ratio
     # would make ln undefined; the rate law itself self-corrects (its sign follows 1 - Gamma/K_eq)
-    ('A_gly', 'R * T * (ln(K_eq_gly) - ln(abs(Gamma_gly) + 1e-300))'),
+    ('A_hk', 'R * T * (ln(K_eq_hk) - ln(abs(Gamma_hk) + 1e-300))'),
+    ('A_lg', 'R * T * (ln(K_eq_lg) - ln(abs(Gamma_lg) + 1e-300))'),
     ('A_hyd', 'R * T * (ln(K_eq_hyd) - ln(abs(Gamma_hyd) + 1e-300))'),
-    ('K_eq_store', 'exp(-dG0_store / (R * T))'),
-    ('K_eq_mob', 'exp(-(dG0_ferm - dG0_store - dG0_hyd) / (R * T))'),
-    ('Gamma_store', '((C_ADP / c_std) ** 2.0 * (C_Pi / c_std) ** 2.0) / ((C_glc / c_std) * (C_ATP / c_std) ** 2.0)'),
-    ('Gamma_mob', '((C_lac / c_std) ** 2.0 * (C_ATP / c_std) ** 3.0) / ((C_ADP / c_std) ** 3.0 * (C_Pi / c_std) ** 3.0)'),
+    # dG0_store is that of glucose + 2 ATP -> glycogen + 2 ADP + 2 Pi; the store takes G6P (less the hexokinase step) and
+    # the phosphorylase gives G6P (glycogen + Pi: the reverse, plus ATP hydrolysis)
+    ('K_eq_store', 'exp(-(dG0_store - dG0_hk) / (R * T))'),
+    ('K_eq_mob', 'exp(-(dG0_hk + dG0_hyd - dG0_store) / (R * T))'),
+    # the store's reverse needs glycogen: glycogen's activity there is a_glyc = C_glyc/(K_glyc_mob + C_glyc)
+    ('a_glyc', 'C_glyc / (K_glyc_mob + C_glyc)'),
+    ('Gamma_store', 'a_glyc * ((C_ADP / c_std) * (C_Pi / c_std) ** 2.0) / ((C_G6P / c_std) * (C_ATP / c_std))'),
+    ('Gamma_mob', '(C_G6P / c_std) / (C_Pi / c_std)'),
     # storage saturates near the ceiling (smooth, always >= 0 so its sign follows the affinity)
-    ('v_store', 'V_store_max * store_alloc * f_T * C_glc / (K_glc_store + C_glc) * C_ATP / (K_ATP_store + C_ATP) '
-                '/ (1.0 + (C_glyc / C_glyc_max) ** 8.0) * (1.0 - Gamma_store / K_eq_store)'),
-    ('v_mob', 'V_mob * f_T * C_glyc / (K_glyc_mob + C_glyc) * C_ADP / (K_ADP_mob + C_ADP) * C_Pi / (K_Pi_mob + C_Pi) '
-              '* K_i_ATP_mob / (K_i_ATP_mob + C_ATP) * (1.0 - Gamma_mob / K_eq_mob)'),
+    # (each written as a difference of products, finite as any reactant runs out)
+    ('v_store', 'V_store_max * store_alloc * f_T * (C_G6P * C_ATP - a_glyc * C_ADP * C_Pi ** 2.0 / (c_std * K_eq_store)) '
+                '/ ((K_G6P_store + C_G6P) * (K_ATP_store + C_ATP)) / (1.0 + (C_glyc / C_glyc_max) ** 8.0)'),
+    ('v_mob', 'V_mob * f_T * C_glyc / (K_glyc_mob + C_glyc) * (C_Pi - C_G6P / K_eq_mob) / (K_Pi_mob + C_Pi) '
+              '* K_i_ATP_mob / (K_i_ATP_mob + C_ATP)'),
     ('A_store', 'R * T * (ln(K_eq_store) - ln(abs(Gamma_store) + 1e-300))'),
     ('A_mob', 'R * T * (ln(K_eq_mob) - ln(abs(Gamma_mob) + 1e-300))'),
-    ('P_diss', 'V_c * (v_gly * A_gly + v_hyd * A_hyd + v_store * A_store + v_mob * A_mob)'),
+    ('P_diss', 'V_c * (v_gly * A_hk + v_lg * A_lg + v_hyd * A_hyd + v_store * A_store + v_mob * A_mob)'),
     ('J_ATP_turnover', 'V_c * v_hyd - j_ATP_ext'),
-    # one H+ per ATP hydrolysed (2 per glucose stored); glycogenolysis to lactate takes up one H+ (charge balance)
-    ('j_H_met', 'V_c * (v_hyd + 2.0 * v_store - v_mob) - j_ATP_ext'),
-    ('Q_met', 'V_c * (v_gly * (2.0 * h_lac_gly - 2.0 * h_ATP) + v_hyd * h_ATP + v_store * (2.0 * h_ATP + h_glyc_poly) '
-              '+ v_mob * (2.0 * h_lac_gly - h_glyc_poly - 3.0 * h_ATP)) - j_ATP_ext * h_ATP'),
-    ('d/dt C_glc', '(J_glc_in + J_glc_out) / V_c - v_gly - v_store'),
-    ('d/dt C_lac', '(J_lac_in + J_lac_out) / V_c + 2.0 * v_gly + 2.0 * v_mob'),
-    ('d/dt C_ATP', '(J_ATP_in + J_ATP_out + j_ATP_ext) / V_c + 2.0 * v_gly - v_hyd - 2.0 * v_store + 3.0 * v_mob'),
-    ('d/dt C_ADP', '(J_ADP_in + J_ADP_out + j_ADP_ext) / V_c - 2.0 * v_gly + v_hyd + 2.0 * v_store - 3.0 * v_mob'),
-    ('d/dt C_Pi', '(J_Pi_in + J_Pi_out + j_Pi_ext) / V_c - 2.0 * v_gly + v_hyd + 2.0 * v_store - 3.0 * v_mob'),
+    # H+ with the ionised species: one per ATP hydrolysed and per sugar phosphorylated by ATP (hexokinase, the PTS's ATP
+    # equivalent, ADP-glucose synthesis); the lower glycolysis takes one up; the phosphorylase none
+    ('j_H_met', 'V_c * (v_hyd + v_gly - v_lg + v_store) - j_ATP_ext'),
+    # heat: the reaction enthalpies; the ATP_hydrolysis_port users hydrolyse ATP (one Pi each), the PTS phosphorylates
+    # glucose (one G6P each)
+    ('Q_met', 'V_c * (v_gly * h_hk + v_lg * (2.0 * h_lac_gly - 2.0 * h_ATP - h_hk) + v_hyd * h_ATP '
+              '+ v_store * (2.0 * h_ATP + h_glyc_poly - h_hk) + v_mob * (h_hk - h_ATP - h_glyc_poly)) '
+              '+ j_Pi_ext * h_ATP + j_G6P_ext * h_hk'),
+    ('d/dt C_glc', '(J_glc_in + J_glc_out) / V_c - v_gly'),
+    ('d/dt C_G6P', 'j_G6P_ext / V_c + v_gly + v_mob - v_lg - v_store'),
+    ('d/dt C_lac', '(J_lac_in + J_lac_out) / V_c + 2.0 * v_lg'),
+    ('d/dt C_ATP', '(J_ATP_in + J_ATP_out + j_ATP_ext) / V_c - v_gly + 3.0 * v_lg - v_hyd - v_store'),
+    ('d/dt C_ADP', '(J_ADP_in + J_ADP_out + j_ADP_ext) / V_c + v_gly - 3.0 * v_lg + v_hyd + v_store'),
+    ('d/dt C_Pi', '(J_Pi_in + J_Pi_out + j_Pi_ext) / V_c - 2.0 * v_lg + v_hyd + 2.0 * v_store - v_mob'),
     ('d/dt C_glyc', 'v_store - v_mob'),
-    # the ATP budget by reaction, from the stoichiometry above
-    ('J_ATP_gly', '2.0 * V_c * v_gly'), ('J_ATP_mob', '3.0 * V_c * v_mob'), ('J_ATP_store', '2.0 * V_c * v_store'),
+    # the ATP budget by reaction: the store is charged 2 per glucose (its own ATP and the hexokinase's), glycogen is
+    # credited the 3 its G6P makes; glycolysis has the rest of the net 3 v_lg - v_gly
+    ('J_ATP_hk', 'V_c * v_gly'), ('J_ATP_lg', '3.0 * V_c * v_lg'),
+    ('J_ATP_gly', 'J_ATP_lg - J_ATP_hk - J_ATP_mob + V_c * v_store'),
+    ('J_ATP_mob', '3.0 * V_c * v_mob'), ('J_ATP_store', '2.0 * V_c * v_store'),
     ('J_ATP_maint', 'V_c * v_hyd'), ('M_glyc_ATP', '3.0 * V_c * C_glyc'),
 ]
 cyto_roles = {v[0]: 'constant' for v in cyto_vars if v[0] != 't'}
 cyto_roles.update({f'C_{s}': 'variable' for s in cyto_species})
 cyto_roles.update({f'J_{s}_{d}': 'variable' for s in cyto_species for d in ('in', 'out')})
 cyto_roles.update({f'j_{s}_ext': 'variable' for s in ('ATP', 'ADP', 'Pi')})
-cyto_roles.update({n: 'variable' for n in ('f_T', 'K_eq_gly', 'K_eq_hyd', 'Gamma_gly', 'Gamma_hyd', 'v_gly', 'v_hyd',
-                                            'A_gly', 'A_hyd', 'P_diss', 'Q_met', 'J_ATP_turnover', 'V_c', 'j_H_met',
-                                            'C_glyc', 'K_eq_store', 'K_eq_mob', 'Gamma_store', 'Gamma_mob', 'v_store',
-                                            'v_mob', 'A_store', 'A_mob', 'J_ATP_gly', 'J_ATP_mob', 'J_ATP_store',
-                                            'J_ATP_maint', 'M_glyc_ATP')})
+cyto_roles.update({n: 'variable' for n in ('f_T', 'K_eq_hk', 'K_eq_lg', 'K_eq_hyd', 'Gamma_hk', 'Gamma_lg', 'Gamma_hyd',
+                                            'v_gly', 'v_lg', 'v_hyd', 'A_hk', 'A_lg', 'A_hyd', 'P_diss', 'Q_met',
+                                            'J_ATP_turnover', 'V_c', 'j_H_met', 'C_glyc', 'C_G6P', 'j_G6P_ext',
+                                            'K_eq_store', 'K_eq_mob', 'Gamma_store', 'a_glyc', 'Gamma_mob', 'v_store', 'v_mob',
+                                            'A_store', 'A_mob', 'J_ATP_gly', 'J_ATP_mob', 'J_ATP_store', 'J_ATP_maint',
+                                            'J_ATP_hk', 'J_ATP_lg', 'M_glyc_ATP')})
 cyto_roles['store_alloc'] = 'boundary_condition'   # set by the game
 cyto_roles['m_gly'] = 'boundary_condition'   # from the glycolytic enzymes' protein_pool
 cyto_roles.update({n: 'global_constant' for n in ('T', 'R')})
@@ -665,6 +735,8 @@ cyto_ports = {
     'general_ports': [
         {'port_type': 'ATP_hydrolysis_port', 'variables': ['C_ATP', 'C_ADP', 'C_Pi', 'j_ATP_ext', 'j_ADP_ext', 'j_Pi_ext'],
          'multi_port': ['True', 'True', 'True', 'sum', 'sum', 'sum']},
+        # the G6P pool, for carriers that deliver G6P (the PTS)
+        {'port_type': 'G6P_port', 'variables': ['C_G6P', 'j_G6P_ext'], 'multi_port': ['True', 'sum']},
         {'port_type': 'compartment_volume', 'variables': ['V_c']},
         {'port_type': 'heat_source_port', 'variables': ['T', 'Q_met']},
         {'port_type': 'H_production', 'variables': ['j_H_met']},
@@ -677,6 +749,8 @@ cyto_ports = {
 cyto_params = [
     ('C_glc_init', GLC_I, 'calibrated: steady state of the lumped cell (uptake by the membrane carrier = glycolysis)', False),
     ('C_lac_init', LAC_I, 'calibrated: steady state of the lumped cell (export by the membrane carrier = production)', False),
+    ('C_G6P_init', G6P_I, '', False),
+    ('j_G6P_ext', 0.0, 'no G6P-delivering carrier connected', False),
     ('C_ATP_init', ATP, 'bennett2009absolute; ATP 9.6 mM in glucose-fed, exponentially growing E. coli', True),
     ('C_ADP_init', ADP, f'{PH}; ADP of order 0.5 mM in E. coli (reported about 0.56 mM by Bennett et al. 2009; to confirm)',
      False),
@@ -701,6 +775,8 @@ cyto_params = [
     ('V_gly', V_GLY, 'calibrated: glycolysis supplies the total ATP turnover (lynch2015bioenergetic maintenance at 20 C) '
                      'at the default steady state', False),
     ('K_glc', GLY['K_glc'], f'{PH}; lumped glycolysis affinity for glucose (glucokinase order 0.1 mM)', False),
+    ('K_ATP_hk', GLY['K_ATP_hk'], '', False), ('dG0_hk', DG0_HK, '', False), ('h_hk', H_HK, '', False),
+    ('V_lg', V_LG, '', False), ('K_G6P_lg', GLY['K_G6P_lg'], '', False),
     ('K_ADP_gly', GLY['K_ADP_gly'], f'{PH}; lumped glycolysis affinity for ADP', False),
     ('K_Pi_gly', GLY['K_Pi_gly'], f'{PH}; lumped glycolysis affinity for Pi', False),
     ('K_lac', GLY['K_lac'], f'{PH}; lumped glycolysis product constant for lactate', False),
@@ -716,13 +792,12 @@ cyto_params = [
     ('store_alloc', 0.0, 'definitional; storage off until the player allocates energy to it', False),
     ('V_store_max', GLYC['V_store_max'], f'{PH}; at full allocation the cell stores glucose at about half its resting '
                                          'glycolytic flux', False),
-    ('K_glc_store', GLYC['K_glc_store'], f'{PH}; glucokinase-order affinity', False),
+    ('K_G6P_store', GLYC['K_G6P_store'], '', False),
     ('K_ATP_store', GLYC['K_ATP_store'], f'{PH}; ADP-glucose pyrophosphorylase ATP affinity, order 1 mM', False),
     ('C_glyc_max', GLYC['C_glyc_max'], f'{PH}; about 10% of dry weight (cell 1.1 g/mL, 30% dry): 200 mM glucose units',
      False),
     ('V_mob', GLYC['V_mob'], f'{PH}; mobilisation capacity twice the resting glycolytic flux', False),
     ('K_glyc_mob', GLYC['K_glyc_mob'], f'{PH}; phosphorylase affinity for glycogen', False),
-    ('K_ADP_mob', GLYC['K_ADP_mob'], f'{PH}; lumped affinity for ADP', False),
     ('K_Pi_mob', GLYC['K_Pi_mob'], f'{PH}; phosphorylase affinity for Pi, order 5 mM', False),
     ('K_i_ATP_mob', GLYC['K_i_ATP_mob'], f'{PH}; ATP inhibits mobilisation, so glycogen is spent when ATP falls', False),
     ('dG0_store', GLYC['dG0_store'], f'{PH}; textbook steps glucose -> G6P -> G1P -> UDP-glucose -> glycogen with PPi '
@@ -732,50 +807,70 @@ cyto_params = [
 ]
 h_glc = 2 * H_LAC_GLY
 cyto_invariants = [
-    {'description': 'carbon balance with the membrane carriers: d/dt V_c (6 C_glc + 3 C_lac + 6 C_glyc) = 6 J_glc + '
-                    '3 J_lac, integrated (relative 1e-6)',
-     'expr': 'abs(V_c*((6*C_glc[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 3*C_lac[0] + 6*C_glyc[0])) - '
-             'np.trapz(6*mf__J_glc + 3*mf__J_lac, t)) <= 1e-6*np.trapz(np.abs(6*mf__J_glc) + np.abs(3*mf__J_lac), t)'},
+    {'description': 'carbon balance with the membrane carriers: d/dt V_c (6 C_glc + 6 C_G6P + 3 C_lac + 6 C_glyc) = '
+                    '6 J_glc + 3 J_lac, integrated (relative 1e-6)',
+     'expr': 'abs(V_c*((6*C_glc[-1] + 6*C_G6P[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 6*C_G6P[0] + 3*C_lac[0] '
+             '+ 6*C_glyc[0])) - np.trapz(6*mf__J_glc + 3*mf__J_lac, t)) <= 1e-6*np.trapz(np.abs(6*mf__J_glc) + '
+             'np.abs(3*mf__J_lac), t)'},
     {'description': 'adenine is conserved (bond-graph structure; ATP, ADP do not cross): C_ATP + C_ADP constant '
                     '(relative 1e-9)',
      'expr': 'np.ptp(C_ATP + C_ADP) <= 1e-9*np.max(C_ATP + C_ADP)'},
-    {'description': 'phosphoryl groups are conserved: C_ATP + C_Pi constant (relative 1e-9)',
-     'expr': 'np.ptp(C_ATP + C_Pi) <= 1e-9*np.max(C_ATP + C_Pi)'},
+    {'description': 'phosphoryl groups are conserved: C_ATP + C_Pi + C_G6P constant (relative 1e-9)',
+     'expr': 'np.ptp(C_ATP + C_Pi + C_G6P) <= 1e-9*np.max(C_ATP + C_Pi + C_G6P)'},
     {'description': f'first law: the enthalpy brought in with glucose equals the change in stored enthalpy plus the heat, '
-                    f'h_glc int J_glc dt = V_c (h_glc dC_glc + h_ATP dC_ATP) + int Q_met dt, h_glc = 2 h_lac_gly = '
-                    f'{h_glc:g} J/mol relative to lactate, ADP + Pi (relative 2e-5 of the heat: trapezoid integration of the output)',
-     'expr': 'abs(2*h_lac_gly*np.trapz(mf__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + h_ATP*(C_ATP[-1] - '
-             'C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - C_glyc[0])) - np.trapz(Q_met, t)) <= '
-             '2e-5*np.trapz(np.abs(Q_met), t)'},   # trapezoid integration of the logged heat over fast transients
+                    f'h_glc int J_glc dt = V_c (h_glc dC_glc + h_G6P dC_G6P + h_ATP dC_ATP + h_glyc dC_glyc) + int '
+                    f'Q_met dt, relative to lactate, ADP + Pi: h_glc = 2 h_lac_gly = {h_glc:g} J/mol, h_G6P = h_glc + '
+                    f'h_ATP - h_hk, h_glyc = h_glc - h_glyc_poly (relative 2e-4 of the heat: trapezoid integration of the '
+                    f'output, whose G6P transients last milliseconds)',
+     'expr': 'abs(2*h_lac_gly*np.trapz(mf__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + (2*h_lac_gly + h_ATP - '
+             'h_hk)*(C_G6P[-1] - C_G6P[0]) + h_ATP*(C_ATP[-1] - C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - '
+             'C_glyc[0])) - np.trapz(Q_met, t)) <= 2e-4*np.trapz(np.abs(Q_met), t)'},   # trapezoid integration of the logged heat
     {'description': 'second law: each reaction runs down its affinity, v A >= 0, so P_diss >= 0',
-     'expr': 'np.all(v_gly*A_gly >= 0) and np.all(v_hyd*A_hyd >= 0) and np.all(v_store*A_store >= 0) and '
-             'np.all(v_mob*A_mob >= 0) and np.all(P_diss >= 0)'},
-    {'description': 'the ATP budget by reaction follows the stoichiometry (exact): 2 per glycolysis, 3 per glycogen '
-                    'unit mobilised, 2 per glucose stored, 1 per maintenance turnover; M_glyc_ATP = 3 V_c C_glyc',
-     'expr': 'np.allclose(J_ATP_gly, 2*V_c*v_gly, rtol=1e-12, atol=0) and np.allclose(J_ATP_mob, 3*V_c*v_mob, rtol=1e-12, '
-             'atol=0) and np.allclose(J_ATP_store, 2*V_c*v_store, rtol=1e-12, atol=0) and np.allclose(J_ATP_maint, '
-             'V_c*v_hyd, rtol=1e-12, atol=0) and np.allclose(M_glyc_ATP, 3*V_c*C_glyc, rtol=1e-12, atol=0)'},
+     'expr': 'np.all(v_gly*A_hk >= 0) and np.all(v_lg*A_lg >= 0) and np.all(v_hyd*A_hyd >= 0) and '
+             'np.all(v_store*A_store >= 0) and np.all(v_mob*A_mob >= 0) and np.all(P_diss >= 0)'},
+    {'description': 'the ATP budget by reaction follows the stoichiometry (exact): the hexokinase step spends 1, the '
+                    'lower glycolysis makes 3 per G6P, glycogen is credited 3 per unit mobilised and charged 2 per unit '
+                    'stored, glycolysis has the rest; 1 per maintenance turnover; M_glyc_ATP = 3 V_c C_glyc',
+     'expr': 'np.allclose(J_ATP_hk, V_c*v_gly, rtol=1e-12, atol=0) and np.allclose(J_ATP_lg, 3*V_c*v_lg, rtol=1e-12, '
+             'atol=0) and np.allclose(J_ATP_mob, 3*V_c*v_mob, rtol=1e-12, atol=0) and np.allclose(J_ATP_store, '
+             '2*V_c*v_store, rtol=1e-12, atol=0) and np.allclose(J_ATP_gly + J_ATP_mob - J_ATP_store, V_c*(3*v_lg - '
+             'v_gly - v_store), rtol=1e-9, atol=1e-30) and np.allclose(J_ATP_maint, V_c*v_hyd, rtol=1e-12, atol=0) and '
+             'np.allclose(M_glyc_ATP, 3*V_c*C_glyc, rtol=1e-12, atol=0)'},
     {'description': 'glycogen stays between 0 and its ceiling (plus 5%)',
      'expr': 'np.all(C_glyc >= -1e-9) and np.all(C_glyc <= 1.05*C_glyc_max)'},
 ]
 cyto_notes = (
     'The cytosol of a fermenting prokaryote-grade cell (AdaptOrDeity\'s starting organism) as a bond graph in concentration '
     'form: species stores (C elements, mu = mu0 + RT ln(C/c_std)) for glucose, lactate, ATP, ADP and Pi, joined by two '
-    'reactions (R elements): homolactic glycolysis, glucose + 2 ADP + 2 Pi <=> 2 lactate + 2 ATP, and the maintenance '
-    'ATPase, ATP <=> ADP + Pi; plus a glycogen store (a polymer of glucose units, activity 1): synthesis, glucose + 2 ATP '
-    '-> glycogen + 2 ADP + 2 Pi (scaled by the game\'s store_alloc and slowed near the ceiling C_glyc_max), and glycogenolysis '
-    'to lactate, glycogen + 3 ADP + 3 Pi -> 2 lactate + 3 ATP, inhibited by ATP so the store is spent when ATP falls. '
-    'Storing a glucose costs 2 ATP and gives 3 later (instead of 2 now): about 75% round trip. The junction structure is the stoichiometry, so carbon (6 glc + 3 lac), adenine (ATP + ADP) '
-    'and phosphoryl groups (ATP + Pi) are conserved by construction. Each rate is the common modular rate law '
-    '(Liebermeister et al. 2010) written with the thermodynamic factor (1 - Gamma/K_eq): it saturates in each reactant and '
-    'its sign is always that of the affinity A = RT ln(K_eq/Gamma), so the dissipation v A is never negative. Heat is the '
-    'reaction enthalpy released: 2 h_lac_gly - 2 h_ATP per glycolysis turnover, h_ATP per ATP hydrolysed (including ATP '
-    'hydrolysed by transporters on the ATP_hydrolysis_port, e.g. the H+-ATPase), so at steady ATP the heat is 63 kJ per '
-    'mol lactate (Gnaiger and Kemp 1990). Protons: glycolysis to lactate written with the ionised species (glucose + 2 '
-    'ADP3- + 2 HPO4 2- -> 2 lactate- + 2 ATP4-) releases none, and each ATP hydrolysed releases one H+ (ATP4- + H2O -> '
-    'ADP3- + HPO4 2- + H+), so the cytosol exports j_H_met = V_c v_hyd - j_ATP_ext on the H_production port for all ATP hydrolysed, '
-    'its own and that of the ATP_hydrolysis_port users (transporters, protein turnover); at steady ATP the cell makes 2 H+ per glucose, which leave with lactate. Ports: cytosol_face_port (entrance and exit; the five concentrations shared, the '
-    'five fluxes summed) for diffusion faces and the cell membrane; ATP_hydrolysis_port for ATP-driven transporters; '
+    'reactions (R elements): homolactic glycolysis in two steps, the hexokinase step, glucose + ATP <=> glucose '
+    '6-phosphate (G6P) + ADP, and the lower glycolysis, G6P + 3 ADP + 2 Pi <=> 2 lactate + 3 ATP (net glucose + 2 ADP + 2 '
+    'Pi -> 2 lactate + 2 ATP), and the maintenance ATPase, ATP <=> ADP + Pi; plus a glycogen store (a polymer of glucose '
+    'units, activity 1): synthesis by the bacterial ADP-glucose route, G6P + ATP -> glycogen + ADP + 2 Pi (scaled by the '
+    'game\'s store_alloc and slowed near the ceiling C_glyc_max), and the phosphorylase, glycogen + Pi -> G6P, inhibited by '
+    'ATP so the store is spent when ATP falls; the store cannot run backwards without glycogen (its reverse takes glycogen at '
+    'the activity a_glyc = C_glyc/(K_glyc_mob + C_glyc)). Storing a glucose costs 2 ATP (the hexokinase step and ADP-glucose) and '
+    'gives 3 later through the lower glycolysis (the phosphorylase saves the hexokinase ATP), instead of 2 now. G6P is '
+    'trapped: no carrier takes it out, and a group-translocating carrier (the PTS) delivers it on the G6P_port. The '
+    'hexokinase step carries the pathway\'s control: the lumped pathway\'s common modular kinetics in glucose, ADP, Pi, '
+    'lactate and ATP (as the cell had before the split), saturating in its substrate ATP (K_ATP_hk), with the '
+    'hexokinase reaction\'s thermodynamic factor; the lower glycolysis (saturating in G6P, ADP and Pi) is fast (lower_glycolysis_headroom times the resting flux), so G6P stays at about 0.3 uM and the Glf cell '
+    'behaves as with one lumped reaction. The junction structure is the stoichiometry, so carbon (6 glc + 6 G6P + 3 lac + '
+    '6 glycogen), adenine (ATP + ADP) and phosphoryl groups (ATP + Pi + G6P) are conserved by construction. Each rate is '
+    'written with the thermodynamic factor (1 - Gamma/K_eq) of its reaction (the common modular rate law of Liebermeister '
+    'et al. 2010 for the hexokinase step, saturating factors for the others), as a difference of products so it stays '
+    'finite when a substrate runs out: it saturates in each reactant and its sign '
+    'is always that of the affinity A = RT ln(K_eq/Gamma), so the dissipation v A is never negative. Heat is the '
+    'reaction enthalpy released: h_hk per hexokinase turnover, 2 h_lac_gly - 2 h_ATP - h_hk per lower glycolysis turnover, '
+    'h_ATP per ATP hydrolysed (including ATP hydrolysed by transporters on the ATP_hydrolysis_port, e.g. the H+-ATPase, '
+    'counted by the Pi they return) and h_hk per glucose a carrier phosphorylates (counted by the G6P it delivers), so at '
+    'steady ATP the heat is 63 kJ per mol lactate (Gnaiger and Kemp 1990). Protons, with the ionised species: each ATP '
+    'hydrolysed releases one H+ (ATP4- + H2O -> ADP3- + HPO4 2- + H+), so does each sugar phosphorylated by ATP (glucose + '
+    'ATP4- -> G6P2- + ADP3- + H+: the hexokinase step, the PTS, ADP-glucose synthesis), the lower glycolysis takes one '
+    'up and the phosphorylase none; the cytosol exports j_H_met = V_c (v_hyd + v_gly - v_lg + v_store) - j_ATP_ext on the '
+    'H_production port; at steady ATP the cell makes 2 H+ per glucose, which leave with lactate. Ports: cytosol_face_port '
+    '(entrance and exit; the five concentrations shared, the five fluxes summed) for diffusion faces and the cell '
+    'membrane; ATP_hydrolysis_port for ATP-driven transporters; G6P_port (C_G6P shared, j_G6P_ext summed) for carriers '
+    'that deliver G6P; '
     'compartment_volume (from the membrane); heat_source_port to a thermal_volume. The default instance is the steady state '
     'of the whole fermenter cell (generic_adaptive_cell fermenter) with total ATP turnover at the Lynch & Marinov (2015) '
     'maintenance cost for its volume at 20 C. Its tests feed it through cell_membrane_face from a 1 mM glucose medium. '
@@ -787,9 +882,9 @@ cyto_notes = (
 cyto_verif = {
     'sim_time': 120.0, 'pre_time': 0.0, 'dt': 0.01, 'solver': 'CVODE_myokit',
     'solver_info': {'rtol': 1e-10, 'atol': 1e-14, 'MaximumStep': 0.5},
-    'outputs': [f'C_{s}' for s in cyto_species] + ['C_glyc', 'v_store', 'v_mob', 'A_store', 'A_mob'] +
-               ['v_gly', 'v_hyd', 'A_gly', 'A_hyd', 'P_diss', 'Q_met', 'f_T', 'J_ATP_gly', 'J_ATP_mob', 'J_ATP_store',
-                'J_ATP_maint', 'M_glyc_ATP',
+    'outputs': [f'C_{s}' for s in cyto_species] + ['C_G6P', 'C_glyc', 'v_store', 'v_mob', 'A_store', 'A_mob'] +
+               ['v_gly', 'v_lg', 'v_hyd', 'A_hk', 'A_lg', 'A_hyd', 'P_diss', 'Q_met', 'f_T', 'J_ATP_gly', 'J_ATP_mob',
+                'J_ATP_store', 'J_ATP_maint', 'J_ATP_hk', 'J_ATP_lg', 'M_glyc_ATP', 'j_H_met',
                                                      'mf/J_glc', 'mf/J_lac'],
     'run_parameters': {'store_alloc': 0.5, 'C_glyc_init': 50.0},   # exercise storage and mobilisation
     # fed through the cell membrane from the background glucose of the medium (the medium side is open: C_glc_e, C_lac_e parameters);
@@ -802,7 +897,10 @@ cyto_verif = {
                        ['A_mem_mf', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']],
     },
     'invariants': cyto_invariants,
-    'bc_sweep': TEMPERATURE_SWEEP,
+    'bc_sweep': {'ranges': {**TEMPERATURE_SWEEP['ranges'], 'dG0_ferm': [-230000.0, -160000.0]},
+                 'rationale': TEMPERATURE_SWEEP['rationale'] + '; the standard Gibbs energy of glucose to lactate within '
+                              'about 20% of the textbook -196 kJ/mol (BioNumbers -183.6): at half of it the lower '
+                              'glycolysis would come near equilibrium, which no fermenter\'s chemistry allows'},
     'stability': {'supported': [{'solver': 'CVODE_myokit', 'rtol': 1e-6, 'atol': 1e-8}]},
 }
 write_version('cell', 'energy_metabolism', 'energy_metabolism_fermenter', cyto_vars, cyto_eqs,
@@ -1601,11 +1699,11 @@ write_version('cell/ion_channels', 'i_H_flagellum', 'i_H_flagellum_MotAB', fl_va
 # Glf (n_0 below), so the carriers compare at equal copy number: capacity n_0 turnover / N_A. In the fermenter their pools
 # start at 0, so the level-1 cell is unchanged.
 GC = 'glucose_carrier'
-V_GC_ATP, V_GC_H = 'ATP_ArgusUNPUBLISHED_v01', 'H_symport_ArgusUNPUBLISHED_v01'
+V_GC_ATP, V_GC_H, V_GC_PTS = 'ATP_ArgusUNPUBLISHED_v01', 'H_symport_ArgusUNPUBLISHED_v01', 'PTS_ArgusUNPUBLISHED_v01'
 N0_CARRIER = der(PROTEINS['Glf'][2], 'the calibrated cell\'s Glf copies (Glf capacity / turnover_Glf)', 'turnover_Glf')
 # key: (label, module version, instance, turnover key, length key, footprint key)
 CARRIERS = {
-    'PTS': ('glucose phosphotransferase system (PtsG, EIIA-Glc, EI, HPr)', V_GC_ATP, 'PTS'),
+    'PTS': ('glucose phosphotransferase system (PtsG, EIIA-Glc, EI, HPr)', V_GC_PTS, 'default'),
     'ABC': ('binding-protein ABC glucose importer (MglABC)', V_GC_ATP, 'ABC'),
     'GalP': ('GalP-type glucose/H+ symporter (MFS)', V_GC_H, 'default'),
 }
@@ -1680,7 +1778,7 @@ CARRIER_SWEEP = {'ranges': {'C_glc_e': {'min': 1e-4, 'max': 50.0, 'points': 7, '
                               'from empty to above the outside at the low end (so the carrier runs backwards there), '
                               'expression from none to the game\'s maximum'}
 
-# --- glucose_carrier ATP: uptake driven by n_P ATP equivalents (PTS: 1 PEP; ABC: 2 ATP)
+# --- glucose_carrier ATP: uptake driven by n_P ATP hydrolysed (ABC: 2 ATP)
 gca_vars = face_side_vars + [
     ('n_P', 'dimensionless', 'in', None, 'ATP equivalents hydrolysed per glucose taken up'),
     ('K_m_ATP', 'millimolar', 'in', None, 'ATP for half-rate'),
@@ -1721,7 +1819,7 @@ write_version('transport', GC, 'glucose_carrier_ATP', gca_vars, gca_eqs,
                                  {'port_type': 'ATP_hydrolysis_port',
                                   'variables': ['ATP', 'ADP', 'Pi', 'j_ATP', 'j_ADP', 'j_Pi']}],
                'roles': gca_roles},
-              gca_rows('PTS', 'n_P_PTS'),
+              gca_rows('ABC', 'n_ATP_ABC'),
               {**RUN1, 'outputs': ['J_glc', 'A_glc', 'A_ATP', 'ATP_eq', 'J_ATP_cost', 'j_ATP', 'j_ADP', 'j_Pi', 'J_glc_e',
                                    'J_lac_e', 'J_glc_c', 'J_lac_c', 'J_ATP_c', 'J_ADP_c', 'J_Pi_c'],
                'run_parameters': {},
@@ -1740,7 +1838,7 @@ write_version('transport', GC, 'glucose_carrier_ATP', gca_vars, gca_eqs,
                     'expr': 'np.all(J_glc*A_glc >= 0)'}],
                'bc_sweep': CARRIER_SWEEP, 'stability': STAB},
               {'reviewed': False, 'notes': (
-                  'A glucose carrier driven by n_P ATP equivalents, between the medium (entrance medium_face_port) and '
+                  'A glucose carrier driven by n_P ATP hydrolysed, between the medium (entrance medium_face_port) and '
                   'the cytosol (exit cytosol_face_port, as the Glf face cell_membrane_face adaptive), the ATP taken from '
                   'and ADP and Pi returned to the cytosol on the ATP_hydrolysis_port. Reaction glc_e + n_P ATP <=> glc_i '
                   '+ n_P (ADP + Pi), affinity A = RT ln(C_e/C_i) + n_P A_ATP, rate J = jmax m A_mem (C_e a^n - C_i '
@@ -1749,16 +1847,130 @@ write_version('transport', GC, 'glucose_carrier_ATP', gca_vars, gca_eqs,
                   'nothing inside), saturating in ATP, zero at equilibrium and always of the sign of A, so J A >= 0. At '
                   'the cell\'s ATP (A_ATP ~49 kJ/mol) one ATP holds a 10^8-fold gradient: the carrier is irreversible in '
                   'practice. J_ATP_cost = n_P J is the ATP it spends; the cytosol counts the H+ and heat of that '
-                  'hydrolysis. Instances: PTS (phosphotransferase system, Km 5 uM, n_P = 1: one PEP per glucose, '
-                  'deutscher2006how) and ABC (binding-protein importer, Km 0.5 uM, ferenci1996adaptation; n_P = 2 ATP, '
-                  'davidson2008structure). The lumped cytosol has no PEP or glucose 6-phosphate: the PTS PEP is '
-                  'charged as one ATP, and its glucose enters as free glucose, which the lumped glycolysis phosphorylates '
-                  'again (hexokinase), so a PTS glucose nets 1 ATP here where a real PTS cell keeps 2 (the PEP replaces '
-                  'the hexokinase ATP). The driving forces agree: PEP to pyruvate with glucose phosphorylation releases '
-                  'about 48 kJ/mol, one ATP at the cell\'s ratios about 49. m = 1 is as many copies as the calibrated '
-                  'cell\'s Glf; turnover numbers and K_m_ATP are placeholders.')},
-              ['argus2026unpublished', 'deutscher2006how', 'davidson2008structure', 'ferenci1996adaptation'], V_GC_ATP,
-              extra_instances={'PTS': gca_rows('PTS', 'n_P_PTS'), 'ABC': gca_rows('ABC', 'n_ATP_ABC')})
+                  'hydrolysis. Default instance: a binding-protein ABC importer (Mgl type; Km 0.5 uM, '
+                  'ferenci1996adaptation; n_P = 2 ATP, davidson2008structure); the glucose enters free and the cytosol\'s '
+                  'hexokinase step phosphorylates it, so a fermenter nets 0 ATP per ABC glucose. m = 1 is as many copies '
+                  'as the calibrated cell\'s Glf; the turnover number and K_m_ATP are placeholders.')},
+              ['argus2026unpublished', 'davidson2008structure', 'ferenci1996adaptation'], V_GC_ATP)
+
+# --- glucose_carrier PTS: group translocation, glucose from the medium to G6P in the cytosol, one PEP equivalent each
+gcp_vars = [
+    ('t', 'second', 'in', None, None),
+    ('C_glc_e', 'millimolar', 'in', None, 'medium side (entrance medium_face_port)'),
+    ('C_lac_e', 'millimolar', 'in', None, 'carried for the port'),
+    ('A_mem', 'um2', 'in', None, None),
+    ('m_expr', 'dimensionless', 'in', None, 'expression (protein_expression port): n_0 copies at 1'),
+    ('jmax_glc', 'mol_per_s_per_um2', 'in', None, 'capacity per membrane area at m_expr = 1'),
+    ('K_glc_t', 'millimolar', 'in', None, 'affinity for glucose outside'),
+    ('K_m_ATP', 'millimolar', 'in', None, 'ATP (the PEP equivalent) for half-rate'),
+    ('ATP', 'millimolar', 'in', None, 'cytosol ATP (ATP_hydrolysis_port): PEP is charged as ATP'),
+    ('K_ADP_PEP', 'millimolar', 'in', None, 'ADP for half-rate of the PEP supply (the lower glycolysis\' ADP affinity)'),
+    ('K_Pi_PEP', 'millimolar', 'in', None, 'Pi for half-rate of the PEP supply (the lower glycolysis\' Pi affinity)'),
+    ('f_PEP', 'dimensionless', 'out', None, 'PEP supply: the lower glycolysis makes PEP only as fast as ADP and Pi allow'),
+    ('ADP', 'millimolar', 'in', None, None), ('Pi', 'millimolar', 'in', None, None),
+    ('C_G6P', 'millimolar', 'in', None, 'cytosol glucose 6-phosphate (G6P_port)'),
+    ('dG0_hk', 'J_per_mol', 'in', None, 'standard Gibbs energy of glucose + ATP -> G6P + ADP'),
+    ('c_std', 'millimolar', 'in', None, None),
+    ('R', 'J_per_mol_K', 'in', None, None), ('T', 'kelvin', 'in', None, None),
+    ('K_eq', 'dimensionless', 'out', None, 'equilibrium constant of glc_e + ATP <=> G6P_i + ADP'),
+    ('Gamma', 'dimensionless', 'out', None, 'its mass-action ratio, G6P ADP/(glc_e ATP)'),
+    ('J_glc', 'mol_per_s', 'out', None, 'glucose taken from the medium (and delivered as G6P)'),
+    ('A_glc', 'J_per_mol', 'out', None, 'affinity of one transport cycle (> 0 drives glucose in)'),
+    ('J_glc_e', 'mol_per_s', 'out', None, None), ('J_lac_e', 'mol_per_s', 'out', None, None),
+    ('J_G6P', 'mol_per_s', 'out', None, 'G6P into the cytosol (G6P_port)'),
+    ('J_ATP_cost', 'mol_per_s', 'out', None, 'PEP spent, in ATP equivalents: one per glucose'),
+    ('j_ATP', 'mol_per_s', 'out', None, None), ('j_ADP', 'mol_per_s', 'out', None, None),
+    ('j_Pi', 'mol_per_s', 'out', None, 'no Pi is released: the phosphoryl goes onto the glucose'),
+]
+gcp_eqs = [
+    ('K_eq', 'exp(-dG0_hk / (R * T))'),
+    ('Gamma', '((C_G6P / c_std) * (ADP / c_std)) / ((C_glc_e / c_std) * (ATP / c_std))'),
+    # the PEP comes from the lower glycolysis, which needs ADP and Pi: the PTS slows with it as ATP builds up
+    ('f_PEP', 'ADP / (K_ADP_PEP + ADP) * Pi / (K_Pi_PEP + Pi)'),
+    # glc_e + ATP <=> G6P_i + ADP: Michaelis-Menten in glucose outside, saturating in ATP, zero at equilibrium
+    ('J_glc', 'jmax_glc * m_expr * A_mem * f_PEP * (C_glc_e * ATP - C_G6P * ADP / K_eq) / ((K_m_ATP + ATP) '
+              '* (K_glc_t + C_glc_e))'),
+    ('A_glc', 'R * T * (ln(K_eq) - ln(abs(Gamma) + 1e-300))'),
+    ('J_glc_e', '-J_glc'), ('J_lac_e', 'u(0.0, mol_per_s)'), ('J_G6P', 'J_glc'),
+    ('J_ATP_cost', 'J_glc'), ('j_ATP', '-J_glc'), ('j_ADP', 'J_glc'), ('j_Pi', 'u(0.0, mol_per_s)'),
+]
+gcp_roles = {n: 'boundary_condition' for n in ('C_glc_e', 'C_lac_e', 'A_mem', 'm_expr', 'ATP', 'ADP', 'Pi', 'C_G6P')}
+gcp_roles.update({n: 'constant' for n in ('jmax_glc', 'K_glc_t', 'K_m_ATP', 'K_ADP_PEP', 'K_Pi_PEP', 'dG0_hk', 'c_std')})
+gcp_roles.update({'R': 'global_constant', 'T': 'global_constant'})
+gcp_roles.update({n: 'variable' for n in ('f_PEP', 'K_eq', 'Gamma', 'J_glc', 'A_glc', 'J_glc_e', 'J_lac_e', 'J_G6P', 'J_ATP_cost',
+                                          'j_ATP', 'j_ADP', 'j_Pi')})
+gcp_rows = [('C_glc_e', GLC_E, '', False), ('C_lac_e', LAC_E, 'no lactate in the medium', False),
+            ('A_mem', A_MEM, 'geometry: in-plane membrane of the 2 um cell', False),
+            ('m_expr', 1.0, 'definitional; n_0 copies, as many as the calibrated cell has Glf', False),
+            ('jmax_glc', carrier_jmax('PTS'), '', False), ('K_glc_t', par('K_glc_PTS'), '', False),
+            ('K_m_ATP', par('K_m_ATP_carrier'), '', False),
+            ('K_ADP_PEP', GLY['K_ADP_gly'], '', False), ('K_Pi_PEP', GLY['K_Pi_gly'], '', False),
+            ('ATP', ATP, '', False), ('ADP', ADP, '', False), ('Pi', PI, '', False),
+            ('C_G6P', G6P_I, 'the fermenter cell\'s calibrated steady state', False),
+            ('dG0_hk', DG0_HK, '', False),
+            ('c_std', C_STD, 'definitional; standard concentration 1 M', True),
+            ('R', R, 'definitional; gas constant, as the library\'s SN modules', True),
+            ('T', T, 'operating point: 20 C', False)]
+write_version('transport', GC, 'glucose_carrier_PTS', gcp_vars, gcp_eqs,
+              {'required_citations': ['argus2026unpublished'],
+               'entrance_ports': [{'port_type': 'medium_face_port', 'variables': ['C_glc_e', 'C_lac_e', 'J_glc_e',
+                                                                                  'J_lac_e']}],
+               'exit_ports': [],
+               'general_ports': [{'port_type': 'membrane_area', 'variables': ['A_mem']},
+                                 {'port_type': 'protein_expression', 'variables': ['m_expr']},
+                                 {'port_type': 'ATP_hydrolysis_port',
+                                  'variables': ['ATP', 'ADP', 'Pi', 'j_ATP', 'j_ADP', 'j_Pi']},
+                                 {'port_type': 'G6P_port', 'variables': ['C_G6P', 'J_G6P']}],
+               'roles': gcp_roles},
+              gcp_rows,
+              {**RUN1, 'outputs': ['J_glc', 'A_glc', 'f_PEP', 'K_eq', 'Gamma', 'J_G6P', 'J_ATP_cost', 'j_ATP', 'j_ADP', 'j_Pi',
+                                   'J_glc_e', 'J_lac_e'],
+               'run_parameters': {},
+               'invariants': [
+                   {'description': 'rate law (relative 1e-9): J = jmax m A_mem f_PEP (C_e ATP - G6P ADP/K_eq)/((K_m_ATP '
+                                   '+ ATP)(K + C_e)), f_PEP = ADP/(K_ADP_PEP + ADP) Pi/(K_Pi_PEP + Pi), K_eq = '
+                                   'exp(-dG0_hk/RT)',
+                    'expr': 'np.allclose(J_glc, jmax_glc*m_expr*A_mem*ADP/(K_ADP_PEP + ADP)*Pi/(K_Pi_PEP + Pi)*(C_glc_e*ATP '
+                            '- C_G6P*ADP*np.exp(dG0_hk/(R*T)))/((K_m_ATP + ATP)*(K_glc_t + C_glc_e)), rtol=1e-9, '
+                            'atol=1e-12*abs(jmax_glc*A_mem*max(m_expr, 1e-30)))'},
+                   {'description': 'stoichiometry (exact): glucose leaves the medium and arrives as G6P, one ATP '
+                                   'equivalent becomes ADP per glucose and no Pi is released; lactate does not cross',
+                    'expr': 'np.array_equal(J_glc_e, -J_glc) and np.array_equal(J_G6P, J_glc) and '
+                            'np.array_equal(J_ATP_cost, J_glc) and np.array_equal(j_ATP, -J_glc) and '
+                            'np.array_equal(j_ADP, J_glc) and np.all(j_Pi == 0) and np.all(J_lac_e == 0)'},
+                   {'description': 'second law: glucose moves down the affinity of the coupled reaction, J A >= 0, A = '
+                                   'RT ln(K_eq C_e ATP/(G6P ADP))',
+                    'expr': 'np.all(J_glc*A_glc >= 0)'}],
+               'bc_sweep': {'ranges': {'C_glc_e': {'min': 1e-4, 'max': 50.0, 'points': 7, 'scale': 'log'},
+                                       'C_G6P': [0.0, 10.0], 'ATP': [1e-3, 12.0], 'm_expr': [0.0, 4.0]},
+                            'rationale': 'glucose outside from 0.1 uM to 50 mM (the game\'s range, both sides of the '
+                                         'Km), G6P inside from none to a real cell\'s ~10 mM, ATP from exhaustion (where '
+                                         'the carrier can run backwards) to above rest, expression from none to the '
+                                         'game\'s maximum'},
+               'stability': STAB},
+              {'reviewed': False, 'notes': (
+                  'The glucose phosphotransferase system (PTS: PtsG/EIICB-Glc with EIIA-Glc, enzyme I and HPr; '
+                  'deutscher2006how) as one group-translocating carrier between the medium (entrance medium_face_port) '
+                  'and the cytosol: it takes glucose from the medium and delivers glucose 6-phosphate (G6P_port), '
+                  'phosphorylated by PEP. The cytosol has no PEP: the PEP is charged as one ATP (ATP_hydrolysis_port: '
+                  'ATP -> ADP, no Pi released, the phosphoryl going onto the glucose), and its supply follows the lower '
+                  'glycolysis, which makes PEP only as fast as ADP and Pi allow: f_PEP = ADP/(K_ADP_PEP + ADP) Pi/(K_Pi_PEP '
+                  '+ Pi), with the lower glycolysis\' affinities, so a PTS cell takes up glucose at the pace its ATP use '
+                  'sets (as ATP builds up ADP falls and the PTS slows with the lower glycolysis) and G6P settles where '
+                  'the two capacities balance, G6P/(K_G6P_lg + G6P) = PTS capacity / lower glycolysis capacity, instead '
+                  'of trapping the cell\'s phosphate. The PEP would have made one ATP at '
+                  'pyruvate kinase, and the PTS glucose skips the hexokinase ATP, so a fermenter nets 3 - 1 = 2 ATP per '
+                  'PTS glucose, as with free glucose. Reaction glc_e + ATP <=> G6P_i + ADP, affinity A = RT ln(K_eq C_e '
+                  'ATP/(G6P ADP)) with K_eq = exp(-dG0_hk/RT) (the hexokinase reaction across the membrane), rate J = '
+                  'jmax m A_mem f_PEP (C_e ATP - G6P ADP/K_eq)/((K_m_ATP + ATP)(K + C_e)): Michaelis-Menten in glucose '
+                  'outside (J = jmax m A_mem f_PEP C_e/(K + C_e) ATP/(K_m_ATP + ATP) with no G6P inside), '
+                  'saturating in ATP, zero at equilibrium and of the sign of A, so J A >= 0. At the cell\'s ATP/ADP the '
+                  'carrier holds G6P up to ~2x10^4 times the glucose outside. G6P cannot leave by any carrier. The '
+                  'charged driving force is smaller than the real one (PEP + glucose -> pyruvate + G6P releases ~48 '
+                  'kJ/mol standard, ATP + glucose ~17): the difference, PEP\'s at pyruvate kinase, is in the lower '
+                  'glycolysis\' lumped affinity. Km 5 uM (deutscher2006how); m = 1 is as many copies as the '
+                  'calibrated cell\'s Glf; the turnover number and K_m_ATP are placeholders.')},
+              ['argus2026unpublished', 'deutscher2006how'], V_GC_PTS)
 
 # --- glucose_carrier H_symport: glucose with n_H H+ down the proton motive force (GalP-type MFS)
 gch_vars = face_side_vars + [
@@ -1924,7 +2136,7 @@ pool_inv = [
      'expr': 'np.all(np.diff(m)*np.sign(m_target - m[0]) >= -1e-12) and np.all((m - m_target)*(m[0] - m_target) >= -1e-12)'},
     {'description': 'costs are never negative', 'expr': 'np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(M_build >= 0)'},
 ]
-pool_extra = {k: pool_rows(k) for k in [*PROTEINS, *CARRIERS]}
+pool_extra = {k: pool_rows(k) for k in PROTEINS}
 write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
               {'required_citations': ['argus2026unpublished'],
                'entrance_ports': [], 'exit_ports': [],
@@ -1963,10 +2175,97 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                   'goes to biosynthesis (daughter_share, summed there); the costs, demand, daughter share and area go to '
                   'protein_expression on protein_synthesis, which returns ATP and s_build. Instances: one per protein of '
                   'the fermenter cell (copy numbers, lengths and footprints in each; see parameters.json).'),
-               'instances': {**{k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS},
-                             **{k: f'{CARRIERS[k][0]}: none at start; n_0 = the calibrated cell\'s Glf copies' for k in CARRIERS}}},
+               'instances': {k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS}},
               ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers'], POOL_V,
               extra_instances=pool_extra)
+
+# --- protein_pool membrane_share: a membrane protein whose target is a share of the membrane's protein ceiling
+# The game sets s_target, the share of the area the proteins may take (A_ceiling: protein_expression's A_protein_max,
+# on the membrane_ceiling port, which scales with membrane area); the target copies are s_target A_ceiling / footprint,
+# m_target = s_target A_ceiling / a_unit. The game keeps the shares of a cell's pools summing to at most 1.
+POOL_SHARE_V = 'membrane_share_ArgusUNPUBLISHED_v01'
+MEMBRANE_SHARE_KEYS = ['H_ATPase', 'NhaA', 'KefC', 'Trk', 'NCX', 'Glf', 'LacT', *CARRIERS]
+A_PROTEIN_MAX = der(par('protein_area_max_fraction') * A_SURFACE, 'protein_area_max_fraction x the whole cell surface',
+                    'protein_area_max_fraction', 'R_cell', 'h_cell')
+share_vars = [v if v[0] != 'm_target' else ('m_target', 'dimensionless', 'out', None,
+                                             'expression the cell is moving to: s_target A_ceiling / a_unit')
+              for v in pool_vars] + [
+    ('s_target', 'dimensionless', 'in', None, 'share of the membrane\'s protein ceiling the copies are to take (set by the '
+                                               'game; a cell\'s shares sum to at most 1)'),
+    ('A_ceiling', 'um2', 'in', None, 'most membrane area the proteins may take (membrane_ceiling port)'),
+    ('share', 'dimensionless', 'out', None, 'share of the ceiling the present copies take'),
+]
+share_eqs = [('m_target', 's_target * A_ceiling / a_unit'), ('share', 'A_protein / A_ceiling')] + pool_eqs
+share_roles = {**pool_roles, 'm_target': 'variable', 's_target': 'boundary_condition', 'A_ceiling': 'boundary_condition',
+               'share': 'variable'}
+
+
+def share_rows(key):
+    rows = [r for r in pool_rows(key) if r[0] != 'm_target']
+    if key in CARRIERS:
+        s0 = (0.0, 'definitional; none until the game sets a share', False)
+    else:
+        n_0, fp = PROTEINS[key][2], par(f'footprint_{key}')
+        s0 = (der(n_0 * fp * 1e-6 / A_PROTEIN_MAX, f'the calibrated cell\'s copies x footprint_{key} / A_ceiling: m_target '
+                  '= 1 (its share at rest)', f'footprint_{key}', 'protein_area_max_fraction'), '', False)
+    return rows + [('s_target', *s0), ('A_ceiling', A_PROTEIN_MAX, '', False)]
+
+
+share_extra = {k: share_rows(k) for k in MEMBRANE_SHARE_KEYS}
+S0_GLF = share_rows('Glf')[-2][1]
+write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars, share_eqs,
+              {'required_citations': ['argus2026unpublished'],
+               'entrance_ports': [], 'exit_ports': [],
+               'general_ports': [{'port_type': 'protein_expression', 'variables': ['m']},
+                                 {'port_type': 'daughter_share', 'variables': ['M_build']},
+                                 {'port_type': 'protein_synthesis',
+                                  'variables': ['ATP', 's_build', 'J_demand', 'J_ATP', 'J_keep', 'J_build', 'M_build',
+                                                'A_protein']},
+                                 {'port_type': 'membrane_ceiling', 'variables': ['A_ceiling']}],
+               'roles': share_roles},
+              share_rows('Glf'),
+              {'sim_time': 60.0, 'pre_time': 0.0, 'dt': 0.1, 'solver': 'CVODE_myokit',
+               'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
+               'outputs': ['m', 'm_target', 'share', 'n', 'r_up', 'r_down', 'f_ATP', 'J_keep', 'J_demand', 'J_build',
+                           'J_ATP', 'M_build', 'A_protein'],
+               'run_parameters': {'s_target': 2.0 * S0_GLF},
+               'invariants': [
+                   {'description': 'the target is a share of the ceiling (exact): m_target = s_target A_ceiling / '
+                                   '(n_0 footprint), so the target copies take s_target A_ceiling; share = A_protein / '
+                                   'A_ceiling',
+                    'expr': 'np.allclose(m_target, s_target*A_ceiling/(n_0*footprint*1e-6), rtol=1e-12, atol=0) and '
+                            'np.allclose(n_0*m_target*footprint*1e-6, s_target*A_ceiling, rtol=1e-12, atol=0) and '
+                            'np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0)'},
+                   {'description': 'the share moves monotonically to its target and never overshoots',
+                    'expr': 'np.all(np.diff(share)*np.sign(s_target - share[0]) >= -1e-12) and '
+                            'np.all((share - s_target)*(share[0] - s_target) >= -1e-12)'}]
+              # the pool's invariants, with m_target an output here (constant in time)
+              + [dict(i, expr=i['expr'].replace('np.sign(m_target - m[0])', 'np.sign(m_target[0] - m[0])'))
+                 for i in pool_inv],
+               'bc_sweep': {'ranges': {'s_target': [0.0, 1.0], 'ATP': [0.5, 12.0], 's_build': [0.0, 1.0]},
+                            'rationale': 'shares from none to the whole ceiling; ATP from near exhaustion to above rest; '
+                                         'synthesis from stalled to unconstrained'},
+               'timestep': {'scheme': 'rk4', 'dts': [2.0, 1.0, 0.5], 't_end': 20.0, 'min_order': 0.8, 'tol': 1e-3,
+                            'cvode_tol': 1e-2},
+               'stability': STAB},
+              {'reviewed': False, 'notes': (
+                  'protein_pool ArgusUNPUBLISHED_v01 for a membrane protein whose target is set as a share of the '
+                  'membrane\'s protein ceiling: the game sets s_target in [0, 1], the share of A_ceiling (the most '
+                  'membrane area the proteins may take: protein_expression\'s A_protein_max on the membrane_ceiling '
+                  'port, a fixed fraction of the cell surface, so it scales with membrane area) the copies are to take. '
+                  'The target copies are s_target A_ceiling / footprint, m_target = s_target A_ceiling / (n_0 '
+                  'footprint); everything else (approach with tau, upkeep, build cost and its limits, daughter share, '
+                  'area) is the ArgusUNPUBLISHED_v01 maths. share = A_protein / A_ceiling is the share the present '
+                  'copies take. The game keeps a cell\'s shares summing to at most 1. Instances: the fermenter cell\'s '
+                  'transporters, each with s_target at its share at rest (m_target = 1), and the glucose carriers the '
+                  'game unlocks after level 1 (PTS, ABC, GalP: none at start, n_0 = the calibrated cell\'s Glf '
+                  'copies).'),
+               'instances': {**{k: f'{PROTEINS[k][0]}: s_target = its share at rest' for k in MEMBRANE_SHARE_KEYS
+                                if k in PROTEINS},
+                             **{k: f'{CARRIERS[k][0]}: none at start; n_0 = the calibrated cell\'s Glf copies'
+                                for k in CARRIERS}}},
+              ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers'], POOL_SHARE_V,
+              extra_instances=share_extra)
 
 # --- protein_expression adaptive: the cell's protein synthesis, serving its pools
 pe_vars = [
@@ -2056,6 +2355,8 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                'general_ports': [{'port_type': 'ATP_hydrolysis_port',
                                   'variables': ['ATP', 'ADP', 'Pi', 'j_ATP_prot', 'j_ADP_prot', 'j_Pi_prot']},
                                  {'port_type': 'membrane_area', 'variables': ['A_mem']},
+                                 # the ceiling the membrane_share pools take their share of
+                                 {'port_type': 'membrane_ceiling', 'variables': ['A_protein_max'], 'multi_port': 'True'},
                                  {'port_type': 'protein_synthesis',
                                   'variables': ['ATP', 's_build', 'J_demand_in', 'J_ATP_in', 'J_keep_in', 'J_build_in',
                                                 'M_build_in', 'A_protein_in'],
@@ -2428,19 +2729,20 @@ FERM_PROTEINS = [  # (pool key, the submodule it scales, (module_type, version))
     ('LacT', 'membrane_face', None),   # the face's second protein_expression port (pools connect in submodule order)
     ('Flagellum', 'i_flagellum', ('i_H_flagellum', 'MotAB_ArgusUNPUBLISHED_v01')),
     # glucose carriers the game unlocks after level 1 (pools start at 0)
-    ('PTS', 'glc_PTS', (GC, V_GC_ATP, 'PTS')),
-    ('ABC', 'glc_ABC', (GC, V_GC_ATP, 'ABC')),
+    ('PTS', 'glc_PTS', (GC, V_GC_PTS)),
+    ('ABC', 'glc_ABC', (GC, V_GC_ATP)),
     ('GalP', 'glc_GalP', (GC, V_GC_H)),
 ]
 GLC_CARRIERS = ['glc_PTS', 'glc_ABC', 'glc_GalP']
-ATP_CARRIERS = {'glc_PTS': 'n_P_glc_PTS', 'glc_ABC': 'n_P_glc_ABC'}   # submodule: its n_P parameter
+ATP_CARRIERS = {'glc_PTS': '1', 'glc_ABC': 'n_P_glc_ABC'}   # submodule: ATP (equivalents) per glucose
 _targets = []
 for key, target, mod in FERM_PROTEINS:
     if mod and target not in [t['name'] for t in _targets]:
         _targets.append(S(target, *mod))
 define_cell(
     'fermenter', extends='empty_membrane',
-    submodules=_targets + [S(f'pool_{key}', 'protein_pool', POOL_V, key) for key, _, _ in FERM_PROTEINS],
+    submodules=_targets + [S(f'pool_{key}', 'protein_pool', POOL_SHARE_V if key in MEMBRANE_SHARE_KEYS else POOL_V, key)
+                           for key, _, _ in FERM_PROTEINS],
     links=[('membrane', t['name']) for t in _targets]
           + [('Na_K', x) for x in ('i_K_Trk', 'i_NaH', 'i_KH', 'i_NaCa')] + [('Ca', 'i_NaCa')]
           + [('H', x) for x in ('i_H_ATPase', 'i_NaH', 'i_KH', 'i_flagellum')]
@@ -2465,12 +2767,15 @@ define_cell(
         'adaptive as the Trk K+ uptake channel), i_NaCa (adaptive; archaeal NCX_Mj is the prokaryotic equivalent) and '
         'membrane_face (cell_membrane_face adaptive: the Glf glucose facilitator and a lactate-/H+ symporter). The '
         'default instance is an exact steady state at -105 mV and pH 7.6 with total ATP turnover equal to Lynch & '
-        'Marinov\'s maintenance cost at 20 C. Three glucose carriers the game unlocks after level 1 sit beside Glf with '
-        'their pools at 0 (m_init and m_target 0), so the level-1 cell is unchanged until the game sets a target: '
-        'glc_PTS (glucose_carrier ATP, instance PTS: the phosphotransferase system, Km 5 uM, one PEP charged as one '
-        'ATP per glucose), glc_ABC (instance ABC: binding-protein importer, Km 0.5 uM, 2 ATP per glucose) and glc_GalP '
-        '(glucose_carrier H_symport: Km 0.1 mM, one H+ per glucose). Each takes its medium glucose from its own '
-        'C_glc_e parameter, set to the same value as membrane_face\'s.'))
+        'Marinov\'s maintenance cost at 20 C. The membrane proteins\' pools (protein_pool membrane_share) take their '
+        'target as a share s_target of the membrane\'s protein ceiling (protein\'s A_protein_max), each at its share at '
+        'rest; the game keeps the shares summing to at most 1. Three glucose carriers the game unlocks after level 1 '
+        'sit beside Glf with their pools at 0 (m_init and s_target 0), so the level-1 cell is unchanged until the game '
+        'sets a share: glc_PTS (glucose_carrier PTS: the phosphotransferase system, Km 5 uM, delivering glucose '
+        '6-phosphate for one PEP charged as one ATP, so 2 ATP net per glucose), glc_ABC (glucose_carrier ATP: '
+        'binding-protein importer, Km 0.5 uM, 2 ATP per glucose, 0 net) and glc_GalP (glucose_carrier H_symport: Km 0.1 '
+        'mM, one H+ per glucose, about 1.7 ATP net once the H+-ATPase pumps it out). Each takes its medium glucose '
+        'from its own C_glc_e parameter, set to the same value as membrane_face\'s.'))
 
 m = lambda sub_name, var: f'mod_{sub_name}__{var}'
 D = lambda x: f'({x}[-1] - {x}[0])'
@@ -2491,11 +2796,12 @@ def cell_invariants(names, steady):
          'expr': f'abs({m("membrane", "Cm")}[0]*1e-12*{D(m("membrane", "V"))}*1e-3 - {CHARGE_IN}) <= '
                  f'1e-6*96485*{VOL0}*(abs({D(m("Na_K", "Nai"))}) + abs({D(m("Na_K", "Ki"))}) + '
                  f'abs({D(m("H", "H_total_rel"))})) + 1e-21'},
-        {'description': 'adenine and phosphoryl groups are conserved through every ATP user: ATP + ADP and ATP + Pi '
-                        'constant (relative 1e-9)',
+        {'description': 'adenine and phosphoryl groups are conserved through every ATP user and the PTS: ATP + ADP and '
+                        'ATP + Pi + G6P constant (relative 1e-9)',
          'expr': f'np.ptp({m("cytosol", "C_ATP")} + {m("cytosol", "C_ADP")}) <= 1e-9*np.max({m("cytosol", "C_ATP")} + '
-                 f'{m("cytosol", "C_ADP")}) and np.ptp({m("cytosol", "C_ATP")} + {m("cytosol", "C_Pi")}) <= '
-                 f'1e-9*np.max({m("cytosol", "C_ATP")} + {m("cytosol", "C_Pi")})'},
+                 f'{m("cytosol", "C_ADP")}) and np.ptp({m("cytosol", "C_ATP")} + {m("cytosol", "C_Pi")} + '
+                 f'{m("cytosol", "C_G6P")}) <= 1e-9*np.max({m("cytosol", "C_ATP")} + {m("cytosol", "C_Pi")} + '
+                 f'{m("cytosol", "C_G6P")})'},
         {'description': 'the ATP budget closes: the cytosol\'s external ATP use equals what the H+-ATPase (if present), '
                         'protein synthesis and biosynthesis take (relative 1e-9)',
          'expr': f'np.allclose({m("cytosol", "J_ATP_turnover")} - {m("cytosol", "J_ATP_maint")}, ' + ' + '.join(
@@ -2508,8 +2814,8 @@ def cell_invariants(names, steady):
               f'np.all({m("i_leak_Ca", "i_leak_Ca")}*({m("membrane", "V")} - {m("i_leak_Ca", "E_Ca")}) >= 0)',
               f'np.all({m("i_leak_H", "i_leak_H")}*({m("membrane", "V")} - {m("H", "E_H")}) >= 0)'] +
              [f'np.all({m("i_K_Trk", "i_leak_K")}*({m("membrane", "V")} - {m("Na_K", "E_K")}) >= 0)'] * ('i_K_Trk' in names))},
-        {'description': 'concentrations stay non-negative: ATP, ADP, Pi, glucose, lactate and glycogen >= -1e-9 mM',
-         'expr': ' and '.join(f'np.all({m("cytosol", "C_" + s_)} >= -1e-9)' for s_ in cyto_species + ['glyc'])},
+        {'description': 'concentrations stay non-negative: ATP, ADP, Pi, glucose, G6P, lactate and glycogen >= -1e-9 mM',
+         'expr': ' and '.join(f'np.all({m("cytosol", "C_" + s_)} >= -1e-9)' for s_ in cyto_species + ['G6P', 'glyc'])},
         {'description': 'second law for the reactions: dissipation P_diss >= 0',
          'expr': f'np.all({m("cytosol", "P_diss")} >= -1e-30)'},
         {'description': 'protein synthesis never spends more than its capacity: J_build_total <= J_cap (relative 1e-9)',
@@ -2530,23 +2836,30 @@ def cell_invariants(names, steady):
     if carriers:
         glc_in = ' + '.join([m('membrane_face', 'J_glc')] + [m(c, 'J_glc') for c in carriers])
         inv += [
-            {'description': 'carbon is conserved through every glucose carrier: Vol d(6 glc + 3 lac + 6 glycogen) = '
-                            'int (6 sum J_glc + 3 J_lac) dt (relative 1e-5: trapezoid integration of the logged fluxes)',
-             'expr': f'abs({VOL0}*(6*{D(m("cytosol", "C_glc"))} + 3*{D(m("cytosol", "C_lac"))} + '
-                     f'6*{D(m("cytosol", "C_glyc"))}) - np.trapz(6*({glc_in}) + 3*{m("membrane_face", "J_lac")}, t)) '
+            {'description': 'carbon is conserved through every glucose carrier: Vol d(6 glc + 6 G6P + 3 lac + 6 '
+                            'glycogen) = int (6 sum J_glc + 3 J_lac) dt (relative 1e-5: trapezoid integration of the '
+                            'logged fluxes)',
+             'expr': f'abs({VOL0}*(6*{D(m("cytosol", "C_glc"))} + 6*{D(m("cytosol", "C_G6P"))} + '
+                     f'3*{D(m("cytosol", "C_lac"))} + 6*{D(m("cytosol", "C_glyc"))}) - np.trapz(6*({glc_in}) + '
+                     f'3*{m("membrane_face", "J_lac")}, t)) '
                      f'<= 1e-5*np.trapz(np.abs(6*({glc_in})) + np.abs(3*{m("membrane_face", "J_lac")}), t) + 1e-30'},
-            {'description': 'the carriers\' costs follow their stoichiometry (exact): n_P ATP per glucose for the '
-                            'ATP-driven ones, one H+ per glucose for the symporter',
+            {'description': 'the carriers\' costs follow their stoichiometry (exact): one PEP (ATP equivalent) per '
+                            'glucose for the PTS, which delivers it as G6P, n_P ATP per glucose for the ABC importer, one '
+                            'H+ per glucose for the symporter',
              'expr': ' and '.join([f'np.allclose({m(c, "J_ATP_cost")}, {n}*{m(c, "J_glc")}, rtol=1e-12, atol=0)'
                                    for c, n in ATP_CARRIERS.items() if c in names] +
+                                  [f'np.array_equal({m("glc_PTS", "J_G6P")}, {m("glc_PTS", "J_glc")})'] * ('glc_PTS' in names) +
                                   [f'np.allclose({m("glc_GalP", "j_H")}, n_H_glc_GalP*{m("glc_GalP", "J_glc")}, '
                                    'rtol=1e-12, atol=0)'] * ('glc_GalP' in names))},
             {'description': 'second law for the glucose carriers, each against the cytosol\'s own state: J (RT '
-                            'ln(C_e/C_glc) + n_P A_hyd) >= 0 (ATP-driven), J (RT ln(C_e/C_glc) + n_H F (E_H - V)) >= 0 '
-                            '(symporter)',
+                            'ln(C_e/C_glc) + n_P A_hyd) >= 0 (ABC), J (RT ln(K_eq_hk C_e ATP/(G6P ADP))) >= 0 (PTS), J '
+                            '(RT ln(C_e/C_glc) + n_H F (E_H - V)) >= 0 (symporter)',
              'expr': ' and '.join(
                  [f'np.all({m(c, "J_glc")}*(R*T*np.log(C_glc_e_{c}/np.abs({m("cytosol", "C_glc")})) + '
-                  f'{n}*{m("cytosol", "A_hyd")}) >= -1e-30)' for c, n in ATP_CARRIERS.items() if c in names] +
+                  f'{n}*{m("cytosol", "A_hyd")}) >= -1e-30)' for c, n in ATP_CARRIERS.items()
+                  if c in names and c != 'glc_PTS'] +
+                 [f'np.all({m("glc_PTS", "J_glc")}*(-dG0_hk_glc_PTS + R*T*np.log(C_glc_e_glc_PTS*{m("cytosol", "C_ATP")}/'
+                  f'np.abs({m("cytosol", "C_G6P")}*{m("cytosol", "C_ADP")}) + 1e-300)) >= -1e-30)'] * ('glc_PTS' in names) +
                  [f'np.all({m("glc_GalP", "J_glc")}*(R*T*np.log(C_glc_e_glc_GalP/np.abs({m("cytosol", "C_glc")})) + '
                   f'n_H_glc_GalP*F*({m("H", "E_H")} - {m("membrane", "V")})*1e-3) >= -1e-30)'] * ('glc_GalP' in names))},
         ]
@@ -2563,6 +2876,7 @@ def cell_outputs(names):
             ('Na_K', 'E_Na'), ('Na_K', 'E_K'), ('Ca', 'Cai'), ('Ca', 'CaB_Cai'), ('H', 'H_i'), ('H', 'pH_i'),
             ('H', 'E_H'), ('H', 'H_total_rel'), ('cytosol', 'C_glc'), ('cytosol', 'C_lac'), ('cytosol', 'C_ATP'),
             ('cytosol', 'C_ADP'), ('cytosol', 'C_Pi'), ('cytosol', 'C_glyc'), ('cytosol', 'v_gly'), ('cytosol', 'v_hyd'),
+            ('cytosol', 'C_G6P'), ('cytosol', 'v_lg'), ('cytosol', 'J_ATP_hk'), ('cytosol', 'J_ATP_lg'),
             ('cytosol', 'v_store'), ('cytosol', 'v_mob'), ('cytosol', 'A_hyd'), ('cytosol', 'P_diss'),
             ('cytosol', 'Q_met'), ('cytosol', 'j_H_met'), ('cytosol', 'J_ATP_turnover'), ('cytosol', 'J_ATP_gly'),
             ('cytosol', 'J_ATP_maint'), ('i_leak_Na', 'i_leak_Na'), ('i_leak_Ca', 'i_leak_Ca'), ('i_leak_Ca', 'E_Ca'),
@@ -2580,7 +2894,14 @@ def cell_outputs(names):
         if c in names:
             base += [(c, 'J_glc')] + ([(c, 'J_ATP_cost')] if c in ATP_CARRIERS else [(c, 'j_H')])
     base += [(n, 'm') for n in names if n.startswith('pool_')]
+    base += [(n, v) for n in names if n[5:] in MEMBRANE_SHARE_KEYS for v in ('m_target', 'share')]
+    base += [('protein', 'A_protein_max')] + [('glc_PTS', 'J_G6P')] * ('glc_PTS' in names)
     return [m(s, v).replace('__', '/') for s, v in base]
+
+
+def share_unit(key):
+    '''Share of the membrane ceiling that m = 1 of a membrane protein takes.'''
+    return float(PROTEINS[key][2] if key in PROTEINS else N0_CARRIER) * par(f'footprint_{key}') * 1e-6 / A_PROTEIN_MAX
 
 
 def write_cell(cell, steady, sweep_extra, timestep=None):
@@ -2613,7 +2934,11 @@ def write_cell(cell, steady, sweep_extra, timestep=None):
     vals = {r[0]: float(r[2]) for r in out}
     ranges = {'T': [273.15, 313.15], 'T_ref_cytosol': [283.15, 303.15],
               'growth_level_bio': [0.0, 20.0], 'repair_level_bio': [0.0, 1.0], 'store_alloc_cytosol': [0.0, 1.0],
-              **{f'm_target_{n}': [0.25, 4.0] for n in names if n.startswith('pool_') and n != 'pool_proteome'},
+              **{f'm_target_{n}': [0.25, 4.0] for n in names if n.startswith('pool_') and n != 'pool_proteome'
+                 and n[5:] not in MEMBRANE_SHARE_KEYS},
+              # membrane proteins: the same range of copies, as shares of the ceiling (the carriers' unit is the Glf copies)
+              **{f's_target_{n}': [0.25 * share_unit(n[5:]), 4.0 * share_unit(n[5:])] for n in names
+                 if n[5:] in MEMBRANE_SHARE_KEYS},
               **sweep_extra}
     verif = {
         'module_type': GAC, 'version': name, 'sim_time': 60.0, 'pre_time': 0.0, 'dt': 0.01,
@@ -2705,7 +3030,8 @@ for d in [os.path.join(REPO, 'modules', *parts) for parts in [
         ('cell', 'protein_pool', 'versions', POOL_V), ('cell', 'ion_channels', 'i_leak_K', 'versions', V_NEW),
         ('cell', 'ion_channels', 'i_NaCa', 'versions', V_NEW),
         ('cell', 'ion_channels', 'i_H_flagellum', 'versions', 'MotAB_ArgusUNPUBLISHED_v01'),
-        ('transport', GC, 'versions', V_GC_ATP), ('transport', GC, 'versions', V_GC_H)]] + CELL_DIRS:
+        ('transport', GC, 'versions', V_GC_ATP), ('transport', GC, 'versions', V_GC_H),
+        ('transport', GC, 'versions', V_GC_PTS), ('cell', 'protein_pool', 'versions', POOL_SHARE_V)]] + CELL_DIRS:
     added = complete_bib(d)
     if added:
         print(f'{os.path.relpath(d, REPO)}: added {added}')

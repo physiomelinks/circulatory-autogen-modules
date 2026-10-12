@@ -1,0 +1,20 @@
+module_type: glucose_carrier
+version: PTS_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The glucose phosphotransferase system (PTS: PtsG/EIICB-Glc with EIIA-Glc, enzyme I and HPr; deutscher2006how) as one
+  group-translocating carrier between the medium (entrance medium_face_port) and the cytosol: it takes glucose from the medium
+  and delivers glucose 6-phosphate (G6P_port), phosphorylated by PEP. The cytosol has no PEP: the PEP is charged as one ATP
+  (ATP_hydrolysis_port: ATP -> ADP, no Pi released, the phosphoryl going onto the glucose), and its supply follows the lower
+  glycolysis, which makes PEP only as fast as ADP and Pi allow: f_PEP = ADP/(K_ADP_PEP + ADP) Pi/(K_Pi_PEP + Pi), with the
+  lower glycolysis'' affinities, so a PTS cell takes up glucose at the pace its ATP use sets (as ATP builds up ADP falls and
+  the PTS slows with the lower glycolysis) and G6P settles where the two capacities balance, G6P/(K_G6P_lg + G6P) = PTS capacity
+  / lower glycolysis capacity, instead of trapping the cell''s phosphate. The PEP would have made one ATP at pyruvate kinase,
+  and the PTS glucose skips the hexokinase ATP, so a fermenter nets 3 - 1 = 2 ATP per PTS glucose, as with free glucose. Reaction
+  glc_e + ATP <=> G6P_i + ADP, affinity A = RT ln(K_eq C_e ATP/(G6P ADP)) with K_eq = exp(-dG0_hk/RT) (the hexokinase reaction
+  across the membrane), rate J = jmax m A_mem f_PEP (C_e ATP - G6P ADP/K_eq)/((K_m_ATP + ATP)(K + C_e)): Michaelis-Menten
+  in glucose outside (J = jmax m A_mem f_PEP C_e/(K + C_e) ATP/(K_m_ATP + ATP) with no G6P inside), saturating in ATP, zero
+  at equilibrium and of the sign of A, so J A >= 0. At the cell''s ATP/ADP the carrier holds G6P up to ~2x10^4 times the glucose
+  outside. G6P cannot leave by any carrier. The charged driving force is smaller than the real one (PEP + glucose -> pyruvate
+  + G6P releases ~48 kJ/mol standard, ATP + glucose ~17): the difference, PEP''s at pyruvate kinase, is in the lower glycolysis''
+  lumped affinity. Km 5 uM (deutscher2006how); m = 1 is as many copies as the calibrated cell''s Glf; the turnover number
+  and K_m_ATP are placeholders.'

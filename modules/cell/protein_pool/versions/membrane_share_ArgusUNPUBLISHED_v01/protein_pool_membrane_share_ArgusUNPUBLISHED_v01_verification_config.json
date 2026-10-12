@@ -1,0 +1,95 @@
+{
+  "module_type": "protein_pool",
+  "version": "membrane_share_ArgusUNPUBLISHED_v01",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "m",
+    "m_target",
+    "share",
+    "n",
+    "r_up",
+    "r_down",
+    "f_ATP",
+    "J_keep",
+    "J_demand",
+    "J_build",
+    "J_ATP",
+    "M_build",
+    "A_protein"
+  ],
+  "run_parameters": {
+    "s_target": 0.09935375105580513
+  },
+  "invariants": [
+    {
+      "description": "the target is a share of the ceiling (exact): m_target = s_target A_ceiling / (n_0 footprint), so the target copies take s_target A_ceiling; share = A_protein / A_ceiling",
+      "expr": "np.allclose(m_target, s_target*A_ceiling/(n_0*footprint*1e-6), rtol=1e-12, atol=0) and np.allclose(n_0*m_target*footprint*1e-6, s_target*A_ceiling, rtol=1e-12, atol=0) and np.allclose(share, A_protein/A_ceiling, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "the share moves monotonically to its target and never overshoots",
+      "expr": "np.all(np.diff(share)*np.sign(s_target - share[0]) >= -1e-12) and np.all((share - s_target)*(share[0] - s_target) >= -1e-12)"
+    },
+    {
+      "description": "costs (exact): J_keep = n L (c_poly + c_deg + c_recycle) k_deg f_ATP / N_A, J_demand = r_up n_0 L (c_syn + c_poly) / N_A, J_build = J_demand s_build min(f_ATP, 1), M_build = n L (c_syn + c_poly) / N_A, A_protein = n_0 footprint m",
+      "expr": "np.allclose(J_keep, n_0*m*L*(c_poly + c_deg + c_recycle)*k_deg/N_A*f_ATP, rtol=1e-12, atol=0) and np.allclose(J_demand, np.maximum(m_target - m, 0)/tau*n_0*L*(c_syn + c_poly)/N_A, rtol=1e-9, atol=1e-30) and np.allclose(J_build, J_demand*s_build*np.minimum(f_ATP, 1), rtol=1e-9, atol=1e-30) and np.allclose(M_build, n_0*m*L*(c_syn + c_poly)/N_A, rtol=1e-12, atol=0) and np.allclose(A_protein, n_0*footprint*1e-6*m, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0)) = int J_build dt while m rises (relative 1e-4: trapezoid integration of the logged flux)",
+      "expr": "abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0]) - np.trapz(J_build, t)) <= 1e-4*abs(np.trapz(J_build, t)) + 1e-30",
+      "applies": "run"
+    },
+    {
+      "description": "expression approaches its target and never overshoots: m moves monotonically towards m_target",
+      "expr": "np.all(np.diff(m)*np.sign(m_target[0] - m[0]) >= -1e-12) and np.all((m - m_target)*(m[0] - m_target) >= -1e-12)"
+    },
+    {
+      "description": "costs are never negative",
+      "expr": "np.all(J_keep >= 0) and np.all(J_build >= 0) and np.all(M_build >= 0)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "s_target": [
+        0.0,
+        1.0
+      ],
+      "ATP": [
+        0.5,
+        12.0
+      ],
+      "s_build": [
+        0.0,
+        1.0
+      ]
+    },
+    "rationale": "shares from none to the whole ceiling; ATP from near exhaustion to above rest; synthesis from stalled to unconstrained"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      2.0,
+      1.0,
+      0.5
+    ],
+    "t_end": 20.0,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

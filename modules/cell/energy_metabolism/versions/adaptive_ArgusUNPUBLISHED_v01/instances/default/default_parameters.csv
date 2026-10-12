@@ -1,6 +1,8 @@
 variable_name,units,value,data_reference,sourced
 C_glc_init,millimolar,0.002,"unreferenced_placeholder; glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)",no
 C_lac_init,millimolar,0.26990316647694707,calibrated: steady state of the lumped cell (export by the membrane carrier = production),no
+C_G6P_init,millimolar,0.0003344481605351171,"derived: steady state of the lower glycolysis at rest: K_G6P_lg/(headroom - 1) (K_G6P_lg: unreferenced_placeholder, placeholder; lower_glycolysis_headroom: unreferenced_placeholder, placeholder)",no
+j_G6P_ext,mol_per_s,0.0,no G6P-delivering carrier connected,no
 C_ATP_init,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 C_ADP_init,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
 C_Pi_init,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
@@ -26,8 +28,13 @@ Q10,dimensionless,2.0,unreferenced_placeholder; metabolic Q10 typically 2-3,no
 c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
 dG0_ferm,J_per_mol,-196000.0,unreferenced_placeholder; textbook standard Gibbs energy of glucose -> 2 lactate (BioNumbers BNID 106539 lists -183.6 kJ/mol),no
 dG0_hyd,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
-V_gly,millimolar_per_s,6.319127470321385,calibrated: glycolysis supplies the total ATP turnover (lynch2015bioenergetic maintenance at 20 C) at the default steady state,no
+V_gly,millimolar_per_s,6.385017571116603,calibrated: glycolysis supplies the total ATP turnover (lynch2015bioenergetic maintenance at 20 C) at the default steady state,no
 K_glc,millimolar,0.1,unreferenced_placeholder; lumped glycolysis affinity for glucose (glucokinase order 0.1 mM),no
+K_ATP_hk,millimolar,0.1,"unreferenced_placeholder; ATP for half-rate of the hexokinase step, order 0.1 mM (far below the cell's 9.6 mM, so it acts only as ATP runs out)",no
+dG0_hk,J_per_mol,-16700.0,unreferenced_placeholder; standard Gibbs energy of glucose + ATP -> glucose 6-phosphate + ADP (textbook -16.7 kJ/mol: G6P hydrolysis -13.8 against ATP hydrolysis -30.5),no
+h_hk,J_per_mol,23800.0,unreferenced_placeholder; enthalpy released by glucose + ATP -> glucose 6-phosphate + ADP (about -24 kJ/mol reported for the hexokinase reaction; to confirm and cite),no
+V_lg,millimolar_per_s,28.05882448294951,"derived: lower_glycolysis_headroom x resting glycolytic flux / its ADP and Pi saturation at rest (lower_glycolysis_headroom: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced; K_ADP_gly: unreferenced_placeholder, placeholder; K_Pi_gly: unreferenced_placeholder, placeholder)",no
+K_G6P_lg,millimolar,0.1,"unreferenced_placeholder; lower glycolysis (glucose 6-phosphate to lactate) affinity for G6P, phosphoglucose isomerase/phosphofructokinase order 0.1 mM",no
 K_ADP_gly,millimolar,0.1,unreferenced_placeholder; lumped glycolysis affinity for ADP,no
 K_Pi_gly,millimolar,1.0,unreferenced_placeholder; lumped glycolysis affinity for Pi,no
 K_lac,millimolar,10.0,unreferenced_placeholder; lumped glycolysis product constant for lactate,no
@@ -41,12 +48,11 @@ h_ATP,J_per_mol,20500.0,gajewski1986thermodynamics; enthalpy of ATP hydrolysis -
 C_glyc_init,millimolar,0.0,definitional; the starting cell stores nothing,no
 store_alloc,dimensionless,0.0,definitional; storage off until the player allocates energy to it,no
 V_store_max,millimolar_per_s,0.05050073093349957,"derived: glycogen_store_rate x resting glycolytic flux (glycogen_store_rate: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
-K_glc_store,millimolar,0.1,unreferenced_placeholder; glucokinase-order affinity of glycogen synthesis,no
+K_G6P_store,millimolar,0.016722408026755856,"derived: K_glc_store x G6P_i / glc_i: the store saturated at rest as when it took free glucose (K_glc_store: unreferenced_placeholder, placeholder; glc_i: unreferenced_placeholder, placeholder; K_G6P_lg: unreferenced_placeholder, placeholder; lower_glycolysis_headroom: unreferenced_placeholder, placeholder)",no
 K_ATP_store,millimolar,1.0,"unreferenced_placeholder; ADP-glucose pyrophosphorylase ATP affinity, order 1 mM",no
 C_glyc_max,millimolar,200.0,"unreferenced_placeholder; glycogen ceiling: about 10% of dry weight (cell 1.1 g/mL, 30% dry), in mM glucose units",no
 V_mob,millimolar_per_s,0.14428780266714164,"derived: glycogen_mobilise_rate x resting glycolytic flux (glycogen_mobilise_rate: unreferenced_placeholder, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
 K_glyc_mob,millimolar,10.0,unreferenced_placeholder; phosphorylase affinity for glycogen,no
-K_ADP_mob,millimolar,0.5,unreferenced_placeholder; lumped mobilisation affinity for ADP,no
 K_Pi_mob,millimolar,5.0,"unreferenced_placeholder; phosphorylase affinity for Pi, order 5 mM",no
 K_i_ATP_mob,millimolar,1.0,"unreferenced_placeholder; ATP inhibits mobilisation, so glycogen is spent when ATP falls",no
 dG0_store,J_per_mol,-42000.0,"unreferenced_placeholder; glucose + 2 ATP -> glycogen unit: textbook steps via G6P, G1P, UDP-glucose with PPi hydrolysis",no

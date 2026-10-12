@@ -373,6 +373,41 @@
    "status": "placeholder",
    "note": "lumped glycolysis product constant for ATP"
   },
+  "dG0_hk": {
+   "value": -16700.0,
+   "units": "J_per_mol",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "standard Gibbs energy of glucose + ATP -> glucose 6-phosphate + ADP (textbook -16.7 kJ/mol: G6P hydrolysis -13.8 against ATP hydrolysis -30.5)"
+  },
+  "h_hk": {
+   "value": 23800.0,
+   "units": "J_per_mol",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "enthalpy released by glucose + ATP -> glucose 6-phosphate + ADP (about -24 kJ/mol reported for the hexokinase reaction; to confirm and cite)"
+  },
+  "K_G6P_lg": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "lower glycolysis (glucose 6-phosphate to lactate) affinity for G6P, phosphoglucose isomerase/phosphofructokinase order 0.1 mM"
+  },
+  "K_ATP_hk": {
+   "value": 0.1,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "ATP for half-rate of the hexokinase step, order 0.1 mM (far below the cell's 9.6 mM, so it acts only as ATP runs out)"
+  },
+  "lower_glycolysis_headroom": {
+   "value": 300.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "capacity of the lower glycolysis (G6P to lactate) as a multiple of the resting flux, six times the hexokinase step's 52x: a Glf cell's flux stays set at the entry step and G6P stays low (about 0.3 uM at rest, K_G6P_lg/(headroom - 1); ~0.02 mM at 50x), so the level-1 traces move by less than 1e-3 (G6P holds phosphate and carbon); a PTS cell, which delivers G6P, can run up to it. Real cells hold mM G6P: a designer trade-off"
+  },
   "K_ATP_hyd": {
    "value": 0.5,
    "units": "millimolar",
@@ -413,7 +448,7 @@
    "units": "millimolar",
    "source": "unreferenced_placeholder",
    "status": "placeholder",
-   "note": "glucokinase-order affinity of glycogen synthesis"
+   "note": "glucokinase-order affinity of glycogen synthesis for free glucose; the store takes glucose 6-phosphate, and its G6P affinity is this times G6P_i/glc_i (the same saturation at rest)"
   },
   "K_ATP_store": {
    "value": 1.0,
@@ -435,13 +470,6 @@
    "source": "unreferenced_placeholder",
    "status": "placeholder",
    "note": "phosphorylase affinity for glycogen"
-  },
-  "K_ADP_mob": {
-   "value": 0.5,
-   "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "lumped mobilisation affinity for ADP"
   },
   "K_Pi_mob": {
    "value": 5.0,
@@ -1051,13 +1079,6 @@
    "source": "pao1998major",
    "status": "sourced",
    "note": "MFS sugar/H+ symporters (GalP, LacY) Km ~10 uM-1 mM; 0.1 mM, the geometric middle of the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))"
-  },
-  "n_P_PTS": {
-   "value": 1.0,
-   "units": "dimensionless",
-   "source": "deutscher2006how",
-   "status": "sourced",
-   "note": "one PEP phosphoryl per glucose taken up (and phosphorylated); charged to the lumped cytosol as one ATP equivalent"
   },
   "n_ATP_ABC": {
    "value": 2.0,
