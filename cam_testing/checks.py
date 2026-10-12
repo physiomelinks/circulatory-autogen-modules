@@ -1326,11 +1326,79 @@ DEFAULT_STABILITY = {
     'solve_ivp': ['RK45', 'BDF', 'LSODA'],
     'fixed_step': {'schemes': ['euler', 'heun', 'rk4'], 'dt_start': 1e-2},   # halved until it works
     'max_step_start': 1e-2,             # CVODE / solve_ivp: MaximumStep tried after the unconstrained run, /10 each
-    'time_budget': None,                # seconds per run before refinement stops (default 20 s per state)
+    'time_budget': None,                # seconds a run may take (default 20 s per state, at most max_run_seconds)
+    'max_run_seconds': 60.0,            # a run still going after this is stopped
+    'total_time_budget': 420.0,         # seconds for all refinement runs; families not reached in it are skipped
     'tol': 1e-2,                        # max normalised difference from the reference to count as working
     # configurations the module is declared to work with; each must pass
     'supported': [{'solver': 'CVODE_myokit', 'rtol': 1e-6, 'atol': 1e-8}],
 }
+
+
+class RunTimeout(Exception):
+    """A run stopped at its wall-clock limit."""
+
+
+def run_limited(fn, limit):
+    """Returns fn() run in a forked child process, which is stopped after ``limit`` seconds
+    (RunTimeout); an exception in fn is raised again here as a RuntimeError with its message.
+    Without fork (Windows), or with no limit, fn runs here and cannot be stopped."""
+    import multiprocessing as mp
+    if limit is None or 'fork' not in mp.get_all_start_methods():
+        return fn()
+    ctx = mp.get_context('fork')
+    receive, send = ctx.Pipe(duplex=False)
+
+    def child():
+        try:
+            send.send(('ok', fn()))
+        except BaseException as e:   # report every failure to the parent
+            send.send(('error', f'{type(e).__name__}: {e}'))
+        finally:
+            send.close()
+
+    proc = ctx.Process(target=child, daemon=True)
+    proc.start()
+    send.close()
+    try:
+        if not receive.poll(max(limit, 0.0)):
+            raise RunTimeout(f'stopped at the {limit:.0f} s limit per run')
+        kind, value = receive.recv()
+    except EOFError:
+        kind, value = 'error', f'the run ended without a result (exit code {proc.exitcode})'
+    finally:
+        if proc.is_alive():
+            proc.kill()
+        proc.join()
+        receive.close()
+    if kind == 'error':
+        raise RuntimeError(value)
+    return value
+
+
+def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstrained, budget, min_step, deadline):
+    """Runs make_cfg(step) for step = first_step, first_step/factor, ... (after an unconstrained try
+    when try_unconstrained) until one works, a run is stopped at its limit, the next run is
+    predicted over ``budget`` seconds, the step falls below ``min_step``, or ``deadline``
+    (time.perf_counter()) passes. ``record(cfg, fn, limit)`` makes a run and returns its row
+    (with 'works', 'seconds' and 'timed_out'). Returns (row of the last run or None, why it stopped)."""
+    steps = ([None] if try_unconstrained else []) + [first_step]
+    last = None
+    while True:
+        step = steps.pop(0) if steps else last['step'] / factor
+        if step is not None and step < min_step:
+            return (last and last['row']), f'reached min_step {min_step:g}'
+        if last is not None and last['row']['seconds'] * (factor if last['step'] else 2.0) > budget:
+            return last['row'], f'stopped: next run (step {step:g}) predicted over the {budget:.0f} s budget'
+        remaining = deadline - time.perf_counter()
+        if remaining <= 0.0:
+            return (last and last['row']), "skipped: the test's time budget is used up"
+        row = record(make_cfg(step), lambda step=step: run_fn(step), min(budget, remaining))
+        last = {'step': step, 'row': row}
+        if row['works']:
+            return row, ''
+        if row.get('timed_out'):
+            return row, f'stopped: run (step {step:g}) reached the {min(budget, remaining):.0f} s limit'
 
 
 def config_label(cfg):
@@ -1382,53 +1450,39 @@ def stability_test(cm):
 
         rows = []
 
-        def record(cfg, fn):
-            import time
+        def record(cfg, fn, limit=None):
             start = time.perf_counter()
+            timed_out = False
             try:
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                    t, out = fn()
+                    t, out = run_limited(fn, limit)
                 err = compare(np.asarray(t, float), out, t_ref, ref, scale)
                 works = bool(np.isfinite(err) and err <= tol)
                 note = '' if works else ('non-finite output' if not np.isfinite(err) else f'difference {err:.1e} > tol')
+            except RunTimeout as e:
+                err, works, note, timed_out = None, False, str(e), True
             except Exception as e:
                 err, works, note = None, False, f'{type(e).__name__}: {str(e)[:200]}'
             row = {'config': cfg, 'label': config_label(cfg), 'works': works, 'difference': err,
-                   'seconds': round(time.perf_counter() - start, 3), 'note': note}
+                   'seconds': round(time.perf_counter() - start, 3), 'note': note, 'timed_out': timed_out}
             rows.append(row)
             return row
 
-        # Each solver family is refined (smaller step) until it works, or until the next run
-        # is predicted to take longer than the budget: 20 s per state variable by default.
+        # Each solver family is refined (smaller step) until it works, a run reaches the per-run
+        # limit (20 s per state variable, at most max_run_seconds; the run is stopped there), or the
+        # next run is predicted over it; all refinement shares total_time_budget, so the test stays
+        # within its shard.
         rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.point_model())
         n_states = max(len(state_qnames), 1)
-        budget = float(st.get('time_budget') or 20.0 * n_states)
+        budget = min(float(st.get('time_budget') or 20.0 * n_states), float(st['max_run_seconds']))
+        deadline = time.perf_counter() + float(st['total_time_budget'])
         min_step = float(st.get('min_step', 1e-7))
         families = []
 
         def refine(family, make_cfg, run_fn, first_step, factor, try_unconstrained):
-            """Runs make_cfg(step) for step = first_step, first_step/factor, ... (after an
-            unconstrained try when try_unconstrained) until one works or the budget stops it."""
-            steps = ([None] if try_unconstrained else []) + [first_step]
-            last = None
-            stop = ''
-            while True:
-                step = steps.pop(0) if steps else last['step'] / factor
-                if step is not None and step < min_step:
-                    stop = f'reached min_step {min_step:g}'
-                    break
-                if last is not None and last['row']['seconds'] * (factor if last['step'] else 2.0) > budget:
-                    stop = (f'stopped: next run (step {step:g}) predicted over the '
-                            f'{budget:.0f} s budget ({n_states} states x 20 s)')
-                    break
-                row = record(make_cfg(step), lambda step=step: run_fn(step))
-                last = {'step': step, 'row': row}
-                if row['works']:
-                    break
-                if row['seconds'] > budget:
-                    stop = f'stopped: run took {row["seconds"]:.0f} s > {budget:.0f} s budget'
-                    break
-            works_at = last['row']['label'] if last and last['row']['works'] else None
+            last, stop = refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstrained,
+                                       budget, min_step, deadline)
+            works_at = last['label'] if last and last['works'] else None
             families.append({'family': family, 'works_at': works_at, 'stop': '' if works_at else stop})
 
         cv_start = float(st.get('max_step_start', 1e-2))
@@ -1493,7 +1547,7 @@ def stability_test(cm):
             solver = d.pop('solver')
             if solver == 'CVODE_myokit':
                 record(dict(declared), lambda d=d: harness.run(harness.simulation_helper(cm.model_path, base, solver_info=d),
-                                                               outputs, params=point))
+                                                               outputs, params=point), budget)
 
         supported = st.get('supported') or []
         broken = []
