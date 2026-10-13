@@ -61,7 +61,8 @@ jobs:
           path: _artifact/
           if-no-files-found: ignore
 
-  # A fresh install (apt + pip, no cache) compared with the cached setup the other jobs use
+  # A fresh install (apt + pip, no cache) compared with the cached setup the other jobs use: Python
+  # packages must match (all pinned, ci/constraints.txt); apt differences (Ubuntu updates) warn
   # (.github/actions/setup, key ci/setup_key.sh): fails, printing the difference, when the cache
   # is stale, e.g. an unpinned dependency released a new version.
   setup-check:
