@@ -8,6 +8,7 @@
     "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "available_to_phlynx": false,
     "required_citations": [
       "safaei2016roadmap",
       "argus2026circulatory"
@@ -18,29 +19,23 @@
     ],
     "entrance_ports": [
       {
-        "port_type": "flow_port",
+        "port_type": "vessel_port",
         "variables": [
-          "v"
-        ]
-      },
-      {
-        "port_type": "pressure_port",
-        "variables": [
+          "v",
           "u_in"
         ]
       }
     ],
     "exit_ports": [
       {
-        "port_type": "flow_port",
+        "port_type": "vessel_port",
         "variables": [
-          "v_out"
-        ]
-      },
-      {
-        "port_type": "pressure_port",
-        "variables": [
+          "v_out",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -59,6 +54,13 @@
         "port_type": "flow_feedback_port",
         "variables": [
           "v"
+        ]
+      },
+      {
+        "port_type": "pressure_and_deriv_port",
+        "variables": [
+          "u_C",
+          "du_C_dt"
         ]
       }
     ],
@@ -188,6 +190,18 @@
         "m3_per_s",
         "access",
         "boundary_condition"
+      ],
+      [
+        "du_C_dt",
+        "J_per_m3s",
+        "access",
+        "variable"
+      ],
+      [
+        "u_C",
+        "J_per_m3",
+        "access",
+        "variable"
       ]
     ]
   }

@@ -1,0 +1,81 @@
+[
+  {
+    "module_type": "simple",
+    "module_subtype": "pv_noI_SI_lumped",
+    "module_format": "supermodule",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "description": "simple/pv_noI_SI built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): R (resistance pp_linear) -> C (compliance vv_linear_novisco); V (vessel_volume summed) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "routes": {
+      "inputs": {
+        "vessel_port": "R"
+      },
+      "outputs": {
+        "vessel_port": "C",
+        "volume_port": "V"
+      }
+    },
+    "shared_parameters": [
+      "R",
+      "C",
+      "q_0",
+      "u_0",
+      "u_in",
+      "v_out"
+    ],
+    "outputs": {
+      "u": "C/u",
+      "v": "R/v",
+      "q": "V/q"
+    },
+    "replaces": {
+      "module_subtype": "pv_noI_SI",
+      "parameters": {
+        "q_C_init_C": "(q_init - q_0)"
+      }
+    },
+    "submodules": [
+      {
+        "name": "R",
+        "module_type": "resistance",
+        "module_subtype": "pp_linear",
+        "parameterisation": "default",
+        "inp_instances": [],
+        "out_instances": [
+          "C"
+        ]
+      },
+      {
+        "name": "C",
+        "module_type": "compliance",
+        "module_subtype": "vv_linear_novisco",
+        "parameterisation": "default",
+        "inp_instances": [
+          "R"
+        ],
+        "out_instances": [
+          "V"
+        ]
+      },
+      {
+        "name": "V",
+        "module_type": "vessel_volume",
+        "module_subtype": "summed",
+        "parameterisation": "default",
+        "inp_instances": [
+          "C"
+        ],
+        "out_instances": []
+      }
+    ]
+  }
+]

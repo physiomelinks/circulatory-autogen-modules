@@ -1,0 +1,39 @@
+{
+  "module_type": "venous",
+  "version": "pp_nonlinear_lumped",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.002,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_I_d/v", "mod_I_p/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": ["beta_g", "g", "mu", "rho"],
+    "equivalent_version": {
+      "version": "venous/pp_nonlinear",
+      "monolithic_parameters": {
+        "I_scale": 1.0,
+        "K_tube": 10.0,
+        "R_flag": 1.0,
+        "beta_g": 1.0,
+        "g": 1.0,
+        "l": 0.1,
+        "m_tube": 10.0,
+        "mu": 1.0,
+        "n_tube": -1.5,
+        "r_0": 0.01,
+        "rho": 1.0,
+        "theta": 90.0,
+        "u_0": 0.0,
+        "u_ext": 0.0,
+        "u_in": 666.61,
+        "u_out": 0.0
+      },
+      "output_map": {"u": "C/u", "v": "I_p/v", "v_d": "I_d/v", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

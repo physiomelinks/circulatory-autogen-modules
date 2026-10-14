@@ -27,6 +27,7 @@
         <variable name="q_0" public_interface="out" units="m3"/>
         <variable name="R_flag" public_interface="in" units="dimensionless"/>
         <variable name="I_scale" public_interface="in" units="dimensionless"/>
+        <variable name="du_dt" public_interface="out" units="J_per_m3s"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -197,6 +198,64 @@
                         </apply>
                     </apply>
                     <ci>u_ext</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>du_dt</ci>
+                <apply>
+                    <times/>
+                    <ci>K_tube</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>m_tube</ci>
+                                <apply>
+                                    <power/>
+                                    <ci>q</ci>
+                                    <apply>
+                                        <minus/>
+                                        <ci>m_tube</ci>
+                                        <cn cellml:units="dimensionless">1</cn>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <power/>
+                                <ci>q_0</ci>
+                                <ci>m_tube</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>n_tube</ci>
+                                <apply>
+                                    <power/>
+                                    <ci>q</ci>
+                                    <apply>
+                                        <minus/>
+                                        <ci>n_tube</ci>
+                                        <cn cellml:units="dimensionless">1</cn>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <power/>
+                                <ci>q_0</ci>
+                                <ci>n_tube</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <ci>v</ci>
+                        <ci>v_out</ci>
+                    </apply>
                 </apply>
             </apply>
         </math>

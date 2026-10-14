@@ -1,0 +1,97 @@
+{
+  "module_type": "arterial_simple",
+  "version": "vp_lumped",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.0005,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/q_C", "mod_C/u", "mod_I/v"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent": [
+      {
+        "model": "closed_loop_cvs/3compartment_lumped",
+        "reproduces": "closed_loop_cvs/3compartment",
+        "replaced_vessels": ["aortic_root", "par", "pvn", "systemic_T", "venous_svc"],
+        "output_map": {
+          "aortic_root/q": "aortic_root/q",
+          "aortic_root/q_C": "aortic_root/q_C",
+          "aortic_root/q_C_d": "aortic_root/q_C_d",
+          "aortic_root/u": "aortic_root/u",
+          "aortic_root/u_d": "aortic_root/u_d",
+          "aortic_root/v": "aortic_root/v",
+          "par/q": "par/q",
+          "par/q_C": "par/q_C",
+          "par/u": "par/u",
+          "par/v": "par/v",
+          "pvn/q": "pvn/q",
+          "pvn/q_C": "pvn/q_C",
+          "pvn/q_C_change": "pvn/q_C_change",
+          "pvn/q_us_wCont": "pvn/q_us_wCont",
+          "pvn/u": "pvn/u",
+          "pvn/v": "pvn/v",
+          "systemic_T/q": "systemic_T/q",
+          "systemic_T/u": "systemic_T/u",
+          "systemic_T/u_C": "systemic_T/u_C",
+          "systemic_T/v": "systemic_T/v",
+          "systemic_T/v_T": "systemic_T/v_T",
+          "venous_svc/q": "venous_svc/q",
+          "venous_svc/q_C": "venous_svc/q_C",
+          "venous_svc/q_C_change": "venous_svc/q_C_change",
+          "venous_svc/q_us_wCont": "venous_svc/q_us_wCont",
+          "venous_svc/u": "venous_svc/u",
+          "venous_svc/v": "venous_svc/v"
+        },
+        "tol": 1e-06,
+        "solver_info": {"rtol": 1e-10, "atol": 1e-14},
+        "ignore": {
+          "pvn/t": "time",
+          "par/t": "time",
+          "aortic_root/t": "time",
+          "systemic_T/t": "time",
+          "venous_svc/t": "time",
+          "volume_sum/t": "time",
+          "heart_clock/t": "time",
+          "ra/t": "time",
+          "rv/t": "time",
+          "la/t": "time",
+          "lv/t": "time",
+          "trv/t": "time",
+          "puv/t": "time",
+          "miv/t": "time",
+          "aov/t": "time"
+        },
+        "wrapped": {
+          "ra/chi_floor": 1.0,
+          "ra/chi_floor_final": 1.0,
+          "rv/chi_floor": 1.0,
+          "rv/chi_floor_final": 1.0,
+          "la/chi_floor": 1.0,
+          "la/chi_floor_final": 1.0,
+          "lv/chi_floor": 1.0,
+          "lv/chi_floor_final": 1.0
+        },
+        "reciprocal": ["trv/L", "trv/B", "puv/L", "puv/B", "miv/L", "miv/B", "aov/L", "aov/B"]
+      }
+    ],
+    "equivalent_version": {
+      "version": "arterial_simple/vp",
+      "monolithic_parameters": {
+        "C": 3.09077e-10,
+        "I": 1e-06,
+        "R": 10664000.0,
+        "q_0": 0.0,
+        "u_0": 1463.0,
+        "u_ext": 0.0,
+        "u_out": 12665.6,
+        "v_in": 0.0001
+      },
+      "output_map": {"u": "C/u", "v": "I/v", "q_C": "C/q_C"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

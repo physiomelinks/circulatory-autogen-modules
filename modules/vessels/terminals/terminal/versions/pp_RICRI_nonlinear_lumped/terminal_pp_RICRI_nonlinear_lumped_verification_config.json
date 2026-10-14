@@ -1,0 +1,35 @@
+{
+  "module_type": "terminal",
+  "version": "pp_RICRI_nonlinear_lumped",
+  "sim_time": 5.0,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/u", "mod_I_d/v", "mod_I_p/v", "mod_V/q"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent_version": {
+      "version": "terminal/pp_RICRI_nonlinear",
+      "monolithic_parameters": {
+        "I_T_1": 10000.0,
+        "I_T_2": 10000.0,
+        "K_tube": 10000.0,
+        "R_T": 260870000.0,
+        "frac_R_T_1_of_R_T": 0.05,
+        "m_tube": 0.5,
+        "n_tube": 0.0,
+        "q_init": 1e-05,
+        "q_us": 1e-05,
+        "u_ext": 0.0,
+        "u_in": 13332.2,
+        "u_out": 666.61
+      },
+      "output_map": {"u": "C/u", "v": "I_p/v", "v_T": "I_d/v", "q": "V/q"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

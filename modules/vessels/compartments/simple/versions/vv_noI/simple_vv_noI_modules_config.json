@@ -8,6 +8,7 @@
     "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "available_to_phlynx": false,
     "required_citations": [
       "safaei2016roadmap",
       "argus2026circulatory"
@@ -22,6 +23,10 @@
         "variables": [
           "v_in",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       }
     ],
@@ -31,6 +36,10 @@
         "variables": [
           "v_out",
           "u_d"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {

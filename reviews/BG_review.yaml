@@ -78,7 +78,7 @@ proposed_fixes:
 - 'terminal2/pp (W_controller2_type): add [''u_in'', ''J_per_m3'', ''access'', ''boundary_condition''] to variables_and_units
   and a u_in parameter row. Also consider renaming the port "multi_portgjsfglj"; this module is used with BC_type pp_controller
   in circulatory_autogen. With u_in declared in a patched copy, it generates and passes.'
-- 'vv_merge_simple_type (merge_junction_simple/vv, venous_merge_junction_simple/vv): in the CellML, q = q_Cq_C_d + q_0 should
+- '(Applied) vv_merge_simple_type (merge_junction_simple/vv, venous_merge_junction_simple/vv): in the CellML, q = q_Cq_C_d + q_0 should
   be q = q_C + q_C_d + q_0. libcellml rejects the undeclared variable. With the fix in a patched copy, both components pass
   all tests.'
 - 'venous/vp_wCont: remove the duplicate v_in and u_out entries from variables_and_units. libcellml: "Component mod contains
@@ -91,7 +91,7 @@ proposed_fixes:
 - 'rigid_vessel/vv (vv_rigid_type): u = (v_in - v_out)/R is not dimensionally a pressure (m^3/s divided by Pa s/m^3). If it
   is meant as a penalty for flow mismatch, it should be u = R (v_in - v_out) (Pa s/m^3 times m^3/s = Pa), or be documented.
   The test currently only checks the law as written.'
-- vv_Min_nonlinear_visco_type, vv_Nout_nonlinear_visco_type and vv_MinNout_nonlinear_visco_type declare K_tube_visco, but
+- (Applied) vv_Min_nonlinear_visco_type, vv_Nout_nonlinear_visco_type and vv_MinNout_nonlinear_visco_type declare K_tube_visco, but
   their u and u_d equations omit the viscoelastic terms 2 K_visco (inflow - v) and 2 K_visco (v - outflow) that vv_nonlinear_visco_type
   (and all other *_visco types) include. As implemented, they equal the non-visco types. Add the terms, or drop K_tube_visco
   from these configs. The stated-law invariant fails; this is recorded as expected_failures.

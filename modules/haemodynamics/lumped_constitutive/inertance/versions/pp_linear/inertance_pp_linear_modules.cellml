@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="inertance_pp_linear" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="inertance_pp_linear">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="fraction" public_interface="in" units="dimensionless"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable name="v_init" public_interface="in" units="m3_per_s"/>
+        <variable initial_value="v_init" name="v" public_interface="out" units="m3_per_s"/>
+        <variable name="I_eff" public_interface="out" units="Js2_per_m6"/>
+        <variable name="I" public_interface="in" units="Js2_per_m6"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>I_eff</ci><apply><times/><ci>fraction</ci><ci>I</ci></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>v</ci></apply><apply><divide/><apply><minus/><ci>u_in</ci><ci>u_out</ci></apply><ci>I_eff</ci></apply></apply>
+        </math>
+    </component>
+</model>

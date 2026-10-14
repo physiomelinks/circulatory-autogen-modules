@@ -1,0 +1,31 @@
+{
+  "module_type": "venule",
+  "version": "vp_micro_lumped",
+  "sim_time": 0.05,
+  "pre_time": 0.0,
+  "dt": 0.0005,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-14},
+  "reference_solver_info": {"rtol": 1e-10, "atol": 1e-16},
+  "outputs": ["mod_C/u", "mod_I/v", "mod_V/q"],
+  "run_parameters": {},
+  "supermodule": {
+    "globals": [],
+    "equivalent_version": {
+      "version": "venule/vp_micro",
+      "monolithic_parameters": {
+        "C": 2.851e-17,
+        "I": 100000.0,
+        "R": 9082000000000.0,
+        "q_0": 1.052e-13,
+        "u_0": 3330.0,
+        "u_ext": 0.0,
+        "u_out": 2830.0,
+        "v_in": 5.505e-11
+      },
+      "output_map": {"u": "C/u", "v": "I/v", "q": "V/q"},
+      "tol": 1e-05,
+      "solver_info": {"rtol": 1e-10, "atol": 1e-20}
+    }
+  }
+}

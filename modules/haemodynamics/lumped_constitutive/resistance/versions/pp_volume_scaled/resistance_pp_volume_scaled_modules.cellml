@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="resistance_pp_volume_scaled" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="resistance_pp_volume_scaled">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="fraction" public_interface="in" units="dimensionless"/>
+        <variable name="R_eff" public_interface="out" units="Js_per_m6"/>
+        <variable name="R" public_interface="in" units="Js_per_m6"/>
+        <variable name="q_ref" public_interface="in" units="m3"/>
+        <variable name="q_total" public_interface="in" units="m3"/>
+        <variable name="R_nonlinear" public_interface="out" units="Js_per_m6"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable name="v" public_interface="out" units="m3_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>R_nonlinear</ci><apply><times/><ci>R</ci><apply><power/><apply><divide/><ci>q_ref</ci><ci>q_total</ci></apply><cn cellml:units="dimensionless">2</cn></apply></apply></apply>
+            <apply><eq/><ci>R_eff</ci><apply><times/><ci>fraction</ci><ci>R_nonlinear</ci></apply></apply>
+            <apply><eq/><ci>v</ci><apply><divide/><apply><minus/><ci>u_in</ci><ci>u_out</ci></apply><ci>R_eff</ci></apply></apply>
+        </math>
+    </component>
+</model>

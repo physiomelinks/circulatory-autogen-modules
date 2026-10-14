@@ -54,3 +54,7 @@ equivalence:
   solver_info: {rtol: 1.0e-10, atol: 1.0e-12}
 invariants: []
 notes: []
+expected_failures: {system_equivalence_test: 'Deliberate difference from circulatory_autogen''s generic_junction_test_open_loop:
+    aortic_arch_I was a Nout_junction vv_nonlinear_visco, whose built-in version omits the viscoelastic term
+    2 K_tube_visco (inflow - v) / (v - outflow) that every other *_nonlinear_visco type has. In this library it is
+    arterial vv_nonlinear_visco, with the term; as the first vessel after the inflow it changes nearly every output.'}
