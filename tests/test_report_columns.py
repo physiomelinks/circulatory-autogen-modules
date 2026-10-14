@@ -122,6 +122,16 @@ def test_supermodule_index(tmp_path):
     assert ('mt_s1', 's1') not in index
 
 
+def test_supermodule_index_skips_template_slots(tmp_path):
+    '''A template's slots name a module_type and its choices, but no version yet.'''
+    a = _fake_version(tmp_path, 'a')
+    slot = {'name': 'R', 'module_type': 'mt_r', 'choices': ['x', 'y']}
+    template = _fake_version(tmp_path, 't', True, submodules=[_sub(a), slot])
+    index = checks.supermodule_index([a, template])
+    assert [v.key for v in index[('mt_a', 'a')]] == [template.key]
+    assert not [k for k in index if k[0] == 'mt_r']
+
+
 def test_supermodule_index_of_the_library():
     index = checks.supermodule_index()
     assert 'soma/sympathetic' in [v.key for v in index[('membrane_potential', 'SN_soma_Argus2026_v01')]]

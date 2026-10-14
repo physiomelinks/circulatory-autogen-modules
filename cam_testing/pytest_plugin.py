@@ -27,8 +27,8 @@ MARKERS = [
     'system_model: system-model tests (system_models/) and supermodule reproduces tests',
     'phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)',
 ]
-QUICK_TESTS = ('review_test', 'run_test', 'supermodule_structure_test', 'phlynx_export_test', 'cuflynx_simulate_test',
-               'phlynx_equivalence_test', 'cuflynx_parameterisation_omex_test')
+QUICK_TESTS = ('review_test', 'run_test', 'supermodule_structure_test', 'supermodule_version_equivalence_test',
+               'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test', 'cuflynx_parameterisation_omex_test')
 
 
 def pytest_addoption(parser):
@@ -145,7 +145,15 @@ _selected_instances = _selected_parameterisations   # the former name
 
 
 def _selected_supermodules(config):
-    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config, True)]
+    # a template (an empty supermodule) is skipped by every other test, but its structure is checked
+    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=[] if v.config.get('template') else _marks(config, v))
+            for v in _versions(config, True)]
+
+
+def _selected_version_equivalences(config):
+    '''Supermodule versions that say which monolithic version they reproduce (supermodule.equivalent_version).'''
+    return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config, True)
+            if (v.spec.get('supermodule') or {}).get('equivalent_version')]
 
 
 def _selected_equivalences(config):
@@ -166,6 +174,8 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize('supermodule_key', _selected_supermodules(metafunc.config))
     if 'equivalence_key' in metafunc.fixturenames:
         metafunc.parametrize('equivalence_key', _selected_equivalences(metafunc.config))
+    if 'version_equivalence_key' in metafunc.fixturenames:
+        metafunc.parametrize('version_equivalence_key', _selected_version_equivalences(metafunc.config))
 
 
 # ---- fixtures -----------------------------------------------------------------------------------
@@ -221,7 +231,8 @@ def pytest_collection_modifyitems(config, items):
         if callspec is None:
             continue
         key = callspec.params.get('component_key') or callspec.params.get('parameterisation_key') \
-            or callspec.params.get('supermodule_key') or callspec.params.get('equivalence_key')
+            or callspec.params.get('supermodule_key') or callspec.params.get('equivalence_key') \
+            or callspec.params.get('version_equivalence_key')
         if not isinstance(key, (tuple, list)):  # None, or NOTSET for an empty parameter set
             continue
         vkey = tuple(key[:2])
