@@ -555,6 +555,9 @@ Status rules (decided in the Lotka_Volterra review, 2026-10-01):
 - In the stability matrix a configuration that is too inaccurate at a step (e.g. explicit Euler at a
   coarse dt) is shown as not working at that step; the test fails only if a declared-supported
   configuration fails.
+- The stability matrix keeps the test under 10 minutes: each run is stopped at its time limit and
+  shown as not working there (an explicit solver on a stiff model can need hours at a tiny step),
+  and families the total budget does not reach are shown as skipped.
 
 What the version page shows besides the tests:
 - **Contents.** A line of counts at the top: states (variables with a d/dt equation in the CellML),
@@ -620,7 +623,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |
-| `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget`, `t_end`, `tol` |
+| `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`), variables, targets, metric, threshold, optimiser settings |
 | `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`) |

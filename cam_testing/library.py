@@ -454,8 +454,8 @@ NESTED_ORDER = {
     'harness': ('module_array', 'parameters'),
     'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'bounds', 'constraints', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
     'timestep': ('scheme', 'dts', 'pre_time', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
-    'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
-                  'tol'),
+    'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget',
+                  'max_run_seconds', 'total_time_budget', 't_end', 'tol'),
     'supermodule': ('globals', 'equivalent'),
     'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
@@ -568,14 +568,11 @@ def misplaced_spec_keys(tests, verification):
 # module_type / version / parameterisation
 # ----------------------------------------------------------------------------------------------
 
-# what the tests and the report generator write into a version directory (git-ignored)
-GENERATED = ('results', 'plots')
-
-
 def _has_source(path):
-    '''Whether a version directory holds more than generated output: a renamed or removed version can
-    leave its results/, plots/ or report behind (e.g. restored from CI's results cache).'''
-    return any(e not in GENERATED and not e.endswith('.html') and not e.startswith('.') for e in os.listdir(path))
+    '''Whether a directory under versions/ is a version: it has its modules config. A renamed or removed
+    version can leave generated output behind (results/, plots/, reports, parameterisations' .omex
+    archives), e.g. restored from CI's results cache.'''
+    return any(e.endswith('_modules_config.json') for e in os.listdir(path))
 
 
 @dataclass
