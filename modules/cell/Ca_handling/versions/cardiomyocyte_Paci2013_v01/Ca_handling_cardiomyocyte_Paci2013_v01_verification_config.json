@@ -1,0 +1,62 @@
+{
+  "module_type": "Ca_handling",
+  "version": "cardiomyocyte_Paci2013_v01",
+  "sim_time": 0.5,
+  "pre_time": 0.0,
+  "dt": 0.0005,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["Cai", "Ca_SR", "g", "i_up", "i_rel", "i_leak"],
+  "run_parameters": {"i_CaL": -0.5, "i_NaCa": 0.1, "Ca_SR_init": 0.3},
+  "invariants": [
+    {
+      "description": "total Ca content (free + rapidly buffered, cytosol + SR, in um^3 mM) changes only by the sarcolemmal fluxes: Q(t) = Q(0) - (I_CaL + I_bCa + I_PCa - 2 I_NaCa) Cm/(2 F 1e-18) t (exact for constant currents; SR uptake, release and leak cancel)",
+      "expr": "np.max(np.abs(((Vc*(Cai + Buf_C*Cai/(Cai + Kbuf_C)) + V_SR*(Ca_SR + Buf_SR*Ca_SR/(Ca_SR + Kbuf_SR))) - (Vc*(Cai + Buf_C*Cai/(Cai + Kbuf_C)) + V_SR*(Ca_SR + Buf_SR*Ca_SR/(Ca_SR + Kbuf_SR)))[0]) + (i_CaL + i_b_Ca + i_PCa - 2*i_NaCa)*Cm/(2*F*1e-18)*t)) <= 1e-5*np.max(np.abs((Vc*(Cai + Buf_C*Cai/(Cai + Kbuf_C)) + V_SR*(Ca_SR + Buf_SR*Ca_SR/(Ca_SR + Kbuf_SR))))) + 1e-9"
+    },
+    {"description": "Ca2+ release gate g stays in [0, 1]", "expr": "np.all((g >= -1e-9) & (g <= 1 + 1e-9))"},
+    {
+      "description": "SERCA uptake i_up = VmaxUp/(1 + Kup^2/Cai^2) (Paci 2013)",
+      "expr": "np.max(np.abs(i_up - VmaxUp/(1 + Kup**2/Cai**2))) <= 1e-9*VmaxUp"
+    },
+    {
+      "description": "leak i_leak = V_leak (Ca_SR - Cai)",
+      "expr": "np.max(np.abs(i_leak - V_leak*(Ca_SR - Cai))) <= 1e-12"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "i_CaL": {"min": -3.0, "max": 0.0, "points": 3},
+      "i_PCa": {"min": 0.0, "max": 0.4, "points": 3},
+      "i_b_Ca": {"min": -0.5, "max": 0.5, "points": 3},
+      "i_NaCa": {"min": -0.5, "max": 0.5, "points": 3},
+      "Vm": {"min": -0.1, "max": 0.05, "points": 3},
+      "Cai_init": {"min": 1e-05, "max": 0.001, "points": 3, "scale": "log"},
+      "Ca_SR_init": {"min": 0.05, "max": 1.0, "points": 3},
+      "g_init": {"min": 0.0, "max": 1.0, "points": 3}
+    },
+    "rationale": "currents over the ranges seen during a Paci 2013 beat (I_CaL down to about -3 A/F, others below 0.5 A/F), Vm -100 to +50 mV (both sides of the -60 mV threshold of const2), Cai 1e-5 to 1e-3 mM, Ca_SR 0.05-1 mM (positive, physiological), g over [0, 1]; constants by the default factors 0.5-2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.0005, 0.00025, 0.000125, 6.25e-05],
+    "t_end": 0.1,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: Ca-transient features of Paci 2013 (Fig. / Table of Ca-transient amplitude and durations vs the hiPSC-CM data of Ma et al.) can only be compared in an assembled cell; not applicable to this component alone."
+      },
+      "calibrate": {"note": "not_applicable: needs the assembled cell."}
+    }
+  }
+}

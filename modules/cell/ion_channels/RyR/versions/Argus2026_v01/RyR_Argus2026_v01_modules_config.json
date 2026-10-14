@@ -5,9 +5,14 @@
     "module_format": "cellml",
     "component_file": "RyR_Argus2026_v01_modules.cellml",
     "component_type": "RyR_SN",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
-    "creator": [],
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "argus2026sympathetic"
+    ],
     "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
     "entrance_ports": [],
     "exit_ports": [],
@@ -34,6 +39,12 @@
         "port_type": "ER_Ca_release",
         "variables": [
           "j_RyR"
+        ]
+      },
+      {
+        "port_type": "ER_membrane_area",
+        "variables": [
+          "A_ER"
         ]
       }
     ],
@@ -108,6 +119,24 @@
         "k_RyR",
         "m3_per_s",
         "access",
+        "variable"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_RyR",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_RyR_single",
+        "um3_per_s",
+        "access",
         "constant"
       ],
       [
@@ -121,6 +150,30 @@
         "millis",
         "access",
         "constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_RyR",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_RyR",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_RyR",
+        "dimensionless",
+        "access",
+        "variable"
       ]
     ]
   }

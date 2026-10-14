@@ -1,0 +1,92 @@
+module_type: membrane_potential
+version: SN_varicosity_Argus2026_v01
+reviewed: true
+description: 'Membrane of a sympathetic-neuron varicosity: its geometry (a sphere of diameter d: A = k_A d^2, Vol = k_V d^3)
+  for the varicosity''s channels and Ca handling, and its voltage, which equals the incoming axon voltage (V = V_in).'
+notes: 'Membrane of the SN varicosity: it has no dynamics of its own (the axon sets its potential), so it passes the axon''s
+  V_in on to the varicosity''s channels as V (V = V_in). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  by a one-off script (tools/build_sn_modules.py, removed; in git history); SN_simple_flat checks that the assembled parts
+  reproduce SN_simple. Geometry (2026-10-02): the varicosity membrane also defines the compartment: diameter d, area A_mem
+  = k_A d^2 (to the channels, membrane_area) and volume Vol = k_V d^3 (to the Ca handling, compartment_volume), a sphere by
+  default; the defaults reproduce the previous varicosity volume 1 um^3.
+
+
+  Ports of the versions of membrane_potential (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance i_stim: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [I_in]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  entrance membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [Vm]; SN_varicosity_Argus2026_v01
+  [V_in]
+
+  entrance stim_current: cardiomyocyte_Paci2013_v01 [i_stim]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_stim]; SN_varicosity_Argus2026_v01
+  -
+
+  exit A_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_A]; SN_varicosity_Argus2026_v01
+  -
+
+  exit CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Ca_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_Ca]; SN_varicosity_Argus2026_v01
+  -
+
+  exit K1_current: cardiomyocyte_Paci2013_v01 [i_K1]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit KCa_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_KCa]; SN_varicosity_Argus2026_v01
+  -
+
+  exit KV_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_KV]; SN_varicosity_Argus2026_v01
+  -
+
+  exit Kr_current: cardiomyocyte_Paci2013_v01 [i_Kr]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Ks_current: cardiomyocyte_Paci2013_v01 [i_Ks]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit NaCa_current: cardiomyocyte_Paci2013_v01 [i_NaCa]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit NaK_current: cardiomyocyte_Paci2013_v01 [i_NaK]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Na_current: cardiomyocyte_Paci2013_v01 [i_Na]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_Na]; SN_varicosity_Argus2026_v01
+  -
+
+  exit PCa_current: cardiomyocyte_Paci2013_v01 [i_PCa]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit VI_port: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [V, I_out]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit b_Ca_current: cardiomyocyte_Paci2013_v01 [i_b_Ca]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit b_Na_current: cardiomyocyte_Paci2013_v01 [i_b_Na]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit f_current: cardiomyocyte_Paci2013_v01 [i_f]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 [V]; SN_Tao2011_v01 [Vm]; SN_varicosity_Argus2026_v01
+  [V]
+
+  exit to_current: cardiomyocyte_Paci2013_v01 [i_to]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general compartment_volume: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Vol]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  [Vol]
+
+  general membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  [A_mem]
+
+  general membrane_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [i_ion]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general shell_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -'
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

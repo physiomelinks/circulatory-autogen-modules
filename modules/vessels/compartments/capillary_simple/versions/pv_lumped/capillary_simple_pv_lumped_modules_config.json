@@ -3,10 +3,18 @@
     "module_type": "capillary_simple",
     "module_subtype": "pv_lumped",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "capillary_simple/pv built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): I (inertance pp_linear) -> R (resistance vp_linear) -> C (compliance vv_linear); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "description": "capillary_simple/pv built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): I (inertance pp_linear) -> R (resistance vp_linear) -> C (compliance vv_linear); V (vessel_volume summed) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
     "routes": {
       "inputs": {
         "vessel_port": "I",
@@ -55,7 +63,7 @@
         "name": "I",
         "module_type": "inertance",
         "module_subtype": "pp_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "R"
@@ -65,7 +73,7 @@
         "name": "R",
         "module_type": "resistance",
         "module_subtype": "vp_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "I"
         ],
@@ -77,7 +85,7 @@
         "name": "C",
         "module_type": "compliance",
         "module_subtype": "vv_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "R"
         ],
@@ -88,8 +96,8 @@
       {
         "name": "V",
         "module_type": "vessel_volume",
-        "module_subtype": "nn",
-        "instance": "default",
+        "module_subtype": "summed",
+        "parameterisation": "default",
         "inp_instances": [
           "C"
         ],

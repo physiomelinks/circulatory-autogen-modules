@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="baroreceptor_Ursino1998_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="baroreceptor_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="P_sys" public_interface="in" units="J_per_m3"/>
+        <variable name="P_baro_init" public_interface="in" units="J_per_m3"/>
+        <variable initial_value="P_baro_init" name="P_baro" public_interface="out" units="J_per_m3"/>
+        <variable name="f_ab" public_interface="out" units="per_s"/>
+        <variable name="dP_sys_dt" public_interface="in" units="J_per_m3s"/>
+        <!-- Constants-->
+        <variable name="P_nom" public_interface="in" units="J_per_m3"/>
+        <variable name="f_ab_min" public_interface="in" units="per_s"/>
+        <variable name="f_ab_max" public_interface="in" units="per_s"/>
+        <variable name="k_ab" public_interface="in" units="J_per_m3"/>
+        <variable name="tau_zb" public_interface="in" units="second"/>
+        <variable name="tau_pb" public_interface="in" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>P_baro</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>P_sys</ci>
+                            <apply>
+                                <times/>
+                                <ci>tau_zb</ci>
+                                <ci>dP_sys_dt</ci>
+                            </apply>
+                        </apply>
+                        <ci>P_baro</ci>
+                    </apply>
+                    <ci>tau_pb</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_ab</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>f_ab_min</ci>
+                        <apply>
+                            <times/>
+                            <ci>f_ab_max</ci>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>P_baro</ci>
+                                        <ci>P_nom</ci>
+                                    </apply>
+                                    <ci>k_ab</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>P_baro</ci>
+                                    <ci>P_nom</ci>
+                                </apply>
+                                <ci>k_ab</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

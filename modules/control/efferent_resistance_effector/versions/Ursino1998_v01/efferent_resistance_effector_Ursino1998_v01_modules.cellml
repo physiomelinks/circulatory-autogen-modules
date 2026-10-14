@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="efferent_resistance_effector_Ursino1998_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="efferent_resistance_effector_Ursino_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- IMPORTANT: THIS MODULE ASSUMES NO DELAY CONSTANTS, WHICH IS DIFFERENT TO THE ORIGINAL PAPER, ALBANESE2016-->
+        <!-- Constants-->
+        <variable name="G_theta" public_interface="in" units="Js_per_m6"/>
+        <variable name="f_es_min" public_interface="in" units="per_s"/>
+        <variable name="tau_theta" public_interface="in" units="second"/>
+        <!-- Variables-->
+        <variable name="f_s" public_interface="in" units="per_s"/>
+        <variable initial_value="0.0" name="Delta_theta" public_interface="out" units="Js_per_m6"/>
+        <variable name="sigma_theta" public_interface="out" units="Js_per_m6"/>
+        <!-- Equations-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>sigma_theta</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>G_theta</ci>
+                            <apply>
+                                <ln/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="second">1</cn>
+                                    <apply>
+                                        <plus/>
+                                        <apply>
+                                            <minus/>
+                                            <ci>f_s</ci>
+                                            <ci>f_es_min</ci>
+                                        </apply>
+                                        <cn cellml:units="per_s">1</cn>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <geq/>
+                            <ci>f_s</ci>
+                            <ci>f_es_min</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="Js_per_m6">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Delta_theta</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>Delta_theta</ci>
+                        </apply>
+                        <ci>sigma_theta</ci>
+                    </apply>
+                    <ci>tau_theta</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

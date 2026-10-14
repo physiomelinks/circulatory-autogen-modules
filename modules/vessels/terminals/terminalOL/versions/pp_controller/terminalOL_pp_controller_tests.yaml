@@ -6,7 +6,7 @@ notes: 'Terminal 3-element-Windkessel-like outlet (series R_T1 = 0.2 R_T, compli
   controller: three membership functions of the pressure error (pressure_d - u_a) weight linear consequents aa_i error + cc_i,
   whose coefficients learn at rate learning_rate (critic - K_a r_a); r_a is the flow-fraction error BFF_ASL - v_a/meanflow_4dflow
   (v_a from a flow_observer). The 0.2/0.8 split equals the ADAN56 Windkessel R1/(R1+R2) ratio (e.g. vertebral_R 1.81e9/9.05e9
-  in the openBF copy of Boileau2015). Tested alone with constant u_in, u_a, v_a (harness values).'
+  in the openBF copy of boileau2015benchmark). Tested alone with constant u_in, u_a, v_a (harness values).'
 known_issues:
 - port variable u_a not in variables_and_units
 - port variable v_a not in variables_and_units
@@ -51,7 +51,7 @@ reference_proposals:
     sourced: definitional
     value: 3.421692218224e-06
   C_T:
-    reference: Boileau2015; iliac-bifurcation benchmark, 3-element Windkessel compliance of each daughter outlet C = 3.6664e-10
+    reference: boileau2015benchmark; iliac-bifurcation benchmark, 3-element Windkessel compliance of each daughter outlet C = 3.6664e-10
       m3/Pa (value confirmed in the openBF copy of the benchmark, models/boileau2015/ibif/ibif.yaml; the paper table itself
       was not accessible)
     sourced: 'yes'
@@ -72,7 +72,7 @@ reference_proposals:
     sourced: 'no'
     value: 0
   meanflow_4dflow:
-    reference: Boileau2015; mean of the iliac-bifurcation inflow waveform, 7.9853e-6 m3/s (computed here from the benchmark
+    reference: boileau2015benchmark; mean of the iliac-bifurcation inflow waveform, 7.9853e-6 m3/s (computed here from the benchmark
       inflow data, equal to the mean term of the nn_aorticbif Fourier series); in the intended use a 4D-flow MRI measurement
     sourced: 'yes'
     value: 7.9853e-06

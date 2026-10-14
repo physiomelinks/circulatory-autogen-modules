@@ -4,7 +4,7 @@ entry (module_type, module_subtype) of the current modules to
 
     modules/<category path>/<module_type>/versions/<version>/instances/<instance>/
 
-for review before tools/restructure_modules.py moves anything. Placement rule: a module goes in
+for review before tools/restructure_to_versions.py moves anything. Placement rule: a module goes in
 the most specific category that covers every context it belongs to (soma only in neurons ->
 cell/neurons; something several cell types share -> cell). No directory name may appear twice in
 the tree. The version is the entry's module_subtype (new versions: <source>_vXX).

@@ -1,0 +1,34 @@
+module_type: efferent_venous_us_volume_and_compliance_effector
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Venous unstressed-volume and compliance effector (Argus saturating form), two independent first-order filters of max(f_s
+  - f_es_min, 0). BUG: Delta_theta_us is computed with G_theta_compliance, so G_theta_us is unused.'
+expected_failures:
+  verification_test_BC: Delta_theta_us uses G_theta_compliance instead of G_theta_us (CellML), so the intended-law invariant
+    fails whenever G_theta_us is swept away from G_theta_compliance (both 0.3 nominally). See proposed_fixes.
+reference_proposals:
+  f_s:
+    reference: argus2026circulatory; test operating point (10 spikes/s)
+    sourced: false
+    value: 10.0
+  G_theta_us:
+    reference: unreferenced_placeholder; "assumed_to_be_improved" fractional change (currently unused, see bug)
+    sourced: false
+  G_theta_compliance:
+    reference: unreferenced_placeholder; "assumed_to_be_improved"
+    sourced: false
+  tau_theta_us:
+    reference: ursino1998interaction; tau_V,u = 20 s (cheng2010integrative Table tau_as_usv = 20 s; gee2023closed Simulink [20 1])
+    sourced: true
+  tau_theta_compliance:
+    reference: unreferenced_placeholder; assumed equal to tau_theta_us (ursino1998interaction has no venous compliance effector)
+    sourced: false
+  f_es_min:
+    reference: ursino1998interaction; 2.66 spikes/s
+    sourced: true
+  f_es_mid:
+    reference: unreferenced_placeholder; "to_be_calibrated"
+    sourced: false
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

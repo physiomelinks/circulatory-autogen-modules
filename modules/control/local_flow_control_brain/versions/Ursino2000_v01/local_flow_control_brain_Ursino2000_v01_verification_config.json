@@ -1,0 +1,57 @@
+{
+  "module_type": "local_flow_control_brain",
+  "version": "Ursino2000_v01",
+  "sim_time": 100.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "outputs": ["x_O2", "x_CO2", "phi_P_CO2_a", "G_p", "R_local_multiplier"],
+  "run_parameters": {"C_O2_p": 0.13, "P_CO2_a": 6000.0},
+  "invariants": [
+    {
+      "description": "x_O2 = (C_O2_p - C_O2_vb_nom)(1 - exp(-t/tau_O2))",
+      "expr": "np.max(np.abs(x_O2 - (C_O2_p - C_O2_vb_nom)*(1 - np.exp(-t/tau_O2)))) <= 1e-4*max(1e-3, abs(C_O2_p - C_O2_vb_nom))"
+    },
+    {
+      "description": "phi_P_CO2_a is the normalised CO2 reactivity sigmoid (0 at P_CO2_a_nom)",
+      "expr": "np.max(np.abs(phi_P_CO2_a - ((A_b_lc + B_b_lc/(1 + C_b_lc*np.exp(D_b_lc*np.log(P_CO2_a))))/(A_b_lc + B_b_lc/(1 + C_b_lc*np.exp(D_b_lc*np.log(P_CO2_a_nom)))) - 1))) <= 1e-10"
+    },
+    {
+      "description": "x_CO2 = phi (1 - exp(-t/tau_CO2)); G_p = 1 - g_O2_b x_O2 + x_CO2; R = 1/G_p",
+      "expr": "(np.max(np.abs(x_CO2 - phi_P_CO2_a*(1 - np.exp(-t/tau_CO2)))) <= 1e-4*max(1e-2, np.max(np.abs(phi_P_CO2_a)))) & (np.max(np.abs(G_p - (1 - g_O2_b*x_O2 + x_CO2))) <= 1e-12) & (np.max(np.abs(R_local_multiplier*G_p - 1)) <= 1e-9)"
+    },
+    {"description": "the cerebral conductance factor stays positive", "expr": "np.min(G_p) > 0"}
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "P_CO2_a": {"min": 3333, "max": 9333, "points": 7},
+      "P_O2_a": {"min": 4000, "max": 20000, "points": 3},
+      "C_O2_p": {"min": 0.08, "max": 0.19, "points": 6},
+      "g_O2_b": {"min": 5, "max": 15, "points": 3}
+    },
+    "rationale": "PaCO2 25-70 mmHg (the range of CO2-reactivity data); C_O2_p 0.08-0.19 ml/ml (cerebral venous/capillary O2 content from hypoxic to hyperoxic); G_p becomes <= 0 (negative resistance) above ~C_O2_vb_nom + (1 + x_CO2)/g_O2_b, so g_O2_b is limited to 0.5-1.5x."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.2, 0.1, 0.05, 0.025],
+    "t_end": 100.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "Candidate: steady-state CBF vs PaCO2 (the reactivity curve the A-D sigmoid was fitted to, e.g. Harper & Glass 1965 / Reivich 1964 as used by Ursino & Lodi); R_mult = 1/G_p predicts relative CBF at constant pressure, so a digitised CBF(PaCO2) table would be a direct baseline. Not set up (data not obtained)."
+      },
+      "calibrate": {"note": "pending: same data would identify A_b_lc..D_b_lc"}
+    }
+  }
+}

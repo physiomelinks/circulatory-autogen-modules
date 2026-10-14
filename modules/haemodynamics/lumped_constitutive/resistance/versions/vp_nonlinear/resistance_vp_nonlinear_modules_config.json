@@ -5,9 +5,17 @@
     "module_format": "cellml",
     "component_file": "resistance_vp_nonlinear_modules.cellml",
     "component_type": "resistance_vp_nonlinear",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
     "description": "Resistance in pressure-drop form, downstream of an inertance: u_in = u_out + f R v; Poiseuille R = 8 mu l/(pi r^4) R_flag, r = sqrt(q_total/(pi l)) from the whole vessel's volume (total_volume_port, from vessel_volume).",
     "entrance_ports": [
       {

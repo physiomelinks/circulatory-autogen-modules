@@ -1,0 +1,10 @@
+module_type: volume_sum
+version: ArgusUNPUBLISHED_v01
+reviewed: true
+notes: Sums the volumes q of the vessels connected to it (entrance volume_port, multi_port sum); used to track total blood
+  volume. The total is also an output, q_sum = Σq, on an optional exit volume_port so another component can use it (this replaces
+  the former volume_sum_2, folded in 2026-09-29; q stays a variable, so it needs no parameters-file value). Tested with two
+  independent BG arterial_simple pv vessels, each between a constant pressure inlet and a constant flow outlet, so their volumes
+  change in time. libcuflynx forms the sum in a generated component (sum_blood_volume.q_mod_sum).
+known_issues:
+- 'FV1D_volume_sum: its volume_ports list no variables, so it can''t be connected from CellML and only holds q_sum.'

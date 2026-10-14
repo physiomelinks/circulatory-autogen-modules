@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="flow_sum_2_Safaei2016_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="flow_sum_2_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="v_1" public_interface="in" units="m3_per_s"/>
+        <variable name="v_2" public_interface="in" units="m3_per_s"/>
+        <variable name="v_total" public_interface="out" units="m3_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_total</ci>
+                <apply>
+                    <plus/>
+                    <ci>v_1</ci>
+                    <ci>v_2</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

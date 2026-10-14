@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T22:59:25Z",
+  "generatedAt": "2026-10-14T04:10:09Z",
   "collections": {
     "modules": [
       {
@@ -173,14 +173,14 @@
         "path": "modules/haemodynamics/lumped_constitutive/resistance/versions/vp_volume_scaled/resistance_vp_volume_scaled_modules.cellml"
       },
       {
-        "name": "vessel_volume (nn)",
-        "file": "vessel_volume_nn_modules.cellml",
-        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/nn/vessel_volume_nn_modules.cellml"
+        "name": "vessel_volume (geometric)",
+        "file": "vessel_volume_geometric_modules.cellml",
+        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/geometric/vessel_volume_geometric_modules.cellml"
       },
       {
-        "name": "vessel_volume (nn_geometric)",
-        "file": "vessel_volume_nn_geometric_modules.cellml",
-        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/nn_geometric/vessel_volume_nn_geometric_modules.cellml"
+        "name": "vessel_volume (summed)",
+        "file": "vessel_volume_summed_modules.cellml",
+        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/summed/vessel_volume_summed_modules.cellml"
       },
       {
         "name": "heart (vp)",
@@ -213,14 +213,14 @@
         "path": "modules/heart/versions/vp_simple/heart_vp_simple_modules.cellml"
       },
       {
-        "name": "heart (vp_simple_2)",
-        "file": "heart_vp_simple_2_modules.cellml",
-        "path": "modules/heart/versions/vp_simple_2/heart_vp_simple_2_modules.cellml"
-      },
-      {
         "name": "heart (vp_simple_OLD)",
         "file": "heart_vp_simple_OLD_modules.cellml",
         "path": "modules/heart/versions/vp_simple_OLD/heart_vp_simple_OLD_modules.cellml"
+      },
+      {
+        "name": "heart (vp_simple_SI)",
+        "file": "heart_vp_simple_SI_modules.cellml",
+        "path": "modules/heart/versions/vp_simple_SI/heart_vp_simple_SI_modules.cellml"
       },
       {
         "name": "heart (vp_wCont)",
@@ -238,14 +238,14 @@
         "path": "modules/heart/versions/vp_wCont_nonstiff/heart_vp_wCont_nonstiff_modules.cellml"
       },
       {
-        "name": "cardiac_clock (nn)",
-        "file": "cardiac_clock_nn_modules.cellml",
-        "path": "modules/heart/cardiac_clock/versions/nn/cardiac_clock_nn_modules.cellml"
+        "name": "cardiac_clock (controlled)",
+        "file": "cardiac_clock_controlled_modules.cellml",
+        "path": "modules/heart/cardiac_clock/versions/controlled/cardiac_clock_controlled_modules.cellml"
       },
       {
-        "name": "cardiac_clock (nn_controlled)",
-        "file": "cardiac_clock_nn_controlled_modules.cellml",
-        "path": "modules/heart/cardiac_clock/versions/nn_controlled/cardiac_clock_nn_controlled_modules.cellml"
+        "name": "cardiac_clock (Liang2009_v01)",
+        "file": "cardiac_clock_Liang2009_v01_modules.cellml",
+        "path": "modules/heart/cardiac_clock/versions/Liang2009_v01/cardiac_clock_Liang2009_v01_modules.cellml"
       },
       {
         "name": "chamber (vv)",
@@ -293,54 +293,54 @@
         "path": "modules/vessels/junctions/flow_split/versions/pv/flow_split_pv_modules.cellml"
       },
       {
-        "name": "flow_sum_2 (nn)",
-        "file": "flow_sum_2_nn_modules.cellml",
-        "path": "modules/vessels/junctions/flow_sum_2/versions/nn/flow_sum_2_nn_modules.cellml"
+        "name": "flow_sum_2 (Safaei2016_v01)",
+        "file": "flow_sum_2_Safaei2016_v01_modules.cellml",
+        "path": "modules/vessels/junctions/flow_sum_2/versions/Safaei2016_v01/flow_sum_2_Safaei2016_v01_modules.cellml"
       },
       {
-        "name": "P_outlet (nn_micro)",
-        "file": "P_outlet_nn_micro_modules.cellml",
-        "path": "modules/vessels/microvasculature/P_outlet/versions/nn_micro/P_outlet_nn_micro_modules.cellml"
+        "name": "P_outlet (micro)",
+        "file": "P_outlet_micro_modules.cellml",
+        "path": "modules/vessels/microvasculature/P_outlet/versions/micro/P_outlet_micro_modules.cellml"
       },
       {
-        "name": "material_prop_const (nn)",
-        "file": "material_prop_const_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_const/versions/nn/material_prop_const_nn_modules.cellml"
+        "name": "material_prop_const (Olufsen2000_v01)",
+        "file": "material_prop_const_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_const/versions/Olufsen2000_v01/material_prop_const_Olufsen2000_v01_modules.cellml"
       },
       {
-        "name": "material_prop_const_ven (nn)",
-        "file": "material_prop_const_ven_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_const_ven/versions/nn/material_prop_const_ven_nn_modules.cellml"
+        "name": "material_prop_const_ven (Olufsen2000_v01)",
+        "file": "material_prop_const_ven_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_const_ven/versions/Olufsen2000_v01/material_prop_const_ven_Olufsen2000_v01_modules.cellml"
       },
       {
-        "name": "material_prop_fromPWV (nn)",
-        "file": "material_prop_fromPWV_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_fromPWV/versions/nn/material_prop_fromPWV_nn_modules.cellml"
+        "name": "material_prop_fromPWV (Olufsen2000_v01)",
+        "file": "material_prop_fromPWV_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_fromPWV/versions/Olufsen2000_v01/material_prop_fromPWV_Olufsen2000_v01_modules.cellml"
       },
       {
-        "name": "material_prop_fromPWV_ven (nn)",
-        "file": "material_prop_fromPWV_ven_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_fromPWV_ven/versions/nn/material_prop_fromPWV_ven_nn_modules.cellml"
+        "name": "material_prop_fromPWV_ven (Olufsen2000_v01)",
+        "file": "material_prop_fromPWV_ven_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_fromPWV_ven/versions/Olufsen2000_v01/material_prop_fromPWV_ven_Olufsen2000_v01_modules.cellml"
       },
       {
-        "name": "material_prop_visco_const (nn)",
-        "file": "material_prop_visco_const_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_const/versions/nn/material_prop_visco_const_nn_modules.cellml"
+        "name": "material_prop_visco_const (Olufsen2000_v01)",
+        "file": "material_prop_visco_const_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_const/versions/Olufsen2000_v01/material_prop_visco_const_Olufsen2000_v01_modules.cellml"
       },
       {
-        "name": "material_prop_visco_const_ven (nn)",
-        "file": "material_prop_visco_const_ven_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_const_ven/versions/nn/material_prop_visco_const_ven_nn_modules.cellml"
+        "name": "material_prop_visco_const_ven (Olufsen2000_v01)",
+        "file": "material_prop_visco_const_ven_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_const_ven/versions/Olufsen2000_v01/material_prop_visco_const_ven_Olufsen2000_v01_modules.cellml"
       },
       {
-        "name": "material_prop_visco_fromPWV (nn)",
-        "file": "material_prop_visco_fromPWV_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_fromPWV/versions/nn/material_prop_visco_fromPWV_nn_modules.cellml"
+        "name": "material_prop_visco_fromPWV (Olufsen2000_v01)",
+        "file": "material_prop_visco_fromPWV_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_fromPWV/versions/Olufsen2000_v01/material_prop_visco_fromPWV_Olufsen2000_v01_modules.cellml"
       },
       {
-        "name": "material_prop_visco_fromPWV_ven (nn)",
-        "file": "material_prop_visco_fromPWV_ven_nn_modules.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_fromPWV_ven/versions/nn/material_prop_visco_fromPWV_ven_nn_modules.cellml"
+        "name": "material_prop_visco_fromPWV_ven (Olufsen2000_v01)",
+        "file": "material_prop_visco_fromPWV_ven_Olufsen2000_v01_modules.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_fromPWV_ven/versions/Olufsen2000_v01/material_prop_visco_fromPWV_ven_Olufsen2000_v01_modules.cellml"
       },
       {
         "name": "terminal (pp_controller)",
@@ -540,14 +540,14 @@
         "path": "modules/haemodynamics/lumped_constitutive/resistance/versions/vp_volume_scaled/resistance_vp_volume_scaled_modules_config.json"
       },
       {
-        "name": "vessel_volume (nn)",
-        "file": "vessel_volume_nn_modules_config.json",
-        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/nn/vessel_volume_nn_modules_config.json"
+        "name": "vessel_volume (geometric)",
+        "file": "vessel_volume_geometric_modules_config.json",
+        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/geometric/vessel_volume_geometric_modules_config.json"
       },
       {
-        "name": "vessel_volume (nn_geometric)",
-        "file": "vessel_volume_nn_geometric_modules_config.json",
-        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/nn_geometric/vessel_volume_nn_geometric_modules_config.json"
+        "name": "vessel_volume (summed)",
+        "file": "vessel_volume_summed_modules_config.json",
+        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/summed/vessel_volume_summed_modules_config.json"
       },
       {
         "name": "lumped_vessel (pp_empty)",
@@ -620,14 +620,14 @@
         "path": "modules/heart/versions/vp_simple/heart_vp_simple_modules_config.json"
       },
       {
-        "name": "heart (vp_simple_2)",
-        "file": "heart_vp_simple_2_modules_config.json",
-        "path": "modules/heart/versions/vp_simple_2/heart_vp_simple_2_modules_config.json"
-      },
-      {
         "name": "heart (vp_simple_OLD)",
         "file": "heart_vp_simple_OLD_modules_config.json",
         "path": "modules/heart/versions/vp_simple_OLD/heart_vp_simple_OLD_modules_config.json"
+      },
+      {
+        "name": "heart (vp_simple_SI)",
+        "file": "heart_vp_simple_SI_modules_config.json",
+        "path": "modules/heart/versions/vp_simple_SI/heart_vp_simple_SI_modules_config.json"
       },
       {
         "name": "heart (vp_wCont)",
@@ -645,14 +645,14 @@
         "path": "modules/heart/versions/vp_wCont_nonstiff/heart_vp_wCont_nonstiff_modules_config.json"
       },
       {
-        "name": "cardiac_clock (nn)",
-        "file": "cardiac_clock_nn_modules_config.json",
-        "path": "modules/heart/cardiac_clock/versions/nn/cardiac_clock_nn_modules_config.json"
+        "name": "cardiac_clock (controlled)",
+        "file": "cardiac_clock_controlled_modules_config.json",
+        "path": "modules/heart/cardiac_clock/versions/controlled/cardiac_clock_controlled_modules_config.json"
       },
       {
-        "name": "cardiac_clock (nn_controlled)",
-        "file": "cardiac_clock_nn_controlled_modules_config.json",
-        "path": "modules/heart/cardiac_clock/versions/nn_controlled/cardiac_clock_nn_controlled_modules_config.json"
+        "name": "cardiac_clock (Liang2009_v01)",
+        "file": "cardiac_clock_Liang2009_v01_modules_config.json",
+        "path": "modules/heart/cardiac_clock/versions/Liang2009_v01/cardiac_clock_Liang2009_v01_modules_config.json"
       },
       {
         "name": "chamber (vv)",
@@ -885,9 +885,19 @@
         "path": "modules/vessels/compartments/simple/versions/pp_noI_lumped/simple_pp_noI_lumped_modules_config.json"
       },
       {
+        "name": "simple (pp_noI_SI_lumped)",
+        "file": "simple_pp_noI_SI_lumped_modules_config.json",
+        "path": "modules/vessels/compartments/simple/versions/pp_noI_SI_lumped/simple_pp_noI_SI_lumped_modules_config.json"
+      },
+      {
         "name": "simple (pv_noI_lumped)",
         "file": "simple_pv_noI_lumped_modules_config.json",
         "path": "modules/vessels/compartments/simple/versions/pv_noI_lumped/simple_pv_noI_lumped_modules_config.json"
+      },
+      {
+        "name": "simple (pv_noI_SI_lumped)",
+        "file": "simple_pv_noI_SI_lumped_modules_config.json",
+        "path": "modules/vessels/compartments/simple/versions/pv_noI_SI_lumped/simple_pv_noI_SI_lumped_modules_config.json"
       },
       {
         "name": "simple (vp_noI_lumped)",
@@ -895,29 +905,19 @@
         "path": "modules/vessels/compartments/simple/versions/vp_noI_lumped/simple_vp_noI_lumped_modules_config.json"
       },
       {
+        "name": "simple (vp_noI_SI_lumped)",
+        "file": "simple_vp_noI_SI_lumped_modules_config.json",
+        "path": "modules/vessels/compartments/simple/versions/vp_noI_SI_lumped/simple_vp_noI_SI_lumped_modules_config.json"
+      },
+      {
         "name": "simple (vv_noI_lumped)",
         "file": "simple_vv_noI_lumped_modules_config.json",
         "path": "modules/vessels/compartments/simple/versions/vv_noI_lumped/simple_vv_noI_lumped_modules_config.json"
       },
       {
-        "name": "simple_2 (pp_noI_lumped)",
-        "file": "simple_2_pp_noI_lumped_modules_config.json",
-        "path": "modules/vessels/compartments/simple_2/versions/pp_noI_lumped/simple_2_pp_noI_lumped_modules_config.json"
-      },
-      {
-        "name": "simple_2 (pv_noI_lumped)",
-        "file": "simple_2_pv_noI_lumped_modules_config.json",
-        "path": "modules/vessels/compartments/simple_2/versions/pv_noI_lumped/simple_2_pv_noI_lumped_modules_config.json"
-      },
-      {
-        "name": "simple_2 (vp_noI_lumped)",
-        "file": "simple_2_vp_noI_lumped_modules_config.json",
-        "path": "modules/vessels/compartments/simple_2/versions/vp_noI_lumped/simple_2_vp_noI_lumped_modules_config.json"
-      },
-      {
-        "name": "simple_2 (vv_noI_lumped)",
-        "file": "simple_2_vv_noI_lumped_modules_config.json",
-        "path": "modules/vessels/compartments/simple_2/versions/vv_noI_lumped/simple_2_vv_noI_lumped_modules_config.json"
+        "name": "simple (vv_noI_SI_lumped)",
+        "file": "simple_vv_noI_SI_lumped_modules_config.json",
+        "path": "modules/vessels/compartments/simple/versions/vv_noI_SI_lumped/simple_vv_noI_SI_lumped_modules_config.json"
       },
       {
         "name": "venous (pp_lumped)",
@@ -995,9 +995,9 @@
         "path": "modules/vessels/junctions/flow_split/versions/pv/flow_split_pv_modules_config.json"
       },
       {
-        "name": "flow_sum_2 (nn)",
-        "file": "flow_sum_2_nn_modules_config.json",
-        "path": "modules/vessels/junctions/flow_sum_2/versions/nn/flow_sum_2_nn_modules_config.json"
+        "name": "flow_sum_2 (Safaei2016_v01)",
+        "file": "flow_sum_2_Safaei2016_v01_modules_config.json",
+        "path": "modules/vessels/junctions/flow_sum_2/versions/Safaei2016_v01/flow_sum_2_Safaei2016_v01_modules_config.json"
       },
       {
         "name": "arteriole (pp_micro_lumped)",
@@ -1050,9 +1050,9 @@
         "path": "modules/vessels/microvasculature/artery/versions/vv_micro_lumped/artery_vv_micro_lumped_modules_config.json"
       },
       {
-        "name": "P_outlet (nn_micro)",
-        "file": "P_outlet_nn_micro_modules_config.json",
-        "path": "modules/vessels/microvasculature/P_outlet/versions/nn_micro/P_outlet_nn_micro_modules_config.json"
+        "name": "P_outlet (micro)",
+        "file": "P_outlet_micro_modules_config.json",
+        "path": "modules/vessels/microvasculature/P_outlet/versions/micro/P_outlet_micro_modules_config.json"
       },
       {
         "name": "vein (pp_micro_lumped)",
@@ -1115,44 +1115,44 @@
         "path": "modules/vessels/microvasculature/venule/versions/vv_micro_lumped/venule_vv_micro_lumped_modules_config.json"
       },
       {
-        "name": "material_prop_const (nn)",
-        "file": "material_prop_const_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_const/versions/nn/material_prop_const_nn_modules_config.json"
+        "name": "material_prop_const (Olufsen2000_v01)",
+        "file": "material_prop_const_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_const/versions/Olufsen2000_v01/material_prop_const_Olufsen2000_v01_modules_config.json"
       },
       {
-        "name": "material_prop_const_ven (nn)",
-        "file": "material_prop_const_ven_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_const_ven/versions/nn/material_prop_const_ven_nn_modules_config.json"
+        "name": "material_prop_const_ven (Olufsen2000_v01)",
+        "file": "material_prop_const_ven_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_const_ven/versions/Olufsen2000_v01/material_prop_const_ven_Olufsen2000_v01_modules_config.json"
       },
       {
-        "name": "material_prop_fromPWV (nn)",
-        "file": "material_prop_fromPWV_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_fromPWV/versions/nn/material_prop_fromPWV_nn_modules_config.json"
+        "name": "material_prop_fromPWV (Olufsen2000_v01)",
+        "file": "material_prop_fromPWV_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_fromPWV/versions/Olufsen2000_v01/material_prop_fromPWV_Olufsen2000_v01_modules_config.json"
       },
       {
-        "name": "material_prop_fromPWV_ven (nn)",
-        "file": "material_prop_fromPWV_ven_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_fromPWV_ven/versions/nn/material_prop_fromPWV_ven_nn_modules_config.json"
+        "name": "material_prop_fromPWV_ven (Olufsen2000_v01)",
+        "file": "material_prop_fromPWV_ven_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_fromPWV_ven/versions/Olufsen2000_v01/material_prop_fromPWV_ven_Olufsen2000_v01_modules_config.json"
       },
       {
-        "name": "material_prop_visco_const (nn)",
-        "file": "material_prop_visco_const_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_visco_const/versions/nn/material_prop_visco_const_nn_modules_config.json"
+        "name": "material_prop_visco_const (Olufsen2000_v01)",
+        "file": "material_prop_visco_const_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_visco_const/versions/Olufsen2000_v01/material_prop_visco_const_Olufsen2000_v01_modules_config.json"
       },
       {
-        "name": "material_prop_visco_const_ven (nn)",
-        "file": "material_prop_visco_const_ven_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_visco_const_ven/versions/nn/material_prop_visco_const_ven_nn_modules_config.json"
+        "name": "material_prop_visco_const_ven (Olufsen2000_v01)",
+        "file": "material_prop_visco_const_ven_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_visco_const_ven/versions/Olufsen2000_v01/material_prop_visco_const_ven_Olufsen2000_v01_modules_config.json"
       },
       {
-        "name": "material_prop_visco_fromPWV (nn)",
-        "file": "material_prop_visco_fromPWV_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_visco_fromPWV/versions/nn/material_prop_visco_fromPWV_nn_modules_config.json"
+        "name": "material_prop_visco_fromPWV (Olufsen2000_v01)",
+        "file": "material_prop_visco_fromPWV_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_visco_fromPWV/versions/Olufsen2000_v01/material_prop_visco_fromPWV_Olufsen2000_v01_modules_config.json"
       },
       {
-        "name": "material_prop_visco_fromPWV_ven (nn)",
-        "file": "material_prop_visco_fromPWV_ven_nn_modules_config.json",
-        "path": "modules/vessels/properties/material_prop_visco_fromPWV_ven/versions/nn/material_prop_visco_fromPWV_ven_nn_modules_config.json"
+        "name": "material_prop_visco_fromPWV_ven (Olufsen2000_v01)",
+        "file": "material_prop_visco_fromPWV_ven_Olufsen2000_v01_modules_config.json",
+        "path": "modules/vessels/properties/material_prop_visco_fromPWV_ven/versions/Olufsen2000_v01/material_prop_visco_fromPWV_ven_Olufsen2000_v01_modules_config.json"
       },
       {
         "name": "single_terminal (vp_R1CR2_wCont_lumped)",
@@ -1432,14 +1432,14 @@
         "path": "modules/haemodynamics/lumped_constitutive/resistance/versions/vp_volume_scaled/resistance_vp_volume_scaled_units.cellml"
       },
       {
-        "name": "vessel_volume (nn)",
-        "file": "vessel_volume_nn_units.cellml",
-        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/nn/vessel_volume_nn_units.cellml"
+        "name": "vessel_volume (geometric)",
+        "file": "vessel_volume_geometric_units.cellml",
+        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/geometric/vessel_volume_geometric_units.cellml"
       },
       {
-        "name": "vessel_volume (nn_geometric)",
-        "file": "vessel_volume_nn_geometric_units.cellml",
-        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/nn_geometric/vessel_volume_nn_geometric_units.cellml"
+        "name": "vessel_volume (summed)",
+        "file": "vessel_volume_summed_units.cellml",
+        "path": "modules/haemodynamics/lumped_constitutive/vessel_volume/versions/summed/vessel_volume_summed_units.cellml"
       },
       {
         "name": "heart (vp)",
@@ -1472,14 +1472,14 @@
         "path": "modules/heart/versions/vp_simple/heart_vp_simple_units.cellml"
       },
       {
-        "name": "heart (vp_simple_2)",
-        "file": "heart_vp_simple_2_units.cellml",
-        "path": "modules/heart/versions/vp_simple_2/heart_vp_simple_2_units.cellml"
-      },
-      {
         "name": "heart (vp_simple_OLD)",
         "file": "heart_vp_simple_OLD_units.cellml",
         "path": "modules/heart/versions/vp_simple_OLD/heart_vp_simple_OLD_units.cellml"
+      },
+      {
+        "name": "heart (vp_simple_SI)",
+        "file": "heart_vp_simple_SI_units.cellml",
+        "path": "modules/heart/versions/vp_simple_SI/heart_vp_simple_SI_units.cellml"
       },
       {
         "name": "heart (vp_wCont)",
@@ -1497,14 +1497,14 @@
         "path": "modules/heart/versions/vp_wCont_nonstiff/heart_vp_wCont_nonstiff_units.cellml"
       },
       {
-        "name": "cardiac_clock (nn)",
-        "file": "cardiac_clock_nn_units.cellml",
-        "path": "modules/heart/cardiac_clock/versions/nn/cardiac_clock_nn_units.cellml"
+        "name": "cardiac_clock (controlled)",
+        "file": "cardiac_clock_controlled_units.cellml",
+        "path": "modules/heart/cardiac_clock/versions/controlled/cardiac_clock_controlled_units.cellml"
       },
       {
-        "name": "cardiac_clock (nn_controlled)",
-        "file": "cardiac_clock_nn_controlled_units.cellml",
-        "path": "modules/heart/cardiac_clock/versions/nn_controlled/cardiac_clock_nn_controlled_units.cellml"
+        "name": "cardiac_clock (Liang2009_v01)",
+        "file": "cardiac_clock_Liang2009_v01_units.cellml",
+        "path": "modules/heart/cardiac_clock/versions/Liang2009_v01/cardiac_clock_Liang2009_v01_units.cellml"
       },
       {
         "name": "chamber (vv)",
@@ -1552,54 +1552,54 @@
         "path": "modules/vessels/junctions/flow_split/versions/pv/flow_split_pv_units.cellml"
       },
       {
-        "name": "flow_sum_2 (nn)",
-        "file": "flow_sum_2_nn_units.cellml",
-        "path": "modules/vessels/junctions/flow_sum_2/versions/nn/flow_sum_2_nn_units.cellml"
+        "name": "flow_sum_2 (Safaei2016_v01)",
+        "file": "flow_sum_2_Safaei2016_v01_units.cellml",
+        "path": "modules/vessels/junctions/flow_sum_2/versions/Safaei2016_v01/flow_sum_2_Safaei2016_v01_units.cellml"
       },
       {
-        "name": "P_outlet (nn_micro)",
-        "file": "P_outlet_nn_micro_units.cellml",
-        "path": "modules/vessels/microvasculature/P_outlet/versions/nn_micro/P_outlet_nn_micro_units.cellml"
+        "name": "P_outlet (micro)",
+        "file": "P_outlet_micro_units.cellml",
+        "path": "modules/vessels/microvasculature/P_outlet/versions/micro/P_outlet_micro_units.cellml"
       },
       {
-        "name": "material_prop_const (nn)",
-        "file": "material_prop_const_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_const/versions/nn/material_prop_const_nn_units.cellml"
+        "name": "material_prop_const (Olufsen2000_v01)",
+        "file": "material_prop_const_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_const/versions/Olufsen2000_v01/material_prop_const_Olufsen2000_v01_units.cellml"
       },
       {
-        "name": "material_prop_const_ven (nn)",
-        "file": "material_prop_const_ven_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_const_ven/versions/nn/material_prop_const_ven_nn_units.cellml"
+        "name": "material_prop_const_ven (Olufsen2000_v01)",
+        "file": "material_prop_const_ven_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_const_ven/versions/Olufsen2000_v01/material_prop_const_ven_Olufsen2000_v01_units.cellml"
       },
       {
-        "name": "material_prop_fromPWV (nn)",
-        "file": "material_prop_fromPWV_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_fromPWV/versions/nn/material_prop_fromPWV_nn_units.cellml"
+        "name": "material_prop_fromPWV (Olufsen2000_v01)",
+        "file": "material_prop_fromPWV_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_fromPWV/versions/Olufsen2000_v01/material_prop_fromPWV_Olufsen2000_v01_units.cellml"
       },
       {
-        "name": "material_prop_fromPWV_ven (nn)",
-        "file": "material_prop_fromPWV_ven_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_fromPWV_ven/versions/nn/material_prop_fromPWV_ven_nn_units.cellml"
+        "name": "material_prop_fromPWV_ven (Olufsen2000_v01)",
+        "file": "material_prop_fromPWV_ven_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_fromPWV_ven/versions/Olufsen2000_v01/material_prop_fromPWV_ven_Olufsen2000_v01_units.cellml"
       },
       {
-        "name": "material_prop_visco_const (nn)",
-        "file": "material_prop_visco_const_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_const/versions/nn/material_prop_visco_const_nn_units.cellml"
+        "name": "material_prop_visco_const (Olufsen2000_v01)",
+        "file": "material_prop_visco_const_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_const/versions/Olufsen2000_v01/material_prop_visco_const_Olufsen2000_v01_units.cellml"
       },
       {
-        "name": "material_prop_visco_const_ven (nn)",
-        "file": "material_prop_visco_const_ven_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_const_ven/versions/nn/material_prop_visco_const_ven_nn_units.cellml"
+        "name": "material_prop_visco_const_ven (Olufsen2000_v01)",
+        "file": "material_prop_visco_const_ven_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_const_ven/versions/Olufsen2000_v01/material_prop_visco_const_ven_Olufsen2000_v01_units.cellml"
       },
       {
-        "name": "material_prop_visco_fromPWV (nn)",
-        "file": "material_prop_visco_fromPWV_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_fromPWV/versions/nn/material_prop_visco_fromPWV_nn_units.cellml"
+        "name": "material_prop_visco_fromPWV (Olufsen2000_v01)",
+        "file": "material_prop_visco_fromPWV_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_fromPWV/versions/Olufsen2000_v01/material_prop_visco_fromPWV_Olufsen2000_v01_units.cellml"
       },
       {
-        "name": "material_prop_visco_fromPWV_ven (nn)",
-        "file": "material_prop_visco_fromPWV_ven_nn_units.cellml",
-        "path": "modules/vessels/properties/material_prop_visco_fromPWV_ven/versions/nn/material_prop_visco_fromPWV_ven_nn_units.cellml"
+        "name": "material_prop_visco_fromPWV_ven (Olufsen2000_v01)",
+        "file": "material_prop_visco_fromPWV_ven_Olufsen2000_v01_units.cellml",
+        "path": "modules/vessels/properties/material_prop_visco_fromPWV_ven/versions/Olufsen2000_v01/material_prop_visco_fromPWV_ven_Olufsen2000_v01_units.cellml"
       },
       {
         "name": "terminal (pp_controller)",

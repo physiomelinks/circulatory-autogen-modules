@@ -5,9 +5,12 @@
     "module_format": "cellml",
     "component_file": "soma_sympathetic_monolithic_v01_modules.cellml",
     "component_type": "SN_soma",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "required_citations": [
+      "argus2026sympathetic"
+    ],
     "entrance_ports": [
       {
         "port_type": "i_stim",
@@ -847,6 +850,18 @@
         "g_Na",
         "microS",
         "access",
+        "variable"
+      ],
+      [
+        "rho_Na",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Na",
+        "picoS",
+        "access",
         "constant"
       ],
       [
@@ -858,6 +873,18 @@
       [
         "g_Na1_6",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_Na1_6",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Na1_6",
+        "picoS",
         "access",
         "constant"
       ],
@@ -871,7 +898,7 @@
         "Cm",
         "picoF",
         "access",
-        "constant"
+        "variable"
       ],
       [
         "E_K",
@@ -901,11 +928,35 @@
         "p_Ca",
         "m3_per_s",
         "access",
+        "variable"
+      ],
+      [
+        "rho_CaL",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "p_Ca_single",
+        "um3_per_s",
+        "access",
         "constant"
       ],
       [
         "g_Kv1_5",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_Kv1_5",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Kv1_5",
+        "picoS",
         "access",
         "constant"
       ],
@@ -913,11 +964,35 @@
         "g_Kv4_2",
         "microS",
         "access",
+        "variable"
+      ],
+      [
+        "rho_Kv4_2",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Kv4_2",
+        "picoS",
+        "access",
         "constant"
       ],
       [
         "g_Kv2",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_Kv2",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Kv2",
+        "picoS",
         "access",
         "constant"
       ],
@@ -925,11 +1000,35 @@
         "g_KCa_BK",
         "microS",
         "access",
+        "variable"
+      ],
+      [
+        "rho_BK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_BK",
+        "picoS",
+        "access",
         "constant"
       ],
       [
         "g_KCa_SK",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_SK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_SK",
+        "picoS",
         "access",
         "constant"
       ],
@@ -943,7 +1042,37 @@
         "Vol",
         "m3",
         "access",
+        "variable"
+      ],
+      [
+        "c_m",
+        "uF_per_cm2",
+        "access",
         "constant"
+      ],
+      [
+        "d",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "variable"
       ],
       [
         "Cao",
@@ -973,6 +1102,18 @@
         "g_M",
         "microS",
         "access",
+        "variable"
+      ],
+      [
+        "rho_M",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_M",
+        "picoS",
+        "access",
         "constant"
       ],
       [
@@ -985,11 +1126,35 @@
         "g_leak_Na",
         "microS",
         "access",
+        "variable"
+      ],
+      [
+        "rho_leak_Na",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_leak_Na",
+        "picoS",
+        "access",
         "constant"
       ],
       [
         "g_leak_K",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_leak_K",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_leak_K",
+        "picoS",
         "access",
         "constant"
       ],
@@ -1075,7 +1240,55 @@
         "k_NaCa",
         "nanoA",
         "access",
+        "variable"
+      ],
+      [
+        "rho_NaCa",
+        "per_um2",
+        "access",
         "constant"
+      ],
+      [
+        "r_NaCa",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "rho_PMCA",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_PMCA",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_PMCA",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "n_PMCA",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "j_max_PMCA",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "j_PMCA",
+        "mol_per_s",
+        "access",
+        "variable"
       ],
       [
         "alpha_NaCa",
@@ -1116,6 +1329,18 @@
       [
         "k_NaK",
         "nanoA",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_NaK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_NaK",
+        "per_s",
         "access",
         "constant"
       ],
@@ -1273,6 +1498,18 @@
         "k_SERCA",
         "mol_per_s",
         "access",
+        "variable"
+      ],
+      [
+        "rho_SERCA",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "r_SERCA",
+        "per_s",
+        "access",
         "constant"
       ],
       [
@@ -1291,79 +1528,121 @@
         "k_RyR",
         "m3_per_s",
         "access",
+        "variable"
+      ],
+      [
+        "rho_RyR",
+        "per_um2",
+        "access",
         "constant"
       ],
       [
-        "c_RyR",
+        "k_RyR_single",
+        "um3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "kon_a_RyR",
+        "per_millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "koff_a_RyR",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "kon_i_RyR",
+        "per_millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "koff_i_RyR",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "kon_l_RyR",
+        "per_millimolar_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "koff_l_RyR",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "N_l_RyR",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "a_RyR_init",
         "dimensionless",
         "access",
         "variable"
       ],
       [
-        "hc_RyR",
+        "i_RyR_init",
         "dimensionless",
         "access",
         "variable"
       ],
       [
-        "c_RyR_inf",
+        "l_RyR_init",
         "dimensionless",
         "access",
         "variable"
       ],
       [
-        "hc_RyR_inf",
+        "a_RyR",
         "dimensionless",
         "access",
         "variable"
       ],
       [
-        "tau_c_RyR",
-        "millis",
+        "i_RyR",
+        "dimensionless",
         "access",
-        "constant"
+        "variable"
       ],
       [
-        "tau_hc_RyR",
-        "millis",
+        "l_RyR",
+        "dimensionless",
         "access",
-        "constant"
+        "variable"
       ],
       [
-        "Cai_RyR_mid",
-        "millimolar",
+        "a_RyR_inf",
+        "dimensionless",
         "access",
-        "constant"
+        "variable"
       ],
       [
-        "Cai_RyR_den",
-        "millimolar",
+        "i_RyR_inf",
+        "dimensionless",
         "access",
-        "constant"
+        "variable"
       ],
       [
-        "Ca_ER_RyR_mid",
-        "millimolar",
+        "l_RyR_inf",
+        "dimensionless",
         "access",
-        "constant"
+        "variable"
       ],
       [
-        "Ca_ER_RyR_den",
-        "millimolar",
+        "P_RyR",
+        "dimensionless",
         "access",
-        "constant"
-      ],
-      [
-        "Ca_ER_RyR_tau_mid",
-        "millimolar",
-        "access",
-        "constant"
-      ],
-      [
-        "Ca_ER_RyR_tau_den",
-        "millimolar",
-        "access",
-        "constant"
+        "variable"
       ],
       [
         "c_ER",
@@ -1372,10 +1651,22 @@
         "constant"
       ],
       [
-        "c_SL",
-        "dimensionless",
+        "d_shell",
+        "um",
         "access",
         "constant"
+      ],
+      [
+        "tau_shell",
+        "millis",
+        "access",
+        "constant"
+      ],
+      [
+        "V_shell",
+        "m3",
+        "access",
+        "variable"
       ],
       [
         "c_bulk",
@@ -1387,11 +1678,35 @@
         "k_IP3",
         "m3_per_s",
         "access",
+        "variable"
+      ],
+      [
+        "rho_IP3R",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_IP3R_single",
+        "um3_per_s",
+        "access",
         "constant"
       ],
       [
         "k_leak_Ca",
         "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "rho_leak_Ca",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "k_leak_Ca_single",
+        "um3_per_s",
         "access",
         "constant"
       ],
@@ -1433,7 +1748,7 @@
       ],
       [
         "a_2",
-        "per_millimolar",
+        "per_millimolar_per_s",
         "access",
         "constant"
       ],
@@ -1480,16 +1795,46 @@
         "variable"
       ],
       [
-        "D_Ca",
-        "m3_per_s",
-        "access",
-        "constant"
-      ],
-      [
         "c_ER_pre",
         "dimensionless",
         "access",
         "constant"
+      ],
+      [
+        "k_A_ER",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V_ER",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_A_ER_pre",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_V_ER_pre",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "A_ER",
+        "um2",
+        "access",
+        "variable"
+      ],
+      [
+        "A_ER_pre",
+        "um2",
+        "access",
+        "variable"
       ],
       [
         "Ca_ER_pre",
@@ -1508,6 +1853,240 @@
         "m3_per_s",
         "access",
         "constant"
+      ],
+      [
+        "Q10_m_Na",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Q10_h_Na",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Na",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_m_Na",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "phi_h_Na",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_m_Na1_6",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Q10_h_Na1_6",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Na1_6",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_m_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "phi_h_Na1_6",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_CaL",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_CaL",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_CaL",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_Kv2",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Kv2",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_Kv2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_m_Kv1_5",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Q10_h_Kv1_5",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Kv1_5",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_m_Kv1_5",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "phi_h_Kv1_5",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_Kv4_2",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Kv4_2",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_Kv4_2",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_BK",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_BK",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_BK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_SK",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_SK",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_SK",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_M",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_M",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_M",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_IP3R",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_IP3R",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_IP3R",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "Q10_RyR",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_RyR",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_RyR",
+        "dimensionless",
+        "access",
+        "variable"
       ]
     ]
   }

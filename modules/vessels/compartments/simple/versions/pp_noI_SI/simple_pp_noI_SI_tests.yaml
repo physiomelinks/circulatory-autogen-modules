@@ -1,0 +1,24 @@
+module_type: simple
+version: pp_noI_SI
+reviewed: false
+notes: 'Pure resistance (SI (m3, Pa)): v = v_d = (u_in - u_out)/R. Algebraic (no state). Duplicate of the litre/kPa component
+  with SI units.'
+reference_proposals:
+  R:
+    reference: 'bozkurt2019mathematical; Table 2 (adult): systemic arterioles R = 0.95 mmHg s/mL = 126.7 kPa s/L (used as the representative
+      compartment for this generic component) [SI variant: 126.7 kPa_s_per_L = 1.267e+08 Pa s/m3]'
+    sourced: 'yes'
+    value: 126700000.0
+  u_in:
+    reference: unreferenced_placeholder; isolated-test boundary value (mean pressure + R x mean flow / 2); in a network it
+      is supplied by the neighbouring compartment
+    sourced: 'no'
+    value: 17280.0
+  u_out:
+    reference: unreferenced_placeholder; isolated-test boundary value (mean pressure - R x mean flow / 2); in a network it
+      is supplied by the neighbouring compartment
+    sourced: 'no'
+    value: 6723.0
+review: reviews/cvs_mvp_review.yaml
+review_scope: The review of the whole cvs_mvp module (23 entries) before the move to versions; only the parts about this version
+  apply.

@@ -1,0 +1,16 @@
+variable_name,units,value,data_reference,sourced
+E_K,milliV,-96.4979,"definitional; Nernst potential RT/F ln(Ko/Ki) at Ko 4.5, Ki 200 mM, 295.15 K (the soma defaults; used when unconnected)",no
+V,milliV,-70.0,"definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. davis2020downregulation)",no
+V_den_h_Kv4_2,milliV,6.7,"bekkers2000properties; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",yes
+V_den_m_Kv4_2,milliV,19.1,"bekkers2000properties; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)",yes
+V_mid_h_Kv4_2,milliV,81.6,"bekkers2000properties; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",yes
+V_mid_m_Kv4_2,milliV,56.2,"bekkers2000properties; Fig. 10Ab: m^3h fit of I_A activation, m_inf V1/2 = -56.2 mV, k = 19.1 mV (changed on review 2026-10-05 from -18.8/16.6, Bekkers' first-power peak-current values that Channelpedia model 40 also used with m^3)",yes
+V_rest_approx,milliV,-70,"davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites davis2021transcriptomic, whose current-clamp traces the value was read from)",yes
+A_mem,um2,3000.0,definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port),no
+rho_Kv4_2,per_um2,4.4444444444444455,definitional; chosen so that g_Kv4_2 = A rho gamma_Kv4_2 (1e-6 uS/pS) reproduces the previous g_Kv4_2 = 0.1 microS (to_be_identified) with A = 3000 um^2 (the soma membrane area) and gamma_Kv4_2 = 7.5 picoS; a density for calibration through gamma_Kv4_2. The previous g_Kv4_2 (as proposed in review): unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'to_be_identified'),no
+gamma_Kv4_2,picoS,7.5,"kaulin2009dipeptidyl; neuronal Kv4.2 (with DPP6, as in cerebellar granule neurons) unitary conductance ~7.5 pS; Kv4.2 alone ~4 pS (Abstract)",yes
+tau_h_Kv4_2,millis,7.0,"bekkers2000properties; Fig. 8Ab, Table 1: I_A decay tau = 0.01 V + 6.7 ms (6.2-7.4 ms over -37 to +73 mV, 22-25 degC); at 37 degC in rat SCG the decay tau is 6.0-9.9 ms over 0 to -50 mV (belluzzi1985fast, p. 96); 7.0 ms = value. **Voltage dependence ignored: recovery from inactivation near rest is much slower (Bekkers Fig. 5A ~40-45 ms at -77 to -97 mV; belluzzi1985fast 42.3 ms at -70 mV, 37 degC) and is not represented by a constant tau_h**",yes
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+Q10_Kv4_2,dimensionless,3,unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T),no
+T_ref_Kv4_2,kelvin,296.65,bekkers2000properties; recorded at 22-25 degC (23.5 degC = 296.65 K); P13-15 rat L5 pyramidal nucleated patches,yes
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

@@ -1,0 +1,56 @@
+{
+  "module_type": "material_prop_const",
+  "version": "Olufsen2000_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["K_tube", "h"],
+  "invariants": [
+    {
+      "description": "wall thickness follows the Avolio/Blanco fit h = r0 (a e^{b r0} + c e^{d r0}) (relative 1e-9)",
+      "expr": "np.max(np.abs((h) - (r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0))))) <= 1e-9*np.max(np.abs(r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0))))"
+    },
+    {
+      "description": "thin-wall tube stiffness K_tube = E h / ((1 − ν²) r0) (relative 1e-9)",
+      "expr": "np.max(np.abs((K_tube) - (E*(r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0)))/((1 - nu**2)*r_0)))) <= 1e-9*np.max(np.abs(E*(r_0*(a_vessel*np.exp(b_vessel*r_0) + c_vessel*np.exp(d_vessel*r_0)))/((1 - nu**2)*r_0)))"
+    },
+    {
+      "description": "stiffness and wall thickness are positive and h/r0 is between 0 and 0.5 (thin wall)",
+      "expr": "(np.all(K_tube > 0)) & np.all((h > 0) & (h/r_0 < 0.5))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "r_0": {"min": 0.001, "max": 0.016, "points": 5, "scale": "log"},
+      "E": {"min": 50000.0, "max": 2000000.0, "points": 5, "scale": "log"},
+      "nu": [0.3, 0.5]
+    },
+    "rationale": "Arterial radii 1-16 mm (small arteries to the aorta, ADAN range) and lengths 0.5-20 cm; E 0.05-2 MPa (identified value to above the ADAN elastin/large-artery range); nu 0.3-0.5; wall viscosity K_M 1e3-1e5 Pa s around toro2022cerebrospinal/muller2023anatomically (3-3.6e4) and smooth-muscle fractions 0.05-0.55 (muller2023anatomically weights 0.10-0.55); Olufsen-type k1 1e5-3e6 Pa, k2 -2500..-500 m^-1, k3 2e4-1e5 Pa spanning the toro2022cerebrospinal and olufsen2000numerical sets; rho 1040-1060 kg/m^3; tube-law exponents around m = 0.5, n = 0. The Avolio/Blanco thickness-fit coefficients are swept by factors 0.5-2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 0.1,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: compare the implied wave speed c0 = sqrt(K_tube (m - n)/rho) with measured pulse wave velocities of named arteries vs radius (e.g. the charlton2019modeling in-silico/in-vivo PWV database or avolio1980multi segment data); needs a network-level geometry table, not set up."
+      },
+      "calibrate": {
+        "note": "not_applicable: algebraic constitutive relation with no dynamics; parameters are calibrated in the vessel network that uses it."
+      }
+    }
+  }
+}

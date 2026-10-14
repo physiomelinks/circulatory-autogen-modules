@@ -5,9 +5,20 @@
     "module_format": "cellml",
     "component_file": "i_Kv1_5_Argus2026_v01_modules.cellml",
     "component_type": "i_Kv1_5_SN",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
-    "creator": [],
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "philipson1991sequence",
+      "ranjanchannelpedia",
+      "argus2026sympathetic"
+    ],
+    "required_citations_uncertain": [
+      "philipson1991sequence",
+      "ranjanchannelpedia"
+    ],
     "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
     "entrance_ports": [],
     "exit_ports": [],
@@ -34,6 +45,12 @@
         "port_type": "K_flux",
         "variables": [
           "j_Kv1_5"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
         ]
       }
     ],
@@ -89,6 +106,24 @@
       [
         "g_Kv1_5",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_Kv1_5",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Kv1_5",
+        "picoS",
         "access",
         "constant"
       ],
@@ -149,6 +184,42 @@
       [
         "tau_m_Kv1_5",
         "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_m_Kv1_5",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Q10_h_Kv1_5",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Kv1_5",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_m_Kv1_5",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "phi_h_Kv1_5",
+        "dimensionless",
         "access",
         "variable"
       ]

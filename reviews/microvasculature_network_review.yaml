@@ -2,7 +2,7 @@ comment: 'Three module defects stop 27 of the 48 entries from working as shipped
   put initial_value="0.0" on an input (v_out_sum / v_in_sum), so generation fails; each is otherwise identical to pv_Nout
   / vp_Min. (2) 14 arteriole/capillary/venule/vein pp/pv/vp/vv entries point at BG *_simple_type, which needs an inertance
   I that the entry never declares (I = 0, division by zero). (3) every vv_*_micro type adds a stray "+ 2 {J_per_m3}" to u
-  and u_d. Every parameter was TODO: the proposed geometry comes from Boas2008 and the wall law from Watanabe2013, but the
+  and u_d. Every parameter was TODO: the proposed geometry comes from boas2008vascular and the wall law from watanabe2013mathematical, but the
   wall law is fitted on arteries and is extrapolated to capillaries here. mu is a single global 0.004 Pa s, which is not the
   apparent viscosity of microvessels. Volumes are about 1e-14 to 1e-19 m3, so the default solver atol is meaningless (see
   findings).'
@@ -16,18 +16,18 @@ summary: 'Microvascular network library, imported from libcuflynx; it supports t
   entries pass run/BC/timestep/stability, and invariants too except the four vv types, which fail on the +2 Pa defect. The
   24 broken entries are recorded as expected failures, with evidence from a patched copy: the 10 Minlet/Noutlet entries pass
   everything once the stray initial_value is removed, and the 14 BG-type entries generate and run once I is declared. Validation:
-  one scalar target is proposed and fails as expected (capillary pp vs Williams1988, see questions); the other entries are
+  one scalar target is proposed and fails as expected (capillary pp vs williams1988dynamic, see questions); the other entries are
   pending, with candidates listed.'
 questions:
-- 'References: confirm the proposed per-class values. Geometry: Boas2008 Table 1 (arteriole d 30.5 um x 100 um, capillary
-  8 x 250 um, venule 36.6 x 100 um). Small artery: Watanabe2013 perforator radius 180 um. Wall law: Watanabe2013 Eq. 3.1 (fit
-  to Avolio1980 data). E: artery from Olufsen1999 via Watanabe2013, arteriole from the Gao2015 pressure-strain modulus, capillary
-  from Salipante2022 (in vitro). u_0: Boas2008 60/25 mmHg and Williams1988 19.4 mmHg. Vein geometry/E/u_0, artery length/u_0
+- 'References: confirm the proposed per-class values. Geometry: boas2008vascular Table 1 (arteriole d 30.5 um x 100 um, capillary
+  8 x 250 um, venule 36.6 x 100 um). Small artery: watanabe2013mathematical perforator radius 180 um. Wall law: watanabe2013mathematical Eq. 3.1 (fit
+  to avolio1980multi data). E: artery from olufsen1999structured via watanabe2013mathematical, arteriole from the gao2015mechanical pressure-strain modulus, capillary
+  from salipante2022blood (in vitro). u_0: boas2008vascular 60/25 mmHg and williams1988dynamic 19.4 mmHg. Vein geometry/E/u_0, artery length/u_0
   and venule E have no verified source (placeholders).'
-- The Watanabe2013 h/r fit is for arteries of r ~0.2-1.4 cm. At capillary radii it gives h/r ~0.41 (h ~1.6 um at r = 4 um).
+- The watanabe2013mathematical h/r fit is for arteries of r ~0.2-1.4 cm. At capillary radii it gives h/r ~0.41 (h ~1.6 um at r = 4 um).
   Keep it for microvessels, or give arterioles/capillaries/venules their own wall law or a direct E h?
 - mu is one global constant (0.004 Pa s, a large-artery value). Apparent viscosity in microvessels is ~1.5-2.1 mPa s in vitro
-  (Pries1992 law) and ~4x higher than in a glass tube in vivo (Pries1994). Should mu become a per-vessel parameter (e.g. Pries
+  (pries1992blood law) and ~4x higher than in a glass tube in vivo (pries1994resistance). Should mu become a per-vessel parameter (e.g. Pries
   in-vivo law from r_0)?
 - The image-to-model tutorial that uses this library samples E from an unreferenced dict (artery 160 kPa, arteriole/capillary/venule
   6.5 kPa, vein 210 kPa). Its pressure pre-solve uses MU = 3.5e-3 while the model uses mu = 4e-3, and it multiplies the radii
@@ -42,11 +42,11 @@ questions:
   import brought the BG-type entries and the stray initial values.
 - theta, rho, g, beta_g and R_v are declared but unused, because the gravity/viscoelastic terms are commented out. Remove
   them from the config, or keep them for the planned terms?
-- 'Validation (proposed, fails): a pp capillary held between the Williams1988 arteriolar-limb (37.7 mmHg) and venular-limb
+- 'Validation (proposed, fails): a pp capillary held between the williams1988dynamic arteriolar-limb (37.7 mmHg) and venular-limb
   (14.6 mmHg) pressures settles at their mean, 26.1 mmHg, against a measured apex of 19.4 +- 1.0 mmHg. A uniform segment cannot
   place the apex below the mean; the measured profile implies more resistance on the arteriolar side (tapering, or Fahraeus-Lindqvist
   effects). Keep this as a documented limitation, change the target, or drop it? Other candidates, for networks built from
-  these components: Pries1990 rat-mesentery networks, the Boas2008 arteriole-capillary-venule chain.'
+  these components: pries1990blood rat-mesentery networks, the boas2008vascular arteriole-capillary-venule chain.'
 proposed_fixes:
 - 'pv_Minlet_type_micro: remove initial_value="0.0" from <variable name="v_out_sum" public_interface="in">. vp_Noutlet_type_micro:
   remove it from v_in_sum. Evidence: patched copy, all 10 Minlet/Noutlet entries pass run, invariants, BC sweep and timestep.

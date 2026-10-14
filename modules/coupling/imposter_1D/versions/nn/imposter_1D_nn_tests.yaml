@@ -1,8 +1,0 @@
-module_type: imposter_1D
-version: nn
-reviewed: true
-notes: 'Stand-in for a 1D model at a 0D-1D interface: exposes a constant total pressure P_t* and area A* and receives the
-  accumulated flux. Tested as the downstream end of the coupler harness.'
-known_issues:
-- circulatory_autogen's 0D_1D_coupling_test network names a vessel 0D_vessel, not a valid CellML name (starts with a digit);
-  the harness here uses vessel0d.

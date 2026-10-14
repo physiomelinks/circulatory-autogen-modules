@@ -1,0 +1,14 @@
+module_type: thoracic_cavity
+version: Albanese2016_v01
+reviewed: false
+notes: 'Pass-through: exports the pleural pressure P_pl as the thoracic external pressure P_thor for vessels/heart in the
+  chest (multi-port).'
+reference_proposals:
+  P_pl:
+    reference: albanese2014physiology; standalone value P_pl,EE = -5 cmH2O = -490 Pa (Table 2-5, citing west2008respiratory); supplied by the lung
+      in use
+    sourced: 'yes'
+    value: -490.0
+review: reviews/lung_review.yaml
+review_scope: The review of the whole lung module (3 entries) before the move to versions; only the parts about this version
+  apply.

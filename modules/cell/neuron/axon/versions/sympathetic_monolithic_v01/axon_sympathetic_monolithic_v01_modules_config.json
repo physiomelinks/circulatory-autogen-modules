@@ -5,9 +5,14 @@
     "module_format": "cellml",
     "component_file": "axon_sympathetic_monolithic_v01_modules.cellml",
     "component_type": "SN_axon",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
-    "creator": [],
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "argus2026sympathetic"
+    ],
     "entrance_ports": [
       {
         "port_type": "VI_port",
@@ -49,11 +54,35 @@
         "C",
         "picoF",
         "access",
-        "constant"
+        "variable"
       ],
       [
         "R",
         "megaOhm",
+        "access",
+        "variable"
+      ],
+      [
+        "c_m",
+        "uF_per_cm2",
+        "access",
+        "constant"
+      ],
+      [
+        "d_ax",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "L_ax",
+        "um",
+        "access",
+        "constant"
+      ],
+      [
+        "R_i",
+        "ohm_cm",
         "access",
         "constant"
       ],

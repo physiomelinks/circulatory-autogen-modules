@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="cardiopulmonary_receptor_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="cardiopulmonary_receptor_Gee2023">
+        <variable name="P_pvn" public_interface="in" units="J_per_m3"/>
+        <variable name="P_mus" public_interface="in" units="J_per_m3"/>
+        <variable name="P_pv_P_thor" public_interface="out" units="J_per_m3"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- P_mus is closest equivalent to P_thor in Finbar's lung model-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>P_pv_P_thor</ci>
+                <apply>
+                    <minus/>
+                    <ci>P_pvn</ci>
+                    <ci>P_mus</ci>
+                </apply>
+            </apply>
+        </math>
+        <!--P_pv_P_thor = sel
+    case t >= 50{second}:
+        13{mmHg};
+    otherwise:
+        6{mmHg};
+endsel;-->
+        <!-- s.41-->
+        <variable name="tau_cp" public_interface="in" units="second"/>
+        <variable name="P_l_init" public_interface="in" units="J_per_m3"/>
+        <variable initial_value="P_l_init" name="P_l" public_interface="out" units="J_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>P_l</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>P_l</ci>
+                        </apply>
+                        <ci>P_pv_P_thor</ci>
+                    </apply>
+                    <ci>tau_cp</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- s.42 (cp firing frequency)-->
+        <variable name="f_cp" public_interface="out" units="Hz"/>
+        <variable name="f_maxl" public_interface="in" units="Hz"/>
+        <variable name="P_tn" public_interface="in" units="J_per_m3"/>
+        <variable name="k_l" public_interface="in" units="J_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_cp</ci>
+                <apply>
+                    <divide/>
+                    <ci>f_maxl</ci>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <minus/>
+                                    <ci>P_tn</ci>
+                                    <ci>P_l</ci>
+                                </apply>
+                                <ci>k_l</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

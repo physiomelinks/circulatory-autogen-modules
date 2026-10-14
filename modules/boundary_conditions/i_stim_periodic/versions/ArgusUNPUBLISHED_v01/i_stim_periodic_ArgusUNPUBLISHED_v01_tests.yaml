@@ -1,0 +1,14 @@
+module_type: i_stim_periodic
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Rectangular stimulus current in nA: i = -stim_flag i_amplitude during the first pulse_duration of each period between
+  t_start and t_end (negative = inward/depolarising in the usual convention). Algebraic, no states. Sign: i = -stim_flag i_amplitude,
+  so a positive amplitude gives a negative (inward, depolarising in the usual convention) current; the opposite sign to the
+  Paci component. Timing and amplitude reuse the Paci 2013 protocol (no source of its own).
+
+
+  Ports of the versions of i_stim_periodic (they differ; allowed and documented, see modules/README.md, Versions):
+
+  exit i_stim: ArgusUNPUBLISHED_v01 [i]; cardiomyocyte_Paci2013_v01 -
+
+  exit stim_current: ArgusUNPUBLISHED_v01 -; cardiomyocyte_Paci2013_v01 [i_stim]'

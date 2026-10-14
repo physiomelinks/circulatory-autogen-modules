@@ -35,11 +35,25 @@ def _units_library():
     return units
 
 
+# the lumped laws split arterial_simple vp's vessel: its references and required citations
+SOURCE_VERSION_DIR = os.path.join(MODULES_DIR, 'vessels', 'compartments', 'arterial_simple', 'versions', 'vp')
+
+
 def _bib():
-    with open(os.path.join(MODULES_DIR, 'vessels', 'compartments', 'arterial_simple', 'versions', 'vp',
-                           'arterial_simple_vp_references.bib')) as f:
-        text = f.read()
-    return text[:text.index('\n}\n') + 3] if '\n}\n' in text else text
+    with open(os.path.join(SOURCE_VERSION_DIR, 'arterial_simple_vp_references.bib')) as f:
+        return f.read()
+
+
+def citations(config_path):
+    '''{"required_citations": [...], "required_citations_uncertain": [...]} of a version's config entry
+    (the keys it has).'''
+    with open(config_path) as f:
+        entry = json.load(f)[0]
+    return {k: entry[k] for k in ('required_citations', 'required_citations_uncertain') if k in entry}
+
+
+def source_citations():
+    return citations(os.path.join(SOURCE_VERSION_DIR, 'arterial_simple_vp_modules_config.json'))
 
 
 def write_json(path, data):
@@ -48,8 +62,8 @@ def write_json(path, data):
         f.write('\n')
 
 
-def write_instance(vdir, rows, name='default'):
-    idir = os.path.join(vdir, 'instances', name)
+def write_parameterisation(vdir, rows, name='default'):
+    idir = os.path.join(vdir, 'parameterisations', name)
     os.makedirs(idir, exist_ok=True)
     with open(os.path.join(idir, f'{name}_parameters.csv'), 'w', newline='') as f:
         writer = csv.writer(f)
@@ -84,10 +98,11 @@ def write_constitutive(v, units_library, bib):
     write_json(os.path.join(vdir, f'{stem}_modules_config.json'), [{
         'module_type': v.module_type, 'module_subtype': v.version, 'module_format': 'cellml',
         'component_file': f'{stem}_modules.cellml', 'component_type': v.component,
-        'default_instance': 'default', 'licence': 'CC0-1.0', 'creator': [], 'description': v.description,
+        'default_parameterisation': 'default', 'licence': 'CC0-1.0', 'creator': [], **source_citations(),
+        'description': v.description,
         'entrance_ports': v.entrance_ports, 'exit_ports': v.exit_ports, 'general_ports': [],
         'variables_and_units': [[var.name, var.units, 'access', var.kind] for var in v.variables]}])
-    write_instance(vdir, [[var.name, var.units, var.default, DEFAULT_REFERENCE, 'no'] for var in v.variables
+    write_parameterisation(vdir, [[var.name, var.units, var.default, DEFAULT_REFERENCE, 'no'] for var in v.variables
                           if var.kind != 'variable'])
     write_spec(vdir, stem, {
         'module_type': v.module_type, 'version': v.version, 'reviewed': False, 'description': v.description,

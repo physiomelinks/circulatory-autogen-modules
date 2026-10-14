@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="ion_concentrations_cardiomyocyte_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="Na_dynamics_Paci_2013">
+        <variable name="Nai_init" public_interface="in" units="millimolar"/>
+        <variable initial_value="Nai_init" name="Nai" public_interface="out" units="millimolar"/>
+        <variable name="Cm" public_interface="in" units="farad"/>
+        <variable name="Vc" public_interface="in" units="microm3"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="F" public_interface="in" units="C_per_M"/>
+        <variable name="i_Na" public_interface="in" units="A_per_F"/>
+        <variable name="i_b_Na" public_interface="in" units="A_per_F"/>
+        <variable name="i_NaK" public_interface="in" units="A_per_F"/>
+        <variable name="i_NaCa" public_interface="in" units="A_per_F"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Nai</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <ci>Cm</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>i_Na</ci>
+                            <ci>i_b_Na</ci>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">3</cn>
+                                <ci>i_NaK</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">3</cn>
+                                <ci>i_NaCa</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>F</ci>
+                        <ci>Vc</ci>
+                        <cn cellml:units="m3_per_microm3" type="e-notation">1<sep/>-18</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

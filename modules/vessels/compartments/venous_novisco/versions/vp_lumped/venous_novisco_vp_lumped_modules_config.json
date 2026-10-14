@@ -3,10 +3,18 @@
     "module_type": "venous_novisco",
     "module_subtype": "vp_lumped",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "venous_novisco/vp built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_linear_controlled_novisco) -> R (resistance pv_linear) -> I (inertance pp_linear); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "description": "venous_novisco/vp built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_linear_controlled_novisco) -> R (resistance pv_linear) -> I (inertance pp_linear); V (vessel_volume summed) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
     "routes": {
       "inputs": {
         "vessel_port": "C",
@@ -60,7 +68,7 @@
         "name": "C",
         "module_type": "compliance",
         "module_subtype": "vv_linear_controlled_novisco",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "R",
@@ -71,7 +79,7 @@
         "name": "R",
         "module_type": "resistance",
         "module_subtype": "pv_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "C"
         ],
@@ -83,7 +91,7 @@
         "name": "I",
         "module_type": "inertance",
         "module_subtype": "pp_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "R"
         ],
@@ -92,8 +100,8 @@
       {
         "name": "V",
         "module_type": "vessel_volume",
-        "module_subtype": "nn",
-        "instance": "default",
+        "module_subtype": "summed",
+        "parameterisation": "default",
         "inp_instances": [
           "C"
         ],

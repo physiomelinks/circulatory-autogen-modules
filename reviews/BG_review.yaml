@@ -32,30 +32,30 @@ summary: 'BG is the bond-graph vessel library: 116 components. It has lumped R-C
   Every failure is a recorded expected failure: 12 generation defects (5 tests each) and 3 Min/Nout/MinNout vv_nonlinear_visco
   types (invariants + sweep); the 2 skipped timestep tests are the algebraic flow_sum_2 and rigid_vessel.'
 questions:
-- 'Global constants (all currently the test_fft fixture value 1): apply rho = 1050 kg/m^3 and mu = 0.004 Pa s (Boileau2015
+- 'Global constants (all currently the test_fft fixture value 1): apply rho = 1050 kg/m^3 and mu = 0.004 Pa s (boileau2015benchmark
   Table II), g = 9.81, beta_g = 0 (gravity off, as in the circulatory_autogen models), and the wall-thickness fit a = 0.2802,
-  b = -505.3 1/m, c = 0.1324, d = -11.14 1/m? The fit is Blanco2015 Eq. (2), fitted to Avolio1980 data; the SI values are
-  in Safaei2018 Table S3. It is not Avolio 1980 itself, which the circulatory_autogen label says.'
-- 'Lumped arterial/venous values: arterial_simple vp R = 1.0664e7 and venous vp R = 1.333e6 are exactly Safaei2018 Table S3
+  b = -505.3 1/m, c = 0.1324, d = -11.14 1/m? The fit is blanco2015anatomically Eq. (2), fitted to avolio1980multi data; the SI values are
+  in safaei2018bond Table S3. It is not Avolio 1980 itself, which the circulatory_autogen label says.'
+- 'Lumped arterial/venous values: arterial_simple vp R = 1.0664e7 and venous vp R = 1.333e6 are exactly safaei2018bond Table S3
   R_par and R_pvn (pulmonary artery/vein; the circulatory_autogen label Blanco_2013_Table_8 could not be checked, paywalled).
   The C values 3.09077e-10 and 6.0015e-9 have the digits of C_par = 3.09077e-8 and C_pvn = 6.0015e-7 but are 100x smaller.
   Is that deliberate? For the TODO siblings I proposed the Table S3 values: arterial R 1.0664e7, C 3.09077e-8; venous R 3.999e6,
   C 1.125281e-7, I 6.665e4 (systemic veins).'
-- 'Inertances I = 1e-6 (labelled Blanco_2013_Table_8 in arterial_simple vp and venous vp; Safaei2018 Table S3 has I = 0 there)
+- 'Inertances I = 1e-6 (labelled Blanco_2013_Table_8 in arterial_simple vp and venous vp; safaei2018bond Table S3 has I = 0 there)
   and other ''small_chosen'' values make those components extremely stiff (fastest time scale 2e-14 s): only implicit solvers
   work, and the RK4 check only covers a very short window. Keep these, or use rho l/(pi r^2)-sized values like the 1e5 proposed
   for the arterial TODOs?'
-- 'ADAN values (E = 0.4/1.6 MPa, l, r_0 for ''ADAN_86''/''ADAN_218'' vessels): I proposed Safaei2018 (which builds the 218-segment
+- 'ADAN values (E = 0.4/1.6 MPa, l, r_0 for ''ADAN_86''/''ADAN_218'' vessels): I proposed safaei2018bond (which builds the 218-segment
   network from ADAN-86 plus the ADAN cerebral vessels) as the citation. The vessel-level numbers could not be checked because
   the ADAN data are in inaccessible supplementary material. Can you confirm them, or point to the ADAN-86 table?'
-- 'Nout_junction vv_nonlinear_visco l = 0.0744 m, r_0 = 0.01445 m and u_0 = 10 kPa (Boileau_2015) are verified: Boileau2015
+- 'Nout_junction vv_nonlinear_visco l = 0.0744 m, r_0 = 0.01445 m and u_0 = 10 kPa (Boileau_2015) are verified: boileau2015benchmark
   Table XII, ADAN56 test vessel 1 (aortic arch I), length 7.441 cm, mean of the proximal and distal radii 1.595 and 1.295
   cm, and Pd = P0 = 10 kPa. Accept as cited?'
-- 'arterial_simple vv q_0 = 6.94e-6 m^3 (''Mynard&Smolich_2015''): in the Mynard2015 supplement, 6.9419 is the aortic-root
+- 'arterial_simple vv q_0 = 6.94e-6 m^3 (''Mynard&Smolich_2015''): in the mynard2015one supplement, 6.9419 is the aortic-root
   A0 in cm^2 with length 1 cm, so A0 l = 6.94 mL fits. Is that the intended origin? The reference pressures 1463 Pa (''assumedRefOf11mmHg'')
-  and 13300 Pa (''assumedRefOf100mmHg'') are not in the accessible parts of Mynard2015, so I marked them placeholders.'
-- 'TODO tube-law values: arterial K_tube is a placeholder from Olufsen2000''s stiffness fit, K = rho c0^2/(m - n) (about 1.15e5
-  Pa for r0 = 1.5 cm); its constants are confirmed only through secondary sources. Venous law m = 10, n = -3/2 (Muller2014,
+  and 13300 Pa (''assumedRefOf100mmHg'') are not in the accessible parts of mynard2015one, so I marked them placeholders.'
+- 'TODO tube-law values: arterial K_tube is a placeholder from olufsen2000numerical''s stiffness fit, K = rho c0^2/(m - n) (about 1.15e5
+  Pa for r0 = 1.5 cm); its constants are confirmed only through secondary sources. Venous law m = 10, n = -3/2 (muller2014global,
   confirmed only secondarily); venous K_tube = 10 Pa is an order-of-magnitude placeholder. K_tube_visco comes from the vessel_properties
   formula with Gamma = 0.1 x 3e4 Pa s. These are normally supplied by vessel_properties when connected: acceptable as stand-alone
   test values?'
@@ -65,11 +65,11 @@ questions:
   r 1e-4 m, l 1e-3 m, E 1.6 MPa. Terminals: R_T 2.6e8, C_T 4e-9 (copied from terminal pp_wCont_no_local), R_T1 or Zc 1.3e7,
   I_T 1e4, frac 0.05. Lumped capillary: R 1e8, C 1e-10, I 1e5. Boundary conditions: 100/95 mmHg arterial, 5/0 mmHg venous,
   40/10 mmHg capillary; flows 0.2 m/s x lumen area or 1e-4/1e-5/5e-6 m^3/s by class. Please replace any where you have data.'
-- 'Validation: all pending. A candidate for the arterial classes is the Boileau2015 benchmark (ADAN56 and aortic-bifurcation
+- 'Validation: all pending. A candidate for the arterial classes is the boileau2015benchmark benchmark (ADAN56 and aortic-bifurcation
   reference waveforms in its supplementary data), compared with a chain of these segments. Candidates for the terminals are
-  published three-element Windkessel fits, and for the veins the Muller2014 venous waveforms. Which, if any, should be set
+  published three-element Windkessel fits, and for the veins the muller2014global venous waveforms. Which, if any, should be set
   up now, or should validation live in network-level models?'
-- The Voigt/viscoelastic wall term uses R_v = 0.01 s/C with 0.01 s hard-coded in the CellML (Safaei2018 Table S3 lists it
+- The Voigt/viscoelastic wall term uses R_v = 0.01 s/C with 0.01 s hard-coded in the CellML (safaei2018bond Table S3 lists it
   as the Voigt parameter f = 0.01 s). Promote it to a parameter?
 proposed_fixes:
 - 'arterial/split_junction/merge_junction *_nonlinear_constR (7 components): remove r from the radius_0_and_s_port exit port
@@ -111,7 +111,7 @@ findings:
   not by a bug.'
 - The tests run at the library values of the global constants (the test_fft fixture value 1). Setting the physiological values
   at the run point breaks the timestep/stability tests (framework issue, reported). In an earlier run with rho = 1050, mu
-  = 0.004 and the Blanco2015 a-d as run parameters, every geometric and nonlinear component generated and ran. Their timescales
+  = 0.004 and the blanco2015anatomically a-d as run parameters, every geometric and nonlinear component generated and ran. Their timescales
   then move from about 1e-5-1e-4 s to 1e-3-10 s, and the arterial nonlinear vessels become lightly damped (Poiseuille R is
   small). Re-run once the globals are applied.
 - 'Stiffness: components with I = 1e-6 or the fixture globals have eigenvalues up to about 5e13 1/s. RK4 convergence is then

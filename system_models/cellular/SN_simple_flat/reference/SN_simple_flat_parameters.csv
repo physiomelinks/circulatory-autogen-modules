@@ -16,31 +16,31 @@ g_KCa_SK_mod_soma_SN, dimensionless, 1.0, to_be_identified
 Vol_soma_SN, m3, 2000.0e-18, Wu2012Soma_Approx
 Cai_init_soma_SN, millimolar, 1e-4, Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease
 Nai_init_soma_SN, millimolar, 13, BoronBoulpaep2017_was_15
-Ki_init_soma_SN, millimolar, 150, BoronBoulpaep2017
+Ki_init_soma_SN, millimolar, 150, boron2017medical
 Cao_soma_SN, millimolar, 2, Tau2011
-Nao_soma_SN, millimolar, 145, BoronBoulpaep2017
-Ko_soma_SN, millimolar, 4.5, BoronBoulpaep2017
+Nao_soma_SN, millimolar, 145, boron2017medical
+Ko_soma_SN, millimolar, 4.5, boron2017medical
 #, #, #, #
-B_Ca_total_soma_SN, millimolar, 8, Matveev2002
+B_Ca_total_soma_SN, millimolar, 8, matveev2002new
 B_Ca_init_soma_SN, millimolar, 7.95, user_defined
 k_bind_Ca_soma_SN, per_millimolar_s, 0.1e6, Matveev2002_was_0.5e6
-k_unbind_Ca_soma_SN, per_s, 8e3, Matveev2002
+k_unbind_Ca_soma_SN, per_s, 8e3, matveev2002new
 k_bind_Ca_ER_soma_SN, per_millimolar_s, 0.5e3, user_defined
 k_unbind_Ca_ER_soma_SN, per_s, 8e3, Matveev2002_for_k_unbind_Ca
 #, #, #, #
-B_Ca_total_var_SN, millimolar, 8, Matveev2002
+B_Ca_total_var_SN, millimolar, 8, matveev2002new
 B_Ca_init_var_SN, millimolar, 7.95, user_defined
 k_bind_Ca_var_SN, per_millimolar_s, 0.1e6, Matveev2002_was_0.5e6
-k_unbind_Ca_var_SN, per_s, 8e3, Matveev2002
+k_unbind_Ca_var_SN, per_s, 8e3, matveev2002new
 k_bind_Ca_ER_var_SN, per_millimolar_s, 0.5e3, user_defined
 k_unbind_Ca_ER_var_SN, per_s, 8e3, Matveev2002_for_k_unbind_Ca
 #, #, #, #
 g_CaN_var_SN, microS, 1e-5, to_be_identified
 Vol_var_SN, m3, 1.0e-18, bennet1998Sympathetic
-Cai_init_var_SN, millimolar, 1e-4, Hagiwara1981
+Cai_init_var_SN, millimolar, 1e-4, hagiwara1981calcium
 Nai_var_SN, millimolar, 13, BoronBoulpaep2017_was_15
 Cao_var_SN, millimolar, 2, Tau2011
-Nao_var_SN, millimolar, 145, BoronBoulpaep2017
+Nao_var_SN, millimolar, 145, boron2017medical
 #, #, #, #
 a_cleft,dimensionless,4000,Tao_2011
 n_cleft,dimensionless,12,Tao_2011
@@ -48,7 +48,7 @@ Vol_cleft,litre,1.5e-15,Tao_2011_UNUSED
 N_avo,per_mol,6.02e23,known
 R,J_per_mol_K,8.314,known
 F,C_per_mol,96485,known
-T,kelvin,310.15,Tao2011
+T,kelvin,310.15,tao2011model
 #, #, #, #
 V_rest_approx_soma_SN, milliV, -70, Davis2021Thesis_from_traces
 h_BK_min_soma_SN, dimensionless, 0.085, Khaliq2003Contribution
@@ -63,14 +63,14 @@ V_mid_m_Na1_6_soma_SN, milliV, 36, Belluzi1991_was_36
 V_mid_h_Na1_6_soma_SN, milliV, 53.2, Belluzi1991_was_53.2
 V_den_m_Na1_6_soma_SN, milliV, 8.0, Belluzi1991_was_7.2
 V_den_h_Na1_6_soma_SN, milliV, 8.0, Belluzi1991_was_6.5
-V_mid_m_Kv1_5_soma_SN, milliV, 6.0, Philipson1991-channelpedia 
-V_den_m_Kv1_5_soma_SN, milliV, 6.4, Philipson1991-channelpedia
-V_mid_h_Kv1_5_soma_SN, milliV, 25.3, Philipson1991-channelpedia
-V_den_h_Kv1_5_soma_SN, milliV, 3.5, Philipson1991-channelpedia
-V_mid_m_Kv4_2_soma_SN, milliV, 18.8, Bekkers2000-channelpedia 
-V_den_m_Kv4_2_soma_SN, milliV, 16.6, Bekkers2000-channelpedia
-V_mid_h_Kv4_2_soma_SN, milliV, 81.6, Bekkers2000-channelpedia
-V_den_h_Kv4_2_soma_SN, milliV, 6.7, Bekkers2000-channelpedia
+V_mid_m_Kv1_5_soma_SN, milliV, 6.0, philipson1991sequence-channelpedia 
+V_den_m_Kv1_5_soma_SN, milliV, 6.4, philipson1991sequence-channelpedia
+V_mid_h_Kv1_5_soma_SN, milliV, 25.3, philipson1991sequence-channelpedia
+V_den_h_Kv1_5_soma_SN, milliV, 3.5, philipson1991sequence-channelpedia
+V_mid_m_Kv4_2_soma_SN, milliV, 18.8, bekkers2000properties-channelpedia 
+V_den_m_Kv4_2_soma_SN, milliV, 16.6, bekkers2000properties-channelpedia
+V_mid_h_Kv4_2_soma_SN, milliV, 81.6, bekkers2000properties-channelpedia
+V_den_h_Kv4_2_soma_SN, milliV, 6.7, bekkers2000properties-channelpedia
 V_mid_c_soma_SN, milliV, 8.1, Tau2011_was_8.1
 V_den_c_soma_SN, milliV, 5, Tau2011_was_9.85
 V_mid_m_Kv2_soma_SN, milliV, 6, Tau2011_was_6

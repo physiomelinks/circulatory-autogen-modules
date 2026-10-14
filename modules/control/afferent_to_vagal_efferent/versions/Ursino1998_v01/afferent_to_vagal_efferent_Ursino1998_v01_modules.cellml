@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="afferent_to_vagal_efferent_Ursino1998_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="afferent_to_vagal_efferent_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- Constants-->
+        <variable name="f_ev_0" public_interface="in" units="per_s"/>
+        <variable name="f_ev_inf" public_interface="in" units="per_s"/>
+        <variable name="f_ab_0" public_interface="in" units="per_s"/>
+        <variable name="theta_v" public_interface="in" units="per_s"/>
+        <variable name="W_cv" public_interface="in" units="dimensionless"/>
+        <!-- var W_pv: dimensionless {pub: in}; not yet including lung stretch receptor effects-->
+        <variable name="k_ev" public_interface="in" units="per_s"/>
+        <!-- Variables-->
+        <variable name="f_apc" public_interface="in" units="per_s"/>
+        <variable name="f_ab" public_interface="in" units="per_s"/>
+        <!-- var f_ap: per_s {pub: in};-->
+        <variable name="f_v" public_interface="out" units="per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>f_v</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>f_ev_0</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>f_ev_inf</ci>
+                                    <apply>
+                                        <exp/>
+                                        <apply>
+                                            <divide/>
+                                            <apply>
+                                                <minus/>
+                                                <ci>f_ab</ci>
+                                                <ci>f_ab_0</ci>
+                                            </apply>
+                                            <ci>k_ev</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <cn cellml:units="dimensionless">1</cn>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <minus/>
+                                            <ci>f_ab</ci>
+                                            <ci>f_ab_0</ci>
+                                        </apply>
+                                        <ci>k_ev</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>W_cv</ci>
+                            <ci>f_apc</ci>
+                        </apply>
+                    </apply>
+                    <ci>theta_v</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- + W_pv*f_ap-->
+    </component>
+</model>

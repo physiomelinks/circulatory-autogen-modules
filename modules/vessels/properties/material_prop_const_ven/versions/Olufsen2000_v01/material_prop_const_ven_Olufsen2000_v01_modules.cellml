@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="material_prop_const_ven_Olufsen2000_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="material_prop_const_ven_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="hr_ratio" public_interface="in" units="dimensionless"/>
+        <variable name="E" public_interface="in" units="J_per_m3"/>
+        <variable name="nu" public_interface="in" units="dimensionless"/>
+        <variable name="K_tube" public_interface="out" units="J_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>K_tube</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <ci>E</ci>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">12</cn>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">1</cn>
+                                <apply>
+                                    <power/>
+                                    <ci>nu</ci>
+                                    <cn cellml:units="dimensionless">2</cn>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <ci>hr_ratio</ci>
+                        <cn cellml:units="dimensionless">3</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

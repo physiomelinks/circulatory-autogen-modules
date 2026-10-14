@@ -1,0 +1,55 @@
+{
+  "module_type": "VanDerPol",
+  "version": "VanDerPol1926_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["x", "y"],
+  "invariants": [
+    {
+      "description": "trajectory stays bounded: |x| ≤ 1.1 max(2, √(x₀² + y₀²/μ)) (limit cycle, or the initial near-harmonic swing for small μ, with 10% for transient overshoot)",
+      "expr": "np.max(np.abs(x)) <= 1.1 * max(2.0, np.sqrt(x_init**2 + y_init**2/mu))"
+    },
+    {
+      "description": "relaxation period matches the Dorodnitsyn (1947) asymptotic formula for this scaling, T ≈ (3 − 2 ln 2) + 7.014 μ^(−2/3), within 2% (nominal μ only; the next term is ~0.8% at μ = 100)",
+      "expr": "abs(period(t, x) - ((3 - 2*np.log(2)) + 7.014*mu**(-2/3))) <= 0.02 * ((3 - 2*np.log(2)) + 7.014*mu**(-2/3))",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "mu": {"min": 0.1, "max": 1000, "points": 9, "scale": "log"},
+      "x_init": {"min": -3, "max": 3, "points": 7},
+      "y_init": {"min": -5, "max": 5, "points": 5}
+    }
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.001, 0.0005, 0.00025, 0.000125],
+    "t_end": 20.0,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10},
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08, "MaximumStep": 0.001}
+    ],
+    "t_end": 20.0
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "mathematical benchmark (relaxation oscillator) with no physiological counterpart; the period is checked against the Dorodnitsyn (1947) asymptotic formula as a verification invariant"
+      },
+      "calibrate": {
+        "note": "not_applicable: mathematical benchmark (relaxation oscillator) with no physiological counterpart; the period is checked against the Dorodnitsyn (1947) asymptotic formula as a verification invariant"
+      }
+    }
+  }
+}

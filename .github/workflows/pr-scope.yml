@@ -1,0 +1,19 @@
+name: PR scope
+
+# A module PR ("Module:" title) changes only module content, any other PR none (README "Pull requests"). Runs again
+# when the title is edited; the module tests don't.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  scope:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Module content only in module PRs, and only module content
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BASE: origin/${{ github.event.pull_request.base.ref }}
+        run: python3 tools/pr_scope.py "$TITLE" "$BASE"

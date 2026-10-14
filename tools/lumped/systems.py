@@ -22,17 +22,20 @@ LUMPED_SYSTEMS = [('closed_loop_cvs/3compartment', '3compartment_lumped', ('arte
 def build(source, name):
     '''Writes system_models/<category>/<name>; returns (system dir, the equivalence entry).'''
     from libcuflynx.utilities.lumped_migration import Library, migrate_files
-    from cam_testing import vessel_array
+    from cam_testing import module_array
     category, src_name = source.split('/')
     src = os.path.join(SYSTEMS_DIR, category, src_name)
     dst = os.path.join(SYSTEMS_DIR, category, name)
     if os.path.isdir(dst):
         shutil.rmtree(dst)
     os.makedirs(dst)
-    result = migrate_files(Library([MODULES_DIR]), os.path.join(src, f'{src_name}_vessel_array.json'),
+    result = migrate_files(Library([MODULES_DIR]), module_array.find(src, src_name),
                            os.path.join(src, f'{src_name}_parameters.csv'), out_dir=dst, prefix=name,
                            old_prefix=src_name)
-    records = vessel_array.read_records(os.path.join(src, f'{src_name}_vessel_array.json'))
+    # in this library's record style (lumped_migration writes the former key "instance")
+    new_array = module_array.find(dst, name)
+    module_array.write_records(new_array, module_array.read_records(new_array))
+    records = module_array.read_records(module_array.find(src, src_name))
     replaced = sorted(result['replaced'])
     src_spec = systems.load_system(src_name).spec
     spec = {

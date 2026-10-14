@@ -4,11 +4,11 @@ model's parameter values against them.
 
     tested range     the range each parameter is varied over by verification_test_BC and the
                      joint risk analysis: bc_sweep.ranges in <module_type>_<version>_verification_config.json,
-                     or bc_sweep.factors x the nominal (default instance) value
+                     or bc_sweep.factors x the nominal (default parameterisation) value
     validated spread the values at which the version matched data in a passing validation
-                     test of any of its instances (published parameter intervals and calibrated values)
+                     test of any of its parameterisations (published parameter intervals and calibrated values)
 
-    python -m cam_testing.ranges check --vessel-array sys_vessel_array.json --parameters sys_parameters.csv
+    python -m cam_testing.ranges check --module-array sys_module_array.json --parameters sys_parameters.csv
         lists each value as inside / outside the tested range and the validated spread, with
         the estimated failure risk near the values (from `make risk`)
 """
@@ -56,7 +56,7 @@ def validated_spread(component):
     def add(var, lo, hi):
         spans[var] = [min(spans[var][0], lo), max(spans[var][1], hi)] if var in spans else [lo, hi]
 
-    for inst in component.instances():
+    for inst in component.parameterisations():
         for test, kind in (('validation_test_baseline', 'baseline'), ('validation_test_calibrate', 'calibrate')):
             r = checks.load(component, test, inst)
             if r is None or r.status != checks.PASSED:
@@ -71,15 +71,16 @@ def validated_spread(component):
 
 
 def _module_index():
-    return version_index()
+    # a system model's records may name versions of the extra libraries too
+    return version_index(include_libraries=True)
 
 
-def check(vessel_array_path, parameters_path, out=sys.stdout):
+def check(module_array_path, parameters_path, out=sys.stdout):
     """Returns the number of values outside the tested range."""
     from cam_testing import risk
-    from cam_testing import vessel_array
+    from cam_testing import module_array
     vessels = [{'name': r['name'], 'vessel_type': r.get('module_type'), 'BC_type': r.get('module_subtype')}
-               for r in vessel_array.read_records(vessel_array_path)]
+               for r in module_array.read_records(module_array_path)]
     with open(parameters_path) as f:
         values = {r['variable_name'].strip(): r['value'].strip()
                   for r in csv.DictReader(f, skipinitialspace=True) if r.get('variable_name')}
@@ -138,10 +139,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest='cmd', required=True)
     ch = sub.add_parser('check', help="check a system model's parameters against module ranges")
-    ch.add_argument('--vessel-array', required=True)
+    ch.add_argument('--module-array', '--vessel-array', dest='module_array', required=True,
+                    help='the module array (--vessel-array is the old name of this option)')
     ch.add_argument('--parameters', required=True)
     args = parser.parse_args(argv)
-    return 1 if check(args.vessel_array, args.parameters) else 0
+    return 1 if check(args.module_array, args.parameters) else 0
 
 
 if __name__ == '__main__':

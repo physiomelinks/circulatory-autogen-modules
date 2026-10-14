@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="neurotransmitter_release_SN_varicosity_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="SN_NE_release">
+        <variable name="t" units="second" public_interface="in"/>
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="Cai_NE_base" public_interface="in" units="millimolar"/>
+        <variable name="NE" public_interface="out" units="millimolar" initial_value="NE_init"/>
+        <variable name="NE_init" public_interface="in" units="millimolar"/>
+        <variable name="k_NE" public_interface="in" units="per_s"/>
+        <variable name="k_NET" public_interface="in" units="per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>NE</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <ci>k_NE</ci>
+                        <apply>
+                            <max/>
+                            <apply>
+                                <minus/>
+                                <ci>Cai</ci>
+                                <ci>Cai_NE_base</ci>
+                            </apply>
+                            <cn cellml:units="millimolar">0</cn>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>k_NET</ci>
+                        <apply>
+                            <minus/>
+                            <ci>NE</ci>
+                            <ci>NE_init</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

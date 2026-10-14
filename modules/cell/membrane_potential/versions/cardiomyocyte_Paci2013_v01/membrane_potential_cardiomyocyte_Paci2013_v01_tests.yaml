@@ -1,0 +1,142 @@
+module_type: membrane_potential
+version: cardiomyocyte_Paci2013_v01
+reviewed: false
+notes: 'Membrane potential of the Paci 2013 hiPSC-CM: dVm/dt = -(sum of 12 ionic currents - i_stim), currents normalised by
+  capacitance (A/F). Alone, with the currents as constant inputs, the solution is exactly linear in time.
+
+
+  Ports of the versions of membrane_potential (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance i_stim: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [I_in]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  entrance membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [Vm]; SN_varicosity_Argus2026_v01
+  [V_in]
+
+  entrance stim_current: cardiomyocyte_Paci2013_v01 [i_stim]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_stim]; SN_varicosity_Argus2026_v01
+  -
+
+  exit A_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_A]; SN_varicosity_Argus2026_v01
+  -
+
+  exit CaL_current: cardiomyocyte_Paci2013_v01 [i_CaL]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Ca_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_Ca]; SN_varicosity_Argus2026_v01
+  -
+
+  exit K1_current: cardiomyocyte_Paci2013_v01 [i_K1]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit KCa_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_KCa]; SN_varicosity_Argus2026_v01
+  -
+
+  exit KV_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_KV]; SN_varicosity_Argus2026_v01
+  -
+
+  exit Kr_current: cardiomyocyte_Paci2013_v01 [i_Kr]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Ks_current: cardiomyocyte_Paci2013_v01 [i_Ks]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit NaCa_current: cardiomyocyte_Paci2013_v01 [i_NaCa]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit NaK_current: cardiomyocyte_Paci2013_v01 [i_NaK]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit Na_current: cardiomyocyte_Paci2013_v01 [i_Na]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 [i_Na]; SN_varicosity_Argus2026_v01
+  -
+
+  exit PCa_current: cardiomyocyte_Paci2013_v01 [i_PCa]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit VI_port: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [V, I_out]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit b_Ca_current: cardiomyocyte_Paci2013_v01 [i_b_Ca]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit b_Na_current: cardiomyocyte_Paci2013_v01 [i_b_Na]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit f_current: cardiomyocyte_Paci2013_v01 [i_f]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  exit membrane_voltage: cardiomyocyte_Paci2013_v01 [Vm]; SN_soma_Argus2026_v01 [V]; SN_Tao2011_v01 [Vm]; SN_varicosity_Argus2026_v01
+  [V]
+
+  exit to_current: cardiomyocyte_Paci2013_v01 [i_to]; SN_soma_Argus2026_v01 -; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general compartment_volume: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Vol]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  [Vol]
+
+  general membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  [A_mem]
+
+  general membrane_current: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [i_ion]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -
+
+  general shell_membrane_area: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [A_mem]; SN_Tao2011_v01 -; SN_varicosity_Argus2026_v01
+  -'
+reference_proposals:
+  i_CaL:
+    reference: definitional; i_CaL is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_K1:
+    reference: definitional; i_K1 is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_f:
+    reference: definitional; i_f is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_Na:
+    reference: definitional; i_Na is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_Kr:
+    reference: definitional; i_Kr is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_Ks:
+    reference: definitional; i_Ks is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_to:
+    reference: definitional; i_to is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_PCa:
+    reference: definitional; i_PCa is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_NaK:
+    reference: definitional; i_NaK is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_NaCa:
+    reference: definitional; i_NaCa is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_b_Ca:
+    reference: definitional; i_b_Ca is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_b_Na:
+    reference: definitional; i_b_Na is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_stim:
+    reference: definitional; i_stim is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  Vm_init:
+    reference: 'paci2013computational; initial membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Vm_init = -0.074334 V'
+    sourced: 'yes'
+    value: -0.0743340057623841
+review: reviews/cell_review.yaml

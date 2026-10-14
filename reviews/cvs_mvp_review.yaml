@@ -2,7 +2,7 @@ comment: '"mvp" is most likely "minimum viable product": B. Ghitti added it in J
   no literature source for the heart was found. The ventricular elastance x exp((1 - x^2)/2) is held flat from mt = 0.4 to
   0.6 and then drops discontinuously to Emin, which looks unintended. Units are litre/kPa, with an SI "_2" duplicate of every
   component. The SI heart cannot be generated: it shares its global constants (declared in litre/kPa) with the litre heart.
-  heart_simple_OLD references a type that does not exist. All 150 parameters were TODO: proposals are from Bozkurt2019 (adult),
+  heart_simple_OLD references a type that does not exist. All 150 parameters were TODO: proposals are from bozkurt2019mathematical (adult),
   but E_LVmin, E_RVmin, the unstressed vessel volume and the initial volumes are placeholders.'
 summary: 'Minimal closed-loop CVS building blocks in litre/kPa, each duplicated in SI: a 4-chamber varying-elastance heart
   with passive atria and diode valves, RC compartments without inertance (pv/vp/pp/vv), junction variants (Nout/Min/MinNout),
@@ -12,22 +12,22 @@ summary: 'Minimal closed-loop CVS building blocks in litre/kPa, each duplicated 
   with open BCs and are checked on port sums, P-V/Ohm laws and mass balance. The heart, alone with constant venous inflows
   and constant root pressures, is checked on diode valves, the exact elastance law recovered from u/(q - q_us), atrial P-V
   laws, whole-heart volume balance and the periodic state (ejection per beat = inflow per beat). Values are proposed from
-  Bozkurt2019 (heart, valves, a representative systemic-arteriole R and C) and Paeme2011 (total blood volume). The SI heart
+  bozkurt2019mathematical (heart, valves, a representative systemic-arteriole R and C) and paeme2011mathematical (total blood volume). The SI heart
   is recorded as an expected failure and heart_simple_OLD is skipped.'
 questions:
 - What is cvs_mvp for, and what is the source of the heart? The elastance E = (Emax - Emin) x exp((1 - x^2)/2) + Emin (x =
-  mt/To_pk) was not found in Bozkurt2019, Smith2004/Paeme2011, Safaei2018 or others checked. Please ask B. Ghitti, or give
+  mt/To_pk) was not found in bozkurt2019mathematical, Smith2004/paeme2011mathematical, safaei2018bond or others checked. Please ask B. Ghitti, or give
   a reference.
 - 'Elastance shape: E is held at its mt = 0.4 value (~0.96 Emax with To_pk = 0.33) until mt = 0.6, then drops discontinuously
   to Emin. Is the plateau-then-drop intended, or was a relaxation branch meant for 0.4-0.6?'
-- 'Confirm the Bozkurt2019 (adult) values: T 0.8 s, To_pk 0.33 (from T1 = 0.33 T, although Bozkurt uses a raised cosine),
+- 'Confirm the bozkurt2019mathematical (adult) values: T 0.8 s, To_pk 0.33 (from T1 = 0.33 T, although Bozkurt uses a raised cosine),
   LV/RV Ees 2.5/1 mmHg/mL, V0 15/40/5/5 mL, atrial E 0.2 mmHg/mL (Emin; atria are passive here), valve R 0.002/0.001 mmHg
   s/mL. E_LVmin, E_RVmin and all *_init volumes are placeholders.'
-- Generic vessel compartments are tested with Bozkurt2019 systemic-arteriole R and C (0.95 mmHg s/mL, 1.7 mL/mmHg), u_0 =
+- Generic vessel compartments are tested with bozkurt2019mathematical systemic-arteriole R and C (0.95 mmHg s/mL, 1.7 mL/mmHg), u_0 =
   0 and a placeholder unstressed volume of 0.1 L. Acceptable as test fixtures?
 - Every component exists twice (litre/kPa and SI "_2"). Keep both? If yes, the SI heart needs its own global names (see proposed_fixes).
 - delay and the output mta (atrial timing) are unused because the atria have constant elastance. Keep them?
-- 'Validation: pending. Candidate: an adult LV pressure-volume loop (e.g. Bozkurt2019 adult haemodynamics), once the heart
+- 'Validation: pending. Candidate: an adult LV pressure-volume loop (e.g. bozkurt2019mathematical adult haemodynamics), once the heart
   is in a closed loop with these compartments. Constant root pressures cannot give a physiological loop. Set this up as a
   system-level validation?'
 proposed_fixes:

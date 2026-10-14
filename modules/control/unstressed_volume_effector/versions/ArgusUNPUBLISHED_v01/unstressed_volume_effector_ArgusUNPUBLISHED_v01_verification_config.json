@@ -1,0 +1,52 @@
+{
+  "module_type": "unstressed_volume_effector",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 30.0,
+  "pre_time": 0.0,
+  "dt": 0.02,
+  "solver": "CVODE_myokit",
+  "outputs": ["Delta_Vusv", "sigma_Vusv"],
+  "run_parameters": {"f_esv": 6.0},
+  "invariants": [
+    {
+      "description": "static map sigma = G_Vusv ln(max(f_esv - f_es_min + 1, 1))",
+      "expr": "np.max(np.abs(sigma_Vusv - (np.where(f_esv >= f_es_min, G_Vusv*np.log(f_esv - f_es_min + 1), 0.0)))) <= 1e-9 * max(1.0, np.max(np.abs(sigma_Vusv)))"
+    },
+    {
+      "description": "Delta_Vusv matches the exact first-order step response sigma (1 - exp(-t/tau_Vusv))",
+      "expr": "np.max(np.abs(Delta_Vusv - (np.where(f_esv >= f_es_min, G_Vusv*np.log(f_esv - f_es_min + 1), 0.0)*(1 - np.exp(-t/tau_Vusv))))) <= 1e-4 * max(1.0, np.max(np.abs(Delta_Vusv)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_esv": {"min": 0.0, "max": 60.0, "points": 7},
+      "tau_Vusv": {"min": 1.0, "max": 30.0, "points": 4, "scale": "log"}
+    },
+    "rationale": "f_esv 0-60 Hz spans silent to maximal sympathetic firing (f_es,max = 60 Hz in Ursino 2000) and crosses f_es_min where the map switches; tau_Vusv 1-30 s covers the csv value and the Gee Simulink value; gain x0.5-x2."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "effector gain/time constant of a reflex arm; component-level response (e.g. peripheral resistance or unstressed volume change after a step in sympathetic firing) is not available as data here; validation belongs to the closed-loop model."
+      },
+      "calibrate": {
+        "note": "not_applicable: effector gain/time constant of a reflex arm; component-level response (e.g. peripheral resistance or unstressed volume change after a step in sympathetic firing) is not available as data here; validation belongs to the closed-loop model."
+      }
+    }
+  }
+}

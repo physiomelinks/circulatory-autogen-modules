@@ -1,0 +1,35 @@
+module_type: sympathetic_efferent
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Sympathetic efferent static maps (Gee 2023 eqs. S.49-S.51, Ursino 1998 form): f_esj = f_esinf + (f_es0 - f_esinf)
+  exp(-k_es f_asj). Algebraic; monotonically decreasing in f_asj, equal to f_es0 at zero drive and tending to f_esinf. (Ursino
+  2000''s f_es,max cap is not included.)'
+reference_proposals:
+  f_esinf:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.12: f_es,inf = 2.1 Hz (Simulink 2.1)'
+    sourced: 'yes'
+  f_es0:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.12: f_es,0 = 16.11 Hz (Simulink f_es0
+      - f_es,inf = 14.01)'
+    sourced: 'yes'
+  k_es:
+    reference: 'gee2023closed; Supplementary text (github v03 Model_documentation) Table S.12: k_es = 0.0675 s'
+    sourced: 'yes'
+  f_ash:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (sympathetic afferent
+      drive to heart)
+    sourced: 'no'
+    value: 20.0
+  f_asp:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (sympathetic afferent
+      drive to periphery)
+    sourced: 'no'
+    value: 25.0
+  f_asv:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (sympathetic afferent
+      drive to veins)
+    sourced: 'no'
+    value: 25.0
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="membrane_potential_SN_varicosity_Argus2026_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="SN_varicosity_membrane">
+        <variable name="V" public_interface="out" units="milliV"/>
+        <variable name="V_in" public_interface="in" units="milliV"/>
+        <variable name="d" public_interface="in" units="um"/>
+        <variable name="k_A" public_interface="in" units="dimensionless"/>
+        <variable name="k_V" public_interface="in" units="dimensionless"/>
+        <variable name="A_mem" public_interface="out" units="um2"/>
+        <variable name="Vol" public_interface="out" units="m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>V</ci>
+                <ci>V_in</ci>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>A_mem</ci><apply><times/><ci>k_A</ci><apply><power/><ci>d</ci><cn cellml:units="dimensionless">2.0</cn></apply></apply></apply>
+            <apply><eq/><ci>Vol</ci><apply><times/><ci>k_V</ci><apply><power/><ci>d</ci><cn cellml:units="dimensionless">3.0</cn></apply><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
+        </math>
+    </component>
+</model>

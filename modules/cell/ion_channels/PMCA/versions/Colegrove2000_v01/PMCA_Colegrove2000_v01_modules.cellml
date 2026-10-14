@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="PMCA_Colegrove2000_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="PMCA_Colegrove2000">
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_PMCA" public_interface="in" units="per_um2"/>
+        <variable name="r_PMCA" public_interface="in" units="per_s"/>
+        <variable name="K_PMCA" public_interface="in" units="millimolar"/>
+        <variable name="n_PMCA" public_interface="in" units="dimensionless"/>
+        <variable name="j_max_PMCA" public_interface="out" units="mol_per_s"/>
+        <variable name="j_PMCA" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>j_max_PMCA</ci><apply><divide/><apply><times/><ci>A_mem</ci><ci>rho_PMCA</ci><ci>r_PMCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
+            <apply><eq/><ci>j_PMCA</ci>
+                <apply><divide/>
+                    <apply><times/><apply><minus/><ci>j_max_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply>
+                    <apply><plus/><apply><power/><ci>K_PMCA</ci><ci>n_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

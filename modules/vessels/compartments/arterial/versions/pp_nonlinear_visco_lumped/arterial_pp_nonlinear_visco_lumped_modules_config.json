@@ -3,10 +3,18 @@
     "module_type": "arterial",
     "module_subtype": "pp_nonlinear_visco_lumped",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "arterial/pp_nonlinear_visco built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): I_p (inertance pp_geometric) -> R_p (resistance vp_nonlinear) -> C (compliance vv_nonlinear_geometric_visco) -> R_d (resistance pv_nonlinear) -> I_d (inertance pp_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "required_citations": [
+      "safaei2016roadmap",
+      "toro2022cerebrospinal"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "toro2022cerebrospinal"
+    ],
+    "description": "arterial/pp_nonlinear_visco built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): I_p (inertance pp_geometric) -> R_p (resistance vp_nonlinear) -> C (compliance vv_nonlinear_geometric_visco) -> R_d (resistance pv_nonlinear) -> I_d (inertance pp_geometric); V (vessel_volume geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
     "routes": {
       "inputs": {
         "vessel_port": "I_p",
@@ -67,7 +75,7 @@
         "name": "I_p",
         "module_type": "inertance",
         "module_subtype": "pp_geometric",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "R_p"
@@ -77,7 +85,7 @@
         "name": "R_p",
         "module_type": "resistance",
         "module_subtype": "vp_nonlinear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "I_p",
           "V"
@@ -90,7 +98,7 @@
         "name": "C",
         "module_type": "compliance",
         "module_subtype": "vv_nonlinear_geometric_visco",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "R_p"
         ],
@@ -103,7 +111,7 @@
         "name": "R_d",
         "module_type": "resistance",
         "module_subtype": "pv_nonlinear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "C",
           "V"
@@ -116,7 +124,7 @@
         "name": "I_d",
         "module_type": "inertance",
         "module_subtype": "pp_geometric",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "R_d"
         ],
@@ -125,8 +133,8 @@
       {
         "name": "V",
         "module_type": "vessel_volume",
-        "module_subtype": "nn_geometric",
-        "instance": "default",
+        "module_subtype": "geometric",
+        "parameterisation": "default",
         "inp_instances": [
           "C"
         ],

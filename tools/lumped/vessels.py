@@ -15,17 +15,19 @@ supermodule whose submodules are, in flow order,
 plus V (vessel_volume): the whole vessel's volume (and geometry), fed by every compliance, for
 hosts that read the vessel's volume or radius and for resistance laws that need the whole volume.
 
-Its default instance carries the monolithic default instance's values (TODOs filled with the
+Its default parameterisation carries the monolithic default parameterisation's values (TODOs filled with the
 representative values in FILL), and its spec says it reproduces the monolithic version
 (supermodule.equivalent_version, checked by cam_testing.supermodule).
 '''
 import copy
 import csv
 import os
+import shutil
 from dataclasses import dataclass, field
 
 from cam_testing.harness import VESSEL
 from cam_testing.library import MODULES_DIR, load_version, write_spec
+from cam_testing.phlynx import NO_SUPERMODULE_SUPPORT
 
 from .constitutive import ALL
 
@@ -104,7 +106,7 @@ class Sub:
 @dataclass
 class Layout:
     chain: list                                    # Subs in flow order (V excluded)
-    volume: str = 'nn'                             # vessel_volume version
+    volume: str = 'summed'                           # vessel_volume version
     outputs: dict = field(default_factory=dict)    # monolithic output -> '<sub>/<var>'
     bc_values: dict = field(default_factory=dict)  # open boundary condition -> value, beyond BC_VALUES
     notes: list = field(default_factory=list)
@@ -175,7 +177,7 @@ def lumped_rci(bc, M, comp='vv_linear', r_law='linear', i_law='linear', geometri
         # difference of near-equal numbers; its total volume is compared instead
         out = {k: v for k, v in out.items() if not k.startswith(state)}
         out['q'] = 'V/q'
-    return Layout(_fit(chain), volume='nn_geometric' if geometric else 'nn', outputs=out)
+    return Layout(_fit(chain), volume='geometric' if geometric else 'summed', outputs=out)
 
 
 def lumped_noI(bc, M, comp='vv_linear_novisco', r_law='linear', geometric=False, q_state='q', cpar=None, rpar=None):
@@ -208,7 +210,7 @@ def lumped_noI(bc, M, comp='vv_linear_novisco', r_law='linear', geometric=False,
         out['q'] = 'V/q'
     elif q_state == 'q_C':
         out.update({'q_C': 'C/q_C'} if 'C' in [s.name for s in chain] else {})
-    return Layout(_fit(chain), volume='nn_geometric' if geometric else 'nn', outputs=out)
+    return Layout(_fit(chain), volume='geometric' if geometric else 'summed', outputs=out)
 
 
 def _q_init(M, q0_name):
@@ -235,7 +237,7 @@ def micro_noI(bc):
         layout = lumped_noI(bc, M, comp='vv_linear_geometric_novisco', r_law='geometric', geometric=True,
                             q_state='q_C')
         if bc == 'pp' and 'u_0' in M:
-            # the instance's u_in and u_out sit either side of u_0, which starts the vessel at its
+            # the parameterisation's u_in and u_out sit either side of u_0, which starts the vessel at its
             # equilibrium (nothing moves); drive it off it
             layout.bc_values['u_out'] = M['u_0'] - 2000
         return layout
@@ -326,7 +328,7 @@ def _terminal_c(M, comp='vv_linear', **extra):
 
 
 def terminal_pp(r1, r2, i1, i2, comp='vv_linear', law='linear', r_extra=None, notes=()):
-    '''I_p -> R_p(vp) -> C -> R_d(pv) -> I_d, values given as functions of the instance.'''
+    '''I_p -> R_p(vp) -> C -> R_d(pv) -> I_d, values given as functions of the parameterisation.'''
     def build(M):
         rx = r_extra(M) if r_extra else ({}, {})
         chain = [I('I_p', 'pp_linear', **i1(M)), R('R_p', f'vp_{law}', **r1(M), **rx[0]), _terminal_c(M, comp),
@@ -385,7 +387,7 @@ def _terminal2_pp(M):
     layout.outputs = {'u': 'C/u', 'v': 'I_p/v', 'v_T': 'I_d/v', 'q_T': 'C/q_C'}
     layout.bc_values['u_out'] = 0
     layout.notes.append('the monolithic version fixes u_out = 0 and I_T = 1: the supermodule\'s u_out and I '
-                        'parameters, set so in its default instance')
+                        'parameters, set so in its default parameterisation')
     return layout
 
 
@@ -426,11 +428,11 @@ FAMILIES = {
     ('venous_novisco', 'vp'): controlled('vv_linear_controlled_novisco'),
     ('venous_novisco', 'vp_woCont'): rci('vp', comp='vv_linear_novisco'),
     ('venous_Rctl', 'vp_woCont'): venous_Rctl,
-    **{(t, bc): simple_noI(bc[:2]) for t in ('simple', 'simple_2') for bc in ('vp_noI', 'pv_noI', 'vv_noI', 'pp_noI')},
+    **{('simple', bc + si): simple_noI(bc[:2]) for si in ('', '_SI') for bc in ('vp_noI', 'pv_noI', 'vv_noI', 'pp_noI')},
     ('resistor', 'pp'): resistor,
     ('terminal', 'pp'): terminal_pp(_half('R_T'), _half('R_T'), lambda M: {'I': 1}, lambda M: {'I': 1},
                                     notes=['the monolithic version fixes I_T = 1: the inertances\' I, set so in the '
-                                           'default instance']),
+                                           'default parameterisation']),
     ('terminal', 'pp_spec_I'): terminal_pp(_half('R_T'), _half('R_T'), _whole('I_T', 'I'), _whole('I_T', 'I')),
     ('terminal', 'pp_I'): terminal_pp(_whole('R_1_T'), _whole('R_2_T'), _whole('I_T', 'I'), _whole('I_T', 'I')),
     ('terminal', 'pp_R1ICR2I'): terminal_pp(_whole('R_T1'), _whole('R_T2'), _whole('I_T1', 'I'), _whole('I_T2', 'I'),
@@ -455,8 +457,9 @@ FAMILIES = {
     ('single_terminal', 'vp_ZCIR_wCont'): _zcir,
 }
 
-PHLYNX_NO_SUPERMODULES = ('PhLynx has no supermodule support yet: it builds models from CellML module configs only '
-                          '(see modules/README.md, "Lumped vessels", for what it needs)')
+# the PhLynx export's known issue for every supermodule (see modules/README.md, "Lumped vessels", for what
+# PhLynx needs)
+PHLYNX_NO_SUPERMODULES = NO_SUPERMODULE_SUPPORT
 
 # vessels that do not split into R, C and I
 NOT_SPLIT = {
@@ -472,7 +475,7 @@ NOT_SPLIT = {
 # ---- building a supermodule version ------------------------------------------------------------
 
 def mono_values(version):
-    '''The monolithic default instance's values, TODOs filled from FILL (by name).'''
+    '''The monolithic default parameterisation's values, TODOs filled from FILL (by name).'''
     values = {}
     for p in version.parameters():
         v = p.value
@@ -484,7 +487,7 @@ def mono_values(version):
             else:
                 continue
         values[p.variable_name] = Expr(float(v), p.variable_name)
-    # constants and globals of the config that the instance has no row for
+    # constants and globals of the config that the parameterisation has no row for
     for name, _units, _access, kind in (version.config.get('variables_and_units') or []):
         if name not in values and kind in ('constant', 'global_constant') and name in FILL:
             values[name] = Expr(FILL[name], name)
@@ -507,7 +510,7 @@ def all_subs(layout):
     subs = list(layout.chain)
     if layout.volume and any(s.module_type == 'compliance' for s in layout.chain):
         geometry = {}
-        if layout.volume == 'nn_geometric':
+        if layout.volume == 'geometric':
             # the vessel's r_0 and l, as its compliances have them
             for s in layout.chain:
                 geometry.update({k: s.params[k] for k in ('r_0', 'l') if k in s.params and k not in geometry})
@@ -566,9 +569,9 @@ def routes(layout, mono_config, outputs=None):
     return {k: v for k, v in result.items() if v}, dropped
 
 
-def instance_rows(layout, mono_rows, bc_values, M):
-    '''The supermodule's default instance, from the submodules' parameters and the open boundary
-    conditions (the monolithic instance's value where it has one, else a test value):
+def parameterisation_rows(layout, mono_rows, bc_values, M):
+    '''The supermodule's default parameterisation, from the submodules' parameters and the open boundary
+    conditions (the monolithic parameterisation's value where it has one, else a test value):
 
     - a value that is a monolithic parameter (an Expr with a name) is a shared parameter under
       that name, setting its variable in each submodule that takes it from there: the supermodule
@@ -651,7 +654,8 @@ def _ref(var, mono_rows, boundary=False):
     return 'lumped split of the monolithic version (tools/lumped/vessels.py)'
 
 
-def supermodule_entry(module_type, version, layout, mono_config, description, template=False, outputs=None):
+def supermodule_entry(module_type, version, layout, mono_config, description, template=False, outputs=None,
+                      cited=None):
     subs = all_subs(layout)
     conns = edges(layout)
     records = []
@@ -661,13 +665,14 @@ def supermodule_entry(module_type, version, layout, mono_config, description, te
             rec['choices'] = choices(s)
         else:
             rec['module_subtype'] = s.version
-            rec['instance'] = 'default'
+            rec['parameterisation'] = 'default'
         rec['inp_instances'] = [a for a, b in conns if b == s.name]
         rec['out_instances'] = [b for a, b in conns if a == s.name]
         records.append(rec)
     route, dropped = routes(layout, mono_config, outputs)
     entry = {'module_type': module_type, 'module_subtype': version, 'module_format': 'supermodule',
-             'default_instance': 'default', 'licence': 'CC0-1.0', 'creator': [], 'description': description}
+             'default_parameterisation': 'default', 'licence': 'CC0-1.0', 'creator': [], **(cited or {}),
+             'description': description}
     if template:
         entry['template'] = True
     entry.update({'routes': route, 'submodules': records})
@@ -695,25 +700,25 @@ def _description(mono, layout):
 
 
 def write_vessel(mono, layout, units_library, bib):
-    from .write import fresh_version_dir, write_instance, write_json, GENERATED_NOTE
+    from .write import citations, fresh_version_dir, write_parameterisation, write_json, GENERATED_NOTE
     module_dir = os.path.dirname(os.path.dirname(mono.dir))
     name = f'{mono.BC_type}_lumped'
     vdir = fresh_version_dir(module_dir, name)
     stem = f'{mono.vessel_type}_{name}'
     M = mono_values(mono)
     mono_rows = _mono_rows(mono)
-    rows, shared, globals_, computed = instance_rows(layout, mono_rows, layout.bc_values, M)
+    rows, shared, globals_, computed = parameterisation_rows(layout, mono_rows, layout.bc_values, M)
     entry, dropped = supermodule_entry(mono.vessel_type, name, layout, mono.config, _description(mono, layout),
-                                       outputs=output_map(mono, layout))
+                                       outputs=output_map(mono, layout), cited=citations(mono.config_path))
     if shared:
         entry['shared_parameters'] = shared
-    # the monolithic version's outputs, under the instance's own name (aortic_root/u)
+    # the monolithic version's outputs, under the vessel's own name in a model (aortic_root/u)
     entry['outputs'] = output_map(mono, layout)
     entry['replaces'] = {'module_subtype': mono.BC_type, 'parameters': computed}
     # keep key order: shared_parameters and replaces before submodules
     entry = {k: entry[k] for k in [k for k in entry if k != 'submodules'] + ['submodules']}
     write_json(os.path.join(vdir, f'{stem}_modules_config.json'), [entry])
-    write_instance(vdir, rows)
+    write_parameterisation(vdir, rows)
     mono_bcs = [v[0] for v in mono.config.get('variables_and_units') or [] if v[3] == 'boundary_condition']
     mono_params = dict(M)
     for b in mono_bcs:
@@ -737,8 +742,8 @@ def write_vessel(mono, layout, units_library, bib):
             'solver_info': {'rtol': 1e-10, 'atol': 1e-20}}},
     }
     write_spec(vdir, stem, spec)
-    with open(os.path.join(vdir, f'{stem}_references.bib'), 'w') as f:
-        f.write(bib)
+    # the monolithic version's references: the supermodule is the same model
+    shutil.copyfile(os.path.join(mono.dir, f'{mono.stem}_references.bib'), os.path.join(vdir, f'{stem}_references.bib'))
     return vdir
 
 
@@ -800,20 +805,22 @@ _TEMPLATE_PORTS = {
 
 
 def write_templates(units_library, bib):
-    from .write import fresh_version_dir, write_instance, write_json, GENERATED_NOTE
+    from .write import fresh_version_dir, source_citations, write_parameterisation, write_json, GENERATED_NOTE
     for name, (chain, what) in TEMPLATES.items():
         layout = Layout(copy.deepcopy(chain))
         vdir = fresh_version_dir(TEMPLATE_DIR, name)
         stem = f'lumped_vessel_{name}'
         description = (f'Empty lumped vessel ({what}): drag it in, then choose a version for each submodule. '
                        'Each slot names the module_type that fits it and the versions that fit its place '
-                       '(choices). V (vessel_volume) gathers the compliances\' volumes; choose nn_geometric for a '
+                       '(choices). V (vessel_volume) gathers the compliances\' volumes; choose geometric for a '
                        'vessel with material-property modules or a nonlinear resistance.')
-        entry, _ = supermodule_entry('lumped_vessel', name, layout, _TEMPLATE_PORTS, description, template=True)
+        entry, _ = supermodule_entry('lumped_vessel', name, layout, _TEMPLATE_PORTS, description, template=True,
+                                     cited=source_citations())
         write_json(os.path.join(vdir, f'{stem}_modules_config.json'), [entry])
-        write_instance(vdir, [])
+        write_parameterisation(vdir, [])
         write_spec(vdir, stem, {'module_type': 'lumped_vessel', 'version': name, 'reviewed': False,
                                 'description': description, 'notes': GENERATED_NOTE,
+                                'expected_failures': {'phlynx_export_test': PHLYNX_NO_SUPERMODULES},
                                 'skip': 'a template: it has no version for its submodules until one is chosen'})
         with open(os.path.join(vdir, f'{stem}_references.bib'), 'w') as f:
             f.write(bib)

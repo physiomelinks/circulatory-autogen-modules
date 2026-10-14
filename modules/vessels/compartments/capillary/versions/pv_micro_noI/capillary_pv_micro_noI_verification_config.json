@@ -8,17 +8,12 @@
   "solver_info": {"rtol": 1e-08, "atol": 1e-24, "MaximumStep": 0.0003125},
   "outputs": ["u", "v", "q_C", "q_0", "q", "R", "C", "u_C", "du_C_dt"],
   "harness": {
-    "vessel_array": [
+    "module_array": [
       ["mod", "pv_micro_noI", "capillary", "", "vout", "default"],
-      ["vout", "nn_constant", "outlet_flow", "mod", "", "default"]
+      ["vout", "constant", "outlet_flow", "mod", "", "default"]
     ],
     "parameters": [
-      [
-        "v_vout",
-        "m3_per_s",
-        7.54e-14,
-        "harness: outflow from the summing v_out port"
-      ],
+      ["v_vout", "m3_per_s", 7.54e-14, "harness: outflow from the summing v_out port"],
       ["P_vout", "J_per_m3", 0, "unused"]
     ]
   },
@@ -82,10 +77,10 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "candidate: Williams1988 human nailfold capillary pressures (arteriolar limb 37.7, apex 19.4, venular limb 14.6 mmHg, steady mean values): a pp/vp capillary between fixed arteriolar- and venular-limb pressures should give the apex pressure; not set up because a single steady value only checks (u_in + u_out)/2 and needs the owner to agree it is a meaningful baseline"
+        "reason": "candidate: williams1988dynamic human nailfold capillary pressures (arteriolar limb 37.7, apex 19.4, venular limb 14.6 mmHg, steady mean values): a pp/vp capillary between fixed arteriolar- and venular-limb pressures should give the apex pressure; not set up because a single steady value only checks (u_in + u_out)/2 and needs the owner to agree it is a meaningful baseline"
       },
       "calibrate": {
-        "note": "pending: candidate: Williams1988 human nailfold capillary pressures (arteriolar limb 37.7, apex 19.4, venular limb 14.6 mmHg, steady mean values): a pp/vp capillary between fixed arteriolar- and venular-limb pressures should give the apex pressure; not set up because a single steady value only checks (u_in + u_out)/2 and needs the owner to agree it is a meaningful baseline"
+        "note": "pending: candidate: williams1988dynamic human nailfold capillary pressures (arteriolar limb 37.7, apex 19.4, venular limb 14.6 mmHg, steady mean values): a pp/vp capillary between fixed arteriolar- and venular-limb pressures should give the apex pressure; not set up because a single steady value only checks (u_in + u_out)/2 and needs the owner to agree it is a meaningful baseline"
       }
     }
   }

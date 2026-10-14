@@ -3,10 +3,18 @@
     "module_type": "venous",
     "module_subtype": "vp_nonlinear_lumped",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "venous/vp_nonlinear built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_nonlinear_geometric) -> R (resistance pv_nonlinear) -> I (inertance pp_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "required_citations": [
+      "safaei2016roadmap",
+      "toro2022cerebrospinal"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "toro2022cerebrospinal"
+    ],
+    "description": "venous/vp_nonlinear built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C (compliance vv_nonlinear_geometric) -> R (resistance pv_nonlinear) -> I (inertance pp_geometric); V (vessel_volume geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
     "routes": {
       "inputs": {
         "vessel_port": "C",
@@ -62,7 +70,7 @@
         "name": "C",
         "module_type": "compliance",
         "module_subtype": "vv_nonlinear_geometric",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "R",
@@ -73,7 +81,7 @@
         "name": "R",
         "module_type": "resistance",
         "module_subtype": "pv_nonlinear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "C",
           "V"
@@ -86,7 +94,7 @@
         "name": "I",
         "module_type": "inertance",
         "module_subtype": "pp_geometric",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "R"
         ],
@@ -95,8 +103,8 @@
       {
         "name": "V",
         "module_type": "vessel_volume",
-        "module_subtype": "nn_geometric",
-        "instance": "default",
+        "module_subtype": "geometric",
+        "parameterisation": "default",
         "inp_instances": [
           "C"
         ],

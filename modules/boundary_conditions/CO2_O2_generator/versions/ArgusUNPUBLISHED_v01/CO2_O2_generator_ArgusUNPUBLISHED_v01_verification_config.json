@@ -1,0 +1,66 @@
+{
+  "module_type": "CO2_O2_generator",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 60.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-12},
+  "outputs": ["C_O2_a", "C_CO2_a", "dot_C_CO2_a"],
+  "run_parameters": {"C_O2_multiplier": 0.8, "C_CO2_multiplier": 1.1},
+  "invariants": [
+    {
+      "description": "C_O2_a is exactly C_O2_a0, multiplied by C_O2_multiplier inside [t_start_C_O2, t_end_C_O2]",
+      "expr": "np.max(np.abs(C_O2_a - np.where((t < t_start_C_O2) | (t > t_end_C_O2), C_O2_a0, C_O2_a0*C_O2_multiplier))) <= 1e-12"
+    },
+    {
+      "description": "C_CO2_a is exactly C_CO2_a0, multiplied by C_CO2_multiplier inside [t_start_C_CO2, t_end_C_CO2]",
+      "expr": "np.max(np.abs(C_CO2_a - np.where((t < t_start_C_CO2) | (t > t_end_C_CO2), C_CO2_a0, C_CO2_a0*C_CO2_multiplier))) <= 1e-12"
+    },
+    {
+      "description": "dot_C_CO2_a is identically zero (as written; see review: it ignores the step in C_CO2_a)",
+      "expr": "np.all(dot_C_CO2_a == 0)"
+    },
+    {
+      "description": "contents are non-negative volume fractions below 1 (mL gas per mL blood)",
+      "expr": "np.all((C_O2_a >= 0) & (C_O2_a < 1) & (C_CO2_a >= 0) & (C_CO2_a < 1))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "C_O2_a0": {"min": 0.1, "max": 0.22, "points": 3},
+      "C_CO2_a0": {"min": 0.4, "max": 0.6, "points": 3},
+      "C_O2_multiplier": {"min": 0.5, "max": 1.1, "points": 3},
+      "C_CO2_multiplier": {"min": 0.8, "max": 1.3, "points": 3},
+      "t_start_C_O2": [0.0, 30.0],
+      "t_end_C_O2": [30.0, 60.0],
+      "t_start_C_CO2": [0.0, 30.0],
+      "t_end_C_CO2": [30.0, 60.0]
+    },
+    "rationale": "Arterial O2 contents from severe hypoxaemia to normal (0.10-0.22 mL/mL), CO2 contents 0.40-0.60 mL/mL (hypo- to hypercapnia); multipliers from strong hypoxia (×0.5) to mild hyperoxia, and ×0.8-1.3 for CO2; step windows anywhere in the 60 s run. Multiplied values stay below 1 (volume fraction)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "prescribed input (arterial gas contents); its values are sourced constants. Validation belongs to the chemoreceptor model it drives."
+      },
+      "calibrate": {
+        "note": "not_applicable: prescribed input (arterial gas contents); its values are sourced constants. Validation belongs to the chemoreceptor model it drives."
+      }
+    }
+  }
+}

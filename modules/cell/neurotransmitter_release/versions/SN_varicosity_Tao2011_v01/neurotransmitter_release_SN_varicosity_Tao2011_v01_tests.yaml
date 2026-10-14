@@ -1,0 +1,46 @@
+module_type: neurotransmitter_release
+version: SN_varicosity_Tao2011_v01
+reviewed: true
+description: 'Tao et al. 2011 Ca-triggered NE release at a sympathetic varicosity: Ca entry from i_Ca into an active-zone volume
+  V_Z with clearance K_Ca (Eq. 2), the five-site Ca-binding scheme for vesicle fusion of Schneggenburger & Neher 2000 (Document
+  S1 Eqs. 108-114, fusion rate E = gamma V_5Ca), and NE in the cleft from n vesicles of a molecules each, cleared by NET at
+  P_up (Eq. 3). Not used by the sympathetic neuron, which uses SN_NE_release.'
+notes: 'Reviewed 2026-10-06 (fix + fill + trace). Equation fixes: (1) dV_1Ca/dt lost K_off b V_1Ca, but Document S1 Eq. 109
+  has K_off b^0 = K_off and Eq. 108 gains K_off V_1Ca, so the vesicle number was not conserved; now K_off. (2) dV_4Ca/dt keeps
+  the gain term 5 K_off b^4 V_5Ca: Eq. 112 prints V_2Ca, a typo in Document S1 (V_5Ca matches the loss term of Eq. 113 and
+  conserves the vesicle number), as the owner''s 2023 CellML comment says ("I think the above V_2Ca should be V_5Ca... error
+  in supp material of Tao 2011?", circulatory_autogen 4753f825, 2023-11-24). As printed (Eq. 113), fusion does not deplete
+  V_5Ca: E = gamma V_5Ca is a rate, the releasable pool is not used up. Units (generation failed on the undefined units C_per_M,
+  M_per_m3 and m3_per_M_millis): the vesicle states are fractions of the n releasable vesicles (dimensionless, were J_per_M),
+  V_Ca starts at 1 (all states started at 0, so nothing could bind); Cai (active-zone Ca, Tao''s Ca_Z) and NE are in millimolar,
+  as the internal_Ca and NE_release ports of the other modules (SN_NE_release); K_on per_millimolar_s, K_off, gamma, E, P_up
+  per_s, F C_per_mol. The Ca equation was dCai/dt = -i_Ca/(2 F V_Z 1e-6) - K_Ca Cai, 1e12 too large for i_Ca in nA and V_Z
+  in L; it is now -i_Ca 1e-9 A/nA 1e3 mmol/mol/(2 F V_Z) - K_Ca Cai. Tao''s Eq. 2 multiplies i_Ca by Cm (his i_Ca is normalised
+  to capacitance); here i_Ca is absolute, so C_m (240 pF) is a declared parameter that the equations do not use. The NE equation
+  divides E n a/V_cleft by Avogadro''s number (and 1e3 mmol/mol) for mM. Parameters: Document S1 p. 8 Table (Neuron, Cleft)
+  and main text p. 596 (n, a), cross-checked with the owner''s 2024 values (CA_user 71ffd8d). K_Ca is not given anywhere in
+  Tao 2011 (main text, Document S1) or in the owner''s history; it stays TODO and the tests use the review proposal 1000 /s
+  (1 ms clearance). With these values the run (i_Ca = -0.002 nA) gives a ~0.1 mM active-zone Ca plateau and a cleft NE of
+  ~30 nM; P_up = 1e7 /s (as printed) makes NE quasi-steady and the module stiff for fixed-step solvers.
+
+
+  Ports of the versions of neurotransmitter_release (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance Ca_current: SN_varicosity_Argus2026_v01 -; SN_varicosity_Tao2011_v01 [i_Ca]
+
+  entrance internal_Ca: SN_varicosity_Argus2026_v01 -; SN_varicosity_Tao2011_v01 [Cai]
+
+  exit NE_release: SN_varicosity_Argus2026_v01 -; SN_varicosity_Tao2011_v01 [NE]
+
+  exit synaptic_NE: SN_varicosity_Argus2026_v01 [NE]; SN_varicosity_Tao2011_v01 -
+
+  general internal_Ca: SN_varicosity_Argus2026_v01 [Cai]; SN_varicosity_Tao2011_v01 -'
+reference_proposals:
+  K_Ca:
+    reference: unreferenced_placeholder; Ca clearance rate K[Ca] of Tao 2011 Eq. 2 is not given numerically in the paper or
+      supplement; 1000 /s (1 ms clearance) as an order of magnitude
+    sourced: 'no'
+    value: 1000.0
+review: reviews/cell_review.yaml
+review_scope: The review of the whole neurons module (11 entries) before the move to versions; only the parts about this version
+  apply.

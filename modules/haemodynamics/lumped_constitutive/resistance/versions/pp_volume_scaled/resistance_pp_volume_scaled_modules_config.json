@@ -5,9 +5,17 @@
     "module_format": "cellml",
     "component_file": "resistance_pp_volume_scaled_modules.cellml",
     "component_type": "resistance_pp_volume_scaled",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
     "description": "Resistance in flow form, for a vessel without inertance: v = (u_in - u_out)/(f R); R (q_ref/q_total)^2, q_total the whole vessel's volume (total_volume_port, from vessel_volume).",
     "entrance_ports": [
       {

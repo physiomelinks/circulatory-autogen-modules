@@ -3,10 +3,18 @@
     "module_type": "capillary",
     "module_subtype": "vv_micro_lumped",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "capillary/vv_micro built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C_p (compliance vv_linear) -> R (resistance pv_linear) -> I (inertance pp_linear) -> C_d (compliance vv_linear); V (vessel_volume nn) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "description": "capillary/vv_micro built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): C_p (compliance vv_linear) -> R (resistance pv_linear) -> I (inertance pp_linear) -> C_d (compliance vv_linear); V (vessel_volume summed) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
     "routes": {
       "inputs": {
         "vessel_port": "C_p"
@@ -53,7 +61,7 @@
         "name": "C_p",
         "module_type": "compliance",
         "module_subtype": "vv_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "R",
@@ -64,7 +72,7 @@
         "name": "R",
         "module_type": "resistance",
         "module_subtype": "pv_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "C_p"
         ],
@@ -76,7 +84,7 @@
         "name": "I",
         "module_type": "inertance",
         "module_subtype": "pp_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "R"
         ],
@@ -88,7 +96,7 @@
         "name": "C_d",
         "module_type": "compliance",
         "module_subtype": "vv_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "I"
         ],
@@ -99,8 +107,8 @@
       {
         "name": "V",
         "module_type": "vessel_volume",
-        "module_subtype": "nn",
-        "instance": "default",
+        "module_subtype": "summed",
+        "parameterisation": "default",
         "inp_instances": [
           "C_p",
           "C_d"

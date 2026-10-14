@@ -1,0 +1,50 @@
+{
+  "module_type": "membrane_potential",
+  "version": "SN_soma_Argus2026_v01",
+  "sim_time": 0.1,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {"rtol": 1e-08, "atol": 1e-10},
+  "outputs": ["V", "V_sensed", "I_in_delayed", "Cm", "A_mem", "Vol"],
+  "run_parameters": {"I_in": 0.05},
+  "invariants": [
+    {
+      "description": "charge balance with no channels or axon connected: Cm (V - V0) + C_sensed (V_sensed - V_sensed0) = +1e6 I_in t (pF mV = 1e-15 C, nA s = 1e-9 C)",
+      "expr": "np.max(np.abs(Cm*(V - V[0]) + C_sensed*(V_sensed - V_sensed[0]) - 1e6*I_in*t)) <= 1e-6*max(1e-12, np.max(np.abs(1e6*I_in*t)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "d": {
+        "values": [19.275732104070492, 22.065205075171992, 24.285900630052804, 27.80041634445638, 30.59831741945869]
+      }
+    },
+    "rationale": "Constants by factors 0.5-2; the diameter d by the cube roots of those factors, so the volume k_V d^3 spans 0.5-2 of its value (as Vol did) and the area k_A d^2 0.63-1.59; k_A and c_m scale Cm by 0.5-2 (as Cm did)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [2e-06, 1e-06, 5e-07, 2.5e-07],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: a part of the SN_simple sympathetic neuron, whose values are the owner's hand-tuned SN_simple values; validation belongs to the assembled neuron (SN_soma / sympathetic_neuron supermodule)."
+      }
+    }
+  }
+}

@@ -12,7 +12,7 @@ channels of poiseuille_transport volumes and faces between an inlet and an outle
 
 The channel is N cells of length dx; face k joins cell k-1 to cell k (face 0 joins the inlet reservoir
 to cell 0, face N cell N-1 to the outlet), with d_up = d_down = dx/2 inside and 0 on the reservoir side.
-Rewrites the vessel array and parameters, and writes the spec only if there isn't one.
+Rewrites the module array and parameters, and writes the spec only if there isn't one.
 
     python tools/build_poiseuille_examples.py
 """
@@ -152,7 +152,7 @@ def write(model, case):
                    [f'K_shape_f{k}', 'dimensionless', K_SQUARE, 'square duct Poiseuille factor (series solution)'],
                    [f'k_TA_f{k}', 'dimensionless', 0, 'no Taylor-Aris dispersion (exact 1D solution)']]
     rows.append(['outlet', 'nn', 'poiseuille_transport_outlet', f'f{N}', ''])
-    with open(os.path.join(d, f'{model}_vessel_array.csv'), 'w', newline='') as f:
+    with open(os.path.join(d, f'{model}_module_array.csv'), 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
         w.writerows(rows)

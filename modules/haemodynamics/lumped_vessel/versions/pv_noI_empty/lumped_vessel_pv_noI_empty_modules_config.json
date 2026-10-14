@@ -3,10 +3,18 @@
     "module_type": "lumped_vessel",
     "module_subtype": "pv_noI_empty",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "Empty lumped vessel (resistance then compliance, no inertance): drag it in, then choose a version for each submodule. Each slot names the module_type that fits it and the versions that fit its place (choices). V (vessel_volume) gathers the compliances' volumes; choose nn_geometric for a vessel with material-property modules or a nonlinear resistance.",
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "description": "Empty lumped vessel (resistance then compliance, no inertance): drag it in, then choose a version for each submodule. Each slot names the module_type that fits it and the versions that fit its place (choices). V (vessel_volume) gathers the compliances' volumes; choose geometric for a vessel with material-property modules or a nonlinear resistance.",
     "template": true,
     "routes": {
       "inputs": {
@@ -66,8 +74,8 @@
         "name": "V",
         "module_type": "vessel_volume",
         "choices": [
-          "nn",
-          "nn_geometric"
+          "geometric",
+          "summed"
         ],
         "inp_instances": [
           "C"

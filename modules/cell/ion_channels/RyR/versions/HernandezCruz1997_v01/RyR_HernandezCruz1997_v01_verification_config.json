@@ -1,0 +1,158 @@
+{
+  "module_type": "RyR",
+  "version": "HernandezCruz1997_v01",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-08,
+    "atol": 1e-10
+  },
+  "outputs": [
+    "a_RyR",
+    "i_RyR",
+    "l_RyR",
+    "a_RyR_inf",
+    "i_RyR_inf",
+    "l_RyR_inf",
+    "P_RyR",
+    "j_RyR",
+    "k_RyR",
+    "phi_RyR",
+    "a_RyR_init",
+    "i_RyR_init",
+    "l_RyR_init"
+  ],
+  "run_parameters": {
+    "Cai": 0.001,
+    "Ca_ER": 0.6
+  },
+  "invariants": [
+    {
+      "description": "every site occupancy stays in [0, 1], and so does the open fraction P_RyR",
+      "expr": "np.all((a_RyR >= -1e-9) & (a_RyR <= 1 + 1e-9)) & np.all((i_RyR >= -1e-9) & (i_RyR <= 1 + 1e-9)) & np.all((l_RyR >= -1e-9) & (l_RyR <= 1 + 1e-9)) & np.all((P_RyR >= -1e-9) & (P_RyR <= 1 + 1e-9))"
+    },
+    {
+      "description": "Eq. A12 and A11: P_RyR = a (1 - i) l^N and j_RyR = k_RyR P_RyR (Ca_ER - Cai)",
+      "expr": "(np.max(np.abs(P_RyR - a_RyR*(1 - i_RyR)*l_RyR**N_l_RyR)) <= 1e-12) & (np.max(np.abs(j_RyR - k_RyR*P_RyR*(Ca_ER - Cai))) <= 1e-12*max(1e-30, np.max(np.abs(j_RyR))))"
+    },
+    {
+      "description": "k_RyR = A_ER rho_RyR k_RyR_single 1e-18 m3/um3 (density x per-channel flux coefficient)",
+      "expr": "np.max(np.abs(k_RyR - A_ER*rho_RyR*k_RyR_single*1e-18)) <= 1e-12*A_ER*rho_RyR*k_RyR_single*1e-18"
+    },
+    {
+      "description": "steady-state occupancies are the mass-action values kon C/(kon C + koff) (the Kds koff/kon: activating 200 uM at rest, inactivating 0.63 uM, luminal 130 uM)",
+      "expr": "(np.max(np.abs(a_RyR_inf - kon_a_RyR*Cai/(kon_a_RyR*Cai + koff_a_RyR))) <= 1e-12) & (np.max(np.abs(i_RyR_inf - kon_i_RyR*Cai/(kon_i_RyR*Cai + koff_i_RyR))) <= 1e-12) & (np.max(np.abs(l_RyR_inf - kon_l_RyR*Ca_ER/(kon_l_RyR*Ca_ER + koff_l_RyR))) <= 1e-12)"
+    },
+    {
+      "description": "the starting occupancies are the steady state at the starting Ca: a_RyR_init = kon_a Cai_init/(kon_a Cai_init + koff_a), i_RyR_init likewise, l_RyR_init = kon_l Ca_ER_init/(kon_l Ca_ER_init + koff_l)",
+      "expr": "(np.max(np.abs(a_RyR_init - kon_a_RyR*Cai_init/(kon_a_RyR*Cai_init + koff_a_RyR))) <= 1e-12) & (np.max(np.abs(i_RyR_init - kon_i_RyR*Cai_init/(kon_i_RyR*Cai_init + koff_i_RyR))) <= 1e-12) & (np.max(np.abs(l_RyR_init - kon_l_RyR*Ca_ER_init/(kon_l_RyR*Ca_ER_init + koff_l_RyR))) <= 1e-12)"
+    },
+    {
+      "description": "each site state starts at its computed starting occupancy (run test only: in a parameter sweep the simulation keeps the starting state computed at the default parameters, see known_issues)",
+      "expr": "(abs(a_RyR[0] - a_RyR_init[0]) <= 1e-12) & (abs(i_RyR[0] - i_RyR_init[0]) <= 1e-12) & (abs(l_RyR[0] - l_RyR_init[0]) <= 1e-12)",
+      "applies": "run"
+    },
+    {
+      "description": "with Cai fixed, a_RyR relaxes exactly (Eq. A13 is linear in a): a_inf + (a_RyR_init - a_inf) exp(-t phi (kon_a Cai + koff_a))",
+      "expr": "np.max(np.abs(a_RyR - ((kon_a_RyR*Cai/(kon_a_RyR*Cai + koff_a_RyR)) + (a_RyR_init - (kon_a_RyR*Cai/(kon_a_RyR*Cai + koff_a_RyR)))*np.exp(-t*(Q10_RyR**((T - T_ref_RyR)/10))*(kon_a_RyR*Cai + koff_a_RyR))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "with Cai fixed, i_RyR relaxes exactly (Eq. A14): i_inf + (i_RyR_init - i_inf) exp(-t phi (kon_i Cai + koff_i))",
+      "expr": "np.max(np.abs(i_RyR - ((kon_i_RyR*Cai/(kon_i_RyR*Cai + koff_i_RyR)) + (i_RyR_init - (kon_i_RyR*Cai/(kon_i_RyR*Cai + koff_i_RyR)))*np.exp(-t*(Q10_RyR**((T - T_ref_RyR)/10))*(kon_i_RyR*Cai + koff_i_RyR))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "with Ca_ER fixed, l_RyR relaxes exactly (Eq. A15): l_inf + (l_RyR_init - l_inf) exp(-t phi (kon_l Ca_ER + koff_l))",
+      "expr": "np.max(np.abs(l_RyR - ((kon_l_RyR*Ca_ER/(kon_l_RyR*Ca_ER + koff_l_RyR)) + (l_RyR_init - (kon_l_RyR*Ca_ER/(kon_l_RyR*Ca_ER + koff_l_RyR)))*np.exp(-t*(Q10_RyR**((T - T_ref_RyR)/10))*(kon_l_RyR*Ca_ER + koff_l_RyR))))) <= 1e-6",
+      "applies": "run"
+    },
+    {
+      "description": "flux direction: release j_RyR has the sign of Ca_ER - Cai (zero when they are equal)",
+      "expr": "np.all(j_RyR*(Ca_ER - Cai) >= -1e-30)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "T": {
+        "min": 273.15,
+        "max": 313.15,
+        "points": 3
+      },
+      "kon_a_RyR": {
+        "values": [
+          5,
+          10,
+          20,
+          500,
+          2500
+        ]
+      }
+    },
+    "bounds": {
+      "Cai_init": [
+        0,
+        null
+      ],
+      "Ca_ER_init": [
+        0,
+        null
+      ],
+      "Q10_RyR": [
+        1,
+        5
+      ],
+      "T_ref_RyR": [
+        273.15,
+        313.15
+      ],
+      "T": [
+        273.15,
+        313.15
+      ]
+    },
+    "rationale": "Factors 0.5-2 on every parameter. kon_a_RyR also covers the caffeine value: 5-20 /(mM s) around rest and 500 and 2500 /(mM s) (2500 = hernandezcruz1997ca's k_on+Caff, Kd 0.8 uM). Temperature: T is swept over 273.15-313.15 K (0-40 degC; the factors would give 148-590 K, where the Q10 factors are absurd); Q10s are bounded to 1-5, T_ref to 273.15-313.15 K and the initial occupancies to [0, 1]."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      2e-06,
+      1e-06,
+      5e-07,
+      2.5e-07
+    ],
+    "t_end": 0.002,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "the source's own validation is its full diffusion model (cytosolic shells, buffers, pumps; Fig. 10-11), whose shell count and pump binding rates are not given in the paper, so its figures can't be reproduced by the RyR alone; the kinetic constants are the published ones (Fig. 10 legend). Validation belongs to the assembled neuron (soma / sympathetic neuron supermodule)."
+      },
+      "calibrate": {
+        "note": "not_applicable: the constants are hernandezcruz1997ca's published values; calibration of the flux magnitude (rho_RyR) belongs to the assembled neuron (soma / sympathetic neuron supermodule)."
+      }
+    }
+  }
+}

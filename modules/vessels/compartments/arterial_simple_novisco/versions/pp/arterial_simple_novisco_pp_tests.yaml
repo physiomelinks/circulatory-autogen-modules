@@ -5,12 +5,12 @@ notes: 'pp lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 0.0
   0.0094 s, slowest decay 0.072 s).'
 reference_proposals:
   q_0:
-    reference: 'Mynard2015; Supplemental File 1, aortic root: A0 = 6.9419 cm^2, length 1 cm, so A0 l = 6.94 mL = 6.94e-6 m^3
+    reference: 'mynard2015one; Supplemental File 1, aortic root: A0 = 6.9419 cm^2, length 1 cm, so A0 l = 6.94 mL = 6.94e-6 m^3
       (as arterial_simple vv); a zero-pressure segment volume used as a generic unstressed volume'
     sourced: 'yes'
     value: 6.94e-06
   R:
-    reference: Safaei2018; Table S3 R_par = 10.664e6 J s m^-6 (0.08 mmHg s/mL), pulmonary arteries, used here as a generic
+    reference: safaei2018bond; Table S3 R_par = 10.664e6 J s m^-6 (0.08 mmHg s/mL), pulmonary arteries, used here as a generic
       lumped arterial compartment (as the arterial_simple vp sibling does)
     sourced: 'yes'
     value: 10664000.0
@@ -23,17 +23,17 @@ reference_proposals:
     sourced: definitional
     value: 0.5
   C:
-    reference: Safaei2018; Table S3 C_par = 0.0309077e-6 m^6 J^-1 (4.1 mL/mmHg), pulmonary arteries, used as a generic lumped
+    reference: safaei2018bond; Table S3 C_par = 0.0309077e-6 m^6 J^-1 (4.1 mL/mmHg), pulmonary arteries, used as a generic lumped
       arterial compartment (NB the arterial_simple vp sibling has 3.09077e-10, 100x smaller)
     sourced: 'yes'
     value: 3.09077e-08
   I:
     reference: unreferenced_placeholder; inertance 1e5 Pa s^2 m^-3, order of rho l/(pi r^2) for a large artery (1050 x 0.05/(pi
-      0.0115^2) = 1.3e5); Safaei2018 Table S3 sets I = 0 for the pulmonary arteries, which this ODE module cannot take
+      0.0115^2) = 1.3e5); safaei2018bond Table S3 sets I = 0 for the pulmonary arteries, which this ODE module cannot take
     sourced: 'no'
     value: 100000.0
     also_cites:
-    - Safaei2018
+    - safaei2018bond
   u_ext:
     reference: definitional; external (transmural reference) pressure taken as 0 Pa gauge when the module is used alone
     sourced: definitional

@@ -1,0 +1,9 @@
+variable_name,units,value,data_reference,sourced
+Ki_init,millimolar,200,"brown1974changes; rat superior cervical ganglion neurons: [K]i 192.7 +- 2.8 mmol/kg cell water, 207 mM corrected to fresh (flame photometry); galvan1984intracellular 196 mmol/L cell water (electron microprobe). Was 150 (Boron & Boulpaep 2017 Table 5-2 gives a generic 120 mM)",yes
+Ko,millimolar,4.5,boron2017medical; Table 5-2 (interstitium) and Table 5-3: extracellular K 4.5 mM,yes
+Nai_init,millimolar,13,brown1974changes; rat superior cervical ganglion [Na]i 19.8 mmol/kg cell water (22 mM fresh); galvan1984intracellular 5 mmol/L cell water; Boron & Boulpaep 2017 Table 5-2 generic 15 mM. 13 mM lies within the range,yes
+Nao,millimolar,145,boron2017medical; Table 5-2 (interstitium) and Table 5-3: extracellular Na 145 mM,yes
+Vol,m3,7500.0e-18,"wallis1996cardiac; rat stellate ganglion neurons (cardiac-projecting), mean projected soma area 463 um^2: a sphere of that cross-section (diameter ~24 um) holds ~7,500 um^3. Was 2000 um^3 (wu2012soma, spinal preganglionic neurons: wrong cell type) Used when unconnected; in the soma the volume comes from the membrane (compartment_volume port, Vol = k_V d^3).",no
+F,C_per_mol,96485,"definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",yes
+R,J_per_mol_K,8.314,"definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",yes
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

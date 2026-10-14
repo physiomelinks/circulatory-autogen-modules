@@ -15,6 +15,10 @@
     {
       "description": "the ion flux j_NaCa_Na = -3*i_NaCa/F (mol/s; the current in nA, so the factor 1e-9)",
       "expr": "np.max(np.abs(j_NaCa_Na - 1e-9*(-3*i_NaCa/F))) <= 1e-12*max(1e-30, np.max(np.abs(j_NaCa_Na)))"
+    },
+    {
+      "description": "the exchanger current reverses at V_rev = (RT/F) ln(alpha Nao^3 Cai/(Nai^3 Cao)) (3Na:1Ca with the alpha weighting): i_NaCa has the sign of V - V_rev (outward, positive, above it)",
+      "expr": "np.all(i_NaCa*(V - (1000*R*T/F*np.log(alpha_NaCa*Nao**3*Cai/(Nai**3*Cao)))) >= -1e-15)"
     }
   ],
   "bc_sweep": {

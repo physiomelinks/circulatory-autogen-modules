@@ -1,4 +1,4 @@
-comment: 'Several csv values attributed to Gee2023 do not match Gee 2023 (supplementary tables + authors'' Simulink v03):
+comment: 'Several csv values attributed to gee2023closed do not match Gee 2023 (supplementary tables + authors'' Simulink v03):
   tau_Rsp = 2 s and tau_Vusv = 5 s are the pure DELAYS D_R/D_V (Gee/Ursino time constants are 6 s and 20 s); k_NActr = 23
   should be 7; G_al = 2.329e7 per m3 s treats Gee''s 23.29 Hz/L as Hz/mL (1000x too large: q_str = 0.3 L gives f_ls ~ 7000
   Hz). f_mid_ls (0.13), f_mid_cp (20.2), f_mid_NA (30) are unexplained local changes; LCN/PNNA/PNDMV and NTS-chemoreceptor
@@ -15,14 +15,14 @@ summary: 'Gee et al. 2023 (AIChE J 69:e18033) vagal/sympathetic reflex network, 
   v03), which disagree in places (listed below). Validation: not_applicable for the internal neuronal populations (no component-level
   data; closed-loop validation candidate is Gee 2023 Table 2), pending for the two receptors.'
 questions:
-- 'Confirm the Gee2023 references for the parameters marked sourced: yes (see references table; values checked against Supplementary
+- 'Confirm the gee2023closed references for the parameters marked sourced: yes (see references table; values checked against Supplementary
   Tables S.7-S.24 and the v03 Simulink block constants).'
 - 'tau_Rsp = 2 s and tau_Vusv = 5 s: the Gee Simulink uses 1/(6s+1) with a 2 s transport delay (resistance) and 1/(20s+1)
   with a 5 s delay (unstressed volume); the csv values equal the delays (Table S.14 lists the D''s under a "time constants"
   caption). Change to 6 s and 20 s? (The delay itself is not modelled; add one via the delay module if wanted.)'
 - 'G_al: Gee uses 23.29 with lung volume in litres (V_lung0 = 1.9, V_ln = 2.54), i.e. 2.329e4 Hz per m3. The csv 2.3291e7
   assumes mL. Change to 2.329e4? (At q_str = 0.3 L the current value gives f_ls ~ 7000 Hz.)'
-- k_NActr = 23 (cited Gee2023) but Gee Table S.21 and the Simulink both give 7 (23 is k_NA). Change to 7?
+- k_NActr = 23 (cited gee2023closed) but Gee Table S.21 and the Simulink both give 7 (23 is k_NA). Change to 7?
 - k_l = 190.48 Pa (1.4286 mmHg) matches the Gee Simulink, but Supplementary Table S.7 gives 11.758 mmHg; conversely Gee's
   baroreceptor k_a is 1.43 mmHg in the table but 11.758 in the Simulink. Which slope do you want for the cardiopulmonary receptor?
 - 'Local modifications with no source: f_mid_ls 0.13 (Gee 11.126), f_mid_cp 20.2 (Gee 10.21), f_mid_NA 30 (Gee 59.83), f_mid_br

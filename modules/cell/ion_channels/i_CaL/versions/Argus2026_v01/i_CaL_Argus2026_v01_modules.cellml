@@ -23,11 +23,18 @@
         <variable name="hc_init" public_interface="out" units="dimensionless"/>
         <variable name="i_Ca_L" public_interface="out" units="nanoA"/>
         <variable name="j_Ca_L" public_interface="out" units="mol_per_s"/>
-        <variable name="p_Ca" public_interface="in" units="m3_per_s"/>
+        <variable name="p_Ca" public_interface="out" units="m3_per_s"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <variable name="rho_CaL" public_interface="in" units="per_um2"/>
+        <variable name="p_Ca_single" public_interface="in" units="um3_per_s"/>
         <variable name="tau_c" public_interface="out" units="millis"/>
         <variable name="tau_c_max" public_interface="in" units="millis"/>
         <variable name="tau_c_min" public_interface="in" units="millis"/>
         <variable name="tau_hc" public_interface="in" units="millis"/>
+        <!-- temperature scaling of the gating kinetics: every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (review 2026-10-05) -->
+        <variable name="Q10_CaL" public_interface="in" units="dimensionless"/>
+        <variable name="T_ref_CaL" public_interface="in" units="kelvin"/>
+        <variable name="phi_CaL" public_interface="out" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -200,12 +207,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_c</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_c</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaL</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -230,12 +241,16 @@
                     <apply>
                         <plus/>
                         <apply>
-                            <abs/>
+                            <divide/>
                             <apply>
-                                <divide/>
-                                <ci>tau_hc</ci>
-                                <cn cellml:units="millis_per_s">1000</cn>
+                                <abs/>
+                                <apply>
+                                    <divide/>
+                                    <ci>tau_hc</ci>
+                                    <cn cellml:units="millis_per_s">1000</cn>
+                                </apply>
                             </apply>
+                            <ci>phi_CaL</ci>
                         </apply>
                         <ci>epsilon_tau</ci>
                     </apply>
@@ -244,7 +259,47 @@
             <apply>
                 <eq/>
                 <ci>i_Ca_L</ci>
-                <apply>
+                <piecewise>
+                <piece>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="nanoA_per_milliA" type="e-notation">1<sep/>6</cn>
+                                <ci>F</ci>
+                                <ci>p_Ca</ci>
+                                <apply>
+                                    <plus/>
+                                    <cn cellml:units="dimensionless">1</cn>
+                                    <ci>cAMP</ci>
+                                </apply>
+                                <apply>
+                                    <minus/>
+                                    <ci>Cai</ci>
+                                    <ci>Cao</ci>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="V_per_milliV" type="e-notation">2<sep/>-3</cn>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <ci>c</ci>
+                            <cn cellml:units="dimensionless">2</cn>
+                        </apply>
+                        <ci>hc</ci>
+                    </apply>
+                    <apply>
+                        <lt/>
+                        <apply>
+                            <abs/>
+                            <ci>V</ci>
+                        </apply>
+                        <cn cellml:units="milliV" type="e-notation">1<sep/>-6</cn>
+                    </apply>
+                </piece>
+                <otherwise><apply>
                     <times/>
                     <apply>
                         <divide/>
@@ -285,8 +340,8 @@
                                             <divide/>
                                             <apply>
                                                 <times/>
-                                                <cn cellml:units="V_per_milliV" type="e-notation">2<sep/>-3</cn>
                                                 <ci>V</ci>
+                                                <cn cellml:units="V_per_milliV" type="e-notation">2<sep/>-3</cn>
                                                 <ci>F</ci>
                                             </apply>
                                             <apply>
@@ -308,8 +363,8 @@
                                     <divide/>
                                     <apply>
                                         <times/>
-                                        <cn cellml:units="V_per_milliV" type="e-notation">2<sep/>-3</cn>
                                         <ci>V</ci>
+                                        <cn cellml:units="V_per_milliV" type="e-notation">2<sep/>-3</cn>
                                         <ci>F</ci>
                                     </apply>
                                     <apply>
@@ -328,7 +383,7 @@
                         <cn cellml:units="dimensionless">2</cn>
                     </apply>
                     <ci>hc</ci>
-                </apply>
+                </apply></otherwise></piecewise>
             </apply>
             <apply>
                 <eq/>
@@ -348,6 +403,28 @@
                         </apply>
                     </apply>
                     <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>p_Ca</ci><apply><times/><ci>A_mem</ci><ci>rho_CaL</ci><ci>p_Ca_single</ci><cn cellml:units="m3_per_um3" type="e-notation">1<sep/>-18</cn></apply></apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>phi_CaL</ci>
+                <apply>
+                    <power/>
+                    <ci>Q10_CaL</ci>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <ci>T</ci>
+                            <ci>T_ref_CaL</ci>
+                        </apply>
+                        <cn cellml:units="kelvin">10</cn>
+                    </apply>
                 </apply>
             </apply>
         </math>

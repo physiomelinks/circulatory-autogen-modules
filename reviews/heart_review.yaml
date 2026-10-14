@@ -19,9 +19,9 @@ summary: 'Four-chamber time-varying-elastance heart (Liang 2009 raised-cosine ac
   secondary sources. Validation: proposed Maceira 2006 steady-state baseline targets on five adult variants. The nominal model
   meets SV, EF and the aortic pressures but misses EDV (203 vs 142 +- 21 ml) and ESV (81 vs 47 +- 10 ml). The rest is pending.'
 questions:
-- 'References (see the table): Liang2009MBEC Table 2 for the timings (T_ac, T_ar, t_astart, T_vr, t_vstart) and atrial elastances;
-  Korakianitis2006JBiomech Table 1 for the unstressed volumes; Mynard2015ABME for K_vo/K_vc of the tricuspid and pulmonary
-  valves and K_vc_miv; Trudnowski1974 for rho. The primary tables were paywalled; the values were matched against Rabineau2021
+- 'References (see the table): liang2009multi Table 2 for the timings (T_ac, T_ar, t_astart, T_vr, t_vstart) and atrial elastances;
+  korakianitis2006numerical Table 1 for the unstressed volumes; mynard2015one for K_vo/K_vc of the tricuspid and pulmonary
+  valves and K_vc_miv; trudnowski1974specific for rho. The primary tables were paywalled; the values were matched against rabineau2021closed
   Table 1 (open access, adapted from Liang 2009 and Mynard & Smolich 2015) and two arXiv reproductions. Please check them
   against the primary tables before confirming.'
 - E_lv_A = 200e6, E_lv_B = 20e6, E_rv_A = 60e6 and E_rv_B = 0.2e6 Pa/m3 are user values; Liang 2009 Table 2 gives 3.67e8,
@@ -36,7 +36,7 @@ questions:
   a zero-flow inlet, and neighbour inertances raised from 1e-6..1e-1 to 1e5 Pa s2/m3 (the CA values made the network, not
   the heart, stiff, with R/I up to 1e13 1/s). Initial volumes (q_*_init) set the closed-loop blood volume, so they are effectively
   parameters: should they be sourced (e.g. from a total blood volume)?'
-- 'Validation (proposed, awaiting confirmation): baseline targets from Maceira2006LV Table 8 (verified in the paper PDF):
+- 'Validation (proposed, awaiting confirmation): baseline targets from maceira2006normalized Table 8 (verified in the paper PDF):
   EDV 142 +- 21, ESV 47 +- 10, SV 95 +- 14 ml, EF 67 +- 4.6 %; aortic systolic 115-135 and diastolic 68-79 mmHg (range of
   the Table 1 brachial cuff decile means; brachial, not central, pressure). They are set on heart vp_wCont, vp, vp_Ca, vp_wCont_nonstiff
   and vp_new_valve, with a pass at 2 SD. At nominal parameters (heart vp) SV 122 ml, EF 60 %, aortic 131/77 mmHg pass, but EDV

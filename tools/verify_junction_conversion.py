@@ -35,6 +35,7 @@ import myokit
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from cam_testing import module_array  # noqa: E402
 from cam_testing.system import compare, generate, simulate, system_models  # noqa: E402
 from libcuflynx.utilities.junction_migration import RENAMED_VARIABLES, migrate_file, migrate_records  # noqa: E402
 
@@ -47,18 +48,18 @@ def has_parameters(system):
 
 
 def uses_junctions(system):
-    path = os.path.join(system.dir, f'{system.name}_vessel_array.json')
-    if not os.path.exists(path):
+    path = module_array.find(system.dir, system.name)
+    if not path or not os.path.exists(path):
         return False
     with open(path) as f:
         return bool(migrate_records(json.load(f))[1])
 
 
 def converted_copy(system, work_dir):
-    '''A copy of the system dir whose vessel array has no junctions; returns (system, renamed).'''
+    '''A copy of the system dir whose module array has no junctions; returns (system, renamed).'''
     copy_dir = os.path.join(work_dir, 'converted', system.name)
     shutil.copytree(system.dir, copy_dir, ignore=shutil.ignore_patterns('results', 'plots', 'reference'))
-    renamed = migrate_file(os.path.join(copy_dir, f'{system.name}_vessel_array.json'),
+    renamed = migrate_file(module_array.find(copy_dir, system.name),
                            os.path.join(copy_dir, f'{system.name}_parameters.csv'))
     return type(system)(system.name, system.category, copy_dir, system.spec), renamed
 
@@ -168,9 +169,9 @@ def main(argv=None):
               + (f', {len(missing)} missing' if missing else ''))
     if args.write and not failed:
         for system in systems:
-            migrate_file(os.path.join(system.dir, f'{system.name}_vessel_array.json'),
+            migrate_file(module_array.find(system.dir, system.name),
                          os.path.join(system.dir, f'{system.name}_parameters.csv'))
-        print(f'converted {len(systems)} vessel arrays')
+        print(f'converted {len(systems)} module arrays')
     return 1 if failed else 0
 
 

@@ -1,0 +1,50 @@
+module_type: heart_effector
+version: rv_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Right-ventricular version of heart_effector_Gee2023 (scale = 0.5903).
+
+
+  Ports of the versions of heart_effector (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance sympathetic_efferent_heart_freq: lv_ArgusUNPUBLISHED_v01 [f_esh]; rv_ArgusUNPUBLISHED_OLD [f_esh]; rv_ArgusUNPUBLISHED_v01
+  [f_esh]
+
+  entrance vagal_efferent_filt_firing_rate_port: lv_ArgusUNPUBLISHED_v01 [f_PNDMV_filt]; rv_ArgusUNPUBLISHED_OLD [f_PNDMV_filt];
+  rv_ArgusUNPUBLISHED_v01 [f_PNDMV_filt]
+
+  exit Elastance_delta_port: lv_ArgusUNPUBLISHED_v01 [Delta_Emax]; rv_ArgusUNPUBLISHED_OLD [Delta_Emax]; rv_ArgusUNPUBLISHED_v01
+  [Delta_Emax]
+
+  exit Elastance_delta_port_lv: lv_ArgusUNPUBLISHED_v01 [Delta_Emax]; rv_ArgusUNPUBLISHED_OLD -; rv_ArgusUNPUBLISHED_v01 -
+
+  exit Elastance_delta_port_rv: lv_ArgusUNPUBLISHED_v01 -; rv_ArgusUNPUBLISHED_OLD [Delta_Emax]; rv_ArgusUNPUBLISHED_v01 [Delta_Emax]'
+reference_proposals:
+  f_esh:
+    reference: argus2026circulatory; test operating point (5 Hz)
+    sourced: false
+    value: 5.0
+  f_PNDMV_filt:
+    reference: argus2026circulatory; test operating point (1 Hz)
+    sourced: false
+    value: 1.0
+  G_Es:
+    reference: unreferenced_placeholder; "user_defined"
+    sourced: false
+  tau_Es:
+    reference: unreferenced_placeholder; gee2023closed Simulink uses 8 s for the RV sympathetic effector (not 2 s)
+    sourced: false
+  G_Ev:
+    reference: unreferenced_placeholder; "user_defined"
+    sourced: false
+  tau_Ev:
+    reference: unreferenced_placeholder; gee2023closed Simulink uses 1.5 s for the RV vagal effector (not 0.2 s)
+    sourced: false
+  scale:
+    reference: gee2023closed; RV/LV scaling 0.5903 (Simulink gain 1/0.5903 on the compliance-domain RV effectors)
+    sourced: true
+  f_es_min:
+    reference: ursino1998interaction; 2.66 spikes/s
+    sourced: true
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

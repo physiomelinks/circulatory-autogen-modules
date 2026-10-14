@@ -1,0 +1,53 @@
+{
+  "module_type": "lung_stretch_receptor",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 10.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["f_ls"],
+  "run_parameters": {"q_str": 0.0003},
+  "invariants": [
+    {
+      "description": "f_ls matches the exact first-order step response G_al q_str (1 - exp(-t/tau_lung))",
+      "expr": "np.max(np.abs(f_ls - (G_al*q_str*(1 - np.exp(-t/tau_lung))))) <= 1e-4 * max(1.0, np.max(np.abs(f_ls)))"
+    },
+    {
+      "description": "f_ls >= 0 for non-negative stretch",
+      "expr": "np.all(f_ls >= -1e-9*max(1.0, np.max(np.abs(f_ls))))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "q_str": {"min": 0.0, "max": 0.001, "points": 5},
+      "tau_lung": {"min": 0.5, "max": 10, "points": 5, "scale": "log"},
+      "G_al": {"min": 23290.0, "max": 23290000.0, "points": 4, "scale": "log"}
+    },
+    "rationale": "q_str 0-1 L covers rest to deep-breath stretch above the reference volume; tau_lung 0.5-10 s brackets the 2 s of Gee 2023; G_al spans both candidate unit conversions (23.29 Hz/L = 2.329e4 and the csv 2.329e7 Hz/m3, see review) so the claimed range holds whichever is confirmed."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.02, 0.01, 0.005, 0.0025],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: human/animal SAR firing vs lung volume data (Ursino-Magosso lineage models tune G_al to such data); not located in an obtainable table yet. Also depends on resolving the G_al unit question first."
+      },
+      "calibrate": {
+        "note": "pending: candidate: human/animal SAR firing vs lung volume data (Ursino-Magosso lineage models tune G_al to such data); not located in an obtainable table yet. Also depends on resolving the G_al unit question first."
+      }
+    }
+  }
+}

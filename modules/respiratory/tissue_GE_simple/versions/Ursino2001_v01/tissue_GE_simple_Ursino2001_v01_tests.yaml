@@ -1,0 +1,41 @@
+module_type: tissue_GE_simple
+version: Ursino2001_v01
+reviewed: false
+notes: 'Well-mixed tissue/capillary gas compartment of volume q_0: q_0 dC/dt = v (C_a - C) + M for O2 and CO2 (contents in
+  ml gas per ml blood, M in m3/s of gas; M_O2 < 0 is consumption). With constant arterial contents and flow the exact solution
+  is C = C_ss + (C_init - C_ss) exp(-v t / q_0), C_ss = C_a + M/v. libcuflynx special-cases tissue_GE_simple (it must be fed
+  by a terminal vessel), so the harness feeds it from a pp_I terminal used as a steady flow source (v_T -> 4e-6 m3/s within
+  ~20 ms).'
+reference_proposals:
+  C_CO2_a:
+    reference: 'spencer1979computational; test BC: arterial CO2 content at P_O2 = 100, P_CO2 = 40 mmHg from the Spencer curve (21.35 mmol/L)
+      x 22.72 ml/mmol = 0.485 ml/ml'
+    sourced: 'yes'
+    value: 0.485
+  C_O2_a:
+    reference: 'spencer1979computational; test BC: arterial O2 content at P_O2 = 100, P_CO2 = 40 mmHg (8.75 mmol/L) x 22.72 ml/mmol = 0.199
+      ml/ml'
+    sourced: 'yes'
+    value: 0.199
+  q_0:
+    reference: albanese2014physiology; brain tissue volume 1300 ml (Table 2-7, citing ursino2001integrated) split over the 8 cerebral GE compartments
+      of the CA parasympathetic model = 162.5 ml; library 164 ml. Ursino 2001 itself not accessed
+    sourced: 'yes'
+  C_CO2_p_init:
+    reference: unreferenced_placeholder; initial condition near mixed-venous CO2 content (albanese2014physiology Table 2-12 normal 53
+      ml/dl)
+    sourced: 'no'
+  C_O2_p_init:
+    reference: unreferenced_placeholder; initial condition = normal mixed-venous O2 content 15 ml/dl (albanese2014physiology Table 2-12)
+    sourced: 'no'
+  M_CO2:
+    reference: unreferenced_placeholder; library value 8.64 ml/min (RQ 0.8 of M_O2). albanese2014physiology Table 2-7 gives brain CO2
+      production 39.9 ml/min total = 5.0 ml/min per 1/8 of brain
+    sourced: 'no'
+  M_O2:
+    reference: unreferenced_placeholder; library value -10.8 ml/min. albanese2014physiology Table 2-7 gives brain O2 consumption 47.5
+      ml/min (from Ursino & Magosso) = 5.9 ml/min per 1/8 of brain, i.e. ~1.8x smaller
+    sourced: 'no'
+review: reviews/gas_exchange_review.yaml
+review_scope: The review of the whole gas_exchange module (7 entries) before the move to versions; only the parts about this
+  version apply.

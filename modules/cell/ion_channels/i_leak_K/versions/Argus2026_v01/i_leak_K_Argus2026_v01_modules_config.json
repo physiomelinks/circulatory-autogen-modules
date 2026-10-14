@@ -5,9 +5,14 @@
     "module_format": "cellml",
     "component_file": "i_leak_K_Argus2026_v01_modules.cellml",
     "component_type": "i_leak_K_SN",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
-    "creator": [],
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "argus2026sympathetic"
+    ],
     "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
     "entrance_ports": [],
     "exit_ports": [],
@@ -35,6 +40,12 @@
         "variables": [
           "j_leak_K"
         ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
@@ -59,6 +70,24 @@
       [
         "g_leak_K",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_leak_K",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_leak_K",
+        "picoS",
         "access",
         "constant"
       ],

@@ -1,0 +1,102 @@
+module_type: chemoreceptor
+version: Ursino2000_v01
+reviewed: false
+notes: 'Peripheral (carotid body) chemoreceptor. Arterial O2 content is inverted through the Spencer (1979) dissociation curves
+  to P_O2_a and a saturation S_O2_a; a static O2-CO2 interaction term phi_stat (CO2 content above C_CO2_a_nom, scaled by an
+  O2 factor) is saturated to f_c_stat; a dynamic term driven by dC_CO2/dt is low-pass filtered (tau_cap) and saturated to
+  f_c_dyn; their sum is low-pass filtered to phi_apc and rectified to f_apc. With constant inputs: phi_CO2_dyn = dot_C_CO2_a
+  tau_CO2_cc_dyn (1 - e^(-t/tau_cap)) exactly, and with dot_C_CO2_a = 0, phi_apc = f_c_stat (1 - e^(-t/tau_cap)) exactly.'
+reference_proposals:
+  C_O2_a:
+    reference: spencer1979computational; 0.1987 ml/ml = O2 content from the module's own Spencer constants at PaO2 100 mmHg, PaCO2 40 mmHg
+      (normal arterial tensions, west2008respiratory)
+    sourced: true
+    value: 0.1987
+  C_CO2_a:
+    reference: spencer1979computational; 0.485 ml/ml = CO2 content from the module's Spencer constants at PaO2 100 mmHg, PaCO2 40 mmHg
+      (west2008respiratory)
+    sourced: true
+    value: 0.485
+  dot_C_CO2_a:
+    reference: definitional; steady arterial CO2 content (no dynamic chemoreceptor drive)
+    sourced: definitional
+    value: 0.0
+  AA:
+    reference: magosso2001mathematical; A = 600 (chemoreceptor O2 term; value in circulatory_autogen resources - not verified against
+      the paywalled paper; this content-based chemoreceptor may instead come from albanese2016integrated)
+    sourced: true
+  BB:
+    reference: 'magosso2001mathematical; B = 10.18 (as AA: not verified against the paper)'
+    sourced: true
+  C_CO2_a_nom:
+    reference: unreferenced_placeholder; library note says "changed_from_0.36" but the value is 0.36; normal arterial CO2
+      content with the module's Spencer curve is 0.485 ml/ml, so 0.36 gives a large resting f_c_stat - owner to confirm the
+      source and intended value
+    sourced: false
+  K_O2:
+    reference: magosso2001mathematical; K_O2 = 200 (not verified against the paper)
+    sourced: true
+  K_CO2:
+    reference: magosso2001mathematical; K_CO2 = 1 /s (not verified against the paper)
+    sourced: true
+  K_stat:
+    reference: magosso2001mathematical; K_stat = 20 spikes/s (not verified against the paper)
+    sourced: true
+  K_dyn:
+    reference: magosso2001mathematical; K_dyn = 45 spikes/s (not verified against the paper)
+    sourced: true
+  tau_cap:
+    reference: magosso2001mathematical; 3.5 s (not verified against the paper)
+    sourced: true
+  tau_CO2_cc_dyn:
+    reference: magosso2001mathematical; 600 (a gain, dimensionless here, despite the tau name; not verified against the paper)
+    sourced: true
+  alpha_O2:
+    reference: west2008respiratory; O2 solubility 0.003 ml O2/(100 ml blood mmHg) = 3e-5 /133.322 Pa = 2.25e-7 /Pa. The library 2.33e-7
+      corresponds to 0.0031 ml/(100 ml mmHg) - both are common textbook values
+    sourced: true
+  Hgb:
+    reference: west2008respiratory; normal haemoglobin ~15 g/100 ml = 150 kg/m3 (textbook value; page not checked)
+    sourced: true
+  k_1:
+    reference: spencer1979computational; K1 = 14.99 mmHg = 1998.5 Pa (value as in circulatory_autogen; could not read the paper; cheng2010integrative
+      Table cites spencer1979computational with K1 = 13 - owner to check)
+    sourced: true
+  k_2:
+    reference: spencer1979computational; K2 = 194.4 mmHg = 25917 Pa (matches cheng2010integrative Table citing spencer1979computational)
+    sourced: true
+  h_1:
+    reference: spencer1979computational; a1 = 0.3836 (matches cheng2010integrative Table)
+    sourced: true
+  h_2:
+    reference: spencer1979computational; a2 = 1.819 (matches cheng2010integrative Table)
+    sourced: true
+  alpha_1:
+    reference: spencer1979computational; alpha1 = 0.03198 /mmHg = 2.40e-4 /Pa (cheng2010integrative Table cites 0.02598 - owner to check)
+    sourced: true
+  alpha_2:
+    reference: spencer1979computational; alpha2 = 0.05591 /mmHg = 4.19e-4 /Pa (matches cheng2010integrative Table)
+    sourced: true
+  beta_1:
+    reference: spencer1979computational; beta1 = 0.008275 /mmHg = 6.21e-5 /Pa (cheng2010integrative Table cites 0.012275 - owner to check)
+    sourced: true
+  beta_2:
+    reference: spencer1979computational; beta2 = 0.03255 /mmHg = 2.44e-4 /Pa (matches cheng2010integrative Table). Note other circulatory_autogen
+      parameter files carry 2.4415e-5 (a factor-10 typo)
+    sourced: true
+  overcap_solubility:
+    reference: unreferenced_placeholder; numerical guard (Pa per unit excess content above the saturation cap)
+    sourced: false
+  saturation_cap:
+    reference: unreferenced_placeholder; numerical guard keeping the Spencer inversion finite
+    sourced: false
+  C_O2_sat:
+    reference: spencer1979computational; C1 = 9.0 mmol/l converted with 22.72 ml/mmol = 0.2045 ml/ml (the conversion factor is not the
+      STPD 22.4 ml/mmol - owner to confirm)
+    sourced: true
+  C_CO2_sat:
+    reference: spencer1979computational; C2 = 86.11 mmol/l x 22.72 ml/mmol = 1.9564 ml/ml (same conversion as C_O2_sat)
+    sourced: true
+review: reviews/control_review.yaml
+review_scope: The review of the whole control module (18 entries) before the move to versions; only the parts about this version
+  apply.

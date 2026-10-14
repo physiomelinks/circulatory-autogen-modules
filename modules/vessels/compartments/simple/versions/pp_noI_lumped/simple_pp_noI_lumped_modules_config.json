@@ -3,9 +3,17 @@
     "module_type": "simple",
     "module_subtype": "pp_noI_lumped",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
     "description": "simple/pp_noI built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): R (resistance pp_linear). Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
     "routes": {
       "inputs": {
@@ -32,7 +40,7 @@
         "name": "R",
         "module_type": "resistance",
         "module_subtype": "pp_linear",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": []
       }

@@ -5,7 +5,7 @@ notes: 'Pressure-in / flow-out RC compartment without inertance (litre / kPa): d
   + (q - q_0)/C. Linear first order; alone with constant BCs the exact solution relaxes with time constant RC.'
 reference_proposals:
   q_0:
-    reference: unreferenced_placeholder; unstressed volume not given in Bozkurt2019; 0.1 L test value
+    reference: unreferenced_placeholder; unstressed volume not given in bozkurt2019mathematical; 0.1 L test value
     sourced: 'no'
     value: 0.1
   u_0:
@@ -13,7 +13,7 @@ reference_proposals:
     sourced: definitional
     value: 0.0
   C:
-    reference: 'Bozkurt2019; Table 2 (adult): systemic arterioles C = 1.7 mL/mmHg = 0.01275 L/kPa (representative compartment)'
+    reference: 'bozkurt2019mathematical; Table 2 (adult): systemic arterioles C = 1.7 mL/mmHg = 0.01275 L/kPa (representative compartment)'
     sourced: 'yes'
     value: 0.01275
   q_init:
@@ -21,7 +21,7 @@ reference_proposals:
     sourced: definitional
     value: 0.253
   R:
-    reference: 'Bozkurt2019; Table 2 (adult): systemic arterioles R = 0.95 mmHg s/mL = 126.7 kPa s/L (used as the representative
+    reference: 'bozkurt2019mathematical; Table 2 (adult): systemic arterioles R = 0.95 mmHg s/mL = 126.7 kPa s/L (used as the representative
       compartment for this generic component)'
     sourced: 'yes'
     value: 126.7

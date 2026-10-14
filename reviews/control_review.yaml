@@ -3,22 +3,22 @@ comment: 'Four components do not generate or are mis-wired: efferent_resistance_
   in the config but alpha_P_mus in the CellML), and heart_effector_Gee2023_OLD (points at the elastance component instead
   of _INV, so all outputs are 0). efferent_venous_us_volume_and_compliance_effector ignores G_theta_us, and local_flow_control_muscle
   has no way to receive C_O2_p (declared "variable", so it is silently 0). Provenance is shaky: the Magosso/Ursino and Spencer
-  papers are paywalled (values checked only against open secondary sources), several "Magosso2001AndUrsino2000"/"Gee2023"
+  papers are paywalled (values checked only against open secondary sources), several "Magosso2001AndUrsino2000"/"gee2023closed"
   values do not match those sources (k_ab, W_cv, W_bs, W_cs, tau_Es, tau_Ev), and "Bizzotto2022" could not be identified.'
 summary: 'control: 18 reflex-control components (baro/chemoreceptor afferents, central integration to vagal, sympathetic and
   respiratory efferents, Ursino/Argus/Gee effectors, local metabolic flow control). Every component runs alone with its inputs
   as boundary conditions (no harness needed) and is verified against exact solutions: first-order filter step responses, exact
   algebraic sigmoid/exponential/log maps, clamps and bounds. 64+ tests pass; the 4 defective components are recorded as expected
   failures with evidence from a patched copy of the library (all pass once fixed). Reference proposals for all 160 parameter
-  entries (TODO values given placeholder or derived values) and a proposed bib (Ursino1998, UrsinoMagosso2000, MagossoUrsino2001,
-  Spencer1979, Albanese2016, Gee2023, Cheng2010, West2008). Validation is pending (candidate data identified, not obtainable/set
+  entries (TODO values given placeholder or derived values) and a proposed bib (ursino1998interaction, ursino2000acute, magosso2001mathematical,
+  spencer1979computational, albanese2016integrated, gee2023closed, cheng2010integrative, west2008respiratory). Validation is pending (candidate data identified, not obtainable/set
   up) or not_applicable (pure signal blocks).'
 questions:
-- 'Paywalled primary sources: Ursino1998 values (P_n, k_a, f_min/max, tau_z/p, f_es,0/inf, k_es, f_es,min, effector G/tau)
-  were checked against the open Cheng2010 table (PMC2965826) and the Gee2023 Simulink model, not the paper itself. MagossoUrsino2001/UrsinoMagosso2000
+- 'Paywalled primary sources: ursino1998interaction values (P_n, k_a, f_min/max, tau_z/p, f_es,0/inf, k_es, f_es,min, effector G/tau)
+  were checked against the open cheng2010integrative table (PMC2965826) and the gee2023closed Simulink model, not the paper itself. magosso2001mathematical/ursino2000acute
   values (AA, BB, K_O2, K_CO2, K_stat, K_dyn, tau_cap, k_CO2_m, g_O2_m/b, C_O2_v*_nom, A-D_b_lc, W_cv, theta_v, f_es_max)
   could not be checked at all. Please confirm them against your copies.'
-- 'baroreceptor: P_nom = 12000 Pa (90 mmHg; "modified from 1.25e4") and k_ab = 1610 Pa (12.08 mmHg) vs Ursino1998 P_n = 92
+- 'baroreceptor: P_nom = 12000 Pa (90 mmHg; "modified from 1.25e4") and k_ab = 1610 Pa (12.08 mmHg) vs ursino1998interaction P_n = 92
   mmHg (12266 Pa), k_a = 11.758 mmHg (1567.6 Pa). Keep the modified values (and say why) or revert?'
 - 'afferent_to_sympathetic_efferent: W_bs = -1.14, W_cs = 12 are not the Ursino & Magosso 2000 weights (W_b = 1 with a minus
   sign, W_c,sp = 5 / W_c,sh = 1) and there is no offset theta_s, so at f_ab = 25, f_apc = 3.7 f_s = 43 spikes/s. Where do
@@ -26,17 +26,17 @@ questions:
 - 'afferent_to_vagal_efferent: W_cv = 0.208 vs 0.2 in Ursino & Magosso 2000 reimplementations - typo or deliberate?'
 - 'chemoreceptor: C_CO2_a_nom = 0.36 ml/ml while normal arterial CO2 content with the module''s own Spencer constants is 0.485
   ml/ml, so the resting static drive is non-zero (f_c_stat = 2.85 at the proposed normal inputs). Is 0.36 intended? Which
-  paper is the content-based chemoreceptor from (MagossoUrsino2001 uses PaCO2/PaO2; Albanese2016?)'
-- 'Spencer constants: k_1 (14.99 mmHg), alpha_1 (0.03198), beta_1 (0.008275) differ from the Cheng2010 table that also cites
-  Spencer1979 (13, 0.02598, 0.012275); k_2, h_1, h_2, alpha_2, beta_2 match. C_O2_sat/C_CO2_sat use 22.72 ml/mmol (not 22.4).
-  Please confirm against Spencer1979. (Other circulatory_autogen files carry beta_2 = 2.4415e-5, a x10 typo.)'
-- 'efferent_heart_period_effector: G_Ts = -0.1 s and G_Tv = 0.05 s^2 are "user_defined"; Ursino1998 has -0.13 and 0.09. Adopt
+  paper is the content-based chemoreceptor from (magosso2001mathematical uses PaCO2/PaO2; albanese2016integrated?)'
+- 'Spencer constants: k_1 (14.99 mmHg), alpha_1 (0.03198), beta_1 (0.008275) differ from the cheng2010integrative table that also cites
+  spencer1979computational (13, 0.02598, 0.012275); k_2, h_1, h_2, alpha_2, beta_2 match. C_O2_sat/C_CO2_sat use 22.72 ml/mmol (not 22.4).
+  Please confirm against spencer1979computational. (Other circulatory_autogen files carry beta_2 = 2.4415e-5, a x10 typo.)'
+- 'efferent_heart_period_effector: G_Ts = -0.1 s and G_Tv = 0.05 s^2 are "user_defined"; ursino1998interaction has -0.13 and 0.09. Adopt
   the Ursino values or keep and mark unsourced?'
-- 'heart_effector_Gee2023: tau_Es = 2 s and tau_Ev = 0.2 s are cited as Gee2023, but the Gee2023 Simulink model (BioModels
+- 'heart_effector_Gee2023: tau_Es = 2 s and tau_Ev = 0.2 s are cited as gee2023closed, but the gee2023closed Simulink model (BioModels
   MODEL2402270001) uses 8 s (sympathetic) and 1.5 s (vagal). Which is intended? G_Es/G_Ev are user values (the Gee gains are
   compliance-domain, 0.103 and 0.2053 ml/mmHg).'
 - 'efferent_respiratory_effector: what is "Bizzotto2022"/"Bizotto2022"? No such publication could be found (possible source:
-  Albanese2016 chemoreflex table). Please give the full reference.'
+  albanese2016integrated chemoreflex table). Please give the full reference.'
 - efferent_respiratory_effector_Gee_Argus_2026 had every value TODO; placeholders were proposed (sibling time constants, 0.01
   s / 0.001 s fractional gains, alpha limits 0.2-3). Provide real values or keep as placeholders?
 - 'heart_effector_Gee2023_OLD: delete it, or fix it (module_type -> heart_effector_Gee2023_INV)? If kept, its 1e-7 m6/J states
@@ -71,8 +71,8 @@ findings:
   0 when x_O2 >= (1 + x_CO2)/g_O2_b). Sweep ranges are restricted accordingly.'
 - 'afferent_to_respiratory_efferent and local_flow_control_*: P_O2_a is an input that no equation uses.'
 - 'chemoreceptor: tau_CO2_cc_dyn is a dimensionless gain (600), not a time constant, despite its name.'
-- 'Gee2023 values were read from the authors'' Simulink model (BioModels MODEL2402270001): heart-period taus 2 s / 1.5 s and
-  G_Ts = -0.13 match Ursino1998; contractility taus are 8 s / 1.5 s; RV scale 1/0.5903.'
+- 'gee2023closed values were read from the authors'' Simulink model (BioModels MODEL2402270001): heart-period taus 2 s / 1.5 s and
+  G_Ts = -0.13 match ursino1998interaction; contractility taus are 8 s / 1.5 s; RV scale 1/0.5903.'
 - 'Stability: every generating component works with CVODE rtol 1e-6 / atol 1e-8 except the OLD compliance-form effector, whose
   1e-7-scale states need atol <= 1e-12.'
 - 'Structure-test warnings (22) checked: the Js_per_m3/Js_per_m6 mismatch (Ursino resistance), the duplicate u_p_resp, the

@@ -1,9 +1,9 @@
 """
 The standard verification & validation tests, run on one module version at a time (the
-validation tests on one of its instances).
+validation tests on one of its parameterisations).
 
-Each check returns a Result and writes it to <version dir>/results/<test>.json (instance tests:
-results/instances/<instance>/<test>.json), with any figures in <version dir>/plots/. The pytest
+Each check returns a Result and writes it to <version dir>/results/<test>.json (parameterisation
+tests: results/parameterisations/<parameterisation>/<test>.json), with any figures in <version dir>/plots/. The pytest
 layer (tests/test_modules.py) turns a Result into pass / fail / skip; the report generator reads
 the JSON files, so the HTML shows exactly what the last test run found.
 """
@@ -23,21 +23,29 @@ from dataclasses import asdict, dataclass, field
 import numpy as np
 
 from cam_testing import fixed_step, harness, plots
-from cam_testing.library import REPO_ROOT
+from cam_testing.library import library_dirs
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
+# partial: met what the model's maths allows but not the full criterion (e.g. the time-step test on a piecewise
+# right-hand side: convergent and agreeing with CVODE, but below the scheme's order); not a failure
+PARTIAL = 'partial'
 # validation.<kind>.status: 'active' (confirmed data) or 'proposed' (run, but the data awaits confirmation)
 PROPOSED = 'proposed'
 
 # per version
-VERSION_TESTS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
+# review_test: whether the version has been reviewed (tests.yaml reviewed: true); a version not
+# reviewed yet fails it, so its status never reads as all-passed (it stays public and usable)
+REVIEW_TEST = 'review_test'
+VERSION_TESTS = [REVIEW_TEST, 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                  'stability_test']
-# per instance
-INSTANCE_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
-TESTS = VERSION_TESTS + INSTANCE_TESTS
-NO_CALIBRATION_DATA = 'no calibration data in this instance'
-NO_BASELINE_DATA = 'no baseline data in this instance'
-NO_INSTANCE_CALIBRATION = 'no instance has calibration data'
+# per parameterisation
+PARAMETERISATION_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
+INSTANCE_TESTS = PARAMETERISATION_TESTS   # the former name
+TESTS = VERSION_TESTS + PARAMETERISATION_TESTS
+NO_CALIBRATION_DATA = 'no calibration data in this parameterisation'
+NO_BASELINE_DATA = 'no baseline data in this parameterisation'
+NO_PARAMETERISATION_CALIBRATION = 'no parameterisation has calibration data'
+NO_INSTANCE_CALIBRATION = NO_PARAMETERISATION_CALIBRATION   # the former name
 
 
 # version_calibration of a version calibrated only as part of supermodules (below): pass-styled /
@@ -56,6 +64,8 @@ def supermodule_index(versions=None):
         if not v.is_supermodule:
             continue
         for sub in v.submodules:
+            if not sub.get('module_subtype'):   # a template's slot: no version chosen yet
+                continue
             users = index.setdefault((sub['module_type'], sub['module_subtype']), [])
             if all(u.key != v.key for u in users):
                 users.append(v)
@@ -64,8 +74,8 @@ def supermodule_index(versions=None):
 
 def version_calibration(version, index=None, _seen=()):
     '''
-    The version's calibration, from its instances: failed when no instance has calibration data
-    (obs_data); otherwise failed if any instance's calibration failed, passed if they ran and
+    The version's calibration, from its parameterisations: failed when no parameterisation has
+    calibration data (obs_data); otherwise failed if any parameterisation's calibration failed, passed if they ran and
     passed, pending if not run yet.
 
     A version with no calibration data of its own that is a submodule of supermodule versions
@@ -75,10 +85,10 @@ def version_calibration(version, index=None, _seen=()):
     does (a supermodule with no calibration data counts as failed). tests.yaml
     ``calibration_in_supermodule: false`` opts a version out (the plain rule).
     '''
-    with_data = [i for i in version.instances() if i.has_obs_data]
+    with_data = [i for i in version.parameterisations() if i.has_obs_data]
     if not with_data:
         return _calibration_in_supermodules(version, index, _seen) \
-            or Result('version_calibration', FAILED, NO_INSTANCE_CALIBRATION)
+            or Result('version_calibration', FAILED, NO_PARAMETERISATION_CALIBRATION)
     results = {i.name: load(version, 'validation_test_calibrate', i) for i in with_data}
     failed = [n for n, r in results.items() if r is not None and r.status == FAILED]
     passed = [n for n, r in results.items() if r is not None and r.status == PASSED]
@@ -126,30 +136,44 @@ class Result:
     timestamp: str = ''
 
 
-def result_path(component, test, instance=None):
-    if instance is not None:
-        return os.path.join(instance.results_dir, f'{test}.json')
+def review_check(version):
+    '''Passes for a reviewed version (tests.yaml reviewed: true), fails for one not reviewed yet.'''
+    review = version.spec.get('review')
+    if version.reviewed:
+        where = (f'; the review: {review}' if isinstance(review, str) else
+                 '; the review is in the version\'s tests.yaml' if review else '')
+        return save(version, Result(REVIEW_TEST, PASSED, f'Reviewed (tests.yaml reviewed: true){where}.'))
+    return save(version, Result(
+        REVIEW_TEST, FAILED,
+        'Not reviewed yet: its equations, parameter sources, tests and known issues have not been checked '
+        'with its owner, so treat its values and behaviour as provisional. It is public and usable; CI runs '
+        'only its quick tests (run, PhLynx -> CUFLynx) until it is reviewed.'))
+
+
+def result_path(component, test, parameterisation=None):
+    if parameterisation is not None:
+        return os.path.join(parameterisation.results_dir, f'{test}.json')
     return os.path.join(component.results_dir, f'{test}.json')
 
 
-def plot_path(component, name, instance=None):
-    prefix = f'{instance.name}__' if instance is not None else ''
+def plot_path(component, name, parameterisation=None):
+    prefix = f'{parameterisation.name}__' if parameterisation is not None else ''
     return os.path.join(component.plots_dir, f'{prefix}{name}.png')
 
 
-def save(component, result, instance=None):
+def save(component, result, parameterisation=None):
     result.timestamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     # plots are stored relative to the version dir, which is where the HTML lives
     result.plots = [os.path.relpath(p, component.dir) for p in result.plots]
-    path = result_path(component, result.test, instance)
+    path = result_path(component, result.test, parameterisation)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as f:
         json.dump(asdict(result), f, indent=2, default=_json_default)
     return result
 
 
-def load(component, test, instance=None):
-    path = result_path(component, test, instance)
+def load(component, test, parameterisation=None):
+    path = result_path(component, test, parameterisation)
     if not os.path.isfile(path):
         return None
     with open(path) as f:
@@ -166,22 +190,26 @@ def _json_default(o):
 
 class ComponentModel(object):
     '''A version's generated model and simulation helper, built once and reused. The parameter
-    values are an instance's (default: the version's default instance).'''
+    values are a parameterisation's (default: the version's default parameterisation; ``instance``: its
+    former name, still accepted).'''
 
-    def __init__(self, component, work_dir=None, instance=None):
+    def __init__(self, component, work_dir=None, parameterisation=None, instance=None):
         self.component = component
-        self.instance = instance or component.default_instance
+        self.parameterisation = parameterisation or instance or component.default_parameterisation
+        # the test network: the version's own for the version tests (no parameterisation given), else the
+        # parameterisation's (validation.<p>.harness) if it has one -- even for the default parameterisation
+        self._network_of = parameterisation or instance
         self.spec = component.spec
         self.work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_{component.id}_')
         self._model_path = None
         self._helper = None
-        # the instance's own rows: what the model is generated with
-        self._raw_params = component.parameters() if self.instance.is_default else self.instance.parameters()
+        # the parameterisation's own rows: what the model is generated with
+        self._raw_params = component.parameters() if self.parameterisation.is_default else self.parameterisation.parameters()
         self._params = None
         if not component.is_supermodule:
             self._load_parameters()
         # A supermodule's parameters are those of its generated (flattened) model, read once it is
-        # generated: its own instance's, its submodules' instances' and the boundary conditions no
+        # generated: its own parameterisation's, its submodules' parameterisations' and the boundary conditions no
         # internal connection closes (harness.supermodule_parameters).
 
     def _load_parameters(self):
@@ -202,11 +230,16 @@ class ComponentModel(object):
                 pass
         # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
         # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
-        for name, _units, value, *_ref in (self.spec.get('harness') or {}).get('parameters') or []:
+        for name, _units, value, *_ref in harness.network(self.component, self._network_of).get('parameters') or []:
             if name not in nominal:
                 nominal[name] = float(value)
                 var_of[name] = name
         self._params, self._nominal, self._var_of_map = params, nominal, var_of
+
+    @property
+    def instance(self):
+        '''The former name of ``parameterisation``.'''
+        return self.parameterisation
 
     @property
     def nominal(self):
@@ -231,7 +264,8 @@ class ComponentModel(object):
             if getattr(self, '_generation_error', None) is not None:
                 raise self._generation_error          # don't regenerate a model that failed to generate
             try:
-                self._model_path = harness.generate(self.component, self.work_dir, parameters=self._instance_params())
+                self._model_path = harness.generate(self.component, self.work_dir, parameters=self._parameterisation_params(),
+                                                    parameterisation=self._network_of)
             except harness.GenerationFailed as e:
                 self._generation_error = e
                 raise
@@ -244,17 +278,17 @@ class ComponentModel(object):
         return self._helper
 
     def parameters(self):
-        '''The model's parameters: the instance's (a supermodule's: every parameter of its flattened
+        '''The model's parameters: the parameterisation's (a supermodule's: every parameter of its flattened
         model, named <var>_<submodule path> or as the global it is).'''
         self._load_parameters()
         return self._params
 
-    def _instance_params(self):
-        return None if self.instance.is_default else self._raw_params
+    def _parameterisation_params(self):
+        return None if self.parameterisation.is_default else self._raw_params
 
     def generate(self, work_dir, **kw):
-        '''Another model of this version at this instance's parameters (e.g. a python model).'''
-        return harness.generate(self.component, work_dir, parameters=self._instance_params(), **kw)
+        '''Another model of this version at this parameterisation's parameters (e.g. a python model).'''
+        return harness.generate(self.component, work_dir, parameters=self._parameterisation_params(), parameterisation=self._network_of, **kw)
 
     def run_point_params(self):
         '''The spec's run_parameters as simulation-helper overrides ({'parameters/<name>': value}).'''
@@ -355,16 +389,16 @@ def _non_finite(outputs):
     return [name for name, y in outputs.items() if not np.all(np.isfinite(y))]
 
 
-def _guard(component, test, fn, instance=None):
+def _guard(component, test, fn, parameterisation=None):
     '''Runs a check; any unexpected exception is a failed Result, not a crash.'''
     plots.TIME_LABEL = component.spec.get('time_label', 'time [s]')
     try:
-        return save(component, fn(), instance)
+        return save(component, fn(), parameterisation)
     except harness.MissingParameters as e:
-        return save(component, Result(test, SKIPPED, str(e)), instance)
+        return save(component, Result(test, SKIPPED, str(e)), parameterisation)
     except Exception as e:
         return save(component, Result(test, FAILED, f'{type(e).__name__}: {e}',
-                                      details=[traceback.format_exc()[-3000:]]), instance)
+                                      details=[traceback.format_exc()[-3000:]]), parameterisation)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -393,13 +427,90 @@ CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp or external_ap
                       'simulation to check')
 
 
+EXTERNAL_NOT_APPLICABLE = ('external Python model (module_format external_api, api transport python, e.g. a FEniCS '
+                           'model): it has no CellML '
+                           'equations, so the CellML simulation checks do not apply; run_test loads its model file and '
+                           'steps it, and the system models that couple it to CellML modules test it in use')
+
+
+def is_external_api(component):
+    """An external Python model (module_format external_api, api transport python, e.g. FEniCS),
+    coupled to the generated C++ through libcuflynx.coupling."""
+    api = component.config.get('api') or {}
+    return component.config.get('module_format', 'cellml') == 'external_api' and api.get('transport') == 'python'
+
+
 def is_cpp(component):
-    # cpp: the C++ 1D solver component as it was; external_api: the same, described by an api block
-    return component.config.get('module_format', 'cellml') in ('cpp', 'external_api')
+    """A C++ coupling component: the 1D finite-volume solver's parts (module_format cpp, or
+    external_api coupled over named pipes: FV1D_vessel, FV1D_solver) and other non-Python external
+    APIs. run_test generates the 0D model coupled to it and compiles it."""
+    fmt = component.config.get('module_format', 'cellml')
+    return fmt == 'cpp' or (fmt == 'external_api' and not is_external_api(component))
+
+
+def is_non_cellml(component):
+    """Not simulated through CellML: a C++ coupling component or an external Python (e.g. FEniCS) model."""
+    return is_cpp(component) or is_external_api(component)
+
+
+def non_cellml_reason(component):
+    return EXTERNAL_NOT_APPLICABLE if is_external_api(component) else CPP_NOT_APPLICABLE
 
 
 def _cpp_not_applicable(cm, test):
-    return save(cm.component, Result(test, NOT_APPLICABLE, CPP_NOT_APPLICABLE))
+    return save(cm.component, Result(test, NOT_APPLICABLE, non_cellml_reason(cm.component)))
+
+
+def external_model_check(cm):
+    """
+    run_test for an external model (module_format external_api, api transport python): load the
+    model file the api block names, create the class with the default parameterisation's parameters and
+    one connected 0D module per port variable, and step it a few times with constant inputs
+    (spec 'run_inputs', default 0). Every output must be finite. Skipped when the model's own
+    dependencies (e.g. dolfinx) are not installed.
+    """
+    import importlib.util
+    import numpy as np
+
+    def check():
+        component = cm.component
+        api = component.config.get('api') or {}
+        py = api.get('python') or {}
+        path = os.path.join(os.path.dirname(component.config_path), py.get('file', ''))
+        if not (py.get('file') and os.path.isfile(path)):
+            return Result('run_test', FAILED, f"api.python.file {py.get('file')!r} not found next to the config")
+        spec = importlib.util.spec_from_file_location(f'cam_external_{component.id}', path)
+        module = importlib.util.module_from_spec(spec)
+        try:
+            spec.loader.exec_module(module)
+        except ImportError as e:
+            return Result('run_test', SKIPPED, f'cannot import the model ({e}); install what it needs to run it')
+        cls = getattr(module, py.get('class', ''), None)
+        if cls is None:
+            return Result('run_test', FAILED, f"{os.path.basename(path)} has no class {py.get('class')!r}")
+        values = {p.variable_name: p.value for p in cm.parameters()}
+        variables = component.config.get('variables_and_units', [])
+        params = {v[0]: float(values[v[0]]) for v in variables
+                  if v[3] in ('constant', 'global_constant') and v[0] in values}
+        port_vars = [v for kind in ('entrance_ports', 'exit_ports', 'general_ports')
+                     for p in component.config.get(kind) or [] for v in p['variables']]
+        run_inputs = cm.spec.get('run_inputs') or {}
+        dt = float(api.get('coupling_dt', 1e-3))
+        model = cls(params=params, neighbours={v: ['m0'] for v in port_vars}, comm=None,
+                    info={'units': {v[0]: v[1] for v in variables}, 'coupling_dt': dt, 'row': 'mod',
+                          'output_dir': cm.work_dir})
+        out = model.initial_outputs()
+        inputs = {v: np.array([float(run_inputs.get(v, 0.0))]) for v in port_vars if v not in out}
+        n_steps = int(cm.spec.get('run_steps', 5))
+        for k in range(n_steps):
+            out = model.step(k * dt, dt, inputs)
+        bad = [k for k, v in out.items() if not np.all(np.isfinite(np.asarray(v, dtype=float)))]
+        if bad or not out:
+            return Result('run_test', FAILED, f'outputs not finite: {bad}' if bad else 'step() returned nothing')
+        return Result('run_test', PASSED, f'loaded {os.path.basename(path)} and stepped {py.get("class")} '
+                      f'{n_steps} times; outputs {sorted(out)} finite',
+                      {k: np.asarray(v, dtype=float).tolist() for k, v in out.items()})
+    return _guard(cm.component, 'run_test', check)
 
 
 def cpp_generation_check(cm):
@@ -422,7 +533,7 @@ def cpp_generation_check(cm):
                'solver': 'RK4', 'couple_to_1d': True, 'resources_dir': res,
                'generated_models_dir': os.path.join(work, 'generated_models'),
                'cpp_generated_models_dir': os.path.join(work, 'cpp_out'), 'cpp_1d_model_config_path': None,
-               'module_library_dirs': [harness.MODULES_DIR], 'use_builtin_modules': False, 'DEBUG': False,
+               'module_library_dirs': library_dirs(), 'use_builtin_modules': False, 'DEBUG': False,
                'dt': float(cm.spec.get('dt', 1e-3)),
                'solver_info': {'dt_solver': 1e-4, 'MaximumNumberOfSteps': 5000, 'solver': 'RK4'}}
         log = io.StringIO()
@@ -435,11 +546,11 @@ def cpp_generation_check(cm):
         tail = [l for l in log.getvalue().splitlines() if l.strip()][-6:]
         if not ok:
             return Result('run_test', FAILED, 'C++ 0D-1D generation failed: ' + (tail[-1] if tail else ''), details=tail)
+        # libcuflynx's template generator writes model0d.cpp (+ model0d_core.c/.h); the previous
+        # generator wrote one model0d.cc
         out_dir = cfg['cpp_generated_models_dir']
-        # libcuflynx's template generator writes model0d.cpp (+ model0d_core.c/.h); before it, model0d.cc
-        src = os.path.join(out_dir, 'model0d.cpp')
-        if not os.path.exists(src):
-            src = os.path.join(out_dir, 'model0d.cc')
+        src = os.path.join(out_dir, 'model0d.cpp' if os.path.isfile(os.path.join(out_dir, 'model0d.cpp'))
+                           else 'model0d.cc')
         coupler = [f for f in os.listdir(cfg['cpp_generated_models_dir']) if f.endswith('_coupler1d0d.json')]
         metrics = {'generated': sorted(os.listdir(cfg['cpp_generated_models_dir'])), 'coupler': coupler}
         gxx = shutil.which('g++')
@@ -460,6 +571,8 @@ def cpp_generation_check(cm):
 
 def run_test(cm):
     """Generates the component with libcuflynx, simulates it, and checks every output is finite."""
+    if is_external_api(cm.component):
+        return external_model_check(cm)
     if is_cpp(cm.component):
         return cpp_generation_check(cm)
 
@@ -484,10 +597,47 @@ def run_test(cm):
             warning = f'; WARNING: every output is constant{" (all zero)" if len(zero) == len(outputs) else ""}'
         elif zero:
             warning = f'; note: identically zero: {", ".join(zero)}'
+        figs, details = [fig], [f'constant outputs: {", ".join(flat)}'] if flat else []
+        rest = rest_check(cm)
+        if rest:
+            warning += f'; {rest["text"]}'
+            metrics['rest_check'] = {k: v for k, v in rest.items() if k != 'fig'}
+            details.append(rest['text'])
+            figs += [rest['fig']] if rest.get('fig') else []
         return Result('run_test', PASSED, f'generated and simulated {cm.spec["sim_time"]} s; '
-                      f'all {len(outputs)} outputs finite' + warning, metrics, [fig],
-                      [f'constant outputs: {", ".join(flat)}'] if flat else [])
+                      f'all {len(outputs)} outputs finite' + warning, metrics, figs, details)
     return _guard(cm.component, 'run_test', check)
+
+
+def rest_check(cm):
+    '''
+    spec ``rest_check: {sim_time, window, voltage, parameters, threshold (mV, default 0), dt}``: a long
+    run (e.g. at 0 pA injected) reported by run_test, information rather than a pass/fail gate: the
+    spikes (upward crossings of the threshold by ``voltage``) and their rate in the last ``window`` s.
+    '''
+    rc = cm.spec.get('rest_check')
+    if not rc:
+        return None
+    sim_time, window, thr = float(rc['sim_time']), float(rc.get('window', 10.0)), float(rc.get('threshold', 0.0))
+    label = rc.get('label', f'rest ({sim_time:g} s)')
+    try:
+        spec = dict(cm.spec, sim_time=sim_time, dt=float(rc.get('dt', cm.spec['dt'])))
+        helper = harness.simulation_helper(cm.model_path, spec)
+        by_var = {p.variable_name: p for p in cm.parameters()}
+        params = {'parameters/' + (harness.parameter_name(by_var[k]) if k in by_var else k): float(v)
+                  for k, v in (rc.get('parameters') or {}).items()}
+        t, out = harness.run(helper, [rc['voltage']], params)
+    except Exception as e:
+        return {'text': f'{label}: did not run ({type(e).__name__}: {str(e)[:200]})'}
+    v = out[harness.output_key(rc['voltage'])]
+    up = np.flatnonzero((v[:-1] < thr) & (v[1:] >= thr)) + 1
+    n = int(np.sum(t[up] >= t[-1] - window))
+    text = (f'{label}: fires at {n / window:.3g} Hz in the last {window:g} s ({n} spikes)' if n
+            else f'{label}: silent in the last {window:g} s (no spikes; V ends at {v[-1]:.1f} mV)')
+    fig = plots.plot_outputs(plot_path(cm.component, 'rest'), t, {rc['voltage']: v}, {rc['voltage']: 'mV'},
+                             f'{cm.component.label}: {label}')
+    return {'text': text, 'spikes_in_window': n, 'rate_Hz': n / window, 'window_s': window, 'sim_time_s': sim_time,
+            'spikes_total': int(up.size), 'fig': fig}
 
 
 # ----------------------------------------------------------------------------------------------
@@ -495,7 +645,7 @@ def run_test(cm):
 # ----------------------------------------------------------------------------------------------
 
 def verification_test_invariants(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_invariants')
     """
     Checks the simulation against what the component is supposed to do: the spec's
@@ -597,7 +747,7 @@ def parameter_bounds(component, params=None):
       2. else a gate's initial value: a dimensionless "<x>_init" whose state x an invariant keeps
          in [0, 1] (unit_interval_states) lies in [0, 1];
       3. else a quantity in NON_NEGATIVE_UNITS with a non-negative value stays >= 0.
-    ``params``: the parameters to bound (default: the version's default instance; a supermodule's
+    ``params``: the parameters to bound (default: the version's default parameterisation; a supermodule's
     model gives its flattened parameters, ComponentModel.parameters()).
     '''
     spec = component.spec
@@ -962,7 +1112,7 @@ def sweep_parameter_names(cm):
 
 
 def verification_test_BC(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_BC')
     def check():
         component, spec = cm.component, cm.spec
@@ -1107,7 +1257,7 @@ def verification_test_BC(cm):
 # ----------------------------------------------------------------------------------------------
 
 def verification_test_timestep(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_timestep')
     def check():
         component = cm.component
@@ -1124,13 +1274,25 @@ def verification_test_timestep(cm):
         rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.point_model())
         if not state_qnames:
             return Result('verification_test_timestep', SKIPPED, 'component has no state variables (algebraic only)')
+        # convergence after a warm-up (timestep.pre_time, else the spec's pre_time), so a start-up
+        # transient doesn't dominate the comparison: one tight CVODE run to pre_time, whose final state
+        # every step size (and the CVODE reference) starts from
+        pre = float(ts.get('pre_time', cm.spec.get('pre_time', 0.0)) or 0.0)
+        if pre > 0:
+            pre = round(pre / dts[0]) * dts[0]            # a whole number of every step size
+            with contextlib.redirect_stdout(io.StringIO()):
+                warm = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=dts[0], sim_time=pre, pre_time=0.0),
+                                                 solver_info=reference_tolerances(cm))
+            harness.run(warm, cm.outputs(), params=cm.run_point_params())
+            at_pre = dict(zip((v.qname() for v in warm.model.states()), warm.simulation.state()))
+            y0 = np.array([at_pre[q] for q in state_qnames], dtype=float)
 
         outputs = cm.outputs()
         qnames = [cm.helper._resolve_name(harness.output_name(o))[1] for o in outputs]
         stride_base = dts[0]
         runs = []
         for dt in dts:
-            t, Y = fixed_step.integrate(rhs, y0, t_end, dt, scheme)
+            t, Y = fixed_step.integrate(rhs, y0, pre + t_end, dt, scheme, t0=pre)
             stride = int(round(stride_base / dt))
             idx = np.arange(0, len(t), stride)
             vals = np.array([observe(t[i], Y[i], qnames) for i in idx], dtype=float)
@@ -1161,7 +1323,7 @@ def verification_test_timestep(cm):
 
         # cross-check against libcuflynx's CVODE run with tight tolerances
         with contextlib.redirect_stdout(io.StringIO()):
-            tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=0.0),
+            tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=pre),
                                               solver_info=reference_tolerances(cm))
         t_cv, cv = harness.run(tight, outputs, params=cm.run_point_params())
         n = min(len(t_cv), finest.shape[0])
@@ -1174,27 +1336,23 @@ def verification_test_timestep(cm):
                                            [(dt, t, v[:, 0]) for dt, t, v in runs], outputs[0], cm.units(),
                                            f'{component.label}: {outputs[0]} vs step size')]
         metrics = {'scheme': scheme, 'dts': dts, 'successive_differences': diffs, 'observed_orders': observed,
-                   'expected_order': order, 'cvode_tight_vs_finest': cvode_diff, 't_end': t_end}
+                   'expected_order': order, 'cvode_tight_vs_finest': cvode_diff, 't_end': t_end, 'pre_time': pre}
 
-        problems = []
-        if not all(np.isfinite(diffs)):
-            problems.append('non-finite solution at some step size (explicit scheme unstable? use smaller dts)')
-        else:
-            if any(diffs[k + 1] > diffs[k] and diffs[k + 1] > roundoff for k in range(len(diffs) - 1)):
-                problems.append(f'differences do not decrease with dt: {["%.2e" % d for d in diffs]}')
-            last = next((o for o in reversed(observed) if o is not None), None)
-            if last is not None and last < min_order:
-                problems.append(f'observed order {last:.2f} < {min_order}')
-            if diffs[-1] > tol:
-                problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
-            if cvode_diff > cvode_tol:
-                problems.append(f'fixed-step and CVODE solutions differ by {cvode_diff:.2e} > {cvode_tol:.1e}')
+        problems, order_problems = timestep_problems(diffs, observed, cvode_diff, min_order=min_order, tol=tol,
+                                                     cvode_tol=cvode_tol, roundoff=roundoff)
         last = next((o for o in reversed(observed) if o is not None), None)
         summary = (f'{scheme}: differences {diffs[0]:.1e} -> {diffs[-1]:.1e}'
                    + (f', observed order {last:.2f} (expected {order})' if last is not None else ', at round-off')
                    + f'; agrees with CVODE to {cvode_diff:.1e}')
         if problems:
-            return Result('verification_test_timestep', FAILED, '; '.join(problems), metrics, figs, problems)
+            return Result('verification_test_timestep', FAILED, '; '.join(problems + order_problems), metrics, figs,
+                          problems + order_problems)
+        if order_problems:
+            return Result('verification_test_timestep', PARTIAL,
+                          'partial: converges (differences decrease monotonically) and agrees with CVODE to '
+                          f'{cvode_diff:.1e}, but ' + '; '.join(order_problems)
+                          + ' (expected for a piecewise right-hand side: fixed steps are first order across a switch)',
+                          metrics, figs, order_problems)
         return Result('verification_test_timestep', PASSED, summary, metrics, figs)
     return _guard(cm.component, 'verification_test_timestep', check)
 
@@ -1232,7 +1390,7 @@ def _matches(declared, cfg):
 
 
 def stability_test(cm):
-    if is_cpp(cm.component):
+    if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'stability_test')
     """
     Runs the component with a matrix of solvers and settings and records which work:
@@ -1408,12 +1566,12 @@ def stability_test(cm):
 # ----------------------------------------------------------------------------------------------
 
 def _validation_status(cm, kind, test):
-    '''(early Result or None, spec block) for validation.<instance>.<kind> of the model's instance.'''
-    inst = cm.instance
+    '''(early Result or None, spec block) for validation.<parameterisation>.<kind> of the model's parameterisation.'''
+    inst = cm.parameterisation
     v = inst.validation.get(kind) or {}
     if kind == 'calibrate' and not inst.has_obs_data:
-        # an instance without obs_data has nothing to calibrate to: not applicable for that
-        # instance. A version with no calibration data in any instance fails the version-level
+        # a parameterisation without obs_data has nothing to calibrate to: not applicable for it.
+        # A version with no calibration data in any parameterisation fails the version-level
         # calibration (version_calibration, in the report's test overview).
         why = v.get('note') or v.get('reason')
         return Result(test, NOT_APPLICABLE, NO_CALIBRATION_DATA, details=[why] if why else []), v
@@ -1425,13 +1583,79 @@ def _validation_status(cm, kind, test):
     return None, v
 
 
+def period_changes(t, out, period):
+    '''{output: its largest change from one period to the next, as a fraction of its range} over a run
+    ``t`` (from the start of the first period, at least two periods long) of the outputs ``out``.'''
+    t = np.asarray(t, dtype=float)
+    first = t < t[0] + period - 1e-9
+    changes = {}
+    for name, y in out.items():
+        y = np.asarray(y, dtype=float)
+        scale = np.ptp(y) or (abs(float(np.mean(y))) or 1.0)
+        changes[name] = float(np.max(np.abs(np.interp(t[first] + period, t, y) - y[first])) / scale)
+    return changes
+
+
+def timestep_problems(diffs, observed, cvode_diff, min_order, tol, cvode_tol, roundoff):
+    '''
+    The time-step test's verdict from its successive differences ``diffs`` (coarsest first), the
+    ``observed`` orders and the finest fixed-step solution's difference from CVODE: (problems,
+    order_problems). Problems (non-finite, not decreasing, disagreeing with CVODE) fail the test; the
+    order and finest-step criteria alone (convergent, monotone, agreeing with CVODE, but slower than
+    the scheme's order, e.g. a piecewise right-hand side) make it partial.
+    '''
+    problems, order_problems = [], []
+    if not all(np.isfinite(diffs)):
+        problems.append('non-finite solution at some step size (explicit scheme unstable? use smaller dts)')
+        return problems, order_problems
+    if any(diffs[k + 1] > diffs[k] and diffs[k + 1] > roundoff for k in range(len(diffs) - 1)):
+        problems.append(f'differences do not decrease with dt: {["%.2e" % d for d in diffs]}')
+    last = next((o for o in reversed(observed) if o is not None), None)
+    if last is not None and last < min_order:
+        order_problems.append(f'observed order {last:.2f} < {min_order}')
+    if diffs[-1] > tol:
+        order_problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
+    if cvode_diff > cvode_tol:
+        problems.append(f'fixed-step and CVODE solutions differ by {cvode_diff:.2e} > {cvode_tol:.1e}')
+    return problems, order_problems
+
+
+def periodic_steady_state(cm, pre_time, outputs, params=None):
+    """
+    Whether the model, after ``pre_time`` s with ``params`` (model parameter names -> values),
+    is at periodic steady state: each of ``outputs`` repeats over one more period, its largest
+    change from one period to the next <= rtol x its range. None when the spec declares no
+    ``periodic_steady_state: {period, rtol}`` or there is no warm-up; else (ok, message, metrics).
+    ``period`` is in seconds, or the name of a parameter holding it (e.g. the cardiac period T).
+    """
+    pss = cm.spec.get('periodic_steady_state')
+    if not pss or not pre_time:
+        return None
+    period = pss.get('period', 1.0)
+    if isinstance(period, str):
+        values = {p.variable_name: p for p in cm.parameters()}
+        period = float((params or {}).get('parameters/' + harness.parameter_name(values[period]), values[period].float_value))
+    period, rtol = float(period), float(pss.get('rtol', 1e-3))
+    run_spec = dict(cm.spec, pre_time=float(pre_time), sim_time=2 * period, dt=min(float(cm.spec['dt']), period / 200))
+    helper = harness.simulation_helper(cm.model_path, run_spec)
+    t, out = harness.run(helper, list(outputs), params=params)
+    changes = period_changes(t, out, period)
+    bad = sorted(((c, n) for n, c in changes.items() if c > rtol), reverse=True)
+    metrics = {'period': period, 'rtol': rtol, 'pre_time': float(pre_time), 'changes': changes}
+    if not bad:
+        return True, f'at periodic steady state after {pre_time:g} s (every output repeats to {rtol:g} of its range)', metrics
+    return False, (f'not at periodic steady state after a {pre_time:g} s warm-up: '
+                   + ', '.join(f'{n} still changes {c:.2g} of its range per period' for c, n in bad)
+                   + ' (lengthen pre_time)'), metrics
+
+
 def validation_test_baseline(cm):
     '''
-    Compare the model, at the instance's parameters, with baseline data. Spec
-    (validation.<instance>.baseline in the version's verification_config.json):
+    Compare the model, at the parameterisation's parameters, with baseline data. Spec
+    (validation.<parameterisation>.baseline in the version's verification_config.json):
         status: active
         source: citation / URL
-        data: instances/<instance>/<file>.csv   time column + one column per compared output
+        data: parameterisations/<p>/<file>.csv   time column + one column per compared output
         time_column: t        time_offset: 0
         variables: {model_output: csv_column}
         parameters: {variable_name: value}  the parameter set the data are compared at
@@ -1446,7 +1670,7 @@ def validation_test_baseline(cm):
             return early
         if v.get('targets'):
             return _baseline_targets(cm, v)
-        # data paths are relative to the version directory (instances/<instance>/<file>)
+        # data paths are relative to the version directory (parameterisations/<parameterisation>/<file>)
         t_data, data = load_data(cm.component.dir, v)
         by_var = {p.variable_name: p for p in cm.parameters()}
         params = {k: float(val) for k, val in (v.get('parameters') or {}).items()}
@@ -1458,9 +1682,9 @@ def validation_test_baseline(cm):
         metric = v.get('metric', 'nrmse')
         threshold = float(v.get('threshold', 0.1))
         errors = {var: score(metric, np.interp(t_data, t, out[var]), data[var]) for var in v['variables']}
-        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline', cm.instance), t, out,
+        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline', cm.parameterisation), t, out,
                                        {k: t_data for k in data}, data, cm.units(),
-                                       f'{component.label} [{cm.instance.name}]: model vs {v.get("source_short", "data")}')
+                                       f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}')
         metrics = {metric: errors, 'threshold': threshold, 'source': v.get('source', ''),
                    'validated_values': params}
         if v.get('kind') == 'fit_check':
@@ -1471,7 +1695,7 @@ def validation_test_baseline(cm):
         if worst > threshold:
             return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, [fig])
         return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, [fig])
-    return _guard(cm.component, 'validation_test_baseline', check, cm.instance)
+    return _guard(cm.component, 'validation_test_baseline', check, cm.parameterisation)
 
 
 FEATURE_OPS = {
@@ -1483,7 +1707,7 @@ FEATURE_OPS = {
 def _baseline_targets(cm, v):
     '''
     Scalar validation targets, e.g. steady-state clinical values, evaluated on the logged run
-    (after pre_time). Spec (validation.<instance>.baseline):
+    (after pre_time). Spec (validation.<parameterisation>.baseline):
         pre_time: 20            sim_time: 5            parameters: {var: value}   (optional)
         targets:
           - {name: LV end-diastolic volume, expr: 'np.max(q_lv)*1e6', value: 142, std: 21, units: ml}
@@ -1503,6 +1727,9 @@ def _baseline_targets(cm, v):
     env.update(out)
     z = float(v.get('z_threshold', 2.0))
     rows, problems = [], []
+    pss = periodic_steady_state(cm, float(run_spec.get('pre_time') or 0.0), cm.outputs(), overrides)
+    if pss is not None and not pss[0]:
+        problems.append(pss[1])
     for tg in v['targets']:
         try:
             model = float(eval(tg['expr'], env))  # noqa: S307 - expressions come from the repo's own yaml
@@ -1520,17 +1747,20 @@ def _baseline_targets(cm, v):
         if not ok:
             problems.append(f"{tg['name']}: model {model:.4g} vs {target} {tg.get('units', '')}")
     metrics = {'targets': rows, 'z_threshold': z, 'source': v.get('source', ''), 'validated_values': params}
+    if pss is not None:
+        metrics['periodic_steady_state'] = pss[2]
     if problems:
-        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(v["targets"])} targets missed',
+        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(v["targets"])} targets missed'
+                      + ('' if pss is None or pss[0] else '; ' + pss[1]),
                       metrics, [], problems)
     return Result('validation_test_baseline', PASSED, f'all {len(rows)} targets met', metrics)
 
 
 def validation_test_calibrate(cm):
     '''
-    Calibrate to the instance's obs_data with libcuflynx parameter identification, then validate
-    on its held-out data; writes the instance's calibrated parameters. Not applicable to an
-    instance without obs_data ("no calibration data in this instance"); see version_calibration.
+    Calibrate to the parameterisation's obs_data with libcuflynx parameter identification, then
+    validate on its held-out data; writes the parameterisation's calibrated parameters. Not
+    applicable to a parameterisation without obs_data ("no calibration data in this parameterisation"); see version_calibration.
     '''
     def check():
         early, v = _validation_status(cm, 'calibrate', 'validation_test_calibrate')
@@ -1538,7 +1768,7 @@ def validation_test_calibrate(cm):
             return early
         from cam_testing import calibrate
         return calibrate.run(cm, v, plot_path)
-    return _guard(cm.component, 'validation_test_calibrate', check, cm.instance)
+    return _guard(cm.component, 'validation_test_calibrate', check, cm.parameterisation)
 
 
 CHECKS = {

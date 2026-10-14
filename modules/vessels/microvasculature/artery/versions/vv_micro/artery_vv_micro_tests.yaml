@@ -11,8 +11,8 @@ expected_failures:
     + 2). See review.proposed_fixes.'
 reference_proposals:
   E:
-    reference: 'Watanabe2013; Sec. 3.3 quoting Olufsen1999: E h/r_0 = k1 e^(k2 r_0) + k3, k1 = 2.0e7 dyn/cm^2, k2 = -22.53
-      cm^-1, k3 = 8.65e5 dyn/cm^2 -> E h/r_0 = 1.42 MPa at r_0 = 180 um; with h/r_0 = 0.388 (Watanabe2013 fit) E = 3.66 MPa
+    reference: 'watanabe2013mathematical; Sec. 3.3 quoting olufsen1999structured: E h/r_0 = k1 e^(k2 r_0) + k3, k1 = 2.0e7 dyn/cm^2, k2 = -22.53
+      cm^-1, k3 = 8.65e5 dyn/cm^2 -> E h/r_0 = 1.42 MPa at r_0 = 180 um; with h/r_0 = 0.388 (watanabe2013mathematical fit) E = 3.66 MPa
       (derived)'
     sourced: 'yes'
     value: 3660000.0
@@ -21,7 +21,7 @@ reference_proposals:
     sourced: 'no'
     value: 0.005
   r_0:
-    reference: Watanabe2013; smallest arm arteries (perforators) lumen radius 0.018 cm = 180 um, used as the representative
+    reference: watanabe2013mathematical; smallest arm arteries (perforators) lumen radius 0.018 cm = 180 um, used as the representative
       small artery feeding a microvascular network
     sourced: 'yes'
     value: 0.00018
@@ -51,13 +51,13 @@ reference_proposals:
     sourced: 'no'
     value: 2.061e-08
   a_vessel:
-    reference: 'Watanabe2013; Eq. (3.1), p. 969: fit h/r = a e^(b r) + c e^(d r) to the Avolio1980 arterial radius/wall-thickness
+    reference: 'watanabe2013mathematical; Eq. (3.1), p. 969: fit h/r = a e^(b r) + c e^(d r) to the avolio1980multi arterial radius/wall-thickness
       data, a = 0.2802. Fitted on arteries (r ~0.2-1.4 cm); used here down to capillaries = extrapolation (h/r -> a + c =
       0.41 as r -> 0)'
     sourced: 'yes'
     value: 0.2802
   b_vessel:
-    reference: 'Watanabe2013; Eq. (3.1): b = -5.053 cm^-1 = -505.3 m^-1 (r in cm, Fig. 2)'
+    reference: 'watanabe2013mathematical; Eq. (3.1): b = -5.053 cm^-1 = -505.3 m^-1 (r in cm, Fig. 2)'
     sourced: 'yes'
     value: -505.3
   beta_g:
@@ -65,11 +65,11 @@ reference_proposals:
     sourced: definitional
     value: 0.0
   c_vessel:
-    reference: 'Watanabe2013; Eq. (3.1): c = 0.1324'
+    reference: 'watanabe2013mathematical; Eq. (3.1): c = 0.1324'
     sourced: 'yes'
     value: 0.1324
   d_vessel:
-    reference: 'Watanabe2013; Eq. (3.1): d = -0.1114 cm^-1 = -11.14 m^-1'
+    reference: 'watanabe2013mathematical; Eq. (3.1): d = -0.1114 cm^-1 = -11.14 m^-1'
     sourced: 'yes'
     value: -11.14
   g:
@@ -77,14 +77,14 @@ reference_proposals:
     sourced: definitional
     value: 9.81
   mu:
-    reference: 'Watanabe2013; p. 976, mu = 0.04 P = 0.004 Pa s (whole-blood modelling value for large arteries). NOTE: for
-      microvessels the apparent viscosity is lower in vitro (Pries1992 law via Secomb2013: rel. viscosity 1.27 at 8 um, 1.78
-      at 30 um, x plasma 1.1-1.3 mPa s -> ~1.5-2.1 mPa s) and higher in vivo (Pries1994: 10 um vessels ~4x glass tube). One
+    reference: 'watanabe2013mathematical; p. 976, mu = 0.04 P = 0.004 Pa s (whole-blood modelling value for large arteries). NOTE: for
+      microvessels the apparent viscosity is lower in vitro (pries1992blood law via secomb2013blood: rel. viscosity 1.27 at 8 um, 1.78
+      at 30 um, x plasma 1.1-1.3 mPa s -> ~1.5-2.1 mPa s) and higher in vivo (pries1994resistance: 10 um vessels ~4x glass tube). One
       global value for all vessel classes'
     sourced: 'yes'
     value: 0.004
   rho:
-    reference: Watanabe2013; p. 976, rho = 1.04 g/cm^3 = 1040 kg/m^3 (Trudnowski1974 measured 1050.6 kg/m^3 at 37 C). Not
+    reference: watanabe2013mathematical; p. 976, rho = 1.04 g/cm^3 = 1040 kg/m^3 (trudnowski1974specific measured 1050.6 kg/m^3 at 37 C). Not
       used by any equation (the gravity/inertia terms are commented out)
     sourced: 'yes'
     value: 1040.0

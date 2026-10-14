@@ -1,0 +1,98 @@
+module_type: ion_concentrations
+version: cardiomyocyte_Paci2013_v01
+reviewed: false
+notes: 'Paci 2013 intracellular Na: dNai/dt = -Cm (I_Na + I_bNa + 3 I_NaK + 3 I_NaCa)/(F Vc). Linear in time for constant
+  currents.
+
+
+  Ports of the versions of ion_concentrations (they differ; allowed and documented, see modules/README.md, Versions):
+
+  entrance internal_Na: cardiomyocyte_Paci2013_v01 [Nai]; SN_soma_Argus2026_v01 -
+
+  exit NaCa_current: cardiomyocyte_Paci2013_v01 [i_NaCa]; SN_soma_Argus2026_v01 -
+
+  exit NaK_current: cardiomyocyte_Paci2013_v01 [i_NaK]; SN_soma_Argus2026_v01 -
+
+  exit Na_current: cardiomyocyte_Paci2013_v01 [i_Na]; SN_soma_Argus2026_v01 -
+
+  exit b_Na_current: cardiomyocyte_Paci2013_v01 [i_b_Na]; SN_soma_Argus2026_v01 -
+
+  exit internal_Na: cardiomyocyte_Paci2013_v01 [Nai]; SN_soma_Argus2026_v01 -
+
+  general E_K_potential: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [E_K]
+
+  general K_flux: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_K_total]
+
+  general Na_Nernst_potential: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [E_Na]
+
+  general Na_flux: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [j_Na_total]
+
+  general compartment_volume: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Vol]
+
+  general internal_Na: cardiomyocyte_Paci2013_v01 -; SN_soma_Argus2026_v01 [Nai]'
+known_issues:
+- 'undefined units: C_per_M'
+expected_failures:
+  run_test: 'generation fails: the global constants R and F are in units J_per_MK / C_per_M in cell_parameters.csv and the
+    Paci components, which are not defined anywhere (known issue), while the SN components declare the same globals as J_per_mol_K
+    / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match with units of J_per_mol_K in
+    module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere (CellML, config, parameters)
+    for R and F. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_invariants: 'generation fails: the global constants R and F are in units J_per_MK / C_per_M in cell_parameters.csv
+    and the Paci components, which are not defined anywhere (known issue), while the SN components declare the same globals
+    as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match with units of
+    J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere (CellML, config,
+    parameters) for R and F. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_BC: 'generation fails: the global constants R and F are in units J_per_MK / C_per_M in cell_parameters.csv
+    and the Paci components, which are not defined anywhere (known issue), while the SN components declare the same globals
+    as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match with units of
+    J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere (CellML, config,
+    parameters) for R and F. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  verification_test_timestep: 'generation fails: the global constants R and F are in units J_per_MK / C_per_M in cell_parameters.csv
+    and the Paci components, which are not defined anywhere (known issue), while the SN components declare the same globals
+    as J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match with units of
+    J_per_mol_K in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere (CellML, config,
+    parameters) for R and F. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+  stability_test: 'generation fails: the global constants R and F are in units J_per_MK / C_per_M in cell_parameters.csv and
+    the Paci components, which are not defined anywhere (known issue), while the SN components declare the same globals as
+    J_per_mol_K / C_per_mol (libcuflynx exits: ''units of J_per_MK in parameters.csv file does not match with units of J_per_mol_K
+    in module_config.json for param R''). Fix: use the defined J_per_mol_K / C_per_mol everywhere (CellML, config, parameters)
+    for R and F. With the proposed fixes applied to a copy of the library, all tests of this component pass.'
+reference_proposals:
+  Nai_init:
+    reference: 'paci2013computational; initial value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+      ventricularVersion): Nai_init = 10.9248'
+    sourced: 'yes'
+    value: 10.9248496211574
+  i_Na:
+    reference: definitional; i_Na is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_b_Na:
+    reference: definitional; i_b_Na is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_NaK:
+    reference: definitional; i_NaK is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  i_NaCa:
+    reference: definitional; i_NaCa is supplied by a connected module in a network; 0 alone (test operating point)
+    sourced: definitional
+    value: 0.0
+  Cm:
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Cm = 9.87109e-11 F (Paci 2013 cell; used by the Paci components of this module)'
+    sourced: 'yes'
+    value: 9.87109e-11
+  Vc:
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+      Vc = 8800 um^3 (Paci 2013 cell; used by the Paci components of this module)'
+    sourced: 'yes'
+    value: 8800.0
+  F:
+    reference: tiesinga2021codata; Faraday constant 96485.33212 C/mol, rounded to 96485 C/mol
+    sourced: 'yes'
+review: reviews/cell_review.yaml
+review_scope: The review of the whole cardiomyocytes module (3 entries) before the move to versions; only the parts about
+  this version apply.

@@ -3,10 +3,18 @@
     "module_type": "capillary",
     "module_subtype": "pp_micro_lumped",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
-    "description": "capillary/pp_micro built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): R_p (resistance pp_geometric) -> C (compliance vv_linear_geometric_novisco) -> R_d (resistance pp_geometric); V (vessel_volume nn_geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "description": "capillary/pp_micro built from lumped constitutive submodules (modules/haemodynamics/lumped_constitutive): R_p (resistance pp_geometric) -> C (compliance vv_linear_geometric_novisco) -> R_d (resistance pp_geometric); V (vessel_volume geometric) gathers the compliances' volumes. Reproduces the monolithic version (supermodule.equivalent_version in its spec).",
     "routes": {
       "inputs": {
         "vessel_port": "R_p"
@@ -62,7 +70,7 @@
         "name": "R_p",
         "module_type": "resistance",
         "module_subtype": "pp_geometric",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "C"
@@ -72,7 +80,7 @@
         "name": "C",
         "module_type": "compliance",
         "module_subtype": "vv_linear_geometric_novisco",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "R_p"
         ],
@@ -85,7 +93,7 @@
         "name": "R_d",
         "module_type": "resistance",
         "module_subtype": "pp_geometric",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "C"
         ],
@@ -94,8 +102,8 @@
       {
         "name": "V",
         "module_type": "vessel_volume",
-        "module_subtype": "nn_geometric",
-        "instance": "default",
+        "module_subtype": "geometric",
+        "parameterisation": "default",
         "inp_instances": [
           "C"
         ],

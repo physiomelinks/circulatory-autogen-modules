@@ -7,22 +7,22 @@ notes: 'Paci 2013 hiPSC-CM (ventricular-like) inward rectifier I_K1 = g_K1 XK1_i
   so alone it is a pure function of its inputs, checked exactly against the original model equations.'
 reference_proposals:
   g_K1:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       g_K1 = 28.1492'
     sourced: 'yes'
     value: 28.1492
   Vm:
-    reference: 'Paci2013; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
     sourced: 'yes'
     value: -0.0743340057623841
   E_K:
-    reference: 'definitional; Nernst potential of the Paci2013 electric_potentials at the CellML initial state (R=8.314472,
+    reference: 'definitional; Nernst potential of the paci2013computational electric_potentials at the CellML initial state (R=8.314472,
       T=310, F=96485.3415, Nao=151, Ko=5.4, Ki=150, Cao=1.8 mM, Nai=10.9248, Cai=1.80774e-5 mM): E_K = -0.0888029 V'
     sourced: definitional
     value: -0.08880285397707481
   Ko:
-    reference: 'Paci2013; extracellular K in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; extracellular K in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Ko = 5.4 mM'
     sourced: 'yes'
     value: 5.4

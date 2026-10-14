@@ -4,24 +4,24 @@ of other modules' versions. Such a version replaces a monolithic one of the same
 heart version Argus2026_v01, cell/neuron/soma version sympathetic).
 
   <module_type>_<version>_modules_config.json   one entry: module_format "supermodule", the
-                                                submodules (a vessel array of library versions, each
-                                                with its "instance"; internal connections only) and
-                                                "default_instance"
-  instances/<instance>/<instance>_parameters.csv  its parameters, {var}_{submodule} or globals
+                                                submodules (a module array of library versions, each
+                                                with its "parameterisation"; internal connections only)
+                                                and "default_parameterisation"
+  parameterisations/<p>/<p>_parameters.csv      its parameters, {var}_{submodule} or globals
   <module_type>_<version>_tests.yaml / _verification_config.json   description; supermodule.globals and
                                                 supermodule.equivalent (system models it must reproduce)
 
-A model uses one record, e.g. {"name": "heart", "module_type": "heart", "module_subtype":
-"Argus2026_v01", "instance": "default", "per_submodule_inputs": {"ra": ["venous_svc"]},
+A model uses one record (an instance of the version), e.g. {"name": "heart", "module_type": "heart",
+"module_subtype": "Argus2026_v01", "parameterisation": "default", "per_submodule_inputs": {"ra": ["venous_svc"]},
 "per_submodule_outputs": {"aov": ["aortic_root"]}}. libcuflynx expands it: each submodule becomes
 <name>_<submodule>, the host modules in per_submodule_inputs / per_submodule_outputs are coupled to
-that submodule, and the instance's parameters are renamed to the prefixed names. Precedence: the
-model's parameters file > the supermodule's instance > the submodules' instances.
+that submodule, and the parameterisation's parameters are renamed to the prefixed names. Precedence:
+the model's parameters file > the supermodule's parameterisation > the submodules' parameterisations.
 
 The version-level tests (tests/test_modules.py):
-  supermodule_structure_test    every submodule names a library (module_type, version) and an instance
-                                it has; internal connections name sibling submodules; the instance's
-                                parameters name submodules (or are declared globals)
+  supermodule_structure_test    every submodule names a library (module_type, version) and a
+                                parameterisation it has; internal connections name sibling submodules;
+                                the parameterisations' parameters name submodules (or are declared globals)
   supermodule_equivalence_test  each supermodule.equivalent entry: a system model using the version
                                 reproduces a system model with the submodules written out
 """
@@ -29,7 +29,7 @@ import csv
 import dataclasses
 import os
 
-from cam_testing import checks, library
+from cam_testing import checks, library, module_array
 
 
 def supermodules():
@@ -48,7 +48,7 @@ def load_supermodule(key):
 
 
 def structure_problems(version):
-    index = library.version_index()
+    index = library.version_index(include_libraries=True)   # submodules may be extra libraries' versions
     names = set(version.submodule_names)
     problems = []
     if len(names) != len(version.submodules):
@@ -68,9 +68,9 @@ def structure_problems(version):
         target = index.get(key)
         if target is None:
             problems.append(f'{sub["name"]}: ({key[0]}, {key[1]}) is not a version in the module library')
-        elif sub.get('instance') and sub['instance'] not in target.instance_names():
-            problems.append(f'{sub["name"]}: {key[0]}/{key[1]} has no instance {sub["instance"]} '
-                            f'(it has {target.instance_names()})')
+        elif module_array.parameterisation_of(sub) and module_array.parameterisation_of(sub) not in target.parameterisation_names():
+            problems.append(f'{sub["name"]}: {key[0]}/{key[1]} has no parameterisation {module_array.parameterisation_of(sub)} '
+                            f'(it has {target.parameterisation_names()})')
         for n in sub.get('inp_instances', []) + sub.get('out_instances', []):
             if n not in names:
                 problems.append(f'{sub["name"]}: {n} is not a submodule (external connections belong in the host\'s '
@@ -82,15 +82,16 @@ def structure_problems(version):
             for n in [subs] if isinstance(subs, str) else subs:
                 if n not in names:
                     problems.append(f'routes.{key}.{port_type}: {n} is not a submodule')
-    for inst in version.instances():
+    for inst in version.parameterisations():
         with open(inst.parameters_path) as f:
             for row in csv.DictReader(f):
                 var = (row.get('variable_name') or '').strip()
                 owner = next((n for n in sorted(names, key=len, reverse=True) if var.endswith('_' + n)), None)
                 if owner is None and var not in declared and var not in shared:
-                    problems.append(f'instance {inst.name}: parameter {var} names no submodule and is not a declared global')
-    if version.default_instance_name not in version.instance_names():
-        problems.append(f'default_instance {version.default_instance_name} has no instances/ directory')
+                    problems.append(f'parameterisation {inst.name}: parameter {var} names no submodule and is not a declared global')
+    if version.default_parameterisation_name not in version.parameterisation_names():
+        problems.append(f'default_parameterisation {version.default_parameterisation_name} has no '
+                        'parameterisations/ directory')
     return problems
 
 
@@ -112,7 +113,8 @@ def equivalence(version, entry, work_dir):
     solver_info = entry.get('solver_info') or {'rtol': 1e-10, 'atol': 1e-12}
     ref_path = systems.generate(target, os.path.join(work_dir, 'target'))
     t_ref, ref = systems.simulate(ref_path, target.spec, solver_info)
-    # submodule outputs renamed <instance>_<sub>; an explicit output_map in the spec (for nested
+    # submodule outputs renamed <instance>_<sub> (the instance: the supermodule's record name in the
+    # model); an explicit output_map in the spec (for nested
     # supermodules, or variables that moved between components) takes precedence
     output_map = {**prefixed_output_map(ref, entry.get('instance', version.vessel_type), version.submodule_names),
                   **(entry.get('output_map') or {})}
@@ -145,7 +147,7 @@ def structure_check(version):
         r = checks.Result('supermodule_structure_test', checks.FAILED, f'{len(problems)} problems', details=problems)
     else:
         r = checks.Result('supermodule_structure_test', checks.PASSED,
-                          f'{len(version.submodules)} submodules, all library versions with their instances; '
+                          f'{len(version.submodules)} submodules, all library versions with their parameterisations; '
                           'connections internal; parameters name submodules or globals')
     return checks.save(version, r)
 
@@ -193,8 +195,8 @@ def coarse_atol(rows, solver_info, states):
 # supermodule.equivalent_version in the spec:
 #   version                 <module_type>/<version> of the monolithic version
 #   monolithic_parameters   {variable: value}: the monolithic version's parameters for the comparison
-#                           (its default instance's, with its TODOs and boundary conditions filled to
-#                           match the supermodule's default instance)
+#                           (its default parameterisation's, with its TODOs and boundary conditions filled to
+#                           match the supermodule's default parameterisation)
 #   output_map              {monolithic output: "<submodule>/<variable>"}
 #   tol, solver_info
 # Both are generated alone (the vessel "mod") and simulated over the supermodule's sim_time.
@@ -203,7 +205,7 @@ def version_equivalence(version, entry, work_dir):
     from cam_testing import harness, system as systems
     mt, v = entry['version'].split('/', 1)
     mono = library.load_version(mt, v)
-    # the monolithic version's parameters, with the entry's values (and any the instance lacks)
+    # the monolithic version's parameters, with the entry's values (and any the parameterisation lacks)
     values = dict(entry.get('monolithic_parameters') or {})
     config = {r[0]: r for r in mono.config.get('variables_and_units') or []}
     params = []
@@ -221,10 +223,11 @@ def version_equivalence(version, entry, work_dir):
     # a monolithic version tested in a network (spec harness: e.g. a flow source upstream) is compared
     # with the supermodule in the same network, in its place
     network = mono.spec.get('harness')
-    if network and network.get('vessel_array'):
+    if module_array.harness_rows(network):
         rows = [[r[0], version.BC_type, version.vessel_type, *r[3:]] if r[0] == harness.VESSEL else r
-                for r in network['vessel_array']]
-        version = dataclasses.replace(version, spec={**version.spec, 'harness': {**network, 'vessel_array': rows}})
+                for r in module_array.harness_rows(network)]
+        network = {k: v for k, v in network.items() if k != 'vessel_array'}
+        version = dataclasses.replace(version, spec={**version.spec, 'harness': {**network, 'module_array': rows}})
     super_path = harness.generate(version, os.path.join(work_dir, 'supermodule'))
     _, ref = systems.simulate(mono_path, spec, solver_info, names=list(output_map))
     _, new = systems.simulate(super_path, spec, solver_info, names=list(output_map.values()))

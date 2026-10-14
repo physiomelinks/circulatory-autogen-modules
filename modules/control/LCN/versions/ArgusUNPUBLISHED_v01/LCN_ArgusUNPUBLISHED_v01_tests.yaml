@@ -1,0 +1,66 @@
+module_type: LCN
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Local circuit neurons of the intrinsic cardiac nervous system (Gee 2023 eq. S.1 + eq. 3): weighted sum of vagal (DMV
+  + NActr), baroreceptor and cardiopulmonary inputs minus sympathetic heart efferent, clipped at 0, then the sigmoid. Gee
+  2023 feeds the vagal efferent f_ev; here f_DMV + f_NActr. Parameters were re-identified by the module author (identified-11-6-24).
+  Algebraic.'
+reference_proposals:
+  f_min_LCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives f_min,LCN
+      = 1.99 Hz for comparison
+    sourced: 'no'
+  f_max_LCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives f_max,LCN
+      = 18.38 Hz for comparison
+    sourced: 'no'
+  f_mid_LCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives f_mid,LCN
+      = 521.22 Hz for comparison
+    sourced: 'no'
+  k_LCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives k_LCN = 3.00
+      for comparison
+    sourced: 'no'
+  k_evEmax_gainLCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives K_LCN,fev
+      = 3.33 for comparison
+    sourced: 'no'
+  k_br_gainLCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives K_LCN,BR
+      = 2.66 for comparison
+    sourced: 'no'
+  k_esh_gainLCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives K_LCN,fesh
+      = 0.07 for comparison
+    sourced: 'no'
+  k_cp_gainLCN:
+    reference: unreferenced_placeholder; identified by the module author (2024-06-11); Gee 2023 Table S.28 gives K_LCN,CP
+      = 5.64 for comparison
+    sourced: 'no'
+  f_NActr:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (NActr output)
+    sourced: 'no'
+    value: 5.0
+  f_DMV:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (DMV output)
+    sourced: 'no'
+    value: 4.0
+  f_esh:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (sympathetic heart
+      efferent)
+    sourced: 'no'
+    value: 4.0
+  f_br:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (baroreceptor
+      firing)
+    sourced: 'no'
+    value: 25.0
+  f_cp:
+    reference: unreferenced_placeholder; test operating point for an input normally supplied by a neighbour (cardiopulmonary
+      firing)
+    sourced: 'no'
+    value: 10.0
+review: reviews/parasympathetic_review.yaml
+review_scope: The review of the whole parasympathetic module (14 entries) before the move to versions; only the parts about
+  this version apply.

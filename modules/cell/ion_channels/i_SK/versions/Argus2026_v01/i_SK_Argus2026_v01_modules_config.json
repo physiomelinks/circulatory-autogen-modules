@@ -5,9 +5,18 @@
     "module_format": "cellml",
     "component_file": "i_SK_Argus2026_v01_modules.cellml",
     "component_type": "i_SK_SN",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
-    "creator": [],
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "hirschberg1998gating",
+      "argus2026sympathetic"
+    ],
+    "required_citations_uncertain": [
+      "hirschberg1998gating"
+    ],
     "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
     "entrance_ports": [],
     "exit_ports": [],
@@ -25,9 +34,9 @@
         ]
       },
       {
-        "port_type": "bulk_Ca",
+        "port_type": "internal_Ca",
         "variables": [
-          "Ca_bulk"
+          "Cai"
         ]
       },
       {
@@ -41,11 +50,17 @@
         "variables": [
           "j_KCa_SK"
         ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
       }
     ],
     "variables_and_units": [
       [
-        "Ca_bulk",
+        "Cai",
         "millimolar",
         "access",
         "boundary_condition"
@@ -83,6 +98,24 @@
       [
         "g_KCa_SK",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_SK",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_SK",
+        "picoS",
         "access",
         "constant"
       ],
@@ -133,6 +166,30 @@
         "millis",
         "access",
         "constant"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_SK",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_SK",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_SK",
+        "dimensionless",
+        "access",
+        "variable"
       ]
     ]
   }

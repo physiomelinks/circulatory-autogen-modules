@@ -5,9 +5,17 @@
     "module_format": "cellml",
     "component_file": "compliance_vv_nonlinear_modules.cellml",
     "component_type": "compliance_vv_nonlinear",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
+    "required_citations": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "safaei2016roadmap",
+      "argus2026circulatory"
+    ],
     "description": "Nonlinear tube law u = K_tube ((q/(f q_0))^m - (q/(f q_0))^n) + u_0 + u_ext, q_0 a parameter.",
     "entrance_ports": [
       {

@@ -1,0 +1,75 @@
+{
+ "parameterisation": "FitzHugh_Nagumo_data",
+ "version": "FitzHugh_Nagumo/nn",
+ "date": "2026-09-30",
+ "passed": true,
+ "summary": "start a=0.8, b=0.9, c=2 -> a=0.1999, b=0.2006, c=3 (prediction nrmse 0.000101)",
+ "method": "multi_start_sp_minimize",
+ "files": [
+  "parameterisations/FitzHugh_Nagumo_data/FitzHugh_Nagumo_data_obs_data.json",
+  "parameterisations/FitzHugh_Nagumo_data/FitzHugh_Nagumo_data_params_for_id.csv"
+ ],
+ "cost": 4.526370989661677e-06,
+ "calibrated_parameters": {
+  "a": 0.1999116267559553,
+  "b": 0.20059597384053354,
+  "c": 2.9999928018398023
+ },
+ "runs": [
+  {
+   "start": {
+    "a": 0.8,
+    "b": 0.9,
+    "c": 2.0
+   },
+   "calibrated_parameters": {
+    "a": 0.1999116267559553,
+    "b": 0.20059597384053354,
+    "c": 2.9999928018398023
+   },
+   "cost": 4.526370989661677e-06,
+   "calibration_scores": {
+    "V": 6.465335142958059e-05,
+    "R": 8.25036469648772e-05
+   },
+   "prediction_scores": {
+    "V": 0.00010068542277508693,
+    "R": 5.82112138296044e-05
+   },
+   "constant_items": {
+    "V_max_validation": {
+     "model": 2.0406505419668024,
+     "data": 2.03413362,
+     "z": 0.06516921966802425
+    },
+    "V_min_validation": {
+     "model": -1.95315002772183,
+     "data": -1.95323581,
+     "z": 0.0008578227816991024
+    },
+    "V_mean_validation": {
+     "model": 0.28459959634968646,
+     "data": 0.280355813255814,
+     "z": 0.7362688489471197
+    },
+    "R_max_validation": {
+     "model": 1.1115256394722435,
+     "data": 1.11094909,
+     "z": 0.011530989444867856
+    },
+    "R_min_validation": {
+     "model": -0.9416661907397726,
+     "data": -0.94177367,
+     "z": 0.002149585204547222
+    },
+    "R_mean_validation": {
+     "model": 0.00016599274895722475,
+     "data": 0.000574665182724242,
+     "z": 0.14180403463151278
+    }
+   }
+  }
+ ],
+ "metric": "nrmse",
+ "threshold": 0.1
+}

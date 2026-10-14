@@ -1,0 +1,13 @@
+module_type: muscle_pressure
+version: constant
+reviewed: false
+notes: Constant pressure P exposed on a thoracic_pressure_port (consumed by lung thoracic_cavity as P_pl or by the parasympathetic
+  cardiopulmonary receptor as P_mus). Tested driving lung/thoracic_cavity, whose P_thor = P_pl.
+reference_proposals:
+  P:
+    reference: definitional; relaxed respiratory muscles (no muscle pressure) at rest; set per protocol
+    sourced: definitional
+    value: 0.0
+review: reviews/boundary_condition_review.yaml
+review_scope: The review of the whole boundary_condition module (11 entries) before the move to versions; only the parts about
+  this version apply.

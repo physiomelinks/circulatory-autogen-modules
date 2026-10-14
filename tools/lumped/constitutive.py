@@ -30,7 +30,7 @@ class Variable:
     units: str
     kind: str                  # constant | global_constant | boundary_condition | variable
     initial: str = None        # a state's initial value (a number or a constant's name)
-    default: object = None     # the default instance's value (constants and boundary conditions)
+    default: object = None     # the default parameterisation's value (constants and boundary conditions)
 
 
 @dataclass
@@ -406,9 +406,9 @@ def _vessel_volume(version, description, geometric):
 
 
 VESSEL_VOLUME = [
-    _vessel_volume('nn', 'The whole vessel\'s volume: the sum of its compliances\' volumes (volume_port in, summed), '
+    _vessel_volume('summed', 'The whole vessel\'s volume: the sum of its compliances\' volumes (volume_port in, summed), '
                    'passed to hosts (volume_port) and to resistance laws that need it (total_volume_port).', False),
-    _vessel_volume('nn_geometric', 'The whole vessel\'s volume and geometry: q_total summed over its compliances, '
+    _vessel_volume('geometric', 'The whole vessel\'s volume and geometry: q_total summed over its compliances, '
                    'r_0 and l, and the radius r = sqrt(q_total/(pi l)), for hosts (volume_port, radius_port, len_port, '
                    'radius_0_and_s_port: material-property modules) and resistance laws (total_volume_port).', True),
 ]

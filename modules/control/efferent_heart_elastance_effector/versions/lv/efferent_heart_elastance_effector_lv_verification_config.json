@@ -1,0 +1,48 @@
+{
+  "module_type": "efferent_heart_elastance_effector",
+  "version": "lv",
+  "sim_time": 40.0,
+  "pre_time": 0.0,
+  "dt": 0.05,
+  "solver": "CVODE_myokit",
+  "outputs": ["Delta_theta", "sigma_theta"],
+  "invariants": [
+    {
+      "description": "sigma_theta = G_theta ln(f_s - f_es_min + 1) above threshold, 0 below",
+      "expr": "np.max(np.abs(sigma_theta - (G_theta*np.log(f_s - f_es_min + 1) if f_s >= f_es_min else 0.0))) <= 1e-9*max(1.0, abs(G_theta))"
+    },
+    {
+      "description": "Delta_theta matches sigma (1 - exp(-t/tau_theta))",
+      "expr": "np.max(np.abs(Delta_theta - sigma_theta*(1 - np.exp(-t/tau_theta)))) <= 1e-4*max(1.0, np.max(np.abs(sigma_theta)))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {
+      "f_s": {"min": 0.0, "max": 60.0, "points": 7}
+    },
+    "rationale": "f_s from silent to f_es_max; gain and time constant 0.5-2x."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.04, 0.02, 0.01, 0.005],
+    "t_end": 40.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "effector transfer block; exact solution checked; contractility response data belong to a closed-loop heart network."
+      },
+      "calibrate": {"note": "not_applicable: see baseline"}
+    }
+  }
+}

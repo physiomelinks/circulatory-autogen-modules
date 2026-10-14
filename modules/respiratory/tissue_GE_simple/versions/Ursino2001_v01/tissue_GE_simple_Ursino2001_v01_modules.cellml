@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="tissue_GE_simple_Ursino2001_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="tissue_GE_simple_type">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- Constitutive parameters-->
+        <variable name="q_0" public_interface="in" units="m3"/>
+        <variable name="v" public_interface="in" units="m3_per_s"/>
+        <variable name="M_O2" public_interface="in" units="m3_per_s"/>
+        <variable name="M_CO2" public_interface="in" units="m3_per_s"/>
+        <variable name="C_O2_a" public_interface="in" units="dimensionless"/>
+        <variable name="C_CO2_a" public_interface="in" units="dimensionless"/>
+        <variable name="C_O2_p_init" public_interface="in" units="dimensionless"/>
+        <variable name="C_CO2_p_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="C_O2_p_init" name="C_O2_p" public_interface="out" units="dimensionless"/>
+        <variable initial_value="C_CO2_p_init" name="C_CO2_p" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_O2_p</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>v</ci>
+                            <apply>
+                                <minus/>
+                                <ci>C_O2_a</ci>
+                                <ci>C_O2_p</ci>
+                            </apply>
+                        </apply>
+                        <ci>M_O2</ci>
+                    </apply>
+                    <ci>q_0</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_CO2_p</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>v</ci>
+                            <apply>
+                                <minus/>
+                                <ci>C_CO2_a</ci>
+                                <ci>C_CO2_p</ci>
+                            </apply>
+                        </apply>
+                        <ci>M_CO2</ci>
+                    </apply>
+                    <ci>q_0</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

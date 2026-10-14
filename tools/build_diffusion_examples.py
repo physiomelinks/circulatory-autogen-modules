@@ -9,7 +9,7 @@ diffusion_volume's tissue_diffusion_volume cells and tissue_diffusion_face faces
 Each cell is a volume (V_P); each shared face joins two cells with its area A_f and the distances
 d_up, d_down from the two cell centres (centroids) to the face. The domains are closed, with
 different initial concentrations and no sources or consumption, so the total amount sum V C is
-conserved and every cell tends to the volume-weighted mean. Rewrites the vessel array and
+conserved and every cell tends to the volume-weighted mean. Rewrites the module array and
 parameters, and writes the spec only if there isn't one.
 
     python tools/build_diffusion_examples.py
@@ -23,7 +23,7 @@ import numpy as np
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from cam_testing import vessel_array  # noqa: E402
+from cam_testing import module_array  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, 'system_models', 'diffusion')
@@ -102,23 +102,23 @@ def write(model, description, cells, faces):
     d = os.path.join(OUT, model)
     os.makedirs(d, exist_ok=True)
     C0 = initial(cells)
-    rows, params = [], [['sigma_diff', 'm2_per_s', SIGMA, 'Secomb2020; Table 1 tissue O2 diffusivity 2410 um^2/s']]
+    rows, params = [], [['sigma_diff', 'm2_per_s', SIGMA, 'secomb2020mass; Table 1 tissue O2 diffusivity 2410 um^2/s']]
     for n, c in cells.items():
         inp = [f'f{k}' for k, f in enumerate(faces) if f[1] == n]
         out = [f'f{k}' for k, f in enumerate(faces) if f[0] == n]
-        rows.append([n, 'nn', 'tissue_diffusion_volume', ' '.join(inp), ' '.join(out), 'default'])
+        rows.append([n, 'Fang2008_v01', 'tissue_diffusion_volume', ' '.join(inp), ' '.join(out), 'default'])
         params += [[f'C_P_init_{n}', 'millimolar', round(C0[n], 6), 'example: random initial concentration'],
                    [f'V_P_{n}', 'm3', c['V'], 'example mesh: cell volume'],
                    [f'flux_c_{n}', 'mol_per_s', 0, 'example: closed domain, no capillary supply'],
                    [f'M_{n}', 'millimolar_per_s', 0, 'example: no consumption'],
                    [f'C50_{n}', 'millimolar', 0.0133, 'example (unused with M = 0)']]
     for k, (a, b, A, da, db) in enumerate(faces):
-        rows.append([f'f{k}', 'nn', 'tissue_diffusion_face', a, b, 'default'])
+        rows.append([f'f{k}', 'Fang2008_v01', 'tissue_diffusion_face', a, b, 'default'])
         params += [[f'A_f_f{k}', 'm2', A, 'example mesh: face area'],
                    [f'd_up_f{k}', 'metre', da, f'example mesh: centre of {a} to the face'],
                    [f'd_down_f{k}', 'metre', db, f'example mesh: centre of {b} to the face'],
                    [f'open_flag_f{k}', 'dimensionless', 1, 'open face']]
-    vessel_array.write_records(os.path.join(d, f'{model}_vessel_array.json'), vessel_array.from_rows(rows))
+    module_array.write_records(os.path.join(d, f'{model}_module_array.json'), module_array.from_rows(rows))
     with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(['variable_name', 'units', 'value', 'data_reference'])

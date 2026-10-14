@@ -38,32 +38,32 @@ expected_failures:
     in ion_channel_units.cellml. With the proposed fix applied to a copy of the library, all tests of this component pass.'
 reference_proposals:
   g_Kr:
-    reference: 'Paci2013; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
+    reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
       g_Kr = 29.8667'
     sourced: 'yes'
     value: 29.8667
   Vm:
-    reference: 'Paci2013; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; resting (initial) membrane potential in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): -0.0743340 V (operating point; a voltage-clamp input here)'
     sourced: 'yes'
     value: -0.0743340057623841
   E_K:
-    reference: 'definitional; Nernst potential of the Paci2013 electric_potentials at the CellML initial state (R=8.314472,
+    reference: 'definitional; Nernst potential of the paci2013computational electric_potentials at the CellML initial state (R=8.314472,
       T=310, F=96485.3415, Nao=151, Ko=5.4, Ki=150, Cao=1.8 mM, Nai=10.9248, Cai=1.80774e-5 mM): E_K = -0.0888029 V'
     sourced: definitional
     value: -0.08880285397707481
   Xr1:
-    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Xr1 = 0.00778547'
     sourced: 'yes'
     value: 0.00778547011240132
   Xr2:
-    reference: 'Paci2013; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; initial (quasi-steady) value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Xr2 = 0.432163'
     sourced: 'yes'
     value: 0.432162576531617
   Ko:
-    reference: 'Paci2013; extracellular K in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; extracellular K in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Ko = 5.4 mM'
     sourced: 'yes'
     value: 5.4
@@ -78,19 +78,19 @@ reference_proposals:
     sourced: definitional
     value: 0
   R:
-    reference: Paci2013; gas constant as used in the authors' CellML (8.314472 J/(mol K), CODATA 2006)
+    reference: paci2013computational; gas constant as used in the authors' CellML (8.314472 J/(mol K), CODATA 2006)
     sourced: 'yes'
     value: 8.314472
   T:
-    reference: Paci2013; temperature in the authors' CellML (310 K)
+    reference: paci2013computational; temperature in the authors' CellML (310 K)
     sourced: 'yes'
     value: 310
   F:
-    reference: Paci2013; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
+    reference: paci2013computational; Faraday constant as used in the authors' CellML (96485.3415 C/mol, CODATA 2006)
     sourced: 'yes'
     value: 96485.3415
   Cao:
-    reference: 'Paci2013; extracellular Ca in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
+    reference: 'paci2013computational; extracellular Ca in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013,
       ventricularVersion): Cao = 1.8 mM (note: the Tao 2011 neuron currents share this global; Tao 2011 used its own bath
       value)'
     sourced: 'yes'

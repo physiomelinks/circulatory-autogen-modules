@@ -1,0 +1,18 @@
+module_type: flow_sum_2
+version: Safaei2016_v01
+reviewed: false
+notes: Algebraic flow summation v_total = v_1 + v_2; no states.
+reference_proposals:
+  v_1:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 5e-05
+      m^3/s, half of the total for a two-branch port
+    sourced: 'no'
+    value: 5.0e-05
+  v_2:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 5e-05
+      m^3/s, half of the total for a two-branch port
+    sourced: 'no'
+    value: 5.0e-05
+review: reviews/BG_review.yaml
+review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
+  apply.

@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="membrane_potential_cardiomyocyte_Paci2013_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="myocyte_membrane_voltage">
+        <variable name="Vm_init" public_interface="in" units="volt"/>
+        <variable initial_value="Vm_init" name="Vm" public_interface="out" units="volt"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="i_CaL" public_interface="in" units="A_per_F"/>
+        <variable name="i_K1" public_interface="in" units="A_per_F"/>
+        <variable name="i_f" public_interface="in" units="A_per_F"/>
+        <variable name="i_Na" public_interface="in" units="A_per_F"/>
+        <variable name="i_Kr" public_interface="in" units="A_per_F"/>
+        <variable name="i_Ks" public_interface="in" units="A_per_F"/>
+        <variable name="i_to" public_interface="in" units="A_per_F"/>
+        <variable name="i_PCa" public_interface="in" units="A_per_F"/>
+        <variable name="i_NaK" public_interface="in" units="A_per_F"/>
+        <variable name="i_NaCa" public_interface="in" units="A_per_F"/>
+        <variable name="i_b_Ca" public_interface="in" units="A_per_F"/>
+        <variable name="i_b_Na" public_interface="in" units="A_per_F"/>
+        <variable name="i_stim" public_interface="in" units="A_per_F"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Vm</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>i_K1</ci>
+                            <ci>i_to</ci>
+                            <ci>i_Kr</ci>
+                            <ci>i_Ks</ci>
+                            <ci>i_CaL</ci>
+                            <ci>i_NaK</ci>
+                            <ci>i_Na</ci>
+                            <ci>i_NaCa</ci>
+                            <ci>i_PCa</ci>
+                            <ci>i_f</ci>
+                            <ci>i_b_Na</ci>
+                            <ci>i_b_Ca</ci>
+                        </apply>
+                        <ci>i_stim</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

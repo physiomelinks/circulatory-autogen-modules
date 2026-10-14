@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="tissue_diffusion_volume_Fang2008_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="diffusion_volume">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="C_P_init" public_interface="in" units="millimolar"/>
+        <variable initial_value="C_P_init" name="C_P" public_interface="out" units="millimolar"/>
+        <!-- net diffusive flux into the cell from the faces on its entrance and exit ports -->
+        <variable name="J_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_out" public_interface="in" units="mol_per_s"/>
+        <variable name="flux_c" public_interface="in" units="mol_per_s"/>
+        <!-- the cell's volume: any cell shape (box, prism, tetrahedron, ...) -->
+        <variable name="V_P" public_interface="in" units="m3"/>
+        <variable name="M" public_interface="in" units="millimolar_per_s"/>
+        <variable name="M_reduced" public_interface="out" units="millimolar_per_s"/>
+        <!-- Michaelis-Menten consumption: M_reduced = M C_P/(C_P + C50); M < 0 consumes -->
+        <variable name="C50" public_interface="in" units="millimolar"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>M_reduced</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>M</ci>
+                        <ci>C_P</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>C_P</ci>
+                        <ci>C50</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_P</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>J_in</ci>
+                            <ci>J_out</ci>
+                            <ci>flux_c</ci>
+                        </apply>
+                        <ci>V_P</ci>
+                    </apply>
+                    <ci>M_reduced</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

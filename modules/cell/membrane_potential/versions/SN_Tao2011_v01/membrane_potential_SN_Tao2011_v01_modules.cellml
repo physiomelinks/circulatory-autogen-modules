@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="membrane_potential_SN_Tao2011_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="sympathetic_neuron_membrane_voltage">
+        <variable name="Vm_init" public_interface="in" units="milliV"/>
+        <variable initial_value="Vm_init" name="Vm" public_interface="out" units="milliV"/>
+        <variable name="Vm_volt" units="volt"/>
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="i_Ca" public_interface="in" units="nanoA"/>
+        <variable name="i_Na" public_interface="in" units="nanoA"/>
+        <variable name="i_A" public_interface="in" units="nanoA"/>
+        <variable name="i_KV" public_interface="in" units="nanoA"/>
+        <variable name="i_KCa" public_interface="in" units="nanoA"/>
+        <variable name="i_stim" public_interface="in" units="nanoA"/>
+        <variable name="C_m" public_interface="in" units="picoF"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>Vm</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <plus/>
+                                    <ci>i_Na</ci>
+                                    <ci>i_Ca</ci>
+                                    <ci>i_A</ci>
+                                    <ci>i_KV</ci>
+                                    <ci>i_KCa</ci>
+                                </apply>
+                                <ci>i_stim</ci>
+                            </apply>
+                        </apply>
+                        <ci>C_m</ci>
+                    </apply>
+                    <cn cellml:units="milliV_per_kiloV" type="e-notation">1<sep/>6</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Vm_volt</ci>
+                <apply>
+                    <divide/>
+                    <ci>Vm</ci>
+                    <cn cellml:units="milliV_per_V">1000</cn>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

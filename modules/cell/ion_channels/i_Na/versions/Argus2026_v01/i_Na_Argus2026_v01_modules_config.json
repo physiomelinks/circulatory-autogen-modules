@@ -5,9 +5,16 @@
     "module_format": "cellml",
     "component_file": "i_Na_Argus2026_v01_modules.cellml",
     "component_type": "i_Na_SN",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
-    "creator": [],
+    "creator": [
+      "Finbar Argus"
+    ],
+    "required_citations": [
+      "belluzzi1986quantitative",
+      "tao2011model",
+      "argus2026sympathetic"
+    ],
     "notes": "Built for: sympathetic neuron, soma or varicosity (Argus sympathetic-neuron model, decomposed from SN_soma / SN_varicosity)",
     "entrance_ports": [],
     "exit_ports": [],
@@ -34,6 +41,12 @@
         "port_type": "Na_flux",
         "variables": [
           "j_Na"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
         ]
       }
     ],
@@ -89,6 +102,24 @@
       [
         "g_Na",
         "microS",
+        "access",
+        "variable"
+      ],
+      [
+        "A_mem",
+        "um2",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "rho_Na",
+        "per_um2",
+        "access",
+        "constant"
+      ],
+      [
+        "gamma_Na",
+        "picoS",
         "access",
         "constant"
       ],
@@ -167,6 +198,42 @@
       [
         "tau_m",
         "millis",
+        "access",
+        "variable"
+      ],
+      [
+        "T",
+        "kelvin",
+        "access",
+        "global_constant"
+      ],
+      [
+        "Q10_m_Na",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Q10_h_Na",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "T_ref_Na",
+        "kelvin",
+        "access",
+        "constant"
+      ],
+      [
+        "phi_m_Na",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "phi_h_Na",
+        "dimensionless",
         "access",
         "variable"
       ]
