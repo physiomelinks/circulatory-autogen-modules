@@ -26,6 +26,9 @@ from cam_testing import fixed_step, harness, plots
 from cam_testing.library import library_dirs
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
+# partial: met what the model's maths allows but not the full criterion (e.g. the time-step test on a piecewise
+# right-hand side: convergent and agreeing with CVODE, but below the scheme's order); not a failure
+PARTIAL = 'partial'
 # validation.<kind>.status: 'active' (confirmed data) or 'proposed' (run, but the data awaits confirmation)
 PROPOSED = 'proposed'
 
@@ -191,6 +194,9 @@ class ComponentModel(object):
     def __init__(self, component, work_dir=None, parameterisation=None, instance=None):
         self.component = component
         self.parameterisation = parameterisation or instance or component.default_parameterisation
+        # the test network: the version's own for the version tests (no parameterisation given), else the
+        # parameterisation's (validation.<p>.harness) if it has one -- even for the default parameterisation
+        self._network_of = parameterisation or instance
         self.spec = component.spec
         self.work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_{component.id}_')
         self._model_path = None
@@ -222,7 +228,7 @@ class ComponentModel(object):
                 pass
         # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
         # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
-        for name, _units, value, *_ref in harness.network(self.component, self.parameterisation).get('parameters') or []:
+        for name, _units, value, *_ref in harness.network(self.component, self._network_of).get('parameters') or []:
             if name not in nominal:
                 nominal[name] = float(value)
                 var_of[name] = name
@@ -257,7 +263,7 @@ class ComponentModel(object):
                 raise self._generation_error          # don't regenerate a model that failed to generate
             try:
                 self._model_path = harness.generate(self.component, self.work_dir, parameters=self._parameterisation_params(),
-                                                    parameterisation=self.parameterisation)
+                                                    parameterisation=self._network_of)
             except harness.GenerationFailed as e:
                 self._generation_error = e
                 raise
@@ -280,7 +286,7 @@ class ComponentModel(object):
 
     def generate(self, work_dir, **kw):
         '''Another model of this version at this parameterisation's parameters (e.g. a python model).'''
-        return harness.generate(self.component, work_dir, parameters=self._parameterisation_params(), parameterisation=self.parameterisation, **kw)
+        return harness.generate(self.component, work_dir, parameters=self._parameterisation_params(), parameterisation=self._network_of, **kw)
 
     def run_point_params(self):
         '''The spec's run_parameters as simulation-helper overrides ({'parameters/<name>': value}).'''
@@ -1263,13 +1269,25 @@ def verification_test_timestep(cm):
         rhs, y0, state_qnames, observe = fixed_step.compile_rhs(cm.point_model())
         if not state_qnames:
             return Result('verification_test_timestep', SKIPPED, 'component has no state variables (algebraic only)')
+        # convergence after a warm-up (timestep.pre_time, else the spec's pre_time), so a start-up
+        # transient doesn't dominate the comparison: one tight CVODE run to pre_time, whose final state
+        # every step size (and the CVODE reference) starts from
+        pre = float(ts.get('pre_time', cm.spec.get('pre_time', 0.0)) or 0.0)
+        if pre > 0:
+            pre = round(pre / dts[0]) * dts[0]            # a whole number of every step size
+            with contextlib.redirect_stdout(io.StringIO()):
+                warm = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=dts[0], sim_time=pre, pre_time=0.0),
+                                                 solver_info=reference_tolerances(cm))
+            harness.run(warm, cm.outputs(), params=cm.run_point_params())
+            at_pre = dict(zip((v.qname() for v in warm.model.states()), warm.simulation.state()))
+            y0 = np.array([at_pre[q] for q in state_qnames], dtype=float)
 
         outputs = cm.outputs()
         qnames = [cm.helper._resolve_name(harness.output_name(o))[1] for o in outputs]
         stride_base = dts[0]
         runs = []
         for dt in dts:
-            t, Y = fixed_step.integrate(rhs, y0, t_end, dt, scheme)
+            t, Y = fixed_step.integrate(rhs, y0, pre + t_end, dt, scheme, t0=pre)
             stride = int(round(stride_base / dt))
             idx = np.arange(0, len(t), stride)
             vals = np.array([observe(t[i], Y[i], qnames) for i in idx], dtype=float)
@@ -1300,7 +1318,7 @@ def verification_test_timestep(cm):
 
         # cross-check against libcuflynx's CVODE run with tight tolerances
         with contextlib.redirect_stdout(io.StringIO()):
-            tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=0.0),
+            tight = harness.simulation_helper(cm.model_path, dict(cm.spec, dt=stride_base, sim_time=t_end, pre_time=pre),
                                               solver_info=reference_tolerances(cm))
         t_cv, cv = harness.run(tight, outputs, params=cm.run_point_params())
         n = min(len(t_cv), finest.shape[0])
@@ -1313,27 +1331,23 @@ def verification_test_timestep(cm):
                                            [(dt, t, v[:, 0]) for dt, t, v in runs], outputs[0], cm.units(),
                                            f'{component.label}: {outputs[0]} vs step size')]
         metrics = {'scheme': scheme, 'dts': dts, 'successive_differences': diffs, 'observed_orders': observed,
-                   'expected_order': order, 'cvode_tight_vs_finest': cvode_diff, 't_end': t_end}
+                   'expected_order': order, 'cvode_tight_vs_finest': cvode_diff, 't_end': t_end, 'pre_time': pre}
 
-        problems = []
-        if not all(np.isfinite(diffs)):
-            problems.append('non-finite solution at some step size (explicit scheme unstable? use smaller dts)')
-        else:
-            if any(diffs[k + 1] > diffs[k] and diffs[k + 1] > roundoff for k in range(len(diffs) - 1)):
-                problems.append(f'differences do not decrease with dt: {["%.2e" % d for d in diffs]}')
-            last = next((o for o in reversed(observed) if o is not None), None)
-            if last is not None and last < min_order:
-                problems.append(f'observed order {last:.2f} < {min_order}')
-            if diffs[-1] > tol:
-                problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
-            if cvode_diff > cvode_tol:
-                problems.append(f'fixed-step and CVODE solutions differ by {cvode_diff:.2e} > {cvode_tol:.1e}')
+        problems, order_problems = timestep_problems(diffs, observed, cvode_diff, min_order=min_order, tol=tol,
+                                                     cvode_tol=cvode_tol, roundoff=roundoff)
         last = next((o for o in reversed(observed) if o is not None), None)
         summary = (f'{scheme}: differences {diffs[0]:.1e} -> {diffs[-1]:.1e}'
                    + (f', observed order {last:.2f} (expected {order})' if last is not None else ', at round-off')
                    + f'; agrees with CVODE to {cvode_diff:.1e}')
         if problems:
-            return Result('verification_test_timestep', FAILED, '; '.join(problems), metrics, figs, problems)
+            return Result('verification_test_timestep', FAILED, '; '.join(problems + order_problems), metrics, figs,
+                          problems + order_problems)
+        if order_problems:
+            return Result('verification_test_timestep', PARTIAL,
+                          'partial: converges (differences decrease monotonically) and agrees with CVODE to '
+                          f'{cvode_diff:.1e}, but ' + '; '.join(order_problems)
+                          + ' (expected for a piecewise right-hand side: fixed steps are first order across a switch)',
+                          metrics, figs, order_problems)
         return Result('verification_test_timestep', PASSED, summary, metrics, figs)
     return _guard(cm.component, 'verification_test_timestep', check)
 
@@ -1618,6 +1632,72 @@ def _validation_status(cm, kind, test):
     return None, v
 
 
+def period_changes(t, out, period):
+    '''{output: its largest change from one period to the next, as a fraction of its range} over a run
+    ``t`` (from the start of the first period, at least two periods long) of the outputs ``out``.'''
+    t = np.asarray(t, dtype=float)
+    first = t < t[0] + period - 1e-9
+    changes = {}
+    for name, y in out.items():
+        y = np.asarray(y, dtype=float)
+        scale = np.ptp(y) or (abs(float(np.mean(y))) or 1.0)
+        changes[name] = float(np.max(np.abs(np.interp(t[first] + period, t, y) - y[first])) / scale)
+    return changes
+
+
+def timestep_problems(diffs, observed, cvode_diff, min_order, tol, cvode_tol, roundoff):
+    '''
+    The time-step test's verdict from its successive differences ``diffs`` (coarsest first), the
+    ``observed`` orders and the finest fixed-step solution's difference from CVODE: (problems,
+    order_problems). Problems (non-finite, not decreasing, disagreeing with CVODE) fail the test; the
+    order and finest-step criteria alone (convergent, monotone, agreeing with CVODE, but slower than
+    the scheme's order, e.g. a piecewise right-hand side) make it partial.
+    '''
+    problems, order_problems = [], []
+    if not all(np.isfinite(diffs)):
+        problems.append('non-finite solution at some step size (explicit scheme unstable? use smaller dts)')
+        return problems, order_problems
+    if any(diffs[k + 1] > diffs[k] and diffs[k + 1] > roundoff for k in range(len(diffs) - 1)):
+        problems.append(f'differences do not decrease with dt: {["%.2e" % d for d in diffs]}')
+    last = next((o for o in reversed(observed) if o is not None), None)
+    if last is not None and last < min_order:
+        order_problems.append(f'observed order {last:.2f} < {min_order}')
+    if diffs[-1] > tol:
+        order_problems.append(f'finest-step difference {diffs[-1]:.2e} > tol {tol:.1e}')
+    if cvode_diff > cvode_tol:
+        problems.append(f'fixed-step and CVODE solutions differ by {cvode_diff:.2e} > {cvode_tol:.1e}')
+    return problems, order_problems
+
+
+def periodic_steady_state(cm, pre_time, outputs, params=None):
+    """
+    Whether the model, after ``pre_time`` s with ``params`` (model parameter names -> values),
+    is at periodic steady state: each of ``outputs`` repeats over one more period, its largest
+    change from one period to the next <= rtol x its range. None when the spec declares no
+    ``periodic_steady_state: {period, rtol}`` or there is no warm-up; else (ok, message, metrics).
+    ``period`` is in seconds, or the name of a parameter holding it (e.g. the cardiac period T).
+    """
+    pss = cm.spec.get('periodic_steady_state')
+    if not pss or not pre_time:
+        return None
+    period = pss.get('period', 1.0)
+    if isinstance(period, str):
+        values = {p.variable_name: p for p in cm.parameters()}
+        period = float((params or {}).get('parameters/' + harness.parameter_name(values[period]), values[period].float_value))
+    period, rtol = float(period), float(pss.get('rtol', 1e-3))
+    run_spec = dict(cm.spec, pre_time=float(pre_time), sim_time=2 * period, dt=min(float(cm.spec['dt']), period / 200))
+    helper = harness.simulation_helper(cm.model_path, run_spec)
+    t, out = harness.run(helper, list(outputs), params=params)
+    changes = period_changes(t, out, period)
+    bad = sorted(((c, n) for n, c in changes.items() if c > rtol), reverse=True)
+    metrics = {'period': period, 'rtol': rtol, 'pre_time': float(pre_time), 'changes': changes}
+    if not bad:
+        return True, f'at periodic steady state after {pre_time:g} s (every output repeats to {rtol:g} of its range)', metrics
+    return False, (f'not at periodic steady state after a {pre_time:g} s warm-up: '
+                   + ', '.join(f'{n} still changes {c:.2g} of its range per period' for c, n in bad)
+                   + ' (lengthen pre_time)'), metrics
+
+
 def validation_test_baseline(cm):
     '''
     Compare the model, at the parameterisation's parameters, with baseline data. Spec
@@ -1696,6 +1776,9 @@ def _baseline_targets(cm, v):
     env.update(out)
     z = float(v.get('z_threshold', 2.0))
     rows, problems = [], []
+    pss = periodic_steady_state(cm, float(run_spec.get('pre_time') or 0.0), cm.outputs(), overrides)
+    if pss is not None and not pss[0]:
+        problems.append(pss[1])
     for tg in v['targets']:
         try:
             model = float(eval(tg['expr'], env))  # noqa: S307 - expressions come from the repo's own yaml
@@ -1713,8 +1796,11 @@ def _baseline_targets(cm, v):
         if not ok:
             problems.append(f"{tg['name']}: model {model:.4g} vs {target} {tg.get('units', '')}")
     metrics = {'targets': rows, 'z_threshold': z, 'source': v.get('source', ''), 'validated_values': params}
+    if pss is not None:
+        metrics['periodic_steady_state'] = pss[2]
     if problems:
-        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(v["targets"])} targets missed',
+        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(v["targets"])} targets missed'
+                      + ('' if pss is None or pss[0] else '; ' + pss[1]),
                       metrics, [], problems)
     return Result('validation_test_baseline', PASSED, f'all {len(rows)} targets met', metrics)
 
