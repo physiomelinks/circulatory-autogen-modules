@@ -19,7 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # libcuflynx at the ref requirements.txt pins (keep the two in step): pip install "cam-testing[libcuflynx] @ git+..."
-libcuflynx = ["libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-parameterisations"]
+libcuflynx = ["libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-node-multiports"]
 
 [project.entry-points.pytest11]
 # named as the module, so a conftest.py's pytest_plugins naming it too doesn't register it twice
@@ -35,8 +35,8 @@ cam_testing = ["templates/*.html", "data/*.json", "bridges/phlynx/*.mjs", "bridg
 [tool.cam_testing]
 # this repo is the root (the default); curated PhLynx manifests besides all.json (python -m cam_testing.manifests)
 [tool.cam_testing.manifests]
-"index.json" = ["vessels", "heart"]
-"vitalworkshop.json" = ["vessels", "heart"]
+"index.json" = ["vessels", "heart", "haemodynamics"]
+"vitalworkshop.json" = ["vessels", "heart", "haemodynamics"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

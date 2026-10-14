@@ -4,7 +4,8 @@ versions layout (modules/<category>/<module_type>/versions/<version>/..., nested
 their parent's directory, e.g. modules/heart/chamber/versions/vv/).
 
 all.json lists every version of the repo's modules/ (not the extra libraries': a manifest's paths
-are relative to the repo). Curated manifests list the versions under some paths of modules/
+are relative to the repo) that is available to PhLynx: a config entry with "available_to_phlynx":
+false is left out of every manifest. Curated manifests list the versions under some paths of modules/
 (categories or module_types, each with what is nested in it), from pyproject.toml:
 
     [tool.cam_testing.manifests]
@@ -70,7 +71,8 @@ def main(argv=None):
     argparse.ArgumentParser(description='Rewrite manifests/*.json for the repo under test').parse_args(argv)
     manifests_dir = paths.roots().manifests_dir
     os.makedirs(manifests_dir, exist_ok=True)
-    versions = sorted(all_versions(), key=lambda v: (v.mtype.relpath.lower(), v.name.lower()))
+    versions = sorted((v for v in all_versions() if v.available_to_phlynx),
+                      key=lambda v: (v.mtype.relpath.lower(), v.name.lower()))
     for filename, prefixes in manifest_selection().items():
         chosen = _selected(versions, prefixes)
         with open(os.path.join(manifests_dir, filename), 'w') as f:

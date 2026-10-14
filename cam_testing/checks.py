@@ -64,6 +64,8 @@ def supermodule_index(versions=None):
         if not v.is_supermodule:
             continue
         for sub in v.submodules:
+            if not sub.get('module_subtype'):   # a template's slot: no version chosen yet
+                continue
             users = index.setdefault((sub['module_type'], sub['module_subtype']), [])
             if all(u.key != v.key for u in users):
                 users.append(v)
@@ -420,7 +422,7 @@ def _run_point(cm):
     return {(harness.parameter_name(by_var[k]) if k in by_var else k): float(v) for k, v in (cm.spec.get('run_parameters') or {}).items()}
 
 
-CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp): libcuflynx generates the 0D model coupled to it '
+CPP_NOT_APPLICABLE = ('C++ 1D-solver component (module_format cpp or external_api): libcuflynx generates the 0D model coupled to it '
                       '(checked by run_test), but the 1D solver it couples to is not runnable here, so there is no '
                       'simulation to check')
 
@@ -555,7 +557,10 @@ def cpp_generation_check(cm):
         if not gxx:
             return Result('run_test', PASSED, 'generated the C++ 0D model and 0D-1D coupler (g++ not available, '
                           'compilation not checked)', metrics)
-        p = subprocess.run([gxx, '-std=c++17', '-fsyntax-only', f'-I{out_dir}', src], capture_output=True, text=True)
+        includes = ['-I', out_dir]
+        if os.environ.get('SUNDIALS_DIR'):
+            includes += ['-I', os.path.join(os.environ['SUNDIALS_DIR'], 'include')]
+        p = subprocess.run([gxx, '-std=c++17', '-fsyntax-only'] + includes + [src], capture_output=True, text=True)
         if p.returncode != 0:
             return Result('run_test', FAILED, f'generated {os.path.basename(src)} does not compile: '
                           + (p.stderr.strip().splitlines() or [''])[0][:300], metrics, details=p.stderr.splitlines()[:20])

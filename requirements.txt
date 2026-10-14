@@ -3,13 +3,14 @@
 # library's PhLynx-format module configs (#533, stacked on #530), and JSON module arrays plus
 # supermodules (#534), module versions/instances + obs_data_name and held-out data in prediction_items
 # (#535, stacked on #534), and prediction items with an operation as SA / emulator features (#536,
-# stacked on #535; the instances' obs_data use it). Pinned to #536's branch until these are merged
-# and released.
-# The external (FEniCS) models and coupled examples also need libcuflynx.coupling and the python
-# api transport (circulatory_autogen PR #520, cpp-template-generator), which is not in the #536
-# stack: until both are merged, FinbarArgus/circulatory_autogen integration/modules-external-coupling
-# is #536's branch merged with #520's. integration/modules-parameterisations is that branch plus
-# circulatory_autogen #567 (reads parameterisations/, default_parameterisation and the record key
-# "parameterisation"). Once #520, #536 and #567 are on master, pin physiomelinks master instead.
-libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-parameterisations
+# stacked on #535; the instances' obs_data use it), libcuflynx.coupling and the python api transport
+# for the external (FEniCS) models and coupled examples (#520, cpp-template-generator), reading
+# parameterisations/, default_parameterisation and the record key "parameterisation" (#567), and
+# ports that sum over a whole node, so ordinary vessels join any number of vessels and the junction
+# module types are not needed, with supermodule outputs, aliased shared_parameters and
+# lumped_migration for the lumped vessels (#538, feat/node-multiports).
+# FinbarArgus/circulatory_autogen integration/modules-node-multiports is #536's branch merged with
+# #520, #567 and #538 (integration/modules-parameterisations plus feat/node-multiports). Once these
+# are on master, pin physiomelinks master instead.
+libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autogen@integration/modules-node-multiports
 -e .
