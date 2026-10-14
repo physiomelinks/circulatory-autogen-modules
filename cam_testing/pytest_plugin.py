@@ -196,7 +196,8 @@ def parameterisation_model(parameterisation_key, tmp_path_factory):
     from cam_testing.library import load_version
     mt, v, inst = parameterisation_key
     version = load_version(mt, v)
-    if inst == version.default_parameterisation_name:
+    own_network = (((version.spec.get('validation') or {}).get(inst) or {}).get('harness')) is not None
+    if inst == version.default_parameterisation_name and not own_network:
         return _version_model((mt, v), tmp_path_factory)
     if parameterisation_key not in _models:
         _models[parameterisation_key] = checks.ComponentModel(version, str(tmp_path_factory.mktemp(f'{version.id}__{inst}')),

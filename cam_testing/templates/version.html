@@ -1,5 +1,5 @@
 {%- macro chip(status, label=None) -%}
-<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
+<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','partial':'Partial','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
 {%- endmacro -%}
 {%- macro test_article(c, t, anchor) -%}
           <article class="test {{ t.status or '' }}" id="{{ anchor }}">
@@ -154,7 +154,7 @@
 .toc a { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 4px; color: var(--ink-2); text-decoration: none; }
 .toc a:hover { background: var(--accent-soft); color: var(--ink); }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--skip); }
-.dot.failed, .dot.failed_in_super { background: var(--fail); } .dot.passed, .dot.passed_in_super { background: var(--pass); } .dot.pending { background: var(--pend); }
+.dot.failed, .dot.failed_in_super { background: var(--fail); } .dot.partial { background: var(--partial); } .dot.passed, .dot.passed_in_super { background: var(--pass); } .dot.pending { background: var(--pend); }
 main { display: grid; gap: 40px; min-width: 0; }
 header.module { display: grid; gap: 10px; }
 .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 0.88rem; }
@@ -269,6 +269,7 @@ window.addEventListener('DOMContentLoaded', function () {
       </div>
       <div class="counts">
         {{ chip('passed', counts.passed ~ ' passed') }}
+        {{ chip('partial', (counts.partial or 0) ~ ' partial') }}
         {{ chip('failed', counts.failed ~ ' failed') }}
         {{ chip('pending', counts.pending ~ ' pending') }}
         {{ chip('skipped', counts.skipped ~ ' skipped') }}
@@ -301,18 +302,31 @@ window.addEventListener('DOMContentLoaded', function () {
 
     <section class="block" aria-labelledby="overview">
       <h2 id="overview">Test overview</h2>
+      {%- set ps = components[0].parameterisations %}
+      {%- macro p_cells(i) -%}
+        {%- for t in i.tests %}<td title="{{ t.message }}"><a href="#{{ t.anchor }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}
+        <td title="{{ i.omex_known_issue or i.omex_message }}">{% if i.omex_known_issue and i.omex_status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(i.omex_status) }}{% endif %}</td>
+      {%- endmacro %}
       <div class="table-wrap">
         <table class="grid-table">
-          <thead><tr><th>Version</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}</tr></thead>
+          <thead><tr><th>Version</th><th>Parameterisation</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}
+            {%- if ps %}{% for h in param_cols %}<th>{{ h }}</th>{% endfor %}{% endif %}</tr></thead>
           <tbody>
           {%- for c in components %}
-            <tr><td><a href="#{{ c.id }}">{{ c.label }}</a></td>
-            {%- for t in c.tests %}<td title="{{ t.message }}"><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a>{% for l in t.links %}<br><a href="{{ l.href }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}</tr>
+            {%- set default = (c.parameterisations|selectattr('is_default')|first) if c.parameterisations else None %}
+            <tr><th scope="row" class="rowhead"><a href="#{{ c.id }}">{{ c.label }}</a></th>
+            <th scope="row" class="rowhead mono">{% if default %}<a href="#parameterisations">{{ default.name }}</a> <span class="muted">(default)</span>{% endif %}</th>
+            {%- for t in c.tests %}<td title="{{ t.message }}"><a href="#{{ c.id }}--{{ t.key }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a>{% for l in t.links %}<br><a href="{{ l.href }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}
+            {%- if default %}{{ p_cells(default) }}{% elif ps %}{% for h in param_cols %}<td></td>{% endfor %}{% endif %}</tr>
+            {%- for i in c.parameterisations if not i.is_default %}
+            <tr><th scope="row" class="rowhead"></th><th scope="row" class="rowhead mono"><a href="#parameterisations">{{ i.name }}</a></th>
+            {%- for k in test_keys %}<td></td>{% endfor %}{{ p_cells(i) }}</tr>
+            {%- endfor %}
           {%- endfor %}
           </tbody>
         </table>
       </div>
-      <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has these columns. {{ chip('not_applicable') }} the test doesn't apply to this version; {{ chip(None) }} it applies but has no result yet; only a test that ran and passed shows {{ chip('passed') }}.</p>
+      <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has these columns. {{ chip('not_applicable') }} the test doesn't apply to this version; {{ chip(None) }} it applies but has no result yet; only a test that ran and passed shows {{ chip('passed') }}. {{ chip('partial') }} the test ran and its result is usable but short of the full criterion (e.g. a time-step order below the scheme's across a switch); it isn't a failure. The first row is the version with its default parameterisation (the one the version tests run with); each other parameterisation has a row filled only in its own columns (Baseline, Calibrate, CUFLynx archive). A component's Supermodule columns show the results of the supermodule versions that use it ({{ chip('passed_in_super') }} / {{ chip('failed_in_super') }}, linked); N/A when none does.</p>
       {%- set na = components[0].tests|selectattr('status', 'equalto', 'not_applicable')|list %}
       {%- if na %}
       <ul class="muted" style="margin:0;font-size:0.84rem">{% for t in na %}<li>{{ t.short }}: N/A, {{ t.message }}</li>{% endfor %}</ul>
