@@ -1,0 +1,54 @@
+{
+ "parameterisation": "lv",
+ "version": "chamber/Liang2009_v01",
+ "date": "2026-10-12",
+ "passed": true,
+ "summary": "start nominal -> systemic_T/R_T=1.836e+08, systemic_T/C_T=1.134e-08, aortic_root/R=1.46e+05, aortic_root/C=9.999e-09, q_us=1.219e-06, pv_p/P=1124 (prediction nrmse 0.0751)",
+ "method": "CMA-ES",
+ "files": [
+  "parameterisations/lv/lv_obs_data.json",
+  "parameterisations/lv/lv_params_for_id.csv"
+ ],
+ "cost": 1.382912819777519,
+ "calibrated_parameters": {
+  "systemic_T/R_T": 183635941.48614553,
+  "systemic_T/C_T": 1.1341120944462719e-08,
+  "aortic_root/R": 145958.8092557007,
+  "aortic_root/C": 9.999010781035373e-09,
+  "q_us": 1.2186393825707875e-06,
+  "pv_p/P": 1123.8410030276455
+ },
+ "runs": [
+  {
+   "periodic_steady_state": {
+    "period": 1.0,
+    "rtol": 0.001,
+    "pre_time": 30.0,
+    "changes": {
+     "aortic_root__u": 8.912293783181727e-05,
+     "q": 7.796546478104647e-05,
+     "u": 0.00011721776505085554
+    }
+   },
+   "start": {},
+   "calibrated_parameters": {
+    "systemic_T/R_T": 183635941.48614553,
+    "systemic_T/C_T": 1.1341120944462719e-08,
+    "aortic_root/R": 145958.8092557007,
+    "aortic_root/C": 9.999010781035373e-09,
+    "q_us": 1.2186393825707875e-06,
+    "pv_p/P": 1123.8410030276455
+   },
+   "cost": 1.382912819777519,
+   "calibration_scores": {
+    "u": 0.07473325271776755
+   },
+   "prediction_scores": {
+    "u": 0.07508432284351355
+   },
+   "constant_items": {}
+  }
+ ],
+ "metric": "nrmse",
+ "threshold": 0.15
+}

@@ -1,13 +1,15 @@
 [
   {
     "module_type": "chamber",
-    "module_subtype": "vv",
+    "module_subtype": "Liang2009_v01",
     "module_format": "cellml",
-    "component_file": "chamber_vv_modules.cellml",
-    "component_type": "chamber_type",
-    "default_parameterisation": "default",
+    "component_file": "chamber_Liang2009_v01_modules.cellml",
+    "component_type": "chamber_Liang2009",
+    "default_parameterisation": "lv",
     "licence": "CC0-1.0",
-    "creator": [],
+    "creator": [
+      "Finbar Argus"
+    ],
     "required_citations": [
       "liang2009multi"
     ],
@@ -149,6 +151,12 @@
       [
         "q_us",
         "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "k_S",
+        "s_per_m3",
         "access",
         "constant"
       ],
