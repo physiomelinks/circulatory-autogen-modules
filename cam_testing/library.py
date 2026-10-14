@@ -568,14 +568,11 @@ def misplaced_spec_keys(tests, verification):
 # module_type / version / parameterisation
 # ----------------------------------------------------------------------------------------------
 
-# what the tests and the report generator write into a version directory (git-ignored)
-GENERATED = ('results', 'plots')
-
-
 def _has_source(path):
-    '''Whether a version directory holds more than generated output: a renamed or removed version can
-    leave its results/, plots/ or report behind (e.g. restored from CI's results cache).'''
-    return any(e not in GENERATED and not e.endswith('.html') and not e.startswith('.') for e in os.listdir(path))
+    '''Whether a directory under versions/ is a version: it has its modules config. A renamed or removed
+    version can leave generated output behind (results/, plots/, reports, parameterisations' .omex
+    archives), e.g. restored from CI's results cache.'''
+    return any(e.endswith('_modules_config.json') for e in os.listdir(path))
 
 
 @dataclass
