@@ -50,6 +50,8 @@ def test_a_directory_left_with_only_generated_output_is_not_a_version(tmp_path):
     left = tmp_path / 'vv'
     (left / 'results').mkdir(parents=True)
     (left / 'plots').mkdir()
+    (left / 'parameterisations' / 'default').mkdir(parents=True)
+    (left / 'parameterisations' / 'default' / 'chamber_vv_default.omex').write_text('')
     (left / 'chamber_vv.html').write_text('')
     assert not _has_source(left)
     (left / 'chamber_vv_modules_config.json').write_text('[]')
