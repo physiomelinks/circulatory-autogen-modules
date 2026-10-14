@@ -61,7 +61,8 @@ jobs:
           path: _artifact/
           if-no-files-found: ignore
 
-  # A fresh install (apt + pip, no cache) compared with the cached setup the other jobs use
+  # A fresh install (apt + pip, no cache) compared with the cached setup the other jobs use: Python
+  # packages must match (all pinned, ci/constraints.txt); apt differences (Ubuntu updates) warn
   # (.github/actions/setup, key ci/setup_key.sh): fails, printing the difference, when the cache
   # is stale, e.g. an unpinned dependency released a new version.
   setup-check:
@@ -85,6 +86,10 @@ jobs:
   coupled:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      # MPI (UCX) must not open the runner's InfiniBand device: on some runner VMs (Azure MANA, mana_0)
+      # it fails and MPI_Init aborts. The coupled examples run on one machine: shared memory and TCP.
+      UCX_TLS: self,sm,tcp
     defaults:
       run:
         shell: bash -el {0}
