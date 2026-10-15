@@ -116,8 +116,10 @@
     },
     "miv": {
       "baseline": {
-        "status": "pending",
-        "reason": "mynard2012simple Fig. 7 (mitral valve) not digitised yet"
+        "status": "active",
+        "obs_data": "parameterisations/miv/miv_validation_obs_data.json",
+        "metric": "nrmse",
+        "threshold": 0.1
       },
       "calibrate": {
         "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
@@ -125,8 +127,10 @@
     },
     "puv": {
       "baseline": {
-        "status": "pending",
-        "reason": "mynard2012simple Fig. 6 (pulmonary valve) not digitised yet"
+        "status": "active",
+        "obs_data": "parameterisations/puv/puv_validation_obs_data.json",
+        "metric": "nrmse",
+        "threshold": 0.1
       },
       "calibrate": {
         "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
@@ -135,7 +139,18 @@
     "trv": {
       "baseline": {
         "status": "pending",
-        "reason": "mynard2012simple Fig. 8 (tricuspid valve) not digitised yet"
+        "reason": "mynard2012simple Fig. 8 shows the right atrial pressure but not the right ventricular one, so the tricuspid valve cannot be driven from it; no other source chosen yet"
+      },
+      "calibrate": {
+        "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
+      }
+    },
+    "miv_stenosis": {
+      "baseline": {
+        "status": "active",
+        "obs_data": "parameterisations/miv_stenosis/miv_stenosis_validation_obs_data.json",
+        "metric": "nrmse",
+        "threshold": 0.1
       },
       "calibrate": {
         "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
