@@ -1,3 +1,12 @@
 module_type: cardiac_clock
 version: Liang2009_v01
-reviewed: false
+reviewed: true
+review:
+  summary: 'Reviewed 2026-10-15 with Finbar Argus. A phase clock: s grows at 1/T and mt = s - floor(s) is
+    the fraction of the current beat, driving the heart chambers and valves. T = 1.0 s from Liang 2009.'
+  decisions:
+  - 'verification: three exact-solution invariants (s = t/T, 0 <= mt < 1, T_eff = T), checked in the run
+    and the BC sweep over T'
+  - 'validation not applicable: no measured quantity; validated within the heart and system models it drives'
+  - 'T = 1.0 s sourced to liang2009multi, section 3 p. 746 (was cited as Table 2, unsourced)'
+  - 'creator Finbar Argus'

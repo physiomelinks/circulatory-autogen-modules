@@ -6,7 +6,20 @@
   "dt": 0.01,
   "solver": "CVODE_myokit",
   "outputs": ["T_eff", "s", "mt"],
-  "invariants": [],
+  "invariants": [
+      {
+          "description": "the phase grows at 1/T from 0: s = t/T (exact solution), to the solver tolerance",
+          "expr": "np.max(np.abs(s - t/T)) <= 1e-6*(1 + t[-1]/T)"
+      },
+      {
+          "description": "the beat fraction stays in [0, 1): mt = s - floor(s)",
+          "expr": "np.all((mt >= 0) & (mt < 1))"
+      },
+      {
+          "description": "the effective period is the period: T_eff = T",
+          "expr": "np.max(np.abs(T_eff - T)) <= 1e-12*T"
+      }
+  ],
   "bc_sweep": {
     "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
     "ranges": {}
@@ -26,8 +39,13 @@
   },
   "validation": {
     "default": {
-      "baseline": {"status": "pending", "reason": "validation data not chosen yet"},
-      "calibrate": {"note": "pending: validation data not chosen yet"}
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a phase clock: no measured quantity to compare with. Verified against its exact solution (s = t/T, mt = frac(t/T)); validated within the heart and system models it drives."
+      },
+      "calibrate": {
+        "note": "not_applicable: a phase clock: no measured quantity to compare with. Verified against its exact solution (s = t/T, mt = frac(t/T)); validated within the heart and system models it drives."
+      }
     }
   }
 }
