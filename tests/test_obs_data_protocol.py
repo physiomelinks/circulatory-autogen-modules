@@ -2,7 +2,9 @@
 A version's tests driven by the protocol of an obs_data file (verification_config ``protocol``;
 validation.<p>.baseline ``obs_data``): the heart valve heart/valve/pp driven by a prescribed inlet
 pressure u_in(t) (a protocol_traces entry) that reverses the pressure difference across it, so it
-opens and then closes. Results and plots go to a temporary directory.
+opens and then closes. The protocol also sets the parameters the valve's opening depends on (u_out,
+K_vo, K_vc), so the test does not depend on the version's parameterisations. Results and plots go to a
+temporary directory.
 """
 import json
 
@@ -12,10 +14,15 @@ import pytest
 from cam_testing import checks, harness
 from cam_testing.library import load_version, protocol_problems
 
-# u_out is 10666 J/m3 in the default parameterisation: u_in is 2000 above it, then ramps to 2000 below
+# u_in is 2000 J/m3 above u_out, then ramps to 2000 below it
 TRACE_T = [0.0, 0.1, 0.2]
 TRACE_U = [12666.0, 12666.0, 8666.0]
 U_OUT = 10666.0
+
+
+def _fixed(n_sub):
+    '''params_to_change entries holding u_out and the opening and closing rates over n_sub sub-experiments.'''
+    return {'mod/u_out': [[U_OUT] * n_sub], 'mod/K_vo': [[0.04] * n_sub], 'mod/K_vc': [[0.04] * n_sub]}
 
 
 def _obs_data(path, protocol, data_items=()):
@@ -23,8 +30,10 @@ def _obs_data(path, protocol, data_items=()):
     return str(path)
 
 
-REVERSAL = {'pre_times': [0.0], 'sim_times': [[0.2]], 'params_to_change': {'mod/u_in': [['dp']]},
+REVERSAL = {'pre_times': [0.0], 'sim_times': [[0.2]], 'params_to_change': {'mod/u_in': [['dp']], **_fixed(1)},
             'protocol_traces': {'dp': {'t': TRACE_T, 'values': TRACE_U}}}
+# two sub-experiments at constant u_in: forward, then reversed
+STEPS = {'pre_times': [0.0], 'sim_times': [[0.1, 0.1]], 'params_to_change': {'mod/u_in': [[12666.0, 8666.0]], **_fixed(2)}}
 
 
 @pytest.fixture(scope='module')
@@ -53,7 +62,7 @@ def cm(out_dir):
 
 def test_the_protocol_sets_the_run_and_its_input_is_an_output(cm):
     assert cm.spec['sim_time'] == 0.2 and cm.spec['pre_time'] == 0.0
-    assert cm.outputs()[-1] == 'u_in'
+    assert cm.outputs()[-4:] == ['u_in', 'u_out', 'K_vo', 'K_vc']
     t, out = cm.run()
     assert t[0] == 0.0 and t[-1] == pytest.approx(0.2)
     np.testing.assert_allclose(out['u_in'], np.interp(t, TRACE_T, TRACE_U))
@@ -67,7 +76,7 @@ def test_invariants_see_the_trace_input(cm):
 
 def test_the_driven_input_is_not_swept(cm):
     names, _ = checks.sweep_parameter_names(cm)
-    assert 'u_in' not in names and 'u_out' in names
+    assert names and not {'u_in', 'u_out', 'K_vo', 'K_vc'} & set(names)
 
 
 def test_fixed_step_tests_are_not_applicable(cm):
@@ -81,10 +90,8 @@ def test_fixed_step_tests_are_not_applicable(cm):
 
 
 def test_sub_experiments_are_joined(cm, out_dir):
-    # two sub-experiments with constant u_in: forward then reversed
-    protocol = {'pre_times': [0.0], 'sim_times': [[0.1, 0.1]], 'params_to_change': {'mod/u_in': [[12666.0, 8666.0]]}}
-    helper = harness.simulation_helper(cm.model_path, harness.with_protocol(harness.without_protocol(cm.spec), protocol))
-    t, out, starts = harness.run_protocol(helper, ['zeta', 'u_in'], protocol)
+    helper = harness.simulation_helper(cm.model_path, harness.with_protocol(harness.without_protocol(cm.spec), STEPS))
+    t, out, starts = harness.run_protocol(helper, ['zeta', 'u_in'], STEPS)
     assert list(starts) == [0.0, 0.1] and len(t) == len(out['u_in']) == 41
     assert np.all(out['u_in'][t < 0.1] == 12666.0) and np.all(out['u_in'][t > 0.1] == 8666.0)
     assert out['zeta'][20] > 0.99 > 0.5 > out['zeta'][-1]
@@ -101,7 +108,7 @@ def test_structure_checks_the_protocol_files(tmp_path):
 
 def _baseline(cm, out_dir, data_items, protocol=REVERSAL):
     path = _obs_data(out_dir / 'baseline_obs_data.json', protocol, data_items)
-    cm.component.spec['validation'] = {'default': {'baseline': {'status': 'active', 'source': 'synthetic',
+    cm.component.spec['validation'] = {cm.parameterisation.name: {'baseline': {'status': 'active', 'source': 'synthetic',
                                                                  'obs_data': path, 'metric': 'nrmse', 'threshold': 0.01}}}
     return checks.validation_test_baseline(cm)
 
@@ -135,8 +142,7 @@ def test_baseline_scores_the_obs_data_against_the_protocol_run(cm, out_dir):
 
 
 def test_baseline_items_are_scored_on_their_sub_experiment(cm, out_dir):
-    protocol = {'pre_times': [0.0], 'sim_times': [[0.1, 0.1]], 'params_to_change': {'mod/u_in': [[12666.0, 8666.0]]}}
     items = [_constant('open', ['mod/zeta'], 1.0, 0.01, None, sub=0), _constant('closed', ['mod/zeta'], 0.0, 0.2, None, sub=1),
              _constant('closing', ['mod/zeta'], 1.0, 0.01, 'max', sub=1)]
-    r = _baseline(cm, out_dir, items, protocol)
+    r = _baseline(cm, out_dir, items, STEPS)
     assert r.status == checks.PASSED, r.message
