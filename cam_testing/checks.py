@@ -1695,6 +1695,15 @@ def timestep_problems(diffs, observed, cvode_diff, min_order, tol, cvode_tol, ro
     return problems, order_problems
 
 
+def expected_failure(version, test, parameterisation=None):
+    """The reason ``test`` is a known failure of ``version`` (its spec's expected_failures), or None.
+    A parameterisation's test is looked up as "<test>[<parameterisation>]" first, then as "<test>",
+    which covers every parameterisation."""
+    ef = version.spec.get('expected_failures') or {}
+    name = getattr(parameterisation, 'name', parameterisation)
+    return (ef.get(f'{test}[{name}]') if name else None) or ef.get(test)
+
+
 def periodic_steady_state(cm, pre_time, outputs, params=None):
     """
     Whether the model, after ``pre_time`` s with ``params`` (model parameter names -> values),

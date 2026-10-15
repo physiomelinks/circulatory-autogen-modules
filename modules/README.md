@@ -690,7 +690,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `notes` | tests | notes on the version, shown in its report |
 | `skip` | tests | a reason not to run the version's tests |
 | `known_issues` | tests | substrings of structure problems that are known (xfail) |
-| `expected_failures` | tests | `{test: reason}`: known failures, recorded as failed and xfail in pytest |
+| `expected_failures` | tests | `{test: reason}`: known failures, recorded as failed and xfail in pytest. A parameterisation's test may be keyed `<test>[<parameterisation>]` (e.g. `validation_test_baseline[aov]`) so that only that parameterisation's failure is known; a bare `<test>` covers every parameterisation |
 | `calibration_in_supermodule` | tests | `false`: the version's Calibration column uses the plain rule even when it has no calibration data and is a submodule of supermodule versions (default: derived from those supermodules, "Pass in super" / "Fail in super") |
 | `reference_proposals` | tests | proposed parameter references (and values for TODO parameters), awaiting review |
 | `review` | tests | the review: `summary`, `comment`, `questions`, `proposed_fixes`, `findings`. A review shared by several versions (a whole old module's review) is kept once, in `reviews/<name>_review.yaml` at the repo root, and `review:` gives that path instead |
