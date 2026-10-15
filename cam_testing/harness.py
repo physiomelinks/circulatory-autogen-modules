@@ -11,6 +11,7 @@ libcuflynx's bundled copies.
 import contextlib
 import csv
 import io
+import json
 import os
 
 import numpy as np
@@ -293,22 +294,114 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
 
 
 def simulation_helper(model_path, spec, solver_info=None, solver=None, model_type='cellml'):
+    '''A libcuflynx simulation helper for the spec's run settings. A spec with a protocol
+    (``spec[PROTOCOL_INFO]``, see ``with_protocol``) gives a helper that ``run`` runs through it.'''
     from libcuflynx.solver_wrappers import get_simulation_helper
 
     info = dict(spec.get('solver_info') or {}) if solver is None else {}
     info.update(solver_info or {})
+    protocol = spec.get(PROTOCOL_INFO)
     with contextlib.redirect_stdout(io.StringIO()):
-        return get_simulation_helper(model_path=model_path, solver=solver or spec.get('solver', 'CVODE_myokit'),
-                                     model_type=model_type, dt=spec['dt'], sim_time=spec['sim_time'],
-                                     solver_info=info, pre_time=spec.get('pre_time', 0.0))
+        helper = get_simulation_helper(model_path=model_path, solver=solver or spec.get('solver', 'CVODE_myokit'),
+                                       model_type=model_type, dt=spec['dt'], sim_time=spec['sim_time'],
+                                       solver_info=info, pre_time=spec.get('pre_time', 0.0))
+        if protocol is not None:
+            helper.set_protocol_info(protocol)
+            helper.cam_protocol = protocol
+    return helper
+
+
+# ---- protocols ---------------------------------------------------------------------------------
+#
+# A version's tests can be driven by the protocol_info of an obs_data file (verification_config
+# "protocol"; validation.<p>.baseline "obs_data"): its pre_times, its sub-experiments (sim_times) and
+# the parameters it changes in each (params_to_change), each a number or the name of a
+# protocol_traces / protocol_shapes entry, a time-varying input libcuflynx interpolates linearly.
+# libcuflynx's ProtocolExecutor runs it.
+
+PROTOCOL_INFO = '_protocol_info'      # the spec key of a loaded protocol_info (set by with_protocol)
+
+
+def load_protocol(path):
+    '''The protocol_info of an obs_data file, its protocol_shapes expanded into protocol_traces.'''
+    from libcuflynx.utilities.protocol_shapes import materialise_shapes, validate_trace_references
+    with open(path, encoding='utf-8-sig') as f:
+        protocol = json.load(f)['protocol_info']
+    materialise_shapes(protocol)
+    validate_trace_references(protocol)
+    return protocol
+
+
+def with_protocol(spec, protocol):
+    '''``spec`` with its runs driven by ``protocol`` (one experiment): sim_time is the protocol's
+    total time and pre_time its pre_time.'''
+    if len(protocol['sim_times']) != 1:
+        raise ValueError(f'the protocol of a version has one experiment, not {len(protocol["sim_times"])}')
+    return dict(spec, sim_time=float(sum(protocol['sim_times'][0])), pre_time=float(protocol['pre_times'][0]),
+                **{PROTOCOL_INFO: protocol})
+
+
+def without_protocol(spec):
+    '''``spec`` with its runs at constant inputs (no protocol).'''
+    return {k: v for k, v in spec.items() if k != PROTOCOL_INFO}
+
+
+def protocol_inputs(protocol):
+    '''The outputs a protocol drives: its params_to_change ("mod/u_in" -> "u_in"; a test-network
+    neighbour's "record/x" stays as it is).'''
+    out = []
+    for name in (protocol or {}).get('params_to_change') or {}:
+        if '/' in name:
+            record, var = name.split('/', 1)
+            out.append(var if record == VESSEL else name)
+    return out
+
+
+def run_protocol(helper, outputs, protocol, params=None, experiment=0):
+    '''
+    Runs experiment ``experiment`` of ``protocol`` from the model's initial state, with ``params``
+    set first; returns (t, {output_key: values}, the start time of each sub-experiment), t from the
+    end of the experiment's pre_time. A trace's times count from the start of its sub-experiment,
+    the first sub-experiment's from the start of the pre_time (libcuflynx's Myokit clock).
+    '''
+    from libcuflynx.protocol_runners.protocol_executor import ProtocolExecutor
+
+    if getattr(helper, 'cam_protocol', None) is not protocol:
+        with contextlib.redirect_stdout(io.StringIO()):
+            helper.set_protocol_info(protocol)
+        helper.cam_protocol = protocol
+    names = list(params or {})
+    wanted = [[output_name(v)] for v in outputs]
+    with contextlib.redirect_stdout(io.StringIO()):
+        ok, by_sub, _, t_by_exp = ProtocolExecutor(helper).run_protocol(
+            protocol, id_param_names=names or None, id_param_vals=[params[n] for n in names] or None,
+            result_variables=wanted, exp_indices=[experiment])
+    if not ok:
+        raise RuntimeError('simulation failed')
+    t = np.asarray(t_by_exp[experiment], dtype=float)
+    sim_times = [float(s) for s in protocol['sim_times'][experiment]]
+    results = {}
+    for i, var in enumerate(outputs):
+        parts = []
+        for sub, sim_time in enumerate(sim_times):
+            values = np.asarray(by_sub[(experiment, sub)][i], dtype=float).ravel()
+            if values.size == 1:
+                values = np.full(int(sim_time / helper.dt) + 1, values[0])   # a constant is logged once
+            parts.append(values if sub == 0 else values[1:])
+        results[output_key(var)] = np.concatenate(parts)
+    starts = np.concatenate([[0.0], np.cumsum(sim_times[:-1])])
+    return t, results, starts
 
 
 def run(helper, outputs, params=None):
     '''
     Runs the helper from the model's initial state (optionally with parameter overrides);
     returns (t, {var: array}). Without the reset, a helper continues from the previous run's
-    final state.
+    final state. A helper made with a protocol runs it (``run_protocol``).
     '''
+    protocol = getattr(helper, 'cam_protocol', None)
+    if protocol is not None:
+        return run_protocol(helper, outputs, protocol, params)[:2]
     if hasattr(helper, 'reset_states'):
         helper.reset_states()
     if params:
