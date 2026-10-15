@@ -1,0 +1,10 @@
+variable_name,units,value,data_reference,sourced
+u_in,J_per_m3,13332,definitional; harness value for the stand-alone test (the chambers set it in a model; the tests drive it with a protocol trace),no
+u_out,J_per_m3,10666,definitional; harness value for the stand-alone test (the chambers set it in a model; the tests drive it with a protocol trace),no
+A_nn,m2,0.00071,mynard2012simple; Table II (p. 631): rvot A0 = 7.1 cm^2; p. 634: A_ann of the pulmonary valve = A0 of the connecting vessel,yes
+M_st,dimensionless,1,"mynard2012simple; Table III (p. 634), Pulmonary, Normal: M_st = 1",yes
+M_rg,dimensionless,0,"mynard2012simple; Table III (p. 634), Pulmonary, Normal: M_rg = 0",yes
+K_vo,m3_per_Js,0.2,"mynard2012simple; Table III (p. 634), Pulmonary, Normal: K_vo = 0.02 cm^2/(dyn s) = 0.2 m^3/(J s) (1 cm^2/(dyn s) = 10 m^3/(J s))",yes
+K_vc,m3_per_Js,0.2,"mynard2012simple; Table III (p. 634), Pulmonary, Normal: K_vc = 0.02 cm^2/(dyn s) = 0.2 m^3/(J s) (1 cm^2/(dyn s) = 10 m^3/(J s))",yes
+l_eff,metre,0.015,"mynard2015one; Table 4 (heart valve parameters), PV: l_eff = 1.5 cm (the same valve model; Table 4 pairs it with its own A_eff,max and K values, not those of mynard2012simple used here)",yes
+rho,Js2_per_m5,1060,mynard2012simple; p. 627: blood density 1.06 g/cm^3,yes

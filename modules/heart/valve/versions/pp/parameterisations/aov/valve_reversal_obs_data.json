@@ -1,0 +1,47 @@
+{
+ "obs_data_name": "valve_reversal",
+ "reference_key": "mynard2012simple",
+ "comment": "Verification protocol for valve/pp: u_out held at 80 mmHg; u_in rises from 80 to 100 mmHg over 0.05 s, holds to 0.3 s (the valve opens and the flow settles to Bernoulli's sqrt(dp/B)), falls to 60 mmHg by 0.35 s and holds to 0.6 s (the valve closes). Definitional test input, not data.",
+ "protocol_info": {
+  "pre_times": [
+   0.0
+  ],
+  "sim_times": [
+   [
+    0.6
+   ]
+  ],
+  "params_to_change": {
+   "mod/u_in": [
+    [
+     "dp_reversal"
+    ]
+   ],
+   "mod/u_out": [
+    [
+     10665.789
+    ]
+   ]
+  },
+  "protocol_traces": {
+   "dp_reversal": {
+    "t": [
+     0.0,
+     0.05,
+     0.3,
+     0.35,
+     0.6
+    ],
+    "values": [
+     10665.789,
+     13332.237,
+     13332.237,
+     7999.342,
+     7999.342
+    ]
+   }
+  }
+ },
+ "data_items": [],
+ "prediction_items": []
+}

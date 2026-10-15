@@ -5,28 +5,141 @@
   "pre_time": 0.0,
   "dt": 0.01,
   "solver": "CVODE_myokit",
-  "outputs": ["v", "zeta", "A_eff", "vel"],
-  "invariants": [],
+  "solver_info": {
+    "MaximumStep": 0.001
+  },
+  "protocol": "parameterisations/aov/valve_reversal_obs_data.json",
+  "outputs": [
+    "v",
+    "zeta",
+    "A_eff",
+    "vel",
+    "B"
+  ],
+  "invariants": [
+    {
+      "description": "the valve state stays in [0, 1] (Mynard 2012 Eq. 6-7: the rates vanish at 0 and 1), to the solver tolerance (1e-6)",
+      "expr": "np.all((zeta >= -1e-6) & (zeta <= 1 + 1e-6))"
+    },
+    {
+      "description": "the effective area follows the state (Mynard 2012 Eq. 4-5): A_eff = ((M_st - M_rg) zeta + M_rg) A_nn",
+      "expr": "np.max(np.abs(A_eff - ((M_st - M_rg)*zeta + M_rg)*A_nn)) <= 1e-9*A_nn"
+    },
+    {
+      "description": "the valve only opens under a forward pressure difference and only closes under a reverse one over output steps with one sign of the pressure difference (a step against it at most 1e-5, ten times the solver noise)",
+      "expr": "np.all(np.diff(zeta)[((u_in - u_out)[:-1] < -1) & ((u_in - u_out)[1:] < -1)] <= 1e-5) & np.all(np.diff(zeta)[((u_in - u_out)[:-1] > 1) & ((u_in - u_out)[1:] > 1)] >= -1e-5)"
+    },
+    {
+      "description": "the reversal protocol opens the valve fully (zeta > 0.95 at 0.3 s) and shuts it (zeta < 0.05 at the end)",
+      "expr": "(zeta[np.argmin(np.abs(t - 0.3))] > 0.95) & (zeta[-1] < 0.05)",
+      "applies": "the reversal protocol at the run parameters (rates K_vo, K_vc of order 0.1 m^3/(J s))"
+    },
+    {
+      "description": "open and steady at the end of the forward hold (0.3 s): the flow is Bernoulli's v = sqrt(dp / B) (Mynard 2012 Eq. 1 with dv/dt = 0)",
+      "expr": "abs(v[np.argmin(np.abs(t - 0.3))] - np.sqrt((u_in - u_out)[np.argmin(np.abs(t - 0.3))]/B[np.argmin(np.abs(t - 0.3))])) <= 0.01*np.sqrt((u_in - u_out)[np.argmin(np.abs(t - 0.3))]/B[np.argmin(np.abs(t - 0.3))])"
+    }
+  ],
   "bc_sweep": {
-    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
-    "ranges": {}
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {},
+    "bounds": {
+      "M_st": [
+        0.0,
+        1.0
+      ],
+      "M_rg": [
+        0.0,
+        1.0
+      ]
+    }
   },
   "timestep": {
     "scheme": "rk4",
-    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "dts": [
+      0.004,
+      0.002,
+      0.001,
+      0.0005
+    ],
     "min_order": 0.8,
     "tol": 0.0001,
     "cvode_tol": 0.001
   },
   "stability": {
     "supported": [
-      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
     ]
   },
   "validation": {
-    "default": {
-      "baseline": {"status": "pending", "reason": "validation data not chosen yet"},
-      "calibrate": {"note": "pending: validation data not chosen yet"}
+    "aov": {
+      "baseline": {
+        "status": "active",
+        "obs_data": "parameterisations/aov/aov_validation_obs_data.json",
+        "metric": "nrmse",
+        "threshold": 0.1
+      },
+      "calibrate": {
+        "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
+      }
+    },
+    "aov_mild_stenosis": {
+      "baseline": {
+        "status": "active",
+        "obs_data": "parameterisations/aov_mild_stenosis/aov_mild_stenosis_validation_obs_data.json",
+        "metric": "nrmse",
+        "threshold": 0.1
+      },
+      "calibrate": {
+        "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
+      }
+    },
+    "aov_severe_stenosis": {
+      "baseline": {
+        "status": "active",
+        "obs_data": "parameterisations/aov_severe_stenosis/aov_severe_stenosis_validation_obs_data.json",
+        "metric": "nrmse",
+        "threshold": 0.1
+      },
+      "calibrate": {
+        "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
+      }
+    },
+    "miv": {
+      "baseline": {
+        "status": "pending",
+        "reason": "mynard2012simple Fig. 7 (mitral valve) not digitised yet"
+      },
+      "calibrate": {
+        "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
+      }
+    },
+    "puv": {
+      "baseline": {
+        "status": "pending",
+        "reason": "mynard2012simple Fig. 6 (pulmonary valve) not digitised yet"
+      },
+      "calibrate": {
+        "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
+      }
+    },
+    "trv": {
+      "baseline": {
+        "status": "pending",
+        "reason": "mynard2012simple Fig. 8 (tricuspid valve) not digitised yet"
+      },
+      "calibrate": {
+        "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
+      }
     }
   }
 }
