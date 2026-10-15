@@ -49,7 +49,7 @@ use_builtin_modules: false
 - values, references, sourced flags and ranges from the default parameterisation's parameters;
 - the bibliography from `<module_type>_<v>_references.bib`;
 - invariants and validation settings from `<module_type>_<v>_verification_config.json`, notes and review from `<module_type>_<v>_tests.yaml`;
-- a parameterisation table with each parameterisation's data, baseline and calibration results;
+- a parameterisation table with each parameterisation's data, baseline and calibration results; each baseline and calibration test shows two columns, "From the paper" (the publication figures the data were read off, `source_figures/`) and "Model vs data" / "Calibration results" (one plot per data item), each figure beside the plots of the items its `source_figures.json` entry lists in `items` (modules/README.md, "Source figures");
 - results and plots from the last test run.
 
 The site index (`make site`) groups the module_types by category (heart, directly under `modules/`, is its own group), lists a nested module_type by its path (e.g. `neuron/soma/SN_membrane_soma` under `cell`) and links both levels.

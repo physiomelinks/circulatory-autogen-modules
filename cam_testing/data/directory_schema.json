@@ -143,11 +143,22 @@
       "directories": [],
       "subdirectories": {
         "source_figures": {
-          "description": "Screenshots of the publication figures/tables the parameterisation's data were extracted from (cropped PNG/JPG) and source_figures.json [{file, source, caption}]; required when the data came from a paper or book (modules/README.md, 'Source figures').",
+          "description": "Screenshots of the publication figures/tables the parameterisation's data were extracted from (cropped PNG/JPG) and source_figures.json [{file, source, caption, items}]; required when the data came from a paper or book (modules/README.md, 'Source figures').",
           "file_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(png|jpg|jpeg)$",
           "required": [
             "source_figures.json"
-          ]
+          ],
+          "index_keys": {
+            "required": [
+              "file",
+              "source"
+            ],
+            "optional": [
+              "caption",
+              "items"
+            ],
+            "items_note": "items: the names of the data items the figure holds (an obs_data data_items/prediction_items data_item_name, or a CSV baseline's compared model output); the report shows the figure beside those items' validation and calibration plots."
+          }
         }
       }
     },
