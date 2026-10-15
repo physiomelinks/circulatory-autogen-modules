@@ -214,7 +214,9 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     '''
     os.makedirs(resources_dir, exist_ok=True)
     network = globals()['network'](component, parameterisation)
-    rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
+    # the version alone, at the parameterisation under test (else the version's default one)
+    own = getattr(parameterisation, 'name', parameterisation) or component.default_parameterisation_name
+    rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', own]]
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
     records = module_array.from_rows(rows)
