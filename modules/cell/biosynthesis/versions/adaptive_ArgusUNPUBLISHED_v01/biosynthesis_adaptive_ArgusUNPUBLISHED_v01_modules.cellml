@@ -40,13 +40,37 @@
         <variable name="T_ref_dmg" public_interface="in" units="kelvin"/>
         <variable name="dT_Q10" public_interface="in" units="kelvin"/>
         <variable name="Q10_dmg" public_interface="in" units="dimensionless"/>
-        <!-- damage accrual: fraction of a lethal load per second -->
+        <!-- wear of ribosomes and proteins: fraction of a lethal load per second -->
         <variable name="r_dmg" public_interface="in" units="per_s"/>
-        <!-- repair capacity at full repair level -->
+        <!-- free cytosolic Ca2+ (internal_Ca port) -->
+        <variable name="Cai" public_interface="in" units="millimolar"/>
+        <!-- ribosome damage at full Ca2+ overload -->
+        <variable name="k_Ca_dmg" public_interface="in" units="per_s"/>
+        <!-- Cai at half the Ca2+ damage rate -->
+        <variable name="K_Ca_dmg" public_interface="in" units="millimolar"/>
+        <!-- Hill coefficient of the Ca2+ damage -->
+        <variable name="n_Ca_dmg" public_interface="in" units="dimensionless"/>
+        <!-- cytosolic K+ (internal_K port) -->
+        <variable name="Ki" public_interface="in" units="millimolar"/>
+        <!-- ribosome damage once all K+ is lost -->
+        <variable name="k_K_dmg" public_interface="in" units="per_s"/>
+        <!-- K+ below which ribosomes are damaged -->
+        <variable name="K_K_dmg" public_interface="in" units="millimolar"/>
+        <!-- de-energisation damage at no ATP -->
+        <variable name="k_energy_dmg" public_interface="in" units="per_s"/>
+        <!-- ATP below which proteins aggregate (de-energisation damage) -->
+        <variable name="ATP_dmg" public_interface="in" units="millimolar"/>
+        <!-- physical damage to the envelope from attacks, per second (set by the game) -->
+        <variable name="r_dmg_phys" public_interface="in" units="per_s"/>
+        <!-- absorbed radiation dose rate (set by the game) -->
+        <variable name="dose_rate" public_interface="in" units="gray_per_s"/>
+        <!-- radiation damage per gray: DNA lesions, as a share of a lethal load -->
+        <variable name="k_rad_dmg" public_interface="in" units="per_gray"/>
+        <!-- repair capacity of each damage type at full repair level -->
         <variable name="r_rep_max" public_interface="in" units="per_s"/>
         <!-- damage at half repair rate -->
         <variable name="K_D" public_interface="in" units="dimensionless"/>
-        <!-- ATP to repair one whole lethal load of damage -->
+        <!-- ATP to repair one whole lethal load of damage (any type) -->
         <variable name="C_repair" public_interface="in" units="mole"/>
         <!-- how much the cell invests in repair, 0-1 (set by the game) -->
         <variable name="repair_level" public_interface="in" units="dimensionless"/>
@@ -74,10 +98,41 @@
         <variable name="growth_progress" public_interface="out" units="dimensionless"/>
         <!-- share of a daughter the glycogen store could finish -->
         <variable name="glycogen_progress" public_interface="out" units="dimensionless"/>
-        <variable name="D_init" public_interface="in" units="dimensionless"/>
+        <variable name="D_phys_init" public_interface="in" units="dimensionless"/>
+        <variable name="D_rad_init" public_interface="in" units="dimensionless"/>
+        <variable name="D_ribo_init" public_interface="in" units="dimensionless"/>
+        <variable name="D_energy_init" public_interface="in" units="dimensionless"/>
         <variable name="P_init" public_interface="in" units="mole"/>
-        <!-- damage (1 = lethal) -->
-        <variable initial_value="D_init" name="D" public_interface="out" units="dimensionless"/>
+        <!-- physical damage: the envelope (membrane and wall) -->
+        <variable initial_value="D_phys_init" name="D_phys" public_interface="out" units="dimensionless"/>
+        <!-- radiation damage: DNA lesions -->
+        <variable initial_value="D_rad_init" name="D_rad" public_interface="out" units="dimensionless"/>
+        <!-- ribosome and protein damage: wear, Ca2+ overload and K+ loss -->
+        <variable initial_value="D_ribo_init" name="D_ribo" public_interface="out" units="dimensionless"/>
+        <!-- de-energisation damage: proteins aggregated without ATP -->
+        <variable initial_value="D_energy_init" name="D_energy" public_interface="out" units="dimensionless"/>
+        <!-- total damage, D_phys + D_rad + D_ribo + D_energy (1 = lethal) -->
+        <variable name="D" public_interface="out" units="dimensionless"/>
+        <!-- Ca2+ overload, 0-1: Cai^n / (K_Ca_dmg^n + Cai^n) -->
+        <variable name="f_Ca_dmg" public_interface="out" units="dimensionless"/>
+        <!-- K+ loss, 0-1: (1 - Ki/K_K_dmg)^2 below K_K_dmg, 0 above -->
+        <variable name="f_K_dmg" public_interface="out" units="dimensionless"/>
+        <!-- de-energisation, 0-1: (1 - ATP/ATP_dmg)^2 below ATP_dmg, 0 above -->
+        <variable name="f_energy_dmg" public_interface="out" units="dimensionless"/>
+        <!-- ribosome and protein damage accrual: wear, Ca2+ overload and K+ loss -->
+        <variable name="R_dmg_ribo" public_interface="out" units="per_s"/>
+        <!-- de-energisation damage accrual -->
+        <variable name="R_dmg_energy" public_interface="out" units="per_s"/>
+        <!-- de-energisation damage repaired per second (disaggregation) -->
+        <variable name="R_rep_energy" public_interface="out" units="per_s"/>
+        <!-- radiation damage accrual -->
+        <variable name="R_dmg_rad" public_interface="out" units="per_s"/>
+        <!-- physical damage repaired per second -->
+        <variable name="R_rep_phys" public_interface="out" units="per_s"/>
+        <!-- radiation damage repaired per second -->
+        <variable name="R_rep_rad" public_interface="out" units="per_s"/>
+        <!-- ribosome and protein damage repaired per second -->
+        <variable name="R_rep_ribo" public_interface="out" units="per_s"/>
         <!-- ATP invested in the daughter so far -->
         <variable initial_value="P_init" name="P_growth" public_interface="out" units="mole"/>
         <!-- phospholipids in the membrane (both leaflets of the whole surface) -->
@@ -91,7 +146,7 @@
         <variable name="J_ribo" public_interface="out" units="mol_per_s"/>
         <!-- membrane lipid turnover, scales with membrane area -->
         <variable name="J_lipid" public_interface="out" units="mol_per_s"/>
-        <!-- damage repaired per second -->
+        <!-- damage repaired per second, all types -->
         <variable name="R_repair" public_interface="out" units="per_s"/>
         <!-- ATP spent on repair -->
         <variable name="J_repair" public_interface="out" units="mol_per_s"/>
@@ -385,7 +440,144 @@
             </apply>
             <apply>
                 <eq/>
-                <ci>R_repair</ci>
+                <ci>f_Ca_dmg</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <power/>
+                        <ci>Cai</ci>
+                        <ci>n_Ca_dmg</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <power/>
+                            <ci>K_Ca_dmg</ci>
+                            <ci>n_Ca_dmg</ci>
+                        </apply>
+                        <apply>
+                            <power/>
+                            <ci>Cai</ci>
+                            <ci>n_Ca_dmg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_K_dmg</ci>
+                <apply>
+                    <power/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <apply>
+                                    <divide/>
+                                    <ci>Ki</ci>
+                                    <ci>K_K_dmg</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <abs/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">1.0</cn>
+                                    <apply>
+                                        <divide/>
+                                        <ci>Ki</ci>
+                                        <ci>K_K_dmg</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_energy_dmg</ci>
+                <apply>
+                    <power/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <apply>
+                                    <divide/>
+                                    <ci>ATP</ci>
+                                    <ci>ATP_dmg</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <abs/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">1.0</cn>
+                                    <apply>
+                                        <divide/>
+                                        <ci>ATP</ci>
+                                        <ci>ATP_dmg</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_dmg_ribo</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>r_dmg</ci>
+                        <ci>f_T_dmg</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>k_Ca_dmg</ci>
+                        <ci>f_Ca_dmg</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>k_K_dmg</ci>
+                        <ci>f_K_dmg</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_dmg_energy</ci>
+                <apply>
+                    <times/>
+                    <ci>k_energy_dmg</ci>
+                    <ci>f_energy_dmg</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_dmg_rad</ci>
+                <apply>
+                    <times/>
+                    <ci>k_rad_dmg</ci>
+                    <ci>dose_rate</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_rep_phys</ci>
                 <apply>
                     <times/>
                     <apply>
@@ -394,16 +586,107 @@
                             <times/>
                             <ci>repair_level</ci>
                             <ci>r_rep_max</ci>
-                            <ci>D</ci>
+                            <ci>D_phys</ci>
                         </apply>
                         <apply>
                             <plus/>
                             <ci>K_D</ci>
-                            <ci>D</ci>
+                            <ci>D_phys</ci>
                         </apply>
                     </apply>
                     <ci>f_ATP_bio</ci>
                     <ci>R_reg_repair</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_rep_rad</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>repair_level</ci>
+                            <ci>r_rep_max</ci>
+                            <ci>D_rad</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>K_D</ci>
+                            <ci>D_rad</ci>
+                        </apply>
+                    </apply>
+                    <ci>f_ATP_bio</ci>
+                    <ci>R_reg_repair</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_rep_ribo</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>repair_level</ci>
+                            <ci>r_rep_max</ci>
+                            <ci>D_ribo</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>K_D</ci>
+                            <ci>D_ribo</ci>
+                        </apply>
+                    </apply>
+                    <ci>f_ATP_bio</ci>
+                    <ci>R_reg_repair</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_rep_energy</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>repair_level</ci>
+                            <ci>r_rep_max</ci>
+                            <ci>D_energy</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>K_D</ci>
+                            <ci>D_energy</ci>
+                        </apply>
+                    </apply>
+                    <ci>f_ATP_bio</ci>
+                    <ci>R_reg_repair</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_repair</ci>
+                <apply>
+                    <plus/>
+                    <ci>R_rep_phys</ci>
+                    <ci>R_rep_rad</ci>
+                    <ci>R_rep_ribo</ci>
+                    <ci>R_rep_energy</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>D</ci>
+                <apply>
+                    <plus/>
+                    <ci>D_phys</ci>
+                    <ci>D_rad</ci>
+                    <ci>D_ribo</ci>
+                    <ci>D_energy</ci>
                 </apply>
             </apply>
             <apply>
@@ -660,16 +943,57 @@
                     <bvar>
                         <ci>t</ci>
                     </bvar>
-                    <ci>D</ci>
+                    <ci>D_phys</ci>
                 </apply>
                 <apply>
                     <minus/>
-                    <apply>
-                        <times/>
-                        <ci>r_dmg</ci>
-                        <ci>f_T_dmg</ci>
-                    </apply>
-                    <ci>R_repair</ci>
+                    <ci>r_dmg_phys</ci>
+                    <ci>R_rep_phys</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>D_rad</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>R_dmg_rad</ci>
+                    <ci>R_rep_rad</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>D_ribo</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>R_dmg_ribo</ci>
+                    <ci>R_rep_ribo</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>D_energy</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>R_dmg_energy</ci>
+                    <ci>R_rep_energy</ci>
                 </apply>
             </apply>
             <apply>

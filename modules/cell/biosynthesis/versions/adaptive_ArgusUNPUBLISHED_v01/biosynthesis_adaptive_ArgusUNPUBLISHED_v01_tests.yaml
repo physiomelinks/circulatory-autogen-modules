@@ -3,17 +3,23 @@ version: adaptive_ArgusUNPUBLISHED_v01
 reviewed: false
 notes: 'The rest of a cell''s energy budget besides pumps and protein turnover. Upkeep: mRNA turnover (n L c_recycle ln2/t_half),
   ribosome rRNA upkeep (n L c_recycle k), membrane lipid turnover (n_lipid c_lipid k, with n_lipid = 2 A_surface / area_per_lipid,
-  so it scales with membrane area). Damage D (1 = lethal) accrues at r_dmg (Q10 2) and is repaired at repair_level r_rep_max
-  D/(K_D + D), costing C_repair per unit: a cell can spend energy on repair or leave damage to accumulate and rely on replication.
-  Growth: the game sets growth_level, the ATP put into a daughter in multiples of the resting turnover J_ref, throttled as
-  ATP falls from rest to ATP_floor, like protein synthesis; P_growth is the ATP invested so far, and the cell can divide when
-  growth_progress = P_growth / M_daughter reaches 1, with M_daughter = M_build_bio (RNA, lipids, DNA) + M_build_protein (every
-  protein_pool''s M_build, summed on daughter_share). glycogen_progress is the share of a daughter the glycogen store (M_glyc_ATP
-  from the cytosol) could finish. Everything slows as ATP runs out (f_ATP = 1 at the resting ATP). At rest the cell builds
-  a daughter for 1.8e11 ATP, close to Lynch & Marinov''s growth cost 2.66e10 V^0.97 (1.6e11 for 6.28 um3); proteins are 89%
-  of it. Regulation: J_growth is also multiplied by R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose and
-  H+ (f_s from cell/expression_regulation on growth_regulation, 1 when unconnected; the switches reg_on_s set by the game,
-  all 0 by default so R_reg = 1 exactly). Maintenance regulation, by the same signals and switches of its own (all 0 by default):
-  the upkeep (mRNA, rRNA and lipid turnover) is multiplied by R_reg_upkeep and repair by R_reg_repair, so a famine-adapted
-  cell can cut them, as the stringent response cuts rRNA and phospholipid synthesis (Potrykus & Cashel 2008). Cutting repair
-  lets damage accumulate; cutting the upkeep has no modelled downside here (the mRNA, ribosome and lipid counts are fixed).'
+  so it scales with membrane area). Damage D (1 = lethal) is the sum of three types, each repaired by its own machinery at
+  repair_level r_rep_max D_x/(K_D + D_x) and costing C_repair per unit: physical damage to the envelope (D_phys, at r_dmg_phys,
+  from attacks), radiation damage to DNA (D_rad, k_rad_dmg per gray of dose_rate) and ribosome and protein damage (D_ribo:
+  wear at r_dmg, Q10 2, plus k_Ca_dmg Cai^n/(K_Ca_dmg^n + Cai^n) as Ca2+ overload displaces Mg2+ from the ribosomes: about
+  170 Mg2+ hold each ribosome together, with 1-2 mM free in the cytosol; plus k_K_dmg (1 - Ki/K_K_dmg)^2 once K+, which ribosomes
+  need to translate, falls below K_K_dmg), and de-energisation damage (D_energy: k_energy_dmg (1 - ATP/ATP_dmg)^2 below ATP_dmg,
+  as proteins aggregate once chaperones and disaggregases lack ATP). Repair needs ATP, so a de-energised cell cannot mend
+  any of it. A cell can spend energy on repair or leave damage to accumulate and rely on replication. Growth: the game sets
+  growth_level, the ATP put into a daughter in multiples of the resting turnover J_ref, throttled as ATP falls from rest to
+  ATP_floor, like protein synthesis; P_growth is the ATP invested so far, and the cell can divide when growth_progress = P_growth
+  / M_daughter reaches 1, with M_daughter = M_build_bio (RNA, lipids, DNA) + M_build_protein (every protein_pool''s M_build,
+  summed on daughter_share). glycogen_progress is the share of a daughter the glycogen store (M_glyc_ATP from the cytosol)
+  could finish. Everything slows as ATP runs out (f_ATP = 1 at the resting ATP). At rest the cell builds a daughter for 1.8e11
+  ATP, close to Lynch & Marinov''s growth cost 2.66e10 V^0.97 (1.6e11 for 6.28 um3); proteins are 89% of it. Regulation: J_growth
+  is also multiplied by R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose and H+ (f_s from cell/expression_regulation
+  on growth_regulation, 1 when unconnected; the switches reg_on_s set by the game, all 0 by default so R_reg = 1 exactly).
+  Maintenance regulation, by the same signals and switches of its own (all 0 by default): the upkeep (mRNA, rRNA and lipid
+  turnover) is multiplied by R_reg_upkeep and repair by R_reg_repair, so a famine-adapted cell can cut them, as the stringent
+  response cuts rRNA and phospholipid synthesis (Potrykus & Cashel 2008). Cutting repair lets damage accumulate; cutting the
+  upkeep has no modelled downside here (the mRNA, ribosome and lipid counts are fixed).'

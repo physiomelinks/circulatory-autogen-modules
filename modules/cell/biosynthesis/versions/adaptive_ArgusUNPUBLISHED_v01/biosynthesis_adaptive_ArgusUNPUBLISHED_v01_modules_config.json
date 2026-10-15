@@ -45,6 +45,18 @@
         ]
       },
       {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "internal_K",
+        "variables": [
+          "Ki"
+        ]
+      },
+      {
         "port_type": "growth_regulation",
         "variables": [
           "f_ATP_reg",
@@ -206,6 +218,78 @@
         "constant"
       ],
       [
+        "Cai",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "k_Ca_dmg",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_Ca_dmg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "n_Ca_dmg",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "Ki",
+        "millimolar",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "k_K_dmg",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "K_K_dmg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "k_energy_dmg",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "ATP_dmg",
+        "millimolar",
+        "access",
+        "constant"
+      ],
+      [
+        "r_dmg_phys",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "dose_rate",
+        "gray_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "k_rad_dmg",
+        "per_gray",
+        "access",
+        "constant"
+      ],
+      [
         "r_rep_max",
         "per_s",
         "access",
@@ -302,7 +386,25 @@
         "variable"
       ],
       [
-        "D_init",
+        "D_phys_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "D_rad_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "D_ribo_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "D_energy_init",
         "dimensionless",
         "access",
         "constant"
@@ -314,8 +416,92 @@
         "constant"
       ],
       [
+        "D_phys",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "D_rad",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "D_ribo",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "D_energy",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
         "D",
         "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_Ca_dmg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_K_dmg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f_energy_dmg",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "R_dmg_ribo",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_dmg_energy",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_rep_energy",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_dmg_rad",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_rep_phys",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_rep_rad",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_rep_ribo",
+        "per_s",
         "access",
         "variable"
       ],

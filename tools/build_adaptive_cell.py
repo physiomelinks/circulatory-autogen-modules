@@ -306,7 +306,13 @@ R_PROT = sum(n * L for _, L, n, _ in PROTEINS.values()) * C_MAINT * K_DEG / NA  
 VOL_UM3 = VOL * 1e18
 A_SURFACE = 2 * math.pi * R_CELL ** 2 + 2 * math.pi * R_CELL * H_CELL     # um2: the whole surface (lipids cover it all)
 BIO = {k: par(k) for k in ('L_mRNA', 't_half_mRNA', 'L_rRNA', 'k_ribo', 'c_nt_recycle', 'c_nt_denovo', 'area_per_lipid',
-                            'c_lipid', 'k_lipid', 'genome_nt', 'K_D', 'repair_cost_fraction', 'Q10_dmg')}
+                            'c_lipid', 'k_lipid', 'genome_nt', 'K_D', 'repair_cost_fraction', 'Q10_dmg', 'k_rad_dmg',
+                            'K_Ca_dmg', 'n_Ca_dmg')}
+BIO['k_Ca_dmg'] = der(1.0 / par('Ca_overload_lethal_time'), '1 / Ca_overload_lethal_time', 'Ca_overload_lethal_time')
+BIO['k_K_dmg'] = der(1.0 / par('K_loss_lethal_time'), '1 / K_loss_lethal_time', 'K_loss_lethal_time')
+BIO['k_energy_dmg'] = der(1.0 / par('deenergised_lethal_time'), '1 / deenergised_lethal_time', 'deenergised_lethal_time')
+BIO['K_K_dmg'] = par('K_K_dmg')
+BIO['ATP_dmg'] = par('ATP_dmg_threshold')
 BIO['n_mRNA'] = der(par('mRNA_per_um3') * VOL_UM3, 'mRNA_per_um3 x cell volume', 'mRNA_per_um3')
 BIO['n_ribo'] = der(par('ribosomes_per_um3') * VOL_UM3, 'ribosomes_per_um3 x cell volume', 'ribosomes_per_um3')
 BIO['r_dmg'] = der(1.0 / par('damage_lifetime'), '1 / damage_lifetime', 'damage_lifetime')
@@ -322,9 +328,14 @@ M_BUILD_DNA = BIO['genome_nt'] * BIO['c_nt_denovo'] / NA
 M_DAUGHTER = M_BUILD_PROT + M_BUILD_RNA + M_BUILD_LIPID + M_BUILD_DNA
 C_REPAIR = der(BIO['repair_cost_fraction'] * M_DAUGHTER, 'repair_cost_fraction x the daughter\'s itemised cost', 'repair_cost_fraction')                   # mol ATP to repair a whole unit of damage
 R_REP_MAX = der(BIO['r_rep_ratio'] * BIO['r_dmg'], 'repair_capacity_ratio / damage_lifetime', 'repair_capacity_ratio', 'damage_lifetime')
-# steady damage at full repair: R_rep_max D/(K_D + D) = r_dmg
-D_REST = BIO['K_D'] * BIO['r_dmg'] / (R_REP_MAX - BIO['r_dmg'])
-J_REPAIR = BIO['r_dmg'] * C_REPAIR
+# ribosome and protein damage at rest: wear plus the (tiny) Ca2+ term at the resting Cai (the K+ and de-energisation
+# terms are exactly 0 above their thresholds)
+assert KI > BIO['K_K_dmg'] and ATP > BIO['ATP_dmg']
+R_DMG_RIBO_REST = BIO['r_dmg'] + BIO['k_Ca_dmg'] * CAI ** BIO['n_Ca_dmg'] / (BIO['K_Ca_dmg'] ** BIO['n_Ca_dmg']
+                                                                          + CAI ** BIO['n_Ca_dmg'])
+# steady damage at full repair: R_rep_max D/(K_D + D) = the accrual (only ribosome damage accrues at rest)
+D_REST = BIO['K_D'] * R_DMG_RIBO_REST / (R_REP_MAX - R_DMG_RIBO_REST)
+J_REPAIR = R_DMG_RIBO_REST * C_REPAIR
 R_BIO = J_RNA + J_RIBO + J_LIPID + J_REPAIR
 V_HYD_SS = (R_TOT - R_F - R_PROT - R_BIO) / VOL   # the maintenance ATPase: what the H+-ATPase, proteins and biosynthesis don't use
 assert V_HYD_SS > 0, 'the itemised costs exceed the Lynch & Marinov total'
@@ -3226,10 +3237,22 @@ bio_vars = [
     ('K_m_ATP_bio', 'millimolar', 'in', None, None), ('ATP_ref', 'millimolar', 'in', None, None),
     ('T', 'kelvin', 'in', None, None), ('T_ref_dmg', 'kelvin', 'in', None, None),
     ('dT_Q10', 'kelvin', 'in', None, None), ('Q10_dmg', 'dimensionless', 'in', None, None),
-    ('r_dmg', 'per_s', 'in', None, 'damage accrual: fraction of a lethal load per second'),
-    ('r_rep_max', 'per_s', 'in', None, 'repair capacity at full repair level'),
+    ('r_dmg', 'per_s', 'in', None, 'wear of ribosomes and proteins: fraction of a lethal load per second'),
+    ('Cai', 'millimolar', 'in', None, 'free cytosolic Ca2+ (internal_Ca port)'),
+    ('k_Ca_dmg', 'per_s', 'in', None, 'ribosome damage at full Ca2+ overload'),
+    ('K_Ca_dmg', 'millimolar', 'in', None, 'Cai at half the Ca2+ damage rate'),
+    ('n_Ca_dmg', 'dimensionless', 'in', None, 'Hill coefficient of the Ca2+ damage'),
+    ('Ki', 'millimolar', 'in', None, 'cytosolic K+ (internal_K port)'),
+    ('k_K_dmg', 'per_s', 'in', None, 'ribosome damage once all K+ is lost'),
+    ('K_K_dmg', 'millimolar', 'in', None, 'K+ below which ribosomes are damaged'),
+    ('k_energy_dmg', 'per_s', 'in', None, 'de-energisation damage at no ATP'),
+    ('ATP_dmg', 'millimolar', 'in', None, 'ATP below which proteins aggregate (de-energisation damage)'),
+    ('r_dmg_phys', 'per_s', 'in', None, 'physical damage to the envelope from attacks, per second (set by the game)'),
+    ('dose_rate', 'gray_per_s', 'in', None, 'absorbed radiation dose rate (set by the game)'),
+    ('k_rad_dmg', 'per_gray', 'in', None, 'radiation damage per gray: DNA lesions, as a share of a lethal load'),
+    ('r_rep_max', 'per_s', 'in', None, 'repair capacity of each damage type at full repair level'),
     ('K_D', 'dimensionless', 'in', None, 'damage at half repair rate'),
-    ('C_repair', 'mole', 'in', None, 'ATP to repair one whole lethal load of damage'),
+    ('C_repair', 'mole', 'in', None, 'ATP to repair one whole lethal load of damage (any type)'),
     ('repair_level', 'dimensionless', 'in', None, 'how much the cell invests in repair, 0-1 (set by the game)'),
     ('growth_level', 'dimensionless', 'in', None, 'ATP the cell puts into a daughter, in multiples of J_ref (set by the '
                                                  'game)'),
@@ -3244,15 +3267,31 @@ bio_vars = [
     ('M_daughter', 'mole', 'out', None, 'ATP to build a daughter: proteins, RNA, lipids and DNA'),
     ('growth_progress', 'dimensionless', 'out', None, 'share of a daughter built'),
     ('glycogen_progress', 'dimensionless', 'out', None, 'share of a daughter the glycogen store could finish'),
-    ('D_init', 'dimensionless', 'in', None, None), ('P_init', 'mole', 'in', None, None),
-    ('D', 'dimensionless', 'out', 'D_init', 'damage (1 = lethal)'),
+    ('D_phys_init', 'dimensionless', 'in', None, None), ('D_rad_init', 'dimensionless', 'in', None, None),
+    ('D_ribo_init', 'dimensionless', 'in', None, None), ('D_energy_init', 'dimensionless', 'in', None, None),
+    ('P_init', 'mole', 'in', None, None),
+    ('D_phys', 'dimensionless', 'out', 'D_phys_init', 'physical damage: the envelope (membrane and wall)'),
+    ('D_rad', 'dimensionless', 'out', 'D_rad_init', 'radiation damage: DNA lesions'),
+    ('D_ribo', 'dimensionless', 'out', 'D_ribo_init', 'ribosome and protein damage: wear, Ca2+ overload and K+ loss'),
+    ('D_energy', 'dimensionless', 'out', 'D_energy_init', 'de-energisation damage: proteins aggregated without ATP'),
+    ('D', 'dimensionless', 'out', None, 'total damage, D_phys + D_rad + D_ribo + D_energy (1 = lethal)'),
+    ('f_Ca_dmg', 'dimensionless', 'out', None, 'Ca2+ overload, 0-1: Cai^n / (K_Ca_dmg^n + Cai^n)'),
+    ('f_K_dmg', 'dimensionless', 'out', None, 'K+ loss, 0-1: (1 - Ki/K_K_dmg)^2 below K_K_dmg, 0 above'),
+    ('f_energy_dmg', 'dimensionless', 'out', None, 'de-energisation, 0-1: (1 - ATP/ATP_dmg)^2 below ATP_dmg, 0 above'),
+    ('R_dmg_ribo', 'per_s', 'out', None, 'ribosome and protein damage accrual: wear, Ca2+ overload and K+ loss'),
+    ('R_dmg_energy', 'per_s', 'out', None, 'de-energisation damage accrual'),
+    ('R_rep_energy', 'per_s', 'out', None, 'de-energisation damage repaired per second (disaggregation)'),
+    ('R_dmg_rad', 'per_s', 'out', None, 'radiation damage accrual'),
+    ('R_rep_phys', 'per_s', 'out', None, 'physical damage repaired per second'),
+    ('R_rep_rad', 'per_s', 'out', None, 'radiation damage repaired per second'),
+    ('R_rep_ribo', 'per_s', 'out', None, 'ribosome and protein damage repaired per second'),
     ('P_growth', 'mole', 'out', 'P_init', 'ATP invested in the daughter so far'),
     ('n_lipid', 'dimensionless', 'out', None, 'phospholipids in the membrane (both leaflets of the whole surface)'),
     ('f_ATP_bio', 'dimensionless', 'out', None, 'synthesis slows as ATP runs out: 1 at ATP_ref'),
     ('f_T_dmg', 'dimensionless', 'out', None, None),
     ('J_RNA', 'mol_per_s', 'out', None, 'mRNA turnover'), ('J_ribo', 'mol_per_s', 'out', None, 'ribosome (rRNA) upkeep'),
     ('J_lipid', 'mol_per_s', 'out', None, 'membrane lipid turnover, scales with membrane area'),
-    ('R_repair', 'per_s', 'out', None, 'damage repaired per second'),
+    ('R_repair', 'per_s', 'out', None, 'damage repaired per second, all types'),
     ('J_repair', 'mol_per_s', 'out', None, 'ATP spent on repair'),
     ('J_growth_used', 'mol_per_s', 'out', None, 'ATP actually put into the daughter'),
     ('J_ATP_bio', 'mol_per_s', 'out', None, 'all ATP used here'),
@@ -3270,7 +3309,18 @@ bio_eqs = [
     ('J_RNA', 'n_mRNA * L_mRNA * c_nt_recycle * ln(2.0) / t_half_mRNA / N_A * f_ATP_bio * R_reg_upkeep'),
     ('J_ribo', 'n_ribo * L_rRNA * c_nt_recycle * k_ribo / N_A * f_ATP_bio * R_reg_upkeep'),
     ('J_lipid', 'n_lipid * c_lipid * k_lipid / N_A * f_ATP_bio * R_reg_upkeep'),
-    ('R_repair', 'repair_level * r_rep_max * D / (K_D + D) * f_ATP_bio * R_reg_repair'),
+    ('f_Ca_dmg', 'Cai ** n_Ca_dmg / (K_Ca_dmg ** n_Ca_dmg + Cai ** n_Ca_dmg)'),
+    ('f_K_dmg', '(((1.0 - Ki / K_K_dmg) + abs(1.0 - Ki / K_K_dmg)) / 2.0) ** 2.0'),
+    ('f_energy_dmg', '(((1.0 - ATP / ATP_dmg) + abs(1.0 - ATP / ATP_dmg)) / 2.0) ** 2.0'),
+    ('R_dmg_ribo', 'r_dmg * f_T_dmg + k_Ca_dmg * f_Ca_dmg + k_K_dmg * f_K_dmg'),
+    ('R_dmg_energy', 'k_energy_dmg * f_energy_dmg'),
+    ('R_dmg_rad', 'k_rad_dmg * dose_rate'),
+    ('R_rep_phys', 'repair_level * r_rep_max * D_phys / (K_D + D_phys) * f_ATP_bio * R_reg_repair'),
+    ('R_rep_rad', 'repair_level * r_rep_max * D_rad / (K_D + D_rad) * f_ATP_bio * R_reg_repair'),
+    ('R_rep_ribo', 'repair_level * r_rep_max * D_ribo / (K_D + D_ribo) * f_ATP_bio * R_reg_repair'),
+    ('R_rep_energy', 'repair_level * r_rep_max * D_energy / (K_D + D_energy) * f_ATP_bio * R_reg_repair'),
+    ('R_repair', 'R_rep_phys + R_rep_rad + R_rep_ribo + R_rep_energy'),
+    ('D', 'D_phys + D_rad + D_ribo + D_energy'),
     ('J_repair', 'R_repair * C_repair'),
     ('x_ATP', '(ATP - ATP_floor) / (ATP_ref - ATP_floor)'),
     ('throttle', '((x_ATP + abs(x_ATP)) / 2.0 + 1.0 - abs((x_ATP + abs(x_ATP)) / 2.0 - 1.0)) / 2.0'),
@@ -3283,12 +3333,15 @@ bio_eqs = [
     ('J_ATP_bio', 'J_RNA + J_ribo + J_lipid + J_repair + J_growth_used'),
     ('M_build_bio', '((n_mRNA * L_mRNA + n_ribo * L_rRNA + genome_nt) * c_nt_denovo + n_lipid * c_lipid) / N_A'),
     ('j_ATP_bio', '-J_ATP_bio'), ('j_ADP_bio', 'J_ATP_bio'), ('j_Pi_bio', 'J_ATP_bio'),
-    ('d/dt D', 'r_dmg * f_T_dmg - R_repair'),
+    ('d/dt D_phys', 'r_dmg_phys - R_rep_phys'),
+    ('d/dt D_rad', 'R_dmg_rad - R_rep_rad'),
+    ('d/dt D_ribo', 'R_dmg_ribo - R_rep_ribo'),
+    ('d/dt D_energy', 'R_dmg_energy - R_rep_energy'),
     ('d/dt P_growth', 'J_growth_used'),
 ]
 bio_roles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in bio_vars if v[0] != 't'}
 bio_roles.update({n: 'boundary_condition' for n in ('ATP', 'ADP', 'Pi', 'A_mem', 'repair_level', 'growth_level',
-                                                    'M_glyc_ATP')})
+                                                    'M_glyc_ATP', 'Cai', 'Ki', 'r_dmg_phys', 'dose_rate')})
 bio_roles['M_build_in'] = 'variable'   # summed from the pools
 bio_roles['T'] = 'global_constant'
 bio_roles.update(REG_ROLES)
@@ -3318,6 +3371,18 @@ bio_params = [
     ('T', T, 'operating point: 20 C', False), ('T_ref_dmg', T, 'reference temperature of the damage rate (20 C)', False),
     ('dT_Q10', DT_Q10, 'definition of Q10', True), ('Q10_dmg', BIO['Q10_dmg'], f'{PH}; damage doubles per 10 K', False),
     ('r_dmg', BIO['r_dmg'], f'{PH}; an unrepaired cell accumulates a lethal load in 10 days at 20 C', False),
+    ('Cai', CAI, 'gangola1987maintenance; 90 nM', True),
+    ('k_Ca_dmg', BIO['k_Ca_dmg'], f'{PH}; full Ca2+ overload kills an unrepaired cell in 30 min', False),
+    ('K_Ca_dmg', BIO['K_Ca_dmg'], f'{PH}; {PARAMS["K_Ca_dmg"]["note"]}', False),
+    ('n_Ca_dmg', BIO['n_Ca_dmg'], f'{PH}; {PARAMS["n_Ca_dmg"]["note"]}', False),
+    ('Ki', KI, par_ref('Ki'), True),
+    ('k_K_dmg', BIO['k_K_dmg'], f'{PH}; a cell that has lost all its K+ kills its ribosomes in an hour', False),
+    ('K_K_dmg', BIO['K_K_dmg'], f'{PH}; {PARAMS["K_K_dmg"]["note"]}', False),
+    ('k_energy_dmg', BIO['k_energy_dmg'], f'{PH}; a cell with no ATP aggregates its proteins beyond rescue in 30 min', False),
+    ('ATP_dmg', BIO['ATP_dmg'], f'{PH}; {PARAMS["ATP_dmg_threshold"]["note"]}', False),
+    ('r_dmg_phys', 0.0, 'definitional; no attack by default', False),
+    ('dose_rate', 0.0, 'definitional; no radiation by default (natural background, ~1e-10 Gy/s, is negligible)', False),
+    ('k_rad_dmg', BIO['k_rad_dmg'], f'{PH}; {PARAMS["k_rad_dmg"]["note"]}', False),
     ('r_rep_max', R_REP_MAX, f'{PH}; full repair removes damage up to 10x as fast as it accrues', False),
     ('K_D', BIO['K_D'], f'{PH}; repair is half-maximal at a tenth of a lethal load', False),
     ('C_repair', C_REPAIR, f'{PH}; repairing a whole lethal load costs 10% of building a daughter', False),
@@ -3328,7 +3393,10 @@ bio_params = [
     ('ATP_floor', par('build_ATP_floor'), '', False),
     ('M_build_in', 0.0, 'no pool connected (an open sum port is 0)', False),
     ('M_glyc_ATP', 0.0, 'definitional; no glycogen (used when unconnected)', False),
-    ('D_init', D_REST, 'calibrated: steady damage at full repair', False),
+    ('D_phys_init', 0.0, 'definitional; no physical damage at start', False),
+    ('D_rad_init', 0.0, 'definitional; no radiation damage at start', False),
+    ('D_ribo_init', D_REST, 'calibrated: steady wear at full repair', False),
+    ('D_energy_init', 0.0, 'definitional; no de-energisation damage at start', False),
     ('P_init', 0.0, 'definitional; no daughter under way', False),
 ] + REG_ROWS + reg_switch_rows('_upkeep') + reg_switch_rows('_repair')
 bio_inv = [
@@ -3336,8 +3404,11 @@ bio_inv = [
      'expr': 'np.allclose(J_RNA, n_mRNA*L_mRNA*c_nt_recycle*np.log(2)/t_half_mRNA/N_A*f_ATP_bio*R_reg_upkeep, rtol=1e-12, '
              'atol=0) and np.allclose(J_lipid, 2*A_mem*surface_factor/area_per_lipid*c_lipid*k_lipid/N_A*f_ATP_bio'
              '*R_reg_upkeep, rtol=1e-12, atol=0) and np.allclose(J_ribo, n_ribo*L_rRNA*c_nt_recycle*k_ribo/N_A*f_ATP_bio'
-             '*R_reg_upkeep, rtol=1e-12, atol=0) and np.allclose(R_repair, repair_level*r_rep_max*D/(K_D + D)*f_ATP_bio'
-             '*R_reg_repair, rtol=1e-12, atol=1e-30) and np.allclose(J_repair, R_repair*C_repair, rtol=1e-12, atol=0) and '
+             '*R_reg_upkeep, rtol=1e-12, atol=0) and '
+             + ' and '.join(f'np.allclose(R_rep_{x}, repair_level*r_rep_max*D_{x}/(K_D + D_{x})*f_ATP_bio*R_reg_repair, '
+                            'rtol=1e-12, atol=1e-30)' for x in ('phys', 'rad', 'ribo', 'energy')) +
+             ' and np.allclose(R_repair, R_rep_phys + R_rep_rad + R_rep_ribo + R_rep_energy, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(J_repair, R_repair*C_repair, rtol=1e-12, atol=0) and '
              'np.allclose(j_ATP_bio, -J_ATP_bio, rtol=1e-12, atol=0) and np.allclose(j_ADP_bio, J_ATP_bio, rtol=1e-12, atol=0)'},
     {'description': 'growth is asked in multiples of the resting turnover, throttled and regulated: J_growth = '
                     'growth_level J_ref throttle R_reg; the daughter costs M_build_bio + M_build_protein; progress = P_growth / M_daughter, glycogen '
@@ -3348,9 +3419,21 @@ bio_inv = [
              'rtol=1e-12, atol=1e-15) and np.allclose(glycogen_progress, M_glyc_ATP/M_daughter, rtol=1e-12, atol=1e-15)'},
     {'description': 'the daughter receives exactly the growth ATP spent: P(t) - P(0) = int J_growth_used dt (relative 1e-6)',
      'expr': 'abs(P_growth[-1] - P_growth[0] - np.trapz(J_growth_used, t)) <= 1e-6*abs(np.trapz(J_growth_used, t)) + 1e-30'},
-    {'description': 'damage balance: D(t) - D(0) = int (r_dmg f_T - R_repair) dt (relative 1e-6), damage never negative',
-     'expr': 'abs(D[-1] - D[0] - np.trapz(r_dmg*f_T_dmg - R_repair, t)) <= 1e-6*np.trapz(np.abs(r_dmg*f_T_dmg) + '
-             'np.abs(R_repair), t) + 1e-15 and np.all(D >= 0)'},
+    {'description': 'damage balance of each type: D_x(t) - D_x(0) = int (accrual - repair) dt (relative 1e-6), never '
+                    'negative; the total is their sum (exact)',
+     'expr': ' and '.join(f'abs(D_{x}[-1] - D_{x}[0] - np.trapz({a} - R_rep_{x}, t)) <= 1e-6*np.trapz(np.abs({a}) + '
+                          f'np.abs(R_rep_{x}), t) + 1e-15 and np.all(D_{x} >= 0)'
+                          for x, a in (('phys', 'r_dmg_phys + 0*t'), ('rad', 'R_dmg_rad'), ('ribo', 'R_dmg_ribo'),
+                                       ('energy', 'R_dmg_energy')))
+             + ' and np.allclose(D, D_phys + D_rad + D_ribo + D_energy, rtol=1e-12, atol=1e-30)'},
+    {'description': 'damage accrual (exact): wear, Ca2+ overload and K+ loss for the ribosomes, falling ATP for '
+                    'de-energisation, k_rad dose rate for radiation; the thresholds give exactly 0 above them',
+     'expr': 'np.allclose(f_Ca_dmg, Cai**n_Ca_dmg/(K_Ca_dmg**n_Ca_dmg + Cai**n_Ca_dmg), rtol=1e-12, atol=1e-30) and '
+             'np.allclose(f_K_dmg, np.clip(1 - Ki/K_K_dmg, 0, None)**2, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(f_energy_dmg, np.clip(1 - ATP/ATP_dmg, 0, None)**2, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(R_dmg_ribo, r_dmg*f_T_dmg + k_Ca_dmg*f_Ca_dmg + k_K_dmg*f_K_dmg, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(R_dmg_energy, k_energy_dmg*f_energy_dmg, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(R_dmg_rad, k_rad_dmg*dose_rate, rtol=1e-12, atol=1e-30)'},
     reg_invariant('growth_level*J_ref*throttle', 'J_growth'),
     {'description': 'regulation of the upkeep (exact): R_reg_upkeep = prod (1 - reg_on_upkeep + reg_on_upkeep f); 1 '
                     'with every switch off',
@@ -3367,21 +3450,30 @@ write_version('cell', 'biosynthesis', 'biosynthesis_fermenter', bio_vars, bio_eq
                                   'variables': ['ATP', 'ADP', 'Pi', 'j_ATP_bio', 'j_ADP_bio', 'j_Pi_bio']},
                                  {'port_type': 'membrane_area', 'variables': ['A_mem']},
                                  {'port_type': 'daughter_share', 'variables': ['M_build_in'], 'multi_port': 'sum'},
-                                 {'port_type': 'glycogen_store', 'variables': ['M_glyc_ATP']}, GROWTH_REG_PORT],
+                                 {'port_type': 'glycogen_store', 'variables': ['M_glyc_ATP']},
+                                 {'port_type': 'internal_Ca', 'variables': ['Cai']},
+                                 {'port_type': 'internal_K', 'variables': ['Ki']}, GROWTH_REG_PORT],
                'roles': bio_roles},
               bio_params,
               {'sim_time': 3600.0, 'pre_time': 0.0, 'dt': 1.0, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-20},
-               'outputs': ['D', 'P_growth', 'J_RNA', 'J_ribo', 'J_lipid', 'R_repair', 'J_repair', 'J_growth', 'J_growth_used',
+               'outputs': ['D', 'D_phys', 'D_rad', 'D_ribo', 'D_energy', 'f_Ca_dmg', 'f_K_dmg', 'f_energy_dmg',
+                           'R_dmg_ribo', 'R_dmg_rad', 'R_dmg_energy', 'R_rep_phys', 'R_rep_rad', 'R_rep_ribo', 'R_rep_energy', 'P_growth', 'J_RNA', 'J_ribo', 'J_lipid', 'R_repair', 'J_repair',
+                           'J_growth', 'J_growth_used',
                            'M_daughter', 'growth_progress', 'glycogen_progress', 'throttle', 'x_ATP', 'M_build_protein',
                            'J_ATP_bio', 'M_build_bio', 'j_ATP_bio', 'j_ADP_bio', 'f_ATP_bio', 'f_T_dmg', 'n_lipid', 'R_reg',
                            'R_reg_upkeep', 'R_reg_repair'],
                'run_parameters': {'growth_level': 1.0, 'repair_level': 0.5, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8,
+                                  'r_dmg_phys': 1e-5, 'dose_rate': 1e-3, 'Cai': 0.2, 'Ki': 60.0, 'ATP': 0.5,
                                   'reg_on_ATP_upkeep': 1.0, 'reg_on_ATP_repair': 1.0},
                'invariants': bio_inv,
                'bc_sweep': {'ranges': {'T': [273.15, 313.15], 'repair_level': [0.0, 1.0], 'growth_level': [0.0, 20.0],
-                                       'ATP': [0.5, 12.0], 'f_ATP_reg': [0.0, 1.0]},
-                            'rationale': 'temperatures 0-40 C; repair level and growth over the ranges the game offers'},
+                                       'ATP': [0.0, 12.0], 'f_ATP_reg': [0.0, 1.0], 'Cai': [0.0, 5.0], 'Ki': [0.0, 250.0],
+                                       'r_dmg_phys': [0.0, 1e-3], 'dose_rate': [0.0, 1.0]},
+                            'rationale': 'temperatures 0-40 C; repair level and growth over the ranges the game offers; '
+                                         'Cai from rest to a dead cell\'s (~2 mM), Ki from none to rest; an attack '
+                                         'removing a lethal load in '
+                                         '17 min; 1 Gy/s, a lethal dose in 5 min'},
                # nearly linear: at small steps RK4 errors are round-off, so test convergence at steps where they are not
                'timestep': {'scheme': 'rk4', 'dts': [900.0, 450.0, 225.0], 't_end': 3600.0, 'min_order': 0.8, 'tol': 1e-3,
                             'cvode_tol': 1e-2},
@@ -3390,8 +3482,16 @@ write_version('cell', 'biosynthesis', 'biosynthesis_fermenter', bio_vars, bio_eq
                   'The rest of a cell\'s energy budget besides pumps and protein turnover. Upkeep: mRNA turnover (n L '
                   'c_recycle ln2/t_half), ribosome rRNA upkeep (n L c_recycle k), membrane lipid turnover (n_lipid c_lipid '
                   'k, with n_lipid = 2 A_surface / area_per_lipid, so it scales with membrane area). Damage D (1 = lethal) '
-                  'accrues at r_dmg (Q10 2) and is repaired at repair_level r_rep_max D/(K_D + D), costing C_repair per '
-                  'unit: a cell can spend energy on repair or leave damage to accumulate and rely on replication. Growth: '
+                  'is the sum of three types, each repaired by its own machinery at repair_level r_rep_max D_x/(K_D + D_x) '
+                  'and costing C_repair per unit: physical damage to the envelope (D_phys, at r_dmg_phys, from attacks), '
+                  'radiation damage to DNA (D_rad, k_rad_dmg per gray of dose_rate) and ribosome and protein damage '
+                  '(D_ribo: wear at r_dmg, Q10 2, plus k_Ca_dmg Cai^n/(K_Ca_dmg^n + Cai^n) as Ca2+ overload displaces '
+                  'Mg2+ from the ribosomes: about 170 Mg2+ hold each ribosome together, with 1-2 mM free in the cytosol; '
+                  'plus k_K_dmg (1 - Ki/K_K_dmg)^2 once K+, which ribosomes need to translate, falls below K_K_dmg), and '
+                  'de-energisation damage (D_energy: k_energy_dmg (1 - ATP/ATP_dmg)^2 below ATP_dmg, as proteins aggregate '
+                  'once chaperones and disaggregases lack ATP). Repair needs ATP, so a de-energised cell cannot mend any '
+                  'of it. '
+                  'A cell can spend energy on repair or leave damage to accumulate and rely on replication. Growth: '
                   'the game sets growth_level, the ATP put into a daughter in multiples of the resting turnover J_ref, '
                   'throttled as ATP falls from rest to ATP_floor, like protein synthesis; P_growth is the ATP invested so far, and the cell can divide when growth_progress = '
                   'P_growth / M_daughter reaches 1, with M_daughter = M_build_bio (RNA, lipids, DNA) + M_build_protein '
@@ -3460,7 +3560,7 @@ define_cell(
                 S('reg', 'expression_regulation', V_REG)]
                + LEAKS,
     links=[('membrane', x) for x in ('Na_K', 'Ca', 'H', 'cytosol', 'bio', 'protein', 'i_leak_Na', 'i_leak_Ca', 'i_leak_H')]
-          + [('Na_K', 'i_leak_Na'), ('Ca', 'i_leak_Ca'), ('H', 'i_leak_H'),
+          + [('Na_K', 'i_leak_Na'), ('Ca', 'i_leak_Ca'), ('H', 'i_leak_H'), ('Ca', 'bio'), ('Na_K', 'bio'),
              ('cytosol', 'H'), ('cytosol', 'protein'), ('cytosol', 'bio'),
              ('pool_proteome', 'protein'), ('pool_proteome', 'bio'),
              ('pool_Glyc', 'protein'), ('pool_Glyc', 'bio'), ('pool_Glyc', 'cytosol'),
@@ -3673,7 +3773,7 @@ def cell_outputs(names):
             ('protein', 'J_prot_total'), ('protein', 'J_saved_total'), ('protein', 'J_cat'), ('protein', 'J_recycled'),
             ('protein', 'N_aa'), ('protein', 'phi_aa'), ('protein', 's_prot'), ('protein', 'Q_aa_rel_total'),
             ('protein', 'Q_aa_use_total'), ('protein', 'r_aa_cat'),
-            ('bio', 'D'), ('bio', 'P_growth'), ('bio', 'J_ATP_bio'), ('bio', 'M_build_bio'), ('bio', 'M_daughter'),
+            ('bio', 'D'), ('bio', 'D_phys'), ('bio', 'D_rad'), ('bio', 'D_ribo'), ('bio', 'D_energy'), ('bio', 'P_growth'), ('bio', 'J_ATP_bio'), ('bio', 'M_build_bio'), ('bio', 'M_daughter'),
             ('bio', 'growth_progress'), ('bio', 'R_reg')] + [('reg', f_) for f_ in REG_F]
     if 'i_H_ATPase' in names:
         base += [('i_K_Trk', 'i_leak_K'), ('i_H_ATPase', 'i_H_ATPase'), ('i_H_ATPase', 'v_ATP_H'),

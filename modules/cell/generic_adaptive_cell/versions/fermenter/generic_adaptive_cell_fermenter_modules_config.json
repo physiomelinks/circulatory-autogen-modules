@@ -49,6 +49,7 @@
         ],
         "out_instances": [
           "i_leak_Na",
+          "bio",
           "i_K_Trk",
           "i_NaH",
           "i_KH",
@@ -65,6 +66,7 @@
         ],
         "out_instances": [
           "i_leak_Ca",
+          "bio",
           "i_NaCa"
         ]
       },
@@ -116,6 +118,8 @@
         "instance": "default",
         "inp_instances": [
           "membrane",
+          "Ca",
+          "Na_K",
           "cytosol",
           "pool_proteome",
           "pool_Glyc",

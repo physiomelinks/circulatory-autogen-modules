@@ -49,7 +49,7 @@ K_ADP_gly_cytosol,millimolar,0.1,unreferenced_placeholder; lumped glycolysis aff
 K_Pi_gly_cytosol,millimolar,1.0,unreferenced_placeholder; lumped glycolysis affinity for Pi,no
 K_lac_cytosol,millimolar,10.0,unreferenced_placeholder; lumped glycolysis product constant for lactate,no
 K_ATP_gly_cytosol,millimolar,1.0,unreferenced_placeholder; lumped glycolysis product constant for ATP,no
-V_hyd_cytosol,millimolar_per_s,0.0836591948542882,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
+V_hyd_cytosol,millimolar_per_s,0.08365908029758785,"calibrated: the maintenance ATPase uses the ATP turnover that neither the H+-ATPase (25%, placeholder) nor protein turnover (protein_expression) uses",no
 K_ATP_hyd_cytosol,millimolar,0.5,unreferenced_placeholder; maintenance ATPase affinity for ATP,no
 K_ADP_hyd_cytosol,millimolar,0.5,unreferenced_placeholder; maintenance ATPase product constant for ADP,no
 K_Pi_hyd_cytosol,millimolar,5.0,unreferenced_placeholder; maintenance ATPase product constant for Pi,no
@@ -98,6 +98,16 @@ T_ref_dmg_bio,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the te
 dT_Q10_bio,kelvin,10.0,definitional; definition of Q10 (rate ratio per 10 K),no
 Q10_dmg_bio,dimensionless,2.0,unreferenced_placeholder; damage doubles per 10 K,no
 r_dmg_bio,per_s,1.1574074074074074e-06,"derived: 1 / damage_lifetime (damage_lifetime: unreferenced_placeholder, placeholder)",no
+k_Ca_dmg_bio,per_s,0.0005555555555555556,"derived: 1 / Ca_overload_lethal_time (Ca_overload_lethal_time: unreferenced_placeholder, placeholder)",no
+K_Ca_dmg_bio,millimolar,0.5,"unreferenced_placeholder; Ca2+ damages ribosomes as it approaches the free Mg2+ (1-2 mM), which holds them together",no
+n_Ca_dmg_bio,dimensionless,2.0,unreferenced_placeholder; Ca2+ displaces Mg2+ cooperatively,no
+k_K_dmg_bio,per_s,0.0002777777777777778,"derived: 1 / K_loss_lethal_time (K_loss_lethal_time: unreferenced_placeholder, placeholder)",no
+K_K_dmg_bio,millimolar,100.0,unreferenced_placeholder; ribosomes need ~100 mM K+ to translate; below it they lose structure,no
+k_energy_dmg_bio,per_s,0.0005555555555555556,"derived: 1 / deenergised_lethal_time (deenergised_lethal_time: unreferenced_placeholder, placeholder)",no
+ATP_dmg_bio,millimolar,1.0,unreferenced_placeholder; below ~1 mM ATP chaperones and disaggregases stop keeping proteins folded,no
+r_dmg_phys_bio,per_s,0.0,definitional; no attack by default,no
+dose_rate_bio,gray_per_s,0.0,"definitional; no radiation by default (natural background, ~1e-10 Gy/s, is negligible)",no
+k_rad_dmg_bio,per_gray,0.0033333333333333335,unreferenced_placeholder; a lethal load at 300 Gy: E. coli's D10 for gamma rays is ~0.14-0.7 kGy (Deinococcus radiodurans ~10 kGy),no
 r_rep_max_bio,per_s,1.1574074074074073e-05,"derived: repair_capacity_ratio / damage_lifetime (repair_capacity_ratio: unreferenced_placeholder, placeholder; damage_lifetime: unreferenced_placeholder, placeholder)",no
 K_D_bio,dimensionless,0.1,unreferenced_placeholder; repair is half-maximal at a tenth of a lethal load,no
 C_repair_bio,mole,3.0037809007103e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
@@ -105,7 +115,10 @@ repair_level_bio,dimensionless,1.0,definitional; full repair by default,no
 growth_level_bio,dimensionless,0.0,definitional; no growth until the player puts energy into it,no
 J_ref_bio,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
 ATP_floor_bio,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
-D_init_bio,dimensionless,0.011111111111111112,calibrated: steady damage at full repair,no
+D_phys_init_bio,dimensionless,0.0,definitional; no physical damage at start,no
+D_rad_init_bio,dimensionless,0.0,definitional; no radiation damage at start,no
+D_ribo_init_bio,dimensionless,0.011111303111436668,calibrated: steady wear at full repair,no
+D_energy_init_bio,dimensionless,0.0,definitional; no de-energisation damage at start,no
 P_init_bio,mole,0.0,definitional; no daughter under way,no
 reg_on_ATP_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_G6P_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no

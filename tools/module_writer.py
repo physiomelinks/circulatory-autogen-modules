@@ -48,6 +48,8 @@ UNITS = {
     'C_per_mol': [('coulomb', None, 1, 1), ('mole', None, -1, 1)],
     'J_per_mol_K': [('joule', None, 1, 1), ('mole', None, -1, 1), ('kelvin', None, -1, 1)],
     'per_s': [('second', None, -1, 1)],
+    'gray_per_s': [('joule', None, 1, 1), ('kilogram', None, -1, 1), ('second', None, -1, 1)],
+    'per_gray': [('kilogram', None, 1, 1), ('joule', None, -1, 1)],
     'per_millimolar_s': [('millimolar', None, -1, 1), ('second', None, -1, 1)],
     'mol_per_s_per_um2': [('mole', None, 1, 1), ('second', None, -1, 1), ('metre', 'micro', -2, 1)],
     'per_mol': [('mole', None, -1, 1)],

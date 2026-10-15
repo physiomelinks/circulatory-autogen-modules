@@ -1038,6 +1038,62 @@
    "status": "placeholder",
    "note": "damage doubles per 10 K"
   },
+  "k_rad_dmg": {
+   "value": 0.0033333333333333335,
+   "units": "per_gray",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "a lethal load at 300 Gy: E. coli's D10 for gamma rays is ~0.14-0.7 kGy (Deinococcus radiodurans ~10 kGy)"
+  },
+  "Ca_overload_lethal_time": {
+   "value": 1800.0,
+   "units": "second",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "full Ca2+ overload kills an unrepaired cell in 30 min"
+  },
+  "K_Ca_dmg": {
+   "value": 0.5,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "Ca2+ damages ribosomes as it approaches the free Mg2+ (1-2 mM), which holds them together"
+  },
+  "n_Ca_dmg": {
+   "value": 2.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "Ca2+ displaces Mg2+ cooperatively"
+  },
+  "K_loss_lethal_time": {
+   "value": 3600.0,
+   "units": "second",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "a cell that has lost all its K+ kills its ribosomes in an hour"
+  },
+  "K_K_dmg": {
+   "value": 100.0,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "ribosomes need ~100 mM K+ to translate; below it they lose structure"
+  },
+  "deenergised_lethal_time": {
+   "value": 1800.0,
+   "units": "second",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "a cell with no ATP aggregates its proteins beyond rescue in 30 min"
+  },
+  "ATP_dmg_threshold": {
+   "value": 1.0,
+   "units": "millimolar",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "below ~1 mM ATP chaperones and disaggregases stop keeping proteins folded"
+  },
   "L_Flagellum": {
    "value": 10128240,
    "units": "dimensionless",
