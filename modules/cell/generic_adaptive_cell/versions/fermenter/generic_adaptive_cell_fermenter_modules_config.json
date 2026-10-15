@@ -137,7 +137,21 @@
           "pool_ABC",
           "pool_GalP"
         ],
-        "out_instances": []
+        "out_instances": [
+          "ribosomes"
+        ]
+      },
+      {
+        "name": "ribosomes",
+        "module_type": "ribosomes",
+        "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+        "instance": "default",
+        "inp_instances": [
+          "bio"
+        ],
+        "out_instances": [
+          "protein"
+        ]
       },
       {
         "name": "protein",
@@ -147,6 +161,7 @@
         "inp_instances": [
           "membrane",
           "cytosol",
+          "ribosomes",
           "pool_proteome",
           "pool_Glyc",
           "reg",

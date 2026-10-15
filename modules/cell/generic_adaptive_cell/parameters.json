@@ -1087,6 +1087,41 @@
    "status": "placeholder",
    "note": "a cell with no ATP aggregates its proteins beyond rescue in 30 min"
   },
+  "ribosome_rebuild_time": {
+   "value": 3600.0,
+   "units": "second",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "ribosomes lost while their upkeep went unpaid are rebuilt with a time constant of about an hour once it is paid again, the order of a starved bacterium's lag before regrowth"
+  },
+  "ribosome_rebuild_steepness": {
+   "value": 8.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "rebuilding lost ribosomes scales with u^n of the share of the upkeep paid, u: a smooth switch, so a cell still cutting its upkeep (u 0.3: 1e-4) does not rebuild what it is losing, and one paying in full rebuilds at the full rate (the stringent response stops rRNA synthesis while starving)"
+  },
+  "aa_per_ribosome": {
+   "value": 7500.0,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "amino acids in the ~54 proteins of one E. coli ribosome, of order 7,500 (from memory)"
+  },
+  "lipid_damage_lethal_fraction": {
+   "value": 0.5,
+   "units": "dimensionless",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "share of the membrane's phospholipids left unrenewed (oxidised, hydrolysed) that is a lethal load of envelope damage; with turnover at 1%/h, unpaid lipid upkeep adds 2% of a lethal load per hour (calibrated with AdaptOrDeity's level-1 reference players)"
+  },
+  "qc_lapse_lethal_time": {
+   "value": 172800.0,
+   "units": "second",
+   "source": "unreferenced_placeholder",
+   "status": "placeholder",
+   "note": "a cell whose maintenance ATPase (chaperones, proteases, stalled-ribosome rescue and the rest of its unitemised upkeep) is cut completely accumulates a lethal load of ribosome and protein damage in two days: 12.5% in 6 h (at one day a cell regulating its maintenance by ATP dies in AdaptOrDeity's level 1)"
+  },
   "ATP_dmg_threshold": {
    "value": 1.0,
    "units": "millimolar",

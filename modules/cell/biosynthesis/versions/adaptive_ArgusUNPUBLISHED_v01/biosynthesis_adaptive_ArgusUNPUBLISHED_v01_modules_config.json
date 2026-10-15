@@ -64,6 +64,19 @@
           "f_glc_reg",
           "f_H_reg"
         ]
+      },
+      {
+        "port_type": "ribosome_upkeep",
+        "variables": [
+          "x_unpaid",
+          "J_ATP_ribo_in"
+        ]
+      },
+      {
+        "port_type": "maintenance_share",
+        "variables": [
+          "R_reg_maint"
+        ]
       }
     ],
     "variables_and_units": [
@@ -124,12 +137,6 @@
       [
         "L_rRNA",
         "dimensionless",
-        "access",
-        "constant"
-      ],
-      [
-        "k_ribo",
-        "per_s",
         "access",
         "constant"
       ],
@@ -274,6 +281,30 @@
       [
         "r_dmg_phys",
         "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "k_lipid_dmg",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "R_reg_maint",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "k_qc_dmg",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "J_ATP_ribo_in",
+        "mol_per_s",
         "access",
         "boundary_condition"
       ],
@@ -470,6 +501,42 @@
         "variable"
       ],
       [
+        "R_dmg_qc",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_dmg_phys",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_dmg_lipid",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "x_unpaid_raw",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "x_unpaid",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "u_upkeep",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
         "R_dmg_energy",
         "per_s",
         "access",
@@ -531,12 +598,6 @@
       ],
       [
         "J_RNA",
-        "mol_per_s",
-        "access",
-        "variable"
-      ],
-      [
-        "J_ribo",
         "mol_per_s",
         "access",
         "variable"

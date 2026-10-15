@@ -17,7 +17,8 @@ Module versions (equations as infix text, tools/cellml_writer.py):
   cell/membrane_potential/adaptive_ArgusUNPUBLISHED_v01  the membrane as a capacitor (disc geometry)
   cell/Ca_handling/adaptive_ArgusUNPUBLISHED_v01         cytosolic Ca with a fixed buffer (no ER)
   cell/H_handling/adaptive_ArgusUNPUBLISHED_v01          buffered cytosolic H+, pH and E_H
-  cell/biosynthesis/adaptive_ArgusUNPUBLISHED_v01        RNA, ribosomes, lipids, damage and repair, growth to a daughter
+  cell/biosynthesis/adaptive_ArgusUNPUBLISHED_v01        RNA and lipid upkeep, damage and repair, growth to a daughter
+  cell/ribosomes/adaptive_ArgusUNPUBLISHED_v01           the ribosome count: lost when its upkeep is unpaid, rebuilt
   cell/protein_pool/ArgusUNPUBLISHED_v01                 one protein: expression, upkeep, build cost, footprint
   cell/protein_expression/adaptive_ArgusUNPUBLISHED_v01  protein synthesis serving the pools (capacity, ATP throttle)
   cell/expression_regulation/ArgusUNPUBLISHED_v01        falling ATP, G6P, glucose or pH lower the pools' targets and
@@ -311,6 +312,14 @@ BIO = {k: par(k) for k in ('L_mRNA', 't_half_mRNA', 'L_rRNA', 'k_ribo', 'c_nt_re
 BIO['k_Ca_dmg'] = der(1.0 / par('Ca_overload_lethal_time'), '1 / Ca_overload_lethal_time', 'Ca_overload_lethal_time')
 BIO['k_K_dmg'] = der(1.0 / par('K_loss_lethal_time'), '1 / K_loss_lethal_time', 'K_loss_lethal_time')
 BIO['k_energy_dmg'] = der(1.0 / par('deenergised_lethal_time'), '1 / deenergised_lethal_time', 'deenergised_lethal_time')
+# the costs of cutting maintenance: envelope damage from unpaid lipid upkeep, ribosome and protein damage from an unpaid
+# maintenance ATPase (lapsed quality control), and ribosomes lost and rebuilt (cell/ribosomes)
+BIO['k_lipid_dmg'] = der(par('k_lipid') / par('lipid_damage_lethal_fraction'), 'k_lipid / lipid_damage_lethal_fraction',
+                         'k_lipid', 'lipid_damage_lethal_fraction')
+BIO['k_qc_dmg'] = der(1.0 / par('qc_lapse_lethal_time'), '1 / qc_lapse_lethal_time', 'qc_lapse_lethal_time')
+BIO['k_ribo_build'] = der(1.0 / par('ribosome_rebuild_time'), '1 / ribosome_rebuild_time', 'ribosome_rebuild_time')
+BIO['aa_ribo'] = par('aa_per_ribosome')
+BIO['n_ribo_build'] = par('ribosome_rebuild_steepness')
 BIO['K_K_dmg'] = par('K_K_dmg')
 BIO['ATP_dmg'] = par('ATP_dmg_threshold')
 BIO['n_mRNA'] = der(par('mRNA_per_um3') * VOL_UM3, 'mRNA_per_um3 x cell volume', 'mRNA_per_um3')
@@ -1040,6 +1049,8 @@ cyto_ports = {
         {'port_type': 'enzyme_expression', 'variables': ['m_gly']},
         # regulation of the maintenance ATPase by falling metabolites (cell/expression_regulation)
         MAINT_REG_PORT,
+        # its regulation factor, to biosynthesis: the cut share lapses quality control (ribosome and protein damage)
+        {'port_type': 'maintenance_share', 'variables': ['R_reg']},
     ],
 }
 cyto_params = [
@@ -1161,7 +1172,8 @@ cyto_notes = (
     'all 0 by default: a famine-adapted cell can cut its maintenance, as starving bacteria do: their endogenous '
     'metabolism falls by most of itself within days, Novitsky & Morita 1977, towards a survival rate about a thousandth '
     'of maintenance, Price & Sowers 2004, Hoehler & Jorgensen 2013, and energy spilling stops under limitation, Russell & '
-    'Cook 1995); plus a glycogen store (a polymer of glucose '
+    'Cook 1995; the cut share is not free: biosynthesis turns it into ribosome and protein damage, as quality control '
+    'lapses, through the maintenance_share port); plus a glycogen store (a polymer of glucose '
     'units, activity 1): synthesis by the bacterial ADP-glucose route, G6P + ATP -> glycogen + ADP + 2 Pi (scaled by the '
     'game\'s store_alloc and slowed near the ceiling C_glyc_max), and the phosphorylase, glycogen + Pi -> G6P, inhibited by '
     'ATP so the store is spent when ATP falls; the store cannot run backwards without glycogen (its reverse takes glycogen at '
@@ -2832,7 +2844,10 @@ pe_vars = [
     ('M_build_protein', 'mole', 'out', None, 'ATP to build every pool\'s copies: the protein share of a daughter'),
     ('A_protein_total', 'um2', 'out', None, 'membrane area of all pools'),
     ('J_ref', 'mol_per_s', 'in', None, 'resting ATP turnover of the cell: the scale of synthesis and growth'),
-    ('build_capacity', 'dimensionless', 'in', None, 'most ATP synthesis can take, in multiples of J_ref'),
+    ('build_capacity_rest', 'dimensionless', 'in', None, 'most ATP synthesis can take with the resting ribosomes, in '
+                                                        'multiples of J_ref'),
+    ('x_ribo', 'dimensionless', 'in', None, 'ribosomes relative to rest (ribosomes port from cell/ribosomes)'),
+    ('build_capacity', 'dimensionless', 'out', None, 'most ATP synthesis can take now: build_capacity_rest x_ribo'),
     ('ATP_floor', 'millimolar', 'in', None, 'ATP at which synthesis and growth stop'),
     ('ATP_ref', 'millimolar', 'in', None, 'ATP at which synthesis runs at full speed (rest)'),
     ('J_eps', 'mol_per_s', 'in', None, 'numerical floor on the demand (so s_build is defined with nothing to build)'),
@@ -2868,6 +2883,7 @@ pe_eqs = [
     ('J_build_total', 'J_build_in'), ('M_build_protein', 'M_build_in'), ('A_protein_total', 'A_protein_in'),
     ('x_ATP', '(ATP - ATP_floor) / (ATP_ref - ATP_floor)'),
     ('throttle', '((x_ATP + abs(x_ATP)) / 2.0 + 1.0 - abs((x_ATP + abs(x_ATP)) / 2.0 - 1.0)) / 2.0'),
+    ('build_capacity', 'build_capacity_rest * x_ribo'),
     ('J_cap', 'build_capacity * J_ref * throttle * R_reg'),
     # min(1, J_cap/J_demand) as (J_cap + eps)/(max(J_cap, J_demand) + eps): 1 with nothing to build, 0 with no capacity
     ('s_build', '(J_cap + J_eps) / ((J_cap + J_demand_total + abs(J_cap - J_demand_total)) / 2.0 + J_eps)'),
@@ -2882,6 +2898,7 @@ pe_roles.update({n: 'variable' for n in ('J_demand_in', 'J_ATP_in', 'J_keep_in',
                                          'A_protein_in', 'Q_prot_demand_in', 'Q_aa_rel_in', 'Q_aa_use_in', 'J_prot_in',
                                          'J_saved_in')})
 pe_roles.update(REG_ROLES)
+pe_roles['x_ribo'] = 'boundary_condition'
 pe_params = [
     ('ATP', ATP, '', False), ('ADP', ADP, '', False), ('Pi', PI, '', False),
     ('J_demand_in', 0.0, 'no pool connected (an open sum port is 0)', False),
@@ -2899,7 +2916,8 @@ pe_params = [
     ('N_A', NA, '', False),
     ('J_ref', der(R_TOT, 'maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C)',
                   'maintenance_coefficient', 'maintenance_exponent'), '', False),
-    ('build_capacity', BUILD_CAPACITY, '', False),
+    ('build_capacity_rest', BUILD_CAPACITY, '', False),
+    ('x_ribo', 1.0, 'definitional; the resting ribosomes (used when unconnected)', False),
     ('ATP_floor', par('build_ATP_floor'), '', False),
     ('ATP_ref', ATP, '', False),
     ('J_eps', 1e-30, 'definitional; numerical floor, 1e-30 mol/s (12 orders below the resting turnover)', False),
@@ -2912,7 +2930,8 @@ pe_inv = [
     {'description': 'throttle = clamp((ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1); J_cap = build_capacity J_ref '
                     'throttle R_reg; s_build = min(1, J_cap/J_demand_total) (exact up to the 1e-30 mol/s floor)',
      'expr': 'np.allclose(throttle, np.clip((cyto__C_ATP - ATP_floor)/(ATP_ref - ATP_floor), 0, 1), rtol=1e-12, '
-             'atol=1e-15) and np.allclose(J_cap, build_capacity*J_ref*throttle*R_reg, rtol=1e-12, atol=0) and '
+             'atol=1e-15) and np.allclose(build_capacity, build_capacity_rest*x_ribo, rtol=1e-12, atol=0) and '
+             'np.allclose(J_cap, build_capacity*J_ref*throttle*R_reg, rtol=1e-12, atol=0) and '
              'np.allclose(s_build, np.where(J_demand_total > J_cap, (J_cap + J_eps)/(J_demand_total + J_eps), 1.0), '
              'rtol=1e-9, atol=1e-12)'},
     {'description': 'the pools never spend more than synthesis can: J_build_total <= J_cap (relative 1e-9)',
@@ -2950,12 +2969,12 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                                                 'J_saved_in'],
                                   'multi_port': ['True', 'True', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'True', 'True',
                                                  'True', 'sum', 'sum', 'sum', 'sum', 'sum']},
-                                 SYNTH_REG_PORT],
+                                 SYNTH_REG_PORT, {'port_type': 'ribosomes', 'variables': ['x_ribo']}],
                'roles': pe_roles},
               pe_params,
               {'sim_time': 60.0, 'pre_time': 0.0, 'dt': 0.1, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-14},
-               'outputs': ['throttle', 'J_cap', 's_build', 'J_demand_total', 'J_build_total', 'J_keep_total',
+               'outputs': ['throttle', 'build_capacity', 'J_cap', 's_build', 'J_demand_total', 'J_build_total', 'J_keep_total',
                            'J_ATP_total', 'j_ATP_prot', 'M_build_protein', 'A_protein_total', 'f_area', 'x_ATP', 'R_reg',
                            's_prot', 'phi_aa', 'N_aa', 'r_aa_cat', 'J_cat', 'Q_prot_demand_total', 'Q_aa_rel_total',
                            'Q_aa_use_total', 'J_prot_total', 'J_saved_total', 'J_recycled',
@@ -2976,7 +2995,8 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                                   ['m_target_pool_c', 'dimensionless', 0.5, 'harness: half the glycolytic enzymes']]},
                'run_parameters': {},
                'invariants': pe_inv,
-               'bc_sweep': {'ranges': {'build_capacity': [0.5, 20.0], 'ATP_floor': [1.0, 8.0], 'f_ATP_reg': [0.0, 1.0],
+               'bc_sweep': {'ranges': {'build_capacity_rest': [0.5, 20.0], 'x_ribo': [0.0, 1.0], 'ATP_floor': [1.0, 8.0],
+                                       'f_ATP_reg': [0.0, 1.0],
                                        'Q_prot_max': [1e3, 1e7], 'K_aa': [1e5, 1e8], 'tau_aa_cat': [60.0, 36000.0],
                                        'y_aa_cat': [0.0, 2.0]},
                             'exclude': ['ATP', 'ADP', 'Pi'],   # supplied by the harness cytosol
@@ -2987,8 +3007,10 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                   'The protein synthesis of an adaptive cell, serving its protein_pools (one per protein, on the '
                   'protein_synthesis port: their ATP use, turnover, build spending, daughter share and membrane area are '
                   'summed here, and each receives the cytosol ATP, s_build and R_reg). Building is limited to J_cap = '
-                  'build_capacity J_ref throttle R_reg. build_capacity is what the cell\'s ribosomes can make, in '
-                  'multiples of the resting ATP turnover J_ref: n_ribo k_elong f_active (c_syn + c_poly) / N_A / J_ref, '
+                  'build_capacity J_ref throttle R_reg. build_capacity = build_capacity_rest x_ribo is what the cell\'s '
+                  'ribosomes can make, in multiples of the resting ATP turnover J_ref: at rest n_ribo k_elong f_active '
+                  '(c_syn + c_poly) / N_A / J_ref, and in proportion to the ribosomes the cell has, x_ribo = n_ribo / '
+                  'n_ribo_rest (cell/ribosomes, ribosomes port: ribosomes are lost when their upkeep goes unpaid), '
                   'with k_elong about 5 aa/s at 20 C (Farewell & Neidhardt 1998, extrapolated) and f_active 0.8 of the '
                   'ribosomes translating (Dai et al. 2016), 4 ~P per peptide bond (Stouthamer 1973) plus the amino '
                   'acids\' synthesis from glucose; building backs off linearly as ATP falls from rest (ATP_ref) to ATP_floor (the stringent '
@@ -3226,8 +3248,8 @@ bio_vars = [
     ('surface_factor', 'dimensionless', 'in', None, 'whole cell surface / in-plane membrane area'),
     ('n_mRNA', 'dimensionless', 'in', None, 'mRNA molecules per cell'), ('L_mRNA', 'dimensionless', 'in', None, 'nt'),
     ('t_half_mRNA', 'second', 'in', None, 'mRNA half-life'),
-    ('n_ribo', 'dimensionless', 'in', None, 'ribosomes per cell'), ('L_rRNA', 'dimensionless', 'in', None, 'nt per ribosome'),
-    ('k_ribo', 'per_s', 'in', None, 'rRNA turnover'),
+    ('n_ribo', 'dimensionless', 'in', None, 'ribosomes a daughter is built with (the resting cell\'s)'),
+    ('L_rRNA', 'dimensionless', 'in', None, 'nt per ribosome'),
     ('c_nt_recycle', 'dimensionless', 'in', None, '~P to remake a nucleotide from its NMP'),
     ('c_nt_denovo', 'dimensionless', 'in', None, '~P to make a nucleotide from glucose'),
     ('area_per_lipid', 'um2', 'in', None, None), ('c_lipid', 'dimensionless', 'in', None, '~P per phospholipid made'),
@@ -3248,6 +3270,12 @@ bio_vars = [
     ('k_energy_dmg', 'per_s', 'in', None, 'de-energisation damage at no ATP'),
     ('ATP_dmg', 'millimolar', 'in', None, 'ATP below which proteins aggregate (de-energisation damage)'),
     ('r_dmg_phys', 'per_s', 'in', None, 'physical damage to the envelope from attacks, per second (set by the game)'),
+    ('k_lipid_dmg', 'per_s', 'in', None, 'envelope damage with no lipid upkeep paid: lipids left unrenewed'),
+    ('R_reg_maint', 'dimensionless', 'in', None, 'share of the maintenance ATPase left running, the cytosol\'s R_reg '
+                                                 '(maintenance_share port; 1 when unconnected)'),
+    ('k_qc_dmg', 'per_s', 'in', None, 'ribosome and protein damage with the maintenance ATPase cut completely (lapsed '
+                                      'quality control)'),
+    ('J_ATP_ribo_in', 'mol_per_s', 'in', None, 'ATP the ribosomes use: rRNA upkeep and rebuilding (ribosome_upkeep port)'),
     ('dose_rate', 'gray_per_s', 'in', None, 'absorbed radiation dose rate (set by the game)'),
     ('k_rad_dmg', 'per_gray', 'in', None, 'radiation damage per gray: DNA lesions, as a share of a lethal load'),
     ('r_rep_max', 'per_s', 'in', None, 'repair capacity of each damage type at full repair level'),
@@ -3278,7 +3306,15 @@ bio_vars = [
     ('f_Ca_dmg', 'dimensionless', 'out', None, 'Ca2+ overload, 0-1: Cai^n / (K_Ca_dmg^n + Cai^n)'),
     ('f_K_dmg', 'dimensionless', 'out', None, 'K+ loss, 0-1: (1 - Ki/K_K_dmg)^2 below K_K_dmg, 0 above'),
     ('f_energy_dmg', 'dimensionless', 'out', None, 'de-energisation, 0-1: (1 - ATP/ATP_dmg)^2 below ATP_dmg, 0 above'),
-    ('R_dmg_ribo', 'per_s', 'out', None, 'ribosome and protein damage accrual: wear, Ca2+ overload and K+ loss'),
+    ('R_dmg_ribo', 'per_s', 'out', None, 'ribosome and protein damage accrual: wear, Ca2+ overload, K+ loss and lapsed '
+                                         'quality control'),
+    ('R_dmg_qc', 'per_s', 'out', None, 'ribosome and protein damage from the maintenance ATPase\'s cut share'),
+    ('R_dmg_phys', 'per_s', 'out', None, 'physical damage accrual: attacks and unrenewed lipids'),
+    ('R_dmg_lipid', 'per_s', 'out', None, 'envelope damage from the unpaid share of the lipid upkeep'),
+    ('x_unpaid_raw', 'dimensionless', 'out', None, '1 - f_ATP_bio R_reg_upkeep, negative above rest'),
+    ('x_unpaid', 'dimensionless', 'out', None, 'share of the RNA, rRNA and lipid upkeep not paid: max(0, 1 - f_ATP_bio '
+                                               'R_reg_upkeep)'),
+    ('u_upkeep', 'dimensionless', 'out', None, 'share of the RNA, rRNA and lipid upkeep paid: 1 - x_unpaid'),
     ('R_dmg_energy', 'per_s', 'out', None, 'de-energisation damage accrual'),
     ('R_rep_energy', 'per_s', 'out', None, 'de-energisation damage repaired per second (disaggregation)'),
     ('R_dmg_rad', 'per_s', 'out', None, 'radiation damage accrual'),
@@ -3289,7 +3325,7 @@ bio_vars = [
     ('n_lipid', 'dimensionless', 'out', None, 'phospholipids in the membrane (both leaflets of the whole surface)'),
     ('f_ATP_bio', 'dimensionless', 'out', None, 'synthesis slows as ATP runs out: 1 at ATP_ref'),
     ('f_T_dmg', 'dimensionless', 'out', None, None),
-    ('J_RNA', 'mol_per_s', 'out', None, 'mRNA turnover'), ('J_ribo', 'mol_per_s', 'out', None, 'ribosome (rRNA) upkeep'),
+    ('J_RNA', 'mol_per_s', 'out', None, 'mRNA turnover'),
     ('J_lipid', 'mol_per_s', 'out', None, 'membrane lipid turnover, scales with membrane area'),
     ('R_repair', 'per_s', 'out', None, 'damage repaired per second, all types'),
     ('J_repair', 'mol_per_s', 'out', None, 'ATP spent on repair'),
@@ -3306,13 +3342,21 @@ bio_eqs = [
     ('n_lipid', '2.0 * A_mem * surface_factor / area_per_lipid'),
     ('f_ATP_bio', 'ATP / (K_m_ATP_bio + ATP) * (K_m_ATP_bio + ATP_ref) / ATP_ref'),
     ('f_T_dmg', 'Q10_dmg ** ((T - T_ref_dmg) / dT_Q10)'),
-    ('J_RNA', 'n_mRNA * L_mRNA * c_nt_recycle * ln(2.0) / t_half_mRNA / N_A * f_ATP_bio * R_reg_upkeep'),
-    ('J_ribo', 'n_ribo * L_rRNA * c_nt_recycle * k_ribo / N_A * f_ATP_bio * R_reg_upkeep'),
-    ('J_lipid', 'n_lipid * c_lipid * k_lipid / N_A * f_ATP_bio * R_reg_upkeep'),
+    # what is not paid is lost (lipids unrenewed here, ribosomes in cell/ribosomes): x_unpaid = max(0, 1 - f_ATP_bio
+    # R_reg_upkeep), written as (1 - f_ATP_bio) + f_ATP_bio (1 - R_reg_upkeep) with 1 - f_ATP_bio = K_m (ATP_ref - ATP) /
+    # ((K_m + ATP) ATP_ref), so a share near 0 keeps its precision (no 1 - (1 - eps) cancellation)
+    ('x_unpaid_raw', 'K_m_ATP_bio * (ATP_ref - ATP) / ((K_m_ATP_bio + ATP) * ATP_ref) + f_ATP_bio * (1.0 - R_reg_upkeep)'),
+    ('x_unpaid', '(x_unpaid_raw + abs(x_unpaid_raw)) / 2.0'),
+    ('u_upkeep', '1.0 - x_unpaid'),
+    ('J_RNA', 'n_mRNA * L_mRNA * c_nt_recycle * ln(2.0) / t_half_mRNA / N_A * u_upkeep'),
+    ('J_lipid', 'n_lipid * c_lipid * k_lipid / N_A * u_upkeep'),
     ('f_Ca_dmg', 'Cai ** n_Ca_dmg / (K_Ca_dmg ** n_Ca_dmg + Cai ** n_Ca_dmg)'),
     ('f_K_dmg', '(((1.0 - Ki / K_K_dmg) + abs(1.0 - Ki / K_K_dmg)) / 2.0) ** 2.0'),
     ('f_energy_dmg', '(((1.0 - ATP / ATP_dmg) + abs(1.0 - ATP / ATP_dmg)) / 2.0) ** 2.0'),
-    ('R_dmg_ribo', 'r_dmg * f_T_dmg + k_Ca_dmg * f_Ca_dmg + k_K_dmg * f_K_dmg'),
+    ('R_dmg_lipid', 'k_lipid_dmg * x_unpaid'),
+    ('R_dmg_phys', 'r_dmg_phys + R_dmg_lipid'),
+    ('R_dmg_qc', 'k_qc_dmg * (1.0 - R_reg_maint)'),
+    ('R_dmg_ribo', 'r_dmg * f_T_dmg + k_Ca_dmg * f_Ca_dmg + k_K_dmg * f_K_dmg + R_dmg_qc'),
     ('R_dmg_energy', 'k_energy_dmg * f_energy_dmg'),
     ('R_dmg_rad', 'k_rad_dmg * dose_rate'),
     ('R_rep_phys', 'repair_level * r_rep_max * D_phys / (K_D + D_phys) * f_ATP_bio * R_reg_repair'),
@@ -3330,10 +3374,10 @@ bio_eqs = [
     ('J_growth_used', 'J_growth * f_ATP_bio'),
     ('M_daughter', 'M_build_bio + M_build_protein'),
     ('growth_progress', 'P_growth / M_daughter'), ('glycogen_progress', 'M_glyc_ATP / M_daughter'),
-    ('J_ATP_bio', 'J_RNA + J_ribo + J_lipid + J_repair + J_growth_used'),
+    ('J_ATP_bio', 'J_RNA + J_ATP_ribo_in + J_lipid + J_repair + J_growth_used'),
     ('M_build_bio', '((n_mRNA * L_mRNA + n_ribo * L_rRNA + genome_nt) * c_nt_denovo + n_lipid * c_lipid) / N_A'),
     ('j_ATP_bio', '-J_ATP_bio'), ('j_ADP_bio', 'J_ATP_bio'), ('j_Pi_bio', 'J_ATP_bio'),
-    ('d/dt D_phys', 'r_dmg_phys - R_rep_phys'),
+    ('d/dt D_phys', 'R_dmg_phys - R_rep_phys'),
     ('d/dt D_rad', 'R_dmg_rad - R_rep_rad'),
     ('d/dt D_ribo', 'R_dmg_ribo - R_rep_ribo'),
     ('d/dt D_energy', 'R_dmg_energy - R_rep_energy'),
@@ -3341,7 +3385,8 @@ bio_eqs = [
 ]
 bio_roles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in bio_vars if v[0] != 't'}
 bio_roles.update({n: 'boundary_condition' for n in ('ATP', 'ADP', 'Pi', 'A_mem', 'repair_level', 'growth_level',
-                                                    'M_glyc_ATP', 'Cai', 'Ki', 'r_dmg_phys', 'dose_rate')})
+                                                    'M_glyc_ATP', 'Cai', 'Ki', 'r_dmg_phys', 'dose_rate', 'R_reg_maint',
+                                                    'J_ATP_ribo_in')})
 bio_roles['M_build_in'] = 'variable'   # summed from the pools
 bio_roles['T'] = 'global_constant'
 bio_roles.update(REG_ROLES)
@@ -3358,7 +3403,6 @@ bio_params = [
     ('t_half_mRNA', BIO['t_half_mRNA'], 'bernstein2002global; 80% of E. coli mRNA half-lives 3-8 min (median ~5 min)', True),
     ('n_ribo', BIO['n_ribo'], f'{PH}; 7,000-70,000 ribosomes per E. coli cell with growth rate; the slow end per um3', False),
     ('L_rRNA', BIO['L_rRNA'], 'definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt', True),
-    ('k_ribo', BIO['k_ribo'], f'{PH}; rRNA is stable in growing cells; 1%/h', False),
     ('c_nt_recycle', BIO['c_nt_recycle'], 'definitional; NMP -> NDP -> NTP costs 2 ~P', False),
     ('c_nt_denovo', BIO['c_nt_denovo'], f'{PH}; of order 50 ~P per nucleotide from glucose (lynch2015bioenergetic)', False),
     ('area_per_lipid', BIO['area_per_lipid'], 'milo2010bionumbers; BNID 106993, about 0.5 nm2 per lipid', True),
@@ -3381,6 +3425,11 @@ bio_params = [
     ('k_energy_dmg', BIO['k_energy_dmg'], f'{PH}; a cell with no ATP aggregates its proteins beyond rescue in 30 min', False),
     ('ATP_dmg', BIO['ATP_dmg'], f'{PH}; {PARAMS["ATP_dmg_threshold"]["note"]}', False),
     ('r_dmg_phys', 0.0, 'definitional; no attack by default', False),
+    ('k_lipid_dmg', BIO['k_lipid_dmg'], '', False),
+    ('R_reg_maint', 1.0, 'definitional; no maintenance ATPase connected (nothing cut)', False),
+    ('k_qc_dmg', BIO['k_qc_dmg'], '', False),
+    ('J_ATP_ribo_in', J_RIBO, 'calibrated: the resting ribosomes\' rRNA upkeep (cell/ribosomes at rest), used when '
+                              'unconnected', False),
     ('dose_rate', 0.0, 'definitional; no radiation by default (natural background, ~1e-10 Gy/s, is negligible)', False),
     ('k_rad_dmg', BIO['k_rad_dmg'], f'{PH}; {PARAMS["k_rad_dmg"]["note"]}', False),
     ('r_rep_max', R_REP_MAX, f'{PH}; full repair removes damage up to 10x as fast as it accrues', False),
@@ -3400,11 +3449,15 @@ bio_params = [
     ('P_init', 0.0, 'definitional; no daughter under way', False),
 ] + REG_ROWS + reg_switch_rows('_upkeep') + reg_switch_rows('_repair')
 bio_inv = [
-    {'description': 'costs and the ATP port balance (exact): J_RNA, J_ribo, J_lipid from their counts; repair; growth',
-     'expr': 'np.allclose(J_RNA, n_mRNA*L_mRNA*c_nt_recycle*np.log(2)/t_half_mRNA/N_A*f_ATP_bio*R_reg_upkeep, rtol=1e-12, '
-             'atol=0) and np.allclose(J_lipid, 2*A_mem*surface_factor/area_per_lipid*c_lipid*k_lipid/N_A*f_ATP_bio'
-             '*R_reg_upkeep, rtol=1e-12, atol=0) and np.allclose(J_ribo, n_ribo*L_rRNA*c_nt_recycle*k_ribo/N_A*f_ATP_bio'
-             '*R_reg_upkeep, rtol=1e-12, atol=0) and '
+    {'description': 'costs and the ATP port balance (exact): the upkeep paid is u_upkeep = 1 - max(0, 1 - f_ATP_bio '
+                    'R_reg_upkeep) of J_RNA and J_lipid from their counts; the ribosomes\' ATP (cell/ribosomes); repair; '
+                    'growth',
+     'expr': 'np.allclose(x_unpaid, np.maximum(0.0, 1 - f_ATP_bio*R_reg_upkeep), rtol=1e-9, atol=1e-15) and '
+             'np.all(x_unpaid >= 0) and np.allclose(u_upkeep, 1 - x_unpaid, rtol=1e-12, atol=0) and '
+             'np.allclose(J_RNA, n_mRNA*L_mRNA*c_nt_recycle*np.log(2)/t_half_mRNA/N_A*u_upkeep, rtol=1e-12, '
+             'atol=0) and np.allclose(J_lipid, 2*A_mem*surface_factor/area_per_lipid*c_lipid*k_lipid/N_A*u_upkeep, '
+             'rtol=1e-12, atol=0) and np.allclose(J_ATP_bio, J_RNA + J_ATP_ribo_in + J_lipid + J_repair + J_growth_used, '
+             'rtol=1e-12, atol=0) and '
              + ' and '.join(f'np.allclose(R_rep_{x}, repair_level*r_rep_max*D_{x}/(K_D + D_{x})*f_ATP_bio*R_reg_repair, '
                             'rtol=1e-12, atol=1e-30)' for x in ('phys', 'rad', 'ribo', 'energy')) +
              ' and np.allclose(R_repair, R_rep_phys + R_rep_rad + R_rep_ribo + R_rep_energy, rtol=1e-12, atol=1e-30) and '
@@ -3423,15 +3476,21 @@ bio_inv = [
                     'negative; the total is their sum (exact)',
      'expr': ' and '.join(f'abs(D_{x}[-1] - D_{x}[0] - np.trapz({a} - R_rep_{x}, t)) <= 1e-6*np.trapz(np.abs({a}) + '
                           f'np.abs(R_rep_{x}), t) + 1e-15 and np.all(D_{x} >= 0)'
-                          for x, a in (('phys', 'r_dmg_phys + 0*t'), ('rad', 'R_dmg_rad'), ('ribo', 'R_dmg_ribo'),
+                          for x, a in (('phys', 'R_dmg_phys'), ('rad', 'R_dmg_rad'), ('ribo', 'R_dmg_ribo'),
                                        ('energy', 'R_dmg_energy')))
              + ' and np.allclose(D, D_phys + D_rad + D_ribo + D_energy, rtol=1e-12, atol=1e-30)'},
-    {'description': 'damage accrual (exact): wear, Ca2+ overload and K+ loss for the ribosomes, falling ATP for '
-                    'de-energisation, k_rad dose rate for radiation; the thresholds give exactly 0 above them',
+    {'description': 'damage accrual (exact): wear, Ca2+ overload, K+ loss and the maintenance ATPase\'s cut share '
+                    '(k_qc_dmg (1 - R_reg_maint)) for the ribosomes, attacks and the unpaid lipid upkeep (k_lipid_dmg '
+                    'x_unpaid) for the envelope, falling ATP for de-energisation, k_rad dose rate for radiation; the '
+                    'thresholds give exactly 0 above them, and with the upkeep paid and nothing cut the new terms are 0',
      'expr': 'np.allclose(f_Ca_dmg, Cai**n_Ca_dmg/(K_Ca_dmg**n_Ca_dmg + Cai**n_Ca_dmg), rtol=1e-12, atol=1e-30) and '
              'np.allclose(f_K_dmg, np.clip(1 - Ki/K_K_dmg, 0, None)**2, rtol=1e-12, atol=1e-30) and '
              'np.allclose(f_energy_dmg, np.clip(1 - ATP/ATP_dmg, 0, None)**2, rtol=1e-12, atol=1e-30) and '
-             'np.allclose(R_dmg_ribo, r_dmg*f_T_dmg + k_Ca_dmg*f_Ca_dmg + k_K_dmg*f_K_dmg, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(R_dmg_qc, k_qc_dmg*(1 - R_reg_maint), rtol=1e-12, atol=1e-30) and '
+             'np.allclose(R_dmg_ribo, r_dmg*f_T_dmg + k_Ca_dmg*f_Ca_dmg + k_K_dmg*f_K_dmg + R_dmg_qc, rtol=1e-12, '
+             'atol=1e-30) and np.allclose(R_dmg_lipid, k_lipid_dmg*x_unpaid, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(R_dmg_phys, r_dmg_phys + R_dmg_lipid, rtol=1e-12, atol=1e-30) and '
+             'np.all(R_dmg_lipid[x_unpaid == 0.0] == 0.0) and np.all(R_dmg_qc[R_reg_maint == 1.0] == 0.0) and '
              'np.allclose(R_dmg_energy, k_energy_dmg*f_energy_dmg, rtol=1e-12, atol=1e-30) and '
              'np.allclose(R_dmg_rad, k_rad_dmg*dose_rate, rtol=1e-12, atol=1e-30)'},
     reg_invariant('growth_level*J_ref*throttle', 'J_growth'),
@@ -3452,42 +3511,60 @@ write_version('cell', 'biosynthesis', 'biosynthesis_fermenter', bio_vars, bio_eq
                                  {'port_type': 'daughter_share', 'variables': ['M_build_in'], 'multi_port': 'sum'},
                                  {'port_type': 'glycogen_store', 'variables': ['M_glyc_ATP']},
                                  {'port_type': 'internal_Ca', 'variables': ['Cai']},
-                                 {'port_type': 'internal_K', 'variables': ['Ki']}, GROWTH_REG_PORT],
+                                 {'port_type': 'internal_K', 'variables': ['Ki']}, GROWTH_REG_PORT,
+                                 # the paid share of the upkeep to cell/ribosomes, and the ATP they use back
+                                 {'port_type': 'ribosome_upkeep', 'variables': ['x_unpaid', 'J_ATP_ribo_in']},
+                                 # the maintenance ATPase's regulation factor from the cytosol
+                                 {'port_type': 'maintenance_share', 'variables': ['R_reg_maint']}],
                'roles': bio_roles},
               bio_params,
               {'sim_time': 3600.0, 'pre_time': 0.0, 'dt': 1.0, 'solver': 'CVODE_myokit',
                'solver_info': {'rtol': 1e-10, 'atol': 1e-20},
                'outputs': ['D', 'D_phys', 'D_rad', 'D_ribo', 'D_energy', 'f_Ca_dmg', 'f_K_dmg', 'f_energy_dmg',
-                           'R_dmg_ribo', 'R_dmg_rad', 'R_dmg_energy', 'R_rep_phys', 'R_rep_rad', 'R_rep_ribo', 'R_rep_energy', 'P_growth', 'J_RNA', 'J_ribo', 'J_lipid', 'R_repair', 'J_repair',
+                           'R_dmg_ribo', 'R_dmg_rad', 'R_dmg_energy', 'R_rep_phys', 'R_rep_rad', 'R_rep_ribo', 'R_rep_energy', 'P_growth', 'J_RNA', 'J_lipid', 'R_repair', 'J_repair',
+                           'R_dmg_phys', 'R_dmg_lipid', 'R_dmg_qc', 'u_upkeep', 'x_unpaid',
                            'J_growth', 'J_growth_used',
                            'M_daughter', 'growth_progress', 'glycogen_progress', 'throttle', 'x_ATP', 'M_build_protein',
                            'J_ATP_bio', 'M_build_bio', 'j_ATP_bio', 'j_ADP_bio', 'f_ATP_bio', 'f_T_dmg', 'n_lipid', 'R_reg',
                            'R_reg_upkeep', 'R_reg_repair'],
                'run_parameters': {'growth_level': 1.0, 'repair_level': 0.5, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8,
                                   'r_dmg_phys': 1e-5, 'dose_rate': 1e-3, 'Cai': 0.2, 'Ki': 60.0, 'ATP': 0.5,
-                                  'reg_on_ATP_upkeep': 1.0, 'reg_on_ATP_repair': 1.0},
+                                  'reg_on_ATP_upkeep': 1.0, 'reg_on_ATP_repair': 1.0, 'R_reg_maint': 0.4},
                'invariants': bio_inv,
                'bc_sweep': {'ranges': {'T': [273.15, 313.15], 'repair_level': [0.0, 1.0], 'growth_level': [0.0, 20.0],
                                        'ATP': [0.0, 12.0], 'f_ATP_reg': [0.0, 1.0], 'Cai': [0.0, 5.0], 'Ki': [0.0, 250.0],
-                                       'r_dmg_phys': [0.0, 1e-3], 'dose_rate': [0.0, 1.0]},
+                                       'r_dmg_phys': [0.0, 1e-3], 'dose_rate': [0.0, 1.0], 'R_reg_maint': [0.0, 1.0]},
                             'rationale': 'temperatures 0-40 C; repair level and growth over the ranges the game offers; '
                                          'Cai from rest to a dead cell\'s (~2 mM), Ki from none to rest; an attack '
                                          'removing a lethal load in '
-                                         '17 min; 1 Gy/s, a lethal dose in 5 min'},
+                                         '17 min; 1 Gy/s, a lethal dose in 5 min; the maintenance ATPase from cut '
+                                         'completely to uncut'},
                # nearly linear: at small steps RK4 errors are round-off, so test convergence at steps where they are not
                'timestep': {'scheme': 'rk4', 'dts': [900.0, 450.0, 225.0], 't_end': 3600.0, 'min_order': 0.8, 'tol': 1e-3,
                             'cvode_tol': 1e-2},
                'stability': STAB},
               {'reviewed': False, 'notes': (
                   'The rest of a cell\'s energy budget besides pumps and protein turnover. Upkeep: mRNA turnover (n L '
-                  'c_recycle ln2/t_half), ribosome rRNA upkeep (n L c_recycle k), membrane lipid turnover (n_lipid c_lipid '
-                  'k, with n_lipid = 2 A_surface / area_per_lipid, so it scales with membrane area). Damage D (1 = lethal) '
+                  'c_recycle ln2/t_half), membrane lipid turnover (n_lipid c_lipid k, with n_lipid = 2 A_surface / '
+                  'area_per_lipid, so it scales with membrane area) and, through the ribosome_upkeep port, the ribosomes\' '
+                  'rRNA upkeep and rebuilding (cell/ribosomes, which this module pays for: J_ATP_ribo_in). The upkeep is '
+                  'paid at u_upkeep = 1 - x_unpaid, x_unpaid = max(0, 1 - f_ATP_bio R_reg_upkeep), and what is not paid '
+                  'is lost: the unrenewed share of the lipids is envelope damage, k_lipid_dmg x_unpaid with k_lipid_dmg = '
+                  'k_lipid / lipid_damage_lethal_fraction, and the ribosomes not remade are lost (x_unpaid goes on to '
+                  'cell/ribosomes). '
+                  'The mRNA count stays fixed: each protein_pool already follows its target with its own mRNA lifetime, '
+                  'and an mRNA pool here would cut protein synthesis to the paid share within minutes, repeating the '
+                  'protein synthesis switch. Damage D (1 = lethal) '
                   'is the sum of three types, each repaired by its own machinery at repair_level r_rep_max D_x/(K_D + D_x) '
-                  'and costing C_repair per unit: physical damage to the envelope (D_phys, at r_dmg_phys, from attacks), '
+                  'and costing C_repair per unit: physical damage to the envelope (D_phys, at r_dmg_phys from attacks '
+                  'plus the unrenewed lipids), '
                   'radiation damage to DNA (D_rad, k_rad_dmg per gray of dose_rate) and ribosome and protein damage '
                   '(D_ribo: wear at r_dmg, Q10 2, plus k_Ca_dmg Cai^n/(K_Ca_dmg^n + Cai^n) as Ca2+ overload displaces '
                   'Mg2+ from the ribosomes: about 170 Mg2+ hold each ribosome together, with 1-2 mM free in the cytosol; '
-                  'plus k_K_dmg (1 - Ki/K_K_dmg)^2 once K+, which ribosomes need to translate, falls below K_K_dmg), and '
+                  'plus k_K_dmg (1 - Ki/K_K_dmg)^2 once K+, which ribosomes need to translate, falls below K_K_dmg, plus '
+                  'k_qc_dmg (1 - R_reg_maint) while the maintenance ATPase is cut: its unitemised work includes the '
+                  'chaperones, proteases and stalled-ribosome rescue of quality control; R_reg_maint is the cytosol\'s '
+                  'regulation factor, on the maintenance_share port), and '
                   'de-energisation damage (D_energy: k_energy_dmg (1 - ATP/ATP_dmg)^2 below ATP_dmg, as proteins aggregate '
                   'once chaperones and disaggregases lack ATP). Repair needs ATP, so a de-energised cell cannot mend any '
                   'of it. '
@@ -3504,10 +3581,131 @@ write_version('cell', 'biosynthesis', 'biosynthesis_fermenter', bio_vars, bio_eq
                   'R_reg = 1 exactly). Maintenance regulation, by the same signals and switches of its own (all 0 by '
                   'default): the upkeep (mRNA, rRNA and lipid turnover) is multiplied by R_reg_upkeep and repair by '
                   'R_reg_repair, so a famine-adapted cell can cut them, as the stringent response cuts rRNA and '
-                  'phospholipid synthesis (Potrykus & Cashel 2008). Cutting repair lets damage accumulate; cutting the '
-                  'upkeep has no modelled downside here (the mRNA, ribosome and lipid counts are fixed).')},
+                  'phospholipid synthesis (Potrykus & Cashel 2008). Each cut costs something: cutting repair lets damage '
+                  'accumulate, cutting the upkeep damages the envelope and loses ribosomes that are rebuilt slowly and at '
+                  'de novo cost once it is paid again, and cutting the maintenance ATPase damages ribosomes and proteins. '
+                  'At rest (f = 1) none of these terms moves.')},
               ['argus2026unpublished', 'milo2010bionumbers', 'bernstein2002global', 'lynch2015bioenergetic',
                'bennett2009absolute', 'potrykus2008still'], V_NEW)
+
+# ------------------------------------------------------------------ 6e. ribosomes: lost when their upkeep is unpaid, rebuilt
+rib_vars = [
+    ('t', 'second', 'in', None, None),
+    ('x_unpaid', 'dimensionless', 'in', None, 'share of the upkeep not paid, 0-1 (ribosome_upkeep port from '
+                                              'biosynthesis)'),
+    ('u_upkeep', 'dimensionless', 'out', None, 'share of the upkeep paid, 1 - x_unpaid'),
+    ('n_ribo_rest', 'dimensionless', 'in', None, 'ribosomes per cell at rest'),
+    ('n_ribo_init', 'dimensionless', 'in', None, None),
+    ('n_ribo', 'dimensionless', 'out', 'n_ribo_init', 'ribosomes in the cell'),
+    ('L_rRNA', 'dimensionless', 'in', None, 'nt of rRNA per ribosome'),
+    ('k_ribo', 'per_s', 'in', None, 'rRNA turnover: the share of the ribosomes degraded each second and, when paid, remade '
+                                    'from the recycled nucleotides'),
+    ('k_ribo_build', 'per_s', 'in', None, 'rebuilding: ribosomes made per second per ribosome missing, with the upkeep '
+                                          'paid'),
+    ('n_ribo_build', 'dimensionless', 'in', None, 'steepness of rebuilding in the share paid: u^n_ribo_build'),
+    ('c_nt_recycle', 'dimensionless', 'in', None, '~P to remake a nucleotide from its NMP'),
+    ('c_nt_denovo', 'dimensionless', 'in', None, '~P to make a nucleotide from glucose'),
+    ('aa_ribo', 'dimensionless', 'in', None, 'amino acids in one ribosome\'s proteins'),
+    ('c_aa_build', 'dimensionless', 'in', None, '~P to make an amino acid from glucose and polymerise it (c_syn + c_poly)'),
+    ('N_A', 'per_mol', 'in', None, None),
+    ('x_ribo', 'dimensionless', 'out', None, 'ribosomes relative to rest, n_ribo / n_ribo_rest (ribosomes port)'),
+    ('R_ribo_loss', 'per_s', 'out', None, 'ribosomes lost per second: the unpaid share of their turnover'),
+    ('R_ribo_build', 'per_s', 'out', None, 'ribosomes rebuilt per second'),
+    ('c_ribo_build', 'dimensionless', 'out', None, '~P to build one ribosome de novo: its rRNA and its proteins'),
+    ('J_ribo', 'mol_per_s', 'out', None, 'rRNA upkeep paid: the turnover remade from recycled nucleotides'),
+    ('J_ribo_build', 'mol_per_s', 'out', None, 'ATP spent rebuilding lost ribosomes'),
+    ('J_ATP_ribo', 'mol_per_s', 'out', None, 'all ATP the ribosomes use, paid through biosynthesis (ribosome_upkeep port)'),
+]
+rib_eqs = [
+    ('u_upkeep', '1.0 - x_unpaid'),
+    ('x_ribo', 'n_ribo / n_ribo_rest'),
+    ('R_ribo_loss', 'k_ribo * n_ribo * x_unpaid'),
+    # max(0, n_ribo_rest - n_ribo): rebuilding stops at the resting count
+    ('R_ribo_build', 'k_ribo_build * (n_ribo_rest - n_ribo + abs(n_ribo_rest - n_ribo)) / 2.0 * u_upkeep ** n_ribo_build'),
+    ('c_ribo_build', 'L_rRNA * c_nt_denovo + aa_ribo * c_aa_build'),
+    ('J_ribo', 'n_ribo * L_rRNA * c_nt_recycle * k_ribo / N_A * u_upkeep'),
+    ('J_ribo_build', 'R_ribo_build * c_ribo_build / N_A'),
+    ('J_ATP_ribo', 'J_ribo + J_ribo_build'),
+    ('d/dt n_ribo', 'R_ribo_build - R_ribo_loss'),
+]
+rib_roles = {v[0]: ('variable' if v[2] == 'out' else 'constant') for v in rib_vars if v[0] != 't'}
+rib_roles['x_unpaid'] = 'boundary_condition'
+rib_params = [
+    ('x_unpaid', 0.0, 'definitional; the upkeep fully paid (used when unconnected)', False),
+    ('n_ribo_rest', BIO['n_ribo'], '', False),
+    ('n_ribo_init', float(BIO['n_ribo']), 'calibrated: the resting count, n_ribo_rest', False),
+    ('L_rRNA', BIO['L_rRNA'], 'definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt', True),
+    ('k_ribo', BIO['k_ribo'], '', False),
+    ('k_ribo_build', BIO['k_ribo_build'], '', False),
+    ('n_ribo_build', BIO['n_ribo_build'], '', False),
+    ('c_nt_recycle', BIO['c_nt_recycle'], 'definitional; NMP -> NDP -> NTP costs 2 ~P', False),
+    ('c_nt_denovo', BIO['c_nt_denovo'], '', False),
+    ('aa_ribo', BIO['aa_ribo'], '', False),
+    ('c_aa_build', der(C_SYN + C_POLY, 'c_syn + c_poly', 'c_syn', 'c_poly'), '', False),
+    ('N_A', NA, 'definitional; Avogadro constant', True),
+]
+rib_inv = [
+    {'description': 'ribosome balance: n_ribo(t) - n_ribo(0) = int (R_ribo_build - R_ribo_loss) dt (relative 1e-6); '
+                    'never negative, never above the resting count when started at or below it',
+     'expr': 'abs(n_ribo[-1] - n_ribo[0] - np.trapz(R_ribo_build - R_ribo_loss, t)) <= 1e-6*np.trapz(np.abs(R_ribo_build) '
+             '+ np.abs(R_ribo_loss), t) + 1e-9 and np.all(n_ribo >= 0) and (n_ribo[0] > n_ribo_rest or '
+             'np.all(n_ribo <= n_ribo_rest*(1 + 1e-12)))'},
+    {'description': 'loss, rebuilding and their costs (exact): u_upkeep = 1 - x_unpaid; R_ribo_loss = k_ribo n_ribo '
+                    'x_unpaid; R_ribo_build = '
+                    'k_ribo_build max(0, n_ribo_rest - n_ribo) u_upkeep^n_ribo_build; c_ribo_build = L_rRNA c_nt_denovo + aa_ribo '
+                    'c_aa_build; J_ribo = n_ribo L_rRNA c_nt_recycle k_ribo u_upkeep / N_A; J_ribo_build = R_ribo_build '
+                    'c_ribo_build / N_A; x_ribo = n_ribo / n_ribo_rest',
+     'expr': 'np.allclose(u_upkeep, 1 - x_unpaid, rtol=1e-12, atol=0) and '
+             'np.allclose(R_ribo_loss, k_ribo*n_ribo*x_unpaid, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(R_ribo_build, k_ribo_build*np.clip(n_ribo_rest - n_ribo, 0, None)*u_upkeep**n_ribo_build, rtol=1e-9, '
+             'atol=1e-12*k_ribo_build*n_ribo_rest) and '
+             'np.allclose(c_ribo_build, L_rRNA*c_nt_denovo + aa_ribo*c_aa_build, rtol=1e-12, atol=0) and '
+             'np.allclose(J_ribo, n_ribo*L_rRNA*c_nt_recycle*k_ribo*u_upkeep/N_A, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(J_ribo_build, R_ribo_build*c_ribo_build/N_A, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(J_ATP_ribo, J_ribo + J_ribo_build, rtol=1e-12, atol=1e-30) and '
+             'np.allclose(x_ribo, n_ribo/n_ribo_rest, rtol=1e-12, atol=0)'},
+    {'description': 'with the upkeep paid and the resting count nothing moves: no loss, no rebuilding, J_ATP_ribo is the '
+                    'resting rRNA upkeep (exact)',
+     'expr': 'np.any(x_unpaid != 0.0) or n_ribo[0] != n_ribo_rest or (np.all(R_ribo_loss == 0.0) and '
+             'np.all(R_ribo_build == 0.0) and np.all(x_ribo == 1.0) and np.allclose(J_ATP_ribo, '
+             'n_ribo_rest*L_rRNA*c_nt_recycle*k_ribo/N_A, rtol=1e-12, atol=0))'},
+]
+write_version('cell', 'ribosomes', 'ribosomes', rib_vars, rib_eqs,
+              {'required_citations': ['argus2026unpublished'], 'exit_ports': [], 'entrance_ports': [],
+               'general_ports': [{'port_type': 'ribosome_upkeep', 'variables': ['x_unpaid', 'J_ATP_ribo']},
+                                 {'port_type': 'ribosomes', 'variables': ['x_ribo']}],
+               'roles': rib_roles},
+              rib_params,
+              {'sim_time': 7200.0, 'pre_time': 0.0, 'dt': 10.0, 'solver': 'CVODE_myokit',
+               'solver_info': {'rtol': 1e-10, 'atol': 1e-6},
+               'outputs': ['n_ribo', 'x_ribo', 'u_upkeep', 'R_ribo_loss', 'R_ribo_build', 'c_ribo_build', 'J_ribo', 'J_ribo_build',
+                           'J_ATP_ribo'],
+               # a cell that lost a fifth of its ribosomes, paying 60% of its upkeep: some lost, more rebuilt
+               'run_parameters': {'x_unpaid': 0.4, 'n_ribo_init': 0.8 * float(BIO['n_ribo'])},
+               'invariants': rib_inv,
+               'bc_sweep': {'ranges': {'x_unpaid': [0.0, 1.0]},
+                            'rationale': 'the upkeep from unpaid to fully paid'},
+               'timestep': {'scheme': 'rk4', 'dts': [1800.0, 900.0, 450.0], 't_end': 7200.0, 'min_order': 0.8,
+                            'tol': 1e-3, 'cvode_tol': 1e-2},
+               'stability': STAB},
+              {'reviewed': False, 'notes': (
+                  'The cell\'s ribosomes as a count, n_ribo, and what keeping them costs. Their rRNA turns over at k_ribo '
+                  'and is remade from the recycled nucleotides (J_ribo = n_ribo L_rRNA c_nt_recycle k_ribo u / N_A), but '
+                  'only for the share of the upkeep the cell pays, u = 1 - x_unpaid, with x_unpaid = max(0, 1 - f_ATP_bio '
+                  'R_reg_upkeep) from biosynthesis (0 at rest, higher when ATP falls or the cell cuts its RNA and lipid '
+                  'upkeep). The unpaid share is lost, R_ribo_loss = k_ribo n_ribo x_unpaid, as starving bacteria degrade '
+                  'ribosomes. Lost '
+                  'ribosomes are rebuilt towards the resting count, R_ribo_build = k_ribo_build max(0, n_ribo_rest - n_ribo) '
+                  'u^n_ribo_build (n 8: a smooth switch, so a cell still cutting its upkeep does not rebuild what it is '
+                  'losing, as the stringent response stops rRNA synthesis), at de novo cost: c_ribo_build = L_rRNA c_nt_denovo + aa_ribo (c_syn + c_poly) ~P per ribosome, '
+                  'about 230,000 ~P for its rRNA and 210,000 for its proteins, about 50 times what remaking its rRNA from '
+                  'recycled nucleotides costs (J_ribo). The ribosomal proteins are charged '
+                  'here; the proteome pool (cell/protein_pool proteome) keeps its count. Protein synthesis can build at '
+                  'most build_capacity_rest x_ribo (cell/protein_expression, ribosomes port), so a cell that cut its upkeep '
+                  'through a famine builds more slowly until its ribosomes are back: a lag. The ATP used, J_ATP_ribo = '
+                  'J_ribo + J_ribo_build, is paid through biosynthesis (ribosome_upkeep port). At rest (u = 1, n_ribo = '
+                  'n_ribo_rest) nothing moves.')},
+              ['argus2026unpublished'], V_NEW)
 
 # ------------------------------------------------------------------ 7. the generic adaptive cell: a hierarchy of supermodules
 # Module type cell/generic_adaptive_cell. Each version is a flat supermodule (libcuflynx has no nested supermodules): a
@@ -3555,13 +3753,14 @@ define_cell(
     'empty_membrane',
     submodules=[S('membrane', 'membrane_potential', V_NEW), S('Na_K', 'ion_concentrations', 'SN_soma_Argus2026_v01'),
                 S('Ca', 'Ca_handling', V_NEW), S('H', 'H_handling', V_NEW), S('cytosol', 'energy_metabolism', V_NEW),
-                S('bio', 'biosynthesis', V_NEW), S('protein', 'protein_expression', V_NEW),
+                S('bio', 'biosynthesis', V_NEW), S('ribosomes', 'ribosomes', V_NEW),
+                S('protein', 'protein_expression', V_NEW),
                 S('pool_proteome', 'protein_pool', POOL_V, 'proteome'), S('pool_Glyc', 'protein_pool', POOL_V, 'Glyc'),
                 S('reg', 'expression_regulation', V_REG)]
                + LEAKS,
     links=[('membrane', x) for x in ('Na_K', 'Ca', 'H', 'cytosol', 'bio', 'protein', 'i_leak_Na', 'i_leak_Ca', 'i_leak_H')]
           + [('Na_K', 'i_leak_Na'), ('Ca', 'i_leak_Ca'), ('H', 'i_leak_H'), ('Ca', 'bio'), ('Na_K', 'bio'),
-             ('cytosol', 'H'), ('cytosol', 'protein'), ('cytosol', 'bio'),
+             ('cytosol', 'H'), ('cytosol', 'protein'), ('cytosol', 'bio'), ('bio', 'ribosomes'), ('ribosomes', 'protein'),
              ('pool_proteome', 'protein'), ('pool_proteome', 'bio'),
              ('pool_Glyc', 'protein'), ('pool_Glyc', 'bio'), ('pool_Glyc', 'cytosol'),
              ('cytosol', 'reg'), ('H', 'reg'), ('reg', 'bio'), ('reg', 'protein'), ('reg', 'pool_proteome'),
@@ -3579,8 +3778,10 @@ define_cell(
         'membrane (membrane_potential adaptive: capacitor, disc geometry) around a cytosol (energy_metabolism adaptive: '
         'bond-graph glycolysis, maintenance ATPase and glycogen), its Na+/K+ (ion_concentrations SN_soma_Argus2026_v01), '
         'Ca2+ (Ca_handling adaptive, fixed buffer) and H+ (H_handling adaptive, buffered, pH and E_H) pools, the passive '
-        'leaks of a lipid membrane (i_leak_Na, i_leak_Ca, i_leak_H), biosynthesis (RNA, ribosomes, lipids, damage and '
-        'repair, growth towards a daughter), protein synthesis (protein_expression adaptive), its regulation by falling '
+        'leaks of a lipid membrane (i_leak_Na, i_leak_Ca, i_leak_H), biosynthesis (RNA and lipids, damage and '
+        'repair, growth towards a daughter), the ribosomes (lost when their upkeep goes unpaid, rebuilt at de novo cost; '
+        'protein synthesis builds in proportion to them), protein synthesis (protein_expression adaptive), its '
+        'regulation by falling '
         'ATP, G6P, glucose and pH (expression_regulation: every pool\'s target, growth, and the maintenance: protein '
         'synthesis, RNA and lipid upkeep, repair and the maintenance ATPase, each switched on by the game, '
         'all off by default) and two protein_pools every '
@@ -3844,6 +4045,9 @@ def write_cell(cell, steady, sweep_extra, timestep=None):
                                   'storage 0-1: the ranges AdaptOrDeity lets a player choose'},
         'timestep': timestep or {'scheme': 'rk4', 'dts': [2e-7, 1e-7, 5e-8], 't_end': 1e-4, 'min_order': 0.8,
                                  'tol': 1e-3, 'cvode_tol': 1e-2},
+        # the timestep check's CVODE reference: damage states start at 0 and, as ATP dips from rest, grow at round-off
+        # rates (1e-25 in a millisecond), which the default absolute tolerance cannot resolve
+        'reference_solver_info': {'rtol': 1e-10, 'atol': 1e-30},
         # the Ca buffer (~1 us) makes the whole cell stiff: a short horizon and budget keep the solver matrix tractable
         'stability': {'supported': [{'solver': 'CVODE_myokit', 'rtol': 1e-8, 'atol': 1e-14}], 't_end': 1.0,
                       'time_budget': 10},

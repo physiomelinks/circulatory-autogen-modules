@@ -9,7 +9,6 @@ L_mRNA,dimensionless,1000.0,"unreferenced_placeholder; mean mRNA length about 1,
 t_half_mRNA,second,300.0,bernstein2002global; 80% of E. coli mRNA half-lives 3-8 min (median ~5 min),yes
 n_ribo,dimensionless,43982.2971502571,"derived: ribosomes_per_um3 x cell volume (ribosomes_per_um3: unreferenced_placeholder, placeholder)",no
 L_rRNA,dimensionless,4566.0,definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt,yes
-k_ribo,per_s,2.777777777777778e-06,unreferenced_placeholder; rRNA is stable in growing cells; 1%/h,no
 c_nt_recycle,dimensionless,2.0,definitional; NMP -> NDP -> NTP costs 2 ~P,no
 c_nt_denovo,dimensionless,50.0,lynch2015bioenergetic; of order 50 ~P per nucleotide made from glucose,no
 area_per_lipid,um2,5e-07,milo2010bionumbers; BNID 106993: about 0.5 nm2 per lipid,yes
@@ -34,6 +33,10 @@ K_K_dmg,millimolar,100.0,unreferenced_placeholder; ribosomes need ~100 mM K+ to 
 k_energy_dmg,per_s,0.0005555555555555556,"derived: 1 / deenergised_lethal_time (deenergised_lethal_time: unreferenced_placeholder, placeholder)",no
 ATP_dmg,millimolar,1.0,unreferenced_placeholder; below ~1 mM ATP chaperones and disaggregases stop keeping proteins folded,no
 r_dmg_phys,per_s,0.0,definitional; no attack by default,no
+k_lipid_dmg,per_s,5.555555555555556e-06,"derived: k_lipid / lipid_damage_lethal_fraction (k_lipid: unreferenced_placeholder, placeholder; lipid_damage_lethal_fraction: unreferenced_placeholder, placeholder)",no
+R_reg_maint,dimensionless,1.0,definitional; no maintenance ATPase connected (nothing cut),no
+k_qc_dmg,per_s,5.787037037037037e-06,"derived: 1 / qc_lapse_lethal_time (qc_lapse_lethal_time: unreferenced_placeholder, placeholder)",no
+J_ATP_ribo_in,mol_per_s,1.8526373187013572e-21,"calibrated: the resting ribosomes' rRNA upkeep (cell/ribosomes at rest), used when unconnected",no
 dose_rate,gray_per_s,0.0,"definitional; no radiation by default (natural background, ~1e-10 Gy/s, is negligible)",no
 k_rad_dmg,per_gray,0.0033333333333333335,unreferenced_placeholder; a lethal load at 300 Gy: E. coli's D10 for gamma rays is ~0.14-0.7 kGy (Deinococcus radiodurans ~10 kGy),no
 r_rep_max,per_s,1.1574074074074073e-05,"derived: repair_capacity_ratio / damage_lifetime (repair_capacity_ratio: unreferenced_placeholder, placeholder; damage_lifetime: unreferenced_placeholder, placeholder)",no

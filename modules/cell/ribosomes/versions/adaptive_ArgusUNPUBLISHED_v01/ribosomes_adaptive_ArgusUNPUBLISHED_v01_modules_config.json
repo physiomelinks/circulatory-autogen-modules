@@ -1,0 +1,160 @@
+[
+  {
+    "module_type": "ribosomes",
+    "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "ribosomes_adaptive_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "ribosomes",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "exit_ports": [],
+    "entrance_ports": [],
+    "general_ports": [
+      {
+        "port_type": "ribosome_upkeep",
+        "variables": [
+          "x_unpaid",
+          "J_ATP_ribo"
+        ]
+      },
+      {
+        "port_type": "ribosomes",
+        "variables": [
+          "x_ribo"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      [
+        "x_unpaid",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_upkeep",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "n_ribo_rest",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "n_ribo_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "n_ribo",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "L_rRNA",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "k_ribo",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_ribo_build",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "n_ribo_build",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_nt_recycle",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_nt_denovo",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "aa_ribo",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c_aa_build",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "N_A",
+        "per_mol",
+        "access",
+        "constant"
+      ],
+      [
+        "x_ribo",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "R_ribo_loss",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "R_ribo_build",
+        "per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "c_ribo_build",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ribo",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ribo_build",
+        "mol_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "J_ATP_ribo",
+        "mol_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

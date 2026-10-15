@@ -1,0 +1,16 @@
+module_type: ribosomes
+version: adaptive_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The cell''s ribosomes as a count, n_ribo, and what keeping them costs. Their rRNA turns over at k_ribo and is remade
+  from the recycled nucleotides (J_ribo = n_ribo L_rRNA c_nt_recycle k_ribo u / N_A), but only for the share of the upkeep
+  the cell pays, u = 1 - x_unpaid, with x_unpaid = max(0, 1 - f_ATP_bio R_reg_upkeep) from biosynthesis (0 at rest, higher
+  when ATP falls or the cell cuts its RNA and lipid upkeep). The unpaid share is lost, R_ribo_loss = k_ribo n_ribo x_unpaid,
+  as starving bacteria degrade ribosomes. Lost ribosomes are rebuilt towards the resting count, R_ribo_build = k_ribo_build
+  max(0, n_ribo_rest - n_ribo) u^n_ribo_build (n 8: a smooth switch, so a cell still cutting its upkeep does not rebuild what
+  it is losing, as the stringent response stops rRNA synthesis), at de novo cost: c_ribo_build = L_rRNA c_nt_denovo + aa_ribo
+  (c_syn + c_poly) ~P per ribosome, about 230,000 ~P for its rRNA and 210,000 for its proteins, about 50 times what remaking
+  its rRNA from recycled nucleotides costs (J_ribo). The ribosomal proteins are charged here; the proteome pool (cell/protein_pool
+  proteome) keeps its count. Protein synthesis can build at most build_capacity_rest x_ribo (cell/protein_expression, ribosomes
+  port), so a cell that cut its upkeep through a famine builds more slowly until its ribosomes are back: a lag. The ATP used,
+  J_ATP_ribo = J_ribo + J_ribo_build, is paid through biosynthesis (ribosome_upkeep port). At rest (u = 1, n_ribo = n_ribo_rest)
+  nothing moves.'

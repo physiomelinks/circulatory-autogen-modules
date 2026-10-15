@@ -90,7 +90,6 @@ L_mRNA_bio,dimensionless,1000.0,"unreferenced_placeholder; mean mRNA length abou
 t_half_mRNA_bio,second,300.0,bernstein2002global; 80% of E. coli mRNA half-lives 3-8 min (median ~5 min),yes
 n_ribo_bio,dimensionless,43982.2971502571,"derived: ribosomes_per_um3 x cell volume (ribosomes_per_um3: unreferenced_placeholder, placeholder)",no
 L_rRNA_bio,dimensionless,4566.0,definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt,yes
-k_ribo_bio,per_s,2.777777777777778e-06,unreferenced_placeholder; rRNA is stable in growing cells; 1%/h,no
 c_nt_recycle_bio,dimensionless,2.0,definitional; NMP -> NDP -> NTP costs 2 ~P,no
 c_nt_denovo_bio,dimensionless,50.0,lynch2015bioenergetic; of order 50 ~P per nucleotide made from glucose,no
 area_per_lipid_bio,um2,5e-07,milo2010bionumbers; BNID 106993: about 0.5 nm2 per lipid,yes
@@ -112,6 +111,8 @@ K_K_dmg_bio,millimolar,100.0,unreferenced_placeholder; ribosomes need ~100 mM K+
 k_energy_dmg_bio,per_s,0.0005555555555555556,"derived: 1 / deenergised_lethal_time (deenergised_lethal_time: unreferenced_placeholder, placeholder)",no
 ATP_dmg_bio,millimolar,1.0,unreferenced_placeholder; below ~1 mM ATP chaperones and disaggregases stop keeping proteins folded,no
 r_dmg_phys_bio,per_s,0.0,definitional; no attack by default,no
+k_lipid_dmg_bio,per_s,5.555555555555556e-06,"derived: k_lipid / lipid_damage_lethal_fraction (k_lipid: unreferenced_placeholder, placeholder; lipid_damage_lethal_fraction: unreferenced_placeholder, placeholder)",no
+k_qc_dmg_bio,per_s,5.787037037037037e-06,"derived: 1 / qc_lapse_lethal_time (qc_lapse_lethal_time: unreferenced_placeholder, placeholder)",no
 dose_rate_bio,gray_per_s,0.0,"definitional; no radiation by default (natural background, ~1e-10 Gy/s, is negligible)",no
 k_rad_dmg_bio,per_gray,0.0033333333333333335,unreferenced_placeholder; a lethal load at 300 Gy: E. coli's D10 for gamma rays is ~0.14-0.7 kGy (Deinococcus radiodurans ~10 kGy),no
 r_rep_max_bio,per_s,1.1574074074074073e-05,"derived: repair_capacity_ratio / damage_lifetime (repair_capacity_ratio: unreferenced_placeholder, placeholder; damage_lifetime: unreferenced_placeholder, placeholder)",no
@@ -138,6 +139,17 @@ reg_on_ATP_repair_bio,dimensionless,0.0,"definitional; off until the player swit
 reg_on_G6P_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_glc_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
 reg_on_H_repair_bio,dimensionless,0.0,"definitional; off until the player switches it on (design, 2026-10-12)",no
+n_ribo_rest_ribosomes,dimensionless,43982.2971502571,"derived: ribosomes_per_um3 x cell volume (ribosomes_per_um3: unreferenced_placeholder, placeholder)",no
+n_ribo_init_ribosomes,dimensionless,43982.2971502571,"calibrated: the resting count, n_ribo_rest",no
+L_rRNA_ribosomes,dimensionless,4566.0,definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt,yes
+k_ribo_ribosomes,per_s,2.777777777777778e-06,unreferenced_placeholder; rRNA is stable in growing cells; 1%/h,no
+k_ribo_build_ribosomes,per_s,0.0002777777777777778,"derived: 1 / ribosome_rebuild_time (ribosome_rebuild_time: unreferenced_placeholder, placeholder)",no
+n_ribo_build_ribosomes,dimensionless,8.0,"unreferenced_placeholder; rebuilding lost ribosomes scales with u^n of the share of the upkeep paid, u: a smooth switch, so a cell still cutting its upkeep (u 0.3: 1e-4) does not rebuild what it is losing, and one paying in full rebuilds at the full rate (the stringent response stops rRNA synthesis while starving)",no
+c_nt_recycle_ribosomes,dimensionless,2.0,definitional; NMP -> NDP -> NTP costs 2 ~P,no
+c_nt_denovo_ribosomes,dimensionless,50.0,lynch2015bioenergetic; of order 50 ~P per nucleotide made from glucose,no
+aa_ribo_ribosomes,dimensionless,7500.0,"unreferenced_placeholder; amino acids in the ~54 proteins of one E. coli ribosome, of order 7,500 (from memory)",no
+c_aa_build_ribosomes,dimensionless,28.0,"derived: c_syn + c_poly (c_syn: akashi2002metabolic, placeholder; c_poly: definitional, definitional)",no
+N_A_ribosomes,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 Q_prot_max_protein,per_s,80564.18321852955,"derived: proteolysis_capacity x the amino acids in the resting cell's proteins (sum of n_0 L over its pools) (proteolysis_capacity: willetts1967intracellular, placeholder; proteome_per_um3: milo2010bionumbers, sourced; L_proteome: unreferenced_placeholder, placeholder)",no
 Q_eps_protein,per_s,1e-09,"definitional; numerical floor, 1e-9 amino acids/s (13 orders below the proteases' capacity)",no
 N_aa_init_protein,dimensionless,0.0,definitional; no recycled amino acids at rest,no
@@ -146,7 +158,7 @@ tau_aa_cat_protein,second,1800.0,unreferenced_placeholder; time constant with wh
 y_aa_cat_protein,dimensionless,0.5,"unreferenced_placeholder; ATP a fermenting cell makes per amino acid catabolised: 1 per arginine by the arginine deiminase pathway, about 1 for serine, threonine or alanine through pyruvate to acetate, none for most others without respiration; 0.5 assumed as the mean",no
 N_A_protein,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 J_ref_protein,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (Lynch & Marinov at 20 C) (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes
-build_capacity_protein,dimensionless,9.02267970403271,"derived: ribosomes x k_elong x ribosome_active_fraction x (c_syn + c_poly) / N_A / the resting ATP turnover (ribosomes_per_um3: unreferenced_placeholder, placeholder; k_elong: farewell1998effect, sourced; ribosome_active_fraction: dai2016reduction, sourced; c_syn: akashi2002metabolic, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
+build_capacity_rest_protein,dimensionless,9.02267970403271,"derived: ribosomes x k_elong x ribosome_active_fraction x (c_syn + c_poly) / N_A / the resting ATP turnover (ribosomes_per_um3: unreferenced_placeholder, placeholder; k_elong: farewell1998effect, sourced; ribosome_active_fraction: dai2016reduction, sourced; c_syn: akashi2002metabolic, placeholder; maintenance_coefficient: lynch2015bioenergetic, sourced)",no
 ATP_floor_protein,millimolar,4.0,unreferenced_placeholder; ATP at which building protein and growth stop (stringent response); full speed at the resting ATP,no
 ATP_ref_protein,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
 J_eps_protein,mol_per_s,1e-30,"definitional; numerical floor, 1e-30 mol/s (12 orders below the resting turnover)",no

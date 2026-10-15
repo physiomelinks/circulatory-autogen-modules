@@ -1,0 +1,13 @@
+variable_name,units,value,data_reference,sourced
+x_unpaid,dimensionless,0.0,definitional; the upkeep fully paid (used when unconnected),no
+n_ribo_rest,dimensionless,43982.2971502571,"derived: ribosomes_per_um3 x cell volume (ribosomes_per_um3: unreferenced_placeholder, placeholder)",no
+n_ribo_init,dimensionless,43982.2971502571,"calibrated: the resting count, n_ribo_rest",no
+L_rRNA,dimensionless,4566.0,definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt,yes
+k_ribo,per_s,2.777777777777778e-06,unreferenced_placeholder; rRNA is stable in growing cells; 1%/h,no
+k_ribo_build,per_s,0.0002777777777777778,"derived: 1 / ribosome_rebuild_time (ribosome_rebuild_time: unreferenced_placeholder, placeholder)",no
+n_ribo_build,dimensionless,8.0,"unreferenced_placeholder; rebuilding lost ribosomes scales with u^n of the share of the upkeep paid, u: a smooth switch, so a cell still cutting its upkeep (u 0.3: 1e-4) does not rebuild what it is losing, and one paying in full rebuilds at the full rate (the stringent response stops rRNA synthesis while starving)",no
+c_nt_recycle,dimensionless,2.0,definitional; NMP -> NDP -> NTP costs 2 ~P,no
+c_nt_denovo,dimensionless,50.0,lynch2015bioenergetic; of order 50 ~P per nucleotide made from glucose,no
+aa_ribo,dimensionless,7500.0,"unreferenced_placeholder; amino acids in the ~54 proteins of one E. coli ribosome, of order 7,500 (from memory)",no
+c_aa_build,dimensionless,28.0,"derived: c_syn + c_poly (c_syn: akashi2002metabolic, placeholder; c_poly: definitional, definitional)",no
+N_A,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no

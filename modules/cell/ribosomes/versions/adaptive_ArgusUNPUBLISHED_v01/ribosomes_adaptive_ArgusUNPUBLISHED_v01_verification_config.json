@@ -1,0 +1,71 @@
+{
+  "module_type": "ribosomes",
+  "version": "adaptive_ArgusUNPUBLISHED_v01",
+  "sim_time": 7200.0,
+  "pre_time": 0.0,
+  "dt": 10.0,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-06
+  },
+  "outputs": [
+    "n_ribo",
+    "x_ribo",
+    "u_upkeep",
+    "R_ribo_loss",
+    "R_ribo_build",
+    "c_ribo_build",
+    "J_ribo",
+    "J_ribo_build",
+    "J_ATP_ribo"
+  ],
+  "run_parameters": {
+    "x_unpaid": 0.4,
+    "n_ribo_init": 35185.83772020568
+  },
+  "invariants": [
+    {
+      "description": "ribosome balance: n_ribo(t) - n_ribo(0) = int (R_ribo_build - R_ribo_loss) dt (relative 1e-6); never negative, never above the resting count when started at or below it",
+      "expr": "abs(n_ribo[-1] - n_ribo[0] - np.trapz(R_ribo_build - R_ribo_loss, t)) <= 1e-6*np.trapz(np.abs(R_ribo_build) + np.abs(R_ribo_loss), t) + 1e-9 and np.all(n_ribo >= 0) and (n_ribo[0] > n_ribo_rest or np.all(n_ribo <= n_ribo_rest*(1 + 1e-12)))"
+    },
+    {
+      "description": "loss, rebuilding and their costs (exact): u_upkeep = 1 - x_unpaid; R_ribo_loss = k_ribo n_ribo x_unpaid; R_ribo_build = k_ribo_build max(0, n_ribo_rest - n_ribo) u_upkeep^n_ribo_build; c_ribo_build = L_rRNA c_nt_denovo + aa_ribo c_aa_build; J_ribo = n_ribo L_rRNA c_nt_recycle k_ribo u_upkeep / N_A; J_ribo_build = R_ribo_build c_ribo_build / N_A; x_ribo = n_ribo / n_ribo_rest",
+      "expr": "np.allclose(u_upkeep, 1 - x_unpaid, rtol=1e-12, atol=0) and np.allclose(R_ribo_loss, k_ribo*n_ribo*x_unpaid, rtol=1e-12, atol=1e-30) and np.allclose(R_ribo_build, k_ribo_build*np.clip(n_ribo_rest - n_ribo, 0, None)*u_upkeep**n_ribo_build, rtol=1e-9, atol=1e-12*k_ribo_build*n_ribo_rest) and np.allclose(c_ribo_build, L_rRNA*c_nt_denovo + aa_ribo*c_aa_build, rtol=1e-12, atol=0) and np.allclose(J_ribo, n_ribo*L_rRNA*c_nt_recycle*k_ribo*u_upkeep/N_A, rtol=1e-12, atol=1e-30) and np.allclose(J_ribo_build, R_ribo_build*c_ribo_build/N_A, rtol=1e-12, atol=1e-30) and np.allclose(J_ATP_ribo, J_ribo + J_ribo_build, rtol=1e-12, atol=1e-30) and np.allclose(x_ribo, n_ribo/n_ribo_rest, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "with the upkeep paid and the resting count nothing moves: no loss, no rebuilding, J_ATP_ribo is the resting rRNA upkeep (exact)",
+      "expr": "np.any(x_unpaid != 0.0) or n_ribo[0] != n_ribo_rest or (np.all(R_ribo_loss == 0.0) and np.all(R_ribo_build == 0.0) and np.all(x_ribo == 1.0) and np.allclose(J_ATP_ribo, n_ribo_rest*L_rRNA*c_nt_recycle*k_ribo/N_A, rtol=1e-12, atol=0))"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "x_unpaid": [
+        0.0,
+        1.0
+      ]
+    },
+    "rationale": "the upkeep from unpaid to fully paid"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      1800.0,
+      900.0,
+      450.0
+    ],
+    "t_end": 7200.0,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

@@ -16,12 +16,10 @@
         <variable name="L_mRNA" public_interface="in" units="dimensionless"/>
         <!-- mRNA half-life -->
         <variable name="t_half_mRNA" public_interface="in" units="second"/>
-        <!-- ribosomes per cell -->
+        <!-- ribosomes a daughter is built with (the resting cell's) -->
         <variable name="n_ribo" public_interface="in" units="dimensionless"/>
         <!-- nt per ribosome -->
         <variable name="L_rRNA" public_interface="in" units="dimensionless"/>
-        <!-- rRNA turnover -->
-        <variable name="k_ribo" public_interface="in" units="per_s"/>
         <!-- ~P to remake a nucleotide from its NMP -->
         <variable name="c_nt_recycle" public_interface="in" units="dimensionless"/>
         <!-- ~P to make a nucleotide from glucose -->
@@ -62,6 +60,14 @@
         <variable name="ATP_dmg" public_interface="in" units="millimolar"/>
         <!-- physical damage to the envelope from attacks, per second (set by the game) -->
         <variable name="r_dmg_phys" public_interface="in" units="per_s"/>
+        <!-- envelope damage with no lipid upkeep paid: lipids left unrenewed -->
+        <variable name="k_lipid_dmg" public_interface="in" units="per_s"/>
+        <!-- share of the maintenance ATPase left running, the cytosol's R_reg (maintenance_share port; 1 when unconnected) -->
+        <variable name="R_reg_maint" public_interface="in" units="dimensionless"/>
+        <!-- ribosome and protein damage with the maintenance ATPase cut completely (lapsed quality control) -->
+        <variable name="k_qc_dmg" public_interface="in" units="per_s"/>
+        <!-- ATP the ribosomes use: rRNA upkeep and rebuilding (ribosome_upkeep port) -->
+        <variable name="J_ATP_ribo_in" public_interface="in" units="mol_per_s"/>
         <!-- absorbed radiation dose rate (set by the game) -->
         <variable name="dose_rate" public_interface="in" units="gray_per_s"/>
         <!-- radiation damage per gray: DNA lesions, as a share of a lethal load -->
@@ -119,8 +125,20 @@
         <variable name="f_K_dmg" public_interface="out" units="dimensionless"/>
         <!-- de-energisation, 0-1: (1 - ATP/ATP_dmg)^2 below ATP_dmg, 0 above -->
         <variable name="f_energy_dmg" public_interface="out" units="dimensionless"/>
-        <!-- ribosome and protein damage accrual: wear, Ca2+ overload and K+ loss -->
+        <!-- ribosome and protein damage accrual: wear, Ca2+ overload, K+ loss and lapsed quality control -->
         <variable name="R_dmg_ribo" public_interface="out" units="per_s"/>
+        <!-- ribosome and protein damage from the maintenance ATPase's cut share -->
+        <variable name="R_dmg_qc" public_interface="out" units="per_s"/>
+        <!-- physical damage accrual: attacks and unrenewed lipids -->
+        <variable name="R_dmg_phys" public_interface="out" units="per_s"/>
+        <!-- envelope damage from the unpaid share of the lipid upkeep -->
+        <variable name="R_dmg_lipid" public_interface="out" units="per_s"/>
+        <!-- 1 - f_ATP_bio R_reg_upkeep, negative above rest -->
+        <variable name="x_unpaid_raw" public_interface="out" units="dimensionless"/>
+        <!-- share of the RNA, rRNA and lipid upkeep not paid: max(0, 1 - f_ATP_bio R_reg_upkeep) -->
+        <variable name="x_unpaid" public_interface="out" units="dimensionless"/>
+        <!-- share of the RNA, rRNA and lipid upkeep paid: 1 - x_unpaid -->
+        <variable name="u_upkeep" public_interface="out" units="dimensionless"/>
         <!-- de-energisation damage accrual -->
         <variable name="R_dmg_energy" public_interface="out" units="per_s"/>
         <!-- de-energisation damage repaired per second (disaggregation) -->
@@ -142,8 +160,6 @@
         <variable name="f_T_dmg" public_interface="out" units="dimensionless"/>
         <!-- mRNA turnover -->
         <variable name="J_RNA" public_interface="out" units="mol_per_s"/>
-        <!-- ribosome (rRNA) upkeep -->
-        <variable name="J_ribo" public_interface="out" units="mol_per_s"/>
         <!-- membrane lipid turnover, scales with membrane area -->
         <variable name="J_lipid" public_interface="out" units="mol_per_s"/>
         <!-- damage repaired per second, all types -->
@@ -374,6 +390,68 @@
             </apply>
             <apply>
                 <eq/>
+                <ci>x_unpaid_raw</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>K_m_ATP_bio</ci>
+                            <apply>
+                                <minus/>
+                                <ci>ATP_ref</ci>
+                                <ci>ATP</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <plus/>
+                                <ci>K_m_ATP_bio</ci>
+                                <ci>ATP</ci>
+                            </apply>
+                            <ci>ATP_ref</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>f_ATP_bio</ci>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>R_reg_upkeep</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x_unpaid</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>x_unpaid_raw</ci>
+                        <apply>
+                            <abs/>
+                            <ci>x_unpaid_raw</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u_upkeep</ci>
+                <apply>
+                    <minus/>
+                    <cn cellml:units="dimensionless">1.0</cn>
+                    <ci>x_unpaid</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
                 <ci>J_RNA</ci>
                 <apply>
                     <times/>
@@ -395,28 +473,7 @@
                         </apply>
                         <ci>N_A</ci>
                     </apply>
-                    <ci>f_ATP_bio</ci>
-                    <ci>R_reg_upkeep</ci>
-                </apply>
-            </apply>
-            <apply>
-                <eq/>
-                <ci>J_ribo</ci>
-                <apply>
-                    <times/>
-                    <apply>
-                        <divide/>
-                        <apply>
-                            <times/>
-                            <ci>n_ribo</ci>
-                            <ci>L_rRNA</ci>
-                            <ci>c_nt_recycle</ci>
-                            <ci>k_ribo</ci>
-                        </apply>
-                        <ci>N_A</ci>
-                    </apply>
-                    <ci>f_ATP_bio</ci>
-                    <ci>R_reg_upkeep</ci>
+                    <ci>u_upkeep</ci>
                 </apply>
             </apply>
             <apply>
@@ -434,8 +491,7 @@
                         </apply>
                         <ci>N_A</ci>
                     </apply>
-                    <ci>f_ATP_bio</ci>
-                    <ci>R_reg_upkeep</ci>
+                    <ci>u_upkeep</ci>
                 </apply>
             </apply>
             <apply>
@@ -537,6 +593,37 @@
             </apply>
             <apply>
                 <eq/>
+                <ci>R_dmg_lipid</ci>
+                <apply>
+                    <times/>
+                    <ci>k_lipid_dmg</ci>
+                    <ci>x_unpaid</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_dmg_phys</ci>
+                <apply>
+                    <plus/>
+                    <ci>r_dmg_phys</ci>
+                    <ci>R_dmg_lipid</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_dmg_qc</ci>
+                <apply>
+                    <times/>
+                    <ci>k_qc_dmg</ci>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <ci>R_reg_maint</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
                 <ci>R_dmg_ribo</ci>
                 <apply>
                     <plus/>
@@ -555,6 +642,7 @@
                         <ci>k_K_dmg</ci>
                         <ci>f_K_dmg</ci>
                     </apply>
+                    <ci>R_dmg_qc</ci>
                 </apply>
             </apply>
             <apply>
@@ -878,7 +966,7 @@
                 <apply>
                     <plus/>
                     <ci>J_RNA</ci>
-                    <ci>J_ribo</ci>
+                    <ci>J_ATP_ribo_in</ci>
                     <ci>J_lipid</ci>
                     <ci>J_repair</ci>
                     <ci>J_growth_used</ci>
@@ -947,7 +1035,7 @@
                 </apply>
                 <apply>
                     <minus/>
-                    <ci>r_dmg_phys</ci>
+                    <ci>R_dmg_phys</ci>
                     <ci>R_rep_phys</ci>
                 </apply>
             </apply>

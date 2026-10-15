@@ -10,10 +10,12 @@ x = H_rest/H_i for H+; the switches reg_on_s are 0 by default, and f = 1 at and 
 Checks: the switches off leave the cell exactly as it was, and on they change nothing at rest; a switch makes a target
 follow its species; proteins turn over slowly (k_deg) and are built no faster than their mRNA and the ribosomes allow;
 copies above a lowered target (by the player or by regulation) are removed by proteolysis within minutes, within the
-proteases' capacity, and their amino acids are recycled into later building, which then costs less; and a cell on half
+proteases' capacity, and their amino acids are recycled into later building, which then costs less; a cell on half
 food whose maintenance is regulated by ATP holds its ATP and recovers when food returns, where the same cell without
 regulation, or with only its proteins' targets regulated, runs its ATP out and stays there (hexokinase needs ATP to start
-glycolysis again: the ATP trap).
+glycolysis again: the ATP trap); and each maintenance cut has its cost: cutting the RNA and lipid upkeep damages the
+envelope and loses ribosomes, rebuilt at de novo cost when food returns, and cutting the maintenance ATPase damages
+ribosomes and proteins.
 """
 import contextlib
 import io
@@ -240,21 +242,25 @@ def test_maintenance_regulation_avoids_the_ATP_trap_on_half_food(fermenter):
     hydrolase by ATP does not help: their copies are removed within minutes (the H+-ATPase to about half), the membrane
     depolarises and ATP runs out sooner. With the maintenance regulated by ATP (protein synthesis, RNA and lipid upkeep,
     repair, the maintenance ATPase) ATP holds above 4 mM and the membrane near -100 mV, while the proteome loses the copies
-    its cut synthesis does not replace (about 0.3% in the hour, at k_deg) to the recycled pool; when food returns the cell
-    rebuilds them, mostly from those amino acids, and ATP returns to rest (above 9 mM in the hour) and V to -105 mV.'''
+    its cut synthesis does not replace (about 0.3% in the hour, at k_deg) to the recycled pool, and the cuts cost envelope
+    and ribosome damage and some ribosomes. When the resting medium returns the cell rebuilds its proteins, mostly from
+    those amino acids, and repairs the damage, which takes most of the medium's small headroom: ATP climbs back (above 6
+    mM in the hour, above 8.3 mM in four) and V to -104 mV, while the envelope damage falls.'''
     outs = ['mod_cytosol/C_ATP', 'mod_membrane/V', 'mod_pool_H_ATPase/m', 'mod_pool_proteome/m']
     expression = {f'reg_on_ATP_mod_pool_{p}': 1.0 for p in REGULATED}
     fed = _glucose(fermenter.nominal['C_glc_e_mod_membrane_face'])
     (_, off_starve), (_, off_fed) = _phases(fermenter, [(3600.0, _glucose(0.05)), (3600.0, fed)], outs)
     (_, ex_starve), (_, ex_fed) = _phases(fermenter, [(3600.0, {**_glucose(0.05), **expression}), (3600.0, fed)], outs)
-    (_, on_starve), (_, on_fed) = _phases(fermenter, [(3600.0, {**_glucose(0.05), **_maintenance_on()}), (3600.0, fed)],
-                                          outs)
+    outs += ['mod_bio/D_phys']
+    (_, on_starve), (_, on_fed), (_, on_later) = _phases(
+        fermenter, [(3600.0, {**_glucose(0.05), **_maintenance_on()}), (3600.0, fed), (3 * 3600.0, fed)], outs)
     assert off_starve['mod_cytosol/C_ATP'][-1] < 1e-3 and off_fed['mod_cytosol/C_ATP'][-1] < 1e-3
     assert ex_fed['mod_cytosol/C_ATP'][-1] < 1e-3
     assert ex_starve['mod_pool_H_ATPase/m'][30] < 0.8 and ex_starve['mod_pool_H_ATPase/m'][-1] < 0.55
     assert on_starve['mod_cytosol/C_ATP'].min() > 4.0 and on_starve['mod_membrane/V'][-1] < -99.0
-    assert on_fed['mod_cytosol/C_ATP'][-1] > 9.0
-    assert on_fed['mod_membrane/V'][-1] < -104.0
+    assert on_fed['mod_cytosol/C_ATP'][-1] > 6.0 and on_later['mod_cytosol/C_ATP'][-1] > 8.3
+    assert on_later['mod_membrane/V'][-1] < -104.0
+    assert on_later['mod_bio/D_phys'][-1] < 0.6 * on_fed['mod_bio/D_phys'][-1]
     lost = 1.0 - on_starve['mod_pool_proteome/m'][-1]
     assert 0.002 < lost < 0.007
     assert on_fed['mod_pool_proteome/m'][-1] > on_starve['mod_pool_proteome/m'][-1]
@@ -291,3 +297,52 @@ def test_a_protein_rises_with_its_mRNA_lifetime_and_within_the_ribosomes_capacit
     assert r['mod_protein/s_build'][1] < 0.5
     assert np.all(r['mod_protein/J_build_total'] <= r['mod_protein/J_cap'] * (1 + 1e-9) + 1e-30)
     assert 1.01 < r['mod_pool_proteome/m'][-1] < 1.15
+
+
+def test_each_maintenance_cut_costs_damage_or_ribosomes(fermenter):
+    '''Three hours on half food (0.05 mM) with the maintenance regulated by ATP, then three hours on food (10 mM): with
+    every switch on, the unpaid upkeep damages the envelope (D_phys above 0.02) and loses ribosomes (x_ribo below 0.995),
+    and the cut maintenance ATPase damages ribosomes and proteins (D_ribo up by more than 0.025). Leaving the upkeep's
+    switches off removes the envelope damage and the ribosome loss; leaving the maintenance ATPase's off removes the
+    extra ribosome damage. Protein synthesis can build build_capacity_rest x_ribo (exact). When food returns the
+    ribosomes are rebuilt (above 0.998 of rest in three hours, at J_ribo_build > 0), the damage is repaired and ATP
+    returns to rest.'''
+    nom = fermenter.nominal
+    outs = ['mod_cytosol/C_ATP', 'mod_ribosomes/x_ribo', 'mod_ribosomes/J_ribo_build', 'mod_protein/build_capacity',
+            'mod_bio/D_phys', 'mod_bio/D_ribo']
+    on = _maintenance_on()
+    cases = {'all': on, 'upkeep_off': {k: v for k, v in on.items() if '_upkeep_' not in k},
+             'maint_off': {k: v for k, v in on.items() if not k.endswith('_mod_cytosol')}}
+    runs = {name: _phases(fermenter, [(3 * 3600.0, {**_glucose(0.05), **sw}), (3 * 3600.0, {**_glucose(10.0), **sw})],
+                          outs, dt=60.0) for name, sw in cases.items()}
+    (_, starve), (_, fed) = runs['all']
+    assert starve['mod_bio/D_phys'][-1] > 0.02 and starve['mod_ribosomes/x_ribo'][-1] < 0.995
+    d_ribo_rest = nom['D_ribo_init_mod_bio']
+    assert starve['mod_bio/D_ribo'][-1] - d_ribo_rest > 0.025
+    assert runs['upkeep_off'][0][1]['mod_bio/D_phys'][-1] < 0.005
+    assert runs['upkeep_off'][0][1]['mod_ribosomes/x_ribo'][-1] > 0.9995
+    assert runs['maint_off'][0][1]['mod_bio/D_ribo'][-1] - d_ribo_rest < 0.015
+    for r in (starve, fed):
+        np.testing.assert_allclose(r['mod_protein/build_capacity'],
+                                   nom['build_capacity_rest_mod_protein'] * r['mod_ribosomes/x_ribo'], rtol=1e-12)
+    assert np.all(np.diff(fed['mod_ribosomes/x_ribo']) >= 0) and fed['mod_ribosomes/x_ribo'][-1] > 0.998
+    assert fed['mod_ribosomes/J_ribo_build'][1:60].min() > 0
+    assert fed['mod_bio/D_phys'][-1] < 0.6 * starve['mod_bio/D_phys'][-1]
+    assert fed['mod_bio/D_ribo'][-1] < 0.7 * starve['mod_bio/D_ribo'][-1]
+    assert fed['mod_cytosol/C_ATP'][-1] > 9.6
+
+
+def test_nothing_costs_anything_at_rest(fermenter):
+    '''At rest with every maintenance switch on (f = 1): the upkeep is paid in full, no ribosome is lost or rebuilt, and
+    neither new damage term moves, for an hour (all at round-off: 1e-12 of their full rates).'''
+    nom = fermenter.nominal
+    outs = ['mod_bio/x_unpaid', 'mod_ribosomes/R_ribo_loss', 'mod_ribosomes/R_ribo_build', 'mod_ribosomes/x_ribo',
+            'mod_bio/R_dmg_lipid', 'mod_bio/R_dmg_qc']
+    _, r = _phases(fermenter, [(3600.0, _maintenance_on())], outs, dt=60.0)[0]
+    full = {'mod_bio/x_unpaid': 1.0,
+            'mod_ribosomes/R_ribo_loss': nom['k_ribo_mod_ribosomes'] * nom['n_ribo_rest_mod_ribosomes'],
+            'mod_ribosomes/R_ribo_build': nom['k_ribo_build_mod_ribosomes'] * nom['n_ribo_rest_mod_ribosomes'],
+            'mod_bio/R_dmg_lipid': nom['k_lipid_dmg_mod_bio'], 'mod_bio/R_dmg_qc': nom['k_qc_dmg_mod_bio']}
+    for o, rate in full.items():
+        assert np.all(np.abs(r[o]) <= 1e-12 * rate), o
+    np.testing.assert_allclose(r['mod_ribosomes/x_ribo'], 1.0, rtol=0, atol=1e-12)

@@ -85,6 +85,12 @@
           "f_glc_reg",
           "f_H_reg"
         ]
+      },
+      {
+        "port_type": "ribosomes",
+        "variables": [
+          "x_ribo"
+        ]
       }
     ],
     "variables_and_units": [
@@ -323,10 +329,22 @@
         "constant"
       ],
       [
-        "build_capacity",
+        "build_capacity_rest",
         "dimensionless",
         "access",
         "constant"
+      ],
+      [
+        "x_ribo",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "build_capacity",
+        "dimensionless",
+        "access",
+        "variable"
       ],
       [
         "ATP_floor",

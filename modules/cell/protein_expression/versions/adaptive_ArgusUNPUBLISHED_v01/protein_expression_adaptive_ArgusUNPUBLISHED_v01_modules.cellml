@@ -66,8 +66,12 @@
         <variable name="A_protein_total" public_interface="out" units="um2"/>
         <!-- resting ATP turnover of the cell: the scale of synthesis and growth -->
         <variable name="J_ref" public_interface="in" units="mol_per_s"/>
-        <!-- most ATP synthesis can take, in multiples of J_ref -->
-        <variable name="build_capacity" public_interface="in" units="dimensionless"/>
+        <!-- most ATP synthesis can take with the resting ribosomes, in multiples of J_ref -->
+        <variable name="build_capacity_rest" public_interface="in" units="dimensionless"/>
+        <!-- ribosomes relative to rest (ribosomes port from cell/ribosomes) -->
+        <variable name="x_ribo" public_interface="in" units="dimensionless"/>
+        <!-- most ATP synthesis can take now: build_capacity_rest x_ribo -->
+        <variable name="build_capacity" public_interface="out" units="dimensionless"/>
         <!-- ATP at which synthesis and growth stop -->
         <variable name="ATP_floor" public_interface="in" units="millimolar"/>
         <!-- ATP at which synthesis runs at full speed (rest) -->
@@ -424,6 +428,15 @@
                         </apply>
                     </apply>
                     <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>build_capacity</ci>
+                <apply>
+                    <times/>
+                    <ci>build_capacity_rest</ci>
+                    <ci>x_ribo</ci>
                 </apply>
             </apply>
             <apply>
