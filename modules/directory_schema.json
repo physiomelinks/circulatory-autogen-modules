@@ -17,13 +17,13 @@
   "levels": {
     "modules_root": {
       "path": "modules/",
-      "description": "The module library: category directories and top-level module_types (heart), this schema and the README.",
+      "description": "The module library: category directories and top-level module_types (heart), this schema, the README and version_renames.json (versions renamed in module PRs: [{from: [module_type, version], to: [module_type, version], reason}], read by cam_testing.library.version_renames).",
       "files": {
         "required": [
           "README.md",
           "directory_schema.json"
         ],
-        "optional": []
+        "optional": ["version_renames.json"]
       },
       "directories": [
         "category",
