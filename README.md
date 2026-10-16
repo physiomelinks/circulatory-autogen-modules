@@ -32,8 +32,6 @@ Three words name what a model is built from:
 - a **parameterisation** is the same maths with other values: one named parameter set of a version, with its data, calibration and source figures, in `versions/<version>/parameterisations/<name>/`. The config's `default_parameterisation` names the one used by default;
 - an **instance** is one use of a version in a network: a module-array record (or a supermodule's submodule). It names the parameterisation it uses with `"parameterisation"` (default: the version's `default_parameterisation`); several instances may share one parameterisation.
 
-Parameterisations were called instances before 2026-10-09; the former names (`instances/`, `default_instance`, a record's `"instance"`) are still read.
-
 To use the library from libcuflynx, set these in `user_inputs.yaml` (on circulatory_autogen master; not yet in a release):
 
 ```yaml
@@ -116,7 +114,7 @@ The version report shows all of this, regenerating the plots from the committed 
 - the original under `reference/`: circulatory_autogen's files with only the bib keys changed to this library's (`tools/bib_rekey_map.json`, applied by `tools/import_systems.py`; checked against the originals by `tests/test_structure.py`);
 - a `<model>_system.yaml` spec.
 
-The reference can instead be a ready CellML model, simulated as it is: for example the flattened model PhLynx exports, for a model first built in PhLynx. Set `equivalence.reference_cellml: reference/<file>.cellml` in the spec (a path relative to the model's directory), or put it at `reference/<model>.cellml` with no vessel array beside it. Its outputs are `<component>/<variable>` for every component except `environment`, `global_parameters` and `instance_parameters` (`equivalence.ignore_components` changes the list); `output_map`, `ignore`, `wrapped`, `reciprocal` and `tol` work as for an original. PhLynx names a vessel's component by the vessel's name, so its outputs match the library model's `<vessel>/<variable>` with no `output_map`.
+The reference can instead be a ready CellML model, simulated as it is: for example the flattened model PhLynx exports, for a model first built in PhLynx. Set `equivalence.reference_cellml: reference/<file>.cellml` in the spec (a path relative to the model's directory), or put it at `reference/<model>.cellml` with no module array beside it. Its outputs are `<component>/<variable>` for every component except `environment`, `global_parameters` and `instance_parameters` (`equivalence.ignore_components` changes the list); `output_map`, `ignore`, `wrapped`, `reciprocal` and `tol` work as for an original. PhLynx names a vessel's component by the vessel's name, so its outputs match the library model's `<vessel>/<variable>` with no `output_map`.
 
 `tests/test_systems.py` checks three things for each model:
 - it runs;
@@ -128,7 +126,7 @@ Models whose original doesn't generate in circulatory_autogen carry `expected_fa
 Some system models are examples built from this library, with no circulatory_autogen original (equivalence `not_applicable`); their invariants check exact solutions instead:
 - `system_models/diffusion/`: finite-volume diffusion meshes (`tools/build_diffusion_examples.py`).
 
-Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
+Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and the CSV layout with the same columns. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
 
 Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A model uses one through one record:
 

@@ -40,12 +40,10 @@ VERSION_TESTS = [REVIEW_TEST, 'run_test', 'verification_test_invariants', 'verif
                  'stability_test']
 # per parameterisation
 PARAMETERISATION_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
-INSTANCE_TESTS = PARAMETERISATION_TESTS   # the former name
 TESTS = VERSION_TESTS + PARAMETERISATION_TESTS
 NO_CALIBRATION_DATA = 'no calibration data in this parameterisation'
 NO_BASELINE_DATA = 'no baseline data in this parameterisation'
 NO_PARAMETERISATION_CALIBRATION = 'no parameterisation has calibration data'
-NO_INSTANCE_CALIBRATION = NO_PARAMETERISATION_CALIBRATION   # the former name
 
 
 # version_calibration of a version calibrated only as part of supermodules (below): pass-styled /
@@ -188,15 +186,14 @@ def _json_default(o):
 
 class ComponentModel(object):
     '''A version's generated model and simulation helper, built once and reused. The parameter
-    values are a parameterisation's (default: the version's default parameterisation; ``instance``: its
-    former name, still accepted).'''
+    values are a parameterisation's (default: the version's default parameterisation).'''
 
-    def __init__(self, component, work_dir=None, parameterisation=None, instance=None):
+    def __init__(self, component, work_dir=None, parameterisation=None):
         self.component = component
-        self.parameterisation = parameterisation or instance or component.default_parameterisation
+        self.parameterisation = parameterisation or component.default_parameterisation
         # the test network: the version's own for the version tests (no parameterisation given), else the
         # parameterisation's (validation.<p>.harness) if it has one -- even for the default parameterisation
-        self._network_of = parameterisation or instance
+        self._network_of = parameterisation
         self.spec = component.spec
         self.work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_{component.id}_')
         self._model_path = None
@@ -233,11 +230,6 @@ class ComponentModel(object):
                 nominal[name] = float(value)
                 var_of[name] = name
         self._params, self._nominal, self._var_of_map = params, nominal, var_of
-
-    @property
-    def instance(self):
-        '''The former name of ``parameterisation``.'''
-        return self.parameterisation
 
     @property
     def nominal(self):

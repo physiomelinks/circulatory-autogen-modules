@@ -57,11 +57,7 @@ def __getattr__(name):
 
 
 VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameterisations', 'default'
-# a version's parameter sets were called instances (instances/, default_instance) before
-# 2026-10-09; "instance" now means one use of a version in a network. The old names are read too.
-LEGACY_PARAMETERISATIONS, LEGACY_DEFAULT_KEY = 'instances', 'default_instance'
 DEFAULT_KEY = 'default_parameterisation'
-INSTANCES, DEFAULT_INSTANCE = PARAMETERISATIONS, DEFAULT_PARAMETERISATION   # the former names
 SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
 # directories under modules/ that are not categories or module_types (another session's work in
@@ -299,7 +295,7 @@ def with_record_keys(entry, licence=DEFAULT_LICENCE, creator=None):
               'creator': list(entry.get('creator', creator if creator is not None else []))}
     rest = [(k, v) for k, v in entry.items() if k not in RECORD_KEYS]
     keys = [k for k, _ in rest]
-    anchor = next((k for k in (DEFAULT_KEY, LEGACY_DEFAULT_KEY, 'module_subtype', 'BC_type') if k in keys), None)
+    anchor = next((k for k in (DEFAULT_KEY, 'module_subtype') if k in keys), None)
     out = {}
     if anchor is None:
         out.update(values)
@@ -649,7 +645,7 @@ class ModuleType:
 @dataclass
 class Parameterisation:
     '''A named parameter set of a version (same maths, its own values, data and set-ups):
-    <version>/parameterisations/<name>/. Formerly called an instance.'''
+    <version>/parameterisations/<name>/.'''
     version: 'Version'
     name: str
 
@@ -747,8 +743,6 @@ class Parameterisation:
                       if f != os.path.basename(self.parameters_path) and not f.endswith('.omex')
                       and f != SOURCE_FIGURES)   # .omex: generated
 
-
-Instance = Parameterisation   # the former name
 
 
 @dataclass
@@ -897,15 +891,13 @@ class Version:
 
     @property
     def parameterisations_dir(self):
-        '''<version>/parameterisations/ (or a library still on the old layout's instances/).'''
-        new = os.path.join(self.dir, PARAMETERISATIONS)
-        old = os.path.join(self.dir, LEGACY_PARAMETERISATIONS)
-        return old if not os.path.isdir(new) and os.path.isdir(old) else new
+        '''<version>/parameterisations/.'''
+        return os.path.join(self.dir, PARAMETERISATIONS)
 
     # --- parameterisations ------------------------------------------------------------------
     @property
     def default_parameterisation_name(self):
-        return self.config.get(DEFAULT_KEY) or self.config.get(LEGACY_DEFAULT_KEY) or DEFAULT_PARAMETERISATION
+        return self.config.get(DEFAULT_KEY) or DEFAULT_PARAMETERISATION
 
     def parameterisation_names(self):
         root = self.parameterisations_dir
@@ -924,14 +916,6 @@ class Version:
     @property
     def default_parameterisation(self):
         return self.parameterisation()
-
-    # the former names (instance = parameterisation)
-    instances_dir = parameterisations_dir
-    default_instance_name = default_parameterisation_name
-    instance_names = parameterisation_names
-    instances = parameterisations
-    instance = parameterisation
-    default_instance = default_parameterisation
 
     # --- parameters -------------------------------------------------------------------------
     @property

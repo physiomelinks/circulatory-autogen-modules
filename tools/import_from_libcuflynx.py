@@ -128,11 +128,8 @@ def load_ca_parameter_sources(ca_dir):
     '''
     resources = os.path.join(ca_dir, 'resources')
     sources = []
-    # circulatory_autogen's module arrays, under either name (vessel_array before its #549)
-    paths = {}
-    for name in ('vessel_array', 'module_array'):
-        for p in glob.glob(os.path.join(resources, f'*_{name}.csv')):
-            paths[os.path.basename(p)[:-len(f'_{name}.csv')]] = p
+    paths = {os.path.basename(p)[:-len('_module_array.csv')]: p
+             for p in glob.glob(os.path.join(resources, '*_module_array.csv'))}
     for prefix, vessel_path in sorted(paths.items()):
         param_path = os.path.join(resources, f'{prefix}_parameters.csv')
         if not os.path.isfile(param_path):

@@ -198,9 +198,6 @@ def walk_modules():
                     problems.append(f'{rel}: config entry is ({e.get("module_type")}, {e.get("module_subtype")}), '
                                     f'not ({mt}, {v}): the version is its module_subtype')
                 di = e.get('default_parameterisation')
-                if 'default_instance' in e:
-                    problems.append(f'{rel}: config entry has "default_instance" (the former name): rename it '
-                                    f'"default_parameterisation"')
                 if not di:
                     problems.append(f'{rel}: config entry has no default_parameterisation')
                 elif not os.path.isfile(os.path.join(d, 'parameterisations', di, f'{di}_parameters.csv')):
@@ -221,8 +218,7 @@ def walk_modules():
             if c not in allowed:
                 problems.append(f'{rel}: unexpected directory {c}')
         if not os.path.isdir(os.path.join(d, 'parameterisations')):
-            problems.append(f'{rel}: missing parameterisations/'
-                            + (' (instances/ is the former name: rename it)' if os.path.isdir(os.path.join(d, 'instances')) else ''))
+            problems.append(f'{rel}: missing parameterisations/')
             return
         if os.path.isdir(os.path.join(d, 'risk')):
             _check_files('risk', os.path.join(d, 'risk'), names, problems)
@@ -621,10 +617,9 @@ OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'paramete
                   if _not_excluded(p))
 
 
-def _validate(path, schema_name, *older_names):
-    '''older_names: the schema's name in older libcuflynx releases (vessel_array before #549).'''
+def _validate(path, schema_name):
     jsonschema = pytest.importorskip('jsonschema')
-    schema = next((s for s in map(_libcuflynx_schema, (schema_name,) + older_names) if s is not None), None)
+    schema = _libcuflynx_schema(schema_name)
     if schema is None:
         pytest.skip(f'the installed libcuflynx has no schemas/{schema_name}')
     with open(path) as f:
@@ -635,7 +630,7 @@ def _validate(path, schema_name, *older_names):
 
 @pytest.mark.parametrize('path', MODULE_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
 def test_module_array_matches_libcuflynx_schema(path):
-    _validate(path, 'module_array.schema.json', 'vessel_array.schema.json')
+    _validate(path, 'module_array.schema.json')
 
 
 @pytest.mark.parametrize('path', MODULE_CONFIGS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
@@ -806,33 +801,11 @@ def test_obs_data_matches_libcuflynx_schema(path):
 
 
 def test_no_csv_module_arrays_left():
-    left = [os.path.relpath(p, REPO_ROOT) for name in module_array.NAMES
-            for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', f'*_{name}.csv'), recursive=True)
+    left = [os.path.relpath(p, REPO_ROOT)
+            for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_module_array.csv'), recursive=True)
             if os.sep + 'reference' + os.sep not in p]
     assert not left, f'CSV module arrays left (run tools/convert_module_arrays.py): {left[:10]}'
 
-
-def test_module_arrays_use_the_new_name():
-    '''Module arrays were called vessel arrays: the library's own files and verification configs use the new
-    name. reference/ keeps circulatory_autogen's originals as they were, and the readers take both.'''
-    old_files = [os.path.relpath(p, REPO_ROOT)
-                 for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_vessel_array.*'), recursive=True)
-                 if os.sep + 'reference' + os.sep not in p]
-    old_keys = [os.path.relpath(p, REPO_ROOT)
-                for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_verification_config.json'), recursive=True)
-                if '"vessel_array"' in open(p).read()]
-    assert not old_files and not old_keys, (f'rename to module_array: files {old_files[:10]}, '
-                                            f'harness keys in {old_keys[:10]}')
-
-
-def test_old_module_array_names_are_still_read(tmp_path):
-    (tmp_path / 'm_vessel_array.json').write_text('[]')
-    assert module_array.find(str(tmp_path), 'm').endswith('m_vessel_array.json')
-    (tmp_path / 'm_module_array.json').write_text('[]')
-    assert module_array.find(str(tmp_path), 'm').endswith('m_module_array.json')
-    rows = [['mod', 'nn', 'x', '', '']]
-    assert module_array.harness_rows({'vessel_array': rows}) == rows
-    assert module_array.harness_rows({'module_array': rows}) == rows
 
 
 def test_module_type_names_listed():

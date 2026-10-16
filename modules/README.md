@@ -53,10 +53,6 @@ modules/
   version's `default_parameterisation`). Several instances may share one parameterisation, and
   the model's own parameters file can still change any value for one instance.
 
-Parameterisations were called instances before 2026-10-09. The former names (the `instances/`
-directory, the config key `default_instance` and a record's `"instance"` key) are still read
-(`cam_testing.library`, `cam_testing.module_array`), but new files use the new ones.
-
 The top level of `modules/` holds categories and one module_type, `heart`:
 
 | Directory | Holds |

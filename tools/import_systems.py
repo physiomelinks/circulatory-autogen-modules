@@ -354,7 +354,7 @@ def import_model(ca_dir, model, category, configs):
     ref_dir = os.path.join(dest, 'reference')
     os.makedirs(ref_dir, exist_ok=True)
     notes = []
-    va = module_array.find(res, model)     # circulatory_autogen's resources/, either name
+    va = module_array.find(res, model)
     pa = os.path.join(res, f'{model}_parameters.csv')
     module_array.write_records(os.path.join(ref_dir, f'{model}_module_array.json'), module_array.read_records(va))
     if os.path.isfile(pa):

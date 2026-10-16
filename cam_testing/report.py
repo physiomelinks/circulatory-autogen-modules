@@ -245,8 +245,7 @@ def parameterisation_context(version, inst):
             calibration = json.load(f)
     from cam_testing import omex as omex_mod
     omex_file = omex_mod.omex_path(version, inst)
-    omex_result = (checks.load(version, f'cuflynx_parameterisation_omex_test__{inst.name}')
-                   or checks.load(version, f'cuflynx_instance_omex_test__{inst.name}'))   # the former name
+    omex_result = checks.load(version, f'cuflynx_parameterisation_omex_test__{inst.name}')
     return {'name': inst.name, 'is_default': inst.is_default, 'files': inst.data_files(),
             # the generated COMBINE archive for CUFLynx (tools/build_parameterisation_omex.py), and its CUFLynx check
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,

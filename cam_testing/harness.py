@@ -190,8 +190,7 @@ def network(component, parameterisation=None):
     return own if own is not None else (component.spec.get('harness') or {})
 
 
-def _write_resources(component, resources_dir, prefix, overrides, parameters=None, parameterisations=True,
-                     parameterisation=None):
+def _write_resources(component, resources_dir, prefix, overrides, parameters=None, parameterisation=None):
     '''
     The test network: by default the version alone. A version that only works with
     neighbours (its inputs are variables another vessel supplies) gives a small network in its
@@ -207,9 +206,6 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     ``parameters``: the parameterisation's parameters to write (default: the version's default
     parameterisation). A parameterisation may have its own network instead
     (validation.<parameterisation>.harness, see ``network``); ``parameterisation`` selects it.
-    ``parameterisations=False`` leaves "parameterisation" out of the records (each record then gets its
-    version's default parameterisation). libcuflynx before circulatory_autogen #535's baad9e73 needed this for the C++
-    0D-1D split, which appended 5-column rows.
     '''
     os.makedirs(resources_dir, exist_ok=True)
     network = globals()['network'](component, parameterisation)
@@ -217,16 +213,7 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
     records = module_array.from_rows(rows)
-    if not parameterisations:
-        records = [{k: v for k, v in r.items() if k not in ('parameterisation', 'instance')} for r in records]
     module_array.write_records(os.path.join(resources_dir, f'{prefix}_module_array.json'), records)
-    if not module_array.libcuflynx_reads_json():
-        # a libcuflynx without JSON module-array support (0.7.3 and older) reads the CSV, under the
-        # old name, the only one it looks for
-        with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
-            writer.writerows([str(x) for x in r[:5]] for r in rows)
 
     params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
@@ -246,8 +233,7 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
                 writer.writerow([name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
 
 
-def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None,
-             instance=None):
+def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None):
     '''
     Generates the version's model in ``work_dir``; returns the path of the .cellml file,
     or of the .py file for ``model_type='python'``. ``parameters``: a parameterisation's
@@ -263,8 +249,6 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
         work_dir = os.path.join(work_dir, model_type)
     resources_dir = os.path.join(work_dir, 'resources')
     generated_dir = os.path.join(work_dir, 'generated_models')
-    if parameterisation is None:
-        parameterisation = instance
     _write_resources(component, resources_dir, prefix, overrides, parameters, parameterisation=parameterisation)
     config = {
         'file_prefix': prefix,
