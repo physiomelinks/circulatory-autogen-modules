@@ -512,3 +512,18 @@ def _cytosol_affinities():
     names = {'HK': 'A_hk', 'LG': 'A_lg', 'HYD': 'A_hyd', 'STORE': 'A_store', 'MOB': 'A_mob'}
     a, _, _ = lumped.evaluate(*lumped.CYTOSOL, lumped.CYTOSOL_EXPORT, names, {})
     return a
+
+
+def test_cyclic_pathways_are_drawn_as_rings(built):
+    """The diagram draws the longest cycle of reactions linked by their own intermediates as a ring, from its earliest
+    reaction: the TCA cycle from citrate synthase, the glycogen store's pyrophosphorylase, synthase and phosphorylase;
+    glycolysis' NAD+/NADH loop is a cofactor's and not a ring, and the lumped cytosol has none."""
+    assert built['mitochondrion'][0].cycle() == ['CS', 'ACO', 'IDH', 'OGDH', 'SCS', 'CII', 'FUM', 'MDH']
+    assert built['glycogen'][0].cycle() == ['GLGC', 'GLGA', 'GLGP']
+    assert built['glycolysis'][0].cycle() == [] and built['gluconeogenesis'][0].cycle() == []
+    assert lumped.cytosol_graph().cycle() == []
+    ns = '{http://www.w3.org/2000/svg}'
+    for module, rings in (('mitochondrion', 1), ('glycolysis', 0)):
+        svg = ET.parse(os.path.join(REPO, 'modules', 'cell', module, 'versions', VERSION,
+                                    f'{module}_{VERSION}_bondgraph.svg')).getroot()
+        assert sum(c.get('class') == 'cycle' for c in svg.iter(ns + 'circle')) == rings

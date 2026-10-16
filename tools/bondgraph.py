@@ -69,6 +69,8 @@ class BondGraph:
     reactions: List[Reaction]
     temperature: float = 293.15     # K
     gas_constant: float = R_GAS     # J/(mol K): a lumped module's own value, to describe it exactly
+    cofactors: tuple = ()           # species that cycle between reactions as carriers (NAD+/NADH, ...): the diagram
+                                    # does not draw a ring through them
     potentials: Dict[str, float] = field(default_factory=dict)   # compartment -> electrical potential psi [V]
     capacitance: Dict[str, float] = field(default_factory=dict)  # compartment -> membrane capacitance [F/m3]: its psi a
                                                                  # state, charged by the reactions that move charge in
@@ -378,55 +380,118 @@ class BondGraph:
         return '\n'.join(out) + '\n'
 
     # ---------------------------------------------------------------- diagram
+    def cycle(self, max_uses=4):
+        """The longest cycle of reactions linked by their own intermediates (a product of one the substrate of the next;
+        not chemostats, cofactors, nor species used by more than max_uses reactions), from its earliest reaction; [] when there is none of three or
+        more (the TCA cycle, the glycogen store and phosphorylase, ...)."""
+        uses = {sp.name: [r.name for r in self.reactions if sp.name in r.stoich] for sp in self.species}
+        link = {sp.name for sp in self.species if not sp.boundary and sp.name not in self.cofactors
+                and len(uses[sp.name]) <= max_uses}
+        rx = {r.name: r for r in self.reactions}
+        nxt = {a: [b for b in rx if b != a and any(rx[a].stoich.get(x, 0) > 0 and rx[b].stoich.get(x, 0) < 0
+                                                    for x in link)] for a in rx}
+        best = []
+
+        def walk(path):
+            nonlocal best
+            for b in nxt[path[-1]]:
+                if b == path[0] and len(path) > len(best):
+                    best = list(path)
+                elif b not in path and b > path[0]:   # each cycle once, from its least name
+                    walk(path + [b])
+        for a in rx:
+            walk([a])
+        if len(best) < 3:
+            return []
+        k = best.index(min(best, key=[r.name for r in self.reactions].index))   # from its earliest reaction
+        return best[k:] + best[:k]
+
     def svg(self, rdf):
-        """A diagram: reactions down the middle in their order; a species that links two consecutive reactions sits
-        between them, one used by a single reaction beside it, and the rest (cofactors, species joining distant steps)
-        in columns at the sides, each species once (a 0-junction with its store); chemostats dashed. Bonds point from
-        substrates to reactions to products, with the coefficient when it is not 1. The BG-RDF is in the SVG's metadata
-        where CellDL keeps it (id celldl-rdf-metadata, Turtle), so the CellDL tools read the diagram as a bond-graph
-        model (bg2cellml makes CellML from it), and each element's id is its bond-graph name."""
+        """A diagram: reactions in their order down the middle, except the longest cycle of them (cycle()), which is a
+        ring, as pathway maps draw the TCA cycle; a species linking two nearby reactions sits between them (on the ring
+        for the cycle's own intermediates), one used by a single reaction beside it (outside the ring), and the rest
+        (cofactors, species joining distant steps) in columns at the sides, each species once (a 0-junction with its
+        store); chemostats dashed. Bonds point from substrates to reactions to products, with the coefficient when it is
+        not 1. The BG-RDF is in the SVG's metadata where CellDL keeps it (id celldl-rdf-metadata, Turtle), so the CellDL
+        tools read the diagram as a bond-graph model (bg2cellml makes CellML from it), and each element's id is its
+        bond-graph name."""
         rr = self.reactions
-        dy, xr, bh, rad = 110.0, 0.0, 36.0, 21.0
-        bw = max(170.0, max(5.6 * len(r.enzyme) + 20.0 for r in rr))   # wide enough for the enzyme names (10 px)
+        dy, bh, rad = 110.0, 36.0, 21.0
+        width = {r.name: max(130.0, 5.6 * len(r.enzyme) + 20.0) for r in rr}   # each fits its enzyme's name (10 px)
+        bw = max(width.values())
         order = {r.name: i for i, r in enumerate(rr)}
-        ypos = {r.name: 60.0 + i * dy for i, r in enumerate(rr)}
+        ring = self.cycle()
+        pos, y = {}, 60.0
+        before = [r.name for r in rr if r.name not in ring and (not ring or order[r.name] < min(order[c] for c in ring))]
+        after = [r.name for r in rr if r.name not in ring and r.name not in before]
+        for n in before:
+            pos[n], y = (0.0, y), y + dy
+        R, yc = 0.0, 0.0
+        if ring:
+            R = max(180.0, 40.0 * len(ring), 0.5 * max(width[n] for n in ring) + 90.0)
+            yc = y + R
+            for k, n in enumerate(ring):
+                a = -0.5 * math.pi + 2.0 * math.pi * k / len(ring)
+                pos[n] = (R * math.cos(a), yc + R * math.sin(a))
+            y = yc + R + dy
+        for n in after:
+            pos[n], y = (0.0, y), y + dy
         uses = {sp.name: sorted((r.name for r in rr if sp.name in r.stoich), key=order.get) for sp in self.species}
-        place, sides, hubs, gaps = {}, {}, [], {}
+        rxs = {r.name: r for r in rr}
+        place, beside, hubs, between = {}, {}, [], {}
         for sp in self.species:
             u = uses[sp.name]
-            if len(u) == 2 and order[u[1]] - order[u[0]] == 1:
-                k = gaps.get(u[0], 0)   # a second species between the same two steps goes beside the first
-                gaps[u[0]] = k + 1
-                place[sp.name] = (xr + (0.0 if k == 0 else (-1 if k % 2 else 1) * 2.4 * rad * ((k + 1) // 2)),
-                                  0.5 * (ypos[u[0]] + ypos[u[1]]))
+            on_ring = [(k, ring[k]) for k in range(len(ring))
+                       if rxs[ring[k]].stoich.get(sp.name, 0) > 0
+                       and rxs[ring[(k + 1) % len(ring)]].stoich.get(sp.name, 0) < 0]
+            if on_ring and not sp.boundary:
+                k = on_ring[0][0]
+                j = between.get(('ring', k), 0)
+                between[('ring', k)] = j + 1
+                a = -0.5 * math.pi + 2.0 * math.pi * (k + 0.5) / len(ring)
+                r_ = R - 2.4 * rad * j
+                place[sp.name] = (r_ * math.cos(a), yc + r_ * math.sin(a))
+            elif len(u) == 2 and math.dist(pos[u[0]], pos[u[1]]) < 1.5 * dy:
+                j = between.get(tuple(u), 0)   # a second species between the same two steps goes beside the first
+                between[tuple(u)] = j + 1
+                (xa, ya), (xb, yb) = pos[u[0]], pos[u[1]]
+                off = 0.0 if j == 0 else (-1 if j % 2 else 1) * 2.4 * rad * ((j + 1) // 2)
+                place[sp.name] = (0.5 * (xa + xb) + off, 0.5 * (ya + yb))
             elif len(u) == 1:
-                k = sides.get(u[0], 0)
-                sides[u[0]] = k + 1
-                place[sp.name] = (xr + (-1 if k % 2 == 0 else 1) * (bw / 2 + 70.0 + 55.0 * (k // 2)), ypos[u[0]])
+                k = beside.get(u[0], 0)
+                beside[u[0]] = k + 1
+                x, yy = pos[u[0]]
+                if u[0] in ring:   # outside the ring, along its radius
+                    d = math.hypot(x, yy - yc) or 1.0
+                    out_ = width[u[0]] / 2 + 50.0 + 55.0 * k
+                    place[sp.name] = (x + x / d * out_, yy + (yy - yc) / d * (bh / 2 + 40.0 + 50.0 * k))
+                else:
+                    place[sp.name] = (x + (-1 if k % 2 == 0 else 1) * (width[u[0]] / 2 + 70.0 + 55.0 * (k // 2)), yy)
             else:
                 hubs.append(sp.name)
         # side columns: by mean height, alternating sides; a hub too close to another on its side moves out a column
-        hubs.sort(key=lambda n: sum(ypos[r] for r in uses[n]) / len(uses[n]))
+        hubs.sort(key=lambda n: sum(pos[r][1] for r in uses[n]) / len(uses[n]))
         taken = {-1: [], 1: []}
+        edge = R + bw / 2 + 120.0 + (55.0 * max(beside.values()) if beside else 0.0)
         for i, n in enumerate(hubs):
             side = -1 if i % 2 == 0 else 1
-            y = sum(ypos[r] for r in uses[n]) / len(uses[n])
+            yy = sum(pos[r][1] for r in uses[n]) / len(uses[n])
             col = 0
-            while any(c == col and abs(y - yy) < 2.5 * rad for c, yy in taken[side]):
+            while any(c == col and abs(yy - y2) < 2.5 * rad for c, y2 in taken[side]):
                 col += 1
-            taken[side].append((col, y))
-            place[n] = (xr + side * (bw / 2 + 220.0 + 80.0 * col), y)
-        xs = [x for x, _ in place.values()] + [xr - bw / 2, xr + bw / 2]
+            taken[side].append((col, yy))
+            place[n] = (side * (edge + 80.0 * col), yy)
+        xs = [x for x, _ in place.values()] + [pos[n][0] + d * width[n] / 2 for n in pos for d in (-1, 1)]
         x0, x1 = min(xs) - 60.0, max(xs) + 60.0
-        height = max(ypos.values()) + 80.0
+        height = max(yy for _, yy in list(pos.values()) + list(place.values())) + 80.0
         bnd = {sp.name for sp in self.species if sp.boundary}
         lab = {sp.name: sp.label for sp in self.species}
 
-        def edge_of_box(cx, cy, tx, ty):
+        def edge_of_box(cx, cy, tx, ty, w):
             dx, dy_ = tx - cx, ty - cy
             if dx == 0 and dy_ == 0:
                 return cx, cy
-            t = min((bw / 2) / abs(dx) if dx else float('inf'), (bh / 2) / abs(dy_) if dy_ else float('inf'))
+            t = min((w / 2) / abs(dx) if dx else float('inf'), (bh / 2) / abs(dy_) if dy_ else float('inf'))
             return cx + dx * t, cy + dy_ * t
 
         def edge_of_circle(cx, cy, tx, ty):
@@ -439,12 +504,17 @@ class BondGraph:
                '<metadata id="celldl-rdf-metadata" data-content-type="text/turtle"><![CDATA[\n' + rdf + ']]></metadata>',
                '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" '
                'orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/></marker></defs>']
+        if ring:   # the cycle's guide ring, clockwise
+            out.append(f'<circle class="cycle" cx="0" cy="{yc:.1f}" r="{R:.1f}" fill="none" stroke="#e6d7a8" '
+                       f'stroke-width="14" opacity="0.6"/>')
+            out.append(f'<text x="0" y="{yc + 4:.1f}" text-anchor="middle" fill="#9a7b22" font-size="13">'
+                       f'cycle \u21bb</text>')
         for r in rr:
-            y = ypos[r.name]
+            xr, yr = pos[r.name]
             for sp, n in r.stoich.items():
                 sx, sy = place[sp]
-                a = edge_of_circle(sx, sy, xr, y)
-                b = edge_of_box(xr, y, sx, sy)
+                a = edge_of_circle(sx, sy, xr, yr)
+                b = edge_of_box(xr, yr, sx, sy, width[r.name])
                 (x1_, y1_), (x2_, y2_) = (a, b) if n < 0 else (b, a)
                 out.append(f'<line class="bond" id="bond_{sp}_{r.name}" x1="{x1_:.1f}" y1="{y1_:.1f}" x2="{x2_:.1f}" '
                            f'y2="{y2_:.1f}" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>')
@@ -452,21 +522,23 @@ class BondGraph:
                     out.append(f'<text x="{(x1_ + x2_) / 2 + 4:.1f}" y="{(y1_ + y2_) / 2 - 4:.1f}" fill="#444" '
                                f'font-weight="bold">{abs(n)}</text>')
         for r in rr:
-            y = ypos[r.name]
-            out.append(f'<g id="Re_{r.name}" class="reaction"><rect x="{xr - bw / 2:.1f}" y="{y - bh / 2:.1f}" width="{bw}" '
-                       f'height="{bh}" rx="6" fill="#fff4d6" stroke="#b08a2e"/>'
-                       f'<text x="{xr:.1f}" y="{y - 3:.1f}" text-anchor="middle" font-weight="bold">Re: {_x(r.name)}</text>'
-                       f'<text x="{xr:.1f}" y="{y + 11:.1f}" text-anchor="middle" font-size="10">{_x(r.enzyme)}</text></g>')
+            xr, yr = pos[r.name]
+            w = width[r.name]
+            out.append(f'<g id="Re_{r.name}" class="reaction"><rect x="{xr - w / 2:.1f}" y="{yr - bh / 2:.1f}" '
+                       f'width="{w:.0f}" height="{bh}" rx="6" fill="#fff4d6" stroke="#b08a2e"/>'
+                       f'<text x="{xr:.1f}" y="{yr - 3:.1f}" text-anchor="middle" font-weight="bold">Re: {_x(r.name)}</text>'
+                       f'<text x="{xr:.1f}" y="{yr + 11:.1f}" text-anchor="middle" font-size="10">{_x(r.enzyme)}</text></g>')
         for sp in self.species:
-            x, y = place[sp.name]
+            x, yy = place[sp.name]
             dash = ' stroke-dasharray="4 3"' if sp.name in bnd else ''
-            out.append(f'<g id="q_{sp.name}" class="species"><circle cx="{x:.1f}" cy="{y:.1f}" r="{rad}" fill="#e3f0fb" '
-                       f'stroke="#3b6e9e"{dash}/><text x="{x:.1f}" y="{y + 4:.1f}" text-anchor="middle">{_x(sp.name)}</text>'
+            out.append(f'<g id="q_{sp.name}" class="species"><circle cx="{x:.1f}" cy="{yy:.1f}" r="{rad}" fill="#e3f0fb" '
+                       f'stroke="#3b6e9e"{dash}/><text x="{x:.1f}" y="{yy + 4:.1f}" text-anchor="middle">{_x(sp.name)}</text>'
                        f'<title>{_x(lab[sp.name])}{" (chemostat)" if sp.name in bnd else ""}</title></g>')
         out.append(f'<text x="{x0 + 10:.0f}" y="18" fill="#555">{_x(self.label)}: species (0-junction + C), '
                    'reactions (Re between 1-junctions); dashed: chemostats</text>')
         out.append('</svg>')
         return '\n'.join(out) + '\n'
+
 
 def _x(s):
     return str(s).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')

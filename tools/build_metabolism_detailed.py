@@ -244,7 +244,8 @@ def module_parts(bg, rest, rest_ref, kappa, gibbs, where, flux_ref, sigma_ref, k
 
 def build_glycolysis():
     global GLY_REST
-    bg = BondGraph('glycolysis', 'Detailed glycolysis', GLY_SPECIES, GLY_REACTIONS, temperature=T)
+    bg = BondGraph('glycolysis', 'Detailed glycolysis', GLY_SPECIES, GLY_REACTIONS, temperature=T,
+                   cofactors=('NAD', 'NADH'))
     GLY_REST = near_equilibrium_rest(bg)
     bg.centre_potentials(GLY_REST)
     assert not bg.element_imbalance() and not bg.charge_imbalance(), (bg.element_imbalance(), bg.charge_imbalance())
@@ -471,7 +472,8 @@ def mitochondrion_rest(bg):
 
 def mitochondrion_graph():
     return BondGraph('mitochondrion', 'Detailed mitochondrion', MITO_SPECIES, MITO_REACTIONS, temperature=T_M,
-                     potentials={'m': PSI_REST}, capacitance={'m': C_M})
+                     potentials={'m': PSI_REST}, capacitance={'m': C_M},
+                     cofactors=('NAD_m', 'NADH_m', 'ATP_m', 'ADP_m', 'Q', 'QH2', 'cytc_ox', 'cytc_red', 'CoA'))
 
 
 def build_mitochondrion():
