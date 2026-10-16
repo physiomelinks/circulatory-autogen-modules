@@ -1,0 +1,44 @@
+{
+ "obs_data_name": "delta_T_ramp",
+ "reference_key": "argus2026circulatory",
+ "comment": "Verification protocol for the controlled cardiac clock: Delta_T (what a heart-period effector sends) held at 0 to 0.5 s, ramped to -0.8 s by 1.5 s (T + Delta_T = 0.2 s, below the T_min floor), held to 2.5 s, ramped to +0.5 s by 3.5 s and held to 4 s. Definitional test input, not data.",
+ "protocol_info": {
+  "pre_times": [
+   0.0
+  ],
+  "sim_times": [
+   [
+    4.0
+   ]
+  ],
+  "params_to_change": {
+   "mod/Delta_T": [
+    [
+     "delta_T_ramp"
+    ]
+   ]
+  },
+  "protocol_traces": {
+   "delta_T_ramp": {
+    "t": [
+     0.0,
+     0.5,
+     1.5,
+     2.5,
+     3.5,
+     4.0
+    ],
+    "values": [
+     0.0,
+     0.0,
+     -0.8,
+     -0.8,
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "data_items": [],
+ "prediction_items": []
+}

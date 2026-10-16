@@ -1,0 +1,7 @@
+module_type: cardiac_clock
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Liang 2009''s phase clock with a controlled period: T_eff = max(T + Delta_T, T_min), where a heart-period
+  effector sends Delta_T. With Ursino 1998''s effector use the ursino1998 parameterisation (T = T0 = 0.58 s,
+  his period with no autonomic input); the default T = 1.0 s is Liang''s resting period. T_min = 0.3 s is a
+  safety floor at the maximum heart rate (Tanaka 2001).'

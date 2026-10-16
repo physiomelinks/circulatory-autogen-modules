@@ -1,0 +1,94 @@
+{
+  "module_type": "cardiac_clock",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 4.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "MaximumStep": 0.005
+  },
+  "protocol": "parameterisations/default/delta_T_ramp_obs_data.json",
+  "outputs": [
+    "T_eff",
+    "s",
+    "mt"
+  ],
+  "invariants": [
+    {
+      "description": "the effective period is the controlled period, floored: T_eff = max(T + Delta_T, T_min)",
+      "expr": "np.max(np.abs(T_eff - np.maximum(T + Delta_T, T_min))) <= 1e-12*T"
+    },
+    {
+      "description": "the period never falls below its floor: T_eff >= T_min",
+      "expr": "np.all(T_eff >= T_min*(1 - 1e-12))"
+    },
+    {
+      "description": "the phase grows at 1/T_eff: s = the running integral of dt/T_eff (trapezoid, to the solver and output-step accuracy)",
+      "expr": "np.max(np.abs(s - s[0] - np.concatenate([[0.0], np.cumsum(np.diff(t)*(1/T_eff[1:] + 1/T_eff[:-1])/2)]))) <= 1e-4*(1 + abs(s[-1]))"
+    },
+    {
+      "description": "the beat fraction stays in [0, 1): mt = s - floor(s)",
+      "expr": "np.all((mt >= 0) & (mt < 1))"
+    },
+    {
+      "description": "the protocol drives the clock through its floor and above its resting period: T_eff reaches T_min and exceeds T",
+      "expr": "(np.min(T_eff) <= T_min*(1 + 1e-9)) & (np.max(T_eff) > T)",
+      "applies": "the delta_T_ramp protocol at the run parameters (T 1 s, T_min 0.4 s)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {}
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.004,
+      0.002,
+      0.001,
+      0.0005
+    ],
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001,
+    "wrapped": {
+      "mt": 1.0
+    }
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a phase clock: no measured quantity to compare with. Verified against its exact relations under a Delta_T protocol (T_eff = max(T + Delta_T, T_min), s = integral of dt/T_eff); validated within the controlled system models whose heart-period effector drives it."
+      },
+      "calibrate": {
+        "note": "not_applicable: a phase clock: no measured quantity to compare with. Verified against its exact relations under a Delta_T protocol (T_eff = max(T + Delta_T, T_min), s = integral of dt/T_eff); validated within the controlled system models whose heart-period effector drives it."
+      }
+    },
+    "ursino1998": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a phase clock: no measured quantity to compare with. Verified against its exact relations under a Delta_T protocol (T_eff = max(T + Delta_T, T_min), s = integral of dt/T_eff); validated within the controlled system models whose heart-period effector drives it."
+      },
+      "calibrate": {
+        "note": "not_applicable: a phase clock: no measured quantity to compare with. Verified against its exact relations under a Delta_T protocol (T_eff = max(T + Delta_T, T_min), s = integral of dt/T_eff); validated within the controlled system models whose heart-period effector drives it."
+      }
+    }
+  }
+}

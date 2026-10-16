@@ -1,0 +1,4 @@
+variable_name,units,value,data_reference,sourced
+Delta_T,second,0,definitional; harness value for the stand-alone test (a heart-period effector sets it in a model; the tests drive it with a protocol trace),no
+T,second,0.58,"ursino1998interaction; T0 = 0.58 s, the heart period with no autonomic input, to which the heart-period effector's Delta_T = Delta_T_s + Delta_T_v is added (use this parameterisation with control/efferent_heart_period_effector/Ursino1998_v01)",yes
+T_min,second,0.3,"tanaka2001age; age-predicted maximal heart rate HRmax = 208 - 0.7 x age (p. 153): 194 bpm at 20 years, a period of 0.31 s, rounded to 0.3 s. A safety floor at the physiological maximum heart rate (no closed-loop baroreflex model checked clamps the period; Ursino 1998's effector saturates near 0.55 s)",yes
