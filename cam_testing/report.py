@@ -594,16 +594,16 @@ def supermodule_structure(version):
         return None
     subs = version.submodules
     versions = {s['name']: _sub_version(s) for s in subs}
-    # the supermodule's own parameterisation: rows <var>_<part> override the part's parameterisation;
-    # others are globals
-    names = sorted(versions, key=len, reverse=True)
+    # the supermodule's own parameterisation: rows <part>/<var> (nested: <part>/<its part>/<var>)
+    # override the part's parameterisation; others are globals
     overrides, global_rows = {}, []
     for p in version.default_parameterisation.parameters():
-        owner = next((n for n in names if p.variable_name.endswith('_' + n)), None)
-        if owner is None:
+        path, _, var = p.variable_name.rpartition('/')
+        owner = path.split('/')[0] if path else None
+        if owner not in versions:
             global_rows.append({'name': p.variable_name, 'value': p.value, 'units': p.units})
         else:
-            overrides.setdefault(owner, []).append({'name': p.variable_name, 'var': p.variable_name[:-len(owner) - 1],
+            overrides.setdefault(owner, []).append({'name': p.variable_name, 'var': var,
                                                     'value': p.value, 'units': p.units})
     sup_globals = set(version.supermodule_globals)
 

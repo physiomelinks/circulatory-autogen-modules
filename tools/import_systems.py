@@ -100,7 +100,7 @@ def load_configs():
     from cam_testing.library import legacy_renames
     configs = {}
     for path in glob.glob(os.path.join(REPO, 'modules', '**', '*_modules_config.json'), recursive=True):
-        for e in read_config(path):   # either config format, as libcuflynx's names
+        for e in read_config(path):   # internal names (cam_testing.library.PHLYNX_KEYS)
             configs[(e['vessel_type'], e['BC_type'])] = e
     for old, new in legacy_renames().items():
         if new in configs:

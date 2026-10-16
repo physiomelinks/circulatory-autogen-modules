@@ -205,3 +205,16 @@ def test_plugin_registered_once(request):
     pm = request.config.pluginmanager
     assert pm.get_plugin('cam_testing.pytest_plugin') is pytest_plugin
     assert [p for p in pm.get_plugins() if p is pytest_plugin] == [pytest_plugin]
+
+
+def test_config_files_in_the_older_keys_are_refused(tmp_path):
+    '''A config file read by cam_testing uses the current keys; one in libcuflynx's older keys
+    (vessel_type, BC_type, module_file) is refused with the converter's command.'''
+    path = tmp_path / 'old_v1_modules_config.json'
+    path.write_text(json.dumps([{'vessel_type': 'old', 'BC_type': 'v1', 'module_file': 'old_v1_modules.cellml',
+                                 'module_type': 'old_v1', 'variables_and_units': []}]))
+    with pytest.raises(ValueError, match='cuflynx-upgrade module-config'):
+        library.read_config(str(path))
+    path.write_text(json.dumps([{'module_type': 'old', 'module_subtype': 'v1', 'component_file': 'old_v1_modules.cellml',
+                                 'component_type': 'old_v1', 'variables_and_units': []}]))
+    assert library.read_config(str(path))[0]['module_type'] == 'old_v1'      # internal: the component

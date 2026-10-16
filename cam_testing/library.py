@@ -257,9 +257,10 @@ def select_module_types(selectors, include_libraries=False):
 # config formats
 # ----------------------------------------------------------------------------------------------
 
-# Module configs come in two formats: PhLynx's (this library's) and libcuflynx's original.
-# Both are read; code here uses libcuflynx's internal names. module_type means different things in
-# the two, so the format is told by the other keys, never by module_type.
+# Config files use PhLynx's key names (module_type, module_subtype, component_file, component_type),
+# as libcuflynx does. Code here works on entries in internal names (PHLYNX_KEYS: vessel_type, BC_type,
+# module_file, and module_type for the CellML component); config_format tells the two apart by the
+# other keys, never by module_type, which means different things in each.
 PHLYNX_KEYS = {'module_type': 'vessel_type', 'module_subtype': 'BC_type',
                'component_file': 'module_file', 'component_type': 'module_type'}
 LIBCUFLYNX_KEYS = ('vessel_type', 'BC_type', 'module_file', 'module_type')
@@ -347,9 +348,18 @@ def to_phlynx_entry(entry):
     return {**head, **{k: v for k, v in e.items() if k not in LIBCUFLYNX_KEYS and k != 'module_format'}}
 
 
+def entry_from_file(entry, path):
+    '''A config entry read from ``path`` -> internal names. An entry in libcuflynx's older keys
+    (vessel_type, BC_type, module_file) is refused, as libcuflynx refuses it.'''
+    if config_format(entry) == 'libcuflynx':
+        raise ValueError(f'{path}: config entry uses the older keys vessel_type/BC_type/module_file; '
+                         f'convert it once with: cuflynx-upgrade module-config {path}')
+    return normalise_config_entry(entry)
+
+
 def read_config(path):
     with open(path) as f:
-        return [normalise_config_entry(e) for e in json.load(f)]
+        return [entry_from_file(e, path) for e in json.load(f)]
 
 
 # ----------------------------------------------------------------------------------------------
@@ -995,7 +1005,7 @@ def _load_version(mt_name, version):
         raw = json.load(f)
     if len(raw) != 1:
         raise ValueError(f'{cfg_path}: a version config has exactly one entry, not {len(raw)}')
-    entry = normalise_config_entry(raw[0])
+    entry = entry_from_file(raw[0], cfg_path)
     tests, verification = read_spec_files(vdir, stem)
     spec = merge_spec(tests, verification)
     if isinstance(spec.get('review'), str):

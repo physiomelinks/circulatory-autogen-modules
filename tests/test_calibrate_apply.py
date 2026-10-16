@@ -1,6 +1,6 @@
 """
 cam_testing.calibrate apply: a parameterisation's calibrated values reach the version's default
-parameterisation, its supermodules (<var>_<submodule>), the system models using it (<var>_<vessel>[_<submodule>]) and
+parameterisation, its supermodules (<submodule>/<var>), the system models using it (<vessel>[/<submodule>]/<var>) and
 the monolithic counterparts named by a supermodule's equivalent output_map. A mock library in a
 temp directory: no simulation.
 """
@@ -39,7 +39,7 @@ def _library(tmp):
     cell = _version(tmp, 'cell', 's1', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1',
                                                      'parameterisation': 'default'}],
                     spec={'supermodule': {'equivalent': [{'model': 'sys_super', 'reproduces': 'sys_mono',
-                                                          'output_map': {'mono_C/x': 'C_chan/x', 'mono_C/y': 'C_other/y'}}]}})
+                                                          'output_map': {'mono_C/x': 'C__chan/x', 'mono_C/y': 'C__other/y'}}]}})
     organ = _version(tmp, 'organ', 'o1', submodules=[{'name': 'cell', 'module_type': 'cell', 'module_subtype': 's1',
                                                        'parameterisation': 'default'}])
     other = _version(tmp, 'cell', 'other', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1',
@@ -54,19 +54,19 @@ def _library(tmp):
         json.dump({'obs_data_name': 'fit', 'calibration_note': 'Smith2020 Fig. 1', 'reference_key': 'Smith2020',
                    'protocol_info': {}, 'data_items': []}, f)
     _csv(chan.default_parameterisation.parameters_path, ['g,S,1,old ref,no', 'k,S,7,keep,no'], eol='\r\n')
-    _csv(cell.default_parameterisation.parameters_path, ['g_chan,S,1,old,no', 'k_chan,S,7,keep,no'])
-    _csv(organ.default_parameterisation.parameters_path, ['g_cell_chan,S,1,old,no'])
-    _csv(other.default_parameterisation.parameters_path, ['g_chan,S,1,old,no'])
+    _csv(cell.default_parameterisation.parameters_path, ['chan/g,S,1,old,no', 'chan/k,S,7,keep,no'])
+    _csv(organ.default_parameterisation.parameters_path, ['cell/chan/g,S,1,old,no'])
+    _csv(other.default_parameterisation.parameters_path, ['chan/g,S,1,old,no'])
     _csv(mono.default_parameterisation.parameters_path, ['g,S,1,old,no'])
     systems = []
     for key, vessels, rows in (
             ('sys_flat', [{'name': 'C_chan', 'module_type': 'chan', 'module_subtype': 'v1', 'parameterisation': 'default'},
                           {'name': 'D_chan', 'module_type': 'chan', 'module_subtype': 'v1', 'parameterisation': 'fit'}],
-             ['g_C_chan,S,1,old', 'g_D_chan,S,1,old']),
+             ['C_chan/g,S,1,old', 'D_chan/g,S,1,old']),
             ('sys_super', [{'name': 'C', 'module_type': 'cell', 'module_subtype': 's1', 'parameterisation': 'default'}],
-             ['g_C_chan,S,1,old']),
+             ['C/chan/g,S,1,old']),
             ('sys_mono', [{'name': 'mono_C', 'module_type': 'cellmono', 'module_subtype': 'm1', 'parameterisation': 'default'}],
-             ['g_mono_C,S,1,old'])):
+             ['mono_C/g,S,1,old'])):
         path = os.path.join(tmp, 'system_models', key, f'{key}_parameters.csv')
         _csv(path, rows, header=HEADER4)
         systems.append({'key': key, 'dir': os.path.dirname(path), 'vessels': vessels, 'parameters_path': path})
@@ -79,17 +79,17 @@ def test_apply_plan_and_write(tmp_path):
     got = {(os.path.relpath(c['path'], tmp_path), c['row']) for c in plan}
     assert got == {
         ('modules/chan/v1/parameterisations/default/default_parameters.csv', 'g'),
-        ('modules/cell/s1/parameterisations/default/default_parameters.csv', 'g_chan'),
-        ('modules/organ/o1/parameterisations/default/default_parameters.csv', 'g_cell_chan'),
-        ('system_models/sys_flat/sys_flat_parameters.csv', 'g_C_chan'),
-        ('system_models/sys_super/sys_super_parameters.csv', 'g_C_chan'),
-        ('system_models/sys_mono/sys_mono_parameters.csv', 'g_mono_C'),
+        ('modules/cell/s1/parameterisations/default/default_parameters.csv', 'chan/g'),
+        ('modules/organ/o1/parameterisations/default/default_parameters.csv', 'cell/chan/g'),
+        ('system_models/sys_flat/sys_flat_parameters.csv', 'C_chan/g'),
+        ('system_models/sys_super/sys_super_parameters.csv', 'C/chan/g'),
+        ('system_models/sys_mono/sys_mono_parameters.csv', 'mono_C/g'),
         ('modules/cellmono/m1/parameterisations/default/default_parameters.csv', 'g'),
     }
     assert all(c['value'] == repr(2.5000001) for c in plan)          # full precision from calibration.json
     own = next(c for c in plan if c['path'] == chan.default_parameterisation.parameters_path)
     assert own['reference'].startswith('Smith2020; Calibrated (libcuflynx) to parameterisations/fit/fit_obs_data.json: Smith2020 Fig. 1 (was 1;')
-    sup = next(c for c in plan if c['row'] == 'g_chan')
+    sup = next(c for c in plan if c['row'] == 'chan/g')
     assert 'to chan v1 parameterisations/fit/fit_obs_data.json' in sup['reference']
 
     before = {c['path']: open(c['path'], newline='').read() for c in plan}
@@ -101,10 +101,10 @@ def test_apply_plan_and_write(tmp_path):
     assert 'k,S,7,keep,no' in text
     rows = calibrate._row_values(chan.default_parameterisation.parameters_path, {'g'})
     assert rows['g']['value'] == repr(2.5000001) and rows['g']['sourced'] == 'yes'
-    flat = calibrate._row_values(systems[0]['parameters_path'], {'g_C_chan', 'g_D_chan'})
-    assert flat['g_C_chan']['value'] == repr(2.5000001) and flat['g_D_chan']['value'] == '1'   # the vessel at the fit parameterisation untouched
-    other = calibrate._row_values(versions[3].default_parameterisation.parameters_path, {'g_chan'})
-    assert other['g_chan']['value'] == '1'
+    flat = calibrate._row_values(systems[0]['parameters_path'], {'C_chan/g', 'D_chan/g'})
+    assert flat['C_chan/g']['value'] == repr(2.5000001) and flat['D_chan/g']['value'] == '1'   # the vessel at the fit parameterisation untouched
+    other = calibrate._row_values(versions[3].default_parameterisation.parameters_path, {'chan/g'})
+    assert other['chan/g']['value'] == '1'
 
 
 def test_apply_dry_run_writes_nothing(tmp_path, monkeypatch):
