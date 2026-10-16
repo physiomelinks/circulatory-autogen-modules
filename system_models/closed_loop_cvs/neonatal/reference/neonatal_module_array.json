@@ -1,5 +1,5 @@
 [
- {"name": "heart", "module_type": "heart_LVprop", "module_subtype": "vp", "inp_instances": ["venous_ivc", "venous_svc"], "out_instances": ["aortic_root"]},
+ {"name": "heart", "module_type": "heart_LVprop", "module_subtype": "vp", "inp_instances": ["venous_ivc", "venous_svc", "pvn"], "out_instances": ["aortic_root", "par"]},
  {"name": "aortic_root", "module_type": "arterial", "module_subtype": "vv", "inp_instances": ["heart"], "out_instances": ["ascending_aorta"]},
  {"name": "ascending_aorta", "module_type": "split_junction", "module_subtype": "pv", "inp_instances": ["aortic_root"], "out_instances": ["aortic_arch_I", "brachiocephalic"]},
  {"name": "brachiocephalic", "module_type": "split_junction", "module_subtype": "pv", "inp_instances": ["ascending_aorta"], "out_instances": ["subclavian_R", "common_carotid_R"]},
@@ -19,5 +19,7 @@
  {"name": "leg_L_T", "module_type": "terminal", "module_subtype": "pp", "inp_instances": ["abdominal_aorta"], "out_instances": ["venous_ivc"]},
  {"name": "leg_R_T", "module_type": "terminal", "module_subtype": "pp", "inp_instances": ["abdominal_aorta"], "out_instances": ["venous_ivc"]},
  {"name": "venous_ivc", "module_type": "venous", "module_subtype": "vp", "inp_instances": ["abdomen_T", "leg_L_T", "leg_R_T"], "out_instances": ["heart"]},
- {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "inp_instances": ["head_L_T", "head_R_T", "arm_L_T", "arm_R_T"], "out_instances": ["heart"]}
+ {"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "inp_instances": ["head_L_T", "head_R_T", "arm_L_T", "arm_R_T"], "out_instances": ["heart"]},
+ {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "inp_instances": ["heart"], "out_instances": ["pvn"]},
+ {"name": "pvn", "module_type": "arterial_simple", "module_subtype": "vp", "inp_instances": ["par"], "out_instances": ["heart"]}
 ]

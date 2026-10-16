@@ -99,9 +99,7 @@ def _t_rows(job):
 
 
 def test_libcuflynx_warns_about_a_global_its_modules_set_differently(tmp_path):
-    from libcuflynx.utilities import module_instances
-    if not hasattr(module_instances, 'ConflictingGlobalWarning'):
-        pytest.skip('this libcuflynx has no ConflictingGlobalWarning (circulatory_autogen#535)')
+    from libcuflynx.utilities.parameterisations import ConflictingGlobalWarning
     from libcuflynx.utilities.config_schemas import (load_component_registry,
                                                      load_expanded_vessel_records,
                                                      load_supermodule_registry)
@@ -118,7 +116,7 @@ def test_libcuflynx_warns_about_a_global_its_modules_set_differently(tmp_path):
         _, rows = load_expanded_vessel_records(path, load_supermodule_registry(files),
                                                load_component_registry(files))
     conflicts = [w.message for w in caught
-                 if isinstance(w.message, module_instances.ConflictingGlobalWarning)]
+                 if isinstance(w.message, ConflictingGlobalWarning)]
     assert [c.name for c in conflicts] == ['T']
     message = str(conflicts[0])
     assert '295.15 kelvin by "chan"' in message and '1 second by "clock"' in message

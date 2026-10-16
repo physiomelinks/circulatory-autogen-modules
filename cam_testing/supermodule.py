@@ -7,14 +7,15 @@ heart version Argus2026_v01, cell/neuron/soma version sympathetic).
                                                 submodules (a module array of library versions, each
                                                 with its "parameterisation"; internal connections only)
                                                 and "default_parameterisation"
-  parameterisations/<p>/<p>_parameters.csv      its parameters, {var}_{submodule} or globals
+  parameterisations/<p>/<p>_parameters.csv      its parameters, <submodule>/<var> (nested:
+                                                <submodule>/<subsubmodule>/<var>) or globals
   <module_type>_<version>_tests.yaml / _verification_config.json   description; supermodule.globals and
                                                 supermodule.equivalent (system models it must reproduce)
 
 A model uses one record (an instance of the version), e.g. {"name": "heart", "module_type": "heart",
 "module_subtype": "Argus2026_v01", "parameterisation": "default", "per_submodule_inputs": {"ra": ["venous_svc"]},
 "per_submodule_outputs": {"aov": ["aortic_root"]}}. libcuflynx expands it: each submodule becomes
-<name>_<submodule>, the host modules in per_submodule_inputs / per_submodule_outputs are coupled to
+<name>__<submodule>, the host modules in per_submodule_inputs / per_submodule_outputs are coupled to
 that submodule, and the parameterisation's parameters are renamed to the prefixed names. Precedence:
 the model's parameters file > the supermodule's parameterisation > the submodules' parameterisations.
 
@@ -28,7 +29,7 @@ The version-level tests (tests/test_modules.py):
 import csv
 import os
 
-from cam_testing import checks, library, module_array
+from cam_testing import checks, harness, library, module_array
 
 
 def supermodules():
@@ -69,8 +70,10 @@ def structure_problems(version):
         with open(inst.parameters_path) as f:
             for row in csv.DictReader(f):
                 var = (row.get('variable_name') or '').strip()
-                owner = next((n for n in sorted(names, key=len, reverse=True) if var.endswith('_' + n)), None)
-                if owner is None and var not in declared:
+                path = var.rpartition('/')[0]
+                if path and harness.resolve_submodule_path(version, path) is None:
+                    problems.append(f'parameterisation {inst.name}: parameter {var}: {path} is not a submodule path')
+                elif not path and var not in declared:
                     problems.append(f'parameterisation {inst.name}: parameter {var} names no submodule and is not a declared global')
     if version.default_parameterisation_name not in version.parameterisation_names():
         problems.append(f'default_parameterisation {version.default_parameterisation_name} has no '
@@ -79,12 +82,12 @@ def structure_problems(version):
 
 
 def prefixed_output_map(names, instance, submodules):
-    '''Output names of a model with the submodules flattened ('ra/u') -> the supermodule model's ('heart_ra/u').'''
+    '''Output names of a model with the submodules flattened ('ra/u') -> the supermodule model's ('heart__ra/u').'''
     subs = set(submodules)
     out = {}
     for n in names:
         vessel, _, var = n.partition('/')
-        out[n] = f'{instance}_{vessel}/{var}' if vessel in subs else n
+        out[n] = f'{instance}{harness.LEVEL_SEPARATOR}{vessel}/{var}' if vessel in subs else n
     return out
 
 
@@ -96,7 +99,7 @@ def equivalence(version, entry, work_dir):
     solver_info = entry.get('solver_info') or {'rtol': 1e-10, 'atol': 1e-12}
     t_ref, ref = systems.simulate(systems.generate(target, os.path.join(work_dir, 'target')), target.spec, solver_info)
     t_new, new = systems.simulate(systems.generate(model, os.path.join(work_dir, 'model')), model.spec, solver_info)
-    # submodule outputs renamed <instance>_<sub> (the instance: the supermodule's record name in the
+    # submodule outputs renamed <instance>__<sub> (the instance: the supermodule's record name in the
     # model); an explicit output_map in the spec (for nested
     # supermodules, or variables that moved between components) takes precedence
     output_map = {**prefixed_output_map(ref, entry.get('instance', version.vessel_type), version.submodule_names),

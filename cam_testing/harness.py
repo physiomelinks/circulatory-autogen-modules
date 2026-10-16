@@ -30,6 +30,12 @@ class GenerationFailed(Exception):
     pass
 
 
+def libcuflynx_model_name(written):
+    '''The model's name for a parameter written in a parameters file (<vessel>/<var>, or a global).'''
+    from libcuflynx.utilities.parameter_names import model_name
+    return model_name(written)
+
+
 def parameter_name(param):
     '''The name libcuflynx gives a parameter in the generated model.'''
     if getattr(param, 'model_name', ''):
@@ -42,29 +48,23 @@ def parameter_name(param):
 # ---- supermodule versions ----------------------------------------------------------------------
 #
 # A supermodule generated alone is the vessel VESSEL ("mod"); libcuflynx expands it into the vessels
-# mod_<submodule> (nested supermodules: mod_<submodule>_<subsubmodule> ...), and names a submodule's
-# parameter <var>_mod_<submodule>. Its own parameterisation names that parameter <var>_<submodule> (the
-# supermodule-level name used in the spec: run_parameters, bc_sweep, validation); globals keep
-# their names in both.
+# mod__<submodule> (nested supermodules: mod__<submodule>__<subsubmodule> ...: LEVEL_SEPARATOR), and
+# names a submodule's parameter <var>_mod__<submodule>. Its own parameterisation names that parameter
+# <submodule>/<var> (nested: <submodule>/<subsubmodule>/<var>), the supermodule-level name the spec
+# uses too (run_parameters, bc_sweep, validation); globals keep their names in both.
+
+LEVEL_SEPARATOR = '__'
+
 
 def supermodule_model_name(version, name, vessel=VESSEL):
-    '''A supermodule parameterisation's parameter name (<var>_<submodule>, or a global) -> its name in a model in
-    which the supermodule is the vessel ``vessel`` (<var>_<vessel>_<submodule>).'''
-    if name in version.supermodule_globals:
+    '''A supermodule parameterisation's parameter name (<submodule path>/<var>, or a global) -> its
+    name in a model in which the supermodule is the vessel ``vessel`` (<var>_<vessel>__<submodule path>).'''
+    if name.startswith('global/'):
+        return name[len('global/'):]
+    path, _, var = name.rpartition('/')
+    if not path:
         return name
-    for sub in sorted(version.submodule_names, key=len, reverse=True):
-        if name.endswith('_' + sub) and len(name) > len(sub) + 1:
-            return f'{name[:-len(sub)]}{vessel}_{sub}'
-    # a nested submodule's parameter: <var>_<submodule>_<subsubmodule>... (e.g. I_in_soma_membrane in
-    # the neuron, whose soma is itself a supermodule): split at the leftmost "_" whose remainder is a
-    # submodule path that resolves
-    i = name.find('_')
-    while i > 0:
-        path = name[i + 1:]
-        if '_' in path and resolve_submodule_path(version, path) is not None:
-            return f'{name[:i]}_{vessel}_{path}'
-        i = name.find('_', i + 1)
-    return name
+    return f'{var}_{LEVEL_SEPARATOR.join([vessel] + path.split("/"))}'
 
 
 def model_parameter_name(component, param):
@@ -74,44 +74,48 @@ def model_parameter_name(component, param):
     return parameter_name(param)
 
 
+def written_parameter_name(component, param):
+    '''The name a parameterisation's parameter is written with in the model's parameters file:
+    <vessel>/<var> (a supermodule's: mod/<submodule path>/<var>), a global as it is.'''
+    if component.is_supermodule:
+        name = param.variable_name
+        return f'{VESSEL}/{name}' if '/' in name and not name.startswith('global/') else name
+    return param.variable_name if param.is_global else f'{VESSEL}/{param.variable_name}'
+
+
 def _submodule_version(sub):
     from cam_testing.library import load_version
     return load_version(sub['module_type'], sub['module_subtype'])
 
 
 def resolve_submodule_path(version, path):
-    '''"ra" or (nested) "soma_Ca" -> the component version at the end of that submodule path, or None.'''
-    for sub in sorted(version.submodules, key=lambda s: len(s['name']), reverse=True):
-        name = sub['name']
-        if path == name or path.startswith(name + '_'):
-            try:
-                target = _submodule_version(sub)
-            except Exception:  # noqa: BLE001 - a broken reference is the structure test's to report
-                return None
-            if path == name:
-                return target
-            if target.is_supermodule:
-                found = resolve_submodule_path(target, path[len(name) + 1:])
-                if found is not None:
-                    return found
-    return None
+    '''"ra" or (nested) "soma/Ca" -> the component version at the end of that submodule path, or None.'''
+    head, _, rest = path.partition('/')
+    sub = next((s for s in version.submodules if s['name'] == head), None)
+    if sub is None:
+        return None
+    try:
+        target = _submodule_version(sub)
+    except Exception:  # noqa: BLE001 - a broken reference is the structure test's to report
+        return None
+    if not rest:
+        return target
+    return resolve_submodule_path(target, rest) if target.is_supermodule else None
 
 
 def split_model_name(version, full, vessel=VESSEL):
     '''A generated model's parameter name -> (supermodule-level name, variable, submodule path or None,
-    owning component version or None): "V_in_mod_membrane" -> ("V_in_membrane", "V_in", "membrane",
-    <its version>); a global (no "_mod_<submodule>" suffix) -> (name, name, None, None).'''
-    marker = f'_{vessel}_'
-    start = 0
-    while True:
-        i = full.find(marker, start)
-        if i <= 0:
-            return full, full, None, None
-        path = full[i + len(marker):]
-        owner = resolve_submodule_path(version, path)
-        if owner is not None:
-            return f'{full[:i]}_{path}', full[:i], path, owner
-        start = i + 1
+    owning component version or None): "V_in_mod__membrane" -> ("membrane/V_in", "V_in", "membrane",
+    <its version>); a global (no "_mod__<submodule>" suffix) -> (name, name, None, None).'''
+    marker = f'_{vessel}{LEVEL_SEPARATOR}'
+    i = full.rfind(marker)
+    if i <= 0:
+        return full, full, None, None
+    var, path = full[:i], full[i + len(marker):].replace(LEVEL_SEPARATOR, '/')
+    owner = resolve_submodule_path(version, path)
+    if owner is None:
+        return full, full, None, None
+    return f'{path}/{var}', var, path, owner
 
 
 def generated_parameters_path(model_path):
@@ -157,13 +161,14 @@ def state_outputs(helper):
 
 
 def supermodule_units(version, outputs, vessel=VESSEL):
-    '''{output_key: units} for "<vessel>_<submodule path>/<var>" outputs, from the owning submodule's config.'''
+    '''{output_key: units} for "<vessel>__<submodule path>/<var>" outputs, from the owning submodule's config.'''
     units = {}
+    prefix = vessel + LEVEL_SEPARATOR
     for o in outputs:
         comp, _, var = o.rpartition('/')
-        if not comp.startswith(vessel + '_'):
+        if not comp.startswith(prefix):
             continue
-        owner = resolve_submodule_path(version, comp[len(vessel) + 1:])
+        owner = resolve_submodule_path(version, comp[len(prefix):].replace(LEVEL_SEPARATOR, '/'))
         if owner is not None:
             u = {v[0]: v[1] for v in owner.config.get('variables_and_units') or []}.get(var)
             if u:
@@ -190,8 +195,7 @@ def network(component, parameterisation=None):
     return own if own is not None else (component.spec.get('harness') or {})
 
 
-def _write_resources(component, resources_dir, prefix, overrides, parameters=None, parameterisations=True,
-                     parameterisation=None):
+def _write_resources(component, resources_dir, prefix, overrides, parameters=None, parameterisation=None):
     '''
     The test network: by default the version alone. A version that only works with
     neighbours (its inputs are variables another vessel supplies) gives a small network in its
@@ -201,15 +205,12 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
           module_array:    # [name, module_subtype (version), module_type, inp, out, parameterisation]
             - [pressure_in, constant, inlet_pressure, '', mod, default]
             - [mod, pv_0D_1D, coupler, pressure_in, constant_1D, default]
-          parameters:              # values for the neighbours' parameters
-            - [P_pressure_in, J_per_m3, 2000, source]
+          parameters:              # values for the neighbours' parameters, as <vessel>/<var>
+            - [pressure_in/P, J_per_m3, 2000, source]
 
     ``parameters``: the parameterisation's parameters to write (default: the version's default
     parameterisation). A parameterisation may have its own network instead
     (validation.<parameterisation>.harness, see ``network``); ``parameterisation`` selects it.
-    ``parameterisations=False`` leaves "parameterisation" out of the records (each record then gets its
-    version's default parameterisation). libcuflynx before circulatory_autogen #535's baad9e73 needed this for the C++
-    0D-1D split, which appended 5-column rows.
     '''
     os.makedirs(resources_dir, exist_ok=True)
     network = globals()['network'](component, parameterisation)
@@ -217,16 +218,7 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
     records = module_array.from_rows(rows)
-    if not parameterisations:
-        records = [{k: v for k, v in r.items() if k not in ('parameterisation', 'instance')} for r in records]
     module_array.write_records(os.path.join(resources_dir, f'{prefix}_module_array.json'), records)
-    if not module_array.libcuflynx_reads_json():
-        # a libcuflynx without JSON module-array support (0.7.3 and older) reads the CSV, under the
-        # old name, the only one it looks for
-        with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
-            writer.writerows([str(x) for x in r[:5]] for r in rows)
 
     params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
@@ -239,15 +231,15 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
         for p in params:
             name = model_parameter_name(component, p)
             value = overrides.get(name, p.value)
-            writer.writerow([name, p.units, value, p.data_reference or 'cam_testing'])
+            writer.writerow([written_parameter_name(component, p), p.units, value, p.data_reference or 'cam_testing'])
             written.add(name)
-        for name, units, value, *ref in network.get('parameters') or []:
+        for written_name, units, value, *ref in network.get('parameters') or []:
+            name = libcuflynx_model_name(written_name)
             if name not in written:
-                writer.writerow([name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
+                writer.writerow([written_name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
 
 
-def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None,
-             instance=None):
+def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None):
     '''
     Generates the version's model in ``work_dir``; returns the path of the .cellml file,
     or of the .py file for ``model_type='python'``. ``parameters``: a parameterisation's
@@ -263,8 +255,6 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
         work_dir = os.path.join(work_dir, model_type)
     resources_dir = os.path.join(work_dir, 'resources')
     generated_dir = os.path.join(work_dir, 'generated_models')
-    if parameterisation is None:
-        parameterisation = instance
     _write_resources(component, resources_dir, prefix, overrides, parameters, parameterisation=parameterisation)
     config = {
         'file_prefix': prefix,

@@ -8,11 +8,11 @@ reference/, and a spec <model>_system.yaml. The model is generated with every mo
 (cam_testing.paths: this repo's modules/, then the extra ones), so its records may name versions of
 either. The reference is one of:
 
-  - circulatory_autogen's original: a vessel array (and parameters) under reference/, generated
+  - circulatory_autogen's original: a module array (and parameters) under reference/, generated
     with libcuflynx's bundled modules;
   - a ready CellML model, simulated as it is (e.g. the flattened model PhLynx exports):
     equivalence.reference_cellml (a path relative to the system dir), or reference/<model>.cellml
-    when reference/ holds no vessel array. Its outputs are "<component>/<variable>" for every
+    when reference/ holds no module array. Its outputs are "<component>/<variable>" for every
     component but those in equivalence.ignore_components (default: environment,
     global_parameters, instance_parameters), mapped through output_map as for an original.
 
@@ -136,9 +136,9 @@ REFERENCE_CELLML_IGNORED_COMPONENTS = ('environment', 'global_parameters', 'inst
 
 
 def reference_cellml(system):
-    '''The ready CellML model the system model must reproduce, or None (its reference is a vessel array
+    '''The ready CellML model the system model must reproduce, or None (its reference is a module array
     to generate): equivalence.reference_cellml, else reference/<model>.cellml when reference/ has no
-    vessel array.'''
+    module array.'''
     eq = system.spec.get('equivalence') or {}
     if eq.get('reference_cellml'):
         path = os.path.join(system.dir, eq['reference_cellml'])
@@ -147,8 +147,7 @@ def reference_cellml(system):
         return path
     ref = os.path.join(system.dir, 'reference')
     candidate = os.path.join(ref, f'{system.name}.cellml')
-    has_array = any(glob.glob(os.path.join(ref, f'*_{n}.{ext}')) for n in ('module_array', 'vessel_array')
-                    for ext in ('json', 'csv'))
+    has_array = any(glob.glob(os.path.join(ref, f'*_module_array.{ext}')) for ext in ('json', 'csv'))
     return candidate if os.path.isfile(candidate) and not has_array else None
 
 
