@@ -105,10 +105,8 @@
     },
     "aov_severe_stenosis": {
       "baseline": {
-        "status": "active",
-        "obs_data": "parameterisations/aov_severe_stenosis/aov_severe_stenosis_validation_obs_data.json",
-        "metric": "nrmse",
-        "threshold": 0.1
+        "status": "not_applicable",
+        "reason": "not_applicable: the stenosis validation uses the mild case (aov_mild_stenosis). In the severe case the effective area is small (Fig. 4: about 0.7 cm^2), so a relative error over its range mostly measures digitisation error; and Mynard 2012 is inconsistent there (Table III gives 1.02 cm^2, Fig. 4 0.68 cm^2)."
       },
       "calibrate": {
         "note": "not_applicable: the valve parameters are sourced (Mynard 2012, Mynard & Smolich 2015); the validation is a prediction"
