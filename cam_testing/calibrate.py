@@ -69,10 +69,11 @@ def load_data(data_dir, v):
     return t, data
 
 
-def score(metric, model, data):
+def score(metric, model, data, scale=None):
+    '''log_rmse, or nrmse: the rms error over ``scale`` (default: the data's range).'''
     if metric == 'log_rmse':
         return float(np.sqrt(np.mean((np.log(model) - np.log(data)) ** 2)))
-    rng = np.ptp(data) or max(np.max(np.abs(data)), 1e-300)
+    rng = float(scale) if scale else (np.ptp(data) or max(np.max(np.abs(data)), 1e-300))
     return float(np.sqrt(np.mean((model - data) ** 2)) / rng)
 
 

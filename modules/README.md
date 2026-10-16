@@ -659,7 +659,10 @@ and the baseline's `parameters`, runs through that file's protocol, which may ha
 experiments. The baseline then scores the file's `data_items` and the `prediction_items` that carry a
 value, each on its `experiment_idx` and `subexperiment_idx`:
 - a series item is sampled every `obs_dt` from its sub-experiment's start and scored by `metric`
-  (`nrmse` by default, or `log_rmse`) against `threshold` (default 0.1);
+  (`nrmse` by default, or `log_rmse`) against `threshold` (default 0.1). `nrmse` is the rms error over
+  the item's data range, or over `nrmse_scale[<item>]` (in the item's unit) when the baseline gives one:
+  e.g. a severe case whose small range would make digitisation error look large, scored relative to
+  the normal case's range;
 - a constant item takes its `operation` (libcuflynx's operation functions, with its
   `operation_kwargs`) over its sub-experiment, or the sub-experiment's final value, and passes when
   |model - value| <= `z_threshold` (default 2) x `std`.
