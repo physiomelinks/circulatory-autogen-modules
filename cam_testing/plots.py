@@ -6,6 +6,7 @@ identity, a single-hue blue ramp (ordinal steps 250 -> 700) for parameter sweeps
 """
 import math
 import os
+import re
 
 import matplotlib
 
@@ -145,30 +146,37 @@ def plot_timestep_traces(path, runs, output, units, title):
     return _save(fig, path)
 
 
+def item_file_name(name):
+    '''A data item's name as a file-name part (letters, digits, "_", "-", "."; anything else "_").'''
+    return re.sub(r'[^A-Za-z0-9_.-]', '_', str(name))
+
+
 @styled
-def plot_model_vs_data(path, t_model, model, t_data, data, units, title, split=None):
+def plot_model_vs_data(path_of, t_model, model, t_data, data, units, title, split=None):
     '''
-    One panel per compared variable: model line, data as dots. ``split`` marks the end of
-    the calibration window; data after it were held out. ``t_model`` may be a dict (a time base
-    per compared variable).
+    One figure per compared item, model line and data as dots, saved to ``path_of(name)``; returns
+    [(name, path)] in the order of ``model``. ``split`` marks the end of the calibration window; data
+    after it were held out. ``t_model`` may be a dict (a time base per item). ``title`` is each
+    figure's subtitle, the item's name its title.
     '''
-    names = list(model)
-    fig, axes = _grid(len(names))
-    for ax, name in zip(axes, names):
-        tm = t_model[name] if isinstance(t_model, dict) else t_model    # a dict: one time base per panel
+    saved = []
+    for name in model:
+        tm = t_model[name] if isinstance(t_model, dict) else t_model    # a dict: one time base per item
+        fig, ax = plt.subplots(figsize=(5.6, 3.5), constrained_layout=True)
         if split is not None:
             ax.axvspan(split, max(np.max(tm), np.max(t_data[name])), color=GRID, alpha=0.6, lw=0)
             ax.text(split, 0.98, ' held out', transform=ax.get_xaxis_transform(), va='top',
                     fontsize=8, color=TEXT_SECONDARY)
         ax.plot(tm, model[name], color=CATEGORICAL[0], label='model')
-        ax.plot(t_data[name], data[name], linestyle='none', marker='o', markersize=4,
+        ax.plot(t_data[name], data[name], linestyle='none', marker='o', markersize=3.5,
                 color=DATA_COLOUR, label='data')
-        ax.set_title(name)
+        ax.set_title(name, loc='left')
         ax.set_xlabel(TIME_LABEL)
         ax.set_ylabel(units.get(name, ''))
         ax.legend(loc='best')
-    fig.suptitle(title, color=TEXT_PRIMARY, fontsize=11)
-    return _save(fig, path)
+        fig.suptitle(title, color=TEXT_SECONDARY, fontsize=8, x=0.01, ha='left')
+        saved.append((name, _save(fig, path_of(name))))
+    return saved
 
 
 def _risk_cmap():
