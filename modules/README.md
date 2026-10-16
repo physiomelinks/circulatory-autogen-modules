@@ -457,7 +457,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 | `run_test` | generates the version alone (or in its spec's `harness` network) and simulates it; every output finite |
 | `verification_test_invariants` | the spec's invariants hold at the run parameters |
 | `verification_test_BC` | each boundary condition / constant swept over its tested range; runs finite, invariants hold. Points outside a valid range are skipped; failures are classified and a solver setting recommended (below) |
-| `verification_test_timestep` | fixed-step integration converges at the scheme's order and matches CVODE |
+| `verification_test_timestep` | fixed-step integration converges at the scheme's order and matches CVODE (N/A for a version driven by a `protocol`, below) |
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
@@ -482,7 +482,7 @@ other two pipeline tests are skipped.
 
 | Test | Checks |
 |---|---|
-| `validation_test_baseline` | the model at the parameterisation's parameters against its baseline data or scalar targets |
+| `validation_test_baseline` | the model at the parameterisation's parameters against its baseline data (a CSV, or an obs_data run through its protocol) or scalar targets |
 | `validation_test_calibrate` | calibrates to `<p>_obs_data.json` with libcuflynx, predicts the held-out data (the obs_data's `prediction_items` that carry a value), and writes the calibrated files |
 
 How the boundary-condition sweep treats impossible values and failures:
@@ -592,6 +592,66 @@ pytest tests/test_modules.py --module Lotka_Volterra -m slow  # calibration
 python -m cam_testing.report --module Lotka_Volterra          # Lotka_Volterra.html + the version pages
 ```
 
+### Protocol-driven tests
+
+A version whose inputs must vary in time (a valve driven by a prescribed pressure difference, a
+channel under a voltage clamp) names an obs_data file as its `protocol` in the verification config,
+relative to the version directory:
+
+```json
+"protocol": "parameterisations/default/valve_reversal_obs_data.json"
+```
+
+The file's `protocol_info` drives every simulation of the version tests. Its `pre_times` and
+`sim_times` (one experiment, any number of sub-experiments) replace the spec's `pre_time` and
+`sim_time`. Its `params_to_change` set an input in each sub-experiment to a number, or to the name
+of a `protocol_traces` entry (`{t, values}`, linearly interpolated) or a `protocol_shapes` entry
+(pacing events or a ramp). An input is named `mod/<variable>` (`<record>/<variable>` for a
+test-network neighbour). libcuflynx's `ProtocolExecutor` runs it, with CVODE through Myokit.
+
+```json
+{
+  "protocol_info": {
+    "pre_times": [0.0],
+    "sim_times": [[0.2]],
+    "params_to_change": {"mod/u_in": [["dp_reversal"]]},
+    "protocol_traces": {"dp_reversal": {"t": [0.0, 0.1, 0.2], "values": [12666, 12666, 8666]}}
+  },
+  "data_items": [],
+  "prediction_items": []
+}
+```
+
+- A trace's `t` counts from the start of its sub-experiment, and the first sub-experiment's from the
+  start of the pre_time: libcuflynx's Myokit clock restarts at each sub-experiment. The logged time
+  `t` starts at 0 after the pre_time.
+- The inputs the protocol drives are added to the outputs, so invariants see them as they vary (e.g.
+  `u_in - u_out`). They are left out of the BC sweep.
+- The run, invariant, BC sweep and stability tests run the protocol. `run_parameters` and sweep values
+  are set before it runs, and the protocol's inputs override them. A CSV or targets baseline of the
+  version runs it too, at the protocol's times.
+- `verification_test_timestep` is N/A, because the fixed-step integrator integrates the equations at
+  constant parameters. The stability matrix runs its CVODE configurations only. Its solve_ivp and
+  fixed-step families are listed as not run, because libcuflynx's solve_ivp helper does not take
+  traces.
+
+A baseline compares the model with an obs_data in the same way: `validation.<p>.baseline.obs_data`
+names the file (relative to the version directory). The model, at the parameterisation's parameters
+and the baseline's `parameters`, runs through that file's protocol, which may have several
+experiments. The baseline then scores the file's `data_items` and the `prediction_items` that carry a
+value, each on its `experiment_idx` and `subexperiment_idx`:
+- a series item is sampled every `obs_dt` from its sub-experiment's start and scored by `metric`
+  (`nrmse` by default, or `log_rmse`) against `threshold` (default 0.1). `nrmse` is the rms error over
+  the item's data range, or over `nrmse_scale[<item>]` (in the item's unit) when the baseline gives one:
+  e.g. a severe case whose small range would make digitisation error look large, scored relative to
+  the normal case's range;
+- a constant item takes its `operation` (libcuflynx's operation functions, with its
+  `operation_kwargs`) over its sub-experiment, or the sub-experiment's final value, and passes when
+  |model - value| <= `z_threshold` (default 2) x `std`.
+
+An operation that refers to another item (`operation_kwargs` naming one) is not supported here.
+Calibration uses `<p>_obs_data.json` (`calibrate`), not the baseline's file.
+
 ## The version spec: tests.yaml and verification_config.json
 
 A version's spec is two files, merged into one spec when the tests run (the verification config
@@ -613,6 +673,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `solver_info` | verification_config | solver settings for the runs (`rtol`, `atol`, `MaximumStep`, ...) |
 | `reference_solver_info` | verification_config | tolerances of the tight CVODE reference (timestep and stability tests) |
 | `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod_<submodule>/<var>`) |
+| `protocol` | verification_config | an obs_data file, relative to the version directory, whose `protocol_info` (time-varying inputs from `protocol_traces` / `protocol_shapes`, sub-experiments) every run of the version follows (see Protocol-driven tests) |
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
 | `run_inputs` | verification_config | an external model's run_test: `{port variable: value}`, the constant inputs it is stepped with (default 0) |
 | `coupled_systems` | verification_config | system models in `system_models/coupled` that use the version coupled to an external model; tests/test_coupled_systems.py records them as its coupled_validation_test (with heatmaps) |
@@ -625,14 +686,14 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
-| `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`), variables, targets, metric, threshold, optimiser settings |
+| `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`; a baseline's `obs_data` is run through its protocol, see Protocol-driven tests), variables, targets, metric, threshold, optimiser settings |
 | `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`) |
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |
 | `notes` | tests | notes on the version, shown in its report |
 | `skip` | tests | a reason not to run the version's tests |
 | `known_issues` | tests | substrings of structure problems that are known (xfail) |
-| `expected_failures` | tests | `{test: reason}`: known failures, recorded as failed and xfail in pytest |
+| `expected_failures` | tests | `{test: reason}`: known failures, recorded as failed and xfail in pytest. A parameterisation's test may be keyed `<test>[<parameterisation>]` (e.g. `validation_test_baseline[aov]`) so that only that parameterisation's failure is known; a bare `<test>` covers every parameterisation |
 | `calibration_in_supermodule` | tests | `false`: the version's Calibration column uses the plain rule even when it has no calibration data and is a submodule of supermodule versions (default: derived from those supermodules, "Pass in super" / "Fail in super") |
 | `reference_proposals` | tests | proposed parameter references (and values for TODO parameters), awaiting review |
 | `review` | tests | the review: `summary`, `comment`, `questions`, `proposed_fixes`, `findings`. A review shared by several versions (a whole old module's review) is kept once, in `reviews/<name>_review.yaml` at the repo root, and `review:` gives that path instead |

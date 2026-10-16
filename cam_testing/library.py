@@ -445,7 +445,7 @@ def write_parameters(path, parameters):
 IDENTITY_KEYS = ('module_type', 'version')
 # in this order in the JSON file
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
-                     'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
+                     'outputs', 'protocol', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
                      'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
@@ -457,7 +457,8 @@ NESTED_ORDER = {
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget',
                   'max_run_seconds', 'total_time_budget', 't_end', 'tol'),
     'supermodule': ('globals', 'equivalent'),
-    'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
+    'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'obs_data',
+                 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
                  'threshold'),
     'calibrate': ('status', 'reason', 'note', 'source', 'source_kind', 'obs_data', 'params_for_id',
@@ -546,6 +547,30 @@ def dumps_json(data, indent=2, width=110):
                                       for k, v in x.items()) + '\n' + pad + '}'
         return json.dumps(x, ensure_ascii=False)
     return enc(data, 0)
+
+
+def protocol_problems(vdir, verification):
+    '''Problems with the obs_data files a verification_config names (relative to the version directory):
+    its protocol and every validation.<p>.baseline obs_data must be a file with a protocol_info, and the
+    protocol's has one experiment.'''
+    problems = []
+    refs = [('protocol', verification.get('protocol'))] + [
+        (f'validation.{p}.baseline.obs_data', ((kinds or {}).get('baseline') or {}).get('obs_data'))
+        for p, kinds in (verification.get('validation') or {}).items() if isinstance(kinds, dict)]
+    for key, ref in refs:
+        if not ref:
+            continue
+        path = os.path.join(vdir, ref)
+        if not os.path.isfile(path):
+            problems.append(f'{key}: {ref} is not a file in the version directory')
+            continue
+        with open(path) as f:
+            info = (json.load(f) or {}).get('protocol_info')
+        if not info:
+            problems.append(f'{key}: {ref} has no protocol_info')
+        elif key == 'protocol' and len(info.get('sim_times') or []) != 1:
+            problems.append(f'protocol: {ref} has {len(info.get("sim_times") or [])} experiments; a version\'s protocol has one')
+    return problems
 
 
 def misplaced_spec_keys(tests, verification):
