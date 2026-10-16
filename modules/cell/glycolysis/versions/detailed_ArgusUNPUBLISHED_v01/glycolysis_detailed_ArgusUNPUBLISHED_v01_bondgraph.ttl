@@ -1,0 +1,195 @@
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+
+@prefix : <#> .
+
+# Detailed glycolysis: written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
+# T = 293.15 K; volume 6.28319e-18 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+
+:glycolysis
+    a bgf:BondgraphModel ;
+    bgf:usesTemplate tpl:chemical.ttl ;
+    bgf:hasBondElement :q_glc, :q_G6P, :q_F6P, :q_F16BP, :q_DHAP, :q_GAP, :q_BPG13, :q_PG3, :q_PG2, :q_PEP, :q_Pyr, :q_lac, :q_NAD, :q_NADH, :q_ATP, :q_ADP, :q_Pi, :q_H, :q_H2O, :Re_HK, :Re_PGI, :Re_PFK, :Re_ALD, :Re_TPI, :Re_GAPDH, :Re_PGK, :Re_PGM, :Re_ENO, :Re_PK, :Re_LDH .
+
+:q_glc  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435917e-20 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.843162927242573e+17 mol-1"^^cdt:ucum ] .
+
+:q_G6P
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179586e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.105318823853462e+14 mol-1"^^cdt:ucum ] .
+
+:q_F6P
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.124916870157707e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.220212043733876e+14 mol-1"^^cdt:ucum ] .
+
+:q_F16BP
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "9.550441666912970e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.739728023040155e+10 mol-1"^^cdt:ucum ] .
+
+:q_DHAP
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "2.734830441023944e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.941322728262406e+13 mol-1"^^cdt:ucum ] .
+
+:q_GAP
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.259337036863327e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.156741475413434e+15 mol-1"^^cdt:ucum ] .
+
+:q_BPG13
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.154899792716864e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.405976691197571e+15 mol-1"^^cdt:ucum ] .
+
+:q_PG3
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.331576888513929e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.486770124415399e+13 mol-1"^^cdt:ucum ] .
+
+:q_PG2
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "2.187446493610571e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.120399115711991e+14 mol-1"^^cdt:ucum ] .
+
+:q_PEP
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.044186290067518e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.135758892116928e+17 mol-1"^^cdt:ucum ] .
+
+:q_Pyr
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "2.324778563656447e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.442997833767262e+12 mol-1"^^cdt:ucum ] .
+
+:q_lac  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.695851609969200e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.676852056512700e+10 mol-1"^^cdt:ucum ] .
+
+:q_NAD
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.602212253330794e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.292905109901810e+12 mol-1"^^cdt:ucum ] .
+
+:q_NADH
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "5.240176546187776e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.692385618527513e+15 mol-1"^^cdt:ucum ] .
+
+:q_ATP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.031857894892403e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.972243252483167e+13 mol-1"^^cdt:ucum ] .
+
+:q_ADP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.518583772020569e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.522282249079778e+14 mol-1"^^cdt:ucum ] .
+
+:q_Pi  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179586e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.231914451111814e+15 mol-1"^^cdt:ucum ] .
+
+:q_H  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.578264791976477e-22 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.697360650061328e+20 mol-1"^^cdt:ucum ] .
+
+:q_H2O  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.487167845484670e-13 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.120426978265261e+10 mol-1"^^cdt:ucum ] .
+
+:Re_HK  # saturation sigma 0.0009683: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_HK" ; bgf:hasValue "2.293006108074839e-14 mol/s"^^cdt:ucum ] .
+
+:Re_PGI
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGI" ; bgf:hasValue "6.526976631235961e-13 mol/s"^^cdt:ucum ] .
+
+:Re_PFK  # saturation sigma 6.086e-05: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PFK" ; bgf:hasValue "3.649095653536995e-13 mol/s"^^cdt:ucum ] .
+
+:Re_ALD
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_ALD" ; bgf:hasValue "6.132398043099612e-11 mol/s"^^cdt:ucum ] .
+
+:Re_TPI
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_TPI" ; bgf:hasValue "1.667266078835034e-13 mol/s"^^cdt:ucum ] .
+
+:Re_GAPDH
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GAPDH" ; bgf:hasValue "1.090682932752567e-08 mol/s"^^cdt:ucum ] .
+
+:Re_PGK
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGK" ; bgf:hasValue "1.088052773053818e-09 mol/s"^^cdt:ucum ] .
+
+:Re_PGM
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGM" ; bgf:hasValue "1.952629845532238e-12 mol/s"^^cdt:ucum ] .
+
+:Re_ENO
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_ENO" ; bgf:hasValue "1.954584429961954e-12 mol/s"^^cdt:ucum ] .
+
+:Re_PK  # saturation sigma 0.001291 and activation by F16BP (K_a 0.2 mM): folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PK" ; bgf:hasValue "3.439976948473912e-14 mol/s"^^cdt:ucum ] .
+
+:Re_LDH  # saturation sigma 8.291e-08: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_LDH" ; bgf:hasValue "5.357543350481959e-10 mol/s"^^cdt:ucum ] .
+
+:q_glc.Re_HK bgf:hasSource :q_glc ; bgf:hasTarget :Re_HK .
+:q_ATP.Re_HK bgf:hasSource :q_ATP ; bgf:hasTarget :Re_HK .
+:Re_HK.q_G6P bgf:hasSource :Re_HK ; bgf:hasTarget :q_G6P .
+:Re_HK.q_ADP bgf:hasSource :Re_HK ; bgf:hasTarget :q_ADP .
+:Re_HK.q_H bgf:hasSource :Re_HK ; bgf:hasTarget :q_H .
+:q_G6P.Re_PGI bgf:hasSource :q_G6P ; bgf:hasTarget :Re_PGI .
+:Re_PGI.q_F6P bgf:hasSource :Re_PGI ; bgf:hasTarget :q_F6P .
+:q_F6P.Re_PFK bgf:hasSource :q_F6P ; bgf:hasTarget :Re_PFK .
+:q_ATP.Re_PFK bgf:hasSource :q_ATP ; bgf:hasTarget :Re_PFK .
+:Re_PFK.q_F16BP bgf:hasSource :Re_PFK ; bgf:hasTarget :q_F16BP .
+:Re_PFK.q_ADP bgf:hasSource :Re_PFK ; bgf:hasTarget :q_ADP .
+:Re_PFK.q_H bgf:hasSource :Re_PFK ; bgf:hasTarget :q_H .
+:q_F16BP.Re_ALD bgf:hasSource :q_F16BP ; bgf:hasTarget :Re_ALD .
+:Re_ALD.q_DHAP bgf:hasSource :Re_ALD ; bgf:hasTarget :q_DHAP .
+:Re_ALD.q_GAP bgf:hasSource :Re_ALD ; bgf:hasTarget :q_GAP .
+:q_DHAP.Re_TPI bgf:hasSource :q_DHAP ; bgf:hasTarget :Re_TPI .
+:Re_TPI.q_GAP bgf:hasSource :Re_TPI ; bgf:hasTarget :q_GAP .
+:q_GAP.Re_GAPDH bgf:hasSource :q_GAP ; bgf:hasTarget :Re_GAPDH .
+:q_Pi.Re_GAPDH bgf:hasSource :q_Pi ; bgf:hasTarget :Re_GAPDH .
+:q_NAD.Re_GAPDH bgf:hasSource :q_NAD ; bgf:hasTarget :Re_GAPDH .
+:Re_GAPDH.q_BPG13 bgf:hasSource :Re_GAPDH ; bgf:hasTarget :q_BPG13 .
+:Re_GAPDH.q_NADH bgf:hasSource :Re_GAPDH ; bgf:hasTarget :q_NADH .
+:Re_GAPDH.q_H bgf:hasSource :Re_GAPDH ; bgf:hasTarget :q_H .
+:q_BPG13.Re_PGK bgf:hasSource :q_BPG13 ; bgf:hasTarget :Re_PGK .
+:q_ADP.Re_PGK bgf:hasSource :q_ADP ; bgf:hasTarget :Re_PGK .
+:Re_PGK.q_PG3 bgf:hasSource :Re_PGK ; bgf:hasTarget :q_PG3 .
+:Re_PGK.q_ATP bgf:hasSource :Re_PGK ; bgf:hasTarget :q_ATP .
+:q_PG3.Re_PGM bgf:hasSource :q_PG3 ; bgf:hasTarget :Re_PGM .
+:Re_PGM.q_PG2 bgf:hasSource :Re_PGM ; bgf:hasTarget :q_PG2 .
+:q_PG2.Re_ENO bgf:hasSource :q_PG2 ; bgf:hasTarget :Re_ENO .
+:Re_ENO.q_PEP bgf:hasSource :Re_ENO ; bgf:hasTarget :q_PEP .
+:Re_ENO.q_H2O bgf:hasSource :Re_ENO ; bgf:hasTarget :q_H2O .
+:q_PEP.Re_PK bgf:hasSource :q_PEP ; bgf:hasTarget :Re_PK .
+:q_ADP.Re_PK bgf:hasSource :q_ADP ; bgf:hasTarget :Re_PK .
+:q_H.Re_PK bgf:hasSource :q_H ; bgf:hasTarget :Re_PK .
+:Re_PK.q_Pyr bgf:hasSource :Re_PK ; bgf:hasTarget :q_Pyr .
+:Re_PK.q_ATP bgf:hasSource :Re_PK ; bgf:hasTarget :q_ATP .
+:q_Pyr.Re_LDH bgf:hasSource :q_Pyr ; bgf:hasTarget :Re_LDH .
+:q_NADH.Re_LDH bgf:hasSource :q_NADH ; bgf:hasTarget :Re_LDH .
+:q_H.Re_LDH bgf:hasSource :q_H ; bgf:hasTarget :Re_LDH .
+:Re_LDH.q_lac bgf:hasSource :Re_LDH ; bgf:hasTarget :q_lac .
+:Re_LDH.q_NAD bgf:hasSource :Re_LDH ; bgf:hasTarget :q_NAD .

@@ -1,0 +1,21 @@
+module_type: glycolysis
+version: detailed_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Glycolysis step by step, from glucose to lactate (homolactic fermentation), as a bond graph: each metabolite a store
+  (C) on a 0-junction, each enzyme a reaction (Re) between 1-junctions, with every reaction balanced in C, H, O, N and P and
+  in charge (species as at pH 7: G6P 2-, ATP 4-, ...; H+ and water explicit). The reactions'' standard Gibbs energies are
+  textbook values (transformed, pH 7, 1 M); the species'' standard potentials mu0 are fitted to them (tools/bondgraph.py),
+  so the thermodynamics are consistent, and H+ has its standard state at pH 7 so the cell''s pH 7.6 enters through its concentration.
+  Each reaction flows at v = kappa (Pf - Pr) / (1 + (Pf + Pr)/sigma), Pf and Pr the exponentials of its forward and reverse
+  affinities over RT: mass action, as the bond-graph chemical reaction, for the near-equilibrium steps, and saturating for
+  the four far from equilibrium (hexokinase, phosphofructokinase, pyruvate kinase, lactate dehydrogenase; each saturates at
+  50 times its resting flux, the lumped glycolysis'' headroom); pyruvate kinase is also activated by fructose 1,6-bisphosphate,
+  rate x (1 + F16BP/K_a), as E. coli''s PykF is, so the lower pathway keeps pace as the flux rises (it changes the rate, not
+  the equilibrium). The seven near-equilibrium steps run forwards at 1000 times their net rate at rest, which sets their intermediates
+  (F6P, DHAP, GAP, 1,3-BPG, 3PG, 2PG, PEP) from G6P and F1,6BP: they come out close to E. coli''s. Calibrated to the fermenter''s
+  rest: the cytosol''s glucose, lactate, ATP, ADP and Pi (energy_metabolism adaptive), E. coli-like intermediates where they
+  let every step run forwards and chosen ones where they do not (GAP, 1,3-BPG, 3PG, 2PG, PEP), and its glycolytic flux (half
+  the resting ATP turnover): each kappa carries that flux at rest. NAD+/NADH cycle inside (GAPDH makes NADH, LDH uses it).
+  Glucose, lactate, ATP, ADP, Pi, H+ and water are chemostats on the cytosol_metabolites port, which reports each one''s net
+  production. Compared against the lumped glycolysis of energy_metabolism adaptive (two steps) in tests/test_metabolism_detailed.py.
+  Its bond graph is in glycolysis_detailed_ArgusUNPUBLISHED_v01_bondgraph.ttl (BG-RDF) and drawn in glycolysis_detailed_ArgusUNPUBLISHED_v01_bondgraph.svg.'

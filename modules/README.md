@@ -26,6 +26,8 @@ modules/
           <module_type>_<version>_tests.yaml             review and record-keeping (see "The version spec")
           <module_type>_<version>_references.bib         BibTeX entries its parameters and its required_citations cite
           <module_type>_<version>_references_proposed.bib   citations proposed for review (optional)
+          <module_type>_<version>_bondgraph.ttl          its bond graph in BG-RDF, the CellDL tools' format (optional)
+          <module_type>_<version>_bondgraph.svg          its bond-graph diagram, carrying that RDF (optional)
           <module_type>_<version>.html                   version report (generated)
           risk/                                          joint failure-risk analysis (make risk; committed)
           plots/  results/                               written by the tests (not committed)
