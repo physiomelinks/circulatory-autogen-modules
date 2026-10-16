@@ -1,0 +1,3971 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="mitochondrion_detailed_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="mitochondrion_detailed">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="psi_m_init" public_interface="in" units="volt"/>
+        <!-- electrical potential of compartment m -->
+        <variable initial_value="psi_m_init" name="psi_m" public_interface="out" units="volt"/>
+        <!-- membrane capacitance per volume -->
+        <variable name="C_m_m" public_interface="in" units="F_per_m3"/>
+        <!-- charge moved into m (elementary charges) -->
+        <variable name="I_m" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of pyruvate (cytosol) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pyr_c" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pyr_c" public_interface="in" units="millimolar"/>
+        <!-- pyruvate (cytosol) in the cytosol (metabolite port) -->
+        <variable name="C_Pyr_c" public_interface="in" units="millimolar"/>
+        <!-- net production of pyruvate (cytosol) here -->
+        <variable name="j_Pyr_c" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of phosphate (cytosol) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pi_c" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pi_c" public_interface="in" units="millimolar"/>
+        <!-- phosphate (cytosol) in the cytosol (metabolite port) -->
+        <variable name="C_Pi_c" public_interface="in" units="millimolar"/>
+        <!-- net production of phosphate (cytosol) here -->
+        <variable name="j_Pi_c" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of H+ (cytosol and intermembrane space) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H_c" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H_c" public_interface="in" units="millimolar"/>
+        <!-- H+ (cytosol and intermembrane space) in the cytosol (metabolite port) -->
+        <variable name="C_H_c" public_interface="in" units="millimolar"/>
+        <!-- net production of H+ (cytosol and intermembrane space) here -->
+        <variable name="j_H_c" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of ATP (cytosol) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ATP_c" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ATP_c" public_interface="in" units="millimolar"/>
+        <!-- ATP (cytosol) in the cytosol (metabolite port) -->
+        <variable name="C_ATP_c" public_interface="in" units="millimolar"/>
+        <!-- net production of ATP (cytosol) here -->
+        <variable name="j_ATP_c" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of ADP (cytosol) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ADP_c" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ADP_c" public_interface="in" units="millimolar"/>
+        <!-- ADP (cytosol) in the cytosol (metabolite port) -->
+        <variable name="C_ADP_c" public_interface="in" units="millimolar"/>
+        <!-- net production of ADP (cytosol) here -->
+        <variable name="j_ADP_c" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of O2 (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_O2" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_O2" public_interface="in" units="millimolar"/>
+        <!-- O2 in the cytosol (metabolite port) -->
+        <variable name="C_O2" public_interface="in" units="millimolar"/>
+        <!-- net production of O2 here -->
+        <variable name="j_O2" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of CO2 (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_CO2" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_CO2" public_interface="in" units="millimolar"/>
+        <!-- CO2 in the cytosol (metabolite port) -->
+        <variable name="C_CO2" public_interface="in" units="millimolar"/>
+        <!-- net production of CO2 here -->
+        <variable name="j_CO2" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of water (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H2O" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H2O" public_interface="in" units="millimolar"/>
+        <!-- water in the cytosol (metabolite port) -->
+        <variable name="C_H2O" public_interface="in" units="millimolar"/>
+        <!-- net production of water here -->
+        <variable name="j_H2O" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of H+ (matrix) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H_m" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H_m" public_interface="in" units="millimolar"/>
+        <!-- H+ (matrix) in the matrix, held by its buffers -->
+        <variable name="C_H_m" public_interface="in" units="millimolar"/>
+        <!-- net production of H+ (matrix) here -->
+        <variable name="j_H_m" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of pyruvate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pyr_m" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pyr_m" public_interface="in" units="millimolar"/>
+        <variable name="C_Pyr_m_init" public_interface="in" units="millimolar"/>
+        <!-- pyruvate -->
+        <variable initial_value="C_Pyr_m_init" name="C_Pyr_m" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of acetyl-CoA (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_AcCoA" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_AcCoA" public_interface="in" units="millimolar"/>
+        <variable name="C_AcCoA_init" public_interface="in" units="millimolar"/>
+        <!-- acetyl-CoA -->
+        <variable initial_value="C_AcCoA_init" name="C_AcCoA" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of coenzyme A (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_CoA" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_CoA" public_interface="in" units="millimolar"/>
+        <variable name="C_CoA_init" public_interface="in" units="millimolar"/>
+        <!-- coenzyme A -->
+        <variable initial_value="C_CoA_init" name="C_CoA" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of citrate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Cit" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Cit" public_interface="in" units="millimolar"/>
+        <variable name="C_Cit_init" public_interface="in" units="millimolar"/>
+        <!-- citrate -->
+        <variable initial_value="C_Cit_init" name="C_Cit" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of isocitrate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Icit" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Icit" public_interface="in" units="millimolar"/>
+        <variable name="C_Icit_init" public_interface="in" units="millimolar"/>
+        <!-- isocitrate -->
+        <variable initial_value="C_Icit_init" name="C_Icit" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of 2-oxoglutarate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_OG" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_OG" public_interface="in" units="millimolar"/>
+        <variable name="C_OG_init" public_interface="in" units="millimolar"/>
+        <!-- 2-oxoglutarate -->
+        <variable initial_value="C_OG_init" name="C_OG" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of succinyl-CoA (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_SucCoA" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_SucCoA" public_interface="in" units="millimolar"/>
+        <variable name="C_SucCoA_init" public_interface="in" units="millimolar"/>
+        <!-- succinyl-CoA -->
+        <variable initial_value="C_SucCoA_init" name="C_SucCoA" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of succinate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Suc" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Suc" public_interface="in" units="millimolar"/>
+        <variable name="C_Suc_init" public_interface="in" units="millimolar"/>
+        <!-- succinate -->
+        <variable initial_value="C_Suc_init" name="C_Suc" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of fumarate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Fum" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Fum" public_interface="in" units="millimolar"/>
+        <variable name="C_Fum_init" public_interface="in" units="millimolar"/>
+        <!-- fumarate -->
+        <variable initial_value="C_Fum_init" name="C_Fum" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of malate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Mal" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Mal" public_interface="in" units="millimolar"/>
+        <variable name="C_Mal_init" public_interface="in" units="millimolar"/>
+        <!-- malate -->
+        <variable initial_value="C_Mal_init" name="C_Mal" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of oxaloacetate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_OAA" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_OAA" public_interface="in" units="millimolar"/>
+        <variable name="C_OAA_init" public_interface="in" units="millimolar"/>
+        <!-- oxaloacetate -->
+        <variable initial_value="C_OAA_init" name="C_OAA" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of NAD+ (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_NAD_m" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_NAD_m" public_interface="in" units="millimolar"/>
+        <variable name="C_NAD_m_init" public_interface="in" units="millimolar"/>
+        <!-- NAD+ -->
+        <variable initial_value="C_NAD_m_init" name="C_NAD_m" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of NADH (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_NADH_m" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_NADH_m" public_interface="in" units="millimolar"/>
+        <variable name="C_NADH_m_init" public_interface="in" units="millimolar"/>
+        <!-- NADH -->
+        <variable initial_value="C_NADH_m_init" name="C_NADH_m" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of ATP (matrix) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ATP_m" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ATP_m" public_interface="in" units="millimolar"/>
+        <variable name="C_ATP_m_init" public_interface="in" units="millimolar"/>
+        <!-- ATP (matrix) -->
+        <variable initial_value="C_ATP_m_init" name="C_ATP_m" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of ADP (matrix) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ADP_m" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ADP_m" public_interface="in" units="millimolar"/>
+        <variable name="C_ADP_m_init" public_interface="in" units="millimolar"/>
+        <!-- ADP (matrix) -->
+        <variable initial_value="C_ADP_m_init" name="C_ADP_m" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of phosphate (matrix) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pi_m" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pi_m" public_interface="in" units="millimolar"/>
+        <variable name="C_Pi_m_init" public_interface="in" units="millimolar"/>
+        <!-- phosphate (matrix) -->
+        <variable initial_value="C_Pi_m_init" name="C_Pi_m" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of ubiquinone (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Q" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Q" public_interface="in" units="millimolar"/>
+        <variable name="C_Q_init" public_interface="in" units="millimolar"/>
+        <!-- ubiquinone -->
+        <variable initial_value="C_Q_init" name="C_Q" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of ubiquinol (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_QH2" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_QH2" public_interface="in" units="millimolar"/>
+        <variable name="C_QH2_init" public_interface="in" units="millimolar"/>
+        <!-- ubiquinol -->
+        <variable initial_value="C_QH2_init" name="C_QH2" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of cytochrome c (oxidised) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_cytc_ox" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_cytc_ox" public_interface="in" units="millimolar"/>
+        <variable name="C_cytc_ox_init" public_interface="in" units="millimolar"/>
+        <!-- cytochrome c (oxidised) -->
+        <variable initial_value="C_cytc_ox_init" name="C_cytc_ox" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of cytochrome c (reduced) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_cytc_red" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_cytc_red" public_interface="in" units="millimolar"/>
+        <variable name="C_cytc_red_init" public_interface="in" units="millimolar"/>
+        <!-- cytochrome c (reduced) -->
+        <variable initial_value="C_cytc_red_init" name="C_cytc_red" public_interface="out" units="millimolar"/>
+        <!-- mitochondrial pyruvate carrier (H+ symport): rate constant -->
+        <variable name="kappa_PYRC" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PYRC" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PYRC" public_interface="out" units="dimensionless"/>
+        <!-- mitochondrial pyruvate carrier (H+ symport) -->
+        <variable name="v_PYRC" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PYRC" public_interface="out" units="J_per_mol"/>
+        <!-- phosphate carrier (HPO4 2- with 2 H+, electroneutral): rate constant -->
+        <variable name="kappa_PIC" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PIC" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PIC" public_interface="out" units="dimensionless"/>
+        <!-- phosphate carrier (HPO4 2- with 2 H+, electroneutral) -->
+        <variable name="v_PIC" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PIC" public_interface="out" units="J_per_mol"/>
+        <!-- adenine nucleotide translocase (ATP4- out, ADP3- in): rate constant -->
+        <variable name="kappa_ANT" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_ANT" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_ANT" public_interface="out" units="dimensionless"/>
+        <!-- adenine nucleotide translocase (ATP4- out, ADP3- in) -->
+        <variable name="v_ANT" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_ANT" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_ANT" public_interface="in" units="dimensionless"/>
+        <!-- pyruvate dehydrogenase: rate constant -->
+        <variable name="kappa_PDH" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PDH" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PDH" public_interface="out" units="dimensionless"/>
+        <!-- pyruvate dehydrogenase -->
+        <variable name="v_PDH" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PDH" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_PDH" public_interface="in" units="dimensionless"/>
+        <!-- citrate synthase: rate constant -->
+        <variable name="kappa_CS" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_CS" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_CS" public_interface="out" units="dimensionless"/>
+        <!-- citrate synthase -->
+        <variable name="v_CS" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_CS" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_CS" public_interface="in" units="dimensionless"/>
+        <!-- aconitase: rate constant -->
+        <variable name="kappa_ACO" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_ACO" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_ACO" public_interface="out" units="dimensionless"/>
+        <!-- aconitase -->
+        <variable name="v_ACO" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_ACO" public_interface="out" units="J_per_mol"/>
+        <!-- isocitrate dehydrogenase: rate constant -->
+        <variable name="kappa_IDH" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_IDH" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_IDH" public_interface="out" units="dimensionless"/>
+        <!-- isocitrate dehydrogenase -->
+        <variable name="v_IDH" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_IDH" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_IDH" public_interface="in" units="dimensionless"/>
+        <!-- 2-oxoglutarate dehydrogenase: rate constant -->
+        <variable name="kappa_OGDH" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_OGDH" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_OGDH" public_interface="out" units="dimensionless"/>
+        <!-- 2-oxoglutarate dehydrogenase -->
+        <variable name="v_OGDH" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_OGDH" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_OGDH" public_interface="in" units="dimensionless"/>
+        <!-- succinyl-CoA synthetase (ATP-forming, as E. coli SucCD): rate constant -->
+        <variable name="kappa_SCS" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_SCS" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_SCS" public_interface="out" units="dimensionless"/>
+        <!-- succinyl-CoA synthetase (ATP-forming, as E. coli SucCD) -->
+        <variable name="v_SCS" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_SCS" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_SCS" public_interface="in" units="dimensionless"/>
+        <!-- complex II (succinate:ubiquinone oxidoreductase): rate constant -->
+        <variable name="kappa_CII" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_CII" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_CII" public_interface="out" units="dimensionless"/>
+        <!-- complex II (succinate:ubiquinone oxidoreductase) -->
+        <variable name="v_CII" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_CII" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_CII" public_interface="in" units="dimensionless"/>
+        <!-- fumarase: rate constant -->
+        <variable name="kappa_FUM" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_FUM" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_FUM" public_interface="out" units="dimensionless"/>
+        <!-- fumarase -->
+        <variable name="v_FUM" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_FUM" public_interface="out" units="J_per_mol"/>
+        <!-- malate dehydrogenase: rate constant -->
+        <variable name="kappa_MDH" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_MDH" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_MDH" public_interface="out" units="dimensionless"/>
+        <!-- malate dehydrogenase -->
+        <variable name="v_MDH" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_MDH" public_interface="out" units="J_per_mol"/>
+        <!-- complex I (NADH:ubiquinone oxidoreductase, 4 H+ pumped): rate constant -->
+        <variable name="kappa_CI" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_CI" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_CI" public_interface="out" units="dimensionless"/>
+        <!-- complex I (NADH:ubiquinone oxidoreductase, 4 H+ pumped) -->
+        <variable name="v_CI" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_CI" public_interface="out" units="J_per_mol"/>
+        <!-- complex III (Q cycle: 4 H+ out, 2 taken up per QH2): rate constant -->
+        <variable name="kappa_CIII" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_CIII" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_CIII" public_interface="out" units="dimensionless"/>
+        <!-- complex III (Q cycle: 4 H+ out, 2 taken up per QH2) -->
+        <variable name="v_CIII" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_CIII" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_CIII" public_interface="in" units="dimensionless"/>
+        <!-- complex IV (cytochrome c oxidase, 4 H+ pumped per O2): rate constant -->
+        <variable name="kappa_CIV" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_CIV" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_CIV" public_interface="out" units="dimensionless"/>
+        <!-- complex IV (cytochrome c oxidase, 4 H+ pumped per O2) -->
+        <variable name="v_CIV" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_CIV" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_CIV" public_interface="in" units="dimensionless"/>
+        <!-- ATP synthase (3 H+ per ATP): rate constant -->
+        <variable name="kappa_ATPS" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_ATPS" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_ATPS" public_interface="out" units="dimensionless"/>
+        <!-- ATP synthase (3 H+ per ATP) -->
+        <variable name="v_ATPS" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_ATPS" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_ATPS" public_interface="in" units="dimensionless"/>
+        <!-- proton leak across the inner membrane: rate constant -->
+        <variable name="kappa_LEAK" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_LEAK" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_LEAK" public_interface="out" units="dimensionless"/>
+        <!-- proton leak across the inner membrane -->
+        <variable name="v_LEAK" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_LEAK" public_interface="out" units="J_per_mol"/>
+        <!-- free energy dissipated, sum v A (&gt;= 0, second law) -->
+        <variable name="P_diss" public_interface="out" units="W_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Pf_PYRC</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pyr_c</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pyr_c</ci>
+                        </apply>
+                        <ci>c_std_Pyr_c</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H_c</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H_c</ci>
+                        </apply>
+                        <ci>c_std_H_c</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PYRC</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pyr_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pyr_m</ci>
+                        </apply>
+                        <ci>c_std_Pyr_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H_m</ci>
+                        </apply>
+                        <ci>c_std_H_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PYRC</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_PYRC</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_PYRC</ci>
+                        <ci>Pr_PYRC</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PYRC</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PYRC</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PYRC</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PIC</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi_c</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi_c</ci>
+                        </apply>
+                        <ci>c_std_Pi_c</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_c</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_c</ci>
+                            </apply>
+                            <ci>c_std_H_c</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PIC</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi_m</ci>
+                        </apply>
+                        <ci>c_std_Pi_m</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_m</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_m</ci>
+                            </apply>
+                            <ci>c_std_H_m</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PIC</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_PIC</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_PIC</ci>
+                        <ci>Pr_PIC</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PIC</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PIC</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PIC</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_ANT</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP_m</ci>
+                        </apply>
+                        <ci>c_std_ATP_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP_c</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP_c</ci>
+                        </apply>
+                        <ci>c_std_ADP_c</ci>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">0.5</cn>
+                                </apply>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_ANT</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP_c</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP_c</ci>
+                        </apply>
+                        <ci>c_std_ATP_c</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP_m</ci>
+                        </apply>
+                        <ci>c_std_ADP_m</ci>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.5</cn>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_ANT</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_ANT</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_ANT</ci>
+                            <ci>Pr_ANT</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_ANT</ci>
+                                <ci>Pr_ANT</ci>
+                            </apply>
+                            <ci>sigma_ANT</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_ANT</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_ANT</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_ANT</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pyr_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pyr_m</ci>
+                        </apply>
+                        <ci>c_std_Pyr_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_CoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_CoA</ci>
+                        </apply>
+                        <ci>c_std_CoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD_m</ci>
+                        </apply>
+                        <ci>c_std_NAD_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_AcCoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_AcCoA</ci>
+                        </apply>
+                        <ci>c_std_AcCoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH_m</ci>
+                        </apply>
+                        <ci>c_std_NADH_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_CO2</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_CO2</ci>
+                        </apply>
+                        <ci>c_std_CO2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PDH</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_PDH</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_PDH</ci>
+                            <ci>Pr_PDH</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_PDH</ci>
+                                <ci>Pr_PDH</ci>
+                            </apply>
+                            <ci>sigma_PDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PDH</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PDH</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_CS</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_OAA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_OAA</ci>
+                        </apply>
+                        <ci>c_std_OAA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_AcCoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_AcCoA</ci>
+                        </apply>
+                        <ci>c_std_AcCoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H2O</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H2O</ci>
+                        </apply>
+                        <ci>c_std_H2O</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_CS</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Cit</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Cit</ci>
+                        </apply>
+                        <ci>c_std_Cit</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_CoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_CoA</ci>
+                        </apply>
+                        <ci>c_std_CoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H_m</ci>
+                        </apply>
+                        <ci>c_std_H_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_CS</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_CS</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_CS</ci>
+                            <ci>Pr_CS</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_CS</ci>
+                                <ci>Pr_CS</ci>
+                            </apply>
+                            <ci>sigma_CS</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_CS</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_CS</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_CS</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_ACO</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_Cit</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_Cit</ci>
+                    </apply>
+                    <ci>c_std_Cit</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_ACO</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_Icit</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_Icit</ci>
+                    </apply>
+                    <ci>c_std_Icit</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_ACO</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_ACO</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_ACO</ci>
+                        <ci>Pr_ACO</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_ACO</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_ACO</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_ACO</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_IDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Icit</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Icit</ci>
+                        </apply>
+                        <ci>c_std_Icit</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD_m</ci>
+                        </apply>
+                        <ci>c_std_NAD_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_IDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_OG</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_OG</ci>
+                        </apply>
+                        <ci>c_std_OG</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH_m</ci>
+                        </apply>
+                        <ci>c_std_NADH_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_CO2</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_CO2</ci>
+                        </apply>
+                        <ci>c_std_CO2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_IDH</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_IDH</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_IDH</ci>
+                            <ci>Pr_IDH</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_IDH</ci>
+                                <ci>Pr_IDH</ci>
+                            </apply>
+                            <ci>sigma_IDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_IDH</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_IDH</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_IDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_OGDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_OG</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_OG</ci>
+                        </apply>
+                        <ci>c_std_OG</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_CoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_CoA</ci>
+                        </apply>
+                        <ci>c_std_CoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD_m</ci>
+                        </apply>
+                        <ci>c_std_NAD_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_OGDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_SucCoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_SucCoA</ci>
+                        </apply>
+                        <ci>c_std_SucCoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH_m</ci>
+                        </apply>
+                        <ci>c_std_NADH_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_CO2</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_CO2</ci>
+                        </apply>
+                        <ci>c_std_CO2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_OGDH</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_OGDH</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_OGDH</ci>
+                            <ci>Pr_OGDH</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_OGDH</ci>
+                                <ci>Pr_OGDH</ci>
+                            </apply>
+                            <ci>sigma_OGDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_OGDH</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_OGDH</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_OGDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_SCS</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_SucCoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_SucCoA</ci>
+                        </apply>
+                        <ci>c_std_SucCoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP_m</ci>
+                        </apply>
+                        <ci>c_std_ADP_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi_m</ci>
+                        </apply>
+                        <ci>c_std_Pi_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_SCS</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Suc</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Suc</ci>
+                        </apply>
+                        <ci>c_std_Suc</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_CoA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_CoA</ci>
+                        </apply>
+                        <ci>c_std_CoA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP_m</ci>
+                        </apply>
+                        <ci>c_std_ATP_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_SCS</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_SCS</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_SCS</ci>
+                            <ci>Pr_SCS</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_SCS</ci>
+                                <ci>Pr_SCS</ci>
+                            </apply>
+                            <ci>sigma_SCS</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_SCS</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_SCS</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_SCS</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_CII</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Suc</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Suc</ci>
+                        </apply>
+                        <ci>c_std_Suc</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Q</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Q</ci>
+                        </apply>
+                        <ci>c_std_Q</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_CII</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Fum</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Fum</ci>
+                        </apply>
+                        <ci>c_std_Fum</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_QH2</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_QH2</ci>
+                        </apply>
+                        <ci>c_std_QH2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_CII</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_CII</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_CII</ci>
+                            <ci>Pr_CII</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_CII</ci>
+                                <ci>Pr_CII</ci>
+                            </apply>
+                            <ci>sigma_CII</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_CII</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_CII</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_CII</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_FUM</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Fum</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Fum</ci>
+                        </apply>
+                        <ci>c_std_Fum</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H2O</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H2O</ci>
+                        </apply>
+                        <ci>c_std_H2O</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_FUM</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_Mal</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_Mal</ci>
+                    </apply>
+                    <ci>c_std_Mal</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_FUM</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_FUM</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_FUM</ci>
+                        <ci>Pr_FUM</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_FUM</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_FUM</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_FUM</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_MDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Mal</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Mal</ci>
+                        </apply>
+                        <ci>c_std_Mal</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD_m</ci>
+                        </apply>
+                        <ci>c_std_NAD_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_MDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_OAA</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_OAA</ci>
+                        </apply>
+                        <ci>c_std_OAA</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH_m</ci>
+                        </apply>
+                        <ci>c_std_NADH_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H_m</ci>
+                        </apply>
+                        <ci>c_std_H_m</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_MDH</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_MDH</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_MDH</ci>
+                        <ci>Pr_MDH</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_MDH</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_MDH</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_MDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_CI</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH_m</ci>
+                        </apply>
+                        <ci>c_std_NADH_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Q</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Q</ci>
+                        </apply>
+                        <ci>c_std_Q</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_m</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_m</ci>
+                            </apply>
+                            <ci>c_std_H_m</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">5.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">0.5</cn>
+                                </apply>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">4.0</cn>
+                                </apply>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_CI</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD_m</ci>
+                        </apply>
+                        <ci>c_std_NAD_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_QH2</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_QH2</ci>
+                        </apply>
+                        <ci>c_std_QH2</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_c</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_c</ci>
+                            </apply>
+                            <ci>c_std_H_c</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">4.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.5</cn>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">4.0</cn>
+                                </apply>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_CI</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_CI</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_CI</ci>
+                        <ci>Pr_CI</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_CI</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_CI</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_CI</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_CIII</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_QH2</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_QH2</ci>
+                        </apply>
+                        <ci>c_std_QH2</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_cytc_ox</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_cytc_ox</ci>
+                            </apply>
+                            <ci>c_std_cytc_ox</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_m</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_m</ci>
+                            </apply>
+                            <ci>c_std_H_m</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">0.5</cn>
+                                </apply>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_CIII</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Q</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Q</ci>
+                        </apply>
+                        <ci>c_std_Q</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_cytc_red</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_cytc_red</ci>
+                            </apply>
+                            <ci>c_std_cytc_red</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_c</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_c</ci>
+                            </apply>
+                            <ci>c_std_H_c</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">4.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.5</cn>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_CIII</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_CIII</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_CIII</ci>
+                            <ci>Pr_CIII</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_CIII</ci>
+                                <ci>Pr_CIII</ci>
+                            </apply>
+                            <ci>sigma_CIII</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_CIII</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_CIII</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_CIII</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_CIV</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_cytc_red</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_cytc_red</ci>
+                            </apply>
+                            <ci>c_std_cytc_red</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">4.0</cn>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_O2</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_O2</ci>
+                        </apply>
+                        <ci>c_std_O2</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_m</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_m</ci>
+                            </apply>
+                            <ci>c_std_H_m</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">8.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">0.5</cn>
+                                </apply>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">8.0</cn>
+                                </apply>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_CIV</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_cytc_ox</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_cytc_ox</ci>
+                            </apply>
+                            <ci>c_std_cytc_ox</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">4.0</cn>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H2O</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H2O</ci>
+                            </apply>
+                            <ci>c_std_H2O</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_c</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_c</ci>
+                            </apply>
+                            <ci>c_std_H_c</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">4.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.5</cn>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">8.0</cn>
+                                </apply>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_CIV</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_CIV</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_CIV</ci>
+                            <ci>Pr_CIV</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_CIV</ci>
+                                <ci>Pr_CIV</ci>
+                            </apply>
+                            <ci>sigma_CIV</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_CIV</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_CIV</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_CIV</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_ATPS</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP_m</ci>
+                        </apply>
+                        <ci>c_std_ADP_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi_m</ci>
+                        </apply>
+                        <ci>c_std_Pi_m</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_c</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_c</ci>
+                            </apply>
+                            <ci>c_std_H_c</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">3.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">0.5</cn>
+                                </apply>
+                                <cn cellml:units="dimensionless">3.0</cn>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_ATPS</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP_m</ci>
+                        </apply>
+                        <ci>c_std_ATP_m</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H2O</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H2O</ci>
+                        </apply>
+                        <ci>c_std_H2O</ci>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_H_m</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_H_m</ci>
+                            </apply>
+                            <ci>c_std_H_m</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.5</cn>
+                                <cn cellml:units="dimensionless">3.0</cn>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_ATPS</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_ATPS</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_ATPS</ci>
+                            <ci>Pr_ATPS</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_ATPS</ci>
+                                <ci>Pr_ATPS</ci>
+                            </apply>
+                            <ci>sigma_ATPS</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_ATPS</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_ATPS</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_ATPS</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_LEAK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H_c</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H_c</ci>
+                        </apply>
+                        <ci>c_std_H_c</ci>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <minus/>
+                                    <cn cellml:units="dimensionless">0.5</cn>
+                                </apply>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_LEAK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H_m</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H_m</ci>
+                        </apply>
+                        <ci>c_std_H_m</ci>
+                    </apply>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.5</cn>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                                <ci>F</ci>
+                                <ci>psi_m</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_LEAK</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_LEAK</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_LEAK</ci>
+                        <ci>Pr_LEAK</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_LEAK</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_LEAK</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_LEAK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pyr_c</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_PYRC</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pi_c</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_PIC</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H_c</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>v_PYRC</ci>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                    <ci>v_PIC</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">4.0</cn>
+                                <ci>v_CI</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">4.0</cn>
+                                <ci>v_CIII</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">4.0</cn>
+                                <ci>v_CIV</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">3.0</cn>
+                            <ci>v_ATPS</ci>
+                        </apply>
+                    </apply>
+                    <ci>v_LEAK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ATP_c</ci>
+                <ci>v_ANT</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ADP_c</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_ANT</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_O2</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_CIV</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_CO2</ci>
+                <apply>
+                    <plus/>
+                    <ci>v_PDH</ci>
+                    <ci>v_IDH</ci>
+                    <ci>v_OGDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H2O</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>v_CS</ci>
+                        </apply>
+                        <ci>v_FUM</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>v_CIV</ci>
+                    </apply>
+                    <ci>v_ATPS</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H_m</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <plus/>
+                                    <ci>v_PYRC</ci>
+                                    <apply>
+                                        <times/>
+                                        <cn cellml:units="dimensionless">2.0</cn>
+                                        <ci>v_PIC</ci>
+                                    </apply>
+                                    <ci>v_CS</ci>
+                                    <ci>v_MDH</ci>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">5.0</cn>
+                                    <ci>v_CI</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">2.0</cn>
+                                <ci>v_CIII</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">8.0</cn>
+                            <ci>v_CIV</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>v_ATPS</ci>
+                    </apply>
+                    <ci>v_LEAK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Pyr_m</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_PYRC</ci>
+                    <ci>v_PDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_AcCoA</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_PDH</ci>
+                    <ci>v_CS</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_CoA</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <ci>v_PDH</ci>
+                            </apply>
+                            <ci>v_CS</ci>
+                        </apply>
+                        <ci>v_OGDH</ci>
+                    </apply>
+                    <ci>v_SCS</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Cit</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_CS</ci>
+                    <ci>v_ACO</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Icit</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_ACO</ci>
+                    <ci>v_IDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_OG</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_IDH</ci>
+                    <ci>v_OGDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_SucCoA</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_OGDH</ci>
+                    <ci>v_SCS</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Suc</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_SCS</ci>
+                    <ci>v_CII</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Fum</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_CII</ci>
+                    <ci>v_FUM</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Mal</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_FUM</ci>
+                    <ci>v_MDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_OAA</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_CS</ci>
+                    </apply>
+                    <ci>v_MDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_NAD_m</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>v_PDH</ci>
+                                </apply>
+                                <ci>v_IDH</ci>
+                            </apply>
+                            <ci>v_OGDH</ci>
+                        </apply>
+                        <ci>v_MDH</ci>
+                    </apply>
+                    <ci>v_CI</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_NADH_m</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <ci>v_PDH</ci>
+                        <ci>v_IDH</ci>
+                        <ci>v_OGDH</ci>
+                        <ci>v_MDH</ci>
+                    </apply>
+                    <ci>v_CI</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_ATP_m</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_ANT</ci>
+                    </apply>
+                    <ci>v_SCS</ci>
+                    <ci>v_ATPS</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_ADP_m</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_ANT</ci>
+                        <ci>v_SCS</ci>
+                    </apply>
+                    <ci>v_ATPS</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Pi_m</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_PIC</ci>
+                        <ci>v_SCS</ci>
+                    </apply>
+                    <ci>v_ATPS</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Q</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>v_CII</ci>
+                        </apply>
+                        <ci>v_CI</ci>
+                    </apply>
+                    <ci>v_CIII</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_QH2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <ci>v_CII</ci>
+                        <ci>v_CI</ci>
+                    </apply>
+                    <ci>v_CIII</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_cytc_ox</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <ci>v_CIII</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">4.0</cn>
+                        <ci>v_CIV</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_cytc_red</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>v_CIII</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">4.0</cn>
+                        <ci>v_CIV</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>I_m</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <ci>v_ANT</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">4.0</cn>
+                        </apply>
+                        <ci>v_CI</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <ci>v_CIII</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">8.0</cn>
+                        </apply>
+                        <ci>v_CIV</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">3.0</cn>
+                        <ci>v_ATPS</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <ci>v_LEAK</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>psi_m</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>F</ci>
+                        <ci>I_m</ci>
+                    </apply>
+                    <ci>C_m_m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_diss</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>v_PYRC</ci>
+                        <ci>A_PYRC</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PIC</ci>
+                        <ci>A_PIC</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_ANT</ci>
+                        <ci>A_ANT</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PDH</ci>
+                        <ci>A_PDH</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_CS</ci>
+                        <ci>A_CS</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_ACO</ci>
+                        <ci>A_ACO</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_IDH</ci>
+                        <ci>A_IDH</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_OGDH</ci>
+                        <ci>A_OGDH</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_SCS</ci>
+                        <ci>A_SCS</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_CII</ci>
+                        <ci>A_CII</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_FUM</ci>
+                        <ci>A_FUM</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_MDH</ci>
+                        <ci>A_MDH</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_CI</ci>
+                        <ci>A_CI</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_CIII</ci>
+                        <ci>A_CIII</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_CIV</ci>
+                        <ci>A_CIV</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_ATPS</ci>
+                        <ci>A_ATPS</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_LEAK</ci>
+                        <ci>A_LEAK</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

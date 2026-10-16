@@ -1,0 +1,103 @@
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+
+@prefix : <#> .
+
+# Lumped cytosol (energy_metabolism adaptive): written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
+# T = 293.15 K; volume 6.28319e-18 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+
+:energy_metabolism_adaptive
+    a bgf:BondgraphModel ;
+    bgf:usesTemplate tpl:chemical.ttl ;
+    bgf:hasBondElement :q_glc, :q_G6P, :q_lac, :q_ATP, :q_ADP, :q_Pi, :q_glyc, :q_mx, :Re_HK, :Re_LG, :Re_HYD, :Re_STORE, :Re_MOB, :Re_MX .
+
+:q_glc
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435917e-20 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.074161339853868e+14 mol-1"^^cdt:ucum ] .
+
+:q_G6P
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179586e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.842363448957599e+14 mol-1"^^cdt:ucum ] .
+
+:q_lac
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.695851609969200e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.775388727808843e-04 mol-1"^^cdt:ucum ] .
+
+:q_ATP
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.031857894892403e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.342993077067937e+15 mol-1"^^cdt:ucum ] .
+
+:q_ADP
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.518583772020569e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.993429537573035e+12 mol-1"^^cdt:ucum ] .
+
+:q_Pi
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179586e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.288808692130524e+11 mol-1"^^cdt:ucum ] .
+
+:q_glyc  # activity C k_sat / (k_sat + C), k_sat 10 mM: linear here, at the export point
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589793e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.650081038149820e+19 mol-1"^^cdt:ucum ] .
+
+:q_mx  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179586e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.900486228898952e+17 mol-1"^^cdt:ucum ] .
+
+:Re_HK
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_HK" ; bgf:hasValue "2.387758141583535e-13 mol/s"^^cdt:ucum ] .
+
+:Re_LG
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_LG" ; bgf:hasValue "1.115762979324902e+07 mol/s"^^cdt:ucum ] .
+
+:Re_HYD
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_HYD" ; bgf:hasValue "1.032019716948043e-18 mol/s"^^cdt:ucum ] .
+
+:Re_STORE
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_STORE" ; bgf:hasValue "3.425585022139600e-18 mol/s"^^cdt:ucum ] .
+
+:Re_MOB
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_MOB" ; bgf:hasValue "1.574266327074785e-19 mol/s"^^cdt:ucum ] .
+
+:Re_MX
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_MX" ; bgf:hasValue "1.279080856342665e-18 mol/s"^^cdt:ucum ] .
+
+:q_glc.Re_HK bgf:hasSource :q_glc ; bgf:hasTarget :Re_HK .
+:q_ATP.Re_HK bgf:hasSource :q_ATP ; bgf:hasTarget :Re_HK .
+:Re_HK.q_G6P bgf:hasSource :Re_HK ; bgf:hasTarget :q_G6P .
+:Re_HK.q_ADP bgf:hasSource :Re_HK ; bgf:hasTarget :q_ADP .
+:q_G6P.Re_LG bgf:hasSource :q_G6P ; bgf:hasTarget :Re_LG .
+:q_ADP.Re_LG bgf:hasSource :q_ADP ; bgf:hasTarget :Re_LG ; bgf:bondCount 3 .
+:q_Pi.Re_LG bgf:hasSource :q_Pi ; bgf:hasTarget :Re_LG ; bgf:bondCount 2 .
+:Re_LG.q_lac bgf:hasSource :Re_LG ; bgf:hasTarget :q_lac ; bgf:bondCount 2 .
+:Re_LG.q_ATP bgf:hasSource :Re_LG ; bgf:hasTarget :q_ATP ; bgf:bondCount 3 .
+:q_ATP.Re_HYD bgf:hasSource :q_ATP ; bgf:hasTarget :Re_HYD .
+:Re_HYD.q_ADP bgf:hasSource :Re_HYD ; bgf:hasTarget :q_ADP .
+:Re_HYD.q_Pi bgf:hasSource :Re_HYD ; bgf:hasTarget :q_Pi .
+:q_G6P.Re_STORE bgf:hasSource :q_G6P ; bgf:hasTarget :Re_STORE .
+:q_ATP.Re_STORE bgf:hasSource :q_ATP ; bgf:hasTarget :Re_STORE .
+:Re_STORE.q_glyc bgf:hasSource :Re_STORE ; bgf:hasTarget :q_glyc .
+:Re_STORE.q_ADP bgf:hasSource :Re_STORE ; bgf:hasTarget :q_ADP .
+:Re_STORE.q_Pi bgf:hasSource :Re_STORE ; bgf:hasTarget :q_Pi ; bgf:bondCount 2 .
+:q_glyc.Re_MOB bgf:hasSource :q_glyc ; bgf:hasTarget :Re_MOB .
+:q_Pi.Re_MOB bgf:hasSource :q_Pi ; bgf:hasTarget :Re_MOB .
+:Re_MOB.q_G6P bgf:hasSource :Re_MOB ; bgf:hasTarget :q_G6P .
+:q_G6P.Re_MX bgf:hasSource :q_G6P ; bgf:hasTarget :Re_MX .
+:q_ATP.Re_MX bgf:hasSource :q_ATP ; bgf:hasTarget :Re_MX ; bgf:bondCount 2 .
+:Re_MX.q_mx bgf:hasSource :Re_MX ; bgf:hasTarget :q_mx .
+:Re_MX.q_ADP bgf:hasSource :Re_MX ; bgf:hasTarget :q_ADP ; bgf:bondCount 2 .
+:Re_MX.q_Pi bgf:hasSource :Re_MX ; bgf:hasTarget :q_Pi ; bgf:bondCount 3 .

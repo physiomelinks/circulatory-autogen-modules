@@ -1,0 +1,888 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="gluconeogenesis_detailed_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="gluconeogenesis_detailed">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <!-- standard chemical potential of fructose 1,6-bisphosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_F16BP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_F16BP" public_interface="in" units="millimolar"/>
+        <!-- fructose 1,6-bisphosphate in the cytosol (metabolite port) -->
+        <variable name="C_F16BP" public_interface="in" units="millimolar"/>
+        <!-- net production of fructose 1,6-bisphosphate here -->
+        <variable name="j_F16BP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of fructose 6-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_F6P" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_F6P" public_interface="in" units="millimolar"/>
+        <!-- fructose 6-phosphate in the cytosol (metabolite port) -->
+        <variable name="C_F6P" public_interface="in" units="millimolar"/>
+        <!-- net production of fructose 6-phosphate here -->
+        <variable name="j_F6P" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of glucose 6-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_G6P" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_G6P" public_interface="in" units="millimolar"/>
+        <!-- glucose 6-phosphate in the cytosol (metabolite port) -->
+        <variable name="C_G6P" public_interface="in" units="millimolar"/>
+        <!-- net production of glucose 6-phosphate here -->
+        <variable name="j_G6P" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of glucose (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_glc" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_glc" public_interface="in" units="millimolar"/>
+        <!-- glucose in the cytosol (metabolite port) -->
+        <variable name="C_glc" public_interface="in" units="millimolar"/>
+        <!-- net production of glucose here -->
+        <variable name="j_glc" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of dihydroxyacetone phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_DHAP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_DHAP" public_interface="in" units="millimolar"/>
+        <!-- dihydroxyacetone phosphate in the cytosol (metabolite port) -->
+        <variable name="C_DHAP" public_interface="in" units="millimolar"/>
+        <!-- net production of dihydroxyacetone phosphate here -->
+        <variable name="j_DHAP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of glycerol (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_glycerol" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_glycerol" public_interface="in" units="millimolar"/>
+        <!-- glycerol in the cytosol (metabolite port) -->
+        <variable name="C_glycerol" public_interface="in" units="millimolar"/>
+        <!-- net production of glycerol here -->
+        <variable name="j_glycerol" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of NAD+ (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_NAD" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_NAD" public_interface="in" units="millimolar"/>
+        <!-- NAD+ in the cytosol (metabolite port) -->
+        <variable name="C_NAD" public_interface="in" units="millimolar"/>
+        <!-- net production of NAD+ here -->
+        <variable name="j_NAD" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of NADH (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_NADH" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_NADH" public_interface="in" units="millimolar"/>
+        <!-- NADH in the cytosol (metabolite port) -->
+        <variable name="C_NADH" public_interface="in" units="millimolar"/>
+        <!-- net production of NADH here -->
+        <variable name="j_NADH" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of ATP (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ATP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ATP" public_interface="in" units="millimolar"/>
+        <!-- ATP in the cytosol (metabolite port) -->
+        <variable name="C_ATP" public_interface="in" units="millimolar"/>
+        <!-- net production of ATP here -->
+        <variable name="j_ATP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of ADP (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ADP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ADP" public_interface="in" units="millimolar"/>
+        <!-- ADP in the cytosol (metabolite port) -->
+        <variable name="C_ADP" public_interface="in" units="millimolar"/>
+        <!-- net production of ADP here -->
+        <variable name="j_ADP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pi" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pi" public_interface="in" units="millimolar"/>
+        <!-- phosphate in the cytosol (metabolite port) -->
+        <variable name="C_Pi" public_interface="in" units="millimolar"/>
+        <!-- net production of phosphate here -->
+        <variable name="j_Pi" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of H+ (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H" public_interface="in" units="millimolar"/>
+        <!-- H+ in the cytosol (metabolite port) -->
+        <variable name="C_H" public_interface="in" units="millimolar"/>
+        <!-- net production of H+ here -->
+        <variable name="j_H" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of water (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H2O" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H2O" public_interface="in" units="millimolar"/>
+        <!-- water in the cytosol (metabolite port) -->
+        <variable name="C_H2O" public_interface="in" units="millimolar"/>
+        <!-- net production of water here -->
+        <variable name="j_H2O" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of glycerol 3-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Gly3P" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Gly3P" public_interface="in" units="millimolar"/>
+        <variable name="C_Gly3P_init" public_interface="in" units="millimolar"/>
+        <!-- glycerol 3-phosphate -->
+        <variable initial_value="C_Gly3P_init" name="C_Gly3P" public_interface="out" units="millimolar"/>
+        <!-- fructose 1,6-bisphosphatase: rate constant -->
+        <variable name="kappa_FBPASE" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_FBPASE" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_FBPASE" public_interface="out" units="dimensionless"/>
+        <!-- fructose 1,6-bisphosphatase -->
+        <variable name="v_FBPASE" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_FBPASE" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_FBPASE" public_interface="in" units="dimensionless"/>
+        <!-- glucose 6-phosphatase: rate constant -->
+        <variable name="kappa_G6PASE" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_G6PASE" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_G6PASE" public_interface="out" units="dimensionless"/>
+        <!-- glucose 6-phosphatase -->
+        <variable name="v_G6PASE" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_G6PASE" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_G6PASE" public_interface="in" units="dimensionless"/>
+        <!-- glycerol kinase: rate constant -->
+        <variable name="kappa_GK" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_GK" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_GK" public_interface="out" units="dimensionless"/>
+        <!-- glycerol kinase -->
+        <variable name="v_GK" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_GK" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_GK" public_interface="in" units="dimensionless"/>
+        <!-- glycerol 3-phosphate dehydrogenase (towards DHAP): rate constant -->
+        <variable name="kappa_G3PDH" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_G3PDH" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_G3PDH" public_interface="out" units="dimensionless"/>
+        <!-- glycerol 3-phosphate dehydrogenase (towards DHAP) -->
+        <variable name="v_G3PDH" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_G3PDH" public_interface="out" units="J_per_mol"/>
+        <!-- free energy dissipated, sum v A (&gt;= 0, second law) -->
+        <variable name="P_diss" public_interface="out" units="W_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Pf_FBPASE</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_F16BP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_F16BP</ci>
+                        </apply>
+                        <ci>c_std_F16BP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H2O</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H2O</ci>
+                        </apply>
+                        <ci>c_std_H2O</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_FBPASE</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_F6P</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_F6P</ci>
+                        </apply>
+                        <ci>c_std_F6P</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi</ci>
+                        </apply>
+                        <ci>c_std_Pi</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_FBPASE</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_FBPASE</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_FBPASE</ci>
+                            <ci>Pr_FBPASE</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_FBPASE</ci>
+                                <ci>Pr_FBPASE</ci>
+                            </apply>
+                            <ci>sigma_FBPASE</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_FBPASE</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_FBPASE</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_FBPASE</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_G6PASE</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_G6P</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_G6P</ci>
+                        </apply>
+                        <ci>c_std_G6P</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H2O</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H2O</ci>
+                        </apply>
+                        <ci>c_std_H2O</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_G6PASE</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_glc</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_glc</ci>
+                        </apply>
+                        <ci>c_std_glc</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi</ci>
+                        </apply>
+                        <ci>c_std_Pi</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_G6PASE</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_G6PASE</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_G6PASE</ci>
+                            <ci>Pr_G6PASE</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_G6PASE</ci>
+                                <ci>Pr_G6PASE</ci>
+                            </apply>
+                            <ci>sigma_G6PASE</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_G6PASE</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_G6PASE</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_G6PASE</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_GK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_glycerol</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_glycerol</ci>
+                        </apply>
+                        <ci>c_std_glycerol</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP</ci>
+                        </apply>
+                        <ci>c_std_ATP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_GK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Gly3P</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Gly3P</ci>
+                        </apply>
+                        <ci>c_std_Gly3P</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP</ci>
+                        </apply>
+                        <ci>c_std_ADP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_GK</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_GK</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_GK</ci>
+                            <ci>Pr_GK</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_GK</ci>
+                                <ci>Pr_GK</ci>
+                            </apply>
+                            <ci>sigma_GK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_GK</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_GK</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_GK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_G3PDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Gly3P</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Gly3P</ci>
+                        </apply>
+                        <ci>c_std_Gly3P</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD</ci>
+                        </apply>
+                        <ci>c_std_NAD</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_G3PDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_DHAP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_DHAP</ci>
+                        </apply>
+                        <ci>c_std_DHAP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH</ci>
+                        </apply>
+                        <ci>c_std_NADH</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_G3PDH</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_G3PDH</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_G3PDH</ci>
+                        <ci>Pr_G3PDH</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_G3PDH</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_G3PDH</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_G3PDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_F16BP</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_FBPASE</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_F6P</ci>
+                <ci>v_FBPASE</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_G6P</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_G6PASE</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_glc</ci>
+                <ci>v_G6PASE</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_DHAP</ci>
+                <ci>v_G3PDH</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_glycerol</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_GK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NAD</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_G3PDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_NADH</ci>
+                <ci>v_G3PDH</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ATP</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_GK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ADP</ci>
+                <ci>v_GK</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pi</ci>
+                <apply>
+                    <plus/>
+                    <ci>v_FBPASE</ci>
+                    <ci>v_G6PASE</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H</ci>
+                <apply>
+                    <plus/>
+                    <ci>v_GK</ci>
+                    <ci>v_G3PDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H2O</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_FBPASE</ci>
+                    </apply>
+                    <ci>v_G6PASE</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Gly3P</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_GK</ci>
+                    <ci>v_G3PDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_diss</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>v_FBPASE</ci>
+                        <ci>A_FBPASE</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_G6PASE</ci>
+                        <ci>A_G6PASE</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_GK</ci>
+                        <ci>A_GK</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_G3PDH</ci>
+                        <ci>A_G3PDH</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

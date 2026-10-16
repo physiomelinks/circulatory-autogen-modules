@@ -1,0 +1,118 @@
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+
+@prefix : <#> .
+
+# Detailed gluconeogenic bypasses and glycerol entry: written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
+# T = 310.15 K; volume 6.28319e-15 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+
+:gluconeogenesis
+    a bgf:BondgraphModel ;
+    bgf:usesTemplate tpl:chemical.ttl ;
+    bgf:hasBondElement :q_F16BP, :q_F6P, :q_G6P, :q_glc, :q_DHAP, :q_glycerol, :q_NAD, :q_NADH, :q_ATP, :q_ADP, :q_Pi, :q_H, :q_H2O, :q_Gly3P, :Re_FBPASE, :Re_G6PASE, :Re_GK, :Re_G3PDH .
+
+:q_F16BP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435918e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.014755115236239e+16 mol-1"^^cdt:ucum ] .
+
+:q_F6P  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179588e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.805501082679737e+14 mol-1"^^cdt:ucum ] .
+
+:q_G6P  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435918e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.527390018998045e+15 mol-1"^^cdt:ucum ] .
+
+:q_glc  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "5.026548245743670e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.036502448438191e+13 mol-1"^^cdt:ucum ] .
+
+:q_DHAP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.884955592153876e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.304103312107910e+15 mol-1"^^cdt:ucum ] .
+
+:q_glycerol  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179588e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.122486094690295e+16 mol-1"^^cdt:ucum ] .
+
+:q_NAD  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.183735863862472e+14 mol-1"^^cdt:ucum ] .
+
+:q_NADH  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.182461987264720e+17 mol-1"^^cdt:ucum ] .
+
+:q_ATP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.980460008823006e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.561186848636725e+14 mol-1"^^cdt:ucum ] .
+
+:q_ADP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "2.186548486898495e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.484553081229358e+13 mol-1"^^cdt:ucum ] .
+
+:q_Pi  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589793e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.881342803685145e+12 mol-1"^^cdt:ucum ] .
+
+:q_H  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.964421916294998e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.575793175993118e+17 mol-1"^^cdt:ucum ] .
+
+:q_H2O  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.487167845484671e-10 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.851872048248143e+10 mol-1"^^cdt:ucum ] .
+
+:q_Gly3P
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.998030349085263e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.097803692079442e+13 mol-1"^^cdt:ucum ] .
+
+:Re_FBPASE  # saturation sigma 447.4: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_FBPASE" ; bgf:hasValue "4.213032640669796e-19 mol/s"^^cdt:ucum ] .
+
+:Re_G6PASE  # saturation sigma 97.27: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_G6PASE" ; bgf:hasValue "1.936644353152187e-18 mol/s"^^cdt:ucum ] .
+
+:Re_GK  # saturation sigma 149.2: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GK" ; bgf:hasValue "5.052927555475119e-19 mol/s"^^cdt:ucum ] .
+
+:Re_G3PDH
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_G3PDH" ; bgf:hasValue "1.771849755631454e-13 mol/s"^^cdt:ucum ] .
+
+:q_F16BP.Re_FBPASE bgf:hasSource :q_F16BP ; bgf:hasTarget :Re_FBPASE .
+:q_H2O.Re_FBPASE bgf:hasSource :q_H2O ; bgf:hasTarget :Re_FBPASE .
+:Re_FBPASE.q_F6P bgf:hasSource :Re_FBPASE ; bgf:hasTarget :q_F6P .
+:Re_FBPASE.q_Pi bgf:hasSource :Re_FBPASE ; bgf:hasTarget :q_Pi .
+:q_G6P.Re_G6PASE bgf:hasSource :q_G6P ; bgf:hasTarget :Re_G6PASE .
+:q_H2O.Re_G6PASE bgf:hasSource :q_H2O ; bgf:hasTarget :Re_G6PASE .
+:Re_G6PASE.q_glc bgf:hasSource :Re_G6PASE ; bgf:hasTarget :q_glc .
+:Re_G6PASE.q_Pi bgf:hasSource :Re_G6PASE ; bgf:hasTarget :q_Pi .
+:q_glycerol.Re_GK bgf:hasSource :q_glycerol ; bgf:hasTarget :Re_GK .
+:q_ATP.Re_GK bgf:hasSource :q_ATP ; bgf:hasTarget :Re_GK .
+:Re_GK.q_Gly3P bgf:hasSource :Re_GK ; bgf:hasTarget :q_Gly3P .
+:Re_GK.q_ADP bgf:hasSource :Re_GK ; bgf:hasTarget :q_ADP .
+:Re_GK.q_H bgf:hasSource :Re_GK ; bgf:hasTarget :q_H .
+:q_Gly3P.Re_G3PDH bgf:hasSource :q_Gly3P ; bgf:hasTarget :Re_G3PDH .
+:q_NAD.Re_G3PDH bgf:hasSource :q_NAD ; bgf:hasTarget :Re_G3PDH .
+:Re_G3PDH.q_DHAP bgf:hasSource :Re_G3PDH ; bgf:hasTarget :q_DHAP .
+:Re_G3PDH.q_NADH bgf:hasSource :Re_G3PDH ; bgf:hasTarget :q_NADH .
+:Re_G3PDH.q_H bgf:hasSource :Re_G3PDH ; bgf:hasTarget :q_H .

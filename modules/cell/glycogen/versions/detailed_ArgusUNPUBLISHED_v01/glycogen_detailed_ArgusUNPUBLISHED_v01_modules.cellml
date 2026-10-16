@@ -1,0 +1,954 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="glycogen_detailed_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="glycogen_detailed">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <!-- standard chemical potential of glucose 6-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_G6P" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_G6P" public_interface="in" units="millimolar"/>
+        <!-- glucose 6-phosphate in the cytosol (metabolite port) -->
+        <variable name="C_G6P" public_interface="in" units="millimolar"/>
+        <!-- net production of glucose 6-phosphate here -->
+        <variable name="j_G6P" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of ATP (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ATP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ATP" public_interface="in" units="millimolar"/>
+        <!-- ATP in the cytosol (metabolite port) -->
+        <variable name="C_ATP" public_interface="in" units="millimolar"/>
+        <!-- net production of ATP here -->
+        <variable name="j_ATP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of ADP (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ADP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ADP" public_interface="in" units="millimolar"/>
+        <!-- ADP in the cytosol (metabolite port) -->
+        <variable name="C_ADP" public_interface="in" units="millimolar"/>
+        <!-- net production of ADP here -->
+        <variable name="j_ADP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pi" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pi" public_interface="in" units="millimolar"/>
+        <!-- phosphate in the cytosol (metabolite port) -->
+        <variable name="C_Pi" public_interface="in" units="millimolar"/>
+        <!-- net production of phosphate here -->
+        <variable name="j_Pi" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of H+ (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H" public_interface="in" units="millimolar"/>
+        <!-- H+ in the cytosol (metabolite port) -->
+        <variable name="C_H" public_interface="in" units="millimolar"/>
+        <!-- net production of H+ here -->
+        <variable name="j_H" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of water (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H2O" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H2O" public_interface="in" units="millimolar"/>
+        <!-- water in the cytosol (metabolite port) -->
+        <variable name="C_H2O" public_interface="in" units="millimolar"/>
+        <!-- net production of water here -->
+        <variable name="j_H2O" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of glucose 1-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_G1P" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_G1P" public_interface="in" units="millimolar"/>
+        <variable name="C_G1P_init" public_interface="in" units="millimolar"/>
+        <!-- glucose 1-phosphate -->
+        <variable initial_value="C_G1P_init" name="C_G1P" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of ADP-glucose (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ADPglc" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ADPglc" public_interface="in" units="millimolar"/>
+        <variable name="C_ADPglc_init" public_interface="in" units="millimolar"/>
+        <!-- ADP-glucose -->
+        <variable initial_value="C_ADPglc_init" name="C_ADPglc" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of pyrophosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_PPi" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_PPi" public_interface="in" units="millimolar"/>
+        <variable name="C_PPi_init" public_interface="in" units="millimolar"/>
+        <!-- pyrophosphate -->
+        <variable initial_value="C_PPi_init" name="C_PPi" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of glycogen (glucose units) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Gly" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Gly" public_interface="in" units="millimolar"/>
+        <variable name="C_Gly_init" public_interface="in" units="millimolar"/>
+        <!-- glycogen (glucose units) -->
+        <variable initial_value="C_Gly_init" name="C_Gly" public_interface="out" units="millimolar"/>
+        <!-- phosphoglucomutase: rate constant -->
+        <variable name="kappa_PGM" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PGM" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PGM" public_interface="out" units="dimensionless"/>
+        <!-- phosphoglucomutase -->
+        <variable name="v_PGM" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PGM" public_interface="out" units="J_per_mol"/>
+        <!-- ADP-glucose pyrophosphorylase (GlgC): rate constant -->
+        <variable name="kappa_GLGC" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_GLGC" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_GLGC" public_interface="out" units="dimensionless"/>
+        <!-- ADP-glucose pyrophosphorylase (GlgC) -->
+        <variable name="v_GLGC" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_GLGC" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_GLGC" public_interface="in" units="dimensionless"/>
+        <!-- glycogen synthase (GlgA): rate constant -->
+        <variable name="kappa_GLGA" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_GLGA" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_GLGA" public_interface="out" units="dimensionless"/>
+        <!-- glycogen synthase (GlgA) -->
+        <variable name="v_GLGA" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_GLGA" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_GLGA" public_interface="in" units="dimensionless"/>
+        <!-- inorganic pyrophosphatase: rate constant -->
+        <variable name="kappa_PPA" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PPA" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PPA" public_interface="out" units="dimensionless"/>
+        <!-- inorganic pyrophosphatase -->
+        <variable name="v_PPA" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PPA" public_interface="out" units="J_per_mol"/>
+        <!-- glycogen phosphorylase (GlgP): rate constant -->
+        <variable name="kappa_GLGP" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_GLGP" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_GLGP" public_interface="out" units="dimensionless"/>
+        <!-- glycogen phosphorylase (GlgP) -->
+        <variable name="v_GLGP" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_GLGP" public_interface="out" units="J_per_mol"/>
+        <!-- inhibition of glycogen phosphorylase (GlgP) by ATP -->
+        <variable name="Ki_ATP_GLGP" public_interface="in" units="millimolar"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_GLGP" public_interface="in" units="dimensionless"/>
+        <!-- saturation of glycogen (glucose units)'s activity -->
+        <variable name="k_sat_Gly" public_interface="in" units="millimolar"/>
+        <!-- free energy dissipated, sum v A (&gt;= 0, second law) -->
+        <variable name="P_diss" public_interface="out" units="W_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Pf_PGM</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_G6P</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_G6P</ci>
+                    </apply>
+                    <ci>c_std_G6P</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PGM</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_G1P</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_G1P</ci>
+                    </apply>
+                    <ci>c_std_G1P</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PGM</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_PGM</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_PGM</ci>
+                        <ci>Pr_PGM</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PGM</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PGM</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PGM</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_GLGC</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_G1P</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_G1P</ci>
+                        </apply>
+                        <ci>c_std_G1P</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP</ci>
+                        </apply>
+                        <ci>c_std_ATP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_GLGC</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADPglc</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADPglc</ci>
+                        </apply>
+                        <ci>c_std_ADPglc</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_PPi</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_PPi</ci>
+                        </apply>
+                        <ci>c_std_PPi</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_GLGC</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_GLGC</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_GLGC</ci>
+                            <ci>Pr_GLGC</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_GLGC</ci>
+                                <ci>Pr_GLGC</ci>
+                            </apply>
+                            <ci>sigma_GLGC</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_GLGC</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_GLGC</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_GLGC</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_GLGA</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_ADPglc</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_ADPglc</ci>
+                    </apply>
+                    <ci>c_std_ADPglc</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_GLGA</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP</ci>
+                        </apply>
+                        <ci>c_std_ADP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_Gly</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_Gly</ci>
+                                <ci>k_sat_Gly</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>k_sat_Gly</ci>
+                                <ci>C_Gly</ci>
+                            </apply>
+                        </apply>
+                        <ci>c_std_Gly</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_GLGA</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_GLGA</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_GLGA</ci>
+                            <ci>Pr_GLGA</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_GLGA</ci>
+                                <ci>Pr_GLGA</ci>
+                            </apply>
+                            <ci>sigma_GLGA</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_GLGA</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_GLGA</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_GLGA</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PPA</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_PPi</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_PPi</ci>
+                        </apply>
+                        <ci>c_std_PPi</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H2O</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H2O</ci>
+                        </apply>
+                        <ci>c_std_H2O</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PPA</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <power/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_Pi</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_Pi</ci>
+                            </apply>
+                            <ci>c_std_Pi</ci>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PPA</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_PPA</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_PPA</ci>
+                        <ci>Pr_PPA</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PPA</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PPA</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PPA</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_GLGP</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <ci>mu0_Gly</ci>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <ci>C_Gly</ci>
+                                <ci>k_sat_Gly</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>k_sat_Gly</ci>
+                                <ci>C_Gly</ci>
+                            </apply>
+                        </apply>
+                        <ci>c_std_Gly</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi</ci>
+                        </apply>
+                        <ci>c_std_Pi</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_GLGP</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_G1P</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_G1P</ci>
+                    </apply>
+                    <ci>c_std_G1P</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_GLGP</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>kappa_GLGP</ci>
+                                <ci>Ki_ATP_GLGP</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>Ki_ATP_GLGP</ci>
+                                <ci>C_ATP</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_GLGP</ci>
+                            <ci>Pr_GLGP</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_GLGP</ci>
+                                <ci>Pr_GLGP</ci>
+                            </apply>
+                            <ci>sigma_GLGP</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_GLGP</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_GLGP</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_GLGP</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_G6P</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_PGM</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ATP</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_GLGC</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ADP</ci>
+                <ci>v_GLGA</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pi</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>v_PPA</ci>
+                    </apply>
+                    <ci>v_GLGP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_GLGC</ci>
+                    </apply>
+                    <ci>v_GLGA</ci>
+                    <ci>v_PPA</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H2O</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_PPA</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_G1P</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_PGM</ci>
+                        <ci>v_GLGC</ci>
+                    </apply>
+                    <ci>v_GLGP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_ADPglc</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_GLGC</ci>
+                    <ci>v_GLGA</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_PPi</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_GLGC</ci>
+                    <ci>v_PPA</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Gly</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_GLGA</ci>
+                    <ci>v_GLGP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_diss</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>v_PGM</ci>
+                        <ci>A_PGM</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_GLGC</ci>
+                        <ci>A_GLGC</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_GLGA</ci>
+                        <ci>A_GLGA</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PPA</ci>
+                        <ci>A_PPA</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_GLGP</ci>
+                        <ci>A_GLGP</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

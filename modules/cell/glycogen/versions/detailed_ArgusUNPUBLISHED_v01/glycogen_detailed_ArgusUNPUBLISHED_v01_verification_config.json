@@ -1,0 +1,116 @@
+{
+  "module_type": "glycogen",
+  "version": "detailed_ArgusUNPUBLISHED_v01",
+  "sim_time": 600.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-12
+  },
+  "outputs": [
+    "C_G1P",
+    "C_ADPglc",
+    "C_PPi",
+    "C_Gly",
+    "v_PGM",
+    "v_GLGC",
+    "v_GLGA",
+    "v_PPA",
+    "v_GLGP",
+    "j_G6P",
+    "j_ATP",
+    "j_ADP",
+    "j_Pi",
+    "j_H",
+    "j_H2O",
+    "A_PGM",
+    "A_GLGC",
+    "A_GLGA",
+    "A_PPA",
+    "A_GLGP",
+    "P_diss"
+  ],
+  "run_parameters": {
+    "C_ATP": 2.0,
+    "C_ADP": 3.0
+  },
+  "invariants": [
+    {
+      "description": "second law: every reaction runs down its affinity, v A >= 0, so P_diss >= 0",
+      "expr": "np.all(v_PGM*A_PGM >= -1e-12*np.abs(v_PGM).max()*np.abs(A_PGM).max()) and np.all(v_GLGC*A_GLGC >= -1e-12*np.abs(v_GLGC).max()*np.abs(A_GLGC).max()) and np.all(v_GLGA*A_GLGA >= -1e-12*np.abs(v_GLGA).max()*np.abs(A_GLGA).max()) and np.all(v_PPA*A_PPA >= -1e-12*np.abs(v_PPA).max()*np.abs(A_PPA).max()) and np.all(v_GLGP*A_GLGP >= -1e-12*np.abs(v_GLGP).max()*np.abs(A_GLGP).max()) and np.all(P_diss >= -1e-9*np.abs(P_diss).max())"
+    },
+    {
+      "description": "glycogen is never negative (its activity vanishes as it runs out)",
+      "expr": "np.all(C_Gly >= -1e-9*np.abs(C_Gly).max())"
+    },
+    {
+      "description": "the ports report each chemostat's net production: j_G6P = -v_PGM, j_ATP = -v_GLGC, j_ADP = v_GLGA, j_Pi = 2 v_PPA - v_GLGP (exact)",
+      "expr": "np.allclose(j_G6P, -v_PGM, rtol=1e-12, atol=0) and np.allclose(j_ATP, -v_GLGC, rtol=1e-12, atol=0) and np.allclose(j_ADP, v_GLGA, rtol=1e-12, atol=0) and np.allclose(j_Pi, 2.0*v_PPA - v_GLGP, rtol=1e-12, atol=1e-30)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "C_G6P": [
+        0.05,
+        10.0
+      ],
+      "C_ATP": [
+        1.0,
+        12.0
+      ],
+      "C_ADP": [
+        0.1,
+        3.0
+      ],
+      "C_Pi": [
+        1.0,
+        20.0
+      ],
+      "C_H": [
+        1e-05,
+        0.00016
+      ]
+    },
+    "exclude": [
+      "R",
+      "T",
+      "C_H2O",
+      "mu0_G6P",
+      "mu0_ATP",
+      "mu0_ADP",
+      "mu0_Pi",
+      "mu0_H",
+      "mu0_H2O",
+      "mu0_G1P",
+      "mu0_ADPglc",
+      "mu0_PPi",
+      "mu0_Gly"
+    ],
+    "rationale": "G6P from starving to a meal; ATP and ADP from a de-energised to a resting cell; Pi over an order of magnitude; pH 6.8 to 8"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      4e-05,
+      2e-05,
+      1e-05
+    ],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-09
+      }
+    ],
+    "t_end": 10.0,
+    "time_budget": 10
+  }
+}

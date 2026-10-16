@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-471 0 862 580" width="862" height="580" font-family="sans-serif" font-size="11">
+<title>Detailed glycogen store: bond graph</title>
+<metadata id="celldl-rdf-metadata" data-content-type="text/turtle"><![CDATA[
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+
+@prefix : <#> .
+
+# Detailed glycogen store: written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
+# T = 293.15 K; volume 6.28319e-18 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+
+:glycogen
+    a bgf:BondgraphModel ;
+    bgf:usesTemplate tpl:chemical.ttl ;
+    bgf:hasBondElement :q_G6P, :q_ATP, :q_ADP, :q_Pi, :q_H, :q_H2O, :q_G1P, :q_ADPglc, :q_PPi, :q_Gly, :Re_PGM, :Re_GLGC, :Re_GLGA, :Re_PPA, :Re_GLGP .
+
+:q_G6P  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179586e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.722084199971267e+16 mol-1"^^cdt:ucum ] .
+
+:q_ATP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.031857894892403e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.818207982109391e+18 mol-1"^^cdt:ucum ] .
+
+:q_ADP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.518583772020569e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.095332538865514e+15 mol-1"^^cdt:ucum ] .
+
+:q_Pi  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179586e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.467975097404830e+15 mol-1"^^cdt:ucum ] .
+
+:q_H  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.578264791976477e-22 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.903920881343370e+19 mol-1"^^cdt:ucum ] .
+
+:q_H2O  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.487167845484670e-13 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.930950858873811e+14 mol-1"^^cdt:ucum ] .
+
+:q_G1P
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.166904968414481e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.438819252748426e+17 mol-1"^^cdt:ucum ] .
+
+:q_ADPglc
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589793e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.485568323625984e+18 mol-1"^^cdt:ucum ] .
+
+:q_PPi
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589793e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.501356917529899e+17 mol-1"^^cdt:ucum ] .
+
+:q_Gly  # activity C k_sat / (k_sat + C), k_sat 10 mM: linear here, at the export point
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589793e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.237948347876284e+17 mol-1"^^cdt:ucum ] .
+
+:Re_PGM
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGM" ; bgf:hasValue "2.409350424886477e-17 mol/s"^^cdt:ucum ] .
+
+:Re_GLGC  # saturation sigma 46.58: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GLGC" ; bgf:hasValue "6.628471624947949e-21 mol/s"^^cdt:ucum ] .
+
+:Re_GLGA  # saturation sigma 25.56: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GLGA" ; bgf:hasValue "1.219029786617613e-20 mol/s"^^cdt:ucum ] .
+
+:Re_PPA
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PPA" ; bgf:hasValue "8.715052712222028e-23 mol/s"^^cdt:ucum ] .
+
+:Re_GLGP  # saturation sigma 5.062 and inhibition by ATP (K_i 1 mM): folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GLGP" ; bgf:hasValue "4.395289861672892e-21 mol/s"^^cdt:ucum ] .
+
+:q_G6P.Re_PGM bgf:hasSource :q_G6P ; bgf:hasTarget :Re_PGM .
+:Re_PGM.q_G1P bgf:hasSource :Re_PGM ; bgf:hasTarget :q_G1P .
+:q_G1P.Re_GLGC bgf:hasSource :q_G1P ; bgf:hasTarget :Re_GLGC .
+:q_ATP.Re_GLGC bgf:hasSource :q_ATP ; bgf:hasTarget :Re_GLGC .
+:q_H.Re_GLGC bgf:hasSource :q_H ; bgf:hasTarget :Re_GLGC .
+:Re_GLGC.q_ADPglc bgf:hasSource :Re_GLGC ; bgf:hasTarget :q_ADPglc .
+:Re_GLGC.q_PPi bgf:hasSource :Re_GLGC ; bgf:hasTarget :q_PPi .
+:q_ADPglc.Re_GLGA bgf:hasSource :q_ADPglc ; bgf:hasTarget :Re_GLGA .
+:Re_GLGA.q_ADP bgf:hasSource :Re_GLGA ; bgf:hasTarget :q_ADP .
+:Re_GLGA.q_Gly bgf:hasSource :Re_GLGA ; bgf:hasTarget :q_Gly .
+:Re_GLGA.q_H bgf:hasSource :Re_GLGA ; bgf:hasTarget :q_H .
+:q_PPi.Re_PPA bgf:hasSource :q_PPi ; bgf:hasTarget :Re_PPA .
+:q_H2O.Re_PPA bgf:hasSource :q_H2O ; bgf:hasTarget :Re_PPA .
+:Re_PPA.q_Pi bgf:hasSource :Re_PPA ; bgf:hasTarget :q_Pi ; bgf:bondCount 2 .
+:Re_PPA.q_H bgf:hasSource :Re_PPA ; bgf:hasTarget :q_H .
+:q_Gly.Re_GLGP bgf:hasSource :q_Gly ; bgf:hasTarget :Re_GLGP .
+:q_Pi.Re_GLGP bgf:hasSource :q_Pi ; bgf:hasTarget :Re_GLGP .
+:Re_GLGP.q_G1P bgf:hasSource :Re_GLGP ; bgf:hasTarget :q_G1P .
+]]></metadata>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/></marker></defs>
+<line class="bond" id="bond_G6P_PGM" x1="-159.8" y1="60.0" x2="-110.8" y2="60.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_G1P_PGM" x1="-32.5" y1="78.0" x2="-312.4" y2="233.2" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_G1P_GLGC" x1="-310.3" y1="238.8" x2="-81.2" y2="188.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ATP_GLGC" x1="-159.8" y1="170.0" x2="-110.8" y2="170.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_GLGC" x1="310.9" y1="273.4" x2="54.1" y2="188.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ADPglc_GLGC" x1="0.0" y1="188.0" x2="0.0" y2="204.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_PPi_GLGC" x1="-67.2" y1="188.0" x2="-390.5" y2="274.6" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ADPglc_GLGA" x1="0.0" y1="246.0" x2="0.0" y2="262.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ADP_GLGA" x1="-110.8" y1="280.0" x2="-159.8" y2="280.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Gly_GLGA" x1="54.1" y1="298.0" x2="310.9" y2="383.4" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_GLGA" x1="110.8" y1="280.0" x2="309.8" y2="280.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_PPi_PPA" x1="-390.5" y1="285.4" x2="-67.2" y2="372.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H2O_PPA" x1="-159.8" y1="390.0" x2="-110.8" y2="390.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pi_PPA" x1="0.0" y1="408.0" x2="0.0" y2="424.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="4.0" y="412.0" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_H_PPA" x1="54.1" y1="372.0" x2="310.9" y2="286.6" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Gly_GLGP" x1="310.9" y1="396.6" x2="54.1" y2="482.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pi_GLGP" x1="0.0" y1="466.0" x2="0.0" y2="482.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_G1P_GLGP" x1="-23.2" y1="482.0" x2="-314.2" y2="256.2" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<g id="Re_PGM" class="reaction"><rect x="-110.8" y="42.0" width="221.6" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="57.0" text-anchor="middle" font-weight="bold">Re: PGM</text><text x="0.0" y="71.0" text-anchor="middle" font-size="10">phosphoglucomutase</text></g>
+<g id="Re_GLGC" class="reaction"><rect x="-110.8" y="152.0" width="221.6" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="167.0" text-anchor="middle" font-weight="bold">Re: GLGC</text><text x="0.0" y="181.0" text-anchor="middle" font-size="10">ADP-glucose pyrophosphorylase (GlgC)</text></g>
+<g id="Re_GLGA" class="reaction"><rect x="-110.8" y="262.0" width="221.6" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="277.0" text-anchor="middle" font-weight="bold">Re: GLGA</text><text x="0.0" y="291.0" text-anchor="middle" font-size="10">glycogen synthase (GlgA)</text></g>
+<g id="Re_PPA" class="reaction"><rect x="-110.8" y="372.0" width="221.6" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="387.0" text-anchor="middle" font-weight="bold">Re: PPA</text><text x="0.0" y="401.0" text-anchor="middle" font-size="10">inorganic pyrophosphatase</text></g>
+<g id="Re_GLGP" class="reaction"><rect x="-110.8" y="482.0" width="221.6" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="497.0" text-anchor="middle" font-weight="bold">Re: GLGP</text><text x="0.0" y="511.0" text-anchor="middle" font-size="10">glycogen phosphorylase (GlgP)</text></g>
+<g id="q_G6P" class="species"><circle cx="-180.8" cy="60.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-180.8" y="64.0" text-anchor="middle">G6P</text><title>glucose 6-phosphate (chemostat)</title></g>
+<g id="q_ATP" class="species"><circle cx="-180.8" cy="170.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-180.8" y="174.0" text-anchor="middle">ATP</text><title>ATP (chemostat)</title></g>
+<g id="q_ADP" class="species"><circle cx="-180.8" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-180.8" y="284.0" text-anchor="middle">ADP</text><title>ADP (chemostat)</title></g>
+<g id="q_Pi" class="species"><circle cx="0.0" cy="445.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="0.0" y="449.0" text-anchor="middle">Pi</text><title>phosphate (chemostat)</title></g>
+<g id="q_H" class="species"><circle cx="330.8" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="330.8" y="284.0" text-anchor="middle">H</text><title>H+ (chemostat)</title></g>
+<g id="q_H2O" class="species"><circle cx="-180.8" cy="390.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-180.8" y="394.0" text-anchor="middle">H2O</text><title>water (chemostat)</title></g>
+<g id="q_G1P" class="species"><circle cx="-330.8" cy="243.3" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-330.8" y="247.3" text-anchor="middle">G1P</text><title>glucose 1-phosphate</title></g>
+<g id="q_ADPglc" class="species"><circle cx="0.0" cy="225.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="229.0" text-anchor="middle">ADPglc</text><title>ADP-glucose</title></g>
+<g id="q_PPi" class="species"><circle cx="-410.8" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-410.8" y="284.0" text-anchor="middle">PPi</text><title>pyrophosphate</title></g>
+<g id="q_Gly" class="species"><circle cx="330.8" cy="390.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="330.8" y="394.0" text-anchor="middle">Gly</text><title>glycogen (glucose units)</title></g>
+<text x="-461" y="18" fill="#555">Detailed glycogen store: species (0-junction + C), reactions (Re between 1-junctions); dashed: chemostats</text>
+</svg>

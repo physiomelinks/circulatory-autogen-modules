@@ -1,0 +1,197 @@
+{
+  "module_type": "mitochondrion",
+  "version": "detailed_ArgusUNPUBLISHED_v01",
+  "sim_time": 600.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-12
+  },
+  "outputs": [
+    "C_Pyr_m",
+    "C_AcCoA",
+    "C_CoA",
+    "C_Cit",
+    "C_Icit",
+    "C_OG",
+    "C_SucCoA",
+    "C_Suc",
+    "C_Fum",
+    "C_Mal",
+    "C_OAA",
+    "C_NAD_m",
+    "C_NADH_m",
+    "C_ATP_m",
+    "C_ADP_m",
+    "C_Pi_m",
+    "C_Q",
+    "C_QH2",
+    "C_cytc_ox",
+    "C_cytc_red",
+    "psi_m",
+    "I_m",
+    "v_PYRC",
+    "v_PIC",
+    "v_ANT",
+    "v_PDH",
+    "v_CS",
+    "v_ACO",
+    "v_IDH",
+    "v_OGDH",
+    "v_SCS",
+    "v_CII",
+    "v_FUM",
+    "v_MDH",
+    "v_CI",
+    "v_CIII",
+    "v_CIV",
+    "v_ATPS",
+    "v_LEAK",
+    "j_Pyr_c",
+    "j_Pi_c",
+    "j_H_c",
+    "j_ATP_c",
+    "j_ADP_c",
+    "j_O2",
+    "j_CO2",
+    "j_H2O",
+    "j_H_m",
+    "A_PYRC",
+    "A_PIC",
+    "A_ANT",
+    "A_PDH",
+    "A_CS",
+    "A_ACO",
+    "A_IDH",
+    "A_OGDH",
+    "A_SCS",
+    "A_CII",
+    "A_FUM",
+    "A_MDH",
+    "A_CI",
+    "A_CIII",
+    "A_CIV",
+    "A_ATPS",
+    "A_LEAK",
+    "P_diss"
+  ],
+  "run_parameters": {
+    "C_ATP_c": 2.5,
+    "C_ADP_c": 1.0
+  },
+  "invariants": [
+    {
+      "description": "second law: every reaction runs down its affinity, v A >= 0, so P_diss >= 0",
+      "expr": "np.all(v_PYRC*A_PYRC >= -1e-12*np.abs(v_PYRC).max()*np.abs(A_PYRC).max()) and np.all(v_PIC*A_PIC >= -1e-12*np.abs(v_PIC).max()*np.abs(A_PIC).max()) and np.all(v_ANT*A_ANT >= -1e-12*np.abs(v_ANT).max()*np.abs(A_ANT).max()) and np.all(v_PDH*A_PDH >= -1e-12*np.abs(v_PDH).max()*np.abs(A_PDH).max()) and np.all(v_CS*A_CS >= -1e-12*np.abs(v_CS).max()*np.abs(A_CS).max()) and np.all(v_ACO*A_ACO >= -1e-12*np.abs(v_ACO).max()*np.abs(A_ACO).max()) and np.all(v_IDH*A_IDH >= -1e-12*np.abs(v_IDH).max()*np.abs(A_IDH).max()) and np.all(v_OGDH*A_OGDH >= -1e-12*np.abs(v_OGDH).max()*np.abs(A_OGDH).max()) and np.all(v_SCS*A_SCS >= -1e-12*np.abs(v_SCS).max()*np.abs(A_SCS).max()) and np.all(v_CII*A_CII >= -1e-12*np.abs(v_CII).max()*np.abs(A_CII).max()) and np.all(v_FUM*A_FUM >= -1e-12*np.abs(v_FUM).max()*np.abs(A_FUM).max()) and np.all(v_MDH*A_MDH >= -1e-12*np.abs(v_MDH).max()*np.abs(A_MDH).max()) and np.all(v_CI*A_CI >= -1e-12*np.abs(v_CI).max()*np.abs(A_CI).max()) and np.all(v_CIII*A_CIII >= -1e-12*np.abs(v_CIII).max()*np.abs(A_CIII).max()) and np.all(v_CIV*A_CIV >= -1e-12*np.abs(v_CIV).max()*np.abs(A_CIV).max()) and np.all(v_ATPS*A_ATPS >= -1e-12*np.abs(v_ATPS).max()*np.abs(A_ATPS).max()) and np.all(v_LEAK*A_LEAK >= -1e-12*np.abs(v_LEAK).max()*np.abs(A_LEAK).max()) and np.all(P_diss >= -1e-9*np.abs(P_diss).max())"
+    },
+    {
+      "description": "conserved moieties (relative 1e-9): NAD+ + NADH, CoA + acetyl-CoA + succinyl-CoA, matrix ATP + ADP, Q + QH2, cytochrome c, and the TCA cycle's intermediates (citrate to oxaloacetate)",
+      "expr": "np.allclose(C_NAD_m + C_NADH_m, (C_NAD_m + C_NADH_m)[0], rtol=1e-9, atol=0) and np.allclose(C_CoA + C_AcCoA + C_SucCoA, (C_CoA + C_AcCoA + C_SucCoA)[0], rtol=1e-9, atol=0) and np.allclose(C_ATP_m + C_ADP_m, (C_ATP_m + C_ADP_m)[0], rtol=1e-9, atol=0) and np.allclose(C_Q + C_QH2, (C_Q + C_QH2)[0], rtol=1e-9, atol=0) and np.allclose(C_cytc_ox + C_cytc_red, (C_cytc_ox + C_cytc_red)[0], rtol=1e-9, atol=0) and np.allclose(C_Cit + C_Icit + C_OG + C_SucCoA + C_Suc + C_Fum + C_Mal + C_OAA, (C_Cit + C_Icit + C_OG + C_SucCoA + C_Suc + C_Fum + C_Mal + C_OAA)[0], rtol=1e-9, atol=0)"
+    },
+    {
+      "description": "the ports report each chemostat's net production: j_O2 = -v_CIV, j_Pyr_c = -v_PYRC, j_ATP_c = v_ANT, j_CO2 = v_PDH + v_IDH + v_OGDH (exact)",
+      "expr": "np.allclose(j_O2, -v_CIV, rtol=1e-12, atol=0) and np.allclose(j_Pyr_c, -v_PYRC, rtol=1e-12, atol=0) and np.allclose(j_ATP_c, v_ANT, rtol=1e-12, atol=0) and np.allclose(j_CO2, v_PDH + v_IDH + v_OGDH, rtol=1e-12, atol=1e-30)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "C_O2": [
+        0.001,
+        0.2
+      ],
+      "C_ATP_c": [
+        1.0,
+        5.0
+      ],
+      "C_ADP_c": [
+        0.05,
+        2.0
+      ],
+      "C_Pi_c": [
+        0.5,
+        10.0
+      ],
+      "C_Pyr_c": [
+        0.01,
+        1.0
+      ],
+      "C_CO2": [
+        0.5,
+        5.0
+      ],
+      "C_H_c": [
+        2.5e-05,
+        0.00016
+      ],
+      "C_H_m": [
+        1e-05,
+        4e-05
+      ]
+    },
+    "exclude": [
+      "R",
+      "T",
+      "F",
+      "C_H2O",
+      "mu0_Pyr_c",
+      "mu0_Pi_c",
+      "mu0_H_c",
+      "mu0_ATP_c",
+      "mu0_ADP_c",
+      "mu0_O2",
+      "mu0_CO2",
+      "mu0_H2O",
+      "mu0_H_m",
+      "mu0_Pyr_m",
+      "mu0_AcCoA",
+      "mu0_CoA",
+      "mu0_Cit",
+      "mu0_Icit",
+      "mu0_OG",
+      "mu0_SucCoA",
+      "mu0_Suc",
+      "mu0_Fum",
+      "mu0_Mal",
+      "mu0_OAA",
+      "mu0_NAD_m",
+      "mu0_NADH_m",
+      "mu0_ATP_m",
+      "mu0_ADP_m",
+      "mu0_Pi_m",
+      "mu0_Q",
+      "mu0_QH2",
+      "mu0_cytc_ox",
+      "mu0_cytc_red"
+    ],
+    "rationale": "O2 from near anoxia to air-saturated; ATP and ADP from a de-energised to a resting cell; phosphate, pyruvate and CO2 over an order of magnitude; cytosol pH 6.8 to 7.6, matrix 7.4 to 8"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      4e-07,
+      2e-07,
+      1e-07
+    ],
+    "t_end": 0.0001,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-09
+      }
+    ],
+    "t_end": 1.0,
+    "solve_ivp": [
+      "BDF",
+      "LSODA"
+    ],
+    "time_budget": 10
+  }
+}

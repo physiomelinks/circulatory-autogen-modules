@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-332 0 609 470" width="609" height="470" font-family="sans-serif" font-size="11">
+<title>Detailed gluconeogenic bypasses and glycerol entry: bond graph</title>
+<metadata id="celldl-rdf-metadata" data-content-type="text/turtle"><![CDATA[
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+
+@prefix : <#> .
+
+# Detailed gluconeogenic bypasses and glycerol entry: written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
+# T = 310.15 K; volume 6.28319e-15 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+
+:gluconeogenesis
+    a bgf:BondgraphModel ;
+    bgf:usesTemplate tpl:chemical.ttl ;
+    bgf:hasBondElement :q_F16BP, :q_F6P, :q_G6P, :q_glc, :q_DHAP, :q_glycerol, :q_NAD, :q_NADH, :q_ATP, :q_ADP, :q_Pi, :q_H, :q_H2O, :q_Gly3P, :Re_FBPASE, :Re_G6PASE, :Re_GK, :Re_G3PDH .
+
+:q_F16BP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435918e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.014755115236239e+16 mol-1"^^cdt:ucum ] .
+
+:q_F6P  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179588e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.805501082679737e+14 mol-1"^^cdt:ucum ] .
+
+:q_G6P  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435918e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.527390018998045e+15 mol-1"^^cdt:ucum ] .
+
+:q_glc  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "5.026548245743670e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.036502448438191e+13 mol-1"^^cdt:ucum ] .
+
+:q_DHAP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.884955592153876e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.304103312107910e+15 mol-1"^^cdt:ucum ] .
+
+:q_glycerol  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179588e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.122486094690295e+16 mol-1"^^cdt:ucum ] .
+
+:q_NAD  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.183735863862472e+14 mol-1"^^cdt:ucum ] .
+
+:q_NADH  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-18 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.182461987264720e+17 mol-1"^^cdt:ucum ] .
+
+:q_ATP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.980460008823006e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.561186848636725e+14 mol-1"^^cdt:ucum ] .
+
+:q_ADP  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "2.186548486898495e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.484553081229358e+13 mol-1"^^cdt:ucum ] .
+
+:q_Pi  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589793e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.881342803685145e+12 mol-1"^^cdt:ucum ] .
+
+:q_H  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.964421916294998e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.575793175993118e+17 mol-1"^^cdt:ucum ] .
+
+:q_H2O  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.487167845484671e-10 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.851872048248143e+10 mol-1"^^cdt:ucum ] .
+
+:q_Gly3P
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.998030349085263e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.097803692079442e+13 mol-1"^^cdt:ucum ] .
+
+:Re_FBPASE  # saturation sigma 447.4: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_FBPASE" ; bgf:hasValue "4.213032640669796e-19 mol/s"^^cdt:ucum ] .
+
+:Re_G6PASE  # saturation sigma 97.27: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_G6PASE" ; bgf:hasValue "1.936644353152187e-18 mol/s"^^cdt:ucum ] .
+
+:Re_GK  # saturation sigma 149.2: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GK" ; bgf:hasValue "5.052927555475119e-19 mol/s"^^cdt:ucum ] .
+
+:Re_G3PDH
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_G3PDH" ; bgf:hasValue "1.771849755631454e-13 mol/s"^^cdt:ucum ] .
+
+:q_F16BP.Re_FBPASE bgf:hasSource :q_F16BP ; bgf:hasTarget :Re_FBPASE .
+:q_H2O.Re_FBPASE bgf:hasSource :q_H2O ; bgf:hasTarget :Re_FBPASE .
+:Re_FBPASE.q_F6P bgf:hasSource :Re_FBPASE ; bgf:hasTarget :q_F6P .
+:Re_FBPASE.q_Pi bgf:hasSource :Re_FBPASE ; bgf:hasTarget :q_Pi .
+:q_G6P.Re_G6PASE bgf:hasSource :q_G6P ; bgf:hasTarget :Re_G6PASE .
+:q_H2O.Re_G6PASE bgf:hasSource :q_H2O ; bgf:hasTarget :Re_G6PASE .
+:Re_G6PASE.q_glc bgf:hasSource :Re_G6PASE ; bgf:hasTarget :q_glc .
+:Re_G6PASE.q_Pi bgf:hasSource :Re_G6PASE ; bgf:hasTarget :q_Pi .
+:q_glycerol.Re_GK bgf:hasSource :q_glycerol ; bgf:hasTarget :Re_GK .
+:q_ATP.Re_GK bgf:hasSource :q_ATP ; bgf:hasTarget :Re_GK .
+:Re_GK.q_Gly3P bgf:hasSource :Re_GK ; bgf:hasTarget :q_Gly3P .
+:Re_GK.q_ADP bgf:hasSource :Re_GK ; bgf:hasTarget :q_ADP .
+:Re_GK.q_H bgf:hasSource :Re_GK ; bgf:hasTarget :q_H .
+:q_Gly3P.Re_G3PDH bgf:hasSource :q_Gly3P ; bgf:hasTarget :Re_G3PDH .
+:q_NAD.Re_G3PDH bgf:hasSource :q_NAD ; bgf:hasTarget :Re_G3PDH .
+:Re_G3PDH.q_DHAP bgf:hasSource :Re_G3PDH ; bgf:hasTarget :q_DHAP .
+:Re_G3PDH.q_NADH bgf:hasSource :Re_G3PDH ; bgf:hasTarget :q_NADH .
+:Re_G3PDH.q_H bgf:hasSource :Re_G3PDH ; bgf:hasTarget :q_H .
+]]></metadata>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/></marker></defs>
+<line class="bond" id="bond_F16BP_FBPASE" x1="-196.2" y1="60.0" x2="-147.2" y2="60.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H2O_FBPASE" x1="-36.2" y1="99.5" x2="-16.5" y2="78.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_F6P_FBPASE" x1="147.2" y1="60.0" x2="196.2" y2="60.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pi_FBPASE" x1="0.0" y1="78.0" x2="0.0" y2="94.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_G6P_G6PASE" x1="-196.2" y1="170.0" x2="-147.2" y2="170.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H2O_G6PASE" x1="-36.2" y1="130.5" x2="-16.5" y2="152.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_glc_G6PASE" x1="147.2" y1="170.0" x2="196.2" y2="170.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pi_G6PASE" x1="0.0" y1="152.0" x2="0.0" y2="136.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_glycerol_GK" x1="-196.2" y1="280.0" x2="-147.2" y2="280.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ATP_GK" x1="196.2" y1="280.0" x2="147.2" y2="280.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Gly3P_GK" x1="-16.5" y1="298.0" x2="-36.2" y2="319.5" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ADP_GK" x1="-147.2" y1="280.0" x2="-251.2" y2="280.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_GK" x1="0.0" y1="298.0" x2="0.0" y2="314.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Gly3P_G3PDH" x1="-36.2" y1="350.5" x2="-16.5" y2="372.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NAD_G3PDH" x1="196.2" y1="390.0" x2="147.2" y2="390.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_DHAP_G3PDH" x1="-147.2" y1="390.0" x2="-196.2" y2="390.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NADH_G3PDH" x1="-147.2" y1="390.0" x2="-251.2" y2="390.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_G3PDH" x1="0.0" y1="372.0" x2="0.0" y2="356.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<g id="Re_FBPASE" class="reaction"><rect x="-147.2" y="42.0" width="294.4" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="57.0" text-anchor="middle" font-weight="bold">Re: FBPASE</text><text x="0.0" y="71.0" text-anchor="middle" font-size="10">fructose 1,6-bisphosphatase</text></g>
+<g id="Re_G6PASE" class="reaction"><rect x="-147.2" y="152.0" width="294.4" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="167.0" text-anchor="middle" font-weight="bold">Re: G6PASE</text><text x="0.0" y="181.0" text-anchor="middle" font-size="10">glucose 6-phosphatase</text></g>
+<g id="Re_GK" class="reaction"><rect x="-147.2" y="262.0" width="294.4" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="277.0" text-anchor="middle" font-weight="bold">Re: GK</text><text x="0.0" y="291.0" text-anchor="middle" font-size="10">glycerol kinase</text></g>
+<g id="Re_G3PDH" class="reaction"><rect x="-147.2" y="372.0" width="294.4" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="387.0" text-anchor="middle" font-weight="bold">Re: G3PDH</text><text x="0.0" y="401.0" text-anchor="middle" font-size="10">glycerol 3-phosphate dehydrogenase (towards DHAP)</text></g>
+<g id="q_F16BP" class="species"><circle cx="-217.2" cy="60.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-217.2" y="64.0" text-anchor="middle">F16BP</text><title>fructose 1,6-bisphosphate (chemostat)</title></g>
+<g id="q_F6P" class="species"><circle cx="217.2" cy="60.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="217.2" y="64.0" text-anchor="middle">F6P</text><title>fructose 6-phosphate (chemostat)</title></g>
+<g id="q_G6P" class="species"><circle cx="-217.2" cy="170.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-217.2" y="174.0" text-anchor="middle">G6P</text><title>glucose 6-phosphate (chemostat)</title></g>
+<g id="q_glc" class="species"><circle cx="217.2" cy="170.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="217.2" y="174.0" text-anchor="middle">glc</text><title>glucose (chemostat)</title></g>
+<g id="q_DHAP" class="species"><circle cx="-217.2" cy="390.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-217.2" y="394.0" text-anchor="middle">DHAP</text><title>dihydroxyacetone phosphate (chemostat)</title></g>
+<g id="q_glycerol" class="species"><circle cx="-217.2" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-217.2" y="284.0" text-anchor="middle">glycerol</text><title>glycerol (chemostat)</title></g>
+<g id="q_NAD" class="species"><circle cx="217.2" cy="390.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="217.2" y="394.0" text-anchor="middle">NAD</text><title>NAD+ (chemostat)</title></g>
+<g id="q_NADH" class="species"><circle cx="-272.2" cy="390.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-272.2" y="394.0" text-anchor="middle">NADH</text><title>NADH (chemostat)</title></g>
+<g id="q_ATP" class="species"><circle cx="217.2" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="217.2" y="284.0" text-anchor="middle">ATP</text><title>ATP (chemostat)</title></g>
+<g id="q_ADP" class="species"><circle cx="-272.2" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-272.2" y="284.0" text-anchor="middle">ADP</text><title>ADP (chemostat)</title></g>
+<g id="q_Pi" class="species"><circle cx="0.0" cy="115.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="0.0" y="119.0" text-anchor="middle">Pi</text><title>phosphate (chemostat)</title></g>
+<g id="q_H" class="species"><circle cx="0.0" cy="335.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="0.0" y="339.0" text-anchor="middle">H</text><title>H+ (chemostat)</title></g>
+<g id="q_H2O" class="species"><circle cx="-50.4" cy="115.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-50.4" y="119.0" text-anchor="middle">H2O</text><title>water (chemostat)</title></g>
+<g id="q_Gly3P" class="species"><circle cx="-50.4" cy="335.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-50.4" y="339.0" text-anchor="middle">Gly3P</text><title>glycerol 3-phosphate</title></g>
+<text x="-322" y="18" fill="#555">Detailed gluconeogenic bypasses and glycerol entry: species (0-junction + C), reactions (Re between 1-junctions); dashed: chemostats</text>
+</svg>

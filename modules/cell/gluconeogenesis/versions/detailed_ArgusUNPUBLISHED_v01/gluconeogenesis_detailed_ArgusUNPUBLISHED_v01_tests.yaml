@@ -1,0 +1,13 @@
+module_type: gluconeogenesis
+version: detailed_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The steps of gluconeogenesis that glycolysis cannot run backwards, and glycerol''s way in, from the designer''s CarbohydrateMetabolism.cellml
+  (GLY17-20): fructose 1,6-bisphosphatase and glucose 6-phosphatase (the bypasses of phosphofructokinase and hexokinase: with
+  them each forms a cycle that hydrolyses one ATP, their standard Gibbs energies summing to ATP hydrolysis''), glycerol kinase
+  and glycerol 3-phosphate dehydrogenase (glycerol to DHAP, which the glycolysis module''s aldolase and isomerase take on).
+  Every reaction is balanced in elements and charge, with textbook standard Gibbs energies and midpoint potentials. The metabolites
+  it shares with glycolysis are chemostats on the cytosol_metabolites port; glycerol 3-phosphate is its own. Calibrated, with
+  placeholder concentrations, to a respiring (liver-like) cytosol at 37 C making glucose at a placeholder rate: the dehydrogenase
+  can carry glycerol to DHAP only where NADH/NAD+ is low (about 1/1000 here); at the fermenter''s NADH/NAD+ (1/30) it runs
+  the other way (tests/test_metabolism_detailed.py). Its bond graph is in gluconeogenesis_detailed_ArgusUNPUBLISHED_v01_bondgraph.ttl
+  (BG-RDF) and drawn in gluconeogenesis_detailed_ArgusUNPUBLISHED_v01_bondgraph.svg.'

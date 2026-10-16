@@ -1,0 +1,458 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-524 0 1048 1900" width="1048" height="1900" font-family="sans-serif" font-size="11">
+<title>Detailed mitochondrion: bond graph</title>
+<metadata id="celldl-rdf-metadata" data-content-type="text/turtle"><![CDATA[
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+
+@prefix : <#> .
+
+# Detailed mitochondrion: written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
+# T = 310.15 K; volume 6.28319e-15 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+# electrical potentials folded into K: m -150 mV
+
+:mitochondrion
+    a bgf:BondgraphModel ;
+    bgf:usesTemplate tpl:chemical.ttl ;
+    bgf:hasBondElement :q_Pyr_c, :q_Pi_c, :q_H_c, :q_ATP_c, :q_ADP_c, :q_O2, :q_CO2, :q_H2O, :q_H_m, :q_Pyr_m, :q_AcCoA, :q_CoA, :q_Cit, :q_Icit, :q_OG, :q_SucCoA, :q_Suc, :q_Fum, :q_Mal, :q_OAA, :q_NAD_m, :q_NADH_m, :q_ATP_m, :q_ADP_m, :q_Pi_m, :q_Q, :q_QH2, :q_cytc_ox, :q_cytc_red, :Re_PYRC, :Re_PIC, :Re_ANT, :Re_PDH, :Re_CS, :Re_ACO, :Re_IDH, :Re_OGDH, :Re_SCS, :Re_CII, :Re_FUM, :Re_MDH, :Re_CI, :Re_CIII, :Re_CIV, :Re_ATPS, :Re_LEAK .
+
+:q_Pyr_c  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179588e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.239234394949836e+19 mol-1"^^cdt:ucum ] .
+
+:q_Pi_c  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435917e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.702950277757485e+09 mol-1"^^cdt:ucum ] .
+
+:q_H_c  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.964421916294998e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.238023310593496e+14 mol-1"^^cdt:ucum ] .
+
+:q_ATP_c  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.980460008823006e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.295063573792546e+18 mol-1"^^cdt:ucum ] .
+
+:q_ADP_c  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "2.186548486898495e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.783132937986621e+10 mol-1"^^cdt:ucum ] .
+
+:q_O2  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.751061628386214e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.954995204808962e+51 mol-1"^^cdt:ucum ] .
+
+:q_CO2  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "7.539822368615504e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.084463813327356e-13 mol-1"^^cdt:ucum ] .
+
+:q_H2O  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.487167845484671e-10 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.904485569110665e+01 mol-1"^^cdt:ucum ] .
+
+:q_H_m  # a chemostat of the module (held by its port), here a store
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.253660286138159e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.913129979458404e+12 mol-1"^^cdt:ucum ] .
+
+:q_Pyr_m
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.984930735506017e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.392941785311524e+21 mol-1"^^cdt:ucum ] .
+
+:q_AcCoA
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "4.398229715025711e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.095113714899284e+28 mol-1"^^cdt:ucum ] .
+
+:q_CoA
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179588e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.369746695456886e+15 mol-1"^^cdt:ucum ] .
+
+:q_Cit
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "2.513274122871835e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.322357034432887e+18 mol-1"^^cdt:ucum ] .
+
+:q_Icit
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.445101577453008e-17 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.247215471642271e+20 mol-1"^^cdt:ucum ] .
+
+:q_OG
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435918e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.862526567189775e+26 mol-1"^^cdt:ucum ] .
+
+:q_SucCoA
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.758257373304148e+33 mol-1"^^cdt:ucum ] .
+
+:q_Suc
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.765316331033514e+21 mol-1"^^cdt:ucum ] .
+
+:q_Fum
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "7.204618080809418e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.493014581897356e+24 mol-1"^^cdt:ucum ] .
+
+:q_Mal
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.292227522554186e+16 mol-1"^^cdt:ucum ] .
+
+:q_OAA
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.915235085419218e-19 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.924831596704171e+12 mol-1"^^cdt:ucum ] .
+
+:q_NAD_m
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.570796326794897e-14 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.079811671312825e+10 mol-1"^^cdt:ucum ] .
+
+:q_NADH_m
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179587e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.752194481600541e+24 mol-1"^^cdt:ucum ] .
+
+:q_ATP_m
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179587e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.621941524712553e+27 mol-1"^^cdt:ucum ] .
+
+:q_ADP_m
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "6.283185307179587e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.832968915573990e+17 mol-1"^^cdt:ucum ] .
+
+:q_Pi_m
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.255380424374871e-13 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.276579502160471e+14 mol-1"^^cdt:ucum ] .
+
+:q_Q
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.290419053606068e+16 mol-1"^^cdt:ucum ] .
+
+:q_QH2
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.915182570901916e+13 mol-1"^^cdt:ucum ] .
+
+:q_cytc_ox
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "1.256637061435918e-15 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.044443794673352e+16 mol-1"^^cdt:ucum ] .
+
+:q_cytc_red
+    a bgf:ChemicalStorageNode ;
+    bgf:hasValue "3.141592653589794e-16 mol"^^cdt:ucum ;
+    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.425242606617139e+14 mol-1"^^cdt:ucum ] .
+
+:Re_PYRC
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PYRC" ; bgf:hasValue "7.093244130083874e-14 mol/s"^^cdt:ucum ] .
+
+:Re_PIC
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PIC" ; bgf:hasValue "1.398207508378069e+00 mol/s"^^cdt:ucum ] .
+
+:Re_ANT  # saturation sigma 15.58: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_ANT" ; bgf:hasValue "7.146605784639307e-25 mol/s"^^cdt:ucum ] .
+
+:Re_PDH  # saturation sigma 1.997e-11: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PDH" ; bgf:hasValue "4.090163726437410e-20 mol/s"^^cdt:ucum ] .
+
+:Re_CS  # saturation sigma 2.813e-15: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_CS" ; bgf:hasValue "2.890012359024341e-16 mol/s"^^cdt:ucum ] .
+
+:Re_ACO
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_ACO" ; bgf:hasValue "8.573964192200168e-18 mol/s"^^cdt:ucum ] .
+
+:Re_IDH  # saturation sigma 3.451e-09: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_IDH" ; bgf:hasValue "1.774098039528811e-17 mol/s"^^cdt:ucum ] .
+
+:Re_OGDH  # saturation sigma 3.896e-09: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_OGDH" ; bgf:hasValue "7.657784861904448e-25 mol/s"^^cdt:ucum ] .
+
+:Re_SCS  # saturation sigma 0.08609: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_SCS" ; bgf:hasValue "1.669798009879730e-39 mol/s"^^cdt:ucum ] .
+
+:Re_CII  # saturation sigma 1.807e+05: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_CII" ; bgf:hasValue "2.526246561956819e-26 mol/s"^^cdt:ucum ] .
+
+:Re_FUM
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_FUM" ; bgf:hasValue "2.822293389394077e-15 mol/s"^^cdt:ucum ] .
+
+:Re_MDH
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_MDH" ; bgf:hasValue "5.839728182655366e-12 mol/s"^^cdt:ucum ] .
+
+:Re_CI
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_CI" ; bgf:hasValue "2.497727693931049e+06 mol/s"^^cdt:ucum ] .
+
+:Re_CIII  # saturation sigma 4.652e-11: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_CIII" ; bgf:hasValue "9.916674268814192e-03 mol/s"^^cdt:ucum ] .
+
+:Re_CIV  # saturation sigma 1.623e-11: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_CIV" ; bgf:hasValue "2.978520465411059e+05 mol/s"^^cdt:ucum ] .
+
+:Re_ATPS  # saturation sigma 2.784e-15: folded into kappa at the export's concentrations
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_ATPS" ; bgf:hasValue "3.591621320027808e-09 mol/s"^^cdt:ucum ] .
+
+:Re_LEAK
+    a bgf:ChemicalReactionNode ;
+    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_LEAK" ; bgf:hasValue "2.211770799695791e-12 mol/s"^^cdt:ucum ] .
+
+:q_Pyr_c.Re_PYRC bgf:hasSource :q_Pyr_c ; bgf:hasTarget :Re_PYRC .
+:q_H_c.Re_PYRC bgf:hasSource :q_H_c ; bgf:hasTarget :Re_PYRC .
+:Re_PYRC.q_Pyr_m bgf:hasSource :Re_PYRC ; bgf:hasTarget :q_Pyr_m .
+:Re_PYRC.q_H_m bgf:hasSource :Re_PYRC ; bgf:hasTarget :q_H_m .
+:q_Pi_c.Re_PIC bgf:hasSource :q_Pi_c ; bgf:hasTarget :Re_PIC .
+:q_H_c.Re_PIC bgf:hasSource :q_H_c ; bgf:hasTarget :Re_PIC ; bgf:bondCount 2 .
+:Re_PIC.q_Pi_m bgf:hasSource :Re_PIC ; bgf:hasTarget :q_Pi_m .
+:Re_PIC.q_H_m bgf:hasSource :Re_PIC ; bgf:hasTarget :q_H_m ; bgf:bondCount 2 .
+:q_ATP_m.Re_ANT bgf:hasSource :q_ATP_m ; bgf:hasTarget :Re_ANT .
+:q_ADP_c.Re_ANT bgf:hasSource :q_ADP_c ; bgf:hasTarget :Re_ANT .
+:Re_ANT.q_ATP_c bgf:hasSource :Re_ANT ; bgf:hasTarget :q_ATP_c .
+:Re_ANT.q_ADP_m bgf:hasSource :Re_ANT ; bgf:hasTarget :q_ADP_m .
+:q_Pyr_m.Re_PDH bgf:hasSource :q_Pyr_m ; bgf:hasTarget :Re_PDH .
+:q_CoA.Re_PDH bgf:hasSource :q_CoA ; bgf:hasTarget :Re_PDH .
+:q_NAD_m.Re_PDH bgf:hasSource :q_NAD_m ; bgf:hasTarget :Re_PDH .
+:Re_PDH.q_AcCoA bgf:hasSource :Re_PDH ; bgf:hasTarget :q_AcCoA .
+:Re_PDH.q_NADH_m bgf:hasSource :Re_PDH ; bgf:hasTarget :q_NADH_m .
+:Re_PDH.q_CO2 bgf:hasSource :Re_PDH ; bgf:hasTarget :q_CO2 .
+:q_OAA.Re_CS bgf:hasSource :q_OAA ; bgf:hasTarget :Re_CS .
+:q_AcCoA.Re_CS bgf:hasSource :q_AcCoA ; bgf:hasTarget :Re_CS .
+:q_H2O.Re_CS bgf:hasSource :q_H2O ; bgf:hasTarget :Re_CS .
+:Re_CS.q_Cit bgf:hasSource :Re_CS ; bgf:hasTarget :q_Cit .
+:Re_CS.q_CoA bgf:hasSource :Re_CS ; bgf:hasTarget :q_CoA .
+:Re_CS.q_H_m bgf:hasSource :Re_CS ; bgf:hasTarget :q_H_m .
+:q_Cit.Re_ACO bgf:hasSource :q_Cit ; bgf:hasTarget :Re_ACO .
+:Re_ACO.q_Icit bgf:hasSource :Re_ACO ; bgf:hasTarget :q_Icit .
+:q_Icit.Re_IDH bgf:hasSource :q_Icit ; bgf:hasTarget :Re_IDH .
+:q_NAD_m.Re_IDH bgf:hasSource :q_NAD_m ; bgf:hasTarget :Re_IDH .
+:Re_IDH.q_OG bgf:hasSource :Re_IDH ; bgf:hasTarget :q_OG .
+:Re_IDH.q_NADH_m bgf:hasSource :Re_IDH ; bgf:hasTarget :q_NADH_m .
+:Re_IDH.q_CO2 bgf:hasSource :Re_IDH ; bgf:hasTarget :q_CO2 .
+:q_OG.Re_OGDH bgf:hasSource :q_OG ; bgf:hasTarget :Re_OGDH .
+:q_CoA.Re_OGDH bgf:hasSource :q_CoA ; bgf:hasTarget :Re_OGDH .
+:q_NAD_m.Re_OGDH bgf:hasSource :q_NAD_m ; bgf:hasTarget :Re_OGDH .
+:Re_OGDH.q_SucCoA bgf:hasSource :Re_OGDH ; bgf:hasTarget :q_SucCoA .
+:Re_OGDH.q_NADH_m bgf:hasSource :Re_OGDH ; bgf:hasTarget :q_NADH_m .
+:Re_OGDH.q_CO2 bgf:hasSource :Re_OGDH ; bgf:hasTarget :q_CO2 .
+:q_SucCoA.Re_SCS bgf:hasSource :q_SucCoA ; bgf:hasTarget :Re_SCS .
+:q_ADP_m.Re_SCS bgf:hasSource :q_ADP_m ; bgf:hasTarget :Re_SCS .
+:q_Pi_m.Re_SCS bgf:hasSource :q_Pi_m ; bgf:hasTarget :Re_SCS .
+:Re_SCS.q_Suc bgf:hasSource :Re_SCS ; bgf:hasTarget :q_Suc .
+:Re_SCS.q_CoA bgf:hasSource :Re_SCS ; bgf:hasTarget :q_CoA .
+:Re_SCS.q_ATP_m bgf:hasSource :Re_SCS ; bgf:hasTarget :q_ATP_m .
+:q_Suc.Re_CII bgf:hasSource :q_Suc ; bgf:hasTarget :Re_CII .
+:q_Q.Re_CII bgf:hasSource :q_Q ; bgf:hasTarget :Re_CII .
+:Re_CII.q_Fum bgf:hasSource :Re_CII ; bgf:hasTarget :q_Fum .
+:Re_CII.q_QH2 bgf:hasSource :Re_CII ; bgf:hasTarget :q_QH2 .
+:q_Fum.Re_FUM bgf:hasSource :q_Fum ; bgf:hasTarget :Re_FUM .
+:q_H2O.Re_FUM bgf:hasSource :q_H2O ; bgf:hasTarget :Re_FUM .
+:Re_FUM.q_Mal bgf:hasSource :Re_FUM ; bgf:hasTarget :q_Mal .
+:q_Mal.Re_MDH bgf:hasSource :q_Mal ; bgf:hasTarget :Re_MDH .
+:q_NAD_m.Re_MDH bgf:hasSource :q_NAD_m ; bgf:hasTarget :Re_MDH .
+:Re_MDH.q_OAA bgf:hasSource :Re_MDH ; bgf:hasTarget :q_OAA .
+:Re_MDH.q_NADH_m bgf:hasSource :Re_MDH ; bgf:hasTarget :q_NADH_m .
+:Re_MDH.q_H_m bgf:hasSource :Re_MDH ; bgf:hasTarget :q_H_m .
+:q_NADH_m.Re_CI bgf:hasSource :q_NADH_m ; bgf:hasTarget :Re_CI .
+:q_Q.Re_CI bgf:hasSource :q_Q ; bgf:hasTarget :Re_CI .
+:q_H_m.Re_CI bgf:hasSource :q_H_m ; bgf:hasTarget :Re_CI ; bgf:bondCount 5 .
+:Re_CI.q_NAD_m bgf:hasSource :Re_CI ; bgf:hasTarget :q_NAD_m .
+:Re_CI.q_QH2 bgf:hasSource :Re_CI ; bgf:hasTarget :q_QH2 .
+:Re_CI.q_H_c bgf:hasSource :Re_CI ; bgf:hasTarget :q_H_c ; bgf:bondCount 4 .
+:q_QH2.Re_CIII bgf:hasSource :q_QH2 ; bgf:hasTarget :Re_CIII .
+:q_cytc_ox.Re_CIII bgf:hasSource :q_cytc_ox ; bgf:hasTarget :Re_CIII ; bgf:bondCount 2 .
+:q_H_m.Re_CIII bgf:hasSource :q_H_m ; bgf:hasTarget :Re_CIII ; bgf:bondCount 2 .
+:Re_CIII.q_Q bgf:hasSource :Re_CIII ; bgf:hasTarget :q_Q .
+:Re_CIII.q_cytc_red bgf:hasSource :Re_CIII ; bgf:hasTarget :q_cytc_red ; bgf:bondCount 2 .
+:Re_CIII.q_H_c bgf:hasSource :Re_CIII ; bgf:hasTarget :q_H_c ; bgf:bondCount 4 .
+:q_cytc_red.Re_CIV bgf:hasSource :q_cytc_red ; bgf:hasTarget :Re_CIV ; bgf:bondCount 4 .
+:q_O2.Re_CIV bgf:hasSource :q_O2 ; bgf:hasTarget :Re_CIV .
+:q_H_m.Re_CIV bgf:hasSource :q_H_m ; bgf:hasTarget :Re_CIV ; bgf:bondCount 8 .
+:Re_CIV.q_cytc_ox bgf:hasSource :Re_CIV ; bgf:hasTarget :q_cytc_ox ; bgf:bondCount 4 .
+:Re_CIV.q_H2O bgf:hasSource :Re_CIV ; bgf:hasTarget :q_H2O ; bgf:bondCount 2 .
+:Re_CIV.q_H_c bgf:hasSource :Re_CIV ; bgf:hasTarget :q_H_c ; bgf:bondCount 4 .
+:q_ADP_m.Re_ATPS bgf:hasSource :q_ADP_m ; bgf:hasTarget :Re_ATPS .
+:q_Pi_m.Re_ATPS bgf:hasSource :q_Pi_m ; bgf:hasTarget :Re_ATPS .
+:q_H_c.Re_ATPS bgf:hasSource :q_H_c ; bgf:hasTarget :Re_ATPS ; bgf:bondCount 3 .
+:Re_ATPS.q_ATP_m bgf:hasSource :Re_ATPS ; bgf:hasTarget :q_ATP_m .
+:Re_ATPS.q_H2O bgf:hasSource :Re_ATPS ; bgf:hasTarget :q_H2O .
+:Re_ATPS.q_H_m bgf:hasSource :Re_ATPS ; bgf:hasTarget :q_H_m ; bgf:bondCount 2 .
+:q_H_c.Re_LEAK bgf:hasSource :q_H_c ; bgf:hasTarget :Re_LEAK .
+:Re_LEAK.q_H_m bgf:hasSource :Re_LEAK ; bgf:hasTarget :q_H_m .
+]]></metadata>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/></marker></defs>
+<line class="bond" id="bond_Pyr_c_PYRC" x1="-213.0" y1="60.0" x2="-164.0" y2="60.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_c_PYRC" x1="-377.2" y1="1155.9" x2="-6.2" y2="78.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pyr_m_PYRC" x1="-41.9" y1="78.0" x2="-364.7" y2="216.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_PYRC" x1="6.6" y1="78.0" x2="376.8" y2="1091.4" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pi_c_PIC" x1="-213.0" y1="170.0" x2="-164.0" y2="170.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_c_PIC" x1="-376.5" y1="1156.1" x2="-6.9" y2="188.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="-187.7" y="668.0" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_Pi_m_PIC" x1="-10.8" y1="188.0" x2="-453.2" y2="922.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_PIC" x1="7.3" y1="188.0" x2="376.1" y2="1091.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="195.7" y="635.8" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_ATP_m_ANT" x1="373.9" y1="958.3" x2="9.9" y2="298.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ADP_c_ANT" x1="213.0" y1="280.0" x2="164.0" y2="280.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ATP_c_ANT" x1="-164.0" y1="280.0" x2="-213.0" y2="280.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ADP_m_ANT" x1="-9.9" y1="298.0" x2="-373.9" y2="958.3" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pyr_m_PDH" x1="-364.7" y1="233.3" x2="-41.9" y2="372.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_CoA_PDH" x1="-366.9" y1="652.8" x2="-25.1" y2="408.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NAD_m_PDH" x1="-371.6" y1="901.0" x2="-13.1" y2="408.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_AcCoA_PDH" x1="0.0" y1="408.0" x2="0.0" y2="424.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NADH_m_PDH" x1="15.8" y1="408.0" x2="450.1" y2="902.2" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_CO2_PDH" x1="26.9" y1="408.0" x2="366.5" y2="635.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_OAA_CS" x1="369.2" y1="870.1" x2="18.0" y2="518.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_AcCoA_CS" x1="0.0" y1="466.0" x2="0.0" y2="482.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H2O_CS" x1="374.4" y1="1223.8" x2="9.3" y2="518.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Cit_CS" x1="0.0" y1="518.0" x2="0.0" y2="534.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_CoA_CS" x1="-41.9" y1="518.0" x2="-364.7" y2="656.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_CS" x1="11.3" y1="518.0" x2="372.8" y2="1093.3" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Cit_ACO" x1="0.0" y1="576.0" x2="0.0" y2="592.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Icit_ACO" x1="0.0" y1="628.0" x2="0.0" y2="644.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Icit_IDH" x1="0.0" y1="686.0" x2="0.0" y2="702.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NAD_m_IDH" x1="-365.3" y1="908.4" x2="-34.9" y2="738.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_OG_IDH" x1="0.0" y1="738.0" x2="0.0" y2="754.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NADH_m_IDH" x1="42.2" y1="738.0" x2="444.7" y2="909.8" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_CO2_IDH" x1="94.3" y1="702.0" x2="363.4" y2="650.6" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_OG_OGDH" x1="0.0" y1="796.0" x2="0.0" y2="812.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_CoA_OGDH" x1="-364.7" y1="673.3" x2="-41.9" y2="812.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NAD_m_OGDH" x1="-363.5" y1="913.3" x2="-78.5" y2="848.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_SucCoA_OGDH" x1="0.0" y1="848.0" x2="0.0" y2="864.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NADH_m_OGDH" x1="94.9" y1="848.0" x2="443.4" y2="914.1" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_CO2_OGDH" x1="37.7" y1="812.0" x2="365.0" y2="655.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_SucCoA_SCS" x1="0.0" y1="906.0" x2="0.0" y2="922.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ADP_m_SCS" x1="-363.1" y1="974.7" x2="-164.0" y2="955.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pi_m_SCS" x1="-443.0" y1="940.0" x2="-164.0" y2="940.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Suc_SCS" x1="0.0" y1="958.0" x2="0.0" y2="974.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_CoA_SCS" x1="-25.1" y1="922.0" x2="-366.9" y2="677.2" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_ATP_m_SCS" x1="164.0" y1="955.7" x2="363.1" y2="974.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Suc_CII" x1="0.0" y1="1016.0" x2="0.0" y2="1032.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Q_CII" x1="-366.5" y1="1295.0" x2="-26.9" y2="1068.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Fum_CII" x1="0.0" y1="1068.0" x2="0.0" y2="1084.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_QH2_CII" x1="26.9" y1="1068.0" x2="366.5" y2="1295.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Fum_FUM" x1="0.0" y1="1126.0" x2="0.0" y2="1142.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H2O_FUM" x1="363.5" y1="1238.1" x2="83.8" y2="1178.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Mal_FUM" x1="0.0" y1="1178.0" x2="0.0" y2="1194.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Mal_MDH" x1="0.0" y1="1236.0" x2="0.0" y2="1252.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NAD_m_MDH" x1="-368.5" y1="932.2" x2="-19.6" y2="1252.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_OAA_MDH" x1="18.0" y1="1252.0" x2="369.2" y2="899.9" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NADH_m_MDH" x1="23.7" y1="1252.0" x2="447.3" y2="930.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_MDH" x1="43.5" y1="1252.0" x2="364.6" y2="1119.1" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_NADH_m_CI" x1="449.1" y1="932.8" x2="18.1" y2="1362.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Q_CI" x1="-363.4" y1="1310.6" x2="-94.3" y2="1362.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_CI" x1="366.8" y1="1123.2" x2="25.7" y2="1362.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="200.3" y="1238.6" fill="#444" font-weight="bold">5</text>
+<line class="bond" id="bond_NAD_m_CI" x1="-15.0" y1="1362.0" x2="-370.6" y2="934.1" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_QH2_CI" x1="94.3" y1="1362.0" x2="363.4" y2="1310.6" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_c_CI" x1="-33.8" y1="1362.0" x2="-365.5" y2="1185.6" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="-195.6" y="1269.8" fill="#444" font-weight="bold">4</text>
+<line class="bond" id="bond_QH2_CIII" x1="365.0" y1="1315.7" x2="37.7" y2="1472.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_cytc_ox_CIII" x1="0.0" y1="1524.0" x2="0.0" y2="1508.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="4.0" y="1512.0" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_H_m_CIII" x1="369.1" y1="1125.9" x2="18.2" y2="1472.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="197.6" y="1294.9" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_Q_CIII" x1="-37.7" y1="1472.0" x2="-365.0" y2="1315.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_cytc_red_CIII" x1="-16.5" y1="1508.0" x2="-36.2" y2="1529.5" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="-22.4" y="1514.8" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_H_c_CIII" x1="-22.0" y1="1472.0" x2="-367.7" y2="1189.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="-190.9" y="1326.5" fill="#444" font-weight="bold">4</text>
+<line class="bond" id="bond_cytc_red_CIV" x1="-36.2" y1="1560.5" x2="-16.5" y2="1582.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="-22.4" y="1567.2" fill="#444" font-weight="bold">4</text>
+<line class="bond" id="bond_O2_CIV" x1="-213.0" y1="1600.0" x2="-164.0" y2="1600.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_CIV" x1="371.0" y1="1127.6" x2="14.1" y2="1582.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="196.6" y="1350.8" fill="#444" font-weight="bold">8</text>
+<line class="bond" id="bond_cytc_ox_CIV" x1="0.0" y1="1582.0" x2="0.0" y2="1566.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="4.0" y="1570.0" fill="#444" font-weight="bold">4</text>
+<line class="bond" id="bond_H2O_CIV" x1="19.3" y1="1582.0" x2="368.6" y2="1256.8" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="198.0" y="1415.4" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_H_c_CIV" x1="-16.3" y1="1582.0" x2="-369.9" y2="1191.3" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="-189.1" y="1382.6" fill="#444" font-weight="bold">4</text>
+<line class="bond" id="bond_ADP_m_ATPS" x1="-374.3" y1="995.3" x2="-9.4" y2="1692.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_Pi_m_ATPS" x1="-453.2" y1="958.0" x2="-10.8" y2="1692.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_c_ATPS" x1="-371.7" y1="1192.8" x2="-12.9" y2="1692.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="-188.3" y="1438.4" fill="#444" font-weight="bold">3</text>
+<line class="bond" id="bond_ATP_m_ATPS" x1="9.4" y1="1692.0" x2="374.3" y2="995.3" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H2O_ATPS" x1="14.8" y1="1692.0" x2="370.7" y2="1258.7" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_ATPS" x1="11.5" y1="1692.0" x2="372.7" y2="1128.8" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="196.1" y="1406.4" fill="#444" font-weight="bold">2</text>
+<line class="bond" id="bond_H_c_LEAK" x1="-373.2" y1="1193.8" x2="-10.7" y2="1802.0" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line class="bond" id="bond_H_m_LEAK" x1="9.8" y1="1802.0" x2="374.0" y2="1129.6" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+<g id="Re_PYRC" class="reaction"><rect x="-164.0" y="42.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="57.0" text-anchor="middle" font-weight="bold">Re: PYRC</text><text x="0.0" y="71.0" text-anchor="middle" font-size="10">mitochondrial pyruvate carrier (H+ symport)</text></g>
+<g id="Re_PIC" class="reaction"><rect x="-164.0" y="152.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="167.0" text-anchor="middle" font-weight="bold">Re: PIC</text><text x="0.0" y="181.0" text-anchor="middle" font-size="10">phosphate carrier (HPO4 2- with 2 H+, electroneutral)</text></g>
+<g id="Re_ANT" class="reaction"><rect x="-164.0" y="262.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="277.0" text-anchor="middle" font-weight="bold">Re: ANT</text><text x="0.0" y="291.0" text-anchor="middle" font-size="10">adenine nucleotide translocase (ATP4- out, ADP3- in)</text></g>
+<g id="Re_PDH" class="reaction"><rect x="-164.0" y="372.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="387.0" text-anchor="middle" font-weight="bold">Re: PDH</text><text x="0.0" y="401.0" text-anchor="middle" font-size="10">pyruvate dehydrogenase</text></g>
+<g id="Re_CS" class="reaction"><rect x="-164.0" y="482.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="497.0" text-anchor="middle" font-weight="bold">Re: CS</text><text x="0.0" y="511.0" text-anchor="middle" font-size="10">citrate synthase</text></g>
+<g id="Re_ACO" class="reaction"><rect x="-164.0" y="592.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="607.0" text-anchor="middle" font-weight="bold">Re: ACO</text><text x="0.0" y="621.0" text-anchor="middle" font-size="10">aconitase</text></g>
+<g id="Re_IDH" class="reaction"><rect x="-164.0" y="702.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="717.0" text-anchor="middle" font-weight="bold">Re: IDH</text><text x="0.0" y="731.0" text-anchor="middle" font-size="10">isocitrate dehydrogenase</text></g>
+<g id="Re_OGDH" class="reaction"><rect x="-164.0" y="812.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="827.0" text-anchor="middle" font-weight="bold">Re: OGDH</text><text x="0.0" y="841.0" text-anchor="middle" font-size="10">2-oxoglutarate dehydrogenase</text></g>
+<g id="Re_SCS" class="reaction"><rect x="-164.0" y="922.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="937.0" text-anchor="middle" font-weight="bold">Re: SCS</text><text x="0.0" y="951.0" text-anchor="middle" font-size="10">succinyl-CoA synthetase (ATP-forming, as E. coli SucCD)</text></g>
+<g id="Re_CII" class="reaction"><rect x="-164.0" y="1032.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1047.0" text-anchor="middle" font-weight="bold">Re: CII</text><text x="0.0" y="1061.0" text-anchor="middle" font-size="10">complex II (succinate:ubiquinone oxidoreductase)</text></g>
+<g id="Re_FUM" class="reaction"><rect x="-164.0" y="1142.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1157.0" text-anchor="middle" font-weight="bold">Re: FUM</text><text x="0.0" y="1171.0" text-anchor="middle" font-size="10">fumarase</text></g>
+<g id="Re_MDH" class="reaction"><rect x="-164.0" y="1252.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1267.0" text-anchor="middle" font-weight="bold">Re: MDH</text><text x="0.0" y="1281.0" text-anchor="middle" font-size="10">malate dehydrogenase</text></g>
+<g id="Re_CI" class="reaction"><rect x="-164.0" y="1362.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1377.0" text-anchor="middle" font-weight="bold">Re: CI</text><text x="0.0" y="1391.0" text-anchor="middle" font-size="10">complex I (NADH:ubiquinone oxidoreductase, 4 H+ pumped)</text></g>
+<g id="Re_CIII" class="reaction"><rect x="-164.0" y="1472.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1487.0" text-anchor="middle" font-weight="bold">Re: CIII</text><text x="0.0" y="1501.0" text-anchor="middle" font-size="10">complex III (Q cycle: 4 H+ out, 2 taken up per QH2)</text></g>
+<g id="Re_CIV" class="reaction"><rect x="-164.0" y="1582.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1597.0" text-anchor="middle" font-weight="bold">Re: CIV</text><text x="0.0" y="1611.0" text-anchor="middle" font-size="10">complex IV (cytochrome c oxidase, 4 H+ pumped per O2)</text></g>
+<g id="Re_ATPS" class="reaction"><rect x="-164.0" y="1692.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1707.0" text-anchor="middle" font-weight="bold">Re: ATPS</text><text x="0.0" y="1721.0" text-anchor="middle" font-size="10">ATP synthase (3 H+ per ATP)</text></g>
+<g id="Re_LEAK" class="reaction"><rect x="-164.0" y="1802.0" width="328.0" height="36.0" rx="6" fill="#fff4d6" stroke="#b08a2e"/><text x="0.0" y="1817.0" text-anchor="middle" font-weight="bold">Re: LEAK</text><text x="0.0" y="1831.0" text-anchor="middle" font-size="10">proton leak across the inner membrane</text></g>
+<g id="q_Pyr_c" class="species"><circle cx="-234.0" cy="60.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-234.0" y="64.0" text-anchor="middle">Pyr_c</text><title>pyruvate (cytosol) (chemostat)</title></g>
+<g id="q_Pi_c" class="species"><circle cx="-234.0" cy="170.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-234.0" y="174.0" text-anchor="middle">Pi_c</text><title>phosphate (cytosol) (chemostat)</title></g>
+<g id="q_H_c" class="species"><circle cx="-384.0" cy="1175.7" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-384.0" y="1179.7" text-anchor="middle">H_c</text><title>H+ (cytosol and intermembrane space) (chemostat)</title></g>
+<g id="q_ATP_c" class="species"><circle cx="-234.0" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-234.0" y="284.0" text-anchor="middle">ATP_c</text><title>ATP (cytosol) (chemostat)</title></g>
+<g id="q_ADP_c" class="species"><circle cx="234.0" cy="280.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="234.0" y="284.0" text-anchor="middle">ADP_c</text><title>ADP (cytosol) (chemostat)</title></g>
+<g id="q_O2" class="species"><circle cx="-234.0" cy="1600.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="-234.0" y="1604.0" text-anchor="middle">O2</text><title>O2 (chemostat)</title></g>
+<g id="q_CO2" class="species"><circle cx="384.0" cy="646.7" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="384.0" y="650.7" text-anchor="middle">CO2</text><title>CO2 (chemostat)</title></g>
+<g id="q_H2O" class="species"><circle cx="384.0" cy="1242.5" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="384.0" y="1246.5" text-anchor="middle">H2O</text><title>water (chemostat)</title></g>
+<g id="q_H_m" class="species"><circle cx="384.0" cy="1111.1" r="21.0" fill="#e3f0fb" stroke="#3b6e9e" stroke-dasharray="4 3"/><text x="384.0" y="1115.1" text-anchor="middle">H_m</text><title>H+ (matrix) (chemostat)</title></g>
+<g id="q_Pyr_m" class="species"><circle cx="-384.0" cy="225.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-384.0" y="229.0" text-anchor="middle">Pyr_m</text><title>pyruvate</title></g>
+<g id="q_AcCoA" class="species"><circle cx="0.0" cy="445.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="449.0" text-anchor="middle">AcCoA</text><title>acetyl-CoA</title></g>
+<g id="q_CoA" class="species"><circle cx="-384.0" cy="665.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-384.0" y="669.0" text-anchor="middle">CoA</text><title>coenzyme A</title></g>
+<g id="q_Cit" class="species"><circle cx="0.0" cy="555.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="559.0" text-anchor="middle">Cit</text><title>citrate</title></g>
+<g id="q_Icit" class="species"><circle cx="0.0" cy="665.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="669.0" text-anchor="middle">Icit</text><title>isocitrate</title></g>
+<g id="q_OG" class="species"><circle cx="0.0" cy="775.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="779.0" text-anchor="middle">OG</text><title>2-oxoglutarate</title></g>
+<g id="q_SucCoA" class="species"><circle cx="0.0" cy="885.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="889.0" text-anchor="middle">SucCoA</text><title>succinyl-CoA</title></g>
+<g id="q_Suc" class="species"><circle cx="0.0" cy="995.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="999.0" text-anchor="middle">Suc</text><title>succinate</title></g>
+<g id="q_Fum" class="species"><circle cx="0.0" cy="1105.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="1109.0" text-anchor="middle">Fum</text><title>fumarate</title></g>
+<g id="q_Mal" class="species"><circle cx="0.0" cy="1215.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="1219.0" text-anchor="middle">Mal</text><title>malate</title></g>
+<g id="q_OAA" class="species"><circle cx="384.0" cy="885.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="384.0" y="889.0" text-anchor="middle">OAA</text><title>oxaloacetate</title></g>
+<g id="q_NAD_m" class="species"><circle cx="-384.0" cy="918.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-384.0" y="922.0" text-anchor="middle">NAD_m</text><title>NAD+</title></g>
+<g id="q_NADH_m" class="species"><circle cx="464.0" cy="918.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="464.0" y="922.0" text-anchor="middle">NADH_m</text><title>NADH</title></g>
+<g id="q_ATP_m" class="species"><circle cx="384.0" cy="976.7" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="384.0" y="980.7" text-anchor="middle">ATP_m</text><title>ATP (matrix)</title></g>
+<g id="q_ADP_m" class="species"><circle cx="-384.0" cy="976.7" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-384.0" y="980.7" text-anchor="middle">ADP_m</text><title>ADP (matrix)</title></g>
+<g id="q_Pi_m" class="species"><circle cx="-464.0" cy="940.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-464.0" y="944.0" text-anchor="middle">Pi_m</text><title>phosphate (matrix)</title></g>
+<g id="q_Q" class="species"><circle cx="-384.0" cy="1306.7" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-384.0" y="1310.7" text-anchor="middle">Q</text><title>ubiquinone</title></g>
+<g id="q_QH2" class="species"><circle cx="384.0" cy="1306.7" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="384.0" y="1310.7" text-anchor="middle">QH2</text><title>ubiquinol</title></g>
+<g id="q_cytc_ox" class="species"><circle cx="0.0" cy="1545.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="0.0" y="1549.0" text-anchor="middle">cytc_ox</text><title>cytochrome c (oxidised)</title></g>
+<g id="q_cytc_red" class="species"><circle cx="-50.4" cy="1545.0" r="21.0" fill="#e3f0fb" stroke="#3b6e9e"/><text x="-50.4" y="1549.0" text-anchor="middle">cytc_red</text><title>cytochrome c (reduced)</title></g>
+<text x="-514" y="18" fill="#555">Detailed mitochondrion: species (0-junction + C), reactions (Re between 1-junctions); dashed: chemostats</text>
+</svg>

@@ -1,0 +1,43 @@
+variable_name,units,value,data_reference,sourced
+R,J_per_mol_K,8.314462618,definitional; gas constant,yes
+T,kelvin,293.15,operating point: 20 C (the fermenter's),no
+mu0_G6P,J_per_mol,13295.314385404345,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_G6P,millimolar,1000.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_G6P,millimolar,1.0,energy_metabolism adaptive C_G6P_init,no
+mu0_ATP,J_per_mol,25149.019390461064,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_ATP,millimolar,1000.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_ATP,millimolar,9.6,energy_metabolism adaptive C_ATP_init,no
+mu0_ADP,J_per_mol,6282.5768552239715,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_ADP,millimolar,1000.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_ADP,millimolar,0.56,energy_metabolism adaptive C_ADP_init,no
+mu0_Pi,J_per_mol,8128.220712809682,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_Pi,millimolar,1000.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_Pi,millimolar,10.0,energy_metabolism adaptive C_Pi_init,no
+mu0_H,J_per_mol,-6768.489358901621,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_H,millimolar,0.0001,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_H,millimolar,2.5118864315095822e-05,the fermenter's cytosol pH 7.6 (generic_adaptive_cell pH_i),no
+mu0_H2O,J_per_mol,11993.288818670979,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_H2O,millimolar,55500.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_H2O,millimolar,55500.0,definitional; pure water 55.5 M,no
+mu0_G1P,J_per_mol,20595.314385404352,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_G1P,millimolar,1000.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_G1P_init,millimolar,0.05040285800254474,calibrated: phosphoglucomutase near equilibrium at rest (forwards at 1000 times the synthesis flux),no
+mu0_ADPglc,J_per_mol,22281.18116891702,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_ADPglc,millimolar,1000.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_ADPglc_init,millimolar,0.05,unreferenced_placeholder; ADP-glucose of order 0.05 mM,no
+mu0_PPi,J_per_mol,16694.663248046778,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_PPi,millimolar,1000.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_PPi_init,millimolar,0.5,unreferenced_placeholder; pyrophosphate of order 0.5 mM,no
+mu0_Gly,J_per_mol,9367.093672594663,"calibrated: fitted to the reactions' standard Gibbs energies (along the conserved moieties, centred on the rest state)",no
+c_std_Gly,millimolar,10.0,definitional; standard state (1 M; H+ at pH 7; water itself),yes
+C_Gly_init,millimolar,50.0,unreferenced_placeholder; the comparison point: glycogen at a quarter of the lumped store's ceiling,no
+kappa_PGM,millimolar_per_s,3.8346002976124103,"calibrated: carries the lumped store's synthesis and phosphorylase rates at the comparison point (energy_metabolism adaptive, store_alloc 1, glycogen 50 mM) (Gibbs energy at rest +0.02 kJ/mol; dG0 +7.3 kJ/mol, unreferenced_placeholder; textbook transformed standard Gibbs energy at pH 7 (Lehninger, from memory, unchecked))",no
+kappa_GLGC,millimolar_per_s,0.0010841776961596744,"calibrated: carries the lumped store's synthesis and phosphorylase rates at the comparison point (energy_metabolism adaptive, store_alloc 1, glycogen 50 mM) (Gibbs energy at rest -3.85 kJ/mol; dG0 +0.0 kJ/mol, unreferenced_placeholder; nucleotide-sugar pyrophosphorylase, near 0 (UDP-glucose pyrophosphorylase, from memory))",no
+sigma_GLGC,dimensionless,46.57975451107416,calibrated: saturates at the lumped V_store_max (energy_metabolism adaptive),no
+kappa_GLGA,millimolar_per_s,0.001975914451816074,"calibrated: carries the lumped store's synthesis and phosphorylase rates at the comparison point (energy_metabolism adaptive, store_alloc 1, glycogen 50 mM) (Gibbs energy at rest -11.32 kJ/mol; dG0 -13.4 kJ/mol, unreferenced_placeholder; textbook transformed standard Gibbs energy at pH 7 (Lehninger, from memory, unchecked) (glycogen synthase, UDP-glucose))",no
+sigma_GLGA,dimensionless,25.55815657256014,calibrated: saturates at the lumped V_store_max (energy_metabolism adaptive),no
+kappa_PPA,millimolar_per_s,1.387043718456565e-05,"calibrated: carries the lumped store's synthesis and phosphorylase rates at the comparison point (energy_metabolism adaptive, store_alloc 1, glycogen 50 mM) (Gibbs energy at rest -26.49 kJ/mol; dG0 -19.2 kJ/mol, unreferenced_placeholder; textbook transformed standard Gibbs energy at pH 7 (Lehninger, from memory, unchecked))",no
+kappa_GLGP,millimolar_per_s,0.023753001805323845,"calibrated: carries the lumped store's synthesis and phosphorylase rates at the comparison point (energy_metabolism adaptive, store_alloc 1, glycogen 50 mM) (Gibbs energy at rest -9.35 kJ/mol; dG0 +3.1 kJ/mol, unreferenced_placeholder; textbook transformed standard Gibbs energy at pH 7 (Lehninger, from memory, unchecked))",no
+Ki_ATP_GLGP,millimolar,1.0,energy_metabolism adaptive K_i_ATP_mob (unreferenced_placeholder),no
+sigma_GLGP,dimensionless,5.062090111448633,calibrated: saturates at the lumped V_mob (energy_metabolism adaptive),no
+k_sat_Gly,millimolar,10.0,energy_metabolism adaptive K_glyc_mob (the phosphorylase's glycogen affinity),no
