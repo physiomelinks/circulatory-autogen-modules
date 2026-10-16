@@ -30,7 +30,7 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from cam_testing import bib, library, module_array, paths
-from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
+from cam_testing.library import (FIGURES, IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
                                  all_versions, ancestors_of, load_version, misplaced_spec_keys, module_relpath,
                                  module_type_names, parent_of, read_spec_files)
 from cam_testing.mathml import component_names
@@ -222,6 +222,12 @@ def walk_modules():
             return
         if os.path.isdir(os.path.join(d, 'risk')):
             _check_files('risk', os.path.join(d, 'risk'), names, problems)
+        fdir = os.path.join(d, FIGURES)
+        if os.path.isdir(fdir):
+            problems.extend(f'{rel}/{FIGURES}: unexpected file {f} (not an svg, png or jpg)' for f in sorted(os.listdir(fdir))
+                            if not re.match(LEVELS['figures']['file_pattern'], f))
+        if tests.get('figures'):
+            problems.extend(f'{rel}: {p}' for p in load_version(mt, v).figure_problems())
         iroot = os.path.join(d, 'instances')
         _check_files('instances', iroot, {}, problems)
         if not _subdirs(iroot):
