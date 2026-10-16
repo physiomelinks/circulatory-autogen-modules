@@ -1851,6 +1851,9 @@ def _baseline_obs_data(cm, v):
         parameters: {variable_name: value}     optional: the parameter set the data are compared at
         dt: optional output step (default: the spec dt)
         metric: nrmse | log_rmse      threshold: 0.1     series items
+        nrmse_scale: {item: value}    optional: an item's nrmse over this scale (in the item's unit)
+                                      instead of its data range, e.g. a small case's error relative
+                                      to its normal case's range
         z_threshold: 2.0                                 constant items: |model - value| <= z_threshold * std
     Each item is evaluated on the run of its experiment_idx, over its subexperiment_idx's segment: a series
     item sampled every obs_dt from the segment's start, a constant item by its operation (libcuflynx's
@@ -1878,6 +1881,7 @@ def _baseline_obs_data(cm, v):
     ops = get_operation_funcs_dict_for_mode('numpy')
     metric, threshold = v.get('metric', 'nrmse'), float(v.get('threshold', 0.1))
     z = float(v.get('z_threshold', 2.0))
+    scales = v.get('nrmse_scale') or {}
     rows, problems, scores = [], [], {}
     t_model, model, t_data, data, units = {}, {}, {}, {}, {}
     for item in items:
@@ -1892,9 +1896,12 @@ def _baseline_obs_data(cm, v):
             series = np.asarray(ops[op](*args, **kwargs) if op else args[0], dtype=float)
             values = np.asarray(item['value'], dtype=float)
             ts = np.arange(len(values)) * float(item['obs_dt'])
-            scores[name] = score(metric, np.interp(ts, t[seg] - t0, series), values)
+            scores[name] = score(metric, np.interp(ts, t[seg] - t0, series), values,
+                                 scales.get(name) if metric == 'nrmse' else None)
             ok = scores[name] <= threshold
-            rows.append({'name': f'{name} ({metric})', 'model': scores[name], 'target': f'<= {threshold:g}',
+            label = f'{name} ({metric} over {scales[name]:g} {item.get("unit", "")})' if (
+                metric == 'nrmse' and name in scales) else f'{name} ({metric})'
+            rows.append({'name': label, 'model': scores[name], 'target': f'<= {threshold:g}',
                          'units': '', 'ok': ok})
             t_model[name], model[name], t_data[name], data[name] = t[seg] - t0, series, ts, values
             units[name] = item.get('unit', '')
@@ -1915,6 +1922,7 @@ def _baseline_obs_data(cm, v):
             f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}; '
             'time from the start of each sub-experiment'))
     metrics = {'targets': rows, metric: scores, 'threshold': threshold, 'z_threshold': z, 'obs_data': v['obs_data'],
+               'nrmse_scale': scales,
                'source': v.get('source', ''), 'validated_values': params}
     if v.get('kind') == 'fit_check':
         metrics['kind'], metrics['note'] = 'fit_check', v.get('note', '')

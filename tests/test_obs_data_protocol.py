@@ -106,10 +106,10 @@ def test_structure_checks_the_protocol_files(tmp_path):
     assert 'not a file' in protocol_problems(str(tmp_path), {'validation': {'p': {'baseline': {'obs_data': 'x.json'}}}})[0]
 
 
-def _baseline(cm, out_dir, data_items, protocol=REVERSAL):
+def _baseline(cm, out_dir, data_items, protocol=REVERSAL, **extra):
     path = _obs_data(out_dir / 'baseline_obs_data.json', protocol, data_items)
-    cm.component.spec['validation'] = {cm.parameterisation.name: {'baseline': {'status': 'active', 'source': 'synthetic',
-                                                                 'obs_data': path, 'metric': 'nrmse', 'threshold': 0.01}}}
+    cm.component.spec['validation'] = {cm.parameterisation.name: {'baseline': dict(
+        {'status': 'active', 'source': 'synthetic', 'obs_data': path, 'metric': 'nrmse', 'threshold': 0.01}, **extra)}}
     return checks.validation_test_baseline(cm)
 
 
@@ -146,3 +146,16 @@ def test_baseline_items_are_scored_on_their_sub_experiment(cm, out_dir):
              _constant('closing', ['mod/zeta'], 1.0, 0.01, 'max', sub=1)]
     r = _baseline(cm, out_dir, items, STEPS)
     assert r.status == checks.PASSED, r.message
+
+
+def test_nrmse_scale_normalises_an_item_by_a_given_range(cm, out_dir):
+    ts = np.arange(0, 0.2001, 0.02)
+    dp = np.interp(ts, TRACE_T, TRACE_U) - U_OUT
+    off = dp + 0.02*np.ptp(dp)      # 2 % of its own range out: fails at threshold 0.01
+    items = [_series('dp', ['mod/u_in', 'mod/u_out'], off, 0.02, operation='subtraction')]
+    r = _baseline(cm, out_dir, items)
+    assert r.status == checks.FAILED and abs(r.metrics['nrmse']['dp'] - 0.02) < 1e-6
+    # over a range ten times larger, the same error is 0.2 %
+    r = _baseline(cm, out_dir, items, nrmse_scale={'dp': 10*np.ptp(dp)})
+    assert r.status == checks.PASSED, r.message
+    assert abs(r.metrics['nrmse']['dp'] - 0.002) < 1e-7 and 'over' in r.metrics['targets'][0]['name']
