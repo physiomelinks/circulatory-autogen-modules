@@ -348,6 +348,14 @@ window.addEventListener('DOMContentLoaded', function () {
         </div>
         {%- if c.config_notes %}<p style="margin:0;max-width:75ch"><strong>{{ c.config_notes }}</strong></p>{% endif %}
         {%- if c.description %}<p style="margin:0;max-width:75ch">{{ c.description }}</p>{% endif %}
+        {%- if c.figures %}
+        <section class="figures" aria-label="Figures">
+          <h3 style="margin:8px 0 4px">Figures</h3>
+          <div class="plots">
+            {%- for fg in c.figures %}<figure>{% if fg.missing %}<p class="todo">Missing figure <code>{{ fg.file }}</code></p>{% else %}<a href="{{ fg.file }}"><img src="{{ fg.file }}" alt="{{ fg.caption or fg.file }}" loading="lazy"></a>{% endif %}{% if fg.caption %}<figcaption>{{ fg.caption|emph }}</figcaption>{% endif %}</figure>{% endfor %}
+          </div>
+        </section>
+        {%- endif %}
         {%- set rc = c.required_citations %}
         <p class="required-citations" style="margin:0;max-width:75ch" title="The papers this version's model is built on (config required_citations); cite them when you use it. Per-parameter sources are under References.">
           <strong>Required citations:</strong>
