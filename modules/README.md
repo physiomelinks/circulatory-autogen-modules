@@ -192,6 +192,13 @@ in soma and varicosity) and the `cell/cardiomyocytes` category. `tools/restructu
 lists every old (module_type, version) and its new pair; `cam_testing.library.legacy_renames()` reads
 it, so circulatory_autogen's own models and older module arrays still resolve.
 
+**Renaming a version later** (e.g. in a review, to follow the naming rule) is module content: the
+module PR moves the version's directory and files, updates the records naming it, and adds an entry
+to `modules/version_renames.json` (`[{"from": [module_type, old version], "to": [module_type, new
+version], "reason": "..."}]`, in order). `legacy_renames()` applies these last, following each old name
+(circulatory_autogen's included) to the newest, and `tests/test_structure.py` checks that every target
+exists, that no renamed-from version is left, and that each entry gives its reason.
+
 ## Versions
 
 A version is one piece of math for a module_type: one CellML component and one config entry. **The

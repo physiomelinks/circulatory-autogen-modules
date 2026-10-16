@@ -915,3 +915,26 @@ def test_reference_copies_are_circulatory_autogen_originals_in_library_keys(path
         expected = rekey.rekey_string(path, f.read())
     with open(path, encoding='utf-8') as f:
         assert f.read() == expected, f'{path} differs from {original} (after rekeying) beyond its bib keys'
+
+
+def test_version_renames_name_existing_versions():
+    '''Each version_renames.json rename (a version renamed in a module PR) ends at a version of the library,
+    gives its reason, and its old name no longer exists.'''
+    have = {(v.vessel_type, v.name) for v in library.all_versions(include_libraries=True)}
+    problems = []
+    for d in library.library_dirs():
+        path = os.path.join(d, library.VERSION_RENAMES)
+        if not os.path.isfile(path):
+            continue
+        with open(path) as f:
+            entries = json.load(f)
+        renames = {tuple(r['from']): tuple(r['to']) for r in entries}
+        for r in entries:
+            old, new = tuple(r['from']), library._chain(tuple(r['to']), renames)
+            if new not in have:
+                problems.append(f'{path}: {old} -> {new}: no such version')
+            if old in have:
+                problems.append(f'{path}: {old} is renamed but still exists')
+            if not r.get('reason'):
+                problems.append(f'{path}: {old} -> {tuple(r["to"])} has no reason')
+    assert not problems, '\n'.join(problems)
