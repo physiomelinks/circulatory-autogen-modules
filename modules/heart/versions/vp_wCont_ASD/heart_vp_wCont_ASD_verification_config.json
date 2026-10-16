@@ -52,40 +52,40 @@
     ],
     "parameters": [
       [
-        "v_ivc_zero",
+        "ivc_zero/v",
         "m3_per_s",
         0.0,
         "harness: IVC inflow set to zero (all systemic return via venous_svc), as circulatory_autogen does for a heart with one vena cava"
       ],
-      ["R_pvn", "Js_per_m6", 1333000.0, "circulatory_autogen 3compartment example (Blanco_2013_Table_8)"],
-      ["q_C_init_pvn", "m3", 0.0001, "circulatory_autogen 3compartment example (user_defined)"],
-      ["C_pvn", "m6_per_J", 6.0015e-09, "circulatory_autogen 3compartment example (to_be_identified)"],
-      ["u_ext_pvn", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["pvn/R", "Js_per_m6", 1333000.0, "circulatory_autogen 3compartment example (Blanco_2013_Table_8)"],
+      ["pvn/q_C_init", "m3", 0.0001, "circulatory_autogen 3compartment example (user_defined)"],
+      ["pvn/C", "m6_per_J", 6.0015e-09, "circulatory_autogen 3compartment example (to_be_identified)"],
+      ["pvn/u_ext", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
       [
-        "I_pvn",
+        "pvn/I",
         "Js2_per_m6",
         100000.0,
         "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.01 (small_chosen), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
       ],
-      ["q_us_0_pvn", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
-      ["Delta_q_us_pvn", "dimensionless", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
-      ["Delta_C_pvn", "dimensionless", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
-      ["R_par", "Js_per_m6", 10664000.0, "circulatory_autogen 3compartment example (Blanco_2013_Table_8)"],
-      ["C_par", "m6_per_J", 3.09077e-10, "circulatory_autogen 3compartment example (to_be_identified)"],
-      ["u_ext_par", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["pvn/q_us_0", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["pvn/Delta_q_us", "dimensionless", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["pvn/Delta_C", "dimensionless", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["par/R", "Js_per_m6", 10664000.0, "circulatory_autogen 3compartment example (Blanco_2013_Table_8)"],
+      ["par/C", "m6_per_J", 3.09077e-10, "circulatory_autogen 3compartment example (to_be_identified)"],
+      ["par/u_ext", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
       [
-        "I_par",
+        "par/I",
         "Js2_per_m6",
         100000.0,
         "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.000001 (Blanco_2013_Table_8), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
       ],
       [
-        "u_0_par",
+        "par/u_0",
         "J_per_m3",
         1463.0,
         "circulatory_autogen 3compartment example (Mynard&Smolich_2015_assumedRefOf11mmHg)"
       ],
-      ["q_0_par", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined_TO_DO)"],
+      ["par/q_0", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined_TO_DO)"],
       [
         "r_0_par",
         "metre",
@@ -99,31 +99,31 @@
         "circulatory_autogen 3compartment example (Mynard&Smolich_2015_mainPA_NOT_USED)"
       ],
       [
-        "R_aortic_root",
+        "aortic_root/R",
         "Js_per_m6",
         1000000.0,
         "circulatory_autogen 3compartment example (to_be_identified)"
       ],
       [
-        "C_aortic_root",
+        "aortic_root/C",
         "m6_per_J",
         1.2028e-08,
         "circulatory_autogen 3compartment example (to_be_identified)"
       ],
-      ["u_ext_aortic_root", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["aortic_root/u_ext", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
       [
-        "I_aortic_root",
+        "aortic_root/I",
         "Js2_per_m6",
         100000.0,
         "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 10000 (to_be_identified), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
       ],
       [
-        "u_0_aortic_root",
+        "aortic_root/u_0",
         "J_per_m3",
         13300.0,
         "circulatory_autogen 3compartment example (Mynard&Smolich_2015_assumedRefOf100mmHg)"
       ],
-      ["q_0_aortic_root", "m3", 6.94e-06, "circulatory_autogen 3compartment example (Mynard&Smolich_2015)"],
+      ["aortic_root/q_0", "m3", 6.94e-06, "circulatory_autogen 3compartment example (Mynard&Smolich_2015)"],
       [
         "r_0_aortic_root",
         "metre",
@@ -137,60 +137,60 @@
         "circulatory_autogen 3compartment example (Mynard&Smolich_2015_NOT_USED)"
       ],
       [
-        "R_T_systemic_T",
+        "systemic_T/R_T",
         "Js_per_m6",
         110000000.0,
         "circulatory_autogen 3compartment example (calculated_from_mean_P_and_v)"
       ],
       [
-        "C_T_systemic_T",
+        "systemic_T/C_T",
         "m6_per_J",
         1e-07,
         "circulatory_autogen 3compartment example (calculated_from_approx_P_and_q)"
       ],
       [
-        "I_T_systemic_T",
+        "systemic_T/I_T",
         "Js2_per_m6",
         100000.0,
         "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.1 (former_hardcoded_default), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
       ],
-      ["u_ext_systemic_T", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["systemic_T/u_ext", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
       [
-        "q_us_systemic_T",
+        "systemic_T/q_us",
         "m3",
         0.00245,
         "circulatory_autogen 3compartment example (user_defined_70%Of3.5LVenousTotBloodVolume)"
       ],
       [
-        "q_init_systemic_T",
+        "systemic_T/q_init",
         "m3",
         0.00245,
         "circulatory_autogen 3compartment example (user_defined_70%Of3.5LVenousTotBloodVolume)"
       ],
-      ["R_venous_svc", "Js_per_m6", 1114600.0, "circulatory_autogen 3compartment example (small_chosen)"],
-      ["q_C_init_venous_svc", "m3", 0.0013, "circulatory_autogen 3compartment example (user_defined)"],
+      ["venous_svc/R", "Js_per_m6", 1114600.0, "circulatory_autogen 3compartment example (small_chosen)"],
+      ["venous_svc/q_C_init", "m3", 0.0013, "circulatory_autogen 3compartment example (user_defined)"],
       [
-        "C_venous_svc",
+        "venous_svc/C",
         "m6_per_J",
         1e-06,
         "circulatory_autogen 3compartment example (calculated_from_typical_venous_pressure_init_stressed_vol)"
       ],
-      ["u_ext_venous_svc", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["venous_svc/u_ext", "J_per_m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
       [
-        "I_venous_svc",
+        "venous_svc/I",
         "Js2_per_m6",
         100000.0,
         "harness: inertance set to 1e5 Pa s2/m3 (~ rho l/A of a large vessel) instead of the 3compartment value 0.01 (small_chosen), which made the network (not the heart) extremely stiff (R/I up to 1e13 1/s)"
       ],
-      ["q_us_0_venous_svc", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
+      ["venous_svc/q_us_0", "m3", 0.0, "circulatory_autogen 3compartment example (user_defined)"],
       [
-        "Delta_q_us_venous_svc",
+        "venous_svc/Delta_q_us",
         "dimensionless",
         0.0,
         "circulatory_autogen 3compartment example (user_defined)"
       ],
       [
-        "Delta_C_venous_svc",
+        "venous_svc/Delta_C",
         "dimensionless",
         0.0,
         "circulatory_autogen 3compartment example (user_defined)"

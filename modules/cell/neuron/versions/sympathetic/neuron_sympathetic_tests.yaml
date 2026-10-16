@@ -6,7 +6,7 @@ description: 'Sympathetic neuron (SN_simple) built from its parts: a soma (soma,
   The soma''s membrane gives the axon V and takes its axial current; the axon sets the varicosity membrane''s potential. The
   soma and varicosity are themselves built from their parts, with the ion channels as submodules (cell/ion_channels, versions
   Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06). A model uses one record, e.g. {"name": "SN", "module_type": "neuron", "module_subtype": "sympathetic", "parameterisation":
-  "default"}; the expanded parts are named SN_soma_<part>, SN_axon and SN_varicosity_<part>. The soma and varicosity parameters
+  "default"}; the expanded parts are named SN__soma__<part>, SN__axon and SN__varicosity__<part>. The soma and varicosity parameters
   are their own versions'' defaults; this version''s default parameterisation holds the axon''s parameters and the globals (SN_simple''s
   values). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01) by a one-off script (tools/build_sn_modules.py,
   removed; in git history).'
@@ -25,17 +25,17 @@ expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'
 reference_proposals:
-  channel_ratio_axon:
+  axon/channel_ratio:
     reference: unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); no source
       found (the sister SN_full parameter files use 1.0)
     sourced: 'no'
-  V_rest_approx_axon:
+  axon/V_rest_approx:
     reference: unreferenced_placeholder; axon resting potential set equal to the soma's (-70 mV, davis2020downregulation soma measurements);
       no axonal measurement
     sourced: 'no'
     also_cites:
     - davis2020downregulation
-  R_i_axon:
+  axon/R_i:
     value: 200.0
     reference: 'major1994detailed; cytoplasmic resistivity 170-340 ohm cm in rat CA3 pyramidal neurons (Abstract; specific membrane
       resistance 120-200 kOhm cm^2, Cm 0.7-0.8 uF/cm^2). A central-neuron proxy: no value for postganglionic sympathetic axons
@@ -45,7 +45,7 @@ reference_proposals:
     previous: 'previous R_axon (as proposed in review): unreferenced_placeholder; owner''s hand-set value in the SN_simple
       model (CA token ''to_be_determined''); lumped axial resistance; no source found (the sister SN_full parameter files
       use 150 MOhm; somatic input resistance is about 218 MOhm in Wistar stellate neurons, Davis et al. 2019 bioRxiv)'
-  L_ax_axon:
+  axon/L_ax:
     reference: 'definitional; axon length chosen so that C = c_m pi d_ax L_ax reproduces the previous C = 10 pF (SN_simple
       to_be_determined C = 10 pF): L_ax = C/(c_m pi d_ax) = 318.3 um. The previous C_axon (as proposed in review): unreferenced_placeholder;
       owner''s hand-set value in the SN_simple model (CA token ''to_be_determined''); lumped axon capacitance; no source found
