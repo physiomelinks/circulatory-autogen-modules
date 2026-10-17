@@ -158,8 +158,9 @@ def _document(module):
 def test_its_bond_graph_is_a_celldl_document(module, built):
     """The version's bond graph is a CellDL document: its Turtle (the _bondgraph.ttl) in CellDL's metadata element, a
     celldl:Document and bgf:BondgraphModel; in its diagram layer a component per species, reaction and chemostat copy
-    (one beside each reaction that uses it) and a bond per species of each reaction; each element the template of its
-    constitutive relation (saturating where the module saturates)."""
+    (one beside each reaction that uses it) and a bond per species of each reaction; for a membrane with a
+    capacitance its capacitor and, for each reaction moving charge across it, two transformers (four bonds); each
+    element the template of its constitutive relation (saturating where the module saturates)."""
     graph = built[module][0]
     svg, ttl = _document(module)
     ns = '{http://www.w3.org/2000/svg}'
@@ -172,9 +173,12 @@ def test_its_bond_graph_is_a_celldl_document(module, built):
     internal = [sp for sp in graph.species if not sp.boundary]
     boundary = {sp.name for sp in graph.species if sp.boundary}
     copies = {f'Se_{sp}_{r.name}' for r in graph.reactions for sp in r.stoich if sp in boundary}
-    assert components == {f'q_{sp.name}' for sp in internal} | {f'Re_{r.name}' for r in graph.reactions} | copies
+    electrogenic = [r.name for r in graph.reactions for c in graph.capacitance if graph.charge_into(r, c)]
+    membranes = {f'C_m_{c}' for c in graph.capacitance} | {f'TF_{side}_{n}' for n in electrogenic for side in 'fr'}
+    assert components == ({f'q_{sp.name}' for sp in internal} | {f'Re_{r.name}' for r in graph.reactions} | copies
+                          | membranes)
     bonds = [p for p in layer.iter(ns + 'path') if 'celldl-Connection' in (p.get('class') or '')]
-    assert len(bonds) == sum(len(r.stoich) for r in graph.reactions)
+    assert len(bonds) == sum(len(r.stoich) for r in graph.reactions) + 4 * len(electrogenic)
     for r in graph.reactions:
         law = 'SaturatingChemicalReactionNode' if r.sigma else 'ChemicalReactionNode'
         assert f':Re_{r.name} a celldl:Component, bgf:{law} ;' in ttl
@@ -352,13 +356,22 @@ def _celldl_rates(ttl):
                 activity[e] *= parameter(e, 'k_sat') / (parameter(e, 'k_sat') + q)
         elif k == 'ChemicalPotential':
             activity[e] = np.exp(number(g.value(e, bgf.hasValue)) / celldl.TEMPLATE_RT)
+    bonds = [(g.value(b, bgf.hasSource), g.value(b, bgf.hasTarget), int(g.value(b, bgf.bondCount) or 1))
+             for b in g.subjects(bgf.hasSource, None)]
+    # a transformer between a membrane's capacitor (phi = Q/C) and a reaction: u_1 = ratio u_0, so the reaction sees
+    # ratio phi on its forward side (capacitor -> transformer -> reaction) and phi/ratio on its reverse side
+    for t in [e for e, k in kind.items() if k == 'TransformerNode']:
+        ratio = number(g.value(t, bgf.hasValue))
+        (cap,) = [a for a, b, _ in bonds if b == t and kind[a] == 'ElectricalCapacitiveNode'] or \
+                 [b for a, b, _ in bonds if a == t and kind[b] == 'ElectricalCapacitiveNode']
+        phi = number(g.value(cap, bgf.hasValue)) / parameter(cap, 'C')
+        forward = any(a == cap and b == t for a, b, _ in bonds)
+        activity[t] = np.exp((ratio * phi if forward else phi / ratio) / celldl.TEMPLATE_RT)
     sides = {e: ([], []) for e, k in kind.items() if 'Reaction' in k}
-    for b in g.subjects(bgf.hasSource, None):
-        a, t = g.value(b, bgf.hasSource), g.value(b, bgf.hasTarget)
-        n = int(g.value(b, bgf.bondCount) or 1)
+    for a, t, n in bonds:
         if t in sides:
             sides[t][0].append((a, n))
-        else:
+        elif a in sides:
             sides[a][1].append((t, n))
     rate = {e: 0.0 for e, k in kind.items() if 'Storage' in k}
     for r, (sub, prod) in sides.items():
@@ -389,19 +402,22 @@ def test_the_celldl_document_has_the_modules_resting_rates(module, built):
     got = _celldl_rates(_document(module)[1])
     assert set(got) == set(want)
     scale = max(abs(x) for x in flux.values()) * volume   # at rest the species are steady: scale by the turnover
-    assert max(abs(got[s] - want[s]) for s in want) <= 1e-9 * scale
+    # a membrane's transformers turn its potential into q F phi, which the template divides by its own RT (2578.73058
+    # J/mol), 3e-6 from the module's R T: complex I, near equilibrium, amplifies that to 1e-7 of the flows
+    tolerance = 1e-6 if bg.capacitance else 1e-9
+    assert max(abs(got[s] - want[s]) for s in want) <= tolerance * scale
 
 
 BG_TOOLS = os.environ.get('BG_TOOLS')   # a BG-Tools checkout (with constitutive-law templates) and its .venv
 
 
 @pytest.mark.skipif(not BG_TOOLS, reason='set BG_TOOLS to a BG-Tools checkout with its .venv to run bg2cellml')
-@pytest.mark.parametrize('module', ['glycogen', 'gluconeogenesis'])
+@pytest.mark.parametrize('module', ['glycogen', 'gluconeogenesis', 'mitochondrion'])
 def test_bg2cellml_makes_the_module_from_its_celldl_document(module, tmp_path):
     """CellDL's bg2cellml turns the module's bond graph into CellML that runs as the module does, at rest and from the
-    verification config's run_parameters, to 1e-8 of each species' scale (tools/compare_celldl.py). Glycolysis and the
-    mitochondrion match at rest only: their allosteric activation and dynamic matrix potential are not yet expressible
-    in the templates."""
+    verification config's run_parameters, to 1e-8 of each species' scale (tools/compare_celldl.py), the
+    mitochondrion's matrix potential too (its capacitor and transformers: electrogenic transport). Glycolysis matches
+    at rest only: pyruvate kinase's activation by F1,6BP is not yet expressible in the templates."""
     import subprocess
     for name, spec in celldl_build.specs(module).items():
         with open(tmp_path / f'{name}.json', 'w') as f:

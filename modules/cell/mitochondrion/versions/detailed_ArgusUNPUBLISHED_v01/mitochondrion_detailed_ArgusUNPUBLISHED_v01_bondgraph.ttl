@@ -6,128 +6,123 @@
 @prefix tpl: <https://bg-rdf.org/templates/> .
 
 # Detailed mitochondrion: written by tools/celldl.py (circulatory-autogen-modules) from the module's bond graph
-# ANT: the electrical work at psi = -150 mV folded into K, kappa, sigma
-# CI: the electrical work at psi = -150 mV folded into K, kappa, sigma
-# CIII: the electrical work at psi = -150 mV folded into K, kappa, sigma
-# CIV: the electrical work at psi = -150 mV folded into K, kappa, sigma
-# ATPS: the electrical work at psi = -150 mV folded into K, kappa, sigma
-# LEAK: the electrical work at psi = -150 mV folded into K, kappa, sigma
 
 <> a celldl:Document, bgf:BondgraphModel ;
   owl:versionInfo "1.0" ;
-  bgf:usesTemplate tpl:chemical.ttl ;
-  bgf:hasBondElement :q_Pyr_m, :q_AcCoA, :q_CoA, :q_Cit, :q_Icit, :q_OG, :q_SucCoA, :q_Suc, :q_Fum, :q_Mal, :q_OAA, :q_NAD_m, :q_NADH_m, :q_ATP_m, :q_ADP_m, :q_Pi_m, :q_Q, :q_QH2, :q_cytc_ox, :q_cytc_red, :Re_PYRC, :Se_Pyr_c_PYRC, :Se_H_c_PYRC, :Se_H_m_PYRC, :Re_PIC, :Se_Pi_c_PIC, :Se_H_c_PIC, :Se_H_m_PIC, :Re_ANT, :Se_ADP_c_ANT, :Se_ATP_c_ANT, :Re_PDH, :Se_CO2_PDH, :Re_CS, :Se_H2O_CS, :Se_H_m_CS, :Re_ACO, :Re_IDH, :Se_CO2_IDH, :Re_OGDH, :Se_CO2_OGDH, :Re_SCS, :Re_CII, :Re_FUM, :Se_H2O_FUM, :Re_MDH, :Se_H_m_MDH, :Re_CI, :Se_H_m_CI, :Se_H_c_CI, :Re_CIII, :Se_H_m_CIII, :Se_H_c_CIII, :Re_CIV, :Se_O2_CIV, :Se_H_m_CIV, :Se_H2O_CIV, :Se_H_c_CIV, :Re_ATPS, :Se_H_c_ATPS, :Se_H2O_ATPS, :Se_H_m_ATPS, :Re_LEAK, :Se_H_c_LEAK, :Se_H_m_LEAK .
+  bgf:usesTemplate tpl:chemical.ttl, tpl:electrical.ttl ;
+  bgf:hasBondElement :q_Pyr_m, :q_AcCoA, :q_CoA, :q_Cit, :q_Icit, :q_OG, :q_SucCoA, :q_Suc, :q_Fum, :q_Mal, :q_OAA, :q_NAD_m, :q_NADH_m, :q_ATP_m, :q_ADP_m, :q_Pi_m, :q_Q, :q_QH2, :q_cytc_ox, :q_cytc_red, :C_m_m, :Re_PYRC, :Se_Pyr_c_PYRC, :Se_H_c_PYRC, :Se_H_m_PYRC, :Re_PIC, :Se_Pi_c_PIC, :Se_H_c_PIC, :Se_H_m_PIC, :Re_ANT, :Se_ADP_c_ANT, :Se_ATP_c_ANT, :Re_PDH, :Se_CO2_PDH, :Re_CS, :Se_H2O_CS, :Se_H_m_CS, :Re_ACO, :Re_IDH, :Se_CO2_IDH, :Re_OGDH, :Se_CO2_OGDH, :Re_SCS, :Re_CII, :Re_FUM, :Se_H2O_FUM, :Re_MDH, :Se_H_m_MDH, :Re_CI, :Se_H_m_CI, :Se_H_c_CI, :Re_CIII, :Se_H_m_CIII, :Se_H_c_CIII, :Re_CIV, :Se_O2_CIV, :Se_H_m_CIV, :Se_H2O_CIV, :Se_H_c_CIV, :Re_ATPS, :Se_H_c_ATPS, :Se_H2O_ATPS, :Se_H_m_ATPS, :Re_LEAK, :Se_H_c_LEAK, :Se_H_m_LEAK ;
+  bgf:hasJunctionStructure :TF_f_ANT, :TF_r_ANT, :TF_f_CI, :TF_r_CI, :TF_f_CIII, :TF_r_CIII, :TF_f_CIV, :TF_r_CIV, :TF_f_ATPS, :TF_r_ATPS, :TF_f_LEAK, :TF_r_LEAK .
 :q_Pyr_m a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Pyr" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "1.98493073550602e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.39294178531152e+21 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.2392343949498e+19 mol-1"^^cdt:ucum ] .
 
 :q_AcCoA a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "AcCoA" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "4.39822971502571e-16 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.09511371489928e+28 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.26260516727782e+19 mol-1"^^cdt:ucum ] .
 
 :q_CoA a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "CoA" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "6.28318530717959e-16 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.36974669545689e+15 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "243752.154657343 mol-1"^^cdt:ucum ] .
 
 :q_Cit a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Cit" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "2.51327412287184e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.32235703443289e+18 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "259319488341.167 mol-1"^^cdt:ucum ] .
 
 :q_Icit a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Icit" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "1.44510157745297e-17 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.24721547164227e+20 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "45054910243207.9 mol-1"^^cdt:ucum ] .
 
 :q_OG a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "OG" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "1.25663706143592e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.86252656718977e+26 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.81859524176288e+21 mol-1"^^cdt:ucum ] .
 
 :q_SucCoA a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "SucCoA" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "3.14159265358979e-16 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "5.75825737330415e+33 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.74262509125635e+21 mol-1"^^cdt:ucum ] .
 
 :q_Suc a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Suc" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "3.14159265358979e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.76531633103351e+21 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.16928854452837e+17 mol-1"^^cdt:ucum ] .
 
 :q_Fum a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Fum" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "7.20461808080938e-16 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.49301458189736e+24 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.13296363577492e+20 mol-1"^^cdt:ucum ] .
 
 :q_Mal a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Mal" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "3.14159265358979e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.29222752255419e+16 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "172382465387.729 mol-1"^^cdt:ucum ] .
 
 :q_OAA a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "OAA" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "3.91523508541922e-19 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4924831596704.17 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "65696992.0112232 mol-1"^^cdt:ucum ] .
 
 :q_NAD_m a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "NAD" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "1.5707963267949e-14 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "30798116713.1282 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "112486709.014026 mol-1"^^cdt:ucum ] .
 
 :q_NADH_m a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "NADH" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "6.28318530717959e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.75219448160054e+24 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.00739158700987e+19 mol-1"^^cdt:ucum ] .
 
 :q_ATP_m a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "ATP" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "6.28318530717959e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.62194152471255e+27 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.35635637996649e+18 mol-1"^^cdt:ucum ] .
 
 :q_ADP_m a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "ADP" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "6.28318530717959e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.83296891557399e+17 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "18675251051.0629 mol-1"^^cdt:ucum ] .
 
 :q_Pi_m a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Pi" ;
   bgf:hasLocation "m" ;
   bgf:hasValue "1.25538042437486e-13 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "127657950216047 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1702950277.75679 mol-1"^^cdt:ucum ] .
 
 :q_Q a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
@@ -156,6 +151,13 @@
   bgf:hasLocation "p" ;
   bgf:hasValue "3.14159265358979e-16 mol"^^cdt:ucum ;
   bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "242524260661714 mol-1"^^cdt:ucum ] .
+
+:C_m_m a celldl:Component, bgf:ElectricalCapacitiveNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "psi" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-6.14495523042164e-13 C"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "C" ; bgf:hasValue "4.09663682028109e-12 F"^^cdt:ucum ] .
 
 :Re_PYRC a celldl:Component, bgf:ChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
@@ -191,7 +193,7 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Re_PYRC.Se_H_m_PYRC a celldl:Connection ;
   celldl:hasSource :Re_PYRC ;
@@ -240,7 +242,7 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Re_PIC.Se_H_m_PIC a celldl:Connection ;
   celldl:hasSource :Re_PIC ;
@@ -259,7 +261,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "ANT" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "9.75122158534779e-25 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "5292721204.45657 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "3.31161124522513e-16 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "15.5847089022118 1"^^cdt:ucum ] .
 
 :Se_ADP_c_ANT a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -297,11 +299,43 @@
   bgf:hasSource :Re_ANT ;
   bgf:hasTarget :q_ADP_m .
 
+:TF_f_ANT a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-48242.66606 C/mol"^^cdt:ucum .
+
+:TF_r_ANT a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "2.07285393132355e-05 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_ANT a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_ANT ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_ANT .
+
+:TF_f_ANT.Re_ANT a celldl:Connection ;
+  celldl:hasSource :TF_f_ANT ;
+  celldl:hasTarget :Re_ANT ;
+  bgf:hasSource :TF_f_ANT ;
+  bgf:hasTarget :Re_ANT .
+
+:Re_ANT.TF_r_ANT a celldl:Connection ;
+  celldl:hasSource :Re_ANT ;
+  celldl:hasTarget :TF_r_ANT ;
+  bgf:hasSource :Re_ANT ;
+  bgf:hasTarget :TF_r_ANT .
+
+:TF_r_ANT.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_ANT ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_ANT ;
+  bgf:hasTarget :C_m_m .
+
 :Re_PDH a celldl:Component, bgf:SaturatingChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "PDH" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "5.45356080450897e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "8412.11810112984 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.29730076226677e-05 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "1.99695217590734e-11 1"^^cdt:ucum ] .
 
 :Se_CO2_PDH a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -349,7 +383,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "CS" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "3.87130660682668e-16 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "1.18502619963824 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "0.163077958376813 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "2.81313293444719e-15 1"^^cdt:ucum ] .
 
 :Se_H2O_CS a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -367,7 +401,7 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Re_CS.Se_H_m_CS a celldl:Connection ;
   celldl:hasSource :Re_CS ;
@@ -403,7 +437,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "ACO" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "8.57396419220017e-18 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.75974813629493e-10 mol/s"^^cdt:ucum ] .
 
 :q_Cit.Re_ACO a celldl:Connection ;
   celldl:hasSource :q_Cit ;
@@ -421,7 +455,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "IDH" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.36548393805019e-17 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "19.3939163235395 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.32926570920179e-07 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "3.45122854231831e-09 1"^^cdt:ucum ] .
 
 :Se_CO2_IDH a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -463,7 +497,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "OGDH" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.02103984480203e-24 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "449306633.749604 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.17761502124314e-07 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "3.89567020899526e-09 1"^^cdt:ucum ] .
 
 :Se_CO2_OGDH a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -511,7 +545,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "SCS" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.25119689123232e-39 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "2.03784918759857e+23 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "5.3289663194232e-15 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "0.0860879855667537 1"^^cdt:ucum ] .
 
 :q_SucCoA.Re_SCS a celldl:Connection ;
   celldl:hasSource :q_SucCoA ;
@@ -553,7 +587,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "CII" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "3.38663757777576e-26 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "13546178622.7955 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.53871893354972e-21 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "180705.303580325 1"^^cdt:ucum ] .
 
 :q_Suc.Re_CII a celldl:Connection ;
   celldl:hasSource :q_Suc ;
@@ -583,7 +617,7 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "FUM" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.82229338939408e-15 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.11567063175172e-10 mol/s"^^cdt:ucum ] .
 
 :Se_H2O_FUM a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -613,13 +647,13 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "MDH" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "5.83972818265537e-12 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "0.000119856469604169 mol/s"^^cdt:ucum ] .
 
 :Se_H_m_MDH a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Re_MDH.Se_H_m_MDH a celldl:Connection ;
   celldl:hasSource :Re_MDH ;
@@ -655,13 +689,13 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "CI" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2497727.69393105 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "9122.67366607289 mol/s"^^cdt:ucum ] .
 
 :Se_H_m_CI a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Se_H_m_CI.Re_CI a celldl:Connection ;
   celldl:hasSource :Se_H_m_CI ;
@@ -707,17 +741,49 @@
   bgf:hasSource :Re_CI ;
   bgf:hasTarget :q_QH2 .
 
+:TF_f_CI a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "192970.66424 C/mol"^^cdt:ucum .
+
+:TF_r_CI a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-5.18213482830886e-06 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_CI a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_CI ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_CI .
+
+:TF_f_CI.Re_CI a celldl:Connection ;
+  celldl:hasSource :TF_f_CI ;
+  celldl:hasTarget :Re_CI ;
+  bgf:hasSource :TF_f_CI ;
+  bgf:hasTarget :Re_CI .
+
+:Re_CI.TF_r_CI a celldl:Connection ;
+  celldl:hasSource :Re_CI ;
+  celldl:hasTarget :TF_r_CI ;
+  bgf:hasSource :Re_CI ;
+  bgf:hasTarget :TF_r_CI .
+
+:TF_r_CI.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_CI ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_CI ;
+  bgf:hasTarget :C_m_m .
+
 :Re_CIII a celldl:Component, bgf:SaturatingChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "CIII" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "0.0135014868087227 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "1.69892391146076e-13 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "4.93126846701672e-05 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "4.65154126834386e-11 1"^^cdt:ucum ] .
 
 :Se_H_m_CIII a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Se_H_m_CIII.Re_CIII a celldl:Connection ;
   celldl:hasSource :Se_H_m_CIII ;
@@ -765,11 +831,43 @@
   bgf:hasTarget :q_cytc_red ;
   bgf:bondCount 2 .
 
+:TF_f_CIII a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "96485.33212 C/mol"^^cdt:ucum .
+
+:TF_r_CIII a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-1.03642696566177e-05 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_CIII a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_CIII ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_CIII .
+
+:TF_f_CIII.Re_CIII a celldl:Connection ;
+  celldl:hasSource :TF_f_CIII ;
+  celldl:hasTarget :Re_CIII ;
+  bgf:hasSource :TF_f_CIII ;
+  bgf:hasTarget :Re_CIII .
+
+:Re_CIII.TF_r_CIII a celldl:Connection ;
+  celldl:hasSource :Re_CIII ;
+  celldl:hasTarget :TF_r_CIII ;
+  bgf:hasSource :Re_CIII ;
+  bgf:hasTarget :TF_r_CIII .
+
+:TF_r_CIII.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_CIII ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_CIII ;
+  bgf:hasTarget :C_m_m .
+
 :Re_CIV a celldl:Component, bgf:SaturatingChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "CIV" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "397136.731405715 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "2.88792208900183e-21 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "7.06721427361637e-05 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "1.62284585492506e-11 1"^^cdt:ucum ] .
 
 :Se_O2_CIV a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -787,7 +885,7 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Se_H_m_CIV.Re_CIV a celldl:Connection ;
   celldl:hasSource :Se_H_m_CIV ;
@@ -836,11 +934,43 @@
   bgf:hasTarget :q_cytc_ox ;
   bgf:bondCount 4 .
 
+:TF_f_CIV a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "385941.32848 C/mol"^^cdt:ucum .
+
+:TF_r_CIV a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-2.59106741415443e-06 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_CIV a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_CIV ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_CIV .
+
+:TF_f_CIV.Re_CIV a celldl:Connection ;
+  celldl:hasSource :TF_f_CIV ;
+  celldl:hasTarget :Re_CIV ;
+  bgf:hasSource :TF_f_CIV ;
+  bgf:hasTarget :Re_CIV .
+
+:Re_CIV.TF_r_CIV a celldl:Connection ;
+  celldl:hasSource :Re_CIV ;
+  celldl:hasTarget :TF_r_CIV ;
+  bgf:hasSource :Re_CIV ;
+  bgf:hasTarget :TF_r_CIV .
+
+:TF_r_CIV.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_CIV ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_CIV ;
+  bgf:hasTarget :C_m_m .
+
 :Re_ATPS a celldl:Component, bgf:SaturatingChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "ATPS" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "4.97418878522324e-09 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "9.45338014469676e-07 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.68928368336637 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "2.78359981578088e-15 1"^^cdt:ucum ] .
 
 :Se_H_c_ATPS a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -871,7 +1001,7 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Re_ATPS.Se_H_m_ATPS a celldl:Connection ;
   celldl:hasSource :Re_ATPS ;
@@ -898,11 +1028,43 @@
   bgf:hasSource :Re_ATPS ;
   bgf:hasTarget :q_ATP_m .
 
+:TF_f_ATPS a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-144727.99818 C/mol"^^cdt:ucum .
+
+:TF_r_ATPS a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "6.90951310441182e-06 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_ATPS a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_ATPS ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_ATPS .
+
+:TF_f_ATPS.Re_ATPS a celldl:Connection ;
+  celldl:hasSource :TF_f_ATPS ;
+  celldl:hasTarget :Re_ATPS ;
+  bgf:hasSource :TF_f_ATPS ;
+  bgf:hasTarget :Re_ATPS .
+
+:Re_ATPS.TF_r_ATPS a celldl:Connection ;
+  celldl:hasSource :Re_ATPS ;
+  celldl:hasTarget :TF_r_ATPS ;
+  bgf:hasSource :Re_ATPS ;
+  bgf:hasTarget :TF_r_ATPS .
+
+:TF_r_ATPS.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_ATPS ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_ATPS ;
+  bgf:hasTarget :C_m_m .
+
 :Re_LEAK a celldl:Component, bgf:ChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "LEAK" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.21177079969579e-12 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.33668367911659e-13 mol/s"^^cdt:ucum ] .
 
 :Se_H_c_LEAK a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
@@ -920,10 +1082,42 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "m" ;
-  bgf:hasValue "-39308.3316576098 J/mol"^^cdt:ucum .
+  bgf:hasValue "-24835.531845069 J/mol"^^cdt:ucum .
 
 :Re_LEAK.Se_H_m_LEAK a celldl:Connection ;
   celldl:hasSource :Re_LEAK ;
   celldl:hasTarget :Se_H_m_LEAK ;
   bgf:hasSource :Re_LEAK ;
   bgf:hasTarget :Se_H_m_LEAK .
+
+:TF_f_LEAK a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-48242.66606 C/mol"^^cdt:ucum .
+
+:TF_r_LEAK a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "2.07285393132355e-05 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_LEAK a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_LEAK ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_LEAK .
+
+:TF_f_LEAK.Re_LEAK a celldl:Connection ;
+  celldl:hasSource :TF_f_LEAK ;
+  celldl:hasTarget :Re_LEAK ;
+  bgf:hasSource :TF_f_LEAK ;
+  bgf:hasTarget :Re_LEAK .
+
+:Re_LEAK.TF_r_LEAK a celldl:Connection ;
+  celldl:hasSource :Re_LEAK ;
+  celldl:hasTarget :TF_r_LEAK ;
+  bgf:hasSource :Re_LEAK ;
+  bgf:hasTarget :TF_r_LEAK .
+
+:TF_r_LEAK.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_LEAK ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_LEAK ;
+  bgf:hasTarget :C_m_m .

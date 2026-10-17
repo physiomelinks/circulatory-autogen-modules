@@ -15,13 +15,19 @@ The elements:
                               (sigma); kappa [mol/s]
   a chemostat                 bgf:ChemicalPotential, u = RT ln(K C V), one beside each reaction that uses it (each
                               copy holds the same potential, so the model is unchanged and its bonds stay short)
+  a membrane                  for a compartment with a capacitance (BondGraph.capacitance): its capacitor
+                              (bgf:ElectricalCapacitiveNode, charge C_m V psi), and for each reaction moving charge q
+                              into it two transformers (bgf:TransformerNode) that split the electrical work q F psi
+                              evenly between the reaction's directions, as the module does: from the capacitor into
+                              its forward side, ratio -q F / 2, and from its reverse side to the capacitor, ratio
+                              2 / (q F); the capacitor gains q F v (electrogenic transport)
 Not representable in the templates, so folded into kappa at `conc` (exact while they stay at it, noted in the result):
-allosteric activators and inhibitors, and an electrical potential (BondGraph.potentials, applied to the stores' K, the
+allosteric activators and inhibitors, and an electrical potential without a capacitance (applied to the stores' K, the
 electrical work's even split moved into kappa and sigma).
 """
 import math
 
-from bondgraph import R_GAS
+from bondgraph import FARADAY
 
 TEMPLATE_RT = 2578.73058   # J/mol: the BG-RDF chemical template's RT (37 C)
 BGF = 'https://bg-rdf.org/ontologies/bondgraph-framework#'
@@ -86,20 +92,31 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
     by = bg.by_name()
     pos, ring, yc, R = _cycle_layout(bg)
 
+    # an electrical potential with a capacitance is a state (the membrane's capacitor and its transformers); one
+    # without is folded in at its value
+    def static_electrical(s):
+        return 0.0 if by[s].compartment in bg.capacitance else bg.electrical(s)
+
+    def static_work(r):
+        return sum(bg.charge_into(r, comp) * FARADAY * psi for comp, psi in bg.potentials.items()
+                   if comp not in bg.capacitance)
+
     def factor(s):
         sp = by[s]
-        return math.exp((bg.mu0[s] + bg.electrical(s)) / rt) * bg.activity(s, conc[s]) / sp.c_std
+        return math.exp((bg.mu0[s] + static_electrical(s)) / rt) * bg.activity(s, conc[s]) / sp.c_std
 
     elements, connections, folded, turtle = [], [], [], []
-    bond_elements = []
+    bond_elements, junctions = [], []
 
-    def element(eid, rdf_type, symbol, species, x, y, values, where=None):
+    def element(eid, rdf_type, symbol, species, x, y, values, where=None, junction=False):
         where = where or location
         elements.append({'id': eid, 'type': BGF + rdf_type, 'symbol': symbol, 'species': species,
                          'location': where, 'x': round(x, 2), 'y': round(y, 2)})
-        bond_elements.append(f':{eid}')
-        lines = [f':{eid} a celldl:Component, bgf:{rdf_type} ;', f'  bgf:hasSymbol "{symbol}" ;',
-                 f'  bgf:hasSpecies "{species}" ;', f'  bgf:hasLocation "{where}"']
+        (junctions if junction else bond_elements).append(f':{eid}')
+        lines = [f':{eid} a celldl:Component, bgf:{rdf_type} ;', f'  bgf:hasSymbol "{symbol}"']
+        if species is not None:
+            lines[-1] += ' ;'
+            lines += [f'  bgf:hasSpecies "{species}" ;', f'  bgf:hasLocation "{where}"']
         for v in values:
             lines[-1] += ' ;'
             lines.append(f'  {v}')
@@ -152,7 +169,7 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
         place[n] = (side * (edge + SIDE * col), y)
     for s in internal:
         x, y = place[s.name]
-        k = math.exp((bg.mu0[s.name] + bg.electrical(s.name)) / rt) / (s.c_std * volume)
+        k = math.exp((bg.mu0[s.name] + static_electrical(s.name)) / rt) / (s.c_std * volume)
         values = [f'bgf:hasValue {_ucum(conc[s.name] * volume, "mol")}']
         if s.k_sat is not None:
             # K q k_sat/(k_sat + q) = K V a with a = C k_sat/(k_sat + C): the module's exp(mu0/RT) a/c_std
@@ -163,19 +180,29 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
             values.append(f'bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue {_ucum(k, "mol-1")} ]')
             element(f'q_{s.name}', 'ChemicalStorageNode', 'q', species_label(s), x, y, values, s.compartment)
 
+    # the membranes: a capacitor per compartment with a capacitance, beyond the side columns
+    electrogenic = {comp: [r for r in bg.reactions if bg.charge_into(r, comp)] for comp in bg.capacitance}
+    for i, (comp, moving) in enumerate(electrogenic.items()):
+        cap = volume * bg.capacitance[comp]
+        y = sum(pos[r.name][1] for r in moving) / max(len(moving), 1)
+        element(f'C_m_{comp}', 'ElectricalCapacitiveNode', 'q', 'psi', edge + SIDE * (3 + i), y,
+                [f'bgf:hasValue {_ucum(cap * bg.potentials[comp], "C")}',
+                 f'bgf:parameterValue [ bgf:varName "C" ; bgf:hasValue {_ucum(cap, "F")} ]'], comp)
+
     # reactions, with a copy of each chemostat they use beside them
     for r in bg.reactions:
         x, y = pos[r.name]
-        sub_el = sum(-n * bg.electrical(sp) for sp, n in r.stoich.items() if n < 0)
-        c = math.exp((0.5 * bg.electrical_work(r) + sub_el) / rt)   # the templates' Pf and Pr over the module's
+        sub_el = sum(-n * static_electrical(sp) for sp, n in r.stoich.items() if n < 0)
+        c = math.exp((0.5 * static_work(r) + sub_el) / rt)   # the templates' Pf and Pr over the module's
         regulation = bg.activation(r, conc)
         if r.activators or r.inhibitors:
             folded.append(f'{r.name}: ' + ', '.join([f'activation by {a}' for a in r.activators] +
                                                     [f'inhibition by {i}' for i in r.inhibitors]) +
                           f' folded into kappa (x{regulation:.4g}) at the export concentrations')
-        if bg.electrical_work(r):
+        if static_work(r):
             folded.append(f'{r.name}: the electrical work at psi = ' +
-                          ', '.join(f'{v * 1e3:g} mV' for v in bg.potentials.values()) + ' folded into K, kappa, sigma')
+                          ', '.join(f'{v * 1e3:g} mV' for c_, v in bg.potentials.items() if c_ not in bg.capacitance)
+                          + ' folded into K, kappa, sigma')
         values = [f'bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue '
                   f'{_ucum(kappa[r.name] * regulation * volume / c, "mol/s")} ]']
         if r.sigma:
@@ -196,12 +223,28 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
         for sp, n in r.stoich.items():
             if not by[sp].boundary:
                 connect(f'q_{sp}', f'Re_{r.name}', abs(n)) if n < 0 else connect(f'Re_{r.name}', f'q_{sp}', n)
+        for comp in bg.capacitance:
+            q = bg.charge_into(r, comp)
+            if not q:
+                continue
+            tx, ty = x + 0.5 * BESIDE, y
+            element(f'TF_f_{r.name}', 'TransformerNode', 'TF', None, tx, ty - 22.0,
+                    [f'bgf:hasValue {_ucum(-0.5 * q * FARADAY, "C/mol")}'], junction=True)
+            element(f'TF_r_{r.name}', 'TransformerNode', 'TF', None, tx, ty + 22.0,
+                    [f'bgf:hasValue {_ucum(2.0 / (q * FARADAY), "mol/C")}'], junction=True)
+            connect(f'C_m_{comp}', f'TF_f_{r.name}', 1)
+            connect(f'TF_f_{r.name}', f'Re_{r.name}', 1)
+            connect(f'Re_{r.name}', f'TF_r_{r.name}', 1)
+            connect(f'TF_r_{r.name}', f'C_m_{comp}', 1)
+    templates = 'tpl:chemical.ttl' + (', tpl:electrical.ttl' if bg.capacitance else '')
     head = ['@prefix : <#> .', '@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .',
             '@prefix cdt: <https://w3id.org/cdt/> .', '@prefix celldl: <http://celldl.org/ontologies/celldl#> .',
             '@prefix owl: <http://www.w3.org/2002/07/owl#> .', '@prefix tpl: <https://bg-rdf.org/templates/> .', '',
             f'# {bg.label}: written by tools/celldl.py (circulatory-autogen-modules) from the module\'s bond graph',
             *[f'# {f}' for f in folded], '',
             '<> a celldl:Document, bgf:BondgraphModel ;', '  owl:versionInfo "1.0" ;',
-            '  bgf:usesTemplate tpl:chemical.ttl ;', '  bgf:hasBondElement ' + ', '.join(bond_elements) + ' .', '']
+            f'  bgf:usesTemplate {templates} ;', '  bgf:hasBondElement ' + ', '.join(bond_elements)
+            + (' ;' if junctions else ' .'),
+            *(['  bgf:hasJunctionStructure ' + ', '.join(junctions) + ' .'] if junctions else []), '']
     return {'label': bg.label, 'turtle': '\n'.join(head) + '\n\n'.join(turtle) + '\n',
             'elements': elements, 'connections': connections, 'folded': folded}

@@ -25,7 +25,8 @@ T_END, DT = 60.0, 1.0
 
 
 def module_run(module, boundary):
-    '''The module's internal concentrations [mM] at t = 0, DT, ... T_END with its boundary concentrations set.'''
+    '''The module's internal concentrations [mM] at t = 0, DT, ... T_END with its boundary concentrations set, and
+    each membrane's potential [V] (psi_<compartment>).'''
     from cam_testing import checks, harness
     from cam_testing.library import load_version
     cm = checks.ComponentModel(load_version(module, detailed.VERSION), work_dir=os.path.join(
@@ -39,12 +40,14 @@ def module_run(module, boundary):
             helper.set_param_vals(['parameters/C_' + k + '_mod' for k in boundary], list(boundary.values()),
                                   change_states=True)
         assert helper.run() is not False
-    return {s: np.asarray(helper.get_results([[harness.output_name('mod/C_' + s)]], flatten=True)[0], float).ravel()
-            for s in internal}
+    names = {s: 'C_' + s for s in internal} | {f'psi_{c}': f'psi_{c}' for c in bg.capacitance}
+    return {s: np.asarray(helper.get_results([[harness.output_name('mod/' + n)]], flatten=True)[0], float).ravel()
+            for s, n in names.items()}
 
 
-def bond_graph_run(cellml_path, volume, species, labels):
-    '''The bond graph's store amounts over the volume [mM] at the same times (labels: species -> its diagram label).'''
+def bond_graph_run(cellml_path, volume, species, labels, capacitance):
+    '''The bond graph's store amounts over the volume [mM] at the same times (labels: species -> its diagram label),
+    and each membrane capacitor's charge over its capacitance [V] (capacitance: compartment -> F/m3).'''
     import myokit
     import myokit.formats.cellml as mc
     model = mc.CellMLImporter().model(cellml_path)
@@ -55,7 +58,10 @@ def bond_graph_run(cellml_path, volume, species, labels):
     log = sim.run(T_END + DT / 2, log_interval=DT)
     # a store's state is q_<species>_<location> (bg2cellml names variables from symbol, species and location)
     states = {s.name().rsplit('_', 1)[0]: s.qname() for s in model.states()}
-    return {s: np.asarray(log[states[f'q_{labels[s]}']], float) / volume for s in species}
+    out = {s: np.asarray(log[states[f'q_{labels[s]}']], float) / volume for s in species if s in labels}
+    for comp, c in capacitance.items():
+        out[f'psi_{comp}'] = np.asarray(log[states['q_psi']], float) / (c * volume)   # its capacitor, q_psi_<comp>
+    return out
 
 
 def compare(spec_dir, module):
@@ -65,7 +71,7 @@ def compare(spec_dir, module):
         mod = module_run(module, boundary)
         graph = detailed.BUILDERS[module]()[0]
         labels = {sp.name: species_label(sp) for sp in graph.species}
-        bg = bond_graph_run(os.path.join(spec_dir, f'{name}.cellml'), volume, list(mod), labels)
+        bg = bond_graph_run(os.path.join(spec_dir, f'{name}.cellml'), volume, list(mod), labels, graph.capacitance)
         worst = {}
         for s in mod:
             n = min(len(mod[s]), len(bg[s]))
