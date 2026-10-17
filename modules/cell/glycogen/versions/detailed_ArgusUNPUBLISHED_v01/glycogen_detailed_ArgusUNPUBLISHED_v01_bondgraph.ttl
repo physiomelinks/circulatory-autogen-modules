@@ -1,102 +1,234 @@
+@prefix : <#> .
 @prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
 @prefix cdt: <https://w3id.org/cdt/> .
+@prefix celldl: <http://celldl.org/ontologies/celldl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix tpl: <https://bg-rdf.org/templates/> .
 
-@prefix : <#> .
+# Detailed glycogen store: written by tools/celldl.py (circulatory-autogen-modules) from the module's bond graph
+# GLGP: inhibition by ATP folded into kappa (x0.09434) at the export concentrations
 
-# Detailed glycogen store: written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
-# T = 293.15 K; volume 6.28319e-18 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+<> a celldl:Document, bgf:BondgraphModel ;
+  owl:versionInfo "1.0" ;
+  bgf:usesTemplate tpl:chemical.ttl ;
+  bgf:hasBondElement :q_G1P, :q_ADPglc, :q_PPi, :q_Gly, :Re_PGM, :Se_G6P_PGM, :Re_GLGC, :Se_ATP_GLGC, :Se_H_GLGC, :Re_GLGA, :Se_ADP_GLGA, :Se_H_GLGA, :Re_PPA, :Se_H2O_PPA, :Se_Pi_PPA, :Se_H_PPA, :Re_GLGP, :Se_Pi_GLGP .
+:q_G1P a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "G1P" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "3.16690496841448e-19 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.43881925274843e+17 mol-1"^^cdt:ucum ] .
 
-:glycogen
-    a bgf:BondgraphModel ;
-    bgf:usesTemplate tpl:chemical.ttl ;
-    bgf:hasBondElement :q_G6P, :q_ATP, :q_ADP, :q_Pi, :q_H, :q_H2O, :q_G1P, :q_ADPglc, :q_PPi, :q_Gly, :Re_PGM, :Re_GLGC, :Re_GLGA, :Re_PPA, :Re_GLGP .
+:q_ADPglc a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "ADPglc" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "3.14159265358979e-19 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.48556832362598e+18 mol-1"^^cdt:ucum ] .
 
-:q_G6P  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "6.283185307179586e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.722084199971267e+16 mol-1"^^cdt:ucum ] .
+:q_PPi a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "PPi" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "3.14159265358979e-18 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.5013569175299e+17 mol-1"^^cdt:ucum ] .
 
-:q_ATP  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "6.031857894892403e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.818207982109391e+18 mol-1"^^cdt:ucum ] .
+:q_Gly a celldl:Component, bgf:SaturatingChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Gly" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "3.14159265358979e-16 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.4276900872577e+17 mol-1"^^cdt:ucum ] , [ bgf:varName "k_sat" ; bgf:hasValue "6.28318530717959e-17 mol"^^cdt:ucum ] .
 
-:q_ADP  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.518583772020569e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.095332538865514e+15 mol-1"^^cdt:ucum ] .
+:Re_PGM a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PGM" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.40935042488648e-17 mol/s"^^cdt:ucum ] .
 
-:q_Pi  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "6.283185307179586e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.467975097404830e+15 mol-1"^^cdt:ucum ] .
+:Se_G6P_PGM a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "G6P" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-3746.91961647496 J/mol"^^cdt:ucum .
 
-:q_H  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.578264791976477e-22 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.903920881343370e+19 mol-1"^^cdt:ucum ] .
+:Se_G6P_PGM.Re_PGM a celldl:Connection ;
+  celldl:hasSource :Se_G6P_PGM ;
+  celldl:hasTarget :Re_PGM ;
+  bgf:hasSource :Se_G6P_PGM ;
+  bgf:hasTarget :Re_PGM .
 
-:q_H2O  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.487167845484670e-13 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.930950858873811e+14 mol-1"^^cdt:ucum ] .
+:Re_PGM.q_G1P a celldl:Connection ;
+  celldl:hasSource :Re_PGM ;
+  celldl:hasTarget :q_G1P ;
+  bgf:hasSource :Re_PGM ;
+  bgf:hasTarget :q_G1P .
 
-:q_G1P
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.166904968414481e-19 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.438819252748426e+17 mol-1"^^cdt:ucum ] .
+:Re_GLGC a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "GLGC" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.81208937088228e-21 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "46.5797545110742 1"^^cdt:ucum ] .
 
-:q_ADPglc
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.141592653589793e-19 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.485568323625984e+18 mol-1"^^cdt:ucum ] .
+:Se_ATP_GLGC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ATP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "14626.6687646928 J/mol"^^cdt:ucum .
 
-:q_PPi
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.141592653589793e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.501356917529899e+17 mol-1"^^cdt:ucum ] .
+:Se_ATP_GLGC.Re_GLGC a celldl:Connection ;
+  celldl:hasSource :Se_ATP_GLGC ;
+  celldl:hasTarget :Re_GLGC ;
+  bgf:hasSource :Se_ATP_GLGC ;
+  bgf:hasTarget :Re_GLGC .
 
-:q_Gly  # activity C k_sat / (k_sat + C), k_sat 10 mM: linear here, at the export point
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.141592653589793e-16 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.237948347876284e+17 mol-1"^^cdt:ucum ] .
+:Se_H_GLGC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum .
 
-:Re_PGM
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGM" ; bgf:hasValue "2.409350424886477e-17 mol/s"^^cdt:ucum ] .
+:Se_H_GLGC.Re_GLGC a celldl:Connection ;
+  celldl:hasSource :Se_H_GLGC ;
+  celldl:hasTarget :Re_GLGC ;
+  bgf:hasSource :Se_H_GLGC ;
+  bgf:hasTarget :Re_GLGC .
 
-:Re_GLGC  # saturation sigma 46.58: folded into kappa at the export's concentrations
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GLGC" ; bgf:hasValue "6.628471624947949e-21 mol/s"^^cdt:ucum ] .
+:q_G1P.Re_GLGC a celldl:Connection ;
+  celldl:hasSource :q_G1P ;
+  celldl:hasTarget :Re_GLGC ;
+  bgf:hasSource :q_G1P ;
+  bgf:hasTarget :Re_GLGC .
 
-:Re_GLGA  # saturation sigma 25.56: folded into kappa at the export's concentrations
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GLGA" ; bgf:hasValue "1.219029786617613e-20 mol/s"^^cdt:ucum ] .
+:Re_GLGC.q_ADPglc a celldl:Connection ;
+  celldl:hasSource :Re_GLGC ;
+  celldl:hasTarget :q_ADPglc ;
+  bgf:hasSource :Re_GLGC ;
+  bgf:hasTarget :q_ADPglc .
 
-:Re_PPA
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PPA" ; bgf:hasValue "8.715052712222028e-23 mol/s"^^cdt:ucum ] .
+:Re_GLGC.q_PPi a celldl:Connection ;
+  celldl:hasSource :Re_GLGC ;
+  celldl:hasTarget :q_PPi ;
+  bgf:hasSource :Re_GLGC ;
+  bgf:hasTarget :q_PPi .
 
-:Re_GLGP  # saturation sigma 5.062 and inhibition by ATP (K_i 1 mM): folded into kappa at the export's concentrations
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GLGP" ; bgf:hasValue "4.395289861672892e-21 mol/s"^^cdt:ucum ] .
+:Re_GLGA a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "GLGA" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.24150366518946e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "25.5581565725601 1"^^cdt:ucum ] .
 
-:q_G6P.Re_PGM bgf:hasSource :q_G6P ; bgf:hasTarget :Re_PGM .
-:Re_PGM.q_G1P bgf:hasSource :Re_PGM ; bgf:hasTarget :q_G1P .
-:q_G1P.Re_GLGC bgf:hasSource :q_G1P ; bgf:hasTarget :Re_GLGC .
-:q_ATP.Re_GLGC bgf:hasSource :q_ATP ; bgf:hasTarget :Re_GLGC .
-:q_H.Re_GLGC bgf:hasSource :q_H ; bgf:hasTarget :Re_GLGC .
-:Re_GLGC.q_ADPglc bgf:hasSource :Re_GLGC ; bgf:hasTarget :q_ADPglc .
-:Re_GLGC.q_PPi bgf:hasSource :Re_GLGC ; bgf:hasTarget :q_PPi .
-:q_ADPglc.Re_GLGA bgf:hasSource :q_ADPglc ; bgf:hasTarget :Re_GLGA .
-:Re_GLGA.q_ADP bgf:hasSource :Re_GLGA ; bgf:hasTarget :q_ADP .
-:Re_GLGA.q_Gly bgf:hasSource :Re_GLGA ; bgf:hasTarget :q_Gly .
-:Re_GLGA.q_H bgf:hasSource :Re_GLGA ; bgf:hasTarget :q_H .
-:q_PPi.Re_PPA bgf:hasSource :q_PPi ; bgf:hasTarget :Re_PPA .
-:q_H2O.Re_PPA bgf:hasSource :q_H2O ; bgf:hasTarget :Re_PPA .
-:Re_PPA.q_Pi bgf:hasSource :Re_PPA ; bgf:hasTarget :q_Pi ; bgf:bondCount 2 .
-:Re_PPA.q_H bgf:hasSource :Re_PPA ; bgf:hasTarget :q_H .
-:q_Gly.Re_GLGP bgf:hasSource :q_Gly ; bgf:hasTarget :Re_GLGP .
-:q_Pi.Re_GLGP bgf:hasSource :q_Pi ; bgf:hasTarget :Re_GLGP .
-:Re_GLGP.q_G1P bgf:hasSource :Re_GLGP ; bgf:hasTarget :q_G1P .
+:Se_ADP_GLGA a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ADP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-12661.5270157358 J/mol"^^cdt:ucum .
+
+:Re_GLGA.Se_ADP_GLGA a celldl:Connection ;
+  celldl:hasSource :Re_GLGA ;
+  celldl:hasTarget :Se_ADP_GLGA ;
+  bgf:hasSource :Re_GLGA ;
+  bgf:hasTarget :Se_ADP_GLGA .
+
+:Se_H_GLGA a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum .
+
+:Re_GLGA.Se_H_GLGA a celldl:Connection ;
+  celldl:hasSource :Re_GLGA ;
+  celldl:hasTarget :Se_H_GLGA ;
+  bgf:hasSource :Re_GLGA ;
+  bgf:hasTarget :Se_H_GLGA .
+
+:q_ADPglc.Re_GLGA a celldl:Connection ;
+  celldl:hasSource :q_ADPglc ;
+  celldl:hasTarget :Re_GLGA ;
+  bgf:hasSource :q_ADPglc ;
+  bgf:hasTarget :Re_GLGA .
+
+:Re_GLGA.q_Gly a celldl:Connection ;
+  celldl:hasSource :Re_GLGA ;
+  celldl:hasTarget :q_Gly ;
+  bgf:hasSource :Re_GLGA ;
+  bgf:hasTarget :q_Gly .
+
+:Re_PPA a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PPA" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "8.71505271222203e-23 mol/s"^^cdt:ucum ] .
+
+:Se_H2O_PPA a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H2O" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "12688.789103557 J/mol"^^cdt:ucum .
+
+:Se_H2O_PPA.Re_PPA a celldl:Connection ;
+  celldl:hasSource :Se_H2O_PPA ;
+  celldl:hasTarget :Re_PPA ;
+  bgf:hasSource :Se_H2O_PPA ;
+  bgf:hasTarget :Re_PPA .
+
+:Se_Pi_PPA a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "Pi" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-3275.91053716953 J/mol"^^cdt:ucum .
+
+:Re_PPA.Se_Pi_PPA a celldl:Connection ;
+  celldl:hasSource :Re_PPA ;
+  celldl:hasTarget :Se_Pi_PPA ;
+  bgf:hasSource :Re_PPA ;
+  bgf:hasTarget :Se_Pi_PPA ;
+  bgf:bondCount 2 .
+
+:Se_H_PPA a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum .
+
+:Re_PPA.Se_H_PPA a celldl:Connection ;
+  celldl:hasSource :Re_PPA ;
+  celldl:hasTarget :Se_H_PPA ;
+  bgf:hasSource :Re_PPA ;
+  bgf:hasTarget :Se_H_PPA .
+
+:q_PPi.Re_PPA a celldl:Connection ;
+  celldl:hasSource :q_PPi ;
+  celldl:hasTarget :Re_PPA ;
+  bgf:hasSource :q_PPi ;
+  bgf:hasTarget :Re_PPA .
+
+:Re_GLGP a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "GLGP" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.40796709381718e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "5.06209011144863 1"^^cdt:ucum ] .
+
+:Se_Pi_GLGP a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "Pi" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-3275.91053716953 J/mol"^^cdt:ucum .
+
+:Se_Pi_GLGP.Re_GLGP a celldl:Connection ;
+  celldl:hasSource :Se_Pi_GLGP ;
+  celldl:hasTarget :Re_GLGP ;
+  bgf:hasSource :Se_Pi_GLGP ;
+  bgf:hasTarget :Re_GLGP .
+
+:q_Gly.Re_GLGP a celldl:Connection ;
+  celldl:hasSource :q_Gly ;
+  celldl:hasTarget :Re_GLGP ;
+  bgf:hasSource :q_Gly ;
+  bgf:hasTarget :Re_GLGP .
+
+:Re_GLGP.q_G1P a celldl:Connection ;
+  celldl:hasSource :Re_GLGP ;
+  celldl:hasTarget :q_G1P ;
+  bgf:hasSource :Re_GLGP ;
+  bgf:hasTarget :q_G1P .

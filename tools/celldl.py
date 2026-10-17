@@ -27,12 +27,21 @@ TEMPLATE_RT = 2578.73058   # J/mol: the BG-RDF chemical template's RT (37 C)
 BGF = 'https://bg-rdf.org/ontologies/bondgraph-framework#'
 
 DY = 95.0          # between consecutive reactions down the column
-BESIDE = 95.0      # from a reaction to the species beside it
+BESIDE = 110.0     # from a reaction to the species beside it
 SIDE = 125.0       # spacing of the side columns
 
 
 def _ucum(value, units):
     return f'"{value:.15g} {units}"^^cdt:ucum'
+
+
+def species_label(sp):
+    """A species' label in the diagram (bgf:hasSpecies): its name without its compartment's suffix (that is its
+    location) or underscores, which LaTeX would set as subscripts (Pyr_c -> Pyr, cytc_ox -> cytcox)."""
+    name = sp.name
+    if sp.compartment and name.endswith(f'_{sp.compartment}'):
+        name = name[:-len(sp.compartment) - 1]
+    return name.replace('_', '')
 
 
 def _cycle_layout(bg):
@@ -47,8 +56,8 @@ def _cycle_layout(bg):
         pos[n], y = (0.0, y), y + DY
     yc = R = 0.0
     if ring:
-        R = max(150.0, 34.0 * len(ring))
-        yc = y + R - DY / 2
+        R = max(170.0, 38.0 * len(ring))
+        yc = y + R
         for k, n in enumerate(ring):
             a = -0.5 * math.pi + 2.0 * math.pi * k / len(ring)
             pos[n] = (R * math.cos(a), yc + R * math.sin(a))
@@ -61,12 +70,13 @@ def _cycle_layout(bg):
 def _outward(pos, n, ring, yc, distance, k):
     """A point beside reaction n: outside the ring along its radius for a ring reaction, else to alternate sides."""
     x, y = pos[n]
-    if n in ring:
+    if n in ring and abs(x) > 0.35 * abs(y - yc):
         # copies fan out around the radius, alternately either side of it
-        a = math.atan2(y - yc, x) + (1 if k % 2 else -1) * 0.38 * ((k + 1) // 2)
+        a = math.atan2(y - yc, x) + (1 if k % 2 else -1) * 0.62 * ((k + 1) // 2)
         return x + math.cos(a) * distance, y + math.sin(a) * distance
+    # at the top and bottom of a ring, as in a column: to the sides, clear of the reactions above and below
     side = -1 if k % 2 == 0 else 1
-    return x + side * distance * (1 + 0.55 * (k // 2)), y + 28.0 * ((k // 2) % 2)
+    return x + side * distance * (1 + 0.6 * (k // 2)), y + 30.0 * ((k // 2) % 2)
 
 
 def celldl_spec(bg, conc, kappa, volume, location='c'):
@@ -148,10 +158,10 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
             # K q k_sat/(k_sat + q) = K V a with a = C k_sat/(k_sat + C): the module's exp(mu0/RT) a/c_std
             values.append(f'bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue {_ucum(k, "mol-1")} ] , '
                           f'[ bgf:varName "k_sat" ; bgf:hasValue {_ucum(s.k_sat * volume, "mol")} ]')
-            element(f'q_{s.name}', 'SaturatingChemicalStorageNode', 'q', s.name, x, y, values, s.compartment)
+            element(f'q_{s.name}', 'SaturatingChemicalStorageNode', 'q', species_label(s), x, y, values, s.compartment)
         else:
             values.append(f'bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue {_ucum(k, "mol-1")} ]')
-            element(f'q_{s.name}', 'ChemicalStorageNode', 'q', s.name, x, y, values, s.compartment)
+            element(f'q_{s.name}', 'ChemicalStorageNode', 'q', species_label(s), x, y, values, s.compartment)
 
     # reactions, with a copy of each chemostat they use beside them
     for r in bg.reactions:
@@ -180,7 +190,7 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
             sx, sy = _outward(pos, r.name, ring, yc, BESIDE, k)
             k += 1
             se = f'Se_{sp}_{r.name}'
-            element(se, 'ChemicalPotential', 'Se', sp, sx, sy,
+            element(se, 'ChemicalPotential', 'Se', species_label(by[sp]), sx, sy,
                     [f'bgf:hasValue {_ucum(TEMPLATE_RT * math.log(factor(sp)), "J/mol")}'], by[sp].compartment)
             connect(se, f'Re_{r.name}', abs(n)) if n < 0 else connect(f'Re_{r.name}', se, n)
         for sp, n in r.stoich.items():

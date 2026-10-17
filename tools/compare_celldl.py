@@ -5,7 +5,8 @@ compared over time (the bond graph's store amounts q [mol] over the volume).
     python tools/compare_celldl.py SPEC_DIR [module ...]
 
 SPEC_DIR holds <module>.json / .cellml and <module>_run.json / .cellml (rest, and the verification config's
-run_parameters). Prints, per module and run, the largest difference relative to each species' scale.
+run_parameters) for the detailed modules. Prints, per module and run, the largest difference relative to each species'
+scale, and writes them to SPEC_DIR/comparison.json.
 """
 import contextlib
 import io
@@ -18,6 +19,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_celldl  # noqa: E402
 import build_metabolism_detailed as detailed  # noqa: E402
+from celldl import species_label  # noqa: E402
 
 T_END, DT = 60.0, 1.0
 
@@ -41,8 +43,8 @@ def module_run(module, boundary):
             for s in internal}
 
 
-def bond_graph_run(cellml_path, volume, species):
-    '''The bond graph's store amounts over the volume [mM] at the same times.'''
+def bond_graph_run(cellml_path, volume, species, labels):
+    '''The bond graph's store amounts over the volume [mM] at the same times (labels: species -> its diagram label).'''
     import myokit
     import myokit.formats.cellml as mc
     model = mc.CellMLImporter().model(cellml_path)
@@ -53,16 +55,17 @@ def bond_graph_run(cellml_path, volume, species):
     log = sim.run(T_END + DT / 2, log_interval=DT)
     # a store's state is q_<species>_<location> (bg2cellml names variables from symbol, species and location)
     states = {s.name().rsplit('_', 1)[0]: s.qname() for s in model.states()}
-    return {s: np.asarray(log[states[f'q_{s}']], float) / volume for s in species}
+    return {s: np.asarray(log[states[f'q_{labels[s]}']], float) / volume for s in species}
 
 
 def compare(spec_dir, module):
     out = {}
-    with contextlib.redirect_stdout(io.StringIO()):
-        _, volume = build_celldl.MODULES[module]
+    volume = build_celldl.MODULES[module][3]
     for name, boundary in ((module, {}), (f'{module}_run', build_celldl.run_parameters(module))):
         mod = module_run(module, boundary)
-        bg = bond_graph_run(os.path.join(spec_dir, f'{name}.cellml'), volume, list(mod))
+        graph = detailed.BUILDERS[module]()[0]
+        labels = {sp.name: species_label(sp) for sp in graph.species}
+        bg = bond_graph_run(os.path.join(spec_dir, f'{name}.cellml'), volume, list(mod), labels)
         worst = {}
         for s in mod:
             n = min(len(mod[s]), len(bg[s]))
@@ -77,7 +80,7 @@ def compare(spec_dir, module):
 if __name__ == '__main__':
     spec_dir = sys.argv[1]
     results = {}
-    for module in sys.argv[2:] or build_celldl.MODULES:
+    for module in sys.argv[2:] or [m for m, entry in build_celldl.MODULES.items() if entry[4]]:
         with contextlib.redirect_stdout(io.StringIO()):
             r = compare(spec_dir, module)
         results.update(r)
