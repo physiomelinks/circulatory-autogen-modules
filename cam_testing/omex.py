@@ -13,8 +13,9 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
   <p>_params_for_id.csv                       its parameters to identify, if any
   inputs, unchanged: <p>_parameters.csv, raw data and
     SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
-    _units.cellml and _verification_config.json; a supermodule's submodules' _modules_config.json
-    (their required_citations); and the test network the model was generated from
+    _units.cellml and _verification_config.json; a supermodule's _module_array.json (its instances)
+    and its submodules' _modules_config.json (their required_citations; a nested supermodule's with
+    its _module_array.json); and the test network the model was generated from
     (<module_type>_<version>_<p>_module_array.json / _model_parameters.csv)
   manifest.xml                                COMBINE manifest (master marked)
 
@@ -87,7 +88,8 @@ def members(version, parameterisation, work_dir):
         full = os.path.join(parameterisation.dir, p)
         if os.path.isfile(full) and not p.endswith('.omex') and p not in {n for n, _, _ in out}:
             add(full)
-    for p in (version.cellml_path, version.config_path, version.units_path, version.verification_config_path):
+    for p in (version.cellml_path, version.config_path, version.module_array_path, version.units_path,
+              version.verification_config_path):
         add(p)
     # a supermodule's submodules' configs (recursively), so their required_citations travel with it
     seen = {version.key}
@@ -95,6 +97,7 @@ def members(version, parameterisation, work_dir):
         if sub.key not in seen:
             seen.add(sub.key)
             add(sub.config_path)
+            add(sub.module_array_path)
     # the test network the model was generated from
     add(os.path.join(res, f'{prefix}_module_array.json'), f'{stem}_module_array.json')
     add(os.path.join(res, f'{prefix}_parameters.csv'), f'{stem}_model_parameters.csv')

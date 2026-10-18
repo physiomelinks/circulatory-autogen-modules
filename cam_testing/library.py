@@ -971,8 +971,19 @@ class Version:
 
     # --- supermodules -----------------------------------------------------------------------
     @property
+    def module_array_path(self):
+        '''<module_type>_<version>_module_array.json: a supermodule version's instances and their coupling.'''
+        return self.path('module_array.json')
+
+    @functools.cached_property
     def submodules(self):
-        return self.config.get('submodules') or []
+        '''A supermodule's instance records, read and checked by libcuflynx from its module array
+        (``module_array_path``); [] for a component.'''
+        if not self.is_supermodule:
+            return []
+        from libcuflynx.utilities.config_schemas import load_supermodule_array, normalise_supermodule_entry
+        entry = normalise_supermodule_entry(self.raw_entry, self.config_path)
+        return load_supermodule_array(entry, self.config_path)
 
     @property
     def submodule_names(self):

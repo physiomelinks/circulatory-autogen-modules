@@ -485,11 +485,13 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 # The calibrated parameters (those in <p>_params_for_id.csv, with their values from
 # <p>_calibrated_parameters.csv) are written to:
 #   1. the version's default parameterisation (row <var>);
-#   2. every supermodule version using the version's default parameterisation as a submodule, recursively
-#      (row <submodule path>/<var>, outer first: soma/sympathetic i_M/rho_M, a neuron using that
-#      soma as "soma" soma/i_M/rho_M), where the row exists;
+#   2. every supermodule version using the version as a submodule, recursively (row <submodule path>/<var>,
+#      outer first: soma/sympathetic i_M/rho_M, a neuron using that soma as "soma" soma/i_M/rho_M), where
+#      the row exists and holds the default parameterisation's value (a row with another value is the
+#      supermodule's own setting of that submodule, e.g. the heart's ra/ rows of the chamber, and is kept);
 #   3. every system model whose module array uses the version, or a supermodule chain over it, at
-#      its default parameterisation (row <vessel>/<var> or <vessel>/<submodule path>/<var>), where the row exists;
+#      its default parameterisation (row <vessel>/<var> or <vessel>/<submodule path>/<var>), where the row
+#      exists (a row through a supermodule chain: and holds the default parameterisation's value, as in 2);
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
 #      to the vessel of `reproduces` ("soma_SN/w": "SN__soma__i_M/w" -> soma_SN), giving row
@@ -540,6 +542,13 @@ def _row_values(path, names):
     return out
 
 
+def _same_value(a, b):
+    try:
+        return float(a) == float(b)
+    except (TypeError, ValueError):
+        return a == b
+
+
 def apply_plan(version, parameterisation_name, versions=None, systems=None):
     """The changes ``apply`` would make: [{path, row, variable, value, old, reference, sourced}].
     ``versions`` (default: the library) and ``systems`` (default: _system_models()) are what is
@@ -572,7 +581,7 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
         v = by_key.get(f'{mt}/{sub}')
         return v.default_parameterisation_name if v is not None else 'default'
 
-    # (version, submodule path) of every supermodule chain over the version's default parameterisation
+    # (version, submodule path) of every supermodule chain over the version
     chain, todo = [], [(version.mtype.name, version.name, '')]
     while todo:
         mt, vname, sfx = todo.pop(0)
@@ -582,17 +591,15 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
             for sub in S.submodules:
                 if (sub.get('module_type'), sub.get('module_subtype')) != (mt, vname):
                     continue
-                if module_array.parameterisation_of(sub, 'default') != default_of(mt, vname):
-                    continue
                 path = sub['name'] + ('/' + sfx if sfx else '')
                 if all((c[0].key, c[1]) != (S.key, path) for c in chain):
                     chain.append((S, path))
                     todo.append((S.mtype.name, S.name, path))
 
-    targets = []          # (csv path, row prefix, where, own)
-    targets.append((version.default_parameterisation.parameters_path, '', f'{version.key} default parameterisation', True))
+    targets = []          # (csv path, row prefix, where, own, only a row holding the default's value)
+    targets.append((version.default_parameterisation.parameters_path, '', f'{version.key} default parameterisation', True, False))
     for S, path in chain:
-        targets.append((S.default_parameterisation.parameters_path, path + '/', f'{S.key} default parameterisation', False))
+        targets.append((S.default_parameterisation.parameters_path, path + '/', f'{S.key} default parameterisation', False, True))
     flattened = {}        # system key -> [flattened vessels, as <record>/<submodule path>]
     systems_by_key = {m['key']: m for m in systems}
     chain_by_key = {}
@@ -610,7 +617,8 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
                 flattened.setdefault(m['key'], []).append(f"{ves['name']}/{path}")
     for mkey, fl in flattened.items():
         for F in fl:
-            targets.append((systems_by_key[mkey]['parameters_path'], F + '/', f'system model {mkey}', False))
+            # a row through a supermodule chain (<vessel>/<submodule path>/<var>) as in (2)
+            targets.append((systems_by_key[mkey]['parameters_path'], F + '/', f'system model {mkey}', False, '/' in F))
     # monolithic counterparts, through supermodule.equivalent output maps
     for S in versions:
         for e in ((S.spec.get('supermodule') or {}).get('equivalent') or []):
@@ -623,21 +631,24 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
                 mono = sorted({a.split('/', 1)[0] for a, b in omap.items() if b.split('/', 1)[0] == vessel})
                 if len(mono) != 1:
                     continue
-                targets.append((rep['parameters_path'], mono[0] + '/', f"system model {rep['key']}", False))
+                targets.append((rep['parameters_path'], mono[0] + '/', f"system model {rep['key']}", False, False))
                 ves = next((x for x in rep['vessels'] if x['name'] == mono[0]), None)
                 mv = by_key.get(f"{ves.get('module_type')}/{ves.get('module_subtype')}") if ves else None
                 if mv is not None:
-                    targets.append((mv.default_parameterisation.parameters_path, '', f'{mv.key} default parameterisation', False))
+                    targets.append((mv.default_parameterisation.parameters_path, '', f'{mv.key} default parameterisation', False, False))
 
     import datetime
     today = datetime.date.today().isoformat()
     obs_rel = os.path.relpath(inst.obs_data_path, version.dir).replace(os.sep, '/')
     plan, seen = [], set()
-    for path, pfx, where, own in targets:
+    defaults = _row_values(version.default_parameterisation.parameters_path, set(names))
+    for path, pfx, where, own, copies_only in targets:
         rows = _row_values(path, {pfx + n for n in names})
         for n in names:
             row = rows.get(pfx + n)
             if row is None or (path, pfx + n) in seen:
+                continue
+            if copies_only and not _same_value(row.get('value'), (defaults.get(n) or {}).get('value')):
                 continue
             seen.add((path, pfx + n))
             to = obs_rel if own else f'{version.mtype.name} {version.name} {obs_rel}'

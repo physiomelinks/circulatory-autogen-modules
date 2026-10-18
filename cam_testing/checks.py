@@ -204,7 +204,7 @@ class ComponentModel(object):
         if not component.is_supermodule:
             self._load_parameters()
         # A supermodule's parameters are those of its generated (flattened) model, read once it is
-        # generated: its own parameterisation's, its submodules' parameterisations' and the boundary conditions no
+        # generated: its own parameterisation's, its submodules' default parameterisations' and the boundary conditions no
         # internal connection closes (harness.supermodule_parameters).
 
     def _load_parameters(self):

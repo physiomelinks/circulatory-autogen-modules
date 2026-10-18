@@ -127,7 +127,7 @@ def generated_parameters_path(model_path):
 def supermodule_parameters(version, model_path, vessel=VESSEL):
     '''
     Every parameter of a supermodule's generated model (the flattened model: the supermodule's own
-    parameterisation, its submodules' parameterisations, and the boundary conditions no internal connection closes),
+    parameterisation, its submodules' default parameterisations, and the boundary conditions no internal connection closes),
     as Parameters named at the supermodule level (<var>_<submodule path>, globals as they are), with
     model_name the generated model's name, and kind from the owning submodule's config
     (global_constant for the globals).

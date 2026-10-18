@@ -64,15 +64,22 @@ def copy_library(tmp):
     shutil.copytree(os.path.join(REPO, 'modules'), dst,
                     ignore=shutil.ignore_patterns('results', 'plots', 'risk', '*.omex', '*.html'))
     sdir = os.path.join(dst, SOMA_REL)
+    # the RyR instance in the soma's module array, and the version its config lists
+    array_path = os.path.join(sdir, 'soma_sympathetic_module_array.json')
+    with open(array_path) as f:
+        records = json.load(f)
+    ryr = [s for s in records if s['name'] == 'RyR']
+    assert len(ryr) == 1, 'RyR submodule not found'
+    old = ryr[0]['module_subtype']
+    ryr[0]['module_subtype'] = NEW
+    with open(array_path, 'w') as f:
+        json.dump(records, f, indent=1)
     cfg_path = os.path.join(sdir, 'soma_sympathetic_modules_config.json')
     with open(cfg_path) as f:
         cfg = json.load(f)
-    n = 0
-    for s in cfg[0]['submodules']:
-        if s['name'] == 'RyR':
-            s['module_subtype'] = NEW
-            n += 1
-    assert n == 1, 'RyR submodule not found'
+    for v in cfg[0]['submodule_versions']:
+        if v == {'module_type': 'RyR', 'module_subtype': old}:
+            v['module_subtype'] = NEW
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
     csv_path = os.path.join(sdir, 'parameterisations', 'default', 'default_parameters.csv')

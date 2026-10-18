@@ -116,10 +116,10 @@ TEST_ABOUT = {
     'phlynx_equivalence_test': 'Compares CUFLynx\'s simulation of the PhLynx-built model with libcuflynx\'s '
                                'model of the same network (outputs matched by instance and variable, '
                                'normalised difference within 1e-6).',
-    'supermodule_structure_test': 'Every submodule is a library version with an existing parameterisation, '
-                                  'internal connections name sibling submodules, and the parameterisation\'s '
-                                  'parameters name '
-                                  'submodules or declared globals.',
+    'supermodule_structure_test': 'Its module array (<module_type>_<version>_module_array.json) loads with '
+                                  'libcuflynx: every submodule is a library version its config lists in '
+                                  'submodule_versions, and internal connections name sibling submodules; the '
+                                  'parameterisation\'s parameters name submodules or declared globals.',
     'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
                                     'with its submodules written out, output for output.',
     'coupled_validation_test': 'The version in use in the coupled system models its spec lists (coupled_systems): '
@@ -595,7 +595,7 @@ def supermodule_structure(version):
     subs = version.submodules
     versions = {s['name']: _sub_version(s) for s in subs}
     # the supermodule's own parameterisation: rows <part>/<var> (nested: <part>/<its part>/<var>)
-    # override the part's parameterisation; others are globals
+    # override the part's version's default parameterisation; others are globals
     overrides, global_rows = {}, []
     for p in version.default_parameterisation.parameters():
         path, _, var = p.variable_name.rpartition('/')
@@ -674,7 +674,7 @@ def supermodule_structure(version):
         uses = _global_names(sv) if sv is not None else set()
         parts.append({
             'name': s['name'], 'module_type': s['module_type'], 'version': s['module_subtype'],
-            'parameterisation': module_array.parameterisation_of(s, '(default)'), 'is_supermodule': bool(sv and sv.is_supermodule),
+            'parameterisation': sv.default_parameterisation_name if sv is not None else '(default)', 'is_supermodule': bool(sv and sv.is_supermodule),
             'n_parts': len(sv.submodules) if sv is not None and sv.is_supermodule else 0,
             'href': os.path.relpath(sv.html_path, version.dir) if sv is not None else None,
             'missing': sv is None, 'ports': ports,

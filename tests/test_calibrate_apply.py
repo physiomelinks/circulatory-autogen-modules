@@ -1,6 +1,6 @@
 """
 cam_testing.calibrate apply: a parameterisation's calibrated values reach the version's default
-parameterisation, its supermodules (<submodule>/<var>), the system models using it (<vessel>[/<submodule>]/<var>) and
+parameterisation, its supermodules (<submodule>/<var>, where the row holds the default's value), the system models using it (<vessel>[/<submodule>]/<var>) and
 the monolithic counterparts named by a supermodule's equivalent output_map. A mock library in a
 temp directory: no simulation.
 """
@@ -36,14 +36,12 @@ def _version(tmp, mt, name, submodules=None, spec=None):
 
 def _library(tmp):
     chan = _version(tmp, 'chan', 'v1')
-    cell = _version(tmp, 'cell', 's1', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1',
-                                                     'parameterisation': 'default'}],
+    cell = _version(tmp, 'cell', 's1', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1'}],
                     spec={'supermodule': {'equivalent': [{'model': 'sys_super', 'reproduces': 'sys_mono',
                                                           'output_map': {'mono_C/x': 'C__chan/x', 'mono_C/y': 'C__other/y'}}]}})
-    organ = _version(tmp, 'organ', 'o1', submodules=[{'name': 'cell', 'module_type': 'cell', 'module_subtype': 's1',
-                                                       'parameterisation': 'default'}])
-    other = _version(tmp, 'cell', 'other', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1',
-                                                         'parameterisation': 'fit'}])      # not the default parameterisation: untouched
+    organ = _version(tmp, 'organ', 'o1', submodules=[{'name': 'cell', 'module_type': 'cell', 'module_subtype': 's1'}])
+    # its parameterisation sets chan/g to its own value (not the default's): untouched
+    other = _version(tmp, 'cell', 'other', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1'}])
     mono = _version(tmp, 'cellmono', 'm1')
     fit = chan.parameterisation('fit')
     _csv(fit.params_for_id_path, ['mod,g,0.1,10,g,uniform'], header='vessel_name,param_name,min,max,name_for_plotting,prior')
@@ -56,15 +54,16 @@ def _library(tmp):
     _csv(chan.default_parameterisation.parameters_path, ['g,S,1,old ref,no', 'k,S,7,keep,no'], eol='\r\n')
     _csv(cell.default_parameterisation.parameters_path, ['chan/g,S,1,old,no', 'chan/k,S,7,keep,no'])
     _csv(organ.default_parameterisation.parameters_path, ['cell/chan/g,S,1,old,no'])
-    _csv(other.default_parameterisation.parameters_path, ['chan/g,S,1,old,no'])
+    _csv(other.default_parameterisation.parameters_path, ['chan/g,S,3,its own,no'])
     _csv(mono.default_parameterisation.parameters_path, ['g,S,1,old,no'])
     systems = []
     for key, vessels, rows in (
             ('sys_flat', [{'name': 'C_chan', 'module_type': 'chan', 'module_subtype': 'v1', 'parameterisation': 'default'},
                           {'name': 'D_chan', 'module_type': 'chan', 'module_subtype': 'v1', 'parameterisation': 'fit'}],
              ['C_chan/g,S,1,old', 'D_chan/g,S,1,old']),
-            ('sys_super', [{'name': 'C', 'module_type': 'cell', 'module_subtype': 's1', 'parameterisation': 'default'}],
-             ['C/chan/g,S,1,old']),
+            ('sys_super', [{'name': 'C', 'module_type': 'cell', 'module_subtype': 's1', 'parameterisation': 'default'},
+                           {'name': 'E', 'module_type': 'cell', 'module_subtype': 's1', 'parameterisation': 'default'}],
+             ['C/chan/g,S,1,old', 'E/chan/g,S,4,its own']),
             ('sys_mono', [{'name': 'mono_C', 'module_type': 'cellmono', 'module_subtype': 'm1', 'parameterisation': 'default'}],
              ['mono_C/g,S,1,old'])):
         path = os.path.join(tmp, 'system_models', key, f'{key}_parameters.csv')
@@ -104,7 +103,9 @@ def test_apply_plan_and_write(tmp_path):
     flat = calibrate._row_values(systems[0]['parameters_path'], {'C_chan/g', 'D_chan/g'})
     assert flat['C_chan/g']['value'] == repr(2.5000001) and flat['D_chan/g']['value'] == '1'   # the vessel at the fit parameterisation untouched
     other = calibrate._row_values(versions[3].default_parameterisation.parameters_path, {'chan/g'})
-    assert other['chan/g']['value'] == '1'
+    assert other['chan/g']['value'] == '3'
+    own_value = calibrate._row_values(systems[1]['parameters_path'], {'E/chan/g'})
+    assert own_value['E/chan/g']['value'] == '4'
 
 
 def test_apply_dry_run_writes_nothing(tmp_path, monkeypatch):

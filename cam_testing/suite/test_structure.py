@@ -107,8 +107,8 @@ def _check_files(level, d, names, problems, supermodule=False):
     spec = LEVELS[level].get('files') or {}
     files = sorted(f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f)) and not f.startswith('.'))
     required = [_fill(f, names) for f in spec.get('required', [])]
-    if not supermodule:
-        required += [_fill(f, names) for f in spec.get('required_unless_supermodule', [])]
+    required += [_fill(f, names) for f in spec.get('required_if_supermodule' if supermodule
+                                                   else 'required_unless_supermodule', [])]
     allowed = set(required) | {_fill(f, names) for f in spec.get('optional', [])} \
         | {_fill(f, names) for f in spec.get('required_unless_supermodule', [])}
     rel = os.path.relpath(d, REPO_ROOT)
@@ -636,6 +636,32 @@ def test_module_array_matches_libcuflynx_schema(path):
 @pytest.mark.parametrize('path', MODULE_CONFIGS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
 def test_module_config_matches_libcuflynx_schema(path):
     _validate(path, 'module_config.schema.json')
+
+
+SUPERMODULE_ARRAYS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'versions', '*', '*_module_array.json'),
+                                                 recursive=True) if _not_excluded(p))
+
+
+@pytest.mark.parametrize('path', SUPERMODULE_ARRAYS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
+def test_supermodule_array_matches_libcuflynx_schema(path):
+    _validate(path, 'module_array.schema.json')
+
+
+def test_supermodule_versions_load_with_libcuflynx():
+    '''Every supermodule version's module array (beside its config) loads with libcuflynx's
+    load_supermodule_array: records of the config's submodule_versions only, each version used,
+    connections between siblings, no record naming a parameterisation.'''
+    pytest.importorskip('libcuflynx')
+    problems = []
+    for version in _versions():
+        if not version.is_supermodule:
+            continue
+        try:
+            if not version.submodules:
+                problems.append(f'{version.key}: no submodules')
+        except ValueError as e:
+            problems.append(f'{version.key}: {e}')
+    assert not problems, '\n'.join(problems)
 
 
 def licence_and_creator_problems(entry):

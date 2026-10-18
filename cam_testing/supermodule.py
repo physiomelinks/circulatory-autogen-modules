@@ -4,9 +4,11 @@ of other modules' versions. Such a version replaces a monolithic one of the same
 heart version Argus2026_v01, cell/neuron/soma version sympathetic).
 
   <module_type>_<version>_modules_config.json   one entry: module_format "supermodule", the
-                                                submodules (a module array of library versions, each
-                                                with its "parameterisation"; internal connections only)
-                                                and "default_parameterisation"
+                                                submodule_versions it is built from ([{"module_type",
+                                                "module_subtype"}]) and "default_parameterisation"
+  <module_type>_<version>_module_array.json     its instances (submodules) and their internal
+                                                connections: a module array, records naming no
+                                                parameterisation (libcuflynx reads it: Version.submodules)
   parameterisations/<p>/<p>_parameters.csv      its parameters, <submodule>/<var> (nested:
                                                 <submodule>/<subsubmodule>/<var>) or globals
   <module_type>_<version>_tests.yaml / _verification_config.json   description; supermodule.globals and
@@ -17,19 +19,21 @@ A model uses one record (an instance of the version), e.g. {"name": "heart", "mo
 "per_submodule_outputs": {"aov": ["aortic_root"]}}. libcuflynx expands it: each submodule becomes
 <name>__<submodule>, the host modules in per_submodule_inputs / per_submodule_outputs are coupled to
 that submodule, and the parameterisation's parameters are renamed to the prefixed names. Precedence:
-the model's parameters file > the supermodule's parameterisation > the submodules' parameterisations.
+the model's parameters file > the supermodule's parameterisation > each submodule version's default
+parameterisation.
 
 The version-level tests (tests/test_modules.py):
-  supermodule_structure_test    every submodule names a library (module_type, version) and a
-                                parameterisation it has; internal connections name sibling submodules;
-                                the parameterisations' parameters name submodules (or are declared globals)
+  supermodule_structure_test    the module array loads with libcuflynx (submodules of the listed
+                                submodule_versions, internal connections naming siblings); every
+                                submodule is a library version; the parameterisations' parameters
+                                name submodules (or are declared globals)
   supermodule_equivalence_test  each supermodule.equivalent entry: a system model using the version
                                 reproduces a system model with the submodules written out
 """
 import csv
 import os
 
-from cam_testing import checks, harness, library, module_array
+from cam_testing import checks, harness, library
 
 
 def supermodules():
@@ -48,23 +52,17 @@ def load_supermodule(key):
 
 
 def structure_problems(version):
+    try:
+        # libcuflynx checks the array: names unique, connections between siblings, versions listed
+        subs = version.submodules
+    except ValueError as e:
+        return [str(e)]
     index = library.version_index(include_libraries=True)   # submodules may be extra libraries' versions
-    names = set(version.submodule_names)
     problems = []
-    if len(names) != len(version.submodules):
-        problems.append('duplicate submodule names')
-    for sub in version.submodules:
+    for sub in subs:
         key = (sub['module_type'], sub['module_subtype'])
-        target = index.get(key)
-        if target is None:
+        if key not in index:
             problems.append(f'{sub["name"]}: ({key[0]}, {key[1]}) is not a version in the module library')
-        elif module_array.parameterisation_of(sub) and module_array.parameterisation_of(sub) not in target.parameterisation_names():
-            problems.append(f'{sub["name"]}: {key[0]}/{key[1]} has no parameterisation {module_array.parameterisation_of(sub)} '
-                            f'(it has {target.parameterisation_names()})')
-        for n in sub.get('inp_instances', []) + sub.get('out_instances', []):
-            if n not in names:
-                problems.append(f'{sub["name"]}: {n} is not a submodule (external connections belong in the host\'s '
-                                'per_submodule_inputs / per_submodule_outputs)')
     declared = version.supermodule_globals
     for inst in version.parameterisations():
         with open(inst.parameters_path) as f:
@@ -119,7 +117,7 @@ def structure_check(version):
         r = checks.Result('supermodule_structure_test', checks.FAILED, f'{len(problems)} problems', details=problems)
     else:
         r = checks.Result('supermodule_structure_test', checks.PASSED,
-                          f'{len(version.submodules)} submodules, all library versions with their parameterisations; '
+                          f'{len(version.submodules)} submodules, all library versions; '
                           'connections internal; parameters name submodules or globals')
     return checks.save(version, r)
 
