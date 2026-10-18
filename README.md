@@ -30,7 +30,7 @@ Three words name what a model is built from:
 
 - a **version** is different maths: its own CellML, config and tests (`versions/<version>/`);
 - a **parameterisation** is the same maths with other values: one named parameter set of a version, with its data, calibration and source figures, in `versions/<version>/parameterisations/<name>/`. The config's `default_parameterisation` names the one used by default;
-- an **instance** is one use of a version in a network: a module-array record (or a supermodule's submodule). It names the parameterisation it uses with `"parameterisation"` (default: the version's `default_parameterisation`); several instances may share one parameterisation.
+- an **instance** is one use of a version in a network: a module-array record (or a supermodule's submodule, a record of its own module array, which names no parameterisation). It names the parameterisation it uses with `"parameterisation"` (default: the version's `default_parameterisation`); several instances may share one parameterisation.
 
 To use the library from libcuflynx, set these in `user_inputs.yaml` (on circulatory_autogen master; not yet in a release):
 
@@ -128,7 +128,7 @@ Some system models are examples built from this library, with no circulatory_aut
 
 Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and the CSV layout with the same columns. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
 
-Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A model uses one through one record:
+Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A supermodule version's config lists the submodule versions it is built from (`submodule_versions`); its instances and their internal connections are its own module array beside the config (`<module_type>_<version>_module_array.json`). A model uses one through one record:
 
 ```json
 {"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
@@ -136,7 +136,7 @@ Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock,
  "per_submodule_outputs": {"puv": ["par"], "aov": ["aortic_root"], "ra": ["volume_sum"], "rv": ["volume_sum"], "la": ["volume_sum"], "lv": ["volume_sum"]}}
 ```
 
-The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart__<submodule>` (`heart__ra`, `heart__aov`, …), the listed host modules are coupled to it, and the parameterisation's rows (`ra/E_A`) set the expanded submodules' parameters (written `heart/ra/E_A` in the model's own parameters file, whose values take precedence). `system_models/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way; its version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that it reproduces `3compartment` to 1e-9, and `cellular/SN_simple_supermodules` reproduces `SN_simple`.
+The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart__<submodule>` (`heart__ra`, `heart__aov`, …), the listed host modules are coupled to it, and the parameterisation's rows (`ra/E_A`) set the expanded submodules' parameters, over each submodule version's default parameterisation (written `heart/ra/E_A` in the model's own parameters file, whose values take precedence). `system_models/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way; its version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that it reproduces `3compartment` to 1e-9, and `cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
 ## PhLynx → CUFLynx pipeline
 

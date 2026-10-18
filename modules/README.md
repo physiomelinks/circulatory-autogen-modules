@@ -48,10 +48,11 @@ modules/
   version, with its data, calibration and source figures, in
   `versions/<version>/parameterisations/<name>/`. The config's `"default_parameterisation"` names the
   one used when nothing else is named;
-- an **instance** is one use of a version in a network: a module-array record (or a supermodule's
-  submodule). It names the parameterisation it uses with `"parameterisation"` (default: the
-  version's `default_parameterisation`). Several instances may share one parameterisation, and
-  the model's own parameters file can still change any value for one instance.
+- an **instance** is one use of a version in a network: a module-array record (or a record of a
+  supermodule's own module array, a submodule). It names the parameterisation it uses with
+  `"parameterisation"` (default: the version's `default_parameterisation`; a submodule names none,
+  see "Supermodule versions"). Several instances may share one parameterisation, and the model's own
+  parameters file can still change any value for one instance.
 
 The top level of `modules/` holds categories and one module_type, `heart`:
 
@@ -258,7 +259,7 @@ keys (these, and the citation keys below), and both config formats carry them un
   the paper exists.
 - A supermodule lists the citations of its own (often a placeholder); its version page adds "From
   its submodules:" (each linked to the submodule's page), and its per-parameterisation OMEX archives carry
-  the submodules' configs too.
+  its module array and the submodules' configs too.
 
 The version page shows the required citations under the description, each linked to its entry in
 the page's References. The initial lists come from the proposal approved on 2026-10-06
@@ -377,9 +378,19 @@ harness networks do the same.
 ## Supermodule versions
 
 A supermodule version is a version whose config entry has `"module_format": "supermodule"`. It is
-built from other versions (its `submodules`, each with its own `module_type`, `module_subtype` and
-`parameterisation`), with internal connections only. It replaces the monolithic version of the same
-module_type:
+built from other versions, with internal connections only. It replaces the monolithic version of the
+same module_type:
+
+- **Config.** `"submodule_versions"` lists the versions it is built from, each
+  `{"module_type", "module_subtype"}` once. It has no CellML or units file.
+- **Module array.** `<module_type>_<version>_module_array.json` beside the config holds its instances
+  (the submodules, named locally) and their internal connections: ordinary module-array records, each
+  of one of the listed versions (every one of which is used), connecting only to siblings, and naming
+  no `"parameterisation"`. libcuflynx reads and checks it (`load_supermodule_registry`); so do
+  `Version.submodules` and `tests/test_structure.py`, which requires it beside every supermodule config.
+- **Parameters.** A submodule's parameters come from the supermodule's parameterisation (rows
+  `<submodule>/<var>`), then from its version's `default_parameterisation`. A submodule that differs
+  from its version's default (the heart's `ra`, `rv` and `la` chambers) is set by those rows.
 
 | Supermodule version | Built from |
 |---|---|
@@ -397,7 +408,7 @@ A model uses one record, e.g.
   supermodule parameterisation's rows `<submodule>/<var>` (nested: `<submodule>/<its submodule>/<var>`)
   set that submodule's parameters.
 - **Precedence.** The model's parameters file wins, then the supermodule's parameterisation, then
-  each submodule's parameterisation.
+  each submodule version's default parameterisation.
 - **Where it lives.** Its `tests.yaml` has a `description`; its `verification_config.json` has a
   `supermodule` block. `globals` lists its global parameters. `equivalent` lists the system models
   it must reproduce: `system_models/closed_loop_cvs/3compartment_supermodules` reproduces
@@ -462,7 +473,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 **Supermodule versions** run the same verification and validation tests as a component. The
 supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod__<submodule>`
 (nested supermodules: `mod__<submodule>__<subsubmodule>`), and its parameters are those of the
-flattened model: the supermodule's own parameterisation, its submodules' parameterisations, and the boundary
+flattened model: the supermodule's own parameterisation, its submodules' default parameterisations, and the boundary
 conditions no internal connection closes. In the spec (`run_parameters`, `bc_sweep`, `validation`)
 a submodule's parameter is named as in the supermodule's parameterisation, `<submodule path>/<var>` (e.g.
 `membrane/I_in`, or `soma/membrane/I_in` in `neuron/sympathetic`); globals keep their names. The
