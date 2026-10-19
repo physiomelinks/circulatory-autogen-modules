@@ -29,7 +29,7 @@ libcuflynx = ["libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autog
 include = ["cam_testing", "cam_testing.*"]
 
 [tool.setuptools.package-data]
-cam_testing = ["templates/*.html", "data/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
+cam_testing = ["templates/*.html", "data/*.json", "data/rhea/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
                "bridges/cuflynx/*.py"]
 
 [tool.cam_testing]
