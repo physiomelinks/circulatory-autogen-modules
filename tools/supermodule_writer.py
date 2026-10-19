@@ -26,7 +26,7 @@ def module_config(module_type, version):
 
 def module_rows(module_type, version, instance='default'):
     d = module_dir(module_type, version)
-    return list(csv.DictReader(open(os.path.join(d, 'instances', instance, f'{instance}_parameters.csv'))))
+    return list(csv.DictReader(open(os.path.join(d, 'parameterisations', instance, f'{instance}_parameters.csv'))))
 
 
 def _ports(cfg, kind):
@@ -63,7 +63,7 @@ def supermodule_rows(submodules, instances=None):
     for s in submodules:
         cfg = module_config(s['module_type'], s['module_subtype'])
         roles = {v[0]: v[3] for v in cfg['variables_and_units']}
-        inst = (instances or {}).get(s['name'], s.get('instance', 'default'))
+        inst = (instances or {}).get(s['name'], s.get('parameterisation', s.get('instance', 'default')))
         for r in module_rows(s['module_type'], s['module_subtype'], inst):
             n = r['variable_name']
             role = roles.get(n)

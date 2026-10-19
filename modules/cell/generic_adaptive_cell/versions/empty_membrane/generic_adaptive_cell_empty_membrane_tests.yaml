@@ -14,7 +14,9 @@ description: 'The base of every AdaptOrDeity cell: the general mechanisms with n
   starts calibrated; alone it has no carriers or pumps, so it runs down (its glucose is spent and its gradients leak away).
   Cell types extend it: fermenter (generic_adaptive_cell fermenter); later bases add the proteins a class shares (an animal
   cell: the Na+/K+-ATPase, NCX, ...).'
-extends: null
 notes: 'Assembled by tools/build_adaptive_cell.py from modules/cell/generic_adaptive_cell/parameters.json: its parameter rows
   are its submodules'' default instances (every value with its source there) with the overrides the cell sets. Protein expression:
   each protein_pool has a target m_target set by the game.'
+expected_failures:
+  phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
+    "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

@@ -67,8 +67,8 @@ def csv_values(path):
 
 
 # ------------------------------------------------------------------ the fermenter's resting cytosol (the lumped modules)
-CYTO = csv_values('modules/cell/energy_metabolism/versions/adaptive_ArgusUNPUBLISHED_v01/instances/default/default_parameters.csv')
-BIO = csv_values('modules/cell/biosynthesis/versions/adaptive_ArgusUNPUBLISHED_v01/instances/default/default_parameters.csv')
+CYTO = csv_values('modules/cell/energy_metabolism/versions/adaptive_ArgusUNPUBLISHED_v01/parameterisations/default/default_parameters.csv')
+BIO = csv_values('modules/cell/biosynthesis/versions/adaptive_ArgusUNPUBLISHED_v01/parameterisations/default/default_parameters.csv')
 T = CYTO['T']
 PH_I = 7.6   # the fermenter's cytosol (generic_adaptive_cell parameters pH_i)
 J_REST = BIO['J_ref'] / CYTO['V_c'] / 2.0   # mM/s of glucose: the resting ATP turnover, two ATP per glucose
@@ -346,7 +346,7 @@ def build_glycolysis():
 
 
 # ------------------------------------------------------------------ the mitochondrion (pyruvate to CO2, oxidative phosphorylation)
-MITO = csv_values('modules/cell/energy_metabolism/versions/mitochondrial_ArgusUNPUBLISHED_v01/instances/default/'
+MITO = csv_values('modules/cell/energy_metabolism/versions/mitochondrial_ArgusUNPUBLISHED_v01/parameterisations/default/'
                   'default_parameters.csv')
 T_M = MITO['T']
 # the lumped respiration's resting O2 use (6 r_ox at its default point): this module is calibrated to it

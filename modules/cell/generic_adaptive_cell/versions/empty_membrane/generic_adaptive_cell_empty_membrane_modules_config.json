@@ -3,7 +3,7 @@
     "module_type": "generic_adaptive_cell",
     "module_subtype": "empty_membrane",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
     "required_citations": [
@@ -15,7 +15,7 @@
         "name": "membrane",
         "module_type": "membrane_potential",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "Na_K",
@@ -33,7 +33,7 @@
         "name": "Na_K",
         "module_type": "ion_concentrations",
         "module_subtype": "SN_soma_Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane"
         ],
@@ -46,7 +46,7 @@
         "name": "Ca",
         "module_type": "Ca_handling",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane"
         ],
@@ -59,7 +59,7 @@
         "name": "H",
         "module_type": "H_handling",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "cytosol"
@@ -73,7 +73,7 @@
         "name": "cytosol",
         "module_type": "energy_metabolism",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "pool_Glyc"
@@ -89,7 +89,7 @@
         "name": "bio",
         "module_type": "biosynthesis",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Ca",
@@ -107,7 +107,7 @@
         "name": "ribosomes",
         "module_type": "ribosomes",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "bio"
         ],
@@ -119,7 +119,7 @@
         "name": "protein",
         "module_type": "protein_expression",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "cytosol",
@@ -134,7 +134,7 @@
         "name": "pool_proteome",
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "proteome",
+        "parameterisation": "proteome",
         "inp_instances": [
           "reg"
         ],
@@ -147,7 +147,7 @@
         "name": "pool_Glyc",
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "Glyc",
+        "parameterisation": "Glyc",
         "inp_instances": [
           "reg"
         ],
@@ -161,7 +161,7 @@
         "name": "reg",
         "module_type": "expression_regulation",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "cytosol",
           "H"
@@ -177,7 +177,7 @@
         "name": "i_leak_Na",
         "module_type": "i_leak_Na",
         "module_subtype": "Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Na_K"
@@ -188,7 +188,7 @@
         "name": "i_leak_Ca",
         "module_type": "i_leak_Ca",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Ca"
@@ -199,7 +199,7 @@
         "name": "i_leak_H",
         "module_type": "i_leak_H",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "H"

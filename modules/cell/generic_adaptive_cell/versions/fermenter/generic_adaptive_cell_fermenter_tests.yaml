@@ -20,9 +20,11 @@ description: 'AdaptOrDeity''s starting organism: generic_adaptive_cell empty_mem
   glucose), glc_ABC (glucose_carrier ATP: binding-protein importer, Km 0.5 uM, 2 ATP per glucose, 0 net) and glc_GalP (glucose_carrier
   H_symport: Km 0.1 mM, one H+ per glucose, about 1.7 ATP net once the H+-ATPase pumps it out). Each takes its medium glucose
   from its own C_glc_e parameter, set to the same value as membrane_face''s.'
-extends: empty_membrane
 notes: 'Assembled by tools/build_adaptive_cell.py from modules/cell/generic_adaptive_cell/parameters.json: its parameter rows
   are its submodules'' default instances (every value with its source there) with the overrides the cell sets. It extends
   generic_adaptive_cell empty_membrane with: i_H_ATPase, i_NaH, i_KH, i_K_Trk, i_NaCa, membrane_face, i_flagellum, hydrolase,
   glc_PTS, glc_ABC, glc_GalP, pool_H_ATPase, pool_NhaA, pool_KefC, pool_Trk, pool_NCX, pool_Glf, pool_LacT, pool_Flagellum,
   pool_Hydrolase, pool_PTS, pool_ABC, pool_GalP. Protein expression: each protein_pool has a target m_target set by the game.'
+expected_failures:
+  phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
+    "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

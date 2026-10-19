@@ -31,19 +31,11 @@ notes: 'One protein of an adaptive cell as a pool of copies: n = n_0 m, with exp
   Regulation: the pool moves to m_goal = m_target R_reg, R_reg = prod_s (1 - reg_on_s + reg_on_s f_s) over ATP, G6P, glucose
   and H+, the f_s from cell/expression_regulation on the regulation_signals port (1 when unconnected); the game sets the switches
   reg_on_s (0 or 1; all 0 by default, so R_reg = 1 exactly and the target is the player''s). Regulation changes the target,
-  and through it what is replaced.'
-instances:
-  H_ATPase: 'F1Fo H+-ATPase: rho_H_ATPase x A_mem (calibrated density)'
-  NhaA: 'NhaA: cycles at rest / turnover_NhaA'
-  KefC: 'KefC: cycles at rest / turnover_KefC'
-  Trk: 'TrkH2-TrkA4: K+ entry at rest / turnover_Trk (the channel law lumps conductance)'
-  NCX: 'NCX_Mj-type exchanger: rho_NaCa x A_mem (calibrated density)'
-  Glf: 'Glf glucose facilitator: capacity / turnover_Glf'
-  LacT: 'lactate-/H+ symporter (LldP-sized): capacity / turnover_LacT'
-  Hydrolase: 'cell-surface polysaccharide hydrolase (lipid-anchored alpha-amylase, SusG type): hydrolysis_capacity x resting
-    glucose flux / kcat_Hydrolase'
-  Flagellum: 'flagellum (filament, hook, basal body, MotAB stators): one flagellum per unit of expression: m is the number
-    of flagella'
-  Glyc: 'glycolytic enzymes: glycolytic_share x proteome_per_um3 x cell volume'
-  proteome: 'rest of the proteome (ribosomal, nucleoid and other proteins): proteome_per_um3 x cell volume, less the glycolytic
-    enzymes'
+  and through it what is replaced. Parameterisations: H_ATPase: F1Fo H+-ATPase: rho_H_ATPase x A_mem (calibrated density);
+  NhaA: NhaA: cycles at rest / turnover_NhaA; KefC: KefC: cycles at rest / turnover_KefC; Trk: TrkH2-TrkA4: K+ entry at rest
+  / turnover_Trk (the channel law lumps conductance); NCX: NCX_Mj-type exchanger: rho_NaCa x A_mem (calibrated density); Glf:
+  Glf glucose facilitator: capacity / turnover_Glf; LacT: lactate-/H+ symporter (LldP-sized): capacity / turnover_LacT; Hydrolase:
+  cell-surface polysaccharide hydrolase (lipid-anchored alpha-amylase, SusG type): hydrolysis_capacity x resting glucose flux
+  / kcat_Hydrolase; Flagellum: flagellum (filament, hook, basal body, MotAB stators): one flagellum per unit of expression:
+  m is the number of flagella; Glyc: glycolytic enzymes: glycolytic_share x proteome_per_um3 x cell volume; proteome: rest
+  of the proteome (ribosomal, nucleoid and other proteins): proteome_per_um3 x cell volume, less the glycolytic enzymes.'

@@ -3,7 +3,7 @@
     "module_type": "generic_adaptive_cell",
     "module_subtype": "fermenter",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
     "required_citations": [
@@ -15,7 +15,7 @@
         "name": "membrane",
         "module_type": "membrane_potential",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "Na_K",
@@ -43,7 +43,7 @@
         "name": "Na_K",
         "module_type": "ion_concentrations",
         "module_subtype": "SN_soma_Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane"
         ],
@@ -60,7 +60,7 @@
         "name": "Ca",
         "module_type": "Ca_handling",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane"
         ],
@@ -74,7 +74,7 @@
         "name": "H",
         "module_type": "H_handling",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "cytosol",
@@ -94,7 +94,7 @@
         "name": "cytosol",
         "module_type": "energy_metabolism",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "pool_Glyc",
@@ -115,7 +115,7 @@
         "name": "bio",
         "module_type": "biosynthesis",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Ca",
@@ -145,7 +145,7 @@
         "name": "ribosomes",
         "module_type": "ribosomes",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "bio"
         ],
@@ -157,7 +157,7 @@
         "name": "protein",
         "module_type": "protein_expression",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "cytosol",
@@ -184,7 +184,7 @@
         "name": "pool_proteome",
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "proteome",
+        "parameterisation": "proteome",
         "inp_instances": [
           "reg"
         ],
@@ -197,7 +197,7 @@
         "name": "pool_Glyc",
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "Glyc",
+        "parameterisation": "Glyc",
         "inp_instances": [
           "reg"
         ],
@@ -211,7 +211,7 @@
         "name": "reg",
         "module_type": "expression_regulation",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "cytosol",
           "H"
@@ -239,7 +239,7 @@
         "name": "i_leak_Na",
         "module_type": "i_leak_Na",
         "module_subtype": "Argus2026_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Na_K"
@@ -250,7 +250,7 @@
         "name": "i_leak_Ca",
         "module_type": "i_leak_Ca",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Ca"
@@ -261,7 +261,7 @@
         "name": "i_leak_H",
         "module_type": "i_leak_H",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "H"
@@ -272,7 +272,7 @@
         "name": "i_H_ATPase",
         "module_type": "i_H_ATPase",
         "module_subtype": "FoF1_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "H",
@@ -285,7 +285,7 @@
         "name": "i_NaH",
         "module_type": "i_NaH",
         "module_subtype": "NhaA_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Na_K",
@@ -298,7 +298,7 @@
         "name": "i_KH",
         "module_type": "i_KH",
         "module_subtype": "KefC_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Na_K",
@@ -311,7 +311,7 @@
         "name": "i_K_Trk",
         "module_type": "i_leak_K",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Na_K",
@@ -323,7 +323,7 @@
         "name": "i_NaCa",
         "module_type": "i_NaCa",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "Na_K",
@@ -336,7 +336,7 @@
         "name": "membrane_face",
         "module_type": "cell_membrane_face",
         "module_subtype": "adaptive_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "pool_Glf",
@@ -351,7 +351,7 @@
         "name": "i_flagellum",
         "module_type": "i_H_flagellum",
         "module_subtype": "MotAB_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "H",
@@ -363,7 +363,7 @@
         "name": "hydrolase",
         "module_type": "polysaccharide_hydrolase",
         "module_subtype": "surface_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "pool_Hydrolase"
         ],
@@ -373,7 +373,7 @@
         "name": "glc_PTS",
         "module_type": "glucose_carrier",
         "module_subtype": "PTS_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "pool_PTS"
@@ -386,7 +386,7 @@
         "name": "glc_ABC",
         "module_type": "glucose_carrier",
         "module_subtype": "ATP_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "pool_ABC"
@@ -399,7 +399,7 @@
         "name": "glc_GalP",
         "module_type": "glucose_carrier",
         "module_subtype": "H_symport_ArgusUNPUBLISHED_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "membrane",
           "H",
@@ -413,7 +413,7 @@
         "name": "pool_H_ATPase",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "H_ATPase",
+        "parameterisation": "H_ATPase",
         "inp_instances": [
           "reg"
         ],
@@ -427,7 +427,7 @@
         "name": "pool_NhaA",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "NhaA",
+        "parameterisation": "NhaA",
         "inp_instances": [
           "reg"
         ],
@@ -441,7 +441,7 @@
         "name": "pool_KefC",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "KefC",
+        "parameterisation": "KefC",
         "inp_instances": [
           "reg"
         ],
@@ -455,7 +455,7 @@
         "name": "pool_Trk",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "Trk",
+        "parameterisation": "Trk",
         "inp_instances": [
           "reg"
         ],
@@ -469,7 +469,7 @@
         "name": "pool_NCX",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "NCX",
+        "parameterisation": "NCX",
         "inp_instances": [
           "reg"
         ],
@@ -483,7 +483,7 @@
         "name": "pool_Glf",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "Glf",
+        "parameterisation": "Glf",
         "inp_instances": [
           "reg"
         ],
@@ -497,7 +497,7 @@
         "name": "pool_LacT",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "LacT",
+        "parameterisation": "LacT",
         "inp_instances": [
           "reg"
         ],
@@ -511,7 +511,7 @@
         "name": "pool_Flagellum",
         "module_type": "protein_pool",
         "module_subtype": "ArgusUNPUBLISHED_v01",
-        "instance": "Flagellum",
+        "parameterisation": "Flagellum",
         "inp_instances": [
           "reg"
         ],
@@ -525,7 +525,7 @@
         "name": "pool_Hydrolase",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "Hydrolase",
+        "parameterisation": "Hydrolase",
         "inp_instances": [
           "reg"
         ],
@@ -539,7 +539,7 @@
         "name": "pool_PTS",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "PTS",
+        "parameterisation": "PTS",
         "inp_instances": [
           "reg"
         ],
@@ -553,7 +553,7 @@
         "name": "pool_ABC",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "ABC",
+        "parameterisation": "ABC",
         "inp_instances": [
           "reg"
         ],
@@ -567,7 +567,7 @@
         "name": "pool_GalP",
         "module_type": "protein_pool",
         "module_subtype": "membrane_share_ArgusUNPUBLISHED_v01",
-        "instance": "GalP",
+        "parameterisation": "GalP",
         "inp_instances": [
           "reg"
         ],

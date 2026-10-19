@@ -91,7 +91,7 @@ def bib_text(keys):
 def write_version(category, module_type, component, variables, equations, config_extra, params, verification, tests,
                   bib_keys, version, extra_instances=None):
     d = os.path.join(REPO, 'modules', category, module_type, 'versions', version)
-    os.makedirs(os.path.join(d, 'instances', 'default'), exist_ok=True)
+    os.makedirs(os.path.join(d, 'parameterisations', 'default'), exist_ok=True)
     stem = f'{module_type}_{version}'
     with open(os.path.join(d, f'{stem}_modules.cellml'), 'w') as f:
         f.write(component_model(stem, component, variables, equations))
@@ -104,7 +104,7 @@ def write_version(category, module_type, component, variables, equations, config
     var_units = {v[0]: v[1] for v in variables}
     config = {
         'module_type': module_type, 'module_subtype': version, 'module_format': 'cellml',
-        'component_file': f'{stem}_modules.cellml', 'component_type': component, 'default_instance': 'default',
+        'component_file': f'{stem}_modules.cellml', 'component_type': component, 'default_parameterisation': 'default',
         'licence': 'CC0-1.0', 'creator': [], **config_extra,
         'variables_and_units': [[n, var_units[n], 'access', roles[n]] for n in roles],
     }
@@ -112,8 +112,8 @@ def write_version(category, module_type, component, variables, equations, config
         json.dump([config], f, indent=2)
         f.write('\n')
     for inst, rows in [('default', params)] + list((extra_instances or {}).items()):
-        os.makedirs(os.path.join(d, 'instances', inst), exist_ok=True)
-        with open(os.path.join(d, 'instances', inst, f'{inst}_parameters.csv'), 'w', newline='') as f:
+        os.makedirs(os.path.join(d, 'parameterisations', inst), exist_ok=True)
+        with open(os.path.join(d, 'parameterisations', inst, f'{inst}_parameters.csv'), 'w', newline='') as f:
             w = csv.writer(f, lineterminator='\n')
             w.writerow(['variable_name', 'units', 'value', 'data_reference', 'sourced'])
             for name, value, ref, sourced in rows:
@@ -122,6 +122,12 @@ def write_version(category, module_type, component, variables, equations, config
     with open(os.path.join(d, f'{stem}_verification_config.json'), 'w') as f:
         json.dump({'module_type': module_type, 'version': version, **verification}, f, indent=2)
         f.write('\n')
+    tests = dict(tests)
+    described = tests.pop('parameterisation_notes', None)
+    if described:
+        # each parameterisation in a sentence of the notes
+        tests['notes'] = (tests.get('notes', '') + ' Parameterisations: '
+                          + '; '.join(f'{k}: {v}' for k, v in described.items()) + '.').strip()
     with open(os.path.join(d, f'{stem}_tests.yaml'), 'w') as f:
         yaml.safe_dump({'module_type': module_type, 'version': version, **tests}, f, sort_keys=False, width=120)
     with open(os.path.join(d, f'{stem}_references.bib'), 'w') as f:

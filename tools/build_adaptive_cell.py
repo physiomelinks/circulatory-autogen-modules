@@ -60,6 +60,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from module_writer import BIB, REPO, register_bib  # noqa: E402
 from module_writer import write_version as _write_version  # noqa: E402
 from matrix_references import MATRIX_BIB  # noqa: E402
+from cam_testing.phlynx import NO_SUPERMODULE_SUPPORT  # a supermodule's PhLynx export fails (a known issue)
 
 
 def write_version(category, module_type, component, variables, equations, config_extra, params, verification, tests,
@@ -2695,7 +2696,7 @@ write_version('cell', 'protein_pool', 'protein_pool', pool_vars, pool_eqs,
                   'glucose and H+, the f_s from cell/expression_regulation on the regulation_signals port (1 when '
                   'unconnected); the game sets the switches reg_on_s (0 or 1; all 0 by default, so R_reg = 1 exactly and '
                   'the target is the player\'s). Regulation changes the target, and through it what is replaced.'),
-               'instances': {k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS}},
+               'parameterisation_notes': {k: f'{PROTEINS[k][0]}: {PROTEINS[k][3]}' for k in PROTEINS}},
               ['argus2026unpublished', 'akashi2002metabolic', 'lynch2015bioenergetic', 'milo2010bionumbers',
                'maurizi1992proteases', 'willetts1967intracellular', 'gupta2024global', 'bernstein2002global',
                'kenniston2003linkage', 'purcell2012temperature', 'herman1995degradation', 'zhou1998regulation'], POOL_V,
@@ -2783,7 +2784,7 @@ write_version('cell', 'protein_pool', 'protein_pool_membrane_share', share_vars,
                   'transporters, each with s_target at its share at rest (m_target = 1), and the glucose carriers the '
                   'game unlocks after level 1 (PTS, ABC, GalP: none at start, n_0 = the calibrated cell\'s Glf '
                   'copies).'),
-               'instances': {**{k: f'{PROTEINS[k][0]}: s_target = its share at rest' for k in MEMBRANE_SHARE_KEYS
+               'parameterisation_notes': {**{k: f'{PROTEINS[k][0]}: s_target = its share at rest' for k in MEMBRANE_SHARE_KEYS
                                 if k in PROTEINS},
                              **{k: f'{CARRIERS[k][0]}: none at start; n_0 = the calibrated cell\'s Glf copies'
                                 for k in CARRIERS}}},
@@ -3179,7 +3180,7 @@ def adaptive_library_version(module_type, src_version, density, note, defaults):
     dst = os.path.join(os.path.dirname(src), V_NEW)
     if os.path.isdir(dst):
         shutil.rmtree(dst)
-    os.makedirs(os.path.join(dst, 'instances', 'default'))
+    os.makedirs(os.path.join(dst, 'parameterisations', 'default'))
     s_stem, d_stem = f'{module_type}_{src_version}', f'{module_type}_{V_NEW}'
     cellml = open(os.path.join(src, f'{s_stem}_modules.cellml')).read().replace(s_stem, d_stem)
     cfg_src = json.load(open(os.path.join(src, f'{s_stem}_modules_config.json')))[0]
@@ -3204,14 +3205,14 @@ def adaptive_library_version(module_type, src_version, density, note, defaults):
     cfg[0]['required_citations'] = sorted(set(cfg[0].get('required_citations', [])) | {'argus2026unpublished'})
     json.dump(cfg, open(os.path.join(dst, f'{d_stem}_modules_config.json'), 'w'), indent=2)
     rows = []
-    for r in csv.DictReader(open(os.path.join(src, 'instances', 'default', 'default_parameters.csv'))):
+    for r in csv.DictReader(open(os.path.join(src, 'parameterisations', 'default', 'default_parameters.csv'))):
         if r['variable_name'] in defaults:
             v, ref, src_ok = defaults[r['variable_name']]
             r.update(value=repr(float(v)), data_reference=ref, sourced='yes' if src_ok else 'no')
         rows.append(r)
     rows.append({'variable_name': 'm_expr', 'units': 'dimensionless', 'value': '1.0',
                  'data_reference': 'definitional; baseline expression (the calibrated cell)', 'sourced': 'no'})
-    with open(os.path.join(dst, 'instances', 'default', 'default_parameters.csv'), 'w', newline='') as f:
+    with open(os.path.join(dst, 'parameterisations', 'default', 'default_parameters.csv'), 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=['variable_name', 'units', 'value', 'data_reference', 'sourced'],
                            lineterminator='\n')
         w.writeheader()
@@ -3721,7 +3722,7 @@ CELLS = {}
 
 
 def S(name, module_type, version, instance='default'):
-    return {'name': name, 'module_type': module_type, 'module_subtype': version, 'instance': instance}
+    return {'name': name, 'module_type': module_type, 'module_subtype': version, 'parameterisation': instance}
 
 
 def define_cell(name, extends=None, submodules=(), links=(), overrides=None, description=''):
@@ -4001,12 +4002,12 @@ def share_unit(key):
 def write_cell(cell, steady, sweep_extra, timestep=None):
     name = cell['name']
     d = os.path.join(GAC_DIR, 'versions', name)
-    os.makedirs(os.path.join(d, 'instances', 'default'), exist_ok=True)
+    os.makedirs(os.path.join(d, 'parameterisations', 'default'), exist_ok=True)
     subs = with_links(cell)
     names = [s['name'] for s in subs]
     stem = f'{GAC}_{name}'
     config = [{'module_type': GAC, 'module_subtype': name, 'module_format': 'supermodule',
-               'default_instance': 'default', 'licence': 'CC0-1.0', 'creator': [],
+               'default_parameterisation': 'default', 'licence': 'CC0-1.0', 'creator': [],
                'required_citations': ['argus2026unpublished'], 'description': cell['description'],
                'submodules': subs}]
     json.dump(config, open(os.path.join(d, f'{stem}_modules_config.json'), 'w'), indent=2)
@@ -4020,7 +4021,7 @@ def write_cell(cell, steady, sweep_extra, timestep=None):
             value, ref, src_ok = cell['overrides'][n]
             sourced = 'yes' if src_ok else 'no'
         out.append([n, units, value, ref, sourced])
-    with open(os.path.join(d, 'instances', 'default', 'default_parameters.csv'), 'w', newline='') as f:
+    with open(os.path.join(d, 'parameterisations', 'default', 'default_parameters.csv'), 'w', newline='') as f:
         w = csv.writer(f, lineterminator='\n')
         w.writerow(['variable_name', 'units', 'value', 'data_reference', 'sourced'])
         for r in out:
@@ -4057,11 +4058,11 @@ def write_cell(cell, steady, sweep_extra, timestep=None):
     json.dump(verif, open(os.path.join(d, f'{stem}_verification_config.json'), 'w'), indent=2)
     extends = f' It extends generic_adaptive_cell {cell["extends"]} with: {", ".join(cell["added"])}.' if cell['extends'] else ''
     yaml.safe_dump({'module_type': GAC, 'version': name, 'reviewed': False, 'description': cell['description'],
-                    'extends': cell['extends'],
                     'notes': ('Assembled by tools/build_adaptive_cell.py from modules/cell/generic_adaptive_cell/'
                               'parameters.json: its parameter rows are its submodules\' default instances (every value '
                               'with its source there) with the overrides the cell sets.' + extends +
-                              ' Protein expression: each protein_pool has a target m_target set by the game.')},
+                              ' Protein expression: each protein_pool has a target m_target set by the game.'),
+                    'expected_failures': {'phlynx_export_test': NO_SUPERMODULE_SUPPORT}},
                    open(os.path.join(d, f'{stem}_tests.yaml'), 'w'), sort_keys=False, width=120)
     open(os.path.join(d, f'{stem}_references.bib'), 'w').write(bib_text(['argus2026unpublished']))
     return d
@@ -4075,7 +4076,7 @@ CELL_DIRS = [write_cell(CELLS['empty_membrane'], False, {},
                          'cvode_tol': 1e-2}),
              write_cell(CELLS['fermenter'], True, {'C_glc_e_membrane_face': [0.0, 50.0], 'a_motor_i_flagellum': [0.0, 1.0],
                                                    'm_target_pool_Flagellum': [1.0, 8.0], 'mx_alloc_cytosol': [0.0, 1.0]})]
-_ferm_rows = {r[0]: r for r in csv.reader(open(os.path.join(CELL_DIRS[1], 'instances', 'default',
+_ferm_rows = {r[0]: r for r in csv.reader(open(os.path.join(CELL_DIRS[1], 'parameterisations', 'default',
                                                             'default_parameters.csv')))}
 
 
@@ -4098,7 +4099,7 @@ def complete_bib(version_dir):
     bib_path = glob.glob(os.path.join(version_dir, '*_references.bib'))[0]
     text = open(bib_path).read()
     keys = set()
-    for csv_path in glob.glob(os.path.join(version_dir, 'instances', '*', '*_parameters.csv')):
+    for csv_path in glob.glob(os.path.join(version_dir, 'parameterisations', '*', '*_parameters.csv')):
         for row in csv.DictReader(open(csv_path)):
             k = reference_key(row['data_reference'])
             if k and k not in (PH, 'definitional'):

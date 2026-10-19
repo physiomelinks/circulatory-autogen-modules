@@ -1,5 +1,5 @@
 [
- {"name": "bath", "module_type": "tissue_diffusion_volume", "module_subtype": "Fang2008_v01", "instance": "default", "inp_instances": [], "out_instances": ["e0"]},
- {"name": "c0", "module_type": "tissue_diffusion_volume", "module_subtype": "Fang2008_v01", "instance": "default", "inp_instances": ["e0"], "out_instances": []},
- {"name": "e0", "module_type": "tissue_diffusion_face", "module_subtype": "Fang2008_v01", "instance": "default", "inp_instances": ["bath"], "out_instances": ["c0"]}
+ {"name": "bath", "module_type": "tissue_diffusion_volume", "module_subtype": "Fang2008_v01", "parameterisation": "default", "inp_instances": [], "out_instances": ["e0"]},
+ {"name": "c0", "module_type": "tissue_diffusion_volume", "module_subtype": "Fang2008_v01", "parameterisation": "default", "inp_instances": ["e0"], "out_instances": []},
+ {"name": "e0", "module_type": "tissue_diffusion_face", "module_subtype": "Fang2008_v01", "parameterisation": "default", "inp_instances": ["bath"], "out_instances": ["c0"]}
 ]

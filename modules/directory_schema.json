@@ -44,12 +44,13 @@
       "min_children": 1
     },
     "module_type": {
-      "description": "One module_type: a directory with versions/. Its report across versions is generated next to it. Its other subdirectories are nested module_types: module_types that only exist within it (each with versions/, possibly nesting again), e.g. heart/chamber, cell/neuron/soma.",
+      "description": "One module_type: a directory with versions/. Its report across versions is generated next to it. Its other subdirectories are nested module_types: module_types that only exist within it (each with versions/, possibly nesting again), e.g. heart/chamber, cell/neuron/soma. It may hold parameters.json: values and their sources shared by its versions, read by the tools that write them (e.g. cell/generic_adaptive_cell).",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [],
         "optional": [
-          "{module_type}.html"
+          "{module_type}.html",
+          "parameters.json"
         ]
       },
       "directories": [
