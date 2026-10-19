@@ -103,8 +103,8 @@ def equivalence(version, entry, work_dir):
     # model); an explicit output_map in the spec (for nested
     # supermodules, or variables that moved between components) takes precedence
     output_map = {**prefixed_output_map(ref, entry.get('instance', version.vessel_type), version.submodule_names),
-                  **(entry.get('output_map') or {})}
-    ignore = entry.get('ignore') or {}
+                  **harness.model_output_map(entry.get('output_map') or {})}
+    ignore = harness.model_output_keys(entry.get('ignore') or {})
     ref = {k: v for k, v in ref.items() if k not in ignore}
     return systems.compare(ref, new, output_map, float(entry.get('tol', 1e-9)))
 

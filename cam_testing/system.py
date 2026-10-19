@@ -196,7 +196,11 @@ def compare(ref, new, output_map, tol, ignore=None, wrapped=None, reciprocal=Non
     for outputs like a valve's L = rho l/(A_eff + eps) that spike near closure and amplify
     tiny differences in A_eff by up to 1/eps.
     '''
-    ignore, wrapped, reciprocal = ignore or {}, wrapped or {}, set(reciprocal or [])
+    from cam_testing import harness
+    # names as the models name them: a nested vessel may be written by its path (SN/soma/membrane/V)
+    output_map = harness.model_output_map(output_map or {})
+    ignore, wrapped = harness.model_output_keys(ignore or {}), harness.model_output_keys(wrapped or {})
+    reciprocal = set(harness.model_output_keys(reciprocal or []))
     rows, missing = [], []
     for name, r in ref.items():
         if name in ignore:
@@ -231,7 +235,8 @@ def equivalence(system, work_dir=None):
         ignored = eq.get('ignore_components', REFERENCE_CELLML_IGNORED_COMPONENTS)
         t_ref, ref = simulate(ref_path, system.spec, solver_info, ignore_components=tuple(ignored))
     new_path = generate(system, work_dir, reference=False)
-    output_map = eq.get('output_map') or {}
+    from cam_testing import harness
+    output_map = harness.model_output_map(eq.get('output_map') or {})
     wanted = sorted({output_map.get(n, n) for n in ref})
     t_new, new = simulate(new_path, system.spec, solver_info, names=wanted)
     rows, missing = compare(ref, new, output_map, float(eq.get('tol', 1e-6)), eq.get('ignore'), eq.get('wrapped'),

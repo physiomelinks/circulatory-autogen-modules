@@ -36,6 +36,25 @@ def libcuflynx_model_name(written):
     return model_name(written)
 
 
+def model_output(written):
+    '''The model's name of an output written <vessel path>/<var> (SN/soma/membrane/V ->
+    SN__soma__membrane/V); a <vessel>/<var> or flat name is unchanged.'''
+    from libcuflynx.utilities.parameter_names import output_model_name
+    return output_model_name(written)
+
+
+def model_output_map(output_map):
+    '''An equivalence output_map {reference output: model output} with its names as the models name them.'''
+    return {model_output(k): model_output(v) for k, v in (output_map or {}).items()}
+
+
+def model_output_keys(names):
+    '''An ignore/wrapped dict (names to a reason or period) or a list of names, with the names as the models name them.'''
+    if isinstance(names, dict):
+        return {model_output(k): v for k, v in names.items()}
+    return [model_output(n) for n in names or []]
+
+
 def parameter_name(param):
     '''The name libcuflynx gives a parameter in the generated model.'''
     if getattr(param, 'model_name', ''):
@@ -177,8 +196,9 @@ def supermodule_units(version, outputs, vessel=VESSEL):
 
 
 def output_name(variable):
-    '''"var" is a variable of the component under test; "vessel/var" one of a neighbour in its test network.'''
-    return variable if '/' in variable else f'{VESSEL}/{variable}'
+    '''"var" is a variable of the component under test; "vessel/var" one of a neighbour in its test
+    network, or of a submodule by its path ("sub/var", "a/b/var").'''
+    return model_output(variable) if '/' in variable else f'{VESSEL}/{variable}'
 
 
 def output_key(variable):

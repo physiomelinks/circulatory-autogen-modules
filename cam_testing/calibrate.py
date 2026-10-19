@@ -617,7 +617,7 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
             rep = systems_by_key.get(e.get('reproduces'))
             if rep is None:
                 continue
-            omap = e.get('output_map') or {}
+            omap = harness.model_output_map(e.get('output_map') or {})
             for F in flattened.get(e.get('model'), []):
                 vessel = F.replace('/', harness.LEVEL_SEPARATOR)    # its name in the model's outputs
                 mono = sorted({a.split('/', 1)[0] for a, b in omap.items() if b.split('/', 1)[0] == vessel})

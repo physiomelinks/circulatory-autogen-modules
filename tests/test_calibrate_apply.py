@@ -39,7 +39,7 @@ def _library(tmp):
     cell = _version(tmp, 'cell', 's1', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1',
                                                      'parameterisation': 'default'}],
                     spec={'supermodule': {'equivalent': [{'model': 'sys_super', 'reproduces': 'sys_mono',
-                                                          'output_map': {'mono_C/x': 'C__chan/x', 'mono_C/y': 'C__other/y'}}]}})
+                                                          'output_map': {'mono_C/x': 'C/chan/x', 'mono_C/y': 'C/other/y'}}]}})
     organ = _version(tmp, 'organ', 'o1', submodules=[{'name': 'cell', 'module_type': 'cell', 'module_subtype': 's1',
                                                        'parameterisation': 'default'}])
     other = _version(tmp, 'cell', 'other', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1',
