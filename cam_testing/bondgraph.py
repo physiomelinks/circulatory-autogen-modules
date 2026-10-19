@@ -223,6 +223,16 @@ def reactions(graph, model):
     return out
 
 
+def annotated_chebis(version):
+    '''Every ChEBI term on the version's bond graph's species.'''
+    if not is_bondgraph(version):
+        return []
+    _, graph, model, _ = read_document(document_path(version))
+    if model is None:
+        return []
+    return sorted({p.chebi for r in reactions(graph, model) for p in r.participants if p.chebi})
+
+
 def annotated_rhea_ids(version):
     '''Every Rhea reaction the version's bond graph annotates.'''
     if not is_bondgraph(version):
@@ -247,13 +257,13 @@ def _coefficient(text):
 def rhea_vector(entry):
     '''{(ChEBI, in|out|None): signed net coefficient} of a Rhea reaction: left negative. A polymer, its
     repeating unit's ChEBI term on both sides with indices n and n+1, nets to the units it gains; unlocated
-    participants of a transport reaction are on the in side.'''
+    participants stay unlocated (compare places them where the model has them).'''
     nets = {}
     for p in entry['participants']:
         n, c = _coefficient(p.get('polymer_index') or '1')
         times = Fraction(str(p['coefficient']))
         n, c = n * times, c * times
-        location = p['location'] or ('in' if entry.get('is_transport') else None)
+        location = p['location']
         sign = -1 if p['side'] == 'L' else 1
         key = (p['chebi'], location)
         a, b = nets.get(key, (Fraction(0), Fraction(0)))
@@ -269,9 +279,9 @@ class Comparison:
 
 
 def _assignments(model_locations, rhea_locations):
-    '''Ways to read Rhea's locations (in, out or None) as the model's.'''
-    rhea_locations = sorted({l for l in rhea_locations}, key=str)
-    if rhea_locations == [None]:
+    '''Ways to read Rhea's locations (in, out) as the model's; {None: None} for a reaction with none.'''
+    rhea_locations = sorted({l for l in rhea_locations if l})
+    if not rhea_locations:
         yield {None: None}
         return
     for chosen in itertools.permutations(sorted(model_locations), len(rhea_locations)):
@@ -289,7 +299,22 @@ def compare(reaction, entries):
     for p in reaction.participants:
         model[(p.chebi, p.location)] = model.get((p.chebi, p.location), 0) + p.coefficient
     model = {k: v for k, v in model.items() if v != 0}
-    vectors = [rhea_vector(e) for e in entries]
+    # a Rhea term the model writes more or less specifically (ChEBI is_a either way) stands for the model's
+    model_chebis = {c for c, _ in model}
+    notes, renamed = [], {}
+    for chebi in sorted({p['chebi'] for e in entries for p in e['participants'] if p['chebi']} - model_chebis):
+        matches = [c for c in model_chebis if rhea.related(c, chebi)]
+        if len(matches) == 1:
+            renamed[chebi] = matches[0]
+            notes.append(f'{names.get(matches[0], matches[0])} ({matches[0]}) for Rhea\'s '
+                         f'{names.get(chebi, chebi)} ({chebi}), by ChEBI is_a')
+    vectors = []
+    for e in entries:
+        v = {}
+        for (chebi, l), c in rhea_vector(e).items():
+            key = (renamed.get(chebi, chebi), l)
+            v[key] = v.get(key, 0) + c
+        vectors.append(v)
     model_locations = {l for _, l in model}
     rhea_locations = {l for v in vectors for _, l in v}
     best = None
@@ -300,7 +325,13 @@ def compare(reaction, entries):
         for v in vectors:
             ref = {}
             for (chebi, l), c in v.items():
-                key = (chebi, assignment[l] if l is not None else next(iter(model_locations), None))
+                if l is not None:
+                    where = assignment[l]
+                else:
+                    # a transport reaction's unlocated participant: wherever the model has that species
+                    own = sorted({ml for mc, ml in model if mc == chebi})
+                    where = own[0] if len(own) == 1 else assignment.get('in', next(iter(model_locations), None))
+                key = (chebi, where)
                 ref[key] = ref.get(key, 0) + c
             placed.append(ref)
         ref = placed[0] if len(placed) == 1 else _lumped(model, placed)
@@ -312,6 +343,8 @@ def compare(reaction, entries):
         kind = 'a transport' if any(l for v in vectors for _, l in v) else 'not a transport'
         return Comparison('fail', f'Rhea\'s reaction is {kind}, but this one {spans}')
     _, comparison = best
+    if notes:
+        comparison.text += ' (' + '; '.join(notes) + ')'
     return comparison
 
 

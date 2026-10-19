@@ -7,6 +7,7 @@ Refresh or add entries with
 
     python -m cam_testing.rhea fetch 17825 18353 ...     # those reactions
     python -m cam_testing.rhea fetch --annotated         # every Rhea term the library's bond graphs annotate
+                                                         # (and the ChEBI ancestors of their species and Rhea's)
     python -m cam_testing.rhea find CHEBI:4167 CHEBI:30616 ...   # Rhea reactions with all these participants
 
 An entry: {"id", "equation", "is_transport", "participants": [{"chebi", "name", "side" (L or R),
@@ -24,6 +25,9 @@ import urllib.parse
 import urllib.request
 
 CACHE_DIR = os.path.join(os.path.dirname(__file__), 'data', 'rhea')
+# {ChEBI term: its is_a ancestors}, for a model's species written more or less specifically than Rhea's
+ANCESTORS_PATH = os.path.join(CACHE_DIR, 'chebi_ancestors.json')
+OLS = 'https://www.ebi.ac.uk/ols4/api/ontologies/chebi/terms'
 SPARQL = 'https://sparql.rhea-db.org/sparql'
 REST = 'https://www.rhea-db.org/rhea'
 H_PLUS, WATER = 'CHEBI:15378', 'CHEBI:15377'
@@ -55,6 +59,50 @@ def load(rhea_id):
         return None
     with open(path) as f:
         return json.load(f)
+
+
+_ancestors = None
+
+
+def ancestors(chebi):
+    '''A ChEBI term's is_a ancestors from the cache (empty when it isn't cached).'''
+    global _ancestors
+    if _ancestors is None:
+        _ancestors = json.load(open(ANCESTORS_PATH)) if os.path.isfile(ANCESTORS_PATH) else {}
+    return set(_ancestors.get(chebi, []))
+
+
+def related(a, b):
+    '''Whether one ChEBI term is the other or is_a the other.'''
+    return a == b or b in ancestors(a) or a in ancestors(b)
+
+
+def fetch_ancestors(chebi):
+    '''A ChEBI term's is_a ancestors from the EBI's Ontology Lookup Service.'''
+    number = chebi.split(':')[1]
+    iri = urllib.parse.quote(urllib.parse.quote(f'http://purl.obolibrary.org/obo/CHEBI_{number}', safe=''), safe='')
+    found, url = [], f'{OLS}/{iri}/ancestors?size=500'
+    while url:
+        request = urllib.request.Request(url, headers={**HEADERS, 'Accept': 'application/json'})
+        with urllib.request.urlopen(request, timeout=120) as response:
+            data = json.loads(response.read().decode())
+        found += [t['obo_id'] for t in data.get('_embedded', {}).get('terms', []) if (t.get('obo_id') or '').startswith('CHEBI:')]
+        url = data.get('_links', {}).get('next', {}).get('href')
+    return sorted(set(found))
+
+
+def save_ancestors(chebis):
+    '''Add the ancestors of ``chebis`` (those not cached yet) to the cache.'''
+    global _ancestors
+    cached = json.load(open(ANCESTORS_PATH)) if os.path.isfile(ANCESTORS_PATH) else {}
+    for chebi in sorted(set(chebis) - set(cached)):
+        cached[chebi] = fetch_ancestors(chebi)
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    with open(ANCESTORS_PATH, 'w') as f:
+        json.dump(cached, f, indent=1, sort_keys=True)
+        f.write('\n')
+    _ancestors = cached
+    return ANCESTORS_PATH
 
 
 def _sparql(query):
@@ -191,8 +239,18 @@ def main(argv=None):
         from cam_testing.library import all_versions
         for version in all_versions():
             ids += bondgraph.annotated_rhea_ids(version)
+    chebis = set()
+    if args.annotated:
+        from cam_testing import bondgraph
+        from cam_testing.library import all_versions
+        for version in all_versions():
+            chebis |= set(bondgraph.annotated_chebis(version))
     for rid in sorted(set(ids), key=int):
-        print(f'{rid}: {save(fetch(rid))}')
+        entry = fetch(rid)
+        print(f'{rid}: {save(entry)}')
+        chebis |= {p['chebi'] for p in entry['participants'] if p['chebi']}
+    if chebis:
+        print(f'ChEBI ancestors: {save_ancestors(chebis)}')
     return 0
 
 

@@ -251,3 +251,24 @@ def test_rheas_equation_and_chebi_list_give_its_participants():
     parts = rhea.parse_equation('[(1->4)-alpha-D-glucosyl](n) + ADP-alpha-D-glucose = [(1->4)-alpha-D-glucosyl](n+1) + ADP + H(+)',
                                 ['CHEBI:15444', 'CHEBI:57498', 'CHEBI:456216', 'CHEBI:15378'])
     assert bondgraph.rhea_vector({'participants': parts}) == bondgraph.rhea_vector(rhea.load('18189'))
+
+
+def test_a_species_written_more_specifically_than_rheas_matches_by_chebi_is_a(tmp_path, monkeypatch):
+    # the model's G6P is a (made-up) more specific term, which ChEBI says is_a Rhea's D-glucose 6-phosphate
+    monkeypatch.setitem(CHEBI, 'G6Pa', 99999)
+    monkeypatch.setattr(rhea, '_ancestors', {'CHEBI:99999': ['CHEBI:61548']})
+    result = bondgraph.reactions_check(hexokinase(tmp_path, products=(('G6Pa', 1), ('ADP', 1), ('H', 1))))
+    assert result.status == checks.PASSED, result.details
+    assert 'by ChEBI is_a' in only(result)
+    monkeypatch.setattr(rhea, '_ancestors', {})
+    assert bondgraph.reactions_check(hexokinase(tmp_path, products=(('G6Pa', 1), ('ADP', 1), ('H', 1)))).status == checks.FAILED
+
+
+def test_a_transport_reactions_unlocated_participants_match_wherever_the_model_has_them(tmp_path):
+    # Na+/K+-ATPase with its ATP, water and products in a third compartment x: Rhea gives them no location
+    elements = [reaction('Re_NKA', ['18353']), species('Na', 'c'), species('Na', 'e'), species('K', 'c'),
+                species('K', 'e')] + [species(n, 'x') for n in ('ATP', 'H2O', 'ADP', 'Pi', 'H')]
+    bonds = [('Na_c', 'Re_NKA', 3), ('K_e', 'Re_NKA', 2), ('ATP_x', 'Re_NKA', 1), ('H2O_x', 'Re_NKA', 1),
+             ('Re_NKA', 'Na_e', 3), ('Re_NKA', 'K_c', 2), ('Re_NKA', 'ADP_x', 1), ('Re_NKA', 'Pi_x', 1), ('Re_NKA', 'H_x', 1)]
+    result = bondgraph.reactions_check(write(tmp_path, elements, bonds))
+    assert result.status == checks.PASSED, result.details
