@@ -4,6 +4,7 @@
 @prefix celldl: <http://celldl.org/ontologies/celldl#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix tpl: <https://bg-rdf.org/templates/> .
+@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .
 
 # Lumped cytosol (energy_metabolism adaptive): written by tools/celldl.py (circulatory-autogen-modules) from the module's bond graph
 
@@ -16,55 +17,70 @@
   bgf:hasSpecies "glc" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "1.25663706143592e-20 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "407416133985387 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "407416133985387 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:4167> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_G6P a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "G6P" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "6.28318530717959e-18 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "684236344895760 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "684236344895760 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:61548> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_lac a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "lac" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "1.6958516099692e-18 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "0.000877538872780884 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "0.000877538872780884 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:16651> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_ATP a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "ATP" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "6.0318578948924e-17 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.34299307706794e+15 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.34299307706794e+15 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_ADP a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "ADP" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "3.51858377202057e-18 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3993429537573.04 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3993429537573.04 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_Pi a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Pi" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "6.28318530717959e-17 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "928880869213.052 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "928880869213.052 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_glyc a celldl:Component, bgf:SaturatingChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "glyc" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "3.14159265358979e-16 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.90048622889892e+19 mol-1"^^cdt:ucum ] , [ bgf:varName "k_sat" ; bgf:hasValue "6.28318530717959e-17 mol"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.90048622889892e+19 mol-1"^^cdt:ucum ] , [ bgf:varName "k_sat" ; bgf:hasValue "6.28318530717959e-17 mol"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:15444> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_HK a celldl:Component, bgf:ChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "HK" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.38775814158354e-13 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.38775814158354e-13 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:17825> .
 
 :q_glc.Re_HK a celldl:Connection ;
   celldl:hasSource :q_glc ;
@@ -94,7 +110,17 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "LG" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "11157629.793249 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "11157629.793249 mol/s"^^cdt:ucum ] ;
+  bqbiol:hasPart <https://identifiers.org/rhea:11816> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:16109> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:14729> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:18585> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:10300> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:14801> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:15901> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:10164> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:18157> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:23444> .
 
 :q_G6P.Re_LG a celldl:Connection ;
   celldl:hasSource :q_G6P ;
@@ -134,7 +160,8 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "HYD" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.03201971694804e-18 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.03201971694804e-18 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:13065> .
 
 :q_ATP.Re_HYD a celldl:Connection ;
   celldl:hasSource :q_ATP ;
@@ -158,7 +185,11 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "STORE" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "3.4255850221396e-18 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "3.4255850221396e-18 mol/s"^^cdt:ucum ] ;
+  bqbiol:hasPart <https://identifiers.org/rhea:23536> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:12120> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:18189> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:24576> .
 
 :q_G6P.Re_STORE a celldl:Connection ;
   celldl:hasSource :q_G6P ;
@@ -195,7 +226,9 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "MOB" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.57426632707479e-19 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.57426632707479e-19 mol/s"^^cdt:ucum ] ;
+  bqbiol:hasPart <https://identifiers.org/rhea:41732> ;
+  bqbiol:hasPart <https://identifiers.org/rhea:23536> .
 
 :q_glyc.Re_MOB a celldl:Connection ;
   celldl:hasSource :q_glyc ;
@@ -225,7 +258,8 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "mx" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "4713.59933376726 J/mol"^^cdt:ucum .
+  bgf:hasValue "4713.59933376726 J/mol"^^cdt:ucum ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_MX.Se_mx_MX a celldl:Connection ;
   celldl:hasSource :Re_MX ;

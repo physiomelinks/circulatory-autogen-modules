@@ -27,6 +27,7 @@ electrical work's even split moved into kappa and sigma).
 """
 import math
 
+from annotations import reaction_terms, species_terms
 from bondgraph import FARADAY
 
 TEMPLATE_RT = 2578.73058   # J/mol: the BG-RDF chemical template's RT (37 C)
@@ -85,7 +86,7 @@ def _outward(pos, n, ring, yc, distance, k):
     return x + side * distance * (1 + 0.6 * (k // 2)), y + 30.0 * ((k // 2) % 2)
 
 
-def celldl_spec(bg, conc, kappa, volume, location='c'):
+def celldl_spec(bg, conc, kappa, volume, location='c', module=None):
     """The CellDL document of bg at concentrations conc [mM] with rate constants kappa [mM/s], for a compartment of
     volume [m3]: {'label', 'turtle', 'elements': [...], 'connections': [...], 'folded': [...]}."""
     rt = bg.gas_constant * bg.temperature
@@ -117,6 +118,11 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
         if species is not None:
             lines[-1] += ' ;'
             lines += [f'  bgf:hasSpecies "{species}" ;', f'  bgf:hasLocation "{where}"']
+        # its biological identity (tools/annotations.py): a reaction's Rhea terms, a species' ChEBI and GO terms
+        if rdf_type.endswith('ChemicalReactionNode'):
+            values = list(values) + reaction_terms(module, species)
+        elif species is not None and 'Chemical' in rdf_type:
+            values = list(values) + species_terms(species, where)
         for v in values:
             lines[-1] += ' ;'
             lines.append(f'  {v}')
@@ -239,7 +245,8 @@ def celldl_spec(bg, conc, kappa, volume, location='c'):
     templates = 'tpl:chemical.ttl' + (', tpl:electrical.ttl' if bg.capacitance else '')
     head = ['@prefix : <#> .', '@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .',
             '@prefix cdt: <https://w3id.org/cdt/> .', '@prefix celldl: <http://celldl.org/ontologies/celldl#> .',
-            '@prefix owl: <http://www.w3.org/2002/07/owl#> .', '@prefix tpl: <https://bg-rdf.org/templates/> .', '',
+            '@prefix owl: <http://www.w3.org/2002/07/owl#> .', '@prefix tpl: <https://bg-rdf.org/templates/> .',
+            '@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .', '',
             f'# {bg.label}: written by tools/celldl.py (circulatory-autogen-modules) from the module\'s bond graph',
             *[f'# {f}' for f in folded], '',
             '<> a celldl:Document, bgf:BondgraphModel ;', '  owl:versionInfo "1.0" ;',

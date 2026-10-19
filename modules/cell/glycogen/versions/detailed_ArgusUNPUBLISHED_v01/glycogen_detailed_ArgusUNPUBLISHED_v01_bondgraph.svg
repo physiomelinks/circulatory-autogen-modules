@@ -4,6 +4,7 @@
 @prefix celldl: <http://celldl.org/ontologies/celldl#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix tpl: <https://bg-rdf.org/templates/> .
+@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .
 
 # Detailed glycogen store: written by tools/celldl.py (circulatory-autogen-modules) from the module's bond graph
 # GLGP: inhibition by ATP folded into kappa (x0.09434) at the export concentrations
@@ -17,40 +18,51 @@
   bgf:hasSpecies "G1P" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "3.16690496841448e-19 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.43881925274843e+17 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.43881925274843e+17 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:58601> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_ADPglc a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "ADPglc" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "3.14159265358979e-19 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.48556832362598e+18 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.48556832362598e+18 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57498> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_PPi a celldl:Component, bgf:ChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "PPi" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "3.14159265358979e-18 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.5013569175299e+17 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.5013569175299e+17 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:33019> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :q_Gly a celldl:Component, bgf:SaturatingChemicalStorageNode ;
   bgf:hasSymbol "q" ;
   bgf:hasSpecies "Gly" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "3.14159265358979e-16 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.4276900872577e+17 mol-1"^^cdt:ucum ] , [ bgf:varName "k_sat" ; bgf:hasValue "6.28318530717959e-17 mol"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.4276900872577e+17 mol-1"^^cdt:ucum ] , [ bgf:varName "k_sat" ; bgf:hasValue "6.28318530717959e-17 mol"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:15444> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_PGM a celldl:Component, bgf:ChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "PGM" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.40935042488648e-17 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.40935042488648e-17 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:23536> .
 
 :Se_G6P_PGM a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "G6P" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-3746.91961647496 J/mol"^^cdt:ucum .
+  bgf:hasValue "-3746.91961647496 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:61548> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_G6P_PGM.Re_PGM a celldl:Connection ;
   celldl:hasSource :Se_G6P_PGM ;
@@ -68,13 +80,16 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "GLGC" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.81208937088228e-21 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "46.5797545110742 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.81208937088228e-21 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "46.5797545110742 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:12120> .
 
 :Se_ATP_GLGC a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "ATP" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "14626.6687646928 J/mol"^^cdt:ucum .
+  bgf:hasValue "14626.6687646928 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_ATP_GLGC.Re_GLGC a celldl:Connection ;
   celldl:hasSource :Se_ATP_GLGC ;
@@ -86,7 +101,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum .
+  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_H_GLGC.Re_GLGC a celldl:Connection ;
   celldl:hasSource :Se_H_GLGC ;
@@ -116,13 +133,16 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "GLGA" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.24150366518946e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "25.5581565725601 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.24150366518946e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "25.5581565725601 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:18189> .
 
 :Se_ADP_GLGA a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "ADP" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-12661.5270157358 J/mol"^^cdt:ucum .
+  bgf:hasValue "-12661.5270157358 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_GLGA.Se_ADP_GLGA a celldl:Connection ;
   celldl:hasSource :Re_GLGA ;
@@ -134,7 +154,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum .
+  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_GLGA.Se_H_GLGA a celldl:Connection ;
   celldl:hasSource :Re_GLGA ;
@@ -158,13 +180,16 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "PPA" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "8.71505271222203e-23 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "8.71505271222203e-23 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:24576> .
 
 :Se_H2O_PPA a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H2O" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "12688.789103557 J/mol"^^cdt:ucum .
+  bgf:hasValue "12688.789103557 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_H2O_PPA.Re_PPA a celldl:Connection ;
   celldl:hasSource :Se_H2O_PPA ;
@@ -176,7 +201,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "Pi" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-3275.91053716953 J/mol"^^cdt:ucum .
+  bgf:hasValue "-3275.91053716953 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_PPA.Se_Pi_PPA a celldl:Connection ;
   celldl:hasSource :Re_PPA ;
@@ -189,7 +216,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum .
+  bgf:hasValue "-10723.6473546 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_PPA.Se_H_PPA a celldl:Connection ;
   celldl:hasSource :Re_PPA ;
@@ -207,13 +236,16 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "GLGP" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.40796709381718e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "5.06209011144863 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.40796709381718e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "5.06209011144863 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:41732> .
 
 :Se_Pi_GLGP a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "Pi" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-3275.91053716953 J/mol"^^cdt:ucum .
+  bgf:hasValue "-3275.91053716953 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_Pi_GLGP.Re_GLGP a celldl:Connection ;
   celldl:hasSource :Se_Pi_GLGP ;

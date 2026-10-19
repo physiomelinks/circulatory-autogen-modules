@@ -69,9 +69,9 @@ def specs(module):
     '''{name: spec}: the module at rest, and for a detailed module at its run_parameters.'''
     _, _, build, volume, is_detailed = MODULES[module]
     bg, kappa, rest = build()
-    out = {module: celldl_spec(bg, rest, kappa, volume)}
+    out = {module: celldl_spec(bg, rest, kappa, volume, module=module)}
     if is_detailed:
-        out[f'{module}_run'] = celldl_spec(bg, dict(rest, **run_parameters(module)), kappa, volume)
+        out[f'{module}_run'] = celldl_spec(bg, dict(rest, **run_parameters(module)), kappa, volume, module=module)
     return out
 
 

@@ -4,6 +4,7 @@
 @prefix celldl: <http://celldl.org/ontologies/celldl#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix tpl: <https://bg-rdf.org/templates/> .
+@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .
 
 # Detailed gluconeogenic bypasses and glycerol entry: written by tools/celldl.py (circulatory-autogen-modules) from the module's bond graph
 
@@ -16,19 +17,24 @@
   bgf:hasSpecies "Gly3P" ;
   bgf:hasLocation "c" ;
   bgf:hasValue "1.99803034908526e-15 mol"^^cdt:ucum ;
-  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "70978036920794.4 mol-1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "70978036920794.4 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57597> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_FBPASE a celldl:Component, bgf:SaturatingChemicalReactionNode ;
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "FBPASE" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "5.61754522461127e-19 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "447.397221095937 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "5.61754522461127e-19 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "447.397221095937 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:11064> .
 
 :Se_F16BP_FBPASE a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "F16BP" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "5612.49095666968 J/mol"^^cdt:ucum .
+  bgf:hasValue "5612.49095666968 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:32966> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_F16BP_FBPASE.Re_FBPASE a celldl:Connection ;
   celldl:hasSource :Se_F16BP_FBPASE ;
@@ -40,7 +46,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H2O" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "7293.82216738478 J/mol"^^cdt:ucum .
+  bgf:hasValue "7293.82216738478 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_H2O_FBPASE.Re_FBPASE a celldl:Connection ;
   celldl:hasSource :Se_H2O_FBPASE ;
@@ -52,7 +60,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "F6P" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-5612.49095666967 J/mol"^^cdt:ucum .
+  bgf:hasValue "-5612.49095666967 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:57634> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_FBPASE.Se_F6P_FBPASE a celldl:Connection ;
   celldl:hasSource :Re_FBPASE ;
@@ -64,7 +74,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "Pi" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-7293.82216738479 J/mol"^^cdt:ucum .
+  bgf:hasValue "-7293.82216738479 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_FBPASE.Se_Pi_FBPASE a celldl:Connection ;
   celldl:hasSource :Re_FBPASE ;
@@ -76,13 +88,16 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "G6PASE" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.58382740493759e-18 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "97.2694274419828 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.58382740493759e-18 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "97.2694274419828 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:16689> .
 
 :Se_G6P_G6PASE a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "G6P" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "1681.33121071512 J/mol"^^cdt:ucum .
+  bgf:hasValue "1681.33121071512 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:61548> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_G6P_G6PASE.Re_G6PASE a celldl:Connection ;
   celldl:hasSource :Se_G6P_G6PASE ;
@@ -94,7 +109,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H2O" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "7293.82216738478 J/mol"^^cdt:ucum .
+  bgf:hasValue "7293.82216738478 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_H2O_G6PASE.Re_G6PASE a celldl:Connection ;
   celldl:hasSource :Se_H2O_G6PASE ;
@@ -106,7 +123,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "glc" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-1681.33121071512 J/mol"^^cdt:ucum .
+  bgf:hasValue "-1681.33121071512 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:4167> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_G6PASE.Se_glc_G6PASE a celldl:Connection ;
   celldl:hasSource :Re_G6PASE ;
@@ -118,7 +137,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "Pi" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-7293.82216738479 J/mol"^^cdt:ucum .
+  bgf:hasValue "-7293.82216738479 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_G6PASE.Se_Pi_G6PASE a celldl:Connection ;
   celldl:hasSource :Re_G6PASE ;
@@ -130,13 +151,16 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "GK" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.73749415207111e-19 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "149.211209161451 1"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.73749415207111e-19 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "149.211209161451 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:21644> .
 
 :Se_glycerol_GK a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "glycerol" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "5037.35167519192 J/mol"^^cdt:ucum .
+  bgf:hasValue "5037.35167519192 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:17754> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_glycerol_GK.Re_GK a celldl:Connection ;
   celldl:hasSource :Se_glycerol_GK ;
@@ -148,7 +172,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "ATP" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "5037.35167519192 J/mol"^^cdt:ucum .
+  bgf:hasValue "5037.35167519192 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_ATP_GK.Re_GK a celldl:Connection ;
   celldl:hasSource :Se_ATP_GK ;
@@ -160,7 +186,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "ADP" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-5037.35167519192 J/mol"^^cdt:ucum .
+  bgf:hasValue "-5037.35167519192 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_GK.Se_ADP_GK a celldl:Connection ;
   celldl:hasSource :Re_GK ;
@@ -172,7 +200,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-5037.86767935302 J/mol"^^cdt:ucum .
+  bgf:hasValue "-5037.86767935302 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_GK.Se_H_GK a celldl:Connection ;
   celldl:hasSource :Re_GK ;
@@ -190,13 +220,16 @@
   bgf:hasSymbol "Re" ;
   bgf:hasSpecies "G3PDH" ;
   bgf:hasLocation "c" ;
-  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.77184975563145e-13 mol/s"^^cdt:ucum ] .
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.77184975563145e-13 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:11092> .
 
 :Se_NAD_G3PDH a celldl:Component, bgf:ChemicalPotential ;
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "NAD" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "0.516004161100997 J/mol"^^cdt:ucum .
+  bgf:hasValue "0.516004161100997 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:57540> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Se_NAD_G3PDH.Re_G3PDH a celldl:Connection ;
   celldl:hasSource :Se_NAD_G3PDH ;
@@ -208,7 +241,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "DHAP" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-0.516004161092385 J/mol"^^cdt:ucum .
+  bgf:hasValue "-0.516004161092385 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:57642> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_G3PDH.Se_DHAP_G3PDH a celldl:Connection ;
   celldl:hasSource :Re_G3PDH ;
@@ -220,7 +255,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "NADH" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-0.516004161113289 J/mol"^^cdt:ucum .
+  bgf:hasValue "-0.516004161113289 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:57945> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_G3PDH.Se_NADH_G3PDH a celldl:Connection ;
   celldl:hasSource :Re_G3PDH ;
@@ -232,7 +269,9 @@
   bgf:hasSymbol "Se" ;
   bgf:hasSpecies "H" ;
   bgf:hasLocation "c" ;
-  bgf:hasValue "-5037.86767935302 J/mol"^^cdt:ucum .
+  bgf:hasValue "-5037.86767935302 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
 :Re_G3PDH.Se_H_G3PDH a celldl:Connection ;
   celldl:hasSource :Re_G3PDH ;

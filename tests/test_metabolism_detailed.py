@@ -187,6 +187,19 @@ def test_its_bond_graph_is_a_celldl_document(module, built):
         assert f':q_{sp.name} a celldl:Component, bgf:{law} ;' in ttl
 
 
+@pytest.mark.parametrize('module', list(MODULES) + ['energy_metabolism_adaptive'])
+def test_its_reactions_and_species_are_annotated_as_rheas(module):
+    '''tools/annotations.py's terms are on the document's elements: every reaction of a detailed module (all but the
+    lumped cytosol's maintenance, whose product has no chemical identity) is annotated, and matches Rhea's reaction.'''
+    from types import SimpleNamespace
+    from cam_testing import bondgraph
+    vdir, stem = celldl_build.version_dir(module)
+    result = bondgraph.reactions_check(SimpleNamespace(path=lambda suffix: os.path.join(vdir, f'{stem}_{suffix}')))
+    unannotated = [d for d in result.details if d.endswith(': not annotated')]
+    assert unannotated == (['Re_MX: not annotated'] if module == 'energy_metabolism_adaptive' else []), result.details
+    assert result.metrics['fail'] == 0, result.details
+
+
 def test_it_rests_at_the_fermenters_glycolytic_flux(det):
     '''At its default (the fermenter's rest) every intermediate stays put for a minute, glucose is used at half the
     resting ATP turnover and ATP made at twice that, and the reactions dissipate free energy.'''
