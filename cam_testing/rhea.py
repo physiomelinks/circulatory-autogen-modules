@@ -174,13 +174,20 @@ def _charge(text):
         return None
 
 
+_sparql_failed = False
+
+
 def fetch(rhea_id):
-    '''Rhea's reaction from its SPARQL endpoint and REST API, or from the REST API alone when SPARQL fails.'''
-    try:
-        return fetch_sparql(rhea_id)
-    except (OSError, TimeoutError) as e:
-        print(f'Rhea SPARQL failed for {rhea_id} ({e}); using the REST API', file=sys.stderr)
-        return fetch_rest(rhea_id)
+    '''Rhea's reaction from its SPARQL endpoint and REST API, or from the REST API alone when SPARQL fails (for
+    the rest of the run, once it has failed).'''
+    global _sparql_failed
+    if not _sparql_failed:
+        try:
+            return fetch_sparql(rhea_id)
+        except (OSError, TimeoutError) as e:
+            _sparql_failed = True
+            print(f'Rhea SPARQL failed ({e}); using the REST API', file=sys.stderr)
+    return fetch_rest(rhea_id)
 
 
 def fetch_sparql(rhea_id):
