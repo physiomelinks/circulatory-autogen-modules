@@ -38,7 +38,7 @@ def _library(tmp):
     chan = _version(tmp, 'chan', 'v1')
     cell = _version(tmp, 'cell', 's1', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1'}],
                     spec={'supermodule': {'equivalent': [{'model': 'sys_super', 'reproduces': 'sys_mono',
-                                                          'output_map': {'mono_C/x': 'C__chan/x', 'mono_C/y': 'C__other/y'}}]}})
+                                                          'output_map': {'mono_C/x': 'C/chan/x', 'mono_C/y': 'C/other/y'}}]}})
     organ = _version(tmp, 'organ', 'o1', submodules=[{'name': 'cell', 'module_type': 'cell', 'module_subtype': 's1'}])
     # its parameterisation sets chan/g to its own value (not the default's): untouched
     other = _version(tmp, 'cell', 'other', submodules=[{'name': 'chan', 'module_type': 'chan', 'module_subtype': 'v1'}])
