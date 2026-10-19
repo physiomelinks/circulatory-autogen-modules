@@ -239,3 +239,15 @@ def test_the_cache_holds_the_tests_reactions():
         entry = rhea.load(rid)
         assert entry and entry['id'] == rid and entry['participants']
     assert rhea.load('18353')['is_transport'] and not rhea.load('17825')['is_transport']
+
+
+def test_rheas_equation_and_chebi_list_give_its_participants():
+    # the REST API's form: the distinct compounds' ChEBI terms in the order the equation names them
+    parts = rhea.parse_equation('2 K(+)(out) + 3 Na(+)(in) + ATP + H2O = 2 K(+)(in) + 3 Na(+)(out) + ADP + phosphate + H(+)',
+                                ['CHEBI:29103', 'CHEBI:29101', 'CHEBI:30616', 'CHEBI:15377', 'CHEBI:456216', 'CHEBI:43474',
+                                 'CHEBI:15378'])
+    entry = {'is_transport': True, 'participants': parts}
+    assert bondgraph.rhea_vector(entry) == bondgraph.rhea_vector(rhea.load('18353'))
+    parts = rhea.parse_equation('[(1->4)-alpha-D-glucosyl](n) + ADP-alpha-D-glucose = [(1->4)-alpha-D-glucosyl](n+1) + ADP + H(+)',
+                                ['CHEBI:15444', 'CHEBI:57498', 'CHEBI:456216', 'CHEBI:15378'])
+    assert bondgraph.rhea_vector({'participants': parts}) == bondgraph.rhea_vector(rhea.load('18189'))

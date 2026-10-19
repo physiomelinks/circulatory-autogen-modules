@@ -1,8 +1,9 @@
 """
 Rhea's reactions, as the bond-graph reaction check compares a module's reactions with them.
 
-The check reads a cache in the package (cam_testing/data/rhea/<id>.json), so CI never goes online. Refresh
-or add entries with
+The check reads a cache in the package (cam_testing/data/rhea/<id>.json), so CI never goes online. Entries come
+from Rhea's SPARQL endpoint, or when that fails from its REST API (whose entries have no charges or formulas).
+Refresh or add entries with
 
     python -m cam_testing.rhea fetch 17825 18353 ...     # those reactions
     python -m cam_testing.rhea fetch --annotated         # every Rhea term the library's bond graphs annotate
@@ -17,6 +18,7 @@ charge. Rhea's IDs here are master
 import argparse
 import json
 import os
+import re
 import sys
 import urllib.parse
 import urllib.request
@@ -37,15 +39,6 @@ SELECT ?side ?coef ?chebi ?polymer ?index ?name ?charge ?formula ?loc ?transport
   OPTIONAL {{ ?c rh:chebi ?chebi }} OPTIONAL {{ ?c rh:charge ?charge }} OPTIONAL {{ ?c rh:formula ?formula }}
   OPTIONAL {{ ?c rh:underlyingChebi ?polymer ; rh:polymerizationIndex ?index }}
   OPTIONAL {{ ?p rh:location ?loc }} }}'''
-
-FIND = '''PREFIX rh: <http://rdf.rhea-db.org/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX CHEBI: <http://purl.obolibrary.org/obo/CHEBI_>
-SELECT DISTINCT ?acc ?equation WHERE {{
-  ?r rdfs:subClassOf rh:Reaction ; rh:accession ?acc ; rh:equation ?equation .
-  {participants}
-}} LIMIT 50'''
-
 
 class RheaError(Exception):
     pass
@@ -71,6 +64,48 @@ def _sparql(query):
         return json.loads(response.read().decode())['results']['bindings']
 
 
+def _rest(query, columns='rhea-id,equation,chebi-id', limit=None):
+    params = {'query': query, 'columns': columns, 'format': 'tsv'}
+    if limit:
+        params['limit'] = limit
+    url = REST + '?' + urllib.parse.urlencode(params)
+    with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=120) as response:
+        lines = response.read().decode().strip().splitlines()
+    return [line.split('\t') for line in lines[1:]]
+
+
+TERM = re.compile(r'^(?:(\d+|n) )?(.*?)(?:\((n(?:[+-]\d+)?)\))?(?:\((in|out)\))?$')
+
+
+def parse_equation(equation, chebis):
+    '''A cache entry's participants from Rhea's equation and its ChEBI list (distinct compounds, in the order the
+    equation first names them): coefficients, (in)/(out) and a polymer's (n) or (n+1) read from the text.'''
+    parts = []
+    for side, text in zip('LR', equation.split(' = ')):
+        for term in text.split(' + '):
+            coefficient, name, index, location = TERM.match(term.strip()).groups()
+            parts.append({'side': side, 'coefficient': coefficient if coefficient and coefficient != 'n' else '1',
+                          'name': name, 'polymer_index': index, 'location': location})
+    names = list(dict.fromkeys(p['name'] for p in parts))
+    if len(names) != len(chebis):
+        raise RheaError(f'{len(names)} compounds in "{equation}" but {len(chebis)} ChEBI terms')
+    chebi_of = dict(zip(names, chebis))
+    for p in parts:
+        p.update(chebi=chebi_of[p['name']], charge=None, formula=None)
+    return sorted(parts, key=lambda p: (p['side'], p['chebi'] or '', p['location'] or ''))
+
+
+def fetch_rest(rhea_id):
+    '''Rhea's reaction from its REST API, as a cache entry (no charges or formulas).'''
+    rows = _rest(f'RHEA:{rhea_id}')
+    row = next((r for r in rows if r[0] == f'RHEA:{rhea_id}'), None)
+    if row is None:
+        raise RheaError(f'Rhea has no reaction {rhea_id}')
+    participants = parse_equation(row[1], row[2].split(';'))
+    return {'id': str(rhea_id), 'equation': row[1], 'is_transport': any(p['location'] for p in participants),
+            'participants': participants, 'source': 'rest'}
+
+
 def _equation(rhea_id):
     url = REST + '?' + urllib.parse.urlencode({'query': f'RHEA:{rhea_id}', 'columns': 'rhea-id,equation',
                                                'format': 'tsv'})
@@ -92,7 +127,16 @@ def _charge(text):
 
 
 def fetch(rhea_id):
-    '''Rhea's reaction from its SPARQL endpoint and REST API, as a cache entry.'''
+    '''Rhea's reaction from its SPARQL endpoint and REST API, or from the REST API alone when SPARQL fails.'''
+    try:
+        return fetch_sparql(rhea_id)
+    except (OSError, TimeoutError) as e:
+        print(f'Rhea SPARQL failed for {rhea_id} ({e}); using the REST API', file=sys.stderr)
+        return fetch_rest(rhea_id)
+
+
+def fetch_sparql(rhea_id):
+    '''Rhea's reaction from its SPARQL endpoint (participants, charges, formulas) and REST API (its equation).'''
     rows = _sparql(PARTICIPANTS.format(id=rhea_id))
     if not rows:
         raise RheaError(f'Rhea has no reaction {rhea_id} (or it is not a master reaction)')
@@ -122,12 +166,10 @@ def save(entry):
 
 
 def find(chebis):
-    '''Approved Rhea reactions with every one of ``chebis`` as a participant: [(id, equation)].'''
-    clauses = '\n  '.join(f'?r rh:side ?s{k} . ?s{k} rh:contains ?p{k} . ?p{k} rh:compound/rh:chebi CHEBI:{c.split(":")[1]} .'
-                          for k, c in enumerate(chebis))
-    rows = _sparql(FIND.format(participants=clauses))
-    found = {(r['acc']['value'].split(':', 1)[1], r['equation']['value']) for r in rows}
-    return sorted(found, key=lambda r: int(r[0]))
+    '''Rhea reactions with every one of ``chebis`` as a participant: [(id, equation)], from its REST search.'''
+    query = ' AND '.join(f'chebi:{c.split(":")[1]}' for c in chebis)
+    rows = _rest(query, columns='rhea-id,equation', limit=50)
+    return sorted({(r[0].split(':', 1)[1], r[1]) for r in rows}, key=lambda r: int(r[0]))
 
 
 def main(argv=None):
