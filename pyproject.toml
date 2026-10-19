@@ -14,6 +14,7 @@ dependencies = [
     "numpy>=2.0",   # np.trapezoid in verification invariants
     "pytest",
     "jsonschema>=4.18",  # module arrays and module configs against libcuflynx's JSON Schemas
+    "rdflib>=6",    # the bond-graph tests read a CellDL document's BG-RDF (cam_testing/bondgraph.py)
     "tomli; python_version < '3.11'",  # [tool.cam_testing] in a repo's pyproject.toml
 ]
 
@@ -29,7 +30,7 @@ libcuflynx = ["libcuflynx @ git+https://github.com/FinbarArgus/circulatory_autog
 include = ["cam_testing", "cam_testing.*"]
 
 [tool.setuptools.package-data]
-cam_testing = ["templates/*.html", "data/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
+cam_testing = ["templates/*.html", "data/*.json", "data/rhea/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
                "bridges/cuflynx/*.py"]
 
 [tool.cam_testing]

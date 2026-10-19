@@ -20,7 +20,7 @@ import pytest
 
 # The standard tests keep the names run_test, verification_test_BC, ... rather than test_*.
 PYTHON_FUNCTIONS = ['run_test', '*_test_*', 'stability_test', 'system_*_test', 'supermodule_*_test',
-                    'phlynx_*_test', 'cuflynx_*_test']
+                    'phlynx_*_test', 'cuflynx_*_test', 'bondgraph_*_test']
 MARKERS = [
     'slow: long-running (calibration)',
     'module_vv: per-version verification and per-instance validation tests',
@@ -28,7 +28,7 @@ MARKERS = [
     'phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)',
 ]
 QUICK_TESTS = ('run_test', 'supermodule_structure_test', 'phlynx_export_test', 'cuflynx_simulate_test',
-               'phlynx_equivalence_test', 'cuflynx_instance_omex_test')
+               'phlynx_equivalence_test', 'cuflynx_instance_omex_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test')
 
 
 def pytest_addoption(parser):
