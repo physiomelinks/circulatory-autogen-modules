@@ -21,16 +21,25 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, phlynx, ranges, risk
+from cam_testing import bib, bondgraph, checks, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
-from cam_testing.library import LICENCES, REPO_ROOT, load_module_type, module_type_names, select_module_types
+from cam_testing import paths
+from cam_testing.library import LICENCES, load_module_type, module_type_names, select_module_types
 from cam_testing.mathml import component_equation_targets, component_equations, component_variables
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
-SITE_DIR = os.path.join(REPO_ROOT, 'site')
+
+
+def __getattr__(name):
+    # the former constant: site/ of the repo under test (cam_testing.paths)
+    if name == 'SITE_DIR':
+        return paths.roots().site_dir
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
 TEST_TITLES = {
+    'bondgraph_celldl_test': 'Bond graph: opens in CellDL',
+    'bondgraph_reactions_test': 'Bond graph: reactions match Rhea',
     'run_test': 'Run',
     'verification_test_invariants': 'Verification: invariants',
     'verification_test_BC': 'Verification: boundary conditions',
@@ -44,14 +53,26 @@ TEST_TITLES = {
     'phlynx_equivalence_test': 'PhLynx → CUFLynx vs libcuflynx',
     'supermodule_structure_test': 'Supermodule: structure',
     'supermodule_equivalence_test': 'Supermodule: reproduces',
+    'coupled_validation_test': 'Validation: coupled, against the CellML grid',
 }
 TEST_SHORT = {
     'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
     'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
+    'coupled_validation_test': 'Coupled',
+    'bondgraph_celldl_test': 'Opens in CellDL', 'bondgraph_reactions_test': 'Reactions vs Rhea',
 }
 TEST_ABOUT = {
+    'bondgraph_celldl_test': 'The version\'s bond graph (<version>_bondgraph.svg) is a CellDL document the editor '
+                             'opens: Turtle BG-RDF with one bond-graph model, every element and connection drawn and '
+                             'nothing drawn that the RDF lacks, and the same graph as <version>_bondgraph.ttl. With '
+                             'BG_TOOLS set, bg2cellml also makes CellML from it. N/A without a bond graph.',
+    'bondgraph_reactions_test': 'Every reaction annotated with a Rhea reaction (bqbiol:isVersionOf, or bqbiol:hasPart '
+                                'for a lumped one) has Rhea\'s participants (ChEBI terms on its species) and '
+                                'stoichiometry (bond counts), allowing the reverse direction and one common factor. A '
+                                'difference only in H+ or H2O is a warning. Pending while some reactions are not '
+                                'annotated; N/A without a bond graph.',
     'run_test': 'Generates the version alone with libcuflynx (every boundary condition becomes a '
                 'parameter, valued from the default instance; a supermodule is expanded into its submodules, '
                 'and the boundary conditions no internal connection closes become parameters), simulates it, '
@@ -104,15 +125,23 @@ TEST_ABOUT = {
                                   'submodules or declared globals.',
     'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
                                     'with its submodules written out, output for output.',
+    'coupled_validation_test': 'The version in use in the coupled system models its spec lists (coupled_systems): '
+                               '0D modules generated as C++ and coupled to the FEniCS model tissue_diffusion_FEniCS, '
+                               'against the same problem with the tissue as a finite-volume grid of CellML cells '
+                               '(tests/test_coupled_systems.py). The heatmaps show the mid-plane of the box at a few '
+                               'times, in both, and their difference on the grid.',
 }
 # The test columns of every version, component or supermodule, in this order: verification, the
 # version-level calibration, the PhLynx -> CUFLynx pipeline, then the supermodule tests. A column
 # that doesn't apply to a version is N/A with the reason (not_applicable_reason); one that applies
 # but has no result is "Not run". The validation tests are shown per instance.
 SUPERMODULE_TESTS = ['supermodule_structure_test', 'supermodule_equivalence_test']
-REPORT_TESTS = checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
+COUPLED_TESTS = ['coupled_validation_test']
+REPORT_TESTS = (checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
+                + COUPLED_TESTS + bondgraph.BONDGRAPH_TESTS)
 INSTANCE_TESTS = checks.INSTANCE_TESTS
 NOT_A_SUPERMODULE = 'not a supermodule'
+NOT_COUPLED = 'not used in a coupled system model (the spec lists no coupled_systems)'
 NO_EQUIVALENT = ('no system model to reproduce: the spec lists no supermodule.equivalent entry (the version is '
                  'checked through the models that use it)')
 STATUS_LABEL = {'passed': 'Passed', 'failed': 'Failed', 'skipped': 'Skipped', 'pending': 'Pending',
@@ -223,15 +252,19 @@ def instance_context(version, inst):
 
 def not_applicable_reason(version, test):
     '''Why a report column doesn't apply to the version, or None when it does.'''
+    if test in bondgraph.BONDGRAPH_TESTS and not bondgraph.is_bondgraph(version):
+        return bondgraph.NOT_A_BONDGRAPH
     if test in SUPERMODULE_TESTS and not version.is_supermodule:
         return NOT_A_SUPERMODULE
     if test == 'supermodule_equivalence_test' and not (version.spec.get('supermodule') or {}).get('equivalent'):
         return NO_EQUIVALENT
-    if checks.is_cpp(version):
+    if test in COUPLED_TESTS and not version.spec.get('coupled_systems'):
+        return NOT_COUPLED
+    if checks.is_non_cellml(version):
         if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test'):
-            return checks.CPP_NOT_APPLICABLE
+            return checks.non_cellml_reason(version)
         if test in phlynx.PIPELINE_TESTS:
-            return phlynx.CPP_REASON
+            return phlynx.EXTERNAL_REASON if checks.is_external_api(version) else phlynx.CPP_REASON
     return None
 
 
@@ -990,11 +1023,12 @@ def _href(relpath, page):
 def assemble_site(names, contexts):
     '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page and
     plots; a nested module_type's directory is inside its parent's), as GitHub Pages serves it.'''
-    if os.path.isdir(SITE_DIR):
-        shutil.rmtree(SITE_DIR)
+    site_dir = paths.roots().site_dir
+    if os.path.isdir(site_dir):
+        shutil.rmtree(site_dir)
     for name in names:
         mtype = load_module_type(name)
-        dest = os.path.join(SITE_DIR, 'modules', mtype.relpath)
+        dest = os.path.join(site_dir, 'modules', mtype.relpath)
         os.makedirs(dest, exist_ok=True)
         if not os.path.isfile(mtype.html_path) or any(not os.path.isfile(v.html_path) for v in mtype.versions()):
             build_module(name)
@@ -1012,8 +1046,8 @@ def assemble_site(names, contexts):
                     idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
                     os.makedirs(idest, exist_ok=True)
                     shutil.copy2(archive, idest)
-    build_review_queue(contexts, os.path.join(SITE_DIR, 'review_queue.html'), _href)
-    return build_index(contexts, os.path.join(SITE_DIR, 'index.html'), _href)
+    build_review_queue(contexts, os.path.join(site_dir, 'review_queue.html'), _href)
+    return build_index(contexts, os.path.join(site_dir, 'index.html'), _href)
 
 
 def main(argv=None):
@@ -1028,7 +1062,7 @@ def main(argv=None):
     for name in select_module_types(args.module):
         out, ctx = build_module(name)
         contexts[name] = ctx
-        print(f'wrote {os.path.relpath(out, REPO_ROOT)} and {ctx["n_versions"]} version page(s)')
+        print(f'wrote {os.path.relpath(out, paths.roots().repo_root)} and {ctx["n_versions"]} version page(s)')
     if args.site:
         # the index always covers every module_type, even when only some pages were rebuilt
         for name in module_type_names():
@@ -1036,7 +1070,7 @@ def main(argv=None):
                 vctx = [version_context(v) for v in load_module_type(name).versions()]
                 contexts[name] = dict(module_context(name, vctx), version_contexts=vctx)
         out = assemble_site(module_type_names(), [contexts[n] for n in module_type_names()])
-        print(f'wrote {os.path.relpath(out, REPO_ROOT)}')
+        print(f'wrote {os.path.relpath(out, paths.roots().repo_root)}')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,36 @@
+module_type: PMCA
+version: Colegrove2000_v01
+reviewed: false
+description: 'Plasma-membrane Ca-ATPase as an instantaneous Hill pump (Colegrove, Albrecht & Friel 2000, bullfrog sympathetic
+  neurons): j_PMCA = -j_max_PMCA Cai^n_PMCA/(K_PMCA^n_PMCA + Cai^n_PMCA), j_max_PMCA = A_mem rho_PMCA r_PMCA / N_A (mol/s, negative
+  = out of the cell). Cai is the sub-membrane shell Ca (internal_Ca), A_mem the membrane area (membrane_area), and j_PMCA goes
+  to the Ca handling''s summed Ca_flux (j_Ca_in), like i_NaCa''s Ca flux. Built for the sympathetic-neuron soma and varicosity.'
+notes: 'Added 2026-10-07 (job notes tau_provenance_rest.md, section 19). Form: Colegrove et al. 2000 (J Gen Physiol 115:371,
+  Eq. 1 and Fig. 1A) fit the net plasma-membrane Ca flux of bullfrog sympathetic neurons (19-22 degC) as a leak minus V_max
+  [Ca]^n/(EC50^n + [Ca]^n), with EC50 378.8 nM and n 1.8; the extrusion term is used here, without their leak (the cell model
+  has its own Ca entry paths). Their fit lumps all uphill Ca transport; in rat SCG neurons the PMCA is the principal extruder
+  at rest and for loads up to 500 nM, with NCX and SERCA without effect (Wanaverbecq et al. 2003), so the term is taken as the
+  PMCA. The maximal rate follows the library''s density x single-protein form, j_max = A_mem rho_PMCA r_PMCA / N_A; r_PMCA (30
+  /s) is an unreferenced placeholder, so only the product rho r is meaningful. Temperature: the pump has no kinetics and no
+  Q10/T_ref; Colegrove''s constants are room temperature (19-22 degC, the model''s 22 degC), Wanaverbecq''s calibration data
+  33 degC (not corrected). Size: rho_PMCA was first set so that j_max = 100 amol/s on the 3,000 um^2 soma (the extrusion estimated
+  to hold resting Ca near 0.1 uM; bracket 42-470 amol/s from Colegrove 2000 and Wanaverbecq 2003), then calibrated with libcuflynx
+  in instance wanaverbecq2003_scg and applied (calibrate apply) to the default, the soma and varicosity supermodules, their
+  monolithic versions and SN_simple*. Calibration set-up (validation.wanaverbecq2003_scg.harness, an instance-level test network):
+  the PMCA on the soma Ca handling (Ca_handling SN_soma_Argus2026_v01, its own buffer: binding ratio ~100 against Wanaverbecq''s
+  ~500) with SERCA and the ER leak off (thapsigargin had no effect) and no NCX (Na-free had no effect), a tonic Ca entry (Ca_influx
+  constant, record leak: Wanaverbecq''s La3+-sensitive leak, a fitted nuisance parameter not applied to the model) and a 0.2 s
+  Ca load (record load) sized for ~100 and ~500 nM rises; fitted to resting Ca 102 nM and the recovery series (tau 5 s and 2.5
+  s). **The model cannot shorten tau with the load as the data do**: the shell-to-bulk exchange (V_shell/tau_shell, Khaliq shell)
+  is in series with the pump and limits the recovery to tau >= ~2.4 s at any pump rate, and the model''s recovery tau is ~3.5 s
+  for both loads at the calibrated rate (a compromise between 5 and 2.5 s). Tests: the Hill law, the j_max law and the sign
+  exactly (relative 1e-12), half-maximal at Cai = K (the run point), a sweep of Cai over 0-10 uM and of n over 1-4 with bounds.
+
+
+  Ports of the versions of PMCA (they differ; allowed and documented, see modules/README.md, Versions):
+
+  general Ca_flux: Colegrove2000_v01 [j_PMCA]
+
+  general internal_Ca: Colegrove2000_v01 [Cai]
+
+  general membrane_area: Colegrove2000_v01 [A_mem]'

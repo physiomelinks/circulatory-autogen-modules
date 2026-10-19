@@ -2719,6 +2719,13 @@
         <variable name="k_NaCa" public_interface="out" units="nanoA"/>
         <variable name="rho_NaCa" public_interface="in" units="per_um2"/>
         <variable name="r_NaCa" public_interface="in" units="per_s"/>
+        <!-- plasma-membrane Ca-ATPase (PMCA module Colegrove2000_v01: Hill pump of Colegrove, Albrecht & Friel 2000, j_max = A_mem rho_PMCA r_PMCA / N_A; review 2026-10-07) -->
+        <variable name="rho_PMCA" public_interface="in" units="per_um2"/>
+        <variable name="r_PMCA" public_interface="in" units="per_s"/>
+        <variable name="K_PMCA" public_interface="in" units="millimolar"/>
+        <variable name="n_PMCA" public_interface="in" units="dimensionless"/>
+        <variable name="j_max_PMCA" public_interface="out" units="mol_per_s"/>
+        <variable name="j_PMCA" public_interface="out" units="mol_per_s"/>
         <variable name="alpha_NaCa" public_interface="in" units="dimensionless"/>
         <variable name="gamma_NaCa" public_interface="in" units="dimensionless"/>
         <variable name="Ksat" public_interface="in" units="dimensionless"/>
@@ -3191,9 +3198,9 @@
         <variable name="kon_l_RyR" public_interface="in" units="per_millimolar_per_s"/>
         <variable name="koff_l_RyR" public_interface="in" units="per_s"/>
         <variable name="N_l_RyR" public_interface="in" units="dimensionless"/>
-        <variable name="a_RyR_init" public_interface="in" units="dimensionless"/>
-        <variable name="i_RyR_init" public_interface="in" units="dimensionless"/>
-        <variable name="l_RyR_init" public_interface="in" units="dimensionless"/>
+        <variable name="a_RyR_init" public_interface="out" units="dimensionless"/>
+        <variable name="i_RyR_init" public_interface="out" units="dimensionless"/>
+        <variable name="l_RyR_init" public_interface="out" units="dimensionless"/>
         <variable name="a_RyR" public_interface="out" units="dimensionless" initial_value="a_RyR_init"/>
         <variable name="i_RyR" public_interface="out" units="dimensionless" initial_value="i_RyR_init"/>
         <variable name="l_RyR" public_interface="out" units="dimensionless" initial_value="l_RyR_init"/>
@@ -3213,6 +3220,9 @@
         <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>j_RyR</ci><apply><times/><ci>k_RyR</ci><ci>P_RyR</ci><apply><minus/><ci>Ca_ER</ci><ci>Cai</ci></apply></apply></apply></math>
         <!-- steady-state occupancies at the current Cai, Ca_ER: kon C / (kon C + koff) -->
         <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>a_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai</ci></apply><ci>koff_a_RyR</ci></apply></apply></apply><apply><eq/><ci>i_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><apply><plus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai</ci></apply><ci>koff_i_RyR</ci></apply></apply></apply><apply><eq/><ci>l_RyR_inf</ci><apply><divide/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><apply><plus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER</ci></apply><ci>koff_l_RyR</ci></apply></apply></apply></math>
+        <!-- starting occupancies: the steady state at the starting Ca (Cai_init, Ca_ER_init); a computed initial value,
+             so libCellML's Python/C generators reject the model (CVODE/Myokit runs it) -->
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><ci>a_RyR_init</ci><apply><divide/><apply><times/><ci>kon_a_RyR</ci><ci>Cai_init</ci></apply><apply><plus/><apply><times/><ci>kon_a_RyR</ci><ci>Cai_init</ci></apply><ci>koff_a_RyR</ci></apply></apply></apply><apply><eq/><ci>i_RyR_init</ci><apply><divide/><apply><times/><ci>kon_i_RyR</ci><ci>Cai_init</ci></apply><apply><plus/><apply><times/><ci>kon_i_RyR</ci><ci>Cai_init</ci></apply><ci>koff_i_RyR</ci></apply></apply></apply><apply><eq/><ci>l_RyR_init</ci><apply><divide/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER_init</ci></apply><apply><plus/><apply><times/><ci>kon_l_RyR</ci><ci>Ca_ER_init</ci></apply><ci>koff_l_RyR</ci></apply></apply></apply></math>
         <!-- Ca concentration calculations in each region-->
         <variable name="Cai_init" public_interface="in" units="millimolar"/>
         <variable initial_value="Cai_init" name="Cai" public_interface="out" units="millimolar"/>
@@ -3433,6 +3443,7 @@
                                 <plus/>
                                 <ci>j_Ca_L</ci>
                                 <ci>j_NaCa_Ca</ci>
+                                <ci>j_PMCA</ci>
                                 <ci>j_IP3</ci>
                                 <ci>j_RyR</ci>
                                 <ci>j_diffCa</ci>
@@ -3936,6 +3947,8 @@
             <apply><eq/><ci>g_KCa_SK</ci><apply><times/><ci>A_mem</ci><ci>rho_SK</ci><ci>gamma_SK</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
             <apply><eq/><ci>g_M</ci><apply><times/><ci>A_mem</ci><ci>rho_M</ci><ci>gamma_M</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
             <apply><eq/><ci>k_NaCa</ci><apply><times/><ci>A_mem</ci><ci>rho_NaCa</ci><ci>r_NaCa</ci><cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn></apply></apply>
+            <apply><eq/><ci>j_max_PMCA</ci><apply><divide/><apply><times/><ci>A_mem</ci><ci>rho_PMCA</ci><ci>r_PMCA</ci></apply><cn cellml:units="per_mol" type="e-notation">6.02214076<sep/>23</cn></apply></apply>
+            <apply><eq/><ci>j_PMCA</ci><apply><divide/><apply><times/><apply><minus/><ci>j_max_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply><apply><plus/><apply><power/><ci>K_PMCA</ci><ci>n_PMCA</ci></apply><apply><power/><ci>Cai</ci><ci>n_PMCA</ci></apply></apply></apply></apply>
             <apply><eq/><ci>k_NaK</ci><apply><times/><ci>A_mem</ci><ci>rho_NaK</ci><ci>r_NaK</ci><cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn></apply></apply>
             <apply><eq/><ci>g_leak_Na</ci><apply><times/><ci>A_mem</ci><ci>rho_leak_Na</ci><ci>gamma_leak_Na</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>
             <apply><eq/><ci>g_leak_K</ci><apply><times/><ci>A_mem</ci><ci>rho_leak_K</ci><ci>gamma_leak_K</ci><cn cellml:units="microS_per_picoS" type="e-notation">1<sep/>-6</cn></apply></apply>

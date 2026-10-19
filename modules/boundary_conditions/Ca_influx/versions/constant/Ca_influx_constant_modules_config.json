@@ -1,0 +1,30 @@
+[
+  {
+    "module_type": "Ca_influx",
+    "module_subtype": "constant",
+    "module_format": "cellml",
+    "component_file": "Ca_influx_constant_modules.cellml",
+    "component_type": "Ca_influx_constant",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026circulatory"
+    ],
+    "notes": "A prescribed Ca flux j_Ca = j_Ca_influx (mol/s; positive into the cell) on the Ca_flux port, summed into a Ca handling's j_Ca_in like a channel's Ca flux: a tonic Ca entry or a Ca load in a test network (e.g. the PMCA calibration of instance PMCA/Colegrove2000_v01 wanaverbecq2003_scg).",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_Ca"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      ["j_Ca_influx", "mol_per_s", "access", "constant"],
+      ["j_Ca", "mol_per_s", "access", "variable"]
+    ]
+  }
+]

@@ -47,7 +47,7 @@ def load_supermodule(key):
 
 
 def structure_problems(version):
-    index = library.version_index()
+    index = library.version_index(include_libraries=True)   # submodules may be extra libraries' versions
     names = set(version.submodule_names)
     problems = []
     if len(names) != len(version.submodules):

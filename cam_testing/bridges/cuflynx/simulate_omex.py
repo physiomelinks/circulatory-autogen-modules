@@ -3,7 +3,7 @@ CUFLynx half of the module pipeline test: launches a released CUFLynx binary, im
 .omex exports through its HTTP API (as PhLynx's hand-off and the upload box do), and simulates
 them. Standard library only, so it runs in any Python.
 
-    CUFLYNX_BIN=~/software/CUFLynx python tools/cuflynx_bridge/simulate_omex.py job.json
+    CUFLYNX_BIN=~/software/CUFLynx python cam_testing/bridges/cuflynx/simulate_omex.py job.json
 
 job.json: {"models": [{"id", "omex", "sim_time", "extra_outputs", "out"}], "solver_info": {...}}
 For each model: POST /api/omex/upload, then POST /api/simulate for the model's states plus

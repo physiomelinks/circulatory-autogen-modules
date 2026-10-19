@@ -3,7 +3,7 @@
  * PhLynx's *real* code (a checkout at PHLYNX_DIR) and exports the .omex PhLynx would send to
  * CUFLynx.
  *
- *   node tools/phlynx_bridge/export_omex.mjs <job.json> <out.omex>
+ *   node cam_testing/bridges/phlynx/export_omex.mjs <job.json> <out.omex>
  *
  * job.json:
  *   { "cellml": [paths], "units": [paths], "configs": [paths],       library files to load
@@ -23,7 +23,7 @@
  * underscore (map_variables), which silently empties PhLynx's CellML connection parsing
  * (see CUFLynx apps/api/tests/phlynx_bridge/roundtrip.mjs).
  * Needs node >= 22.15 (module.registerHooks) and jsdom, installed next to this script
- * (npm install in tools/phlynx_bridge) or found from JSDOM_DIR.
+ * (npm ci in cam_testing/bridges/phlynx: make pipeline-setup) or found from JSDOM_DIR.
  */
 import { readFile, writeFile } from 'node:fs/promises'
 import { createRequire, registerHooks } from 'node:module'

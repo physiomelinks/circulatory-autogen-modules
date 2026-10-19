@@ -5,6 +5,7 @@ Builds a COMBINE archive (.omex) for every instance of every version, from the l
     python tools/build_instance_omex.py                       # every instance
     python tools/build_instance_omex.py --module Lotka_Volterra --module neuron
     python tools/build_instance_omex.py --version heart/Argus2026_v01
+    python tools/build_instance_omex.py --module vessels --shard 2/6 --shard-stage omex   # one CI shard
 
 C++ (module_format cpp) versions are skipped: CUFLynx runs CellML models.
 """
@@ -22,9 +23,15 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
     ap.add_argument('--module', action='append', default=[], help='module_type (with those nested in it) or path under modules/ (repeatable)')
     ap.add_argument('--version', action='append', default=[], help='<module_type>/<version> (repeatable)')
+    ap.add_argument('--shard', default=None, metavar='K/N', help='only shard K of N of the selected module_types (cam_testing/shards.py)')
+    ap.add_argument('--shard-stage', default='omex', help='whose durations balance --shard (default omex)')
     args = ap.parse_args(argv)
     versions = ([library.version_by_key(k) for k in args.version] if args.version
                 else library.all_versions(args.module or None))
+    if args.shard:
+        from cam_testing.shards import shard_module_types
+        wanted = shard_module_types(args.module, args.shard_stage, args.shard)
+        versions = [v for v in versions if v.mtype.name in wanted]
     built, failed, skipped = 0, [], 0
     for v in versions:
         if v.format != 'cellml' and not v.is_supermodule:

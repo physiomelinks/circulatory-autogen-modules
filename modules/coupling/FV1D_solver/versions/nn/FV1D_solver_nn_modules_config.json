@@ -1,0 +1,58 @@
+[
+  {
+    "module_type": "FV1D_solver",
+    "module_subtype": "nn",
+    "module_format": "external_api",
+    "component_file": "FV1D_solver_nn_modules.cellml",
+    "component_type": "Muller_1d__FV1D_solver_nn",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "muller2014global",
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "muller2014global",
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "T",
+        "second",
+        "access",
+        "global_constant"
+      ]
+    ],
+    "api": {
+      "name": "FV_1d_solver",
+      "description": "The FV 1D solver (libcuflynx/solver1d) run alongside the 0D model. The coupler (libcuflynx/coupler) launches both programs and relays their messages over named pipes; the FV1D_vessel and FV1D_volume_sum entries say what each connection exchanges over these pipes. From this entry the C++ generator writes coupler_config.json. The coupler and the 1D solver are run for whole cycles of the global period T.",
+      "role": "process",
+      "transport": "named_pipe",
+      "coordinator": "coupler",
+      "program": {
+        "interpreter": "python",
+        "package": "libcuflynx.solver1d",
+        "script": "main1D.py"
+      },
+      "message_length": 2,
+      "channels": {
+        "dt": {
+          "send": "zero_to_parent_dt",
+          "recv": "parent_to_zero_dt"
+        },
+        "conn": {
+          "send": "zero_to_parent_{i}",
+          "recv": "parent_to_zero_{i}",
+          "indexed_by": "connection"
+        },
+        "volume": {
+          "recv": "parent_to_zero_vol"
+        }
+      }
+    }
+  }
+]

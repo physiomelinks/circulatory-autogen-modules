@@ -1,0 +1,18 @@
+model: microvasc_O2_FV
+category: coupled
+reviewed: false
+sim_time: 10.0
+pre_time: 0.0
+dt: 0.1
+solver_info:
+  rtol: 1.0e-08
+  atol: 1.0e-12
+equivalence:
+  status: not_applicable
+  reason: an example built from this library
+skip: 'a coupled example: generated as C++ and run by tests/test_coupled_systems.py, not by the CellML system tests'
+description: Two capillaries exchanging O2 with a cube of tissue (20 um cells) modelled as a finite-volume grid of CellML
+  cells.
+notes:
+- Built by tools/build_coupled_examples.py. Generated as C++ and run, with the FEniCS-coupled variants, by tests/test_coupled_systems.py
+  (outputs and run times compared).

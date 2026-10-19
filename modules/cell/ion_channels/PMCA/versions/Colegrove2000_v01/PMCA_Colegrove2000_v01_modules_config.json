@@ -1,0 +1,49 @@
+[
+  {
+    "module_type": "PMCA",
+    "module_subtype": "Colegrove2000_v01",
+    "module_format": "cellml",
+    "component_file": "PMCA_Colegrove2000_v01_modules.cellml",
+    "component_type": "PMCA_Colegrove2000",
+    "default_instance": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "colegrove2000quantitative",
+      "wanaverbecq2003plasma"
+    ],
+    "notes": "Plasma-membrane Ca-ATPase as an instantaneous Hill pump (Colegrove, Albrecht & Friel 2000, bullfrog sympathetic neurons), j_PMCA = -j_max Cai^n/(K^n + Cai^n), j_max = A_mem rho_PMCA r_PMCA / N_A; its Ca flux goes to the Ca handling's sub-membrane shell (Ca_flux, j_Ca_in sum). Built for the sympathetic-neuron soma and varicosity.",
+    "entrance_ports": [],
+    "exit_ports": [],
+    "general_ports": [
+      {
+        "port_type": "internal_Ca",
+        "variables": [
+          "Cai"
+        ]
+      },
+      {
+        "port_type": "Ca_flux",
+        "variables": [
+          "j_PMCA"
+        ]
+      },
+      {
+        "port_type": "membrane_area",
+        "variables": [
+          "A_mem"
+        ]
+      }
+    ],
+    "variables_and_units": [
+      ["Cai", "millimolar", "access", "boundary_condition"],
+      ["A_mem", "um2", "access", "boundary_condition"],
+      ["rho_PMCA", "per_um2", "access", "constant"],
+      ["r_PMCA", "per_s", "access", "constant"],
+      ["K_PMCA", "millimolar", "access", "constant"],
+      ["n_PMCA", "dimensionless", "access", "constant"],
+      ["j_max_PMCA", "mol_per_s", "access", "variable"],
+      ["j_PMCA", "mol_per_s", "access", "variable"]
+    ]
+  }
+]

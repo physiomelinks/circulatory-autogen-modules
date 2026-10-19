@@ -30,7 +30,7 @@
     },
     {
       "description": "v is periodic with the heart period T: its mean over the last whole period equals A_0 cos φ_0 (1e-3 of max |v|)",
-      "expr": "abs(np.trapz(v[t >= t[-1] - T], t[t >= t[-1] - T])/T - A_0*np.cos(phi_0)) <= 1e-3*np.max(np.abs(v)) + 1e-12",
+      "expr": "abs(np.trapezoid(v[t >= t[-1] - T], t[t >= t[-1] - T])/T - A_0*np.cos(phi_0)) <= 1e-3*np.max(np.abs(v)) + 1e-12",
       "applies": "run"
     },
     {

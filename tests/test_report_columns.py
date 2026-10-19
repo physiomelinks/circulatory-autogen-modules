@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-import conftest
+from cam_testing import pytest_plugin
 from cam_testing import checks, harness, phlynx, report
 from cam_testing.library import Parameter, all_versions, load_version
 
@@ -20,14 +20,16 @@ from cam_testing.library import Parameter, all_versions, load_version
 
 EXPECTED_COLUMNS = ['run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                     'stability_test', 'version_calibration', 'phlynx_export_test', 'cuflynx_simulate_test',
-                    'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test']
+                    'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
+                    'coupled_validation_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test']
 
 
 def test_report_columns_in_order():
     assert report.REPORT_TESTS == EXPECTED_COLUMNS
     assert [report.TEST_SHORT[k] for k in EXPECTED_COLUMNS] == [
         'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
-        'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces']
+        'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces', 'Coupled', 'Opens in CellDL',
+        'Reactions vs Rhea']
 
 
 def test_every_version_has_the_same_test_keys():
@@ -53,6 +55,15 @@ def test_supermodule_columns_not_applicable_to_a_component():
         assert tests[k]['message'] == report.NOT_A_SUPERMODULE
 
 
+def test_coupled_column_applies_to_versions_with_coupled_systems():
+    assert report.not_applicable_reason(load_version('Lotka_Volterra', 'Lotka1925_v01'), 'coupled_validation_test') == \
+        report.NOT_COUPLED
+    for mt, ver in (('tissue_diffusion_FEniCS', 'box_v01'), ('varicosity', 'NEexchange_v01')):
+        v = load_version(mt, ver)
+        assert v.spec.get('coupled_systems')
+        assert report.not_applicable_reason(v, 'coupled_validation_test') is None
+
+
 def test_supermodule_without_equivalent_is_not_applicable():
     v = load_version('soma', 'sympathetic')
     assert not (v.spec.get('supermodule') or {}).get('equivalent')
@@ -74,6 +85,7 @@ def _fake_version(tmp_path, name='v', supermodule=False, spec=None, instances=()
                         dir=str(vdir), results_dir=str(vdir / 'results'), plots_dir=str(vdir / 'plots'),
                         is_supermodule=supermodule, spec=dict(spec or {}), config={'module_format': 'cellml'},
                         submodules=list(submodules))
+    v.path = lambda suffix: str(vdir / f'mt_{name}_{name}_{suffix}')
     v.instances = lambda: [SimpleNamespace(name=i, has_obs_data=data, results_dir=str(vdir / 'results' / 'instances' / i))
                            for i, data in instances]
     return v
@@ -190,9 +202,9 @@ def test_report_links_and_counts_for_calibration_in_super():
 
 def test_supermodule_versions_get_the_verification_tests():
     config = SimpleNamespace(getoption=lambda k: ['soma'] if k == '--module' else ([] if k == '--component' else True))
-    ids = [p.id for p in conftest._selected_versions(config)]
+    ids = [p.id for p in pytest_plugin._selected_versions(config)]
     assert 'soma/sympathetic' in ids and 'soma/sympathetic_monolithic_v01' in ids
-    inst = [p.id for p in conftest._selected_instances(config)]
+    inst = [p.id for p in pytest_plugin._selected_instances(config)]
     assert 'soma/sympathetic/default' in inst
 
 

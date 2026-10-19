@@ -1,0 +1,289 @@
+{
+  "title": "circulatory-autogen-modules directory layout",
+  "description": "Every level of modules/ and system_models/: the directories and files each may hold, their name patterns, and the rules across levels. tests/test_structure.py walks both trees and checks them against this file; modules/README.md explains it. In a file or directory name, {module_type}, {version}, {instance}, {model} and {category} stand for the enclosing directories' names.",
+  "version": 1,
+  "excluded": {
+    "modules/poiseuille_transport": "another session's module in the pre-versions layout; moves to transport/ when that work is committed",
+    "modules/system": "holds only system/poiseuille (another session's uncommitted system models); moves to system_models/poiseuille when that work is committed"
+  },
+  "generic_directory_names": [
+    "versions",
+    "instances",
+    "risk",
+    "plots",
+    "results",
+    "reference"
+  ],
+  "levels": {
+    "modules_root": {
+      "path": "modules/",
+      "description": "The module library: category directories and top-level module_types (heart), this schema and the README.",
+      "files": {
+        "required": [
+          "README.md",
+          "directory_schema.json"
+        ],
+        "optional": []
+      },
+      "directories": [
+        "category",
+        "module_type"
+      ]
+    },
+    "category": {
+      "description": "A physiological grouping (vessels, cell, control, ...), possibly nested (cell/ion_channels), used only where no module_type of that meaning exists. Holds only subcategories and module_types, no files. A directory is a category when it has no versions/ directory and is not inside a module_type.",
+      "name_pattern": "^[a-z][a-z0-9_]*$",
+      "files": {
+        "required": [],
+        "optional": []
+      },
+      "directories": [
+        "category",
+        "module_type"
+      ],
+      "min_children": 1
+    },
+    "module_type": {
+      "description": "One module_type: a directory with versions/. Its report across versions is generated next to it. Its other subdirectories are nested module_types: module_types that only exist within it (each with versions/, possibly nesting again), e.g. heart/chamber, cell/neuron/soma.",
+      "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
+      "files": {
+        "required": [],
+        "optional": [
+          "{module_type}.html"
+        ]
+      },
+      "directories": [
+        "versions",
+        "module_type"
+      ],
+      "required_directories": [
+        "versions"
+      ]
+    },
+    "versions": {
+      "description": "One directory per version of the module_type.",
+      "files": {
+        "required": [],
+        "optional": []
+      },
+      "directories": [
+        "version"
+      ],
+      "min_children": 1
+    },
+    "version": {
+      "description": "One version: the math (CellML component, one config entry, units) and its tests. The version name is the config entry's module_subtype. A supermodule version (module_format supermodule) has no CellML or units of its own. A version of an external model (module_format external_api, e.g. a FEniCS model) keeps the model in {module_type}_{version}_model.py, which its api block names, and has a placeholder CellML and units file with no component, like the C++ FV1D_vessel versions.",
+      "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
+      "files": {
+        "required": [
+          "{module_type}_{version}_modules_config.json",
+          "{module_type}_{version}_tests.yaml",
+          "{module_type}_{version}_verification_config.json",
+          "{module_type}_{version}_references.bib"
+        ],
+        "required_unless_supermodule": [
+          "{module_type}_{version}_modules.cellml",
+          "{module_type}_{version}_units.cellml"
+        ],
+        "optional": [
+          "{module_type}_{version}_references_proposed.bib",
+          "{module_type}_{version}.html",
+          "{module_type}_{version}_model.py"
+        ]
+      },
+      "directories": [
+        "instances",
+        "risk",
+        "plots",
+        "results"
+      ],
+      "required_directories": [
+        "instances"
+      ]
+    },
+    "instances": {
+      "description": "One directory per instance of the version.",
+      "files": {
+        "required": [],
+        "optional": []
+      },
+      "directories": [
+        "instance"
+      ],
+      "min_children": 1
+    },
+    "instance": {
+      "description": "One parameter set of the version (never different math). Named by its obs_data's obs_data_name; 'default' is the parameters a version has unless a model names another instance.",
+      "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
+      "files": {
+        "required": [
+          "{instance}_parameters.csv"
+        ],
+        "optional": [
+          "{instance}_obs_data.json",
+          "{instance}_params_for_id.csv",
+          "{instance}_calibrated_parameters.csv",
+          "{instance}_calibration.json",
+          "SOURCES.md"
+        ],
+        "data_file_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(csv|json|txt|md)$",
+        "generated": [
+          "{module_type}_{version}_{instance}.omex"
+        ],
+        "ignored_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.omex$",
+        "generated_note": "Built by tools/build_instance_omex.py (make omex) from the files above and the version's files; not committed. A COMBINE archive for CUFLynx: the flattened model of the version's test network with this instance's parameters as master, the obs_data and params_for_id, and every input incl. the verification config."
+      },
+      "parameters_columns": [
+        "variable_name",
+        "units",
+        "value",
+        "data_reference",
+        "sourced"
+      ],
+      "directories": [],
+      "subdirectories": {
+        "source_figures": {
+          "description": "Screenshots of the publication figures/tables the instance's data were extracted from (cropped PNG/JPG) and source_figures.json [{file, source, caption}]; required when the data came from a paper or book (modules/README.md, 'Source figures').",
+          "file_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(png|jpg|jpeg)$",
+          "required": [
+            "source_figures.json"
+          ]
+        }
+      }
+    },
+    "risk": {
+      "description": "The joint failure-risk analysis of the version (make risk), committed.",
+      "files": {
+        "required": [],
+        "optional": [
+          "{module_type}_{version}_risk.json",
+          "{module_type}_{version}_risk_samples.npz"
+        ]
+      },
+      "directories": []
+    },
+    "plots": {
+      "description": "Generated by the tests (gitignored).",
+      "generated": true
+    },
+    "results": {
+      "description": "Generated by the tests (gitignored).",
+      "generated": true
+    },
+    "system_models_root": {
+      "path": "system_models/",
+      "description": "Whole models built from the library, grouped in categories. System models are not modules or supermodules.",
+      "files": {
+        "required": [],
+        "optional": []
+      },
+      "directories": [
+        "system_category"
+      ]
+    },
+    "system_category": {
+      "name_pattern": "^[a-z][a-z0-9_]*$",
+      "files": {
+        "required": [],
+        "optional": []
+      },
+      "directories": [
+        "system_model"
+      ]
+    },
+    "system_model": {
+      "description": "One model: its module array (records name a module_type, a version as module_subtype, and an instance), parameters (which win over the instances'), spec, and under reference/ what it must reproduce: circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
+      "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
+      "files": {
+        "required": [
+          "{model}_module_array.json",
+          "{model}_system.yaml"
+        ],
+        "optional": [
+          "{model}_parameters.csv",
+          "{model}_parameters_unfinished.csv",
+          "{model}_obs_data.json",
+          "{model}_params_for_id.csv"
+        ],
+        "ignored_pattern": "^user_inputs_.*\\.yaml$"
+      },
+      "directories": [
+        "reference",
+        "results",
+        "plots"
+      ]
+    },
+    "reference": {
+      "description": "The reference the system model must reproduce: circulatory_autogen's original model (its own module names), or a ready CellML model; not checked.",
+      "unchecked": true
+    }
+  },
+  "rules": {
+    "version_is_module_subtype": "A version directory's config file has exactly one entry, whose module_type is the module_type directory's name and whose module_subtype is the version directory's name.",
+    "spec_files": "A version's spec is two files. {module_type}_{version}_verification_config.json holds what the checks run: the keys in spec_keys.verification_config. {module_type}_{version}_tests.yaml holds review and record-keeping: the keys in spec_keys.tests. module_type and version (equal to the directory names) are in both. Any other key, or a key in the wrong file, is an error.",
+    "default_instance_exists": "The config entry's default_instance names an instance directory of the version.",
+    "instance_is_obs_data_name": "An instance with an obs_data (and a validation obs_data) has \"obs_data_name\" equal to the instance directory's name.",
+    "unique_directory_names": "No category or module_type directory name appears twice in modules/, nested module_types included (the generic names above, version names, which repeat across module_types, and instance names, which name data sets, are exempt).",
+    "category_is_not_module_type": "No category directory has the name of a module_type.",
+    "nested_module_types": "A module_type's subdirectories other than versions/ are nested module_types. A nested module_type is used only within its parent: every supermodule submodule and every harness record (verification_config harness.module_array) that names it belongs to a version of its parent, of a module_type nested (at any depth) in its parent, or of itself. System models are exempt: they may wire a parent's parts explicitly (e.g. SN_simple_flat, 3compartment's chambers and valves).",
+    "placement": "A module_type is named after the mechanism it models, never after the cell, compartment, system or author it was built for (no surnames or years in type names). It sits in the most general category where its mechanism is meaningful (cell/Ca_handling; cell/ion_channels/<channel> for channels, pumps and exchangers), and is nested only when it is an anatomical part of its parent (cell/neuron/{soma,axon,varicosity}, heart/{chamber,valve,cardiac_clock}). A category exists only where no module_type of that meaning does. Modules of one mechanism built for different cells or compartments are versions (different maths) or instances (same maths, other values) of one type.",
+    "version_names": "Versions are named <system>_<compartment>_<Source><Year>_vXX, <system>_<Source><Year>_vXX or <Source><Year>_vXX (Source: the first author's surname in ASCII CamelCase; ArgusUNPUBLISHED for the owner's unpublished or modified models), with _SI for an SI-unit duplicate and _OLD for a superseded formulation. Vessel versions keep their port letters first (pp, pv, vp, vv: libcuflynx reads a vessel's first two letters as its inlet/outlet port kinds) and their descriptive subtypes. No version starts with nn, except the pairs libcuflynx writes itself (nn_versions_allowed).",
+    "system_model_records_resolve": "Every record of a system model's module array names a (module_type, version) of the library and an instance that version has (records of modules not in this library are listed in the model's spec as known).",
+    "version_or_instance": "Different equations (a changed relation, state or port variable) make a version; the same equations with other parameter values make an instance of the existing version.",
+    "port_differences": "Versions of one module_type may expose different ports when the mechanism does not allow common ones (e.g. named-current vs summed-current membrane versions). This is allowed and documented: each such version's tests.yaml notes end with the type's port table ('Ports of the versions of <type>'). No check compares ports across versions.",
+    "required_citations": "Every version's config entry has \"required_citations\": a non-empty list of bib keys, each in the version's {module_type}_{version}_references.bib, naming the papers the version's model (its equations) is built on, as distinct from the per-parameter value sources in the instance CSVs' data_reference. \"required_citations_uncertain\" (optional, left out when empty) lists the keys among them that are a best guess still to confirm. Owner-original models cite placeholders (argus2026sympathetic, argus2026unpublished, gee2026unpublished) and generic mechanisms the software (argus2026circulatory). A supermodule lists its own; its report adds its submodules'.",
+    "bib_keys": "Every BibTeX key is <first author's surname><year><first significant title word>, lowercase ASCII (belluzzi1986quantitative; cam_testing.bib.convention_key): particles join the surname (vanderpol), accents and hyphens are dropped (hernandezcruz), stopwords (a, an, the, on, of, ...) are skipped. Two different papers with the same key take further title words. One key per paper. Entries without a year (undated web pages) are listed in tests/test_structure.py UNDATED_BIB_KEYS."
+  },
+  "spec_keys": {
+    "both": [
+      "module_type",
+      "version"
+    ],
+    "verification_config": [
+      "time_label",
+      "sim_time",
+      "pre_time",
+      "dt",
+      "solver",
+      "solver_info",
+      "reference_solver_info",
+      "outputs",
+      "run_parameters",
+      "run_inputs",
+      "run_steps",
+      "rest_check",
+      "harness",
+      "invariants",
+      "bc_sweep",
+      "timestep",
+      "stability",
+      "parameter_ranges",
+      "validation",
+      "supermodule",
+      "coupled_systems"
+    ],
+    "tests": [
+      "reviewed",
+      "description",
+      "notes",
+      "skip",
+      "known_issues",
+      "expected_failures",
+      "calibration_in_supermodule",
+      "reference_proposals",
+      "review",
+      "review_scope"
+    ]
+  },
+  "config_entry_record_keys": {
+    "licence": "SPDX id of the version's licence (cam_testing.library.LICENCES); default CC0-1.0",
+    "creator": "list of the names of the people who created the version ([] until given in review)",
+    "required_citations": "non-empty list of bib keys in the version's references.bib: the papers its model is built on (rules.required_citations)",
+    "required_citations_uncertain": "optional: the keys of required_citations that are a best guess still to confirm (left out when none)"
+  },
+  "nn_versions_allowed": {
+    "coupling/FV1D_solver/nn": "libcuflynx's 1D coupling adds a FV1D_solver record with BC_type nn (convert_0d_to_1d; the C++ generator writes coupler_config.json from it)",
+    "coupling/FV1D_vessel/nn": "libcuflynx's 1D coupling writes FV1D_vessel records with BC_type nn",
+    "coupling/FV1D_volume_sum/nn": "libcuflynx's ModelParsers adds a ('FV1D_volume_sum', 'nn') record to 1D-coupled models"
+  }
+}
