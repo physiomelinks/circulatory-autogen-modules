@@ -21,8 +21,8 @@ activity (a strict xfail).
 """
 import contextlib
 import io
+import json
 import os
-import re
 import sys
 import xml.etree.ElementTree as ET
 
@@ -36,6 +36,9 @@ from cam_testing.library import load_version
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 import build_bondgraph_lumped as lumped  # noqa: E402
+import build_celldl as celldl_build  # noqa: E402
+import celldl  # noqa: E402
+import compare_celldl as celldl_compare  # noqa: E402
 import build_metabolism_detailed as detailed  # noqa: E402
 from bondgraph import BondGraph, R_GAS  # noqa: E402
 
@@ -143,27 +146,58 @@ def built():
         return {m: detailed.BUILDERS[m]() for m in MODULES}
 
 
+def _document(module):
+    """The version's CellDL document (_bondgraph.svg) and its Turtle (_bondgraph.ttl)."""
+    vdir, stem = celldl_build.version_dir(module)
+    with open(os.path.join(vdir, f'{stem}_bondgraph.ttl')) as f:
+        ttl = f.read()
+    return ET.parse(os.path.join(vdir, f'{stem}_bondgraph.svg')).getroot(), ttl
+
+
 @pytest.mark.parametrize('module', list(MODULES))
-def test_its_bond_graph_is_written_as_bg_rdf_and_drawn(module, built):
-    '''The BG-RDF (reduced form, as the CellDL editor writes it) has the model, a storage node per species and a reaction
-    node per reaction, and a bond per species of each reaction carrying its coefficient (bgf:bondCount when above 1); the diagram is well-formed SVG carrying that RDF where
-    CellDL keeps it, with an element per species and reaction named as in the bond graph.'''
+def test_its_bond_graph_is_a_celldl_document(module, built):
+    """The version's bond graph is a CellDL document: its Turtle (the _bondgraph.ttl) in CellDL's metadata element, a
+    celldl:Document and bgf:BondgraphModel; in its diagram layer a component per species, reaction and chemostat copy
+    (one beside each reaction that uses it) and a bond per species of each reaction; for a membrane with a
+    capacitance its capacitor and, for each reaction moving charge across it, two transformers (four bonds); each
+    element the template of its constitutive relation (saturating where the module saturates)."""
     graph = built[module][0]
-    vdir = os.path.join(REPO, 'modules', 'cell', module, 'versions', VERSION)
-    ttl = open(os.path.join(vdir, f'{module}_{VERSION}_bondgraph.ttl')).read()
-    assert 'a bgf:BondgraphModel' in ttl and 'bgf:usesTemplate tpl:chemical.ttl' in ttl
-    assert ttl.count('a bgf:ChemicalStorageNode') == len(graph.species)
-    assert ttl.count('a bgf:ChemicalReactionNode') == len(graph.reactions)
-    assert ttl.count('bgf:hasSource') == sum(len(r.stoich) for r in graph.reactions)
-    assert sum(int(n) for n in re.findall(r'bgf:bondCount (\d+)', ttl)) == \
-        sum(abs(n) for r in graph.reactions for n in r.stoich.values() if abs(n) > 1)
-    svg = ET.parse(os.path.join(vdir, f'{module}_{VERSION}_bondgraph.svg')).getroot()
+    svg, ttl = _document(module)
     ns = '{http://www.w3.org/2000/svg}'
     meta = svg.find(ns + 'metadata')
     assert meta is not None and meta.get('id') == 'celldl-rdf-metadata' and meta.get('data-content-type') == 'text/turtle'
-    assert meta.text.strip() == ttl.strip()
-    ids = {g.get('id') for g in svg.iter(ns + 'g')}
-    assert {f'q_{s.name}' for s in graph.species} | {f'Re_{r.name}' for r in graph.reactions} <= ids
+    assert meta.text == ttl
+    assert '<> a celldl:Document, bgf:BondgraphModel ;' in ttl
+    layer = [g for g in svg.iter(ns + 'g') if g.get('id') == 'celldl-diagram-layer'][0]
+    components = {g.get('id') for g in layer.iter(ns + 'g') if g.get('class') == 'celldl-Component'}
+    internal = [sp for sp in graph.species if not sp.boundary]
+    boundary = {sp.name for sp in graph.species if sp.boundary}
+    copies = {f'Se_{sp}_{r.name}' for r in graph.reactions for sp in r.stoich if sp in boundary}
+    electrogenic = [r.name for r in graph.reactions for c in graph.capacitance if graph.charge_into(r, c)]
+    membranes = {f'C_m_{c}' for c in graph.capacitance} | {f'TF_{side}_{n}' for n in electrogenic for side in 'fr'}
+    assert components == ({f'q_{sp.name}' for sp in internal} | {f'Re_{r.name}' for r in graph.reactions} | copies
+                          | membranes)
+    bonds = [p for p in layer.iter(ns + 'path') if 'celldl-Connection' in (p.get('class') or '')]
+    assert len(bonds) == sum(len(r.stoich) for r in graph.reactions) + 4 * len(electrogenic)
+    for r in graph.reactions:
+        law = 'SaturatingChemicalReactionNode' if r.sigma else 'ChemicalReactionNode'
+        assert f':Re_{r.name} a celldl:Component, bgf:{law} ;' in ttl
+    for sp in internal:
+        law = 'SaturatingChemicalStorageNode' if sp.k_sat is not None else 'ChemicalStorageNode'
+        assert f':q_{sp.name} a celldl:Component, bgf:{law} ;' in ttl
+
+
+@pytest.mark.parametrize('module', list(MODULES) + ['energy_metabolism_adaptive'])
+def test_its_reactions_and_species_are_annotated_as_rheas(module):
+    '''tools/annotations.py's terms are on the document's elements: every reaction of a detailed module (all but the
+    lumped cytosol's maintenance, whose product has no chemical identity) is annotated, and matches Rhea's reaction.'''
+    from types import SimpleNamespace
+    from cam_testing import bondgraph
+    vdir, stem = celldl_build.version_dir(module)
+    result = bondgraph.reactions_check(SimpleNamespace(path=lambda suffix: os.path.join(vdir, f'{stem}_{suffix}')))
+    unannotated = [d for d in result.details if d.endswith(': not annotated')]
+    assert unannotated == (['Re_MX: not annotated'] if module == 'energy_metabolism_adaptive' else []), result.details
+    assert result.metrics['fail'] == 0, result.details
 
 
 def test_it_rests_at_the_fermenters_glycolytic_flux(det):
@@ -308,49 +342,111 @@ def test_compared_with_the_lumped_respiration(mdet, mlump):
     assert d_hi < 0.8 * l_hi, 'the detailed one saturates sooner with ADP (its dehydrogenases and pumps at 4x rest)'
 
 
-def _bg_rdf_rates(ttl, temperature):
-    """Each store's rate of change [mol/s] in a reduced BG-RDF chemical bond graph, as the BG-RDF chemical template
-    defines it (u = RT ln(K q) per store; per reaction v = kappa (exp(u_f/RT) - exp(u_r/RT)), u_f and u_r the sums of
-    its substrates' and products' u, each times its bond's bgf:bondCount)."""
-    rt = R_GAS * temperature
-    stores = {m[0]: (float(m[1]), float(m[2])) for m in re.findall(
-        r':q_(\w+)[^\n]*\n\s+a bgf:ChemicalStorageNode ;\n\s+bgf:hasValue "(\S+) mol"\^\^cdt:ucum ;\n'
-        r'\s+bgf:parameterValue \[ bgf:varName "K" ; bgf:hasValue "(\S+) mol-1"', ttl)}
-    kappa = {m[0]: float(m[1]) for m in re.findall(
-        r':Re_(\w+)[^\n]*\n\s+a bgf:ChemicalReactionNode ;\n[^\n]*bgf:hasValue "(\S+) mol/s"', ttl)}
-    sides = {r: ([], []) for r in kappa}
-    for a, b, n in re.findall(r'^:\S+ bgf:hasSource :(\w+) ; bgf:hasTarget :(\w+)(?: ; bgf:bondCount (\d+))? \.$', ttl, re.M):
-        n = int(n or 1)
-        if a.startswith('q_'):
-            sides[b[3:]][0].append((a[2:], n))
-        else:
-            sides[a[3:]][1].append((b[2:], n))
-    u = {s: rt * np.log(k * q) for s, (q, k) in stores.items()}
-    rate = {s: 0.0 for s in stores}
+def _celldl_rates(ttl):
+    """Each store's rate of change [mol/s] in a CellDL document's bond graph, as the BG-RDF templates define it: a store's
+    exp(u/RT) is K q (times k_sat/(k_sat + q) for a saturating one), a chemical potential source's exp(u/RT) its value's;
+    a reaction's Pf and Pr are the products over its substrates and products of exp(u/RT) to its bonds' bondCount, and
+    it flows kappa (Pf - Pr), over 1 + (Pf + Pr)/sigma when saturating."""
+    import rdflib
+    bgf = rdflib.Namespace('https://bg-rdf.org/ontologies/bondgraph-framework#')
+    g = rdflib.Graph().parse(data=ttl, format='turtle', publicID='https://example.org/document')
+
+    def number(literal):
+        return float(str(literal).split()[0])
+
+    def parameter(e, name):
+        for b in g.objects(e, bgf.parameterValue):
+            if str(g.value(b, bgf.varName)) == name:
+                return number(g.value(b, bgf.hasValue))
+
+    kind = {e: str(t).rsplit('#', 1)[1] for e, t in g.subject_objects(rdflib.RDF.type) if str(t).startswith(str(bgf))}
+    activity = {}
+    for e, k in kind.items():
+        if k in ('ChemicalStorageNode', 'SaturatingChemicalStorageNode'):
+            q = number(g.value(e, bgf.hasValue))
+            activity[e] = parameter(e, 'K') * q
+            if k == 'SaturatingChemicalStorageNode':
+                activity[e] *= parameter(e, 'k_sat') / (parameter(e, 'k_sat') + q)
+        elif k == 'ChemicalPotential':
+            activity[e] = np.exp(number(g.value(e, bgf.hasValue)) / celldl.TEMPLATE_RT)
+    bonds = [(g.value(b, bgf.hasSource), g.value(b, bgf.hasTarget), int(g.value(b, bgf.bondCount) or 1))
+             for b in g.subjects(bgf.hasSource, None)]
+    # a transformer between a membrane's capacitor (phi = Q/C) and a reaction: u_1 = ratio u_0, so the reaction sees
+    # ratio phi on its forward side (capacitor -> transformer -> reaction) and phi/ratio on its reverse side
+    for t in [e for e, k in kind.items() if k == 'TransformerNode']:
+        ratio = number(g.value(t, bgf.hasValue))
+        (cap,) = [a for a, b, _ in bonds if b == t and kind[a] == 'ElectricalCapacitiveNode'] or \
+                 [b for a, b, _ in bonds if a == t and kind[b] == 'ElectricalCapacitiveNode']
+        phi = number(g.value(cap, bgf.hasValue)) / parameter(cap, 'C')
+        forward = any(a == cap and b == t for a, b, _ in bonds)
+        activity[t] = np.exp((ratio * phi if forward else phi / ratio) / celldl.TEMPLATE_RT)
+    sides = {e: ([], []) for e, k in kind.items() if 'Reaction' in k}
+    for a, t, n in bonds:
+        if t in sides:
+            sides[t][0].append((a, n))
+        elif a in sides:
+            sides[a][1].append((t, n))
+    rate = {e: 0.0 for e, k in kind.items() if 'Storage' in k}
     for r, (sub, prod) in sides.items():
-        v = kappa[r] * (np.exp(sum(n * u[s] for s, n in sub) / rt) - np.exp(sum(n * u[s] for s, n in prod) / rt))
-        for s, n in sub:
-            rate[s] -= n * v
-        for s, n in prod:
-            rate[s] += n * v
-    return rate
+        pf = np.prod([activity[e] ** n for e, n in sub])
+        pr = np.prod([activity[e] ** n for e, n in prod])
+        v = parameter(r, 'kappa') * (pf - pr)
+        if kind[r] == 'SaturatingChemicalReactionNode':
+            v /= 1.0 + (pf + pr) / parameter(r, 'sigma')
+        for e, n in sub:
+            if e in rate:
+                rate[e] -= n * v
+        for e, n in prod:
+            if e in rate:
+                rate[e] += n * v
+    return {str(e).rsplit('#', 1)[1][2:]: x for e, x in rate.items()}
 
 
 @pytest.mark.parametrize('module', list(MODULES))
-def test_the_bg_rdf_has_the_modules_resting_rates(module, built):
-    """Evaluated as the BG-RDF chemical template defines it (what CellDL's bg2cellml generates), the exported bond graph
-    gives every store the module's own resting rate of change, S v times the volume (to 1e-9 of the largest): the
-    stoichiometry, the stores' K (with psi_m folded in), and the rate constants (with saturation and activation folded in)
-    say the same as the module at the export point."""
+def test_the_celldl_document_has_the_modules_resting_rates(module, built):
+    """Evaluated as the BG-RDF templates define it (what CellDL's bg2cellml generates), the CellDL document gives every
+    store the module's own resting rate of change, S v times the volume (to 1e-9 of the largest flow): its stoichiometry,
+    the stores' K, the chemostats' potentials and the rate constants (with saturation, regulation and psi_m folded in)
+    say the same as the module at rest."""
     bg = built[module][0]
     flux, volume = MODULES[module]
-    want = {s: x * volume for s, x in bg.steady(flux).items()}
-    ttl = open(os.path.join(REPO, 'modules', 'cell', module, 'versions', VERSION, f'{module}_{VERSION}_bondgraph.ttl')).read()
-    got = _bg_rdf_rates(ttl, bg.temperature)
+    want = {s.name: x * volume for s, x in zip(bg.species, bg.S() @ [flux[r.name] for r in bg.reactions])
+            if not s.boundary}
+    got = _celldl_rates(_document(module)[1])
     assert set(got) == set(want)
-    scale = max(abs(x) for x in want.values())
-    assert max(abs(got[s] - want[s]) for s in want) <= 1e-9 * scale
+    scale = max(abs(x) for x in flux.values()) * volume   # at rest the species are steady: scale by the turnover
+    # a membrane's transformers turn its potential into q F phi, which the template divides by its own RT (2578.73058
+    # J/mol), 3e-6 from the module's R T: complex I, near equilibrium, amplifies that to 1e-7 of the flows
+    tolerance = 1e-6 if bg.capacitance else 1e-9
+    assert max(abs(got[s] - want[s]) for s in want) <= tolerance * scale
 
+
+BG_TOOLS = os.environ.get('BG_TOOLS')   # a BG-Tools checkout (with constitutive-law templates) and its .venv
+
+
+@pytest.mark.skipif(not BG_TOOLS, reason='set BG_TOOLS to a BG-Tools checkout with its .venv to run bg2cellml')
+@pytest.mark.parametrize('module', ['glycogen', 'gluconeogenesis', 'mitochondrion'])
+def test_bg2cellml_makes_the_module_from_its_celldl_document(module, tmp_path):
+    """CellDL's bg2cellml turns the module's bond graph into CellML that runs as the module does, at rest and from the
+    verification config's run_parameters, to 1e-8 of each species' scale (tools/compare_celldl.py), the
+    mitochondrion's matrix potential too (its capacitor and transformers: electrogenic transport). Glycolysis matches
+    at rest only: pyruvate kinase's activation by F1,6BP is not yet expressible in the templates."""
+    import subprocess
+    for name, spec in celldl_build.specs(module).items():
+        with open(tmp_path / f'{name}.json', 'w') as f:
+            json.dump(spec, f)
+        (tmp_path / f'{name}.ttl').write_text(spec['turtle'])
+        script = ('import asyncio, sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); '
+                  'from bg2cellml.bondgraph.framework import get_framework\n'
+                  'async def main():\n    fw = await get_framework(); src = Path(sys.argv[2])\n'
+                  '    m = fw.make_bondgraph_model(src.as_uri(), src.read_text()); assert not m.has_issues\n'
+                  '    Path(sys.argv[3]).write_text(m.make_cellml_model().to_xml())\nasyncio.run(main())')
+        subprocess.run([os.path.join(BG_TOOLS, '.venv', 'bin', 'python'), '-c', script, BG_TOOLS,
+                        str(tmp_path / f'{name}.ttl'), str(tmp_path / f'{name}.cellml')], check=True, cwd=BG_TOOLS)
+    with contextlib.redirect_stdout(io.StringIO()):
+        result = celldl_compare.compare(str(tmp_path), module)
+    for name, r in result.items():
+        assert r['max_relative_difference'] < 1e-8, (name, r['species'])
 
 
 @pytest.fixture(scope='module')
@@ -478,11 +574,11 @@ def test_the_lumped_cytosols_bond_graph_is_its_stoichiometry(cytosol_point):
     for s, d in deriv.items():
         transport = sum(j[f'{s}:{n}'] for n in lumped.CYTOSOL_TRANSPORT[s]) / detailed.CYTO['V_c']
         assert d - transport == pytest.approx(net[s], rel=1e-9, abs=1e-15), s
-    ttl = open(os.path.join(REPO, 'modules', 'cell', lumped.CYTOSOL[0], 'versions', lumped.CYTOSOL[1],
-                            f'{lumped.CYTOSOL[0]}_{lumped.CYTOSOL[1]}_bondgraph.ttl')).read()
-    got = _bg_rdf_rates(ttl, bg.temperature)
-    scale = max(abs(x) for x in net.values())
-    assert max(abs(got[s] - net[s] * detailed.CYTO['V_c']) for s in net) <= 1e-9 * scale * detailed.CYTO['V_c']
+    got = _celldl_rates(_document('energy_metabolism_adaptive')[1])
+    stores = {s.name for s in bg.species if not s.boundary}
+    assert set(got) == stores
+    scale = max(abs(net[s]) for s in stores)
+    assert max(abs(got[s] - net[s] * detailed.CYTO['V_c']) for s in stores) <= 1e-9 * scale * detailed.CYTO['V_c']
 
 
 def test_the_lumped_cytosols_affinities_are_its_bond_graphs(cytosol_point):
@@ -515,15 +611,10 @@ def _cytosol_affinities():
 
 
 def test_cyclic_pathways_are_drawn_as_rings(built):
-    """The diagram draws the longest cycle of reactions linked by their own intermediates as a ring, from its earliest
-    reaction: the TCA cycle from citrate synthase, the glycogen store's pyrophosphorylase, synthase and phosphorylase;
+    """The CellDL layout (tools/celldl.py) draws the longest cycle of reactions linked by their own intermediates as a
+    ring, from its earliest reaction: the TCA cycle from citrate synthase, the glycogen store's pyrophosphorylase, synthase and phosphorylase;
     glycolysis' NAD+/NADH loop is a cofactor's and not a ring, and the lumped cytosol has none."""
     assert built['mitochondrion'][0].cycle() == ['CS', 'ACO', 'IDH', 'OGDH', 'SCS', 'CII', 'FUM', 'MDH']
     assert built['glycogen'][0].cycle() == ['GLGC', 'GLGA', 'GLGP']
     assert built['glycolysis'][0].cycle() == [] and built['gluconeogenesis'][0].cycle() == []
     assert lumped.cytosol_graph().cycle() == []
-    ns = '{http://www.w3.org/2000/svg}'
-    for module, rings in (('mitochondrion', 1), ('glycolysis', 0)):
-        svg = ET.parse(os.path.join(REPO, 'modules', 'cell', module, 'versions', VERSION,
-                                    f'{module}_{VERSION}_bondgraph.svg')).getroot()
-        assert sum(c.get('class') == 'cycle' for c in svg.iter(ns + 'circle')) == rings

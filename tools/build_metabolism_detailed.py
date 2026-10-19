@@ -22,8 +22,8 @@ Module versions (all detailed_ArgusUNPUBLISHED_v01):
   cell/gluconeogenesis   the gluconeogenic bypasses (fructose 1,6-bisphosphatase, glucose 6-phosphatase) and glycerol's
                          way in (glycerol kinase, glycerol 3-phosphate dehydrogenase), in a respiring cytosol
 
-Each version also gets <module>_<version>_bondgraph.ttl (BG-RDF) and _bondgraph.svg (a CellDL-style diagram carrying
-that RDF). tools/build_bondgraph_lumped.py writes the same for lumped modules.
+Each version's bond graph is a CellDL document, <module>_<version>_bondgraph.svg, with its BG-RDF also in
+_bondgraph.ttl (tools/build_celldl.py; the lumped cytosol's through tools/build_bondgraph_lumped.py).
 
 These modules change nothing in the game's cell: they are references to test the lumped ones against
 (tests/test_metabolism_detailed.py).
@@ -306,7 +306,7 @@ def build_glycolysis():
         'cycle inside (GAPDH makes NADH, LDH uses it). Glucose, lactate, ATP, ADP, Pi, H+ and water are chemostats on '
         'the cytosol_metabolites port, which reports each one\'s net production. Compared against the lumped glycolysis '
         'of energy_metabolism adaptive (two steps) in tests/test_metabolism_detailed.py. Its bond graph is in '
-        f'glycolysis_{VERSION}_bondgraph.ttl (BG-RDF) and drawn in glycolysis_{VERSION}_bondgraph.svg.')
+        f'glycolysis_{VERSION}_bondgraph.svg (a CellDL document; its BG-RDF in _bondgraph.ttl).')
     write_version('cell', 'glycolysis', 'glycolysis_detailed', variables, eqs,
                   {'required_citations': ['argus2026unpublished'], 'entrance_ports': [], 'exit_ports': [],
                    'general_ports': ports, 'roles': roles},
@@ -330,12 +330,6 @@ def build_glycolysis():
                                  'time_budget': 10}},
                   {'reviewed': False, 'notes': notes},
                   ['argus2026unpublished', 'bennett2009absolute'], VERSION)
-    d = os.path.join(REPO, 'modules', 'cell', 'glycolysis', 'versions', VERSION)
-    rdf = bg.bg_rdf(GLY_REST, kappa, CYTO['V_c'])
-    with open(os.path.join(d, f'glycolysis_{VERSION}_bondgraph.ttl'), 'w') as f:
-        f.write(rdf)
-    with open(os.path.join(d, f'glycolysis_{VERSION}_bondgraph.svg'), 'w') as f:
-        f.write(bg.svg(rdf))
     print(f'glycolysis: J_rest {J_REST:.5f} mM/s; fit residual {bg.fit_residual:.2e} J/mol; rest ' +
           ', '.join(f'{k} {GLY_REST[k]:.3g}' for k in ('F6P', 'DHAP', 'GAP', 'BPG13', 'PG3', 'PG2', 'PEP')) + ' mM')
     for r in bg.reactions:
@@ -544,8 +538,8 @@ def build_mitochondrion():
         '11.25 ATP are exported (P/O 2.25; the leak takes 9% of the pumped protons). Pyruvate, phosphate, H+, ATP, ADP, '
         'O2, CO2 and water are chemostats on the cytosol_metabolites port. Compared against energy_metabolism '
         'mitochondrial in tests/test_metabolism_detailed.py. Its bond graph is in '
-        f'mitochondrion_{VERSION}_bondgraph.ttl (BG-RDF; psi_m folded into the stores\' K) and drawn in '
-        f'mitochondrion_{VERSION}_bondgraph.svg.')
+        f'mitochondrion_{VERSION}_bondgraph.svg (a CellDL document; its BG-RDF in _bondgraph.ttl, psi_m at rest '
+        'folded into it).')
     write_version('cell', 'mitochondrion', 'mitochondrion_detailed', variables, eqs,
                   {'required_citations': ['argus2026unpublished'], 'entrance_ports': [], 'exit_ports': [],
                    'general_ports': ports, 'roles': roles},
@@ -572,12 +566,6 @@ def build_mitochondrion():
                                  'solve_ivp': ['BDF', 'LSODA'], 'time_budget': 10}},
                   {'reviewed': False, 'notes': notes},
                   ['argus2026unpublished'], VERSION)
-    d = os.path.join(REPO, 'modules', 'cell', 'mitochondrion', 'versions', VERSION)
-    rdf = bg.bg_rdf(rest, kappa, MITO['V_c'])
-    with open(os.path.join(d, f'mitochondrion_{VERSION}_bondgraph.ttl'), 'w') as f:
-        f.write(rdf)
-    with open(os.path.join(d, f'mitochondrion_{VERSION}_bondgraph.svg'), 'w') as f:
-        f.write(bg.svg(rdf))
     print(f'mitochondrion: J_pyr {J_PYR:.5f} mM/s (O2 {O2_REST:.4f}); fit residual {bg.fit_residual:.2e} J/mol; rest ' +
           ', '.join(f'{k} {rest[k]:.3g}' for k in MITO_SOLVED) + ' mM')
     for r in bg.reactions:
@@ -712,7 +700,7 @@ def build_glycogen():
         'phosphorylase rates, saturating at the lumped maxima. Unlike the lumped store it has no ceiling (glycogen\'s '
         'size is limited by branching and particle structure, not modelled). Compared against energy_metabolism adaptive '
         'in tests/test_metabolism_detailed.py; its bond graph is in '
-        f'glycogen_{VERSION}_bondgraph.ttl (BG-RDF) and drawn in glycogen_{VERSION}_bondgraph.svg.')
+        f'glycogen_{VERSION}_bondgraph.svg (a CellDL document; its BG-RDF in _bondgraph.ttl).')
     write_version('cell', 'glycogen', 'glycogen_detailed', variables, bg.equations(),
                   {'required_citations': ['argus2026unpublished'], 'entrance_ports': [], 'exit_ports': [],
                    'general_ports': [{'port_type': 'cytosol_metabolites',
@@ -734,7 +722,6 @@ def build_glycogen():
                    'stability': {'supported': [{'solver': 'CVODE_myokit', 'rtol': 1e-6, 'atol': 1e-9}], 't_end': 10.0,
                                  'time_budget': 10}},
                   {'reviewed': False, 'notes': notes}, ['argus2026unpublished'], VERSION)
-    _write_bond_graph(bg, 'glycogen', rest, kappa, CYTO['V_c'])
     _report('glycogen', bg, kappa, gibbs, f'store {V_STORE:.5f}, phosphorylase {V_MOB:.5f} mM/s; G1P {rest["G1P"]:.3g} mM')
     return bg, kappa
 
@@ -837,7 +824,7 @@ def build_gluconeogenesis():
         'placeholder concentrations, to a respiring (liver-like) cytosol at 37 C making glucose at a placeholder rate: '
         'the dehydrogenase can carry glycerol to DHAP only where NADH/NAD+ is low (about 1/1000 here); at the '
         'fermenter\'s NADH/NAD+ (1/30) it runs the other way (tests/test_metabolism_detailed.py). Its bond graph is in '
-        f'gluconeogenesis_{VERSION}_bondgraph.ttl (BG-RDF) and drawn in gluconeogenesis_{VERSION}_bondgraph.svg.')
+        f'gluconeogenesis_{VERSION}_bondgraph.svg (a CellDL document; its BG-RDF in _bondgraph.ttl).')
     write_version('cell', 'gluconeogenesis', 'gluconeogenesis_detailed', variables, bg.equations(),
                   {'required_citations': ['argus2026unpublished'], 'entrance_ports': [], 'exit_ports': [],
                    'general_ports': [{'port_type': 'cytosol_metabolites',
@@ -860,18 +847,8 @@ def build_gluconeogenesis():
                    'stability': {'supported': [{'solver': 'CVODE_myokit', 'rtol': 1e-6, 'atol': 1e-9}], 't_end': 10.0,
                                  'time_budget': 10}},
                   {'reviewed': False, 'notes': notes}, ['argus2026unpublished'], VERSION)
-    _write_bond_graph(bg, 'gluconeogenesis', rest, kappa, MITO['V_c'])
     _report('gluconeogenesis', bg, kappa, gibbs, f'Gly3P {rest["Gly3P"]:.3g} mM')
     return bg, kappa
-
-
-def _write_bond_graph(bg, module, rest, kappa, volume):
-    d = os.path.join(REPO, 'modules', 'cell', module, 'versions', VERSION)
-    rdf = bg.bg_rdf(rest, kappa, volume)
-    with open(os.path.join(d, f'{module}_{VERSION}_bondgraph.ttl'), 'w') as f:
-        f.write(rdf)
-    with open(os.path.join(d, f'{module}_{VERSION}_bondgraph.svg'), 'w') as f:
-        f.write(bg.svg(rdf))
 
 
 def _report(module, bg, kappa, gibbs, line):

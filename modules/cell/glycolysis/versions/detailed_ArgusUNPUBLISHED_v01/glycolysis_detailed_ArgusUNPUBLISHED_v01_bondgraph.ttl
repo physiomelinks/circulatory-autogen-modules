@@ -1,195 +1,587 @@
+@prefix : <#> .
 @prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
 @prefix cdt: <https://w3id.org/cdt/> .
+@prefix celldl: <http://celldl.org/ontologies/celldl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix tpl: <https://bg-rdf.org/templates/> .
+@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .
 
-@prefix : <#> .
+# Detailed glycolysis: written by tools/celldl.py (circulatory-autogen-modules) from the module's bond graph
+# PK: activation by F16BP folded into kappa (x77) at the export concentrations
 
-# Detailed glycolysis: written by tools/bondgraph.py from the module's description (circulatory-autogen-modules)
-# T = 293.15 K; volume 6.28319e-18 m3; stores q = C V, K = exp(mu0/RT) / (c_std V)
+<> a celldl:Document, bgf:BondgraphModel ;
+  owl:versionInfo "1.0" ;
+  bgf:usesTemplate tpl:chemical.ttl ;
+  bgf:hasBondElement :q_G6P, :q_F6P, :q_F16BP, :q_DHAP, :q_GAP, :q_BPG13, :q_PG3, :q_PG2, :q_PEP, :q_Pyr, :q_NAD, :q_NADH, :Re_HK, :Se_glc_HK, :Se_ATP_HK, :Se_ADP_HK, :Se_H_HK, :Re_PGI, :Re_PFK, :Se_ATP_PFK, :Se_ADP_PFK, :Se_H_PFK, :Re_ALD, :Re_TPI, :Re_GAPDH, :Se_Pi_GAPDH, :Se_H_GAPDH, :Re_PGK, :Se_ADP_PGK, :Se_ATP_PGK, :Re_PGM, :Re_ENO, :Se_H2O_ENO, :Re_PK, :Se_ADP_PK, :Se_H_PK, :Se_ATP_PK, :Re_LDH, :Se_H_LDH, :Se_lac_LDH .
+:q_G6P a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "G6P" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "6.28318530717959e-18 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.30263652615493e+17 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:61548> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:glycolysis
-    a bgf:BondgraphModel ;
-    bgf:usesTemplate tpl:chemical.ttl ;
-    bgf:hasBondElement :q_glc, :q_G6P, :q_F6P, :q_F16BP, :q_DHAP, :q_GAP, :q_BPG13, :q_PG3, :q_PG2, :q_PEP, :q_Pyr, :q_lac, :q_NAD, :q_NADH, :q_ATP, :q_ADP, :q_Pi, :q_H, :q_H2O, :Re_HK, :Re_PGI, :Re_PFK, :Re_ALD, :Re_TPI, :Re_GAPDH, :Re_PGK, :Re_PGM, :Re_ENO, :Re_PK, :Re_LDH .
+:q_F6P a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "F6P" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "3.12491687015771e-18 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.46685293116202e+18 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57634> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_glc  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.256637061435917e-20 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.858675646308115e+22 mol-1"^^cdt:ucum ] .
+:q_F16BP a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "F16BP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "9.55044166691297e-17 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "160736295674919 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:32966> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_G6P
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "6.283185307179586e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.302636526154929e+17 mol-1"^^cdt:ucum ] .
+:q_DHAP a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "DHAP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "2.73483044102394e-17 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.53041827509376e+15 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57642> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_F6P
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.124916870157707e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.466852931162024e+18 mol-1"^^cdt:ucum ] .
+:q_GAP a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "GAP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "1.25933703686333e-18 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.82861261217051e+16 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:59776> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_F16BP
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "9.550441666912970e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.607362956749191e+14 mol-1"^^cdt:ucum ] .
+:q_BPG13 a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "BPG13" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "1.15489979271686e-19 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.26433196169416e+18 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57604> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_DHAP
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "2.734830441023944e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.530418275093756e+15 mol-1"^^cdt:ucum ] .
+:q_PG3 a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "PG3" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "1.33157688851393e-17 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.09218359071779e+17 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:58272> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_GAP
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.259337036863327e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9.828612612170514e+16 mol-1"^^cdt:ucum ] .
+:q_PG2 a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "PG2" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "2.18744649361057e-18 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.64186349348576e+17 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:58289> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_BPG13
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.154899792716864e-19 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.264331961694160e+18 mol-1"^^cdt:ucum ] .
+:q_PEP a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "PEP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "1.04418629006752e-18 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.85309247207154e+20 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:58702> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_PG3
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.331576888513929e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.092183590717791e+17 mol-1"^^cdt:ucum ] .
+:q_Pyr a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Pyr" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "2.32477856365645e-18 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.26805441691379e+16 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:15361> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_PG2
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "2.187446493610571e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "6.641863493485760e+17 mol-1"^^cdt:ucum ] .
+:q_NAD a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "NAD" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "1.60221225333079e-17 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.15775850271254e+15 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57540> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_PEP
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.044186290067518e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.853092472071541e+20 mol-1"^^cdt:ucum ] .
+:q_NADH a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "NADH" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "5.24017654618778e-19 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.66401405676308e+19 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57945> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_Pyr
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "2.324778563656447e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.268054416913792e+16 mol-1"^^cdt:ucum ] .
+:Re_HK a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "HK" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.83201624207953e-21 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "8003.01732254288 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:17825> .
 
-:q_lac  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.695851609969200e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.754171173104319e+14 mol-1"^^cdt:ucum ] .
+:Se_glc_HK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "glc" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "14063.0390259992 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:4167> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_NAD
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.602212253330794e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "7.157758502712536e+15 mol-1"^^cdt:ucum ] .
+:Se_glc_HK.Re_HK a celldl:Connection ;
+  celldl:hasSource :Se_glc_HK ;
+  celldl:hasTarget :Re_HK ;
+  bgf:hasSource :Se_glc_HK ;
+  bgf:hasTarget :Re_HK .
 
-:q_NADH
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "5.240176546187776e-19 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.664014056763082e+19 mol-1"^^cdt:ucum ] .
+:Se_ATP_HK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ATP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-901.57954668254 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_ATP  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "6.031857894892403e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.168719333450913e+16 mol-1"^^cdt:ucum ] .
+:Se_ATP_HK.Re_HK a celldl:Connection ;
+  celldl:hasSource :Se_ATP_HK ;
+  celldl:hasTarget :Re_HK ;
+  bgf:hasSource :Se_ATP_HK ;
+  bgf:hasTarget :Re_HK .
 
-:q_ADP  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.518583772020569e-18 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.031538159463822e+17 mol-1"^^cdt:ucum ] .
+:Se_ADP_HK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ADP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "901.579546682529 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_Pi  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "6.283185307179586e-17 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.388014458706853e+18 mol-1"^^cdt:ucum ] .
+:Re_HK.Se_ADP_HK a celldl:Connection ;
+  celldl:hasSource :Re_HK ;
+  celldl:hasTarget :Se_ADP_HK ;
+  bgf:hasSource :Re_HK ;
+  bgf:hasTarget :Se_ADP_HK .
 
-:q_H  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "1.578264791976477e-22 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.242134961438856e+21 mol-1"^^cdt:ucum ] .
+:Se_H_HK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-4201.85436785455 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:q_H2O  # a chemostat of the module (held by its port), here a store
-    a bgf:ChemicalStorageNode ;
-    bgf:hasValue "3.487167845484670e-13 mol"^^cdt:ucum ;
-    bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.151022446828791e+10 mol-1"^^cdt:ucum ] .
+:Re_HK.Se_H_HK a celldl:Connection ;
+  celldl:hasSource :Re_HK ;
+  celldl:hasTarget :Se_H_HK ;
+  bgf:hasSource :Re_HK ;
+  bgf:hasTarget :Se_H_HK .
 
-:Re_HK  # saturation sigma 8003: folded into kappa at the export's concentrations
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_HK" ; bgf:hasValue "2.774491195969944e-21 mol/s"^^cdt:ucum ] .
+:Re_HK.q_G6P a celldl:Connection ;
+  celldl:hasSource :Re_HK ;
+  celldl:hasTarget :q_G6P ;
+  bgf:hasSource :Re_HK ;
+  bgf:hasTarget :q_G6P .
 
-:Re_PGI
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGI" ; bgf:hasValue "9.879158174630710e-17 mol/s"^^cdt:ucum ] .
+:Re_PGI a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PGI" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "9.87915817463071e-17 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:11816> .
 
-:Re_PFK  # saturation sigma 158.1: folded into kappa at the export's concentrations
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PFK" ; bgf:hasValue "1.404647175512461e-19 mol/s"^^cdt:ucum ] .
+:q_G6P.Re_PGI a celldl:Connection ;
+  celldl:hasSource :q_G6P ;
+  celldl:hasTarget :Re_PGI ;
+  bgf:hasSource :q_G6P ;
+  bgf:hasTarget :Re_PGI .
 
-:Re_ALD
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_ALD" ; bgf:hasValue "2.952854722909308e-14 mol/s"^^cdt:ucum ] .
+:Re_PGI.q_F6P a celldl:Connection ;
+  celldl:hasSource :Re_PGI ;
+  celldl:hasTarget :q_F6P ;
+  bgf:hasSource :Re_PGI ;
+  bgf:hasTarget :q_F6P .
 
-:Re_TPI
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_TPI" ; bgf:hasValue "3.658565094257288e-15 mol/s"^^cdt:ucum ] .
+:Re_PFK a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PFK" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.43339083906712e-19 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "158.119296045145 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:16109> .
 
-:Re_GAPDH
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_GAPDH" ; bgf:hasValue "7.323258176627448e-16 mol/s"^^cdt:ucum ] .
+:Se_ATP_PFK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ATP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-901.57954668254 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:Re_PGK
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGK" ; bgf:hasValue "8.833885186582484e-16 mol/s"^^cdt:ucum ] .
+:Se_ATP_PFK.Re_PFK a celldl:Connection ;
+  celldl:hasSource :Se_ATP_PFK ;
+  celldl:hasTarget :Re_PFK ;
+  bgf:hasSource :Se_ATP_PFK ;
+  bgf:hasTarget :Re_PFK .
 
-:Re_PGM
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PGM" ; bgf:hasValue "6.233724318221831e-16 mol/s"^^cdt:ucum ] .
+:Se_ADP_PFK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ADP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "901.579546682529 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:Re_ENO
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_ENO" ; bgf:hasValue "6.239964282453219e-16 mol/s"^^cdt:ucum ] .
+:Re_PFK.Se_ADP_PFK a celldl:Connection ;
+  celldl:hasSource :Re_PFK ;
+  celldl:hasTarget :Se_ADP_PFK ;
+  bgf:hasSource :Re_PFK ;
+  bgf:hasTarget :Se_ADP_PFK .
 
-:Re_PK  # saturation sigma 2636 and activation by F16BP (K_a 0.2 mM): folded into kappa at the export's concentrations
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_PK" ; bgf:hasValue "1.685446006951417e-20 mol/s"^^cdt:ucum ] .
+:Se_H_PFK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-4201.85436785455 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
 
-:Re_LDH  # saturation sigma 2.462: folded into kappa at the export's concentrations
-    a bgf:ChemicalReactionNode ;
-    bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasSymbol "kappa_LDH" ; bgf:hasValue "1.804430090722083e-17 mol/s"^^cdt:ucum ] .
+:Re_PFK.Se_H_PFK a celldl:Connection ;
+  celldl:hasSource :Re_PFK ;
+  celldl:hasTarget :Se_H_PFK ;
+  bgf:hasSource :Re_PFK ;
+  bgf:hasTarget :Se_H_PFK .
 
-:q_glc.Re_HK bgf:hasSource :q_glc ; bgf:hasTarget :Re_HK .
-:q_ATP.Re_HK bgf:hasSource :q_ATP ; bgf:hasTarget :Re_HK .
-:Re_HK.q_G6P bgf:hasSource :Re_HK ; bgf:hasTarget :q_G6P .
-:Re_HK.q_ADP bgf:hasSource :Re_HK ; bgf:hasTarget :q_ADP .
-:Re_HK.q_H bgf:hasSource :Re_HK ; bgf:hasTarget :q_H .
-:q_G6P.Re_PGI bgf:hasSource :q_G6P ; bgf:hasTarget :Re_PGI .
-:Re_PGI.q_F6P bgf:hasSource :Re_PGI ; bgf:hasTarget :q_F6P .
-:q_F6P.Re_PFK bgf:hasSource :q_F6P ; bgf:hasTarget :Re_PFK .
-:q_ATP.Re_PFK bgf:hasSource :q_ATP ; bgf:hasTarget :Re_PFK .
-:Re_PFK.q_F16BP bgf:hasSource :Re_PFK ; bgf:hasTarget :q_F16BP .
-:Re_PFK.q_ADP bgf:hasSource :Re_PFK ; bgf:hasTarget :q_ADP .
-:Re_PFK.q_H bgf:hasSource :Re_PFK ; bgf:hasTarget :q_H .
-:q_F16BP.Re_ALD bgf:hasSource :q_F16BP ; bgf:hasTarget :Re_ALD .
-:Re_ALD.q_DHAP bgf:hasSource :Re_ALD ; bgf:hasTarget :q_DHAP .
-:Re_ALD.q_GAP bgf:hasSource :Re_ALD ; bgf:hasTarget :q_GAP .
-:q_DHAP.Re_TPI bgf:hasSource :q_DHAP ; bgf:hasTarget :Re_TPI .
-:Re_TPI.q_GAP bgf:hasSource :Re_TPI ; bgf:hasTarget :q_GAP .
-:q_GAP.Re_GAPDH bgf:hasSource :q_GAP ; bgf:hasTarget :Re_GAPDH .
-:q_Pi.Re_GAPDH bgf:hasSource :q_Pi ; bgf:hasTarget :Re_GAPDH .
-:q_NAD.Re_GAPDH bgf:hasSource :q_NAD ; bgf:hasTarget :Re_GAPDH .
-:Re_GAPDH.q_BPG13 bgf:hasSource :Re_GAPDH ; bgf:hasTarget :q_BPG13 .
-:Re_GAPDH.q_NADH bgf:hasSource :Re_GAPDH ; bgf:hasTarget :q_NADH .
-:Re_GAPDH.q_H bgf:hasSource :Re_GAPDH ; bgf:hasTarget :q_H .
-:q_BPG13.Re_PGK bgf:hasSource :q_BPG13 ; bgf:hasTarget :Re_PGK .
-:q_ADP.Re_PGK bgf:hasSource :q_ADP ; bgf:hasTarget :Re_PGK .
-:Re_PGK.q_PG3 bgf:hasSource :Re_PGK ; bgf:hasTarget :q_PG3 .
-:Re_PGK.q_ATP bgf:hasSource :Re_PGK ; bgf:hasTarget :q_ATP .
-:q_PG3.Re_PGM bgf:hasSource :q_PG3 ; bgf:hasTarget :Re_PGM .
-:Re_PGM.q_PG2 bgf:hasSource :Re_PGM ; bgf:hasTarget :q_PG2 .
-:q_PG2.Re_ENO bgf:hasSource :q_PG2 ; bgf:hasTarget :Re_ENO .
-:Re_ENO.q_PEP bgf:hasSource :Re_ENO ; bgf:hasTarget :q_PEP .
-:Re_ENO.q_H2O bgf:hasSource :Re_ENO ; bgf:hasTarget :q_H2O .
-:q_PEP.Re_PK bgf:hasSource :q_PEP ; bgf:hasTarget :Re_PK .
-:q_ADP.Re_PK bgf:hasSource :q_ADP ; bgf:hasTarget :Re_PK .
-:q_H.Re_PK bgf:hasSource :q_H ; bgf:hasTarget :Re_PK .
-:Re_PK.q_Pyr bgf:hasSource :Re_PK ; bgf:hasTarget :q_Pyr .
-:Re_PK.q_ATP bgf:hasSource :Re_PK ; bgf:hasTarget :q_ATP .
-:q_Pyr.Re_LDH bgf:hasSource :q_Pyr ; bgf:hasTarget :Re_LDH .
-:q_NADH.Re_LDH bgf:hasSource :q_NADH ; bgf:hasTarget :Re_LDH .
-:q_H.Re_LDH bgf:hasSource :q_H ; bgf:hasTarget :Re_LDH .
-:Re_LDH.q_lac bgf:hasSource :Re_LDH ; bgf:hasTarget :q_lac .
-:Re_LDH.q_NAD bgf:hasSource :Re_LDH ; bgf:hasTarget :q_NAD .
+:q_F6P.Re_PFK a celldl:Connection ;
+  celldl:hasSource :q_F6P ;
+  celldl:hasTarget :Re_PFK ;
+  bgf:hasSource :q_F6P ;
+  bgf:hasTarget :Re_PFK .
+
+:Re_PFK.q_F16BP a celldl:Connection ;
+  celldl:hasSource :Re_PFK ;
+  celldl:hasTarget :q_F16BP ;
+  bgf:hasSource :Re_PFK ;
+  bgf:hasTarget :q_F16BP .
+
+:Re_ALD a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "ALD" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.95285472290931e-14 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:14729> .
+
+:q_F16BP.Re_ALD a celldl:Connection ;
+  celldl:hasSource :q_F16BP ;
+  celldl:hasTarget :Re_ALD ;
+  bgf:hasSource :q_F16BP ;
+  bgf:hasTarget :Re_ALD .
+
+:Re_ALD.q_DHAP a celldl:Connection ;
+  celldl:hasSource :Re_ALD ;
+  celldl:hasTarget :q_DHAP ;
+  bgf:hasSource :Re_ALD ;
+  bgf:hasTarget :q_DHAP .
+
+:Re_ALD.q_GAP a celldl:Connection ;
+  celldl:hasSource :Re_ALD ;
+  celldl:hasTarget :q_GAP ;
+  bgf:hasSource :Re_ALD ;
+  bgf:hasTarget :q_GAP .
+
+:Re_TPI a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "TPI" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "3.65856509425729e-15 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:18585> .
+
+:q_DHAP.Re_TPI a celldl:Connection ;
+  celldl:hasSource :q_DHAP ;
+  celldl:hasTarget :Re_TPI ;
+  bgf:hasSource :q_DHAP ;
+  bgf:hasTarget :Re_TPI .
+
+:Re_TPI.q_GAP a celldl:Connection ;
+  celldl:hasSource :Re_TPI ;
+  celldl:hasTarget :q_GAP ;
+  bgf:hasSource :Re_TPI ;
+  bgf:hasTarget :q_GAP .
+
+:Re_GAPDH a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "GAPDH" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "7.32325817662745e-16 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:10300> .
+
+:Se_Pi_GAPDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "Pi" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "11522.6358153518 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_Pi_GAPDH.Re_GAPDH a celldl:Connection ;
+  celldl:hasSource :Se_Pi_GAPDH ;
+  celldl:hasTarget :Re_GAPDH ;
+  bgf:hasSource :Se_Pi_GAPDH ;
+  bgf:hasTarget :Re_GAPDH .
+
+:Se_H_GAPDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-4201.85436785455 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_GAPDH.Se_H_GAPDH a celldl:Connection ;
+  celldl:hasSource :Re_GAPDH ;
+  celldl:hasTarget :Se_H_GAPDH ;
+  bgf:hasSource :Re_GAPDH ;
+  bgf:hasTarget :Se_H_GAPDH .
+
+:q_GAP.Re_GAPDH a celldl:Connection ;
+  celldl:hasSource :q_GAP ;
+  celldl:hasTarget :Re_GAPDH ;
+  bgf:hasSource :q_GAP ;
+  bgf:hasTarget :Re_GAPDH .
+
+:q_NAD.Re_GAPDH a celldl:Connection ;
+  celldl:hasSource :q_NAD ;
+  celldl:hasTarget :Re_GAPDH ;
+  bgf:hasSource :q_NAD ;
+  bgf:hasTarget :Re_GAPDH .
+
+:Re_GAPDH.q_BPG13 a celldl:Connection ;
+  celldl:hasSource :Re_GAPDH ;
+  celldl:hasTarget :q_BPG13 ;
+  bgf:hasSource :Re_GAPDH ;
+  bgf:hasTarget :q_BPG13 .
+
+:Re_GAPDH.q_NADH a celldl:Connection ;
+  celldl:hasSource :Re_GAPDH ;
+  celldl:hasTarget :q_NADH ;
+  bgf:hasSource :Re_GAPDH ;
+  bgf:hasTarget :q_NADH .
+
+:Re_PGK a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PGK" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "8.83388518658248e-16 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:14801> .
+
+:Se_ADP_PGK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ADP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "901.579546682529 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_ADP_PGK.Re_PGK a celldl:Connection ;
+  celldl:hasSource :Se_ADP_PGK ;
+  celldl:hasTarget :Re_PGK ;
+  bgf:hasSource :Se_ADP_PGK ;
+  bgf:hasTarget :Re_PGK .
+
+:Se_ATP_PGK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ATP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-901.57954668254 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_PGK.Se_ATP_PGK a celldl:Connection ;
+  celldl:hasSource :Re_PGK ;
+  celldl:hasTarget :Se_ATP_PGK ;
+  bgf:hasSource :Re_PGK ;
+  bgf:hasTarget :Se_ATP_PGK .
+
+:q_BPG13.Re_PGK a celldl:Connection ;
+  celldl:hasSource :q_BPG13 ;
+  celldl:hasTarget :Re_PGK ;
+  bgf:hasSource :q_BPG13 ;
+  bgf:hasTarget :Re_PGK .
+
+:Re_PGK.q_PG3 a celldl:Connection ;
+  celldl:hasSource :Re_PGK ;
+  celldl:hasTarget :q_PG3 ;
+  bgf:hasSource :Re_PGK ;
+  bgf:hasTarget :q_PG3 .
+
+:Re_PGM a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PGM" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.23372431822183e-16 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:15901> .
+
+:q_PG3.Re_PGM a celldl:Connection ;
+  celldl:hasSource :q_PG3 ;
+  celldl:hasTarget :Re_PGM ;
+  bgf:hasSource :q_PG3 ;
+  bgf:hasTarget :Re_PGM .
+
+:Re_PGM.q_PG2 a celldl:Connection ;
+  celldl:hasSource :Re_PGM ;
+  celldl:hasTarget :q_PG2 ;
+  bgf:hasSource :Re_PGM ;
+  bgf:hasTarget :q_PG2 .
+
+:Re_ENO a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "ENO" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.23996428245322e-16 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:10164> .
+
+:Se_H2O_ENO a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H2O" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-12617.0120781996 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_ENO.Se_H2O_ENO a celldl:Connection ;
+  celldl:hasSource :Re_ENO ;
+  celldl:hasTarget :Se_H2O_ENO ;
+  bgf:hasSource :Re_ENO ;
+  bgf:hasTarget :Se_H2O_ENO .
+
+:q_PG2.Re_ENO a celldl:Connection ;
+  celldl:hasSource :q_PG2 ;
+  celldl:hasTarget :Re_ENO ;
+  bgf:hasSource :q_PG2 ;
+  bgf:hasTarget :Re_ENO .
+
+:Re_ENO.q_PEP a celldl:Connection ;
+  celldl:hasSource :Re_ENO ;
+  celldl:hasTarget :q_PEP ;
+  bgf:hasSource :Re_ENO ;
+  bgf:hasTarget :q_PEP .
+
+:Re_PK a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PK" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.7198699858609e-20 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "2635.62655659001 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:18157> .
+
+:Se_ADP_PK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ADP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "901.579546682529 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_ADP_PK.Re_PK a celldl:Connection ;
+  celldl:hasSource :Se_ADP_PK ;
+  celldl:hasTarget :Re_PK ;
+  bgf:hasSource :Se_ADP_PK ;
+  bgf:hasTarget :Re_PK .
+
+:Se_H_PK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-4201.85436785455 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_H_PK.Re_PK a celldl:Connection ;
+  celldl:hasSource :Se_H_PK ;
+  celldl:hasTarget :Re_PK ;
+  bgf:hasSource :Se_H_PK ;
+  bgf:hasTarget :Re_PK .
+
+:Se_ATP_PK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ATP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-901.57954668254 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_PK.Se_ATP_PK a celldl:Connection ;
+  celldl:hasSource :Re_PK ;
+  celldl:hasTarget :Se_ATP_PK ;
+  bgf:hasSource :Re_PK ;
+  bgf:hasTarget :Se_ATP_PK .
+
+:q_PEP.Re_PK a celldl:Connection ;
+  celldl:hasSource :q_PEP ;
+  celldl:hasTarget :Re_PK ;
+  bgf:hasSource :q_PEP ;
+  bgf:hasTarget :Re_PK .
+
+:Re_PK.q_Pyr a celldl:Connection ;
+  celldl:hasSource :Re_PK ;
+  celldl:hasTarget :q_Pyr ;
+  bgf:hasSource :Re_PK ;
+  bgf:hasTarget :q_Pyr .
+
+:Re_LDH a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "LDH" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.84148080132109e-17 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "2.46157060413831 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:23444> .
+
+:Se_H_LDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-4201.85436785455 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_H_LDH.Re_LDH a celldl:Connection ;
+  celldl:hasSource :Se_H_LDH ;
+  celldl:hasTarget :Re_LDH ;
+  bgf:hasSource :Se_H_LDH ;
+  bgf:hasTarget :Re_LDH .
+
+:Se_lac_LDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "lac" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-17107.1037623445 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:16651> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_LDH.Se_lac_LDH a celldl:Connection ;
+  celldl:hasSource :Re_LDH ;
+  celldl:hasTarget :Se_lac_LDH ;
+  bgf:hasSource :Re_LDH ;
+  bgf:hasTarget :Se_lac_LDH .
+
+:q_Pyr.Re_LDH a celldl:Connection ;
+  celldl:hasSource :q_Pyr ;
+  celldl:hasTarget :Re_LDH ;
+  bgf:hasSource :q_Pyr ;
+  bgf:hasTarget :Re_LDH .
+
+:q_NADH.Re_LDH a celldl:Connection ;
+  celldl:hasSource :q_NADH ;
+  celldl:hasTarget :Re_LDH ;
+  bgf:hasSource :q_NADH ;
+  bgf:hasTarget :Re_LDH .
+
+:Re_LDH.q_NAD a celldl:Connection ;
+  celldl:hasSource :Re_LDH ;
+  celldl:hasTarget :q_NAD ;
+  bgf:hasSource :Re_LDH ;
+  bgf:hasTarget :q_NAD .

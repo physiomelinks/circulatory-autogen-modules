@@ -1,9 +1,10 @@
 """Bond-graph descriptions of existing (lumped) modules: their stoichiometry and standard Gibbs energies as a bond graph
-(tools/bondgraph.py), written next to the version as its BG-RDF and diagram. The module's own kinetics are not mass
-action, so the BG-RDF's rate constants are the module's rates at an export point (each reaction's flux over its
-Pf - Pr there): the same flows there, mass action away from it. The module's equations are unchanged.
+(tools/bondgraph.py), whose CellDL document tools/build_celldl.py writes next to the version. The module's own
+kinetics are not mass action, so the bond graph's rate constants are the module's rates at an export point (each
+reaction's flux over its Pf - Pr there): the same flows there, mass action away from it. The module's equations are
+unchanged.
 
-    python tools/build_bondgraph_lumped.py
+    python tools/build_bondgraph_lumped.py      (prints the export point's rates)
 
   cell/energy_metabolism/adaptive_ArgusUNPUBLISHED_v01   the fermenter's cytosol: hexokinase, the lower glycolysis,
                                                          ATP hydrolysis, the glycogen store and phosphorylase, matrix
@@ -21,7 +22,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bondgraph import BondGraph, Reaction, Species  # noqa: E402
 from build_metabolism_detailed import CYTO, GLYC_REST_C  # noqa: E402
-from module_writer import REPO  # noqa: E402
 
 CYTOSOL = ('energy_metabolism', 'adaptive_ArgusUNPUBLISHED_v01')
 # the export point: the module's default, with the store and the matrix allocated and some glycogen
@@ -91,17 +91,10 @@ def build_cytosol():
     conc = {k: float(x) for k, x in conc.items()}
     conc['mx'] = 1.0   # exported: its activity does not enter (the module's export is irreversible)
     kappa = bg.calibrate(conc, v)
-    d = os.path.join(REPO, 'modules', 'cell', CYTOSOL[0], 'versions', CYTOSOL[1])
-    stem = f'{CYTOSOL[0]}_{CYTOSOL[1]}_bondgraph'
-    rdf = bg.bg_rdf(conc, kappa, CYTO['V_c'])
-    with open(os.path.join(d, f'{stem}.ttl'), 'w') as f:
-        f.write(rdf)
-    with open(os.path.join(d, f'{stem}.svg'), 'w') as f:
-        f.write(bg.svg(rdf))
     print(f'{CYTOSOL[0]} {CYTOSOL[1]}: ' + ', '.join(f'{r} {x:.4g}' for r, x in v.items()) + ' mM/s at the export point')
     return bg, kappa, v, conc
 
 
 if __name__ == '__main__':
     build_cytosol()
-    print('written')
+    print('done')
