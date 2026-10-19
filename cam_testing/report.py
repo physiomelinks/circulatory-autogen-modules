@@ -21,7 +21,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, module_array, phlynx, ranges, risk
+from cam_testing import bib, bondgraph, checks, module_array, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -29,6 +29,16 @@ from cam_testing.library import LICENCES, load_module_type, module_type_names, s
 from cam_testing.mathml import component_equation_targets, component_equations, component_variables
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
+
+# The apps a version page opens its files in. The CellDL editor and PhLynx take the file in the
+# URL's hash, standard base64 of its bytes, which the page builds when the link is clicked
+# (templates/_open_in.js); CUFLynx takes the archive's absolute URL, percent-encoded, through its
+# cuflynx:// link scheme.
+CELLDL_EDITOR_URL = 'https://finbarargus.github.io/CellDLEditorComponent/'
+CELLDL_OPEN = CELLDL_EDITOR_URL + '?open=celldl#'
+PHLYNX_OPEN = 'https://phlynx.com/?open=omex#'
+CUFLYNX_OPEN = 'cuflynx://open?url='
+PHLYNX_NOT_EXPORTED = 'not exported yet (the PhLynx pipeline, make pipeline, keeps its export with the results)'
 
 
 def __getattr__(name):
@@ -39,6 +49,8 @@ def __getattr__(name):
 
 TEST_TITLES = {
     'review_test': 'Reviewed',
+    'bondgraph_celldl_test': 'Bond graph: opens in CellDL',
+    'bondgraph_reactions_test': 'Bond graph: reactions match Rhea',
     'run_test': 'Run',
     'verification_test_invariants': 'Verification: invariants',
     'verification_test_BC': 'Verification: boundary conditions',
@@ -60,6 +72,7 @@ TEST_SHORT = {
     'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
     'coupled_validation_test': 'Coupled',
+    'bondgraph_celldl_test': 'Opens in CellDL', 'bondgraph_reactions_test': 'Reactions vs Rhea',
 }
 TEST_ABOUT = {
     'review_test': 'Whether the version has been reviewed: its equations, parameter sources (each value traced '
@@ -67,6 +80,15 @@ TEST_ABOUT = {
                    'true). A version not reviewed yet fails this check. It is still published and usable, but '
                    'its values and behaviour are provisional, and CI runs only its quick tests (Run, the '
                    'PhLynx -> CUFLynx pipeline) until it is reviewed, so its other columns show Not run.',
+    'bondgraph_celldl_test': 'The version\'s bond graph (<version>_bondgraph.svg) is a CellDL document the editor '
+                             'opens: Turtle BG-RDF with one bond-graph model, every element and connection drawn and '
+                             'nothing drawn that the RDF lacks, and the same graph as <version>_bondgraph.ttl. With '
+                             'BG_TOOLS set, bg2cellml also makes CellML from it. N/A without a bond graph.',
+    'bondgraph_reactions_test': 'Every reaction annotated with a Rhea reaction (bqbiol:isVersionOf, or bqbiol:hasPart '
+                                'for a lumped one) has Rhea\'s participants (ChEBI terms on its species) and '
+                                'stoichiometry (bond counts), allowing the reverse direction and one common factor. A '
+                                'difference only in H+ or H2O is a warning. Pending while some reactions are not '
+                                'annotated; N/A without a bond graph.',
     'run_test': 'Generates the version alone with libcuflynx (every boundary condition becomes a '
                 'parameter, valued from the default parameterisation; a supermodule is expanded into its submodules, '
                 'and the boundary conditions no internal connection closes become parameters), simulates it, '
@@ -135,7 +157,7 @@ TEST_ABOUT = {
 SUPERMODULE_TESTS = ['supermodule_structure_test', 'supermodule_equivalence_test']
 COUPLED_TESTS = ['coupled_validation_test']
 REPORT_TESTS = (checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
-                + COUPLED_TESTS)
+                + COUPLED_TESTS + bondgraph.BONDGRAPH_TESTS)
 PARAMETERISATION_TESTS = checks.PARAMETERISATION_TESTS
 # the test overview's parameterisation columns: each parameterisation's validation tests and its CUFLynx archive
 PARAM_COLS = [TEST_SHORT[t] for t in PARAMETERISATION_TESTS] + ['CUFLynx archive']
@@ -263,6 +285,8 @@ def parameterisation_context(version, inst):
 
 def not_applicable_reason(version, test):
     '''Why a report column doesn't apply to the version, or None when it does.'''
+    if test in bondgraph.BONDGRAPH_TESTS and not bondgraph.is_bondgraph(version):
+        return bondgraph.NOT_A_BONDGRAPH
     if test in SUPERMODULE_TESTS and not version.is_supermodule:
         return NOT_A_SUPERMODULE
     if test == 'supermodule_equivalence_test' and not (version.spec.get('supermodule') or {}).get('equivalent'):
@@ -905,9 +929,31 @@ def _bc_summary(comp):
     return '; '.join(parts)
 
 
+def open_in_context(version):
+    '''The version page's "Open in" links: {celldl, phlynx, cuflynx}. celldl (a bond graph only) and
+    phlynx are {href: the file relative to the page, open: the app URL its base64 follows}; phlynx is
+    {reason} where PhLynx has no form of the version and {missing} before an export is kept.
+    cuflynx is the URL prefix of the per-parameterisation links.'''
+    celldl = None
+    if bondgraph.is_bondgraph(version):
+        celldl = {'href': os.path.relpath(bondgraph.document_path(version), version.dir).replace(os.sep, '/'),
+                  'open': CELLDL_OPEN}
+    archive = phlynx.archive_path(version)
+    if phlynx._cpp(version):
+        phl = {'reason': phlynx._reason(version)}
+    elif version.is_supermodule:
+        phl = {'reason': phlynx.NO_SUPERMODULE_SUPPORT}
+    elif os.path.isfile(archive):
+        phl = {'href': os.path.relpath(archive, version.dir).replace(os.sep, '/'), 'open': PHLYNX_OPEN}
+    else:
+        phl = {'missing': PHLYNX_NOT_EXPORTED}
+    return {'celldl': celldl, 'phlynx': phl, 'cuflynx': CUFLYNX_OPEN}
+
+
 def version_context(version):
     comp = component_context(version)
     return {
+        'open_in': open_in_context(version),
         'name': version.label, 'key': version.key, 'module_type': version.vessel_type, 'version': version.name,
         'category': version.category, 'location': version.mtype.location, 'reviewed': version.reviewed,
         'components': [comp],
@@ -1077,8 +1123,9 @@ def _href(relpath, page):
 
 
 def assemble_site(names, contexts):
-    '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page and
-    plots; a nested module_type's directory is inside its parent's), as GitHub Pages serves it.'''
+    '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page, plots,
+    bond graph, PhLynx export and parameterisation archives; a nested module_type's directory is inside its
+    parent's), as GitHub Pages serves it.'''
     site_dir = paths.roots().site_dir
     if os.path.isdir(site_dir):
         shutil.rmtree(site_dir)
@@ -1095,6 +1142,12 @@ def assemble_site(names, contexts):
             shutil.copy2(v.html_path, vdest)
             if os.path.isdir(v.plots_dir):
                 shutil.copytree(v.plots_dir, os.path.join(vdest, 'plots'))
+            # the files the page opens in the CellDL editor and PhLynx, at the same relative paths
+            for path in (bondgraph.document_path(v), phlynx.archive_path(v)):
+                if os.path.isfile(path):
+                    fdest = os.path.join(vdest, os.path.relpath(path, v.dir))
+                    os.makedirs(os.path.dirname(fdest), exist_ok=True)
+                    shutil.copy2(path, fdest)
             # the parameterisations' CUFLynx archives, where they have been built (make omex)
             for inst in v.parameterisations():
                 archive = omex_mod.omex_path(v, inst)

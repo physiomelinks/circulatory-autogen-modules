@@ -224,9 +224,29 @@ def compare(cf, lib_t, lib_outputs, tol):
     return rows, unmatched
 
 
+def archive_path(version):
+    '''Where a version's PhLynx export (the .omex PhLynx sends to CUFLynx) is kept, with its other
+    generated results: results/<module_type>_<version>_phlynx.omex. Its report links it ("Open in PhLynx").'''
+    return os.path.join(version.results_dir, f'{version.stem}_phlynx.omex')
+
+
+def keep_archives(components, reports):
+    '''Copies each version's exported .omex (reports from export) to its archive_path, and removes
+    the kept one of a version whose export failed, so the report never links a stale archive.'''
+    for c in components:
+        omex = (reports.get(c.id) or {}).get('omex')
+        path = archive_path(c)
+        if omex and os.path.isfile(omex):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            shutil.copyfile(omex, path)
+        elif os.path.isfile(path):
+            os.remove(path)
+
+
 def run_versions(name, components, solver_info=None, keep_dir=None):
     '''Exports and simulates the given versions (e.g. every version of a module_type); returns
-    {version id: result} and keeps it in <work dir>/phlynx_pipeline.json.'''
+    {version id: result} and keeps it in <work dir>/phlynx_pipeline.json, and each version's export
+    at its archive_path.'''
     work_dir = keep_dir or tempfile.mkdtemp(prefix=f'cam_phlynx_{name}_')
     os.makedirs(work_dir, exist_ok=True)
     jobs, results = [], {}
@@ -238,6 +258,7 @@ def run_versions(name, components, solver_info=None, keep_dir=None):
         except Exception as e:  # noqa: BLE001 - e.g. parameters still TODO
             results[c.id] = {'export': {'ok': False, 'stage': 'job', 'error': f'{type(e).__name__}: {e}'}}
     reports = export(jobs, work_dir)
+    keep_archives([c for c in components if not (_cpp(c) or c.is_supermodule)], reports)
     sims = simulate(jobs, reports, work_dir, solver_info)
     for j in jobs:
         results[j['id']] = {'export': reports.get(j['id']), 'cuflynx': sims.get(j['id']), 'job': {

@@ -21,14 +21,15 @@ from cam_testing.library import Parameter, all_versions, load_version
 EXPECTED_COLUMNS = ['review_test', 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
                     'stability_test', 'version_calibration', 'phlynx_export_test', 'cuflynx_simulate_test',
                     'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
-                    'coupled_validation_test']
+                    'coupled_validation_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test']
 
 
 def test_report_columns_in_order():
     assert report.REPORT_TESTS == EXPECTED_COLUMNS
     assert [report.TEST_SHORT[k] for k in EXPECTED_COLUMNS] == [
         'Reviewed', 'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
-        'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces', 'Coupled']
+        'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces', 'Coupled', 'Opens in CellDL',
+        'Reactions vs Rhea']
 
 
 def test_every_version_has_the_same_test_keys():
@@ -84,6 +85,7 @@ def _fake_version(tmp_path, name='v', supermodule=False, spec=None, parameterisa
                         dir=str(vdir), results_dir=str(vdir / 'results'), plots_dir=str(vdir / 'plots'),
                         is_supermodule=supermodule, spec=dict(spec or {}), config={'module_format': 'cellml'},
                         submodules=list(submodules))
+    v.path = lambda suffix: str(vdir / f'mt_{name}_{name}_{suffix}')
     v.parameterisations = lambda: [SimpleNamespace(name=i, has_obs_data=data,
                                                    results_dir=str(vdir / 'results' / 'parameterisations' / i))
                                    for i, data in parameterisations]

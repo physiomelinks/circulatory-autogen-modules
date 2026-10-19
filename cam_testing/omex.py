@@ -11,7 +11,10 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
                                               parameterisation's parameters, as libcuflynx generates it
   <p>_obs_data.json                           the parameterisation's calibration data, if it has any
   <p>_params_for_id.csv                       its parameters to identify, if any
-  inputs, unchanged: <p>_parameters.csv, raw data and
+  <p>_parameters.csv                          its parameters, unchanged
+  <p>_calibration.json                        its calibration result, if it has been calibrated: an
+  <p>_calibrated_parameters.csv               object with "calibrated_parameters", and those values
+  the other inputs, unchanged: raw data and
     SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
     _units.cellml and _verification_config.json; a supermodule's submodules' _modules_config.json
     (their required_citations); and the test network the model was generated from
@@ -20,7 +23,9 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
 model, the first JSON with "obs" in its name is the obs_data, and the first CSV with "param" in
-its name is the params_for_id. So the study members are written first, in that order.
+its name is the params_for_id. So the study members are written first, in that order, and the
+calibration result (whose CSV name holds "param") after them and the parameters, so it is never
+taken for either; CUFLynx recognises it by its own names ("calibration", "calibrated").
 """
 import io
 import os
@@ -83,6 +88,9 @@ def members(version, parameterisation, work_dir):
     add(parameterisation.params_for_id_path)
     # the inputs, as they are in the library
     add(parameterisation.parameters_path)
+    # the calibration result, after every member CUFLynx takes as obs_data or params_for_id
+    add(parameterisation.calibration_path)
+    add(parameterisation.calibrated_parameters_path)
     for p in sorted(os.listdir(parameterisation.dir)):
         full = os.path.join(parameterisation.dir, p)
         if os.path.isfile(full) and not p.endswith('.omex') and p not in {n for n, _, _ in out}:
