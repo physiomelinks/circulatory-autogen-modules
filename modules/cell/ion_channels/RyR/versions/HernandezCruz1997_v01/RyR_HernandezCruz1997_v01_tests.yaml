@@ -26,4 +26,16 @@ notes: 'The ryanodine receptor of the rat superior cervical ganglion (sympatheti
   RyR(Ca,t) (Ca_ERt - Ca_n) to the cytosolic shell and to the ER compartment (vol_ER = 100 um^3) without a volume
   ratio, so the amount released is not conserved between them; the cytosolic-shell reading (shell volume ds dx) is
   used for rho_RyR. (3) The number of shells n and the pump binding rates are not given, so Fig. 10 can''t be
-  reproduced. (4) The legend calls all values "initial parameters"; the rates are taken as constant.'
+  reproduced. (4) The legend calls all values "initial parameters"; the rates are taken as constant.
+  Starting occupancies (2026-10-08): computed in the model as the steady state at the starting Ca, Cai_init and
+  Ca_ER_init (constants; in a cell, equal to the Ca handling''s Cai_init and Ca_ER_init), as SN_full does. They were
+  constants hand-computed at 0.1 uM and 75 uM, so in the soma and varicosity (Ca_ER_init 0.6 mM) l_RyR started at 0.37
+  instead of its steady state 0.82.'
+known_issues:
+- 'Python/C generation unsupported: the RyR site occupancies start from computed initial values (a_RyR_init =
+  kon_a Cai_init/(kon_a Cai_init + koff_a), likewise i_RyR_init and l_RyR_init at Ca_ER_init), which libCellML''s
+  analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Since 2026-10-08.'
+- 'Starting state not recomputed when a parameter changes on a built simulation: Myokit evaluates the initial-value
+  expressions once, so in the BC sweep the site states start at the occupancies computed with the default rates and
+  starting Ca (a_RyR_init, i_RyR_init, l_RyR_init themselves follow the new values). A calibration that sets
+  parameters on a built simulation would behave the same; rebuild the model to start at the new steady state.'

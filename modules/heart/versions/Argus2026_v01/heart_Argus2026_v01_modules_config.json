@@ -3,7 +3,7 @@
     "module_type": "heart",
     "module_subtype": "Argus2026_v01",
     "module_format": "supermodule",
-    "default_instance": "default",
+    "default_parameterisation": "default",
     "licence": "CC0-1.0",
     "creator": [],
     "required_citations": [
@@ -18,7 +18,7 @@
         "name": "clock",
         "module_type": "cardiac_clock",
         "module_subtype": "Liang2009_v01",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [],
         "out_instances": [
           "ra",
@@ -30,8 +30,8 @@
       {
         "name": "ra",
         "module_type": "chamber",
-        "module_subtype": "vv",
-        "instance": "default",
+        "module_subtype": "Liang2009NoVisco_v01",
+        "parameterisation": "ra",
         "inp_instances": [
           "clock"
         ],
@@ -42,8 +42,8 @@
       {
         "name": "rv",
         "module_type": "chamber",
-        "module_subtype": "vv",
-        "instance": "default",
+        "module_subtype": "Liang2009NoVisco_v01",
+        "parameterisation": "rv",
         "inp_instances": [
           "trv",
           "clock"
@@ -55,8 +55,8 @@
       {
         "name": "la",
         "module_type": "chamber",
-        "module_subtype": "vv",
-        "instance": "default",
+        "module_subtype": "Liang2009NoVisco_v01",
+        "parameterisation": "la",
         "inp_instances": [
           "clock"
         ],
@@ -67,8 +67,8 @@
       {
         "name": "lv",
         "module_type": "chamber",
-        "module_subtype": "vv",
-        "instance": "default",
+        "module_subtype": "Liang2009NoVisco_v01",
+        "parameterisation": "lv",
         "inp_instances": [
           "miv",
           "clock"
@@ -81,7 +81,7 @@
         "name": "trv",
         "module_type": "valve",
         "module_subtype": "pp",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "ra"
         ],
@@ -93,7 +93,7 @@
         "name": "puv",
         "module_type": "valve",
         "module_subtype": "pp",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "rv"
         ],
@@ -103,7 +103,7 @@
         "name": "miv",
         "module_type": "valve",
         "module_subtype": "pp",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "la"
         ],
@@ -115,7 +115,7 @@
         "name": "aov",
         "module_type": "valve",
         "module_subtype": "pp",
-        "instance": "default",
+        "parameterisation": "default",
         "inp_instances": [
           "lv"
         ],

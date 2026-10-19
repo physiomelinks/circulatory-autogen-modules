@@ -1,5 +1,5 @@
 """
-The module library on disk: module_types, their versions and each version's instances.
+The module library on disk: module_types, their versions and each version's parameterisations.
 
 Layout (modules/README.md and modules/directory_schema.json describe it in full):
 
@@ -7,20 +7,20 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
         <module_type>.html                          report across the versions (generated)
         versions/<version>/                         version == the config entry's module_subtype
             <module_type>_<version>_modules.cellml
-            <module_type>_<version>_modules_config.json   one entry; "default_instance"
+            <module_type>_<version>_modules_config.json   one entry; "default_parameterisation"
             <module_type>_<version>_units.cellml
             <module_type>_<version>_verification_config.json   what the checks run
             <module_type>_<version>_tests.yaml            review and record-keeping
             <module_type>_<version>_references.bib        (+ _references_proposed.bib)
             <module_type>_<version>.html                  version report (generated)
             risk/  plots/  results/                       (plots, results generated)
-            instances/<instance>/                         instance == obs_data_name
-                <instance>_parameters.csv                 variable_name,units,value,data_reference,sourced
-                <instance>_obs_data.json                  optional: calibration data (data_items) and
+            parameterisations/<p>/                        p == obs_data_name (a parameterisation)
+                <p>_parameters.csv                        variable_name,units,value,data_reference,sourced
+                <p>_obs_data.json                         optional: calibration data (data_items) and
                                                           held-out data (prediction_items with a value)
-                <instance>_params_for_id.csv              optional
-                <instance>_calibrated_parameters.csv      written by calibration (committed)
-                <instance>_calibration.json               written by calibration (committed)
+                <p>_params_for_id.csv                     optional
+                <p>_calibrated_parameters.csv             written by calibration (committed)
+                <p>_calibration.json                      written by calibration (committed)
 
 A module_type directory is any directory under modules/ with a versions/ subdirectory. A module_type
 may contain the module_types that only exist within it (nested module_types: its other
@@ -39,15 +39,30 @@ from dataclasses import dataclass, field
 
 import yaml
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODULES_DIR = os.path.join(REPO_ROOT, 'modules')
-SYSTEM_MODELS_DIR = os.path.join(REPO_ROOT, 'system_models')
-# reviews shared by several versions (a whole pre-versions module's review): tests.yaml's
-# review: reviews/<name>_review.yaml points to one copy
-REVIEWS_DIR = os.path.join(REPO_ROOT, 'reviews')
+from cam_testing import paths
 
-VERSIONS, INSTANCES, DEFAULT_INSTANCE = 'versions', 'instances', 'default'
-SOURCE_FIGURES = 'source_figures'              # instance dir: screenshots of the data's publication figures
+# The repo root, its modules/ (the primary library), system_models/ and reviews/ come from
+# cam_testing.paths (configurable: CAM_REPO_ROOT, [tool.cam_testing], --cam-root), read when used:
+# library.MODULES_DIR etc. still work as attributes. reviews/ holds reviews shared by several
+# versions (a whole pre-versions module's review): tests.yaml's review: reviews/<name>_review.yaml
+# points to one copy.
+_ROOT_ATTRIBUTES = {'REPO_ROOT': 'repo_root', 'MODULES_DIR': 'modules_dir',
+                    'SYSTEM_MODELS_DIR': 'system_models_dir', 'REVIEWS_DIR': 'reviews_dir'}
+
+
+def __getattr__(name):
+    if name in _ROOT_ATTRIBUTES:
+        return getattr(paths.roots(), _ROOT_ATTRIBUTES[name])
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+
+
+VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameterisations', 'default'
+# a version's parameter sets were called instances (instances/, default_instance) before
+# 2026-10-09; "instance" now means one use of a version in a network. The old names are read too.
+LEGACY_PARAMETERISATIONS, LEGACY_DEFAULT_KEY = 'instances', 'default_instance'
+DEFAULT_KEY = 'default_parameterisation'
+INSTANCES, DEFAULT_INSTANCE = PARAMETERISATIONS, DEFAULT_PARAMETERISATION   # the former names
+SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
 # directories under modules/ that are not categories or module_types (another session's work in
 # the old layout, until it is moved)
@@ -77,15 +92,15 @@ def safe_id(text):
 # ----------------------------------------------------------------------------------------------
 
 @functools.lru_cache(maxsize=None)
-def _discover():
+def _discover_library(modules_dir):
     '''(module_type name -> directory, module_type name -> enclosing module_type name or None), for
-    every modules/**/<name>/ that has versions/, nested module_types included.'''
+    every <modules_dir>/**/<name>/ that has versions/, nested module_types included.'''
     found, parents = {}, {}
-    if not os.path.isdir(MODULES_DIR):
+    if not os.path.isdir(modules_dir):
         return found, parents
-    enclosing = {MODULES_DIR: None}     # directory -> the module_type it is in (None: none)
-    for root, dirs, files in os.walk(MODULES_DIR):
-        rel = os.path.relpath(root, MODULES_DIR)
+    enclosing = {modules_dir: None}     # directory -> the module_type it is in (None: none)
+    for root, dirs, files in os.walk(modules_dir):
+        rel = os.path.relpath(root, modules_dir)
         if rel != '.' and rel.split(os.sep)[0] in UNMIGRATED:
             dirs[:] = []
             continue
@@ -104,14 +119,60 @@ def _discover():
     return found, parents
 
 
+def library_dirs():
+    '''Every module library, primary (this repo's modules/) first, then the extra ones
+    (cam_testing.paths): what libcuflynx gets as module_library_dirs.'''
+    return paths.roots().library_dirs
+
+
+def _discover(include_libraries=True):
+    '''_discover_library for the primary library, or (include_libraries) for every library merged:
+    a module_type name found in several libraries resolves to the first (its versions are looked up in
+    each, see module_type_dirs).'''
+    dirs = library_dirs()
+    if not include_libraries:
+        return _discover_library(dirs[0])
+    found, parents = {}, {}
+    for d in dirs:
+        f, p = _discover_library(d)
+        for name, path in f.items():
+            if name not in found:
+                found[name], parents[name] = path, p[name]
+    return found, parents
+
+
+def clear_caches():
+    '''Forget discovered module_types (after cam_testing.paths.configure, or files moved).'''
+    _discover_library.cache_clear()
+    _load_version_cached.cache_clear()
+    legacy_renames.cache_clear()
+
+
 def _module_type_dirs():
-    '''module_type name -> directory, for every modules/**/<name>/ that has versions/.'''
+    '''module_type name -> directory, for every module_type of every library (primary first).'''
     return _discover()[0]
 
 
-def module_type_names():
-    '''Every module_type (nested ones included), in case-insensitive order.'''
-    return sorted(_module_type_dirs(), key=str.lower)
+def module_type_dirs(name):
+    '''Every directory of a module_type, one per library that has it (primary first).'''
+    out = [_discover_library(d)[0].get(name) for d in library_dirs()]
+    return [d for d in out if d]
+
+
+def library_of(path):
+    '''The library (modules/ directory) a path is in; the primary library for a path in none.'''
+    p = os.path.realpath(path)
+    for d in library_dirs():
+        r = os.path.realpath(d)
+        if p == r or p.startswith(r + os.sep):
+            return d
+    return library_dirs()[0]
+
+
+def module_type_names(include_libraries=False):
+    '''Every module_type of the primary library (nested ones included), or of every library
+    (include_libraries), in case-insensitive order.'''
+    return sorted(_discover(include_libraries)[0], key=str.lower)
 
 
 # the old name: a "module" is now a module_type
@@ -119,7 +180,7 @@ module_names = module_type_names
 
 
 def module_type_dir(name):
-    return _module_type_dirs().get(name) or os.path.join(MODULES_DIR, name)
+    return _module_type_dirs().get(name) or os.path.join(library_dirs()[0], name)
 
 
 module_dir = module_type_dir
@@ -145,8 +206,9 @@ def nested_in(name):
 
 
 def module_relpath(name):
-    '''The module_type directory relative to modules/, e.g. "cell/neuron/soma".'''
-    return os.path.relpath(module_type_dir(name), MODULES_DIR).replace(os.sep, '/')
+    '''The module_type directory relative to its library's modules/, e.g. "cell/neuron/soma".'''
+    d = module_type_dir(name)
+    return os.path.relpath(d, library_of(d)).replace(os.sep, '/')
 
 
 def category_of(name):
@@ -154,7 +216,8 @@ def category_of(name):
     e.g. "cell" for neuron and soma, "vessels/compartments" for simple, and "" for
     heart (directly under modules/) and the module_types nested in it.'''
     outer = (ancestors_of(name) or [name])[-1]
-    rel = os.path.relpath(os.path.dirname(module_type_dir(outer)), MODULES_DIR).replace(os.sep, '/')
+    d = module_type_dir(outer)
+    rel = os.path.relpath(os.path.dirname(d), library_of(d)).replace(os.sep, '/')
     return '' if rel == '.' else rel
 
 
@@ -187,8 +250,8 @@ def matches_selector(name, selector):
     return rel == sel or rel.startswith(sel + '/')
 
 
-def select_module_types(selectors):
-    names = module_type_names()
+def select_module_types(selectors, include_libraries=False):
+    names = module_type_names(include_libraries)
     if not selectors:
         return names
     return [n for n in names if any(matches_selector(n, s) for s in selectors)]
@@ -231,12 +294,12 @@ CITATION_KEYS = ('required_citations', 'required_citations_uncertain')
 
 def with_record_keys(entry, licence=DEFAULT_LICENCE, creator=None):
     '''The entry with "licence" and "creator" (the defaults where missing; existing values kept),
-    placed after "default_instance" (or after the subtype key when it has none), other keys in order.'''
+    placed after "default_parameterisation" (or after the subtype key when it has none), other keys in order.'''
     values = {'licence': entry.get('licence', licence),
               'creator': list(entry.get('creator', creator if creator is not None else []))}
     rest = [(k, v) for k, v in entry.items() if k not in RECORD_KEYS]
     keys = [k for k, _ in rest]
-    anchor = next((k for k in ('default_instance', 'module_subtype', 'BC_type') if k in keys), None)
+    anchor = next((k for k in (DEFAULT_KEY, LEGACY_DEFAULT_KEY, 'module_subtype', 'BC_type') if k in keys), None)
     out = {}
     if anchor is None:
         out.update(values)
@@ -346,7 +409,7 @@ class Parameter:
 
 
 def read_parameters(path, kinds=None):
-    '''An instance's parameters (kind from the config's variables_and_units, where it has one).'''
+    '''A parameterisation's parameters (kind from the config's variables_and_units, where it has one).'''
     kinds = kinds or {}
     out = []
     if not os.path.isfile(path):
@@ -382,17 +445,17 @@ def write_parameters(path, parameters):
 IDENTITY_KEYS = ('module_type', 'version')
 # in this order in the JSON file
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
-                     'outputs', 'run_parameters', 'rest_check', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
-                     'parameter_ranges', 'validation', 'supermodule')
+                     'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
+                     'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
 # readable order of the nested keys the checks know (others follow in their own order)
 NESTED_ORDER = {
     'harness': ('module_array', 'parameters'),
     'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'bounds', 'constraints', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
-    'timestep': ('scheme', 'dts', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
-    'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
-                  'tol'),
+    'timestep': ('scheme', 'dts', 'pre_time', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
+    'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget',
+                  'max_run_seconds', 'total_time_budget', 't_end', 'tol'),
     'supermodule': ('globals', 'equivalent'),
     'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
@@ -502,8 +565,15 @@ def misplaced_spec_keys(tests, verification):
 
 
 # ----------------------------------------------------------------------------------------------
-# module_type / version / instance
+# module_type / version / parameterisation
 # ----------------------------------------------------------------------------------------------
+
+def _has_source(path):
+    '''Whether a directory under versions/ is a version: it has its modules config. A renamed or removed
+    version can leave generated output behind (results/, plots/, reports, parameterisations' .omex
+    archives), e.g. restored from CI's results cache.'''
+    return any(e.endswith('_modules_config.json') for e in os.listdir(path))
+
 
 @dataclass
 class ModuleType:
@@ -531,8 +601,18 @@ class ModuleType:
         return nested_in(self.name)
 
     @property
+    def library(self):
+        '''The library (modules/ directory) it is in.'''
+        return library_of(self.dir)
+
+    @property
+    def is_primary(self):
+        '''In this repo's modules/ (not an extra library).'''
+        return self.library == library_dirs()[0]
+
+    @property
     def relpath(self):
-        return os.path.relpath(self.dir, MODULES_DIR).replace(os.sep, '/')
+        return os.path.relpath(self.dir, self.library).replace(os.sep, '/')
 
     @property
     def location(self):
@@ -551,7 +631,8 @@ class ModuleType:
         if not os.path.isdir(self.versions_dir):
             return []
         return sorted((d for d in os.listdir(self.versions_dir)
-                       if os.path.isdir(os.path.join(self.versions_dir, d)) and not d.startswith('.')), key=str.lower)
+                       if os.path.isdir(os.path.join(self.versions_dir, d)) and not d.startswith('.')
+                       and _has_source(os.path.join(self.versions_dir, d))), key=str.lower)
 
     def versions(self):
         return [load_version(self.name, v) for v in self.version_names()]
@@ -566,13 +647,15 @@ class ModuleType:
 
 
 @dataclass
-class Instance:
+class Parameterisation:
+    '''A named parameter set of a version (same maths, its own values, data and set-ups):
+    <version>/parameterisations/<name>/. Formerly called an instance.'''
     version: 'Version'
     name: str
 
     @property
     def dir(self):
-        return os.path.join(self.version.dir, INSTANCES, self.name)
+        return os.path.join(self.version.parameterisations_dir, self.name)
 
     @property
     def key(self):
@@ -618,11 +701,11 @@ class Instance:
 
     @property
     def is_default(self):
-        return self.name == self.version.default_instance_name
+        return self.name == self.version.default_parameterisation_name
 
     @property
     def validation(self):
-        '''This instance's validation spec: {baseline: {...}, calibrate: {...}}.'''
+        '''This parameterisation's validation spec: {baseline: {...}, calibrate: {...}}.'''
         return ((self.version.spec.get('validation') or {}).get(self.name)) or {}
 
     @property
@@ -630,7 +713,7 @@ class Instance:
         return os.path.join(self.dir, SOURCE_FIGURES)
 
     def source_figures(self):
-        '''Screenshots of the publication figures/tables the instance's data were extracted from:
+        '''Screenshots of the publication figures/tables the parameterisation's data were extracted from:
         source_figures/source_figures.json lists [{"file", "source", "caption"}], file relative to
         source_figures/. Returned with file relative to the version directory.'''
         index = os.path.join(self.source_figures_dir, SOURCE_FIGURES_INDEX)
@@ -642,22 +725,22 @@ class Instance:
                 for e in entries]
 
     def needs_source_figures(self):
-        '''True when the instance's validation data were extracted from a publication (a paper or a
+        '''True when the parameterisation's validation data were extracted from a publication (a paper or a
         book): a validation entry with a source and source_kind "publication" (the default when a
         source is given; "dataset" and "synthetic" are exempt).'''
         return any(isinstance(e, dict) and e.get('source') and e.get('source_kind', 'publication') == 'publication'
                    for e in self.validation.values())
 
     def parameters(self):
-        '''The instance's own rows, then the version's globals, TODO values filled from review proposals.'''
+        '''The parameterisation's own rows, then the version's globals, TODO values filled from review proposals.'''
         return self.version._apply_proposals(read_parameters(self.parameters_path, self.version.kinds))
 
     @property
     def results_dir(self):
-        return os.path.join(self.version.results_dir, INSTANCES, self.name)
+        return os.path.join(self.version.results_dir, PARAMETERISATIONS, self.name)
 
     def data_files(self):
-        '''Every file of the instance except its parameters.'''
+        '''Every file of the parameterisation except its parameters.'''
         if not os.path.isdir(self.dir):
             return []
         return sorted(f for f in os.listdir(self.dir)
@@ -665,9 +748,12 @@ class Instance:
                       and f != SOURCE_FIGURES)   # .omex: generated
 
 
+Instance = Parameterisation   # the former name
+
+
 @dataclass
 class Version:
-    '''One version of a module_type: its config entry, spec and instances. It is what the tests
+    '''One version of a module_type: its config entry, spec and parameterisations. It is what the tests
     run (the old Module + Component in one).'''
     mtype: ModuleType
     name: str
@@ -810,46 +896,57 @@ class Version:
         return os.path.join(self.dir, 'risk')
 
     @property
-    def instances_dir(self):
-        return os.path.join(self.dir, INSTANCES)
+    def parameterisations_dir(self):
+        '''<version>/parameterisations/ (or a library still on the old layout's instances/).'''
+        new = os.path.join(self.dir, PARAMETERISATIONS)
+        old = os.path.join(self.dir, LEGACY_PARAMETERISATIONS)
+        return old if not os.path.isdir(new) and os.path.isdir(old) else new
 
-    # --- instances --------------------------------------------------------------------------
+    # --- parameterisations ------------------------------------------------------------------
     @property
-    def default_instance_name(self):
-        return self.config.get('default_instance') or DEFAULT_INSTANCE
+    def default_parameterisation_name(self):
+        return self.config.get(DEFAULT_KEY) or self.config.get(LEGACY_DEFAULT_KEY) or DEFAULT_PARAMETERISATION
 
-    def instance_names(self):
-        if not os.path.isdir(self.instances_dir):
+    def parameterisation_names(self):
+        root = self.parameterisations_dir
+        if not os.path.isdir(root):
             return []
-        names = sorted(d for d in os.listdir(self.instances_dir)
-                       if os.path.isdir(os.path.join(self.instances_dir, d)) and not d.startswith('.'))
-        # the default instance first
-        return sorted(names, key=lambda n: (n != self.default_instance_name, n.lower()))
+        names = sorted(d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d)) and not d.startswith('.'))
+        # the default parameterisation first
+        return sorted(names, key=lambda n: (n != self.default_parameterisation_name, n.lower()))
 
-    def instances(self):
-        return [Instance(self, n) for n in self.instance_names()]
+    def parameterisations(self):
+        return [Parameterisation(self, n) for n in self.parameterisation_names()]
 
-    def instance(self, name=None):
-        return Instance(self, name or self.default_instance_name)
+    def parameterisation(self, name=None):
+        return Parameterisation(self, name or self.default_parameterisation_name)
 
     @property
-    def default_instance(self):
-        return self.instance()
+    def default_parameterisation(self):
+        return self.parameterisation()
+
+    # the former names (instance = parameterisation)
+    instances_dir = parameterisations_dir
+    default_instance_name = default_parameterisation_name
+    instance_names = parameterisation_names
+    instances = parameterisations
+    instance = parameterisation
+    default_instance = default_parameterisation
 
     # --- parameters -------------------------------------------------------------------------
     @property
     def kinds(self):
         if self.is_supermodule:
-            # no variables_and_units: its instance rows are {var}_{submodule} or the declared globals
+            # no variables_and_units: its parameterisation rows are {var}_{submodule} or the declared globals
             return {g: 'global_constant' for g in self.supermodule_globals}
         return {v[0]: v[3].strip() for v in self.config.get('variables_and_units') or []}
 
     @functools.cached_property
     def _parameters(self):
-        return self.default_instance.parameters()
+        return self.default_parameterisation.parameters()
 
     def parameters(self):
-        '''The default instance's parameters: the version's own constants / BCs, then globals.'''
+        '''The default parameterisation's parameters: the version's own constants / BCs, then globals.'''
         return self._parameters
 
     def _apply_proposals(self, params):
@@ -889,7 +986,7 @@ class Version:
 
     @property
     def supermodule_globals(self):
-        '''The global constants a supermodule's instance may set (spec supermodule.globals).'''
+        '''The global constants a supermodule's parameterisation may set (spec supermodule.globals).'''
         return list((self.spec.get('supermodule') or {}).get('globals') or SUPERMODULE_DEFAULT_GLOBALS)
 
 
@@ -903,7 +1000,10 @@ def _load_version_cached(mt_name, version):
 
 
 def _load_version(mt_name, version):
-    mtype = load_module_type(mt_name)
+    # a module_type in several libraries: the version is in one of them
+    dirs = module_type_dirs(mt_name)
+    vdir_of = [d for d in dirs if os.path.isdir(os.path.join(d, VERSIONS, version))]
+    mtype = ModuleType(mt_name, vdir_of[0]) if vdir_of else load_module_type(mt_name)
     vdir = os.path.join(mtype.versions_dir, version)
     stem = f'{mt_name}_{version}'
     cfg_path = os.path.join(vdir, f'{stem}_modules_config.json')
@@ -916,13 +1016,14 @@ def _load_version(mt_name, version):
     spec = merge_spec(tests, verification)
     if isinstance(spec.get('review'), str):
         spec['review_file'] = spec['review']
-        spec['review'] = read_review(spec['review'])
+        # relative to the root of the repo the version is in (an extra library's version: that library's)
+        spec['review'] = read_review(spec['review'], os.path.dirname(mtype.library))
     return Version(mtype, version, entry, spec, raw[0])
 
 
-def read_review(rel):
+def read_review(rel, repo_root=None):
     '''A shared review (tests.yaml's review: reviews/<name>_review.yaml, relative to the repo root).'''
-    with open(os.path.join(REPO_ROOT, rel)) as f:
+    with open(os.path.join(repo_root or paths.roots().repo_root, rel)) as f:
         return yaml.safe_load(f) or {}
 
 
@@ -931,8 +1032,14 @@ def load_version(mt_name, version):
     return _load_version(mt_name, version)
 
 
-def all_versions(selectors=None):
-    return [v for n in select_module_types(selectors) for v in load_module_type(n).versions()]
+def all_versions(selectors=None, include_libraries=False):
+    '''Every version of the primary library's (selected) module_types; include_libraries: of every
+    library's, a module_type in several libraries contributing the versions of each.'''
+    out = []
+    for n in select_module_types(selectors, include_libraries):
+        dirs = module_type_dirs(n) if include_libraries else [load_module_type(n).dir]
+        out += [v for d in dirs for v in ModuleType(n, d).versions()]
+    return out
 
 
 def version_by_key(key):
@@ -947,9 +1054,12 @@ def version_by_key(key):
     raise KeyError(key)
 
 
-def version_index():
-    '''(module_type, version) -> Version, for the whole library.'''
-    return {(v.vessel_type, v.name): v for v in all_versions()}
+def version_index(include_libraries=False):
+    '''(module_type, version) -> Version, for the whole (primary) library, or every library.'''
+    out = {}
+    for v in all_versions(include_libraries=include_libraries):
+        out.setdefault((v.vessel_type, v.name), v)
+    return out
 
 
 # The alternative hearts became versions of heart (2026-10, nested module_types). A version name
@@ -967,7 +1077,7 @@ HEART_VERSION_RENAMES = {
 
 # The 2026-10-06 restructure (tools/restructure_modules.py): types named by mechanism, versions by
 # source, no nn prefixes; old pair -> new pair, written by the restructure.
-RESTRUCTURE_RENAMES = os.path.join(REPO_ROOT, 'tools', 'restructure_modules_renames.json')
+RESTRUCTURE_RENAMES = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_modules_renames.json')
 
 
 @functools.lru_cache(maxsize=None)
@@ -988,7 +1098,7 @@ def legacy_renames():
     the others, so each old pair maps to today's pair). circulatory_autogen's own models still use
     the old pairs.'''
     later = restructure_renames()
-    path = os.path.join(REPO_ROOT, 'tools', 'restructure_map.yaml')
+    path = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_map.yaml')
     out = {}
     if os.path.isfile(path):
         with open(path) as f:

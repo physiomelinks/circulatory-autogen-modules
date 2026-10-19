@@ -7,8 +7,8 @@ Written before the switch (2026-10-06): the soma now uses HernandezCruz1997_v01 
 script compares HC1997 with HC1997; check out a commit before the switch to reproduce the page.
 
 The soma is not changed. The script copies modules/ to a temporary directory, switches the RyR
-submodule of soma/sympathetic to HernandezCruz1997_v01 there (and drops the soma instance's
-Argus-only RyR rows, so the RyR takes its own default instance), and points the library and
+submodule of soma/sympathetic to HernandezCruz1997_v01 there (and drops the soma parameterisation's
+Argus-only RyR rows, so the RyR takes its own default parameterisation), and points the library and
 libcuflynx at the copy to generate the second model. The current model is generated from the
 repository itself.
 
@@ -75,7 +75,7 @@ def copy_library(tmp):
     assert n == 1, 'RyR submodule not found'
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
-    csv_path = os.path.join(sdir, 'instances', 'default', 'default_parameters.csv')
+    csv_path = os.path.join(sdir, 'parameterisations', 'default', 'default_parameters.csv')
     with open(csv_path, newline='') as f:
         rows = list(csv.reader(f))
     keep = [r for r in rows if not (r and r[0].endswith('_RyR') and r[0] != 'variable_name')]
@@ -303,10 +303,10 @@ def build_page(R, dropped):
     body.append('<h2>Summary (computed)</h2><ul>' + ''.join(f'<li>{s}</li>' for s in summary) + '</ul>')
     body.append('<h2>Reading</h2><ul>' + ''.join(f'<li>{html.escape(s)}</li>' for s in FINDINGS) + '</ul>')
     body.append('<h2>Setup</h2><ul>'
-                '<li><b>current</b>: RyR Argus2026_v01 with the soma instance\'s values.</li>'
-                '<li><b>HC1997</b>: RyR HernandezCruz1997_v01 at its default instance (activating Kd 200 uM, inactivating 0.63 uM, '
+                '<li><b>current</b>: RyR Argus2026_v01 with the soma parameterisation\'s values.</li>'
+                '<li><b>HC1997</b>: RyR HernandezCruz1997_v01 at its default parameterisation (activating Kd 200 uM, inactivating 0.63 uM, '
                 'luminal 130 uM with N = 7; k_RyR = A_ER rho k_single, rho 5403 /um^2, k_single 2.591 um^3/s; T_ref 295.65 K). '
-                'The soma instance rows dropped in the copy (Argus-only parameters): ' + ', '.join(f'<code>{html.escape(d)}</code>' for d in dropped) + '.</li>'
+                'The soma parameterisation rows dropped in the copy (Argus-only parameters): ' + ', '.join(f'<code>{html.escape(d)}</code>' for d in dropped) + '.</li>'
                 '<li><b>HC1997 + caffeine</b>: kon_a_RyR = 2500 /(mM s) (k_on+Caff, Kd 0.8 uM), the source\'s representation of 10 mM caffeine.</li>'
                 f'<li>Rest: 30 s at 0 pA from the model\'s initial state. Steps: from the end of the rest (caffeine: from the end of 30 s in caffeine), '
                 f'{STEP_S} s at 5, 9, 50 pA then {POST_S} s at 0 pA. Spikes: upward crossings of 0 mV during the step.</li>'

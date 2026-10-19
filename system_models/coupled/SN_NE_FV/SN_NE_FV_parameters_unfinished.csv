@@ -1,0 +1,606 @@
+variable_name,units,value,data_reference
+stim_flag_stim,dimensionless,1,pulse train on
+t_start_stim,second,0.01,first pulse after 10 ms at rest
+t_end_stim,second,1000.0,pulses throughout
+period_stim,second,0.05,20 Hz train (a high sympathetic firing rate)
+pulse_duration_stim,second,0.002,2 ms current pulse
+i_amplitude_stim,nanoA,-1.0,"suprathreshold: -1 nA (the soma takes I_in as an outward current, so a depolaris"
+V_rest_approx_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+h_BK_min_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+z_BK_coeff_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_m_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_h_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_m_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_h_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_m_Na1_6_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_h_Na1_6_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_m_Na1_6_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_h_Na1_6_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_c_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_c_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_m_Kv1_5_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_m_Kv1_5_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_h_Kv1_5_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_h_Kv1_5_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_m_Kv4_2_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_m_Kv4_2_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_h_Kv4_2_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_h_Kv4_2_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_m_Kv2_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_m_Kv2_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_w_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Delta_V_mid_w_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_w_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_m_BK_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_h_BK_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_h_BK_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_thresh_m_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_thresh_h_soma_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_h_min_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_h_max_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_h_Na1_6_min_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_h_Na1_6_max_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_w_min_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_c_min_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_c_max_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_hc_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_h_Kv4_2_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_z_BK_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_m_SK_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+R_diffSensed_soma_SN,megaOhm,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+C_sensed_soma_SN,picoF,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+p_SK_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Cai_init_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ca_mid_m_SK_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+B_Ca_init_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+B_Ca_total_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_bind_Ca_soma_SN,per_millimolar_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_unbind_Ca_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_bind_Ca_ER_soma_SN,per_millimolar_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_unbind_Ca_ER_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Nai_init_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ki_init_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_Na_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_Na_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+g_Na_mod_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_Na1_6_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_Na1_6_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+g_Na1_6_mod_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_CaL_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+p_Ca_single_soma_SN,um3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_Kv1_5_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_Kv1_5_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_Kv4_2_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_Kv4_2_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_Kv2_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_Kv2_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_BK_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_BK_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_SK_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_SK_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+g_KCa_SK_mod_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_m_soma_SN,uF_per_cm2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_soma_SN,um,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_A_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_V_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Cao_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ko_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Nao_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_M_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_M_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+g_M_mod_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_leak_Na_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_leak_Na_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_leak_K_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_leak_K_soma_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+delta_gM_soma_SN,microS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_w_num_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+cAMP_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_NaCa_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+r_NaCa_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+alpha_NaCa_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_NaCa_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ksat_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+KmCa_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+KmNai_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_NaK_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+r_NaK_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Nai_mid_NaK_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Nai_power_NaK_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ko_mid_NaK_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ca_ER_init_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+K_mf_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+K_mr_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_SERCA_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+r_SERCA_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+H_SERCA_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_RyR_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_RyR_single_soma_SN,um3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+kon_a_RyR_soma_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+koff_a_RyR_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+kon_i_RyR_soma_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+koff_i_RyR_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+kon_l_RyR_soma_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+koff_l_RyR_soma_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+N_l_RyR_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_ER_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_shell_soma_SN,um,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_shell_soma_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_IP3R_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_IP3R_single_soma_SN,um3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_leak_Ca_soma_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_leak_Ca_single_soma_SN,um3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+h_IP3_init_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+IP3_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+a_2_soma_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_1_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_2_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_3_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_5_soma_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_ER_pre_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_A_ER_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_V_ER_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_A_ER_pre_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_V_ER_pre_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+D_Ca_ER_soma_SN,m3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_m_Na_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_h_Na_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_Na_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_m_Na1_6_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_h_Na1_6_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_Na1_6_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_CaL_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_CaL_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_Kv2_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_Kv2_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_m_Kv1_5_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_h_Kv1_5_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_Kv1_5_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_Kv4_2_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_Kv4_2_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_BK_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_BK_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_SK_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_SK_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_M_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_M_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_IP3R_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_IP3R_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_RyR_soma_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_RyR_soma_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+R,J_per_mol_K,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+F,C_per_mol,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+channel_ratio_axon_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_m_axon_SN,uF_per_cm2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_ax_axon_SN,um,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+L_ax_axon_SN,um,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+R_i_axon_SN,ohm_cm,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_rest_approx_axon_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_init_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+hc_init_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_mid_c_var_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+V_den_c_var_SN,milliV,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_c_min_var_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_c_max_var_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+tau_hc_var_SN,millis,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Cai_init_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+B_Ca_init_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+B_Ca_total_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_bind_Ca_var_SN,per_millimolar_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_unbind_Ca_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_bind_Ca_ER_var_SN,per_millimolar_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_unbind_Ca_ER_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Nai_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Nao_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+NE_init_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Cai_NE_base_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_NE_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_NET_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_CaN_var_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_CaN_var_SN,picoS,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_var_SN,um,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_A_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_V_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Cao_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+cAMP_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_NaCa_var_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+r_NaCa_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+alpha_NaCa_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+gamma_NaCa_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ksat_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+KmCa_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+KmNai_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Ca_ER_init_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+K_mf_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+K_mr_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_SERCA_var_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+r_SERCA_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+H_SERCA_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_RyR_var_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_RyR_single_var_SN,um3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+kon_a_RyR_var_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+koff_a_RyR_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+kon_i_RyR_var_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+koff_i_RyR_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+kon_l_RyR_var_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+koff_l_RyR_var_SN,per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+N_l_RyR_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_IP3R_var_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_IP3R_single_var_SN,um3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+rho_leak_Ca_var_SN,per_um2,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_leak_Ca_single_var_SN,um3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+h_IP3_init_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+IP3_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+a_2_var_SN,per_millimolar_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_1_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_2_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_3_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+d_5_var_SN,millimolar,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_ER_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_SL_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+D_Ca_var_SN,m3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+c_ER_pre_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_A_ER_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_V_ER_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_A_ER_pre_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+k_V_ER_pre_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+D_Ca_ER_var_SN,m3_per_s,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_CaN_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_CaN_var_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_IP3R_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_IP3R_var_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+Q10_RyR_var_SN,dimensionless,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+T_ref_RyR_var_SN,kelvin,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+N_avo,per_mol,EMPTY_MUST_BE_FILLED,EMPTY_MUST_BE_FILLED
+C_P_init_c000,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c000,millimolar_per_s,0.0,as the FEniCS instance
+C50_c000,millimolar,1.0,as the FEniCS instance
+V_P_c000,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c000,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c001,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c001,millimolar_per_s,0.0,as the FEniCS instance
+C50_c001,millimolar,1.0,as the FEniCS instance
+V_P_c001,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c001,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c002,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c002,millimolar_per_s,0.0,as the FEniCS instance
+C50_c002,millimolar,1.0,as the FEniCS instance
+V_P_c002,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c002,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c010,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c010,millimolar_per_s,0.0,as the FEniCS instance
+C50_c010,millimolar,1.0,as the FEniCS instance
+V_P_c010,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c010,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c011,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c011,millimolar_per_s,0.0,as the FEniCS instance
+C50_c011,millimolar,1.0,as the FEniCS instance
+V_P_c011,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c011,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c012,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c012,millimolar_per_s,0.0,as the FEniCS instance
+C50_c012,millimolar,1.0,as the FEniCS instance
+V_P_c012,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c012,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c020,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c020,millimolar_per_s,0.0,as the FEniCS instance
+C50_c020,millimolar,1.0,as the FEniCS instance
+V_P_c020,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c020,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c021,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c021,millimolar_per_s,0.0,as the FEniCS instance
+C50_c021,millimolar,1.0,as the FEniCS instance
+V_P_c021,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c021,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c022,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c022,millimolar_per_s,0.0,as the FEniCS instance
+C50_c022,millimolar,1.0,as the FEniCS instance
+V_P_c022,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c022,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c100,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c100,millimolar_per_s,0.0,as the FEniCS instance
+C50_c100,millimolar,1.0,as the FEniCS instance
+V_P_c100,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c100,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c101,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c101,millimolar_per_s,0.0,as the FEniCS instance
+C50_c101,millimolar,1.0,as the FEniCS instance
+V_P_c101,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c101,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c102,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c102,millimolar_per_s,0.0,as the FEniCS instance
+C50_c102,millimolar,1.0,as the FEniCS instance
+V_P_c102,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c102,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c110,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c110,millimolar_per_s,0.0,as the FEniCS instance
+C50_c110,millimolar,1.0,as the FEniCS instance
+V_P_c110,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c110,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c111,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c111,millimolar_per_s,0.0,as the FEniCS instance
+C50_c111,millimolar,1.0,as the FEniCS instance
+V_P_c111,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+C_P_init_c112,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c112,millimolar_per_s,0.0,as the FEniCS instance
+C50_c112,millimolar,1.0,as the FEniCS instance
+V_P_c112,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c112,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c120,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c120,millimolar_per_s,0.0,as the FEniCS instance
+C50_c120,millimolar,1.0,as the FEniCS instance
+V_P_c120,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c120,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c121,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c121,millimolar_per_s,0.0,as the FEniCS instance
+C50_c121,millimolar,1.0,as the FEniCS instance
+V_P_c121,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c121,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c122,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c122,millimolar_per_s,0.0,as the FEniCS instance
+C50_c122,millimolar,1.0,as the FEniCS instance
+V_P_c122,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c122,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c200,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c200,millimolar_per_s,0.0,as the FEniCS instance
+C50_c200,millimolar,1.0,as the FEniCS instance
+V_P_c200,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c200,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c201,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c201,millimolar_per_s,0.0,as the FEniCS instance
+C50_c201,millimolar,1.0,as the FEniCS instance
+V_P_c201,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c201,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c202,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c202,millimolar_per_s,0.0,as the FEniCS instance
+C50_c202,millimolar,1.0,as the FEniCS instance
+V_P_c202,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c202,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c210,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c210,millimolar_per_s,0.0,as the FEniCS instance
+C50_c210,millimolar,1.0,as the FEniCS instance
+V_P_c210,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c210,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c211,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c211,millimolar_per_s,0.0,as the FEniCS instance
+C50_c211,millimolar,1.0,as the FEniCS instance
+V_P_c211,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c211,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c212,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c212,millimolar_per_s,0.0,as the FEniCS instance
+C50_c212,millimolar,1.0,as the FEniCS instance
+V_P_c212,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c212,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c220,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c220,millimolar_per_s,0.0,as the FEniCS instance
+C50_c220,millimolar,1.0,as the FEniCS instance
+V_P_c220,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c220,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c221,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c221,millimolar_per_s,0.0,as the FEniCS instance
+C50_c221,millimolar,1.0,as the FEniCS instance
+V_P_c221,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c221,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+C_P_init_c222,millimolar,0.0,initial concentration (as the FEniCS instance)
+M_c222,millimolar_per_s,0.0,as the FEniCS instance
+C50_c222,millimolar,1.0,as the FEniCS instance
+V_P_c222,m3,9.999999999999999e-19,"grid cell, 1 um cube"
+flux_c_c222,mol_per_s,0.0,no source: the cell exchanges only with its neighbours
+A_f_fx000,m2,1e-12,face of the uniform grid
+d_up_fx000,metre,5e-07,centre-to-face distance
+d_down_fx000,metre,5e-07,centre-to-face distance
+open_flag_fx000,dimensionless,1,open face
+sigma_diff,m2_per_s,3e-10,as the FEniCS instance
+A_f_fy000,m2,1e-12,face of the uniform grid
+d_up_fy000,metre,5e-07,centre-to-face distance
+d_down_fy000,metre,5e-07,centre-to-face distance
+open_flag_fy000,dimensionless,1,open face
+A_f_fz000,m2,1e-12,face of the uniform grid
+d_up_fz000,metre,5e-07,centre-to-face distance
+d_down_fz000,metre,5e-07,centre-to-face distance
+open_flag_fz000,dimensionless,1,open face
+A_f_fx001,m2,1e-12,face of the uniform grid
+d_up_fx001,metre,5e-07,centre-to-face distance
+d_down_fx001,metre,5e-07,centre-to-face distance
+open_flag_fx001,dimensionless,1,open face
+A_f_fy001,m2,1e-12,face of the uniform grid
+d_up_fy001,metre,5e-07,centre-to-face distance
+d_down_fy001,metre,5e-07,centre-to-face distance
+open_flag_fy001,dimensionless,1,open face
+A_f_fz001,m2,1e-12,face of the uniform grid
+d_up_fz001,metre,5e-07,centre-to-face distance
+d_down_fz001,metre,5e-07,centre-to-face distance
+open_flag_fz001,dimensionless,1,open face
+A_f_fx002,m2,1e-12,face of the uniform grid
+d_up_fx002,metre,5e-07,centre-to-face distance
+d_down_fx002,metre,5e-07,centre-to-face distance
+open_flag_fx002,dimensionless,1,open face
+A_f_fy002,m2,1e-12,face of the uniform grid
+d_up_fy002,metre,5e-07,centre-to-face distance
+d_down_fy002,metre,5e-07,centre-to-face distance
+open_flag_fy002,dimensionless,1,open face
+A_f_fx010,m2,1e-12,face of the uniform grid
+d_up_fx010,metre,5e-07,centre-to-face distance
+d_down_fx010,metre,5e-07,centre-to-face distance
+open_flag_fx010,dimensionless,1,open face
+A_f_fy010,m2,1e-12,face of the uniform grid
+d_up_fy010,metre,5e-07,centre-to-face distance
+d_down_fy010,metre,5e-07,centre-to-face distance
+open_flag_fy010,dimensionless,1,open face
+A_f_fz010,m2,1e-12,face of the uniform grid
+d_up_fz010,metre,5e-07,centre-to-face distance
+d_down_fz010,metre,5e-07,centre-to-face distance
+open_flag_fz010,dimensionless,1,open face
+A_f_fx011,m2,1e-12,face of the uniform grid
+d_up_fx011,metre,5e-07,centre-to-face distance
+d_down_fx011,metre,5e-07,centre-to-face distance
+open_flag_fx011,dimensionless,1,open face
+A_f_fy011,m2,1e-12,face of the uniform grid
+d_up_fy011,metre,5e-07,centre-to-face distance
+d_down_fy011,metre,5e-07,centre-to-face distance
+open_flag_fy011,dimensionless,1,open face
+A_f_fz011,m2,1e-12,face of the uniform grid
+d_up_fz011,metre,5e-07,centre-to-face distance
+d_down_fz011,metre,5e-07,centre-to-face distance
+open_flag_fz011,dimensionless,1,open face
+A_f_fx012,m2,1e-12,face of the uniform grid
+d_up_fx012,metre,5e-07,centre-to-face distance
+d_down_fx012,metre,5e-07,centre-to-face distance
+open_flag_fx012,dimensionless,1,open face
+A_f_fy012,m2,1e-12,face of the uniform grid
+d_up_fy012,metre,5e-07,centre-to-face distance
+d_down_fy012,metre,5e-07,centre-to-face distance
+open_flag_fy012,dimensionless,1,open face
+A_f_fx020,m2,1e-12,face of the uniform grid
+d_up_fx020,metre,5e-07,centre-to-face distance
+d_down_fx020,metre,5e-07,centre-to-face distance
+open_flag_fx020,dimensionless,1,open face
+A_f_fz020,m2,1e-12,face of the uniform grid
+d_up_fz020,metre,5e-07,centre-to-face distance
+d_down_fz020,metre,5e-07,centre-to-face distance
+open_flag_fz020,dimensionless,1,open face
+A_f_fx021,m2,1e-12,face of the uniform grid
+d_up_fx021,metre,5e-07,centre-to-face distance
+d_down_fx021,metre,5e-07,centre-to-face distance
+open_flag_fx021,dimensionless,1,open face
+A_f_fz021,m2,1e-12,face of the uniform grid
+d_up_fz021,metre,5e-07,centre-to-face distance
+d_down_fz021,metre,5e-07,centre-to-face distance
+open_flag_fz021,dimensionless,1,open face
+A_f_fx022,m2,1e-12,face of the uniform grid
+d_up_fx022,metre,5e-07,centre-to-face distance
+d_down_fx022,metre,5e-07,centre-to-face distance
+open_flag_fx022,dimensionless,1,open face
+A_f_fx100,m2,1e-12,face of the uniform grid
+d_up_fx100,metre,5e-07,centre-to-face distance
+d_down_fx100,metre,5e-07,centre-to-face distance
+open_flag_fx100,dimensionless,1,open face
+A_f_fy100,m2,1e-12,face of the uniform grid
+d_up_fy100,metre,5e-07,centre-to-face distance
+d_down_fy100,metre,5e-07,centre-to-face distance
+open_flag_fy100,dimensionless,1,open face
+A_f_fz100,m2,1e-12,face of the uniform grid
+d_up_fz100,metre,5e-07,centre-to-face distance
+d_down_fz100,metre,5e-07,centre-to-face distance
+open_flag_fz100,dimensionless,1,open face
+A_f_fx101,m2,1e-12,face of the uniform grid
+d_up_fx101,metre,5e-07,centre-to-face distance
+d_down_fx101,metre,5e-07,centre-to-face distance
+open_flag_fx101,dimensionless,1,open face
+A_f_fy101,m2,1e-12,face of the uniform grid
+d_up_fy101,metre,5e-07,centre-to-face distance
+d_down_fy101,metre,5e-07,centre-to-face distance
+open_flag_fy101,dimensionless,1,open face
+A_f_fz101,m2,1e-12,face of the uniform grid
+d_up_fz101,metre,5e-07,centre-to-face distance
+d_down_fz101,metre,5e-07,centre-to-face distance
+open_flag_fz101,dimensionless,1,open face
+A_f_fx102,m2,1e-12,face of the uniform grid
+d_up_fx102,metre,5e-07,centre-to-face distance
+d_down_fx102,metre,5e-07,centre-to-face distance
+open_flag_fx102,dimensionless,1,open face
+A_f_fy102,m2,1e-12,face of the uniform grid
+d_up_fy102,metre,5e-07,centre-to-face distance
+d_down_fy102,metre,5e-07,centre-to-face distance
+open_flag_fy102,dimensionless,1,open face
+A_f_fx110,m2,1e-12,face of the uniform grid
+d_up_fx110,metre,5e-07,centre-to-face distance
+d_down_fx110,metre,5e-07,centre-to-face distance
+open_flag_fx110,dimensionless,1,open face
+A_f_fy110,m2,1e-12,face of the uniform grid
+d_up_fy110,metre,5e-07,centre-to-face distance
+d_down_fy110,metre,5e-07,centre-to-face distance
+open_flag_fy110,dimensionless,1,open face
+A_f_fz110,m2,1e-12,face of the uniform grid
+d_up_fz110,metre,5e-07,centre-to-face distance
+d_down_fz110,metre,5e-07,centre-to-face distance
+open_flag_fz110,dimensionless,1,open face
+A_f_fx111,m2,1e-12,face of the uniform grid
+d_up_fx111,metre,5e-07,centre-to-face distance
+d_down_fx111,metre,5e-07,centre-to-face distance
+open_flag_fx111,dimensionless,1,open face
+A_f_fy111,m2,1e-12,face of the uniform grid
+d_up_fy111,metre,5e-07,centre-to-face distance
+d_down_fy111,metre,5e-07,centre-to-face distance
+open_flag_fy111,dimensionless,1,open face
+A_f_fz111,m2,1e-12,face of the uniform grid
+d_up_fz111,metre,5e-07,centre-to-face distance
+d_down_fz111,metre,5e-07,centre-to-face distance
+open_flag_fz111,dimensionless,1,open face
+A_f_fx112,m2,1e-12,face of the uniform grid
+d_up_fx112,metre,5e-07,centre-to-face distance
+d_down_fx112,metre,5e-07,centre-to-face distance
+open_flag_fx112,dimensionless,1,open face
+A_f_fy112,m2,1e-12,face of the uniform grid
+d_up_fy112,metre,5e-07,centre-to-face distance
+d_down_fy112,metre,5e-07,centre-to-face distance
+open_flag_fy112,dimensionless,1,open face
+A_f_fx120,m2,1e-12,face of the uniform grid
+d_up_fx120,metre,5e-07,centre-to-face distance
+d_down_fx120,metre,5e-07,centre-to-face distance
+open_flag_fx120,dimensionless,1,open face
+A_f_fz120,m2,1e-12,face of the uniform grid
+d_up_fz120,metre,5e-07,centre-to-face distance
+d_down_fz120,metre,5e-07,centre-to-face distance
+open_flag_fz120,dimensionless,1,open face
+A_f_fx121,m2,1e-12,face of the uniform grid
+d_up_fx121,metre,5e-07,centre-to-face distance
+d_down_fx121,metre,5e-07,centre-to-face distance
+open_flag_fx121,dimensionless,1,open face
+A_f_fz121,m2,1e-12,face of the uniform grid
+d_up_fz121,metre,5e-07,centre-to-face distance
+d_down_fz121,metre,5e-07,centre-to-face distance
+open_flag_fz121,dimensionless,1,open face
+A_f_fx122,m2,1e-12,face of the uniform grid
+d_up_fx122,metre,5e-07,centre-to-face distance
+d_down_fx122,metre,5e-07,centre-to-face distance
+open_flag_fx122,dimensionless,1,open face
+A_f_fy200,m2,1e-12,face of the uniform grid
+d_up_fy200,metre,5e-07,centre-to-face distance
+d_down_fy200,metre,5e-07,centre-to-face distance
+open_flag_fy200,dimensionless,1,open face
+A_f_fz200,m2,1e-12,face of the uniform grid
+d_up_fz200,metre,5e-07,centre-to-face distance
+d_down_fz200,metre,5e-07,centre-to-face distance
+open_flag_fz200,dimensionless,1,open face
+A_f_fy201,m2,1e-12,face of the uniform grid
+d_up_fy201,metre,5e-07,centre-to-face distance
+d_down_fy201,metre,5e-07,centre-to-face distance
+open_flag_fy201,dimensionless,1,open face
+A_f_fz201,m2,1e-12,face of the uniform grid
+d_up_fz201,metre,5e-07,centre-to-face distance
+d_down_fz201,metre,5e-07,centre-to-face distance
+open_flag_fz201,dimensionless,1,open face
+A_f_fy202,m2,1e-12,face of the uniform grid
+d_up_fy202,metre,5e-07,centre-to-face distance
+d_down_fy202,metre,5e-07,centre-to-face distance
+open_flag_fy202,dimensionless,1,open face
+A_f_fy210,m2,1e-12,face of the uniform grid
+d_up_fy210,metre,5e-07,centre-to-face distance
+d_down_fy210,metre,5e-07,centre-to-face distance
+open_flag_fy210,dimensionless,1,open face
+A_f_fz210,m2,1e-12,face of the uniform grid
+d_up_fz210,metre,5e-07,centre-to-face distance
+d_down_fz210,metre,5e-07,centre-to-face distance
+open_flag_fz210,dimensionless,1,open face
+A_f_fy211,m2,1e-12,face of the uniform grid
+d_up_fy211,metre,5e-07,centre-to-face distance
+d_down_fy211,metre,5e-07,centre-to-face distance
+open_flag_fy211,dimensionless,1,open face
+A_f_fz211,m2,1e-12,face of the uniform grid
+d_up_fz211,metre,5e-07,centre-to-face distance
+d_down_fz211,metre,5e-07,centre-to-face distance
+open_flag_fz211,dimensionless,1,open face
+A_f_fy212,m2,1e-12,face of the uniform grid
+d_up_fy212,metre,5e-07,centre-to-face distance
+d_down_fy212,metre,5e-07,centre-to-face distance
+open_flag_fy212,dimensionless,1,open face
+A_f_fz220,m2,1e-12,face of the uniform grid
+d_up_fz220,metre,5e-07,centre-to-face distance
+d_down_fz220,metre,5e-07,centre-to-face distance
+open_flag_fz220,dimensionless,1,open face
+A_f_fz221,m2,1e-12,face of the uniform grid
+d_up_fz221,metre,5e-07,centre-to-face distance
+d_down_fz221,metre,5e-07,centre-to-face distance
+open_flag_fz221,dimensionless,1,open face

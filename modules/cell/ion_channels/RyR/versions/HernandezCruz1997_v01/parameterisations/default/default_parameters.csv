@@ -1,0 +1,18 @@
+variable_name,units,value,data_reference,sourced
+Cai,millimolar,0.0001,"definitional; resting cytosolic Ca 1e-4 mM (Cai_init of the soma Ca handling, cf. wanaverbecq2003plasma) used when unconnected",no
+Ca_ER,millimolar,0.075,"hernandezcruz1997ca; Fig. 10 legend: initial [Ca2+]ERt = [Ca2+]ERs = 75 uM = 0.075 mM (= value; the model's resting ER Ca, used when unconnected). The soma Ca handling holds 0.6 mM (Ca_ER_init)",yes
+A_ER,um2,86.00525082199546,definitional; the soma ER membrane area 86.01 um^2 of a sphere of volume c_ER Vol (used when unconnected; in a soma it comes from the Ca handling through the ER_membrane_area port),no
+kon_a_RyR,per_millimolar_per_s,10,"hernandezcruz1997ca; Fig. 10 legend: k_on-Caff = 0.01 /uM/s = 10 /(mM s) (= value), the activating-site on-rate without caffeine (Eq. A16); with koff_a, Kd = 200 uM at rest. Caffeine (10 mM) is simulated by k_on+Caff = 2.5 /uM/s = 2500 /(mM s) (Kd 0.8 uM; Methods 'Mathematical modeling', Eq. A16), set kon_a_RyR to 2500",yes
+koff_a_RyR,per_s,2,hernandezcruz1997ca; Fig. 10 legend: k_offaRyR = 2 /s (= value),yes
+kon_i_RyR,per_millimolar_per_s,280,hernandezcruz1997ca; Fig. 10 legend: k_oniRyR = 0.28 /uM/s = 280 /(mM s) (= value); Kd = 0.176/0.28 = 0.63 uM,yes
+koff_i_RyR,per_s,0.176,hernandezcruz1997ca; Fig. 10 legend: k_offiRyR = 0.176 /s (= value; the first of two entries printed 'k_offiRyR'),yes
+kon_l_RyR,per_millimolar_per_s,10000,hernandezcruz1997ca; Fig. 10 legend: k_onlRyR = 10 /uM/s = 1e4 /(mM s) (= value),yes
+koff_l_RyR,per_s,1300,"hernandezcruz1997ca; Fig. 10 legend: printed 'k_offiRyR = 1,300 s-1' next to k_onlRyR; read as the luminal off-rate k_offlRyR (the inactivating k_off is given separately as 0.176 /s), Kd = 130 uM",yes
+N_l_RyR,dimensionless,7,"hernandezcruz1997ca; Fig. 10 legend: N = 7, the cooperativity of the luminal site (Appendix, Eq. A12) (= value)",yes
+rho_RyR,per_um2,5403.17859872,"hernandezcruz1997ca; Fig. 10 legend: RyR_max = 70,000 /(s um^2), acting on the inmost cytosolic shell (Eq. A11) of volume ds dx = 0.8 um^2 x 0.25 um = 0.2 um^3: maximal flux coefficient per ER area RyR_max ds dx = 14,000 um^3/s per um^2, divided by k_RyR_single (2.591 um^3/s) = 5403 /um^2 (derived; a model capacity, not a measured density, and above the packing limit of ~1000 RyR/um^2 for a ~30 nm footprint)",no
+k_RyR_single,um3_per_s,2.5910674141544323,"kettlun2003unitary; Abstract: unitary RyR Ca current just under 0.5 pA with 1 mM luminal Ca in physiological K+ and Mg2+ (cardiac/amphibian RyR in bilayers, room temperature); flux coefficient i/(2 F dCa) = 0.5 pA/(2 F x 1 mM) = 2.591 um^3/s (derived)",yes
+Cai_init,millimolar,0.0001,"definitional; the starting cytosolic Ca at which the RyR site occupancies start at their steady state (a_RyR_init, i_RyR_init computed in the model); = Cai (1e-4 mM) here, so the sites start at rest when unconnected; in a cell, the Ca handling's Cai_init",no
+Ca_ER_init,millimolar,0.075,"definitional; the starting ER Ca at which the luminal-site occupancy starts at its steady state (l_RyR_init computed in the model); = Ca_ER (0.075 mM, hernandezcruz1997ca Fig. 10 legend) here; in a cell, the Ca handling's Ca_ER_init",no
+Q10_RyR,dimensionless,3,unreferenced_placeholder; conventional Q10 for the binding rates (no Q10 given by the source),no
+T_ref_RyR,kelvin,295.65,"hernandezcruz1997ca; Methods: 'Experiments were carried out at 22-23 degC'; 22.5 degC = 295.65 K, the temperature of the fitted rates",yes
+T,kelvin,295.15,"davis2021transcriptomic; Methods (Ch. 2): ""All recordings were performed at room temperature"" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC",yes

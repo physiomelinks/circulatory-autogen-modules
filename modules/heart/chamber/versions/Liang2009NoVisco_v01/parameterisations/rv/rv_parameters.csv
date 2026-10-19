@@ -1,0 +1,15 @@
+variable_name,units,value,data_reference,sourced
+v_in,m3_per_s,1e-4,definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model),no
+v_out,m3_per_s,1e-4,definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model),no
+mt,dimensionless,0.5,definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model),no
+T_eff,second,1,definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model),no
+T_c,second,0.3,"liang2009multi; Table 2 (p. 748), Right ventricle: T_cp (contraction duration) 0.3 s, for a 1 s cycle",yes
+T_r,second,0.15,"liang2009multi; Table 2 (p. 748), Right ventricle: T_rp (relaxation duration) 0.15 s, for a 1 s cycle",yes
+t_start,second,0.0,"liang2009multi; Table 2 (p. 748), Right ventricle: t_c (start of contraction) 0.0 s",yes
+E_A,J_per_m6,73327302.4,"liang2009multi; Table 2 (p. 748), Right ventricle: E_A (elastance amplitude) 0.55 mmHg/ml = 7.33273e+07 J/m^6 at 1 mmHg/ml = 133.322368e6 J/m^6",yes
+E_B,J_per_m6,6666118.4,"liang2009multi; Table 2 (p. 748), Right ventricle: E_B (baseline elastance) 0.05 mmHg/ml = 6.66612e+06 J/m^6 at 1 mmHg/ml = 133.322368e6 J/m^6",yes
+Delta_E,J_per_m6,0,definitional; no elastance change unless a controller connects (Elastance_delta_port),no
+q_us,m3,1e-05,"korakianitis2006numerical; Table 1 (p. 1970): V_rv,0 = 10 ml (unstressed chamber volume)",yes
+q_init,m3,1e-05,"definitional; starts at its unstressed volume (korakianitis2006numerical Table 1, V_rv,0); liang2009multi gives no initial volume, and in a loop it fills from its neighbours",yes
+u_ext,J_per_m3,0,definitional; no external (e.g. pericardial or intrathoracic) pressure unless connected,no
+T,second,1,liang2009multi; Table 2 note (p. 748): the timings are for a cardiac duration of 1 s; Section 3: cardiac duration 1.0 s,yes

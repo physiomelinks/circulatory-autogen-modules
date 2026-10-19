@@ -4,7 +4,7 @@ Applying a version's confirmed review proposals.
 A version prepared for review carries:
   - in <module_type>_<version>_tests.yaml: reference_proposals: {param: {reference: "<bibkey>; note",
     sourced: yes|no|definitional}} and review: {summary, questions, proposed_fixes, findings};
-  - in <module_type>_<version>_verification_config.json: validation.<instance>.<kind>.status: proposed
+  - in <module_type>_<version>_verification_config.json: validation.<parameterisation>.<kind>.status: proposed
     (validation data run for review, not confirmed);
 and <module_type>_<version>_references_proposed.bib with the proposed citations.
 
@@ -13,7 +13,7 @@ and <module_type>_<version>_references_proposed.bib with the proposed citations.
     python -m cam_testing.review apply --component heart/vp --only R_ao C_ao # just these parameters
     python -m cam_testing.review apply --component heart/vp --no-validation  # references only
 
-Applying writes the references into every instance's parameters file, moves the cited entries from
+Applying writes the references into every parameterisation's parameters file, moves the cited entries from
 the proposed .bib into the version's _references.bib, turns proposed validation into active, and
 removes what was applied from the spec. It does not set reviewed: true; do that when the version is
 done.
@@ -58,7 +58,7 @@ def apply(version, only=None, validation=True):
         if key:
             used_keys.add(key)
         used_keys.update(prop.get('also_cites') or [])
-    for inst in version.instances():
+    for inst in version.parameterisations():
         rows = list(csv.DictReader(open(inst.parameters_path)))
         for r in rows:
             prop = applied.get(r['variable_name'])
