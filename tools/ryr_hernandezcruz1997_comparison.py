@@ -48,13 +48,13 @@ STEP_S, POST_S = 1, 2
 ENTRY_MIN = 1e-18      # mol (1 amol): below it the gain is not computed (no Ca entry)
 KON_CAFF = 2500.0          # /(mM s): hernandezcruz1997ca k_on+Caff 2.5 /uM/s
 
-V = 'mod_membrane/V'
-CAI = 'mod_Ca/Cai'
-CAB = 'mod_Ca/Ca_bulk'
-CAER = 'mod_Ca/Ca_ER'
-JRYR = 'mod_RyR/j_RyR'
-JCAL = 'mod_i_CaL/j_Ca_L'
-HC_GATES = ['mod_RyR/a_RyR', 'mod_RyR/i_RyR', 'mod_RyR/l_RyR', 'mod_RyR/P_RyR']
+V = 'mod__membrane/V'
+CAI = 'mod__Ca/Cai'
+CAB = 'mod__Ca/Ca_bulk'
+CAER = 'mod__Ca/Ca_ER'
+JRYR = 'mod__RyR/j_RyR'
+JCAL = 'mod__i_CaL/j_Ca_L'
+HC_GATES = ['mod__RyR/a_RyR', 'mod__RyR/i_RyR', 'mod__RyR/l_RyR', 'mod__RyR/P_RyR']
 COLORS = {'current': '#2a78d6', 'HC1997': '#eb6834', 'HC1997 + caffeine': '#1baf7a'}
 
 
@@ -106,7 +106,7 @@ class Soma:
         self.has = lambda v: v in by
         self.h = harness.simulation_helper(self.cm.model_path, dict(self.cm.spec, sim_time=1.0, dt=DT))
         self.label = label
-        self.ryr = [n.split('.', 1)[1] for n in self.h.get_all_variable_names() if n.startswith('mod_RyR_module.')]
+        self.ryr = [n.split('.', 1)[1] for n in self.h.get_all_variable_names() if n.startswith('mod__RyR_module.')]
         self.outputs = [V, CAI, CAB, CAER, JRYR, JCAL] + [g for g in HC_GATES if g.split('/')[1] in self.ryr]
 
     def segment(self, params, seconds):
@@ -141,14 +141,14 @@ def steps(soma, start_state, base, j_rest):
     res = {}
     for pa in STEPS_PA:
         soma.set_state(start_state)
-        t1, o1 = soma.segment(dict(base, I_in_membrane=pa * 1e-3), STEP_S)
-        t2, o2 = soma.segment(dict(base, I_in_membrane=0.0), POST_S)
+        t1, o1 = soma.segment({**base, 'membrane/I_in': pa * 1e-3}, STEP_S)
+        t2, o2 = soma.segment({**base, 'membrane/I_in': 0.0}, POST_S)
         t = np.concatenate([t1, t2 + t1[-1] + DT])
         o = {k: np.concatenate([o1[k], o2[k]]) for k in o1}
         rel = np.trapezoid(o[JRYR] - j_rest, t)
         ent = np.trapezoid(np.abs(o[JCAL]), t)
         res[pa] = dict(t=t, o=o, spikes=spikes(o[V], t < STEP_S), gain=rel / ent if ent > ENTRY_MIN else float('nan'),
-                       p_ratio=(float(np.max(o['mod_RyR/P_RyR']) / o['mod_RyR/P_RyR'][0]) if 'mod_RyR/P_RyR' in o else float('nan')),
+                       p_ratio=(float(np.max(o['mod__RyR/P_RyR']) / o['mod__RyR/P_RyR'][0]) if 'mod__RyR/P_RyR' in o else float('nan')),
                        release=rel, entry=ent, j_peak=float(np.max(o[JRYR])), cai_peak=float(np.max(o[CAI])),
                        er0=float(o[CAER][0]), er_min=float(np.min(o[CAER])), er_end=float(o[CAER][-1]))
     return res
@@ -156,7 +156,7 @@ def steps(soma, start_state, base, j_rest):
 
 def simulate(soma, caffeine):
     base = {}
-    t, o = soma.segment(dict(I_in_membrane=0.0), REST_S)
+    t, o = soma.segment({'membrane/I_in': 0.0}, REST_S)
     rest = dict(t=t, o=o, spikes=spikes(o[V]), spikes_last10=spikes(o[V], t >= REST_S - 10))
     st = soma.state()
     j_rest = float(np.mean(o[JRYR][t >= REST_S - 1]))
@@ -164,13 +164,13 @@ def simulate(soma, caffeine):
     out = {'rest': rest, 'steps': steps(soma, st, base, j_rest)}
     # a longer rest (continuing from 30 s to LONG_REST_S), to see where the rest goes
     soma.set_state(st)
-    tl, ol = soma.segment(dict(I_in_membrane=0.0), LONG_REST_S - REST_S)
+    tl, ol = soma.segment({'membrane/I_in': 0.0}, LONG_REST_S - REST_S)
     out['long_rest'] = dict(spikes=spikes(ol[V]), spikes_last30=spikes(ol[V], tl >= tl[-1] - 30), v=float(ol[V][-1]),
                             cai=float(ol[CAI][-1]), er=float(ol[CAER][-1]), j=float(ol[JRYR][-1]))
     if caffeine:
         soma.set_state(st)
-        caff = dict(kon_a_RyR_RyR=KON_CAFF)
-        tc, oc = soma.segment(dict(caff, I_in_membrane=0.0), REST_S)
+        caff = {'RyR/kon_a_RyR': KON_CAFF}
+        tc, oc = soma.segment({**caff, 'membrane/I_in': 0.0}, REST_S)
         out['caffeine'] = dict(t=tc, o=oc, spikes=spikes(oc[V]), er_min=float(np.min(oc[CAER])),
                                j_peak=float(np.max(oc[JRYR])), cai_peak=float(np.max(oc[CAI])),
                                t_peak=float(tc[np.argmax(oc[JRYR])]))

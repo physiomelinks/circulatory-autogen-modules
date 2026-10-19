@@ -141,8 +141,6 @@ def _selected_parameterisations(config):
             for v in _versions(config) for i in v.parameterisations()]
 
 
-_selected_instances = _selected_parameterisations   # the former name
-
 
 def _selected_supermodules(config):
     return [pytest.param((v.vessel_type, v.name), id=v.key, marks=_marks(config, v)) for v in _versions(config, True)]

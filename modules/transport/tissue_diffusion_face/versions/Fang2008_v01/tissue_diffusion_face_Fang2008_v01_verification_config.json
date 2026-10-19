@@ -14,16 +14,16 @@
       ["vb", "Fang2008_v01", "tissue_diffusion_volume", "mod", "", "default"]
     ],
     "parameters": [
-      ["C_P_init_va", "millimolar", 0.08, "harness: two cells at different concentrations"],
-      ["flux_c_va", "mol_per_s", 0, "harness: closed cell"],
-      ["M_va", "millimolar_per_s", 0, "harness: no consumption"],
-      ["C50_va", "millimolar", 0.0133, "harness (unused with M = 0)"],
-      ["C_P_init_vb", "millimolar", 0.02, "harness: two cells at different concentrations"],
-      ["flux_c_vb", "mol_per_s", 0, "harness: closed cell"],
-      ["M_vb", "millimolar_per_s", 0, "harness: no consumption"],
-      ["C50_vb", "millimolar", 0.0133, "harness (unused with M = 0)"],
-      ["V_P_va", "m3", 8.000000000000002e-15, "harness: 20 x 20 x 20 um cell"],
-      ["V_P_vb", "m3", 1.2000000000000003e-14, "harness: 30 x 20 x 20 um cell"]
+      ["va/C_P_init", "millimolar", 0.08, "harness: two cells at different concentrations"],
+      ["va/flux_c", "mol_per_s", 0, "harness: closed cell"],
+      ["va/M", "millimolar_per_s", 0, "harness: no consumption"],
+      ["va/C50", "millimolar", 0.0133, "harness (unused with M = 0)"],
+      ["vb/C_P_init", "millimolar", 0.02, "harness: two cells at different concentrations"],
+      ["vb/flux_c", "mol_per_s", 0, "harness: closed cell"],
+      ["vb/M", "millimolar_per_s", 0, "harness: no consumption"],
+      ["vb/C50", "millimolar", 0.0133, "harness (unused with M = 0)"],
+      ["va/V_P", "m3", 8.000000000000002e-15, "harness: 20 x 20 x 20 um cell"],
+      ["vb/V_P", "m3", 1.2000000000000003e-14, "harness: 30 x 20 x 20 um cell"]
     ]
   },
   "invariants": [

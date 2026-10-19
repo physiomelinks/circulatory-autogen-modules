@@ -367,19 +367,19 @@ def build_report():
     scm = checks.ComponentModel(sv)
     sby = {p.variable_name: p for p in scm.parameters()}
     spn = lambda v: 'parameters/' + harness.parameter_name(sby[v])
-    Vout = 'mod_membrane/V'
+    Vout = 'mod__membrane/V'
     rest_helper = harness.simulation_helper(scm.model_path, dict(scm.spec, sim_time=30.0, dt=1e-4))
     step_helper = harness.simulation_helper(scm.model_path, dict(scm.spec, sim_time=1.0, dt=5e-5))
     neuron = {}
     spikes = lambda t, v: int(np.sum((v[:-1] < 0) & (v[1:] >= 0)))
     for label, p, c in sets:
-        base = {spn('tau_w_num_i_M'): p['tau_w_num'], spn('tau_w_min_i_M'): p['tau_w_min']}
-        t, o = harness.run(rest_helper, [Vout], dict(base, **{spn('I_in_membrane'): 0.0}))
+        base = {spn('i_M/tau_w_num'): p['tau_w_num'], spn('i_M/tau_w_min'): p['tau_w_min']}
+        t, o = harness.run(rest_helper, [Vout], dict(base, **{spn('membrane/I_in'): 0.0}))
         v = o[harness.output_key(Vout)]
         neuron[label] = {'rest': (t, v, spikes(t, v), int(np.sum((v[:-1] < 0) & (v[1:] >= 0) & (t[1:] >= 20.0))))}   # spikes in total, and in the last 10 s
         for pa in (5, 9, 50):
-            t, o = _chain(step_helper, None, [(dict(base, **{spn('I_in_membrane'): 0.0}), 3),
-                                               (dict(base, **{spn('I_in_membrane'): pa * 1e-3}), 1)], [Vout])
+            t, o = _chain(step_helper, None, [(dict(base, **{spn('membrane/I_in'): 0.0}), 3),
+                                               (dict(base, **{spn('membrane/I_in'): pa * 1e-3}), 1)], [Vout])
             v = o[Vout]
             m = t >= 3.0
             neuron[label][pa] = (t[m] - 3.0, v[m], spikes(t[m], v[m]), t[t < 3.0], v[t < 3.0])

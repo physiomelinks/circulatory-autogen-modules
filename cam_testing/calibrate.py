@@ -291,8 +291,7 @@ def _model_name(key, by_var):
     """A calibrated value's parameter name in the generated model: the version's own
     (harness.parameter_name), or a neighbour's '<record>/<param>' as libcuflynx names it, <param>_<record>."""
     if '/' in key:
-        record, name = key.split('/', 1)
-        return f'{name}_{record}'
+        return harness.libcuflynx_model_name(key)
     return harness.parameter_name(by_var[key])
 
 
@@ -487,14 +486,14 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 # <p>_calibrated_parameters.csv) are written to:
 #   1. the version's default parameterisation (row <var>);
 #   2. every supermodule version using the version's default parameterisation as a submodule, recursively
-#      (row <var>_<submodule path>, outer first: soma/sympathetic rho_M_i_M, a neuron using that
-#      soma as "soma" rho_M_soma_i_M), where the row exists;
+#      (row <submodule path>/<var>, outer first: soma/sympathetic i_M/rho_M, a neuron using that
+#      soma as "soma" soma/i_M/rho_M), where the row exists;
 #   3. every system model whose module array uses the version, or a supermodule chain over it, at
-#      its default parameterisation (row <var>_<vessel> or <var>_<vessel>_<submodule path>), where the row exists;
+#      its default parameterisation (row <vessel>/<var> or <vessel>/<submodule path>/<var>), where the row exists;
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
-#      to the vessel of `reproduces` ("soma_SN/w": "SN_soma_i_M/w" -> soma_SN), giving row
-#      <var>_<that vessel> in that system model and row <var> in that vessel's version's default parameterisation.
+#      to the vessel of `reproduces` ("soma_SN/w": "SN__soma__i_M/w" -> soma_SN), giving row
+#      <that vessel>/<var> in that system model and row <var> in that vessel's version's default parameterisation.
 # Each rewritten reference reads "Calibrated (libcuflynx) to parameterisations/<p>/<p>_obs_data.json:
 # <note>" (with the version named when it is written elsewhere), and keeps the old value. <note> is the
 # obs_data's "calibration_note" (else its obs_data_name); an obs_data "reference_key" (a BibTeX key of
@@ -585,16 +584,16 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
                     continue
                 if module_array.parameterisation_of(sub, 'default') != default_of(mt, vname):
                     continue
-                path = sub['name'] + ('_' + sfx if sfx else '')
+                path = sub['name'] + ('/' + sfx if sfx else '')
                 if all((c[0].key, c[1]) != (S.key, path) for c in chain):
                     chain.append((S, path))
                     todo.append((S.mtype.name, S.name, path))
 
-    targets = []          # (csv path, suffix, where, own)
+    targets = []          # (csv path, row prefix, where, own)
     targets.append((version.default_parameterisation.parameters_path, '', f'{version.key} default parameterisation', True))
     for S, path in chain:
-        targets.append((S.default_parameterisation.parameters_path, '_' + path, f'{S.key} default parameterisation', False))
-    flattened = {}        # system key -> [flattened vessel names]
+        targets.append((S.default_parameterisation.parameters_path, path + '/', f'{S.key} default parameterisation', False))
+    flattened = {}        # system key -> [flattened vessels, as <record>/<submodule path>]
     systems_by_key = {m['key']: m for m in systems}
     chain_by_key = {}
     for S, path in chain:
@@ -608,22 +607,23 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
             if vk == version.key:
                 flattened.setdefault(m['key'], []).append(ves['name'])
             for path in chain_by_key.get(vk, []):
-                flattened.setdefault(m['key'], []).append(f"{ves['name']}_{path}")
+                flattened.setdefault(m['key'], []).append(f"{ves['name']}/{path}")
     for mkey, fl in flattened.items():
         for F in fl:
-            targets.append((systems_by_key[mkey]['parameters_path'], '_' + F, f'system model {mkey}', False))
+            targets.append((systems_by_key[mkey]['parameters_path'], F + '/', f'system model {mkey}', False))
     # monolithic counterparts, through supermodule.equivalent output maps
     for S in versions:
         for e in ((S.spec.get('supermodule') or {}).get('equivalent') or []):
             rep = systems_by_key.get(e.get('reproduces'))
             if rep is None:
                 continue
-            omap = e.get('output_map') or {}
+            omap = harness.model_output_map(e.get('output_map') or {})
             for F in flattened.get(e.get('model'), []):
-                mono = sorted({a.split('/', 1)[0] for a, b in omap.items() if b.split('/', 1)[0] == F})
+                vessel = F.replace('/', harness.LEVEL_SEPARATOR)    # its name in the model's outputs
+                mono = sorted({a.split('/', 1)[0] for a, b in omap.items() if b.split('/', 1)[0] == vessel})
                 if len(mono) != 1:
                     continue
-                targets.append((rep['parameters_path'], '_' + mono[0], f"system model {rep['key']}", False))
+                targets.append((rep['parameters_path'], mono[0] + '/', f"system model {rep['key']}", False))
                 ves = next((x for x in rep['vessels'] if x['name'] == mono[0]), None)
                 mv = by_key.get(f"{ves.get('module_type')}/{ves.get('module_subtype')}") if ves else None
                 if mv is not None:
@@ -633,16 +633,16 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     today = datetime.date.today().isoformat()
     obs_rel = os.path.relpath(inst.obs_data_path, version.dir).replace(os.sep, '/')
     plan, seen = [], set()
-    for path, sfx, where, own in targets:
-        rows = _row_values(path, {n + sfx for n in names})
+    for path, pfx, where, own in targets:
+        rows = _row_values(path, {pfx + n for n in names})
         for n in names:
-            row = rows.get(n + sfx)
-            if row is None or (path, n + sfx) in seen:
+            row = rows.get(pfx + n)
+            if row is None or (path, pfx + n) in seen:
                 continue
-            seen.add((path, n + sfx))
+            seen.add((path, pfx + n))
             to = obs_rel if own else f'{version.mtype.name} {version.name} {obs_rel}'
             ref = (f'{key}; ' if key else '') + f'Calibrated (libcuflynx) to {to}: {note} (was {row.get("value")}; applied {today})'
-            plan.append({'path': path, 'where': where, 'row': n + sfx, 'variable': n, 'value': calibrated[n],
+            plan.append({'path': path, 'where': where, 'row': pfx + n, 'variable': n, 'value': calibrated[n],
                          'old': row.get('value'), 'reference': ref, 'sourced': 'yes' if key else None})
     return plan
 

@@ -213,19 +213,32 @@ def test_supermodule_versions_get_the_verification_tests():
 def test_supermodule_model_names():
     soma = load_version('soma', 'sympathetic')
     assert harness.supermodule_model_name(soma, 'T') == 'T'
-    assert harness.supermodule_model_name(soma, 'Cm_membrane') == 'Cm_mod_membrane'
-    assert harness.supermodule_model_name(soma, 'tau_z_BK_i_BK') == 'tau_z_BK_mod_i_BK'
-    p = Parameter('Cm_membrane', 'picoF', '30', 'x')
-    assert harness.model_parameter_name(soma, p) == 'Cm_mod_membrane'
-    assert harness.parameter_name(Parameter('a', '', '1', '', model_name='a_mod_x')) == 'a_mod_x'
+    assert harness.supermodule_model_name(soma, 'global/T') == 'T'
+    assert harness.supermodule_model_name(soma, 'membrane/Cm') == 'Cm_mod__membrane'
+    assert harness.supermodule_model_name(soma, 'i_BK/tau_z_BK') == 'tau_z_BK_mod__i_BK'
+    p = Parameter('membrane/Cm', 'picoF', '30', 'x')
+    assert harness.model_parameter_name(soma, p) == 'Cm_mod__membrane'
+    assert harness.written_parameter_name(soma, p) == 'mod/membrane/Cm'
+    assert harness.written_parameter_name(soma, Parameter('T', 'kelvin', '295', 'x')) == 'T'
+    assert harness.parameter_name(Parameter('a', '', '1', '', model_name='a_mod__x')) == 'a_mod__x'
+    neuron = load_version('neuron', 'sympathetic')
+    assert harness.supermodule_model_name(neuron, 'soma/membrane/I_in') == 'I_in_mod__soma__membrane'
+
+
+def test_written_parameter_names_of_a_version():
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    p = next(p for p in v.default_parameterisation.parameters() if not p.is_global)
+    assert harness.written_parameter_name(v, p) == f'mod/{p.variable_name}'
+    assert harness.model_parameter_name(v, p) == f'{p.variable_name}_mod'
+    assert harness.libcuflynx_model_name('pvn/R') == 'R_pvn'
 
 
 def test_split_model_name_nested():
     neuron = load_version('neuron', 'sympathetic')
-    name, var, path, owner = harness.split_model_name(neuron, 'I_in_mod_soma_membrane')
-    assert (name, var, path) == ('I_in_soma_membrane', 'I_in', 'soma_membrane')
+    name, var, path, owner = harness.split_model_name(neuron, 'I_in_mod__soma__membrane')
+    assert (name, var, path) == ('soma/membrane/I_in', 'I_in', 'soma/membrane')
     assert owner.key == 'membrane_potential/SN_soma_Argus2026_v01'
-    assert harness.split_model_name(neuron, 'C_mod_axon')[3].key == 'axon/sympathetic_monolithic_v01'
+    assert harness.split_model_name(neuron, 'C_mod__axon')[3].key == 'axon/sympathetic_monolithic_v01'
     assert harness.split_model_name(neuron, 'T') == ('T', 'T', None, None)
 
 

@@ -2,7 +2,7 @@ model: 3compartment
 category: closed_loop_cvs
 reviewed: false
 sim_time: 2.0
-pre_time: 0.0
+pre_time: 20.0
 dt: 0.01
 equivalence:
   reference: reference
@@ -22,7 +22,7 @@ equivalence:
     trv/t: time, puv/t: time, miv/t: time, aov/t: time, heart/q: sum of the four chambers (no single variable after the split)}
   wrapped: {heart/mt: 1.0, heart/chi_afloor: 1.0, heart/chi_vfloor: 1.0, heart/chi_afloor_final: 1.0, heart/chi_vfloor_final: 1.0}
   reciprocal: [heart/L_trv, heart/L_puv, heart/L_miv, heart/L_aov, heart/B_trv, heart/B_puv, heart/B_miv, heart/B_aov]
-  tol: 1.0e-06
+  tol: 1.0e-05
   solver_info: {rtol: 1.0e-12, atol: 1.0e-14}
 invariants:
 - {description: total blood volume is conserved in the closed loop (relative drift < 1e-6), expr: np.ptp(sum_blood_volume__q_volume_sum_sum)

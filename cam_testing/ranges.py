@@ -139,8 +139,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest='cmd', required=True)
     ch = sub.add_parser('check', help="check a system model's parameters against module ranges")
-    ch.add_argument('--module-array', '--vessel-array', dest='module_array', required=True,
-                    help='the module array (--vessel-array is the old name of this option)')
+    ch.add_argument('--module-array', required=True, help='the module array')
     ch.add_argument('--parameters', required=True)
     args = parser.parse_args(argv)
     return 1 if check(args.module_array, args.parameters) else 0

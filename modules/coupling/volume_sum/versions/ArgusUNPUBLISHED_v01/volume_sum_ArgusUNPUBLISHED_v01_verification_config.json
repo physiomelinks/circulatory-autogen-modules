@@ -17,22 +17,22 @@
       ["mod", "ArgusUNPUBLISHED_v01", "volume_sum", "va vb", "", "default"]
     ],
     "parameters": [
-      ["P_p_in_a", "J_per_m3", 2000, "harness test value"],
-      ["v_flow_out_a", "m3_per_s", 0.0001, "harness test value"],
-      ["R_va", "Js_per_m6", 10000000.0, "harness test value"],
-      ["C_va", "m6_per_J", 1e-08, "harness test value"],
-      ["I_va", "Js2_per_m6", 100000.0, "harness test value"],
-      ["q_0_va", "m3", 0, "harness: zero unstressed volume"],
-      ["u_0_va", "J_per_m3", 0, "harness: zero reference pressure"],
-      ["u_ext_va", "J_per_m3", 0, "harness: zero external pressure"],
-      ["P_p_in_b", "J_per_m3", 1500, "harness test value"],
-      ["v_flow_out_b", "m3_per_s", 2e-05, "harness test value"],
-      ["R_vb", "Js_per_m6", 10000000.0, "harness test value"],
-      ["C_vb", "m6_per_J", 1e-08, "harness test value"],
-      ["I_vb", "Js2_per_m6", 100000.0, "harness test value"],
-      ["q_0_vb", "m3", 0, "harness: zero unstressed volume"],
-      ["u_0_vb", "J_per_m3", 0, "harness: zero reference pressure"],
-      ["u_ext_vb", "J_per_m3", 0, "harness: zero external pressure"]
+      ["p_in_a/P", "J_per_m3", 2000, "harness test value"],
+      ["flow_out_a/v", "m3_per_s", 0.0001, "harness test value"],
+      ["va/R", "Js_per_m6", 10000000.0, "harness test value"],
+      ["va/C", "m6_per_J", 1e-08, "harness test value"],
+      ["va/I", "Js2_per_m6", 100000.0, "harness test value"],
+      ["va/q_0", "m3", 0, "harness: zero unstressed volume"],
+      ["va/u_0", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["va/u_ext", "J_per_m3", 0, "harness: zero external pressure"],
+      ["p_in_b/P", "J_per_m3", 1500, "harness test value"],
+      ["flow_out_b/v", "m3_per_s", 2e-05, "harness test value"],
+      ["vb/R", "Js_per_m6", 10000000.0, "harness test value"],
+      ["vb/C", "m6_per_J", 1e-08, "harness test value"],
+      ["vb/I", "Js2_per_m6", 100000.0, "harness test value"],
+      ["vb/q_0", "m3", 0, "harness: zero unstressed volume"],
+      ["vb/u_0", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["vb/u_ext", "J_per_m3", 0, "harness: zero external pressure"]
     ]
   },
   "invariants": [

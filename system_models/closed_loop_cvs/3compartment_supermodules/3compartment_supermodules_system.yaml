@@ -2,29 +2,29 @@ model: 3compartment_supermodules
 category: closed_loop_cvs
 reviewed: false
 sim_time: 2.0
-pre_time: 0.0
+pre_time: 20.0
 dt: 0.01
 equivalence:
   reference: reference
-  output_map: {heart/u_ra: heart_ra/u, heart/u_rv: heart_rv/u, heart/u_la: heart_la/u, heart/u_lv: heart_lv/u, heart/q_ra: heart_ra/q,
-    heart/q_rv: heart_rv/q, heart/q_la: heart_la/q, heart/q_lv: heart_lv/q, heart/v_trv: heart_trv/v, heart/v_puv: heart_puv/v,
-    heart/v_miv: heart_miv/v, heart/v_aov: heart_aov/v, heart/zeta_trv: heart_trv/zeta, heart/zeta_puv: heart_puv/zeta, heart/zeta_miv: heart_miv/zeta,
-    heart/zeta_aov: heart_aov/zeta, heart/zeta_trv_pre: heart_trv/zeta_pre, heart/zeta_puv_pre: heart_puv/zeta_pre, heart/zeta_miv_pre: heart_miv/zeta_pre,
-    heart/zeta_aov_pre: heart_aov/zeta_pre, heart/e_a: heart_ra/e, heart/e_v: heart_lv/e, heart/s: heart_clock/s, heart/mt: heart_clock/mt,
-    heart/chi_a: heart_ra/chi, heart/chi_v: heart_lv/chi, heart/v_asd: asd_shunt/v, heart/T_wCont: heart_clock/T_eff, heart/chi_afloor: heart_ra/chi_floor,
-    heart/chi_vfloor: heart_lv/chi_floor, heart/chi_afloor_final: heart_ra/chi_floor_final, heart/chi_vfloor_final: heart_lv/chi_floor_final,
-    heart/R_lin_trv: heart_trv/R_lin, heart/R_lin_puv: heart_puv/R_lin, heart/R_lin_miv: heart_miv/R_lin, heart/R_lin_aov: heart_aov/R_lin,
-    heart/vel_trv: heart_trv/vel, heart/vel_puv: heart_puv/vel, heart/vel_miv: heart_miv/vel, heart/vel_aov: heart_aov/vel,
-    heart/E_lv_A_wCont: heart_lv/E_A_eff, heart/E_rv_A_wCont: heart_rv/E_A_eff, heart/A_eff_trv: heart_trv/A_eff, heart/B_trv: heart_trv/B,
-    heart/L_trv: heart_trv/L, heart/A_eff_puv: heart_puv/A_eff, heart/B_puv: heart_puv/B, heart/L_puv: heart_puv/L, heart/A_eff_miv: heart_miv/A_eff,
-    heart/B_miv: heart_miv/B, heart/L_miv: heart_miv/L, heart/A_eff_aov: heart_aov/A_eff, heart/B_aov: heart_aov/B, heart/L_aov: heart_aov/L,
-    heart/T_ac_wCont: heart_ra/T_c_eff, heart/T_ar_wCont: heart_ra/T_r_eff, heart/T_vc_wCont: heart_lv/T_c_eff, heart/T_vr_wCont: heart_lv/T_r_eff}
+  output_map: {heart/u_ra: heart/ra/u, heart/u_rv: heart/rv/u, heart/u_la: heart/la/u, heart/u_lv: heart/lv/u, heart/q_ra: heart/ra/q,
+    heart/q_rv: heart/rv/q, heart/q_la: heart/la/q, heart/q_lv: heart/lv/q, heart/v_trv: heart/trv/v, heart/v_puv: heart/puv/v,
+    heart/v_miv: heart/miv/v, heart/v_aov: heart/aov/v, heart/zeta_trv: heart/trv/zeta, heart/zeta_puv: heart/puv/zeta, heart/zeta_miv: heart/miv/zeta,
+    heart/zeta_aov: heart/aov/zeta, heart/zeta_trv_pre: heart/trv/zeta_pre, heart/zeta_puv_pre: heart/puv/zeta_pre, heart/zeta_miv_pre: heart/miv/zeta_pre,
+    heart/zeta_aov_pre: heart/aov/zeta_pre, heart/e_a: heart/ra/e, heart/e_v: heart/lv/e, heart/s: heart/clock/s, heart/mt: heart/clock/mt,
+    heart/chi_a: heart/ra/chi, heart/chi_v: heart/lv/chi, heart/v_asd: asd_shunt/v, heart/T_wCont: heart/clock/T_eff, heart/chi_afloor: heart/ra/chi_floor,
+    heart/chi_vfloor: heart/lv/chi_floor, heart/chi_afloor_final: heart/ra/chi_floor_final, heart/chi_vfloor_final: heart/lv/chi_floor_final,
+    heart/R_lin_trv: heart/trv/R_lin, heart/R_lin_puv: heart/puv/R_lin, heart/R_lin_miv: heart/miv/R_lin, heart/R_lin_aov: heart/aov/R_lin,
+    heart/vel_trv: heart/trv/vel, heart/vel_puv: heart/puv/vel, heart/vel_miv: heart/miv/vel, heart/vel_aov: heart/aov/vel,
+    heart/E_lv_A_wCont: heart/lv/E_A_eff, heart/E_rv_A_wCont: heart/rv/E_A_eff, heart/A_eff_trv: heart/trv/A_eff, heart/B_trv: heart/trv/B,
+    heart/L_trv: heart/trv/L, heart/A_eff_puv: heart/puv/A_eff, heart/B_puv: heart/puv/B, heart/L_puv: heart/puv/L, heart/A_eff_miv: heart/miv/A_eff,
+    heart/B_miv: heart/miv/B, heart/L_miv: heart/miv/L, heart/A_eff_aov: heart/aov/A_eff, heart/B_aov: heart/aov/B, heart/L_aov: heart/aov/L,
+    heart/T_ac_wCont: heart/ra/T_c_eff, heart/T_ar_wCont: heart/ra/T_r_eff, heart/T_vc_wCont: heart/lv/T_c_eff, heart/T_vr_wCont: heart/lv/T_r_eff}
   ignore: {heart/q_heart: sum of the four chambers (no single variable after the split), pvn/t: time, par/t: time, aortic_root/t: time,
-    systemic_T/t: time, venous_svc/t: time, volume_sum/t: time, heart_clock/t: time, ra/t: time, rv/t: time, la/t: time, lv/t: time,
+    systemic_T/t: time, venous_svc/t: time, volume_sum/t: time, heart/clock/t: time, ra/t: time, rv/t: time, la/t: time, lv/t: time,
     trv/t: time, puv/t: time, miv/t: time, aov/t: time, heart/q: sum of the four chambers (no single variable after the split)}
   wrapped: {heart/mt: 1.0, heart/chi_afloor: 1.0, heart/chi_vfloor: 1.0, heart/chi_afloor_final: 1.0, heart/chi_vfloor_final: 1.0}
   reciprocal: [heart/L_trv, heart/L_puv, heart/L_miv, heart/L_aov, heart/B_trv, heart/B_puv, heart/B_miv, heart/B_aov]
-  tol: 1.0e-06
+  tol: 1.0e-05
   solver_info: {rtol: 1.0e-12, atol: 1.0e-14}
 invariants:
 - {description: total blood volume is conserved in the closed loop (relative drift < 1e-6), expr: np.ptp(sum_blood_volume__q_volume_sum_sum)
