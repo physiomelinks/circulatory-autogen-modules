@@ -142,7 +142,7 @@ def test_an_annotated_reaction_with_rheas_stoichiometry_matches(tmp_path):
 def test_a_difference_only_in_h_plus_or_water_is_a_warning(tmp_path):
     result = bondgraph.reactions_check(hexokinase(tmp_path, products=(('G6P', 1), ('ADP', 1))))
     assert result.status == checks.PASSED
-    assert result.metrics['warn'] == 1 and 'H+: 0 where Rhea has 1' in only(result)
+    assert result.metrics['warn'] == 1 and 'H+ (c): 0 where Rhea has 1' in only(result)
 
 
 def test_a_wrong_or_missing_participant_fails(tmp_path):
@@ -272,3 +272,20 @@ def test_a_transport_reactions_unlocated_participants_match_wherever_the_model_h
              ('Re_NKA', 'Na_e', 3), ('Re_NKA', 'K_c', 2), ('Re_NKA', 'ADP_x', 1), ('Re_NKA', 'Pi_x', 1), ('Re_NKA', 'H_x', 1)]
     result = bondgraph.reactions_check(write(tmp_path, elements, bonds))
     assert result.status == checks.PASSED, result.details
+
+
+LEAK = {'id': '34979', 'equation': 'H(+)(in) = H(+)(out)', 'is_transport': True,
+        'participants': [{'chebi': 'CHEBI:15378', 'side': 'L', 'coefficient': '1', 'location': 'in', 'name': 'H(+)'},
+                         {'chebi': 'CHEBI:15378', 'side': 'R', 'coefficient': '1', 'location': 'out', 'name': 'H(+)'}]}
+
+
+def test_a_reaction_of_protons_alone_compares_them_strictly(tmp_path):
+    # a proton leak, H+(in) = H+(out): with nothing else in it, H+ isn't let off with a warning
+    elements = [reaction('Re_LEAK', ['34979']), species('H', 'c'), species('H', 'm')]
+    result = bondgraph.reactions_check(write(tmp_path, elements, [('H_c', 'Re_LEAK', 1), ('Re_LEAK', 'H_m', 1)]),
+                                       load=lambda rid: LEAK)
+    assert result.status == checks.PASSED and 'matches' in only(result)
+    os.makedirs(tmp_path / 'b')
+    result = bondgraph.reactions_check(write(tmp_path / 'b', elements, [('H_c', 'Re_LEAK', 2), ('Re_LEAK', 'H_m', 1)]),
+                                       load=lambda rid: LEAK)
+    assert result.status == checks.FAILED

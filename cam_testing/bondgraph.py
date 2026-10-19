@@ -367,7 +367,9 @@ def _lumped(model, parts):
 
 def _match(model, ref, names):
     '''(cost, Comparison): the model's coefficients against k times Rhea's, for the best k.'''
-    hard = lambda d: {k: v for k, v in d.items() if k[0] not in SOFT}
+    # H+ and H2O are compared loosely, unless they are all a reaction has (a proton leak)
+    soft = SOFT if any(k[0] not in SOFT for k in set(model) | set(ref)) else set()
+    hard = lambda d: {k: v for k, v in d.items() if k[0] not in soft}
     m, r = hard(model), hard(ref)
     shared = [k for k in m if k in r]
     if not shared:
@@ -389,8 +391,8 @@ def _match(model, ref, names):
             problems.append(f'{label(key)}: {abs(have)} where Rhea has {abs(want)}')
     warnings = []
     for key in sorted(set(model) | set(ref), key=str):
-        if key[0] in SOFT and k * ref.get(key, 0) != model.get(key, 0):
-            name = 'H+' if key[0] == rhea.H_PLUS else 'H2O'
+        if key[0] in soft and k * ref.get(key, 0) != model.get(key, 0):
+            name = ('H+' if key[0] == rhea.H_PLUS else 'H2O') + (f' ({key[1]})' if key[1] else '')
             warnings.append(f'{name}: {abs(model.get(key, 0))} where Rhea has {abs(k * ref.get(key, 0))}')
     how = ('reversed' if k < 0 else 'as written') + (f', scaled by {abs(k)}' if abs(k) != 1 else '')
     if problems:
