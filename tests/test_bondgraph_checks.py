@@ -192,6 +192,30 @@ def test_a_lumped_reaction_is_compared_by_its_net_equation(tmp_path):
     assert '17825+16689' in only(result)
 
 
+def test_a_lumped_reaction_may_take_a_part_more_than_once(tmp_path):
+    # two hexokinase steps (2 Glc + 2 ATP = 2 G6P + 2 ADP + 2 H+) and one glucose-6-phosphatase back:
+    # Glc + 2 ATP + H2O = G6P + 2 ADP + Pi + 2 H+
+    elements = [reaction('Re_lump', parts=['17825', '16689'])] + [species(n) for n in ('Glc', 'ATP', 'H2O', 'G6P', 'ADP', 'Pi', 'H')]
+    bonds = [('Glc_c', 'Re_lump', 1), ('ATP_c', 'Re_lump', 2), ('H2O_c', 'Re_lump', 1), ('Re_lump', 'G6P_c', 1),
+             ('Re_lump', 'ADP_c', 2), ('Re_lump', 'Pi_c', 1), ('Re_lump', 'H_c', 2)]
+    result = bondgraph.reactions_check(write(tmp_path, elements, bonds))
+    assert result.status == checks.PASSED, result.details
+    # one ADP too many: no multiples of the parts give it
+    os.makedirs(tmp_path / 'b')
+    bonds[4] = ('Re_lump', 'ADP_c', 3)
+    assert bondgraph.reactions_check(write(tmp_path / 'b', elements, bonds)).status == checks.FAILED
+
+
+def test_an_electrical_element_with_a_species_name_is_not_a_participant(tmp_path):
+    # a membrane potential, written with a species name, bonded both ways (it nets to nothing anyway)
+    elements = [reaction('Re_HK', ['17825'])] + [species(n) for n in ('Glc', 'ATP', 'G6P', 'ADP', 'H')] \
+        + [('psi_m', 'ElectricalCapacitiveNode', 'psi', 'm', False)]
+    bonds = [('Glc_c', 'Re_HK', 1), ('ATP_c', 'Re_HK', 1), ('Re_HK', 'G6P_c', 1), ('Re_HK', 'ADP_c', 1),
+             ('Re_HK', 'H_c', 1), ('psi_m', 'Re_HK', 1), ('Re_HK', 'psi_m', 1)]
+    result = bondgraph.reactions_check(write(tmp_path, elements, bonds))
+    assert result.status == checks.PASSED, result.details
+
+
 def test_a_polymer_counts_the_units_it_gains(tmp_path):
     # glycogen synthase: [glucosyl](n) + ADP-glucose = [glucosyl](n+1) + ADP + H+, a store of glucosyl units
     elements = [reaction('Re_GS', ['18189']), species('ADPglc'), species('Gly', cls='ChemicalStorageNode'),

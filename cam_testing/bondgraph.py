@@ -175,7 +175,8 @@ def _identifier(iri, prefix):
 
 def reactions(graph, model):
     '''The model's reactions (elements whose class is a ...ReactionNode, or annotated with a Rhea reaction),
-    each with its Rhea terms and participants.'''
+    each with its Rhea terms and participants: the chemical species elements bonded to it (a capacitor's
+    potential, an electrical element, isn't one).'''
     import rdflib
     uri = rdflib.URIRef
     elements = set(graph.objects(model, uri(BGF + 'hasBondElement')))
@@ -187,7 +188,7 @@ def reactions(graph, model):
     is_reaction = {e for e in elements
                    if any(t.endswith('ReactionNode') for t in types[e]) or rhea_of[e] or parts_of[e]}
     species = {e for e in elements - is_reaction if graph.value(e, uri(BGF + 'hasSpecies')) is not None
-               and not types[e] & JUNCTIONS}
+               and any('Chemical' in _local(t) for t in types[e])}
     junctions = set(graph.objects(model, uri(BGF + 'hasJunctionStructure'))) | {e for e in elements if types[e] & JUNCTIONS}
     bonds = []
     for c in graph.subjects(uri(BGF + 'hasSource'), None):
@@ -290,30 +291,45 @@ def compare(reaction, entries):
     model = {k: v for k, v in model.items() if v != 0}
     vectors = [rhea_vector(e) for e in entries]
     model_locations = {l for _, l in model}
+    rhea_locations = {l for v in vectors for _, l in v}
     best = None
-    # a lumped reaction: each part forwards or backwards
-    for signs in itertools.product((1, -1), repeat=len(vectors)):
-        net = {}
-        for s, v in zip(signs, vectors):
-            for k, c in v.items():
-                net[k] = net.get(k, 0) + s * c
-        net = {k: c for k, c in net.items() if c != 0}
-        for assignment in _assignments(model_locations, {l for _, l in net}):
-            if None in assignment and len(model_locations) > 1:
-                continue                              # Rhea's reaction isn't a transport but this one spans locations
+    for assignment in _assignments(model_locations, rhea_locations):
+        if None in assignment and len(model_locations) > 1:
+            continue                                  # Rhea's reaction isn't a transport but this one spans locations
+        placed = []
+        for v in vectors:
             ref = {}
-            for (chebi, l), c in net.items():
+            for (chebi, l), c in v.items():
                 key = (chebi, assignment[l] if l is not None else next(iter(model_locations), None))
                 ref[key] = ref.get(key, 0) + c
-            result = _match(model, ref, names)
-            if best is None or result[0] < best[0]:
-                best = result
+            placed.append(ref)
+        ref = placed[0] if len(placed) == 1 else _lumped(model, placed)
+        result = _match(model, ref, names)
+        if best is None or result[0] < best[0]:
+            best = result
     if best is None:
         spans = 'spans ' + ' and '.join(sorted(model_locations)) if len(model_locations) > 1 else 'is in one location'
         kind = 'a transport' if any(l for v in vectors for _, l in v) else 'not a transport'
         return Comparison('fail', f'Rhea\'s reaction is {kind}, but this one {spans}')
     _, comparison = best
     return comparison
+
+
+def _lumped(model, parts):
+    '''The net reaction of ``parts`` that comes nearest the model's: each part times the multiplier (any sign,
+    so either direction) a least-squares fit over the participants other than H+ and H2O gives, rounded to a
+    simple fraction.'''
+    import numpy as np
+    keys = sorted({k for p in parts for k in p} | set(model), key=str)
+    hard = [k for k in keys if k[0] not in SOFT]
+    a = np.array([[float(p.get(k, 0)) for p in parts] for k in hard])
+    b = np.array([float(model.get(k, 0)) for k in hard])
+    multipliers = [Fraction(x).limit_denominator(12) for x in np.linalg.lstsq(a, b, rcond=None)[0]]
+    net = {}
+    for m, p in zip(multipliers, parts):
+        for k, c in p.items():
+            net[k] = net.get(k, 0) + m * c
+    return {k: c for k, c in net.items() if c != 0}
 
 
 def _match(model, ref, names):
