@@ -275,3 +275,33 @@ def test_page_base64_round_trips_a_binary_file(tmp_path):
     assert r['b64'] == base64.b64encode(blob.read_bytes()).decode()
     assert r['page'] == 'cuflynx://open?url=https%3A%2F%2Fphysiomelinks.github.io%2Fcam%2Fmodules%2Fv%2Fparameterisations%2Fa%2520b%2Fx.omex'
     assert r['disk'] == 'cuflynx://open?url=file%3A%2F%2F%2Fhome%2Fu%2Fmodules%2Fv%2Fparameterisations%2Fi%2Fx.omex'
+
+
+def test_cuflynx_bridge_leaves_the_link_handler_alone(monkeypatch, tmp_path):
+    """The bridge's CUFLynx runs with CUFLYNX_NO_URL_SCHEME, so a test run never re-registers cuflynx:// links."""
+    import importlib.util
+    import subprocess
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        'cam_testing', 'bridges', 'cuflynx', 'simulate_omex.py')
+    spec = importlib.util.spec_from_file_location('simulate_omex', path)
+    bridge = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bridge)
+    seen = {}
+
+    class Exited:
+        returncode = 1
+
+        def poll(self):
+            return 1
+
+    def popen(args, **kw):
+        seen.update(kw['env'])
+        return Exited()
+
+    monkeypatch.setattr(subprocess, 'Popen', popen)
+    monkeypatch.setattr(bridge.tempfile, 'mkdtemp', lambda prefix='': str(tmp_path))
+    try:
+        bridge.launch('CUFLynx')
+    except Exception:
+        pass
+    assert seen.get('CUFLYNX_NO_URL_SCHEME') == '1'
