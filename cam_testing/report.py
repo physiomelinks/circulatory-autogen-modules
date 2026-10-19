@@ -30,6 +30,16 @@ from cam_testing.mathml import component_equation_targets, component_equations, 
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
 
+# The apps a version page opens its files in. The CellDL editor and PhLynx take the file in the
+# URL's hash, standard base64 of its bytes, which the page builds when the link is clicked
+# (templates/_open_in.js); CUFLynx takes the archive's absolute URL, percent-encoded, through its
+# cuflynx:// link scheme.
+CELLDL_EDITOR_URL = 'https://finbarargus.github.io/CellDLEditorComponent/'
+CELLDL_OPEN = CELLDL_EDITOR_URL + '?open=celldl#'
+PHLYNX_OPEN = 'https://phlynx.com/?open=omex#'
+CUFLYNX_OPEN = 'cuflynx://open?url='
+PHLYNX_NOT_EXPORTED = 'not exported yet (the PhLynx pipeline, make pipeline, keeps its export with the results)'
+
 
 def __getattr__(name):
     # the former constant: site/ of the repo under test (cam_testing.paths)
@@ -851,9 +861,31 @@ def _bc_summary(comp):
     return '; '.join(parts)
 
 
+def open_in_context(version):
+    '''The version page's "Open in" links: {celldl, phlynx, cuflynx}. celldl (a bond graph only) and
+    phlynx are {href: the file relative to the page, open: the app URL its base64 follows}; phlynx is
+    {reason} where PhLynx has no form of the version and {missing} before an export is kept.
+    cuflynx is the URL prefix of the per-instance links.'''
+    celldl = None
+    if bondgraph.is_bondgraph(version):
+        celldl = {'href': os.path.relpath(bondgraph.document_path(version), version.dir).replace(os.sep, '/'),
+                  'open': CELLDL_OPEN}
+    archive = phlynx.archive_path(version)
+    if phlynx._cpp(version):
+        phl = {'reason': phlynx._reason(version)}
+    elif version.is_supermodule:
+        phl = {'reason': phlynx.NO_SUPERMODULE_SUPPORT}
+    elif os.path.isfile(archive):
+        phl = {'href': os.path.relpath(archive, version.dir).replace(os.sep, '/'), 'open': PHLYNX_OPEN}
+    else:
+        phl = {'missing': PHLYNX_NOT_EXPORTED}
+    return {'celldl': celldl, 'phlynx': phl, 'cuflynx': CUFLYNX_OPEN}
+
+
 def version_context(version):
     comp = component_context(version)
     return {
+        'open_in': open_in_context(version),
         'name': version.label, 'key': version.key, 'module_type': version.vessel_type, 'version': version.name,
         'category': version.category, 'location': version.mtype.location, 'reviewed': version.reviewed,
         'components': [comp],
@@ -1021,8 +1053,9 @@ def _href(relpath, page):
 
 
 def assemble_site(names, contexts):
-    '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page and
-    plots; a nested module_type's directory is inside its parent's), as GitHub Pages serves it.'''
+    '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page, plots,
+    bond graph, PhLynx export and instance archives; a nested module_type's directory is inside its
+    parent's), as GitHub Pages serves it.'''
     site_dir = paths.roots().site_dir
     if os.path.isdir(site_dir):
         shutil.rmtree(site_dir)
@@ -1039,6 +1072,12 @@ def assemble_site(names, contexts):
             shutil.copy2(v.html_path, vdest)
             if os.path.isdir(v.plots_dir):
                 shutil.copytree(v.plots_dir, os.path.join(vdest, 'plots'))
+            # the files the page opens in the CellDL editor and PhLynx, at the same relative paths
+            for path in (bondgraph.document_path(v), phlynx.archive_path(v)):
+                if os.path.isfile(path):
+                    fdest = os.path.join(vdest, os.path.relpath(path, v.dir))
+                    os.makedirs(os.path.dirname(fdest), exist_ok=True)
+                    shutil.copy2(path, fdest)
             # the instances' CUFLynx archives, where they have been built (make omex)
             for inst in v.instances():
                 archive = omex_mod.omex_path(v, inst)

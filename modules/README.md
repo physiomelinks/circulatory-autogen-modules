@@ -613,12 +613,16 @@ What an archive holds, in this order:
 | `<module_type>_<version>_<instance>.cellml` | **Master model** (marked in `manifest.xml`): the flattened model of the version's test network (the version alone, or its `harness` network) with this instance's parameters, as libcuflynx generates it. This is what CUFLynx opens and simulates. |
 | `<instance>_obs_data.json` | The instance's data, if it has any (CUFLynx's observations): calibration data, and held-out validation data as `prediction_items`. |
 | `<instance>_params_for_id.csv` | The parameters to identify, if any (CUFLynx's calibration setup). |
-| `<instance>_parameters.csv`, raw data files, `SOURCES.md`, `<instance>_calibrated_parameters.csv`, `<instance>_calibration.json` | The instance's own files, unchanged. |
+| `<instance>_parameters.csv` | The instance's parameters, unchanged. |
+| `<instance>_calibration.json`, `<instance>_calibrated_parameters.csv` | The calibration result, if the instance has been calibrated (`validation_test_calibrate`): the JSON is an object with `calibrated_parameters` (and the cost and date), the CSV the parameters with those values. |
+| raw data files, `SOURCES.md` | The instance's other files, unchanged. |
 | `<module_type>_<version>_modules.cellml`, `_modules_config.json`, `_units.cellml` | The version's math, unchanged. |
 | `<module_type>_<version>_verification_config.json` | The version's verification settings, in preparation for CUFLynx running them. |
 | `<module_type>_<version>_<instance>_module_array.json`, `_model_parameters.csv` | The test network and the parameters file the model was generated from. |
 
-CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the first `.csv` with "param" in its name is the params_for_id. So the study members come first.
+CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the first `.csv` with "param" in its name is the params_for_id. So the study members come first, and the calibration result after them and the parameters (its CSV's name holds "param"); CUFLynx recognises the calibration result by its names.
+
+The version report's "Open in CUFLynx" link, beside each archive's download, opens it in the CUFLynx app as `cuflynx://open?url=<the archive's absolute URL, percent-encoded>`, the URL worked out by the page itself, so it works on the published site and from disk. It needs a CUFLynx that handles `cuflynx://` links.
 
 An instance with no obs_data or params_for_id still loads and simulates, but CUFLynx then tries other members in those roles and shows two harmless "could not read" notes. That limitation is noted for a future change.
 
