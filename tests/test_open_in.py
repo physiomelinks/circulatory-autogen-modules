@@ -73,6 +73,7 @@ def test_page_of_a_version_without_a_bond_graph_has_no_celldl_link():
     assert ctx['open_in']['celldl'] is None
     html = _render(ctx)
     assert 'id="open-celldl"' not in html and report.CELLDL_EDITOR_URL not in html
+    assert 'id="bond-graph"' not in html and 'id="bond-graph-figure"' not in html
     assert 'class="open-in"' in html
 
 
@@ -91,6 +92,12 @@ def test_page_of_a_bond_graph_has_the_celldl_and_phlynx_links(tmp_path):
     assert f'data-open-url="{report.CELLDL_OPEN}"' in celldl
     ph = re.search(r'<a [^>]*id="open-phlynx"[^>]*>', html).group(0)
     assert 'data-open-file="results/mt_v_phlynx.omex"' in ph and 'data-open-url="https://phlynx.com/?open=omex#"' in ph
+    # the document itself is the figure, right after the test overview
+    figure = re.search(r'<img [^>]*id="bond-graph-figure"[^>]*>', html).group(0)
+    assert 'src="mt_v_bondgraph.svg"' in figure
+    assert html.index('id="overview"') < html.index('id="bond-graph"') < html.index('id="bond-graph-figure"')
+    assert html.index('id="bond-graph-figure"') < html.index('</section>', html.index('id="bond-graph"'))
+    assert '<a href="#bond-graph">' in html
     # the encoder is inline, so the page needs nothing else to open the file
     assert 'camOpenIn' in html and 'bytesToBase64' in html
 
