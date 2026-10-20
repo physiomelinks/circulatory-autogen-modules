@@ -196,7 +196,7 @@
       ]
     },
     "system_model": {
-      "description": "One model: its module array (records name a module_type, a version as module_subtype, and a parameterisation), parameters (which win over the parameterisations'), spec, and under reference/ what it must reproduce: circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
+      "description": "One model: its module array (records name a module_type, a version as module_subtype, and a parameterisation), its supermodule instances' parameters files ({model}_supermodule_parameters/<instance>.json), parameters (which win over the parameterisations' and those files), spec, and under reference/ what it must reproduce: circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
@@ -214,8 +214,18 @@
       "directories": [
         "reference",
         "results",
-        "plots"
+        "plots",
+        "{model}_supermodule_parameters"
       ]
+    },
+    "supermodule_instance_parameters": {
+      "path": "system_models/<category>/<model>/{model}_supermodule_parameters/",
+      "description": "The parameters file of each supermodule instance of the model's module array, <instance>.json (libcuflynx's supermodule parameters format), written once from its version's <module_type>_<version>_parameters.json by cuflynx-upgrade supermodule-instances. Generation reads it, never the version's file; calibrate apply writes it. One file per supermodule instance, and no other.",
+      "files": {
+        "required": [],
+        "optional": [],
+        "data_file_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*\\.json$"
+      }
     },
     "reference": {
       "description": "The reference the system model must reproduce: circulatory_autogen's original model (its own module names), or a ready CellML model; not checked.",

@@ -1,15 +1,17 @@
 """
 cam_testing.calibrate apply: a parameterisation's calibrated values reach the version's default
-parameterisation, every instance of it in a supermodule's parameters file (whatever parameterisation the
-instance started from), the system models using it (<vessel>[/<submodule>]/<var>) and the monolithic
-counterparts named by a supermodule's equivalent output_map. A mock library in a temp directory, shaped like
-the heart: no simulation.
+parameterisation, every instance of it in a supermodule version's parameters file and in each system model's
+supermodule instance parameters files (whatever parameterisation the instance started from), the system
+models' parameters CSV rows (<vessel>[/<submodule>]/<var>) and the monolithic counterparts named by a
+supermodule's equivalent output_map. A mock library in a temp directory, shaped like the heart: no
+simulation.
 """
 import json
 import os
 from types import SimpleNamespace
 
-from libcuflynx.utilities.config_schemas import dump_supermodule_parameters
+from libcuflynx.utilities.config_schemas import (dump_supermodule_parameters,
+                                                 supermodule_instance_parameters_path)
 
 from cam_testing import calibrate
 
@@ -82,11 +84,34 @@ def _library(tmp):
                            {'name': 'E', 'module_type': 'heart', 'module_subtype': 's1', 'parameterisation': 'default'}],
              ['C/lv/E_A,S,1,old', 'E/ra/E_A,S,4,its own']),
             ('sys_mono', [{'name': 'mono_C', 'module_type': 'heartmono', 'module_subtype': 'm1', 'parameterisation': 'default'}],
-             ['mono_C/E_A,S,1,old'])):
+             ['mono_C/E_A,S,1,old']),
+            ('sys_body', [{'name': 'B', 'module_type': 'body', 'module_subtype': 'o1', 'parameterisation': 'default'}],
+             [])):
         path = os.path.join(tmp, 'system_models', key, f'{key}_parameters.csv')
         _csv(path, rows, header=HEADER4)
-        systems.append({'key': key, 'dir': os.path.dirname(path), 'vessels': vessels, 'parameters_path': path})
+        array = os.path.join(tmp, 'system_models', key, f'{key}_module_array.json')
+        systems.append({'key': key, 'dir': os.path.dirname(path), 'vessels': vessels, 'array_path': array,
+                        'parameters_path': path})
+    # each supermodule instance's parameters file in the model, made from its version's: E's ra has a value
+    # of its own; the body's holds the heart's values as paths
+    for system, name, instances in (
+            ('sys_super', 'C', {'ra': ('ra', {'E_A': 3, 'k': 7}), 'lv': ('default', {'E_A': 1, 'k': 7})}),
+            ('sys_super', 'E', {'ra': ('ra', {'E_A': 4, 'k': 7}), 'lv': ('default', {'E_A': 1, 'k': 7})}),
+            ('sys_body', 'B', {'heart': ('default', {'ra/E_A': 3, 'ra/k': 7, 'lv/E_A': 1, 'lv/k': 7})})):
+        _instance_file(tmp, system, name, instances)
     return chamber, [chamber, heart, body, single, mono], systems
+
+
+def _instance_file(tmp, system, name, instances):
+    path = supermodule_instance_parameters_path(
+        os.path.join(tmp, 'system_models', system, f'{system}_module_array.json'), name)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w') as f:
+        f.write(dump_supermodule_parameters({'schema_version': 1, 'instances': {
+            n: {'parameterisation': p, 'parameters': {v: {'value': x, 'units': 'S', 'data_reference': 'model'}
+                                                      for v, x in values.items()}}
+            for n, (p, values) in instances.items()}}))
+    return path
 
 
 def _instances(version):
@@ -118,6 +143,30 @@ def test_a_chamber_calibration_updates_every_chamber_instance_in_the_heart_s_par
         assert f.read() == dump_supermodule_parameters({'schema_version': 1, 'instances': instances})
 
 
+def test_a_chamber_calibration_updates_the_system_models_supermodule_instance_files(tmp_path):
+    """Each system model's supermodule instance has its own parameters file; every instance of the version in
+    it is written, whatever it started from, through a nested supermodule's paths too."""
+    chamber, versions, systems = _library(str(tmp_path))
+    calibrate.write_plan(calibrate.apply_plan(chamber, 'fit', versions=versions, systems=systems))
+
+    def instances(system, name):
+        path = supermodule_instance_parameters_path(
+            os.path.join(str(tmp_path), 'system_models', system, f'{system}_module_array.json'), name)
+        with open(path) as f:
+            return json.load(f)['instances']
+    for name in ('C', 'E'):
+        heart = instances('sys_super', name)
+        assert heart['lv']['parameters']['E_A']['value'] == 2.5000001
+        assert heart['ra']['parameters']['E_A']['value'] == 2.5000001
+        assert heart['ra']['parameterisation'] == 'ra'
+        assert heart['ra']['parameters']['k'] == {'value': 7, 'units': 'S', 'data_reference': 'model'}
+        assert heart['lv']['parameters']['E_A']['data_reference'].startswith(
+            'Smith2020; Calibrated (libcuflynx) to chamber v1 parameterisations/fit/fit_obs_data.json')
+    body = instances('sys_body', 'B')['heart']['parameters']
+    assert body['lv/E_A']['value'] == body['ra/E_A']['value'] == 2.5000001
+    assert body['lv/k']['value'] == 7
+
+
 def test_apply_plan_and_write(tmp_path):
     chamber, versions, systems = _library(str(tmp_path))
     plan = calibrate.apply_plan(chamber, 'fit', versions=versions, systems=systems)
@@ -134,6 +183,12 @@ def test_apply_plan_and_write(tmp_path):
         ('system_models/sys_super/sys_super_parameters.csv', 'E/ra/E_A'),
         ('system_models/sys_mono/sys_mono_parameters.csv', 'mono_C/E_A'),
         ('modules/heartmono/m1/parameterisations/default/default_parameters.csv', 'E_A'),
+        ('system_models/sys_super/sys_super_supermodule_parameters/C.json', 'lv/E_A'),
+        ('system_models/sys_super/sys_super_supermodule_parameters/C.json', 'ra/E_A'),
+        ('system_models/sys_super/sys_super_supermodule_parameters/E.json', 'lv/E_A'),
+        ('system_models/sys_super/sys_super_supermodule_parameters/E.json', 'ra/E_A'),
+        ('system_models/sys_body/sys_body_supermodule_parameters/B.json', 'heart/lv/E_A'),
+        ('system_models/sys_body/sys_body_supermodule_parameters/B.json', 'heart/ra/E_A'),
     }
     assert all(c['value'] == repr(2.5000001) for c in plan)          # full precision from calibration.json
     own = next(c for c in plan if c['path'] == chamber.default_parameterisation.parameters_path)
@@ -167,5 +222,5 @@ def test_apply_dry_run_writes_nothing(tmp_path, monkeypatch):
                                                       versions[1].instance_parameters_path)}
     lines = []
     plan = calibrate.apply_command('chamber/v1', 'fit', dry_run=True, versions=versions, systems=systems, out=lines.append)
-    assert len(plan) == 11 and lines[-1].startswith('11 row(s)') and 'dry run' in lines[-1]
+    assert len(plan) == 17 and lines[-1].startswith('17 row(s)') and 'dry run' in lines[-1]
     assert all(open(p, newline='').read() == t for p, t in before.items())

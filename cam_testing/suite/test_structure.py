@@ -85,6 +85,14 @@ def _library_versions():
     return all_versions(include_libraries=True)
 
 
+@functools.lru_cache(maxsize=1)
+def _supermodule_registry():
+    '''libcuflynx's supermodule registry of every library, as a model is generated with.'''
+    from libcuflynx.utilities.module_library import ModuleSources
+    from cam_testing.library import library_dirs
+    return ModuleSources({'module_library_dirs': library_dirs(), 'use_builtin_modules': False}).supermodule_registry()
+
+
 VERSION_KEYS = [v.key for v in _versions()]
 
 
@@ -382,12 +390,41 @@ def test_system_models_directory_layout():
             _name_ok('system_model', model, mdir, problems)
             _check_files('system_model', mdir, {'model': model}, problems)
             for c in _subdirs(mdir):
-                if c not in LEVELS['system_model']['directories']:
+                if c not in {_fill(x, {'model': model}) for x in LEVELS['system_model']['directories']}:
                     problems.append(f'{os.path.relpath(mdir, REPO_ROOT)}: unexpected directory {c}')
+                elif c == f'{model}_supermodule_parameters':
+                    _check_files('supermodule_instance_parameters', os.path.join(mdir, c), {}, problems)
     assert not problems, '\n'.join(problems)
 
 
 SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_module_array.json')))
+
+
+@pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
+def test_system_model_supermodule_instances_have_their_parameters_files(path):
+    '''Each supermodule instance of a system model has its parameters file
+    ({model}_supermodule_parameters/<instance>.json), which libcuflynx loads against its version, and no other
+    instance has one.'''
+    from libcuflynx.utilities.config_schemas import supermodule_instances_dir
+    from libcuflynx.utilities.supermodules import load_instance_parameters
+    registry = _supermodule_registry()
+    records = json.load(open(path))
+    problems, supers = [], set()
+    for r in records:
+        entry = registry.get((r.get('module_type'), r.get('module_subtype')))
+        if entry is None:
+            continue
+        supers.add(r['name'])
+        try:
+            load_instance_parameters(path, r, entry, f'{os.path.basename(path)}: "{r["name"]}"')
+        except ValueError as e:
+            problems.append(str(e))
+    directory = supermodule_instances_dir(path)
+    if os.path.isdir(directory):
+        stray = sorted(f for f in os.listdir(directory) if os.path.splitext(f)[0] not in supers)
+        if stray:
+            problems.append(f'{os.path.relpath(directory, REPO_ROOT)}: {stray} are not supermodule instances of the model')
+    assert not problems, '\n'.join(problems)
 
 
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))

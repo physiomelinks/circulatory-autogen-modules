@@ -491,8 +491,10 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 #      (soma/sympathetic: instance i_M, parameter rho_M), and the parameter <path>/<var> of an instance of a
 #      supermodule over it, where the file has it (a neuron using that soma as "soma": instance soma,
 #      parameter i_M/rho_M). The instance's "parameterisation" (where its values started) is kept;
-#   3. every system model whose module array uses the version, or a supermodule chain over it (row
-#      <vessel>/<var> or <vessel>/<submodule path>/<var>), where the row exists;
+#   3. every system model whose module array uses the version, or a supermodule chain over it: in the
+#      parameters file of each supermodule instance (<prefix>_supermodule_parameters/<instance>.json beside
+#      the module array), the parameter <var> or <path>/<var> as in (2), where the file has it; and in its
+#      parameters CSV the row <vessel>/<var> or <vessel>/<submodule path>/<var>, where the row exists;
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
 #      to the vessel of `reproduces` ("soma_SN/w": "SN__soma__i_M/w" -> soma_SN), giving row
@@ -504,7 +506,7 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 
 
 def _system_models(root=None):
-    """[{key, dir, vessels, parameters_path}] of every system model under ``root``."""
+    """[{key, dir, vessels, array_path, parameters_path}] of every system model under ``root``."""
     from cam_testing import paths
     root = root or paths.roots().system_models_dir
     out = []
@@ -515,6 +517,7 @@ def _system_models(root=None):
                 with open(os.path.join(d, f)) as fh:
                     vessels = json.load(fh)
                 out.append({'key': os.path.relpath(d, root).replace(os.sep, '/'), 'dir': d, 'vessels': vessels,
+                            'array_path': os.path.join(d, f),
                             'parameters_path': os.path.join(d, f'{name}_parameters.csv')})
     return sorted(out, key=lambda m: m['key'])
 
@@ -670,6 +673,18 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
             n = parameter.rpartition('/')[2]
             add(S.instance_parameters_path, f'{S.key} parameters file', f'{inst}/{parameter}', n, value.get('value'),
                 instance=inst, parameter=parameter)
+    # the system models' supermodule instances: each instance's parameters file in the model
+    from libcuflynx.utilities.config_schemas import supermodule_instance_parameters_path
+    for m in systems:
+        for ves in m['vessels']:
+            paths = chain_by_key.get(f"{ves.get('module_type')}/{ves.get('module_subtype')}")
+            if not paths or not m.get('array_path'):
+                continue
+            path = supermodule_instance_parameters_path(m['array_path'], ves['name'])
+            for (inst, parameter), value in _instance_values(path, paths, names).items():
+                n = parameter.rpartition('/')[2]
+                add(path, f"system model {m['key']} instance {ves['name']}", f'{inst}/{parameter}', n,
+                    value.get('value'), instance=inst, parameter=parameter)
     for path, pfx, where, own in targets[1:]:
         rows = _row_values(path, {pfx + n for n in names})
         for n in names:

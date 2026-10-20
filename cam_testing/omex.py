@@ -17,7 +17,8 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
     _parameters.json (their values) and its submodules' _modules_config.json (their required_citations;
     a nested supermodule's with its _module_array.json and _parameters.json); and the test network the
     model was generated from
-    (<module_type>_<version>_<p>_module_array.json / _model_parameters.csv)
+    (<module_type>_<version>_<p>_module_array.json, its supermodule instances' parameters files
+    <module_type>_<version>_<p>_supermodule_parameters/<instance>.json, and _model_parameters.csv)
   manifest.xml                                COMBINE manifest (master marked)
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
@@ -102,6 +103,10 @@ def members(version, parameterisation, work_dir):
             add(sub.instance_parameters_path)
     # the test network the model was generated from
     add(os.path.join(res, f'{prefix}_module_array.json'), f'{stem}_module_array.json')
+    from libcuflynx.utilities.config_schemas import supermodule_instances_dir
+    instances = supermodule_instances_dir(os.path.join(res, f'{prefix}_module_array.json'))
+    for f in sorted(os.listdir(instances)) if os.path.isdir(instances) else []:
+        add(os.path.join(instances, f), f'{stem}_supermodule_parameters/{f}')
     add(os.path.join(res, f'{prefix}_parameters.csv'), f'{stem}_model_parameters.csv')
     return out
 

@@ -10,6 +10,7 @@ libcuflynx's bundled copies.
 """
 import contextlib
 import csv
+import functools
 import io
 import os
 
@@ -238,7 +239,9 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     if not any(r[0] == VESSEL for r in rows):
         raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
     records = module_array.from_rows(rows)
-    module_array.write_records(os.path.join(resources_dir, f'{prefix}_module_array.json'), records)
+    array = os.path.join(resources_dir, f'{prefix}_module_array.json')
+    module_array.write_records(array, records)
+    _write_supermodule_instances(array, records)
 
     params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
@@ -257,6 +260,32 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
             name = libcuflynx_model_name(written_name)
             if name not in written:
                 writer.writerow([written_name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
+
+
+def _write_supermodule_instances(array, records):
+    '''Each supermodule instance of the test network gets its parameters file, new from its version
+    (libcuflynx's supermodules.write_instance_parameters), so it is tested with the version's values.'''
+    keys = _supermodule_keys(tuple(library_dirs()))
+    if not any((r.get('module_type'), r.get('module_subtype')) in keys for r in records):
+        return
+    from libcuflynx.utilities.module_library import ModuleSources
+    from libcuflynx.utilities.supermodules import write_instance_parameters
+    registry = ModuleSources({'module_library_dirs': library_dirs(), 'use_builtin_modules': False}).supermodule_registry()
+    write_instance_parameters(array, registry, replace=True)
+
+
+@functools.lru_cache(maxsize=4)
+def _supermodule_keys(libraries):
+    '''(module_type, version) of every supermodule version in ``libraries``: those with a module array.'''
+    keys = set()
+    for library in libraries:
+        for root, _dirs, files in os.walk(library):
+            for f in files:
+                if f.endswith('_module_array.json'):
+                    mt, version = os.path.basename(os.path.dirname(os.path.dirname(root))), os.path.basename(root)
+                    if f == f'{mt}_{version}_module_array.json':
+                        keys.add((mt, version))
+    return keys
 
 
 def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None):

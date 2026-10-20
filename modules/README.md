@@ -322,8 +322,11 @@ A parameterisation is **a parameter set of a version: only the parameters change
     `rho_M`; the heart: `lv` and `ra`, `rv`, `la` alike for a chamber calibration), and the parameter
     `<path>/<var>` of an instance of a supermodule over it where the file has one. The instance's
     `"parameterisation"`, where its values started, is kept;
-  - the system models with an instance of the version or of such a supermodule (row
-    `<vessel>[/<submodule path>]/<var>`, e.g. `SN/soma/i_M/rho_M`), where the row exists;
+  - the system models with an instance of the version or of such a supermodule: in each supermodule
+    instance's parameters file (`<model>_supermodule_parameters/<instance>.json`), the parameter
+    `<var>` or `<path>/<var>` as in a supermodule version's file (`SN.json`: instance `soma`, parameter
+    `i_M/rho_M`), whatever parameterisation the instance started from; and in the model's parameters
+    CSV the row `<vessel>[/<submodule path>]/<var>` (e.g. `SN/soma/i_M/rho_M`), where the row exists;
   - the monolithic counterparts named by a supermodule's `supermodule.equivalent` output_map (row
     `<vessel>/<var>` in the `reproduces` system model, e.g. `soma_SN/rho_M`, and `<var>` in that
     vessel's version's default parameterisation).
@@ -408,12 +411,26 @@ same module_type:
 
   A nested supermodule's instance names paths into it (`i_M/rho_M`), and only where it overrides
   that supermodule's own file. `cuflynx-upgrade module-config` wrote these files from each instance's
-  parameterisation; since then the file is what is edited, and what `calibrate apply` writes. Generation
-  uses its values: the model's parameters file wins, then the supermodule's parameterisation (which
-  holds its globals), then this file, then the submodule version's default parameterisation for a
-  parameter the file does not give. `Version.instance_parameters` reads it, and the structure test
-  checks that each instance's parameters are variables of its version (not its globals) and that it
-  started from a parameterisation the version has.
+  parameterisation. This file is the **template** of a new instance of the version: a model never
+  reads it. `calibrate apply` writes it, so later instances start from the calibrated values.
+  `Version.instance_parameters` reads it, and the structure test checks that each instance's
+  parameters are variables of its version (not its globals) and that it started from a
+  parameterisation the version has. The supermodule's parameterisations hold its globals only: libcuflynx
+  refuses a `<submodule>/<var>` row there.
+- **A model's instances.** Each supermodule instance of a model has its own copy, in the same format,
+  beside the model's module array: `<model>_supermodule_parameters/<instance>.json`
+  (`system_models/closed_loop_cvs/3compartment_supermodules/3compartment_supermodules_supermodule_parameters/heart.json`).
+  It is written once from the version's file, with a nested supermodule's values written out as
+  paths (`SN.json` holds every soma and varicosity value as `soma/<instance>/<var>`):
+
+  ```
+  cuflynx-upgrade supermodule-instances system_models/<category>/<model>/<model>_module_array.json --module-library-dir modules --no-builtin-modules
+  ```
+
+  Generation reads that file and refuses an instance without one. The test harness writes a new one
+  for a version's test network each time it generates it, so a version is tested with its own file's
+  values. `tests/test_structure.py` checks that each system model's supermodule instances have their
+  files, which libcuflynx loads, and no others.
 
 | Supermodule version | Built from |
 |---|---|
@@ -428,10 +445,10 @@ A model uses one record, e.g.
 `{"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
 "per_submodule_inputs": {"ra": ["venous_svc"]}, "per_submodule_outputs": {"aov": ["aortic_root"]}}`.
 - **Expansion.** libcuflynx expands the record: each submodule becomes `<name>__<submodule>`, and the
-  supermodule's parameters file (and any parameterisation rows `<submodule>/<var>`, nested:
-  `<submodule>/<its submodule>/<var>`) set that submodule's parameters.
-- **Precedence.** The model's parameters file wins, then the supermodule's parameterisation, then its
-  parameters file, then each submodule version's default parameterisation.
+  instance's parameters file in the model (`<model>_supermodule_parameters/<name>.json`; nested:
+  `<submodule>/<its submodule>/<var>`) sets that submodule's parameters.
+- **Precedence.** The model's parameters file wins, then the supermodule's parameterisation (its
+  globals), then the instance's parameters file, then each submodule version's default parameterisation.
 - **Where it lives.** Its `tests.yaml` has a `description`; its `verification_config.json` has a
   `supermodule` block. `globals` lists its global parameters. `equivalent` lists the system models
   it must reproduce: `system_models/closed_loop_cvs/3compartment_supermodules` reproduces
@@ -496,7 +513,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 **Supermodule versions** run the same verification and validation tests as a component. The
 supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod__<submodule>`
 (nested supermodules: `mod__<submodule>__<subsubmodule>`), and its parameters are those of the
-flattened model: the supermodule's own parameterisation and parameters file, its submodules' default parameterisations, and the boundary
+flattened model: the supermodule's own parameterisation, a new instance's parameters file (a copy of the version's, `<prefix>_supermodule_parameters/mod.json` beside the test network), its submodules' default parameterisations, and the boundary
 conditions no internal connection closes. In the spec (`run_parameters`, `bc_sweep`, `validation`)
 a submodule's parameter is named as in the supermodule's parameterisation, `<submodule path>/<var>` (e.g.
 `membrane/I_in`, or `soma/membrane/I_in` in `neuron/sympathetic`); globals keep their names. The
@@ -685,7 +702,7 @@ What an archive holds, in this order:
 | `<p>_parameters.csv`, raw data files, `SOURCES.md`, `<p>_calibrated_parameters.csv`, `<p>_calibration.json` | The parameterisation's own files, unchanged. |
 | `<module_type>_<version>_modules.cellml`, `_modules_config.json`, `_units.cellml` | The version's math, unchanged. |
 | `<module_type>_<version>_verification_config.json` | The version's verification settings, in preparation for CUFLynx running them. |
-| `<module_type>_<version>_<p>_module_array.json`, `_model_parameters.csv` | The test network and the parameters file the model was generated from. |
+| `<module_type>_<version>_<p>_module_array.json`, `_supermodule_parameters/<instance>.json`, `_model_parameters.csv` | The test network, its supermodule instances' parameters files, and the parameters file the model was generated from. |
 
 CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the first `.csv` with "param" in its name is the params_for_id. So the study members come first.
 
