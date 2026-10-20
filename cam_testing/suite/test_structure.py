@@ -518,7 +518,93 @@ def version_problems(version, library_components=None):
                 errors.append(f'{key}: {name} has units {units} in the config but {v.get("units")} in the CellML')
             if not v.get('public_interface'):
                 warnings.append(f'{key}: config variable {name} has no public_interface in the CellML')
+    if comp is not None and entry.get('module_format', 'cellml') == 'cellml':
+        parameter_names = {p.variable_name for inst in version.parameterisations() for p in inst.parameters()}
+        unused = unused_variables(root, entry['module_type'], entry, parameter_names, _spec_names(version.spec),
+                                  _supermodule_mapped_names().get(version.key, set()))
+        if unused:
+            warnings.append(f'{key}: {UNUSED_MESSAGE}: ' + ', '.join(f'{n} ({"/".join(w)})' for n, w in unused))
     return errors, warnings
+
+
+UNUSED_MESSAGE = 'declared but used by no equation, port or mapping'
+MATHML_CI = '{http://www.w3.org/1998/Math/MathML}ci'
+
+
+def unused_variables(root, component, entry, parameter_names=(), spec_names=(), mapped_elsewhere=()):
+    '''[(name, [where, ...])] for the variables declared in CellML ``component`` (in the parsed CellML
+    ``root``), in the config entry's variables_and_units or in a parameterisation's parameters, that no
+    equation of the component, no initial value naming it, no port of the entry and no map_variables of
+    the file uses. Not reported,
+    since they are used outside the version: port variables (a neighbour or a harness connects them),
+    global constants (they may be defined for other modules), names in the entry's other keys (e.g.
+    delay_info, which libcuflynx reads), ``spec_names`` (the verification config's
+    outputs and harness rows for the version) and ``mapped_elsewhere`` (names a supermodule maps), and time.'''
+    comp = {c.get('name'): c for c in root.iter(f'{{{CELLML_NS}}}component')}.get(component)
+    declared = {}
+    if comp is not None:
+        for v in comp.findall(f'{{{CELLML_NS}}}variable'):
+            declared.setdefault(v.get('name'), []).append('CellML')
+    for row in entry.get('variables_and_units') or []:
+        declared.setdefault(row[0], []).append('config')
+    for name in sorted(parameter_names):
+        declared.setdefault(name, []).append('parameters')
+    used = {'t', 'time'} | set(spec_names) | set(mapped_elsewhere)
+    if comp is not None:
+        used |= {ci.text.strip() for ci in comp.iter(MATHML_CI) if ci.text}
+        # a state's initial value may name another variable (initial_value="x_init")
+        used |= {v.get('initial_value') for v in comp.findall(f'{{{CELLML_NS}}}variable') if v.get('initial_value')}
+    for m in root.iter(f'{{{CELLML_NS}}}map_variables'):
+        used |= {m.get('variable_1'), m.get('variable_2')}
+    for key in ('entrance_ports', 'exit_ports', 'general_ports'):
+        for port in entry.get(key) or []:
+            used |= set(port.get('variables') or [])
+    used |= {row[0] for row in entry.get('variables_and_units') or [] if row[3] == 'global_constant'}
+    # other keys of the entry that libcuflynx reads may name a variable (e.g. delay_info's delay_amounts)
+    used |= {s for k, v in entry.items() if k != 'variables_and_units' for s in _strings(v)}
+    return [(name, where) for name, where in declared.items() if name not in used]
+
+
+def _spec_names(spec):
+    '''The version's own variables its verification config names: outputs ("var", not "vessel/var") and
+    harness parameter rows of the version under test ("mod/var").'''
+    names = {o for o in spec.get('outputs') or [] if isinstance(o, str) and '/' not in o}
+    for row in ((spec.get('harness') or {}).get('parameters') or []):
+        if isinstance(row, (list, tuple)) and row and str(row[0]).startswith('mod/'):
+            names.add(str(row[0]).split('/', 1)[1])
+    return names
+
+
+def _strings(value):
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for k, v in value.items():
+            yield from _strings(k)
+            yield from _strings(v)
+    elif isinstance(value, (list, tuple)):
+        for v in value:
+            yield from _strings(v)
+
+
+@functools.lru_cache(maxsize=1)
+def _supermodule_mapped_names():
+    '''{submodule version key: names the supermodule versions using it map}: the last path segment of
+    every string in a supermodule's config entry (routes, shared_parameters, outputs, ...), of its
+    parameterisations' rows (<submodule>/<var>) and of its spec's outputs and globals.'''
+    out = {}
+    for sv in _library_versions():
+        if not sv.is_supermodule:
+            continue
+        names = set(_strings(sv.config))
+        names |= {p.variable_name for inst in sv.parameterisations() for p in inst.parameters()}
+        names |= set(_strings(sv.spec.get('outputs') or []))
+        names |= set(_strings((sv.spec.get('supermodule') or {}).get('globals') or []))
+        names = {n.rsplit('/', 1)[-1] for n in names}
+        for sub in sv.submodules:
+            k = f"{sub.get('module_type')}/{sub.get('module_subtype')}"
+            out.setdefault(k, set()).update(names)
+    return out
 
 
 def write_structure_results(version, errors, warnings, known):
@@ -673,6 +759,63 @@ def test_licence_and_creator_rules():
     assert 'is not one of' in licence_and_creator_problems({'licence': 'GPL-3.0', 'creator': []})[0]
     assert 'not a list of names' in licence_and_creator_problems({'licence': 'MIT', 'creator': 'A. Author'})[0]
     assert licence_and_creator_problems({'licence': 'MIT'}) == ['no "creator"']
+
+
+_UNUSED_CELLML = f'''<model xmlns="{CELLML_NS}" name="m"><component name="c">
+  <variable name="t" public_interface="in" units="second"/>
+  <variable name="x_init" public_interface="in" units="dimensionless"/>
+  <variable name="x" initial_value="x_init" public_interface="out" units="dimensionless"/>
+  <variable name="k" public_interface="in" units="dimensionless"/>
+  <variable name="spare" initial_value="8.314" units="dimensionless"/>
+  {{extra}}
+  <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>x</ci></apply>
+    <apply><times/><ci>k</ci><ci>x</ci></apply></apply></math>
+</component></model>'''
+
+
+def _unused(extra_vars=(), rows=(), ports=None, **kw):
+    extra = ''.join(f'<variable name="{n}" public_interface="in" units="dimensionless"/>' for n in extra_vars)
+    root = ET.fromstring(_UNUSED_CELLML.replace('{extra}', extra))
+    entry = {'variables_and_units': [['x_init', 'dimensionless', 'access', 'constant'],
+                                     ['x', 'dimensionless', 'access', 'variable'],
+                                     ['k', 'dimensionless', 'access', 'constant'], *rows],
+             'entrance_ports': ports or [], 'exit_ports': [], 'general_ports': [], **kw.pop('entry', {})}
+    return unused_variables(root, 'c', entry, **kw)
+
+
+def test_unused_variables_are_reported_with_where_they_are_declared():
+    # equations, a named initial value and time count as uses; an unused CellML variable does not
+    assert _unused() == [('spare', ['CellML'])]
+    assert _unused(rows=[['spare', 'dimensionless', 'access', 'constant']], parameter_names={'spare', 'k', 'gone'}) == \
+        [('spare', ['CellML', 'config', 'parameters']), ('gone', ['parameters'])]
+
+
+def test_unused_variables_leaves_out_what_is_used_outside_the_version():
+    ext = ['u_port', 'g', 'out1', 'sup', 'd']
+    rows = [['u_port', 'dimensionless', 'access', 'boundary_condition'], ['g', 'dimensionless', 'access', 'global_constant'],
+            ['out1', 'dimensionless', 'access', 'variable'], ['sup', 'dimensionless', 'access', 'constant'],
+            ['d', 'second', 'access', 'constant']]
+    # a global constant may be defined for other modules: never reported
+    assert {n for n, _ in _unused(ext, rows)} == {'spare', 'u_port', 'out1', 'sup', 'd'}
+    left = _unused(ext, rows, ports=[{'port_type': 'p', 'variables': ['u_port']}],      # a neighbour connects it
+                   spec_names={'out1'},                                                 # an output of the spec
+                   mapped_elsewhere={'sup'},                                            # a supermodule maps it
+                   entry={'delay_info': {'delay_amounts': ['d']}})                      # libcuflynx reads it
+    assert left == [('spare', ['CellML'])]
+    assert _spec_names({'outputs': ['out1', 'nbr/v'], 'harness': {'parameters': [['mod/p', 'u', 1, 's'], ['nbr/q', 'u', 1, 's']]}}) \
+        == {'out1', 'p'}
+    # a submodule's variables that its supermodule versions name (routes, rows <sub>/<var>, outputs, globals)
+    assert _supermodule_mapped_names().get('membrane_potential/SN_soma_Argus2026_v01')
+
+
+def test_version_problems_warn_of_an_unused_parameter():
+    import dataclasses
+    version = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    assert not [w for w in version_problems(version)[1] if UNUSED_MESSAGE in w]
+    rows = version.config['variables_and_units'] + [['spare_k', 'dimensionless', 'access', 'constant']]
+    extra = dataclasses.replace(version, config={**version.config, 'variables_and_units': rows})
+    warned = [w for w in version_problems(extra)[1] if UNUSED_MESSAGE in w]
+    assert warned == [f'{version.key}: {UNUSED_MESSAGE}: spare_k (config)'], warned
 
 
 def test_config_must_declare_cellml_inputs_in_their_units():
