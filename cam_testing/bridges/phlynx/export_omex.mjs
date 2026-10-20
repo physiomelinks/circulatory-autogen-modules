@@ -131,7 +131,7 @@ try {
   report.missing_modules = [...new Set(wanted.filter((ref) => !library.availableModules.has(ref)))]
   report.stub_modules = [...new Set(wanted.filter((ref) => library.availableModules.get(ref)?.isStub))]
   const { pendingInstances: nodes, pendingEdges: edges } = buildWorkflowGraph(
-    job.instances, library.availableModules, [])
+    job.instances, library.availableModules, library.getMathAnalysis, [], null, library.getMathDefaults)
   report.nodes = nodes.length
   report.edges = edges.length
   report.expected_edges = job.instances.reduce((n, r) => n + String(r.out_instances || '').split(/\s+/).filter(Boolean).length, 0)
@@ -151,8 +151,17 @@ try {
     phlynxParameters = null
   }
   if (phlynxParameters?.applyParametersToNodes) {
-    report.parameters_applied = phlynxParameters.applyParametersToNodes(nodes, job.parameters || [], library).totalUpdated
-    report.parameters_via = 'PhLynx applyParametersToNodes'
+    // As PhLynx's loadParametersData (src/views/WorkspaceArea.vue) does: the rows set values, the
+    // global constants are loaded separately, and a row for a variable a connection supplies is skipped.
+    const content = job.parameters || []
+    const catalogue = new Set(nodes.flatMap((node) => node.data.variables.map((v) => v.name.trim())))
+    const { variablesById, updated, skipped } = phlynxParameters.applyParametersToNodes(nodes, content)
+    for (const node of nodes) if (variablesById.has(node.id)) node.data.variables = variablesById.get(node.id)
+    const globals = content.filter((e) => catalogue.has(e.variable_name.trimEnd()))
+    for (const e of globals) library.assignGlobalConstant(e.variable_name.trimEnd(), String(e.value), e.units, e.data_reference)
+    report.parameters_applied = updated + globals.length
+    report.parameters_skipped = skipped
+    report.parameters_via = 'PhLynx applyParametersToNodes (main API)'
   } else {
     report.parameters_applied = applyParameters(nodes, job.parameters || [], library)
     report.parameters_via = 'bridge mirror of loadParametersData'
@@ -169,7 +178,7 @@ try {
   const dt = Number(job.dt ?? 0.01)
   // The same CellML as text: Node's Blob isn't a type JSZip reads (CUFLynx's bridge does the same).
   const returned = await generateOmexArchive(
-    { blob: modelText },
+    { blob: Object.assign(new TextEncoder().encode(modelText), { text: async () => modelText }) },
     JSON.stringify({ nodeData: nodes, edgeData: edges, mathLibrary: {} }),
     { simulationSettings: { initialPoint: 0, startingPoint: 0, endingPoint: simTime, pointInterval: dt },
       plotConfig: [], parameterScanConfig: {} },

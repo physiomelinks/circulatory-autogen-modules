@@ -369,14 +369,19 @@ def equivalence_check(component, res, work_dir):
     cf = (res or {}).get('cuflynx') or {}
     if not cf.get('ok'):
         return Result('phlynx_equivalence_test', SKIPPED, 'no CUFLynx run to compare')
-    path = harness.generate(component, work_dir)
     spec = dict(component.spec, pre_time=0.0)
-    lib_t, lib = systems.simulate(path, spec, SOLVER_INFO)
     wanted = [harness.output_name(o) for o in (component.spec.get('outputs') or [])]
-    if any(w not in lib for w in wanted):
-        # the listing misses some variables (e.g. an algebraic-only model); ask for them by name
-        lib_t, extra = systems.simulate(path, spec, SOLVER_INFO, names=wanted)
-        lib = {**extra, **lib}
+    try:
+        path = harness.generate(component, work_dir)
+        lib_t, lib = systems.simulate(path, spec, SOLVER_INFO)
+        if any(w not in lib for w in wanted):
+            # the listing misses some variables (e.g. an algebraic-only model); ask for them by name
+            lib_t, extra = systems.simulate(path, spec, SOLVER_INFO, names=wanted)
+            lib = {**extra, **lib}
+    except harness.GenerationFailed as e:
+        # the reference is missing: a failure the version's expected_failures can name
+        first = next((l for l in str(e).splitlines() if l.strip()), '')
+        return Result('phlynx_equivalence_test', FAILED, f'libcuflynx could not generate the reference model: {first[:300]}')
     rows, unmatched = compare(cf, lib_t, lib, EQUIVALENCE_TOL)
     bad = [r for r in rows if not r['ok']]
     worst = max(rows, key=lambda r: r['difference']) if rows else None
