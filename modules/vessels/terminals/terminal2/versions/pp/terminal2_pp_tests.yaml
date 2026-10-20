@@ -3,24 +3,31 @@ version: pp
 reviewed: false
 notes: 'Terminal RCR with inertance and u_out = 0 hard-coded (W_controller2). Jacobian timescales (nominal: fastest 7.4e-15
   s, slowest decay 0.27 s; run: fastest 7.4e-15 s, slowest decay 0.27 s).'
-known_issues:
-- port variable u_in not in variables_and_units
 expected_failures:
-  run_test: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type: terminal2, BC_type:
-    pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared in a patched copy the
-    component generates and its tests pass (see review.proposed_fixes)'
-  verification_test_invariants: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel
-    type: terminal2, BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared
-    in a patched copy the component generates and its tests pass (see review.proposed_fixes)'
-  verification_test_BC: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type: terminal2,
-    BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared in a patched
-    copy the component generates and its tests pass (see review.proposed_fixes)'
-  verification_test_timestep: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type:
-    terminal2, BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared
-    in a patched copy the component generates and its tests pass (see review.proposed_fixes)'
-  stability_test: 'libcuflynx exits during generation: "the port variable u_in is not a variable for vessel type: terminal2,
-    BC_type: pp" (u_in is used by W_controller2_type but missing from variables_and_units). With u_in declared in a patched
-    copy the component generates and its tests pass (see review.proposed_fixes)'
+  run_test: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port) is declared,
+    but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals use an unsourced
+    test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still TODO"; PhLynx: "Missing
+    parameter values: mod.u_in").'
+  verification_test_invariants: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the
+    vessel_port) is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the
+    sibling terminals use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone
+    ("parameters still TODO"; PhLynx: "Missing parameter values: mod.u_in").'
+  verification_test_BC: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port)
+    is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals
+    use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still
+    TODO"; PhLynx: "Missing parameter values: mod.u_in").'
+  verification_test_timestep: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the
+    vessel_port) is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the
+    sibling terminals use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone
+    ("parameters still TODO"; PhLynx: "Missing parameter values: mod.u_in").'
+  stability_test: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port)
+    is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals
+    use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still
+    TODO"; PhLynx: "Missing parameter values: mod.u_in").'
+  phlynx_export_test: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port)
+    is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals
+    use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still
+    TODO"; PhLynx: "Missing parameter values: mod.u_in").'
 reference_proposals:
   R_T:
     reference: unreferenced_placeholder; terminal resistance copied from terminal pp_wCont_no_local (2.6e8 Pa s m^-3 = 1.96
