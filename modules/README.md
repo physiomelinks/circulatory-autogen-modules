@@ -314,18 +314,21 @@ A parameterisation is **a parameter set of a version: only the parameters change
   3. to make the calibrated values the defaults, run
      `python -m cam_testing.calibrate apply <module_type>/<version> <p>` (`--dry-run` lists the changes first).
 
-  `apply` copies the parameters of `<p>_params_for_id.csv`, at their calibrated values, into:
+  `apply` copies the parameters of `<p>_params_for_id.csv`, at their calibrated values, into every
+  place that uses the version, whatever parameterisation it uses there:
   - the version's default parameterisation;
-  - every supermodule version that uses the version's default parameterisation, recursively (row
-    `<submodule path>/<var>`, e.g. soma/sympathetic `i_M/rho_M`);
-  - the system models with an instance of the version or of such a supermodule at its default
-    parameterisation (row
-    `<vessel>[/<submodule path>]/<var>`, e.g. `SN/soma/i_M/rho_M`);
+  - every supermodule version with an instance of the version, recursively: in its parameters file,
+    the parameter `<var>` of every such instance (soma/sympathetic: instance `i_M`, parameter
+    `rho_M`; the heart: `lv` and `ra`, `rv`, `la` alike for a chamber calibration), and the parameter
+    `<path>/<var>` of an instance of a supermodule over it where the file has one. The instance's
+    `"parameterisation"`, where its values started, is kept;
+  - the system models with an instance of the version or of such a supermodule (row
+    `<vessel>[/<submodule path>]/<var>`, e.g. `SN/soma/i_M/rho_M`), where the row exists;
   - the monolithic counterparts named by a supermodule's `supermodule.equivalent` output_map (row
     `<vessel>/<var>` in the `reproduces` system model, e.g. `soma_SN/rho_M`, and `<var>` in that
     vessel's version's default parameterisation).
 
-  Only rows that already exist are rewritten. Each reference becomes `Calibrated (libcuflynx) to
+  Only rows and parameters-file entries that already exist are rewritten. Each reference becomes `Calibrated (libcuflynx) to
   parameterisations/<p>/<p>_obs_data.json: <note> (was <old value>; applied <date>)`. The
   `<note>` is the obs_data's optional `"calibration_note"`; an optional `"reference_key"` (a BibTeX key)
   prefixes the reference and marks the row sourced.
@@ -388,9 +391,29 @@ same module_type:
   of one of the listed versions (every one of which is used), connecting only to siblings, and naming
   no `"parameterisation"`. libcuflynx reads and checks it (`load_supermodule_registry`); so do
   `Version.submodules` and `tests/test_structure.py`, which requires it beside every supermodule config.
-- **Parameters.** A submodule's parameters come from the supermodule's parameterisation (rows
-  `<submodule>/<var>`), then from its version's `default_parameterisation`. A submodule that differs
-  from its version's default (the heart's `ra`, `rv` and `la` chambers) is set by those rows.
+- **Parameters file.** `<module_type>_<version>_parameters.json` beside the module array holds the
+  values of its instances (libcuflynx schema `supermodule_parameters.schema.json`). For each instance
+  it records the parameterisation of its version its values started from (`"default"`, or a name: the
+  heart's `ra`, `rv` and `la` started from the chamber's `ra`, `rv` and `la`, and `lv` from its default)
+  and the values, each `{"value", "units", "data_reference"[, "sourced"]}`:
+
+  ```json
+  {"schema_version": 1,
+   "instances": {
+    "lv": {"parameterisation": "default", "parameters": {
+     "E_A": {"value": 366575000, "units": "J_per_m6", "data_reference": "Liang_2009_Table_2", "sourced": "yes"},
+     ...}},
+    ...}}
+  ```
+
+  A nested supermodule's instance names paths into it (`i_M/rho_M`), and only where it overrides
+  that supermodule's own file. `cuflynx-upgrade module-config` wrote these files from each instance's
+  parameterisation; since then the file is what is edited, and what `calibrate apply` writes. Generation
+  uses its values: the model's parameters file wins, then the supermodule's parameterisation (which
+  holds its globals), then this file, then the submodule version's default parameterisation for a
+  parameter the file does not give. `Version.instance_parameters` reads it, and the structure test
+  checks that each instance's parameters are variables of its version (not its globals) and that it
+  started from a parameterisation the version has.
 
 | Supermodule version | Built from |
 |---|---|
@@ -405,10 +428,10 @@ A model uses one record, e.g.
 `{"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
 "per_submodule_inputs": {"ra": ["venous_svc"]}, "per_submodule_outputs": {"aov": ["aortic_root"]}}`.
 - **Expansion.** libcuflynx expands the record: each submodule becomes `<name>__<submodule>`, and the
-  supermodule parameterisation's rows `<submodule>/<var>` (nested: `<submodule>/<its submodule>/<var>`)
-  set that submodule's parameters.
-- **Precedence.** The model's parameters file wins, then the supermodule's parameterisation, then
-  each submodule version's default parameterisation.
+  supermodule's parameters file (and any parameterisation rows `<submodule>/<var>`, nested:
+  `<submodule>/<its submodule>/<var>`) set that submodule's parameters.
+- **Precedence.** The model's parameters file wins, then the supermodule's parameterisation, then its
+  parameters file, then each submodule version's default parameterisation.
 - **Where it lives.** Its `tests.yaml` has a `description`; its `verification_config.json` has a
   `supermodule` block. `globals` lists its global parameters. `equivalent` lists the system models
   it must reproduce: `system_models/closed_loop_cvs/3compartment_supermodules` reproduces
@@ -473,7 +496,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 **Supermodule versions** run the same verification and validation tests as a component. The
 supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod__<submodule>`
 (nested supermodules: `mod__<submodule>__<subsubmodule>`), and its parameters are those of the
-flattened model: the supermodule's own parameterisation, its submodules' default parameterisations, and the boundary
+flattened model: the supermodule's own parameterisation and parameters file, its submodules' default parameterisations, and the boundary
 conditions no internal connection closes. In the spec (`run_parameters`, `bc_sweep`, `validation`)
 a submodule's parameter is named as in the supermodule's parameterisation, `<submodule path>/<var>` (e.g.
 `membrane/I_in`, or `soma/membrane/I_in` in `neuron/sympathetic`); globals keep their names. The

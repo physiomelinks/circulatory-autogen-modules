@@ -23,7 +23,6 @@ same window (integral of j_Ca_L): the release gain.
 """
 import base64
 import contextlib
-import csv
 import functools
 import html
 import io
@@ -82,13 +81,15 @@ def copy_library(tmp):
             v['module_subtype'] = NEW
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
-    csv_path = os.path.join(sdir, 'parameterisations', 'default', 'default_parameters.csv')
-    with open(csv_path, newline='') as f:
-        rows = list(csv.reader(f))
-    keep = [r for r in rows if not (r and r[0].endswith('_RyR') and r[0] != 'variable_name')]
-    dropped = [r[0] for r in rows if r not in keep]
-    with open(csv_path, 'w', newline='') as f:
-        csv.writer(f).writerows(keep)
+    # the RyR instance's values were the old version's: it takes the new version's default instead
+    from libcuflynx.utilities.config_schemas import dump_supermodule_parameters
+    parameters_path = os.path.join(sdir, 'soma_sympathetic_parameters.json')
+    with open(parameters_path) as f:
+        doc = json.load(f)
+    dropped = [f'RyR/{v}' for v in doc['instances']['RyR']['parameters']]
+    doc['instances']['RyR'] = {'parameterisation': 'default', 'parameters': {}}
+    with open(parameters_path, 'w') as f:
+        f.write(dump_supermodule_parameters(doc))
     return dst, dropped
 
 

@@ -986,6 +986,21 @@ class Version:
         return load_supermodule_array(entry, self.config_path)
 
     @property
+    def instance_parameters_path(self):
+        '''<module_type>_<version>_parameters.json: a supermodule version's instances' parameter values.'''
+        return self.path('parameters.json')
+
+    @functools.cached_property
+    def instance_parameters(self):
+        '''{instance: {"parameterisation", "parameters"}} of a supermodule, read and checked by libcuflynx
+        from its parameters file (``instance_parameters_path``); {} for a component.'''
+        if not self.is_supermodule:
+            return {}
+        from libcuflynx.utilities.config_schemas import load_supermodule_parameters, normalise_supermodule_entry
+        entry = normalise_supermodule_entry(self.raw_entry, self.config_path)
+        return load_supermodule_parameters(entry, self.config_path, self.submodules)
+
+    @property
     def submodule_names(self):
         return [s['name'] for s in self.submodules]
 

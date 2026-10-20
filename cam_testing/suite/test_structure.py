@@ -647,10 +647,20 @@ def test_supermodule_array_matches_libcuflynx_schema(path):
     _validate(path, 'module_array.schema.json')
 
 
+SUPERMODULE_PARAMETERS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'versions', '*', '*_parameters.json'),
+                                                     recursive=True) if _not_excluded(p))
+
+
+@pytest.mark.parametrize('path', SUPERMODULE_PARAMETERS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
+def test_supermodule_parameters_match_libcuflynx_schema(path):
+    _validate(path, 'supermodule_parameters.schema.json')
+
+
 def test_supermodule_versions_load_with_libcuflynx():
-    '''Every supermodule version's module array (beside its config) loads with libcuflynx's
-    load_supermodule_array: records of the config's submodule_versions only, each version used,
-    connections between siblings, no record naming a parameterisation.'''
+    '''Every supermodule version's module array and parameters file (beside its config) load with
+    libcuflynx's load_supermodule_array and load_supermodule_parameters: records of the config's
+    submodule_versions only, each version used, connections between siblings, no record naming a
+    parameterisation, and one parameters entry per record.'''
     pytest.importorskip('libcuflynx')
     problems = []
     for version in _versions():
@@ -659,6 +669,7 @@ def test_supermodule_versions_load_with_libcuflynx():
         try:
             if not version.submodules:
                 problems.append(f'{version.key}: no submodules')
+            version.instance_parameters
         except ValueError as e:
             problems.append(f'{version.key}: {e}')
     assert not problems, '\n'.join(problems)

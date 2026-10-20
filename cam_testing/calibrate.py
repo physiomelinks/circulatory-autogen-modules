@@ -483,15 +483,16 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 #     python -m cam_testing.calibrate apply <module_type>/<version> <parameterisation> [--dry-run]
 #
 # The calibrated parameters (those in <p>_params_for_id.csv, with their values from
-# <p>_calibrated_parameters.csv) are written to:
+# <p>_calibrated_parameters.csv) are written to every place that uses the version, whatever parameterisation
+# it uses there:
 #   1. the version's default parameterisation (row <var>);
-#   2. every supermodule version using the version as a submodule, recursively (row <submodule path>/<var>,
-#      outer first: soma/sympathetic i_M/rho_M, a neuron using that soma as "soma" soma/i_M/rho_M), where
-#      the row exists and holds the default parameterisation's value (a row with another value is the
-#      supermodule's own setting of that submodule, e.g. the heart's ra/ rows of the chamber, and is kept);
-#   3. every system model whose module array uses the version, or a supermodule chain over it, at
-#      its default parameterisation (row <vessel>/<var> or <vessel>/<submodule path>/<var>), where the row
-#      exists (a row through a supermodule chain: and holds the default parameterisation's value, as in 2);
+#   2. every supermodule version using the version as a submodule, recursively: in its parameters file
+#      (<module_type>_<version>_parameters.json), the parameter <var> of every instance of the version
+#      (soma/sympathetic: instance i_M, parameter rho_M), and the parameter <path>/<var> of an instance of a
+#      supermodule over it, where the file has it (a neuron using that soma as "soma": instance soma,
+#      parameter i_M/rho_M). The instance's "parameterisation" (where its values started) is kept;
+#   3. every system model whose module array uses the version, or a supermodule chain over it (row
+#      <vessel>/<var> or <vessel>/<submodule path>/<var>), where the row exists;
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
 #      to the vessel of `reproduces` ("soma_SN/w": "SN__soma__i_M/w" -> soma_SN), giving row
@@ -542,11 +543,22 @@ def _row_values(path, names):
     return out
 
 
-def _same_value(a, b):
-    try:
-        return float(a) == float(b)
-    except (TypeError, ValueError):
-        return a == b
+def _instance_values(path, instance_paths, names):
+    """{(instance, parameter): {column: value}} of a supermodule parameters file: the parameters <var> (for an
+    instance path "i_M") or <rest>/<var> (for "soma/i_M": instance soma) of ``names`` it has."""
+    if not os.path.isfile(path):
+        return {}
+    with open(path) as f:
+        instances = json.load(f).get('instances') or {}
+    out = {}
+    for inst_path in instance_paths:
+        head, _, rest = inst_path.partition('/')
+        parameters = (instances.get(head) or {}).get('parameters') or {}
+        for n in names:
+            key = f'{rest}/{n}' if rest else n
+            if key in parameters:
+                out[(head, key)] = parameters[key]
+    return out
 
 
 def apply_plan(version, parameterisation_name, versions=None, systems=None):
@@ -577,11 +589,7 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     by_key = {v.key: v for v in versions}
     by_key.setdefault(version.key, version)
 
-    def default_of(mt, sub):
-        v = by_key.get(f'{mt}/{sub}')
-        return v.default_parameterisation_name if v is not None else 'default'
-
-    # (version, submodule path) of every supermodule chain over the version
+    # (supermodule version, submodule path) of every supermodule chain over the version
     chain, todo = [], [(version.mtype.name, version.name, '')]
     while todo:
         mt, vname, sfx = todo.pop(0)
@@ -596,10 +604,8 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
                     chain.append((S, path))
                     todo.append((S.mtype.name, S.name, path))
 
-    targets = []          # (csv path, row prefix, where, own, only a row holding the default's value)
-    targets.append((version.default_parameterisation.parameters_path, '', f'{version.key} default parameterisation', True, False))
-    for S, path in chain:
-        targets.append((S.default_parameterisation.parameters_path, path + '/', f'{S.key} default parameterisation', False, True))
+    targets = []          # (csv path, row prefix, where, own)
+    targets.append((version.default_parameterisation.parameters_path, '', f'{version.key} default parameterisation', True))
     flattened = {}        # system key -> [flattened vessels, as <record>/<submodule path>]
     systems_by_key = {m['key']: m for m in systems}
     chain_by_key = {}
@@ -608,17 +614,13 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     for m in systems:
         for ves in m['vessels']:
             vk = f"{ves.get('module_type')}/{ves.get('module_subtype')}"
-            p_name = module_array.parameterisation_of(ves, 'default')
-            if p_name != default_of(ves.get('module_type'), ves.get('module_subtype')):
-                continue
             if vk == version.key:
                 flattened.setdefault(m['key'], []).append(ves['name'])
             for path in chain_by_key.get(vk, []):
                 flattened.setdefault(m['key'], []).append(f"{ves['name']}/{path}")
     for mkey, fl in flattened.items():
         for F in fl:
-            # a row through a supermodule chain (<vessel>/<submodule path>/<var>) as in (2)
-            targets.append((systems_by_key[mkey]['parameters_path'], F + '/', f'system model {mkey}', False, '/' in F))
+            targets.append((systems_by_key[mkey]['parameters_path'], F + '/', f'system model {mkey}', False))
     # monolithic counterparts, through supermodule.equivalent output maps
     for S in versions:
         for e in ((S.spec.get('supermodule') or {}).get('equivalent') or []):
@@ -631,39 +633,80 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
                 mono = sorted({a.split('/', 1)[0] for a, b in omap.items() if b.split('/', 1)[0] == vessel})
                 if len(mono) != 1:
                     continue
-                targets.append((rep['parameters_path'], mono[0] + '/', f"system model {rep['key']}", False, False))
+                targets.append((rep['parameters_path'], mono[0] + '/', f"system model {rep['key']}", False))
                 ves = next((x for x in rep['vessels'] if x['name'] == mono[0]), None)
                 mv = by_key.get(f"{ves.get('module_type')}/{ves.get('module_subtype')}") if ves else None
                 if mv is not None:
-                    targets.append((mv.default_parameterisation.parameters_path, '', f'{mv.key} default parameterisation', False, False))
+                    targets.append((mv.default_parameterisation.parameters_path, '', f'{mv.key} default parameterisation', False))
 
     import datetime
     today = datetime.date.today().isoformat()
     obs_rel = os.path.relpath(inst.obs_data_path, version.dir).replace(os.sep, '/')
     plan, seen = [], set()
-    defaults = _row_values(version.default_parameterisation.parameters_path, set(names))
-    for path, pfx, where, own, copies_only in targets:
+
+    def add(path, where, row, n, old, own=False, instance=None, parameter=None):
+        if (path, row) in seen:
+            return
+        seen.add((path, row))
+        to = obs_rel if own else f'{version.mtype.name} {version.name} {obs_rel}'
+        ref = (f'{key}; ' if key else '') + f'Calibrated (libcuflynx) to {to}: {note} (was {old}; applied {today})'
+        change = {'path': path, 'where': where, 'row': row, 'variable': n, 'value': calibrated[n],
+                  'old': old, 'reference': ref, 'sourced': 'yes' if key else None}
+        if instance is not None:
+            change.update(instance=instance, parameter=parameter)
+        plan.append(change)
+
+    for path, pfx, where, own in targets[:1]:
+        rows = _row_values(path, set(names))
+        for n in names:
+            if n in rows:
+                add(path, where, n, n, rows[n].get('value'), own=True)
+    # the supermodules' parameters files: every instance of the version, whatever its parameterisation
+    by_supermodule = {}
+    for S, path in chain:
+        by_supermodule.setdefault(S.key, (S, []))[1].append(path)
+    for S, paths in by_supermodule.values():
+        for (inst, parameter), value in _instance_values(S.instance_parameters_path, paths, names).items():
+            n = parameter.rpartition('/')[2]
+            add(S.instance_parameters_path, f'{S.key} parameters file', f'{inst}/{parameter}', n, value.get('value'),
+                instance=inst, parameter=parameter)
+    for path, pfx, where, own in targets[1:]:
         rows = _row_values(path, {pfx + n for n in names})
         for n in names:
-            row = rows.get(pfx + n)
-            if row is None or (path, pfx + n) in seen:
-                continue
-            if copies_only and not _same_value(row.get('value'), (defaults.get(n) or {}).get('value')):
-                continue
-            seen.add((path, pfx + n))
-            to = obs_rel if own else f'{version.mtype.name} {version.name} {obs_rel}'
-            ref = (f'{key}; ' if key else '') + f'Calibrated (libcuflynx) to {to}: {note} (was {row.get("value")}; applied {today})'
-            plan.append({'path': path, 'where': where, 'row': pfx + n, 'variable': n, 'value': calibrated[n],
-                         'old': row.get('value'), 'reference': ref, 'sourced': 'yes' if key else None})
+            if pfx + n in rows:
+                add(path, where, pfx + n, n, rows[pfx + n].get('value'))
     return plan
 
 
+def _write_instance_values(path, changes):
+    """Sets the parameters ``changes`` names in the supermodule parameters file ``path``: value, data_reference,
+    and sourced where the change sets it."""
+    from libcuflynx.utilities.config_schemas import dump_supermodule_parameters
+    with open(path) as f:
+        doc = json.load(f)
+    for c in changes.values():
+        parameter = doc['instances'][c['instance']]['parameters'][c['parameter']]
+        try:
+            parameter['value'] = float(c['value'])
+        except ValueError:
+            parameter['value'] = c['value']
+        parameter['data_reference'] = c['reference']
+        if c['sourced']:
+            parameter['sourced'] = c['sourced']
+    with open(path, 'w') as f:
+        f.write(dump_supermodule_parameters(doc))
+
+
 def write_plan(plan):
-    """Rewrites the rows of ``plan`` in place, keeping each file's columns and line endings."""
+    """Rewrites the rows of ``plan`` in place, keeping each CSV's columns and line endings; a supermodule
+    parameters file is rewritten in libcuflynx's layout."""
     by_path = {}
     for c in plan:
         by_path.setdefault(c['path'], {})[c['row']] = c
     for path, changes in by_path.items():
+        if path.endswith('.json'):
+            _write_instance_values(path, changes)
+            continue
         lines, eol, header = _csv_rows(path)
         for k, ln in enumerate(lines[1:], start=1):
             if not ln.strip():

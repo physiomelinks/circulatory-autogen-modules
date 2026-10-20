@@ -72,7 +72,7 @@
       "min_children": 1
     },
     "version": {
-      "description": "One version: the math (CellML component, one config entry, units) and its tests. The version name is the config entry's module_subtype. A supermodule version (module_format supermodule) has no CellML or units of its own: its config lists the submodule versions it is built from (submodule_versions), and {module_type}_{version}_module_array.json beside it holds its instances (submodules) and their internal connections. A version of an external model (module_format external_api, e.g. a FEniCS model) keeps the model in {module_type}_{version}_model.py, which its api block names, and has a placeholder CellML and units file with no component, like the C++ FV1D_vessel versions.",
+      "description": "One version: the math (CellML component, one config entry, units) and its tests. The version name is the config entry's module_subtype. A supermodule version (module_format supermodule) has no CellML or units of its own: its config lists the submodule versions it is built from (submodule_versions), {module_type}_{version}_module_array.json beside it holds its instances (submodules) and their internal connections, and {module_type}_{version}_parameters.json their parameter values. A version of an external model (module_format external_api, e.g. a FEniCS model) keeps the model in {module_type}_{version}_model.py, which its api block names, and has a placeholder CellML and units file with no component, like the C++ FV1D_vessel versions.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
@@ -86,7 +86,8 @@
           "{module_type}_{version}_units.cellml"
         ],
         "required_if_supermodule": [
-          "{module_type}_{version}_module_array.json"
+          "{module_type}_{version}_module_array.json",
+          "{module_type}_{version}_parameters.json"
         ],
         "optional": [
           "{module_type}_{version}_references_proposed.bib",
