@@ -137,9 +137,9 @@ def test_supermodule_structure_of_the_sympathetic_neuron():
     edges = {(e['src'], e['src_inner'], e['dst'], e['dst_inner']): e for e in sv['edges']}
     assert set(edges) == {('soma', 'membrane', 'axon', None), ('axon', None, 'varicosity', 'membrane')}
     assert edges[('soma', 'membrane', 'axon', None)]['ports'] == ['VI_port']
-    # the supermodule's parameterisation overrides the axon's parameters (rows <var>_axon); R, F, T are globals
-    # the axon is set by its geometry since review 2026-10-06 (was C_axon, R_axon)
-    assert {o['name'] for o in parts['axon']['overrides']} >= {'d_ax_axon', 'L_ax_axon', 'R_i_axon'}
+    # the supermodule's parameterisation overrides the axon's parameters (rows axon/<var>); R, F, T are globals
+    assert {o['name'] for o in parts['axon']['overrides']} >= {'axon/d_ax', 'axon/L_ax', 'axon/R_i'}
+    assert {o['var'] for o in parts['axon']['overrides']} >= {'d_ax', 'L_ax', 'R_i'}
     assert {'R', 'F', 'T'} <= set(sv['globals'])
     assert 'click p_soma' in sv['mermaid'] and 'p_soma -->' in sv['mermaid']
     assert [n['name'] for n in sv['tree']] == ['soma', 'axon', 'varicosity']

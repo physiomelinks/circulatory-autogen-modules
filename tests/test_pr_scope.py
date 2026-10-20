@@ -1,4 +1,4 @@
-'''tools/pr_scope.py: a module PR ("Module:" title) changes only module content.'''
+'''tools/pr_scope.py: a module PR ("Module:" title) changes only module content, a migration PR ("Migration:") anything.'''
 import importlib.util
 import os
 
@@ -36,3 +36,10 @@ def test_module_prefix_only_at_the_start():
     # the prefix only counts at the start of the title
     assert not pr_scope.is_module_pr('Fix the Module: label')
     assert pr_scope.is_module_pr('  Module: valve review')
+
+
+def test_migration_pr_may_change_module_content_and_the_rest():
+    repo = ['cam_testing/checks.py', 'tools/convert_configs.py', 'modules/directory_schema.json']
+    assert pr_scope.out_of_scope('Migration: supermodule versions', repo + MODULE_FILES) == []
+    assert pr_scope.is_migration_pr('  Migration: supermodule versions')
+    assert not pr_scope.is_migration_pr('Fix the Migration: label')

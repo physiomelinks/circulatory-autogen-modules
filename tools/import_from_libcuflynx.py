@@ -34,7 +34,7 @@ import yaml
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES_DIR = os.path.join(REPO_ROOT, 'modules')
 sys.path.insert(0, REPO_ROOT)
-from cam_testing.library import normalise_config_entry, to_phlynx_entry, with_record_keys  # noqa: E402
+from cam_testing.library import entry_from_file, to_phlynx_entry, with_record_keys  # noqa: E402
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
 
@@ -128,11 +128,8 @@ def load_ca_parameter_sources(ca_dir):
     '''
     resources = os.path.join(ca_dir, 'resources')
     sources = []
-    # circulatory_autogen's module arrays, under either name (vessel_array before its #549)
-    paths = {}
-    for name in ('vessel_array', 'module_array'):
-        for p in glob.glob(os.path.join(resources, f'*_{name}.csv')):
-            paths[os.path.basename(p)[:-len(f'_{name}.csv')]] = p
+    paths = {os.path.basename(p)[:-len('_module_array.csv')]: p
+             for p in glob.glob(os.path.join(resources, '*_module_array.csv'))}
     for prefix, vessel_path in sorted(paths.items()):
         param_path = os.path.join(resources, f'{prefix}_parameters.csv')
         if not os.path.isfile(param_path):
@@ -265,9 +262,8 @@ def import_module(name, cellml_src, config_src, unit_blocks, sources, reseed):
     shutil.copyfile(cellml_src, cellml_dest)
 
     with open(config_src) as f:
-        config = [normalise_config_entry(e) for e in json.load(f)]
-    # Written in PhLynx's key names (the library's format; libcuflynx reads both), with the
-    # CellML file named as it is in this repo.
+        config = [entry_from_file(e, config_src) for e in json.load(f)]
+    # Written in PhLynx's key names, with the CellML file named as it is in this repo.
     with open(os.path.join(dest, f'{name}_modules_config.json'), 'w') as f:
         json.dump([with_record_keys(to_phlynx_entry(dict(e, module_file=f'{name}_modules.cellml'))) for e in config], f, indent=2,
                   ensure_ascii=False)

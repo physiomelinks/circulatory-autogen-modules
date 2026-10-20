@@ -55,10 +55,6 @@ modules/
   version's `default_parameterisation`). Several instances may share one parameterisation, and
   the model's own parameters file can still change any value for one instance.
 
-Parameterisations were called instances before 2026-10-09. The former names (the `instances/`
-directory, the config key `default_instance` and a record's `"instance"` key) are still read
-(`cam_testing.library`, `cam_testing.module_array`), but new files use the new ones.
-
 The top level of `modules/` holds categories and one module_type, `heart`:
 
 | Directory | Holds |
@@ -322,12 +318,12 @@ A parameterisation is **a parameter set of a version: only the parameters change
   `apply` copies the parameters of `<p>_params_for_id.csv`, at their calibrated values, into:
   - the version's default parameterisation;
   - every supermodule version that uses the version's default parameterisation, recursively (row
-    `<var>_<submodule path>`, e.g. soma/sympathetic `rho_M_i_M`);
+    `<submodule path>/<var>`, e.g. soma/sympathetic `i_M/rho_M`);
   - the system models with an instance of the version or of such a supermodule at its default
     parameterisation (row
-    `<var>_<vessel>[_<submodule path>]`, e.g. `rho_M_SN_soma_i_M`);
+    `<vessel>[/<submodule path>]/<var>`, e.g. `SN/soma/i_M/rho_M`);
   - the monolithic counterparts named by a supermodule's `supermodule.equivalent` output_map (row
-    `<var>_<vessel>` in the `reproduces` system model, e.g. `rho_M_soma_SN`, and `<var>` in that
+    `<vessel>/<var>` in the `reproduces` system model, e.g. `soma_SN/rho_M`, and `<var>` in that
     vessel's version's default parameterisation).
 
   Only rows that already exist are rewritten. Each reference becomes `Calibrated (libcuflynx) to
@@ -399,8 +395,9 @@ The monolithic versions sit beside them. For example, `soma` also has `sympathet
 A model uses one record, e.g.
 `{"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
 "per_submodule_inputs": {"ra": ["venous_svc"]}, "per_submodule_outputs": {"aov": ["aortic_root"]}}`.
-- **Expansion.** libcuflynx expands the record: each submodule becomes `<name>_<submodule>`, and the
-  supermodule parameterisation's rows `{var}_{submodule}` are renamed to match.
+- **Expansion.** libcuflynx expands the record: each submodule becomes `<name>__<submodule>`, and the
+  supermodule parameterisation's rows `<submodule>/<var>` (nested: `<submodule>/<its submodule>/<var>`)
+  set that submodule's parameters.
 - **Precedence.** The model's parameters file wins, then the supermodule's parameterisation, then
   each submodule's parameterisation.
 - **Where it lives.** Its `tests.yaml` has a `description`; its `verification_config.json` has a
@@ -465,13 +462,13 @@ parameterisation's parameters. Every version runs them, component or supermodule
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
 
 **Supermodule versions** run the same verification and validation tests as a component. The
-supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod_<submodule>`
-(nested supermodules: `mod_<submodule>_<subsubmodule>`), and its parameters are those of the
+supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod__<submodule>`
+(nested supermodules: `mod__<submodule>__<subsubmodule>`), and its parameters are those of the
 flattened model: the supermodule's own parameterisation, its submodules' parameterisations, and the boundary
 conditions no internal connection closes. In the spec (`run_parameters`, `bc_sweep`, `validation`)
-a submodule's parameter is named as in the supermodule's parameterisation, `<var>_<submodule path>` (e.g.
-`I_in_membrane`, or `I_in_soma_membrane` in `neuron/sympathetic`); globals keep their names. The
-default `outputs` are every state of the model (`mod_<submodule>/<var>`). The default BC sweep
+a submodule's parameter is named as in the supermodule's parameterisation, `<submodule path>/<var>` (e.g.
+`membrane/I_in`, or `soma/membrane/I_in` in `neuron/sympathetic`); globals keep their names. The
+default `outputs` are every state of the model (`mod__<submodule>/<var>`). The default BC sweep
 (`bc_sweep.sweep: globals_and_bcs`) varies only what the supermodule adds: its global constants and
 those open boundary conditions, plus any `bc_sweep.extra_parameters`. Each submodule's own parameters
 are swept in that submodule version's own tests (soma `sympathetic` has 133 parameters; sweeping them
@@ -579,7 +576,7 @@ What the version page shows besides the tests:
   internal connections with the port types the configs connect, the modules outside that couple to a
   part (from the supermodule versions and system models that use this one, through
   `per_submodule_inputs` / `per_submodule_outputs`), and a table of the parts: version, parameterisation, ports,
-  connections, the supermodule parameterisation's rows `<var>_<part>` that override the part, and the globals it
+  connections, the supermodule parameterisation's rows `<part>/<var>` that override the part, and the globals it
   shares. A collapsible tree lists every nested level. The diagram is drawn by mermaid (loaded from
   cdn.jsdelivr.net like MathJax); offline, its source text and the table remain.
 
@@ -614,14 +611,14 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `solver` | verification_config | libcuflynx solver for the runs (`CVODE_myokit`) |
 | `solver_info` | verification_config | solver settings for the runs (`rtol`, `atol`, `MaximumStep`, ...) |
 | `reference_solver_info` | verification_config | tolerances of the tight CVODE reference (timestep and stability tests) |
-| `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod_<submodule>/<var>`) |
+| `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod__<submodule>/<var>`) |
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
 | `run_inputs` | verification_config | an external model's run_test: `{port variable: value}`, the constant inputs it is stepped with (default 0) |
 | `coupled_systems` | verification_config | system models in `system_models/coupled` that use the version coupled to an external model; tests/test_coupled_systems.py records them as its coupled_validation_test (with heatmaps) |
 | `run_steps` | verification_config | an external model's run_test: how many coupling steps to take (default 5) |
 | `rest_check` | verification_config | `{sim_time, window, voltage, parameters, threshold, dt}`: a long run (e.g. 0 pA injected) that run_test reports, not a pass/fail gate: the spikes (upward crossings of `threshold` mV, default 0) of `voltage` and their rate in the last `window` s, in the message, metrics.rest_check and plots/rest.png |
 | `periodic_steady_state` | verification_config | `{period, rtol}` (period in s, or a parameter's name, e.g. `T`; rtol default 1e-3): the model oscillates with this period and must reach periodic steady state before it is scored. Every calibration and baseline run that has a warm-up (`pre_time`) then checks that each scored output repeats over one more period (max change <= rtol x its range) and fails, naming the output, if it doesn't (e.g. a heart chamber in a loop whose arterial time constant is longer than the warm-up) |
-| `harness` | verification_config | the test network: `module_array` rows `[name, module_subtype, module_type, inp, out, parameterisation]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours; a parameterisation may have its own, `validation.<p>.harness` (same form), used for that parameterisation's model, calibration and archive instead (e.g. an experiment's set-up: `PMCA/Colegrove2000_v01` parameterisation `wanaverbecq2003_scg` puts the pump on the soma Ca handling with a Ca leak and a load, while the version's own tests run the pump alone) |
+| `harness` | verification_config | the test network: `module_array` rows `[name, module_subtype, module_type, inp, out, parameterisation]` (the version under test is `mod`) and `parameters` rows `[<vessel>/<var>, units, value, source]` for the neighbours; a parameterisation may have its own, `validation.<p>.harness` (same form), used for that parameterisation's model, calibration and archive instead (e.g. an experiment's set-up: `PMCA/Colegrove2000_v01` parameterisation `wanaverbecq2003_scg` puts the pump on the soma Ca handling with a Ca leak and a load, while the version's own tests run the pump alone) |
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |

@@ -1,5 +1,5 @@
 [
- {"name": "heart", "module_type": "heart", "module_subtype": "vp", "inp_instances": ["venous_ivc", "venous_svc"], "out_instances": ["ascending_aorta_A"]},
+ {"name": "heart", "module_type": "heart", "module_subtype": "vp", "inp_instances": ["venous_ivc", "venous_svc", "pvn"], "out_instances": ["ascending_aorta_A", "par"]},
  {"name": "ascending_aorta_A", "module_type": "arterial", "module_subtype": "vv_nonlinear_visco", "inp_instances": ["heart"], "out_instances": ["ascending_aorta_B", "K_tube_ascending_aorta_A"]},
  {"name": "ascending_aorta_B", "module_type": "arterial", "module_subtype": "pv_nonlinear_visco", "inp_instances": ["ascending_aorta_A"], "out_instances": ["ascending_aorta_C", "K_tube_ascending_aorta_B"]},
  {"name": "ascending_aorta_C", "module_type": "arterial", "module_subtype": "pv_nonlinear_visco", "inp_instances": ["ascending_aorta_B"], "out_instances": ["ascending_aorta_D", "K_tube_ascending_aorta_C"]},
@@ -70,5 +70,7 @@
  {"name": "K_tube_common_iliac_R216", "module_type": "material_prop_visco_const", "module_subtype": "nn", "inp_instances": ["common_iliac_R216"], "out_instances": []},
  {"name": "K_tube_external_iliac_R220", "module_type": "material_prop_visco_const", "module_subtype": "nn", "inp_instances": ["external_iliac_R220"], "out_instances": []},
  {"name": "K_tube_femoral_L200", "module_type": "material_prop_visco_const", "module_subtype": "nn", "inp_instances": ["femoral_L200"], "out_instances": []},
- {"name": "K_tube_femoral_R222", "module_type": "material_prop_visco_const", "module_subtype": "nn", "inp_instances": ["femoral_R222"], "out_instances": []}
+ {"name": "K_tube_femoral_R222", "module_type": "material_prop_visco_const", "module_subtype": "nn", "inp_instances": ["femoral_R222"], "out_instances": []},
+ {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "inp_instances": ["heart"], "out_instances": ["pvn"]},
+ {"name": "pvn", "module_type": "arterial_simple", "module_subtype": "vp", "inp_instances": ["par"], "out_instances": ["heart"]}
 ]

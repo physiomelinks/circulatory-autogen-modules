@@ -267,8 +267,7 @@ def parameterisation_context(version, inst):
             calibration = json.load(f)
     from cam_testing import omex as omex_mod
     omex_file = omex_mod.omex_path(version, inst)
-    omex_result = (checks.load(version, f'cuflynx_parameterisation_omex_test__{inst.name}')
-                   or checks.load(version, f'cuflynx_instance_omex_test__{inst.name}'))   # the former name
+    omex_result = checks.load(version, f'cuflynx_parameterisation_omex_test__{inst.name}')
     return {'name': inst.name, 'is_default': inst.is_default, 'files': inst.data_files(),
             # the generated COMBINE archive for CUFLynx (tools/build_parameterisation_omex.py), and its CUFLynx check
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
@@ -619,16 +618,16 @@ def supermodule_structure(version):
         return None
     subs = version.submodules
     versions = {s['name']: _sub_version(s) for s in subs}
-    # the supermodule's own parameterisation: rows <var>_<part> override the part's parameterisation;
-    # others are globals
-    names = sorted(versions, key=len, reverse=True)
+    # the supermodule's own parameterisation: rows <part>/<var> (nested: <part>/<its part>/<var>)
+    # override the part's parameterisation; others are globals
     overrides, global_rows = {}, []
     for p in version.default_parameterisation.parameters():
-        owner = next((n for n in names if p.variable_name.endswith('_' + n)), None)
-        if owner is None:
+        path, _, var = p.variable_name.rpartition('/')
+        owner = path.split('/')[0] if path else None
+        if owner not in versions:
             global_rows.append({'name': p.variable_name, 'value': p.value, 'units': p.units})
         else:
-            overrides.setdefault(owner, []).append({'name': p.variable_name, 'var': p.variable_name[:-len(owner) - 1],
+            overrides.setdefault(owner, []).append({'name': p.variable_name, 'var': var,
                                                     'value': p.value, 'units': p.units})
     sup_globals = set(version.supermodule_globals)
 
