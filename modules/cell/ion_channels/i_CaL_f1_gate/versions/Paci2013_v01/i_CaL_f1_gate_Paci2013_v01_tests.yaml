@@ -6,6 +6,8 @@ notes: 'Paci 2013 hiPSC-CM I_CaL fast voltage inactivation f1 (Ca-dependent slow
   used as the invariant. The run point steps the clamp from rest (-74.3 mV) to -20 mV. tau_f1 is multiplied by constf1 = 1
   + 1433 (Cai - 50e-6) while f1 is rising (f1_inf > f1); the sign of (f1_inf - f1) cannot change during a monotone relaxation,
   so the exact solution still applies.'
+known_issues:
+- Vm has units dimensionless in the config but volt in the CellML
 expected_failures:
   run_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters file)
     but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
