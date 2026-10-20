@@ -1,0 +1,41 @@
+{
+ "parameterisation": "wanaverbecq2003_scg",
+ "version": "PMCA/Colegrove2000_v01",
+ "date": "2026-10-06",
+ "passed": true,
+ "summary": "start nominal -> rho_PMCA=2577, j_Ca_influx=3.349e-17",
+ "method": "CMA-ES",
+ "files": [
+  "parameterisations/wanaverbecq2003_scg/wanaverbecq2003_scg_obs_data.json",
+  "parameterisations/wanaverbecq2003_scg/wanaverbecq2003_scg_params_for_id.csv"
+ ],
+ "cost": 0.18675853825958497,
+ "calibrated_parameters": {
+  "rho_PMCA": 2577.0626203392067,
+  "j_Ca_influx": 3.34883046584601e-17
+ },
+ "runs": [
+  {
+   "start": {},
+   "calibrated_parameters": {
+    "rho_PMCA": 2577.0626203392067,
+    "j_Ca_influx": 3.34883046584601e-17
+   },
+   "cost": 0.18675853825958497,
+   "calibration_scores": {
+    "recovery_100nM": 0.07493504632167025,
+    "recovery_500nM": 0.10091396039122917
+   },
+   "prediction_scores": {},
+   "constant_items": {
+    "resting_Ca": {
+     "model": 0.00010258102153839222,
+     "data": 0.000102,
+     "z": 0.14525538459805445
+    }
+   }
+  }
+ ],
+ "metric": "nrmse",
+ "threshold": 0.3
+}

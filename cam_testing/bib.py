@@ -1,6 +1,6 @@
 """
 Per-version BibTeX: versions/<version>/<module_type>_<version>_references.bib holds the sources
-cited by the version's parameters (all its instances). A parameter's data_reference is "<bibkey>; <note>" (the note is optional), or
+cited by the version's parameters (all its parameterisations). A parameter's data_reference is "<bibkey>; <note>" (the note is optional), or
 starts with "definitional" / names a test fixture when there is nothing to cite.
 
 A small reader, enough for the entries this repo writes (@type{key, field = {...}, ...}).

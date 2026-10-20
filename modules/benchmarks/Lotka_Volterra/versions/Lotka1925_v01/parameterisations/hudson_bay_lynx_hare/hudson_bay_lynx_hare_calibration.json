@@ -1,0 +1,72 @@
+{
+ "parameterisation": "hudson_bay_lynx_hare",
+ "version": "Lotka_Volterra/nn",
+ "date": "2026-10-01",
+ "passed": true,
+ "summary": "start nominal -> alpha=0.4371, beta=0.02311, gamma=0.9974, delta=0.02933, x_init=35.56, y_init=4.936 (prediction log_rmse 0.394)",
+ "method": "CMA-ES",
+ "files": [
+  "parameterisations/hudson_bay_lynx_hare/hudson_bay_lynx_hare_obs_data.json",
+  "parameterisations/hudson_bay_lynx_hare/hudson_bay_lynx_hare_params_for_id.csv"
+ ],
+ "cost": 0.27193979766414555,
+ "calibrated_parameters": {
+  "alpha": 0.437115502731126,
+  "beta": 0.023109818898925043,
+  "gamma": 0.997410204271596,
+  "delta": 0.029329235159471837,
+  "x_init": 35.56371206957994,
+  "y_init": 4.936379231838263
+ },
+ "runs": [
+  {
+   "start": {},
+   "calibrated_parameters": {
+    "alpha": 0.437115502731126,
+    "beta": 0.023109818898925043,
+    "gamma": 0.997410204271596,
+    "delta": 0.029329235159471837,
+    "x_init": 35.56371206957994,
+    "y_init": 4.936379231838263
+   },
+   "cost": 0.27193979766414555,
+   "calibration_scores": {
+    "x": 0.16249525592951514,
+    "y": 0.2296517194743917
+   },
+   "prediction_scores": {
+    "x": 0.39403788944649015,
+    "y": 0.3271588824045506
+   },
+   "constant_items": {
+    "x_max_validation": {
+     "model": 65.1641171465662,
+     "data": 77.4,
+     "z": 0.6323453671025223
+    },
+    "x_mean_validation": {
+     "model": 34.02556967815463,
+     "data": 34.0809523809524,
+     "z": 0.02539356222985561
+    },
+    "y_max_validation": {
+     "model": 48.00498764958436,
+     "data": 59.4,
+     "z": 0.7673408990178883
+    },
+    "y_min_validation": {
+     "model": 4.920922210124309,
+     "data": 4.0,
+     "z": 0.9209222101243091
+    },
+    "y_mean_validation": {
+     "model": 19.213980389712844,
+     "data": 20.166666666666668,
+     "z": 0.6741998453341178
+    }
+   }
+  }
+ ],
+ "metric": "log_rmse",
+ "threshold": 0.5
+}

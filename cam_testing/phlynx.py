@@ -81,7 +81,10 @@ def component_job(component, work_dir):
     instances = [{'name': r['name'], 'module_type': r['module_type'], 'module_subtype': r['module_subtype'],
                   'inp_instances': ' '.join(r.get('inp_instances', [])),
                   'out_instances': ' '.join(r.get('out_instances', []))} for r in records]
-    params = [{k: (v or '') for k, v in r.items()} for r in _read_csv(os.path.join(res, f'{prefix}_parameters.csv'))]
+    # PhLynx matches a row to an instance by the model's name (<var>_<instance>, a global bare),
+    # so the file's <vessel>/<var> rows are passed by that name
+    params = [dict({k: (v or '') for k, v in r.items()}, variable_name=harness.libcuflynx_model_name(r['variable_name']))
+              for r in _read_csv(os.path.join(res, f'{prefix}_parameters.csv'))]
     params += _neighbour_parameters(records, {p['variable_name'] for p in params})
     spec = component.spec
     extra = [harness.output_name(o) for o in (spec.get('outputs') or [])]
@@ -92,8 +95,8 @@ def component_job(component, work_dir):
 
 def _neighbour_parameters(records, have):
     '''
-    The harness neighbours' instance parameters, named as libcuflynx names them ({var}_{name};
-    globals unsuffixed). libcuflynx reads a neighbour's values from its instance in the library;
+    The harness neighbours' parameterisations' parameters, named as libcuflynx names them ({var}_{name};
+    globals unsuffixed). libcuflynx reads a neighbour's values from its parameterisation in the library;
     PhLynx only gets the parameters it is given, so without these a neighbour's constants are
     empty (e.g. i_CaL's V_den_c, and its computed c_init divides by zero in CUFLynx).
     Names already in ``have`` (the version's own rows and the harness's) win.
@@ -107,7 +110,7 @@ def _neighbour_parameters(records, have):
             version = load_version(r['module_type'], r['module_subtype'])
         except (OSError, ValueError):
             continue
-        for p in version.instance(r.get('instance') or None).parameters():
+        for p in version.parameterisation(module_array.parameterisation_of(r)).parameters():
             name = p.variable_name if p.is_global else f'{p.variable_name}_{r["name"]}'
             if name in have or p.is_todo:
                 continue

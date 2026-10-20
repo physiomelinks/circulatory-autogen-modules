@@ -4,9 +4,9 @@ model's parameter values against them.
 
     tested range     the range each parameter is varied over by verification_test_BC and the
                      joint risk analysis: bc_sweep.ranges in <module_type>_<version>_verification_config.json,
-                     or bc_sweep.factors x the nominal (default instance) value
+                     or bc_sweep.factors x the nominal (default parameterisation) value
     validated spread the values at which the version matched data in a passing validation
-                     test of any of its instances (published parameter intervals and calibrated values)
+                     test of any of its parameterisations (published parameter intervals and calibrated values)
 
     python -m cam_testing.ranges check --module-array sys_module_array.json --parameters sys_parameters.csv
         lists each value as inside / outside the tested range and the validated spread, with
@@ -56,7 +56,7 @@ def validated_spread(component):
     def add(var, lo, hi):
         spans[var] = [min(spans[var][0], lo), max(spans[var][1], hi)] if var in spans else [lo, hi]
 
-    for inst in component.instances():
+    for inst in component.parameterisations():
         for test, kind in (('validation_test_baseline', 'baseline'), ('validation_test_calibrate', 'calibrate')):
             r = checks.load(component, test, inst)
             if r is None or r.status != checks.PASSED:
@@ -139,8 +139,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest='cmd', required=True)
     ch = sub.add_parser('check', help="check a system model's parameters against module ranges")
-    ch.add_argument('--module-array', '--vessel-array', dest='module_array', required=True,
-                    help='the module array (--vessel-array is the old name of this option)')
+    ch.add_argument('--module-array', required=True, help='the module array')
     ch.add_argument('--parameters', required=True)
     args = parser.parse_args(argv)
     return 1 if check(args.module_array, args.parameters) else 0

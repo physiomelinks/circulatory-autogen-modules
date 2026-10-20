@@ -1,5 +1,5 @@
 """
-The module library on disk: module_types, their versions and each version's instances.
+The module library on disk: module_types, their versions and each version's parameterisations.
 
 Layout (modules/README.md and modules/directory_schema.json describe it in full):
 
@@ -7,20 +7,20 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
         <module_type>.html                          report across the versions (generated)
         versions/<version>/                         version == the config entry's module_subtype
             <module_type>_<version>_modules.cellml
-            <module_type>_<version>_modules_config.json   one entry; "default_instance"
+            <module_type>_<version>_modules_config.json   one entry; "default_parameterisation"
             <module_type>_<version>_units.cellml
             <module_type>_<version>_verification_config.json   what the checks run
             <module_type>_<version>_tests.yaml            review and record-keeping
             <module_type>_<version>_references.bib        (+ _references_proposed.bib)
             <module_type>_<version>.html                  version report (generated)
             risk/  plots/  results/                       (plots, results generated)
-            instances/<instance>/                         instance == obs_data_name
-                <instance>_parameters.csv                 variable_name,units,value,data_reference,sourced
-                <instance>_obs_data.json                  optional: calibration data (data_items) and
+            parameterisations/<p>/                        p == obs_data_name (a parameterisation)
+                <p>_parameters.csv                        variable_name,units,value,data_reference,sourced
+                <p>_obs_data.json                         optional: calibration data (data_items) and
                                                           held-out data (prediction_items with a value)
-                <instance>_params_for_id.csv              optional
-                <instance>_calibrated_parameters.csv      written by calibration (committed)
-                <instance>_calibration.json               written by calibration (committed)
+                <p>_params_for_id.csv                     optional
+                <p>_calibrated_parameters.csv             written by calibration (committed)
+                <p>_calibration.json                      written by calibration (committed)
 
 A module_type directory is any directory under modules/ with a versions/ subdirectory. A module_type
 may contain the module_types that only exist within it (nested module_types: its other
@@ -56,8 +56,9 @@ def __getattr__(name):
     raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
 
-VERSIONS, INSTANCES, DEFAULT_INSTANCE = 'versions', 'instances', 'default'
-SOURCE_FIGURES = 'source_figures'              # instance dir: screenshots of the data's publication figures
+VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameterisations', 'default'
+DEFAULT_KEY = 'default_parameterisation'
+SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
 # directories under modules/ that are not categories or module_types (another session's work in
 # the old layout, until it is moved)
@@ -256,9 +257,10 @@ def select_module_types(selectors, include_libraries=False):
 # config formats
 # ----------------------------------------------------------------------------------------------
 
-# Module configs come in two formats: PhLynx's (this library's) and libcuflynx's original.
-# Both are read; code here uses libcuflynx's internal names. module_type means different things in
-# the two, so the format is told by the other keys, never by module_type.
+# Config files use PhLynx's key names (module_type, module_subtype, component_file, component_type),
+# as libcuflynx does. Code here works on entries in internal names (PHLYNX_KEYS: vessel_type, BC_type,
+# module_file, and module_type for the CellML component); config_format tells the two apart by the
+# other keys, never by module_type, which means different things in each.
 PHLYNX_KEYS = {'module_type': 'vessel_type', 'module_subtype': 'BC_type',
                'component_file': 'module_file', 'component_type': 'module_type'}
 LIBCUFLYNX_KEYS = ('vessel_type', 'BC_type', 'module_file', 'module_type')
@@ -289,12 +291,12 @@ CITATION_KEYS = ('required_citations', 'required_citations_uncertain')
 
 def with_record_keys(entry, licence=DEFAULT_LICENCE, creator=None):
     '''The entry with "licence" and "creator" (the defaults where missing; existing values kept),
-    placed after "default_instance" (or after the subtype key when it has none), other keys in order.'''
+    placed after "default_parameterisation" (or after the subtype key when it has none), other keys in order.'''
     values = {'licence': entry.get('licence', licence),
               'creator': list(entry.get('creator', creator if creator is not None else []))}
     rest = [(k, v) for k, v in entry.items() if k not in RECORD_KEYS]
     keys = [k for k, _ in rest]
-    anchor = next((k for k in ('default_instance', 'module_subtype', 'BC_type') if k in keys), None)
+    anchor = next((k for k in (DEFAULT_KEY, 'module_subtype') if k in keys), None)
     out = {}
     if anchor is None:
         out.update(values)
@@ -346,9 +348,18 @@ def to_phlynx_entry(entry):
     return {**head, **{k: v for k, v in e.items() if k not in LIBCUFLYNX_KEYS and k != 'module_format'}}
 
 
+def entry_from_file(entry, path):
+    '''A config entry read from ``path`` -> internal names. An entry in libcuflynx's older keys
+    (vessel_type, BC_type, module_file) is refused, as libcuflynx refuses it.'''
+    if config_format(entry) == 'libcuflynx':
+        raise ValueError(f'{path}: config entry uses the older keys vessel_type/BC_type/module_file; '
+                         f'convert it once with: cuflynx-upgrade module-config {path}')
+    return normalise_config_entry(entry)
+
+
 def read_config(path):
     with open(path) as f:
-        return [normalise_config_entry(e) for e in json.load(f)]
+        return [entry_from_file(e, path) for e in json.load(f)]
 
 
 # ----------------------------------------------------------------------------------------------
@@ -404,7 +415,7 @@ class Parameter:
 
 
 def read_parameters(path, kinds=None):
-    '''An instance's parameters (kind from the config's variables_and_units, where it has one).'''
+    '''A parameterisation's parameters (kind from the config's variables_and_units, where it has one).'''
     kinds = kinds or {}
     out = []
     if not os.path.isfile(path):
@@ -440,7 +451,7 @@ def write_parameters(path, parameters):
 IDENTITY_KEYS = ('module_type', 'version')
 # in this order in the JSON file
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
-                     'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
+                     'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
                      'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
@@ -448,9 +459,9 @@ TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expec
 NESTED_ORDER = {
     'harness': ('module_array', 'parameters'),
     'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'bounds', 'constraints', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
-    'timestep': ('scheme', 'dts', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
-    'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget', 't_end',
-                  'tol'),
+    'timestep': ('scheme', 'dts', 'pre_time', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
+    'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget',
+                  'max_run_seconds', 'total_time_budget', 't_end', 'tol'),
     'supermodule': ('globals', 'equivalent'),
     'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
@@ -560,8 +571,15 @@ def misplaced_spec_keys(tests, verification):
 
 
 # ----------------------------------------------------------------------------------------------
-# module_type / version / instance
+# module_type / version / parameterisation
 # ----------------------------------------------------------------------------------------------
+
+def _has_source(path):
+    '''Whether a directory under versions/ is a version: it has its modules config. A renamed or removed
+    version can leave generated output behind (results/, plots/, reports, parameterisations' .omex
+    archives), e.g. restored from CI's results cache.'''
+    return any(e.endswith('_modules_config.json') for e in os.listdir(path))
+
 
 @dataclass
 class ModuleType:
@@ -619,7 +637,8 @@ class ModuleType:
         if not os.path.isdir(self.versions_dir):
             return []
         return sorted((d for d in os.listdir(self.versions_dir)
-                       if os.path.isdir(os.path.join(self.versions_dir, d)) and not d.startswith('.')), key=str.lower)
+                       if os.path.isdir(os.path.join(self.versions_dir, d)) and not d.startswith('.')
+                       and _has_source(os.path.join(self.versions_dir, d))), key=str.lower)
 
     def versions(self):
         return [load_version(self.name, v) for v in self.version_names()]
@@ -634,13 +653,15 @@ class ModuleType:
 
 
 @dataclass
-class Instance:
+class Parameterisation:
+    '''A named parameter set of a version (same maths, its own values, data and set-ups):
+    <version>/parameterisations/<name>/.'''
     version: 'Version'
     name: str
 
     @property
     def dir(self):
-        return os.path.join(self.version.dir, INSTANCES, self.name)
+        return os.path.join(self.version.parameterisations_dir, self.name)
 
     @property
     def key(self):
@@ -686,11 +707,11 @@ class Instance:
 
     @property
     def is_default(self):
-        return self.name == self.version.default_instance_name
+        return self.name == self.version.default_parameterisation_name
 
     @property
     def validation(self):
-        '''This instance's validation spec: {baseline: {...}, calibrate: {...}}.'''
+        '''This parameterisation's validation spec: {baseline: {...}, calibrate: {...}}.'''
         return ((self.version.spec.get('validation') or {}).get(self.name)) or {}
 
     @property
@@ -698,7 +719,7 @@ class Instance:
         return os.path.join(self.dir, SOURCE_FIGURES)
 
     def source_figures(self):
-        '''Screenshots of the publication figures/tables the instance's data were extracted from:
+        '''Screenshots of the publication figures/tables the parameterisation's data were extracted from:
         source_figures/source_figures.json lists [{"file", "source", "caption"}], file relative to
         source_figures/. Returned with file relative to the version directory.'''
         index = os.path.join(self.source_figures_dir, SOURCE_FIGURES_INDEX)
@@ -710,22 +731,22 @@ class Instance:
                 for e in entries]
 
     def needs_source_figures(self):
-        '''True when the instance's validation data were extracted from a publication (a paper or a
+        '''True when the parameterisation's validation data were extracted from a publication (a paper or a
         book): a validation entry with a source and source_kind "publication" (the default when a
         source is given; "dataset" and "synthetic" are exempt).'''
         return any(isinstance(e, dict) and e.get('source') and e.get('source_kind', 'publication') == 'publication'
                    for e in self.validation.values())
 
     def parameters(self):
-        '''The instance's own rows, then the version's globals, TODO values filled from review proposals.'''
+        '''The parameterisation's own rows, then the version's globals, TODO values filled from review proposals.'''
         return self.version._apply_proposals(read_parameters(self.parameters_path, self.version.kinds))
 
     @property
     def results_dir(self):
-        return os.path.join(self.version.results_dir, INSTANCES, self.name)
+        return os.path.join(self.version.results_dir, PARAMETERISATIONS, self.name)
 
     def data_files(self):
-        '''Every file of the instance except its parameters.'''
+        '''Every file of the parameterisation except its parameters.'''
         if not os.path.isdir(self.dir):
             return []
         return sorted(f for f in os.listdir(self.dir)
@@ -733,9 +754,10 @@ class Instance:
                       and f != SOURCE_FIGURES)   # .omex: generated
 
 
+
 @dataclass
 class Version:
-    '''One version of a module_type: its config entry, spec and instances. It is what the tests
+    '''One version of a module_type: its config entry, spec and parameterisations. It is what the tests
     run (the old Module + Component in one).'''
     mtype: ModuleType
     name: str
@@ -878,46 +900,47 @@ class Version:
         return os.path.join(self.dir, 'risk')
 
     @property
-    def instances_dir(self):
-        return os.path.join(self.dir, INSTANCES)
+    def parameterisations_dir(self):
+        '''<version>/parameterisations/.'''
+        return os.path.join(self.dir, PARAMETERISATIONS)
 
-    # --- instances --------------------------------------------------------------------------
+    # --- parameterisations ------------------------------------------------------------------
     @property
-    def default_instance_name(self):
-        return self.config.get('default_instance') or DEFAULT_INSTANCE
+    def default_parameterisation_name(self):
+        return self.config.get(DEFAULT_KEY) or DEFAULT_PARAMETERISATION
 
-    def instance_names(self):
-        if not os.path.isdir(self.instances_dir):
+    def parameterisation_names(self):
+        root = self.parameterisations_dir
+        if not os.path.isdir(root):
             return []
-        names = sorted(d for d in os.listdir(self.instances_dir)
-                       if os.path.isdir(os.path.join(self.instances_dir, d)) and not d.startswith('.'))
-        # the default instance first
-        return sorted(names, key=lambda n: (n != self.default_instance_name, n.lower()))
+        names = sorted(d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d)) and not d.startswith('.'))
+        # the default parameterisation first
+        return sorted(names, key=lambda n: (n != self.default_parameterisation_name, n.lower()))
 
-    def instances(self):
-        return [Instance(self, n) for n in self.instance_names()]
+    def parameterisations(self):
+        return [Parameterisation(self, n) for n in self.parameterisation_names()]
 
-    def instance(self, name=None):
-        return Instance(self, name or self.default_instance_name)
+    def parameterisation(self, name=None):
+        return Parameterisation(self, name or self.default_parameterisation_name)
 
     @property
-    def default_instance(self):
-        return self.instance()
+    def default_parameterisation(self):
+        return self.parameterisation()
 
     # --- parameters -------------------------------------------------------------------------
     @property
     def kinds(self):
         if self.is_supermodule:
-            # no variables_and_units: its instance rows are {var}_{submodule} or the declared globals
+            # no variables_and_units: its parameterisation rows are {var}_{submodule} or the declared globals
             return {g: 'global_constant' for g in self.supermodule_globals}
         return {v[0]: v[3].strip() for v in self.config.get('variables_and_units') or []}
 
     @functools.cached_property
     def _parameters(self):
-        return self.default_instance.parameters()
+        return self.default_parameterisation.parameters()
 
     def parameters(self):
-        '''The default instance's parameters: the version's own constants / BCs, then globals.'''
+        '''The default parameterisation's parameters: the version's own constants / BCs, then globals.'''
         return self._parameters
 
     def _apply_proposals(self, params):
@@ -957,7 +980,7 @@ class Version:
 
     @property
     def supermodule_globals(self):
-        '''The global constants a supermodule's instance may set (spec supermodule.globals).'''
+        '''The global constants a supermodule's parameterisation may set (spec supermodule.globals).'''
         return list((self.spec.get('supermodule') or {}).get('globals') or SUPERMODULE_DEFAULT_GLOBALS)
 
 
@@ -982,7 +1005,7 @@ def _load_version(mt_name, version):
         raw = json.load(f)
     if len(raw) != 1:
         raise ValueError(f'{cfg_path}: a version config has exactly one entry, not {len(raw)}')
-    entry = normalise_config_entry(raw[0])
+    entry = entry_from_file(raw[0], cfg_path)
     tests, verification = read_spec_files(vdir, stem)
     spec = merge_spec(tests, verification)
     if isinstance(spec.get('review'), str):

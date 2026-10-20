@@ -100,7 +100,7 @@ def load_configs():
     from cam_testing.library import legacy_renames
     configs = {}
     for path in glob.glob(os.path.join(REPO, 'modules', '**', '*_modules_config.json'), recursive=True):
-        for e in read_config(path):   # either config format, as libcuflynx's names
+        for e in read_config(path):   # internal names (cam_testing.library.PHLYNX_KEYS)
             configs[(e['vessel_type'], e['BC_type'])] = e
     for old, new in legacy_renames().items():
         if new in configs:
@@ -354,7 +354,7 @@ def import_model(ca_dir, model, category, configs):
     ref_dir = os.path.join(dest, 'reference')
     os.makedirs(ref_dir, exist_ok=True)
     notes = []
-    va = module_array.find(res, model)     # circulatory_autogen's resources/, either name
+    va = module_array.find(res, model)
     pa = os.path.join(res, f'{model}_parameters.csv')
     module_array.write_records(os.path.join(ref_dir, f'{model}_module_array.json'), module_array.read_records(va))
     if os.path.isfile(pa):
@@ -369,7 +369,7 @@ def import_model(ca_dir, model, category, configs):
     wrapped = mapping.pop('__wrapped__', {})
     reciprocal = mapping.pop('__reciprocal__', [])
     ignore.update({f'{r["name"]}/t': 'time' for r in rows})
-    # this library's (module_type, version) names, each record with its default instance
+    # this library's (module_type, version) names, each record with its default parameterisation
     module_array.write_records(os.path.join(dest, f'{model}_module_array.json'), module_array.to_library_versions(rows))
     if os.path.isfile(pa):
         write_rows(os.path.join(dest, f'{model}_parameters.csv'), ['variable_name', 'units', 'value', 'data_reference'], params)

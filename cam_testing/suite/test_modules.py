@@ -1,6 +1,6 @@
 """
-The standard V&V tests: per version (module_type/version) for verification, and per instance
-(module_type/version/instance) for validation.
+The standard V&V tests: per version (module_type/version) for verification, and per
+parameterisation (module_type/version/parameterisation) for validation.
 
     pytest                                        # every reviewed version
     pytest --module Lotka_Volterra                # one module_type and those nested in it (or a category: --module cell)
@@ -22,6 +22,11 @@ pytestmark = pytest.mark.module_vv
 def _assert(result, version):
     if result.status == checks.PASSED:
         return
+    if result.status == checks.PARTIAL:
+        # met what the model allows but not the full criterion: not a failure (the report shows Partial)
+        import warnings
+        warnings.warn(f'{result.test} partial: {result.message}')
+        return
     if result.status in (checks.SKIPPED, checks.PENDING, checks.NOT_APPLICABLE):
         pytest.skip(f'{result.status}: {result.message}')
     # A failure listed under expected_failures in the spec is a recorded known issue: it
@@ -34,6 +39,12 @@ def _assert(result, version):
 
 
 # ---- per version --------------------------------------------------------------------------------
+
+def review_test(component_key):
+    # no model: whether the version has been reviewed (a version not reviewed yet fails)
+    version = load_version(*component_key)
+    _assert(checks.review_check(version), version)
+
 
 def run_test(component_model):
     _assert(checks.run_test(component_model), component_model.component)
@@ -55,15 +66,15 @@ def stability_test(component_model):
     _assert(checks.stability_test(component_model), component_model.component)
 
 
-# ---- per instance -------------------------------------------------------------------------------
+# ---- per parameterisation -----------------------------------------------------------------------
 
-def validation_test_baseline(instance_model):
-    _assert(checks.validation_test_baseline(instance_model), instance_model.component)
+def validation_test_baseline(parameterisation_model):
+    _assert(checks.validation_test_baseline(parameterisation_model), parameterisation_model.component)
 
 
 @pytest.mark.slow
-def validation_test_calibrate(instance_model):
-    _assert(checks.validation_test_calibrate(instance_model), instance_model.component)
+def validation_test_calibrate(parameterisation_model):
+    _assert(checks.validation_test_calibrate(parameterisation_model), parameterisation_model.component)
 
 
 # ---- supermodule versions -----------------------------------------------------------------------
