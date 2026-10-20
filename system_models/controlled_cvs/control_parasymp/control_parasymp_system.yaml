@@ -55,3 +55,10 @@ equivalence:
 invariants: []
 notes: ['Equivalence at rtol = atol = 1e-11: circulatory_autogen''s original fails to simulate (CVODE) at rtol 1e-12 or atol
     <= 1e-10 with rtol 1e-12, and at rtol 1e-10/atol 1e-12; at 1e-11/1e-11 all outputs agree to < 1e-6.']
+expected_failures:
+  system_equivalence_test: 'circulatory_autogen''s original model has the defect this library''s efferent_respiratory_effector/Albanese2016_v01
+    no longer has: its efferent_respiratory_effector_type names the muscle pressure alpha_P_mus (dimensionless), while its
+    config declares Delta_P_mus, Delta_P_mus_max/min (J_per_m3), so the clamps are unset (0) and the lung''s Delta_P_mus is
+    never set. The original runs with no respiratory muscle-pressure control (resp_effector stays at 0); here resp_effector/Delta_P_mus
+    reaches the lung (73 Pa at 2 s), and most outputs move. The reference reproduces again once circulatory_autogen''s module
+    is fixed and the reference regenerated.'

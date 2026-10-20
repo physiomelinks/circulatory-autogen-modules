@@ -21,6 +21,9 @@ notes: 'Compliance (inverse-elastance) form of the gee2023closed effector. The c
   exit Elastance_delta_port_lv: lv_ArgusUNPUBLISHED_v01 [Delta_Emax]; rv_ArgusUNPUBLISHED_OLD -; rv_ArgusUNPUBLISHED_v01 -
 
   exit Elastance_delta_port_rv: lv_ArgusUNPUBLISHED_v01 -; rv_ArgusUNPUBLISHED_OLD [Delta_Emax]; rv_ArgusUNPUBLISHED_v01 [Delta_Emax]'
+known_issues:
+- CellML input G_Es of heart_effector_Gee2023__heart_effector_Gee2023_OLD_nn_rv is not declared in the config
+- CellML input G_Ev of heart_effector_Gee2023__heart_effector_Gee2023_OLD_nn_rv is not declared in the config
 expected_failures:
   verification_test_invariants: config module_type is heart_effector_Gee2023 but the variables (inv_*) belong to heart_effector_Gee2023_INV;
     the generated model leaves inv_* unset (all outputs 0), so the INV-law invariants fail. Also heart_effector_Gee2023_INV

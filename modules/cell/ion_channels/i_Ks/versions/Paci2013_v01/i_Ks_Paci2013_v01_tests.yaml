@@ -4,27 +4,6 @@ reviewed: false
 notes: 'Paci 2013 hiPSC-CM (ventricular-like) slow delayed rectifier I_Ks = Chromanol_coeff g_Ks (Vm - E_Ks) Xs^2 (1 + 0.6/(1
   + (3.8e-5/Cai)^1.4)). Algebraic: all gates, concentrations and the membrane potential are inputs, so alone it is a pure
   function of its inputs, checked exactly against the original model equations.'
-expected_failures:
-  run_test: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the original Paci encapsulation
-    hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
-    Also Chromanol_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''.
-    With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  verification_test_invariants: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of
-    the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
-    Fix: public_interface=''in''. Also Chromanol_coeff is exposed in the config but has no public interface in the CellML;
-    fix: public_interface=''out''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  verification_test_BC: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the original
-    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
-    Also Chromanol_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''.
-    With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  verification_test_timestep: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the
-    original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
-    Fix: public_interface=''in''. Also Chromanol_coeff is exposed in the config but has no public interface in the CellML;
-    fix: public_interface=''out''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  stability_test: 'generation fails: the gate inputs Xs are declared private_interface=''in'' (a leftover of the original
-    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
-    Also Chromanol_coeff is exposed in the config but has no public interface in the CellML; fix: public_interface=''out''.
-    With the proposed fix applied to a copy of the library, all tests of this component pass.'
 reference_proposals:
   g_Ks:
     reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):

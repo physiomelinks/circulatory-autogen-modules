@@ -28,6 +28,10 @@ expected_failures:
     with heart_simplesimple_type, and cvs_mvp_parameters.csv declares them once in litre/kPa units; libcuflynx refuses to
     generate ("units of litre in parameters.csv file does not match with units of m3 in module_config.json for param q_LV_init").
     See review.proposed_fixes.'
+  phlynx_equivalence_test: 'module defect: heart_simplesimple_type2 (SI) shares its global constants (T, E_LVmax, q_LV_us,
+    R_AV, ...) with heart_simplesimple_type, and cvs_mvp_parameters.csv declares them once in litre/kPa units; libcuflynx
+    refuses to generate ("units of litre in parameters.csv file does not match with units of m3 in module_config.json for
+    param q_LV_init"). See review.proposed_fixes.'
 reference_proposals:
   T:
     reference: 'bozkurt2019mathematical; Table 1 (adult): cardiac cycle T = 0.8 s'

@@ -4,6 +4,11 @@ reviewed: false
 notes: 'heart_devel (marked "unvalidated" in the CellML): heart_simple with a patient-specific aortic valve law B_aov = gamma
   rho (pi r_ao^2)^beta /(r_lvot^4 A_eff^beta), A_eff_aov based on the measured valve area A_aov, L_aov from r_lvot, and saturating
   B values for all valves. It cannot currently be generated (see expected_failures).'
+known_issues:
+- B_aov has units dimensionless in the config but Js2_per_m9 in the CellML
+- B_trv has units dimensionless in the config but Js2_per_m9 in the CellML
+- B_puv has units dimensionless in the config but Js2_per_m9 in the CellML
+- B_miv has units dimensionless in the config but Js2_per_m9 in the CellML
 expected_failures:
   run_test: 'heart_devel cannot be generated: the config declares B_aov, B_trv, B_puv, B_miv as dimensionless variables while
     the CellML declares them Js2_per_m9, and A_eff_trv/puv/miv/aov and u_rv, u_lv (declared "variable" in the config) have
