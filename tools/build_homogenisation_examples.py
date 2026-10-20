@@ -59,8 +59,8 @@ SQUARE_MEAN = 0.0351442  # mean of u, -lap u = 1 on the unit square, u = 0 on th
 
 # Parameters swept in both models of a pair: each name is a glob over the parameters file.
 SWEEP_PARAMETERS = {
-    'bath_O2': {'pattern': 'C_P_init_bath', 'units': 'millimolar'},
-    'M': {'pattern': 'M_c*', 'units': 'millimolar_per_s'},
+    'bath_O2': {'pattern': 'bath/C_P_init', 'units': 'millimolar'},
+    'M': {'pattern': 'c*/M', 'units': 'millimolar_per_s'},
 }
 SWEEP_POINTS = [
     {'bath_O2': 0.2, 'M': M_DEFAULT},
@@ -168,11 +168,11 @@ def write(model, description, cells, faces, exposed, sim_time, homogenisation=No
         inp = [f[5] for f in all_faces if f[1] == name]
         out = [f[5] for f in all_faces if f[0] == name]
         rows.append([name, 'Fang2008_v01', 'tissue_diffusion_volume', ' '.join(inp), ' '.join(out), 'default'])
-        params.extend([[f'C_P_init_{name}', 'millimolar', c0, ref],
-                       [f'V_P_{name}', 'm3', V, ref],
-                       [f'flux_c_{name}', 'mol_per_s', 0, 'no capillary supply'],
-                       [f'M_{name}', 'millimolar_per_s', m, ref],
-                       [f'C50_{name}', 'millimolar', C50, 'CelayaAlcala2021 via the default instance']])
+        params.extend([[f'{name}/C_P_init', 'millimolar', c0, ref],
+                       [f'{name}/V_P', 'm3', V, ref],
+                       [f'{name}/flux_c', 'mol_per_s', 0, 'no capillary supply'],
+                       [f'{name}/M', 'millimolar_per_s', m, ref],
+                       [f'{name}/C50', 'millimolar', C50, 'CelayaAlcala2021 via the default instance']])
 
     add_volume('bath', BATH_V, C_BATH, 0, 'homogenisation example: well-mixed bath, no consumption')
     for name, c in cells.items():
@@ -182,10 +182,10 @@ def write(model, description, cells, faces, exposed, sim_time, homogenisation=No
         kind = 'derived effective distance (see tools/build_homogenisation_examples.py)' \
             if a == 'bath' and model.endswith('lumped') else 'mesh geometry'
         rows.append([fname, 'Fang2008_v01', 'tissue_diffusion_face', a, c, 'default'])
-        params += [[f'A_f_{fname}', 'm2', area, 'mesh geometry: face area'],
-                   [f'd_up_{fname}', 'metre', da, kind],
-                   [f'd_down_{fname}', 'metre', dc, kind],
-                   [f'open_flag_{fname}', 'dimensionless', 1, 'open face']]
+        params += [[f'{fname}/A_f', 'm2', area, 'mesh geometry: face area'],
+                   [f'{fname}/d_up', 'metre', da, kind],
+                   [f'{fname}/d_down', 'metre', dc, kind],
+                   [f'{fname}/open_flag', 'dimensionless', 1, 'open face']]
     module_array.write_records(os.path.join(d, f'{model}_module_array.json'), module_array.from_rows(rows))
     with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
         w = csv.writer(f)

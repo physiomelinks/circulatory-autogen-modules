@@ -175,13 +175,13 @@ FACES = ['fN', 'fS']
 harness_params = []
 for f in FACES:
     side = 'up' if f == 'fN' else 'down'
-    harness_params += [[f'A_f_{f}', 'm2', A_F, 'harness: one cell-cell gap, h deep'],
-                       [f'd_up_{f}', 'metre', D_HALF, 'harness: centroid to the gap'],
-                       [f'd_down_{f}', 'metre', 0.0 if f == 'fS' else D_HALF, 'harness: the open side'],
-                       [f'open_flag_{f}', 'dimensionless', 1, 'harness: open face'],
-                       [f'f_{side}_{f}', 'dimensionless', 1.0, 'harness: open water, no matrix']]
+    harness_params += [[f'{f}/A_f', 'm2', A_F, 'harness: one cell-cell gap, h deep'],
+                       [f'{f}/d_up', 'metre', D_HALF, 'harness: centroid to the gap'],
+                       [f'{f}/d_down', 'metre', 0.0 if f == 'fS' else D_HALF, 'harness: the open side'],
+                       [f'{f}/open_flag', 'dimensionless', 1, 'harness: open face'],
+                       [f'{f}/f_{side}', 'dimensionless', 1.0, 'harness: open water, no matrix']]
     for s in SPECIES:
-        harness_params.append([f'C_{s}_{side}_{f}', 'millimolar', SEA[s][0] * (1.5 if f == 'fN' else 1.0) +
+        harness_params.append([f'{f}/C_{s}_{side}', 'millimolar', SEA[s][0] * (1.5 if f == 'fN' else 1.0) +
                                (0.01 if s == 'lac' and f == 'fN' else 0.0), 'harness: open water'])
 face_sum = {s: ' + '.join(['fN__J_%s_down' % s, 'fS__J_%s_up' % s]) for s in SPECIES}
 
@@ -356,13 +356,13 @@ face_params += [row('D_glc', 'D_glc_water'), row('D_lac', 'D_lac_water'),
 
 face_harness = []
 for v, c0, mx in (('va', 1.0, 0.0), ('vb', 0.2, 0.5)):
-    face_harness += [[f'C_glc_init_{v}', 'millimolar', 0.1 * c0, 'harness: two volumes at different concentrations'],
-                     [f'C_lac_init_{v}', 'millimolar', 0.5 * c0, 'harness'],
-                     [f'C_H_init_{v}', 'millimolar', H_SEA * (1 + c0), 'harness'],
-                     [f'C_O2_init_{v}', 'millimolar', val('C_O2_proterozoic') * c0, 'harness'],
-                     [f'C_mx_init_{v}', 'millimolar', mx * C_MX_MAX, 'harness: matrix in one volume'],
-                     [f'k_mx_{v}', 'per_s', 0.0, 'harness: matrix held, so the hindrance is constant'],
-                     [f'V_e_{v}', 'm3', V_E * (1.0 if v == 'va' else 1.5), 'harness: two volumes of different size']]
+    face_harness += [[f'{v}/C_glc_init', 'millimolar', 0.1 * c0, 'harness: two volumes at different concentrations'],
+                     [f'{v}/C_lac_init', 'millimolar', 0.5 * c0, 'harness'],
+                     [f'{v}/C_H_init', 'millimolar', H_SEA * (1 + c0), 'harness'],
+                     [f'{v}/C_O2_init', 'millimolar', val('C_O2_proterozoic') * c0, 'harness'],
+                     [f'{v}/C_mx_init', 'millimolar', mx * C_MX_MAX, 'harness: matrix in one volume'],
+                     [f'{v}/k_mx', 'per_s', 0.0, 'harness: matrix held, so the hindrance is constant'],
+                     [f'{v}/V_e', 'm3', V_E * (1.0 if v == 'va' else 1.5), 'harness: two volumes of different size']]
 face_invariants = [
     {'description': 'G_s = open_flag A_f D_s f_up f_down/(d_up f_down + d_down f_up) (two half-cells in series), J_s = '
                     'G_s (C_up - C_down) with C_up, C_down and f_up, f_down from the connected volumes, J_down = J, J_up = '

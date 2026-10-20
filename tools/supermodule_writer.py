@@ -2,7 +2,7 @@
 level is written as a flat supermodule (libcuflynx has no nested supermodules).
 
 Parameter rows of a supermodule are generated from its submodules' own default instances: every constant of a submodule
-that no port connection supplies becomes <variable>_<submodule> (global constants keep their bare name), with the value,
+that no port connection supplies becomes <submodule>/<variable> (global constants keep their bare name), with the value,
 data_reference and sourced flag of the submodule's CSV. A cell then overrides the rows its calibration changes.
 """
 import csv
@@ -74,5 +74,5 @@ def supermodule_rows(submodules, instances=None):
                 continue
             if n in conn[s['name']] and role in ('boundary_condition', 'variable'):
                 continue
-            rows.append([f'{n}_{s["name"]}', r['units'], float(r['value']), r['data_reference'], r['sourced']])
+            rows.append([f'{s["name"]}/{n}', r['units'], float(r['value']), r['data_reference'], r['sourced']])
     return rows

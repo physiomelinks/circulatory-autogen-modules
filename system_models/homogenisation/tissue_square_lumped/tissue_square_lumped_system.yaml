@@ -183,10 +183,10 @@ homogenisation:
   sweep:
     parameters:
       bath_O2:
-        pattern: C_P_init_bath
+        pattern: bath/C_P_init
         units: millimolar
       M:
-        pattern: M_c*
+        pattern: c*/M
         units: millimolar_per_s
     points:
     - bath_O2: 0.2

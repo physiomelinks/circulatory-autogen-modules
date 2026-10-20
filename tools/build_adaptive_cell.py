@@ -1237,9 +1237,9 @@ cyto_verif = {
     'harness': {
         'module_array': [['mf', V_NEW, 'cell_membrane_face', '', 'mod', 'default'],
                          ['mod', V_NEW, 'energy_metabolism', 'mf', '', 'default']],
-        'parameters': [['C_glc_e_mf', 'millimolar', GLC_E, 'harness: the background glucose of the medium'],
-                       ['C_lac_e_mf', 'millimolar', LAC_E, 'harness: no lactate in the medium'],
-                       ['A_mem_mf', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']],
+        'parameters': [['mf/C_glc_e', 'millimolar', GLC_E, 'harness: the background glucose of the medium'],
+                       ['mf/C_lac_e', 'millimolar', LAC_E, 'harness: no lactate in the medium'],
+                       ['mf/A_mem', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']],
     },
     'invariants': cyto_invariants,
     'bc_sweep': {'ranges': {**TEMPERATURE_SWEEP['ranges'], 'dG0_ferm': [-230000.0, -160000.0], 'mx_alloc': [0.0, 1.0]},
@@ -1703,8 +1703,8 @@ write_version('cell', 'H_handling', 'H_fermenter', h_vars, h_eqs,
                'harness': {
                    'module_array': [['leak', V_PROK, 'i_leak_H', '', 'mod', 'default'],
                                     ['mod', V_NEW, 'H_handling', 'leak', '', 'default']],
-                   'parameters': [['V_leak', 'milliV', V_REST, 'harness: the fermenter cell\'s resting potential'],
-                                  ['A_mem_leak', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']]},
+                   'parameters': [['leak/V', 'milliV', V_REST, 'harness: the fermenter cell\'s resting potential'],
+                                  ['leak/A_mem', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']]},
                'invariants': [{'description': 'proton conservation with the buffer: Vol d(H_i - beta_H pH_i) = int j_H dt '
                                               '(relative 1e-6)',
                                'expr': 'abs(Vol*(H_total_rel[-1] - H_total_rel[0]) - np.trapz(leak__j_leak_H, t)) <= '
@@ -2991,9 +2991,9 @@ write_version('cell', 'protein_expression', 'protein_expression_adaptive', pe_va
                                     ['pool_c', POOL_V, 'protein_pool', '', 'mod', 'Glyc'],
                                     ['cyto', V_NEW, 'energy_metabolism', '', 'mod', 'default'],
                                     ['mod', V_NEW, 'protein_expression', 'pool_a pool_b pool_c cyto', '', 'default']],
-                   'parameters': [['m_target_pool_a', 'dimensionless', 3.0, 'harness: triple the H+-ATPase'],
-                                  ['m_target_pool_b', 'dimensionless', 1.2, 'harness: a fifth more of the proteome'],
-                                  ['m_target_pool_c', 'dimensionless', 0.5, 'harness: half the glycolytic enzymes']]},
+                   'parameters': [['pool_a/m_target', 'dimensionless', 3.0, 'harness: triple the H+-ATPase'],
+                                  ['pool_b/m_target', 'dimensionless', 1.2, 'harness: a fifth more of the proteome'],
+                                  ['pool_c/m_target', 'dimensionless', 0.5, 'harness: half the glycolytic enzymes']]},
                'run_parameters': {},
                'invariants': pe_inv,
                'bc_sweep': {'ranges': {'build_capacity_rest': [0.5, 20.0], 'x_ribo': [0.0, 1.0], 'ATP_floor': [1.0, 8.0],
@@ -3134,8 +3134,8 @@ write_version('cell', 'expression_regulation', 'expression_regulation', reg_cvar
                                     ['H', V_NEW, 'H_handling', '', 'mod', 'default'],
                                     ['mod', V_REG, 'expression_regulation', 'cyto H', 'pool_a', 'default'],
                                     ['pool_a', POOL_V, 'protein_pool', 'mod', '', 'H_ATPase']],
-                   'parameters': [['reg_on_ATP_pool_a', 'dimensionless', 1.0, 'harness: ATP regulates the H+-ATPase'],
-                                  ['m_target_pool_a', 'dimensionless', 1.0, 'harness: the resting target']]},
+                   'parameters': [['pool_a/reg_on_ATP', 'dimensionless', 1.0, 'harness: ATP regulates the H+-ATPase'],
+                                  ['pool_a/m_target', 'dimensionless', 1.0, 'harness: the resting target']]},
                'run_parameters': {},
                'invariants': reg_cinv,
                'bc_sweep': {'ranges': {'n_reg': [2.0, 8.0], 'K_ATP_reg': [1.0, 8.0], 'K_H_reg': [3e-5, 1e-4],
@@ -3768,11 +3768,11 @@ define_cell(
              ('reg', 'pool_Glyc')],
     overrides={
         'T': O(T, 'operating point: 20 C, the temperature Lynch & Marinov normalise maintenance costs to'),
-        'Nai_init_Na_K': O(NAI, par_ref('Nai')), 'Ki_init_Na_K': O(KI, par_ref('Ki'), True),
-        'Nao_Na_K': O(NAO, par_ref('Nao'), True), 'Ko_Na_K': O(KO, par_ref('Ko'), True),
-        'rho_leak_Na_i_leak_Na': O(RHO_NA, 'calibrated: Na+ entry balances NhaA less Na/Ca exchange at rest (the '
+        'Na_K/Nai_init': O(NAI, par_ref('Nai')), 'Na_K/Ki_init': O(KI, par_ref('Ki'), True),
+        'Na_K/Nao': O(NAO, par_ref('Nao'), True), 'Na_K/Ko': O(KO, par_ref('Ko'), True),
+        'i_leak_Na/rho_leak_Na': O(RHO_NA, 'calibrated: Na+ entry balances NhaA less Na/Ca exchange at rest (the '
                                            'fermenter cell)'),
-        'gamma_leak_Na_i_leak_Na': O(GAMMA_NA, par_ref('gamma_Na')),
+        'i_leak_Na/gamma_leak_Na': O(GAMMA_NA, par_ref('gamma_Na')),
     },
     description=(
         'The base of every AdaptOrDeity cell: the general mechanisms with no transport proteins. A ~2 um disc of '
@@ -3808,7 +3808,7 @@ FERM_PROTEINS = [  # (pool key, the submodule it scales, (module_type, version))
     ('GalP', 'glc_GalP', (GC, V_GC_H)),
 ]
 GLC_CARRIERS = ['glc_PTS', 'glc_ABC', 'glc_GalP']
-ATP_CARRIERS = {'glc_PTS': '1', 'glc_ABC': 'n_P_glc_ABC'}   # submodule: ATP (equivalents) per glucose
+ATP_CARRIERS = {'glc_PTS': '1', 'glc_ABC': 'param["glc_ABC/n_P"]'}   # submodule: ATP (equivalents) per glucose
 _targets = []
 for key, target, mod in FERM_PROTEINS:
     if mod and target not in [t['name'] for t in _targets]:
@@ -3825,11 +3825,11 @@ define_cell(
           + [l for key, target, _ in FERM_PROTEINS
              for l in ((f'pool_{key}', 'protein'), (f'pool_{key}', 'bio'), (f'pool_{key}', target), ('reg', f'pool_{key}'))],
     overrides={
-        'rho_leak_K_i_K_Trk': O(RHO_K, 'calibrated: K+ entry through Trk balances KefC export at rest'),
-        'gamma_leak_K_i_K_Trk': O(GAMMA_K, par_ref('gamma_K')),
-        'Nao_i_NaCa': O(NAO, par_ref('Nao'), True), 'Cao_i_NaCa': O(CAO, par_ref('Cao'), True),
-        'rho_NaCa_i_NaCa': O(RHO_NCX, 'calibrated: exchanger cycles = NCX_share of NhaA\'s at rest'),
-        **{f'{k}_i_NaCa': O(NCX[k], par_ref(k)) for k in ('KmCa', 'KmNai', 'Ksat', 'alpha_NaCa', 'gamma_NaCa', 'r_NaCa')},
+        'i_K_Trk/rho_leak_K': O(RHO_K, 'calibrated: K+ entry through Trk balances KefC export at rest'),
+        'i_K_Trk/gamma_leak_K': O(GAMMA_K, par_ref('gamma_K')),
+        'i_NaCa/Nao': O(NAO, par_ref('Nao'), True), 'i_NaCa/Cao': O(CAO, par_ref('Cao'), True),
+        'i_NaCa/rho_NaCa': O(RHO_NCX, 'calibrated: exchanger cycles = NCX_share of NhaA\'s at rest'),
+        **{f'i_NaCa/{k}': O(NCX[k], par_ref(k)) for k in ('KmCa', 'KmNai', 'Ksat', 'alpha_NaCa', 'gamma_NaCa', 'r_NaCa')},
     },
     description=(
         'AdaptOrDeity\'s starting organism: generic_adaptive_cell empty_membrane plus the proteins of a ~2 um prokaryote '
@@ -3854,7 +3854,8 @@ define_cell(
         'mM, one H+ per glucose, about 1.7 ATP net once the H+-ATPase pumps it out). Each takes its medium glucose '
         'from its own C_glc_e parameter, set to the same value as membrane_face\'s.'))
 
-m = lambda sub_name, var: f'mod_{sub_name}__{var}'
+m = lambda sub_name, var: f'mod__{sub_name}__{var}'   # an output in an invariant expression
+p = lambda sub_name, var: f'param["{sub_name}/{var}"]'   # a supermodule parameter in an invariant expression
 D = lambda x: f'({x}[-1] - {x}[0])'
 
 
@@ -3898,7 +3899,7 @@ def cell_invariants(names, steady):
         {'description': 'regulation stays within 0-1 and, with its switches off (the default), leaves growth\'s target '
                         'exactly as asked: R_reg = 1',
          'expr': ' and '.join(f'np.all(({m("reg", f_)} >= 0) & ({m("reg", f_)} <= 1))' for f_ in REG_F)
-                 + f' and ({" or ".join(on + "_bio" for on in REG_ON)} or np.all({m("bio", "R_reg")} == 1.0))'},
+                 + f' and ({" or ".join(p("bio", on) for on in REG_ON)} or np.all({m("bio", "R_reg")} == 1.0))'},
         {'description': 'protein synthesis never spends more than its capacity: J_build_total <= J_cap (relative 1e-9)',
          'expr': f'np.all({m("protein", "J_build_total")} <= {m("protein", "J_cap")}*(1 + 1e-9) + 1e-30)'},
         {'description': 'amino acids are conserved through proteolysis and recycling: N_aa(t) - N_aa(0) = int (released '
@@ -3938,19 +3939,19 @@ def cell_invariants(names, steady):
              'expr': ' and '.join([f'np.allclose({m(c, "J_ATP_cost")}, {n}*{m(c, "J_glc")}, rtol=1e-12, atol=0)'
                                    for c, n in ATP_CARRIERS.items() if c in names] +
                                   [f'np.array_equal({m("glc_PTS", "J_G6P")}, {m("glc_PTS", "J_glc")})'] * ('glc_PTS' in names) +
-                                  [f'np.allclose({m("glc_GalP", "j_H")}, n_H_glc_GalP*{m("glc_GalP", "J_glc")}, '
+                                  [f'np.allclose({m("glc_GalP", "j_H")}, {p("glc_GalP", "n_H")}*{m("glc_GalP", "J_glc")}, '
                                    'rtol=1e-12, atol=0)'] * ('glc_GalP' in names))},
             {'description': 'second law for the glucose carriers, each against the cytosol\'s own state: J (RT '
                             'ln(C_e/C_glc) + n_P A_hyd) >= 0 (ABC), J (RT ln(K_eq_hk C_e ATP/(G6P ADP))) >= 0 (PTS), J '
                             '(RT ln(C_e/C_glc) + n_H F (E_H - V)) >= 0 (symporter)',
              'expr': ' and '.join(
-                 [f'np.all({m(c, "J_glc")}*(R*T*np.log(C_glc_e_{c}/np.abs({m("cytosol", "C_glc")})) + '
+                 [f'np.all({m(c, "J_glc")}*(R*T*np.log({p(c, "C_glc_e")}/np.abs({m("cytosol", "C_glc")})) + '
                   f'{n}*{m("cytosol", "A_hyd")}) >= -1e-30)' for c, n in ATP_CARRIERS.items()
                   if c in names and c != 'glc_PTS'] +
-                 [f'np.all({m("glc_PTS", "J_glc")}*(-dG0_hk_glc_PTS + R*T*np.log(C_glc_e_glc_PTS*{m("cytosol", "C_ATP")}/'
+                 [f'np.all({m("glc_PTS", "J_glc")}*(-{p("glc_PTS", "dG0_hk")} + R*T*np.log({p("glc_PTS", "C_glc_e")}*{m("cytosol", "C_ATP")}/'
                   f'np.abs({m("cytosol", "C_G6P")}*{m("cytosol", "C_ADP")}) + 1e-300)) >= -1e-30)'] * ('glc_PTS' in names) +
-                 [f'np.all({m("glc_GalP", "J_glc")}*(R*T*np.log(C_glc_e_glc_GalP/np.abs({m("cytosol", "C_glc")})) + '
-                  f'n_H_glc_GalP*F*({m("H", "E_H")} - {m("membrane", "V")})*1e-3) >= -1e-30)'] * ('glc_GalP' in names))},
+                 [f'np.all({m("glc_GalP", "J_glc")}*(R*T*np.log({p("glc_GalP", "C_glc_e")}/np.abs({m("cytosol", "C_glc")})) + '
+                  f'{p("glc_GalP", "n_H")}*F*({m("H", "E_H")} - {m("membrane", "V")})*1e-3) >= -1e-30)'] * ('glc_GalP' in names))},
         ]
     if steady:
         inv.append({'description': 'the default point is a steady state: V stays at -105 mV (1e-6 mV), pH at 7.6 (1e-9) '
@@ -3991,7 +3992,7 @@ def cell_outputs(names):
     base += [('pool_Flagellum', v) for v in ('share', 's_unit')] * ('pool_Flagellum' in names)
     base += [('protein', 'A_protein_max')]
     base += [('hydrolase', 'V_hydrolysis_max'), ('hydrolase', 'n_copies')] * ('hydrolase' in names) + [('glc_PTS', 'J_G6P')] * ('glc_PTS' in names)
-    return [m(s, v).replace('__', '/') for s, v in base]
+    return [f'mod/{s}/{v}' for s, v in base]
 
 
 def share_unit(key):
@@ -3999,7 +4000,8 @@ def share_unit(key):
     return float(PROTEINS[key][2] if key in PROTEINS else N0_CARRIER) * par(f'footprint_{key}') * 1e-6 / A_PROTEIN_MAX
 
 
-def write_cell(cell, steady, sweep_extra, timestep=None):
+def write_cell(cell, steady, sweep_extra, timestep=None, solve_ivp=None):
+    '''solve_ivp: the solve_ivp methods the stability matrix tries (default: cam_testing's).'''
     name = cell['name']
     d = os.path.join(GAC_DIR, 'versions', name)
     os.makedirs(os.path.join(d, 'parameterisations', 'default'), exist_ok=True)
@@ -4027,12 +4029,12 @@ def write_cell(cell, steady, sweep_extra, timestep=None):
         for r in out:
             w.writerow([r[0], r[1], repr(float(r[2])), r[3], r[4]])
     vals = {r[0]: float(r[2]) for r in out}
-    ranges = {'T': [273.15, 313.15], 'T_ref_cytosol': [283.15, 303.15],
-              'growth_level_bio': [0.0, 20.0], 'repair_level_bio': [0.0, 1.0], 'store_alloc_cytosol': [0.0, 1.0],
-              **{f'm_target_{n}': [0.25, 4.0] for n in names if n.startswith('pool_') and n != 'pool_proteome'
+    ranges = {'T': [273.15, 313.15], 'cytosol/T_ref': [283.15, 303.15],
+              'bio/growth_level': [0.0, 20.0], 'bio/repair_level': [0.0, 1.0], 'cytosol/store_alloc': [0.0, 1.0],
+              **{f'{n}/m_target': [0.25, 4.0] for n in names if n.startswith('pool_') and n != 'pool_proteome'
                  and n[5:] not in MEMBRANE_SHARE_KEYS},
               # membrane proteins: the same range of copies, as shares of the ceiling (the carriers' unit is the Glf copies)
-              **{f's_target_{n}': [0.25 * share_unit(n[5:]), 4.0 * share_unit(n[5:])] for n in names
+              **{f'{n}/s_target': [0.25 * share_unit(n[5:]), 4.0 * share_unit(n[5:])] for n in names
                  if n[5:] in MEMBRANE_SHARE_KEYS},
               **sweep_extra}
     verif = {
@@ -4051,7 +4053,7 @@ def write_cell(cell, steady, sweep_extra, timestep=None):
         'reference_solver_info': {'rtol': 1e-10, 'atol': 1e-30},
         # the Ca buffer (~1 us) makes the whole cell stiff: a short horizon and budget keep the solver matrix tractable
         'stability': {'supported': [{'solver': 'CVODE_myokit', 'rtol': 1e-8, 'atol': 1e-14}], 't_end': 1.0,
-                      'time_budget': 10},
+                      'time_budget': 10, **({'solve_ivp': solve_ivp} if solve_ivp else {})},
         'validation': {'default': {}},
         'supermodule': {'globals': ['R', 'F', 'T']},
     }
@@ -4074,8 +4076,10 @@ from module_writer import bib_text  # noqa: E402
 CELL_DIRS = [write_cell(CELLS['empty_membrane'], False, {},
                         {'scheme': 'rk4', 'dts': [2e-6, 1e-6, 5e-7], 't_end': 1e-3, 'min_order': 0.8, 'tol': 1e-3,
                          'cvode_tol': 1e-2}),
-             write_cell(CELLS['fermenter'], True, {'C_glc_e_membrane_face': [0.0, 50.0], 'a_motor_i_flagellum': [0.0, 1.0],
-                                                   'm_target_pool_Flagellum': [1.0, 8.0], 'mx_alloc_cytosol': [0.0, 1.0]})]
+             # the whole fermenter is stiff: explicit RK45 does not finish, so its stability matrix tries implicit methods
+             write_cell(CELLS['fermenter'], True, {'membrane_face/C_glc_e': [0.0, 50.0], 'i_flagellum/a_motor': [0.0, 1.0],
+                                                   'pool_Flagellum/m_target': [1.0, 8.0], 'cytosol/mx_alloc': [0.0, 1.0]},
+                        solve_ivp=['BDF', 'LSODA'])]
 _ferm_rows = {r[0]: r for r in csv.reader(open(os.path.join(CELL_DIRS[1], 'parameterisations', 'default',
                                                             'default_parameters.csv')))}
 
