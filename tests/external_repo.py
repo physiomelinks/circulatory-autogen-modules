@@ -62,17 +62,17 @@ def make(root, library=None, pyproject=True):
         json.dump(verification, f, indent=2)
     with open(os.path.join(vdir, f'{stem}_tests.yaml'), 'w') as f:
         f.write(f'module_type: {MT}\nversion: {VERSION}\nreviewed: true\nnotes: a test copy of outlet_pressure/constant\n')
-    shutil.copy(os.path.join(src, 'parameterisations', 'default', 'default_parameters.csv'),
-                os.path.join(vdir, 'parameterisations', 'default', 'default_parameters.csv'))
+    shutil.copy(os.path.join(src, 'parameterisations', 'default', 'default_parameters.json'),
+                os.path.join(vdir, 'parameterisations', 'default', 'default_parameters.json'))
 
     sdir = os.path.join(root, 'system_models', SYSTEM_CATEGORY, SYSTEM)
     os.makedirs(os.path.join(sdir, 'reference'))
     with open(os.path.join(sdir, f'{SYSTEM}_module_array.json'), 'w') as f:
         json.dump(SYSTEM_RECORDS, f, indent=1)
-    with open(os.path.join(sdir, f'{SYSTEM}_parameters.csv'), 'w') as f:
-        f.write('variable_name,units,value,data_reference\n')
-        for name, units, value, ref in verification['harness']['parameters']:
-            f.write(f'{name},{units},{value},{ref}\n')
+    from libcuflynx.utilities import parameters_file as pf
+    pf.write_parameter_rows(os.path.join(sdir, f'{SYSTEM}_parameters.json'),
+                            [{'variable_name': name, 'units': units, 'value': str(value), 'data_reference': ref}
+                             for name, units, value, ref in verification['harness']['parameters']])
     with open(os.path.join(sdir, f'{SYSTEM}_system.yaml'), 'w') as f:
         f.write(f'model: {SYSTEM}\ncategory: {SYSTEM_CATEGORY}\nreviewed: false\nsim_time: 2.0\npre_time: 0.0\n'
                 f'dt: 0.01\nequivalence:\n  reference_cellml: reference/{SYSTEM}.cellml\n  tol: 1.0e-06\n'

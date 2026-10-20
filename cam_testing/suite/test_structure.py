@@ -19,7 +19,6 @@ A problem listed (as a substring) under ``known_issues`` in a version's spec is 
 rather than a failure, so known defects stay visible without blocking CI; once fixed, remove the
 entry.
 """
-import csv
 import functools
 import glob
 import json
@@ -30,7 +29,7 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from cam_testing import bib, library, module_array, paths
-from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
+from cam_testing.library import (IDENTITY_KEYS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
                                  all_versions, ancestors_of, load_version, misplaced_spec_keys, module_relpath,
                                  module_type_names, parent_of, read_spec_files)
 from cam_testing.mathml import component_names
@@ -208,8 +207,8 @@ def walk_modules():
                 di = e.get('default_parameterisation')
                 if not di:
                     problems.append(f'{rel}: config entry has no default_parameterisation')
-                elif not os.path.isfile(os.path.join(d, 'parameterisations', di, f'{di}_parameters.csv')):
-                    problems.append(f'{rel}: default_parameterisation {di} has no parameterisations/{di}/{di}_parameters.csv')
+                elif not os.path.isfile(os.path.join(d, 'parameterisations', di, f'{di}_parameters.json')):
+                    problems.append(f'{rel}: default_parameterisation {di} has no parameterisations/{di}/{di}_parameters.json')
         _check_files('version', d, names, problems, supermodule)
         # the spec's two files: every key in its own file, identity keys matching the directories
         tests, verification = read_spec_files(d, f'{mt}_{v}')
@@ -254,12 +253,9 @@ def walk_modules():
             for f in sub.get('required', []):
                 if not os.path.isfile(os.path.join(d, c, f)):
                     problems.append(f'{rel}/{c}: missing {f}')
-        pp = os.path.join(d, f'{i}_parameters.csv')
-        if os.path.isfile(pp):
-            with open(pp, newline='') as f:
-                header = next(csv.reader(f), [])
-            if [h.strip() for h in header] != LEVELS['parameterisation']['parameters_columns']:
-                problems.append(f'{rel}: {i}_parameters.csv columns are {header}, not {INSTANCE_COLUMNS}')
+        for pp in (os.path.join(d, f'{i}_parameters.json'), os.path.join(d, f'{i}_calibrated_parameters.json')):
+            if os.path.isfile(pp):
+                problems.extend(f'{rel}: {e}' for e in _parameters_file_problems(pp))
         p = os.path.join(d, f'{i}_obs_data.json')
         if os.path.isfile(p):
             name = json.load(open(p)).get('obs_data_name')
@@ -392,8 +388,6 @@ def test_system_models_directory_layout():
             for c in _subdirs(mdir):
                 if c not in {_fill(x, {'model': model}) for x in LEVELS['system_model']['directories']}:
                     problems.append(f'{os.path.relpath(mdir, REPO_ROOT)}: unexpected directory {c}')
-                elif c == f'{model}_supermodule_parameters':
-                    _check_files('supermodule_instance_parameters', os.path.join(mdir, c), {}, problems)
     assert not problems, '\n'.join(problems)
 
 
@@ -401,30 +395,17 @@ SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_mo
 
 
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
-def test_system_model_supermodule_instances_have_their_parameters_files(path):
-    '''Each supermodule instance of a system model has its parameters file
-    ({model}_supermodule_parameters/<instance>.json), which libcuflynx loads against its version, and no other
-    instance has one.'''
-    from libcuflynx.utilities.config_schemas import supermodule_instances_dir
-    from libcuflynx.utilities.supermodules import load_instance_parameters
-    registry = _supermodule_registry()
-    records = json.load(open(path))
-    problems, supers = [], set()
-    for r in records:
-        entry = registry.get((r.get('module_type'), r.get('module_subtype')))
-        if entry is None:
-            continue
-        supers.add(r['name'])
-        try:
-            load_instance_parameters(path, r, entry, f'{os.path.basename(path)}: "{r["name"]}"')
-        except ValueError as e:
-            problems.append(str(e))
-    directory = supermodule_instances_dir(path)
-    if os.path.isdir(directory):
-        stray = sorted(f for f in os.listdir(directory) if os.path.splitext(f)[0] not in supers)
-        if stray:
-            problems.append(f'{os.path.relpath(directory, REPO_ROOT)}: {stray} are not supermodule instances of the model')
-    assert not problems, '\n'.join(problems)
+def test_system_model_supermodule_instances_have_their_values(path):
+    '''Each supermodule instance of a system model has an entry in the model's parameters file
+    ({model}_parameters.json, libcuflynx's nested JSON), which libcuflynx reads; a new one is written with
+    cuflynx-upgrade supermodule-instances.'''
+    from libcuflynx.utilities.supermodules import check_model_instances
+    from libcuflynx.utilities.config_schemas import read_module_array_records, model_parameters_path
+    try:
+        check_model_instances(read_module_array_records(path), _supermodule_registry(), path,
+                              model_parameters_path(path))
+    except ValueError as e:
+        pytest.fail(str(e))
 
 
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
@@ -654,6 +635,19 @@ OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'paramete
                   if _not_excluded(p))
 
 
+def _parameters_file_problems(path):
+    '''A parameterisation's parameters file: libcuflynx reads it (nested JSON rooted at the module), and each
+    parameter has the library's keys (value, units, data_reference and optionally sourced).'''
+    from libcuflynx.utilities import parameters_file as pf
+    try:
+        rows = pf.read_parameter_rows(path, kind=pf.MODULE)
+    except ValueError as e:
+        return [str(e)]
+    allowed = set(LEVELS['parameterisation']['parameters_columns'])
+    return [f'{os.path.basename(path)}: {r["variable_name"]} has the keys {sorted(set(r) - allowed)}, '
+            f'not those of {sorted(allowed)}' for r in rows if set(r) - allowed]
+
+
 def _validate(path, schema_name):
     jsonschema = pytest.importorskip('jsonschema')
     schema = _libcuflynx_schema(schema_name)
@@ -684,20 +678,20 @@ def test_supermodule_array_matches_libcuflynx_schema(path):
     _validate(path, 'module_array.schema.json')
 
 
-SUPERMODULE_PARAMETERS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'versions', '*', '*_parameters.json'),
-                                                     recursive=True) if _not_excluded(p))
+PARAMETERS_FILES = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'parameterisations', '*', '*_parameters.json'),
+                                               recursive=True) if _not_excluded(p)) + \
+    sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_parameters*.json'), recursive=True))
 
 
-@pytest.mark.parametrize('path', SUPERMODULE_PARAMETERS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
-def test_supermodule_parameters_match_libcuflynx_schema(path):
-    _validate(path, 'supermodule_parameters.schema.json')
+@pytest.mark.parametrize('path', PARAMETERS_FILES, ids=lambda p: os.path.relpath(p, REPO_ROOT))
+def test_parameters_files_match_libcuflynx_schema(path):
+    _validate(path, 'parameters.schema.json')
 
 
 def test_supermodule_versions_load_with_libcuflynx():
-    '''Every supermodule version's module array and parameters file (beside its config) load with
-    libcuflynx's load_supermodule_array and load_supermodule_parameters: records of the config's
-    submodule_versions only, each version used, connections between siblings, no record naming a
-    parameterisation, and one parameters entry per record.'''
+    '''Every supermodule version's module array (beside its config) loads with libcuflynx's
+    load_supermodule_array (records of the config's submodule_versions only, each version used, connections
+    between siblings, no record naming a parameterisation), and its template (default parameterisation) reads.'''
     pytest.importorskip('libcuflynx')
     problems = []
     for version in _versions():
@@ -942,7 +936,7 @@ def _ca_resources():
 
 def _reference_copies():
     return sorted(p for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', 'reference', '*'))
-                  if p.endswith(('_parameters.csv', '_obs_data.json', '_params_for_id.csv')))
+                  if p.endswith(('_parameters.json', '_obs_data.json', '_params_for_id.csv')))
 
 
 @pytest.mark.parametrize('path', _reference_copies(), ids=lambda p: os.path.relpath(p, SYSTEM_MODELS_DIR))

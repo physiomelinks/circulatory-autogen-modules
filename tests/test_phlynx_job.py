@@ -1,7 +1,8 @@
 """
 cam_testing.phlynx.component_job: the parameters PhLynx gets are named as the model names them
 (<var>_<instance>, a global bare), since PhLynx matches a row to an instance by that name. The
-harness writes the parameters file <vessel>/<var>. No PhLynx needed.
+harness writes the parameters file as libcuflynx's nested JSON; the job flattens it into those rows (PhLynx
+takes CSV rows). No PhLynx needed.
 """
 from cam_testing import harness, phlynx
 from cam_testing.library import load_version

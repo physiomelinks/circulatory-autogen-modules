@@ -81,15 +81,14 @@ def copy_library(tmp):
             v['module_subtype'] = NEW
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
-    # the RyR instance's values were the old version's: it takes the new version's default instead
-    from libcuflynx.utilities.config_schemas import dump_supermodule_parameters
-    parameters_path = os.path.join(sdir, 'soma_sympathetic_parameters.json')
-    with open(parameters_path) as f:
-        doc = json.load(f)
-    dropped = [f'RyR/{v}' for v in doc['instances']['RyR']['parameters']]
-    doc['instances']['RyR'] = {'parameterisation': 'default', 'parameters': {}}
-    with open(parameters_path, 'w') as f:
-        f.write(dump_supermodule_parameters(doc))
+    # the RyR instance's values in the soma's template (its default parameterisation) were the old version's:
+    # it takes the new version's default instead
+    from libcuflynx.utilities import parameters_file as pf
+    parameters_path = os.path.join(sdir, 'parameterisations', 'default', 'default_parameters.json')
+    doc = pf.read_parameters_file(parameters_path, kind=pf.MODULE)
+    dropped = [f'RyR/{r["variable_name"]}' for r in pf.parameter_rows(doc.get('RyR') or {}, pf.MODULE)]
+    doc['RyR'] = {}
+    pf.write_parameters_file(parameters_path, doc)
     return dst, dropped
 
 

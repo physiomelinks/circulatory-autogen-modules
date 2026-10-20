@@ -21,7 +21,7 @@ modules/<category>/<module_type>/                    (or modules/<module_type>/,
     <module_type>_<version>_references.bib           BibTeX entries the parameters cite
     risk/                                            joint failure-risk samples + classifier (committed)
     parameterisations/<p>/                           parameter sets; p == obs_data_name
-      <p>_parameters.csv                             variable_name,units,value,data_reference,sourced
+      <p>_parameters.json                            nested values {value, units, data_reference, sourced}
       <p>_obs_data.json, _params_for_id.csv, ...     calibration data and results
 system_models/<category>/<model>/                    whole models built from the library
 ```
@@ -66,7 +66,7 @@ Each version (one config entry: `module_type`/`module_subtype`) is generated alo
 | `verification_test_timestep` | fixed-step integration of the generated right-hand side at halved steps converges at the scheme's order, and agrees with CVODE at tight tolerances |
 | `stability_test` | a matrix of solvers, tolerances and timesteps (CVODE, SciPy `solve_ivp`, fixed-step Euler/Heun/RK4); reports which work, and requires the declared-supported ones to work |
 | `validation_test_baseline` | per parameterisation: model vs baseline data (NRMSE threshold) or scalar targets |
-| `validation_test_calibrate` | per parameterisation: calibrate to its obs_data with libcuflynx parameter identification, predict held-out data, and write `<p>_calibrated_parameters.csv` / `<p>_calibration.json` |
+| `validation_test_calibrate` | per parameterisation: calibrate to its obs_data with libcuflynx parameter identification, predict held-out data, and write `<p>_calibrated_parameters.json` / `<p>_calibration.json` |
 
 Supermodule versions run the same tests, generated alone and expanded into their submodules, plus `supermodule_structure_test` and `supermodule_equivalence_test` (the system model using them reproduces the one with the submodules written out). Their BC sweep varies only their global constants and the boundary conditions no internal connection closes (`bc_sweep.sweep: globals_and_bcs`, the supermodule default; `all` sweeps every parameter): each submodule's own parameters are swept in that submodule version's tests. PhLynx has no supermodule support, so their PhLynx export test fails as a recorded known issue.
 
@@ -87,7 +87,7 @@ Each parameter's **tested range** is set in `<module_type>_<version>_verificatio
 To check a system model's parameters against the modules it uses:
 
 ```bash
-python -m cam_testing.ranges check --module-array my_module_array.json --parameters my_parameters.csv
+python -m cam_testing.ranges check --module-array my_module_array.json --parameters my_parameters.json
 ```
 
 This lists each value as inside or outside its tested range and validated spread (over all the version's parameterisations), and estimates the failure risk near the values from the `make risk` samples. It exits non-zero if any value is outside a tested range.
@@ -110,7 +110,7 @@ The version report shows all of this, regenerating the plots from the committed 
 ## System models
 
 `system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into cardiac clock, chamber and valve vessels (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`). System models are not modules or supermodules: they use the library. Every module-array record (an instance of a version) names a module_type, a version (`module_subtype`) and the parameterisation it uses (`"parameterisation": "default"`); the model's own parameters file wins over the parameterisation's values. Each directory contains:
-- the module array and parameters, and each supermodule instance's parameters file (`<model>_supermodule_parameters/<instance>.json`, written once from the version's file by `cuflynx-upgrade supermodule-instances`; generation reads it, never the version's);
+- the module array and parameters (`<model>_parameters.json`, libcuflynx's nested JSON: instance, sub-instance, variable). A supermodule instance's values are under its name there, written once from the version's template (its default parameterisation) by `cuflynx-upgrade supermodule-instances`; generation reads them, never the template;
 - the original under `reference/`: circulatory_autogen's files with only the bib keys changed to this library's (`tools/bib_rekey_map.json`, applied by `tools/import_systems.py`; checked against the originals by `tests/test_structure.py`);
 - a `<model>_system.yaml` spec. Its output names (`equivalence.output_map`, `ignore`) name a nested vessel by its path, `SN/soma/membrane/V` for the model's `SN__soma__membrane/V`; the flat form is accepted too.
 
@@ -128,7 +128,7 @@ Some system models are examples built from this library, with no circulatory_aut
 
 Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and the CSV layout with the same columns. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
 
-Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A supermodule version's config lists the submodule versions it is built from (`submodule_versions`); its instances and their internal connections are its own module array beside the config (`<module_type>_<version>_module_array.json`), and their parameter values its parameters file (`<module_type>_<version>_parameters.json`: for each instance, the parameterisation its values started from and the values). A model uses one through one record:
+Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A supermodule version's config lists the submodule versions it is built from (`submodule_versions`); its instances and their internal connections are its own module array beside the config (`<module_type>_<version>_module_array.json`), and their parameter values its default parameterisation, nested by instance (the template a model's instance is copied from). A model uses one through one record:
 
 ```json
 {"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
@@ -136,7 +136,7 @@ Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock,
  "per_submodule_outputs": {"puv": ["par"], "aov": ["aortic_root"], "ra": ["volume_sum"], "rv": ["volume_sum"], "la": ["volume_sum"], "lv": ["volume_sum"]}}
 ```
 
-The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart__<submodule>` (`heart__ra`, `heart__aov`, …), the listed host modules are coupled to it, and the heart instance's own parameters file (`3compartment_supermodules_supermodule_parameters/heart.json` beside the module array, a copy of the version's file made when the instance was; instance `ra`, parameter `E_A`) sets the expanded submodules' parameters, under the supermodule's parameterisation (its globals) and over each submodule version's default parameterisation (written `heart/ra/E_A` in the model's own parameters file, whose values take precedence). `python -m cam_testing.calibrate apply` writes a calibrated version's values into every instance of it, in the versions' files and in the system models' instance files. `system_models/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way; its version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that it reproduces `3compartment` to 1e-9, and `cellular/SN_simple_supermodules` reproduces `SN_simple`.
+The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart__<submodule>` (`heart__ra`, `heart__aov`, …), the listed host modules are coupled to it, and the heart instance's values in the model's parameters file (`3compartment_supermodules_parameters.json`, under `heart`: `heart/ra/E_A`, a copy of the version's template made when the instance was) set the expanded submodules' parameters, over the supermodule's parameterisation's globals and each submodule version's default parameterisation. `python -m cam_testing.calibrate apply` writes a calibrated version's values into every instance of it, in the supermodule versions' templates and in the system models' parameters files. `system_models/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way; its version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that it reproduces `3compartment` to 1e-9, and `cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
 ## PhLynx → CUFLynx pipeline
 

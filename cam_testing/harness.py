@@ -241,37 +241,44 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     records = module_array.from_rows(rows)
     array = os.path.join(resources_dir, f'{prefix}_module_array.json')
     module_array.write_records(array, records)
-    _write_supermodule_instances(array, records)
+    path = os.path.join(resources_dir, f'{prefix}_parameters.json')
+    doc = _supermodule_instances(array, records, path)
 
     params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
     if todo:
         raise MissingParameters(f'parameters still TODO in the parameterisation parameters of {component.key}: {", ".join(todo)}')
-    with open(os.path.join(resources_dir, f'{prefix}_parameters.csv'), 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['variable_name', 'units', 'value', 'data_reference'])
-        written = set()
-        for p in params:
-            name = model_parameter_name(component, p)
-            value = overrides.get(name, p.value)
-            writer.writerow([written_parameter_name(component, p), p.units, value, p.data_reference or 'cam_testing'])
-            written.add(name)
-        for written_name, units, value, *ref in network.get('parameters') or []:
-            name = libcuflynx_model_name(written_name)
-            if name not in written:
-                writer.writerow([written_name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
+    from libcuflynx.utilities import parameters_file as pf
+    written = set()
+    for p in params:
+        name = model_parameter_name(component, p)
+        pf.set_leaf(doc, pf.name_path(written_parameter_name(component, p)),
+                    {'value': overrides.get(name, p.value), 'units': p.units,
+                     'data_reference': p.data_reference or 'cam_testing'})
+        written.add(name)
+    for written_name, units, value, *ref in network.get('parameters') or []:
+        name = libcuflynx_model_name(written_name)
+        if name not in written:
+            pf.set_leaf(doc, pf.name_path(written_name),
+                        {'value': overrides.get(name, value), 'units': units,
+                         'data_reference': ref[0] if ref else 'cam_testing harness'})
+    pf.write_parameters_file(path, doc)
 
 
-def _write_supermodule_instances(array, records):
-    '''Each supermodule instance of the test network gets its parameters file, new from its version
-    (libcuflynx's supermodules.write_instance_parameters), so it is tested with the version's values.'''
+def _supermodule_instances(array, records, path):
+    '''The test network's parameters document, with each supermodule instance's values new from its version
+    (libcuflynx's supermodules.write_instance_parameters, into ``path``), so it is tested with the version's
+    values; the parameterisation's and the network's own rows go over them.'''
+    from libcuflynx.utilities import parameters_file as pf
     keys = _supermodule_keys(tuple(library_dirs()))
     if not any((r.get('module_type'), r.get('module_subtype')) in keys for r in records):
-        return
+        return pf.new_document()
     from libcuflynx.utilities.module_library import ModuleSources
     from libcuflynx.utilities.supermodules import write_instance_parameters
     registry = ModuleSources({'module_library_dirs': library_dirs(), 'use_builtin_modules': False}).supermodule_registry()
-    write_instance_parameters(array, registry, replace=True)
+    pf.write_parameters_file(path, pf.new_document())
+    write_instance_parameters(array, registry, replace=True, parameters=path)
+    return pf.read_parameters_file(path)
 
 
 @functools.lru_cache(maxsize=4)
@@ -307,7 +314,7 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
     _write_resources(component, resources_dir, prefix, overrides, parameters, parameterisation=parameterisation)
     config = {
         'file_prefix': prefix,
-        'input_param_file': f'{prefix}_parameters.csv',
+        'input_param_file': f'{prefix}_parameters.json',
         'model_type': model_type,
         'solver': component.spec.get('solver', 'CVODE_myokit') if model_type == 'cellml' else 'solve_ivp',
         'resources_dir': resources_dir,

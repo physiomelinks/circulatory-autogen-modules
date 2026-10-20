@@ -11,14 +11,14 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
                                               parameterisation's parameters, as libcuflynx generates it
   <p>_obs_data.json                           the parameterisation's calibration data, if it has any
   <p>_params_for_id.csv                       its parameters to identify, if any
-  inputs, unchanged: <p>_parameters.csv, raw data and
+  inputs, unchanged: <p>_parameters.json, raw data and
     SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
     _units.cellml and _verification_config.json; a supermodule's _module_array.json (its instances),
-    _parameters.json (their values) and its submodules' _modules_config.json (their required_citations;
-    a nested supermodule's with its _module_array.json and _parameters.json); and the test network the
-    model was generated from
-    (<module_type>_<version>_<p>_module_array.json, its supermodule instances' parameters files
-    <module_type>_<version>_<p>_supermodule_parameters/<instance>.json, and _model_parameters.csv)
+    its template (its default parameterisation, <module_type>_<version>_default_parameters.json, when
+    <p> is another) and its submodules' _modules_config.json (their required_citations; a nested
+    supermodule's with its _module_array.json and template); and the test network the model was
+    generated from (<module_type>_<version>_<p>_module_array.json and _model_parameters.json, which
+    holds its supermodule instances' values)
   manifest.xml                                COMBINE manifest (master marked)
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
@@ -91,8 +91,13 @@ def members(version, parameterisation, work_dir):
         if os.path.isfile(full) and not p.endswith('.omex') and p not in {n for n, _, _ in out}:
             add(full)
     for p in (version.cellml_path, version.config_path, version.module_array_path,
-              version.instance_parameters_path, version.units_path, version.verification_config_path):
+              version.units_path, version.verification_config_path):
         add(p)
+
+    def add_template(v):
+        if v.is_supermodule and v.instance_parameters_path != parameterisation.parameters_path:
+            add(v.instance_parameters_path, f'{v.mtype.name}_{v.name}_{os.path.basename(v.instance_parameters_path)}')
+    add_template(version)
     # a supermodule's submodules' configs (recursively), so their required_citations travel with it
     seen = {version.key}
     for sub, _, _ in version.submodule_citations() if version.is_supermodule else []:
@@ -100,14 +105,10 @@ def members(version, parameterisation, work_dir):
             seen.add(sub.key)
             add(sub.config_path)
             add(sub.module_array_path)
-            add(sub.instance_parameters_path)
+            add_template(sub)
     # the test network the model was generated from
     add(os.path.join(res, f'{prefix}_module_array.json'), f'{stem}_module_array.json')
-    from libcuflynx.utilities.config_schemas import supermodule_instances_dir
-    instances = supermodule_instances_dir(os.path.join(res, f'{prefix}_module_array.json'))
-    for f in sorted(os.listdir(instances)) if os.path.isdir(instances) else []:
-        add(os.path.join(instances, f), f'{stem}_supermodule_parameters/{f}')
-    add(os.path.join(res, f'{prefix}_parameters.csv'), f'{stem}_model_parameters.csv')
+    add(os.path.join(res, f'{prefix}_parameters.json'), f'{stem}_model_parameters.json')
     return out
 
 

@@ -8,12 +8,11 @@ model's parameter values against them.
     validated spread the values at which the version matched data in a passing validation
                      test of any of its parameterisations (published parameter intervals and calibrated values)
 
-    python -m cam_testing.ranges check --module-array sys_module_array.json --parameters sys_parameters.csv
+    python -m cam_testing.ranges check --module-array sys_module_array.json --parameters sys_parameters.json
         lists each value as inside / outside the tested range and the validated spread, with
         the estimated failure risk near the values (from `make risk`)
 """
 import argparse
-import csv
 import sys
 
 from cam_testing import checks
@@ -81,9 +80,10 @@ def check(module_array_path, parameters_path, out=sys.stdout):
     from cam_testing import module_array
     vessels = [{'name': r['name'], 'vessel_type': r.get('module_type'), 'BC_type': r.get('module_subtype')}
                for r in module_array.read_records(module_array_path)]
-    with open(parameters_path) as f:
-        values = {r['variable_name'].strip(): r['value'].strip()
-                  for r in csv.DictReader(f, skipinitialspace=True) if r.get('variable_name')}
+    from libcuflynx.utilities import parameters_file as pf
+    from libcuflynx.utilities.parameter_names import model_name
+    # the model's parameters file (nested JSON), by the names the model gives them
+    values = {model_name(r['variable_name']): r['value'] for r in pf.read_parameter_rows(parameters_path)}
     index = _module_index()
     rows, outside, unknown, risks = [], 0, set(), []
     for vessel in vessels:

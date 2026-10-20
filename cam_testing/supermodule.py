@@ -9,12 +9,11 @@ heart version Argus2026_v01, cell/neuron/soma version sympathetic).
   <module_type>_<version>_module_array.json     its instances (submodules) and their internal
                                                 connections: a module array, records naming no
                                                 parameterisation (libcuflynx reads it: Version.submodules)
-  <module_type>_<version>_parameters.json       its instances' parameter values: for each instance, the
-                                                parameterisation of its version they started from and the
-                                                values (Version.instance_parameters); calibrate apply
-                                                writes every instance of a calibrated version here
-  parameterisations/<p>/<p>_parameters.csv      its globals (and any <submodule>/<var> rows, read over
-                                                the parameters file)
+  parameterisations/<p>/<p>_parameters.json     nested values: its instances' under their names and its
+                                                globals under "global"; the default parameterisation is
+                                                the template a new instance is copied from
+                                                (Version.instance_parameters); calibrate apply writes
+                                                every instance of a calibrated version into it
   <module_type>_<version>_tests.yaml / _verification_config.json   description; supermodule.globals and
                                                 supermodule.equivalent (system models it must reproduce)
 
@@ -22,21 +21,19 @@ A model uses one record (an instance of the version), e.g. {"name": "heart", "mo
 "module_subtype": "Argus2026_v01", "parameterisation": "default", "per_submodule_inputs": {"ra": ["venous_svc"]},
 "per_submodule_outputs": {"aov": ["aortic_root"]}}. libcuflynx expands it: each submodule becomes
 <name>__<submodule>, the host modules in per_submodule_inputs / per_submodule_outputs are coupled to
-that submodule, and the parameterisation's parameters are renamed to the prefixed names. Precedence:
-the model's parameters file > the supermodule's parameterisation > the supermodule's parameters file >
-each submodule version's default parameterisation.
+that submodule. The instance's values are in the model's parameters file under its name
+(heart/lv/E_A), copied once from the template (cuflynx-upgrade supermodule-instances). Precedence: the
+model's parameters file > the supermodule's parameterisation's globals > each submodule version's default
+parameterisation.
 
 The version-level tests (tests/test_modules.py):
-  supermodule_structure_test    the module array and parameters file load with libcuflynx (submodules
-                                of the listed submodule_versions, internal connections naming siblings,
-                                one parameters entry per instance); every submodule is a library version;
-                                the parameters file names each instance's variables and a parameterisation
-                                it has; the parameterisations' parameters name submodules (or are
-                                declared globals)
+  supermodule_structure_test    the module array loads with libcuflynx (submodules of the listed
+                                submodule_versions, internal connections naming siblings); every submodule
+                                is a library version; each parameterisation's values are under its
+                                instances and name their variables (or are declared globals)
   supermodule_equivalence_test  each supermodule.equivalent entry: a system model using the version
                                 reproduces a system model with the submodules written out
 """
-import csv
 import os
 
 from cam_testing import checks, harness, library
@@ -58,39 +55,59 @@ def load_supermodule(key):
 
 
 def parameters_file_problems(version):
-    '''The supermodule's parameters file: libcuflynx loads it (one entry per instance, its schema), and each
-    instance's parameters are variables of its version (not its globals, which the supermodule's
-    parameterisation sets), or paths into a supermodule instance, and its parameterisation one the version has.'''
-    try:
-        instances = version.instance_parameters
-    except ValueError as e:
-        return [str(e)]
+    '''The supermodule's parameterisations: libcuflynx reads each (its schema), every top-level entry but
+    "global" is one of its instances, an instance's values are variables of its version (not its globals,
+    which go under "global") or, for a supermodule instance, paths into it, and its globals are declared.'''
+    from libcuflynx.utilities import parameters_file as pf
     problems = []
-    for sub in version.submodules:
-        name = sub['name']
+    names = {s['name']: s for s in version.submodules}
+    declared = version.supermodule_globals
+    for inst in version.parameterisations():
         try:
-            sv = library.load_version(sub['module_type'], sub['module_subtype'])
-        except (OSError, ValueError, KeyError):
-            continue                     # reported as not a library version
-        where = f'parameters file, instance {name}'
-        started = instances[name]['parameterisation']
-        if started != 'default' and started not in sv.parameterisation_names():
-            problems.append(f'{where}: {sv.key} has no parameterisation {started} (it has {sv.parameterisation_names()})')
-        kinds = {v[0]: v[3] for v in sv.config.get('variables_and_units') or []} if not sv.is_supermodule else {}
-        for var in instances[name]['parameters']:
-            path, _, leaf = var.rpartition('/')
-            if sv.is_supermodule:
-                owner = harness.resolve_submodule_path(sv, path) if path else None
-                if owner is None:
-                    problems.append(f'{where}: parameter {var} is not <its submodule path>/<variable> of {sv.key}')
-            elif path:
-                problems.append(f'{where}: parameter {var} names a path, but {sv.key} is not a supermodule')
-            elif leaf not in kinds:
-                problems.append(f'{where}: parameter {var} is not a variable of {sv.key}')
-            elif kinds[leaf] == 'global_constant':
-                problems.append(f'{where}: parameter {var} is a global of {sv.key}; the supermodule\'s '
-                                'parameterisation sets it')
+            doc = pf.read_parameters_file(inst.parameters_path, kind=pf.MODULE)
+        except (OSError, ValueError) as e:
+            problems.append(str(e))
+            continue
+        for g in doc.get(pf.GLOBAL) or {}:
+            if g not in declared:
+                problems.append(f'parameterisation {inst.name}: global {g} is not a declared global')
+        for name, node in doc.items():
+            if name in (pf.GLOBAL, pf.SCHEMA_VERSION_KEY):
+                continue
+            where = f'parameterisation {inst.name}, instance {name}'
+            if name not in names or pf.is_leaf(node):
+                problems.append(f'parameterisation {inst.name}: {name} is not one of its instances {sorted(names)}')
+                continue
+            sub = names[name]
+            try:
+                sv = library.load_version(sub['module_type'], sub['module_subtype'])
+            except (OSError, ValueError, KeyError):
+                continue                     # reported as not a library version
+            kinds = {v[0]: v[3] for v in sv.config.get('variables_and_units') or []} if not sv.is_supermodule else {}
+            for var in _paths(node):
+                path, _, leaf = var.rpartition('/')
+                if sv.is_supermodule:
+                    owner = harness.resolve_submodule_path(sv, path) if path else None
+                    if owner is None:
+                        problems.append(f'{where}: parameter {var} is not <its submodule path>/<variable> of {sv.key}')
+                elif path:
+                    problems.append(f'{where}: parameter {var} names a path, but {sv.key} is not a supermodule')
+                elif leaf not in kinds:
+                    problems.append(f'{where}: parameter {var} is not a variable of {sv.key}')
+                elif kinds[leaf] == 'global_constant':
+                    problems.append(f'{where}: parameter {var} is a global of {sv.key}; it goes under "global"')
+    if version.default_parameterisation_name not in version.parameterisation_names():
+        problems.append(f'default_parameterisation {version.default_parameterisation_name} has no '
+                        'parameterisations/ directory')
     return problems
+
+
+def _paths(node, prefix=()):
+    from libcuflynx.utilities import parameters_file as pf
+    out = []
+    for k, v in node.items():
+        out += ['/'.join(prefix + (k,))] if pf.is_leaf(v) else _paths(v, prefix + (k,))
+    return out
 
 
 def structure_problems(version):
@@ -106,19 +123,6 @@ def structure_problems(version):
         if key not in index:
             problems.append(f'{sub["name"]}: ({key[0]}, {key[1]}) is not a version in the module library')
     problems += parameters_file_problems(version)
-    declared = version.supermodule_globals
-    for inst in version.parameterisations():
-        with open(inst.parameters_path) as f:
-            for row in csv.DictReader(f):
-                var = (row.get('variable_name') or '').strip()
-                path = var.rpartition('/')[0]
-                if path and harness.resolve_submodule_path(version, path) is None:
-                    problems.append(f'parameterisation {inst.name}: parameter {var}: {path} is not a submodule path')
-                elif not path and var not in declared:
-                    problems.append(f'parameterisation {inst.name}: parameter {var} names no submodule and is not a declared global')
-    if version.default_parameterisation_name not in version.parameterisation_names():
-        problems.append(f'default_parameterisation {version.default_parameterisation_name} has no '
-                        'parameterisations/ directory')
     return problems
 
 
