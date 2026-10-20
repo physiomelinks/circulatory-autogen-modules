@@ -21,13 +21,16 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bondgraph import BondGraph, Reaction, Species  # noqa: E402
-from build_metabolism_detailed import CYTO, GLYC_REST_C  # noqa: E402
+from build_metabolism_detailed import CYTO, GLYC_REST_C, F  # noqa: E402
 
 CYTOSOL = ('energy_metabolism', 'adaptive_ArgusUNPUBLISHED_v01')
 # the export point: the module's default, with the store and the matrix allocated and some glycogen
 CYTOSOL_EXPORT = {'store_alloc': 1.0, 'mx_alloc': 1.0, 'C_glyc_init': GLYC_REST_C}
 # the module's rate variable for each reaction, and its state variable for each species
 CYTOSOL_RATES = {'HK': 'v_gly', 'LG': 'v_lg', 'HYD': 'v_hyd', 'STORE': 'v_store', 'MOB': 'v_mob', 'MX': 'v_mx'}
+# the chemostats' concentrations [mM]: H+ at pH 7 and water, each its standard concentration (as in the detailed
+# modules), and the exported matrix, whose activity does not enter (the module's export is irreversible)
+CYTOSOL_CHEMOSTATS = {'H': 1e-4, 'H2O': 55500.0, 'mx': 1.0}
 # the module's transport into each state [mol/s] (faces and carriers; not reactions of this bond graph)
 CYTOSOL_TRANSPORT = {'glc': ('J_glc_in', 'J_glc_out'), 'G6P': ('j_G6P_ext',), 'lac': ('J_lac_in', 'J_lac_out'),
                      'ATP': ('J_ATP_in', 'J_ATP_out', 'j_ATP_ext'), 'ADP': ('J_ADP_in', 'J_ADP_out', 'j_ADP_ext'),
@@ -37,24 +40,35 @@ CYTOSOL_STATES = {'glc': 'C_glc', 'G6P': 'C_G6P', 'lac': 'C_lac', 'ATP': 'C_ATP'
 
 
 def cytosol_graph():
-    """energy_metabolism adaptive as its module writes it: H+ and water implicit, so no element formulae (the
-    reactions are not element-balanced as written); glycogen with the module's activity C/(K_glyc_mob + C)."""
+    """energy_metabolism adaptive with H+ and water as chemostats (the module leaves them implicit): H+ at pH 7 and
+    water at its own concentration, each at its standard concentration (C/c_std = 1), so the module's dG0s at pH 7
+    apply and the rates are the module's. The species have the formulae and charges of their major microspecies at
+    pH 7, so every reaction but the matrix export (mx has no chemical identity) balances in elements and charge.
+    Glycogen has the module's activity C/(K_glyc_mob + C)."""
     n = int(CYTO['n_ATP_mx'])
     assert n == CYTO['n_ATP_mx'], 'n_ATP_mx must be a whole number for a stoichiometry'
     species = [
-        Species('glc', 'glucose', {}), Species('G6P', 'glucose 6-phosphate', {}), Species('lac', 'lactate', {}),
-        Species('ATP', 'ATP', {}), Species('ADP', 'ADP', {}), Species('Pi', 'phosphate', {}),
-        Species('glyc', 'glycogen (glucose units)', {}, c_std=CYTO['K_glyc_mob'], k_sat=CYTO['K_glyc_mob']),
+        Species('glc', 'glucose', F(C=6, H=12, O=6)),
+        Species('G6P', 'glucose 6-phosphate', F(C=6, H=11, O=9, P=1), charge=-2),
+        Species('lac', 'lactate', F(C=3, H=5, O=3), charge=-1),
+        Species('ATP', 'ATP', F(C=10, H=12, N=5, O=13, P=3), charge=-4),
+        Species('ADP', 'ADP', F(C=10, H=12, N=5, O=10, P=2), charge=-3),
+        Species('Pi', 'phosphate', F(H=1, O=4, P=1), charge=-2),
+        Species('glyc', 'glycogen (glucose units)', F(C=6, H=10, O=5), c_std=CYTO['K_glyc_mob'],
+                k_sat=CYTO['K_glyc_mob']),
         Species('mx', 'matrix exported (glucose units)', {}, boundary=True),
+        Species('H', 'H+', F(H=1), boundary=True, charge=1, c_std=CYTOSOL_CHEMOSTATS['H']),
+        Species('H2O', 'water', F(H=2, O=1), boundary=True, c_std=CYTOSOL_CHEMOSTATS['H2O']),
     ]
     hk, hyd, ferm, store = CYTO['dG0_hk'], CYTO['dG0_hyd'], CYTO['dG0_ferm'], CYTO['dG0_store']
     reactions = [
-        Reaction('HK', 'hexokinase step', {'glc': -1, 'ATP': -1, 'G6P': 1, 'ADP': 1}, hk, 'dG0_hk'),
-        Reaction('LG', 'lower glycolysis', {'G6P': -1, 'ADP': -3, 'Pi': -2, 'lac': 2, 'ATP': 3}, ferm - 2 * hyd - hk,
-                 'dG0_ferm - 2 dG0_hyd - dG0_hk'),
-        Reaction('HYD', 'ATP hydrolysis (maintenance)', {'ATP': -1, 'ADP': 1, 'Pi': 1}, hyd, 'dG0_hyd'),
-        Reaction('STORE', 'glycogen synthesis', {'G6P': -1, 'ATP': -1, 'glyc': 1, 'ADP': 1, 'Pi': 2}, store - hk,
-                 'dG0_store - dG0_hk'),
+        Reaction('HK', 'hexokinase step', {'glc': -1, 'ATP': -1, 'G6P': 1, 'ADP': 1, 'H': 1}, hk, 'dG0_hk'),
+        Reaction('LG', 'lower glycolysis', {'G6P': -1, 'ADP': -3, 'Pi': -2, 'H': -1, 'lac': 2, 'ATP': 3, 'H2O': 2},
+                 ferm - 2 * hyd - hk, 'dG0_ferm - 2 dG0_hyd - dG0_hk'),
+        Reaction('HYD', 'ATP hydrolysis (maintenance)', {'ATP': -1, 'H2O': -1, 'ADP': 1, 'Pi': 1, 'H': 1}, hyd,
+                 'dG0_hyd'),
+        Reaction('STORE', 'glycogen synthesis', {'G6P': -1, 'ATP': -1, 'H2O': -1, 'glyc': 1, 'ADP': 1, 'Pi': 2, 'H': 1},
+                 store - hk, 'dG0_store - dG0_hk'),
         Reaction('MOB', 'glycogen phosphorylase', {'glyc': -1, 'Pi': -1, 'G6P': 1}, hk + hyd - store,
                  'dG0_hk + dG0_hyd - dG0_store'),
         Reaction('MX', 'matrix synthesis and export', {'G6P': -1, 'ATP': -n, 'mx': 1, 'ADP': n, 'Pi': n + 1},
@@ -88,8 +102,7 @@ def evaluate(component, version, values, rates, states):
 def build_cytosol():
     bg = cytosol_graph()
     v, _, conc = evaluate(*CYTOSOL, CYTOSOL_EXPORT, CYTOSOL_RATES, CYTOSOL_STATES)
-    conc = {k: float(x) for k, x in conc.items()}
-    conc['mx'] = 1.0   # exported: its activity does not enter (the module's export is irreversible)
+    conc = {**{k: float(x) for k, x in conc.items()}, **CYTOSOL_CHEMOSTATS}
     kappa = bg.calibrate(conc, v)
     print(f'{CYTOSOL[0]} {CYTOSOL[1]}: ' + ', '.join(f'{r} {x:.4g}' for r, x in v.items()) + ' mM/s at the export point')
     return bg, kappa, v, conc
