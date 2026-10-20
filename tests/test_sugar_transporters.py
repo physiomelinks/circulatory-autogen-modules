@@ -52,7 +52,7 @@ def _carrier_model(key, tmp_root):
     version, instance, _, _ = CARRIERS[key]
     v = load_version(GC, version)
     inst = next(i for i in v.parameterisations() if i.name == instance)
-    return checks.ComponentModel(v, work_dir=str(tmp_root / key), instance=inst)
+    return checks.ComponentModel(v, work_dir=str(tmp_root / key), parameterisation=inst)
 
 
 @pytest.fixture(scope='module')
