@@ -200,6 +200,32 @@ def test_its_reactions_and_species_are_annotated_as_rheas(module):
     assert result.metrics['fail'] == 0, result.details
 
 
+def test_the_lumped_cytosols_document_has_h_and_water_as_chemostats():
+    '''The lumped cytosol's bond graph has H+ (pH 7) and water as chemostats at their standard concentrations, as the
+    detailed modules do: each reaction that makes or uses them has its copy of the chemostat in the document, and with
+    them every reaction but the matrix export balances in elements and charge. Its hexokinase step, ATP hydrolysis,
+    lower glycolysis and glycogen store match Rhea strictly.'''
+    from types import SimpleNamespace
+    from cam_testing import bondgraph
+    bg = lumped.cytosol_graph()
+    chemostats = {s.name: s for s in bg.species if s.name in ('H', 'H2O')}
+    assert chemostats['H'].boundary and chemostats['H'].c_std == lumped.CYTOSOL_CHEMOSTATS['H'] == 1e-4
+    assert chemostats['H2O'].boundary and chemostats['H2O'].c_std == lumped.CYTOSOL_CHEMOSTATS['H2O'] == 55500.0
+    uses = {r.name: {s: n for s, n in r.stoich.items() if s in chemostats} for r in bg.reactions}
+    assert uses == {'HK': {'H': 1}, 'LG': {'H': -1, 'H2O': 2}, 'HYD': {'H2O': -1, 'H': 1},
+                    'STORE': {'H2O': -1, 'H': 1}, 'MOB': {}, 'MX': {}}
+    assert set(bg.element_imbalance()) == set(bg.charge_imbalance()) == {'MX'}
+    _, ttl = _document('energy_metabolism_adaptive')
+    for r, used in uses.items():
+        for s in used:
+            assert f':Se_{s}_{r} a celldl:Component, bgf:ChemicalPotential ;' in ttl, f'{r}: no {s} chemostat'
+    vdir, stem = celldl_build.version_dir('energy_metabolism_adaptive')
+    result = bondgraph.reactions_check(SimpleNamespace(path=lambda suffix: os.path.join(vdir, f'{stem}_{suffix}')))
+    strict = {d.split(' ')[0] for d in result.details if '): matches (' in d and ' but for ' not in d}
+    assert {'Re_HK', 'Re_HYD', 'Re_LG', 'Re_STORE'} <= strict, result.details
+    assert result.metrics['warn'] == 0 and result.metrics['fail'] == 0, result.details
+
+
 def test_it_rests_at_the_fermenters_glycolytic_flux(det):
     '''At its default (the fermenter's rest) every intermediate stays put for a minute, glucose is used at half the
     resting ATP turnover and ATP made at twice that, and the reactions dissipate free energy.'''
@@ -589,7 +615,8 @@ def test_the_lumped_cytosols_affinities_are_its_bond_graphs(cytosol_point):
     affinity = _cytosol_affinities()
     for r in bg.reactions:
         if r.name in ('HK', 'LG', 'HYD', 'STORE'):
-            assert affinity[r.name] == pytest.approx(-bg.reaction_gibbs(r, dict(conc, mx=1.0)), rel=1e-6), r.name
+            assert affinity[r.name] == pytest.approx(
+                -bg.reaction_gibbs(r, dict(conc, **lumped.CYTOSOL_CHEMOSTATS)), rel=1e-6), r.name
 
 
 @pytest.mark.xfail(strict=True, reason='energy_metabolism adaptive: the phosphorylase\'s equilibrium (Gamma_mob = G6P/Pi) '
@@ -600,8 +627,8 @@ def test_the_lumped_phosphorylases_affinity_is_its_bond_graphs(cytosol_point):
     so the store and phosphorylase cycle sums to ATP hydrolysis (Wegscheider)."""
     _, _, conc = cytosol_point
     mob = {r.name: r for r in lumped.cytosol_graph().reactions}['MOB']
-    assert _cytosol_affinities()['MOB'] == pytest.approx(-lumped.cytosol_graph().reaction_gibbs(mob, dict(conc, mx=1.0)),
-                                                         rel=1e-6)
+    assert _cytosol_affinities()['MOB'] == pytest.approx(
+        -lumped.cytosol_graph().reaction_gibbs(mob, dict(conc, **lumped.CYTOSOL_CHEMOSTATS)), rel=1e-6)
 
 
 def _cytosol_affinities():
