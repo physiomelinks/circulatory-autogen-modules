@@ -502,7 +502,9 @@ def version_problems(version, library_components=None):
         declared_cfg = {v[0] for v in entry['variables_and_units']}
         for name, v in cvars.items():
             if v.get('public_interface') == 'in' and name not in declared_cfg and name not in ('t', 'time'):
-                warnings.append(f'{key}: CellML input {name} of {entry["module_type"]} is not declared in the config (left unset)')
+                # nothing gives it a value: libcuflynx leaves it unset (Myokit uses 0) and PhLynx stops
+                # ("Missing parameter values")
+                errors.append(f'{key}: CellML input {name} of {entry["module_type"]} is not declared in the config')
         seen_names = [v[0] for v in entry['variables_and_units']]
         for name in sorted({n for n in seen_names if seen_names.count(n) > 1}):
             warnings.append(f'{key}: variable {name} listed more than once in variables_and_units')
@@ -512,7 +514,8 @@ def version_problems(version, library_components=None):
                 warnings.append(f'{key}: config variable {name} is not in CellML component {entry["module_type"]}')
                 continue
             if not same_units(v.get('units'), units):
-                warnings.append(f'{key}: {name} has units {units} in the config but {v.get("units")} in the CellML')
+                # libcuflynx maps the config's units to the CellML's, which libcellml rejects
+                errors.append(f'{key}: {name} has units {units} in the config but {v.get("units")} in the CellML')
             if not v.get('public_interface'):
                 warnings.append(f'{key}: config variable {name} has no public_interface in the CellML')
     return errors, warnings
@@ -670,6 +673,26 @@ def test_licence_and_creator_rules():
     assert 'is not one of' in licence_and_creator_problems({'licence': 'GPL-3.0', 'creator': []})[0]
     assert 'not a list of names' in licence_and_creator_problems({'licence': 'MIT', 'creator': 'A. Author'})[0]
     assert licence_and_creator_problems({'licence': 'MIT'}) == ['no "creator"']
+
+
+def test_config_must_declare_cellml_inputs_in_their_units():
+    '''A CellML input missing from variables_and_units, or declared in other units, is an error.'''
+    import dataclasses
+    version = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    assert version_problems(version)[0] == []
+    rows = version.config['variables_and_units']
+    name, units = next((r[0], r[1]) for r in rows if r[3] == 'constant')
+
+    dropped = dataclasses.replace(version, config={**version.config,
+                                                   'variables_and_units': [r for r in rows if r[0] != name]})
+    errors = version_problems(dropped)[0]
+    assert any(f'CellML input {name} of' in e and 'is not declared in the config' in e for e in errors), errors
+
+    other = 'J_per_m3' if units != 'J_per_m3' else 'second'
+    relabelled = dataclasses.replace(version, config={**version.config, 'variables_and_units': [
+        [r[0], other, *r[2:]] if r[0] == name else r for r in rows]})
+    errors = version_problems(relabelled)[0]
+    assert any(f'{name} has units {other} in the config but {units} in the CellML' in e for e in errors), errors
 
 
 # ----------------------------------------------------------------------------------------------
