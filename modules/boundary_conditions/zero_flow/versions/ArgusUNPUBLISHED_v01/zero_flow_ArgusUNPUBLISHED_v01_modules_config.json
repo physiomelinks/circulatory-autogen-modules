@@ -14,14 +14,9 @@
     "required_citations_uncertain": [
       "argus2026circulatory"
     ],
-    "notes": "A zero flow into a vessel_port: list it as an input of a module whose entrance port should take no flow, such as the v_ivc port of a monolithic heart with one vena cava (listed first among the heart's vessel inputs).",
+    "notes": "A constant zero flow, v_zero. It has no port: a port of it would pair v_zero with a blank variable, which the library's structure check does not allow. libcuflynx's built-in zero_flow (nn) has that port, and is what a monolithic heart with one vena cava lists first among its vessel inputs.",
     "entrance_ports": [],
-    "exit_ports": [
-      {
-        "port_type": "vessel_port",
-        "variables": ["v_zero", ""]
-      }
-    ],
+    "exit_ports": [],
     "general_ports": [],
     "variables_and_units": [
       [
