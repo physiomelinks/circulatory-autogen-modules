@@ -42,18 +42,19 @@ expected_failures:
 reference_proposals:
   R:
     reference: 'unreferenced_placeholder; derived for the test from the proposed arteriole geometry: R = 8 mu l/(pi r_0^4)
-      (Poiseuille, mu = 0.004 Pa s). In a network this is set per vessel'
+      (Poiseuille, mu = 0.004 Pa s). In a network this is set per vessel (value in Pa_s_per_uL; 18830000000000.0 Js_per_m6)'
     sourced: 'no'
-    value: 18830000000000.0
+    value: 18830.0
   C:
     reference: 'unreferenced_placeholder; derived for the test from the proposed arteriole geometry: C = 2 pi r_0^3 l/(E h),
-      h from the watanabe2013mathematical fit'
+      h from the watanabe2013mathematical fit (value in uL_per_Pa; 1.978e-17 m6_per_J)'
     sourced: 'no'
-    value: 1.978e-17
+    value: 1.978e-08
   q_0:
-    reference: 'unreferenced_placeholder; derived for the test: q_0 = pi r_0^2 l for the proposed arteriole geometry'
+    reference: 'unreferenced_placeholder; derived for the test: q_0 = pi r_0^2 l for the proposed arteriole geometry (value
+      in uL; 7.306e-14 m3)'
     sourced: 'no'
-    value: 7.306e-14
+    value: 7.306e-05
   u_ext:
     reference: definitional; no external (tissue) pressure acting on the vessel in the isolated test (0 Pa); in a network
       this is the surrounding tissue pressure
@@ -70,14 +71,14 @@ reference_proposals:
     sourced: 'no'
   v_in:
     reference: unreferenced_placeholder; isolated-test boundary value (flow 1500 Pa / R); in a network it is supplied by the
-      neighbouring vessel
+      neighbouring vessel (value in uL_per_s; 7.965e-11 m3_per_s)
     sourced: 'no'
-    value: 7.965e-11
+    value: 0.07965
   v_out:
     reference: unreferenced_placeholder; isolated-test boundary value (flow 1500 Pa / R); in a network it is supplied by the
-      neighbouring vessel
+      neighbouring vessel (value in uL_per_s; 7.965e-11 m3_per_s)
     sourced: 'no'
-    value: 7.965e-11
+    value: 0.07965
 review: reviews/microvasculature_network_review.yaml
 review_scope: The review of the whole microvasculature_network module (48 entries) before the move to versions; only the parts
   about this version apply.

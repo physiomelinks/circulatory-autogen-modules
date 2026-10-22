@@ -8,18 +8,19 @@ notes: 'vein (vp) vp_micro without its inertance: the same geometry-free compone
 reference_proposals:
   R:
     reference: 'unreferenced_placeholder; derived for the test from the proposed vein geometry: R = 8 mu l/(pi r_0^4) (Poiseuille,
-      mu = 0.004 Pa s). In a network this is set per vessel'
+      mu = 0.004 Pa s). In a network this is set per vessel (value in Pa_s_per_uL; 31830000000.0 Js_per_m6)'
     sourced: 'no'
-    value: 31830000000.0
+    value: 31.83
   C:
     reference: 'unreferenced_placeholder; derived for the test from the proposed vein geometry: C = 2 pi r_0^3 l/(E h), h
-      from the watanabe2013mathematical fit'
+      from the watanabe2013mathematical fit (value in uL_per_Pa; 3.261e-14 m6_per_J)'
     sourced: 'no'
-    value: 3.261e-14
+    value: 3.261e-05
   q_0:
-    reference: 'unreferenced_placeholder; derived for the test: q_0 = pi r_0^2 l for the proposed vein geometry'
+    reference: 'unreferenced_placeholder; derived for the test: q_0 = pi r_0^2 l for the proposed vein geometry (value in
+      uL; 6.283e-10 m3)'
     sourced: 'no'
-    value: 6.283e-10
+    value: 0.6283
   u_ext:
     reference: definitional; no external (tissue) pressure acting on the vessel in the isolated test (0 Pa); in a network
       this is the surrounding tissue pressure
@@ -36,6 +37,6 @@ reference_proposals:
     value: 1033.0
   v_in:
     reference: unreferenced_placeholder; isolated-test boundary value (equilibrium flow 300 Pa / R); in a network it is supplied
-      by the neighbouring vessel
+      by the neighbouring vessel (value in uL_per_s; 9.425e-09 m3_per_s)
     sourced: 'no'
-    value: 9.425e-09
+    value: 9.425

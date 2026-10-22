@@ -3,23 +3,23 @@
     <component name="vv_simple_noI_visco_type__venule_vv_micro_noI_visco">
         <variable name="t" public_interface="in" units="second"/>
         <!-- Constitutive parameters-->
-        <variable name="C" public_interface="in" units="m6_per_J"/>
-        <variable name="R" public_interface="in" units="Js_per_m6"/>
-        <variable name="R_v" public_interface="out" units="Js_per_m6"/>
+        <variable name="C" public_interface="in" units="uL_per_Pa"/>
+        <variable name="R" public_interface="in" units="Pa_s_per_uL"/>
+        <variable name="R_v" public_interface="out" units="Pa_s_per_uL"/>
         <!-- State Variables-->
-        <variable name="q_0" public_interface="in" units="m3"/>
+        <variable name="q_0" public_interface="in" units="uL"/>
         <variable name="u_0" public_interface="in" units="J_per_m3"/>
         <variable name="u_ext" public_interface="in" units="J_per_m3"/>
-        <variable name="v_in" public_interface="in" units="m3_per_s"/>
+        <variable name="v_in" public_interface="in" units="uL_per_s"/>
         <variable name="u" public_interface="out" units="J_per_m3"/>
         <variable name="u_C" public_interface="out" units="J_per_m3"/>
-        <variable name="v" public_interface="out" units="m3_per_s"/>
+        <variable name="v" public_interface="out" units="uL_per_s"/>
         <variable name="u_d" public_interface="out" units="J_per_m3"/>
         <variable name="u_C_d" public_interface="out" units="J_per_m3"/>
-        <variable name="v_out" public_interface="in" units="m3_per_s"/>
-        <variable initial_value="0.0" name="q_C" public_interface="out" units="m3"/>
-        <variable initial_value="0.0" name="q_C_d" public_interface="out" units="m3"/>
-        <variable name="q" public_interface="out" units="m3"/>
+        <variable name="v_out" public_interface="in" units="uL_per_s"/>
+        <variable initial_value="0.0" name="q_C" public_interface="out" units="uL"/>
+        <variable initial_value="0.0" name="q_C_d" public_interface="out" units="uL"/>
+        <variable name="q" public_interface="out" units="uL"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
