@@ -1,0 +1,43 @@
+module_type: vein
+version: pp_micro_noI_visco
+reviewed: false
+notes: 'vein (pp) pp_micro without its inertance: the same geometry-free component (R, C, q_0 given directly) with the viscoelastic
+  term R_v = 0.01/C, the same ports and parameter values, and the flows algebraic. They are the I -> 0 limit of pp_micro''s
+  flow equations, solved explicitly (u = (R/2*(u_0 + u_C + u_ext) + R_v*(u_in + u_out))/(R/2 + 2*R_v); v = (u_in - u)/(R/2);
+  v_d = (u - u_out)/(R/2)); the invariants check the original''s flow laws with I = 0. Derived from vein/pp_micro, whose parameter
+  sources and references it shares (not yet reviewed itself).'
+reference_proposals:
+  R:
+    reference: 'unreferenced_placeholder; derived for the test from the proposed vein geometry: R = 8 mu l/(pi r_0^4) (Poiseuille,
+      mu = 0.004 Pa s). In a network this is set per vessel (value in Pa_s_per_uL; 31830000000.0 Js_per_m6)'
+    sourced: 'no'
+    value: 31.83
+  C:
+    reference: 'unreferenced_placeholder; derived for the test from the proposed vein geometry: C = 2 pi r_0^3 l/(E h), h
+      from the watanabe2013mathematical fit (value in uL_per_Pa; 3.261e-14 m6_per_J)'
+    sourced: 'no'
+    value: 3.261e-05
+  q_0:
+    reference: 'unreferenced_placeholder; derived for the test: q_0 = pi r_0^2 l for the proposed vein geometry (value in
+      uL; 6.283e-10 m3)'
+    sourced: 'no'
+    value: 0.6283
+  u_ext:
+    reference: definitional; no external (tissue) pressure acting on the vessel in the isolated test (0 Pa); in a network
+      this is the surrounding tissue pressure
+    sourced: definitional
+    value: 0.0
+  u_0:
+    reference: unreferenced_placeholder; small-vein pressure 10 mmHg = 1.333 kPa (order of magnitude)
+    sourced: 'no'
+    value: 1333.0
+  u_in:
+    reference: unreferenced_placeholder; isolated-test boundary value (u_0 + 150 Pa); in a network it is supplied by the neighbouring
+      vessel
+    sourced: 'no'
+    value: 1483.0
+  u_out:
+    reference: unreferenced_placeholder; isolated-test boundary value (u_0 - 150 Pa); in a network it is supplied by the neighbouring
+      vessel
+    sourced: 'no'
+    value: 1183.0

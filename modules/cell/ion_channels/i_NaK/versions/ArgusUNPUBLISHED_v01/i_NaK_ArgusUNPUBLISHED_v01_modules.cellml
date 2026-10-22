@@ -4,8 +4,6 @@
         <!-- BG model of NKE ATPase-->
         <variable name="t" public_interface="in" units="second"/>
         <variable initial_value="0.0964853321" name="F" units="nC_per_fmol"/>
-        <variable initial_value="8.314" name="R" units="J_per_K_per_mol"/>
-        <variable initial_value="310" name="T" units="kelvin"/>
         <variable initial_value="0.0025773" name="RT" units="nJ_per_fmol"/>
         <variable initial_value="153400" name="C_m" units="fF"/>
         <variable name="u_e" public_interface="out" units="nJ_per_nC"/>
@@ -42,7 +40,6 @@
         <variable name="K_2" public_interface="in" units="per_fmol"/>
         <variable name="K_3" public_interface="in" units="per_fmol"/>
         <variable name="K_4" public_interface="in" units="per_fmol"/>
-        <variable initial_value="0.04565" name="K_H" units="per_fmol"/>
         <variable initial_value="0.009236" name="K_Ke" units="per_fmol"/>
         <variable initial_value="0.0012595" name="K_Ki" units="per_fmol"/>
         <variable initial_value="7.976e-05" name="K_ADP" units="per_fmol"/>
@@ -446,7 +443,6 @@
         </math>
         <!-- Steady state flux-->
         <variable name="v_NKE" units="fmol_per_s"/>
-        <variable initial_value="1000" name="NKE_tot" units="fmol"/>
         <variable name="a_1" units="fmol"/>
         <variable name="a_2" units="fmol"/>
         <variable name="a_3" units="fmol"/>

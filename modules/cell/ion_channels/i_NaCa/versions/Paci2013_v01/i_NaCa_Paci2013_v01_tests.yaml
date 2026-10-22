@@ -8,6 +8,7 @@ known_issues:
 - 'undefined units: C_per_M'
 - 'undefined units: J_per_MK'
 - port variable Cai not in variables_and_units
+- CellML input Cai of i_NaCa_Paci_2013 is not declared in the config
 expected_failures:
   run_test: 'generation fails: R and F use the undefined units J_per_MK / C_per_M (known issue); fix: define them (joule/(mole
     kelvin), coulomb/mole) in ion_channel_units.cellml. Also Cai is a port variable used in the equation but missing from

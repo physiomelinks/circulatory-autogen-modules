@@ -6,8 +6,8 @@
         <variable name="E_K" public_interface="in" units="volt"/>
         <variable name="t" private_interface="out" public_interface="in" units="second"/>
         <variable name="Vm" private_interface="out" public_interface="in" units="volt"/>
-        <variable name="q" private_interface="in" units="dimensionless"/>
-        <variable name="r" private_interface="in" units="dimensionless"/>
+        <variable name="q" public_interface="in" units="dimensionless"/>
+        <variable name="r" public_interface="in" units="dimensionless"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>

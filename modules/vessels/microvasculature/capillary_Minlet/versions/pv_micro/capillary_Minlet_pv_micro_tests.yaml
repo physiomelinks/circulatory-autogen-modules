@@ -22,6 +22,9 @@ expected_failures:
   stability_test: 'module defect: the input variable v_out_sum carries initial_value="0.0" in the CellML; libcellml/Myokit
     reject the connected set ("Multiple initial values defined in connected variable set"), so the model cannot be generated.
     Verified: removing the initial_value in a patched copy makes it generate and pass. See review.proposed_fixes.'
+  phlynx_equivalence_test: 'module defect: the input variable v_out_sum carries initial_value="0.0" in the CellML; libcellml/Myokit
+    reject the connected set ("Multiple initial values defined in connected variable set"), so the model cannot be generated.
+    Verified: removing the initial_value in a patched copy makes it generate and pass. See review.proposed_fixes.'
 reference_proposals:
   E:
     reference: salipante2022blood; capillary-scale vessel-on-chip Young modulus 3.0-10.0 kPa, 4.3 kPa for one vessel (in vitro,

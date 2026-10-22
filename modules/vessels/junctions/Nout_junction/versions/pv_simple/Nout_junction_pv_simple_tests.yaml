@@ -5,6 +5,13 @@ notes: 'pv lumped linear R-C-I vessel. Tested in a harness network (libcuflynx s
   real vessels are connected there): mod (Nout_junction pv_simple); bcin (inlet_pressure constant); dn1 (arterial_simple
   pv); bcout1 (outlet_flow constant); dn2 (arterial_simple pv); bcout2 (outlet_flow constant). Jacobian timescales (nominal:
   fastest 0.00094 s, slowest decay 0.35 s; run: fastest 0.00094 s, slowest decay 0.35 s).'
+expected_failures:
+  phlynx_export_test: 'PhLynx main reads the multi_port "True" of the port of v_out_sum as one variable shared with every
+    neighbour, so the flows of the vessels at the node become one variable, initialised twice ("... are equivalent and cannot
+    therefore both be initialised"). libcuflynx sums those flows instead, in its generic_junction_connection, because of this
+    module type''s name. The list form ["sum", "True"], a sum in both, cannot be used yet: libcuflynx then sums the flow a
+    second time ("v_out_sum ... is computed more than once"). Needs libcuflynx to leave a junction port with a list-form multi_port
+    to its multiport sum (or #4, which removes the junction types).'
 reference_proposals:
   u_in:
     reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 13332.2

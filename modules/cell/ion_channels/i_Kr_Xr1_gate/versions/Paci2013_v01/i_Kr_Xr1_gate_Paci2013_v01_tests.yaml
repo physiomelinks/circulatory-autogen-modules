@@ -8,6 +8,7 @@ notes: 'Paci 2013 hiPSC-CM I_Kr activation Xr1 (V_half from the Ca-dependent for
 known_issues:
 - 'undefined units: C_per_M'
 - 'undefined units: J_per_MK'
+- Vm has units dimensionless in the config but volt in the CellML
 expected_failures:
   run_test: 'generation fails: Vm is declared ''dimensionless'' in ion_channel_modules_config.json (and the parameters file)
     but ''volt'' in the CellML, so the connection is rejected (Myokit: ''Connected variables must have compatible units'').
