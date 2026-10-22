@@ -7,7 +7,7 @@ notes: 'arteriole (pp) entry of this config that points at the BG library type p
   Geometry-free (R, C, q_0 given directly). Invariants (volume balance, pressure law) verified on a patched copy with I given
   a value. After that fix the entry is still extremely stiff: I/R ~ 7.6e-06 s (with I = rho l/(pi r^2)) against a relaxation
   time (R + 0.01/C) C ~ 0.01 s, so explicit fixed-step schemes (timestep test) are not practical; the _micro types (no inertance)
-  are the natural choice for microvessels.'
+  are the natural choice for microvessels. A version without the inertance, otherwise the same, is arteriole/pp_micro_noI_visco.'
 expected_failures:
   run_test: 'module defect, open question: the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du -
     R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO and no source
