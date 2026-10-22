@@ -204,7 +204,7 @@ class ComponentModel(object):
         if not component.is_supermodule:
             self._load_parameters()
         # A supermodule's parameters are those of its generated (flattened) model, read once it is
-        # generated: its own parameterisation's, its submodules' parameterisations' and the boundary conditions no
+        # generated: its own parameterisation's, its submodules' default parameterisations' and the boundary conditions no
         # internal connection closes (harness.supermodule_parameters).
 
     def _load_parameters(self):
@@ -519,7 +519,7 @@ def cpp_generation_check(cm):
         work = os.path.join(cm.work_dir, 'cpp')
         res = os.path.join(work, 'resources')
         harness._write_resources(component, res, prefix, {})
-        cfg = {'file_prefix': prefix, 'input_param_file': f'{prefix}_parameters.csv', 'model_type': 'cpp',
+        cfg = {'file_prefix': prefix, 'input_param_file': f'{prefix}_parameters.json', 'model_type': 'cpp',
                'solver': 'RK4', 'couple_to_1d': True, 'resources_dir': res,
                'generated_models_dir': os.path.join(work, 'generated_models'),
                'cpp_generated_models_dir': os.path.join(work, 'cpp_out'), 'cpp_1d_model_config_path': None,

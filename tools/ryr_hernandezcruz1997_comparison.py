@@ -23,7 +23,6 @@ same window (integral of j_Ca_L): the release gain.
 """
 import base64
 import contextlib
-import csv
 import functools
 import html
 import io
@@ -64,24 +63,32 @@ def copy_library(tmp):
     shutil.copytree(os.path.join(REPO, 'modules'), dst,
                     ignore=shutil.ignore_patterns('results', 'plots', 'risk', '*.omex', '*.html'))
     sdir = os.path.join(dst, SOMA_REL)
+    # the RyR instance in the soma's module array, and the version its config lists
+    array_path = os.path.join(sdir, 'soma_sympathetic_module_array.json')
+    with open(array_path) as f:
+        records = json.load(f)
+    ryr = [s for s in records if s['name'] == 'RyR']
+    assert len(ryr) == 1, 'RyR submodule not found'
+    old = ryr[0]['module_subtype']
+    ryr[0]['module_subtype'] = NEW
+    with open(array_path, 'w') as f:
+        json.dump(records, f, indent=1)
     cfg_path = os.path.join(sdir, 'soma_sympathetic_modules_config.json')
     with open(cfg_path) as f:
         cfg = json.load(f)
-    n = 0
-    for s in cfg[0]['submodules']:
-        if s['name'] == 'RyR':
-            s['module_subtype'] = NEW
-            n += 1
-    assert n == 1, 'RyR submodule not found'
+    for v in cfg[0]['submodule_versions']:
+        if v == {'module_type': 'RyR', 'module_subtype': old}:
+            v['module_subtype'] = NEW
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
-    csv_path = os.path.join(sdir, 'parameterisations', 'default', 'default_parameters.csv')
-    with open(csv_path, newline='') as f:
-        rows = list(csv.reader(f))
-    keep = [r for r in rows if not (r and r[0].endswith('_RyR') and r[0] != 'variable_name')]
-    dropped = [r[0] for r in rows if r not in keep]
-    with open(csv_path, 'w', newline='') as f:
-        csv.writer(f).writerows(keep)
+    # the RyR instance's values in the soma's template (its default parameterisation) were the old version's:
+    # it takes the new version's default instead
+    from libcuflynx.utilities import parameters_file as pf
+    parameters_path = os.path.join(sdir, 'parameterisations', 'default', 'default_parameters.json')
+    doc = pf.read_parameters_file(parameters_path, kind=pf.MODULE)
+    dropped = [f'RyR/{r["variable_name"]}' for r in pf.parameter_rows(doc.get('RyR') or {}, pf.MODULE)]
+    doc['RyR'] = {}
+    pf.write_parameters_file(parameters_path, doc)
     return dst, dropped
 
 

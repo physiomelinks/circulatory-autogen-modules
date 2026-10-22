@@ -1,0 +1,31 @@
+{
+ "schema_version": 1,
+ "global": {
+  "Hgb": {"value": 1.50e+02, "units": "kg_per_m3", "data_reference": "control_parasymp: west2008respiratory", "sourced": "yes"},
+  "k_1": {"value": 1998.5, "units": "J_per_m3", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "k_2": {"value": 25917.4, "units": "J_per_m3", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "h_1": {"value": 0.3836, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "h_2": {"value": 1.819, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "alpha_1": {"value": 2.40e-04, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "alpha_2": {"value": 4.19e-04, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "beta_1": {"value": 6.21e-05, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "beta_2": {"value": 2.44e-04, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "overcap_solubility": {"value": 10000000000.0, "units": "J_per_m3", "data_reference": "control_parasymp: user_defined_for_numerical_stability", "sourced": "no"},
+  "saturation_cap": {"value": 0.9999, "units": "dimensionless", "data_reference": "control_parasymp: user_defined_for_numerical_stability", "sourced": "no"},
+  "C_O2_sat": {"value": 0.20448, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "C_CO2_sat": {"value": 1.9564, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"}
+ },
+ "AA": {"value": 600, "units": "dimensionless", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "BB": {"value": 10.18, "units": "dimensionless", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "C_CO2_a_nom": {"value": 0.36, "units": "dimensionless", "data_reference": "control_parasymp: changed_from_0.36_from_Magosso2001AndUrsino2000", "sourced": "yes"},
+ "K_O2": {"value": 200, "units": "dimensionless", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "K_CO2": {"value": 1, "units": "per_s", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "K_stat": {"value": 20, "units": "per_s", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "K_dyn": {"value": 45, "units": "per_s", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "tau_cap": {"value": 3.5, "units": "second", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "tau_CO2_cc_dyn": {"value": 600, "units": "dimensionless", "data_reference": "control_parasymp: Magosso2001AndUrsino2000", "sourced": "yes"},
+ "C_CO2_a": {"value": "TODO", "units": "dimensionless", "data_reference": "TODO", "sourced": "no"},
+ "C_O2_a": {"value": "TODO", "units": "dimensionless", "data_reference": "TODO", "sourced": "no"},
+ "dot_C_CO2_a": {"value": "TODO", "units": "per_s", "data_reference": "TODO", "sourced": "no"},
+ "alpha_O2": {"value": 2.33e-07, "units": "m3_per_J", "data_reference": "control_parasymp: Magosso2001AndUrsino2000_converted_from_0.003_per_100ml_per_mmHg", "sourced": "yes"}
+}

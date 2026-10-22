@@ -116,10 +116,11 @@ TEST_ABOUT = {
     'phlynx_equivalence_test': 'Compares CUFLynx\'s simulation of the PhLynx-built model with libcuflynx\'s '
                                'model of the same network (outputs matched by instance and variable, '
                                'normalised difference within 1e-6).',
-    'supermodule_structure_test': 'Every submodule is a library version with an existing parameterisation, '
-                                  'internal connections name sibling submodules, and the parameterisation\'s '
-                                  'parameters name '
-                                  'submodules or declared globals.',
+    'supermodule_structure_test': 'Its module array (<module_type>_<version>_module_array.json) loads with '
+                                  'libcuflynx: every submodule is a library version its config lists in '
+                                  'submodule_versions and internal connections name sibling submodules; each '
+                                  'parameterisation (nested JSON) gives its instances their own variables, and its '
+                                  'globals are declared.',
     'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
                                     'with its submodules written out, output for output.',
     'coupled_validation_test': 'The version in use in the coupled system models its spec lists (coupled_systems): '
@@ -583,6 +584,13 @@ def _structure_tree(version, from_dir, _depth=0):
     return out
 
 
+def _same_number(a, b):
+    try:
+        return float(a) == float(b)
+    except (TypeError, ValueError):
+        return str(a).strip() == str(b).strip()
+
+
 def supermodule_structure(version):
     '''A supermodule version's parts and connections: {parts, edges, external, globals, mermaid, tree}.
     Edges are the internal connections (inp_instances / out_instances between parts, and a part's
@@ -594,17 +602,27 @@ def supermodule_structure(version):
         return None
     subs = version.submodules
     versions = {s['name']: _sub_version(s) for s in subs}
-    # the supermodule's own parameterisation: rows <part>/<var> (nested: <part>/<its part>/<var>)
-    # override the part's parameterisation; others are globals
+    # what this supermodule sets for a part: its template's values (its default parameterisation, nested by
+    # part) that differ from the part's version's default parameterisation; the template's globals
     overrides, global_rows = {}, []
+    try:
+        instance_parameters = version.instance_parameters
+    except ValueError:
+        instance_parameters = {}       # the structure test reports it
+    for name, inst in instance_parameters.items():
+        sv = versions.get(name)
+        defaults = {} if sv is None or sv.is_supermodule else \
+            {q.variable_name: q.value for q in sv.default_parameterisation.parameters()}
+        for var, q in inst.items():
+            if var in defaults and _same_number(defaults[var], q['value']):
+                continue
+            overrides.setdefault(name, {})[f'{name}/{var}'] = {
+                'name': f'{name}/{var}', 'var': var.rpartition('/')[2], 'value': str(q['value']),
+                'units': q.get('units', '')}
     for p in version.default_parameterisation.parameters():
-        path, _, var = p.variable_name.rpartition('/')
-        owner = path.split('/')[0] if path else None
-        if owner not in versions:
+        if '/' not in p.variable_name:
             global_rows.append({'name': p.variable_name, 'value': p.value, 'units': p.units})
-        else:
-            overrides.setdefault(owner, []).append({'name': p.variable_name, 'var': var,
-                                                    'value': p.value, 'units': p.units})
+    overrides = {k: list(v.values()) for k, v in overrides.items()}
     sup_globals = set(version.supermodule_globals)
 
     edges = {}
@@ -674,7 +692,7 @@ def supermodule_structure(version):
         uses = _global_names(sv) if sv is not None else set()
         parts.append({
             'name': s['name'], 'module_type': s['module_type'], 'version': s['module_subtype'],
-            'parameterisation': module_array.parameterisation_of(s, '(default)'), 'is_supermodule': bool(sv and sv.is_supermodule),
+            'is_supermodule': bool(sv and sv.is_supermodule),
             'n_parts': len(sv.submodules) if sv is not None and sv.is_supermodule else 0,
             'href': os.path.relpath(sv.html_path, version.dir) if sv is not None else None,
             'missing': sv is None, 'ports': ports,

@@ -5,7 +5,8 @@ per-module layout of this repo:
     modules/<name>/<name>_modules.cellml
     modules/<name>/<name>_modules_config.json
     modules/<name>/<name>_units.cellml        units used by the module, from CA's units files
-    modules/<name>/<name>_parameters.csv      seeded from CA resources/*_parameters.csv
+    modules/<name>/<name>_parameters.json     seeded from CA resources/*_parameters.json (nested JSON,
+                                              tools/parameter_files.py)
     modules/<name>/<name>_tests.yaml          per-component test spec (created once, never overwritten)
 
 Usage:
@@ -20,7 +21,6 @@ provenance. The library now uses modules/<category>/<module_type>/versions/<vers
 modules/README.md); tools/restructure_to_versions.py moves an old-layout tree into it.
 """
 import argparse
-import csv
 import glob
 import json
 import os
@@ -35,6 +35,8 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES_DIR = os.path.join(REPO_ROOT, 'modules')
 sys.path.insert(0, REPO_ROOT)
 from cam_testing.library import entry_from_file, to_phlynx_entry, with_record_keys  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from parameter_files import write_module_table  # noqa: E402
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
 
@@ -124,25 +126,30 @@ def write_units_file(path, needed, blocks):
 def load_ca_parameter_sources(ca_dir):
     '''
     Every (module_array, parameters) pair in CA's resources/, as a list of
-    (prefix, vessels: [(name, vessel_type, BC_type)], params: {variable_name: row}).
+    (prefix, vessels: [(name, module_type, module_subtype)], params: {name: row}), each
+    parameter named as a generated model names it ({variable}_{vessel}, a global bare).
     '''
+    from libcuflynx.utilities import parameters_file as pf
+    from libcuflynx.utilities.config_schemas import read_module_array_records
+    from libcuflynx.utilities.parameter_names import output_model_name
     resources = os.path.join(ca_dir, 'resources')
     sources = []
-    paths = {os.path.basename(p)[:-len('_module_array.csv')]: p
-             for p in glob.glob(os.path.join(resources, '*_module_array.csv'))}
+    paths = {}
+    for p in sorted(glob.glob(os.path.join(resources, '*_module_array.*'))):
+        if p.endswith(('.csv', '.json')):
+            paths.setdefault(os.path.basename(p).rsplit('_module_array.', 1)[0], p)
     for prefix, vessel_path in sorted(paths.items()):
-        param_path = os.path.join(resources, f'{prefix}_parameters.csv')
+        param_path = os.path.join(resources, f'{prefix}_parameters.json')
         if not os.path.isfile(param_path):
             continue
         try:
-            with open(vessel_path) as f:
-                reader = csv.DictReader(f, skipinitialspace=True)
-                vessels = [(r['name'].strip(), r['vessel_type'].strip(), r['BC_type'].strip())
-                           for r in reader if r.get('name')]
-            with open(param_path) as f:
-                reader = csv.DictReader(f, skipinitialspace=True)
-                params = {r['variable_name'].strip(): r for r in reader if r.get('variable_name')}
-        except (KeyError, csv.Error, UnicodeDecodeError) as e:
+            vessels = [(r['name'], r['module_type'], r['module_subtype'])
+                       for r in read_module_array_records(vessel_path)]
+            params = {}
+            for row in pf.read_parameter_rows(param_path):
+                vessel, _, variable = output_model_name(row['variable_name']).rpartition('/')
+                params[f'{variable}_{vessel}' if vessel else variable] = row
+        except (KeyError, ValueError, UnicodeDecodeError) as e:
             print(f'WARNING: could not read {prefix}: {e}')
             continue
         sources.append((prefix, vessels, params))
@@ -213,10 +220,7 @@ from cam_testing.library import PARAMETER_COLUMNS, looks_sourced  # noqa: E402
 
 
 def write_parameters(path, rows):
-    with open(path, 'w', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=PARAMETER_COLUMNS, restval='')
-        writer.writeheader()
-        writer.writerows(rows)
+    write_module_table(path, [{c: r.get(c, '') for c in PARAMETER_COLUMNS} for r in rows])
 
 
 def default_tests_spec(name, config, known_issues=None):
@@ -274,7 +278,7 @@ def import_module(name, cellml_src, config_src, unit_blocks, sources, reseed):
         print(f'WARNING: {name}: units not defined in CA units files: {sorted(missing)}')
     write_units_file(os.path.join(dest, f'{name}_units.cellml'), needed, unit_blocks)
 
-    params_path = os.path.join(dest, f'{name}_parameters.csv')
+    params_path = os.path.join(dest, f'{name}_parameters.json')
     if reseed or not os.path.isfile(params_path):
         rows = seed_parameters(config, sources)
         write_parameters(params_path, rows)
@@ -292,7 +296,7 @@ def main(argv=None):
     parser.add_argument('--ca-dir', default=os.path.join(REPO_ROOT, '..', 'circulatory_autogen'))
     parser.add_argument('--only', nargs='*', help='only import these module names')
     parser.add_argument('--reseed-parameters', action='store_true',
-                        help='overwrite existing <name>_parameters.csv files')
+                        help='overwrite existing <name>_parameters.json files')
     args = parser.parse_args(argv)
 
     ca_dir = os.path.abspath(args.ca_dir)

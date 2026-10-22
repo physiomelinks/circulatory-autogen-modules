@@ -3,7 +3,7 @@ System models: system_models/<category>/<model>/ (at the repo root; not modules,
 
 Each system dir holds the model built from this module library (<model>_module_array.json, whose
 records (instances) name a module_type, its version (module_subtype) and the parameterisation
-it uses, and <model>_parameters.csv, whose values win over the parameterisations'), the reference it must reproduce under
+it uses, and <model>_parameters.json, whose values win over the parameterisations'), the reference it must reproduce under
 reference/, and a spec <model>_system.yaml. The model is generated with every module library
 (cam_testing.paths: this repo's modules/, then the extra ones), so its records may name versions of
 either. The reference is one of:
@@ -112,7 +112,7 @@ def generate(system, work_dir, reference=False, quiet=True):
     out_dir = os.path.join(work_dir, 'reference' if reference else 'library')
     config = {
         'file_prefix': system.name,
-        'input_param_file': f'{system.name}_parameters.csv',
+        'input_param_file': f'{system.name}_parameters.json',
         'model_type': 'cellml', 'solver': 'CVODE_myokit',
         'resources_dir': resources, 'generated_models_dir': out_dir, 'DEBUG': False,
     }

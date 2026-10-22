@@ -15,11 +15,14 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
             <module_type>_<version>.html                  version report (generated)
             risk/  plots/  results/                       (plots, results generated)
             parameterisations/<p>/                        p == obs_data_name (a parameterisation)
-                <p>_parameters.csv                        variable_name,units,value,data_reference,sourced
+                <p>_parameters.json                       nested values (libcuflynx parameters_file): own
+                                                          variables at the top, globals under "global", a
+                                                          supermodule's instances nested; leaves {value,
+                                                          units, data_reference, sourced}
                 <p>_obs_data.json                         optional: calibration data (data_items) and
                                                           held-out data (prediction_items with a value)
-                <p>_params_for_id.csv                     optional
-                <p>_calibrated_parameters.csv             written by calibration (committed)
+                <p>_params_for_id.json                    optional
+                <p>_calibrated_parameters.json            written by calibration (committed)
                 <p>_calibration.json                      written by calibration (committed)
 
 A module_type directory is any directory under modules/ with a versions/ subdirectory. A module_type
@@ -396,6 +399,7 @@ class Parameter:
     kind: str = ''                  # from the config's variables_and_units
     proposed: bool = False          # value comes from a review proposal (not in the parameters file yet)
     model_name: str = ''            # its name in a generated model, when known (a supermodule's flattened parameters)
+    in_global: bool = False         # under "global" in its parameters file
 
     @property
     def is_global(self):
@@ -415,28 +419,40 @@ class Parameter:
 
 
 def read_parameters(path, kinds=None):
-    '''A parameterisation's parameters (kind from the config's variables_and_units, where it has one).'''
+    '''A parameterisation's parameters (nested JSON rooted at the module, read by libcuflynx's
+    parameters_file), in file order: a global by its plain name (``in_global``), an own variable by its
+    name, a supermodule's instance value by its path (``lv/E_A``). kind from the config's
+    variables_and_units, where it has one.'''
+    from libcuflynx.utilities import parameters_file as pf
     kinds = kinds or {}
     out = []
     if not os.path.isfile(path):
         return out
-    with open(path, newline='') as f:
-        for row in csv.DictReader(f):
-            row = {(k or '').strip(): (v or '').strip() for k, v in row.items()}
-            if not row.get('variable_name'):
-                continue
-            out.append(Parameter(row['variable_name'], row.get('units', ''), row.get('value', ''),
-                                 row.get('data_reference', ''), row.get('sourced', ''),
-                                 kinds.get(row['variable_name'], '')))
+    for row in pf.read_parameter_rows(path, kind=pf.MODULE):
+        name = row['variable_name']
+        in_global = name.startswith(pf.GLOBAL + '/')
+        if in_global:
+            name = name[len(pf.GLOBAL) + 1:]
+        out.append(Parameter(name, row.get('units', ''), row.get('value', ''),
+                             row.get('data_reference', ''), row.get('sourced', ''),
+                             kinds.get(name, ''), in_global=in_global))
     return out
 
 
 def write_parameters(path, parameters):
-    with open(path, 'w', newline='') as f:
-        w = csv.writer(f)
-        w.writerow(INSTANCE_COLUMNS)
-        for p in parameters:
-            w.writerow([p.variable_name, p.units, p.value, p.data_reference, p.sourced])
+    '''Write ``parameters`` as a parameterisation's parameters file (nested JSON rooted at the module): a
+    global (``in_global``, or kind global_constant) under "global", the others at their paths.'''
+    from libcuflynx.utilities import parameters_file as pf
+    rows = []
+    for p in parameters:
+        name = p.variable_name
+        if (p.in_global or p.is_global) and '/' not in name:
+            name = f'{pf.GLOBAL}/{name}'
+        row = {'variable_name': name, 'units': p.units, 'value': p.value, 'data_reference': p.data_reference}
+        if p.sourced:
+            row['sourced'] = p.sourced
+        rows.append(row)
+    pf.write_parameter_rows(path, rows, pf.MODULE)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -676,7 +692,7 @@ class Parameterisation:
 
     @property
     def parameters_path(self):
-        return self.path('parameters.csv')
+        return self.path('parameters.json')
 
     @property
     def obs_data_path(self):
@@ -684,11 +700,11 @@ class Parameterisation:
 
     @property
     def params_for_id_path(self):
-        return self.path('params_for_id.csv')
+        return self.path('params_for_id.json')
 
     @property
     def calibrated_parameters_path(self):
-        return self.path('calibrated_parameters.csv')
+        return self.path('calibrated_parameters.json')
 
     @property
     def calibration_path(self):
@@ -971,8 +987,51 @@ class Version:
 
     # --- supermodules -----------------------------------------------------------------------
     @property
+    def module_array_path(self):
+        '''<module_type>_<version>_module_array.json: a supermodule version's instances and their coupling.'''
+        return self.path('module_array.json')
+
+    @functools.cached_property
     def submodules(self):
-        return self.config.get('submodules') or []
+        '''A supermodule's instance records, read and checked by libcuflynx from its module array
+        (``module_array_path``); [] for a component.'''
+        if not self.is_supermodule:
+            return []
+        from libcuflynx.utilities.config_schemas import load_supermodule_array, normalise_supermodule_entry
+        entry = normalise_supermodule_entry(self.raw_entry, self.config_path)
+        return load_supermodule_array(entry, self.config_path)
+
+    @property
+    def instance_parameters_path(self):
+        '''A supermodule version's template, the values a new instance of it starts from: its default
+        parameterisation's parameters file (its instances' values nested under their names).'''
+        return os.path.join(self.parameterisations_dir, self.default_parameterisation_name,
+                            f'{self.default_parameterisation_name}_parameters.json')
+
+    @functools.cached_property
+    def instance_parameters(self):
+        '''{instance: {path: parameter}} of a supermodule's template (``instance_parameters_path``): each
+        instance of its module array (``{}`` when the template gives it nothing), its values by their path
+        in it (``E_A``; ``i_M/rho_M`` in a nested supermodule instance); {} for a component.'''
+        if not self.is_supermodule:
+            return {}
+        from libcuflynx.utilities import parameters_file as pf
+        doc = (pf.read_parameters_file(self.instance_parameters_path, kind=pf.MODULE)
+               if os.path.isfile(self.instance_parameters_path) else {})
+        out = {}
+        for sub in self.submodules:
+            node = doc.get(sub['name']) or {}
+            flat = {}
+
+            def walk(n, prefix):
+                for k, v in n.items():
+                    if pf.is_leaf(v):
+                        flat['/'.join(prefix + [k])] = v
+                    else:
+                        walk(v, prefix + [k])
+            walk(node, [])
+            out[sub['name']] = flat
+        return out
 
     @property
     def submodule_names(self):

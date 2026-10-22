@@ -1,5 +1,5 @@
-# libcuflynx: circulatory_autogen #591 (release/drop-legacy), which reads only the current file
-# forms this library is written in; pin physiomelinks master once it is merged and released.
+# libcuflynx: circulatory_autogen feat/supermodule-versions (#593, based on master), which reads
+# the supermodule layout this library is written in; pin physiomelinks master once #593 merges.
 # The coupled (FEniCS) models also need libcuflynx.coupling from circulatory_autogen #520.
-libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@release/drop-legacy
+libcuflynx @ git+https://github.com/physiomelinks/circulatory_autogen@feat/supermodule-versions
 -e .
