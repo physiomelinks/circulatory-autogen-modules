@@ -6,12 +6,6 @@ notes: 'arteriole (vv) vv_micro without its inertance: the same geometry-free co
   of vv_micro''s flow equations, solved explicitly (v = ((u_0 + u_C + u_ext) - (u_0 + u_C_d + u_ext) + 2*R_v*(v_in + v_out))/(R
   + 4*R_v)); the invariants check the original''s flow laws with I = 0. Derived from arteriole/vv_micro, whose parameter sources
   and references it shares (not yet reviewed itself).'
-expected_failures:
-  phlynx_equivalence_test: 'the pipeline computes libcuflynx''s side of the comparison with fixed tolerances (rtol 1e-10,
-    atol 1e-12; cam_testing.phlynx.SOLVER_INFO), which do no error control on this version''s volumes (~1e-17 m^3): at those
-    tolerances libcuflynx''s own q_C is off by ~30% from the solution at the version''s solver_info (rtol 1e-8, atol 1e-24),
-    which agrees with a tighter run to 1e-9. The CUFLynx run differs from that inaccurate reference by 1-2%. Needs the equivalence
-    check to use the version''s solver_info (as for capillary pp_micro / vp_micro).'
 reference_proposals:
   R:
     reference: 'unreferenced_placeholder; derived for the test from the proposed arteriole geometry: R = 8 mu l/(pi r_0^4)
