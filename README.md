@@ -22,7 +22,7 @@ modules/<category>/<module_type>/                    (or modules/<module_type>/,
     risk/                                            joint failure-risk samples + classifier (committed)
     parameterisations/<p>/                           parameter sets; p == obs_data_name
       <p>_parameters.json                            nested values {value, units, data_reference, sourced}
-      <p>_obs_data.json, _params_for_id.csv, ...     calibration data and results
+      <p>_obs_data.json, _params_for_id.json, ...     calibration data and results
 system_models/<category>/<model>/                    whole models built from the library
 ```
 

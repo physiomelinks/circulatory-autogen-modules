@@ -10,7 +10,7 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
                                               network (its harness, or the version alone) with this
                                               parameterisation's parameters, as libcuflynx generates it
   <p>_obs_data.json                           the parameterisation's calibration data, if it has any
-  <p>_params_for_id.csv                       its parameters to identify, if any
+  <p>_params_for_id.json                      its parameters to identify, if any
   inputs, unchanged: <p>_parameters.json, raw data and
     SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
     _units.cellml and _verification_config.json; a supermodule's _module_array.json (its instances),
@@ -22,8 +22,9 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
   manifest.xml                                COMBINE manifest (master marked)
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
-model, the first JSON with "obs" in its name is the obs_data, and the first CSV with "param" in
-its name is the params_for_id. So the study members are written first, in that order.
+model, the first JSON with "obs" in its name is the obs_data, and the params_for_id is the first CSV
+with "param" in its name, else the first JSON with it (``<p>_parameters.json`` has it too). So the
+study members are written first, in that order, and the library has no CSV named "param".
 """
 import io
 import os
@@ -81,7 +82,7 @@ def members(version, parameterisation, work_dir):
         if path and os.path.isfile(path):
             out.append((name or os.path.basename(path), open(path, 'rb').read(), False))
 
-    # the study, first: CUFLynx takes the first "obs" JSON and the first "param" CSV
+    # the study, first: CUFLynx takes the first "obs" JSON and the first "param" JSON
     add(parameterisation.obs_data_path)
     add(parameterisation.params_for_id_path)
     # the inputs, as they are in the library

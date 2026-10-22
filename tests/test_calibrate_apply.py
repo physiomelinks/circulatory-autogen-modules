@@ -11,6 +11,7 @@ import os
 from types import SimpleNamespace
 
 from libcuflynx.utilities import parameters_file as pf
+from libcuflynx.utilities import params_for_id_file as pfi
 
 from cam_testing import calibrate
 
@@ -39,7 +40,7 @@ def _version(tmp, mt, name, instances=None, spec=None):
     def parameterisation(n=None):
         n = n or 'default'
         p = lambda suffix: os.path.join(d, 'parameterisations', n, f'{n}_{suffix}')
-        return SimpleNamespace(name=n, parameters_path=p('parameters.json'), params_for_id_path=p('params_for_id.csv'),
+        return SimpleNamespace(name=n, parameters_path=p('parameters.json'), params_for_id_path=p('params_for_id.json'),
                                calibrated_parameters_path=p('calibrated_parameters.json'),
                                calibration_path=p('calibration.json'), obs_data_path=p('obs_data.json'))
     default = parameterisation()
@@ -59,12 +60,6 @@ def _version(tmp, mt, name, instances=None, spec=None):
                            instance_parameters_path=default.parameters_path)
 
 
-def _csv(path, rows, header):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w', newline='') as f:
-        f.write('\n'.join([header] + rows) + '\n')
-
-
 def _library(tmp):
     chamber = _version(tmp, 'chamber', 'v1')
     # ra has its own E_A (from the chamber's parameterisation "ra"); lv the chamber's default
@@ -77,7 +72,8 @@ def _library(tmp):
     single = _version(tmp, 'heart', 'single', instances={'chamber': ('chamber/v1', {'E_A': 5})})
     mono = _version(tmp, 'heartmono', 'm1')
     fit = chamber.parameterisation('fit')
-    _csv(fit.params_for_id_path, ['mod,E_A,0.1,10,E_A,uniform'], 'vessel_name,param_name,min,max,name_for_plotting,prior')
+    pfi.write_params_for_id(fit.params_for_id_path, [{'targets': ['mod/E_A'], 'min': 0.1, 'max': 10,
+                                                      'name_for_plotting': 'E_A', 'prior': 'uniform'}])
     _write(fit.calibrated_parameters_path, {'E_A': _leaf(2.5, 'calibrated', 'no'), 'k': _leaf(7, 'not fitted', 'no')})
     with open(fit.calibration_path, 'w') as f:
         json.dump({'calibrated_parameters': {'E_A': 2.5000001}}, f)

@@ -500,7 +500,7 @@ Spikes are upward crossings of 0 mV; the one spike at rest is the start-up trans
 
 <h2>Redo</h2>
 <p><code>venv/bin/python tools/i_M_davis2020_kinetics.py obs-data</code> re-digitises the trace. Alternatively, edit
-<code>parameterisations/{PARAMETERISATION}/{PARAMETERISATION}_obs_data.json</code> or <code>_params_for_id.csv</code> directly. Then run
+<code>parameterisations/{PARAMETERISATION}/{PARAMETERISATION}_obs_data.json</code> or <code>_params_for_id.json</code> directly. Then run
 <code>venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k 'calibrate and {PARAMETERISATION}' --include-unreviewed</code>
 and <code>venv/bin/python tools/i_M_davis2020_kinetics.py report</code>.</p>
 </main></body></html>

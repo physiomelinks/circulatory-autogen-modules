@@ -936,7 +936,7 @@ def _ca_resources():
 
 def _reference_copies():
     return sorted(p for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', 'reference', '*'))
-                  if p.endswith(('_parameters.json', '_obs_data.json', '_params_for_id.csv')))
+                  if p.endswith(('_parameters.json', '_obs_data.json', '_params_for_id.json')))
 
 
 @pytest.mark.parametrize('path', _reference_copies(), ids=lambda p: os.path.relpath(p, SYSTEM_MODELS_DIR))

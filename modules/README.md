@@ -33,7 +33,7 @@ modules/
             <p>/                                         a parameterisation; p == its obs_data_name
               <p>_parameters.json                        nested values (see "Parameterisations")
               <p>_obs_data.json                          calibration and held-out validation data (optional)
-              <p>_params_for_id.csv                      parameters to calibrate, with bounds (optional)
+              <p>_params_for_id.json                      parameters to calibrate, with bounds (optional)
               <p>_calibrated_parameters.json             written by calibration (committed)
               <p>_calibration.json                       calibration summary: method, cost, values, date (committed)
               SOURCES.md, raw data files                 where the data came from (e.g. hudson_bay_lynx_hare.csv)
@@ -318,14 +318,14 @@ A parameterisation is **a parameter set of a version: only the parameters change
   writes `<p>_calibrated_parameters.json` (the same form) and `<p>_calibration.json` beside them.
 - **Recalibrating, and applying a calibration.** A calibration to data is always a libcuflynx run on
   a committed obs_data, never a hand calculation, so anyone can change the data and redo it:
-  1. edit `<p>_obs_data.json` (values, std, protocol) or `<p>_params_for_id.csv`;
+  1. edit `<p>_obs_data.json` (values, std, protocol) or `<p>_params_for_id.json`;
   2. run the parameterisation's calibration test,
      `pytest tests/test_modules.py --component <module_type>/<version> -k 'calibrate and <p>' --include-unreviewed`
      (it rewrites `<p>_calibrated_parameters.json` and `<p>_calibration.json`);
   3. to make the calibrated values the defaults, run
      `python -m cam_testing.calibrate apply <module_type>/<version> <p>` (`--dry-run` lists the changes first).
 
-  `apply` copies the parameters of `<p>_params_for_id.csv`, at their calibrated values, into every
+  `apply` copies the parameters of `<p>_params_for_id.json`, at their calibrated values, into every
   place that uses the version, whatever value it had there (no value-equality checks):
   - the version's default parameterisation (`<var>`);
   - every supermodule version with an instance of the version, recursively: in its template (its
@@ -701,14 +701,14 @@ What an archive holds, in this order:
 |---|---|
 | `<module_type>_<version>_<p>.cellml` | **Master model** (marked in `manifest.xml`): the flattened model of the version's test network (the version alone, or its `harness` network) with this parameterisation's parameters, as libcuflynx generates it. This is what CUFLynx opens and simulates. |
 | `<p>_obs_data.json` | The parameterisation's data, if it has any (CUFLynx's observations): calibration data, and held-out validation data as `prediction_items`. |
-| `<p>_params_for_id.csv` | The parameters to identify, if any (CUFLynx's calibration setup). |
+| `<p>_params_for_id.json` | The parameters to identify, if any (CUFLynx's calibration setup). |
 | `<p>_parameters.json`, raw data files, `SOURCES.md`, `<p>_calibrated_parameters.json`, `<p>_calibration.json` | The parameterisation's own files, unchanged. |
 | `<module_type>_<version>_modules.cellml`, `_modules_config.json`, `_units.cellml` | The version's math, unchanged. |
 | `<module_type>_<version>_verification_config.json` | The version's verification settings, in preparation for CUFLynx running them. |
 | `<module_type>_<version>_<p>_module_array.json`, `_model_parameters.json` | The test network and the parameters file the model was generated from (with its supermodule instances' values). |
 | `<module_type>_<version>_default_parameters.json` | A supermodule's template (its default parameterisation) when `<p>` is another, and its nested supermodules' templates. |
 
-CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the first `.csv` with "param" in its name is the params_for_id. So the study members come first.
+CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the params_for_id is the first `.csv` with "param" in its name, else the first `.json` with it (`<p>_parameters.json` has it too). So the study members come first, and the library has no `.csv` named "param".
 
 A parameterisation with no obs_data or params_for_id still loads and simulates, but CUFLynx then tries other members in those roles and shows two harmless "could not read" notes. That limitation is noted for a future change.
 
@@ -754,7 +754,7 @@ equal): change both together. Another repo's `modules/` is checked against its o
   uses, and `parameterisations/default/default_parameters.json`. Then run `make structure` and
   `pytest tests/test_modules.py --component <module_type>/<source>_vXX`.
 - **A data parameterisation**: add `parameterisations/<name>/` with `<name>_parameters.json`, the obs_data files
-  (`"obs_data_name": "<name>"`), `<name>_params_for_id.csv`, the raw data and `SOURCES.md`. Then add
+  (`"obs_data_name": "<name>"`), `<name>_params_for_id.json`, the raw data and `SOURCES.md`. Then add
   `validation.<name>` to the version's verification_config.json.
 - **A new module_type**: first check that the mechanism has no type yet (a new cell's Ca handling is
   a version of `Ca_handling`, not a new type). Name it by its mechanism and put it in the most general
@@ -854,7 +854,7 @@ calculation: it comes from a calibration (step 6) and `python -m cam_testing.cal
 **6. A parameterisation from data** (optional): `parameterisations/<name>/` with
 `<name>_parameters.json` (only the parameters that differ), the data (`<name>_obs_data.json`, its
 `"obs_data_name": "<name>"`; build it from a CSV with `python -m cam_testing.calibrate from-csv`),
-`<name>_params_for_id.csv` when it is calibrated, and, for data read off a publication's figure,
+`<name>_params_for_id.json` when it is calibrated, and, for data read off a publication's figure,
 `source_figures/` with the cropped screenshot and `source_figures.json` (shown beside the
 validation plots). Then a `validation.<name>` block in the verification config (`baseline` and/or
 `calibrate`: the data, the outputs compared, the metric and threshold).

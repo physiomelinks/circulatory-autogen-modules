@@ -11,7 +11,7 @@ directly:
                                           carry a value are the held-out data the calibrated
                                           model is validated against, scored on
                                           prediction_window (without any, the data_items are)
-    <p>_params_for_id.csv                 parameters calibrated, with bounds
+    <p>_params_for_id.json                parameters calibrated, with bounds
 
 and the results are written there too, and committed:
 
@@ -20,7 +20,7 @@ and the results are written there too, and committed:
     <p>_calibration.json                  summary: method, cost, fitted values, scores, date
 
 The version is generated alone as a single vessel named "mod" (cam_testing.harness.VESSEL),
-so operands are "mod/<variable>" and params_for_id vessel_name is "mod".
+so operands are "mod/<variable>" and params_for_id targets are "mod/<variable>".
 
 Spec (validation.<p>.calibrate in <module_type>_<version>_verification_config.json; file
 references relative to the version directory, defaulting to the parameterisation's files):
@@ -28,7 +28,7 @@ references relative to the version directory, defaulting to the parameterisation
     status: active
     source: citation / URL
     obs_data: parameterisations/<p>/<p>_obs_data.json
-    params_for_id: parameterisations/<p>/<p>_params_for_id.csv
+    params_for_id: parameterisations/<p>/<p>_params_for_id.json
     prediction_window: [15, 20]           model time scored for series predictions (optional)
     initial_parameters: {a: 0.8}          optional optimiser start (default: nominal values)
     starts: [{a: 1}, {a: -1}]             optional: several starts, each calibrated and checked
@@ -193,11 +193,11 @@ def series_from_obs_data(obs):
 
 
 def read_params_for_id(path):
-    with open(path) as f:
-        rows = [{k.strip(): (v or '').strip() for k, v in r.items()} for r in csv.DictReader(f, skipinitialspace=True)]
-    return [{'vessel_name': r['vessel_name'], 'param_name': r['param_name'], 'min': float(r['min']),
-             'max': float(r['max']), 'name_for_plotting': r.get('name_for_plotting') or r['param_name']}
-            for r in rows]
+    """The entries of a params_for_id JSON file as libcuflynx's in-code form
+    ({vessel_name, param_name, min, max, name_for_plotting})."""
+    from libcuflynx.utilities.params_for_id_helpers import load_params_for_id
+    return [dict(p, name_for_plotting=p.get('name_for_plotting') or p['param_name'])
+            for p in load_params_for_id(path)]
 
 
 def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
@@ -483,7 +483,7 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 #
 #     python -m cam_testing.calibrate apply <module_type>/<version> <parameterisation> [--dry-run]
 #
-# The calibrated parameters (those in <p>_params_for_id.csv, with their values from
+# The calibrated parameters (those in <p>_params_for_id.json, with their values from
 # <p>_calibrated_parameters.json) are written to every place that uses the version, whatever parameterisation
 # it uses there (no value-equality checks), each where that file has the parameter:
 #   1. the version's default parameterisation (<var>);

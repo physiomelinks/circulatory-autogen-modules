@@ -21,7 +21,7 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
                                                           units, data_reference, sourced}
                 <p>_obs_data.json                         optional: calibration data (data_items) and
                                                           held-out data (prediction_items with a value)
-                <p>_params_for_id.csv                     optional
+                <p>_params_for_id.json                    optional
                 <p>_calibrated_parameters.json            written by calibration (committed)
                 <p>_calibration.json                      written by calibration (committed)
 
@@ -700,7 +700,7 @@ class Parameterisation:
 
     @property
     def params_for_id_path(self):
-        return self.path('params_for_id.csv')
+        return self.path('params_for_id.json')
 
     @property
     def calibrated_parameters_path(self):
