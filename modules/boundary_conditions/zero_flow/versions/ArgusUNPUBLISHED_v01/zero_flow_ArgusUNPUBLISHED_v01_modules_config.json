@@ -14,9 +14,14 @@
     "required_citations_uncertain": [
       "argus2026circulatory"
     ],
-    "notes": "libcuflynx helper: the generator connects v_zero to the v_ivc input of a monolithic heart module named \"heart\" that has only one vena cava input, and finds the component by its name (zero_flow), so the name must not change.",
+    "notes": "A zero flow into a vessel_port: list it as an input of a module whose entrance port should take no flow, such as the v_ivc port of a monolithic heart with one vena cava (listed first among the heart's vessel inputs).",
     "entrance_ports": [],
-    "exit_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": ["v_zero", ""]
+      }
+    ],
     "general_ports": [],
     "variables_and_units": [
       [
