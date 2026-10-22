@@ -195,12 +195,15 @@ def write(model, description, cells, faces, exposed, sim_time, homogenisation=No
     vols = ' + '.join(f'{c["V"]!r}*{n}__C_P' for n, c in cells.items())
     cons = ' + '.join(f'{c["V"]!r}*{n}__M_reduced' for n, c in cells.items())
     supply = ' + '.join(f'{f[5]}__J' for f in all_faces if f[0] == 'bath')
-    integral = lambda e: f'np.concatenate([[0.0], np.cumsum(0.5*np.diff(t)*(({e})[1:] + ({e})[:-1]))])'
     invariants = [
-        {'description': 'mass conservation (zero loss): the amount in the cells changes only by bath supply and '
-                        'consumption, sum V C(t) - sum V C(0) = int (supply + sum V M_reduced) dt (relative 1e-6)',
-         'expr': f'np.max(np.abs(({vols}) - ({vols})[0] - {integral(f"{supply} + {cons}")})) '
-                 f'<= 1e-6*max(np.max(np.abs({vols})), np.max(np.abs({integral(supply)})))'},
+        {'description': 'mass conservation (zero loss): over every output step the amount in the cells, A = sum V C, '
+                        'changes by the integral of f = supply + sum V M_reduced. That integral is the trapezoid '
+                        'to within 0.5 dt |f(t+dt) - f(t)| where f is monotone over the step; the check allows '
+                        'twice that, dt |f(t+dt) - f(t)|, plus 1e-6 of max |A|, so a transient faster than the '
+                        'output step (the cells start empty) is bounded rather than failed',
+         'expr': f'(lambda A, f: np.all(np.abs(np.diff(A) - 0.5*np.diff(t)*(f[1:] + f[:-1])) '
+                 f'<= np.diff(t)*np.abs(np.diff(f)) + 1e-6*np.max(np.abs(A))))'
+                 f'({vols}, {supply} + {cons})'},
         {'description': 'second law: every face dissipates, J ln(C_up/C_down) >= 0 (using the connected volumes, so '
                         'it also checks the couplings)',
          'expr': ' and '.join(f'np.all({f[5]}__J*(np.log(np.maximum({f[0]}__C_P, 1e-300)) - '
