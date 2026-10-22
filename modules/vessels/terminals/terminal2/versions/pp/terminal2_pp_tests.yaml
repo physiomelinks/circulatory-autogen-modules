@@ -3,31 +3,6 @@ version: pp
 reviewed: false
 notes: 'Terminal RCR with inertance and u_out = 0 hard-coded (W_controller2). Jacobian timescales (nominal: fastest 7.4e-15
   s, slowest decay 0.27 s; run: fastest 7.4e-15 s, slowest decay 0.27 s).'
-expected_failures:
-  run_test: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port) is declared,
-    but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals use an unsourced
-    test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still TODO"; PhLynx: "Missing
-    parameter values: mod.u_in").'
-  verification_test_invariants: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the
-    vessel_port) is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the
-    sibling terminals use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone
-    ("parameters still TODO"; PhLynx: "Missing parameter values: mod.u_in").'
-  verification_test_BC: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port)
-    is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals
-    use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still
-    TODO"; PhLynx: "Missing parameter values: mod.u_in").'
-  verification_test_timestep: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the
-    vessel_port) is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the
-    sibling terminals use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone
-    ("parameters still TODO"; PhLynx: "Missing parameter values: mod.u_in").'
-  stability_test: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port)
-    is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals
-    use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still
-    TODO"; PhLynx: "Missing parameter values: mod.u_in").'
-  phlynx_export_test: 'open question: u_in (the inlet pressure of W_controller2_type, a boundary condition on the vessel_port)
-    is declared, but has no value: the default parameterisation has u_in = TODO and no source gives one (the sibling terminals
-    use an unsourced test value of 13332.2 Pa, 100 mmHg). Until it has one the version cannot run alone ("parameters still
-    TODO"; PhLynx: "Missing parameter values: mod.u_in").'
 reference_proposals:
   R_T:
     reference: unreferenced_placeholder; terminal resistance copied from terminal pp_wCont_no_local (2.6e8 Pa s m^-3 = 1.96
@@ -38,6 +13,11 @@ reference_proposals:
     reference: unreferenced_placeholder; terminal compliance copied from terminal pp_wCont_no_local (4e-9 m^3/Pa = 0.53 mL/mmHg)
     sourced: 'no'
     value: 4.0e-09
+  u_in:
+    reference: unreferenced_placeholder; boundary condition supplied by the connected neighbour in a network; test value 13332.2
+      Pa (100 mmHg), typical inlet pressure for this vessel class (as the sibling terminals)
+    sourced: 'no'
+    value: 13332.2
 review: reviews/BG_review.yaml
 review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
   apply.
