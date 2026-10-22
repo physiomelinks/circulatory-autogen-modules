@@ -3,5 +3,8 @@ version: nonstiff_Argus2026_v01
 reviewed: false
 description: 'Four-chamber heart with a controlled cardiac clock (cardiac_clock controlled), four generic chambers and four Mynard valves with a linearised pressure drop (pp_linear), which keeps the model non-stiff (circulatory_autogen''s heart vp_wCont_nonstiff split into submodules). Defined by the module_format "supermodule" entry in heart_nonstiff_Argus2026_v01_modules_config.json; default parameters as heart Argus2026_v01 (3compartment''s), with the clock''s T_min. A model uses one "heart" entry whose per_submodule_inputs / per_submodule_outputs couple clock (the heart-period effector), ra, la, rv, lv (venous returns, elastance effectors), puv, aov and the chambers'' volumes to the circulation.'
 expected_failures:
+  verification_test_timestep: 'fixed-step RK4 goes non-finite at every step tried, down to 6.25e-6 s: a closing pp_linear valve
+    (A_eff -> 0) has dv/dt = (u_in - u_out - R_lin v)/L with R_lin/L = 2 v_ref eps_m2/(eps_m4 l_eff), a rate far beyond any explicit
+    step. CVODE integrates it (run_test and stability_test pass).'
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

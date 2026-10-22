@@ -58,7 +58,7 @@
         "points": 3
       }
     },
-    "rationale": "Supermodule default: the globals and the boundary conditions no internal connection closes, alone (no circulation): T 0.6-1.5 s and rho 1040-1070 kg/m3 (as heart vp), l_eff by factors 0.5-2; the venous inflows v_in_ra / v_in_la and the arterial pressures u_out_puv / u_out_aov by factors 0.5-2; Delta_E_lv +-100 MPa/m3 and Delta_E_rv +-30 MPa/m3 (inotropic control, as heart vp); the external pressures u_ext_* +-1 kPa (heart vp's intrathoracic swing). The atrial Delta_E_ra / Delta_E_la (nominal 0, no range in heart vp) are not swept. Each submodule's own parameters are swept in that submodule version's tests."
+    "rationale": "Supermodule default: the globals and the boundary conditions no internal connection closes, with no circulation, fed by the harness inflows into ra and la (inlet_flow at 1e-4 m3/s, not swept: the summing chamber ports make them neighbours, not parameters): T 0.6-1.5 s and rho 1040-1070 kg/m3 (as heart vp), l_eff by factors 0.5-2; the arterial pressures u_out_puv / u_out_aov by factors 0.5-2; Delta_E_lv +-100 MPa/m3 and Delta_E_rv +-30 MPa/m3 (inotropic control, as heart vp); the external pressures u_ext_* +-1 kPa (heart vp's intrathoracic swing). The atrial Delta_E_ra / Delta_E_la (nominal 0, no range in heart vp) are not swept. Each submodule's own parameters are swept in that submodule version's tests."
   },
   "timestep": {
     "scheme": "rk4",
@@ -94,6 +94,17 @@
   },
   "validation": {
     "default": {}
+  },
+  "harness": {
+    "module_array": [
+      ["ra_in", "constant", "inlet_flow", "", "mod", "default"],
+      ["la_in", "constant", "inlet_flow", "", "mod", "default"],
+      {"name": "mod", "module_type": "heart", "module_subtype": "controlled_Argus2026_v01", "parameterisation": "default", "per_submodule_inputs": {"ra": ["ra_in"], "la": ["la_in"]}}
+    ],
+    "parameters": [
+      ["ra_in/v", "m3_per_s", "0.0001", "harness test value: the venous return into ra (its summing entrance port)"],
+      ["la_in/v", "m3_per_s", "0.0001", "harness test value: the pulmonary venous return into la (its summing entrance port)"]
+    ]
   },
   "supermodule": {
     "globals": [
