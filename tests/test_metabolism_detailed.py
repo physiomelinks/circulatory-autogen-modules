@@ -189,22 +189,22 @@ def test_its_bond_graph_is_a_celldl_document(module, built):
 
 @pytest.mark.parametrize('module', list(MODULES) + ['energy_metabolism_adaptive'])
 def test_its_reactions_and_species_are_annotated_as_rheas(module):
-    '''tools/annotations.py's terms are on the document's elements: every reaction of a detailed module (all but the
-    lumped cytosol's maintenance, whose product has no chemical identity) is annotated, and matches Rhea's reaction.'''
+    '''tools/annotations.py's terms are on the document's elements: every reaction of a detailed module and of the
+    lumped cytosol is annotated, and matches Rhea's reaction.'''
     from types import SimpleNamespace
     from cam_testing import bondgraph
     vdir, stem = celldl_build.version_dir(module)
     result = bondgraph.reactions_check(SimpleNamespace(path=lambda suffix: os.path.join(vdir, f'{stem}_{suffix}')))
     unannotated = [d for d in result.details if d.endswith(': not annotated')]
-    assert unannotated == (['Re_MX: not annotated'] if module == 'energy_metabolism_adaptive' else []), result.details
+    assert unannotated == [], result.details
     assert result.metrics['fail'] == 0, result.details
 
 
 def test_the_lumped_cytosols_document_has_h_and_water_as_chemostats():
     '''The lumped cytosol's bond graph has H+ (pH 7) and water as chemostats at their standard concentrations, as the
     detailed modules do: each reaction that makes or uses them has its copy of the chemostat in the document, and with
-    them every reaction but the matrix export balances in elements and charge. Its hexokinase step, ATP hydrolysis,
-    lower glycolysis and glycogen store match Rhea strictly.'''
+    them every reaction balances in elements and charge. Every reaction, the matrix export through UDP-glucose
+    included, matches Rhea strictly.'''
     from types import SimpleNamespace
     from cam_testing import bondgraph
     bg = lumped.cytosol_graph()
@@ -213,8 +213,8 @@ def test_the_lumped_cytosols_document_has_h_and_water_as_chemostats():
     assert chemostats['H2O'].boundary and chemostats['H2O'].c_std == lumped.CYTOSOL_CHEMOSTATS['H2O'] == 55500.0
     uses = {r.name: {s: n for s, n in r.stoich.items() if s in chemostats} for r in bg.reactions}
     assert uses == {'HK': {'H': 1}, 'LG': {'H': -1, 'H2O': 2}, 'HYD': {'H2O': -1, 'H': 1},
-                    'STORE': {'H2O': -1, 'H': 1}, 'MOB': {}, 'MX': {}}
-    assert set(bg.element_imbalance()) == set(bg.charge_imbalance()) == {'MX'}
+                    'STORE': {'H2O': -1, 'H': 1}, 'MOB': {}, 'MX': {'H2O': -2, 'H': 2}}
+    assert not bg.element_imbalance() and not bg.charge_imbalance()
     _, ttl = _document('energy_metabolism_adaptive')
     for r, used in uses.items():
         for s in used:
@@ -222,7 +222,7 @@ def test_the_lumped_cytosols_document_has_h_and_water_as_chemostats():
     vdir, stem = celldl_build.version_dir('energy_metabolism_adaptive')
     result = bondgraph.reactions_check(SimpleNamespace(path=lambda suffix: os.path.join(vdir, f'{stem}_{suffix}')))
     strict = {d.split(' ')[0] for d in result.details if '): matches (' in d and ' but for ' not in d}
-    assert {'Re_HK', 'Re_HYD', 'Re_LG', 'Re_STORE'} <= strict, result.details
+    assert {'Re_HK', 'Re_HYD', 'Re_LG', 'Re_STORE', 'Re_MOB', 'Re_MX'} <= strict, result.details
     assert result.metrics['warn'] == 0 and result.metrics['fail'] == 0, result.details
 
 

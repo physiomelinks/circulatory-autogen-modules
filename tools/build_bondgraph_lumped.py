@@ -43,7 +43,7 @@ def cytosol_graph():
     """energy_metabolism adaptive with H+ and water as chemostats (the module leaves them implicit): H+ at pH 7 and
     water at its own concentration, each at its standard concentration (C/c_std = 1), so the module's dG0s at pH 7
     apply and the rates are the module's. The species have the formulae and charges of their major microspecies at
-    pH 7, so every reaction but the matrix export (mx has no chemical identity) balances in elements and charge.
+    pH 7, so every reaction balances in elements and charge (the matrix as its glucan unit).
     Glycogen has the module's activity C/(K_glyc_mob + C)."""
     n = int(CYTO['n_ATP_mx'])
     assert n == CYTO['n_ATP_mx'], 'n_ATP_mx must be a whole number for a stoichiometry'
@@ -56,7 +56,7 @@ def cytosol_graph():
         Species('Pi', 'phosphate', F(H=1, O=4, P=1), charge=-2),
         Species('glyc', 'glycogen (glucose units)', F(C=6, H=10, O=5), c_std=CYTO['K_glyc_mob'],
                 k_sat=CYTO['K_glyc_mob']),
-        Species('mx', 'matrix exported (glucose units)', {}, boundary=True),
+        Species('mx', 'matrix exported (glucose units)', F(C=6, H=10, O=5), boundary=True),
         Species('H', 'H+', F(H=1), boundary=True, charge=1, c_std=CYTOSOL_CHEMOSTATS['H']),
         Species('H2O', 'water', F(H=2, O=1), boundary=True, c_std=CYTOSOL_CHEMOSTATS['H2O']),
     ]
@@ -71,7 +71,8 @@ def cytosol_graph():
                  store - hk, 'dG0_store - dG0_hk'),
         Reaction('MOB', 'glycogen phosphorylase', {'glyc': -1, 'Pi': -1, 'G6P': 1}, hk + hyd - store,
                  'dG0_hk + dG0_hyd - dG0_store'),
-        Reaction('MX', 'matrix synthesis and export', {'G6P': -1, 'ATP': -n, 'mx': 1, 'ADP': n, 'Pi': n + 1},
+        Reaction('MX', 'matrix synthesis and export', {'G6P': -1, 'ATP': -n, 'H2O': -n, 'mx': 1, 'ADP': n, 'Pi': n + 1,
+                                                       'H': n},
                  CYTO['dG0_mx'], 'dG0_mx'),
     ]
     return BondGraph('energy_metabolism_adaptive', 'Lumped cytosol (energy_metabolism adaptive)', species, reactions,
