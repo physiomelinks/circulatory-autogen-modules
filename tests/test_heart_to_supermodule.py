@@ -123,3 +123,17 @@ def test_supermodule_equivalence_compares_wrapped_and_reciprocal(monkeypatch):
     assert ok(entry) == {'heart/mt': False, 'heart/L_aov': False}
     assert ok(dict(entry, wrapped={'heart/mt': 1.0}, reciprocal=['heart/L_aov'])) == {'heart/mt': True,
                                                                                       'heart/L_aov': True}
+
+
+def test_a_harness_row_may_be_a_supermodule_record():
+    """A heart version's test network feeds ra and la through per_submodule_inputs, so its "mod" row is
+    a record; the ledger counts the network's other versions as the version's dependencies."""
+    from cam_testing import ledger, module_array
+    from cam_testing.library import load_version
+    mod = {'name': 'mod', 'module_type': 'heart', 'module_subtype': 'Argus2026_v01',
+           'per_submodule_inputs': {'ra': ['ra_in']}}
+    records = module_array.from_rows([['ra_in', 'constant', 'inlet_flow', '', 'mod', 'default'], mod])
+    assert records[0]['out_instances'] == ['mod'] and records[1]['per_submodule_inputs'] == {'ra': ['ra_in']}
+    heart = load_version('heart', 'Argus2026_v01')
+    assert heart.spec['harness']['module_array'][-1]['per_submodule_inputs'] == {'ra': ['ra_in'], 'la': ['la_in']}
+    assert ('inlet_flow', 'constant') in {(v.vessel_type, v.BC_type) for v in ledger._network_versions(heart)}
