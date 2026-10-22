@@ -1122,8 +1122,8 @@ cyto_invariants = [
     {'description': 'carbon balance with the membrane carriers and the matrix exported: d/dt V_c (6 C_glc + 6 C_G6P + '
                     '3 C_lac + 6 C_glyc) = 6 J_glc + 3 J_lac - 6 J_mx, integrated (relative 1e-6)',
      'expr': 'abs(V_c*((6*C_glc[-1] + 6*C_G6P[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 6*C_G6P[0] + 3*C_lac[0] '
-             '+ 6*C_glyc[0])) - np.trapz(6*mf__J_glc + 3*mf__J_lac - 6*J_mx, t)) <= 1e-6*np.trapz(np.abs(6*mf__J_glc) + '
-             'np.abs(3*mf__J_lac) + np.abs(6*J_mx), t)'},
+             '+ 6*C_glyc[0])) - np.trapz(6*membrane_face__J_glc + 3*membrane_face__J_lac - 6*J_mx, t)) <= 1e-6*np.trapz(np.abs(6*membrane_face__J_glc) + '
+             'np.abs(3*membrane_face__J_lac) + np.abs(6*J_mx), t)'},
     {'description': 'adenine is conserved (bond-graph structure; ATP, ADP do not cross): C_ATP + C_ADP constant '
                     '(relative 1e-9)',
      'expr': 'np.ptp(C_ATP + C_ADP) <= 1e-9*np.max(C_ATP + C_ADP)'},
@@ -1135,7 +1135,7 @@ cyto_invariants = [
                     f'lactate, ADP + Pi: h_glc = 2 h_lac_gly = {h_glc:g} J/mol, h_G6P = h_glc + h_ATP - h_hk, h_glyc = '
                     f'h_glc - h_glyc_poly (relative 2e-4 of the heat: trapezoid integration of the output, whose G6P '
                     f'transients last milliseconds)',
-     'expr': 'abs(2*h_lac_gly*np.trapz(mf__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + (2*h_lac_gly + h_ATP - '
+     'expr': 'abs(2*h_lac_gly*np.trapz(membrane_face__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + (2*h_lac_gly + h_ATP - '
              'h_hk)*(C_G6P[-1] - C_G6P[0]) + h_ATP*(C_ATP[-1] - C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - '
              'C_glyc[0])) - np.trapz(Q_met, t) - (2*h_lac_gly - h_mx_poly)*np.trapz(J_mx, t)) <= '
              '2e-4*np.trapz(np.abs(Q_met), t)'},   # trapezoid integration of the logged heat
@@ -1228,18 +1228,18 @@ cyto_verif = {
                ['v_gly', 'v_lg', 'v_hyd', 'A_hk', 'A_lg', 'A_hyd', 'P_diss', 'Q_met', 'f_T', 'J_ATP_gly', 'J_ATP_mob',
                 'J_ATP_store', 'J_ATP_maint', 'J_ATP_hk', 'J_ATP_lg', 'M_glyc_ATP', 'j_H_met', 'v_mx', 'A_mx', 'J_mx',
                 'J_ATP_mx', 'R_reg',
-                                                     'mf/J_glc', 'mf/J_lac'],
+                                                     'membrane_face/J_glc', 'membrane_face/J_lac'],
     # exercise storage, mobilisation and the matrix
     # ATP regulation of the maintenance ATPase switched on, at f = 0.8
     'run_parameters': {'store_alloc': 0.5, 'C_glyc_init': 50.0, 'mx_alloc': 0.5, 'reg_on_ATP': 1.0, 'f_ATP_reg': 0.8},
     # fed through the cell membrane from the background glucose of the medium (the medium side is open: C_glc_e, C_lac_e parameters);
     # without the H+-ATPase the maintenance ATPase is the only ATP user, so ATP settles a little above its whole-cell value
     'harness': {
-        'module_array': [['mf', V_NEW, 'cell_membrane_face', '', 'mod', 'default'],
-                         ['mod', V_NEW, 'energy_metabolism', 'mf', '', 'default']],
-        'parameters': [['mf/C_glc_e', 'millimolar', GLC_E, 'harness: the background glucose of the medium'],
-                       ['mf/C_lac_e', 'millimolar', LAC_E, 'harness: no lactate in the medium'],
-                       ['mf/A_mem', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']],
+        'module_array': [['membrane_face', V_NEW, 'cell_membrane_face', '', 'mod', 'default'],
+                         ['mod', V_NEW, 'energy_metabolism', 'membrane_face', '', 'default']],
+        'parameters': [['membrane_face/C_glc_e', 'millimolar', GLC_E, 'harness: the background glucose of the medium'],
+                       ['membrane_face/C_lac_e', 'millimolar', LAC_E, 'harness: no lactate in the medium'],
+                       ['membrane_face/A_mem', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']],
     },
     'invariants': cyto_invariants,
     'bc_sweep': {'ranges': {**TEMPERATURE_SWEEP['ranges'], 'dG0_ferm': [-230000.0, -160000.0], 'mx_alloc': [0.0, 1.0]},

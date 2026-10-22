@@ -44,8 +44,8 @@
     "J_mx",
     "J_ATP_mx",
     "R_reg",
-    "mf/J_glc",
-    "mf/J_lac"
+    "membrane_face/J_glc",
+    "membrane_face/J_lac"
   ],
   "run_parameters": {
     "store_alloc": 0.5,
@@ -57,7 +57,7 @@
   "harness": {
     "module_array": [
       [
-        "mf",
+        "membrane_face",
         "adaptive_ArgusUNPUBLISHED_v01",
         "cell_membrane_face",
         "",
@@ -68,26 +68,26 @@
         "mod",
         "adaptive_ArgusUNPUBLISHED_v01",
         "energy_metabolism",
-        "mf",
+        "membrane_face",
         "",
         "default"
       ]
     ],
     "parameters": [
       [
-        "mf/C_glc_e",
+        "membrane_face/C_glc_e",
         "millimolar",
         0.1,
         "harness: the background glucose of the medium"
       ],
       [
-        "mf/C_lac_e",
+        "membrane_face/C_lac_e",
         "millimolar",
         0.0,
         "harness: no lactate in the medium"
       ],
       [
-        "mf/A_mem",
+        "membrane_face/A_mem",
         "um2",
         12.566370614359172,
         "harness: in-plane membrane of the 2 um cell"
@@ -97,7 +97,7 @@
   "invariants": [
     {
       "description": "carbon balance with the membrane carriers and the matrix exported: d/dt V_c (6 C_glc + 6 C_G6P + 3 C_lac + 6 C_glyc) = 6 J_glc + 3 J_lac - 6 J_mx, integrated (relative 1e-6)",
-      "expr": "abs(V_c*((6*C_glc[-1] + 6*C_G6P[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 6*C_G6P[0] + 3*C_lac[0] + 6*C_glyc[0])) - np.trapz(6*mf__J_glc + 3*mf__J_lac - 6*J_mx, t)) <= 1e-6*np.trapz(np.abs(6*mf__J_glc) + np.abs(3*mf__J_lac) + np.abs(6*J_mx), t)"
+      "expr": "abs(V_c*((6*C_glc[-1] + 6*C_G6P[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 6*C_G6P[0] + 3*C_lac[0] + 6*C_glyc[0])) - np.trapz(6*membrane_face__J_glc + 3*membrane_face__J_lac - 6*J_mx, t)) <= 1e-6*np.trapz(np.abs(6*membrane_face__J_glc) + np.abs(3*membrane_face__J_lac) + np.abs(6*J_mx), t)"
     },
     {
       "description": "adenine is conserved (bond-graph structure; ATP, ADP do not cross): C_ATP + C_ADP constant (relative 1e-9)",
@@ -109,7 +109,7 @@
     },
     {
       "description": "first law: the enthalpy brought in with glucose equals the change in stored enthalpy plus the heat, h_glc int J_glc dt = V_c (h_glc dC_glc + h_G6P dC_G6P + h_ATP dC_ATP + h_glyc dC_glyc) + int Q_met dt + (h_glc - h_mx_poly) int J_mx dt (the enthalpy the matrix carries out), relative to lactate, ADP + Pi: h_glc = 2 h_lac_gly = 126000 J/mol, h_G6P = h_glc + h_ATP - h_hk, h_glyc = h_glc - h_glyc_poly (relative 2e-4 of the heat: trapezoid integration of the output, whose G6P transients last milliseconds)",
-      "expr": "abs(2*h_lac_gly*np.trapz(mf__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + (2*h_lac_gly + h_ATP - h_hk)*(C_G6P[-1] - C_G6P[0]) + h_ATP*(C_ATP[-1] - C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - C_glyc[0])) - np.trapz(Q_met, t) - (2*h_lac_gly - h_mx_poly)*np.trapz(J_mx, t)) <= 2e-4*np.trapz(np.abs(Q_met), t)"
+      "expr": "abs(2*h_lac_gly*np.trapz(membrane_face__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + (2*h_lac_gly + h_ATP - h_hk)*(C_G6P[-1] - C_G6P[0]) + h_ATP*(C_ATP[-1] - C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - C_glyc[0])) - np.trapz(Q_met, t) - (2*h_lac_gly - h_mx_poly)*np.trapz(J_mx, t)) <= 2e-4*np.trapz(np.abs(Q_met), t)"
     },
     {
       "description": "second law: each reaction runs down its affinity, v A >= 0, so P_diss >= 0; matrix export never runs backwards (v_mx >= 0)",
