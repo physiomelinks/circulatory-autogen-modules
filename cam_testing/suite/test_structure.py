@@ -408,6 +408,22 @@ def test_system_model_supermodule_instances_have_their_values(path):
         pytest.fail(str(e))
 
 
+def test_named_supermodule_parameterisations_are_complete():
+    '''A named supermodule parameterisation replaces the default as a new instance's values, so it
+    sets every instance value the default parameterisation sets (libcuflynx's
+    parameterisation_missing, which instance creation refuses on).'''
+    from libcuflynx.utilities.parameterisations import available_parameterisations
+    from libcuflynx.utilities.supermodules import parameterisation_missing
+    incomplete = {}
+    for key, entry in sorted(_supermodule_registry().items()):
+        for name in available_parameterisations(entry['config_path']):
+            if name != entry.get('default_parameterisation'):
+                missing = parameterisation_missing(entry, name, f'{key}')
+                if missing:
+                    incomplete[f'{key[0]}/{key[1]} {name}'] = missing
+    assert not incomplete, incomplete
+
+
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
 def test_system_model_records_resolve(path):
     '''Every record (an instance) names a (module_type, version) of the library and a
