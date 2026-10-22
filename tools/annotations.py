@@ -33,6 +33,7 @@ SPECIES_CHEBI = {
     'ADPglc': 57498,    # ADP-alpha-D-glucose
     'Gly': 15444,       # glycogen, as Rhea's [(1->4)-alpha-D-glucosyl](n): its unit's ChEBI term
     'glyc': 15444,      # the lumped cytosol's glycogen
+    'mx': 18246,        # the lumped cytosol's matrix, as Rhea's (1->4)-beta-D-glucan: its unit's ChEBI term
     'AcCoA': 57288, 'CoA': 57287,
     'Cit': 16947,       # citrate
     'Icit': 15562,      # D-threo-isocitrate
@@ -88,7 +89,8 @@ REACTIONS = {
         'LG': {'parts': _GLYCOLYSIS},   # G6P to 2 lactate
         'MOB': {'parts': ['41732', '23536']},                  # glycogen phosphorylase, phosphoglucomutase
         'STORE': {'parts': ['23536', '12120', '18189', '24576']},   # to glycogen through ADP-glucose
-        # MX (maintenance) makes the lumped product mx, which has no chemical identity
+        # matrix: to a glucan through UDP-glucose (UTP remade from ATP), and one ATP for the export
+        'MX': {'parts': ['23536', '19889', '24576', '19929', '25098', '13065']},
     },
 }
 IDENTIFIERS = 'https://identifiers.org/'
