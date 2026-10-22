@@ -39,8 +39,8 @@
       "expr": "np.max(np.abs(e[(t >= T) & (t <= t[-1] - T)] - np.interp(t[(t >= T) & (t <= t[-1] - T)] + T, t, e))) <= 1e-3"
     },
     {
-      "description": "volume balance: dq/dt = v_in - v_out, so with constant flows q = q_init + (v_in - v_out) t",
-      "expr": "np.max(np.abs(q - (q_init + (v_in - v_out)*t))) <= 1e-6*abs(q_init) + 1e-12"
+      "description": "volume balance: dq/dt = v_in - v_out, the flows of the harness inflow (1e-4 m3/s) and outflow (5e-5 m3/s) through the summing ports, so q = q_init + 5e-5 t",
+      "expr": "np.max(np.abs(q - (q_init + (0.0001 - 5e-05)*t))) <= 1e-6*abs(q_init) + 1e-12"
     }
   ],
   "bc_sweep": {
@@ -64,10 +64,12 @@
     "constraints": [
       "T_c + T_r < T"
     ],
-    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, flows, u_ext). Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt and T_eff are excluded: the harness clock drives them. The activation switches phase discontinuously, so CVODE needs a step cap below the clock's start window (eps_1 = 7 % of a beat): MaximumStep 1 ms.",
+    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, u_ext); the flows v_in and v_out are the sums over the summing vessel ports, set by the harness inflow and outflow, not swept here. Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt and T_eff are excluded: the harness clock drives them. The activation switches phase discontinuously, so CVODE needs a step cap below the clock's start window (eps_1 = 7 % of a beat): MaximumStep 1 ms.",
     "exclude": [
       "mt",
-      "T_eff"
+      "T_eff",
+      "v_in",
+      "v_out"
     ],
     "bounds": {
       "T": [
@@ -436,10 +438,6 @@
       }
     }
   },
-  "run_parameters": {
-    "v_in": 0.0001,
-    "v_out": 5e-05
-  },
   "periodic_steady_state": {
     "period": "T",
     "rtol": 0.001
@@ -455,12 +453,42 @@
         "default"
       ],
       [
+        "inflow",
+        "constant",
+        "inlet_flow",
+        "",
+        "mod",
+        "default"
+      ],
+      [
         "mod",
         "Liang2009NoVisco_v02",
         "chamber",
-        "clock",
-        "",
+        "inflow clock",
+        "outflow",
         "lv"
+      ],
+      [
+        "outflow",
+        "constant",
+        "outlet_flow",
+        "mod",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "inflow/v",
+        "m3_per_s",
+        "0.0001",
+        "harness test value: the inflow the summing entrance port takes"
+      ],
+      [
+        "outflow/v",
+        "m3_per_s",
+        "5e-05",
+        "harness test value: the outflow the summing exit port takes"
       ]
     ]
   }
