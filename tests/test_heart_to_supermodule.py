@@ -137,3 +137,26 @@ def test_a_harness_row_may_be_a_supermodule_record():
     heart = load_version('heart', 'Argus2026_v01')
     assert heart.spec['harness']['module_array'][-1]['per_submodule_inputs'] == {'ra': ['ra_in'], 'la': ['la_in']}
     assert ('inlet_flow', 'constant') in {(v.vessel_type, v.BC_type) for v in ledger._network_versions(heart)}
+
+
+FLAT_HEARTS = {'vp', 'vp_Ca', 'vp_LVprop', 'vp_devel', 'vp_new_valve', 'vp_simple', 'vp_simple_OLD', 'vp_simple_SI',
+               'vp_wCont', 'vp_wCont_ASD', 'vp_wCont_nonstiff'}
+
+
+def _flat_heart_models(pattern):
+    import glob
+    import json
+    out = set()
+    for path in glob.glob(os.path.join(ROOT, 'system_models', pattern)):
+        for r in json.load(open(path)):
+            mt, sub = r.get('module_type') or r.get('vessel_type'), r.get('module_subtype') or r.get('BC_type')
+            if str(mt).startswith('heart') and sub in FLAT_HEARTS:
+                out.add(os.path.relpath(path, os.path.join(ROOT, 'system_models')).split(os.sep)[1])
+    return out
+
+
+def test_obsolete_3compartment_is_the_only_flat_heart_model():
+    """Every other system model uses a heart supermodule and keeps no flat-heart reference (its spec's
+    equivalence is not_applicable); obsolete_3compartment keeps circulatory_autogen's 3compartment as its reference."""
+    assert _flat_heart_models('*/*/*_module_array.json') == {'obsolete_3compartment'}
+    assert _flat_heart_models('*/*/reference/*_module_array.json') == {'obsolete_3compartment'}

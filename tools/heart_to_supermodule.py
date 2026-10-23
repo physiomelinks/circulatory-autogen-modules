@@ -18,8 +18,9 @@ whatever its name). The tool:
 - renames the submodules in params_for_id targets, obs_data operands and the system spec's
   output_map and ignore (``ra/E_A`` -> ``heart/ra/E_A``, ``heart_clock/s`` -> ``heart/clock/s``).
 
-The model's reference/ is not changed: it is circulatory_autogen's original, the model's
-equivalence reference.
+The tool does not change reference/ (circulatory_autogen's flat-heart original). Once the conversion
+is checked (the model's outputs are unchanged), remove reference/ and set the spec's equivalence to
+{status: not_applicable, reason: ...}; closed_loop_cvs/obsolete_3compartment is the flat-heart check.
 """
 import argparse
 import glob

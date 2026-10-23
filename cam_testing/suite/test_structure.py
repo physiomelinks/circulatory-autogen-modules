@@ -972,3 +972,24 @@ def test_reference_copies_are_circulatory_autogen_originals_in_library_keys(path
         expected = rekey.rekey_string(path, f.read())
     with open(path, encoding='utf-8') as f:
         assert f.read() == expected, f'{path} differs from {original} (after rekeying) beyond its bib keys'
+
+
+def _system_models():
+    from cam_testing import system as systems
+    return systems.system_models()
+
+
+@pytest.mark.parametrize('system', _system_models(), ids=lambda s: s.id)
+def test_system_model_has_a_reference_or_says_it_has_none(system):
+    '''system_equivalence_test compares a model with its reference: circulatory_autogen's original (a
+    module array under reference/) or a ready CellML model. A model with neither sets its spec's
+    equivalence to {status: not_applicable (or skipped), reason: ...}, so the test is skipped with the reason.'''
+    eq = system.spec.get('equivalence') or {}
+    ref = os.path.join(system.dir, 'reference')
+    has_array = any(glob.glob(os.path.join(ref, f'*_module_array.{ext}')) for ext in ('json', 'csv'))
+    has_cellml = bool(eq.get('reference_cellml')) or os.path.isfile(os.path.join(ref, f'{system.name}.cellml'))
+    if eq.get('status') in ('not_applicable', 'skipped'):
+        assert eq.get('reason'), f'{system.id}: equivalence {eq["status"]} needs a reason'
+    else:
+        assert has_array or has_cellml, (f'{system.id}: no reference (reference/<model>_module_array.json or a CellML '
+                                         f'model) and the spec\'s equivalence does not say so (status: not_applicable)')
