@@ -421,7 +421,7 @@ same module_type:
   entry is an instance whose values are variables of its version (not its globals) and that its globals
   are declared (`supermodule.globals`).
 - **A model's instances.** Each supermodule instance of a model has its values in the model's parameters
-  file, under its name (`system_models/closed_loop_cvs/3compartment_supermodules/3compartment_supermodules_parameters.json`:
+  file, under its name (`system_models/closed_loop_cvs/3compartment/3compartment_parameters.json`:
   `"heart": {"lv": {"E_A": ...}, ...}`). They are written once from the version's template, with a
   nested supermodule's values written out in full (`SN` holds every soma and varicosity value,
   `SN/soma/i_M/rho_M`):
@@ -437,7 +437,9 @@ same module_type:
 
 | Supermodule version | Built from |
 |---|---|
-| `heart` `Argus2026_v01` | cardiac clock, four chambers, four valves (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`) |
+| `heart` `Argus2026_v01` | cardiac clock `Liang2009_v01`, four chambers (chamber `Liang2009NoVisco_v02`, whose vessel ports sum their flows), four valves `pp` (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`) |
+| `heart` `controlled_Argus2026_v01` | as `Argus2026_v01` with the controlled cardiac clock (`cardiac_clock` `controlled`, period set by a heart-period effector) |
+| `heart` `nonstiff_Argus2026_v01` | as `controlled_Argus2026_v01` with linearised valves (`valve` `pp_linear`) |
 | `cell/neuron` `sympathetic` | soma `sympathetic`, axon `sympathetic_monolithic_v01`, varicosity `sympathetic` |
 | `cell/neuron/soma` `sympathetic` | membrane (`membrane_potential`), Na/K (`ion_concentrations`), Ca handling (`Ca_handling`), each version `SN_soma_Argus2026_v01`, and 15 `cell/ion_channels` versions |
 | `cell/neuron/varicosity` `sympathetic` | membrane, Ca handling, NE release (`neurotransmitter_release`), each version `SN_varicosity_Argus2026_v01`, and channels |
@@ -454,8 +456,9 @@ A model uses one record, e.g.
   globals), then each submodule version's default parameterisation.
 - **Where it lives.** Its `tests.yaml` has a `description`; its `verification_config.json` has a
   `supermodule` block. `globals` lists its global parameters. `equivalent` lists the system models
-  it must reproduce: `system_models/closed_loop_cvs/3compartment_supermodules` reproduces
-  `3compartment`, and `system_models/cellular/SN_simple_supermodules` reproduces `SN_simple`.
+  it must reproduce: `system_models/closed_loop_cvs/3compartment` (heart `Argus2026_v01`) reproduces
+  `obsolete_3compartment` (circulatory_autogen's flat heart `vp_Ca`), and
+  `system_models/cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
 ## External model versions
 
@@ -677,7 +680,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`), variables, targets, metric, threshold, optimiser settings |
-| `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`) |
+| `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`, and `wrapped` / `reciprocal` as in a system model's equivalence) |
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |
 | `notes` | tests | notes on the version, shown in its report |

@@ -151,7 +151,8 @@ def equivalence(version, entry, work_dir):
                   **harness.model_output_map(entry.get('output_map') or {})}
     ignore = harness.model_output_keys(entry.get('ignore') or {})
     ref = {k: v for k, v in ref.items() if k not in ignore}
-    return systems.compare(ref, new, output_map, float(entry.get('tol', 1e-9)))
+    return systems.compare(ref, new, output_map, float(entry.get('tol', 1e-9)),
+                           wrapped=entry.get('wrapped'), reciprocal=entry.get('reciprocal'))
 
 
 def equivalence_result_name(entry):

@@ -196,7 +196,7 @@
       ]
     },
     "system_model": {
-      "description": "One model: its module array (records name a module_type, a version as module_subtype, and a parameterisation), its parameters ({model}_parameters.json, libcuflynx's nested JSON: instance, sub-instance, variable; a supermodule instance's values under its name, written once from its version's default parameterisation by cuflynx-upgrade supermodule-instances; they win over the parameterisations'), spec, and under reference/ what it must reproduce: circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
+      "description": "One model: its module array (records name a module_type, a version as module_subtype, and a parameterisation), its parameters ({model}_parameters.json, libcuflynx's nested JSON: instance, sub-instance, variable; a supermodule instance's values under its name, written once from its version's default parameterisation by cuflynx-upgrade supermodule-instances; they win over the parameterisations'), spec, and under reference/ what it must reproduce, if anything (a model with no reference sets its spec's equivalence status to not_applicable): circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [

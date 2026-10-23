@@ -12,7 +12,7 @@
     "required_citations_uncertain": [
       "argus2026unpublished"
     ],
-    "description": "Four-chamber heart built from heart's nested module_types (modules/heart/cardiac_clock, chamber, valve): a cardiac clock, one generic chamber per chamber (ra, rv, la, lv) and a Mynard valve between each chamber and its outflow (trv, puv, miv, aov). In a model, each submodule is named <instance>__<submodule> (e.g. heart__ra), and the host vessels that couple to it are given in the instance's per_submodule_inputs / per_submodule_outputs: typically systemic venous return into ra, pulmonary venous return into la, puv and aov out to the pulmonary and systemic arteries, and the chambers' volumes out to a volume_sum. Several inflows into an atrium go through a flow_merge vessel in the host.",
+    "description": "Four-chamber heart built from heart's nested module_types (modules/heart/cardiac_clock, chamber, valve): a cardiac clock, one generic chamber per chamber (ra, rv, la, lv) and a Mynard valve between each chamber and its outflow (trv, puv, miv, aov). In a model, each submodule is named <instance>__<submodule> (e.g. heart__ra), and the host vessels that couple to it are given in the instance's per_submodule_inputs / per_submodule_outputs: typically systemic venous return into ra, pulmonary venous return into la, puv and aov out to the pulmonary and systemic arteries, and the chambers' volumes out to a volume_sum. A chamber's vessel ports sum their flows (chamber Liang2009NoVisco_v02), so an atrium takes any number of inflows (both venae cavae into ra) and a chamber any number of outflows (an ASD shunt from la), with no junction.",
     "submodule_versions": [
       {
         "module_type": "cardiac_clock",
@@ -20,7 +20,7 @@
       },
       {
         "module_type": "chamber",
-        "module_subtype": "Liang2009NoVisco_v01"
+        "module_subtype": "Liang2009NoVisco_v02"
       },
       {
         "module_type": "valve",

@@ -89,9 +89,13 @@ def harness_rows(harness):
 
 def from_rows(rows):
     '''Spec harness rows [name, module_subtype, module_type, inp, out(, parameterisation)] (inp/out
-    space-separated) -> records.'''
+    space-separated) -> records. A row may instead be a module-array record (a dict), e.g. a
+    supermodule instance with per_submodule_inputs / per_submodule_outputs.'''
     out = []
     for r in rows:
+        if isinstance(r, dict):
+            out.append(normalise_record(r))
+            continue
         n, bc, vt, i, o = r[:5]
         rec = {'name': str(n), 'module_type': str(vt), 'module_subtype': str(bc)}
         if len(r) > 5 and r[5]:
