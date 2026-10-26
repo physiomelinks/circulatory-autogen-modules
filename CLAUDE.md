@@ -15,3 +15,11 @@ A PR is a **module PR**, a **migration PR** or another PR (README "Pull requests
 - During a module review walkthrough, put infrastructure fixes on their own branch as you go, not on the
   review branch. Check with `python tools/pr_scope.py "<title>" origin/main` before opening the PR; the
   `PR scope` workflow runs the same check.
+
+## Data sources
+
+- Schmidt-Nielsen, *Animal Physiology: Adaptation and Environment*, fifth edition (1997; bib key
+  `schmidtnielsen1997animal`), a local copy at
+  `/home/farg967/Documents/books/Physiology/Animal physiology adaptation and environment Fifth Edition.pdf`:
+  a good source of parameter values and validation data for modules. Cite it in the version's `references.bib`,
+  and keep `source_figures/` screenshots of the figures and tables used.
