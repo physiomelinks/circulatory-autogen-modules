@@ -374,7 +374,6 @@ def import_model(ca_dir, model, category, configs):
     ignore = mapping.pop('__ignore__', {})
     wrapped = mapping.pop('__wrapped__', {})
     reciprocal = mapping.pop('__reciprocal__', [])
-    ignore.update({f'{r["name"]}/t': 'time' for r in rows})
     # this library's (module_type, version) names, each record with its default parameterisation
     module_array.write_records(os.path.join(dest, f'{model}_module_array.json'), module_array.to_library_versions(rows))
     if os.path.isfile(pa):

@@ -195,8 +195,8 @@ def _not_run_reason(version, test):
     from cam_testing.pytest_plugin import QUICK_TESTS
     if not getattr(version, 'reviewed', True) and test not in QUICK_TESTS:
         return ('Not run: the version is not reviewed yet, and CI runs only the quick tests (Run, the '
-                'PhLynx -> CUFLynx pipeline) for such versions. It runs the full set once the version is '
-                'reviewed (locally: pytest --include-unreviewed).')
+                'supermodule tests, the PhLynx -> CUFLynx pipeline) for such versions. It runs the full set '
+                'once the version is reviewed (locally: pytest --include-unreviewed).')
     return 'This test has not been run yet.'
 
 
