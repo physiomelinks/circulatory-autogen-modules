@@ -44,9 +44,9 @@ CURRENTS = [0.02, 0.05, 0.1, 0.2]          # nA
 SIM_TIME, DT = 1.0, 1e-5
 L0, RI0, D0, CR0 = 318.3098861837907, 74.02203300817018, 1.0, 0.5
 C_SOMA = 0.01 * 5.086427133679043 * 24.285900630052804 ** 2   # pF, soma Cm = c_m k_A d^2
-DEFAULTS = {'L_ax_mod_axon': L0, 'R_i_mod_axon': RI0, 'd_ax_mod_axon': D0, 'channel_ratio_mod_axon': CR0}
-OUTPUTS = ['mod_soma_membrane/V', 'mod_axon/V', 'mod_varicosity_membrane/V', 'mod_axon/I',
-           'mod_varicosity_Ca/Cai', 'mod_varicosity_NE/NE']
+DEFAULTS = {'L_ax_mod__axon': L0, 'R_i_mod__axon': RI0, 'd_ax_mod__axon': D0, 'channel_ratio_mod__axon': CR0}
+OUTPUTS = ['mod__soma__membrane/V', 'mod__axon/V', 'mod__varicosity__membrane/V', 'mod__axon/I',
+           'mod__varicosity__Ca/Cai', 'mod__varicosity__NE/NE']
 COL = {'soma': '#2a78d6', 'axon': '#eb6834', 'var': '#1baf7a', 'iso': '#52514e'}
 
 
@@ -142,13 +142,13 @@ def half_width(t, x):
 
 
 def metrics(t, r):
-    s, a, v = r['mod_soma_membrane__V'], r['mod_axon__V'], r['mod_varicosity_membrane__V']
+    s, a, v = r['mod__soma__membrane__V'], r['mod__axon__V'], r['mod__varicosity__membrane__V']
     cs, ca, cv = up_crossings(t, s), up_crossings(t, a), up_crossings(t, v)
     m = dict(n_soma=len(cs), n_axon=len(ca), n_var=len(cv), pk_soma=s.max(), pk_axon=a.max(), pk_var=v.max(),
              lat_soma=cs[0] * 1e3 if len(cs) else None,
              delay=(cv[0] - cs[0]) * 1e3 if len(cs) and len(cv) else None,
-             I_ax=np.max(np.abs(r['mod_axon__I'])), Cai=r['mod_varicosity_Ca__Cai'].max() * 1e3,
-             NE=r['mod_varicosity_NE__NE'].max() * 1e3)
+             I_ax=np.max(np.abs(r['mod__axon__I'])), Cai=r['mod__varicosity__Ca__Cai'].max() * 1e3,
+             NE=r['mod__varicosity__NE__NE'].max() * 1e3)
     m['ok'] = m['n_soma'] > 0 and m['n_axon'] == m['n_soma'] and abs(m['pk_axon'] - m['pk_soma']) <= 20
     return m
 
@@ -177,7 +177,7 @@ def style(ax):
 
 
 def trace_fig(opt, I, t, r, t_iso, v_iso):
-    s, a, v = r['mod_soma_membrane__V'], r['mod_axon__V'], r['mod_varicosity_membrane__V']
+    s, a, v = r['mod__soma__membrane__V'], r['mod__axon__V'], r['mod__varicosity__membrane__V']
     cs = up_crossings(t, s)
     t0 = cs[0] if len(cs) else t[np.argmax(s)]
     fig, axs = plt.subplots(1, 2, figsize=(9.6, 2.9), gridspec_kw={'width_ratios': [1.1, 1]})
@@ -203,12 +203,12 @@ def options():
     dens = lambda ms_cm2: ms_cm2 * 1e-5 * A   # mS/cm2 -> microS for the compartment
     return [
         dict(key='current', label='Current model', change='none (R 300 MOhm, C 10 pF, channel_ratio 0.5)', params={}),
-        dict(key='L3', label='L_ax / 3', change='L_ax 318 -> 106 um (R 100 MOhm, C 3.3 pF)', params={'L_ax_mod_axon': L0 / 3}),
-        dict(key='L4', label='L_ax / 4', change='L_ax 318 -> 80 um (R 75 MOhm, C 2.5 pF)', params={'L_ax_mod_axon': L0 / 4}),
-        dict(key='Ri10', label='R_i / 10', change='R_i 74 -> 7.4 ohm cm (R 30 MOhm, C 10 pF)', params={'R_i_mod_axon': RI0 / 10}),
-        dict(key='d5', label='d_ax x 5', change='d_ax 1 -> 5 um (R 12 MOhm, C 50 pF)', params={'d_ax_mod_axon': 5.0}),
-        dict(key='cr10', label='channel_ratio 10', change='channel_ratio 0.5 -> 10', params={'channel_ratio_mod_axon': 10.0}),
-        dict(key='crneg', label='channel_ratio -0.5', change='sign check: channel_ratio 0.5 -> -0.5', params={'channel_ratio_mod_axon': -0.5}),
+        dict(key='L3', label='L_ax / 3', change='L_ax 318 -> 106 um (R 100 MOhm, C 3.3 pF)', params={'L_ax_mod__axon': L0 / 3}),
+        dict(key='L4', label='L_ax / 4', change='L_ax 318 -> 80 um (R 75 MOhm, C 2.5 pF)', params={'L_ax_mod__axon': L0 / 4}),
+        dict(key='Ri10', label='R_i / 10', change='R_i 74 -> 7.4 ohm cm (R 30 MOhm, C 10 pF)', params={'R_i_mod__axon': RI0 / 10}),
+        dict(key='d5', label='d_ax x 5', change='d_ax 1 -> 5 um (R 12 MOhm, C 50 pF)', params={'d_ax_mod__axon': 5.0}),
+        dict(key='cr10', label='channel_ratio 10', change='channel_ratio 0.5 -> 10', params={'channel_ratio_mod__axon': 10.0}),
+        dict(key='crneg', label='channel_ratio -0.5', change='sign check: channel_ratio 0.5 -> -0.5', params={'channel_ratio_mod__axon': -0.5}),
         dict(key='hh', label='HH axon (2x Na, 6.3 degC kinetics)',
              change='prototype: HH Na/K/leak in the axon (gNa 240, gK 36, gL 0.3 mS/cm2, phi 1), channel_ratio unused',
              hh=dict(gNa=dens(240), gK=dens(36), gL=dens(0.3), phi=1.0)),
@@ -241,8 +241,8 @@ def main():
     hs = harness.simulation_helper(soma_path, dict(soma.spec, dt=DT, sim_time=SIM_TIME))
     iso = {}
     for I in CURRENTS:
-        t, r = harness.run(hs, ['mod_membrane/V'], params={'parameters/I_in_mod_membrane': I})
-        x = r['mod_membrane__V']; c = up_crossings(t, x)
+        t, r = harness.run(hs, ['mod__membrane/V'], params={'parameters/I_in_mod__membrane': I})
+        x = r['mod__membrane__V']; c = up_crossings(t, x)
         iso[I] = dict(t=t, v=x, n=len(c), lat=c[0] * 1e3 if len(c) else None, pk=x.max())
         print('isolated soma', I, iso[I]['n'], flush=True)
 
@@ -257,7 +257,7 @@ def main():
             h = h_base
         for I in CURRENTS:
             params = {f'parameters/{k}': v for k, v in {**DEFAULTS, **o.get('params', {})}.items()}
-            params['parameters/I_in_mod_soma_membrane'] = I
+            params['parameters/I_in_mod__soma__membrane'] = I
             t, r = harness.run(h, OUTPUTS, params=params)
             results[o['key'], I] = (t, r, metrics(t, r))
             m = results[o['key'], I][2]
@@ -270,19 +270,19 @@ def main():
                       ('L_ax', [L0 / f for f in (1, 1.5, 2, 2.5, 3, 4, 5, 10)]),
                       ('d_ax', [1, 2, 3, 5, 8])]:
         for val in vals:
-            pv = dict(DEFAULTS, **{f'{fam}_mod_axon': float(val)})
-            Rm = 4 * pv['R_i_mod_axon'] * pv['L_ax_mod_axon'] * 0.01 / (math.pi * pv['d_ax_mod_axon'] ** 2)
-            Cp = math.pi * pv['d_ax_mod_axon'] * pv['L_ax_mod_axon'] * 0.01
-            tau = Rm * Cp * 1e-3 / (1 + pv['channel_ratio_mod_axon'])     # ms
+            pv = dict(DEFAULTS, **{f'{fam}_mod__axon': float(val)})
+            Rm = 4 * pv['R_i_mod__axon'] * pv['L_ax_mod__axon'] * 0.01 / (math.pi * pv['d_ax_mod__axon'] ** 2)
+            Cp = math.pi * pv['d_ax_mod__axon'] * pv['L_ax_mod__axon'] * 0.01
+            tau = Rm * Cp * 1e-3 / (1 + pv['channel_ratio_mod__axon'])     # ms
             params = {f'parameters/{k}': v for k, v in pv.items()}
-            params['parameters/I_in_mod_soma_membrane'] = 0.05
+            params['parameters/I_in_mod__soma__membrane'] = 0.05
             t, r = harness.run(h_base, OUTPUTS, params=params)
             m = metrics(t, r)
             sweep[fam].append((tau, m['pk_axon'] - m['pk_soma'], m['pk_soma']))
 
     # AP width and multi-compartment estimate, from the current model at 50 pA
     t, r, _ = results['current', 0.05]
-    vs = r['mod_soma_membrane__V']
+    vs = r['mod__soma__membrane__V']
     hw = half_width(t, vs) * 1e3
     c0 = up_crossings(t, vs)[0]; d0 = up_crossings(t, -vs)[0]
     w0 = (d0 - c0) * 1e3          # ms above 0 mV
@@ -373,7 +373,7 @@ code {{ font-size:13px; }}
 <h1>Sympathetic neuron: AP transmission soma &rarr; axon &rarr; varicosity</h1>
 <p class="muted">neuron/sympathetic (soma sympathetic, axon sympathetic_monolithic_v01, varicosity sympathetic). Simulation only, no module
 file changed. Built by <code>tools/neuron_ap_transmission.py</code>; CVODE (myokit), rtol 1e-8, {SIM_TIME:g} s, output every {DT * 1e3:g} ms;
-stimulus <code>I_in_mod_soma_membrane</code> from t = 0. The check is the neuron spec's invariants: equal spike counts (upward 0 mV
+stimulus <code>I_in_mod__soma__membrane</code> from t = 0. The check is the neuron spec's invariants: equal spike counts (upward 0 mV
 crossings, at least one) and axon peak within 20 mV of the soma peak.</p>
 
 <h2>Recommendation</h2>
@@ -422,8 +422,8 @@ A negative channel_ratio slows it further (cr &lt; &minus;1 would make it unstab
 
 <h2>Metrics</h2>
 <p class="muted">Counts are soma/axon/varicosity upward 0 mV crossings in {SIM_TIME:g} s. Delay: first somatic to first varicosity
-crossing. Soma vs isolated: spike counts and first-spike latency against soma/sympathetic alone (<code>I_in_mod_membrane</code>). I_ax:
-peak |axial current|. Cai and NE: varicosity peak cytosolic Ca and peak NE (uM). A negative delay means the axon crossed 0 mV before the soma. NE is <code>mod_varicosity_NE/NE</code>, driven by
+crossing. Soma vs isolated: spike counts and first-spike latency against soma/sympathetic alone (<code>I_in_mod__membrane</code>). I_ax:
+peak |axial current|. Cai and NE: varicosity peak cytosolic Ca and peak NE (uM). A negative delay means the axon crossed 0 mV before the soma. NE is <code>mod__varicosity__NE/NE</code>, driven by
 Cai above 0.1 uM.</p>
 <div class="scroll"><table>
 <tr><th>option</th><th>pA</th><th>spikes s/a/v</th><th>soma pk (mV)</th><th>axon pk</th><th>var pk</th><th>delay (ms)</th>

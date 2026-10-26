@@ -139,11 +139,11 @@ def _network_versions(version):
                  if isinstance(v, dict)]
     out = []
     for net in networks:
-        for row in module_array.harness_rows(net) or []:
-            if str(row[0]) == harness.VESSEL:
+        for rec in module_array.from_rows(module_array.harness_rows(net) or []):
+            if rec['name'] == harness.VESSEL:
                 continue
             try:
-                out.append(load_version(str(row[2]), str(row[1])))
+                out.append(load_version(rec['module_type'], rec['module_subtype']))
             except (OSError, ValueError, KeyError):
                 pass
     return out

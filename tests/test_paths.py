@@ -161,35 +161,6 @@ def test_reconfigure_clears_discovery(two_libraries):
     assert 'neighbour' in library.module_type_names(include_libraries=True)
 
 
-def test_former_parameterisation_names_are_still_read(tmp_path):
-    '''A library on the layout before 2026-10-09: the version's parameter sets in instances/ (now
-    parameterisations/), the config's "default_instance" (now "default_parameterisation") and a
-    module-array record's "instance" (now "parameterisation").'''
-    from cam_testing import module_array
-    repo = tmp_path / 'repo'
-    d = repo / 'modules' / 'cat' / 'old' / 'versions' / 'v1'
-    (d / 'instances' / 'fit').mkdir(parents=True)
-    (d / 'instances' / 'fit' / 'fit_parameters.csv').write_text('variable_name,units,value,data_reference\n'
-                                                                'a,dimensionless,2,test\n')
-    (d / 'old_v1_modules_config.json').write_text(json.dumps([{
-        'module_type': 'old', 'module_subtype': 'v1', 'component_file': 'old_v1_modules.cellml',
-        'component_type': 'old_v1', 'default_instance': 'fit', 'variables_and_units': []}]))
-    try:
-        paths.configure(repo_root=str(repo), library_dirs=[], export=False)
-        v = library.load_version('old', 'v1')
-        assert v.parameterisations_dir == str(d / 'instances')
-        assert v.default_parameterisation_name == 'fit' and v.parameterisation_names() == ['fit']
-        assert [p.value for p in v.default_parameterisation.parameters()] == ['2']
-        # the former method names are aliases
-        assert v.default_instance_name == 'fit' and v.instance('fit').name == 'fit'
-    finally:
-        paths.reset()
-    record = {'name': 'a', 'module_type': 'old', 'module_subtype': 'v1', 'instance': 'fit'}
-    assert module_array.parameterisation_of(record) == 'fit'
-    assert module_array.normalise_record(record) == {'name': 'a', 'module_type': 'old', 'module_subtype': 'v1',
-                                                     'parameterisation': 'fit', 'inp_instances': [],
-                                                     'out_instances': []}
-
 
 def test_libcuflynx_gets_every_library(two_libraries, monkeypatch, tmp_path):
     '''harness.generate (and the system models, the C++ run_test) pass module_library_dirs = the repo's
@@ -234,3 +205,16 @@ def test_plugin_registered_once(request):
     pm = request.config.pluginmanager
     assert pm.get_plugin('cam_testing.pytest_plugin') is pytest_plugin
     assert [p for p in pm.get_plugins() if p is pytest_plugin] == [pytest_plugin]
+
+
+def test_config_files_in_the_older_keys_are_refused(tmp_path):
+    '''A config file read by cam_testing uses the current keys; one in libcuflynx's older keys
+    (vessel_type, BC_type, module_file) is refused with the converter's command.'''
+    path = tmp_path / 'old_v1_modules_config.json'
+    path.write_text(json.dumps([{'vessel_type': 'old', 'BC_type': 'v1', 'module_file': 'old_v1_modules.cellml',
+                                 'module_type': 'old_v1', 'variables_and_units': []}]))
+    with pytest.raises(ValueError, match='cuflynx-upgrade module-config'):
+        library.read_config(str(path))
+    path.write_text(json.dumps([{'module_type': 'old', 'module_subtype': 'v1', 'component_file': 'old_v1_modules.cellml',
+                                 'component_type': 'old_v1', 'variables_and_units': []}]))
+    assert library.read_config(str(path))[0]['module_type'] == 'old_v1'      # internal: the component
