@@ -55,7 +55,7 @@
    "value": 293.15,
    "units": "kelvin",
    "source": "lynch2015bioenergetic",
-   "status": "design",
+   "status": "sourced",
    "note": "operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to"
   },
   "R_cell": {
@@ -180,16 +180,16 @@
   "ADP": {
    "value": 0.56,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm)"
+   "source": "bennett2009absolute",
+   "status": "sourced",
+   "note": "glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)"
   },
   "Pi": {
    "value": 10.0,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported)"
+   "source": "amin1995dual",
+   "status": "sourced",
+   "note": "cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells"
   },
   "glc_e": {
    "value": 0.1,
@@ -209,8 +209,8 @@
    "value": 0.002,
    "units": "millimolar",
    "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)"
+   "status": "design",
+   "note": "design value; no measurement found (searched 2026-10-23): free glucose inside the cell (no E. coli measurement: PTS uptake delivers G6P). glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)"
   },
   "H_ATPase_share": {
    "value": 0.25,
@@ -290,25 +290,25 @@
    "note": "H+-ATPase half-activated at pH 7.6: regulates cytoplasmic pH at 7.6-7.8, more active as the cytoplasm acidifies"
   },
   "dG0_ferm": {
-   "value": -196000.0,
+   "value": -193300.0,
    "units": "J_per_mol",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "textbook standard Gibbs energy of glucose -> 2 lactate (BioNumbers BNID 106539 lists -183.6 kJ/mol)"
+   "source": "beber2022equilibrator",
+   "status": "sourced",
+   "note": "glucose -> 2 lactate: -193.3 +- 3.7 kJ/mol (the same for D- and L-lactate), eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set"
   },
   "dG0_hyd": {
-   "value": -30500.0,
+   "value": -27400.0,
    "units": "J_per_mol",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "textbook standard Gibbs energy of ATP hydrolysis"
+   "source": "beber2022equilibrator",
+   "status": "sourced",
+   "note": "ATP + H2O -> ADP + Pi: -27.4 +- 0.6 kJ/mol, eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set"
   },
   "dG0_store": {
-   "value": -42000.0,
+   "value": -40600.0,
    "units": "J_per_mol",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "glucose + 2 ATP -> glycogen unit: textbook steps via G6P, G1P, UDP-glucose with PPi hydrolysis"
+   "source": "beber2022equilibrator",
+   "status": "sourced",
+   "note": "glucose + 2 ATP -> glycogen unit + 2 ADP + 2 Pi: 2 dG0_hyd minus the alpha-1,4 bond's hydrolysis, taken as maltose hydrolysis (-14.2 +- 3.1 kJ/mol), eQuilibrator 3.0 as dG0_hyd"
   },
   "h_lac_gly": {
    "value": 63000.0,
@@ -325,11 +325,11 @@
    "note": "enthalpy of ATP hydrolysis -20.5 kJ/mol at 25 C"
   },
   "h_glyc_poly": {
-   "value": 0.0,
+   "value": -500.0,
    "units": "J_per_mol",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "enthalpy of adding a glucose to glycogen, taken as zero"
+   "source": "alberty1998calculation",
+   "status": "sourced",
+   "note": "heat released by adding a glucose to glycogen: -0.5 kJ/mol (it absorbs 0.5 kJ), from maltose hydrolysis (Delta H -0.49 kJ/mol, Alberty's species enthalpies) for the alpha-1,4 bond"
   },
   "Q10": {
    "value": 2.0,
@@ -341,51 +341,51 @@
   "K_glc": {
    "value": 0.1,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "lumped glycolysis affinity for glucose (glucokinase order 0.1 mM)"
+   "source": "miller2004identifying",
+   "status": "sourced",
+   "note": "lumped glycolysis affinity for glucose: E. coli glucokinase Km 0.076 mM (Miller 2004), 0.15 mM (arora1995glucokinase), 0.78 mM (meyer1997molecular). Wild-type E. coli takes glucose up mostly through the PTS"
   },
   "K_ADP_gly": {
-   "value": 0.1,
+   "value": 0.2,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "lumped glycolysis affinity for ADP"
+   "source": "chassagnole2002dynamic",
+   "status": "sourced",
+   "note": "lumped glycolysis affinity for ADP: the ADP constants of its two ATP-making steps in the E. coli kinetic model, PGK 0.185 and pyruvate kinase 0.26 mM (BIOMD0000000051)"
   },
   "K_Pi_gly": {
-   "value": 1.0,
+   "value": 0.5,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "lumped glycolysis affinity for Pi"
+   "source": "eyschen1999engineered",
+   "status": "sourced",
+   "note": "lumped glycolysis affinity for Pi: E. coli glyceraldehyde-3-phosphate dehydrogenase Km(Pi) 0.53 mM"
   },
   "K_lac": {
    "value": 10.0,
    "units": "millimolar",
    "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "lumped glycolysis product constant for lactate"
+   "status": "design",
+   "note": "design value; no measurement found (searched 2026-10-23): lumped glycolysis product constant for lactate (no E. coli lactate dehydrogenase lactate constant). lumped glycolysis product constant for lactate"
   },
   "K_ATP_gly": {
-   "value": 1.0,
+   "value": 0.65,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "lumped glycolysis product constant for ATP"
+   "source": "chassagnole2002dynamic",
+   "status": "sourced",
+   "note": "lumped glycolysis product constant for ATP: PGK's ATP constant 0.653 mM in the E. coli kinetic model (BIOMD0000000051)"
   },
   "dG0_hk": {
-   "value": -16700.0,
+   "value": -17900.0,
    "units": "J_per_mol",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "standard Gibbs energy of glucose + ATP -> glucose 6-phosphate + ADP (textbook -16.7 kJ/mol: G6P hydrolysis -13.8 against ATP hydrolysis -30.5)"
+   "source": "beber2022equilibrator",
+   "status": "sourced",
+   "note": "glucose + ATP -> glucose 6-phosphate + ADP: -17.9 +- 0.8 kJ/mol, eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set"
   },
   "h_hk": {
-   "value": 23800.0,
+   "value": 21600.0,
    "units": "J_per_mol",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "enthalpy released by glucose + ATP -> glucose 6-phosphate + ADP (about -24 kJ/mol reported for the hexokinase reaction; to confirm and cite)"
+   "source": "alberty1998calculation",
+   "status": "sourced",
+   "note": "heat released by glucose + ATP -> glucose 6-phosphate + ADP: 21.58 kJ/mol from Alberty's species enthalpies (25 C, I = 0; no buffer heat, as h_ATP); calorimetry of yeast hexokinase PI gives 21.3 (bianconi2003calorimetric)"
   },
   "G6P_i": {
    "value": 1.0,
@@ -395,18 +395,18 @@
    "note": "glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)"
   },
   "n_G6P_lg": {
-   "value": 4.0,
+   "value": 3.6,
    "units": "dimensionless",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "Hill coefficient of the lumped lower glycolysis in G6P, from its committed step: E. coli phosphofructokinase (PFK-1, a tetramer) is cooperative in fructose 6-phosphate with a Hill coefficient of about 4 (Blangy, Buc and Monod 1968, J Mol Biol 31:13-35, doi 10.1016/0022-2836(68)90051-x: the paper is confirmed, the value is from memory, to check). With 4, G6P rises from 1 mM at rest to ~3 mM at 50x the resting flux and a cell with a large PTS keeps its phosphate; with 2 it would rise to ~8 mM and a full-ceiling PTS would run Pi down to ~0"
+   "source": "johnson1992mgatp",
+   "status": "sourced",
+   "note": "Hill coefficient of the lumped lower glycolysis in G6P, from its committed step: E. coli phosphofructokinase (PFK-1) binds fructose 6-phosphate with a Hill coefficient of 3.6 at saturating MgATP (Johnson & Reinhart 1992; \"almost 4\" in lebras1982proteolyzed). The lumped Hill in G6P is PFK's in F6P while phosphoglucose isomerase stays near equilibrium"
   },
   "K_ATP_hk": {
-   "value": 0.1,
+   "value": 0.26,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "ATP for half-rate of the hexokinase step, order 0.1 mM (far below the cell's 9.6 mM, so it acts only as ATP runs out)"
+   "source": "miller2004identifying",
+   "status": "sourced",
+   "note": "ATP for half-rate of the hexokinase step: E. coli glucokinase Km(ATP) 0.26 mM (pH 7.6, 25 C; 0.5 and 3.76 mM in arora1995glucokinase and meyer1997molecular). Far below the cell's 9.6 mM, so it acts only as ATP runs out"
   },
   "lower_glycolysis_headroom": {
    "value": 300.0,
@@ -419,22 +419,22 @@
    "value": 0.5,
    "units": "millimolar",
    "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "maintenance ATPase affinity for ATP"
+   "status": "design",
+   "note": "design value; no measurement found (searched 2026-10-23): maintenance ATPase affinity for ATP (a lumped ATPase, no single enzyme). maintenance ATPase affinity for ATP"
   },
   "K_ADP_hyd": {
    "value": 0.5,
    "units": "millimolar",
    "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "maintenance ATPase product constant for ADP"
+   "status": "design",
+   "note": "design value; no measurement found (searched 2026-10-23): maintenance ATPase product constant for ADP (a lumped ATPase). maintenance ATPase product constant for ADP"
   },
   "K_Pi_hyd": {
    "value": 5.0,
    "units": "millimolar",
    "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "maintenance ATPase product constant for Pi"
+   "status": "design",
+   "note": "design value; no measurement found (searched 2026-10-23): maintenance ATPase product constant for Pi (a lumped ATPase). maintenance ATPase product constant for Pi"
   },
   "glycogen_store_rate": {
    "value": 0.7,
@@ -450,47 +450,47 @@
    "status": "placeholder",
    "note": "mobilisation capacity, as a multiple of the resting glycolytic flux"
   },
-  "K_glc_store": {
-   "value": 0.1,
+  "K_G6P_pgm": {
+   "value": 1.04,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "glucokinase-order affinity of glycogen synthesis for free glucose; the store takes glucose 6-phosphate, and its G6P affinity is this times G6P_i/glc_i (the same saturation at rest)"
+   "source": "chassagnole2002dynamic",
+   "status": "sourced",
+   "note": "G6P affinity of the glycogen store and matrix synthesis: phosphoglucomutase, the step that takes G6P towards both, Km(G6P) 1.04 mM in the E. coli kinetic model (BIOMD0000000051, KPGMg6p)"
   },
   "K_ATP_store": {
    "value": 1.0,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "ADP-glucose pyrophosphorylase ATP affinity, order 1 mM"
+   "source": "hill2015conserved",
+   "status": "sourced",
+   "note": "ATP affinity of glycogen synthesis: E. coli ADP-glucose pyrophosphorylase (GlgC) S0.5(ATP) 0.17 mM with its activator FBP, 2.5 mM without (Hill 2015); 1.2-1.3 mM (haugen1976biosynthesis)"
   },
   "C_glyc_max": {
    "value": 200.0,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "glycogen ceiling: about 10% of dry weight (cell 1.1 g/mL, 30% dry), in mM glucose units"
+   "source": "neidhardt1996chemical",
+   "status": "design",
+   "note": "glycogen ceiling: 4x the 2.5% of dry weight (about 50 mM glucose units) of balanced growth (Neidhardt & Umbarger 1996); nitrogen-limited cells given excess glucose hold more (wright1965effects)"
   },
   "K_glyc_mob": {
-   "value": 10.0,
+   "value": 40.0,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "phosphorylase affinity for glycogen"
+   "source": "chen1968purification",
+   "status": "sourced",
+   "note": "glycogen phosphorylase affinity for glycogen: E. coli GlgP Km 0.67% w/v (0.46% with AMP), about 41 mM glucose units"
   },
   "K_Pi_mob": {
    "value": 5.0,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "phosphorylase affinity for Pi, order 5 mM"
+   "source": "boeck1996purification",
+   "status": "design",
+   "note": "phosphorylase affinity for Pi: a design value, order 5 mM. The nearest measured value, E. coli maltodextrin phosphorylase (MalP) Km(Pi) 0.5 mM, would leave the phosphorylase almost saturated in Pi at rest, with no room for its rate to rise (glycogen phosphorylase itself not measured)"
   },
   "K_i_ATP_mob": {
    "value": 1.0,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "ATP inhibits mobilisation, so glycogen is spent when ATP falls"
+   "source": "chen1968purification",
+   "status": "design",
+   "note": "ATP inhibits mobilisation, so glycogen is spent when ATP falls: a design stand-in for E. coli GlgP's activation by AMP (Chen & Segel 1968), which rises as ATP falls"
   },
   "K_glc_t": {
    "value": 4.1,
@@ -1346,26 +1346,19 @@
    "status": "placeholder",
    "note": "matrix capacity at full allocation, as a multiple of the resting glycolytic flux; lactic acid bacteria divert about 0.5-3% of the sugar they ferment to exopolysaccharide (Welman and Maddox 2003), biofilm formers more; 0.1 chosen for play"
   },
-  "K_glc_matrix": {
-   "value": 0.1,
-   "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "glucose affinity of matrix synthesis (glucokinase order, as glycogen synthesis); the matrix is made from glucose 6-phosphate, and its G6P affinity is this times G6P_i/glc_i (the same saturation at rest)"
-  },
   "K_ATP_matrix": {
-   "value": 1.0,
+   "value": 0.07,
    "units": "millimolar",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "ATP affinity of matrix synthesis (nucleotide-sugar pyrophosphorylase order 1 mM, as glycogen synthesis)"
+   "source": "weissborn1994utp",
+   "status": "sourced",
+   "note": "ATP affinity of matrix synthesis: E. coli GalU (UDP-glucose pyrophosphorylase, the UDP-glucose step of exopolysaccharide synthesis) Km(UTP) 0.058-0.07 mM, UTP counted as an ATP equivalent"
   },
   "h_matrix_poly": {
-   "value": 0.0,
+   "value": -500.0,
    "units": "J_per_mol",
-   "source": "unreferenced_placeholder",
-   "status": "placeholder",
-   "note": "enthalpy of adding a glucose unit to the matrix polymer, taken as zero (as glycogen)"
+   "source": "alberty1998calculation",
+   "status": "design",
+   "note": "heat released by adding a glucose unit to the matrix polymer: taken as the alpha-1,4 bond's -0.5 kJ/mol (maltose, Alberty 1998); the matrix linkages themselves are not measured"
   },
   "matrix_decay_rate": {
    "value": 1e-06,

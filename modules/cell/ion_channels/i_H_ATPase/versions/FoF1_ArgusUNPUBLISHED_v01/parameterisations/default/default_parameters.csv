@@ -5,15 +5,15 @@ H_i,millimolar,2.5118864315095822e-05,"derived: free H+ = 10^-pH_i M (pH_i: slon
 K_act_H,millimolar,2.5118864315095822e-05,"derived: H+ at the half-activation pH (pH_act_H_ATPase: kobayashi1985proton, placeholder)",no
 A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
 m_expr,dimensionless,1.0,definitional; baseline expression (the calibrated cell),no
-rho_H_ATPase,per_um2,226.81614751349176,calibrated: the H+-ATPase uses 25% of the cell's ATP turnover at rest (placeholder share),no
+rho_H_ATPase,per_um2,240.93509168144894,calibrated: the H+-ATPase uses 25% of the cell's ATP turnover at rest (placeholder share),no
 r_H_ATPase,per_s,100.0,unreferenced_placeholder; ATP hydrolysed per H+-ATPase per second at full activity (order 100),no
 n_H,dimensionless,3.3333333333333335,jiang2001preferred; E. coli c10 ring over 3 catalytic sites: 10/3 H+ per ATP,yes
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
-ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
-Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+ADP,millimolar,0.56,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)",yes
+Pi,millimolar,10.0,"amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells",yes
 K_m_ATP_H,millimolar,0.2,"unreferenced_placeholder; H+-ATPase affinity for ATP, order 0.1-0.5 mM",no
 R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
-T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",yes
 F,C_per_mol,96485.0,"definitional; Faraday constant, as the library's SN modules",no
-dG0_hyd,J_per_mol,-30500.0,unreferenced_placeholder; textbook standard Gibbs energy of ATP hydrolysis,no
+dG0_hyd,J_per_mol,-27400.0,"beber2022equilibrator; ATP + H2O -> ADP + Pi: -27.4 +- 0.6 kJ/mol, eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set",yes
 c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no

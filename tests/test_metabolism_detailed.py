@@ -512,19 +512,21 @@ def test_the_glycogen_store_rests_at_the_lumped_rates(gdet):
     assert (r['C_Gly'][-1] - r['C_Gly'][0]) / (t[-1] - t[0]) == pytest.approx(detailed.V_STORE - detailed.V_MOB, rel=1e-3)
 
 
-def _glycogen_net(gdet, glyc, g6p, atp, adp):
-    '''Net storage after ten minutes (pyrophosphate and ADP-glucose settle in that time; glycogen moves a few mM).'''
+def _glycogen_rates(gdet, glyc, g6p, atp, adp):
+    '''Net storage and the phosphorylase's rate after ten minutes (pyrophosphate and ADP-glucose settle in that time;
+    glycogen moves a few mM).'''
     _, r = _run(gdet, {'C_Gly_init': glyc, 'C_G6P': g6p, 'C_ATP': atp, 'C_ADP': adp}, 600.0, 60.0, ['v_GLGA', 'v_GLGP'])
-    return r['v_GLGA'][-1] - r['v_GLGP'][-1]
+    return r['v_GLGA'][-1] - r['v_GLGP'][-1], r['v_GLGP'][-1]
 
 
 def test_compared_with_the_lumped_glycogen_store(gdet):
     """With the cytosol clamped alike (the lumped store fully allocated), after ten minutes: the same net rate at the
     comparison point; both store more with more G6P and spend the store as ATP falls (the phosphorylase's ATP
-    inhibition, in both), and slow as glycogen runs out. They differ in how they get there: the detailed store
-    responds to G6P less (pyrophosphate builds up behind its pyrophosphorylase, as its pyrophosphatase is mass action,
-    and the phosphorylase runs closer to equilibrium); the lumped store slows near its ceiling ((C/200 mM)^8) while
-    the detailed steps, which have no ceiling, slow only as glycogen's activity saturates."""
+    inhibition, in both), and their phosphorylase slows as glycogen runs out. They differ in how they get there: the
+    lumped store saturates in G6P at phosphoglucomutase's affinity (K_G6P_store 1.04 mM), so at twenty times its
+    resting G6P it stores less than the detailed steps, whose G6P response is mass action; the lumped store slows near
+    its ceiling ((C/200 mM)^8) while the detailed steps, which have no ceiling, slow only as glycogen's activity
+    saturates."""
     c = detailed.CYTO
     rows = []
     for name, glyc, g6p, atp, adp in (('rest', 50.0, c['C_G6P_init'], c['C_ATP_init'], c['C_ADP_init']),
@@ -534,17 +536,19 @@ def test_compared_with_the_lumped_glycogen_store(gdet):
                                       ('little glycogen', 2.0, c['C_G6P_init'], c['C_ATP_init'], c['C_ADP_init']),
                                       ('near the ceiling, G6P x20', 190.0, 20.0, c['C_ATP_init'], c['C_ADP_init'])):
         store, mob = detailed.lumped_store_rates(g6p, atp, adp, c['C_Pi_init'], glyc)
-        rows.append((name, store - mob, _glycogen_net(gdet, glyc, g6p, atp, adp)))
-    print('\ncondition                     lumped net storage   detailed [mM/s]')
-    for name, l, d in rows:
-        print(f'{name:28s} {l:18.5f} {d:12.5f}')
-    net = {name: (l, d) for name, l, d in rows}
+        net, mob_detailed = _glycogen_rates(gdet, glyc, g6p, atp, adp)
+        rows.append((name, store - mob, net, mob, mob_detailed))
+    print('\ncondition                     lumped net storage   detailed   lumped phosphorylase   detailed [mM/s]')
+    for name, l, d, ml, md in rows:
+        print(f'{name:28s} {l:18.5f} {d:10.5f} {ml:22.5f} {md:10.5f}')
+    net = {name: (l, d) for name, l, d, _, _ in rows}
+    mob = {name: (ml, md) for name, _, _, ml, md in rows}
     assert net['rest'][1] == pytest.approx(net['rest'][0], rel=0.02), 'calibrated alike (glycogen drifts in ten minutes)'
     for k in (0, 1):
         assert net['rest'][k] < net['G6P x5'][k] < net['G6P x20'][k], 'both store more with G6P'
         assert net['ATP 2, ADP 3'][k] < net['rest'][k], 'and spend it as ATP falls'
-        assert abs(net['little glycogen'][k]) < abs(net['rest'][k]), 'the phosphorylase slows as glycogen runs out'
-    assert net['G6P x20'][1] < net['G6P x20'][0], 'the detailed store responds to G6P less'
+        assert mob['little glycogen'][k] < mob['rest'][k], 'the phosphorylase slows as glycogen runs out'
+    assert net['G6P x20'][0] < net['G6P x20'][1], 'the lumped store saturates in G6P sooner'
     assert net['near the ceiling, G6P x20'][0] < 0.7 * net['G6P x20'][0], 'the lumped store slows near its ceiling'
     assert net['near the ceiling, G6P x20'][1] > 0.75 * net['G6P x20'][1], \
         'the detailed one has no ceiling (it slows only as glycogen\'s activity saturates)'

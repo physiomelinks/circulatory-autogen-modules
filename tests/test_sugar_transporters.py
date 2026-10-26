@@ -251,11 +251,11 @@ def test_level1_unchanged(scenario, fermenter):
 LUMPED_SHIFT = {
     'rest': {'mod__membrane__V': 1e-9, 'mod__cytosol__C_ATP': 1e-9, 'mod__cytosol__C_lac': 1e-9, 'mod__H__pH_i': 1e-9,
              'mod__membrane_face__J_glc': 1e-9},
-    'famine': {'mod__membrane__V': 0.01, 'mod__cytosol__C_ATP': 0.12, 'mod__cytosol__C_lac': 0.45, 'mod__H__pH_i': 0.003,
+    'famine': {'mod__membrane__V': 0.05, 'mod__cytosol__C_ATP': 0.12, 'mod__cytosol__C_lac': 0.45, 'mod__H__pH_i': 0.003,
                'mod__membrane_face__J_glc': 0.08},
     # feast: the proteins rise with their mRNA's lifetime (~7 min, 2026-10-13) instead of 10 s, so the cell moves less
-    # in the minute (V 1.4%, ATP 0.05%, lactate 15%)
-    'feast': {'mod__membrane__V': 0.02, 'mod__cytosol__C_ATP': 1e-3, 'mod__cytosol__C_lac': 0.2, 'mod__H__pH_i': 1e-3,
+    # in the minute (V 3.1%, ATP 0.25%, lactate 13%, with the reviewed energy-metabolism parameters)
+    'feast': {'mod__membrane__V': 0.035, 'mod__cytosol__C_ATP': 3e-3, 'mod__cytosol__C_lac': 0.2, 'mod__H__pH_i': 1e-3,
               'mod__membrane_face__J_glc': 0.05},
 }
 
@@ -265,7 +265,7 @@ def test_level1_shift_from_lumped_glycolysis(scenario, fermenter):
     '''Against the lumped glycolysis' traces: at rest the cell is the same steady state (V, ATP, lactate, pH, uptake);
     in famine the 1 mM of G6P is a reserve (3 ATP each), so ATP runs down later (half gone at ~57 s instead of ~45 s);
     in a feast G6P rises to ~2 mM and holds that much more of the cell's phosphate (Pi falls by as much), while ATP and
-    pH stay within 0.5% and V within 2% (its H+-ATPase now rises over minutes, not seconds: 1.4%).'''
+    pH stay within 0.5% and V within 3.5% (its H+-ATPase now rises over minutes, not seconds: 3.1%).'''
     diffs = {name: d for d, name, scale in level1_differences(fermenter, scenario, LEVEL1_LUMPED)}
     for name, bound in LUMPED_SHIFT[scenario].items():
         assert diffs[name] <= bound, f'{name}: moved by {diffs[name]:.3g} of its scale'
@@ -278,7 +278,7 @@ def test_PTS_uptake_far_above_Glf_at_10uM(fermenter):
     outs = ['mod/glc_PTS/J_glc', 'mod/membrane_face/J_glc', 'mod/cytosol/C_ATP']
     t, with_pts = _run(fermenter, {**_glucose(0.01), **_express(fermenter, 'PTS')}, outs)
     _, glf_only = _run(fermenter, _glucose(0.01), outs)
-    assert with_pts['mod/glc_PTS/J_glc'][0] > 50 * with_pts['mod/membrane_face/J_glc'][0]
+    assert with_pts['mod/glc_PTS/J_glc'][0] > 40 * with_pts['mod/membrane_face/J_glc'][0]
     taken_up = np.trapz(with_pts['mod/glc_PTS/J_glc'] + with_pts['mod/membrane_face/J_glc'], t)
     assert taken_up > 5 * np.trapz(glf_only['mod/membrane_face/J_glc'], t)
     assert with_pts['mod/cytosol/C_ATP'][-1] >= with_pts['mod/cytosol/C_ATP'][0]

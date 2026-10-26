@@ -6,13 +6,13 @@ m_expr,dimensionless,1.0,"definitional; n_0 copies, as many as the calibrated ce
 jmax_glc,mol_per_s_per_um2,3.0933897205955476e-19,"derived: n_0 x turnover_PTS / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_PTS: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
 K_glc_t,millimolar,0.005,"deutscher2006how; glucose PTS (PtsG/EIICB-Glc) Km ~3-10 uM; 5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
 K_m_ATP,millimolar,0.1,"unreferenced_placeholder; ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM",no
-K_ADP_PEP,millimolar,0.1,unreferenced_placeholder; lumped glycolysis affinity for ADP,no
-K_Pi_PEP,millimolar,1.0,unreferenced_placeholder; lumped glycolysis affinity for Pi,no
+K_ADP_PEP,millimolar,0.2,"chassagnole2002dynamic; lumped glycolysis affinity for ADP: the ADP constants of its two ATP-making steps in the E. coli kinetic model, PGK 0.185 and pyruvate kinase 0.26 mM (BIOMD0000000051)",yes
+K_Pi_PEP,millimolar,0.5,eyschen1999engineered; lumped glycolysis affinity for Pi: E. coli glyceraldehyde-3-phosphate dehydrogenase Km(Pi) 0.53 mM,yes
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
-ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
-Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+ADP,millimolar,0.56,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)",yes
+Pi,millimolar,10.0,"amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells",yes
 C_G6P,millimolar,1.0,"chassagnole2002dynamic; glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)",no
-dG0_hk,J_per_mol,-16700.0,unreferenced_placeholder; standard Gibbs energy of glucose + ATP -> glucose 6-phosphate + ADP (textbook -16.7 kJ/mol: G6P hydrolysis -13.8 against ATP hydrolysis -30.5),no
+dG0_hk,J_per_mol,-17900.0,"beber2022equilibrator; glucose + ATP -> glucose 6-phosphate + ADP: -17.9 +- 0.8 kJ/mol, eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set",yes
 c_std,millimolar,1000.0,definitional; standard concentration 1 M for thermodynamic factors,no
 R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
-T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",yes

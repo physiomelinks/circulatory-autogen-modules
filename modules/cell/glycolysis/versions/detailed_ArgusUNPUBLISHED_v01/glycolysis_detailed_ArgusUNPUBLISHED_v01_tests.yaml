@@ -4,7 +4,7 @@ reviewed: false
 notes: 'Glycolysis step by step, from glucose to lactate (homolactic fermentation), as a bond graph: each metabolite a store
   (C) on a 0-junction, each enzyme a reaction (Re) between 1-junctions, with every reaction balanced in C, H, O, N and P and
   in charge (species as at pH 7: G6P 2-, ATP 4-, ...; H+ and water explicit). The reactions'' standard Gibbs energies are
-  textbook values (transformed, pH 7, 1 M); the species'' standard potentials mu0 are fitted to them (tools/bondgraph.py),
+  eQuilibrator 3.0''s (transformed, pH 7, pMg 3, I 0.25 M); the species'' standard potentials mu0 are fitted to them (tools/bondgraph.py),
   so the thermodynamics are consistent, and H+ has its standard state at pH 7 so the cell''s pH 7.6 enters through its concentration.
   Each reaction flows at v = kappa (Pf - Pr) / (1 + (Pf + Pr)/sigma), Pf and Pr the exponentials of its forward and reverse
   affinities over RT: mass action, as the bond-graph chemical reaction, for the near-equilibrium steps, and saturating for

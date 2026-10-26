@@ -57,9 +57,10 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from module_writer import BIB, REPO, register_bib  # noqa: E402
+from module_writer import BIB, REPO, kept_record_keys, register_bib  # noqa: E402
 from module_writer import write_version as _write_version  # noqa: E402
 from matrix_references import MATRIX_BIB  # noqa: E402
+from energy_metabolism_references import ENERGY_BIB  # noqa: E402
 from cam_testing.phlynx import NO_SUPERMODULE_SUPPORT  # a supermodule's PhLynx export fails (a known issue)
 
 
@@ -244,7 +245,7 @@ GLYC = {k: par(k) for k in ('K_ATP_store', 'C_glyc_max', 'K_glyc_mob', 'K_Pi_mob
                             'h_glyc_poly')}
 GLYC['V_store_max'] = der(par('glycogen_store_rate') * V_GLY_SS, 'glycogen_store_rate x resting glycolytic flux', 'glycogen_store_rate', 'maintenance_coefficient')
 # extracellular matrix (exopolysaccharide): glucose + n ATP -> a glucose unit of matrix outside the cell
-MX = {k: par(k) for k in ('K_glc_matrix', 'K_ATP_matrix', 'h_matrix_poly', 'matrix_ATP_per_unit')}
+MX = {k: par(k) for k in ('K_ATP_matrix', 'h_matrix_poly', 'matrix_ATP_per_unit')}
 MX['V_mx_max'] = der(par('matrix_production_rate') * V_GLY_SS, 'matrix_production_rate x resting glycolytic flux', 'matrix_production_rate', 'maintenance_coefficient')
 # the matrix is made from G6P: of the matrix_ATP_per_unit ATP per glucose unit, the first phosphorylated the glucose
 # (the hexokinase step, or the PTS's PEP), the rest are the matrix reaction's, G6P + n ATP -> unit + n ADP + (n + 1) Pi
@@ -398,10 +399,9 @@ assert _gamma_lg / KEQ_LG < 1e-12, 'the lower glycolysis must be far from equili
 V_GLY = V_GLY_SS / cm_gly(GLC_I, LAC_I, ATP, ADP, PI, G6P_I)
 GLY_HEADROOM = V_GLY * cm_gly(1e3, LAC_I, ATP, ADP, PI, G6P_I) / V_GLY_SS   # if glucose inside were saturating
 # glycogen synthesis takes G6P: its affinity scaled so it runs at the same share of its capacity at rest
-MX['K_G6P_mx'] = der(MX['K_glc_matrix'] * G6P_I / GLC_I, 'K_glc_matrix x G6P_i / glc_i: matrix synthesis saturated at '
-                     'rest as if it took free glucose', 'K_glc_matrix', 'glc_i', 'G6P_i')
-GLYC['K_G6P_store'] = der(par('K_glc_store') * G6P_I / GLC_I, 'K_glc_store x G6P_i / glc_i: the store saturated at rest '
-                          'as when it took free glucose', 'K_glc_store', 'glc_i', 'G6P_i')
+# the glycogen store and matrix synthesis take G6P through phosphoglucomutase
+MX['K_G6P_mx'] = par('K_G6P_pgm')
+GLYC['K_G6P_store'] = par('K_G6P_pgm')
 V_HYD = V_HYD_SS / cm_hyd(ATP, ADP, PI)
 H_GLC = 2 * H_LAC_GLY                        # J/mol relative to lactate (lactate is this cell's end product)
 A_HYD = RT * math.log(KEQ_HYD / ((ADP / C_STD) * (PI / C_STD) / (ATP / C_STD)))
@@ -434,6 +434,7 @@ print(f'H+-ATPase thermodynamics: ATP affinity {A_HYD / 1e3:.2f} kJ/mol vs H+ wo
 
 # ------------------------------------------------------------------ references
 register_bib(MATRIX_BIB)
+register_bib(ENERGY_BIB)
 register_bib({
     # regulated proteolysis: its ATP cost and speed
     'kenniston2003linkage': dict(type='article',
@@ -4009,7 +4010,8 @@ def write_cell(cell, steady, sweep_extra, timestep=None, solve_ivp=None):
     names = [s['name'] for s in subs]
     stem = f'{GAC}_{name}'
     config = [{'module_type': GAC, 'module_subtype': name, 'module_format': 'supermodule',
-               'default_parameterisation': 'default', 'licence': 'CC0-1.0', 'creator': [],
+               'default_parameterisation': 'default',
+               **kept_record_keys(os.path.join(d, f'{stem}_modules_config.json')),
                'required_citations': ['argus2026unpublished'], 'description': cell['description'],
                'submodules': subs}]
     json.dump(config, open(os.path.join(d, f'{stem}_modules_config.json'), 'w'), indent=2)

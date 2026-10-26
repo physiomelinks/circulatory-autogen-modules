@@ -1,17 +1,17 @@
 variable_name,units,value,data_reference,sourced
 C_glc_e,millimolar,0.1,"unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food",no
 C_lac_e,millimolar,0.0,definitional; no lactate in the medium,no
-C_glc,millimolar,0.002,"unreferenced_placeholder; glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)",no
+C_glc,millimolar,0.002,"unreferenced_placeholder; design value; no measurement found (searched 2026-10-23): free glucose inside the cell (no E. coli measurement: PTS uptake delivers G6P). glucose inside an uptake-limited cell at rest: low, so glycolysis has ~50x headroom (growing fermenters run 10-40x their maintenance flux)",no
 C_lac,millimolar,0.26990316647694707,the fermenter cell's calibrated steady state,no
 C_ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
-C_ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
-C_Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+C_ADP,millimolar,0.56,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)",yes
+C_Pi,millimolar,10.0,"amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells",yes
 A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
 m_expr,dimensionless,1.0,"definitional; n_0 copies, as many as the calibrated cell has Glf",no
 jmax_glc,mol_per_s_per_um2,7.733474301488869e-20,"derived: n_0 x turnover_GalP / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_GalP: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)",no
 K_glc_t,millimolar,0.1,"pao1998major; MFS sugar/H+ symporters (GalP, LacY) Km ~10 uM-1 mM; 0.1 mM, the geometric middle of the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))",yes
 R,J_per_mol_K,8.314,"definitional; gas constant, as the library's SN modules",no
-T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",yes
 n_H,dimensionless,1.0,pao1998major; one H+ per sugar in MFS sugar/H+ symport,yes
 V,milliV,-105.0,"milo2010bionumbers; BNID 103386: E. coli membrane potential -140 to -105 mV, fermenting at the less negative end",yes
 E_H,milliV,17.449261892231384,"Nernst potential at pH 7.6 in, 7.3 out",no

@@ -5,11 +5,11 @@ notes: 'The glycogen store step by step, by the bacterial ADP-glucose route (E. 
   (G6P to G1P), ADP-glucose pyrophosphorylase (G1P + ATP to ADP-glucose + PPi), glycogen synthase (a glucose unit onto glycogen,
   ADP out), pyrophosphatase (pulls the pyrophosphorylase forwards) and glycogen phosphorylase (glycogen + Pi to G1P; inhibited
   by ATP, as the lumped store). The designer''s CarbohydrateMetabolism.cellml has the animal route (UTP, UDP-glucose): the
-  same bond graph with UTP and UDP in place of ATP and ADP. Every reaction is balanced in elements and charge; the textbook
-  standard Gibbs energies sum to the lumped store''s (G6P + ATP + H2O to a glucose unit + ADP + 2 Pi + H+: -25.3 kJ/mol).
-  Glycogen is a store whose activity saturates, C/(K + C) with K the lumped phosphorylase''s glycogen affinity (its chain
-  ends; the lumped a_glyc), so the phosphorylase stops as it runs out. Calibrated at the comparison point (the fermenter''s
-  rest with the store fully allocated and glycogen at 50 mM) to the lumped store''s synthesis and phosphorylase rates, saturating
-  at the lumped maxima. Unlike the lumped store it has no ceiling (glycogen''s size is limited by branching and particle structure,
-  not modelled). Compared against energy_metabolism adaptive in tests/test_metabolism_detailed.py; its bond graph is in glycogen_detailed_ArgusUNPUBLISHED_v01_bondgraph.svg
-  (a CellDL document; its BG-RDF in _bondgraph.ttl).'
+  same bond graph with UTP and UDP in place of ATP and ADP. Every reaction is balanced in elements and charge; the standard
+  Gibbs energies (eQuilibrator 3.0, the glycogen bond as maltose''s) sum to the lumped store''s (G6P + ATP + H2O to a glucose
+  unit + ADP + 2 Pi + H+: -22.7 kJ/mol). Glycogen is a store whose activity saturates, C/(K + C) with K the lumped phosphorylase''s
+  glycogen affinity (its chain ends; the lumped a_glyc), so the phosphorylase stops as it runs out. Calibrated at the comparison
+  point (the fermenter''s rest with the store fully allocated and glycogen at 50 mM) to the lumped store''s synthesis and
+  phosphorylase rates, saturating at the lumped maxima. Unlike the lumped store it has no ceiling (glycogen''s size is limited
+  by branching and particle structure, not modelled). Compared against energy_metabolism adaptive in tests/test_metabolism_detailed.py;
+  its bond graph is in glycogen_detailed_ArgusUNPUBLISHED_v01_bondgraph.svg (a CellDL document; its BG-RDF in _bondgraph.ttl).'

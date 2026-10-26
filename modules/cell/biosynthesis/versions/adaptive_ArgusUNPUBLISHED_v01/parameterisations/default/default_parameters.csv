@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
-ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
-Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+ADP,millimolar,0.56,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)",yes
+Pi,millimolar,10.0,"amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells",yes
 A_mem,um2,12.566370614359172,geometry: in-plane membrane of the 2 um cell,no
 surface_factor,dimensionless,1.5,geometry: a disc of radius 1 um and depth 2 um has 1.5x its in-plane area as surface,no
 n_mRNA,dimensionless,8670.79572390783,"derived: mRNA_per_um3 x cell volume (mRNA_per_um3: milo2010bionumbers, sourced)",yes
@@ -18,8 +18,8 @@ genome_nt,dimensionless,9200000.0,"unreferenced_placeholder; an E. coli-sized ge
 N_A,per_mol,6.02214076e+23,definitional; Avogadro constant (exact),no
 K_m_ATP_bio,millimolar,0.1,"unreferenced_placeholder; polymerase and synthetase ATP affinity, order 0.1 mM",no
 ATP_ref,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
-T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
-T_ref_dmg,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",no
+T,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",yes
+T_ref_dmg,kelvin,293.15,"lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to",yes
 dT_Q10,kelvin,10.0,definitional; definition of Q10 (rate ratio per 10 K),no
 Q10_dmg,dimensionless,2.0,unreferenced_placeholder; damage doubles per 10 K,no
 r_dmg,per_s,1.1574074074074074e-06,"derived: 1 / damage_lifetime (damage_lifetime: unreferenced_placeholder, placeholder)",no
@@ -41,7 +41,7 @@ dose_rate,gray_per_s,0.0,"definitional; no radiation by default (natural backgro
 k_rad_dmg,per_gray,0.0033333333333333335,unreferenced_placeholder; a lethal load at 300 Gy: E. coli's D10 for gamma rays is ~0.14-0.7 kGy (Deinococcus radiodurans ~10 kGy),no
 r_rep_max,per_s,1.1574074074074073e-05,"derived: repair_capacity_ratio / damage_lifetime (repair_capacity_ratio: unreferenced_placeholder, placeholder; damage_lifetime: unreferenced_placeholder, placeholder)",no
 K_D,dimensionless,0.1,unreferenced_placeholder; repair is half-maximal at a tenth of a lethal load,no
-C_repair,mole,3.0037809007103e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
+C_repair,mole,3.0041847059128135e-14,"derived: repair_cost_fraction x the daughter's itemised cost (repair_cost_fraction: unreferenced_placeholder, placeholder)",no
 repair_level,dimensionless,1.0,definitional; full repair by default,no
 growth_level,dimensionless,0.0,definitional; no growth until the player puts energy into it,no
 J_ref,mol_per_s,9.06587001723412e-19,"derived: maintenance_coefficient x cell volume ^ maintenance_exponent (maintenance_coefficient: lynch2015bioenergetic, sourced; maintenance_exponent: lynch2015bioenergetic, sourced)",yes

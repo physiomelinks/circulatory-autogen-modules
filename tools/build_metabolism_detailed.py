@@ -39,13 +39,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import module_writer  # noqa: E402
 from module_writer import REPO, register_bib, write_version  # noqa: E402
 from bondgraph import BondGraph, Reaction, Species, FARADAY, R_GAS  # noqa: E402
+from energy_metabolism_references import ENERGY_BIB  # noqa: E402
 
 VERSION = 'detailed_ArgusUNPUBLISHED_v01'
 PH = 'unreferenced_placeholder'
-TEXTBOOK = f'{PH}; textbook transformed standard Gibbs energy at pH 7 (Lehninger, from memory, unchecked)'
+EQ = 'beber2022equilibrator; eQuilibrator 3.0 transformed standard Gibbs energy (pH 7.0, pMg 3, I 0.25 M, 25 C)'
 module_writer.UNITS.update({'W_per_m3': [('watt', None, 1, 1), ('metre', None, -3, 1)],
                             'F_per_m3': [('farad', None, 1, 1), ('metre', None, -3, 1)]})
 
+register_bib(ENERGY_BIB)
 register_bib({
     'argus2026unpublished': dict(
         type='unpublished', author='Argus, Finbar', title='Unpublished modules of the circulatory-autogen module library',
@@ -96,21 +98,20 @@ GLY_SPECIES = [
     Species('H2O', 'water', F(H=2, O=1), boundary=True, c_std=55500.0),
 ]
 GLY_REACTIONS = [
-    Reaction('HK', 'hexokinase', {'glc': -1, 'ATP': -1, 'G6P': 1, 'ADP': 1, 'H': 1}, -16.7e3, TEXTBOOK),
-    Reaction('PGI', 'glucose-6-phosphate isomerase', {'G6P': -1, 'F6P': 1}, 1.7e3, TEXTBOOK),
-    Reaction('PFK', 'phosphofructokinase', {'F6P': -1, 'ATP': -1, 'F16BP': 1, 'ADP': 1, 'H': 1}, -14.2e3, TEXTBOOK),
-    Reaction('ALD', 'aldolase', {'F16BP': -1, 'DHAP': 1, 'GAP': 1}, 23.8e3, TEXTBOOK),
-    Reaction('TPI', 'triose-phosphate isomerase', {'DHAP': -1, 'GAP': 1}, 7.5e3, TEXTBOOK),
+    Reaction('HK', 'hexokinase', {'glc': -1, 'ATP': -1, 'G6P': 1, 'ADP': 1, 'H': 1}, -17.90e3, EQ),
+    Reaction('PGI', 'glucose-6-phosphate isomerase', {'G6P': -1, 'F6P': 1}, 2.66e3, EQ),
+    Reaction('PFK', 'phosphofructokinase', {'F6P': -1, 'ATP': -1, 'F16BP': 1, 'ADP': 1, 'H': 1}, -14.60e3, EQ),
+    Reaction('ALD', 'aldolase', {'F16BP': -1, 'DHAP': 1, 'GAP': 1}, 22.39e3, EQ),
+    Reaction('TPI', 'triose-phosphate isomerase', {'DHAP': -1, 'GAP': 1}, 5.58e3, EQ),
     Reaction('GAPDH', 'glyceraldehyde-3-P dehydrogenase', {'GAP': -1, 'Pi': -1, 'NAD': -1, 'BPG13': 1, 'NADH': 1, 'H': 1},
-             6.3e3, TEXTBOOK),
-    Reaction('PGK', 'phosphoglycerate kinase', {'BPG13': -1, 'ADP': -1, 'PG3': 1, 'ATP': 1}, -18.5e3, TEXTBOOK),
-    Reaction('PGM', 'phosphoglycerate mutase', {'PG3': -1, 'PG2': 1}, 4.4e3, TEXTBOOK),
-    Reaction('ENO', 'enolase', {'PG2': -1, 'PEP': 1, 'H2O': 1}, 1.8e3,
-             f'{PH}; textbook +1.8 kJ/mol (Berg, from memory; Lehninger\'s +7.5 cannot carry the flux at the cell\'s rest)'),
+             4.60e3, EQ),
+    Reaction('PGK', 'phosphoglycerate kinase', {'BPG13': -1, 'ADP': -1, 'PG3': 1, 'ATP': 1}, -19.32e3, EQ),
+    Reaction('PGM', 'phosphoglycerate mutase', {'PG3': -1, 'PG2': 1}, 4.52e3, EQ),
+    Reaction('ENO', 'enolase', {'PG2': -1, 'PEP': 1, 'H2O': 1}, -3.81e3, EQ),
     # activated feed-forward by fructose 1,6-bisphosphate (E. coli PykF), so the lower pathway keeps pace as flux rises
-    Reaction('PK', 'pyruvate kinase', {'PEP': -1, 'ADP': -1, 'H': -1, 'Pyr': 1, 'ATP': 1}, -31.4e3, TEXTBOOK,
+    Reaction('PK', 'pyruvate kinase', {'PEP': -1, 'ADP': -1, 'H': -1, 'Pyr': 1, 'ATP': 1}, -27.58e3, EQ,
              activators={'F16BP': 0.2}),
-    Reaction('LDH', 'lactate dehydrogenase', {'Pyr': -1, 'NADH': -1, 'H': -1, 'lac': 1, 'NAD': 1}, -25.1e3, TEXTBOOK),
+    Reaction('LDH', 'lactate dehydrogenase', {'Pyr': -1, 'NADH': -1, 'H': -1, 'lac': 1, 'NAD': 1}, -26.76e3, EQ),
 ]
 # resting concentrations [mM]: the cytosol's from the lumped module; F1,6BP, pyruvate and NAD+/NADH E. coli-like
 # (Bennett et al. 2009, from memory); the other intermediates from the near-equilibrium steps (near_equilibrium_rest)
@@ -289,7 +290,8 @@ def build_glycolysis():
         'Glycolysis step by step, from glucose to lactate (homolactic fermentation), as a bond graph: each metabolite a '
         'store (C) on a 0-junction, each enzyme a reaction (Re) between 1-junctions, with every reaction balanced in C, '
         'H, O, N and P and in charge (species as at pH 7: G6P 2-, ATP 4-, ...; H+ and water explicit). The reactions\' '
-        'standard Gibbs energies are textbook values (transformed, pH 7, 1 M); the species\' standard potentials mu0 are '
+        'standard Gibbs energies are eQuilibrator 3.0\'s (transformed, pH 7, pMg 3, I 0.25 M); the species\' standard '
+        'potentials mu0 are '
         'fitted to them (tools/bondgraph.py), so the thermodynamics are consistent, and H+ has its standard state at pH '
         '7 so the cell\'s pH 7.6 enters through its concentration. Each reaction flows at v = kappa (Pf - Pr) / (1 + '
         '(Pf + Pr)/sigma), Pf and Pr the exponentials of its forward and reverse affinities over RT: mass action, as the '
@@ -348,7 +350,11 @@ _ADP = MITO['A_tot'] - MITO['ATP_init']
 O2_REST = 6.0 * MITO['V_ox'] * MITO['C_O2'] / (MITO['K_O2'] + MITO['C_O2']) * MITO['C_glc'] / (MITO['K_glc'] + MITO['C_glc']) \
     * _ADP / (MITO['K_ADP'] + _ADP)
 J_PYR = O2_REST / 2.5   # mM/s of pyruvate oxidised: 2.5 O2 per pyruvate
-MEMORY = f'{PH}; textbook midpoint potentials (Lehninger, from memory, unchecked)'
+# eQuilibrator 3.0 midpoint potentials (pH 7.0, pMg 3, I 0.25 M) of the couples complexes III and IV link through
+# cytochrome c, a protein eQuilibrator does not cover
+E_Q, E_O2 = 0.113, 0.854
+E_CYTC = 0.254
+CYTC = f'{PH}; cytochrome c midpoint +0.254 V (textbook, from memory, unchecked)'
 
 
 def _fe(e_acceptor, e_donor, n):
@@ -396,29 +402,28 @@ MITO_REACTIONS = [
     Reaction('ANT', 'adenine nucleotide translocase (ATP4- out, ADP3- in)', {'ATP_m': -1, 'ADP_c': -1, 'ATP_c': 1,
                                                                              'ADP_m': 1}, 0.0, 'definitional; transport'),
     Reaction('PDH', 'pyruvate dehydrogenase', {'Pyr_m': -1, 'CoA': -1, 'NAD_m': -1, 'AcCoA': 1, 'NADH_m': 1, 'CO2': 1},
-             -33.4e3, TEXTBOOK),
-    Reaction('CS', 'citrate synthase', {'OAA': -1, 'AcCoA': -1, 'H2O': -1, 'Cit': 1, 'CoA': 1, 'H_m': 1}, -32.2e3, TEXTBOOK),
-    Reaction('ACO', 'aconitase', {'Cit': -1, 'Icit': 1}, 13.3e3, TEXTBOOK),
-    Reaction('IDH', 'isocitrate dehydrogenase', {'Icit': -1, 'NAD_m': -1, 'OG': 1, 'NADH_m': 1, 'CO2': 1}, -20.9e3, TEXTBOOK),
+             -34.02e3, EQ),
+    Reaction('CS', 'citrate synthase', {'OAA': -1, 'AcCoA': -1, 'H2O': -1, 'Cit': 1, 'CoA': 1, 'H_m': 1}, -35.92e3, EQ),
+    Reaction('ACO', 'aconitase', {'Cit': -1, 'Icit': 1}, 6.84e3, EQ),
+    Reaction('IDH', 'isocitrate dehydrogenase', {'Icit': -1, 'NAD_m': -1, 'OG': 1, 'NADH_m': 1, 'CO2': 1}, 5.61e3, EQ),
     Reaction('OGDH', '2-oxoglutarate dehydrogenase', {'OG': -1, 'CoA': -1, 'NAD_m': -1, 'SucCoA': 1, 'NADH_m': 1, 'CO2': 1},
-             -33.5e3, TEXTBOOK),
+             -28.00e3, EQ),
     Reaction('SCS', 'succinyl-CoA synthetase (ATP-forming, as E. coli SucCD)',
-             {'SucCoA': -1, 'ADP_m': -1, 'Pi_m': -1, 'Suc': 1, 'CoA': 1, 'ATP_m': 1}, -2.9e3, TEXTBOOK),
+             {'SucCoA': -1, 'ADP_m': -1, 'Pi_m': -1, 'Suc': 1, 'CoA': 1, 'ATP_m': 1}, 1.75e3, EQ),
     Reaction('CII', 'complex II (succinate:ubiquinone oxidoreductase)', {'Suc': -1, 'Q': -1, 'Fum': 1, 'QH2': 1},
-             _fe(0.045, 0.031, 2), MEMORY + ': fumarate/succinate +0.031 V, Q/QH2 +0.045 V'),
-    Reaction('FUM', 'fumarase', {'Fum': -1, 'H2O': -1, 'Mal': 1}, -3.8e3, TEXTBOOK),
-    Reaction('MDH', 'malate dehydrogenase', {'Mal': -1, 'NAD_m': -1, 'OAA': 1, 'NADH_m': 1, 'H_m': 1}, 29.7e3, TEXTBOOK),
+             -24.11e3, EQ),
+    Reaction('FUM', 'fumarase', {'Fum': -1, 'H2O': -1, 'Mal': 1}, -3.43e3, EQ),
+    Reaction('MDH', 'malate dehydrogenase', {'Mal': -1, 'NAD_m': -1, 'OAA': 1, 'NADH_m': 1, 'H_m': 1}, 29.56e3, EQ),
     Reaction('CI', 'complex I (NADH:ubiquinone oxidoreductase, 4 H+ pumped)',
-             {'NADH_m': -1, 'Q': -1, 'H_m': -5, 'NAD_m': 1, 'QH2': 1, 'H_c': 4}, _fe(0.045, -0.320, 2),
-             MEMORY + ': NAD+/NADH -0.320 V, Q/QH2 +0.045 V'),
+             {'NADH_m': -1, 'Q': -1, 'H_m': -5, 'NAD_m': 1, 'QH2': 1, 'H_c': 4}, -85.33e3, EQ),
     Reaction('CIII', 'complex III (Q cycle: 4 H+ out, 2 taken up per QH2)',
-             {'QH2': -1, 'cytc_ox': -2, 'H_m': -2, 'Q': 1, 'cytc_red': 2, 'H_c': 4}, _fe(0.254, 0.045, 2),
-             MEMORY + ': cytochrome c +0.254 V'),
+             {'QH2': -1, 'cytc_ox': -2, 'H_m': -2, 'Q': 1, 'cytc_red': 2, 'H_c': 4}, _fe(E_CYTC, E_Q, 2),
+             CYTC + ', Q/QH2 from eQuilibrator 3.0'),
     Reaction('CIV', 'complex IV (cytochrome c oxidase, 4 H+ pumped per O2)',
-             {'cytc_red': -4, 'O2': -1, 'H_m': -8, 'cytc_ox': 4, 'H2O': 2, 'H_c': 4}, _fe(0.816, 0.254, 4),
-             MEMORY + ': O2/H2O +0.816 V'),
+             {'cytc_red': -4, 'O2': -1, 'H_m': -8, 'cytc_ox': 4, 'H2O': 2, 'H_c': 4}, _fe(E_O2, E_CYTC, 4),
+             CYTC + ', O2/H2O from eQuilibrator 3.0'),
     Reaction('ATPS', 'ATP synthase (3 H+ per ATP)', {'ADP_m': -1, 'Pi_m': -1, 'H_c': -3, 'ATP_m': 1, 'H2O': 1, 'H_m': 2},
-             30.5e3, TEXTBOOK + ': ATP hydrolysis -30.5 kJ/mol'),
+             -CYTO['dG0_hyd'], 'derived: the reverse of ATP hydrolysis (energy_metabolism adaptive dG0_hyd, eQuilibrator 3.0)'),
     Reaction('LEAK', 'proton leak across the inner membrane', {'H_c': -1, 'H_m': 1}, 0.0, 'definitional; transport'),
 ]
 PSI_REST = -0.150   # V, matrix against cytosol
@@ -426,7 +431,7 @@ PH_C, PH_M = 7.2, 7.7
 C_M = 652.0         # F/m3
 MITO_REST = dict(Pyr_c=0.1, Pi_c=2.0, H_c=1e3 * 10 ** -PH_C, ATP_c=MITO['ATP_init'], ADP_c=_ADP, O2=MITO['C_O2'],
                  CO2=MITO['C_CO2'], H2O=55500.0, H_m=1e3 * 10 ** -PH_M, AcCoA=0.07, CoA=0.1, Cit=0.4, OG=0.2, Mal=0.5,
-                 NAD_m=2.5, NADH_m=1.0, ATP_m=1.0, ADP_m=1.0, Q=0.5, QH2=0.05, cytc_ox=0.2, cytc_red=0.05, SucCoA=0.05,
+                 NAD_m=2.5, NADH_m=1.0, ATP_m=1.0, ADP_m=1.0, Q=0.385, QH2=0.165, cytc_ox=0.225, cytc_red=0.025, SucCoA=0.05,
                  Suc=0.5)
 MITO_NEAR_EQ = ('PYRC', 'PIC', 'ACO', 'FUM', 'MDH')
 MITO_SOLVED = ['Pyr_m', 'Pi_m', 'Icit', 'Fum', 'OAA']
@@ -441,18 +446,18 @@ MITO_FLUX.update(CI=4.0 * J_PYR, CIII=5.0 * J_PYR, CIV=2.5 * J_PYR, ATPS=N_ATPS 
                  PIC=(N_ATPS + 1.0) * J_PYR, LEAK=N_LEAK * J_PYR)
 MITO_REST_REF = {
     'Pyr_c': f'{PH}; cytosolic pyruvate of order 0.1 mM', 'Pi_c': f'{PH}; cytosolic phosphate of order 1-5 mM',
-    'H_c': f'{PH}; cytosol pH 7.2', 'ATP_c': 'energy_metabolism mitochondrial ATP_init (traut1994physiological)',
+    'H_c': 'orij2009vivo; design: cytosol and intermembrane space pH 7.2 (measured: 7.2 in yeast, Orij 2009; intermembrane space 6.88 in HeLa cells, porcelli2005ph)', 'ATP_c': 'energy_metabolism mitochondrial ATP_init (traut1994physiological)',
     'ADP_c': 'energy_metabolism mitochondrial A_tot - ATP_init', 'O2': 'energy_metabolism mitochondrial C_O2',
     'CO2': 'energy_metabolism mitochondrial C_CO2', 'H2O': 'definitional; pure water 55.5 M',
-    'H_m': f'{PH}; matrix pH 7.7 (0.5 above the cytosol), held by its buffers',
+    'H_m': 'orij2009vivo; design: matrix pH 7.7, 0.5 above the cytosol (measured: 7.5 in yeast, Orij 2009; 0.9 above the intermembrane space in HeLa cells, porcelli2005ph)',
     'AcCoA': f'{PH}; matrix acetyl-CoA of order 0.1 mM', 'SucCoA': f'{PH}; succinyl-CoA of order 0.05 mM',
     'Suc': f'{PH}; succinate of order 0.5 mM', 'CoA': f'{PH}; free CoA of order 0.1 mM',
     'Cit': f'{PH}; citrate of order 0.5 mM', 'OG': f'{PH}; 2-oxoglutarate of order 0.2 mM',
     'Mal': f'{PH}; malate of order 0.5 mM', 'NAD_m': f'{PH}; matrix NAD+ of order 2.5 mM',
     'NADH_m': f'{PH}; matrix NADH of order 1 mM (NADH/NAD+ 0.4)', 'ATP_m': f'{PH}; matrix ATP/ADP about 1',
-    'ADP_m': f'{PH}; matrix ADP of order 1 mM', 'Q': f'{PH}; ubiquinone pool of order 0.5 mM',
-    'QH2': f'{PH}; ubiquinol: the pool 10% reduced', 'cytc_ox': f'{PH}; cytochrome c of order 0.25 mM',
-    'cytc_red': f'{PH}; cytochrome c 20% reduced',
+    'ADP_m': f'{PH}; matrix ADP of order 1 mM', 'Q': f'{PH}; ubiquinone pool of order 0.5 mM (0.55 mM), 30% reduced',
+    'QH2': f'{PH}; ubiquinol: the pool 30% reduced, so complex III runs down its Gibbs energy at rest with eQuilibrator\'s Q/QH2 (+0.113 V)', 'cytc_ox': f'{PH}; cytochrome c of order 0.25 mM, 10% reduced',
+    'cytc_red': f'{PH}; cytochrome c 10% reduced',
     'psi_m': f'{PH}; mitochondrial membrane potential -150 mV',
     'C_m_m': f'{PH}; inner-membrane capacitance (Beard 2005 6.756e-6 mol/V per litre of mitochondria, from memory)',
 }
@@ -521,7 +526,8 @@ def build_mitochondrion():
         'the pyruvate and phosphate carriers, pyruvate dehydrogenase, the eight steps of the TCA cycle, complexes I to IV '
         'and the ubiquinone and cytochrome c pools, ATP synthase, the adenine nucleotide translocase and a proton leak. '
         'Every reaction is balanced in C, H, O, N, P, S and in charge (species as at pH 7, H+ and water explicit); '
-        'standard Gibbs energies are textbook values (transformed, pH 7, 1 M) and midpoint potentials, and the species\' '
+        'standard Gibbs energies and midpoint potentials are eQuilibrator 3.0\'s (transformed, pH 7, pMg 3, I 0.25 M; '
+        'cytochrome c\'s, a protein it does not cover, +0.254 V), and the species\' '
         'standard potentials are fitted to them (tools/bondgraph.py), so the thermodynamics are consistent. The matrix '
         'has an electrical potential psi_m, a state on the inner membrane\'s capacitance (C_m dpsi/dt = F I_m): the '
         'complexes pump charge out (4, 2 and 8 per turnover), ATP synthase (3 H+ per ATP), the translocase (ATP4- out '
@@ -612,13 +618,17 @@ GLYC_SPECIES = [
             k_sat=CYTO['K_glyc_mob']),
 ]
 GLYC_REACTIONS = [
-    Reaction('PGM', 'phosphoglucomutase', {'G6P': -1, 'G1P': 1}, 7.3e3, TEXTBOOK),
-    Reaction('GLGC', 'ADP-glucose pyrophosphorylase (GlgC)', {'G1P': -1, 'ATP': -1, 'H': -1, 'ADPglc': 1, 'PPi': 1}, 0.0,
-             f'{PH}; nucleotide-sugar pyrophosphorylase, near 0 (UDP-glucose pyrophosphorylase, from memory)'),
-    Reaction('GLGA', 'glycogen synthase (GlgA)', {'ADPglc': -1, 'ADP': 1, 'Gly': 1, 'H': 1}, -13.4e3,
-             TEXTBOOK + ' (glycogen synthase, UDP-glucose)'),
-    Reaction('PPA', 'inorganic pyrophosphatase', {'PPi': -1, 'H2O': -1, 'Pi': 2, 'H': 1}, -19.2e3, TEXTBOOK),
-    Reaction('GLGP', 'glycogen phosphorylase (GlgP)', {'Gly': -1, 'Pi': -1, 'G1P': 1}, 3.1e3, TEXTBOOK,
+    Reaction('PGM', 'phosphoglucomutase', {'G6P': -1, 'G1P': 1}, 7.37e3, EQ),
+    Reaction('GLGC', 'ADP-glucose pyrophosphorylase (GlgC)', {'G1P': -1, 'ATP': -1, 'H': -1, 'ADPglc': 1, 'PPi': 1}, -8.33e3, EQ),
+    Reaction('GLGA', 'glycogen synthase (GlgA)', {'ADPglc': -1, 'ADP': 1, 'Gly': 1, 'H': 1},
+             CYTO['dG0_store'] - CYTO['dG0_hk'] - (7.37e3 - 8.33e3 - 17.02e3),
+             'derived: the lumped store\'s dG0_store - dG0_hk less the other three steps (eQuilibrator 3.0); the glycogen '
+             'bond as maltose, as the lumped store (eQuilibrator ADP-glucose + glucose -> maltose + ADP: -4.62 +- 2.02 kJ/mol)'),
+    Reaction('PPA', 'inorganic pyrophosphatase', {'PPi': -1, 'H2O': -1, 'Pi': 2, 'H': 1}, -17.02e3, EQ),
+    Reaction('GLGP', 'glycogen phosphorylase (GlgP)', {'Gly': -1, 'Pi': -1, 'G1P': 1},
+             CYTO['dG0_hk'] + CYTO['dG0_hyd'] - CYTO['dG0_store'] + 7.37e3,
+             'derived: the lumped mobilisation (dG0_hk + dG0_hyd - dG0_store) plus phosphoglucomutase; the glycogen bond as '
+             'maltose (eQuilibrator maltose + Pi -> glucose + G1P: +2.60 +- 1.53 kJ/mol)',
              inhibitors={'ATP': CYTO['K_i_ATP_mob']}),
 ]
 GLYC_FLUX = dict(PGM=V_STORE - V_MOB, GLGC=V_STORE, GLGA=V_STORE, PPA=V_STORE, GLGP=V_MOB)
@@ -692,8 +702,9 @@ def build_glycogen():
         'synthase (a glucose unit onto glycogen, ADP out), pyrophosphatase (pulls the pyrophosphorylase forwards) and '
         'glycogen phosphorylase (glycogen + Pi to G1P; inhibited by ATP, as the lumped store). The designer\'s '
         'CarbohydrateMetabolism.cellml has the animal route (UTP, UDP-glucose): the same bond graph with UTP and UDP in '
-        'place of ATP and ADP. Every reaction is balanced in elements and charge; the textbook standard Gibbs energies '
-        'sum to the lumped store\'s (G6P + ATP + H2O to a glucose unit + ADP + 2 Pi + H+: -25.3 kJ/mol). Glycogen is a '
+        'place of ATP and ADP. Every reaction is balanced in elements and charge; the standard Gibbs energies '
+        '(eQuilibrator 3.0, the glycogen bond as maltose\'s) sum to the lumped store\'s (G6P + ATP + H2O to a glucose '
+        'unit + ADP + 2 Pi + H+: -22.7 kJ/mol). Glycogen is a '
         'store whose activity saturates, C/(K + C) with K the lumped phosphorylase\'s glycogen affinity (its chain ends; '
         'the lumped a_glyc), so the phosphorylase stops as it runs out. Calibrated at the comparison point (the '
         'fermenter\'s rest with the store fully allocated and glycogen at 50 mM) to the lumped store\'s synthesis and '
@@ -744,13 +755,11 @@ GNG_SPECIES = [
     Species('Gly3P', 'glycerol 3-phosphate', F(C=3, H=7, O=6, P=1), False, -2),
 ]
 GNG_REACTIONS = [
-    Reaction('FBPASE', 'fructose 1,6-bisphosphatase', {'F16BP': -1, 'H2O': -1, 'F6P': 1, 'Pi': 1}, -16.3e3, TEXTBOOK),
-    Reaction('G6PASE', 'glucose 6-phosphatase', {'G6P': -1, 'H2O': -1, 'glc': 1, 'Pi': 1}, -13.8e3, TEXTBOOK),
-    Reaction('GK', 'glycerol kinase', {'glycerol': -1, 'ATP': -1, 'Gly3P': 1, 'ADP': 1, 'H': 1}, -21.3e3,
-             f'{PH}; ATP hydrolysis -30.5 less glycerol 3-phosphate hydrolysis -9.2 kJ/mol (textbook, from memory)'),
+    Reaction('FBPASE', 'fructose 1,6-bisphosphatase', {'F16BP': -1, 'H2O': -1, 'F6P': 1, 'Pi': 1}, -12.77e3, EQ),
+    Reaction('G6PASE', 'glucose 6-phosphatase', {'G6P': -1, 'H2O': -1, 'glc': 1, 'Pi': 1}, -9.46e3, EQ),
+    Reaction('GK', 'glycerol kinase', {'glycerol': -1, 'ATP': -1, 'Gly3P': 1, 'ADP': 1, 'H': 1}, -14.22e3, EQ),
     Reaction('G3PDH', 'glycerol 3-phosphate dehydrogenase (towards DHAP)',
-             {'Gly3P': -1, 'NAD': -1, 'DHAP': 1, 'NADH': 1, 'H': 1}, _fe(-0.320, -0.190, 2),
-             MEMORY + ': DHAP/glycerol 3-phosphate -0.190 V, NAD+/NADH -0.320 V'),
+             {'Gly3P': -1, 'NAD': -1, 'DHAP': 1, 'NADH': 1, 'H': 1}, 25.75e3, EQ),
 ]
 J_GNG = 0.01   # mM/s of glucose made
 GNG_FLUX = dict(FBPASE=J_GNG, G6PASE=J_GNG, GK=0.4 * J_GNG, G3PDH=0.4 * J_GNG)
@@ -819,7 +828,7 @@ def build_gluconeogenesis():
         'of phosphofructokinase and hexokinase: with them each forms a cycle that hydrolyses one ATP, their standard '
         'Gibbs energies summing to ATP hydrolysis\'), glycerol kinase and glycerol 3-phosphate dehydrogenase (glycerol to '
         'DHAP, which the glycolysis module\'s aldolase and isomerase take on). Every reaction is balanced in elements and '
-        'charge, with textbook standard Gibbs energies and midpoint potentials. The metabolites it shares with '
+        'charge, with eQuilibrator 3.0 standard Gibbs energies. The metabolites it shares with '
         'glycolysis are chemostats on the cytosol_metabolites port; glycerol 3-phosphate is its own. Calibrated, with '
         'placeholder concentrations, to a respiring (liver-like) cytosol at 37 C making glucose at a placeholder rate: '
         'the dehydrogenase can carry glycerol to DHAP only where NADH/NAD+ is low (about 1/1000 here); at the '

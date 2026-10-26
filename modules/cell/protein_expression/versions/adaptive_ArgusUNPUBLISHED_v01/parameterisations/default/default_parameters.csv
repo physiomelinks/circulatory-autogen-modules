@@ -1,7 +1,7 @@
 variable_name,units,value,data_reference,sourced
 ATP,millimolar,9.6,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM",yes
-ADP,millimolar,0.56,unreferenced_placeholder; ADP of order 0.5 mM in E. coli (about 0.56 mM by Bennett et al. 2009; to confirm),no
-Pi,millimolar,10.0,unreferenced_placeholder; cytoplasmic Pi kept near 10 mM by the Pho regulon (1-10 mM reported),no
+ADP,millimolar,0.56,"bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)",yes
+Pi,millimolar,10.0,"amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells",yes
 J_demand_in,mol_per_s,0.0,no pool connected (an open sum port is 0),no
 J_ATP_in,mol_per_s,0.0,no pool connected,no
 J_keep_in,mol_per_s,0.0,no pool connected,no
@@ -13,7 +13,7 @@ Q_aa_rel_in,per_s,0.0,no pool connected,no
 Q_aa_use_in,per_s,0.0,no pool connected,no
 J_prot_in,mol_per_s,0.0,no pool connected,no
 J_saved_in,mol_per_s,0.0,no pool connected,no
-Q_prot_max,per_s,80564.18321852955,"derived: proteolysis_capacity x the amino acids in the resting cell's proteins (sum of n_0 L over its pools) (proteolysis_capacity: willetts1967intracellular, placeholder; proteome_per_um3: milo2010bionumbers, sourced; L_proteome: unreferenced_placeholder, placeholder)",no
+Q_prot_max,per_s,80576.24557849558,"derived: proteolysis_capacity x the amino acids in the resting cell's proteins (sum of n_0 L over its pools) (proteolysis_capacity: willetts1967intracellular, placeholder; proteome_per_um3: milo2010bionumbers, sourced; L_proteome: unreferenced_placeholder, placeholder)",no
 Q_eps,per_s,1e-09,"definitional; numerical floor, 1e-9 amino acids/s (13 orders below the proteases' capacity)",no
 N_aa_init,dimensionless,0.0,definitional; no recycled amino acids at rest,no
 K_aa,dimensionless,3783822.6340999305,"derived: aa_reuse_K x cell volume x N_A (aa_reuse_K: unreferenced_placeholder, placeholder)",no

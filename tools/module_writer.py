@@ -76,6 +76,16 @@ def register_bib(entries):
         BIB[key] = fields
 
 
+def kept_record_keys(config_path):
+    """The "licence" and "creator" of the config at config_path (given in review), so a rebuild keeps them; the
+    defaults (CC0-1.0, no creator) when the file is missing."""
+    keys = {'licence': 'CC0-1.0', 'creator': []}
+    if os.path.isfile(config_path):
+        entry = json.load(open(config_path))[0]
+        keys.update({k: entry[k] for k in keys if k in entry})
+    return keys
+
+
 def bib_text(keys):
     out = []
     for k in keys:
@@ -105,7 +115,7 @@ def write_version(category, module_type, component, variables, equations, config
     config = {
         'module_type': module_type, 'module_subtype': version, 'module_format': 'cellml',
         'component_file': f'{stem}_modules.cellml', 'component_type': component, 'default_parameterisation': 'default',
-        'licence': 'CC0-1.0', 'creator': [], **config_extra,
+        **kept_record_keys(os.path.join(d, f'{stem}_modules_config.json')), **config_extra,
         'variables_and_units': [[n, var_units[n], 'access', roles[n]] for n in roles],
     }
     with open(os.path.join(d, f'{stem}_modules_config.json'), 'w') as f:

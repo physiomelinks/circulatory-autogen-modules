@@ -237,15 +237,16 @@ def test_targets_fall_as_ATP_falls(fermenter):
 
 
 def test_maintenance_regulation_avoids_the_ATP_trap_on_half_food(fermenter):
-    '''On half the resting medium glucose (0.05 mM) for an hour, the unregulated cell runs its ATP out and cannot use full
-    food when it returns: hexokinase needs ATP, so ATP stays near 0. Regulating the pumps, exchangers, flagellum and
-    hydrolase by ATP does not help: their copies are removed within minutes (the H+-ATPase to about half), the membrane
-    depolarises and ATP runs out sooner. With the maintenance regulated by ATP (protein synthesis, RNA and lipid upkeep,
-    repair, the maintenance ATPase) ATP holds above 4 mM and the membrane near -100 mV, while the proteome loses the copies
-    its cut synthesis does not replace (about 0.3% in the hour, at k_deg) to the recycled pool, and the cuts cost envelope
-    and ribosome damage and some ribosomes. When the resting medium returns the cell rebuilds its proteins, mostly from
-    those amino acids, and repairs the damage, which takes most of the medium's small headroom: ATP climbs back (above 6
-    mM in the hour, above 8.3 mM in four) and V to -104 mV, while the envelope damage falls.'''
+    '''On half the resting medium glucose (0.05 mM) for an hour, the unregulated cell runs its ATP out and cannot use
+    full food when it returns: hexokinase needs ATP, so ATP stays near 0. Regulating the pumps, exchangers, flagellum
+    and hydrolase by ATP helps: their copies are removed within minutes (the H+-ATPase to about a third in the hour) and
+    the membrane depolarises, but ATP holds above 1 mM and recovers on full food. With the maintenance regulated by ATP
+    (protein synthesis, RNA and lipid upkeep, repair, the maintenance ATPase) ATP holds higher, above 4 mM, and the
+    membrane near -97 mV, while the proteome loses the copies its cut synthesis does not replace (about 0.3% in the
+    hour, at k_deg) to the recycled pool, and the cuts cost envelope and ribosome damage and some ribosomes. When the
+    resting medium returns the cell rebuilds its proteins, mostly from those amino acids, and repairs the damage, which
+    takes most of the medium's small headroom: ATP climbs back (above 6 mM in the hour, above 8.3 mM in four) and V to
+    -104 mV, while the envelope damage falls.'''
     outs = ['mod/cytosol/C_ATP', 'mod/membrane/V', 'mod/pool_H_ATPase/m', 'mod/pool_proteome/m']
     expression = {f'reg_on_ATP_mod__pool_{p}': 1.0 for p in REGULATED}
     fed = _glucose(fermenter.nominal['C_glc_e_mod__membrane_face'])
@@ -255,9 +256,11 @@ def test_maintenance_regulation_avoids_the_ATP_trap_on_half_food(fermenter):
     (_, on_starve), (_, on_fed), (_, on_later) = _phases(
         fermenter, [(3600.0, {**_glucose(0.05), **_maintenance_on()}), (3600.0, fed), (3 * 3600.0, fed)], outs)
     assert off_starve['mod/cytosol/C_ATP'][-1] < 1e-3 and off_fed['mod/cytosol/C_ATP'][-1] < 1e-3
-    assert ex_fed['mod/cytosol/C_ATP'][-1] < 1e-3
+    assert ex_starve['mod/cytosol/C_ATP'].min() > 1.0 and ex_fed['mod/cytosol/C_ATP'][-1] > 9.0
     assert ex_starve['mod/pool_H_ATPase/m'][30] < 0.8 and ex_starve['mod/pool_H_ATPase/m'][-1] < 0.55
-    assert on_starve['mod/cytosol/C_ATP'].min() > 4.0 and on_starve['mod/membrane/V'][-1] < -99.0
+    assert on_starve['mod/cytosol/C_ATP'].min() > 4.0 and on_starve['mod/membrane/V'][-1] < -95.0
+    assert on_starve['mod/cytosol/C_ATP'].min() > ex_starve['mod/cytosol/C_ATP'].min(), \
+        'maintenance regulation helps more'
     assert on_fed['mod/cytosol/C_ATP'][-1] > 6.0 and on_later['mod/cytosol/C_ATP'][-1] > 8.3
     assert on_later['mod/membrane/V'][-1] < -104.0
     assert on_later['mod/bio/D_phys'][-1] < 0.6 * on_fed['mod/bio/D_phys'][-1]

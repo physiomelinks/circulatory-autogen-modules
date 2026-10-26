@@ -4,19 +4,20 @@ reviewed: false
 notes: 'A mitochondrion step by step, from cytosolic pyruvate to CO2 with oxidative phosphorylation, as a bond graph: the
   pyruvate and phosphate carriers, pyruvate dehydrogenase, the eight steps of the TCA cycle, complexes I to IV and the ubiquinone
   and cytochrome c pools, ATP synthase, the adenine nucleotide translocase and a proton leak. Every reaction is balanced in
-  C, H, O, N, P, S and in charge (species as at pH 7, H+ and water explicit); standard Gibbs energies are textbook values
-  (transformed, pH 7, 1 M) and midpoint potentials, and the species'' standard potentials are fitted to them (tools/bondgraph.py),
-  so the thermodynamics are consistent. The matrix has an electrical potential psi_m, a state on the inner membrane''s capacitance
-  (C_m dpsi/dt = F I_m): the complexes pump charge out (4, 2 and 8 per turnover), ATP synthase (3 H+ per ATP), the translocase
-  (ATP4- out for ADP3- in) and the leak let it back, and each species in the matrix has the electrochemical potential mu0
-  + RT ln(C/c_std) + z F psi_m. So respiration is controlled as in a mitochondrion: with little ADP the synthase slows, psi_m
-  rises and the pumps slow. Each reaction flows at v = kappa (Pf - Pr) / (1 + (Pf + Pr)/sigma): mass action (the bond-graph
-  chemical reaction) for the near-equilibrium steps, complex I and the leak; saturating at 4 times their resting flux for
-  the dehydrogenases, citrate synthase, succinyl-CoA synthetase, complexes II, III and IV, ATP synthase and the translocase.
-  The intermembrane space shares the cytosol''s H+; the matrix pH is held (buffered). Calibrated to the lumped respiration''s
-  resting O2 use (energy_metabolism mitochondrial, 37 C) with typical concentrations (placeholders) where they let every step
-  run forwards: the near-equilibrium steps run forwards at 1000 times their net rate, which sets pyruvate and phosphate in
-  the matrix, isocitrate, fumarate and oxaloacetate. Per pyruvate 11.25 ATP are exported (P/O 2.25; the leak takes 9% of the
-  pumped protons). Pyruvate, phosphate, H+, ATP, ADP, O2, CO2 and water are chemostats on the cytosol_metabolites port. Compared
-  against energy_metabolism mitochondrial in tests/test_metabolism_detailed.py. Its bond graph is in mitochondrion_detailed_ArgusUNPUBLISHED_v01_bondgraph.svg
-  (a CellDL document; its BG-RDF in _bondgraph.ttl, psi_m at rest folded into it).'
+  C, H, O, N, P, S and in charge (species as at pH 7, H+ and water explicit); standard Gibbs energies and midpoint potentials
+  are eQuilibrator 3.0''s (transformed, pH 7, pMg 3, I 0.25 M; cytochrome c''s, a protein it does not cover, +0.254 V), and
+  the species'' standard potentials are fitted to them (tools/bondgraph.py), so the thermodynamics are consistent. The matrix
+  has an electrical potential psi_m, a state on the inner membrane''s capacitance (C_m dpsi/dt = F I_m): the complexes pump
+  charge out (4, 2 and 8 per turnover), ATP synthase (3 H+ per ATP), the translocase (ATP4- out for ADP3- in) and the leak
+  let it back, and each species in the matrix has the electrochemical potential mu0 + RT ln(C/c_std) + z F psi_m. So respiration
+  is controlled as in a mitochondrion: with little ADP the synthase slows, psi_m rises and the pumps slow. Each reaction flows
+  at v = kappa (Pf - Pr) / (1 + (Pf + Pr)/sigma): mass action (the bond-graph chemical reaction) for the near-equilibrium
+  steps, complex I and the leak; saturating at 4 times their resting flux for the dehydrogenases, citrate synthase, succinyl-CoA
+  synthetase, complexes II, III and IV, ATP synthase and the translocase. The intermembrane space shares the cytosol''s H+;
+  the matrix pH is held (buffered). Calibrated to the lumped respiration''s resting O2 use (energy_metabolism mitochondrial,
+  37 C) with typical concentrations (placeholders) where they let every step run forwards: the near-equilibrium steps run
+  forwards at 1000 times their net rate, which sets pyruvate and phosphate in the matrix, isocitrate, fumarate and oxaloacetate.
+  Per pyruvate 11.25 ATP are exported (P/O 2.25; the leak takes 9% of the pumped protons). Pyruvate, phosphate, H+, ATP, ADP,
+  O2, CO2 and water are chemostats on the cytosol_metabolites port. Compared against energy_metabolism mitochondrial in tests/test_metabolism_detailed.py.
+  Its bond graph is in mitochondrion_detailed_ArgusUNPUBLISHED_v01_bondgraph.svg (a CellDL document; its BG-RDF in _bondgraph.ttl,
+  psi_m at rest folded into it).'
