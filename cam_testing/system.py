@@ -161,6 +161,17 @@ def all_component_names(helper, ignore_components=REFERENCE_CELLML_IGNORED_COMPO
     return out
 
 
+def time_variable_names(helper):
+    '''The names ('vessel/var' and 'component/var') of the model's free variable, which simulate()
+    returns as t. Myokit binds one variable to time; a helper without a Myokit model has none here.'''
+    model = getattr(helper, 'model', None)
+    time = model.time() if model is not None and hasattr(model, 'time') else None
+    if time is None:
+        return set()
+    qname = time.qname()
+    return {qname.replace('_module.', '/', 1), qname.replace('.', '/', 1)}
+
+
 def simulate(model_path, spec, solver_info, names=None, ignore_components=None):
     '''Runs a model; returns (t, {qualified name 'vessel/var': array}). names=None: a generated
     model's vessel outputs; with ignore_components (a ready CellML reference): every component's.'''
@@ -176,6 +187,10 @@ def simulate(model_path, spec, solver_info, names=None, ignore_components=None):
         # vessel outputs, plus the multi_port "sum" totals (component sum_blood_volume)
         names = [n.replace('_module.', '/', 1).replace('sum_blood_volume.', 'sum_blood_volume/', 1)
                  for n in helper.get_all_variable_names() if '_module.' in n or n.startswith('sum_blood_volume.')]
+    # time is returned as t, not as an output: the solver merges every module's t into one variable
+    # and names it after whichever component it picks, which differs between runs
+    time_names = time_variable_names(helper)
+    names = [n for n in names if n not in time_names]
     t = np.asarray(helper.get_time(), dtype=float)
     out = {}
     for name in names:

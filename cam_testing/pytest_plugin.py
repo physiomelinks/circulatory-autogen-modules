@@ -27,8 +27,10 @@ MARKERS = [
     'system_model: system-model tests (system_models/) and supermodule reproduces tests',
     'phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)',
 ]
-QUICK_TESTS = ('review_test', 'run_test', 'supermodule_structure_test', 'phlynx_export_test', 'cuflynx_simulate_test',
-               'phlynx_equivalence_test', 'cuflynx_parameterisation_omex_test')
+# supermodule_equivalence_test runs for unreviewed versions too: it guards the system models built on them
+QUICK_TESTS = ('review_test', 'run_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
+               'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test',
+               'cuflynx_parameterisation_omex_test')
 
 
 def pytest_addoption(parser):
@@ -49,8 +51,8 @@ def pytest_addoption(parser):
     group.addoption('--include-unreviewed', action='store_true',
                     help='also run versions whose spec has reviewed: false')
     group.addoption('--quick-unreviewed', action='store_true',
-                    help='for versions not reviewed yet, run only run_test and the PhLynx pipeline (CI uses '
-                         'this; the full test set runs once a version is reviewed)')
+                    help='for versions not reviewed yet, run only run_test, the supermodule tests and the PhLynx '
+                         'pipeline (CI uses this; the full test set runs once a version is reviewed)')
     group.addoption('--shard', default=None, metavar='K/N',
                     help='only the versions of shard K of N of the selected module_types (whole module_types, '
                          'balanced by ci/test_durations.json; see cam_testing/shards.py)')
