@@ -34,7 +34,7 @@ TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
 # URL's hash, standard base64 of its bytes, which the page builds when the link is clicked
 # (templates/_open_in.js); CUFLynx takes the archive's absolute URL, percent-encoded, through its
 # cuflynx:// link scheme.
-CELLDL_EDITOR_URL = 'https://finbarargus.github.io/CellDLEditorComponent/'
+CELLDL_EDITOR_URL = 'https://physiomelinks.github.io/CellDLEditorComponent/'
 CELLDL_OPEN = CELLDL_EDITOR_URL + '?open=celldl#'
 PHLYNX_OPEN = 'https://phlynx.com/?open=omex#'
 CUFLYNX_OPEN = 'cuflynx://open?url='
