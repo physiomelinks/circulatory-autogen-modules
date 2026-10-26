@@ -1218,6 +1218,33 @@ def restructure_renames():
         return {tuple(r['from']): tuple(r['to']) for r in json.load(f)}
 
 
+VERSION_RENAMES = 'version_renames.json'      # in a module library: renames made in its module PRs
+
+
+def version_renames():
+    '''(module_type, version) -> (module_type, version) renamed after the restructure, from each
+    library's version_renames.json ([{"from": [mt, v], "to": [mt, v], "reason": ...}], in order, so a
+    later entry may rename an earlier one's target again). A module PR that renames a version adds its
+    entry here, so the rename and the map land together.'''
+    out = {}
+    for d in library_dirs():
+        path = os.path.join(d, VERSION_RENAMES)
+        if os.path.isfile(path):
+            with open(path) as f:
+                for r in json.load(f):
+                    out[tuple(r['from'])] = tuple(r['to'])
+    return out
+
+
+def _chain(pair, renames):
+    '''``pair`` followed through ``renames`` to its last name.'''
+    seen = set()
+    while pair in renames and pair not in seen:
+        seen.add(pair)
+        pair = renames[pair]
+    return pair
+
+
 @functools.lru_cache(maxsize=None)
 def legacy_renames():
     '''(old module_type, old module_subtype) -> (module_type, version) for every pair that changed in
@@ -1225,7 +1252,7 @@ def legacy_renames():
     tools/restructure_map.yaml, in the move of the alternative hearts into heart
     (HEART_VERSION_RENAMES), and in the 2026-10-06 restructure (restructure_renames(), applied after
     the others, so each old pair maps to today's pair). circulatory_autogen's own models still use
-    the old pairs.'''
+    the old pairs. Renames made in module PRs since (version_renames) are applied last.'''
     later = restructure_renames()
     path = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_map.yaml')
     out = {}
@@ -1249,6 +1276,11 @@ def legacy_renames():
     out = {old: later.get(new, new) for old, new in out.items()}
     for old, new in later.items():
         out.setdefault(old, new)
+    # renames from module PRs (version_renames), applied last and followed to the newest name
+    newest = version_renames()
+    out = {old: _chain(new, newest) for old, new in out.items()}
+    for old in newest:
+        out.setdefault(old, _chain(old, newest))
     return {old: new for old, new in out.items() if old != new}
 
 
