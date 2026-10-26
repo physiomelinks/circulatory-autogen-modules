@@ -1,0 +1,14 @@
+{
+ "schema_version": 1,
+ "global": {
+  "l_eff": {"value": 0.02, "units": "metre", "data_reference": "mynard2015one; Table 4 (heart valve parameters), MV: l_eff = 2.0 cm (the same valve model; Table 4 pairs it with its own A_eff,max and K values, not those of mynard2012simple used here)", "sourced": "yes"},
+  "rho": {"value": 1060, "units": "Js2_per_m5", "data_reference": "mynard2012simple; p. 627: blood density 1.06 g/cm^3", "sourced": "yes"}
+ },
+ "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "definitional; harness value for the stand-alone test (the chambers set it in a model; the tests drive it with a protocol trace)", "sourced": "no"},
+ "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "definitional; harness value for the stand-alone test (the chambers set it in a model; the tests drive it with a protocol trace)", "sourced": "no"},
+ "A_nn": {"value": 0.00077, "units": "m2", "data_reference": "mynard2012simple; p. 634: A_ann of the mitral valve 7.7 cm^2 (within the normal range)", "sourced": "yes"},
+ "M_st": {"value": 1, "units": "dimensionless", "data_reference": "mynard2012simple; Table III (p. 634), Mitral, Normal: M_st = 1", "sourced": "yes"},
+ "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "mynard2012simple; Table III (p. 634), Mitral, Normal: M_rg = 0", "sourced": "yes"},
+ "K_vo": {"value": 0.3, "units": "m3_per_Js", "data_reference": "mynard2012simple; Table III (p. 634), Mitral, Normal: K_vo = 0.03 cm^2/(dyn s) = 0.3 m^3/(J s) (1 cm^2/(dyn s) = 10 m^3/(J s))", "sourced": "yes"},
+ "K_vc": {"value": 0.4, "units": "m3_per_Js", "data_reference": "mynard2012simple; Table III (p. 634), Mitral, Normal: K_vc = 0.04 cm^2/(dyn s) = 0.4 m^3/(J s) (1 cm^2/(dyn s) = 10 m^3/(J s))", "sourced": "yes"}
+}

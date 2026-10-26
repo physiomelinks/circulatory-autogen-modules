@@ -418,15 +418,14 @@ window.addEventListener('DOMContentLoaded', function () {
       {%- if c.structure_view %}{% set sv = c.structure_view %}
       <div class="block" id="{{ c.id }}-structure">
         <h3>Structure</h3>
-        <p class="muted" style="margin:0;font-size:0.84rem">The parts of this supermodule version and how they connect. In a model, each part becomes <code>&lt;record name&gt;_&lt;part&gt;</code>; the parameterisation's parameters are renamed the same way. Precedence: the model's parameters file, then this version's parameterisation, then each part's parameterisation. Solid arrows are the internal connections (<code>inp_instances</code> / <code>out_instances</code>, and a part's <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code> naming a sibling, labelled <code>part/inner part</code>), with the port types the configs connect{% if not sv.labelled %} (listed in the table: too many connections to label){% endif %}; dashed boxes are the modules outside that couple to a part, from the supermodule versions and system models that use this one. Click a part to open its version page.</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">The parts of this supermodule version and how they connect. In a model, each part becomes <code>&lt;record name&gt;__&lt;part&gt;</code>; the parameterisation's parameters are renamed the same way. Precedence: the model's parameters file, then this version's parameterisation, then each part's version's default parameterisation. Solid arrows are the internal connections (<code>inp_instances</code> / <code>out_instances</code>, and a part's <code>per_submodule_inputs</code> / <code>per_submodule_outputs</code> naming a sibling, labelled <code>part/inner part</code>), with the port types the configs connect{% if not sv.labelled %} (listed in the table: too many connections to label){% endif %}; dashed boxes are the modules outside that couple to a part, from the supermodule versions and system models that use this one. Click a part to open its version page.</p>
         <div class="diagram"><pre class="mermaid">{{ sv.mermaid }}</pre></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Part</th><th>module_type</th><th>Version</th><th>Parameterisation</th><th>Ports</th><th>Connections</th><th>Set by this supermodule's parameterisation</th><th>Globals shared</th></tr></thead>
+          <thead><tr><th>Part</th><th>module_type</th><th>Version</th><th>Ports</th><th>Connections</th><th>Set by this supermodule</th><th>Globals shared</th></tr></thead>
           <tbody>
           {%- for p in sv.parts %}
             <tr><td class="mono">{{ p.name }}</td><td class="mono">{{ p.module_type }}</td>
             <td class="mono">{% if p.href %}<a href="{{ p.href }}">{{ p.version }}</a>{% else %}{{ p.version }} <span class="todo">(not in the library)</span>{% endif %}{% if p.is_supermodule %}<br><span class="muted">supermodule, {{ p.n_parts }} parts</span>{% endif %}</td>
-            <td class="mono">{{ p.parameterisation }}</td>
             <td class="mono" style="font-size:0.78rem">{% if p.is_supermodule %}<span class="muted">its parts' (see its page)</span>{% else %}{{ p.ports|join('; ') or '—' }}{% endif %}</td>
             <td class="mono" style="font-size:0.78rem">
               {%- for e in p.inputs %}← {{ e.label }}{% if e.ports %} <span class="muted">({{ e.ports|join(', ') }})</span>{% endif %}<br>{% endfor %}
@@ -438,7 +437,7 @@ window.addEventListener('DOMContentLoaded', function () {
           {%- endfor %}
           </tbody>
         </table></div>
-        <p class="muted" style="margin:0;font-size:0.84rem">Globals of this supermodule (<code>supermodule.globals</code>): {{ sv.globals|join(', ') or 'none' }}{% if sv.global_rows %}; set by its parameterisation: {% for g in sv.global_rows %}<code>{{ g.name }} = {{ g.value }}</code>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. "Set by this supermodule's parameterisation" lists its parameterisation's rows <code>&lt;var&gt;_&lt;part&gt;</code>, which override the part's own parameterisation.</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">Globals of this supermodule (<code>supermodule.globals</code>): {{ sv.globals|join(', ') or 'none' }}{% if sv.global_rows %}; set by its parameterisation: {% for g in sv.global_rows %}<code>{{ g.name }} = {{ g.value }}</code>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. "Set by this supermodule" lists the values its default parameterisation (the template a new instance is copied from, nested by part) gives a part that differ from the part's version's default parameterisation.</p>
         {%- if sv.external %}
         <p class="muted" style="margin:0;font-size:0.84rem">Outside couplings: {% for x in sv.external %}<code>{{ x.part }} {{ '←' if x.direction == 'in' else '→' }} ‹{{ x.external }}›</code>{% if not loop.last %}, {% endif %}{% endfor %}.</p>
         {%- else %}

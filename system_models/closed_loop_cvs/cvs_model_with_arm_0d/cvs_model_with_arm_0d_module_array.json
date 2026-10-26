@@ -1,5 +1,5 @@
 [
- {"name": "A_aorta_ascending_1", "module_type": "arterial", "module_subtype": "vv_nonlinear_visco", "parameterisation": "default", "inp_instances": ["aov"], "out_instances": ["A_aorta_ascending_2", "K_tube_A_aorta_ascending_1"]},
+ {"name": "A_aorta_ascending_1", "module_type": "arterial", "module_subtype": "vv_nonlinear_visco", "parameterisation": "default", "inp_instances": ["heart"], "out_instances": ["A_aorta_ascending_2", "K_tube_A_aorta_ascending_1"]},
  {"name": "A_aorta_ascending_2", "module_type": "arterial", "module_subtype": "pv_nonlinear_visco", "parameterisation": "default", "inp_instances": ["A_aorta_ascending_1"], "out_instances": ["A_aorta_ascending_3", "K_tube_A_aorta_ascending_2"]},
  {"name": "A_aorta_ascending_3", "module_type": "arterial", "module_subtype": "pv_nonlinear_visco", "parameterisation": "default", "inp_instances": ["A_aorta_ascending_2"], "out_instances": ["A_aorta_ascending_4", "K_tube_A_aorta_ascending_3"]},
  {"name": "A_aorta_ascending_4", "module_type": "arterial", "module_subtype": "pv_nonlinear_visco", "parameterisation": "default", "inp_instances": ["A_aorta_ascending_3"], "out_instances": ["A_aortic_arch_1", "K_tube_A_aorta_ascending_4"]},
@@ -41,8 +41,8 @@
  {"name": "venous_trunk_C_T", "module_type": "venous_novisco", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["trunk_C_T"], "out_instances": ["venous_ivc"]},
  {"name": "venous_leg_L_T", "module_type": "venous_novisco", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["leg_L_T"], "out_instances": ["venous_ivc"]},
  {"name": "venous_leg_R_T", "module_type": "venous_novisco", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["leg_R_T"], "out_instances": ["venous_ivc"]},
- {"name": "venous_ivc", "module_type": "Min_junction", "module_subtype": "vp_simple_novisco", "parameterisation": "default", "inp_instances": ["venous_trunk_C_T", "venous_leg_L_T", "venous_leg_R_T"], "out_instances": ["ra_inflow"]},
- {"name": "venous_svc", "module_type": "Min_junction", "module_subtype": "vp_simple_novisco", "parameterisation": "default", "inp_instances": ["venous_head_L_T", "venous_head_R_T", "venous_arm_L_T", "venous_arm_R_T"], "out_instances": ["ra_inflow"]},
+ {"name": "venous_ivc", "module_type": "Min_junction", "module_subtype": "vp_simple_novisco", "parameterisation": "default", "inp_instances": ["venous_trunk_C_T", "venous_leg_L_T", "venous_leg_R_T"], "out_instances": ["heart"]},
+ {"name": "venous_svc", "module_type": "Min_junction", "module_subtype": "vp_simple_novisco", "parameterisation": "default", "inp_instances": ["venous_head_L_T", "venous_head_R_T", "venous_arm_L_T", "venous_arm_R_T"], "out_instances": ["heart"]},
  {"name": "K_tube_A_aorta_ascending_1", "module_type": "material_prop_visco_const", "module_subtype": "Olufsen2000_v01", "parameterisation": "default", "inp_instances": ["A_aorta_ascending_1"], "out_instances": []},
  {"name": "K_tube_A_aorta_ascending_2", "module_type": "material_prop_visco_const", "module_subtype": "Olufsen2000_v01", "parameterisation": "default", "inp_instances": ["A_aorta_ascending_2"], "out_instances": []},
  {"name": "K_tube_A_aorta_ascending_3", "module_type": "material_prop_visco_const", "module_subtype": "Olufsen2000_v01", "parameterisation": "default", "inp_instances": ["A_aorta_ascending_3"], "out_instances": []},
@@ -71,16 +71,7 @@
  {"name": "K_tube_A_common_iliac_L", "module_type": "material_prop_visco_const", "module_subtype": "Olufsen2000_v01", "parameterisation": "default", "inp_instances": ["A_common_iliac_L"], "out_instances": []},
  {"name": "K_tube_A_common_iliac_R", "module_type": "material_prop_visco_const", "module_subtype": "Olufsen2000_v01", "parameterisation": "default", "inp_instances": ["A_common_iliac_R"], "out_instances": []},
  {"name": "K_tube_A_brachial_L", "module_type": "material_prop_visco_const", "module_subtype": "Olufsen2000_v01", "parameterisation": "default", "inp_instances": ["A_brachial_L"], "out_instances": []},
- {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["puv"], "out_instances": ["pvn"]},
- {"name": "pvn", "module_type": "arterial_simple", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["par"], "out_instances": ["la"]},
- {"name": "heart_clock", "module_type": "cardiac_clock", "module_subtype": "Liang2009_v01", "parameterisation": "default", "inp_instances": [], "out_instances": ["ra", "rv", "la", "lv"]},
- {"name": "ra", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v01", "parameterisation": "ra", "inp_instances": ["ra_inflow", "heart_clock"], "out_instances": ["trv"]},
- {"name": "rv", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v01", "parameterisation": "rv", "inp_instances": ["trv", "heart_clock"], "out_instances": ["puv"]},
- {"name": "la", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v01", "parameterisation": "la", "inp_instances": ["pvn", "heart_clock"], "out_instances": ["miv"]},
- {"name": "lv", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v01", "parameterisation": "lv", "inp_instances": ["miv", "heart_clock"], "out_instances": ["aov"]},
- {"name": "trv", "module_type": "valve", "module_subtype": "pp", "parameterisation": "trv", "inp_instances": ["ra"], "out_instances": ["rv"]},
- {"name": "puv", "module_type": "valve", "module_subtype": "pp", "parameterisation": "puv", "inp_instances": ["rv"], "out_instances": ["par"]},
- {"name": "miv", "module_type": "valve", "module_subtype": "pp", "parameterisation": "miv", "inp_instances": ["la"], "out_instances": ["lv"]},
- {"name": "aov", "module_type": "valve", "module_subtype": "pp", "parameterisation": "aov", "inp_instances": ["lv"], "out_instances": ["A_aorta_ascending_1"]},
- {"name": "ra_inflow", "module_type": "flow_merge", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["venous_ivc", "venous_svc"], "out_instances": ["ra"]}
+ {"name": "par", "module_type": "arterial_simple", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["heart"], "out_instances": ["pvn"]},
+ {"name": "pvn", "module_type": "arterial_simple", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["par"], "out_instances": ["heart"]},
+ {"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default", "per_submodule_inputs": {"ra": ["venous_ivc", "venous_svc"], "la": ["pvn"]}, "per_submodule_outputs": {"puv": ["par"], "aov": ["A_aorta_ascending_1"]}}
 ]

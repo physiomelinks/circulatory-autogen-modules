@@ -20,9 +20,6 @@ This guide is for people who want to **use** the library. To add or change a mod
 | **instance** | One use of a version in a model: a record of a module array (or a node in PhLynx). It names the parameterisation it uses, and several instances can share one | `*_module_array.json` |
 | **system model** | A whole model built from library modules | `system_models/<category>/<model>/` |
 
-(Parameterisations were called *instances* before October 2026. The old names, `instances/`,
-`default_instance` and a record's `"instance"`, are still read.)
-
 ## Browse the library
 
 The reports are published at **https://physiomelinks.github.io/circulatory-autogen-modules/**.

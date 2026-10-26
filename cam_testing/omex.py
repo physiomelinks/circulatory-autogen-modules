@@ -10,17 +10,21 @@ Built by ``python tools/build_parameterisation_omex.py`` (``make omex``); not co
                                               network (its harness, or the version alone) with this
                                               parameterisation's parameters, as libcuflynx generates it
   <p>_obs_data.json                           the parameterisation's calibration data, if it has any
-  <p>_params_for_id.csv                       its parameters to identify, if any
-  inputs, unchanged: <p>_parameters.csv, raw data and
+  <p>_params_for_id.json                      its parameters to identify, if any
+  inputs, unchanged: <p>_parameters.json, raw data and
     SOURCES.md; the version's _modules.cellml, _modules_config.json (with its required_citations),
-    _units.cellml and _verification_config.json; a supermodule's submodules' _modules_config.json
-    (their required_citations); and the test network the model was generated from
-    (<module_type>_<version>_<p>_module_array.json / _model_parameters.csv)
+    _units.cellml and _verification_config.json; a supermodule's _module_array.json (its instances),
+    its template (its default parameterisation, <module_type>_<version>_default_parameters.json, when
+    <p> is another) and its submodules' _modules_config.json (their required_citations; a nested
+    supermodule's with its _module_array.json and template); and the test network the model was
+    generated from (<module_type>_<version>_<p>_module_array.json and _model_parameters.json, which
+    holds its supermodule instances' values)
   manifest.xml                                COMBINE manifest (master marked)
 
 CUFLynx classifies members by name: the first ``*.cellml`` the manifest marks master is the
-model, the first JSON with "obs" in its name is the obs_data, and the first CSV with "param" in
-its name is the params_for_id. So the study members are written first, in that order.
+model, the first JSON with "obs" in its name is the obs_data, and the params_for_id is the first CSV
+with "param" in its name, else the first JSON with it (``<p>_parameters.json`` has it too). So the
+study members are written first, in that order, and the library has no CSV named "param".
 """
 import io
 import os
@@ -78,7 +82,7 @@ def members(version, parameterisation, work_dir):
         if path and os.path.isfile(path):
             out.append((name or os.path.basename(path), open(path, 'rb').read(), False))
 
-    # the study, first: CUFLynx takes the first "obs" JSON and the first "param" CSV
+    # the study, first: CUFLynx takes the first "obs" JSON and the first "param" JSON
     add(parameterisation.obs_data_path)
     add(parameterisation.params_for_id_path)
     # the inputs, as they are in the library
@@ -87,17 +91,25 @@ def members(version, parameterisation, work_dir):
         full = os.path.join(parameterisation.dir, p)
         if os.path.isfile(full) and not p.endswith('.omex') and p not in {n for n, _, _ in out}:
             add(full)
-    for p in (version.cellml_path, version.config_path, version.units_path, version.verification_config_path):
+    for p in (version.cellml_path, version.config_path, version.module_array_path,
+              version.units_path, version.verification_config_path):
         add(p)
+
+    def add_template(v):
+        if v.is_supermodule and v.instance_parameters_path != parameterisation.parameters_path:
+            add(v.instance_parameters_path, f'{v.mtype.name}_{v.name}_{os.path.basename(v.instance_parameters_path)}')
+    add_template(version)
     # a supermodule's submodules' configs (recursively), so their required_citations travel with it
     seen = {version.key}
     for sub, _, _ in version.submodule_citations() if version.is_supermodule else []:
         if sub.key not in seen:
             seen.add(sub.key)
             add(sub.config_path)
+            add(sub.module_array_path)
+            add_template(sub)
     # the test network the model was generated from
     add(os.path.join(res, f'{prefix}_module_array.json'), f'{stem}_module_array.json')
-    add(os.path.join(res, f'{prefix}_parameters.csv'), f'{stem}_model_parameters.csv')
+    add(os.path.join(res, f'{prefix}_parameters.json'), f'{stem}_model_parameters.json')
     return out
 
 
