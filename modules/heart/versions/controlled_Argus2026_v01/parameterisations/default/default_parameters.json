@@ -4,7 +4,7 @@
   "rho": {"value": 1050, "units": "Js2_per_m5", "data_reference": "known", "sourced": "no"},
   "T": {"value": 1, "units": "second", "data_reference": "Liang_2009_Table_2", "sourced": "yes"},
   "l_eff": {"value": 0.01, "units": "metre", "data_reference": "to_be_identified", "sourced": "no"},
-  "T_min": {"value": 0.4, "units": "second", "data_reference": "circulatory_autogen 3compartment: defined_by_user", "sourced": "no"}
+  "T_min": {"value": 0.3, "units": "second", "data_reference": "tanaka2001age; age-predicted maximal heart rate HRmax = 208 - 0.7 x age (p. 153): 194 bpm at 20 years, a period of 0.31 s, rounded to 0.3 s. A safety floor at the physiological maximum heart rate (no closed-loop baroreflex model checked clamps the period; Ursino 1998's effector saturates near 0.55 s)", "sourced": "yes"}
  },
  "clock": {},
  "ra": {
@@ -70,7 +70,7 @@
  "trv": {
   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
-  "A_nn": {"value": 0.0009, "units": "m2", "data_reference": "to_be_identified", "sourced": "no"},
+  "A_nn": {"value": 0.0008, "units": "m2", "data_reference": "mynard2012simple; p. 634: A_ann of the tricuspid valve 8.0 cm^2 (within the normal range)", "sourced": "yes"},
   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
   "K_vo": {"value": 0.3, "units": "m3_per_Js", "data_reference": "Mynard_2012", "sourced": "yes"},
@@ -79,7 +79,7 @@
  "puv": {
   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
-  "A_nn": {"value": 0.0004, "units": "m2", "data_reference": "to_be_identified", "sourced": "no"},
+  "A_nn": {"value": 0.00071, "units": "m2", "data_reference": "mynard2012simple; Table II (p. 631): rvot A0 = 7.1 cm^2; p. 634: A_ann of the pulmonary valve = A0 of the connecting vessel", "sourced": "yes"},
   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
   "K_vo": {"value": 0.2, "units": "m3_per_Js", "data_reference": "Mynard_2012", "sourced": "yes"},
@@ -88,7 +88,7 @@
  "miv": {
   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
-  "A_nn": {"value": 0.0006, "units": "m2", "data_reference": "to_be_identified", "sourced": "no"},
+  "A_nn": {"value": 0.00077, "units": "m2", "data_reference": "mynard2012simple; p. 634: A_ann of the mitral valve 7.7 cm^2 (within the normal range)", "sourced": "yes"},
   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
   "K_vo": {"value": 0.3, "units": "m3_per_Js", "data_reference": "Mynard_2012", "sourced": "yes"},
@@ -97,10 +97,10 @@
  "aov": {
   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
-  "A_nn": {"value": 0.000314, "units": "m2", "data_reference": "defined_by_user_from_BB128", "sourced": "no"},
+  "A_nn": {"value": 0.00068, "units": "m2", "data_reference": "mynard2012simple; Table II (p. 631): lvot A0 = 6.8 cm^2; p. 634: A_ann of the aortic valve = A0 of the connecting vessel", "sourced": "yes"},
   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012", "sourced": "yes"},
-  "K_vo": {"value": 0.04, "units": "m3_per_Js", "data_reference": "to_be_identified", "sourced": "no"},
-  "K_vc": {"value": 0.04, "units": "m3_per_Js", "data_reference": "to_be_identified", "sourced": "no"}
+  "K_vo": {"value": 0.12, "units": "m3_per_Js", "data_reference": "mynard2012simple; Table III (p. 634), Aortic, Normal: K_vo = 0.012 cm^2/(dyn s) = 0.12 m^3/(J s) (1 cm^2/(dyn s) = 10 m^3/(J s))", "sourced": "yes"},
+  "K_vc": {"value": 0.12, "units": "m3_per_Js", "data_reference": "mynard2012simple; Table III (p. 634), Aortic, Normal: K_vc = 0.012 cm^2/(dyn s) = 0.12 m^3/(J s) (1 cm^2/(dyn s) = 10 m^3/(J s))", "sourced": "yes"}
  }
 }
