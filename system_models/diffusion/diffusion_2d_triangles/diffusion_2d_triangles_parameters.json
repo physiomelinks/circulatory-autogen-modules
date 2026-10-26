@@ -1,0 +1,110 @@
+{
+ "schema_version": 1,
+ "global": {
+  "sigma_diff": {"value": 2.41e-09, "units": "m2_per_s", "data_reference": "secomb2020mass; Table 1 tissue O2 diffusivity 2410 um^2/s"}
+ },
+ "t0": {
+  "C_P_init": {"value": 0.075011, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "t1": {
+  "C_P_init": {"value": 0.107666, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "t2": {
+  "C_P_init": {"value": 0.093082, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "t3": {
+  "C_P_init": {"value": 0.027025, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "t4": {
+  "C_P_init": {"value": 0.03602, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "t5": {
+  "C_P_init": {"value": 0.104826, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "t6": {
+  "C_P_init": {"value": 0.000632, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "t7": {
+  "C_P_init": {"value": 0.098547, "units": "millimolar", "data_reference": "example: random initial concentration"},
+  "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+ },
+ "f0": {
+  "A_f": {"value": 5.656854249492381e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 4.714045207910318e-06, "units": "metre", "data_reference": "example mesh: centre of t0 to the face"},
+  "d_down": {"value": 4.714045207910318e-06, "units": "metre", "data_reference": "example mesh: centre of t1 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f1": {
+  "A_f": {"value": 4.0000000000000007e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 6.666666666666667e-06, "units": "metre", "data_reference": "example mesh: centre of t0 to the face"},
+  "d_down": {"value": 6.666666666666668e-06, "units": "metre", "data_reference": "example mesh: centre of t4 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f2": {
+  "A_f": {"value": 4.0000000000000007e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 6.666666666666667e-06, "units": "metre", "data_reference": "example mesh: centre of t1 to the face"},
+  "d_down": {"value": 6.666666666666668e-06, "units": "metre", "data_reference": "example mesh: centre of t2 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f3": {
+  "A_f": {"value": 5.656854249492381e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 4.714045207910316e-06, "units": "metre", "data_reference": "example mesh: centre of t2 to the face"},
+  "d_down": {"value": 4.714045207910322e-06, "units": "metre", "data_reference": "example mesh: centre of t3 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f4": {
+  "A_f": {"value": 4.0000000000000007e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 6.666666666666667e-06, "units": "metre", "data_reference": "example mesh: centre of t3 to the face"},
+  "d_down": {"value": 6.666666666666668e-06, "units": "metre", "data_reference": "example mesh: centre of t7 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f5": {
+  "A_f": {"value": 5.656854249492381e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 4.714045207910315e-06, "units": "metre", "data_reference": "example mesh: centre of t4 to the face"},
+  "d_down": {"value": 4.714045207910317e-06, "units": "metre", "data_reference": "example mesh: centre of t5 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f6": {
+  "A_f": {"value": 4.0000000000000007e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 6.666666666666667e-06, "units": "metre", "data_reference": "example mesh: centre of t5 to the face"},
+  "d_down": {"value": 6.666666666666668e-06, "units": "metre", "data_reference": "example mesh: centre of t6 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f7": {
+  "A_f": {"value": 5.656854249492381e-10, "units": "m2", "data_reference": "example mesh: face area"},
+  "d_up": {"value": 4.71404520791032e-06, "units": "metre", "data_reference": "example mesh: centre of t6 to the face"},
+  "d_down": {"value": 4.71404520791032e-06, "units": "metre", "data_reference": "example mesh: centre of t7 to the face"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ }
+}

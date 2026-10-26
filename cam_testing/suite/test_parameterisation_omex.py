@@ -11,6 +11,7 @@ params_for_id (when the parameterisation has them), that the run is finite, and 
 libcuflynx within 1e-6 at the output times both have. Skips when the CUFLynx binary isn't there;
 C++ versions are not applicable (CUFLynx runs CellML).
 """
+import glob
 import os
 
 import numpy as np
@@ -18,55 +19,96 @@ import pytest
 
 from cam_testing import checks, harness, omex, phlynx
 from cam_testing import system as systems
-from cam_testing.library import load_module_type, load_version
+from cam_testing.library import load_version
 
 pytestmark = pytest.mark.phlynx_pipeline
 
-_runs = {}
+#: parameterisations built and simulated in one CUFLynx run. Each run launches CUFLynx once (about
+#: 10 s), so the session's parameterisations share runs rather than taking one per module_type; the
+#: first test of a batch makes its run, so no test builds more than this many archives.
+BATCH = 40
+
+_batches = {}   # parameterisation key -> the keys of its batch
+_runs = {}      # batch (tuple of keys) -> ((built, sims, models), work_dir), or PipelineUnavailable
 
 
-def _run_module_type(mt, work_dir):
-    '''Builds every parameterisation's archive of a module_type and simulates them in one CUFLynx run.'''
+def _session_keys(session):
+    '''The parameterisation keys of this test that the session runs (not skipped), in order.'''
+    keys = []
+    for item in session.items:
+        if getattr(item, 'originalname', None) != 'cuflynx_parameterisation_omex_test' \
+                or item.get_closest_marker('skip') is not None:
+            continue
+        callspec = getattr(item, 'callspec', None)
+        key = callspec.params.get('parameterisation_key') if callspec else None
+        if key and key not in keys:
+            keys.append(key)
+    return keys
+
+
+def _batch_of(key, session):
+    '''The batch (tuple of keys) ``key`` is simulated in: the session's keys not yet in a batch,
+    BATCH at a time.'''
+    if key not in _batches:
+        keys = [k for k in _session_keys(session) if k not in _batches]
+        if key not in keys:
+            keys = [key]
+        for i in range(0, len(keys), BATCH):
+            batch = tuple(keys[i:i + BATCH])
+            _batches.update({k: batch for k in batch})
+    return _batches[key]
+
+
+def _run_batch(keys, work_dir):
+    '''Builds the archives of the parameterisations ``keys`` and simulates them in one CUFLynx run.
+    Returns (built, sims, models): models is each one's libcuflynx model, generated for its archive.'''
     from cam_testing.pytest_plugin import UNCHANGED   # skipped as unchanged (--changed-only): not built
-    jobs, reports, built = [], {}, {}
-    for v in load_module_type(mt).versions():
+    jobs, reports, built, models = [], {}, {}, {}
+    for mt, version_name, inst_name in keys:
+        v = load_version(mt, version_name)
         if (v.format != 'cellml' and not v.is_supermodule) or v.key in UNCHANGED:
             continue
         spec = v.spec
-        for inst in v.parameterisations():
-            key = f'{v.id}__{inst.name}'
-            try:
-                # at the parameterisation's own archive path (what make omex writes), so the report links
-                # this archive and CI builds each one once
-                path = omex.build(v, inst, work_dir=os.path.join(work_dir, key))
-            except Exception as e:  # noqa: BLE001 - recorded per parameterisation
-                built[key] = e
-                continue
-            built[key] = path
-            reports[key] = {'omex': path}
-            jobs.append({'id': key, 'sim_time': float(spec.get('sim_time', 1.0)), 'dt': float(spec.get('dt', 0.01)),
-                         'extra_outputs': [harness.output_name(o) for o in (spec.get('outputs') or [])]})
+        inst = v.parameterisation(inst_name)
+        key = f'{v.id}__{inst.name}'
+        try:
+            # at the parameterisation's own archive path (what make omex writes), so the report links
+            # this archive and CI builds each one once
+            path = omex.build(v, inst, work_dir=os.path.join(work_dir, key))
+        except Exception as e:  # noqa: BLE001 - recorded per parameterisation
+            built[key] = e
+            continue
+        built[key] = path
+        # the model omex.build generated for the archive (harness.generate, as the comparison would)
+        generated = [g for g in glob.glob(os.path.join(work_dir, key, 'generated_models', '*', '*.cellml'))
+                     if not g.endswith('_flat.cellml')]
+        if len(generated) == 1:
+            models[key] = generated[0]
+        reports[key] = {'omex': path}
+        jobs.append({'id': key, 'sim_time': float(spec.get('sim_time', 1.0)), 'dt': float(spec.get('dt', 0.01)),
+                     'extra_outputs': [harness.output_name(o) for o in (spec.get('outputs') or [])]})
     sims = phlynx.simulate(jobs, reports, work_dir) if jobs else {}
-    return built, sims
+    return built, sims, models
 
 
-def cuflynx_parameterisation_omex_test(parameterisation_key, tmp_path_factory):
+def cuflynx_parameterisation_omex_test(parameterisation_key, tmp_path_factory, request):
     mt, version_name, inst_name = parameterisation_key
     v = load_version(mt, version_name)
     name = f'cuflynx_parameterisation_omex_test__{inst_name}'
     if v.format != 'cellml' and not v.is_supermodule:
         checks.save(v, checks.Result(name, checks.NOT_APPLICABLE, 'C++ version: CUFLynx runs CellML models'))
         pytest.skip('C++ version')
-    if mt not in _runs:
-        work_dir = str(tmp_path_factory.mktemp(f'omex_{mt}'))
+    batch = _batch_of(parameterisation_key, request.session)
+    if batch not in _runs:
+        work_dir = str(tmp_path_factory.mktemp('omex'))
         try:
-            _runs[mt] = (_run_module_type(mt, work_dir), work_dir)
+            _runs[batch] = (_run_batch(batch, work_dir), work_dir)
         except phlynx.PipelineUnavailable as e:
-            _runs[mt] = (e, work_dir)
-    run, work_dir = _runs[mt]
+            _runs[batch] = (e, work_dir)
+    run, work_dir = _runs[batch]
     if isinstance(run, phlynx.PipelineUnavailable):
         pytest.skip(f'CUFLynx unavailable: {run}')
-    built, sims = run
+    built, sims, models = run
     inst = v.parameterisation(inst_name)
     key = f'{v.id}__{inst_name}'
     problems = []
@@ -92,7 +134,8 @@ def cuflynx_parameterisation_omex_test(parameterisation_key, tmp_path_factory):
     metrics = {'imported': imported, 'n_points': cf.get('n_points'), 'cuflynx_version': cf.get('cuflynx_version')}
     if not problems:
         # the same parameterisation through libcuflynx, compared at the times both logged
-        path = harness.generate(v, str(tmp_path_factory.mktemp(f'lib_{key}')), parameters=inst.parameters(), parameterisation=inst)
+        path = models.get(key) or harness.generate(v, str(tmp_path_factory.mktemp(f'lib_{key}')),
+                                                   parameters=inst.parameters(), parameterisation=inst)
         lib_t, lib = systems.simulate(path, dict(v.spec, pre_time=0.0), phlynx.SOLVER_INFO)
         wanted = [harness.output_name(o) for o in (v.spec.get('outputs') or [])]
         if any(w not in lib for w in wanted):
@@ -107,8 +150,7 @@ def cuflynx_parameterisation_omex_test(parameterisation_key, tmp_path_factory):
     if problems:
         checks.save(v, checks.Result(name, checks.FAILED, problems[0], metrics, details=problems[1:20]))
         ef = v.spec.get('expected_failures') or {}
-        # (cuflynx_instance_omex_test: the test's former name)
-        known = ef.get('cuflynx_parameterisation_omex_test') or ef.get('cuflynx_instance_omex_test')
+        known = ef.get('cuflynx_parameterisation_omex_test')
         if not known and isinstance(built.get(key), Exception) and ef.get('run_test'):
             # the version's model doesn't generate (a known run_test failure), so there is no archive
             known = f'run_test known failure: {ef["run_test"]}'

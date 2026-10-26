@@ -72,7 +72,7 @@
       "min_children": 1
     },
     "version": {
-      "description": "One version: the math (CellML component, one config entry, units) and its tests. The version name is the config entry's module_subtype. A supermodule version (module_format supermodule) has no CellML or units of its own. A version of an external model (module_format external_api, e.g. a FEniCS model) keeps the model in {module_type}_{version}_model.py, which its api block names, and has a placeholder CellML and units file with no component, like the C++ FV1D_vessel versions.",
+      "description": "One version: the math (CellML component, one config entry, units) and its tests. The version name is the config entry's module_subtype. A supermodule version (module_format supermodule) has no CellML or units of its own: its config lists the submodule versions it is built from (submodule_versions), {module_type}_{version}_module_array.json beside it holds its instances (submodules) and their internal connections, and its default parameterisation their parameter values, nested by instance (the template a model's instance is copied from). A version of an external model (module_format external_api, e.g. a FEniCS model) keeps the model in {module_type}_{version}_model.py, which its api block names, and has a placeholder CellML and units file with no component, like the C++ FV1D_vessel versions.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
@@ -84,6 +84,9 @@
         "required_unless_supermodule": [
           "{module_type}_{version}_modules.cellml",
           "{module_type}_{version}_units.cellml"
+        ],
+        "required_if_supermodule": [
+          "{module_type}_{version}_module_array.json"
         ],
         "optional": [
           "{module_type}_{version}_references_proposed.bib",
@@ -117,12 +120,12 @@
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
-          "{parameterisation}_parameters.csv"
+          "{parameterisation}_parameters.json"
         ],
         "optional": [
           "{parameterisation}_obs_data.json",
-          "{parameterisation}_params_for_id.csv",
-          "{parameterisation}_calibrated_parameters.csv",
+          "{parameterisation}_params_for_id.json",
+          "{parameterisation}_calibrated_parameters.json",
           "{parameterisation}_calibration.json",
           "SOURCES.md"
         ],
@@ -133,6 +136,7 @@
         "ignored_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.omex$",
         "generated_note": "Built by tools/build_parameterisation_omex.py (make omex) from the files above and the version's files; not committed. A COMBINE archive for CUFLynx: the flattened model of the version's test network with this parameterisation's parameters as master, the obs_data and params_for_id, and every input incl. the verification config."
       },
+      "parameters_note": "{parameterisation}_parameters.json (and _calibrated_parameters.json) is libcuflynx's nested JSON rooted at the module: own variables at the top, globals under \"global\", a supermodule's instances nested; each parameter has the keys in parameters_columns (sourced optional).",
       "parameters_columns": [
         "variable_name",
         "units",
@@ -192,7 +196,7 @@
       ]
     },
     "system_model": {
-      "description": "One model: its module array (records name a module_type, a version as module_subtype, and a parameterisation), parameters (which win over the parameterisations'), spec, and under reference/ what it must reproduce: circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
+      "description": "One model: its module array (records name a module_type, a version as module_subtype, and a parameterisation), its parameters ({model}_parameters.json, libcuflynx's nested JSON: instance, sub-instance, variable; a supermodule instance's values under its name, written once from its version's default parameterisation by cuflynx-upgrade supermodule-instances; they win over the parameterisations'), spec, and under reference/ what it must reproduce, if anything (a model with no reference sets its spec's equivalence status to not_applicable): circulatory_autogen's original (a module array), or a ready CellML model (reference/{model}.cellml, or the spec's equivalence.reference_cellml), e.g. PhLynx's flattened export.",
       "name_pattern": "^[A-Za-z0-9][A-Za-z0-9_]*$",
       "files": {
         "required": [
@@ -200,10 +204,10 @@
           "{model}_system.yaml"
         ],
         "optional": [
-          "{model}_parameters.csv",
-          "{model}_parameters_unfinished.csv",
+          "{model}_parameters.json",
+          "{model}_parameters_unfinished.json",
           "{model}_obs_data.json",
-          "{model}_params_for_id.csv"
+          "{model}_params_for_id.json"
         ],
         "ignored_pattern": "^user_inputs_.*\\.yaml$"
       },

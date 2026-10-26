@@ -48,6 +48,7 @@ sys.path.insert(0, os.path.join(REPO, 'tools'))
 from cam_testing import bib as bibmod  # noqa: E402
 from cam_testing.library import DEFAULT_LICENCE, write_spec  # noqa: E402
 from import_from_libcuflynx import read_units_blocks, units_closure, write_units_file  # noqa: E402
+from parameter_files import read_module_table, write_params_for_id, write_parameterisation  # noqa: E402
 
 MAP = os.path.join(REPO, 'tools', 'restructure_map.yaml')
 MODULES = os.path.join(REPO, 'modules')
@@ -130,8 +131,8 @@ class OldModule:
         self.cellml = open(os.path.join(d, f'{n}_modules.cellml')).read()
         up = os.path.join(d, f'{n}_units.cellml')
         self.units = read_units_blocks([up]) if os.path.isfile(up) else {}
-        pp = os.path.join(d, f'{n}_parameters.csv')
-        self.params = list(csv.DictReader(open(pp, newline=''))) if os.path.isfile(pp) else []
+        pp = os.path.join(d, f'{n}_parameters.json')
+        self.params = read_module_table(pp) if os.path.isfile(pp) else []
         self.bib = self._bib_blocks(os.path.join(d, f'{n}_references.bib'))
         self.bib_proposed = self._bib_blocks(os.path.join(d, f'{n}_references_proposed.bib'))
         self.comp_specs = {(c['vessel_type'], c['BC_type']): c for c in self.spec.get('components', [])}
@@ -218,11 +219,11 @@ def write_yaml(path, data, header=None):
         yaml.safe_dump(data, f, **YAML_KW)
 
 
-def write_instance_parameters(path, rows):
-    with open(path, 'w', newline='') as f:
-        w = csv.DictWriter(f, fieldnames=INSTANCE_COLUMNS, extrasaction='ignore')
-        w.writeheader()
-        w.writerows(rows)
+def write_instance_parameters(path, rows, global_names=()):
+    '''A parameterisation's nested JSON parameters (tools/parameter_files.py); a row named in
+    ``global_names`` is a global.'''
+    write_parameterisation(path, [{c: r.get(c, '') for c in INSTANCE_COLUMNS} for r in rows],
+                           global_names)
 
 
 def config_head(entry, mt, v, component_file, component_type, extra):
@@ -325,7 +326,7 @@ def validation_split(old_val, instance_files):
             if kind == 'calibrate':
                 same = blk.get('obs_data') == blk.get('validation_obs_data')
                 blk['obs_data'] = f'{idir}{data_inst}_obs_data.json'
-                blk['params_for_id'] = f'{idir}{data_inst}_params_for_id.csv'
+                blk['params_for_id'] = f'{idir}{data_inst}_params_for_id.json'
                 if same:
                     blk.pop('validation_obs_data', None)
                 else:
@@ -480,12 +481,14 @@ def build_version(stage, cat, mt, v, info, old, table, library_bibs, all_blocks,
     val = validation_split(comp_spec.get('validation'), data)
     inst_root = os.path.join(dest, 'instances')
     os.makedirs(os.path.join(inst_root, 'default'), exist_ok=True)
-    write_instance_parameters(os.path.join(inst_root, 'default', 'default_parameters.csv'), rows)
+    glob_names = {r['variable_name'] for r in glob_rows}
+    write_instance_parameters(os.path.join(inst_root, 'default', 'default_parameters.json'), rows,
+                              glob_names)
     if data:
         name, files = data
         idir = os.path.join(inst_root, name)
         os.makedirs(idir, exist_ok=True)
-        write_instance_parameters(os.path.join(idir, f'{name}_parameters.csv'), rows)
+        write_instance_parameters(os.path.join(idir, f'{name}_parameters.json'), rows, glob_names)
         cal = (comp_spec.get('validation') or {}).get('calibrate') or {}
         for f in inst_infos[0]['from']:
             src = os.path.join(old.dir, f)
@@ -495,10 +498,12 @@ def build_version(stage, cat, mt, v, info, old, table, library_bibs, all_blocks,
             elif f == cal.get('validation_obs_data'):
                 target = f'{name}_validation_obs_data.json'
             elif f == cal.get('params_for_id'):
-                target = f'{name}_params_for_id.csv'
+                target = f'{name}_params_for_id.json'
             else:
                 target = base
-            if target.endswith('_obs_data.json'):
+            if target.endswith('_params_for_id.json') and src.endswith('.csv'):
+                write_params_for_id(os.path.join(idir, target), open(src).read())
+            elif target.endswith('_obs_data.json'):
                 obs = json.load(open(src))
                 obs = {'obs_data_name': name, **{k: x for k, x in obs.items() if k != 'obs_data_name'}}
                 write_json(os.path.join(idir, target), obs)
@@ -591,7 +596,7 @@ def build_zero_flow(stage, olds):
     write_json(os.path.join(dest, f'{stem}_modules_config.json'), [entry])
     needed, _ = units_closure({'m3_per_s'} | set(re.findall(r'\bunits="([^"]+)"', block)), owner.units)
     write_units_file(os.path.join(dest, f'{stem}_units.cellml'), needed, owner.units)
-    write_instance_parameters(os.path.join(dest, 'instances', 'default', 'default_parameters.csv'), [])
+    write_instance_parameters(os.path.join(dest, 'instances', 'default', 'default_parameters.json'), [])
     spec = {'module_type': mt, 'version': v, 'reviewed': False, 'sim_time': 1.0, 'pre_time': 0.0, 'dt': 0.01,
             'solver': 'CVODE_myokit', 'outputs': ['v_zero'],
             'invariants': [{'description': 'the flow is zero', 'expr': 'v_zero == 0'}],
@@ -634,7 +639,7 @@ def build_supermodule(stage, cat, mt, v, sdir, table, library_bibs):
                 r['sourced'] = 'yes' if looks_sourced(r.get('data_reference', '')) else 'no'
             rows.append(r)
     os.makedirs(os.path.join(dest, 'instances', 'default'), exist_ok=True)
-    write_instance_parameters(os.path.join(dest, 'instances', 'default', 'default_parameters.csv'), rows)
+    write_instance_parameters(os.path.join(dest, 'instances', 'default', 'default_parameters.json'), rows)
 
     old_spec = yaml.safe_load(open(os.path.join(sdir, f'{name}_supermodule.yaml'))) or {}
     description = old_spec.get('description', entry.get('description', ''))

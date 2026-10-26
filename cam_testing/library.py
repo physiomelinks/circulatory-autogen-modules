@@ -15,11 +15,14 @@ Layout (modules/README.md and modules/directory_schema.json describe it in full)
             <module_type>_<version>.html                  version report (generated)
             risk/  plots/  results/                       (plots, results generated)
             parameterisations/<p>/                        p == obs_data_name (a parameterisation)
-                <p>_parameters.csv                        variable_name,units,value,data_reference,sourced
+                <p>_parameters.json                       nested values (libcuflynx parameters_file): own
+                                                          variables at the top, globals under "global", a
+                                                          supermodule's instances nested; leaves {value,
+                                                          units, data_reference, sourced}
                 <p>_obs_data.json                         optional: calibration data (data_items) and
                                                           held-out data (prediction_items with a value)
-                <p>_params_for_id.csv                     optional
-                <p>_calibrated_parameters.csv             written by calibration (committed)
+                <p>_params_for_id.json                    optional
+                <p>_calibrated_parameters.json            written by calibration (committed)
                 <p>_calibration.json                      written by calibration (committed)
 
 A module_type directory is any directory under modules/ with a versions/ subdirectory. A module_type
@@ -57,11 +60,7 @@ def __getattr__(name):
 
 
 VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameterisations', 'default'
-# a version's parameter sets were called instances (instances/, default_instance) before
-# 2026-10-09; "instance" now means one use of a version in a network. The old names are read too.
-LEGACY_PARAMETERISATIONS, LEGACY_DEFAULT_KEY = 'instances', 'default_instance'
 DEFAULT_KEY = 'default_parameterisation'
-INSTANCES, DEFAULT_INSTANCE = PARAMETERISATIONS, DEFAULT_PARAMETERISATION   # the former names
 SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
 # directories under modules/ that are not categories or module_types (another session's work in
@@ -261,9 +260,10 @@ def select_module_types(selectors, include_libraries=False):
 # config formats
 # ----------------------------------------------------------------------------------------------
 
-# Module configs come in two formats: PhLynx's (this library's) and libcuflynx's original.
-# Both are read; code here uses libcuflynx's internal names. module_type means different things in
-# the two, so the format is told by the other keys, never by module_type.
+# Config files use PhLynx's key names (module_type, module_subtype, component_file, component_type),
+# as libcuflynx does. Code here works on entries in internal names (PHLYNX_KEYS: vessel_type, BC_type,
+# module_file, and module_type for the CellML component); config_format tells the two apart by the
+# other keys, never by module_type, which means different things in each.
 PHLYNX_KEYS = {'module_type': 'vessel_type', 'module_subtype': 'BC_type',
                'component_file': 'module_file', 'component_type': 'module_type'}
 LIBCUFLYNX_KEYS = ('vessel_type', 'BC_type', 'module_file', 'module_type')
@@ -299,7 +299,7 @@ def with_record_keys(entry, licence=DEFAULT_LICENCE, creator=None):
               'creator': list(entry.get('creator', creator if creator is not None else []))}
     rest = [(k, v) for k, v in entry.items() if k not in RECORD_KEYS]
     keys = [k for k, _ in rest]
-    anchor = next((k for k in (DEFAULT_KEY, LEGACY_DEFAULT_KEY, 'module_subtype', 'BC_type') if k in keys), None)
+    anchor = next((k for k in (DEFAULT_KEY, 'module_subtype') if k in keys), None)
     out = {}
     if anchor is None:
         out.update(values)
@@ -351,9 +351,18 @@ def to_phlynx_entry(entry):
     return {**head, **{k: v for k, v in e.items() if k not in LIBCUFLYNX_KEYS and k != 'module_format'}}
 
 
+def entry_from_file(entry, path):
+    '''A config entry read from ``path`` -> internal names. An entry in libcuflynx's older keys
+    (vessel_type, BC_type, module_file) is refused, as libcuflynx refuses it.'''
+    if config_format(entry) == 'libcuflynx':
+        raise ValueError(f'{path}: config entry uses the older keys vessel_type/BC_type/module_file; '
+                         f'convert it once with: cuflynx-upgrade module-config {path}')
+    return normalise_config_entry(entry)
+
+
 def read_config(path):
     with open(path) as f:
-        return [normalise_config_entry(e) for e in json.load(f)]
+        return [entry_from_file(e, path) for e in json.load(f)]
 
 
 # ----------------------------------------------------------------------------------------------
@@ -390,6 +399,7 @@ class Parameter:
     kind: str = ''                  # from the config's variables_and_units
     proposed: bool = False          # value comes from a review proposal (not in the parameters file yet)
     model_name: str = ''            # its name in a generated model, when known (a supermodule's flattened parameters)
+    in_global: bool = False         # under "global" in its parameters file
 
     @property
     def is_global(self):
@@ -409,28 +419,40 @@ class Parameter:
 
 
 def read_parameters(path, kinds=None):
-    '''A parameterisation's parameters (kind from the config's variables_and_units, where it has one).'''
+    '''A parameterisation's parameters (nested JSON rooted at the module, read by libcuflynx's
+    parameters_file), in file order: a global by its plain name (``in_global``), an own variable by its
+    name, a supermodule's instance value by its path (``lv/E_A``). kind from the config's
+    variables_and_units, where it has one.'''
+    from libcuflynx.utilities import parameters_file as pf
     kinds = kinds or {}
     out = []
     if not os.path.isfile(path):
         return out
-    with open(path, newline='') as f:
-        for row in csv.DictReader(f):
-            row = {(k or '').strip(): (v or '').strip() for k, v in row.items()}
-            if not row.get('variable_name'):
-                continue
-            out.append(Parameter(row['variable_name'], row.get('units', ''), row.get('value', ''),
-                                 row.get('data_reference', ''), row.get('sourced', ''),
-                                 kinds.get(row['variable_name'], '')))
+    for row in pf.read_parameter_rows(path, kind=pf.MODULE):
+        name = row['variable_name']
+        in_global = name.startswith(pf.GLOBAL + '/')
+        if in_global:
+            name = name[len(pf.GLOBAL) + 1:]
+        out.append(Parameter(name, row.get('units', ''), row.get('value', ''),
+                             row.get('data_reference', ''), row.get('sourced', ''),
+                             kinds.get(name, ''), in_global=in_global))
     return out
 
 
 def write_parameters(path, parameters):
-    with open(path, 'w', newline='') as f:
-        w = csv.writer(f)
-        w.writerow(INSTANCE_COLUMNS)
-        for p in parameters:
-            w.writerow([p.variable_name, p.units, p.value, p.data_reference, p.sourced])
+    '''Write ``parameters`` as a parameterisation's parameters file (nested JSON rooted at the module): a
+    global (``in_global``, or kind global_constant) under "global", the others at their paths.'''
+    from libcuflynx.utilities import parameters_file as pf
+    rows = []
+    for p in parameters:
+        name = p.variable_name
+        if (p.in_global or p.is_global) and '/' not in name:
+            name = f'{pf.GLOBAL}/{name}'
+        row = {'variable_name': name, 'units': p.units, 'value': p.value, 'data_reference': p.data_reference}
+        if p.sourced:
+            row['sourced'] = p.sourced
+        rows.append(row)
+    pf.write_parameter_rows(path, rows, pf.MODULE)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -649,7 +671,7 @@ class ModuleType:
 @dataclass
 class Parameterisation:
     '''A named parameter set of a version (same maths, its own values, data and set-ups):
-    <version>/parameterisations/<name>/. Formerly called an instance.'''
+    <version>/parameterisations/<name>/.'''
     version: 'Version'
     name: str
 
@@ -670,7 +692,7 @@ class Parameterisation:
 
     @property
     def parameters_path(self):
-        return self.path('parameters.csv')
+        return self.path('parameters.json')
 
     @property
     def obs_data_path(self):
@@ -678,11 +700,11 @@ class Parameterisation:
 
     @property
     def params_for_id_path(self):
-        return self.path('params_for_id.csv')
+        return self.path('params_for_id.json')
 
     @property
     def calibrated_parameters_path(self):
-        return self.path('calibrated_parameters.csv')
+        return self.path('calibrated_parameters.json')
 
     @property
     def calibration_path(self):
@@ -747,8 +769,6 @@ class Parameterisation:
                       if f != os.path.basename(self.parameters_path) and not f.endswith('.omex')
                       and f != SOURCE_FIGURES)   # .omex: generated
 
-
-Instance = Parameterisation   # the former name
 
 
 @dataclass
@@ -897,15 +917,13 @@ class Version:
 
     @property
     def parameterisations_dir(self):
-        '''<version>/parameterisations/ (or a library still on the old layout's instances/).'''
-        new = os.path.join(self.dir, PARAMETERISATIONS)
-        old = os.path.join(self.dir, LEGACY_PARAMETERISATIONS)
-        return old if not os.path.isdir(new) and os.path.isdir(old) else new
+        '''<version>/parameterisations/.'''
+        return os.path.join(self.dir, PARAMETERISATIONS)
 
     # --- parameterisations ------------------------------------------------------------------
     @property
     def default_parameterisation_name(self):
-        return self.config.get(DEFAULT_KEY) or self.config.get(LEGACY_DEFAULT_KEY) or DEFAULT_PARAMETERISATION
+        return self.config.get(DEFAULT_KEY) or DEFAULT_PARAMETERISATION
 
     def parameterisation_names(self):
         root = self.parameterisations_dir
@@ -924,14 +942,6 @@ class Version:
     @property
     def default_parameterisation(self):
         return self.parameterisation()
-
-    # the former names (instance = parameterisation)
-    instances_dir = parameterisations_dir
-    default_instance_name = default_parameterisation_name
-    instance_names = parameterisation_names
-    instances = parameterisations
-    instance = parameterisation
-    default_instance = default_parameterisation
 
     # --- parameters -------------------------------------------------------------------------
     @property
@@ -977,8 +987,51 @@ class Version:
 
     # --- supermodules -----------------------------------------------------------------------
     @property
+    def module_array_path(self):
+        '''<module_type>_<version>_module_array.json: a supermodule version's instances and their coupling.'''
+        return self.path('module_array.json')
+
+    @functools.cached_property
     def submodules(self):
-        return self.config.get('submodules') or []
+        '''A supermodule's instance records, read and checked by libcuflynx from its module array
+        (``module_array_path``); [] for a component.'''
+        if not self.is_supermodule:
+            return []
+        from libcuflynx.utilities.config_schemas import load_supermodule_array, normalise_supermodule_entry
+        entry = normalise_supermodule_entry(self.raw_entry, self.config_path)
+        return load_supermodule_array(entry, self.config_path)
+
+    @property
+    def instance_parameters_path(self):
+        '''A supermodule version's template, the values a new instance of it starts from: its default
+        parameterisation's parameters file (its instances' values nested under their names).'''
+        return os.path.join(self.parameterisations_dir, self.default_parameterisation_name,
+                            f'{self.default_parameterisation_name}_parameters.json')
+
+    @functools.cached_property
+    def instance_parameters(self):
+        '''{instance: {path: parameter}} of a supermodule's template (``instance_parameters_path``): each
+        instance of its module array (``{}`` when the template gives it nothing), its values by their path
+        in it (``E_A``; ``i_M/rho_M`` in a nested supermodule instance); {} for a component.'''
+        if not self.is_supermodule:
+            return {}
+        from libcuflynx.utilities import parameters_file as pf
+        doc = (pf.read_parameters_file(self.instance_parameters_path, kind=pf.MODULE)
+               if os.path.isfile(self.instance_parameters_path) else {})
+        out = {}
+        for sub in self.submodules:
+            node = doc.get(sub['name']) or {}
+            flat = {}
+
+            def walk(n, prefix):
+                for k, v in n.items():
+                    if pf.is_leaf(v):
+                        flat['/'.join(prefix + [k])] = v
+                    else:
+                        walk(v, prefix + [k])
+            walk(node, [])
+            out[sub['name']] = flat
+        return out
 
     @property
     def submodule_names(self):
@@ -1011,7 +1064,7 @@ def _load_version(mt_name, version):
         raw = json.load(f)
     if len(raw) != 1:
         raise ValueError(f'{cfg_path}: a version config has exactly one entry, not {len(raw)}')
-    entry = normalise_config_entry(raw[0])
+    entry = entry_from_file(raw[0], cfg_path)
     tests, verification = read_spec_files(vdir, stem)
     spec = merge_spec(tests, verification)
     if isinstance(spec.get('review'), str):
