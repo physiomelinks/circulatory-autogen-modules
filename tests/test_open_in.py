@@ -47,7 +47,7 @@ def test_celldl_link_only_for_a_bond_graph(tmp_path):
     with open(bondgraph.document_path(v), 'w') as f:
         f.write('<svg xmlns="http://www.w3.org/2000/svg"/>')
     assert report.open_in_context(v)['celldl'] == {'href': 'mt_v_bondgraph.svg', 'open': report.CELLDL_OPEN}
-    assert report.CELLDL_OPEN == 'https://finbarargus.github.io/CellDLEditorComponent/?open=celldl#'
+    assert report.CELLDL_OPEN == 'https://physiomelinks.github.io/CellDLEditorComponent/?open=celldl#'
 
 
 def test_phlynx_link_to_the_kept_export(tmp_path):
