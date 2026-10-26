@@ -1,0 +1,30 @@
+{
+ "schema_version": 1,
+ "global": {
+  "P_m": {"value": 0, "units": "J_per_m3", "data_reference": "control_parasymp: known", "sourced": "no"}
+ },
+ "flag_P_mus_control": {"value": 1.0, "units": "dimensionless", "data_reference": "control_parasymp: albanese2016integrated", "sourced": "yes"},
+ "flag_RR_control": {"value": 1.0, "units": "dimensionless", "data_reference": "control_parasymp: albanese2016integrated", "sourced": "yes"},
+ "P_mus_min": {"value": -980, "units": "J_per_m3", "data_reference": "control_parasymp: Albanese2016_-980_in_this_formulation_is_-490_in_Albanese", "sourced": "yes"},
+ "P_plEE": {"value": -490, "units": "J_per_m3", "data_reference": "control_parasymp: WestPulmonaryPhysiology2008", "sourced": "yes"},
+ "q_D_min": {"value": 1e-05, "units": "m3", "data_reference": "control_parasymp: user_defined", "sourced": "no"},
+ "q_l_us": {"value": 3.44e-05, "units": "m3", "data_reference": "control_parasymp: YasuhiroFukui1972", "sourced": "yes"},
+ "q_t_us": {"value": 6.63e-06, "units": "m3", "data_reference": "control_parasymp: YasuhiroFukui1972", "sourced": "yes"},
+ "q_b_us": {"value": 1.87e-05, "units": "m3", "data_reference": "control_parasymp: YasuhiroFukui1972", "sourced": "yes"},
+ "q_A_us": {"value": 1.26e-06, "units": "m3", "data_reference": "control_parasymp: Bizotto2022", "sourced": "yes"},
+ "R_ml": {"value": 250000, "units": "Js_per_m6", "data_reference": "control_parasymp: changed_from_100058_from_Rideout1991", "sourced": "yes"},
+ "R_lt": {"value": 85000, "units": "Js_per_m6", "data_reference": "control_parasymp: changed_from_33016_from_Rideout1991", "sourced": "yes"},
+ "R_tb": {"value": 80000, "units": "Js_per_m6", "data_reference": "control_parasymp: changed_from_30017_from_Rideout1991", "sourced": "yes"},
+ "R_bA": {"value": 22000, "units": "Js_per_m6", "data_reference": "control_parasymp: changed_from_8006_from_Rideout1991", "sourced": "yes"},
+ "R_plwall": {"value": 10000, "units": "Js_per_m6", "data_reference": "control_parasymp: changed_from_1.00e+04_fromRideout1991", "sourced": "yes"},
+ "alpha_LR": {"value": 1.0, "units": "dimensionless", "data_reference": "control_parasymp: user_defined", "sourced": "no"},
+ "C_l": {"value": 1.30e-08, "units": "m6_per_J", "data_reference": "control_parasymp: YasuhiroFukui1972", "sourced": "yes"},
+ "C_t": {"value": 2.43e-08, "units": "m6_per_J", "data_reference": "control_parasymp: YasuhiroFukui1972", "sourced": "yes"},
+ "C_b": {"value": 1.34e-06, "units": "m6_per_J", "data_reference": "control_parasymp: YasuhiroFukui1972", "sourced": "yes"},
+ "C_A": {"value": 2.04e-05, "units": "m6_per_J", "data_reference": "control_parasymp: YasuhiroFukui1972_increased_to_get_approx_3L_volume", "sourced": "yes"},
+ "C_pl": {"value": 2.50e-06, "units": "m6_per_J", "data_reference": "control_parasymp: user_defined_to_be_identified", "sourced": "no"},
+ "T_resp": {"value": 5, "units": "second", "data_reference": "control_parasymp: WestPulmonaryPhysiology2008", "sourced": "yes"},
+ "Delta_RR_resp": {"value": 0, "units": "per_s", "data_reference": "control_phys_asd: small_chosen", "sourced": "no"},
+ "Delta_P_mus": {"value": 0, "units": "J_per_m3", "data_reference": "control_phys_asd: small_chosen", "sourced": "no"},
+ "IE_ratio": {"value": 0.6, "units": "dimensionless", "data_reference": "control_parasymp: Bizotto2022", "sourced": "yes"}
+}

@@ -21,8 +21,8 @@ modules/<category>/<module_type>/                    (or modules/<module_type>/,
     <module_type>_<version>_references.bib           BibTeX entries the parameters cite
     risk/                                            joint failure-risk samples + classifier (committed)
     parameterisations/<p>/                           parameter sets; p == obs_data_name
-      <p>_parameters.csv                             variable_name,units,value,data_reference,sourced
-      <p>_obs_data.json, _params_for_id.csv, ...     calibration data and results
+      <p>_parameters.json                            nested values {value, units, data_reference, sourced}
+      <p>_obs_data.json, _params_for_id.json, ...     calibration data and results
 system_models/<category>/<model>/                    whole models built from the library
 ```
 
@@ -30,9 +30,7 @@ Three words name what a model is built from:
 
 - a **version** is different maths: its own CellML, config and tests (`versions/<version>/`);
 - a **parameterisation** is the same maths with other values: one named parameter set of a version, with its data, calibration and source figures, in `versions/<version>/parameterisations/<name>/`. The config's `default_parameterisation` names the one used by default;
-- an **instance** is one use of a version in a network: a module-array record (or a supermodule's submodule). It names the parameterisation it uses with `"parameterisation"` (default: the version's `default_parameterisation`); several instances may share one parameterisation.
-
-Parameterisations were called instances before 2026-10-09; the former names (`instances/`, `default_instance`, a record's `"instance"`) are still read.
+- an **instance** is one use of a version in a network: a module-array record (or a supermodule's submodule, a record of its own module array, which names no parameterisation). It names the parameterisation it uses with `"parameterisation"` (default: the version's `default_parameterisation`); several instances may share one parameterisation.
 
 To use the library from libcuflynx, set these in `user_inputs.yaml` (on circulatory_autogen master; not yet in a release):
 
@@ -68,7 +66,7 @@ Each version (one config entry: `module_type`/`module_subtype`) is generated alo
 | `verification_test_timestep` | fixed-step integration of the generated right-hand side at halved steps converges at the scheme's order, and agrees with CVODE at tight tolerances |
 | `stability_test` | a matrix of solvers, tolerances and timesteps (CVODE, SciPy `solve_ivp`, fixed-step Euler/Heun/RK4); reports which work, and requires the declared-supported ones to work |
 | `validation_test_baseline` | per parameterisation: model vs baseline data (NRMSE threshold) or scalar targets |
-| `validation_test_calibrate` | per parameterisation: calibrate to its obs_data with libcuflynx parameter identification, predict held-out data, and write `<p>_calibrated_parameters.csv` / `<p>_calibration.json` |
+| `validation_test_calibrate` | per parameterisation: calibrate to its obs_data with libcuflynx parameter identification, predict held-out data, and write `<p>_calibrated_parameters.json` / `<p>_calibration.json` |
 
 Supermodule versions run the same tests, generated alone and expanded into their submodules, plus `supermodule_structure_test` and `supermodule_equivalence_test` (the system model using them reproduces the one with the submodules written out). Their BC sweep varies only their global constants and the boundary conditions no internal connection closes (`bc_sweep.sweep: globals_and_bcs`, the supermodule default; `all` sweeps every parameter): each submodule's own parameters are swept in that submodule version's tests. PhLynx has no supermodule support, so their PhLynx export test fails as a recorded known issue.
 
@@ -89,7 +87,7 @@ Each parameter's **tested range** is set in `<module_type>_<version>_verificatio
 To check a system model's parameters against the modules it uses:
 
 ```bash
-python -m cam_testing.ranges check --module-array my_module_array.json --parameters my_parameters.csv
+python -m cam_testing.ranges check --module-array my_module_array.json --parameters my_parameters.json
 ```
 
 This lists each value as inside or outside its tested range and validated spread (over all the version's parameterisations), and estimates the failure risk near the values from the `make risk` samples. It exits non-zero if any value is outside a tested range.
@@ -111,16 +109,16 @@ The version report shows all of this, regenerating the plots from the committed 
 
 ## System models
 
-`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart split into cardiac clock, chamber and valve vessels (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`). System models are not modules or supermodules: they use the library. Every module-array record (an instance of a version) names a module_type, a version (`module_subtype`) and the parameterisation it uses (`"parameterisation": "default"`); the model's own parameters file wins over the parameterisation's values. Each directory contains:
-- the module array and parameters;
-- the original under `reference/`: circulatory_autogen's files with only the bib keys changed to this library's (`tools/bib_rekey_map.json`, applied by `tools/import_systems.py`; checked against the originals by `tests/test_structure.py`);
-- a `<model>_system.yaml` spec.
+`system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart as one heart supermodule version (cardiac clock, chambers and valves: `heart/cardiac_clock`, `heart/chamber`, `heart/valve`). `closed_loop_cvs/obsolete_3compartment` alone keeps circulatory_autogen's flat heart, as a check of the supermodule. System models are not modules or supermodules: they use the library. Every module-array record (an instance of a version) names a module_type, a version (`module_subtype`) and the parameterisation it uses (`"parameterisation": "default"`); the model's own parameters file wins over the parameterisation's values. Each directory contains:
+- the module array and parameters (`<model>_parameters.json`, libcuflynx's nested JSON: instance, sub-instance, variable). A supermodule instance's values are under its name there, written once from the version's template (its default parameterisation) by `cuflynx-upgrade supermodule-instances`; generation reads them, never the template;
+- the original under `reference/`: circulatory_autogen's files with only the bib keys changed to this library's (`tools/bib_rekey_map.json`, applied by `tools/import_systems.py`; checked against the originals by `tests/test_structure.py`). A model whose original has a flat heart has no `reference/`: its spec sets `equivalence: {status: not_applicable, reason: ...}` and its notes say how its conversion to the heart supermodule was checked. `closed_loop_cvs/obsolete_3compartment` is the flat-heart check;
+- a `<model>_system.yaml` spec. Its output names (`equivalence.output_map`, `ignore`) name a nested vessel by its path, `SN/soma/membrane/V` for the model's `SN__soma__membrane/V`; the flat form is accepted too.
 
-The reference can instead be a ready CellML model, simulated as it is: for example the flattened model PhLynx exports, for a model first built in PhLynx. Set `equivalence.reference_cellml: reference/<file>.cellml` in the spec (a path relative to the model's directory), or put it at `reference/<model>.cellml` with no vessel array beside it. Its outputs are `<component>/<variable>` for every component except `environment`, `global_parameters` and `instance_parameters` (`equivalence.ignore_components` changes the list); `output_map`, `ignore`, `wrapped`, `reciprocal` and `tol` work as for an original. PhLynx names a vessel's component by the vessel's name, so its outputs match the library model's `<vessel>/<variable>` with no `output_map`.
+The reference can instead be a ready CellML model, simulated as it is: for example the flattened model PhLynx exports, for a model first built in PhLynx. Set `equivalence.reference_cellml: reference/<file>.cellml` in the spec (a path relative to the model's directory), or put it at `reference/<model>.cellml` with no module array beside it. Its outputs are `<component>/<variable>` for every component except `environment`, `global_parameters` and `instance_parameters` (`equivalence.ignore_components` changes the list); `output_map`, `ignore`, `wrapped`, `reciprocal` and `tol` work as for an original. PhLynx names a vessel's component by the vessel's name, so its outputs match the library model's `<vessel>/<variable>` with no `output_map`.
 
 `tests/test_systems.py` checks three things for each model:
 - it runs;
-- it reproduces the original, with every logged output within 1e-6 at the spec's CVODE tolerances;
+- it reproduces the original, when it has one, with every logged output within 1e-6 at the spec's CVODE tolerances;
 - its invariants hold.
 
 Models whose original doesn't generate in circulatory_autogen carry `expected_failures` or `skip` with the reason. `tools/import_systems.py --ca-dir ../circulatory_autogen` re-imports them and never overwrites a spec.
@@ -128,9 +126,9 @@ Models whose original doesn't generate in circulatory_autogen carry `expected_fa
 Some system models are examples built from this library, with no circulatory_autogen original (equivalence `not_applicable`); their invariants check exact solutions instead:
 - `system_models/diffusion/`: finite-volume diffusion meshes (`tools/build_diffusion_examples.py`).
 
-Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and still reads the older CSV layout by converting each row to the same record. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
+Module arrays are JSON (`<model>_module_array.json`): a list of records in PhLynx's key names, e.g. `{"name": "venous_svc", "module_type": "venous", "module_subtype": "vp", "parameterisation": "default", "inp_instances": ["systemic_T"], "out_instances": ["heart", "volume_sum"]}`. libcuflynx reads them, and the CSV layout with the same columns. `tools/convert_module_arrays.py` converts CSV files; `cam_testing/module_array.py` reads either.
 
-Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A model uses one through one record:
+Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock, four chambers and four valves, and `cell/neuron`, its nested `soma` and `varicosity` have `sympathetic` supermodule versions (see [`modules/README.md`](modules/README.md#supermodule-versions)). A supermodule version's config lists the submodule versions it is built from (`submodule_versions`); its instances and their internal connections are its own module array beside the config (`<module_type>_<version>_module_array.json`), and their parameter values its default parameterisation, nested by instance (the template a model's instance is copied from). A model uses one through one record:
 
 ```json
 {"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
@@ -138,7 +136,7 @@ Supermodules are versions: `heart` version `Argus2026_v01` is the cardiac clock,
  "per_submodule_outputs": {"puv": ["par"], "aov": ["aortic_root"], "ra": ["volume_sum"], "rv": ["volume_sum"], "la": ["volume_sum"], "lv": ["volume_sum"]}}
 ```
 
-The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart_<submodule>` (`heart_ra`, `heart_aov`, …), the listed host modules are coupled to it, and the parameterisation's parameters are renamed to match (`E_A_ra` becomes `E_A_heart_ra`), with the model's own values taking precedence. `system_models/closed_loop_cvs/3compartment_supermodules` is 3compartment built this way; its version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that it reproduces `3compartment` to 1e-9, and `cellular/SN_simple_supermodules` reproduces `SN_simple`.
+The host's own vessels name `heart` in their `inp_instances` / `out_instances`. libcuflynx expands the record: each submodule becomes `heart__<submodule>` (`heart__ra`, `heart__aov`, …), the listed host modules are coupled to it, and the heart instance's values in the model's parameters file (`3compartment_parameters.json`, under `heart`: `heart/ra/E_A`, a copy of the version's template made when the instance was) set the expanded submodules' parameters, over the supermodule's parameterisation's globals and each submodule version's default parameterisation. `python -m cam_testing.calibrate apply` writes a calibrated version's values into every instance of it, in the supermodule versions' templates and in the system models' parameters files. Every heart in `system_models/` is built this way. A chamber's vessel ports sum their flows (chamber `Liang2009NoVisco_v02`), so `ra` takes both venae cavae, and `la` an ASD shunt's outflow, with no junction. The version-level test (`pytest tests/test_modules.py -k supermodule`, also `make systems`) checks that `closed_loop_cvs/3compartment` reproduces `obsolete_3compartment`, the same model with circulatory_autogen's flat heart `vp_Ca` (to 1e-5, the 3compartment equivalence tolerance), and that `cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
 ## PhLynx → CUFLynx pipeline
 
@@ -263,12 +261,13 @@ The reports open straight from disk. Plots load by relative path, and MathJax lo
 
 ## Pull requests
 
-Every pull request is either a **module PR** or another PR, so a module review is a review of modules alone.
+Every pull request is a **module PR**, a **migration PR** or another PR, so a module review is a review of modules alone.
 
 - **Module PR**: the title starts with `Module:` (e.g. `Module: heart chamber review`). It changes only module content: the module versions under `modules/` (their CellML, configs, tests.yaml, parameterisations, data, references and results), the system models in `system_models/`, the manifests generated from them in `manifests/` and the review records in `reviews/`.
 - **Other PRs**: everything else (`cam_testing`, `tests/`, `tools/`, CI, documentation including `modules/README.md`, `modules/directory_schema.json`, the setup), and no module content. No `Module:` prefix. A change of this kind found during a module review goes in a PR of its own, and the module PR follows it (merge it first, then merge `main` into the module PR).
+- **Migration PR**: the title starts with `Migration:` (e.g. `Migration: supermodule versions`). It may change both module content and everything else, for a format conversion that changes the module content together with the code that reads it.
 
-The `PR scope` workflow (`tools/pr_scope.py`) fails a module PR that changes anything but module content, and any other PR that changes module content, and lists the files to move; `python tools/pr_scope.py "<title>" origin/main` checks a branch locally.
+The `PR scope` workflow (`tools/pr_scope.py`) fails a module PR that changes anything but module content, and any other PR (apart from a migration PR) that changes module content, and lists the files to move; `python tools/pr_scope.py "<title>" origin/main` checks a branch locally.
 
 ## CI
 

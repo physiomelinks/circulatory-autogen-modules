@@ -31,10 +31,10 @@ modules/
           plots/  results/                               written by the tests (not committed)
           parameterisations/
             <p>/                                         a parameterisation; p == its obs_data_name
-              <p>_parameters.csv                         variable_name,units,value,data_reference,sourced
+              <p>_parameters.json                        nested values (see "Parameterisations")
               <p>_obs_data.json                          calibration and held-out validation data (optional)
-              <p>_params_for_id.csv                      parameters to calibrate, with bounds (optional)
-              <p>_calibrated_parameters.csv              written by calibration (committed)
+              <p>_params_for_id.json                      parameters to calibrate, with bounds (optional)
+              <p>_calibrated_parameters.json             written by calibration (committed)
               <p>_calibration.json                       calibration summary: method, cost, values, date (committed)
               SOURCES.md, raw data files                 where the data came from (e.g. hudson_bay_lynx_hare.csv)
               source_figures/                            screenshots of the publication figures/tables the data came from
@@ -48,14 +48,11 @@ modules/
   version, with its data, calibration and source figures, in
   `versions/<version>/parameterisations/<name>/`. The config's `"default_parameterisation"` names the
   one used when nothing else is named;
-- an **instance** is one use of a version in a network: a module-array record (or a supermodule's
-  submodule). It names the parameterisation it uses with `"parameterisation"` (default: the
-  version's `default_parameterisation`). Several instances may share one parameterisation, and
-  the model's own parameters file can still change any value for one instance.
-
-Parameterisations were called instances before 2026-10-09. The former names (the `instances/`
-directory, the config key `default_instance` and a record's `"instance"` key) are still read
-(`cam_testing.library`, `cam_testing.module_array`), but new files use the new ones.
+- an **instance** is one use of a version in a network: a module-array record (or a record of a
+  supermodule's own module array, a submodule). It names the parameterisation it uses with
+  `"parameterisation"` (default: the version's `default_parameterisation`; a submodule names none,
+  see "Supermodule versions"). Several instances may share one parameterisation, and the model's own
+  parameters file can still change any value for one instance.
 
 The top level of `modules/` holds categories and one module_type, `heart`:
 
@@ -262,7 +259,7 @@ keys (these, and the citation keys below), and both config formats carry them un
   the paper exists.
 - A supermodule lists the citations of its own (often a placeholder); its version page adds "From
   its submodules:" (each linked to the submodule's page), and its per-parameterisation OMEX archives carry
-  the submodules' configs too.
+  its module array and the submodules' configs too.
 
 The version page shows the required citations under the description, each linked to its entry in
 the page's References. The initial lists come from the proposal approved on 2026-10-06
@@ -284,9 +281,20 @@ convention, one key per DOI, and every version's required citations.
 ## Parameterisations
 
 A parameterisation is **a parameter set of a version: only the parameters change, never the maths**.
-- **Parameters.** `<p>_parameters.csv` has one row per parameter, without a vessel suffix:
-  libcuflynx renames a row `C` to `C_<vessel>` for the record (instance) that uses it. A row naming one of the
-  version's `global_constant` variables keeps its plain name.
+- **Parameters.** `<p>_parameters.json` is libcuflynx's nested parameters JSON, rooted at the version:
+  its own variables at the top, without a vessel (libcuflynx renames `C` to `C_<vessel>` for the record,
+  the instance, that uses it), and the version's `global_constant` variables it sets under `"global"`,
+  which keep their plain names. A supermodule's parameterisation nests its instances' values under their
+  names. Each parameter is `{"value", "units", "data_reference"[, "sourced"]}`:
+
+  ```json
+  {"schema_version": 1,
+   "global": {"rho": {"value": 1050, "units": "Js2_per_m5", "data_reference": "known", "sourced": "no"}},
+   "C": {"value": 1.2e-08, "units": "m3_per_Pa", "data_reference": "Liang_2009_Table_2", "sourced": "yes"}}
+  ```
+
+  `global`, `value` and `schema_version` are reserved: no instance or variable has those names.
+  `cuflynx-upgrade parameters <file or directory>` converts the older CSVs.
 - **Naming.** A parameterisation is named by its data set: its obs_data carries
   `"obs_data_name": "<p>"`, which must equal the directory's name.
 - **One data file.** `<p>_obs_data.json` holds all of a parameterisation's data. Its `data_items`
@@ -307,31 +315,34 @@ A parameterisation is **a parameter set of a version: only the parameters change
   parameterisation. The verification tests run at the default parameterisation's parameters.
 - **Data parameterisations.** They currently hold the version's default values, plus their data, e.g.
   `benchmarks/Lotka_Volterra/versions/Lotka1925_v01/parameterisations/hudson_bay_lynx_hare/`. Calibration
-  writes `<p>_calibrated_parameters.csv` and `<p>_calibration.json` beside them.
+  writes `<p>_calibrated_parameters.json` (the same form) and `<p>_calibration.json` beside them.
 - **Recalibrating, and applying a calibration.** A calibration to data is always a libcuflynx run on
   a committed obs_data, never a hand calculation, so anyone can change the data and redo it:
-  1. edit `<p>_obs_data.json` (values, std, protocol) or `<p>_params_for_id.csv`;
+  1. edit `<p>_obs_data.json` (values, std, protocol) or `<p>_params_for_id.json`;
   2. run the parameterisation's calibration test,
      `pytest tests/test_modules.py --component <module_type>/<version> -k 'calibrate and <p>' --include-unreviewed`
-     (it rewrites `<p>_calibrated_parameters.csv` and `<p>_calibration.json`);
+     (it rewrites `<p>_calibrated_parameters.json` and `<p>_calibration.json`);
   3. to make the calibrated values the defaults, run
      `python -m cam_testing.calibrate apply <module_type>/<version> <p>` (`--dry-run` lists the changes first).
 
-  `apply` copies the parameters of `<p>_params_for_id.csv`, at their calibrated values, into:
-  - the version's default parameterisation;
-  - every supermodule version that uses the version's default parameterisation, recursively (row
-    `<var>_<submodule path>`, e.g. soma/sympathetic `rho_M_i_M`);
-  - the system models with an instance of the version or of such a supermodule at its default
-    parameterisation (row
-    `<var>_<vessel>[_<submodule path>]`, e.g. `rho_M_SN_soma_i_M`);
-  - the monolithic counterparts named by a supermodule's `supermodule.equivalent` output_map (row
-    `<var>_<vessel>` in the `reproduces` system model, e.g. `rho_M_soma_SN`, and `<var>` in that
+  `apply` copies the parameters of `<p>_params_for_id.json`, at their calibrated values, into every
+  place that uses the version, whatever value it had there (no value-equality checks):
+  - the version's default parameterisation (`<var>`);
+  - every supermodule version with an instance of the version, recursively: in its template (its
+    default parameterisation), `<instance>/<var>` of every such instance (soma/sympathetic:
+    `i_M/rho_M`; the heart: `lv`, `ra`, `rv` and `la` alike for a chamber calibration), and
+    `<instance>/<path>/<var>` through an instance of a supermodule over it (the neuron:
+    `soma/i_M/rho_M`);
+  - the system models with an instance of the version or of such a supermodule: in the model's
+    parameters file, `<vessel>[/<submodule path>]/<var>` (`heart/lv/E_A`, `SN/soma/i_M/rho_M`);
+  - the monolithic counterparts named by a supermodule's `supermodule.equivalent` output_map
+    (`<vessel>/<var>` in the `reproduces` system model, e.g. `soma_SN/rho_M`, and `<var>` in that
     vessel's version's default parameterisation).
 
-  Only rows that already exist are rewritten. Each reference becomes `Calibrated (libcuflynx) to
+  Only parameters a file already has are rewritten. Each reference becomes `Calibrated (libcuflynx) to
   parameterisations/<p>/<p>_obs_data.json: <note> (was <old value>; applied <date>)`. The
   `<note>` is the obs_data's optional `"calibration_note"`; an optional `"reference_key"` (a BibTeX key)
-  prefixes the reference and marks the row sourced.
+  prefixes the reference and marks the parameter sourced.
 
 ### Source figures
 
@@ -390,22 +401,63 @@ version and the parameterisation it uses:
  "inp_instances": ["heart"], "out_instances": ["systemic_T", "volume_sum"]}
 ```
 
-libcuflynx loads `<config dir>/parameterisations/<p>/<p>_parameters.csv` for the record. With no
+libcuflynx loads `<config dir>/parameterisations/<p>/<p>_parameters.json` for the record. With no
 `"parameterisation"`, it uses the config's `default_parameterisation` if that file exists. **The
-model's own `<model>_parameters.csv` wins** over the parameterisation's values, so a model only lists
-what it changes. Every record in `system_models/` names `"parameterisation": "default"`, and the version specs'
+model's own `<model>_parameters.json` wins** over the parameterisation's values, so a model only lists
+what it changes. It is libcuflynx's nested JSON with the model's instances at the top
+(`{"aortic_root": {"C": {...}}, "heart": {"lv": {"E_A": {...}}}, "global": {...}}`). Every record in `system_models/` names `"parameterisation": "default"`, and the version specs'
 harness networks do the same.
 
 ## Supermodule versions
 
 A supermodule version is a version whose config entry has `"module_format": "supermodule"`. It is
-built from other versions (its `submodules`, each with its own `module_type`, `module_subtype` and
-`parameterisation`), with internal connections only. It replaces the monolithic version of the same
-module_type:
+built from other versions, with internal connections only. It replaces the monolithic version of the
+same module_type:
+
+- **Config.** `"submodule_versions"` lists the versions it is built from, each
+  `{"module_type", "module_subtype"}` once. It has no CellML or units file.
+- **Module array.** `<module_type>_<version>_module_array.json` beside the config holds its instances
+  (the submodules, named locally) and their internal connections: ordinary module-array records, each
+  of one of the listed versions (every one of which is used), connecting only to siblings, and naming
+  no `"parameterisation"`. libcuflynx reads and checks it (`load_supermodule_registry`); so do
+  `Version.submodules` and `tests/test_structure.py`, which requires it beside every supermodule config.
+- **Template.** Its default parameterisation (`parameterisations/default/default_parameters.json`)
+  holds the values of its instances, nested under their names, and its globals under `"global"`:
+
+  ```json
+  {"schema_version": 1,
+   "global": {"rho": {...}, "T": {...}, "l_eff": {...}},
+   "lv": {"E_A": {"value": 366575000, "units": "J_per_m6", "data_reference": "Liang_2009_Table_2", "sourced": "yes"},
+          ...},
+   ...}
+  ```
+
+  A nested supermodule's instance holds values inside it (`"soma": {"i_M": {"rho_M": ...}}`), only where
+  it overrides that supermodule's own template. This is the **template** of a new instance of the
+  version: generation reads only its globals. `calibrate apply` writes it, so later instances start from
+  the calibrated values. `Version.instance_parameters` reads it, and the structure test checks that each
+  entry is an instance whose values are variables of its version (not its globals) and that its globals
+  are declared (`supermodule.globals`).
+- **A model's instances.** Each supermodule instance of a model has its values in the model's parameters
+  file, under its name (`system_models/closed_loop_cvs/3compartment/3compartment_parameters.json`:
+  `"heart": {"lv": {"E_A": ...}, ...}`). They are written once from the version's template, with a
+  nested supermodule's values written out in full (`SN` holds every soma and varicosity value,
+  `SN/soma/i_M/rho_M`):
+
+  ```
+  cuflynx-upgrade supermodule-instances system_models/<category>/<model>/<model>_module_array.json --module-library-dir modules --no-builtin-modules
+  ```
+
+  Generation refuses an instance the file has no entry for. The test harness writes a new instance's
+  values into a version's test network each time it generates it, so a version is tested with its own
+  template's values. `tests/test_structure.py` checks that each system model's supermodule instances have
+  their entries.
 
 | Supermodule version | Built from |
 |---|---|
-| `heart` `Argus2026_v01` | cardiac clock, four chambers, four valves (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`) |
+| `heart` `Argus2026_v01` | cardiac clock `Liang2009_v01`, four chambers (chamber `Liang2009NoVisco_v02`, whose vessel ports sum their flows), four valves `pp` (`heart/cardiac_clock`, `heart/chamber`, `heart/valve`) |
+| `heart` `controlled_Argus2026_v01` | as `Argus2026_v01` with the controlled cardiac clock (`cardiac_clock` `controlled`, period set by a heart-period effector) |
+| `heart` `nonstiff_Argus2026_v01` | as `controlled_Argus2026_v01` with linearised valves (`valve` `pp_linear`) |
 | `cell/neuron` `sympathetic` | soma `sympathetic`, axon `sympathetic_monolithic_v01`, varicosity `sympathetic` |
 | `cell/neuron/soma` `sympathetic` | membrane (`membrane_potential`), Na/K (`ion_concentrations`), Ca handling (`Ca_handling`), each version `SN_soma_Argus2026_v01`, and 15 `cell/ion_channels` versions |
 | `cell/neuron/varicosity` `sympathetic` | membrane, Ca handling, NE release (`neurotransmitter_release`), each version `SN_varicosity_Argus2026_v01`, and channels |
@@ -415,14 +467,16 @@ The monolithic versions sit beside them. For example, `soma` also has `sympathet
 A model uses one record, e.g.
 `{"name": "heart", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default",
 "per_submodule_inputs": {"ra": ["venous_svc"]}, "per_submodule_outputs": {"aov": ["aortic_root"]}}`.
-- **Expansion.** libcuflynx expands the record: each submodule becomes `<name>_<submodule>`, and the
-  supermodule parameterisation's rows `{var}_{submodule}` are renamed to match.
-- **Precedence.** The model's parameters file wins, then the supermodule's parameterisation, then
-  each submodule's parameterisation.
+- **Expansion.** libcuflynx expands the record: each submodule becomes `<name>__<submodule>`, and the
+  model's parameters file under the instance (`<name>/<submodule>/<var>`; nested:
+  `<name>/<submodule>/<its submodule>/<var>`) sets that submodule's parameters.
+- **Precedence.** The model's parameters file wins, then the supermodule's parameterisation (its
+  globals), then each submodule version's default parameterisation.
 - **Where it lives.** Its `tests.yaml` has a `description`; its `verification_config.json` has a
   `supermodule` block. `globals` lists its global parameters. `equivalent` lists the system models
-  it must reproduce: `system_models/closed_loop_cvs/3compartment_supermodules` reproduces
-  `3compartment`, and `system_models/cellular/SN_simple_supermodules` reproduces `SN_simple`.
+  it must reproduce: `system_models/closed_loop_cvs/3compartment` (heart `Argus2026_v01`) reproduces
+  `obsolete_3compartment` (circulatory_autogen's flat heart `vp_Ca`), and
+  `system_models/cellular/SN_simple_supermodules` reproduces `SN_simple`.
 
 ## External model versions
 
@@ -481,13 +535,13 @@ parameterisation's parameters. Every version runs them, component or supermodule
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
 
 **Supermodule versions** run the same verification and validation tests as a component. The
-supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod_<submodule>`
-(nested supermodules: `mod_<submodule>_<subsubmodule>`), and its parameters are those of the
-flattened model: the supermodule's own parameterisation, its submodules' parameterisations, and the boundary
+supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod__<submodule>`
+(nested supermodules: `mod__<submodule>__<subsubmodule>`), and its parameters are those of the
+flattened model: the supermodule's own parameterisation, a new instance's values (a copy of the version's template, under `mod` in the test network's parameters file), its submodules' default parameterisations, and the boundary
 conditions no internal connection closes. In the spec (`run_parameters`, `bc_sweep`, `validation`)
-a submodule's parameter is named as in the supermodule's parameterisation, `<var>_<submodule path>` (e.g.
-`I_in_membrane`, or `I_in_soma_membrane` in `neuron/sympathetic`); globals keep their names. The
-default `outputs` are every state of the model (`mod_<submodule>/<var>`). The default BC sweep
+a submodule's parameter is named as in the supermodule's parameterisation, `<submodule path>/<var>` (e.g.
+`membrane/I_in`, or `soma/membrane/I_in` in `neuron/sympathetic`); globals keep their names. The
+default `outputs` are every state of the model (`mod__<submodule>/<var>`). The default BC sweep
 (`bc_sweep.sweep: globals_and_bcs`) varies only what the supermodule adds: its global constants and
 those open boundary conditions, plus any `bc_sweep.extra_parameters`. Each submodule's own parameters
 are swept in that submodule version's own tests (soma `sympathetic` has 133 parameters; sweeping them
@@ -595,7 +649,7 @@ What the version page shows besides the tests:
   internal connections with the port types the configs connect, the modules outside that couple to a
   part (from the supermodule versions and system models that use this one, through
   `per_submodule_inputs` / `per_submodule_outputs`), and a table of the parts: version, parameterisation, ports,
-  connections, the supermodule parameterisation's rows `<var>_<part>` that override the part, and the globals it
+  connections, the supermodule parameterisation's rows `<part>/<var>` that override the part, and the globals it
   shares. A collapsible tree lists every nested level. The diagram is drawn by mermaid (loaded from
   cdn.jsdelivr.net like MathJax); offline, its source text and the table remain.
 
@@ -690,7 +744,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `solver` | verification_config | libcuflynx solver for the runs (`CVODE_myokit`) |
 | `solver_info` | verification_config | solver settings for the runs (`rtol`, `atol`, `MaximumStep`, ...) |
 | `reference_solver_info` | verification_config | tolerances of the tight CVODE reference (timestep and stability tests) |
-| `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod_<submodule>/<var>`) |
+| `outputs` | verification_config | variables to log and check (`var`, or `vessel/var` for a harness neighbour); default: every `variable` of the config (a supermodule: every state, `mod__<submodule>/<var>`) |
 | `protocol` | verification_config | an obs_data file, relative to the version directory, whose `protocol_info` (time-varying inputs from `protocol_traces` / `protocol_shapes`, sub-experiments) every run of the version follows (see Protocol-driven tests) |
 | `run_parameters` | verification_config | `{parameter: value}`: the operating point of the run and invariant tests |
 | `run_inputs` | verification_config | an external model's run_test: `{port variable: value}`, the constant inputs it is stepped with (default 0) |
@@ -698,14 +752,14 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `run_steps` | verification_config | an external model's run_test: how many coupling steps to take (default 5) |
 | `rest_check` | verification_config | `{sim_time, window, voltage, parameters, threshold, dt}`: a long run (e.g. 0 pA injected) that run_test reports, not a pass/fail gate: the spikes (upward crossings of `threshold` mV, default 0) of `voltage` and their rate in the last `window` s, in the message, metrics.rest_check and plots/rest.png |
 | `periodic_steady_state` | verification_config | `{period, rtol}` (period in s, or a parameter's name, e.g. `T`; rtol default 1e-3): the model oscillates with this period and must reach periodic steady state before it is scored. Every calibration and baseline run that has a warm-up (`pre_time`) then checks that each scored output repeats over one more period (max change <= rtol x its range) and fails, naming the output, if it doesn't (e.g. a heart chamber in a loop whose arterial time constant is longer than the warm-up) |
-| `harness` | verification_config | the test network: `module_array` rows `[name, module_subtype, module_type, inp, out, parameterisation]` (the version under test is `mod`) and `parameters` rows `[name, units, value, source]` for the neighbours; a parameterisation may have its own, `validation.<p>.harness` (same form), used for that parameterisation's model, calibration and archive instead (e.g. an experiment's set-up: `PMCA/Colegrove2000_v01` parameterisation `wanaverbecq2003_scg` puts the pump on the soma Ca handling with a Ca leak and a load, while the version's own tests run the pump alone) |
+| `harness` | verification_config | the test network: `module_array` rows `[name, module_subtype, module_type, inp, out, parameterisation]` (the version under test is `mod`) and `parameters` rows `[<vessel>/<var>, units, value, source]` for the neighbours; a parameterisation may have its own, `validation.<p>.harness` (same form), used for that parameterisation's model, calibration and archive instead (e.g. an experiment's set-up: `PMCA/Colegrove2000_v01` parameterisation `wanaverbecq2003_scg` puts the pump on the soma Ca handling with a Ca leak and a load, while the version's own tests run the pump alone) |
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`; a baseline's `obs_data` is run through its protocol, see Protocol-driven tests), variables, targets, metric, threshold, optimiser settings |
-| `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`) |
+| `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`, and `wrapped` / `reciprocal` as in a system model's equivalence) |
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |
 | `notes` | tests | notes on the version, shown in its report |
@@ -729,13 +783,14 @@ What an archive holds, in this order:
 |---|---|
 | `<module_type>_<version>_<p>.cellml` | **Master model** (marked in `manifest.xml`): the flattened model of the version's test network (the version alone, or its `harness` network) with this parameterisation's parameters, as libcuflynx generates it. This is what CUFLynx opens and simulates. |
 | `<p>_obs_data.json` | The parameterisation's data, if it has any (CUFLynx's observations): calibration data, and held-out validation data as `prediction_items`. |
-| `<p>_params_for_id.csv` | The parameters to identify, if any (CUFLynx's calibration setup). |
-| `<p>_parameters.csv`, raw data files, `SOURCES.md`, `<p>_calibrated_parameters.csv`, `<p>_calibration.json` | The parameterisation's own files, unchanged. |
+| `<p>_params_for_id.json` | The parameters to identify, if any (CUFLynx's calibration setup). |
+| `<p>_parameters.json`, raw data files, `SOURCES.md`, `<p>_calibrated_parameters.json`, `<p>_calibration.json` | The parameterisation's own files, unchanged. |
 | `<module_type>_<version>_modules.cellml`, `_modules_config.json`, `_units.cellml` | The version's math, unchanged. |
 | `<module_type>_<version>_verification_config.json` | The version's verification settings, in preparation for CUFLynx running them. |
-| `<module_type>_<version>_<p>_module_array.json`, `_model_parameters.csv` | The test network and the parameters file the model was generated from. |
+| `<module_type>_<version>_<p>_module_array.json`, `_model_parameters.json` | The test network and the parameters file the model was generated from (with its supermodule instances' values). |
+| `<module_type>_<version>_default_parameters.json` | A supermodule's template (its default parameterisation) when `<p>` is another, and its nested supermodules' templates. |
 
-CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the first `.csv` with "param" in its name is the params_for_id. So the study members come first.
+CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the params_for_id is the first `.csv` with "param" in its name, else the first `.json` with it (`<p>_parameters.json` has it too). So the study members come first, and the library has no `.csv` named "param".
 
 A parameterisation with no obs_data or params_for_id still loads and simulates, but CUFLynx then tries other members in those roles and shows two harmless "could not read" notes. That limitation is noted for a future change.
 
@@ -778,10 +833,10 @@ equal): change both together. Another repo's `modules/` is checked against its o
 - **A new version** of an existing module_type: add
   `versions/<source>_vXX/` with the six files, one config entry (`module_subtype` = the directory name,
   `"default_parameterisation": "default"`, `"licence"` and `"creator"`), a component name no other version
-  uses, and `parameterisations/default/default_parameters.csv`. Then run `make structure` and
+  uses, and `parameterisations/default/default_parameters.json`. Then run `make structure` and
   `pytest tests/test_modules.py --component <module_type>/<source>_vXX`.
-- **A data parameterisation**: add `parameterisations/<name>/` with `<name>_parameters.csv`, the obs_data files
-  (`"obs_data_name": "<name>"`), `<name>_params_for_id.csv`, the raw data and `SOURCES.md`. Then add
+- **A data parameterisation**: add `parameterisations/<name>/` with `<name>_parameters.json`, the obs_data files
+  (`"obs_data_name": "<name>"`), `<name>_params_for_id.json`, the raw data and `SOURCES.md`. Then add
   `validation.<name>` to the version's verification_config.json.
 - **A new module_type**: first check that the mechanism has no type yet (a new cell's Ca handling is
   a version of `Ca_handling`, not a new type). Name it by its mechanism and put it in the most general
@@ -810,7 +865,7 @@ i_b_Na_Smith2020_v01_modules_config.json      one config entry
 i_b_Na_Smith2020_v01_references.bib           every source cited
 i_b_Na_Smith2020_v01_tests.yaml               review record (reviewed: false until reviewed)
 i_b_Na_Smith2020_v01_verification_config.json what the checks run
-parameterisations/default/default_parameters.csv
+parameterisations/default/default_parameters.json
 ```
 
 **3. The CellML** (`component_type` = the component name, unique in the library):
@@ -859,16 +914,17 @@ parameterisations/default/default_parameters.csv
 - Use the port types the neighbours already use (`membrane_voltage`, `membrane_area`, ...), so it
   connects in a soma without changes.
 
-**5. The default parameterisation** (`parameterisations/default/default_parameters.csv`): one row
-per constant and boundary condition, each with its source and whether that source was checked:
+**5. The default parameterisation** (`parameterisations/default/default_parameters.json`): one
+parameter per constant and boundary condition (globals under `"global"`), each with its source and
+whether that source was checked:
 
-```csv
-variable_name,units,value,data_reference,sourced
-rho_b_Na,per_um2,0.02,"smith2020background; Table 2: 2 channels per 100 um^2 (= value)",yes
-gamma_b_Na,picoS,12,"smith2020background; Results, Fig. 3B: unitary conductance 12 pS (= value)",yes
-V,milliV,-70,"definitional; clamp value when unconnected (the resting potential)",no
-E_Na,milliV,60,"definitional; Nernst potential at the soma's default Na concentrations (used when unconnected)",no
-A_mem,um2,3000,"definitional; the soma membrane area (in a soma it comes through the membrane_area port)",no
+```json
+{"schema_version": 1,
+ "rho_b_Na": {"value": 0.02, "units": "per_um2", "data_reference": "smith2020background; Table 2: 2 channels per 100 um^2 (= value)", "sourced": "yes"},
+ "gamma_b_Na": {"value": 12, "units": "picoS", "data_reference": "smith2020background; Results, Fig. 3B: unitary conductance 12 pS (= value)", "sourced": "yes"},
+ "V": {"value": -70, "units": "milliV", "data_reference": "definitional; clamp value when unconnected (the resting potential)", "sourced": "no"},
+ "E_Na": {"value": 60, "units": "milliV", "data_reference": "definitional; Nernst potential at the soma's default Na concentrations (used when unconnected)", "sourced": "no"},
+ "A_mem": {"value": 3000, "units": "um2", "data_reference": "definitional; the soma membrane area (in a soma it comes through the membrane_area port)", "sourced": "no"}}
 ```
 
 `data_reference` is `<bibkey>; <where in the source>: <what it says> (= value)`, or
@@ -878,9 +934,9 @@ from the literature in **bold** (`**...**`). A value fitted to data never comes 
 calculation: it comes from a calibration (step 6) and `python -m cam_testing.calibrate apply`.
 
 **6. A parameterisation from data** (optional): `parameterisations/<name>/` with
-`<name>_parameters.csv` (only the rows that differ), the data (`<name>_obs_data.json`, its
+`<name>_parameters.json` (only the parameters that differ), the data (`<name>_obs_data.json`, its
 `"obs_data_name": "<name>"`; build it from a CSV with `python -m cam_testing.calibrate from-csv`),
-`<name>_params_for_id.csv` when it is calibrated, and, for data read off a publication's figure,
+`<name>_params_for_id.json` when it is calibrated, and, for data read off a publication's figure,
 `source_figures/` with the cropped screenshot and `source_figures.json` (shown beside the
 validation plots; its `items` pairs each figure with the plots of the data items it holds). Then a `validation.<name>` block in the verification config (`baseline` and/or
 `calibrate`: the data, the outputs compared, the metric and threshold).

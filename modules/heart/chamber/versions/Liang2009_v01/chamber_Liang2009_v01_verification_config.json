@@ -187,169 +187,157 @@
         ],
         "parameters": [
           [
-            "K_vo_miv",
+            "miv/K_vo",
             "m3_per_Js",
             "0.3",
             "3compartment system model (Mynard_2012)"
           ],
           [
-            "K_vo_aov",
+            "aov/K_vo",
             "m3_per_Js",
             "0.04",
             "3compartment system model (to_be_identified)"
           ],
           [
-            "K_vc_miv",
+            "miv/K_vc",
             "m3_per_Js",
             "0.4",
             "3compartment system model (Mynard_2012)"
           ],
           [
-            "K_vc_aov",
+            "aov/K_vc",
             "m3_per_Js",
             "0.04",
             "3compartment system model (to_be_identified)"
           ],
           [
-            "M_rg_miv",
+            "miv/M_rg",
             "dimensionless",
             "0",
             "3compartment system model (Mynard_2012)"
           ],
           [
-            "M_rg_aov",
+            "aov/M_rg",
             "dimensionless",
             "0",
             "3compartment system model (Mynard_2012)"
           ],
           [
-            "M_st_miv",
+            "miv/M_st",
             "dimensionless",
             "1",
             "3compartment system model (Mynard_2012)"
           ],
           [
-            "M_st_aov",
+            "aov/M_st",
             "dimensionless",
             "1",
             "3compartment system model (Mynard_2012)"
           ],
           [
-            "A_nn_miv",
+            "miv/A_nn",
             "m2",
             "0.0006",
             "3compartment system model (to_be_identified)"
           ],
           [
-            "A_nn_aov",
+            "aov/A_nn",
             "m2",
             "0.000314",
             "3compartment system model (defined_by_user_from_BB128)"
           ],
           [
-            "R_aortic_root",
+            "aortic_root/R",
             "Js_per_m6",
             "102598",
             "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
-            "C_aortic_root",
+            "aortic_root/C",
             "m6_per_J",
             "9.99986e-09",
             "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
-            "u_ext_aortic_root",
+            "aortic_root/u_ext",
             "J_per_m3",
             "0",
             "3compartment system model (user_defined)"
           ],
           [
-            "I_aortic_root",
+            "aortic_root/I",
             "Js2_per_m6",
             "10000",
             "3compartment system model (to_be_identified)"
           ],
           [
-            "u_0_aortic_root",
+            "aortic_root/u_0",
             "J_per_m3",
             "13300",
             "3compartment system model (Mynard&Smolich_2015_assumedRefOf100mmHg)"
           ],
           [
-            "q_0_aortic_root",
+            "aortic_root/q_0",
             "m3",
             "0.00000694",
             "3compartment system model (Mynard&Smolich_2015)"
           ],
           [
-            "r_0_aortic_root",
-            "metre",
-            "0.014865",
-            "3compartment system model (Mynard&Smolich_2015_NOT_USED)"
-          ],
-          [
-            "l_aortic_root",
-            "metre",
-            "0.01",
-            "3compartment system model (Mynard&Smolich_2015_NOT_USED)"
-          ],
-          [
-            "R_T_systemic_T",
+            "systemic_T/R_T",
             "Js_per_m6",
             "1.87418e+08",
             "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
-            "C_T_systemic_T",
+            "systemic_T/C_T",
             "m6_per_J",
             "1.06705e-08",
             "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
-            "I_T_systemic_T",
+            "systemic_T/I_T",
             "Js2_per_m6",
             "0.1",
             "3compartment system model (former_hardcoded_default)"
           ],
           [
-            "u_ext_systemic_T",
+            "systemic_T/u_ext",
             "J_per_m3",
             "0",
             "3compartment system model (user_defined)"
           ],
           [
-            "q_us_systemic_T",
+            "systemic_T/q_us",
             "m3",
             "0.00245",
             "3compartment system model (user_defined_70%Of3.5LVenousTotBloodVolume)"
           ],
           [
-            "q_init_systemic_T",
+            "systemic_T/q_init",
             "m3",
             "0.00245",
             "3compartment system model (user_defined_70%Of3.5LVenousTotBloodVolume)"
           ],
           [
-            "P_pv_p",
+            "pv_p/P",
             "J_per_m3",
             "1111.97",
             "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
           ],
           [
-            "M_rg_pvc",
+            "pvc/M_rg",
             "dimensionless",
             "1",
             "definitional; always open (A_eff = A_nn): the pulmonary veins have no valve, so the conduit is a resistance and inertance that allows reverse flow (the atrial a-wave)"
           ],
           [
-            "M_st_pvc",
+            "pvc/M_st",
             "dimensionless",
             "1",
             "definitional; no stenosis"
           ],
           [
-            "A_nn_pvc",
+            "pvc/A_nn",
             "m2",
             "0.0006",
             "harness choice: the conduit area, the mitral annulus area of the 3compartment system model (A_nn_miv)"
@@ -402,7 +390,7 @@
         "status": "active",
         "source": "Liang et al. 2009 (MBEC 47:743) Fig. 4b (normal ascending-aortic pressure, fitted) and Fig. 4a/4e (normal LV pressure and P-V loop volumes, held out), digitised (source_figures/)",
         "obs_data": "parameterisations/lv/lv_obs_data.json",
-        "params_for_id": "parameterisations/lv/lv_params_for_id.csv",
+        "params_for_id": "parameterisations/lv/lv_params_for_id.json",
         "z_threshold": 2.0,
         "method": "CMA-ES",
         "optimiser_options": {

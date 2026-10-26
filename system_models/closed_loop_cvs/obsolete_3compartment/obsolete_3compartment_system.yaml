@@ -1,0 +1,23 @@
+model: obsolete_3compartment
+category: closed_loop_cvs
+reviewed: false
+sim_time: 2.0
+pre_time: 20.0
+dt: 0.01
+equivalence:
+  reference: reference
+  ignore: {zero_flow/t: time}
+  tol: 1.0e-09
+  solver_info:
+    rtol: 1.0e-12
+    atol: 1.0e-14
+invariants:
+- description: total blood volume is conserved in the closed loop (relative drift < 1e-6)
+  expr: np.ptp(sum_blood_volume__q_volume_sum_sum) <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))
+notes:
+- 'The one system model kept with a flat (monolithic) heart: circulatory_autogen''s 3compartment, heart vp_Ca with both vena cava ports,
+  the inferior one closed by an explicit zero flow (the record zero_flow, an inlet_flow constant at v = 0, since the library''s zero_flow
+  module has no port). Every other system model uses a heart supermodule version. It checks the flat heart against the supermodule:
+  heart Argus2026_v01''s supermodule.equivalent entry requires closed_loop_cvs/3compartment (the heart supermodule) to reproduce it
+  (tests/test_modules.py -k supermodule). Its own reference is circulatory_autogen''s 3compartment, built with libcuflynx''s bundled
+  modules.'
