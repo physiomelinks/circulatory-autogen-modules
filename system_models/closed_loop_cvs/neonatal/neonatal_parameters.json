@@ -12,34 +12,6 @@
   "c_vessel": {"value": 0.1324, "units": "dimensionless", "data_reference": "TODO_reference"},
   "d_vessel": {"value": -11.14, "units": "per_m", "data_reference": "TODO_reference"}
  },
- "trv": {
-  "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "A_nn": {"value": 0.00028, "units": "m2", "data_reference": "Abushaban2018doubled"}
- },
- "puv": {
-  "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "A_nn": {"value": 0.000088, "units": "m2", "data_reference": "Abushaban2018doubled"}
- },
- "miv": {
-  "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "A_nn": {"value": 0.000316, "units": "m2", "data_reference": "Abushaban2018doubled"}
- },
- "aov": {
-  "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
-  "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
-  "A_nn": {"value": 0.0000946, "units": "m2", "data_reference": "Abushaban2018doubled"}
- },
  "aortic_root": {
   "E": {"value": 400000, "units": "J_per_m3", "data_reference": "to_be_identified"},
   "l": {"value": 0.004, "units": "metre", "data_reference": "Mynard2011"},
@@ -213,48 +185,87 @@
   "u_0": {"value": 0, "units": "J_per_m3", "data_reference": "TO_DO_for_baby"},
   "q_0": {"value": 0, "units": "m3", "data_reference": "TO_DO_for_baby"}
  },
- "ra": {
-  "E_A": {"value": 2060000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.02 (heart_LVprop)"},
-  "E_B": {"value": 8397000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.9 (heart_LVprop)"},
-  "q_us": {"value": 0.00000024, "units": "m3", "data_reference": "literature"},
-  "q_init": {"value": 0.00000024, "units": "m3", "data_reference": "literature"},
-  "T_c": {"value": 0.07, "units": "second", "data_reference": "literature"},
-  "T_r": {"value": 0.07, "units": "second", "data_reference": "literature"},
-  "t_start": {"value": 0.32, "units": "second", "data_reference": "guessed"},
-  "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"},
-  "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"}
- },
- "la": {
-  "E_A": {"value": 2060000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.02 (heart_LVprop)"},
-  "E_B": {"value": 8397000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.9 (heart_LVprop)"},
-  "q_us": {"value": 0.00000016, "units": "m3", "data_reference": "literature"},
-  "q_init": {"value": 0.00000016, "units": "m3", "data_reference": "literature"},
-  "T_c": {"value": 0.07, "units": "second", "data_reference": "literature"},
-  "T_r": {"value": 0.07, "units": "second", "data_reference": "literature"},
-  "t_start": {"value": 0.32, "units": "second", "data_reference": "guessed"},
-  "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"},
-  "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"}
- },
- "rv": {
-  "E_A": {"value": 82400000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.8 (heart_LVprop)"},
-  "E_B": {"value": 5598000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.6 (heart_LVprop)"},
-  "q_us": {"value": 0.0000008, "units": "m3", "data_reference": "literature"},
-  "q_init": {"value": 0.0000008, "units": "m3", "data_reference": "literature"},
-  "T_c": {"value": 0.14, "units": "second", "data_reference": "literature"},
-  "T_r": {"value": 0.06, "units": "second", "data_reference": "literature"},
-  "t_start": {"value": 0, "units": "second", "data_reference": "copied_simple_physiological"},
-  "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"},
-  "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"}
- },
- "lv": {
-  "E_A": {"value": 103000000, "units": "J_per_m6", "data_reference": "to_be_identified"},
-  "E_B": {"value": 9330000, "units": "J_per_m6", "data_reference": "to_be_identified"},
-  "q_us": {"value": 0.00000053, "units": "m3", "data_reference": "literature"},
-  "q_init": {"value": 0.000053, "units": "m3", "data_reference": "to_be_identified"},
-  "T_c": {"value": 0.14, "units": "second", "data_reference": "literature"},
-  "T_r": {"value": 0.06, "units": "second", "data_reference": "literature"},
-  "t_start": {"value": 0, "units": "second", "data_reference": "copied_simple_physiological"},
-  "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"},
-  "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"}
+ "heart": {
+  "clock": {},
+  "ra": {
+   "T_c": {"value": 0.07, "units": "second", "data_reference": "literature"},
+   "T_r": {"value": 0.07, "units": "second", "data_reference": "literature"},
+   "t_start": {"value": 0.32, "units": "second", "data_reference": "guessed"},
+   "E_A": {"value": 2060000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.02 (heart_LVprop)"},
+   "E_B": {"value": 8397000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.9 (heart_LVprop)"},
+   "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"},
+   "q_us": {"value": 0.00000024, "units": "m3", "data_reference": "literature"},
+   "q_init": {"value": 0.00000024, "units": "m3", "data_reference": "literature"},
+   "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"}
+  },
+  "rv": {
+   "T_c": {"value": 0.14, "units": "second", "data_reference": "literature"},
+   "T_r": {"value": 0.06, "units": "second", "data_reference": "literature"},
+   "t_start": {"value": 0, "units": "second", "data_reference": "copied_simple_physiological"},
+   "E_A": {"value": 82400000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.8 (heart_LVprop)"},
+   "E_B": {"value": 5598000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.6 (heart_LVprop)"},
+   "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"},
+   "q_us": {"value": 0.0000008, "units": "m3", "data_reference": "literature"},
+   "q_init": {"value": 0.0000008, "units": "m3", "data_reference": "literature"},
+   "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"}
+  },
+  "la": {
+   "T_c": {"value": 0.07, "units": "second", "data_reference": "literature"},
+   "T_r": {"value": 0.07, "units": "second", "data_reference": "literature"},
+   "t_start": {"value": 0.32, "units": "second", "data_reference": "guessed"},
+   "E_A": {"value": 2060000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.02 (heart_LVprop)"},
+   "E_B": {"value": 8397000.0, "units": "J_per_m6", "data_reference": "to_be_identified x0.9 (heart_LVprop)"},
+   "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"},
+   "q_us": {"value": 0.00000016, "units": "m3", "data_reference": "literature"},
+   "q_init": {"value": 0.00000016, "units": "m3", "data_reference": "literature"},
+   "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"}
+  },
+  "lv": {
+   "T_c": {"value": 0.14, "units": "second", "data_reference": "literature"},
+   "T_r": {"value": 0.06, "units": "second", "data_reference": "literature"},
+   "t_start": {"value": 0, "units": "second", "data_reference": "copied_simple_physiological"},
+   "E_A": {"value": 103000000, "units": "J_per_m6", "data_reference": "to_be_identified"},
+   "E_B": {"value": 9330000, "units": "J_per_m6", "data_reference": "to_be_identified"},
+   "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "no elastance control"},
+   "q_us": {"value": 0.00000053, "units": "m3", "data_reference": "literature"},
+   "q_init": {"value": 0.000053, "units": "m3", "data_reference": "to_be_identified"},
+   "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "no intrathoracic pressure"}
+  },
+  "trv": {
+   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "A_nn": {"value": 0.00028, "units": "m2", "data_reference": "Abushaban2018doubled"},
+   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
+   "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"}
+  },
+  "puv": {
+   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "A_nn": {"value": 0.000088, "units": "m2", "data_reference": "Abushaban2018doubled"},
+   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
+   "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"}
+  },
+  "miv": {
+   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "A_nn": {"value": 0.000316, "units": "m2", "data_reference": "Abushaban2018doubled"},
+   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
+   "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"}
+  },
+  "aov": {
+   "u_in": {"value": 13332, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "u_out": {"value": 10666, "units": "J_per_m3", "data_reference": "harness test value (definitional for a stand-alone test)", "sourced": "no"},
+   "A_nn": {"value": 0.0000946, "units": "m2", "data_reference": "Abushaban2018doubled"},
+   "M_st": {"value": 1, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "M_rg": {"value": 0, "units": "dimensionless", "data_reference": "Mynard_2012"},
+   "K_vo": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"},
+   "K_vc": {"value": 2, "units": "m3_per_Js", "data_reference": "try_ideal_valve"}
+  }
  }
 }

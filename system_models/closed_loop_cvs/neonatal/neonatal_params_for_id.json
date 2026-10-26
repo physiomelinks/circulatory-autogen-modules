@@ -1,7 +1,7 @@
 {
  "version": 1,
  "params": [
-  {"targets": ["lv/q_init"], "min": 5.00e-05, "max": 2.00e-04, "name_for_plotting": "q_{sbv}"},
+  {"targets": ["heart/lv/q_init"], "min": 5.00e-05, "max": 2.00e-04, "name_for_plotting": "q_{sbv}"},
   {"targets": ["leg_L_T/R_T", "leg_R_T/R_T"], "min": 1.00e+07, "max": 1.00e+10, "name_for_plotting": "R_{LE_T}"},
   {"targets": ["arm_L_T/R_T", "arm_R_T/R_T"], "min": 1.00e+07, "max": 1.00e+10, "name_for_plotting": "R_{AR_T}"},
   {"targets": ["head_L_T/R_T", "head_R_T/R_T"], "min": 1.00e+07, "max": 1.00e+10, "name_for_plotting": "R_{HE_T}"},
@@ -10,7 +10,7 @@
   {"targets": ["venous_ivc/C", "venous_svc/C"], "min": 1.00e-08, "max": 1.00e-06, "name_for_plotting": "C_(VE}"},
   {"targets": ["aortic_root/E"], "min": 1.00e+05, "max": 6.00e+05, "name_for_plotting": "E_{ar}"},
   {"targets": ["ascending_aorta/E", "brachiocephalic/E", "subclavian_R/E", "common_carotid_R/E", "common_carotid_L/E", "aortic_arch_I/E", "aortic_arch_II/E", "subclavian_L/E", "descending_aorta/E", "abdominal_aorta/E"], "min": 1.00e+05, "max": 6.00e+05, "name_for_plotting": "E_{rest}"},
-  {"targets": ["lv/E_A"], "min": 1.00e+08, "max": 1.00e+10, "name_for_plotting": "E_{lv_A}"},
-  {"targets": ["lv/E_B"], "min": 1.00e+07, "max": 1.00e+08, "name_for_plotting": "E_{lv_B}"}
+  {"targets": ["heart/lv/E_A"], "min": 1.00e+08, "max": 1.00e+10, "name_for_plotting": "E_{lv_A}"},
+  {"targets": ["heart/lv/E_B"], "min": 1.00e+07, "max": 1.00e+08, "name_for_plotting": "E_{lv_B}"}
  ]
 }

@@ -229,6 +229,9 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
           parameters:              # values for the neighbours' parameters, as <vessel>/<var>
             - [pressure_in/P, J_per_m3, 2000, source]
 
+    A row may be a module-array record instead (a dict), e.g. a supermodule "mod" with
+    per_submodule_inputs naming its neighbours.
+
     ``parameters``: the parameterisation's parameters to write (default: the version's default
     parameterisation). A parameterisation may have its own network instead
     (validation.<parameterisation>.harness, see ``network``); ``parameterisation`` selects it.
@@ -236,9 +239,9 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     os.makedirs(resources_dir, exist_ok=True)
     network = globals()['network'](component, parameterisation)
     rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
-    if not any(r[0] == VESSEL for r in rows):
-        raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
     records = module_array.from_rows(rows)
+    if not any(r['name'] == VESSEL for r in records):
+        raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
     array = os.path.join(resources_dir, f'{prefix}_module_array.json')
     module_array.write_records(array, records)
     path = os.path.join(resources_dir, f'{prefix}_parameters.json')
