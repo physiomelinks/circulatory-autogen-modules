@@ -713,6 +713,8 @@ What an archive holds, in this order:
 
 CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the params_for_id is the first `.csv` with "param" in its name, else the first `.json` with it (`<p>_parameters.json` has it too). So the study members come first, and the library has no `.csv` named "param".
 
+The version report's "Open in CUFLynx" link, beside each archive's download, opens it in the CUFLynx app as `cuflynx://open?url=<the archive's absolute URL, percent-encoded>`, the URL worked out by the page itself, so it works on the published site and from disk. It needs a CUFLynx that handles `cuflynx://` links.
+
 A parameterisation with no obs_data or params_for_id still loads and simulates, but CUFLynx then tries other members in those roles and shows two harmless "could not read" notes. That limitation is noted for a future change.
 
 `tests/test_parameterisation_omex.py` (`make omex-test`) loads every archive into a released CUFLynx and checks four things:
