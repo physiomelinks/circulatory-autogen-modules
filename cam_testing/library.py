@@ -63,6 +63,7 @@ VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameteris
 DEFAULT_KEY = 'default_parameterisation'
 SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
+SOURCE_FIGURE_KEYS = {'required': ['file', 'source'], 'optional': ['caption', 'items']}   # its entries' keys
 # directories under modules/ that are not categories or module_types (another session's work in
 # the old layout, until it is moved)
 UNMIGRATED = ('poiseuille_transport', 'system')
@@ -693,6 +694,34 @@ class ModuleType:
         return bool(vs) and all(v.reviewed for v in vs)
 
 
+def source_figures_problems(entries, item_names, index_keys):
+    '''Problems with a source_figures.json's ``entries``: each an object with the required keys of
+    ``index_keys`` (directory_schema.json: parameterisation.subdirectories.source_figures.index_keys) and
+    no keys beyond its optional ones; "items", when given, a list of the parameterisation's data item
+    names (``item_names``, Parameterisation.item_names).'''
+    if not isinstance(entries, list):
+        return ['source_figures.json is not a list of figures']
+    problems = []
+    allowed = set(index_keys['required']) | set(index_keys.get('optional', []))
+    for n, e in enumerate(entries):
+        where = f'source_figures.json[{n}]' + (f' ({e.get("file")})' if isinstance(e, dict) and e.get('file') else '')
+        if not isinstance(e, dict):
+            problems.append(f'{where}: not an object')
+            continue
+        problems += [f'{where}: missing "{k}"' for k in index_keys['required'] if not e.get(k)]
+        problems += [f'{where}: unknown key "{k}" (allowed: {", ".join(sorted(allowed))})' for k in sorted(set(e) - allowed)]
+        if 'items' in e:
+            items = e['items']
+            if not isinstance(items, list) or not all(isinstance(i, str) for i in items):
+                problems.append(f'{where}: "items" must be a list of data item names')
+                continue
+            unknown = [i for i in items if i not in item_names]
+            if unknown:
+                problems.append(f'{where}: "items" names {unknown}, not data items of the parameterisation '
+                                f'(its items: {sorted(item_names) or "none"})')
+    return problems
+
+
 @dataclass
 class Parameterisation:
     '''A named parameter set of a version (same maths, its own values, data and set-ups):
@@ -761,8 +790,9 @@ class Parameterisation:
 
     def source_figures(self):
         '''Screenshots of the publication figures/tables the parameterisation's data were extracted from:
-        source_figures/source_figures.json lists [{"file", "source", "caption"}], file relative to
-        source_figures/. Returned with file relative to the version directory.'''
+        source_figures/source_figures.json lists [{"file", "source", "caption", "items"}], file relative to
+        source_figures/; the optional items names the data items the figure holds (item_names). Returned
+        with file relative to the version directory.'''
         index = os.path.join(self.source_figures_dir, SOURCE_FIGURES_INDEX)
         if not os.path.isfile(index):
             return []
@@ -770,6 +800,27 @@ class Parameterisation:
             entries = json.load(f)
         return [dict(e, file=os.path.relpath(os.path.join(self.source_figures_dir, e['file']), self.version.dir))
                 for e in entries]
+
+    def item_names(self):
+        '''The names of the parameterisation's data items, which a source figure's "items" may list and
+        the validation plots are named by: the data_item_name of every data_items and prediction_items
+        entry of its obs_data files (*obs_data.json in its directory and the obs_data its validation
+        names), and the compared model outputs (the keys of "variables") of a CSV baseline.'''
+        files = {os.path.join(self.dir, f) for f in (os.listdir(self.dir) if os.path.isdir(self.dir) else [])
+                 if f.endswith('obs_data.json')}
+        files |= {os.path.join(self.version.dir, e['obs_data']) for e in self.validation.values()
+                  if isinstance(e, dict) and e.get('obs_data')}
+        names = set()
+        for path in files:
+            if os.path.isfile(path):
+                with open(path, encoding='utf-8-sig') as f:
+                    obs = json.load(f)
+                names |= {i['data_item_name'] for i in (obs.get('data_items') or []) + (obs.get('prediction_items') or [])
+                          if i.get('data_item_name')}
+        baseline = self.validation.get('baseline') or {}
+        if isinstance(baseline, dict) and baseline.get('data'):
+            names |= set(baseline.get('variables') or {})
+        return names
 
     def needs_source_figures(self):
         '''True when the parameterisation's validation data were extracted from a publication (a paper or a

@@ -17,6 +17,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -215,6 +216,46 @@ def _test_entry(version, test, r, spec_block=None, title=None, parameterisation=
     }
 
 
+def caption_parts(caption):
+    '''{'caption_lead', 'caption_rest'}: a source figure's caption split after its first sentence (a
+    full stop followed by a capital letter), so the page shows what the figure is and folds the
+    extraction notes that follow.'''
+    lead, *rest = re.split(r'(?<=\.)\s+(?=[A-Z])', caption or '', maxsplit=1)
+    return {'caption_lead': lead.strip(), 'caption_rest': ' '.join(rest).strip()}
+
+
+def figure_rows(plots, plot_items, figures):
+    '''
+    The rows of a parameterisation test's two columns, "From the paper" (source figures) and its
+    result plots: [{'figures': [figure], 'plots': [{'file', 'item'}]}]. A figure whose "items" lists a
+    plot's data item (``plot_items``, parallel to ``plots``; None when unknown) is paired with that
+    item's plots. When no figure lists items, a parameterisation with exactly one figure and one plotted
+    item pairs those two. Paired rows come first in plot order, then each unpaired plot, then each
+    unpaired figure, in a row of its own with the other column empty.
+    '''
+    items = list(plot_items or [])
+    plotted = [{'file': p, 'item': items[n] if n < len(items) else None} for n, p in enumerate(plots)]
+    figure_of = {}                                  # item -> index of the first figure listing it
+    for k, f in enumerate(figures):
+        for item in f.get('items') or []:
+            figure_of.setdefault(item, k)
+    names = {p['item'] for p in plotted}
+    if (not any('items' in f for f in figures) and len(figures) == 1 and len(names) == 1
+            and None not in names):
+        figure_of = {names.pop(): 0}
+    rows, row_of, unpaired = [], {}, []
+    for p in plotted:
+        k = figure_of.get(p['item'])
+        if k is None:
+            unpaired.append({'figures': [], 'plots': [p]})
+        elif k in row_of:
+            row_of[k]['plots'].append(p)
+        else:
+            row_of[k] = {'figures': [figures[k]], 'plots': [p]}
+            rows.append(row_of[k])
+    return rows + unpaired + [{'figures': [f], 'plots': []} for k, f in enumerate(figures) if k not in row_of]
+
+
 def parameterisation_context(version, inst):
     '''One parameterisation: its files, and its validation (baseline) and calibration results.'''
     tests = []
@@ -238,8 +279,10 @@ def parameterisation_context(version, inst):
             entry['about'] = v.get('note') or FIT_CHECK_ABOUT
         entry['anchor'] = f'{inst.name}--{test}'
         # the publication figures the data were extracted from, shown beside the test's plots
-        entry['source_figures'] = inst.source_figures()
+        entry['source_figures'] = [dict(sf, **caption_parts(sf.get('caption'))) for sf in inst.source_figures()]
         entry['source_figures_missing'] = inst.needs_source_figures() and not entry['source_figures']
+        entry['figure_rows'] = figure_rows(entry['plots'], entry['metrics'].get('plot_items'), entry['source_figures'])
+        entry['results_heading'] = 'Calibration results' if kind == 'calibrate' else 'Model vs data'
         tests.append(entry)
     calibration = None
     if os.path.isfile(inst.calibration_path):

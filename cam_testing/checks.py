@@ -157,6 +157,18 @@ def plot_path(component, name, parameterisation=None):
     return os.path.join(component.plots_dir, f'{prefix}{name}.png')
 
 
+def item_plot_path(component, name, parameterisation):
+    '''path_of for plots.plot_model_vs_data: plots/<parameterisation>__<name>__<item>.png.'''
+    return lambda item: plot_path(component, f'{name}__{plots.item_file_name(item)}', parameterisation)
+
+
+def item_plots(saved):
+    '''(plot paths, metrics) for plots.plot_model_vs_data's per-item figures ``saved`` [(item, path)]:
+    the metrics' plot_items names each plot's data item, in the order of the plots (the report pairs a
+    plot with the source figure its data came from by it).'''
+    return [p for _, p in saved], {'plot_items': [n for n, _ in saved]}
+
+
 def save(component, result, parameterisation=None):
     result.timestamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     # plots are stored relative to the version dir, which is where the HTML lives
@@ -1760,19 +1772,20 @@ def validation_test_baseline(cm):
         metric = v.get('metric', 'nrmse')
         threshold = float(v.get('threshold', 0.1))
         errors = {var: score(metric, np.interp(t_data, t, out[var]), data[var]) for var in v['variables']}
-        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline', cm.parameterisation), t, out,
-                                       {k: t_data for k in data}, data, cm.units(),
-                                       f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}')
+        saved = plots.plot_model_vs_data(item_plot_path(component, 'validation_baseline', cm.parameterisation), t, out,
+                                         {k: t_data for k in data}, data, cm.units(),
+                                         f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}')
+        figs, plot_metrics = item_plots(saved)
         metrics = {metric: errors, 'threshold': threshold, 'source': v.get('source', ''),
-                   'validated_values': params}
+                   'validated_values': params, **plot_metrics}
         if v.get('kind') == 'fit_check':
             # the published values were fitted to this same data: goodness of fit, not validation
             metrics['kind'] = 'fit_check'
             metrics['note'] = v.get('note', '')
         worst = max(errors.values())
         if worst > threshold:
-            return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, [fig])
-        return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, [fig])
+            return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, figs)
+        return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, figs)
     return _guard(cm.component, 'validation_test_baseline', check, cm.parameterisation)
 
 
@@ -1907,15 +1920,14 @@ def _baseline_obs_data(cm, v):
                          'ok': ok})
             if not ok:
                 problems.append(f'{name}: model {m:.4g} vs {value:g} ± {std:g} {item.get("unit", "")}')
-    figs = []
-    if model:
-        figs.append(plots.plot_model_vs_data(
-            plot_path(component, 'validation_baseline', cm.parameterisation), t_model, model, t_data, data, units,
-            f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}; '
-            'time from the start of each sub-experiment'))
+    saved = plots.plot_model_vs_data(
+        item_plot_path(component, 'validation_baseline', cm.parameterisation), t_model, model, t_data, data, units,
+        f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}; '
+        'time from the start of each sub-experiment')
+    figs, plot_metrics = item_plots(saved)
     metrics = {'targets': rows, metric: scores, 'threshold': threshold, 'z_threshold': z, 'obs_data': v['obs_data'],
                'nrmse_scale': scales,
-               'source': v.get('source', ''), 'validated_values': params}
+               'source': v.get('source', ''), 'validated_values': params, **plot_metrics}
     if v.get('kind') == 'fit_check':
         metrics['kind'], metrics['note'] = 'fit_check', v.get('note', '')
     if problems:
@@ -1935,7 +1947,7 @@ def validation_test_calibrate(cm):
         if early:
             return early
         from cam_testing import calibrate
-        return calibrate.run(cm, v, plot_path)
+        return calibrate.run(cm, v)
     return _guard(cm.component, 'validation_test_calibrate', check, cm.parameterisation)
 
 

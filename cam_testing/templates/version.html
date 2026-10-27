@@ -124,9 +124,25 @@
             <dl class="kv">{% for k, v in t.metrics.items() %}<dt>{{ k }}</dt><dd>{{ v|fmt }}</dd>{% endfor %}</dl>
             {%- endif %}
 
-            {%- if t.plots or t.source_figures %}
+            {%- if t.figure_rows %}
+            {#- a parameterisation's test: its source figures beside the result plots made from their data #}
+            <div class="paper-cols" role="table" aria-label="{{ t.title }}: source figures and results">
+              <div class="paper-row paper-head" role="row"><div class="col-paper" role="columnheader">From the paper</div><div class="col-result" role="columnheader">{{ t.results_heading }}</div></div>
+              {%- for row in t.figure_rows %}
+              <div class="paper-row{% if not (row.figures and row.plots) %} unpaired{% endif %}" role="row">
+                <div class="col-paper" role="cell" data-heading="From the paper">
+                  {%- for sf in row.figures %}<figure class="source-figure"><img src="{{ sf.file }}" alt="source: {{ sf.caption or sf.source }}" loading="lazy"><figcaption><strong>Source</strong> ({{ sf.source|emph }}){% if sf.caption_lead %}: {{ sf.caption_lead|emph }}{% endif %}{% if sf.caption_rest %}<details><summary>Extraction notes</summary>{{ sf.caption_rest|emph }}</details>{% endif %}</figcaption></figure>{% endfor %}
+                  {%- if not row.figures %}<p class="muted none-here">No source figure is matched to {% if row.plots[0].item %}<code>{{ row.plots[0].item }}</code>{% else %}this plot{% endif %}.</p>{% endif %}
+                </div>
+                <div class="col-result" role="cell" data-heading="{{ t.results_heading }}">
+                  {%- for p in row.plots %}<figure><img src="{{ p.file }}" alt="{{ t.title }} plot{% if p.item %} of {{ p.item }}{% endif %} for {{ c.label }}" loading="lazy"></figure>{% endfor %}
+                  {%- if not row.plots %}<p class="muted none-here">No plot of this test is matched to this figure.</p>{% endif %}
+                </div>
+              </div>
+              {%- endfor %}
+            </div>
+            {%- elif t.plots %}
             <div class="plots">
-              {%- for sf in t.source_figures or [] %}<figure class="source-figure"><img src="{{ sf.file }}" alt="source: {{ sf.caption or sf.source }}" loading="lazy"><figcaption><strong>Source</strong> ({{ sf.source|emph }}){% if sf.caption %}: {{ sf.caption|emph }}{% endif %}</figcaption></figure>{% endfor %}
               {%- for p in t.plots %}<figure><img src="{{ p }}" alt="{{ t.title }} plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}
             </div>
             {%- endif %}
@@ -182,7 +198,25 @@ section.component { display: grid; gap: 22px; padding-top: 28px; border-top: 2px
 .plots figure { margin: 0; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
 .plots img { display: block; width: 100%; height: auto; }
 .plots figcaption { font-size: 0.8rem; margin-top: 4px; color: var(--muted, inherit); }
-.source-figure { outline: 2px solid var(--rule); }
+/* a parameterisation test's two columns: the publication's figures (left), the results from their data (right) */
+.paper-cols { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.paper-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.paper-row + .paper-row { border-top: 1px solid var(--rule); }
+.paper-row > div { padding: 10px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.col-paper { background: var(--paper-col-bg); }
+.col-result { background: var(--result-col-bg); }
+.paper-head > div { padding-block: 6px; }
+.paper-head > div, .paper-row > div::before { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; color: var(--ink-2); }
+.paper-cols figure { margin: 0; }
+.paper-cols img { display: block; width: 100%; height: auto; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
+.paper-cols figcaption { font-size: 0.8rem; margin-top: 4px; color: var(--ink-2); }
+.paper-cols figcaption summary { cursor: pointer; color: var(--accent); }
+.paper-cols .none-here { margin: 0; font-size: 0.82rem; }
+@media (max-width: 640px) {
+  .paper-row { grid-template-columns: minmax(0, 1fr); }
+  .paper-head { display: none; }
+  .paper-row > div::before { content: attr(data-heading); }
+}
 details { font-size: 0.85rem; }
 details summary { cursor: pointer; color: var(--ink-2); }
 details pre { white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.78rem; background: var(--paper); padding: 10px; border-radius: 6px; overflow-x: auto; }
