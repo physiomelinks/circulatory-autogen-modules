@@ -1,6 +1,6 @@
 """
-libcuflynx writes a multi_port "sum" as a component multiport_sum_<vessel>_<var>, whose <var> is the total.
-system.simulate() returns it as the output multiport_sum_<vessel>_<var>/<var> (the closed-loop systems'
+libcuflynx writes a multi_port "sum" as a component multiport_sum_<module>_<variable>, whose <variable> is the total.
+system.simulate() returns it as the output multiport_sum_<module>_<variable>/<variable> (the closed-loop systems'
 blood-volume invariants read multiport_sum_volume_sum_q/q), and FV1D_volume_sum's exit volume_port
 maps q_sum, so a volume_sum connected to it sums q_sum.
 """
