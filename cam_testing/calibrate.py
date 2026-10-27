@@ -70,10 +70,11 @@ def load_data(data_dir, v):
     return t, data
 
 
-def score(metric, model, data):
+def score(metric, model, data, scale=None):
+    '''log_rmse, or nrmse: the rms error over ``scale`` (default: the data's range).'''
     if metric == 'log_rmse':
         return float(np.sqrt(np.mean((np.log(model) - np.log(data)) ** 2)))
-    rng = np.ptp(data) or max(np.max(np.abs(data)), 1e-300)
+    rng = float(scale) if scale else (np.ptp(data) or max(np.max(np.abs(data)), 1e-300))
     return float(np.sqrt(np.mean((model - data) ** 2)) / rng)
 
 
@@ -323,7 +324,7 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     dts = [float(i['obs_dt']) for i in val_obs['data_items'] if i.get('data_type') == 'series']
     wanted = sorted(set(series) | {output_of(op) for i in constants for op in i['operands']})
     pre = float(val_obs['protocol_info'].get('pre_times', [0.0])[0])   # e.g. reach periodic steady state first
-    run_spec = dict(cm.spec, sim_time=t_end, pre_time=pre, dt=min(dts + [float(cm.spec['dt'])]))
+    run_spec = dict(harness.without_protocol(cm.spec), sim_time=t_end, pre_time=pre, dt=min(dts + [float(cm.spec['dt'])]))
     helper = harness.simulation_helper(cm.model_path, run_spec, solver_info={'rtol': 1e-8, 'atol': 1e-10})
     overrides = {'parameters/' + _model_name(k, by_var): val for k, val in calibrated.items()}
     tm, out = harness.run(helper, wanted, params=overrides)

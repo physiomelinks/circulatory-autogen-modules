@@ -31,7 +31,7 @@ import pytest
 from cam_testing import bib, library, module_array, paths
 from cam_testing.library import (IDENTITY_KEYS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
                                  all_versions, ancestors_of, load_version, misplaced_spec_keys, module_relpath,
-                                 module_type_names, parent_of, read_spec_files)
+                                 module_type_names, parent_of, protocol_problems, read_spec_files)
 from cam_testing.mathml import component_names
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
@@ -213,6 +213,7 @@ def walk_modules():
         # the spec's two files: every key in its own file, identity keys matching the directories
         tests, verification = read_spec_files(d, f'{mt}_{v}')
         problems.extend(f'{rel}: {p}' for p in misplaced_spec_keys(tests, verification))
+        problems.extend(f'{rel}: {p}' for p in protocol_problems(d, verification))
         review = tests.get('review')
         if isinstance(review, str) and not (review.startswith('reviews/') and os.path.isfile(os.path.join(REPO_ROOT, review))):
             problems.append(f'{rel}: review: {review} is not a file in reviews/')

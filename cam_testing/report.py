@@ -200,7 +200,7 @@ def _not_run_reason(version, test):
     return 'This test has not been run yet.'
 
 
-def _test_entry(version, test, r, spec_block=None, title=None):
+def _test_entry(version, test, r, spec_block=None, title=None, parameterisation=None):
     base = test.split('__')[0]
     return {
         'key': test, 'title': title or TEST_TITLES.get(base, test), 'short': TEST_SHORT.get(base, test),
@@ -209,7 +209,7 @@ def _test_entry(version, test, r, spec_block=None, title=None):
         'message': r.message if r else _not_run_reason(version, base),
         'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
         'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
-        'known_issue': (version.spec.get('expected_failures') or {}).get(test),
+        'known_issue': checks.expected_failure(version, test, parameterisation),
         'proposed_data': (spec_block or {}).get('status') == checks.PROPOSED,
         'links': [],          # related version pages (version_calibration in a supermodule)
     }
@@ -231,7 +231,8 @@ def parameterisation_context(version, inst):
                                   checks.NO_BASELINE_DATA if kind == 'baseline' else checks.NO_CALIBRATION_DATA)
             elif v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED, checks.NOT_APPLICABLE):
                 r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
-        entry = _test_entry(version, test, r, v, title=FIT_CHECK_TITLE if v.get('kind') == 'fit_check' else None)
+        entry = _test_entry(version, test, r, v, title=FIT_CHECK_TITLE if v.get('kind') == 'fit_check' else None,
+                            parameterisation=inst)
         if v.get('kind') == 'fit_check':
             entry['short'] = 'Fit check'
             entry['about'] = v.get('note') or FIT_CHECK_ABOUT
@@ -252,7 +253,7 @@ def parameterisation_context(version, inst):
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
             'omex_status': omex_result.status if omex_result else None,
             'omex_message': omex_result.message if omex_result else 'not checked yet (tests/test_parameterisation_omex.py)',
-            'omex_known_issue': (version.spec.get('expected_failures') or {}).get('cuflynx_parameterisation_omex_test'),
+            'omex_known_issue': checks.expected_failure(version, 'cuflynx_parameterisation_omex_test', inst),
             'n_parameters': len(inst.parameters()), 'obs_data_name': inst.obs_data_name,
             'has_obs_data': inst.has_obs_data, 'calibration': calibration,
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
