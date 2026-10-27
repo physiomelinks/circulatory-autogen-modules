@@ -9,7 +9,6 @@ cam_testing.paths, which a harness may use) only (``use_builtin_modules: false``
 libcuflynx's bundled copies.
 """
 import contextlib
-import csv
 import functools
 import io
 import os
@@ -139,9 +138,10 @@ def split_model_name(version, full, vessel=VESSEL):
 
 
 def generated_parameters_path(model_path):
-    '''The parameters file libcuflynx writes next to a generated model.'''
+    '''The parameters file libcuflynx writes next to a generated model (<prefix>_parameters.json,
+    libcuflynx's nested JSON).'''
     d = os.path.dirname(model_path)
-    return os.path.join(d, f'{os.path.basename(d)}_parameters.csv')
+    return os.path.join(d, f'{os.path.basename(d)}_parameters.json')
 
 
 def supermodule_parameters(version, model_path, vessel=VESSEL):
@@ -153,19 +153,19 @@ def supermodule_parameters(version, model_path, vessel=VESSEL):
     (global_constant for the globals).
     '''
     from cam_testing.library import Parameter
+    from libcuflynx.utilities.parameters_file import model_parameter_rows
     own = {p.variable_name: p for p in version.default_parameterisation.parameters()}
     out = []
-    with open(generated_parameters_path(model_path), newline='') as f:
-        for row in csv.DictReader(f):
-            full = (row.get('variable_name') or '').strip()
-            if not full:
-                continue
-            name, var, _path, owner = split_model_name(version, full, vessel)
-            kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
-            mine = own.get(name)
-            out.append(Parameter(name, (row.get('units') or '').strip(), (row.get('value') or '').strip(),
-                                 (row.get('data_reference') or '').strip(), mine.sourced if mine else '',
-                                 kind, model_name=full))
+    for row in model_parameter_rows(generated_parameters_path(model_path)):
+        full = str(row.get('variable_name') or '').strip()
+        if not full:
+            continue
+        name, var, _path, owner = split_model_name(version, full, vessel)
+        kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
+        mine = own.get(name)
+        cell = lambda k: '' if row.get(k) is None else str(row[k]).strip()
+        out.append(Parameter(name, cell('units'), cell('value'), cell('data_reference'),
+                             mine.sourced if mine else '', kind, model_name=full))
     return out
 
 
