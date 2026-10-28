@@ -22,7 +22,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, module_array, phlynx, ranges, risk
+from cam_testing import bib, checks, library, module_array, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -227,25 +227,20 @@ def caption_parts(caption):
 def figure_rows(plots, plot_items, figures):
     '''
     The rows of a parameterisation test's two columns, "From the paper" (source figures) and its
-    result plots: [{'figures': [figure], 'plots': [{'file', 'item'}]}]. A figure whose "items" lists a
-    plot's data item (``plot_items``, parallel to ``plots``; None when unknown) is paired with that
-    item's plots. When no figure lists items, a parameterisation with exactly one figure and one plotted
-    item pairs those two. Paired rows come first in plot order, then each unpaired plot, then each
-    unpaired figure, in a row of its own with the other column empty.
+    result plots: [{'figures': [figure], 'plots': [{'file', 'item'}]}]. ``plot_items``, parallel to
+    ``plots`` (None when unknown), names each plot's data item, or lists the items of a plot that
+    overlays several. Each figure pairs with the plots of the items library.figure_items gives it (the
+    items its "items" lists, or every item when it is the only figure and no figure lists items).
+    Paired rows come first in plot order, then each unpaired plot, then each unpaired figure, in a row
+    of its own with the other column empty.
     '''
     items = list(plot_items or [])
     plotted = [{'file': p, 'item': items[n] if n < len(items) else None} for n, p in enumerate(plots)]
-    figure_of = {}                                  # item -> index of the first figure listing it
-    for k, f in enumerate(figures):
-        for item in f.get('items') or []:
-            figure_of.setdefault(item, k)
-    names = {p['item'] for p in plotted}
-    if (not any('items' in f for f in figures) and len(figures) == 1 and len(names) == 1
-            and None not in names):
-        figure_of = {names.pop(): 0}
+    names = [i for p in plotted for i in (p['item'] if isinstance(p['item'], list) else [p['item']])]
+    figure_of = {i: k for k, group in enumerate(library.figure_items(figures, names)) for i in group}
     rows, row_of, unpaired = [], {}, []
     for p in plotted:
-        k = figure_of.get(p['item'])
+        k = figure_of.get(p['item'][0] if isinstance(p['item'], list) else p['item'])
         if k is None:
             unpaired.append({'figures': [], 'plots': [p]})
         elif k in row_of:
