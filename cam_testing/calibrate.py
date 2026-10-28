@@ -354,7 +354,8 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
 
 
 def run(cm, v):
-    from cam_testing.checks import FAILED, PASSED, Result, item_plot_path, item_plots, periodic_steady_state
+    from cam_testing.checks import (FAILED, PASSED, Result, item_plot_path, item_plots, overlay_groups,
+                                    periodic_steady_state)
 
     component = cm.component
     inst = cm.parameterisation
@@ -414,7 +415,8 @@ def run(cm, v):
             g = abs(got) if compare_abs else got
             if abs(g - float(want)) > expected_tol * max(abs(float(want)), 1e-12):
                 problems.append(f'start {label}: {par} = {got:.4g}, expected {"|" + par + "| = " if compare_abs else ""}{want}')
-        # one figure per series item (named by its data_item_name), model and data against time
+        # one figure per series item (named by its data_item_name), model and data against time; the items
+        # a source figure overlays share one figure
         path_of = item_plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst)
         if features is not None and series:
             # time from the start of each item's sub-experiment
@@ -422,7 +424,8 @@ def run(cm, v):
                 path_of, {k: t for k, (t, m, d, sd) in series.items()}, {k: m for k, (t, m, d, sd) in series.items()},
                 {k: t for k, (t, m, d, sd) in series.items()},
                 {k: d for k, (t, m, d, sd) in series.items()}, item_units,
-                f'{component.label}: calibrated ({label}); time from the start of each sub-experiment')
+                f'{component.label}: calibrated ({label}); time from the start of each sub-experiment',
+                groups=overlay_groups(inst, series))
         elif series:
             title = f'{component.label}: calibrated to t ≤ {cal_end:g}'
             if v.get('prediction_window'):
@@ -431,7 +434,8 @@ def run(cm, v):
             saved = plots.plot_model_vs_data(
                 path_of, tm, {names[k]: out[harness.output_key(k)] for k in series},
                 {names[k]: ts for k, (ts, _) in series.items()}, {names[k]: d for k, (_, d) in series.items()},
-                item_units, title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end)
+                item_units, title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end,
+                groups=overlay_groups(inst, [names[k] for k in series]))
         else:
             saved = []
         paths, plot_metrics = item_plots(saved)

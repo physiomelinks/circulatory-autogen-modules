@@ -722,6 +722,25 @@ def source_figures_problems(entries, item_names, index_keys):
     return problems
 
 
+def figure_items(figures, items):
+    '''
+    The plotted data items each source figure pairs with, parallel to ``figures``: a figure takes the
+    ``items`` (plot order, duplicates dropped) its "items" lists, each item going to the first figure
+    listing it. A figure may overlay several experiments, so it can take several items. When no figure
+    lists "items", exactly one figure takes every item; several figures without "items" take none (nothing
+    says which item belongs to which), nor does any figure when an item is unknown (None: a result from
+    before plots recorded their items).
+    '''
+    names = list(dict.fromkeys(items))
+    if not any('items' in f for f in figures):
+        return [names if len(figures) == 1 and None not in names else [] for _ in figures]
+    taken, groups = set(), []
+    for f in figures:
+        groups.append([i for i in names if i in (f.get('items') or []) and i not in taken])
+        taken |= set(groups[-1])
+    return groups
+
+
 @dataclass
 class Parameterisation:
     '''A named parameter set of a version (same maths, its own values, data and set-ups):

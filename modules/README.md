@@ -377,12 +377,17 @@ extraction and the fit against the original.
    {"file": "mynard2012_fig4.png", "source": "mynard2012simple; Fig. 4 (p. 634)", "caption": "...",
     "items": ["A_eff_normal"]}]
   ```
-  The validation (baseline) and calibration tests plot each item on its own
-  (`plots/<p>__validation_baseline__<item>.png`, `<p>__validation_calibrate__<item>.png`), and the
-  report shows each test in two columns, "From the paper" (the source figures) and "Model vs data" /
-  "Calibration results" (the plots), with each figure in the row of the plots of the items it lists.
-  Without `items`, a parameterisation with exactly one figure and one plotted item pairs those two;
-  otherwise plots and figures are shown unpaired, after the paired rows.
+  A figure that overlays several experiments' results lists all their items. The validation
+  (baseline) and calibration tests plot each item on its own
+  (`plots/<p>__validation_baseline__<item>.png`, `<p>__validation_calibrate__<item>.png`), except the
+  items of a figure that holds several: those get one plot overlaying them on the same axes, a colour
+  and legend entries per item (`<p>__validation_baseline__<item1>_<item2>.png`), to compare with the
+  paper's figure. The report shows each test in two columns, "From the paper" (the source figures)
+  and "Model vs data" / "Calibration results" (the plots), with each figure in the row of the plots of
+  the items it lists. Without `items`, a parameterisation with exactly one figure pairs it with every
+  plotted item (one overlaid plot when there are several); with several figures and no `items`
+  nothing says which item belongs to which figure, so plots and figures are shown unpaired, after the
+  paired rows.
 - **When it is required:** for every parameterisation whose validation entry (verification_config
   `validation.<p>.baseline` / `.calibrate`) has a `source` and a `source_kind` of
   `"publication"`, the default when a source is given. Data that is not extracted from a
@@ -945,7 +950,7 @@ calculation: it comes from a calibration (step 6) and `python -m cam_testing.cal
 `"obs_data_name": "<name>"`; build it from a CSV with `python -m cam_testing.calibrate from-csv`),
 `<name>_params_for_id.json` when it is calibrated, and, for data read off a publication's figure,
 `source_figures/` with the cropped screenshot and `source_figures.json` (shown beside the
-validation plots; its `items` pairs each figure with the plots of the data items it holds). Then a `validation.<name>` block in the verification config (`baseline` and/or
+validation plots; its `items` pairs each figure with the plots of the data items it holds, one overlaid plot when it holds several). Then a `validation.<name>` block in the verification config (`baseline` and/or
 `calibrate`: the data, the outputs compared, the metric and threshold).
 
 **7. The tests to run on it** (`_verification_config.json`): `outputs`, `run_parameters`,

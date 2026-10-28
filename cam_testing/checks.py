@@ -23,7 +23,7 @@ from dataclasses import asdict, dataclass, field
 import numpy as np
 
 from cam_testing import fixed_step, harness, plots
-from cam_testing.library import library_dirs
+from cam_testing.library import figure_items, library_dirs
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
 # partial: met what the model's maths allows but not the full criterion (e.g. the time-step test on a piecewise
@@ -162,10 +162,16 @@ def item_plot_path(component, name, parameterisation):
     return lambda item: plot_path(component, f'{name}__{plots.item_file_name(item)}', parameterisation)
 
 
+def overlay_groups(parameterisation, items):
+    '''groups for plots.plot_model_vs_data: the plotted ``items`` each of the parameterisation's source
+    figures pairs with (library.figure_items), so a figure overlaying several items gets one plot of them.'''
+    return figure_items(parameterisation.source_figures(), list(items))
+
+
 def item_plots(saved):
     '''(plot paths, metrics) for plots.plot_model_vs_data's per-item figures ``saved`` [(item, path)]:
-    the metrics' plot_items names each plot's data item, in the order of the plots (the report pairs a
-    plot with the source figure its data came from by it).'''
+    the metrics' plot_items names each plot's data item (a list of them for an overlaid plot), in the
+    order of the plots (the report pairs a plot with the source figure its data came from by it).'''
     return [p for _, p in saved], {'plot_items': [n for n, _ in saved]}
 
 
@@ -1774,7 +1780,8 @@ def validation_test_baseline(cm):
         errors = {var: score(metric, np.interp(t_data, t, out[var]), data[var]) for var in v['variables']}
         saved = plots.plot_model_vs_data(item_plot_path(component, 'validation_baseline', cm.parameterisation), t, out,
                                          {k: t_data for k in data}, data, cm.units(),
-                                         f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}')
+                                         f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}',
+                                         groups=overlay_groups(cm.parameterisation, out))
         figs, plot_metrics = item_plots(saved)
         metrics = {metric: errors, 'threshold': threshold, 'source': v.get('source', ''),
                    'validated_values': params, **plot_metrics}
@@ -1923,7 +1930,7 @@ def _baseline_obs_data(cm, v):
     saved = plots.plot_model_vs_data(
         item_plot_path(component, 'validation_baseline', cm.parameterisation), t_model, model, t_data, data, units,
         f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}; '
-        'time from the start of each sub-experiment')
+        'time from the start of each sub-experiment', groups=overlay_groups(cm.parameterisation, model))
     figs, plot_metrics = item_plots(saved)
     metrics = {'targets': rows, metric: scores, 'threshold': threshold, 'z_threshold': z, 'obs_data': v['obs_data'],
                'nrmse_scale': scales,

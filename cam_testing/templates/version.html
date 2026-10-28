@@ -132,10 +132,10 @@
               <div class="paper-row{% if not (row.figures and row.plots) %} unpaired{% endif %}" role="row">
                 <div class="col-paper" role="cell" data-heading="From the paper">
                   {%- for sf in row.figures %}<figure class="source-figure"><img src="{{ sf.file }}" alt="source: {{ sf.caption or sf.source }}" loading="lazy"><figcaption><strong>Source</strong> ({{ sf.source|emph }}){% if sf.caption_lead %}: {{ sf.caption_lead|emph }}{% endif %}{% if sf.caption_rest %}<details><summary>Extraction notes</summary>{{ sf.caption_rest|emph }}</details>{% endif %}</figcaption></figure>{% endfor %}
-                  {%- if not row.figures %}<p class="muted none-here">No source figure is matched to {% if row.plots[0].item %}<code>{{ row.plots[0].item }}</code>{% else %}this plot{% endif %}.</p>{% endif %}
+                  {%- if not row.figures %}<p class="muted none-here">No source figure is matched to {% if row.plots[0].item %}<code>{{ row.plots[0].item if row.plots[0].item is string else row.plots[0].item | join(' + ') }}</code>{% else %}this plot{% endif %}.</p>{% endif %}
                 </div>
                 <div class="col-result" role="cell" data-heading="{{ t.results_heading }}">
-                  {%- for p in row.plots %}<figure><img src="{{ p.file }}" alt="{{ t.title }} plot{% if p.item %} of {{ p.item }}{% endif %} for {{ c.label }}" loading="lazy"></figure>{% endfor %}
+                  {%- for p in row.plots %}<figure><img src="{{ p.file }}" alt="{{ t.title }} plot{% if p.item %} of {{ p.item if p.item is string else p.item | join(' + ') }}{% endif %} for {{ c.label }}" loading="lazy"></figure>{% endfor %}
                   {%- if not row.plots %}<p class="muted none-here">No plot of this test is matched to this figure.</p>{% endif %}
                 </div>
               </div>

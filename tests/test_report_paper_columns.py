@@ -1,7 +1,8 @@
 """
 A parameterisation's validation and calibration results beside the publication figures their data came
-from: one plot per data item, the source figures paired with them by source_figures.json "items" (or the
-one-figure-one-item fallback), source_figures.json validation and the version page's two columns.
+from: one plot per data item, or one overlaid plot of the items a source figure holds; the source
+figures paired with them by source_figures.json "items" (or, with no "items", the only figure pairing with
+every item); source_figures.json validation and the version page's two columns.
 No model is generated except where noted.
 """
 import json
@@ -57,20 +58,79 @@ def test_a_figure_with_several_items_takes_all_their_plots():
     rows = report.figure_rows(['n.png', 'h.png'], ['A_eff_pulmonary_normal', 'A_eff_pulmonary_hypertension'], [fig6])
     assert len(rows) == 1 and [p['item'] for p in rows[0]['plots']] == ['A_eff_pulmonary_normal',
                                                                          'A_eff_pulmonary_hypertension']
+    # the overlaid plot of both
+    rows = report.figure_rows(['nh.png'], [['A_eff_pulmonary_normal', 'A_eff_pulmonary_hypertension']], [fig6])
+    assert rows == [{'figures': [fig6], 'plots': [{'file': 'nh.png', 'item': ['A_eff_pulmonary_normal',
+                                                                              'A_eff_pulmonary_hypertension']}]}]
 
 
-def test_fallback_pairs_one_figure_with_one_item_only():
+def test_the_only_figure_without_items_pairs_every_item():
     one = {'file': 'f7.png', 'source': 's'}
     rows = report.figure_rows(['m.png'], ['A_eff_mitral_normal'], [one])
     assert len(rows) == 1 and rows[0]['figures'] == [one] and rows[0]['plots'][0]['file'] == 'm.png'
     # two starts of a calibration: one item, two plots
     assert len(report.figure_rows(['s0.png', 's1.png'], ['x', 'x'], [one])) == 1
-    # two items, or two figures, or an unknown item (a result from before plot_items): not paired
-    assert len(report.figure_rows(['a.png', 'b.png'], ['x', 'y'], [one])) == 3
-    assert len(report.figure_rows(['a.png'], ['x'], [one, dict(one, file='g.png')])) == 3
+    # a figure overlaying two experiments: both items' plots, or their overlaid plot
+    rows = report.figure_rows(['a.png', 'b.png'], ['x', 'y'], [one])
+    assert len(rows) == 1 and [p['file'] for p in rows[0]['plots']] == ['a.png', 'b.png']
+    assert report.figure_rows(['xy.png'], [['x', 'y']], [one]) == [
+        {'figures': [one], 'plots': [{'file': 'xy.png', 'item': ['x', 'y']}]}]
+    # two figures without items (nothing says which item is in which), or an unknown item (a result
+    # from before plot_items): not paired
+    two = [one, dict(one, file='g.png')]
+    assert len(report.figure_rows(['a.png'], ['x'], two)) == 3
+    assert len(report.figure_rows(['a.png', 'b.png'], ['x', 'y'], two)) == 4
     assert len(report.figure_rows(['a.png'], None, [one])) == 2
     # a figure that lists items turns the fallback off
     assert len(report.figure_rows(['a.png'], ['x'], [dict(one, items=['y'])])) == 2
+
+
+def test_figure_items():
+    one = {'file': 'f.png', 'source': 's'}
+    assert library.figure_items([one], ['x', 'y', 'x']) == [['x', 'y']]
+    assert library.figure_items([one, one], ['x', 'y']) == [[], []]
+    assert library.figure_items([one], ['x', None]) == [[]]
+    # an item listed by two figures goes to the first
+    assert library.figure_items([dict(one, items=['y', 'x']), dict(one, items=['x', 'z'])], ['x', 'y', 'z']) == [
+        ['x', 'y'], ['z']]
+
+
+def _overlay(tmp_path, figures):
+    t = np.linspace(0, 1, 50)
+    model = {'x': np.sin(t), 'y': np.cos(t), 'z': t}
+    groups = library.figure_items(figures, list(model))
+    return plots.plot_model_vs_data(lambda item: str(tmp_path / f'p__{plots.item_file_name(item)}.png'),
+                                    t, model, {k: t[::5] for k in model}, {k: v[::5] for k, v in model.items()},
+                                    {'x': 'mmHg', 'y': 'mmHg'}, 'title', groups=groups)
+
+
+def test_the_only_figure_gets_one_overlaid_plot_of_every_item(tmp_path):
+    one = {'file': 'f.png', 'source': 's'}
+    saved = _overlay(tmp_path, [one])
+    assert [n for n, _ in saved] == [['x', 'y', 'z']] and os.path.basename(saved[0][1]) == 'p__x_y_z.png'
+    assert os.path.getsize(saved[0][1]) > 0
+    paths, metrics = checks.item_plots(saved)
+    assert report.figure_rows(paths, metrics['plot_items'], [one]) == [
+        {'figures': [one], 'plots': [{'file': saved[0][1], 'item': ['x', 'y', 'z']}]}]
+
+
+def test_a_figure_listing_two_items_gets_one_overlaid_plot_of_them(tmp_path):
+    fig = {'file': 'f.png', 'source': 's', 'items': ['z', 'x']}
+    saved = _overlay(tmp_path, [fig])
+    assert [n for n, _ in saved] == [['x', 'z'], 'y']     # at its first item; y not in the figure: alone
+    paths, metrics = checks.item_plots(saved)
+    rows = report.figure_rows(paths, metrics['plot_items'], [fig])
+    assert [([f['file'] for f in r['figures']], [p['item'] for p in r['plots']]) for r in rows] == [
+        (['f.png'], [['x', 'z']]), ([], ['y'])]
+
+
+def test_two_figures_without_items_keep_one_plot_per_item(tmp_path):
+    figs = [{'file': 'f.png', 'source': 's'}, {'file': 'g.png', 'source': 's'}]
+    saved = _overlay(tmp_path, figs)
+    assert [n for n, _ in saved] == ['x', 'y', 'z']
+    paths, metrics = checks.item_plots(saved)
+    rows = report.figure_rows(paths, metrics['plot_items'], figs)
+    assert all(len(r['figures']) + len(r['plots']) == 1 for r in rows) and len(rows) == 5
 
 
 def test_figures_alone_and_plots_alone():
@@ -124,8 +184,8 @@ def test_version_page_shows_paper_and_result_columns(monkeypatch):
 
     def load(version, test, parameterisation=None):
         if parameterisation is not None and parameterisation.name == 'lv' and test == 'validation_test_baseline':
-            return checks.Result(test, checks.PASSED, 'ok', {'plot_items': ['item_a', 'item_b']},
-                                 ['plots/lv__validation_baseline__item_a.png', 'plots/lv__validation_baseline__item_b.png'])
+            return checks.Result(test, checks.PASSED, 'ok', {'plot_items': ['item_a', ['item_b', 'item_c']]},
+                                 ['plots/lv__validation_baseline__item_a.png', 'plots/lv__validation_baseline__item_b_item_c.png'])
         return real_load(version, test, parameterisation)
     monkeypatch.setattr(checks, 'load', load)
     monkeypatch.setattr(library.Parameterisation, 'source_figures',
@@ -135,15 +195,17 @@ def test_version_page_shows_paper_and_result_columns(monkeypatch):
     lv = next(p for p in ctx['components'][0]['parameterisations'] if p['name'] == 'lv')
     rows = lv['baseline']['figure_rows']
     assert rows[0]['figures'][0]['file'] == figures[0]['file'] and rows[0]['plots'][0]['item'] == 'item_a'
-    assert rows[1] == {'figures': [], 'plots': [{'file': 'plots/lv__validation_baseline__item_b.png', 'item': 'item_b'}]}
+    assert rows[1] == {'figures': [], 'plots': [{'file': 'plots/lv__validation_baseline__item_b_item_c.png',
+                                                 'item': ['item_b', 'item_c']}]}
     assert lv['baseline']['results_heading'] == 'Model vs data' and lv['calibrate']['results_heading'] == 'Calibration results'
     html = report._env().get_template('version.html').render(**ctx)
     section = html[html.index('id="lv--validation_test_baseline"'):]
     section = section[:section.index('</article>')]
     assert 'From the paper' in section and 'Model vs data' in section
     assert section.count('class="col-paper"') == len(rows) + 1 and section.count('class="col-result"') == len(rows) + 1
-    assert 'No source figure is matched to <code>item_b</code>' in section
-    assert section.index(figures[0]['file']) < section.index('item_a.png') < section.index('item_b.png')
+    assert 'No source figure is matched to <code>item_b + item_c</code>' in section
+    assert 'plot of item_b + item_c for' in section      # an overlaid plot's items
+    assert section.index(figures[0]['file']) < section.index('item_a.png') < section.index('item_b_item_c.png')
     assert '<summary>Extraction notes</summary>' in section
     style = report._env().get_template('_style.html').render()
     assert style.count('--paper-col-bg') == 3 and style.count('--result-col-bg') == 3   # light, dark (system), dark
