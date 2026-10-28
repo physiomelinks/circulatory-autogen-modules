@@ -105,7 +105,7 @@ jobs:
       # The composite action's steps run in a plain (non-login) bash: put the environment's bin
       # first on PATH so they build and install into this environment's Python.
       - run: echo "$CONDA_PREFIX/bin" >> "$GITHUB_PATH"
-      # remove when libcellml 0.7.2 is on PyPI
+      # remove when a libcellml release on PyPI has cellml/libcellml#1498 (0.7.2 does not)
       # Built with the system compiler, which finds the system libxml2 the action installs (the
       # environment's compiler has its own sysroot).
       - uses: physiomelinks/circulatory_autogen/.github/actions/libcellml-from-source@master
