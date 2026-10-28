@@ -394,7 +394,7 @@ def import_model(ca_dir, model, category, configs):
     invariants = []
     if category in ('closed_loop_cvs', 'controlled_cvs') and any(r['vessel_type'] == 'volume_sum' and r['name'] == 'volume_sum' for r in rows):
         invariants.append({'description': 'total blood volume is conserved in the closed loop (relative drift < 1e-6)',
-                           'expr': 'np.ptp(sum_blood_volume__q_volume_sum_sum) <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))'})
+                           'expr': 'np.ptp(multiport_sum_volume_sum_q__q) <= 1e-6 * np.max(np.abs(multiport_sum_volume_sum_q__q))'})
     spec_path = os.path.join(dest, f'{model}_system.yaml')
     if not os.path.isfile(spec_path):
         spec = {'model': model, 'category': category, 'reviewed': False,

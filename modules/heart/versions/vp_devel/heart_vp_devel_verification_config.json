@@ -28,7 +28,7 @@
     "q_heart",
     "aortic_root/u",
     "par/u",
-    "sum_blood_volume/q_volume_sum_sum"
+    "multiport_sum_volume_sum_q/q"
   ],
   "harness": {
     "module_array": [
@@ -174,7 +174,7 @@
   "invariants": [
     {
       "description": "closed-loop blood volume is conserved: the network total (heart + 5 vessels) stays at its initial value",
-      "expr": "np.ptp(sum_blood_volume__q_volume_sum_sum) <= 1e-6*np.mean(sum_blood_volume__q_volume_sum_sum)"
+      "expr": "np.ptp(multiport_sum_volume_sum_q__q) <= 1e-6*np.mean(multiport_sum_volume_sum_q__q)"
     },
     {
       "description": "q_heart is the sum of the four chamber volumes",
