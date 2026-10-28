@@ -14,12 +14,15 @@
         <variable name="v_in" public_interface="in" units="m3_per_s"/>
         <variable name="u" public_interface="out" units="J_per_m3"/>
         <variable name="u_C" public_interface="out" units="J_per_m3"/>
-        <variable initial_value="0.0" name="v" public_interface="out" units="m3_per_s"/>
+        <variable name="v_init" public_interface="in" units="m3_per_s"/>
+        <variable initial_value="v_init" name="v" public_interface="out" units="m3_per_s"/>
         <variable name="u_d" public_interface="out" units="J_per_m3"/>
         <variable name="u_C_d" public_interface="out" units="J_per_m3"/>
         <variable name="v_out" public_interface="in" units="m3_per_s"/>
-        <variable initial_value="0.0" name="q_C" public_interface="out" units="m3"/>
-        <variable initial_value="0.0" name="q_C_d" public_interface="out" units="m3"/>
+        <variable name="q_C_init" public_interface="in" units="m3"/>
+        <variable name="q_C_d_init" public_interface="in" units="m3"/>
+        <variable initial_value="q_C_init" name="q_C" public_interface="out" units="m3"/>
+        <variable initial_value="q_C_d_init" name="q_C_d" public_interface="out" units="m3"/>
         <variable name="q" public_interface="out" units="m3"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
