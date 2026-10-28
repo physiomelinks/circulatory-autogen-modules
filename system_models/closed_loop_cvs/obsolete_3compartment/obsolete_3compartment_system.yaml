@@ -12,7 +12,7 @@ equivalence:
     atol: 1.0e-14
 invariants:
 - description: total blood volume is conserved in the closed loop (relative drift < 1e-6)
-  expr: np.ptp(sum_blood_volume__q_volume_sum_sum) <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))
+  expr: np.ptp(multiport_sum_volume_sum_q__q) <= 1e-6 * np.max(np.abs(multiport_sum_volume_sum_q__q))
 notes:
 - 'The one system model kept with a flat (monolithic) heart: circulatory_autogen''s 3compartment, heart vp_Ca with both vena cava ports,
   the inferior one closed by an explicit zero flow (the record zero_flow, an inlet_flow constant at v = 0, since the library''s zero_flow
