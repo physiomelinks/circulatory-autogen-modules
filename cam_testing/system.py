@@ -184,9 +184,9 @@ def simulate(model_path, spec, solver_info, names=None, ignore_components=None):
     if names is None and ignore_components is not None:
         names = all_component_names(helper, ignore_components)
     if names is None:
-        # vessel outputs, plus the multi_port "sum" totals (component sum_blood_volume)
-        names = [n.replace('_module.', '/', 1).replace('sum_blood_volume.', 'sum_blood_volume/', 1)
-                 for n in helper.get_all_variable_names() if '_module.' in n or n.startswith('sum_blood_volume.')]
+        # vessel outputs, plus the multi_port "sum" totals (components multiport_sum_<module>_<variable>)
+        names = [n.replace('_module.', '/', 1) if '_module.' in n else n.replace('.', '/', 1)
+                 for n in helper.get_all_variable_names() if '_module.' in n or n.startswith('multiport_sum_')]
     # time is returned as t, not as an output: the solver merges every module's t into one variable
     # and names it after whichever component it picks, which differs between runs
     time_names = time_variable_names(helper)

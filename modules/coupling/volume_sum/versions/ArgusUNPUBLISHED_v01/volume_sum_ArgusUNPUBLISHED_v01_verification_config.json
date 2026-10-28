@@ -5,7 +5,7 @@
   "pre_time": 0.0,
   "dt": 0.001,
   "solver": "CVODE_myokit",
-  "outputs": ["q_sum", "sum_blood_volume/q_mod_sum", "va/q", "vb/q", "va/v", "vb/v", "flow_out_a/v", "flow_out_b/v"],
+  "outputs": ["q_sum", "multiport_sum_mod_q/q", "va/q", "vb/q", "va/v", "vb/v", "flow_out_a/v", "flow_out_b/v"],
   "harness": {
     "module_array": [
       ["p_in_a", "constant", "inlet_pressure", "", "va", "default"],
@@ -38,19 +38,19 @@
   "invariants": [
     {
       "description": "the output is exactly the sum of the connected vessels' volumes, Σq = q_va + q_vb",
-      "expr": "np.max(np.abs(sum_blood_volume__q_mod_sum - (va__q + vb__q))) <= 1e-12*max(1e-30, np.max(np.abs(sum_blood_volume__q_mod_sum)))"
+      "expr": "np.max(np.abs(multiport_sum_mod_q__q - (va__q + vb__q))) <= 1e-12*max(1e-30, np.max(np.abs(multiport_sum_mod_q__q)))"
     },
     {
       "description": "q_sum, the total on the exit volume_port, equals the generated sum exactly",
-      "expr": "np.max(np.abs(q_sum - sum_blood_volume__q_mod_sum)) <= 1e-12*max(1e-30, np.max(np.abs(sum_blood_volume__q_mod_sum)))"
+      "expr": "np.max(np.abs(q_sum - multiport_sum_mod_q__q)) <= 1e-12*max(1e-30, np.max(np.abs(multiport_sum_mod_q__q)))"
     },
     {
       "description": "volume balance: Σq(t) − Σq(0) = ∫(inflows − outflows) dt over both vessels (trapezoidal, < 1e-3 of max Σq)",
-      "expr": "np.max(np.abs((sum_blood_volume__q_mod_sum - sum_blood_volume__q_mod_sum[0]) - np.concatenate(([0.0], np.cumsum(0.5*((va__v + vb__v - flow_out_a__v - flow_out_b__v)[1:] + (va__v + vb__v - flow_out_a__v - flow_out_b__v)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(sum_blood_volume__q_mod_sum))"
+      "expr": "np.max(np.abs((multiport_sum_mod_q__q - multiport_sum_mod_q__q[0]) - np.concatenate(([0.0], np.cumsum(0.5*((va__v + vb__v - flow_out_a__v - flow_out_b__v)[1:] + (va__v + vb__v - flow_out_a__v - flow_out_b__v)[:-1])*np.diff(t)))))) <= 1e-3*np.max(np.abs(multiport_sum_mod_q__q))"
     },
     {
       "description": "steady state: Σq → C_a (P_in,a − R v_out,a) + C_b (P_in,b − R v_out,b) = 1e-8 (2000 − 1000) + 1e-8 (1500 − 200) = 2.3e-5 m^3 (0.1%)",
-      "expr": "abs(sum_blood_volume__q_mod_sum[-1] - 2.3e-5) <= 2.3e-8"
+      "expr": "abs(multiport_sum_mod_q__q[-1] - 2.3e-5) <= 2.3e-8"
     }
   ],
   "bc_sweep": {
