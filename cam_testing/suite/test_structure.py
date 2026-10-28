@@ -938,6 +938,25 @@ def test_missing_source_figures_list_is_current():
     assert not stale, f'remove from MISSING_SOURCE_FIGURES (now has figures or no longer needs them): {sorted(stale)}'
 
 
+def _parameterisations_with_source_figures():
+    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.parameterisations()
+            if os.path.isfile(os.path.join(i.source_figures_dir, library.SOURCE_FIGURES_INDEX))]
+
+
+@pytest.mark.parametrize('key,inst', _parameterisations_with_source_figures(), ids=lambda x: x if isinstance(x, str) else '')
+def test_source_figures_index(key, inst):
+    '''Each source_figures.json entry has the keys directory_schema.json documents (file, source; optional
+    caption and items), and its "items" names data items of the parameterisation (modules/README.md,
+    "Source figures").'''
+    # a repo whose own directory_schema.json predates index_keys: cam_testing's
+    keys = (LEVELS['parameterisation'].get('subdirectories', {}).get(library.SOURCE_FIGURES, {}).get('index_keys')
+            or library.SOURCE_FIGURE_KEYS)
+    with open(os.path.join(inst.source_figures_dir, library.SOURCE_FIGURES_INDEX)) as f:
+        entries = json.load(f)
+    problems = library.source_figures_problems(entries, inst.item_names(), keys)
+    assert not problems, f'{key}: ' + '; '.join(problems)
+
+
 def _ca_resources():
     '''circulatory_autogen's resources/ directory, from the installed libcuflynx (or the sibling clone).'''
     try:

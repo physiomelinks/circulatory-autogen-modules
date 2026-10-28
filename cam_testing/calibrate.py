@@ -193,6 +193,11 @@ def series_from_obs_data(obs):
     return out
 
 
+def series_item_names(obs):
+    """{output: data_item_name} of the series items of an obs_data dict (series_from_obs_data's keys)."""
+    return {output_of(i['operands'][0]): i['data_item_name'] for i in obs['data_items'] if i.get('data_type') == 'series'}
+
+
 def read_params_for_id(path):
     """The entries of a params_for_id JSON file as libcuflynx's in-code form
     ({vessel_name, param_name, min, max, name_for_plotting})."""
@@ -348,8 +353,9 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     return tm, out, series, cal_scores, pred_scores, z_scores
 
 
-def run(cm, v, plot_path):
-    from cam_testing.checks import FAILED, PASSED, Result, periodic_steady_state
+def run(cm, v):
+    from cam_testing.checks import (FAILED, PASSED, Result, item_plot_path, item_plots, overlay_groups,
+                                    periodic_steady_state)
 
     component = cm.component
     inst = cm.parameterisation
@@ -374,7 +380,8 @@ def run(cm, v, plot_path):
 
     # one calibration per start (default: from the nominal values)
     starts = v.get('starts') or [v.get('initial_parameters') or {}]
-    runs, problems, figs = [], [], []
+    runs, problems, figs, plot_items = [], [], [], []
+    item_units = {i['data_item_name']: i.get('unit', '') for i in val_obs['data_items']}
     for n, start_values in enumerate(starts):
         calibrated, method, cost, features = _calibrate_once(cm, v, calibration_obs(obs), params_for_id, start_values, n)
         tm, out, series, cal_s, pred_s, z_s = _evaluate(cm, v, val_obs, calibrated, cal_end, features)
@@ -408,23 +415,32 @@ def run(cm, v, plot_path):
             g = abs(got) if compare_abs else got
             if abs(g - float(want)) > expected_tol * max(abs(float(want)), 1e-12):
                 problems.append(f'start {label}: {par} = {got:.4g}, expected {"|" + par + "| = " if compare_abs else ""}{want}')
+        # one figure per series item (named by its data_item_name), model and data against time; the items
+        # a source figure overlays share one figure
+        path_of = item_plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst)
         if features is not None and series:
-            # one panel per series item, model and data against time from its sub-experiment's start
-            figs.append(plots.plot_model_vs_data(
-                plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst),
-                {k: t for k, (t, m, d, sd) in series.items()}, {k: m for k, (t, m, d, sd) in series.items()},
+            # time from the start of each item's sub-experiment
+            saved = plots.plot_model_vs_data(
+                path_of, {k: t for k, (t, m, d, sd) in series.items()}, {k: m for k, (t, m, d, sd) in series.items()},
                 {k: t for k, (t, m, d, sd) in series.items()},
-                {k: d for k, (t, m, d, sd) in series.items()}, {},
-                f'{component.label}: calibrated ({label}); time from the start of each sub-experiment'))
+                {k: d for k, (t, m, d, sd) in series.items()}, item_units,
+                f'{component.label}: calibrated ({label}); time from the start of each sub-experiment',
+                groups=overlay_groups(inst, series))
         elif series:
             title = f'{component.label}: calibrated to t ≤ {cal_end:g}'
             if v.get('prediction_window'):
                 title += f', predicting {v["prediction_window"][0]:g} < t ≤ {v["prediction_window"][1]:g}'
-            figs.append(plots.plot_model_vs_data(
-                plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst), tm,
-                {k: out[harness.output_key(k)] for k in series}, {k: ts for k, (ts, _) in series.items()},
-                {k: d for k, (_, d) in series.items()}, cm.units(),
-                title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end))
+            names = series_item_names(val_obs)
+            saved = plots.plot_model_vs_data(
+                path_of, tm, {names[k]: out[harness.output_key(k)] for k in series},
+                {names[k]: ts for k, (ts, _) in series.items()}, {names[k]: d for k, (_, d) in series.items()},
+                item_units, title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end,
+                groups=overlay_groups(inst, [names[k] for k in series]))
+        else:
+            saved = []
+        paths, plot_metrics = item_plots(saved)
+        figs += paths
+        plot_items += plot_metrics['plot_items']
 
     validated = {}
     for r in runs:
@@ -435,7 +451,7 @@ def run(cm, v, plot_path):
                'files': sorted(set(files), key=files.index), 'runs': runs,
                'calibrated_parameters': runs[0]['calibrated_parameters'] if len(runs) == 1 else
                {k: vals for k, vals in validated.items()},
-               'validated_values': {k: vals for k, vals in validated.items()}}
+               'validated_values': {k: vals for k, vals in validated.items()}, 'plot_items': plot_items}
     if expected:
         metrics['expected_parameters'] = expected
     summary = '; '.join(
