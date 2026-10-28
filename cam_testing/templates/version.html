@@ -606,6 +606,7 @@ window.addEventListener('DOMContentLoaded', function () {
         {%- if t.status not in (none, 'not_applicable') or t.message not in ('no baseline data in this parameterisation', 'no baseline data in this instance') %}
         <h4 style="margin:8px 0 0">{{ i.name }}</h4>
         {{ test_article(c, t, t.anchor) }}
+        {%- else %}<span id="{{ t.anchor }}"></span>
         {%- endif %}
         {%- endfor %}{% endfor %}
       </div>

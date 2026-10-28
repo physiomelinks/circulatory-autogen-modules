@@ -1423,13 +1423,17 @@ def _copy_version_files(v, vdest):
             fdest = os.path.join(vdest, os.path.relpath(path, v.dir))
             os.makedirs(os.path.dirname(fdest), exist_ok=True)
             shutil.copy2(path, fdest)
-    # the parameterisations' CUFLynx archives, where they have been built (make omex)
     for inst in v.parameterisations():
+        idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
+        # the parameterisation's CUFLynx archive, where it has been built (make omex)
         archive = omex_mod.omex_path(v, inst)
         if os.path.isfile(archive):
-            idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
             os.makedirs(idest, exist_ok=True)
             shutil.copy2(archive, idest)
+        # the publication figures its data came from, shown beside its validation plots
+        if os.path.isdir(inst.source_figures_dir):
+            shutil.copytree(inst.source_figures_dir, os.path.join(idest, os.path.basename(inst.source_figures_dir)),
+                            dirs_exist_ok=True)
 
 
 def _site_version_path(site_dir, v):

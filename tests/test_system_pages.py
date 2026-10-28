@@ -129,23 +129,34 @@ def test_screenshot_node_errors(repo):
     assert any('300x100' in e for e in report.system_context(repo.system)['figure']['errors'])
 
 
-def test_site_and_zip_link_every_page(repo, monkeypatch):
+def test_site_and_zip_link_every_page(repo):
     '''The site holds the system page, its screenshot, and the pages of the extra library's versions it links
     to (the heart's submodules too); every relative link of the system page resolves, and the zip has it all.'''
     _png(repo.dir / 'chain_phlynx.png', 200, 100)
     (repo.dir / 'chain_phlynx_nodes.json').write_text(json.dumps({
         'width': 200, 'height': 100, 'nodes': [{'instance': 'heart', 'box': [0, 0, 100, 50]}]}))
-    monkeypatch.setattr(report, 'build_review_queue', lambda *a, **k: None)
     index = report.assemble_site([], [], [repo.system])
     site = repo.root / 'site'
     page = site / 'system_models' / 'demo' / 'chain' / 'chain.html'
     assert (page.parent / 'chain_phlynx.png').is_file()
     assert 'href="system_models/demo/chain/chain.html"' in open(index).read()
-    html = page.read_text()
-    targets = _hrefs(html)
-    assert len(targets) >= 5
-    for href in targets:
-        assert (page.parent / href).resolve().is_file(), href
+    assert len(_hrefs(page.read_text())) >= 5
+    # every page's relative links resolve in the site (the version pages' source figures too); a link into
+    # a version's parameterisation tests (from its module_type page) names an id of the version page; the
+    # system page's and the index's own anchors name their ids
+    ids_of = lambda path: set(re.findall(r'\bid="([^"]+)"', open(path).read()))  # noqa: E731
+    for d, _, files in os.walk(site):
+        for name in (f for f in files if f.endswith('.html')):
+            text = open(os.path.join(d, name)).read()
+            for href in _hrefs(text):
+                assert os.path.isfile(os.path.join(d, href.split('?')[0])), f'{name}: {href}'
+            for target, anchor in re.findall(r'href="([^"#:]+\.html)#([^"]+--[^"]+_test_[^"]+)"', text):
+                assert anchor in ids_of(os.path.join(d, target)), f'{name}: {target}#{anchor}'
+            if name in ('chain.html', 'index.html'):
+                for anchor in re.findall(r'href="#([^"]+)"', text):
+                    assert anchor in ids_of(os.path.join(d, name)), f'{name}: #{anchor}'
+            assert not re.search(r'href="#[^"]+--validation_test_', text) or 'versions' in d, \
+                f'{name}: a parameterisation test link with no version page'
     chamber = load_version('chamber', next(s['module_subtype'] for s in load_version('heart', 'Argus2026_v01').submodules
                                            if s['name'] == 'lv'))
     assert (site / 'modules' / chamber.mtype.relpath / 'versions' / chamber.name / f'{chamber.stem}.html').is_file()
