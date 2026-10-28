@@ -853,6 +853,10 @@ whether that source was checked:
 `sourced` no). Prefer primary sources to model papers that copied a value; write a large departure
 from the literature in **bold** (`**...**`). A value fitted to data never comes from a hand
 calculation: it comes from a calibration (step 6) and `python -m cam_testing.calibrate apply`.
+A variable summed over a multi_port `"sum"` port is a boundary condition too, and its value here is
+the one it has with nothing connected, usually 0 (`definitional; 0 when nothing is connected to
+this sum: ...`); a model that connects the port sums its neighbours instead
+(`tests/test_multiport_sum_outputs.py` checks every summed variable has one).
 
 **6. A parameterisation from data** (optional): `parameterisations/<name>/` with
 `<name>_parameters.json` (only the parameters that differ), the data (`<name>_obs_data.json`, its

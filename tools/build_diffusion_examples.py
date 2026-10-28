@@ -114,9 +114,6 @@ def write(model, description, cells, faces):
                    [f'flux_c_{n}', 'mol_per_s', 0, 'example: closed domain, no capillary supply'],
                    [f'M_{n}', 'millimolar_per_s', 0, 'example: no consumption'],
                    [f'C50_{n}', 'millimolar', 0.0133, 'example (unused with M = 0)']]
-        # J_in / J_out sum the cell's upstream / downstream faces: boundary conditions, 0 with no face on that side
-        params += [[f'{name}_{n}', 'mol_per_s', 0, 'unconnected sum: 0 keeps the model as before']
-                   for name, faces in (('J_in', inp), ('J_out', out)) if not faces]
     for k, (a, b, A, da, db) in enumerate(faces):
         rows.append([f'f{k}', 'Fang2008_v01', 'tissue_diffusion_face', a, b, 'default'])
         params += [[f'A_f_f{k}', 'm2', A, 'example mesh: face area'],

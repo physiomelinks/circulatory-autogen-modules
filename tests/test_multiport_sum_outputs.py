@@ -88,3 +88,12 @@ def test_every_summed_variable_is_a_boundary_condition():
                for name, _units, _access, kind in v.config['variables_and_units']
                if name in _summed_variables(v.config) and kind != 'boundary_condition']
     assert not not_bcs, not_bcs
+
+
+def test_every_summed_variable_has_a_default_value():
+    """Each summed variable's value with nothing connected is in its version's default parameterisation, so any
+    model that leaves the sum unconnected (a test network, or a user's own) generates; a connected sum ignores it."""
+    missing = [f'{v.key}: {name}'
+               for v in library.all_versions() if not v.is_supermodule
+               for name in sorted(_summed_variables(v.config) - {p.variable_name for p in v.parameters()})]
+    assert not missing, missing

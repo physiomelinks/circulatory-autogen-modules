@@ -46,16 +46,6 @@ def coupled_cells(n_regions):
     return [(int((k + 0.5) * N / n_regions), N // 2, N // 2) for k in range(n_regions)]
 
 
-UNCONNECTED_SUM = 'unconnected sum: 0 keeps the model as before'
-
-
-def unconnected_sums(cell, in_faces, out_faces):
-    """Values of a tissue_diffusion_volume cell's J_in / J_out, the sums over its upstream / downstream
-    faces, when it has no face on that side: they are boundary conditions, 0 with nothing connected."""
-    return [(f'{name}_{cell}', 'mol_per_s', 0.0, UNCONNECTED_SUM)
-            for name, faces in (('J_in', in_faces), ('J_out', out_faces)) if not faces]
-
-
 def fv_grid(sources, props):
     """Records and parameters of an N^3 grid of tissue_diffusion_volume cells joined by
     tissue_diffusion_face faces; sources[k] (a 0D module) exchanges with coupled_cells()[k]."""
@@ -86,7 +76,6 @@ def fv_grid(sources, props):
                    (f'C50_{c}', 'millimolar', props['C50'], 'as the FEniCS instance')]
         if src is None:
             params.append((f'flux_c_{c}', 'mol_per_s', 0.0, 'no source: the cell exchanges only with its neighbours'))
-        params += unconnected_sums(c, inputs[c], outputs[c])
     for f in faces:
         params += [(f"A_f_{f['name']}", 'm2', h * h, 'face of the uniform grid'),
                    (f"d_up_{f['name']}", 'metre', h / 2, 'centre-to-face distance'),
@@ -163,7 +152,6 @@ def single_volume(sources):
                    (f'C_P_init_{c}', 'millimolar', 0.0, 'NE_init of the varicosity'),
                    (f'M_{c}', 'millimolar_per_s', 0.0, 'no clearance but NET (in the varicosity)'),
                    (f'C50_{c}', 'millimolar', 1.0, 'unused with M = 0')]
-        params += unconnected_sums(c, [], [])
     return records, params, [r['name'] for r in records]
 
 

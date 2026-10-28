@@ -6,7 +6,7 @@ notes: 'One finite-volume cell of volume V_P, any shape of one solute (intended 
   = M C_P/(C_P + C50) (Michaelis-Menten; 1 - exp(-k C) before the 2026-09-29 review). J_in and J_out are the sums of the fluxes
   of every diffusion face connected to the entrance and exit diffusion_face_ports (list-form multi_port [True, sum]: C_P is
   shared with each face, the faces'' fluxes are summed), so a grid of any shape needs no ordered ports; with no face on a
-  port, J_in or J_out is a boundary condition taken from the parameters (0 for a closed side). Split on 2026-09-29 from the former tissue_diffusion cell, which had its four N/S/E/W faces built in
+  port, J_in or J_out is a boundary condition, 0 in the default parameterisation (a closed side). Split on 2026-09-29 from the former tissue_diffusion cell, which had its four N/S/E/W faces built in
   and could only be wired as a north-south chain (libcuflynx paired east-west neighbours with the NS ports). Checked identical
   to it (max difference 0.0) for a single cell and a north-south chain, and a 3x3 non-uniform grid matches a direct numpy
   finite-volume solve to 8e-11. Tested here as the old cell was: with four boundary faces (tissue_diffusion_face with the

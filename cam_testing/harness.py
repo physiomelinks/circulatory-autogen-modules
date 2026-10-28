@@ -232,6 +232,13 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
     A row may be a module-array record instead (a dict), e.g. a supermodule "mod" with
     per_submodule_inputs naming its neighbours.
 
+    ``harness.parameters`` holds what the network adds: values for the neighbours' parameters
+    where their own default parameterisations don't fit the test, and anything else the network
+    needs. "mod"'s own values come from its parameterisation, including the value of each of its
+    boundary conditions the network leaves unconnected (e.g. 0 for an unconnected multi_port
+    "sum"). A harness row for a name the parameterisation sets is ignored: the parameterisation
+    holds the reviewed values, and the network cannot override them.
+
     ``parameters``: the parameterisation's parameters to write (default: the version's default
     parameterisation). A parameterisation may have its own network instead
     (validation.<parameterisation>.harness, see ``network``); ``parameterisation`` selects it.
