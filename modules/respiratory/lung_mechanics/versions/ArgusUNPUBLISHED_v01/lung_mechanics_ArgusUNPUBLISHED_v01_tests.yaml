@@ -13,17 +13,22 @@ notes: 'Respiratory mechanics after Albanese et al. (2016) / Rideout-Fukui: seri
   Ports of the versions of lung_mechanics (the same port types):
 
   entrance lung_flow_and_volume_port: ArgusUNPUBLISHED_v01 [v_ml, v_bA, q_D, q_A]; ventilated_ArgusUNPUBLISHED_v01 [v_mt,
-  v_bA, q_D, q_A]
+  v_bA, q_D, q_A]; ventilated_ArgusUNPUBLISHED_v02 [v_mt, v_bA, q_D, q_A]
 
-  entrance respiratory_lung_muscle_pressure_port: ArgusUNPUBLISHED_v01 [Delta_P_mus]; ventilated_ArgusUNPUBLISHED_v01 [alpha_P_mus]
+  entrance respiratory_lung_muscle_pressure_port: ArgusUNPUBLISHED_v01 [Delta_P_mus]; ventilated_ArgusUNPUBLISHED_v01 [alpha_P_mus];
+  ventilated_ArgusUNPUBLISHED_v02 [alpha_P_mus]
 
-  entrance respiratory_rate_port: ArgusUNPUBLISHED_v01 [Delta_RR_resp]; ventilated_ArgusUNPUBLISHED_v01 [Delta_RR_resp]
+  entrance respiratory_rate_port: ArgusUNPUBLISHED_v01 [Delta_RR_resp]; ventilated_ArgusUNPUBLISHED_v01 [Delta_RR_resp]; ventilated_ArgusUNPUBLISHED_v02
+  [Delta_RR_resp]
 
-  exit s_gating: ArgusUNPUBLISHED_v01 [s_floor]; ventilated_ArgusUNPUBLISHED_v01 [s_floor]
+  exit s_gating: ArgusUNPUBLISHED_v01 [s_floor]; ventilated_ArgusUNPUBLISHED_v01 [s_floor]; ventilated_ArgusUNPUBLISHED_v02
+  [s_floor]
 
-  exit thoracic_pressure_port: ArgusUNPUBLISHED_v01 [P_mus]; ventilated_ArgusUNPUBLISHED_v01 [P_pl]
+  exit thoracic_pressure_port: ArgusUNPUBLISHED_v01 [P_mus]; ventilated_ArgusUNPUBLISHED_v01 [P_pl]; ventilated_ArgusUNPUBLISHED_v02
+  [P_pl]
 
-  exit volume_stretch_port: ArgusUNPUBLISHED_v01 [q_str]; ventilated_ArgusUNPUBLISHED_v01 [q_str]'
+  exit volume_stretch_port: ArgusUNPUBLISHED_v01 [q_str]; ventilated_ArgusUNPUBLISHED_v01 [q_str]; ventilated_ArgusUNPUBLISHED_v02
+  [q_str]'
 reference_proposals:
   flag_P_mus_control:
     reference: 'definitional; switch: 1 = muscle-pressure amplitude follows the controller input Delta_P_mus'
