@@ -29,8 +29,8 @@ python -m venv "$HOME/fresh-venv"
 "$HOME/fresh-venv/bin/python" -m pip install -q --upgrade pip
 "$HOME/fresh-venv/bin/pip" install -q -r requirements.txt -c ci/constraints.txt
 # libcellml left out: the setup replaces it with a wheel built from source (libcellml-from-source)
-"$CACHE/venv/bin/pip" freeze --exclude-editable | grep -v '^libcellml==' | sort > cached.txt
-"$HOME/fresh-venv/bin/pip" freeze --exclude-editable | grep -v '^libcellml==' | sort > fresh.txt
+"$CACHE/venv/bin/pip" freeze --exclude-editable | grep -viE '^libcellml( ?==| @ )' | sort > cached.txt
+"$HOME/fresh-venv/bin/pip" freeze --exclude-editable | grep -viE '^libcellml( ?==| @ )' | sort > fresh.txt
 diff cached.txt fresh.txt > pip.diff \
   && echo "pip: same $(wc -l < fresh.txt) packages and versions" \
   || { echo "::error::Python packages differ from the cached setup (< cached, > fresh): pin them in ci/constraints.txt"; cat pip.diff; status=1; }
