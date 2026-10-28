@@ -102,14 +102,6 @@ jobs:
             -c conda-forge python=3.11 fenics-dolfinx=0.9 cmake cxx-compiler sundials nlohmann_json pip
           cache-environment: true
       - run: pip install -r requirements.txt
-      # The composite action's steps run in a plain (non-login) bash: put the environment's bin
-      # first on PATH so they build and install into this environment's Python.
-      - run: echo "$CONDA_PREFIX/bin" >> "$GITHUB_PATH"
-      # remove when a libcellml release on PyPI has cellml/libcellml#1498 (0.7.2 does not)
-      # Built with the system compiler, which finds the system libxml2 the action installs (the
-      # environment's compiler has its own sysroot).
-      - uses: physiomelinks/circulatory_autogen/.github/actions/libcellml-from-source@master
-        env: { CC: /usr/bin/gcc, CXX: /usr/bin/g++ }
       - run: python -c "import dolfinx, libcuflynx.coupling; print('dolfinx', dolfinx.__version__)" && cmake --version
       - run: make structure PYTHON=python
       - run: make coupled PYTHON=python

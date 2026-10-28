@@ -53,6 +53,3 @@ runs:
       run: |
         echo "$HOME/.cam-setup/venv/bin" >> "$GITHUB_PATH"
         echo "VIRTUAL_ENV=$HOME/.cam-setup/venv" >> "$GITHUB_ENV"
-    # remove when a libcellml release on PyPI has cellml/libcellml#1498 (0.7.2 does not). The
-    # wheel goes into the cached virtualenv too; ci/setup_check.sh leaves libcellml out of the compare.
-    - uses: physiomelinks/circulatory_autogen/.github/actions/libcellml-from-source@master
