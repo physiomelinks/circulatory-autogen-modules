@@ -3,6 +3,9 @@ libcuflynx writes a multi_port "sum" as a component multiport_sum_<module>_<vari
 system.simulate() returns it as the output multiport_sum_<module>_<variable>/<variable> (the closed-loop systems'
 blood-volume invariants read multiport_sum_volume_sum_q/q), and FV1D_volume_sum's exit volume_port
 maps q_sum, so a volume_sum connected to it sums q_sum.
+
+A summed variable is a boundary_condition: with nothing connected through its port, libcuflynx takes its value
+from the parameters file (a sum of another kind with nothing connected is an error).
 """
 import copy
 
@@ -67,3 +70,21 @@ def test_volume_sum_sums_the_q_sum_of_an_fv1d_volume_sum(tmp_path, monkeypatch):
     total = out['multiport_sum_mod_q/q']
     assert np.ptp(out['va/q'] + out['vb/q']) > 0          # the vessels' volumes change
     assert np.allclose(total, out['va/q'] + out['vb/q'] + 0.003, rtol=0, atol=1e-12)
+
+
+def _summed_variables(entry):
+    """The variables a module config entry sums through a multi_port "sum" (whole-port or list form)."""
+    out = set()
+    for port in entry.get('entrance_ports', []) + entry.get('exit_ports', []) + entry.get('general_ports', []):
+        mp = port.get('multi_port')
+        entries = [mp] * len(port['variables']) if isinstance(mp, str) else mp if isinstance(mp, list) else []
+        out |= {v for v, e in zip(port['variables'], entries) if isinstance(e, str) and e.lower() == 'sum'}
+    return out
+
+
+def test_every_summed_variable_is_a_boundary_condition():
+    not_bcs = [f'{v.key}: {name} is a {kind}'
+               for v in library.all_versions() if not v.is_supermodule
+               for name, _units, _access, kind in v.config['variables_and_units']
+               if name in _summed_variables(v.config) and kind != 'boundary_condition']
+    assert not not_bcs, not_bcs

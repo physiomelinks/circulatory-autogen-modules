@@ -8,7 +8,8 @@
   "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
   "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
   "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
-  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"},
+  "J_in": {"value": 0, "units": "mol_per_s", "data_reference": "unconnected sum: 0 keeps the model as before"}
  },
  "t1": {
   "C_P_init": {"value": 0.107666, "units": "millimolar", "data_reference": "example: random initial concentration"},
@@ -57,7 +58,8 @@
   "V_P": {"value": 4.000000000000001e-15, "units": "m3", "data_reference": "example mesh: cell volume"},
   "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "example: closed domain, no capillary supply"},
   "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "example: no consumption"},
-  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"}
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "example (unused with M = 0)"},
+  "J_out": {"value": 0, "units": "mol_per_s", "data_reference": "unconnected sum: 0 keeps the model as before"}
  },
  "f0": {
   "A_f": {"value": 5.656854249492381e-10, "units": "m2", "data_reference": "example mesh: face area"},

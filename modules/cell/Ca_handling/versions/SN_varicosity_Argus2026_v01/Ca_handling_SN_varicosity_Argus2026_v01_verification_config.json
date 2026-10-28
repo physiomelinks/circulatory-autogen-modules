@@ -24,6 +24,12 @@
     "j_diffCa_ER",
     "j_leak_Ca"
   ],
+  "harness": {
+    "parameters": [
+      ["mod/j_Ca_in", "mol_per_s", 0, "unconnected sum: 0 keeps the model as before"],
+      ["mod/j_ER_release", "mol_per_s", 0, "unconnected sum: 0 keeps the model as before"]
+    ]
+  },
   "invariants": [
     {
       "description": "alone (no channel fluxes connected) the total Ca, free + buffered in all four compartments, is conserved (relative 1e-6)",

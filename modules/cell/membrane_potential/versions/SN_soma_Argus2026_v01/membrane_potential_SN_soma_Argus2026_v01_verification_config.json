@@ -8,6 +8,11 @@
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
   "outputs": ["V", "V_sensed", "I_in_delayed", "Cm", "A_mem", "Vol"],
   "run_parameters": {"I_in": 0.05},
+  "harness": {
+    "parameters": [
+      ["mod/i_ion", "nanoA", 0, "unconnected sum: 0 keeps the model as before"]
+    ]
+  },
   "invariants": [
     {
       "description": "charge balance with no channels or axon connected: Cm (V - V0) + C_sensed (V_sensed - V_sensed0) = +1e6 I_in t (pF mV = 1e-15 C, nA s = 1e-9 C)",
