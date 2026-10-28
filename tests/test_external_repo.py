@@ -129,6 +129,11 @@ def test_report_and_manifests(repo):
     mt_dir = os.path.join(repo, 'modules', 'boundary_conditions', external_repo.MT)
     assert os.path.isfile(os.path.join(mt_dir, f'{external_repo.MT}.html'))
     assert os.path.isfile(os.path.join(repo, 'site', 'index.html'))
+    # the system model's page, beside it and in the site, listed in the index
+    page = f'system_models/{external_repo.SYSTEM_CATEGORY}/{external_repo.SYSTEM}/{external_repo.SYSTEM}.html'
+    assert os.path.isfile(os.path.join(repo, page)) and os.path.isfile(os.path.join(repo, 'site', page))
+    with open(os.path.join(repo, 'site', 'index.html')) as f:
+        assert f'href="{page}"' in f.read()
     p, out = _run(['-m', 'cam_testing.manifests'], repo)
     assert p.returncode == 0, out
     with open(os.path.join(repo, 'manifests', 'all.json')) as f:

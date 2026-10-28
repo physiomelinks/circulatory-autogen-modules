@@ -280,7 +280,7 @@ window.addEventListener('DOMContentLoaded', function () {
       <div class="open-in" aria-label="Open in">
         <span class="eyebrow">Open in</span>
         {%- if open_in.celldl %}
-        <span><a class="open-app" id="open-celldl" href="{{ open_in.celldl.href }}" data-app="the CellDL editor" data-open-file="{{ open_in.celldl.href }}" data-open-url="{{ open_in.celldl.open }}" data-open-by-url="{{ open_in.celldl.open_by_url }}" target="_blank" rel="noopener" title="Opens the version's bond graph ({{ open_in.celldl.href }}) in the CellDL editor">CellDL</a><span class="open-msg muted" role="status"></span></span>
+        <span><a class="open-app" id="open-celldl" href="{{ open_in.celldl.href }}" data-app="the CellDL editor" data-open-file="{{ open_in.celldl.href }}" data-open-url="{{ open_in.celldl.open }}" data-open-by-url="{{ open_in.celldl.open_by_url }}" target="_blank" rel="noopener" title="Opens the version's bond graph ({{ open_in.celldl.href }}) in the CellDL editor">CellDL</a><span class="open-msg muted" role="status"></span>{% if open_in.celldl.note %}<a href="#celldl-note" class="muted" style="font-size:0.8rem" title="{{ open_in.celldl.note }}">(see the note)</a>{% endif %}</span>
         {%- endif %}
         {%- set ph = open_in.phlynx %}
         <span>{% if ph.href %}<a class="open-app" id="open-phlynx" href="{{ ph.href }}" data-app="PhLynx" data-open-file="{{ ph.href }}" data-open-url="{{ ph.open }}" target="_blank" rel="noopener" title="Opens the version's test network, as PhLynx exported it ({{ ph.href }}), in PhLynx">PhLynx</a><span class="open-msg muted" role="status"></span>
@@ -363,6 +363,9 @@ window.addEventListener('DOMContentLoaded', function () {
         <a href="{{ open_in.celldl.href }}" target="_blank" rel="noopener"><img id="bond-graph-figure" src="{{ open_in.celldl.href }}" alt="The version's bond graph, as the CellDL editor draws it" loading="lazy" style="display:block;max-width:100%;height:auto;max-height:80vh;background:#fff;border:1px solid var(--rule);border-radius:6px"></a>
         <figcaption class="muted" style="margin-top:4px;font-size:0.84rem">The version's CellDL document, <code>{{ open_in.celldl.href }}</code>, drawn as the editor draws it. Click it to see it full size, or <a href="#open-celldl">open it in CellDL</a> to edit it.</figcaption>
       </figure>
+      {%- if open_in.celldl.note %}
+      <p class="celldl-note" id="celldl-note" style="margin:0;padding:8px 12px;border-left:3px solid var(--pend);background:var(--pend-bg);font-size:0.86rem">{{ open_in.celldl.note }}</p>
+      {%- endif %}
     </section>
     {%- endif %}
 

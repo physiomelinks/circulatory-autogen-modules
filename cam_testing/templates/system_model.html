@@ -1,0 +1,176 @@
+{%- macro chip(status, label=None) -%}
+<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','partial':'Partial','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A'}.get(status, 'Not run') }}</span>
+{%- endmacro -%}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ name }} system model</title>
+{% include '_style.html' %}
+<style>
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 28px 64px; display: grid; gap: 36px; }
+header.system { display: grid; gap: 10px; }
+header.system p { margin: 0; max-width: 85ch; color: var(--ink-2); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 0.88rem; }
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+section { display: grid; gap: 10px; min-width: 0; }
+.figure-wrap { position: relative; display: inline-block; max-width: 100%; line-height: 0; background: #fff; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.figure-wrap img { display: block; max-width: 100%; height: auto; }
+.figure-wrap a.node { position: absolute; display: block; border: 2px solid transparent; border-radius: 6px; }
+.figure-wrap a.node:hover, .figure-wrap a.node:focus-visible { border-color: var(--accent); background: rgba(43, 79, 122, 0.10); outline: none; }
+.figure-wrap.show-nodes a.node { border-color: var(--accent); border-style: dashed; }
+.diagram { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 10px; overflow-x: auto; }
+pre.mermaid { margin: 0; font-size: 0.78rem; white-space: pre; color: var(--ink-3); }
+pre.mermaid[data-processed] { color: inherit; text-align: center; }
+td.mono, .mono { font-family: var(--font-mono); font-size: 0.82rem; }
+td { vertical-align: top; }
+.subs { margin: 4px 0 0; padding-left: 16px; font-size: 0.8rem; }
+.test { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
+.test.failed { border-color: var(--fail); }
+.test-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
+.test .about { font-size: 0.84rem; color: var(--ink-2); margin: 0; }
+.test .message { margin: 0; font-weight: 500; }
+.plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 12px; }
+.plots figure { margin: 0; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
+.plots img { display: block; width: 100%; height: auto; }
+details { font-size: 0.85rem; }
+details summary { cursor: pointer; color: var(--ink-2); }
+.yes { color: var(--pass); font-weight: 600; } .no { color: var(--fail); font-weight: 600; }
+footer { color: var(--ink-3); font-size: 0.8rem; }
+</style>
+{%- if mermaid %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" defer></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.mermaid) { return; }   // offline: the diagram's source and the instances table still show the model
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: dark ? 'dark' : 'neutral', flowchart: { htmlLabels: true },
+                       maxTextSize: 1000000, maxEdges: 5000 });
+  mermaid.run({ querySelector: 'pre.mermaid' });
+});
+</script>
+{%- endif %}
+</head>
+<body>
+<div class="wrap">
+  <header class="system">
+    <div class="eyebrow">{% if index_href %}<a href="{{ index_href }}">Module library</a> · {% endif %}system model · {{ category }}</div>
+    <h1>{{ name }}</h1>
+    {%- if description %}<p>{{ description }}</p>{% endif %}
+    <div class="meta">
+      <span>{{ instances|length }} instance{{ '' if instances|length == 1 else 's' }}</span>
+      <span>{{ edges|length }} connection{{ '' if edges|length == 1 else 's' }}</span>
+      <span>{{ 'Reviewed' if reviewed else 'Not reviewed yet' }}</span>
+      {%- for k, v in sim.items() %}<span class="mono">{{ k }} {{ v }}</span>{% endfor %}
+      <span>libcuflynx {{ libcuflynx_version }}</span>
+      <span>Page generated {{ generated }}</span>
+    </div>
+    <div class="counts">
+      {%- for t in tests %}<a href="#{{ t.key }}" style="text-decoration:none">{{ chip(t.status, t.title ~ ': ' ~ ({'passed':'Passed','failed':'Failed','skipped':'Skipped','not_applicable':'N/A'}.get(t.status, 'Not run'))) }}</a> {% endfor %}
+    </div>
+    {%- if skip %}<p style="color:var(--pend)">Its tests are skipped: {{ skip }}</p>{% endif %}
+    {%- if known_issues %}<ul class="muted" style="margin:0;font-size:0.86rem">{% for k in known_issues %}<li>Known issue: {{ k }}</li>{% endfor %}</ul>{% endif %}
+  </header>
+
+  <section aria-labelledby="figure-h">
+    <h2 id="figure-h">{{ 'The model in PhLynx' if figure else 'Diagram' }}</h2>
+    {%- if figure %}
+    <div><div class="figure-wrap" id="system-figure">
+      <img src="{{ figure.src }}" width="{{ figure.width }}" height="{{ figure.height }}" alt="{{ name }} as PhLynx draws it: one box per instance, wired by its connections">
+      {%- for n in figure.nodes %}{% if n.href %}
+      <a class="node" href="{{ n.href }}" data-instance="{{ n.instance }}" title="{{ n.instance }}: {{ n.key }}" aria-label="{{ n.instance }} ({{ n.key }})" style="left:{{ '%.3f'|format(n.left) }}%;top:{{ '%.3f'|format(n.top) }}%;width:{{ '%.3f'|format(n.width) }}%;height:{{ '%.3f'|format(n.height) }}%"></a>
+      {%- endif %}{% endfor %}
+    </div></div>
+    <p class="muted" style="margin:0;font-size:0.84rem">A screenshot of the model's root canvas in PhLynx (<code>{{ figure.src }}</code>{% if figure.source %}: {{ figure.source }}{% endif %}). Click a module to open its version's page. <label><input type="checkbox" onchange="document.getElementById('system-figure').classList.toggle('show-nodes', this.checked)"> Outline the clickable modules</label></p>
+    {%- if figure.errors %}<ul style="margin:0;color:var(--fail);font-size:0.84rem">{% for e in figure.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    {%- else %}
+    <div class="diagram"><pre class="mermaid">{{ mermaid }}</pre></div>
+    <p class="muted" style="margin:0;font-size:0.84rem">Generated from the module array's connections (no PhLynx screenshot, <code>{{ name }}_phlynx.png</code>, beside the model). Click a module to open its version's page.</p>
+    {%- endif %}
+  </section>
+
+  <section aria-labelledby="instances-h">
+    <h2 id="instances-h">Instances</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Instance</th><th>Module type / version</th><th>Parameterisation</th><th>Inputs</th><th>Outputs</th></tr></thead>
+      <tbody>
+      {%- for i in instances %}
+        <tr id="instance-{{ i.name }}">
+          <td class="mono">{{ i.name }}</td>
+          <td class="mono">{% if i.href %}<a href="{{ i.href }}">{{ i.module_type }} / {{ i.version }}</a>{% else %}{{ i.module_type }} / {{ i.version }} <span class="no" style="font-family:var(--font-body)">{{ i.missing }}</span>{% endif %}
+            {%- if i.is_supermodule %} <span class="muted" style="font-family:var(--font-body)">supermodule</span>
+            <ul class="subs">{% for s in i.submodules %}<li>{{ s.name }}: {% if s.href %}<a href="{{ s.href }}">{{ s.key }}</a>{% else %}{{ s.key }}{% endif %}</li>{% endfor %}</ul>
+            {%- endif %}</td>
+          <td class="mono">{{ i.parameterisation }}</td>
+          <td class="mono">{{ i.inputs|join(', ') }}</td>
+          <td class="mono">{{ i.outputs|join(', ') }}</td>
+        </tr>
+      {%- endfor %}
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="connections-h">
+    <h2 id="connections-h">Connections</h2>
+    <p class="muted" style="margin:0;font-size:0.86rem">{{ edges|length }} connections from the module array (out_instances, inp_instances, and a supermodule instance's per-submodule inputs and outputs as <span class="mono">instance/submodule</span>).</p>
+    <details><summary>All {{ edges|length }} connections</summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th>From</th><th>To</th></tr></thead>
+      <tbody>{% for a, b in edges %}<tr><td class="mono">{{ a }}</td><td class="mono">{{ b }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+    </details>
+  </section>
+
+  <section aria-labelledby="parameters-h">
+    <h2 id="parameters-h">Parameters</h2>
+    {%- if parameters %}
+    <p class="muted" style="margin:0;font-size:0.86rem">The values of <code>{{ parameters_file }}</code>, which win over the parameterisations' values.</p>
+    {%- for g in parameters %}
+    <details><summary><span class="mono">{{ g.name }}</span> · {{ g.rows|length }} value{{ '' if g.rows|length == 1 else 's' }}</summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Value</th><th>Units</th><th>Source</th></tr></thead>
+      <tbody>{% for r in g.rows %}<tr><td class="mono">{{ r.name }}</td><td class="mono num">{{ r.value|fmt }}</td><td class="mono">{{ r.units }}</td><td>{{ r.reference }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+    </details>
+    {%- endfor %}
+    {%- else %}
+    <p class="muted" style="margin:0">No parameters file: every value comes from the instances' parameterisations.</p>
+    {%- endif %}
+  </section>
+
+  <section aria-labelledby="tests-h">
+    <h2 id="tests-h">Tests</h2>
+    {%- for t in tests %}
+    <article class="test {{ t.status or '' }}" id="{{ t.key }}">
+      <div class="test-head"><h4 style="margin:0">{{ t.title }}</h4>{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Failed · known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</div>
+      <p class="about">{{ t.about }}</p>
+      {%- if t.known_issue %}<p class="message" style="color:var(--fail)">Known issue: {{ t.known_issue }}</p>{% endif %}
+      <p class="message">{{ t.message }}</p>
+      {%- if t.rows %}
+      <details><summary>Largest differences ({{ t.rows|length }})</summary>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Reference</th><th>Model</th><th>Difference</th><th>Within tol</th></tr></thead>
+        <tbody>{% for r in t.rows %}<tr><td class="mono">{{ r.reference }}</td><td class="mono">{{ r.model }}</td><td class="mono num">{{ r.difference|fmt }}</td><td class="{{ 'yes' if r.ok else 'no' }}">{{ 'Yes' if r.ok else 'No' }}</td></tr>{% endfor %}</tbody>
+      </table></div></details>
+      {%- endif %}
+      {%- if t.details %}<details><summary>Details</summary><ul class="mono" style="margin:0">{% for d in t.details %}<li>{{ d }}</li>{% endfor %}</ul></details>{% endif %}
+      {%- if t.timestamp %}<p class="muted" style="margin:0;font-size:0.8rem">Run {{ t.timestamp }}</p>{% endif %}
+    </article>
+    {%- endfor %}
+    {%- if plots %}
+    <div class="plots">{% for p in plots %}<figure><a href="{{ p }}"><img src="{{ p }}" alt="{{ p }}" loading="lazy"></a><figcaption class="muted mono">{{ p }}</figcaption></figure>{% endfor %}</div>
+    {%- endif %}
+  </section>
+
+  {%- if notes %}
+  <section aria-labelledby="notes-h">
+    <h2 id="notes-h">Notes</h2>
+    <ul style="margin:0;font-size:0.9rem;display:grid;gap:4px">{% for n in notes %}<li>{{ n }}</li>{% endfor %}</ul>
+  </section>
+  {%- endif %}
+
+  <footer>Generated by <span class="mono">python -m cam_testing.report</span> from <span class="mono">{{ name }}_module_array.json</span>, <span class="mono">{{ parameters_file }}</span>, <span class="mono">{{ name }}_system.yaml</span> and the system tests' results.</footer>
+</div>
+</body>
+</html>

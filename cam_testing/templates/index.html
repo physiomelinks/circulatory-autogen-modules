@@ -33,7 +33,29 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
       {%- if totals[None] %} {{ chip(None, totals[None] ~ ' not run') }}{% endif %}
     </div>
   </header>
-  <nav class="cats" aria-label="Categories">{% for g in groups %}<a href="#{{ g.anchor }}">{{ g.category }}</a>{% endfor %}</nav>
+  <nav class="cats" aria-label="Categories">{% if systems %}<a href="#system-models">System models</a>{% endif %}{% for g in groups %}<a href="#{{ g.anchor }}">{{ g.category }}</a>{% endfor %}</nav>
+  {%- if systems %}
+  <section id="system-models" aria-labelledby="system-models-h" style="display:grid;gap:10px">
+    <h2 id="system-models-h" style="font-size:1.1rem">System models <span class="muted" style="font-weight:400">· {{ systems|length }}</span></h2>
+    <p class="muted" style="margin:0;font-size:0.86rem">Whole models built from the library. A system model's page shows it (as PhLynx draws it, where a screenshot is kept), its instances linked to their version pages, its parameters and its tests.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>System model</th><th>Category</th><th>Instances</th>{% for t in systems[0].tests %}<th>{{ t.title.split(':')[0] }}</th>{% endfor %}<th>Description</th></tr></thead>
+        <tbody>
+        {%- for s in systems %}
+          <tr>
+            <td class="name"><a href="{{ s.href }}">{{ s.name }}</a></td>
+            <td class="mono" style="font-size:0.8rem">{{ s.category }}</td>
+            <td class="num">{{ s.n_instances }}</td>
+            {%- for t in s.tests %}<td>{{ chip(t.status, {'passed':'Passed','failed':'Failed','skipped':'Skipped','not_applicable':'N/A'}.get(t.status, 'Not run')) }}</td>{% endfor %}
+            <td style="white-space:normal;font-size:0.84rem;max-width:50ch">{{ s.description|truncate(160) }}</td>
+          </tr>
+        {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {%- endif %}
   {%- for g in groups %}
   <section id="{{ g.anchor }}" aria-labelledby="{{ g.anchor }}-h" style="display:grid;gap:10px">
     <h2 id="{{ g.anchor }}-h" class="mono" style="font-size:1.1rem">{{ g.category }} <span class="muted" style="font-weight:400">· {{ g.rows|length }} module_type{{ '' if g.rows|length == 1 else 's' }}, {{ g.n_versions }} version{{ '' if g.n_versions == 1 else 's' }}</span></h2>

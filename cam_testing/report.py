@@ -5,10 +5,14 @@ HTML reports at two levels, and a site index:
     <module_type>/versions/<v>/<module_type>_<v>.html       the version: equations, variables,
                                                             tests, references, and its parameterisations
                                                             with their validation / calibration
+    system_models/<category>/<model>/<model>.html           a system model: its figure (PhLynx screenshot, or a
+                                                            generated diagram) with each instance linked to its
+                                                            version page, its parameters and its system tests
 
-    python -m cam_testing.report                  # every module_type and its versions
+    python -m cam_testing.report                  # every module_type and its versions, and every system model
     python -m cam_testing.report --module heart   # a module_type and those nested in it (or a category: --module cell)
     python -m cam_testing.report --site           # also assemble site/ as GitHub Pages serves it
+    python -m cam_testing.report --zip out.zip    # site/ zipped with a README.txt, to send by email
 
 Pages read the result JSON and plots the tests wrote, so a report shows the last local (or
 CI) test run. Plots are referenced relatively (plots/...), so a page works opened from disk.
@@ -38,6 +42,9 @@ TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
 # editor build, http://127.0.0.1:8475/).
 CELLDL_EDITOR_URL = 'https://physiomelinks.github.io/CellDLEditorComponent/'
 CELLDL_EDITOR_ENV = 'CAM_CELLDL_EDITOR_URL'
+# A note shown with a version's bond graph and its CellDL link when set (python -m cam_testing.report
+# --celldl-note TEXT, or this variable): e.g. that the linked editor may not draw some element types yet.
+CELLDL_NOTE_ENV = 'CAM_CELLDL_NOTE'
 PHLYNX_OPEN = 'https://phlynx.com/?open=omex#'
 CUFLYNX_OPEN = 'cuflynx://open?url='
 PHLYNX_NOT_EXPORTED = 'not exported yet (the PhLynx pipeline, make pipeline, keeps its export with the results)'
@@ -969,6 +976,8 @@ def open_in_context(version):
     if bondgraph.is_bondgraph(version):
         href = os.path.relpath(bondgraph.document_path(version), version.dir).replace(os.sep, '/')
         celldl = {'href': href, 'open': celldl_open(os.path.basename(href)), 'open_by_url': celldl_editor_url() + '?open='}
+        if os.environ.get(CELLDL_NOTE_ENV):
+            celldl['note'] = os.environ[CELLDL_NOTE_ENV]
     archive = phlynx.archive_path(version)
     if phlynx._cpp(version):
         phl = {'reason': phlynx._reason(version)}
@@ -1012,11 +1021,14 @@ def version_context(version):
     }
 
 
-def build_version(version):
+def build_version(version, out_path=None):
+    '''Writes the version's page (default its html_path; out_path: the same page elsewhere, e.g. in the
+    site for an extra library's version); returns (path, context).'''
     ctx = version_context(version)
-    with open(version.html_path, 'w') as f:
+    out_path = out_path or version.html_path
+    with open(out_path, 'w') as f:
         f.write(_env().get_template('version.html').render(**ctx))
-    return version.html_path, ctx
+    return out_path, ctx
 
 
 def module_context(name, version_contexts=None):
@@ -1071,10 +1083,10 @@ def build_module(name):
     return mtype.html_path, ctx
 
 
-def build_index(contexts, out_path, href):
-    '''The site index: module_types grouped by category (a module_type directly under modules/ and the
-    ones nested in it form their own group), each with links to its versions. A nested module_type
-    is listed by its path in the group, e.g. neuron/soma under cell.'''
+def build_index(contexts, out_path, href, systems=()):
+    '''The site index: the system models (systems: system_rows), then module_types grouped by category (a
+    module_type directly under modules/ and the ones nested in it form their own group), each with links
+    to its versions. A nested module_type is listed by its path in the group, e.g. neuron/soma under cell.'''
     groups = {}
     for c in contexts:
         groups.setdefault(c['group'], []).append(c)
@@ -1100,7 +1112,8 @@ def build_index(contexts, out_path, href):
     totals = {k: sum(r['counts'].get(k, 0) for r in all_rows)
               for k in ('passed', 'partial', 'failed', 'skipped', 'pending', 'not_applicable', None)}
     html_text = _env().get_template('index.html').render(
-        groups=out_groups, totals=totals, n_module_types=len(all_rows), n_versions=sum(r['n_versions'] for r in all_rows),
+        groups=out_groups, systems=list(systems), totals=totals, n_module_types=len(all_rows),
+        n_versions=sum(r['n_versions'] for r in all_rows),
         generated=_now(), libcuflynx_version=_libcuflynx_version())
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, 'w') as f:
@@ -1149,14 +1162,312 @@ def build_review_queue(contexts, out_path, href, standalone=True):
     return out_path
 
 
+# ---- system models ------------------------------------------------------------------------------
+#
+# Every system model (system_models/<category>/<model>/) gets a page, <model>.html beside it (and
+# site/system_models/<category>/<model>/<model>.html), generated from its module array, parameters,
+# spec and test results. Its figure is a PhLynx screenshot when the model has one, <model>_phlynx.png
+# with <model>_phlynx_nodes.json giving each node's instance and pixel box in the image (the page
+# overlays a link per node to that instance's version page); otherwise a diagram generated from the
+# module array's connections.
+
+SYSTEM_TESTS = ['system_run_test', 'system_invariants_test', 'system_equivalence_test']
+SYSTEM_TEST_TITLES = {'system_run_test': 'Run', 'system_invariants_test': 'Verification: invariants',
+                      'system_equivalence_test': 'Equivalence: reproduces its reference'}
+SYSTEM_TEST_ABOUT = {
+    'system_run_test': 'The model generates with libcuflynx from this library and runs; every output is finite.',
+    'system_invariants_test': 'The spec\'s invariants (conservation laws, bounds) hold over the run.',
+    'system_equivalence_test': 'The model reproduces its reference (circulatory_autogen\'s original, or a ready '
+                               'CellML model such as a PhLynx export): every output the reference logs agrees '
+                               'to the spec\'s equivalence.tol.',
+}
+SYSTEM_FIGURE_SUFFIX = '_phlynx.png'
+SYSTEM_NODES_SUFFIX = '_phlynx_nodes.json'
+
+
+def system_page_path(system):
+    '''The system model's page, <model>.html beside its module array.'''
+    return os.path.join(system.dir, f'{system.name}.html')
+
+
+def system_figure_paths(system):
+    '''(<model>_phlynx.png, <model>_phlynx_nodes.json) of a system model.'''
+    return (os.path.join(system.dir, system.name + SYSTEM_FIGURE_SUFFIX),
+            os.path.join(system.dir, system.name + SYSTEM_NODES_SUFFIX))
+
+
+def _png_size(path):
+    with open(path, 'rb') as f:
+        head = f.read(24)
+    if head[:8] != b'\x89PNG\r\n\x1a\n':
+        raise ValueError(f'{path}: not a PNG')
+    return int.from_bytes(head[16:20], 'big'), int.from_bytes(head[20:24], 'big')
+
+
+def system_figure(system, instance_names):
+    '''The PhLynx screenshot and its node boxes, or None when the model has no <model>_phlynx.png:
+    {src, width, height, nodes: [{instance, left, top, width, height} in % of the image], errors}.
+    <model>_phlynx_nodes.json is {"width", "height", "source" (optional: what the screenshot shows),
+    "nodes": [{"instance", "box": [x, y, w, h]}]} in the image's pixels; errors list nodes naming no instance or lying outside the image.'''
+    png, nodes_path = system_figure_paths(system)
+    if not os.path.isfile(png):
+        return None
+    width, height = _png_size(png)
+    out = {'src': os.path.basename(png), 'width': width, 'height': height, 'nodes': [], 'errors': []}
+    if not os.path.isfile(nodes_path):
+        out['errors'].append(f'no {os.path.basename(nodes_path)}: the figure has no clickable nodes')
+        return out
+    with open(nodes_path) as f:
+        doc = json.load(f)
+    out['source'] = doc.get('source')
+    if (doc.get('width'), doc.get('height')) != (width, height):
+        out['errors'].append(f'{os.path.basename(nodes_path)} is for a {doc.get("width")}x{doc.get("height")} '
+                             f'image; {os.path.basename(png)} is {width}x{height}')
+    for node in doc.get('nodes') or []:
+        name, box = node.get('instance'), node.get('box') or []
+        if name not in instance_names:
+            out['errors'].append(f'node {name!r}: no instance of that name in the module array')
+            continue
+        if len(box) != 4 or box[2] <= 0 or box[3] <= 0 or box[0] < 0 or box[1] < 0 \
+                or box[0] + box[2] > width or box[1] + box[3] > height:
+            out['errors'].append(f'node {name!r}: box {box} is not inside the {width}x{height} image')
+            continue
+        x, y, w, h = box
+        out['nodes'].append({'instance': name, 'left': 100 * x / width, 'top': 100 * y / height,
+                             'width': 100 * w / width, 'height': 100 * h / height})
+    return out
+
+
+def _system_records(system):
+    with open(os.path.join(system.dir, f'{system.name}_module_array.json')) as f:
+        rows = json.load(f)
+    return [r for r in rows if isinstance(r, dict) and r.get('name')]
+
+
+def system_connections(records):
+    '''The module array's connections, [(from, to)] in order: out_instances and inp_instances, and a
+    supermodule instance's per_submodule_outputs / per_submodule_inputs as <instance>/<submodule>.'''
+    edges = []
+
+    def add(a, b):
+        if (a, b) not in edges:
+            edges.append((a, b))
+    for r in records:
+        for dst in r.get('out_instances') or []:
+            add(r['name'], dst)
+        for src in r.get('inp_instances') or []:
+            add(src, r['name'])
+        for sub, dsts in (r.get('per_submodule_outputs') or {}).items():
+            for dst in dsts:
+                add(f'{r["name"]}/{sub}', dst)
+        for sub, srcs in (r.get('per_submodule_inputs') or {}).items():
+            for src in srcs:
+                add(src, f'{r["name"]}/{sub}')
+    return edges
+
+
+def _parameter_groups(path):
+    '''A nested parameters file as [{name, rows: [{name, value, units, reference}]}], one group per top key.'''
+    if not os.path.isfile(path):
+        return []
+    with open(path) as f:
+        doc = json.load(f)
+    groups = []
+    for top, node in doc.items():
+        if not isinstance(node, dict):
+            continue
+        rows = []
+
+        def walk(n, prefix):
+            for k, v in n.items():
+                if isinstance(v, dict) and 'value' in v:
+                    rows.append({'name': '/'.join(prefix + [k]), 'value': v.get('value'), 'units': v.get('units', ''),
+                                 'reference': v.get('data_reference', '')})
+                elif isinstance(v, dict):
+                    walk(v, prefix + [k])
+        walk(node, [])
+        groups.append({'name': top, 'rows': rows})
+    return groups
+
+
+def _system_tests(system):
+    out = []
+    for test in SYSTEM_TESTS:
+        path = os.path.join(system.results_dir, f'{test}.json')
+        r = {}
+        if os.path.isfile(path):
+            with open(path) as f:
+                r = json.load(f)
+        known = (system.spec.get('expected_failures') or {}).get(test)
+        out.append({'key': test, 'title': SYSTEM_TEST_TITLES[test], 'about': SYSTEM_TEST_ABOUT[test],
+                    'status': r.get('status'), 'message': r.get('message', 'not run yet'),
+                    'timestamp': r.get('timestamp'), 'details': r.get('details') or [],
+                    'rows': ((r.get('metrics') or {}).get('rows') or [])[:30], 'known_issue': known})
+    return out
+
+
+def _system_plots(system):
+    if not os.path.isdir(system.plots_dir):
+        return []
+    return [f'plots/{f}' for f in sorted(os.listdir(system.plots_dir)) if f.lower().endswith(('.png', '.svg'))]
+
+
+def system_instance(record, href_of):
+    '''One module-array record: its version (linked by href_of(version)) and, for a supermodule, its
+    submodules (linked too). missing says why a record names no version of the libraries.'''
+    from cam_testing.library import load_version
+    out = {'name': record['name'], 'module_type': record.get('module_type'), 'version': record.get('module_subtype'),
+           'parameterisation': record.get('parameterisation', ''), 'href': None, 'missing': None,
+           'is_supermodule': False, 'submodules': [],
+           'inputs': list(record.get('inp_instances') or []), 'outputs': list(record.get('out_instances') or [])}
+    try:
+        v = load_version(record['module_type'], record['module_subtype'])
+    except (OSError, ValueError, KeyError) as e:
+        out['missing'] = f'not a version of the module libraries ({type(e).__name__})'
+        return out
+    out['href'] = href_of(v)
+    out['is_supermodule'] = v.is_supermodule
+    out['in_primary'] = v.mtype.is_primary
+    for sub in v.submodules if v.is_supermodule else []:
+        sv = _sub_version(sub)
+        out['submodules'].append({'name': sub['name'], 'key': f'{sub["module_type"]}/{sub["module_subtype"]}',
+                                  'href': href_of(sv) if sv else None})
+    return out
+
+
+def _system_mermaid(instances, edges):
+    '''The fallback figure: a flowchart of the instances and their connections, each node linking to its page.'''
+    ids = {i['name']: _mermaid_id('n_', i['name']) for i in instances}
+    lines = ['flowchart LR']
+    for i in instances:
+        lines.append(f'  {ids[i["name"]]}["{_mermaid_text(i["name"])}<br/><small>{_mermaid_text(i["module_type"] or "")}'
+                     f' {_mermaid_text(i["version"] or "")}</small>"]')
+    for a, b in edges:
+        ia, ib = ids.get(a.split('/')[0]), ids.get(b.split('/')[0])
+        if ia and ib:
+            label = '/'.join(p for p in (a.partition('/')[2], b.partition('/')[2]) if p)
+            lines.append(f'  {ia} -->|"{_mermaid_text(label)}"| {ib}' if label else f'  {ia} --> {ib}')
+    for i in instances:
+        if i['href']:
+            lines.append(f'  click {ids[i["name"]]} href "{i["href"]}" "{_mermaid_text(i["module_type"] + "/" + i["version"])}"')
+    return '\n'.join(lines)
+
+
+def system_context(system, href_of=None, page_dir=None):
+    '''The system page's context. href_of(version) is the version page's href from the page (default:
+    relative to page_dir, the system model's directory).'''
+    page_dir = page_dir or system.dir
+    href_of = href_of or (lambda v: os.path.relpath(v.html_path, page_dir).replace(os.sep, '/'))
+    records = _system_records(system)
+    instances = [system_instance(r, href_of) for r in records]
+    edges = system_connections(records)
+    spec = system.spec
+    notes = spec.get('notes') or []
+    notes = [notes] if isinstance(notes, str) else list(notes)
+    figure = system_figure(system, {i['name'] for i in instances})
+    hrefs = {i['name']: i['href'] for i in instances}
+    for n in (figure or {}).get('nodes') or []:
+        n['href'] = hrefs.get(n['instance'])
+        n['key'] = next(f'{i["module_type"]}/{i["version"]}' for i in instances if i['name'] == n['instance'])
+    tests = _system_tests(system)
+    counts = {}
+    for t in tests:
+        counts[t['status']] = counts.get(t['status'], 0) + 1
+    return {
+        'name': system.name, 'category': system.category, 'id': system.id,
+        'description': spec.get('description') or (notes[0] if notes else ''),
+        'notes': notes if spec.get('description') else notes[1:],
+        'reviewed': bool(spec.get('reviewed')), 'skip': spec.get('skip'),
+        'known_issues': [f'{t}: {why}' for t, why in (spec.get('expected_failures') or {}).items()],
+        'sim': {k: spec.get(k) for k in ('sim_time', 'pre_time', 'dt') if spec.get(k) is not None},
+        'instances': instances, 'edges': edges, 'figure': figure,
+        'mermaid': None if figure else _system_mermaid(instances, edges),
+        'parameters': _parameter_groups(os.path.join(system.dir, f'{system.name}_parameters.json')),
+        'parameters_file': f'{system.name}_parameters.json',
+        'tests': tests, 'counts': counts, 'plots': _system_plots(system),
+        'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
+    }
+
+
+def build_system(system, out_path=None, href_of=None, index_href=None):
+    '''Writes the system model's page (default <model>.html beside it; index_href: its link to the
+    site index, in the site); returns (path, context).'''
+    out_path = out_path or system_page_path(system)
+    ctx = system_context(system, href_of, os.path.dirname(out_path))
+    ctx['index_href'] = index_href
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, 'w') as f:
+        f.write(_env().get_template('system_model.html').render(**ctx))
+    return out_path, ctx
+
+
+def system_rows(contexts, href):
+    '''The site index's "System models" rows, from the system pages' contexts.'''
+    return [{'id': c['id'], 'name': c['name'], 'category': c['category'], 'href': href(c),
+             'n_instances': len(c['instances']), 'counts': c['counts'], 'description': c['description'],
+             'has_figure': bool(c['figure']), 'tests': c['tests']}
+            for c in sorted(contexts, key=lambda c: c['id'].lower())]
+
+
 def _href(relpath, page):
     return f'modules/{relpath}/{page}'
 
 
-def assemble_site(names, contexts):
+def _copy_version_files(v, vdest):
+    '''A version's plots, bond graph, PhLynx export and parameterisation archives, beside its page in the site.'''
+    if os.path.isdir(v.plots_dir):
+        shutil.copytree(v.plots_dir, os.path.join(vdest, 'plots'), dirs_exist_ok=True)
+    # the files the page opens in the CellDL editor and PhLynx, at the same relative paths
+    for path in (bondgraph.document_path(v), phlynx.archive_path(v)):
+        if os.path.isfile(path):
+            fdest = os.path.join(vdest, os.path.relpath(path, v.dir))
+            os.makedirs(os.path.dirname(fdest), exist_ok=True)
+            shutil.copy2(path, fdest)
+    # the parameterisations' CUFLynx archives, where they have been built (make omex)
+    for inst in v.parameterisations():
+        archive = omex_mod.omex_path(v, inst)
+        if os.path.isfile(archive):
+            idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
+            os.makedirs(idest, exist_ok=True)
+            shutil.copy2(archive, idest)
+
+
+def _site_version_path(site_dir, v):
+    return os.path.join(site_dir, 'modules', v.mtype.relpath, 'versions', v.name, f'{v.stem}.html')
+
+
+def _extra_versions(systems, names):
+    '''The extra libraries' versions the site's pages link to: those the system models use, and (for a
+    supermodule, at any depth) their submodules, and the submodules of this library's supermodules.'''
+    from cam_testing.library import load_version
+    seeds = []
+    for s in systems:
+        for r in _system_records(s):
+            try:
+                seeds.append(load_version(r['module_type'], r['module_subtype']))
+            except (OSError, ValueError, KeyError):
+                pass
+    for name in names:
+        for v in load_module_type(name).versions():
+            seeds += [sv for sv in (_sub_version(sub) for sub in v.submodules) if sv] if v.is_supermodule else []
+    out, todo = {}, list(seeds)
+    while todo:
+        v = todo.pop()
+        if v.key in out:
+            continue
+        if not v.mtype.is_primary:
+            out[v.key] = v
+        if v.is_supermodule:
+            todo += [sv for sv in (_sub_version(sub) for sub in v.submodules) if sv]
+    return sorted(out.values(), key=lambda v: v.key)
+
+
+def assemble_site(names, contexts, systems=()):
     '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page, plots,
     bond graph, PhLynx export and instance archives; a nested module_type's directory is inside its
-    parent's), as GitHub Pages serves it.'''
+    parent's), as GitHub Pages serves it; and site/system_models/<category>/<model>/ for each of
+    systems (its page and PhLynx screenshot). The extra libraries' versions the pages link to get their
+    pages under site/modules/ too, at their own library's paths.'''
     site_dir = paths.roots().site_dir
     if os.path.isdir(site_dir):
         shutil.rmtree(site_dir)
@@ -1171,23 +1482,64 @@ def assemble_site(names, contexts):
             vdest = os.path.join(dest, 'versions', v.name)
             os.makedirs(vdest, exist_ok=True)
             shutil.copy2(v.html_path, vdest)
-            if os.path.isdir(v.plots_dir):
-                shutil.copytree(v.plots_dir, os.path.join(vdest, 'plots'))
-            # the files the page opens in the CellDL editor and PhLynx, at the same relative paths
-            for path in (bondgraph.document_path(v), phlynx.archive_path(v)):
-                if os.path.isfile(path):
-                    fdest = os.path.join(vdest, os.path.relpath(path, v.dir))
-                    os.makedirs(os.path.dirname(fdest), exist_ok=True)
-                    shutil.copy2(path, fdest)
-            # the parameterisations' CUFLynx archives, where they have been built (make omex)
-            for inst in v.parameterisations():
-                archive = omex_mod.omex_path(v, inst)
-                if os.path.isfile(archive):
-                    idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
-                    os.makedirs(idest, exist_ok=True)
-                    shutil.copy2(archive, idest)
+            _copy_version_files(v, vdest)
+    extra = _extra_versions(systems, names)
+    by_type = {}
+    for v in extra:
+        out = _site_version_path(site_dir, v)
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        by_type.setdefault(v.mtype.name, []).append(build_version(v, out)[1])
+        _copy_version_files(v, os.path.dirname(out))
+    for name, vctx in by_type.items():
+        mtype = load_module_type(name)
+        page = os.path.join(site_dir, 'modules', mtype.relpath, f'{name}.html')
+        if not os.path.isfile(page):        # a module_type of this library already has its page
+            os.makedirs(os.path.dirname(page), exist_ok=True)
+            with open(page, 'w') as f:
+                f.write(_env().get_template('module_type.html').render(**module_context(name, vctx)))
+    system_ctx = []
+    for s in systems:
+        sdest = os.path.join(site_dir, 'system_models', s.category, s.name)
+        os.makedirs(sdest, exist_ok=True)
+        png = system_figure_paths(s)[0]
+        if os.path.isfile(png):
+            shutil.copy2(png, sdest)
+        if os.path.isdir(s.plots_dir):
+            shutil.copytree(s.plots_dir, os.path.join(sdest, 'plots'))
+        system_ctx.append(build_system(
+            s, os.path.join(sdest, f'{s.name}.html'),
+            href_of=lambda v, d=sdest: os.path.relpath(_site_version_path(site_dir, v), d).replace(os.sep, '/'),
+            index_href=os.path.relpath(os.path.join(site_dir, 'index.html'), sdest).replace(os.sep, '/'))[1])
     build_review_queue(contexts, os.path.join(site_dir, 'review_queue.html'), _href)
-    return build_index(contexts, os.path.join(site_dir, 'index.html'), _href)
+    return build_index(contexts, os.path.join(site_dir, 'index.html'), _href,
+                       system_rows(system_ctx, lambda c: f'system_models/{c["category"]}/{c["name"]}/{c["name"]}.html'))
+
+
+SHARE_README = '''{title}
+
+A copy of the module library's review site, to read offline.
+
+1. Unzip this file.
+2. Open site/index.html in a web browser.
+3. {start}
+
+Every page links to the others by relative paths, so keep the folder as it is. Equations, fonts and
+diagrams load from the web when you are online; the pages work without them.
+'''
+
+
+def zip_site(zip_path, title='Module library review site', start=None):
+    '''Zips site/ (assembled first) as site/... with a README.txt at the top; returns zip_path.'''
+    import zipfile
+    site_dir = paths.roots().site_dir
+    start = start or 'Click a system model under "System models", or a module type, to open its page.'
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as z:
+        z.writestr('README.txt', SHARE_README.format(title=title, start=start))
+        for root, _, files in os.walk(site_dir):
+            for f in sorted(files):
+                path = os.path.join(root, f)
+                z.write(path, os.path.join('site', os.path.relpath(path, site_dir)))
+    return zip_path
 
 
 def main(argv=None):
@@ -1195,7 +1547,15 @@ def main(argv=None):
     parser.add_argument('--module', action='append', default=[],
                         help='module_type (with those nested in it) or path under modules/ (repeatable); default all')
     parser.add_argument('--site', action='store_true', help='also assemble site/ for GitHub Pages')
+    parser.add_argument('--celldl-note', metavar='TEXT',
+                        help=f'a note shown with every bond graph and its CellDL link (${CELLDL_NOTE_ENV})')
+    parser.add_argument('--zip', metavar='PATH', help='assemble site/ and zip it, with a README.txt, to send')
+    parser.add_argument('--zip-title', default='Module library review site', help="the zip README's title")
+    parser.add_argument('--zip-start', help="the zip README's third step (what to open first)")
     args = parser.parse_args(argv)
+    if args.celldl_note:
+        os.environ[CELLDL_NOTE_ENV] = args.celldl_note
+    from cam_testing import system as systems_mod
     contexts = {}
     _index_cache.clear()
     _contents_cache.clear()
@@ -1203,14 +1563,22 @@ def main(argv=None):
         out, ctx = build_module(name)
         contexts[name] = ctx
         print(f'wrote {os.path.relpath(out, paths.roots().repo_root)} and {ctx["n_versions"]} version page(s)')
-    if args.site:
+    # every system model gets its page, as every version does
+    systems = systems_mod.system_models()
+    for s in systems:
+        build_system(s)
+    print(f'wrote {len(systems)} system model page(s)')
+    if args.site or args.zip:
         # the index always covers every module_type, even when only some pages were rebuilt
         for name in module_type_names():
             if name not in contexts:
                 vctx = [version_context(v) for v in load_module_type(name).versions()]
                 contexts[name] = dict(module_context(name, vctx), version_contexts=vctx)
-        out = assemble_site(module_type_names(), [contexts[n] for n in module_type_names()])
+        out = assemble_site(module_type_names(), [contexts[n] for n in module_type_names()], systems)
         print(f'wrote {os.path.relpath(out, paths.roots().repo_root)}')
+    if args.zip:
+        zip_site(args.zip, args.zip_title, args.zip_start)
+        print(f'wrote {args.zip} ({os.path.getsize(args.zip) / 1e6:.1f} MB)')
 
 
 if __name__ == '__main__':
