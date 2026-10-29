@@ -1,0 +1,12 @@
+{
+ "schema_version": 1,
+ "global": {
+  "sigma_diff": {"value": 2.41e-09, "units": "m2_per_s", "data_reference": "secomb2020mass; Table 1 tissue O2 diffusivity D = 2410 um^2/s (after Lucker et al. 2017, Microcirculation 24:e12337), with solubility 3.89e-5 cm3 O2/(cm3 mmHg); D x alpha = 9.375e-10 cm3 O2/(cm s mmHg) as in celayaalcala2021simulation", "sourced": "yes"}
+ },
+ "C_up": {"value": 0.0597, "units": "millimolar", "data_reference": "unreferenced_placeholder; neighbour at the same mean tissue O2 as C_P_init (47 mmHg x 1.27 uM/mmHg, celayaalcala2021simulation / fang2008oxygen); set by the upstream cell in a network", "sourced": "no"},
+ "C_down": {"value": 0.0597, "units": "millimolar", "data_reference": "unreferenced_placeholder; neighbour at the same mean tissue O2 as C_P_init (47 mmHg x 1.27 uM/mmHg, celayaalcala2021simulation / fang2008oxygen); set by the downstream cell in a network", "sourced": "no"},
+ "A_f": {"value": 4e-10, "units": "m2", "data_reference": "unreferenced_placeholder; 20 um x 20 um face of a uniform 20 um grid; a discretisation choice", "sourced": "no"},
+ "d_up": {"value": 1e-05, "units": "metre", "data_reference": "unreferenced_placeholder; 10 um, the centre-to-face distance of a 20 um cell (uniform grid)", "sourced": "no"},
+ "d_down": {"value": 1e-05, "units": "metre", "data_reference": "unreferenced_placeholder; 10 um, the centre-to-face distance of a 20 um cell (uniform grid)", "sourced": "no"},
+ "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "definitional; 1 = face open to diffusion, 0 = no-flux face", "sourced": "yes"}
+}

@@ -14,7 +14,6 @@ A module_type's versions are exported in one node run and simulated in one CUFLy
 (run_versions), and the per-version results feed the three tests (phlynx_export_test,
 cuflynx_simulate_test, phlynx_equivalence_test), recorded in each version's results/.
 """
-import csv
 import glob
 import json
 import os
@@ -66,11 +65,6 @@ def library_files():
     return {'cellml': cellml, 'units': units, 'configs': configs}
 
 
-def _read_csv(path):
-    with open(path) as f:
-        return list(csv.DictReader(f))
-
-
 def component_job(component, work_dir):
     '''The version's test network (harness) as a PhLynx instance array plus its parameters.'''
     prefix = component.id
@@ -81,7 +75,10 @@ def component_job(component, work_dir):
     instances = [{'name': r['name'], 'module_type': r['module_type'], 'module_subtype': r['module_subtype'],
                   'inp_instances': ' '.join(r.get('inp_instances', [])),
                   'out_instances': ' '.join(r.get('out_instances', []))} for r in records]
-    params = [{k: (v or '') for k, v in r.items()} for r in _read_csv(os.path.join(res, f'{prefix}_parameters.csv'))]
+    # PhLynx takes parameters as CSV rows, not libcuflynx's nested JSON: the network's parameters file is
+    # flattened at this boundary into rows named as the model names them (<var>_<instance>, a global bare),
+    # which PhLynx main matches to instances and PhLynx #858 still reads beside its <instance>/<var>
+    params = phlynx_parameter_rows(os.path.join(res, f'{prefix}_parameters.json'))
     params += _neighbour_parameters(records, {p['variable_name'] for p in params})
     spec = component.spec
     extra = [harness.output_name(o) for o in (spec.get('outputs') or [])]
@@ -90,10 +87,20 @@ def component_job(component, work_dir):
             'resources': res, 'prefix': prefix}
 
 
+def phlynx_parameter_rows(path):
+    '''The parameters file ``path`` (libcuflynx's nested JSON) as the CSV rows PhLynx reads:
+    [{variable_name, units, value, data_reference}], named as the model names them (<var>_<instance>,
+    <var>_<instance>__<sub> in a supermodule instance, a global bare).'''
+    from libcuflynx.utilities import parameters_file as pf
+    return [dict({k: r.get(k, '') for k in ('variable_name', 'units', 'value', 'data_reference')},
+                 variable_name=harness.libcuflynx_model_name(r['variable_name']))
+            for r in pf.read_parameter_rows(path)]
+
+
 def _neighbour_parameters(records, have):
     '''
-    The harness neighbours' instance parameters, named as libcuflynx names them ({var}_{name};
-    globals unsuffixed). libcuflynx reads a neighbour's values from its instance in the library;
+    The harness neighbours' parameterisations' parameters, named as libcuflynx names them ({var}_{name};
+    globals unsuffixed). libcuflynx reads a neighbour's values from its parameterisation in the library;
     PhLynx only gets the parameters it is given, so without these a neighbour's constants are
     empty (e.g. i_CaL's V_den_c, and its computed c_init divides by zero in CUFLynx).
     Names already in ``have`` (the version's own rows and the harness's) win.
@@ -107,7 +114,7 @@ def _neighbour_parameters(records, have):
             version = load_version(r['module_type'], r['module_subtype'])
         except (OSError, ValueError):
             continue
-        for p in version.instance(r.get('instance') or None).parameters():
+        for p in version.parameterisation(module_array.parameterisation_of(r)).parameters():
             name = p.variable_name if p.is_global else f'{p.variable_name}_{r["name"]}'
             if name in have or p.is_todo:
                 continue
@@ -224,9 +231,29 @@ def compare(cf, lib_t, lib_outputs, tol):
     return rows, unmatched
 
 
+def archive_path(version):
+    '''Where a version's PhLynx export (the .omex PhLynx sends to CUFLynx) is kept, with its other
+    generated results: results/<module_type>_<version>_phlynx.omex. Its report links it ("Open in PhLynx").'''
+    return os.path.join(version.results_dir, f'{version.stem}_phlynx.omex')
+
+
+def keep_archives(components, reports):
+    '''Copies each version's exported .omex (reports from export) to its archive_path, and removes
+    the kept one of a version whose export failed, so the report never links a stale archive.'''
+    for c in components:
+        omex = (reports.get(c.id) or {}).get('omex')
+        path = archive_path(c)
+        if omex and os.path.isfile(omex):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            shutil.copyfile(omex, path)
+        elif os.path.isfile(path):
+            os.remove(path)
+
+
 def run_versions(name, components, solver_info=None, keep_dir=None):
     '''Exports and simulates the given versions (e.g. every version of a module_type); returns
-    {version id: result} and keeps it in <work dir>/phlynx_pipeline.json.'''
+    {version id: result} and keeps it in <work dir>/phlynx_pipeline.json, and each version's export
+    at its archive_path.'''
     work_dir = keep_dir or tempfile.mkdtemp(prefix=f'cam_phlynx_{name}_')
     os.makedirs(work_dir, exist_ok=True)
     jobs, results = [], {}
@@ -238,6 +265,7 @@ def run_versions(name, components, solver_info=None, keep_dir=None):
         except Exception as e:  # noqa: BLE001 - e.g. parameters still TODO
             results[c.id] = {'export': {'ok': False, 'stage': 'job', 'error': f'{type(e).__name__}: {e}'}}
     reports = export(jobs, work_dir)
+    keep_archives([c for c in components if not (_cpp(c) or c.is_supermodule)], reports)
     sims = simulate(jobs, reports, work_dir, solver_info)
     for j in jobs:
         results[j['id']] = {'export': reports.get(j['id']), 'cuflynx': sims.get(j['id']), 'job': {

@@ -3,7 +3,7 @@ CI shards: each category's tests split into jobs of about ten minutes or less.
 
 A category's tests run in three stages, each its own CI job: ``vv`` (tests/test_modules.py),
 ``pipeline`` (PhLynx -> CUFLynx, tests/test_phlynx.py) and ``omex`` (CUFLynx archives,
-tests/test_instance_omex.py). A stage with more work is split into shards (``ci/shards.json``).
+tests/test_parameterisation_omex.py). A stage with more work is split into shards (``ci/shards.json``).
 A shard holds whole module_types: the pipeline and archive tests run a module_type's versions in
 one batch, so splitting a module_type would repeat its batch in every shard. Module_types are
 spread over the shards longest first, by their measured seconds in ``ci/test_durations.json``
@@ -14,7 +14,7 @@ spread over the shards longest first, by their measured seconds in ``ci/test_dur
     python -m cam_testing.shards durations pipeline junit*.xml  # refresh ci/test_durations.json
     python -m cam_testing.shards plan                           # every shard's expected seconds
 
-pytest and tools/build_instance_omex.py take ``--shard K/N --shard-stage STAGE`` (with --module
+pytest and tools/build_parameterisation_omex.py take ``--shard K/N --shard-stage STAGE`` (with --module
 for the category) and keep the versions of shard K's module_types only.
 """
 import argparse

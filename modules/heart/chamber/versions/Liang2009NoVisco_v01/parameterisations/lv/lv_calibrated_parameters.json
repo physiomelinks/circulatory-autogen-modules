@@ -1,0 +1,19 @@
+{
+ "schema_version": 1,
+ "global": {
+  "T": {"value": 1, "units": "second", "data_reference": "liang2009multi; Table 2 note (p. 748): the timings are for a cardiac duration of 1 s; Section 3: cardiac duration 1.0 s", "sourced": "yes"}
+ },
+ "v_in": {"value": 1e-4, "units": "m3_per_s", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "v_out": {"value": 1e-4, "units": "m3_per_s", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "mt": {"value": 0.5, "units": "dimensionless", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "T_eff": {"value": 1, "units": "second", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "T_c": {"value": 0.3, "units": "second", "data_reference": "liang2009multi; Table 2 (p. 748), Left ventricle: T_cp (contraction duration) 0.3 s, for a 1 s cycle", "sourced": "yes"},
+ "T_r": {"value": 0.15, "units": "second", "data_reference": "liang2009multi; Table 2 (p. 748), Left ventricle: T_rp (relaxation duration) 0.15 s, for a 1 s cycle", "sourced": "yes"},
+ "t_start": {"value": 0.0, "units": "second", "data_reference": "liang2009multi; Table 2 (p. 748), Left ventricle: t_c (start of contraction) 0.0 s", "sourced": "yes"},
+ "E_A": {"value": 366636512, "units": "J_per_m6", "data_reference": "liang2009multi; Table 2 (p. 748), Left ventricle: E_A (elastance amplitude) 2.75 mmHg/ml = 3.66637e+08 J/m^6 at 1 mmHg/ml = 133.322368e6 J/m^6", "sourced": "yes"},
+ "E_B": {"value": 10665789.44, "units": "J_per_m6", "data_reference": "liang2009multi; Table 2 (p. 748), Left ventricle: E_B (baseline elastance) 0.08 mmHg/ml = 1.06658e+07 J/m^6 at 1 mmHg/ml = 133.322368e6 J/m^6", "sourced": "yes"},
+ "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "definitional; no elastance change unless a controller connects (Elastance_delta_port)", "sourced": "no"},
+ "q_us": {"value": 2.461310681e-06, "units": "m3", "data_reference": "calibrated to lv_obs_data.json (CMA-ES, 2026-10-12)", "sourced": "no"},
+ "q_init": {"value": 0.0001176, "units": "m3", "data_reference": "liang2009multi; Fig. 4e (p. 751), normal LV pressure-volume loop: end-diastolic volume 117.6 ml (digitised: the right edge of the normal loop; source_figures/liang2009_fig4e.png); the run starts at early systole (Section 3), i.e. at the end-diastolic volume", "sourced": "yes"},
+ "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "definitional; no external (e.g. pericardial or intrathoracic) pressure unless connected", "sourced": "no"}
+}

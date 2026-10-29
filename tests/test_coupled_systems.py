@@ -55,7 +55,7 @@ def generate_cpp(name, work):
     from libcuflynx.scripts.script_generate_with_new_architecture import generate_with_new_architecture
     s = load_system(name)
     spec = s.spec
-    cfg = {'file_prefix': name, 'input_param_file': f'{name}_parameters.csv', 'model_type': 'cpp',
+    cfg = {'file_prefix': name, 'input_param_file': f'{name}_parameters.json', 'model_type': 'cpp',
            'resources_dir': s.dir, 'generated_models_dir': str(work), 'DEBUG': False, 'couple_to_1d': False,
            'module_library_dirs': [MODULES_DIR], 'use_builtin_modules': False,
            'pre_time': spec.get('pre_time', 0.0), 'sim_time': spec['sim_time'], 'dt': spec['dt'],
