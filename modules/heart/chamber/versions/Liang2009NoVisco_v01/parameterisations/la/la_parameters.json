@@ -1,0 +1,19 @@
+{
+ "schema_version": 1,
+ "global": {
+  "T": {"value": 1, "units": "second", "data_reference": "liang2009multi; Table 2 note (p. 748): the timings are for a cardiac duration of 1 s; Section 3: cardiac duration 1.0 s", "sourced": "yes"}
+ },
+ "v_in": {"value": 1e-4, "units": "m3_per_s", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "v_out": {"value": 1e-4, "units": "m3_per_s", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "mt": {"value": 0.5, "units": "dimensionless", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "T_eff": {"value": 1, "units": "second", "data_reference": "definitional; harness value for the stand-alone test (the clock and the neighbours set it in a model)", "sourced": "no"},
+ "T_c": {"value": 0.17, "units": "second", "data_reference": "liang2009multi; Table 2 (p. 748), Left atrium: T_cp (contraction duration) 0.17 s, for a 1 s cycle", "sourced": "yes"},
+ "T_r": {"value": 0.17, "units": "second", "data_reference": "liang2009multi; Table 2 (p. 748), Left atrium: T_rp (relaxation duration) 0.17 s, for a 1 s cycle", "sourced": "yes"},
+ "t_start": {"value": 0.8, "units": "second", "data_reference": "liang2009multi; Table 2 (p. 748), Left atrium: t_c (start of contraction) 0.8 s", "sourced": "yes"},
+ "E_A": {"value": 9332565.76, "units": "J_per_m6", "data_reference": "liang2009multi; Table 2 (p. 748), Left atrium: E_A (elastance amplitude) 0.07 mmHg/ml = 9.33257e+06 J/m^6 at 1 mmHg/ml = 133.322368e6 J/m^6", "sourced": "yes"},
+ "E_B": {"value": 11999013.12, "units": "J_per_m6", "data_reference": "liang2009multi; Table 2 (p. 748), Left atrium: E_B (baseline elastance) 0.09 mmHg/ml = 1.1999e+07 J/m^6 at 1 mmHg/ml = 133.322368e6 J/m^6", "sourced": "yes"},
+ "Delta_E": {"value": 0, "units": "J_per_m6", "data_reference": "definitional; no elastance change unless a controller connects (Elastance_delta_port)", "sourced": "no"},
+ "q_us": {"value": 4e-06, "units": "m3", "data_reference": "korakianitis2006numerical; Table 1 (p. 1970): V_la,0 = 4 ml (unstressed chamber volume)", "sourced": "yes"},
+ "q_init": {"value": 4e-06, "units": "m3", "data_reference": "definitional; starts at its unstressed volume (korakianitis2006numerical Table 1, V_la,0); liang2009multi gives no initial volume, and in a loop it fills from its neighbours", "sourced": "yes"},
+ "u_ext": {"value": 0, "units": "J_per_m3", "data_reference": "definitional; no external (e.g. pericardial or intrathoracic) pressure unless connected", "sourced": "no"}
+}

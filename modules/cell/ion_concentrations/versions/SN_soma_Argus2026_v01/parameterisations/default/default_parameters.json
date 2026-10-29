@@ -1,0 +1,13 @@
+{
+ "schema_version": 1,
+ "global": {
+  "F": {"value": 96485, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol", "sourced": "yes"},
+  "R": {"value": 8.314, "units": "J_per_mol_K", "data_reference": "definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)", "sourced": "yes"},
+  "T": {"value": 295.15, "units": "kelvin", "data_reference": "davis2021transcriptomic; Methods (Ch. 2): \"All recordings were performed at room temperature\" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC", "sourced": "yes"}
+ },
+ "Ki_init": {"value": 200, "units": "millimolar", "data_reference": "brown1974changes; rat superior cervical ganglion neurons: [K]i 192.7 +- 2.8 mmol/kg cell water, 207 mM corrected to fresh (flame photometry); galvan1984intracellular 196 mmol/L cell water (electron microprobe). Was 150 (Boron & Boulpaep 2017 Table 5-2 gives a generic 120 mM)", "sourced": "yes"},
+ "Ko": {"value": 4.5, "units": "millimolar", "data_reference": "boron2017medical; Table 5-2 (interstitium) and Table 5-3: extracellular K 4.5 mM", "sourced": "yes"},
+ "Nai_init": {"value": 13, "units": "millimolar", "data_reference": "brown1974changes; rat superior cervical ganglion [Na]i 19.8 mmol/kg cell water (22 mM fresh); galvan1984intracellular 5 mmol/L cell water; Boron & Boulpaep 2017 Table 5-2 generic 15 mM. 13 mM lies within the range", "sourced": "yes"},
+ "Nao": {"value": 145, "units": "millimolar", "data_reference": "boron2017medical; Table 5-2 (interstitium) and Table 5-3: extracellular Na 145 mM", "sourced": "yes"},
+ "Vol": {"value": 7500.0e-18, "units": "m3", "data_reference": "wallis1996cardiac; rat stellate ganglion neurons (cardiac-projecting), mean projected soma area 463 um^2: a sphere of that cross-section (diameter ~24 um) holds ~7,500 um^3. Was 2000 um^3 (wu2012soma, spinal preganglionic neurons: wrong cell type) Used when unconnected; in the soma the volume comes from the membrane (compartment_volume port, Vol = k_V d^3).", "sourced": "no"}
+}

@@ -6,7 +6,7 @@ description: 'Sympathetic-neuron soma (SN_simple''s SN_soma) built from its part
   i_Kv1_5, i_Kv4_2, i_BK, i_SK, i_M, i_NaCa, PMCA (Colegrove2000_v01, since review 2026-10-07), i_NaK, i_leak_Na, i_leak_K, IP3R and RyR (cell/ion_channels, versions Argus2026_v01; RyR HernandezCruz1997_v01 since review 2026-10-06).
   Each submodule becomes <instance>__<submodule> in a model; the membrane couples to the axon: per_submodule_outputs {"membrane":
   ["<axon>"]} (VI_port: V out, the axial current I_out in); optional stimulus through membrane''s i_stim. Default parameters
-  are SN_simple''s (its default instance). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
+  are SN_simple''s (its default parameterisation). Split out of the monolithic SN_soma / SN_varicosity (sympathetic_monolithic_v01)
   by a one-off script (tools/build_sn_modules.py, removed; in git history). Tested through the neuron sympathetic version.'
 notes: 'Temperature (review 2026-10-05): the model is at room temperature, T = 295.15 K (22 degC), like the Davis 2021 thesis
   recordings it is calibrated to; every gating time constant is divided by phi = Q10^((T - T_ref)/10 K) (<submodule>/Q10_<X>,
