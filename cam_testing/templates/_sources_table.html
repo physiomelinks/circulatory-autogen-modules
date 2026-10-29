@@ -8,19 +8,19 @@
     <tr{% if r.problem %} class="unsourced"{% endif %}>
       <td><span class="mono" style="font-weight:600">{{ r.name }}</span>{% if r.variable %}<br><span class="mono muted" style="font-size:0.76rem">{{ r.variable }}</span>{% endif %}{% if r.operation %}<br><span class="muted" style="font-size:0.76rem">{{ r.operation }}</span>{% endif %}</td>
       <td class="mono num">{% if r.value is iterable and r.value is not string %}series ({{ r.value|length }} values){% else %}{{ r.value|fmt }}{% endif %}{% if r.unit %} <span class="muted">{{ r.unit }}</span>{% endif %}</td>
-      <td class="mono num">{% if r.sigma is iterable and r.sigma is not string %}per point{% else %}{{ r.sigma|fmt }}{% endif %}{% if r.sigma_reason %}<br><span class="muted" style="font-family:inherit;font-size:0.76rem;white-space:normal">{{ r.sigma_reason|cite(keys) }}</span>{% endif %}</td>
+      <td class="mono num">{% if r.sigma is iterable and r.sigma is not string %}per point{% else %}{{ r.sigma|fmt }}{% endif %}{% if r.sigma_reason %}<br><span class="muted" style="font-family:var(--font-body);font-size:0.76rem;white-space:normal">{{ r.sigma_reason|cite(keys) }}</span>{% endif %}</td>
       <td style="white-space:normal;font-size:0.8rem;min-width:18rem">
         {%- if r.missing %}<span class="chip failed">source missing</span>{% if r.comment %}<br><span class="muted">Comment in the data file: {{ r.comment|cite(keys) }}</span>{% endif %}
         {%- else %}
-          {%- if r.source %}{{ r.source|cite(keys) }}{% endif %}
-          {%- if r.figure %}<br><strong>Figure/table:</strong> {{ r.figure }}{% endif %}
-          {%- if r.obtained %}<br><strong>Obtained:</strong> {{ r.obtained }}{% endif %}
-          {%- if r.primary_read %}<br><strong>Primary read:</strong> {{ r.primary_read|cite(keys) }}{% endif %}
-          {%- if r.note %}<br>{{ r.note|cite(keys) }}{% endif %}
-          {%- if r.prose %}<br><span class="muted">{{ r.prose|cite(keys) }}</span>{% endif %}
-          <br><span class="muted" style="font-size:0.72rem">from {{ r.origin }}</span>
+          {%- if r.source %}<div>{{ r.source|cite(keys) }}</div>{% endif %}
+          {%- if r.figure %}<div><strong>Figure/table:</strong> {{ r.figure }}</div>{% endif %}
+          {%- if r.obtained %}<div><strong>Obtained:</strong> {{ r.obtained }}</div>{% endif %}
+          {%- if r.primary_read %}<div><strong>Primary read:</strong> {{ r.primary_read|cite(keys) }}</div>{% endif %}
+          {%- if r.note %}<div>{{ r.note|cite(keys) }}</div>{% endif %}
+          {%- if r.prose %}<div class="muted">{{ r.prose|cite(keys) }}</div>{% endif %}
+          <div class="muted" style="font-size:0.72rem">from {{ r.origin }}</div>
         {%- endif %}
-        {%- if r.problem and not r.missing %}<br><span class="todo">{{ r.problem }}</span>{% endif %}
+        {%- if r.problem and not r.missing %}<div class="todo">{{ r.problem }}</div>{% endif %}
       </td>
       <td style="white-space:normal;font-size:0.8rem">{{ r.species or '—' }}</td>
       <td style="white-space:normal;font-size:0.8rem">{% if r.kind_label == 'not stated' %}<span class="muted">not stated</span>{% else %}{{ r.kind_label }}{% endif %}</td>
