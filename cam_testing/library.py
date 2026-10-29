@@ -1023,7 +1023,8 @@ class Version:
 
     def figure_problems(self):
         '''What is wrong with the "figures" entries: a file missing or not an image directly in figures/, or
-        no caption.'''
+        no caption. A figure with no caption tells a reader nothing; figures/ stays flat to keep this check
+        and the page simple.'''
         problems = []
         for e in self._figure_entries():
             f = e.get('file') if isinstance(e, dict) else None

@@ -200,3 +200,40 @@ def test_a_version_without_figures_has_no_figures_section():
     assert v.figures() == []
     html = report._env().get_template('version.html').render(**report.version_context(v))
     assert 'aria-label="Figures"' not in html
+
+
+def test_assembled_site_holds_the_images_its_version_page_links_to(tmp_path):
+    '''GitHub Pages serves site/ alone: a version's figures/ and its parameterisations' source_figures/
+    images are copied beside its page, at the paths the page's <img src> give (and nothing else from them).'''
+    import re
+    import external_repo
+    from cam_testing import paths
+    root = external_repo.make(str(tmp_path / 'repo'))
+    vdir = os.path.join(root, 'modules', 'boundary_conditions', external_repo.MT, 'versions', external_repo.VERSION)
+    svg = '<svg xmlns="http://www.w3.org/2000/svg"/>'
+    os.makedirs(os.path.join(vdir, 'figures'))
+    with open(os.path.join(vdir, 'figures', 'bond_graph.svg'), 'w') as f:
+        f.write(svg)
+    with open(os.path.join(vdir, f'{external_repo.MT}_{external_repo.VERSION}_tests.yaml'), 'a') as f:
+        f.write('figures:\n  - file: bond_graph.svg\n    caption: The bond graph\n')
+    sf_dir = os.path.join(vdir, 'parameterisations', 'default', 'source_figures')
+    os.makedirs(sf_dir)
+    with open(os.path.join(sf_dir, 'fig2.png'), 'wb') as f:
+        f.write(b'\x89PNG\r\n\x1a\n')
+    with open(os.path.join(sf_dir, 'source_figures.json'), 'w') as f:
+        json.dump([{'file': 'fig2.png', 'source': 'Author2000 Fig. 2', 'caption': 'outlet pressure'}], f)
+    try:
+        paths.configure(repo_root=root, library_dirs=[external_repo.library_modules_dir()], export=False)
+        report.main(['--module', external_repo.MT, '--site'])
+        site = paths.roots().site_dir
+    finally:
+        paths.reset()
+    page = os.path.join(site, 'modules', 'boundary_conditions', external_repo.MT, 'versions', external_repo.VERSION,
+                        f'{external_repo.MT}_{external_repo.VERSION}.html')
+    with open(page) as f:
+        srcs = re.findall(r'<img src="([^"]+)"', f.read())
+    assert 'figures/bond_graph.svg' in srcs and 'parameterisations/default/source_figures/fig2.png' in srcs
+    missing = [s for s in srcs if not os.path.isfile(os.path.join(os.path.dirname(page), s))]
+    assert missing == []
+    assert not os.path.exists(os.path.join(os.path.dirname(page), 'parameterisations', 'default', 'source_figures',
+                                           'source_figures.json'))
