@@ -213,7 +213,8 @@ def test_data_sources_test_passes_once_every_item_is_sourced(repo):
 
 
 def test_data_sources_test_unsourced_and_not_applicable(repo, tmp_path):
-    # the copied version's own data have no item sections in its SOURCES.md
+    # the copied version's own data, without their SOURCES.md, are unsourced
+    os.remove(os.path.join(repo.version.parameterisation('hudson_bay_lynx_hare').dir, 'SOURCES.md'))
     r = sources.check(repo.version)
     assert r.status == checks.FAILED and 'hudson_bay_lynx_hare: mod/x: source missing' in '\n'.join(r.details)
     shutil.rmtree(repo.pdir)
