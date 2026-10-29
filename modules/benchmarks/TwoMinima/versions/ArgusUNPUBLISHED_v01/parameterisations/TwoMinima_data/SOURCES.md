@@ -7,3 +7,13 @@
 - **What the test does:** calibrates with a local optimiser (L-BFGS-B, `sp_minimize`) from a = +1 and from a = −1 and requires |a| = 2 within 5% from each side, with the fitted steady state within 2 std of 4.
 
 This checks calibration and identifiability, not physical validation. The validated range recorded for `a` is the envelope [−2, 2], but only the two endpoints were actually validated.
+
+## mod/x
+
+- Kind: derived (synthetic: the steady state of x = a² at a = ±2)
+- Role: target
+- Source: circulatory_autogen's two-minima test fixture, `resources/TwoMinima_obs_data.json` (operands renamed to `mod`)
+- Obtained: copied from the fixture
+- Sigma: 0.5, as in the fixture; it is not a measurement uncertainty.
+
+A calibration and identifiability check with no physical counterpart: no species or preparation.
