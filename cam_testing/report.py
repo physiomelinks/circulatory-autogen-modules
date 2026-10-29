@@ -1179,10 +1179,20 @@ def _href(relpath, page):
     return f'modules/{relpath}/{page}'
 
 
+def _copy_images(src, dest):
+    '''The image files (library.FIGURE_PATTERN) under ``src``, at the same relative paths under ``dest``.'''
+    for dirpath, _, files in os.walk(src):
+        for f in files:
+            if re.match(library.FIGURE_PATTERN, f):
+                out = os.path.join(dest, os.path.relpath(dirpath, src))
+                os.makedirs(out, exist_ok=True)
+                shutil.copy2(os.path.join(dirpath, f), out)
+
+
 def assemble_site(names, contexts):
     '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page, plots,
-    bond graph, PhLynx export and instance archives; a nested module_type's directory is inside its
-    parent's), as GitHub Pages serves it.'''
+    figures/, bond graph, PhLynx export, and its parameterisations' source_figures/ images and CUFLynx
+    archives; a nested module_type's directory is inside its parent's), as GitHub Pages serves it.'''
     site_dir = paths.roots().site_dir
     if os.path.isdir(site_dir):
         shutil.rmtree(site_dir)
@@ -1205,11 +1215,14 @@ def assemble_site(names, contexts):
                     fdest = os.path.join(vdest, os.path.relpath(path, v.dir))
                     os.makedirs(os.path.dirname(fdest), exist_ok=True)
                     shutil.copy2(path, fdest)
-            # the parameterisations' CUFLynx archives, where they have been built (make omex)
+            # the images the version page links to, at the same paths relative to it
+            _copy_images(v.figures_dir, os.path.join(vdest, os.path.relpath(v.figures_dir, v.dir)))
             for inst in v.parameterisations():
+                idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
+                _copy_images(inst.source_figures_dir, os.path.join(idest, os.path.relpath(inst.source_figures_dir, inst.dir)))
+                # the CUFLynx archive, where it has been built (make omex)
                 archive = omex_mod.omex_path(v, inst)
                 if os.path.isfile(archive):
-                    idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
                     os.makedirs(idest, exist_ok=True)
                     shutil.copy2(archive, idest)
     build_review_queue(contexts, os.path.join(site_dir, 'review_queue.html'), _href)
