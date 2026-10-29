@@ -120,6 +120,41 @@ def test_unit_consistency_nothing_shown_when_consistent(tmp_path):
     assert report.unit_consistency_context(v, []) is None
 
 
+VARIABLE_EXPONENT = '<apply><divide/><apply><power/><ci>x</ci><ci>n</ci></apply><apply><power/><ci>x</ci><apply><minus/><ci>n</ci><cn cellml:units="dimensionless">1</cn></apply></apply></apply>'
+
+
+def _with_variable_exponent(cellml):
+    '''z = x^n / x^(n-1): metre for every n, but libcellml can only check it for a given value of n.'''
+    return (cellml.replace('<variable name="V" public_interface="in" units="volt"/>',
+                           '<variable name="V" public_interface="in" units="volt"/>\n        '
+                           '<variable name="n" public_interface="in" units="dimensionless"/>')
+                  .replace('<apply><eq/><ci>z</ci><ci>x</ci></apply>', f'<apply><eq/><ci>z</ci>{VARIABLE_EXPONENT}</apply>'))
+
+
+def test_unit_consistency_variable_exponent_is_not_checked_rather_than_inconsistent(tmp_path):
+    consistent = TINY_CELLML.replace('<apply><plus/><ci>x</ci><ci>V</ci></apply>', '<ci>x</ci>')
+    v = _tiny_version(tmp_path, _with_variable_exponent(consistent))
+    r = checks.unit_consistency(v)
+    assert r['status'] == checks.UNITS_NOT_CHECKED
+    assert r['n_failures'] == 0 and r['n_equations'] == 0
+    assert r['message'] == '1 equation libcellml can check only for particular values of a variable exponent'
+    (f,) = r['failures']
+    assert f['kind'] == 'conditional' and f['variable'] == 'z' and f['equation_index'] == 2
+    # the page still lists the equation, so it can be checked by hand
+    ctx = report.unit_consistency_context(v, ['eq0', 'eq1', 'eq2'])
+    assert [g['latex'] for g in ctx['equations']] == ['eq2']
+
+
+def test_unit_consistency_variable_exponent_beside_a_real_failure(tmp_path):
+    v = _tiny_version(tmp_path, _with_variable_exponent(TINY_CELLML))
+    r = checks.unit_consistency(v)
+    assert r['status'] == checks.UNITS_INCONSISTENT
+    assert r['n_failures'] == 1 and r['n_equations'] == 1
+    assert r['message'] == ('1 equation with inconsistent units; '
+                            '1 equation libcellml can check only for particular values of a variable exponent')
+    assert sorted(f['kind'] for f in r['failures']) == ['conditional', 'not equivalent']
+
+
 def test_unit_consistency_not_applicable_to_a_supermodule():
     assert checks.unit_consistency(load_version('neuron', 'sympathetic'), save=False)['status'] == checks.NOT_APPLICABLE
 

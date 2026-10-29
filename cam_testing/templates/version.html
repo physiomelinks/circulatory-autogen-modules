@@ -473,6 +473,7 @@ window.addEventListener('DOMContentLoaded', function () {
           {%- for f in g.issues %}
             <li><strong>{{ f.kind }}</strong>{% if f.expression %} in <code>{{ f.expression }}</code>{% endif %}:
               {%- if f.sides %} {% for sd in f.sides %}<code>{{ sd.expression }}</code> is in <code>{{ sd.units }}</code>{% if sd.base %} <span class="muted">({{ sd.base }})</span>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% if f.kind == 'not dimensionless' %}, but should be dimensionless{% endif %}
+              {%- elif f.kind == 'conditional' %} libcellml can't check units raised to a variable exponent, so it gives a condition instead: check this term's units by hand
               {%- else %} {{ f.message }}{% endif %}
               <details><summary>libcellml message</summary><pre>{{ f.message }}</pre></details></li>
           {%- endfor %}
@@ -483,7 +484,7 @@ window.addEventListener('DOMContentLoaded', function () {
         <div class="eyebrow">Units definitions</div>
         <ul class="issues">{% for d in uc.definition_issues %}<li>{{ d.message }}</li>{% endfor %}</ul>
         {%- endif %}
-        {%- if uc.status == 'not_checked' or (uc.other_issues and not uc.equations) %}
+        {%- if uc.other_issues and (uc.status == 'not_checked' or not uc.equations) %}
         <div class="eyebrow">Why the equations could not be checked</div>
         <ul class="issues">{% for o in uc.other_issues[:10] %}<li>{{ o }}</li>{% endfor %}{% if uc.other_issues|length > 10 %}<li>… and {{ uc.other_issues|length - 10 }} more</li>{% endif %}</ul>
         {%- endif %}
