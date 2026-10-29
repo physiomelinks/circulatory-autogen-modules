@@ -28,6 +28,7 @@ modules/
           <module_type>_<version>_references_proposed.bib   citations proposed for review (optional)
           <module_type>_<version>.html                   version report (generated)
           risk/                                          joint failure-risk analysis (make risk; committed)
+          figures/                                       figures shown in the version report (tests.yaml "figures"; optional)
           plots/  results/                               written by the tests (not committed)
           parameterisations/
             <p>/                                         a parameterisation; p == its obs_data_name
@@ -775,6 +776,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |
 | `notes` | tests | notes on the version, shown in its report |
+| `figures` | tests | figures of the module shown in its report: `[{"file": "bond_graph.svg", "caption": "..."}]`, files in the version's `figures/` (SVG, PNG or JPG; a bare file name is a figure with no caption, which the structure test reports) |
 | `skip` | tests | a reason not to run the version's tests |
 | `known_issues` | tests | substrings of structure problems that are known (xfail) |
 | `expected_failures` | tests | `{test: reason}`: known failures, recorded as failed and xfail in pytest. A parameterisation's test may be keyed `<test>[<parameterisation>]` (e.g. `validation_test_baseline[aov]`) so that only that parameterisation's failure is known; a bare `<test>` covers every parameterisation |
