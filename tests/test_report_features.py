@@ -228,6 +228,8 @@ def test_assembled_site_holds_the_images_its_version_page_links_to(tmp_path):
         site = paths.roots().site_dir
     finally:
         paths.reset()
+        report._index_cache.clear()     # main() filled them from the repo under tmp_path
+        report._contents_cache.clear()
     page = os.path.join(site, 'modules', 'boundary_conditions', external_repo.MT, 'versions', external_repo.VERSION,
                         f'{external_repo.MT}_{external_repo.VERSION}.html')
     with open(page) as f:
