@@ -30,5 +30,7 @@
  "rho_leak_Ca": {"value": 3.0885062497465667, "units": "per_um2", "data_reference": "definitional; chosen so that k_leak_Ca = A rho k_leak_Ca_single (1e-18 m3/um3) reproduces the previous k_leak_Ca = 2e-20 m3_per_s (user_defined) with A = 0.6476 um^2 (the varicosity pre-ER membrane area) and k_leak_Ca_single = 0.01 um3_per_s; a density for calibration through k_leak_Ca_single", "sourced": "no"},
  "k_leak_Ca_single": {"value": 0.01, "units": "um3_per_s", "data_reference": "unreferenced_placeholder; per-protein Ca leak coefficient (flux per concentration difference) of an ER leak pathway; 0.01 um^3/s assumed", "sourced": "no"},
  "k_unbind_Ca": {"value": 8e3, "units": "per_s", "data_reference": "matveev2002new; Table 1 (\"actual\" set): fixed-buffer off-rate 8 /ms = 8e3 /s (= value; Kd 16 uM with kon 0.5 /uM/ms; with the kon 0.1 used here Kd = 80 uM)", "sourced": "yes"},
- "k_unbind_Ca_ER": {"value": 8e3, "units": "per_s", "data_reference": "unreferenced_placeholder; matveev2002new fixed-buffer off-rate 8e3 /s reused for the pre-ER buffer; no source for an ER-adjacent buffer", "sourced": "no"}
+ "k_unbind_Ca_ER": {"value": 8e3, "units": "per_s", "data_reference": "unreferenced_placeholder; matveev2002new fixed-buffer off-rate 8e3 /s reused for the pre-ER buffer; no source for an ER-adjacent buffer", "sourced": "no"},
+ "j_Ca_in": {"value": 0, "units": "mol_per_s", "data_reference": "definitional; 0 when nothing is connected to this sum: no Ca influx from unconnected channels", "sourced": "no"},
+ "j_ER_release": {"value": 0, "units": "mol_per_s", "data_reference": "definitional; 0 when nothing is connected to this sum: no ER Ca release without a connected release channel", "sourced": "no"}
 }
