@@ -17,11 +17,12 @@ import argparse
 import datetime
 import json
 import os
+import re
 import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, module_array, phlynx, ranges, risk
+from cam_testing import bib, checks, library, module_array, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -200,7 +201,7 @@ def _not_run_reason(version, test):
     return 'This test has not been run yet.'
 
 
-def _test_entry(version, test, r, spec_block=None, title=None):
+def _test_entry(version, test, r, spec_block=None, title=None, parameterisation=None):
     base = test.split('__')[0]
     return {
         'key': test, 'title': title or TEST_TITLES.get(base, test), 'short': TEST_SHORT.get(base, test),
@@ -209,10 +210,45 @@ def _test_entry(version, test, r, spec_block=None, title=None):
         'message': r.message if r else _not_run_reason(version, base),
         'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
         'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
-        'known_issue': (version.spec.get('expected_failures') or {}).get(test),
+        'known_issue': checks.expected_failure(version, test, parameterisation),
         'proposed_data': (spec_block or {}).get('status') == checks.PROPOSED,
         'links': [],          # related version pages (version_calibration in a supermodule)
     }
+
+
+def caption_parts(caption):
+    '''{'caption_lead', 'caption_rest'}: a source figure's caption split after its first sentence (a
+    full stop followed by a capital letter), so the page shows what the figure is and folds the
+    extraction notes that follow.'''
+    lead, *rest = re.split(r'(?<=\.)\s+(?=[A-Z])', caption or '', maxsplit=1)
+    return {'caption_lead': lead.strip(), 'caption_rest': ' '.join(rest).strip()}
+
+
+def figure_rows(plots, plot_items, figures):
+    '''
+    The rows of a parameterisation test's two columns, "From the paper" (source figures) and its
+    result plots: [{'figures': [figure], 'plots': [{'file', 'item'}]}]. ``plot_items``, parallel to
+    ``plots`` (None when unknown), names each plot's data item, or lists the items of a plot that
+    overlays several. Each figure pairs with the plots of the items library.figure_items gives it (the
+    items its "items" lists, or every item when it is the only figure and no figure lists items).
+    Paired rows come first in plot order, then each unpaired plot, then each unpaired figure, in a row
+    of its own with the other column empty.
+    '''
+    items = list(plot_items or [])
+    plotted = [{'file': p, 'item': items[n] if n < len(items) else None} for n, p in enumerate(plots)]
+    names = [i for p in plotted for i in (p['item'] if isinstance(p['item'], list) else [p['item']])]
+    figure_of = {i: k for k, group in enumerate(library.figure_items(figures, names)) for i in group}
+    rows, row_of, unpaired = [], {}, []
+    for p in plotted:
+        k = figure_of.get(p['item'][0] if isinstance(p['item'], list) else p['item'])
+        if k is None:
+            unpaired.append({'figures': [], 'plots': [p]})
+        elif k in row_of:
+            row_of[k]['plots'].append(p)
+        else:
+            row_of[k] = {'figures': [figures[k]], 'plots': [p]}
+            rows.append(row_of[k])
+    return rows + unpaired + [{'figures': [f], 'plots': []} for k, f in enumerate(figures) if k not in row_of]
 
 
 def parameterisation_context(version, inst):
@@ -231,14 +267,17 @@ def parameterisation_context(version, inst):
                                   checks.NO_BASELINE_DATA if kind == 'baseline' else checks.NO_CALIBRATION_DATA)
             elif v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED, checks.NOT_APPLICABLE):
                 r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
-        entry = _test_entry(version, test, r, v, title=FIT_CHECK_TITLE if v.get('kind') == 'fit_check' else None)
+        entry = _test_entry(version, test, r, v, title=FIT_CHECK_TITLE if v.get('kind') == 'fit_check' else None,
+                            parameterisation=inst)
         if v.get('kind') == 'fit_check':
             entry['short'] = 'Fit check'
             entry['about'] = v.get('note') or FIT_CHECK_ABOUT
         entry['anchor'] = f'{inst.name}--{test}'
         # the publication figures the data were extracted from, shown beside the test's plots
-        entry['source_figures'] = inst.source_figures()
+        entry['source_figures'] = [dict(sf, **caption_parts(sf.get('caption'))) for sf in inst.source_figures()]
         entry['source_figures_missing'] = inst.needs_source_figures() and not entry['source_figures']
+        entry['figure_rows'] = figure_rows(entry['plots'], entry['metrics'].get('plot_items'), entry['source_figures'])
+        entry['results_heading'] = 'Calibration results' if kind == 'calibrate' else 'Model vs data'
         tests.append(entry)
     calibration = None
     if os.path.isfile(inst.calibration_path):
@@ -252,7 +291,7 @@ def parameterisation_context(version, inst):
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
             'omex_status': omex_result.status if omex_result else None,
             'omex_message': omex_result.message if omex_result else 'not checked yet (tests/test_parameterisation_omex.py)',
-            'omex_known_issue': (version.spec.get('expected_failures') or {}).get('cuflynx_parameterisation_omex_test'),
+            'omex_known_issue': checks.expected_failure(version, 'cuflynx_parameterisation_omex_test', inst),
             'n_parameters': len(inst.parameters()), 'obs_data_name': inst.obs_data_name,
             'has_obs_data': inst.has_obs_data, 'calibration': calibration,
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
