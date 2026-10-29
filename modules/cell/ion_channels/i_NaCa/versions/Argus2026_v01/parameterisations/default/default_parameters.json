@@ -1,0 +1,21 @@
+{
+ "schema_version": 1,
+ "global": {
+  "R": {"value": 8.314, "units": "J_per_mol_K", "data_reference": "definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)", "sourced": "yes"},
+  "T": {"value": 295.15, "units": "kelvin", "data_reference": "davis2021transcriptomic; Methods (Ch. 2): \"All recordings were performed at room temperature\" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC", "sourced": "yes"},
+  "F": {"value": 96485, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol", "sourced": "yes"}
+ },
+ "Cai": {"value": 0.0001, "units": "millimolar", "data_reference": "definitional; resting cytosolic Ca 1e-4 mM (Cai_init, cf. wanaverbecq2003plasma) used when unconnected", "sourced": "no"},
+ "Cao": {"value": 2, "units": "millimolar", "data_reference": "tao2011model; Supporting Material (Document S1) parameter list: [Ca2+]o = 2 mM (listed for the SA-node cell; no separate neuron value). khaliq2003contribution also uses 2 mM", "sourced": "yes"},
+ "KmCa": {"value": 1.38, "units": "millimolar", "data_reference": "paci2013computational; i_NaCa: KmCa = 1.38 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)", "sourced": "yes"},
+ "KmNai": {"value": 87.5, "units": "millimolar", "data_reference": "paci2013computational; i_NaCa: KmNai = 87.5 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)", "sourced": "yes"},
+ "Ksat": {"value": 0.1, "units": "dimensionless", "data_reference": "paci2013computational; i_NaCa: Ksat = 0.1 (= value; human iPSC-cardiomyocyte model, not verified for neurons)", "sourced": "yes"},
+ "Nai": {"value": 13, "units": "millimolar", "data_reference": "boron2017medical; typical mammalian intracellular Na 15 mM, modified here to 13 mM (= Nai_init; constant when unconnected) [NOT VERIFIED: full text not accessible; value not seen in the source]", "sourced": "no"},
+ "Nao": {"value": 145, "units": "millimolar", "data_reference": "boron2017medical; typical extracellular Na 145 mM [NOT VERIFIED: full text not accessible; value not seen in the source]", "sourced": "no"},
+ "V": {"value": -70.0, "units": "milliV", "data_reference": "definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. davis2020downregulation)", "sourced": "no"},
+ "alpha_NaCa": {"value": 1.2, "units": "dimensionless", "data_reference": "paci2013computational; alpha = 2.857 (enhancement factor of the outward mode); **modified here to 1.2 (owner, CA_user ad0ce77, 2024-07-21)**", "sourced": "yes"},
+ "gamma_NaCa": {"value": 0.35, "units": "dimensionless", "data_reference": "paci2013computational; i_NaCa: gamma = 0.35 (= value; human iPSC-cardiomyocyte model, not verified for neurons)", "sourced": "yes"},
+ "A_mem": {"value": 3000.0, "units": "um2", "data_reference": "definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port)", "sourced": "no"},
+ "rho_NaCa": {"value": 400.0, "units": "per_um2", "data_reference": "hilgemann1991charge; Abstract: Na+-induced charge movements indicate ~400 exchangers per um^2 in guinea-pig (cardiac) sarcolemma, giant patches (= value; set on review 2026-10-05, was 124830 /um^2, which reproduced the old k_NaCa 300 nA). Cardiac proxy: no neuronal NCX density found. With r_NaCa 5000 /s (same sentence: maximal I_NaCa 20-30 uA/cm^2) and A = 3000 um^2, k_NaCa = 0.96 nA. In rat SCG neurons NCX is a minor Ca-extrusion path (PMCA dominant; wanaverbecq2003plasma)", "sourced": "yes"},
+ "r_NaCa": {"value": 5000.0, "units": "per_s", "data_reference": "hilgemann1991charge; cardiac Na/Ca exchanger turnover ~5,000 /s (one net charge per cycle) (Abstract)", "sourced": "yes"}
+}

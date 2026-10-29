@@ -6,10 +6,10 @@
   "dt": 2e-05,
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
-  "run_parameters": {"V_in_membrane": -10.0},
+  "run_parameters": {"membrane/V_in": -10.0},
   "bc_sweep": {
     "ranges": {
-      "V_in_membrane": {"min": -90.0, "max": 30.0, "points": 5},
+      "membrane/V_in": {"min": -90.0, "max": 30.0, "points": 5},
       "T": {"min": 273.15, "max": 313.15, "points": 3}
     },
     "bounds": {

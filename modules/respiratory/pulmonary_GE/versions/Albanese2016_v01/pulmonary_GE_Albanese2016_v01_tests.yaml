@@ -57,16 +57,6 @@ reference_proposals:
   C_O2_p_init:
     reference: unreferenced_placeholder; initial condition (library 0.20 ml/ml, ~arterial O2 content)
     sourced: 'no'
-  C_CO2_a:
-    reference: 'definitional; not a boundary condition: computed by the component (config declares it boundary_condition --
-      see proposed fix). Value only to fill the TODO'
-    sourced: definitional
-    value: 0.485
-  C_O2_a:
-    reference: 'definitional; not a boundary condition: computed by the component (config declares it boundary_condition --
-      see proposed fix). Value only to fill the TODO'
-    sourced: definitional
-    value: 0.199
   q_0:
     reference: unreferenced_placeholder; library 2 L is ~25x a textbook pulmonary capillary blood volume (~70-100 ml at rest);
       Albanese uses the pulmonary peripheral volume of the CVS model

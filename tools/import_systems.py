@@ -1,11 +1,11 @@
 """
 Import circulatory_autogen's system models (resources/<model>_module_array.csv and
-_parameters.csv, plus obs_data / params_for_id when present) into
+_parameters.json, plus obs_data / params_for_id when present) into
 
     system_models/<category>/<model>/
-        <model>_module_array.json, <model>_parameters.csv  the model, using the module library;
+        <model>_module_array.json, <model>_parameters.json the model, using the module library;
                                                            a heart is split into clock/chambers/valves
-        reference/<model>_module_array.json, _parameters.csv  circulatory_autogen's original (module array as JSON),
+        reference/<model>_module_array.json, _parameters.json circulatory_autogen's original (module array as JSON),
                                                            for the equivalence test
         <model>_system.yaml                                test spec (never overwritten)
 
@@ -100,7 +100,7 @@ def load_configs():
     from cam_testing.library import legacy_renames
     configs = {}
     for path in glob.glob(os.path.join(REPO, 'modules', '**', '*_modules_config.json'), recursive=True):
-        for e in read_config(path):   # either config format, as libcuflynx's names
+        for e in read_config(path):   # internal names (cam_testing.library.PHLYNX_KEYS)
             configs[(e['vessel_type'], e['BC_type'])] = e
     for old, new in legacy_renames().items():
         if new in configs:
@@ -312,22 +312,27 @@ for _v in ('trv', 'puv', 'miv', 'aov'):
 
 
 def convert_params_for_id(src, dst, heart_name, notes):
-    '''Rewrites a params_for_id CSV for the split heart (global/heart rows naming heart parameters).'''
-    with open(src) as f:
-        lines = [l for l in csv.reader(f)]
-    header = [h.strip() for h in lines[0]]
-    vi, pi = header.index('vessel_name'), header.index('param_name')
-    out = [lines[0]]
-    for row in lines[1:]:
-        if len(row) > max(vi, pi) and row[vi].strip() in ('global', heart_name) and row[pi].strip() in HEART_PARAM_TARGETS:
-            vessels, param = HEART_PARAM_TARGETS[row[pi].strip()]
-            row = list(row)
-            row[vi], row[pi] = vessels, param
-        elif len(row) > vi and row[vi].strip() == heart_name:
-            notes.append(f'params_for_id row {row} names a heart parameter with no split equivalent')
-        out.append(row)
-    with open(dst, 'w', newline='') as f:
-        csv.writer(f).writerows(out)
+    '''Rewrites a params_for_id JSON file for the split heart (global/heart targets naming heart
+    parameters).'''
+    from libcuflynx.utilities import params_for_id_file as pfi
+    doc = pfi.read_params_for_id(src, keep_text=True)
+    for entry in doc.get('params') or []:
+        key = 'modifies' if entry.get('modifies') else 'targets'
+        names = entry.get(key) or []
+        names = [names] if isinstance(names, str) else names
+        out = []
+        for name in names:
+            vessel, _, param = name.rpartition('/')
+            if vessel in ('global', heart_name) and param in HEART_PARAM_TARGETS:
+                vessels, new = HEART_PARAM_TARGETS[param]
+                out += [f'{v}/{new}' for v in vessels.split()]
+            else:
+                if vessel == heart_name:
+                    notes.append(f'params_for_id target {name} names a heart parameter with no split '
+                                 f'equivalent')
+                out.append(name)
+        entry[key] = out
+    pfi.write_params_for_id(dst, doc)
 
 
 def write_rows(path, header, rows):
@@ -354,32 +359,32 @@ def import_model(ca_dir, model, category, configs):
     ref_dir = os.path.join(dest, 'reference')
     os.makedirs(ref_dir, exist_ok=True)
     notes = []
-    va = module_array.find(res, model)     # circulatory_autogen's resources/, either name
-    pa = os.path.join(res, f'{model}_parameters.csv')
+    va = module_array.find(res, model)
+    pa = os.path.join(res, f'{model}_parameters.json')
     module_array.write_records(os.path.join(ref_dir, f'{model}_module_array.json'), module_array.read_records(va))
     if os.path.isfile(pa):
-        shutil.copyfile(pa, os.path.join(ref_dir, f'{model}_parameters.csv'))
+        shutil.copyfile(pa, os.path.join(ref_dir, f'{model}_parameters.json'))
         # the copy keeps circulatory_autogen's values but this library's bib keys (tools/bib_rekey_map.json)
-        rekey_bib.rekey_file(os.path.join(ref_dir, f'{model}_parameters.csv'))
+        rekey_bib.rekey_file(os.path.join(ref_dir, f'{model}_parameters.json'))
     header, rows = read_rows(va)
-    pheader, params = read_rows(pa) if os.path.isfile(pa) else (['variable_name', 'units', 'value', 'data_reference'], [])
+    from libcuflynx.utilities import parameters_file as pf
+    params = pf.read_parameter_rows(pa) if os.path.isfile(pa) else []
     heart_name = next((r['name'] for r in rows if r['vessel_type'].startswith('heart')), 'heart')
     rows, params, mapping = split_heart(rows, params, configs, notes)
     ignore = mapping.pop('__ignore__', {})
     wrapped = mapping.pop('__wrapped__', {})
     reciprocal = mapping.pop('__reciprocal__', [])
-    ignore.update({f'{r["name"]}/t': 'time' for r in rows})
-    # this library's (module_type, version) names, each record with its default instance
+    # this library's (module_type, version) names, each record with its default parameterisation
     module_array.write_records(os.path.join(dest, f'{model}_module_array.json'), module_array.to_library_versions(rows))
     if os.path.isfile(pa):
-        write_rows(os.path.join(dest, f'{model}_parameters.csv'), ['variable_name', 'units', 'value', 'data_reference'], params)
-    for extra in ('obs_data.json', 'params_for_id.csv'):
+        pf.write_parameter_rows(os.path.join(dest, f'{model}_parameters.json'), params)
+    for extra in ('obs_data.json', 'params_for_id.json'):
         src = os.path.join(res, f'{model}_{extra}')
         if not os.path.isfile(src):
             continue
         shutil.copyfile(src, os.path.join(ref_dir, f'{model}_{extra}'))
         rekey_bib.rekey_file(os.path.join(ref_dir, f'{model}_{extra}'))
-        if extra.endswith('.json'):
+        if extra == 'obs_data.json':
             data = rename_operands(json.load(open(src)), mapping)
             json.dump(data, open(os.path.join(dest, f'{model}_{extra}'), 'w'), indent=1)
         elif mapping:
@@ -389,7 +394,7 @@ def import_model(ca_dir, model, category, configs):
     invariants = []
     if category in ('closed_loop_cvs', 'controlled_cvs') and any(r['vessel_type'] == 'volume_sum' and r['name'] == 'volume_sum' for r in rows):
         invariants.append({'description': 'total blood volume is conserved in the closed loop (relative drift < 1e-6)',
-                           'expr': 'np.ptp(sum_blood_volume__q_volume_sum_sum) <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))'})
+                           'expr': 'np.ptp(multiport_sum_volume_sum_q__q) <= 1e-6 * np.max(np.abs(multiport_sum_volume_sum_q__q))'})
     spec_path = os.path.join(dest, f'{model}_system.yaml')
     if not os.path.isfile(spec_path):
         spec = {'model': model, 'category': category, 'reviewed': False,

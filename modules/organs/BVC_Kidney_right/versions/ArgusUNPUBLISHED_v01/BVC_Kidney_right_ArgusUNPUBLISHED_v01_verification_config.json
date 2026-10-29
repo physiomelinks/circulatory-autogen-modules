@@ -34,61 +34,61 @@
       ["naCirc", "ArgusUNPUBLISHED_v01", "BVC_Na_circ", "mod", "mod", "default"]
     ],
     "parameters": [
-      ["P_pin", "J_per_m3", 13332, "harness: 100 mmHg inflow pressure"],
-      ["P_pout", "J_per_m3", 666, "harness: 5 mmHg outflow pressure"],
-      ["q_0_affA", "m3", 3.509840625e-06, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
-      ["R_affA", "Js_per_m6", 352124180.669857, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
-      ["C_affA", "m6_per_J", 1.56375e-09, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
-      ["u_ext_affA", "J_per_m3", 0, "harness"],
-      ["u_0_affA", "J_per_m3", 0, "harness"],
+      ["pin/P", "J_per_m3", 13332, "harness: 100 mmHg inflow pressure"],
+      ["pout/P", "J_per_m3", 666, "harness: 5 mmHg outflow pressure"],
+      ["affA/q_0", "m3", 3.509840625e-06, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
+      ["affA/R", "Js_per_m6", 352124180.669857, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
+      ["affA/C", "m6_per_J", 1.56375e-09, "circulatory_autogen ANS_CVS_BVC example (lEffArteriol)"],
+      ["affA/u_ext", "J_per_m3", 0, "harness"],
+      ["affA/u_0", "J_per_m3", 0, "harness"],
       [
-        "I_affA",
+        "affA/I",
         "Js2_per_m6",
         1000000.0,
         "harness: inertance raised from the CA example value 1e-7 so the network is not stiff (I/R about 3 ms) and the RK4 timestep test can run"
       ],
       [
-        "q_0_peri",
+        "peri/q_0",
         "m3",
         8e-05,
         "harness: chosen so q_vc_Na/q_vc_W is about 0.14 mol/L (CA example used 2.81e-05)"
       ],
-      ["R_peri", "Js_per_m6", 100000000.0, "circulatory_autogen ANS_CVS_BVC example (lPeritubularC)"],
-      ["C_peri", "m6_per_J", 5e-09, "circulatory_autogen ANS_CVS_BVC example (lPeritubularC)"],
-      ["u_ext_peri", "J_per_m3", 0, "harness"],
+      ["peri/R", "Js_per_m6", 100000000.0, "circulatory_autogen ANS_CVS_BVC example (lPeritubularC)"],
+      ["peri/C", "m6_per_J", 5e-09, "circulatory_autogen ANS_CVS_BVC example (lPeritubularC)"],
+      ["peri/u_ext", "J_per_m3", 0, "harness"],
       [
-        "I_peri",
+        "peri/I",
         "Js2_per_m6",
         1000000.0,
         "harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)"
       ],
-      ["u_0_peri", "J_per_m3", 0, "harness"],
+      ["peri/u_0", "J_per_m3", 0, "harness"],
       [
-        "blood_ctl_dir_peri",
+        "peri/blood_ctl_dir",
         "dimensionless",
         1,
         "circulatory_autogen ANS_CVS_BVC example: reabsorbed water enters the capillary"
       ],
-      ["q_0_venV", "m3", 1.938375e-05, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
-      ["R_venV", "Js_per_m6", 122477975.885168, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
-      ["C_venV", "m6_per_J", 1.0425e-05, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
-      ["u_ext_venV", "J_per_m3", 0, "harness"],
-      ["u_0_venV", "J_per_m3", 0, "harness"],
+      ["venV/q_0", "m3", 1.938375e-05, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
+      ["venV/R", "Js_per_m6", 122477975.885168, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
+      ["venV/C", "m6_per_J", 1.0425e-05, "circulatory_autogen ANS_CVS_BVC example (lKidneyV)"],
+      ["venV/u_ext", "J_per_m3", 0, "harness"],
+      ["venV/u_0", "J_per_m3", 0, "harness"],
       [
-        "I_venV",
+        "venV/I",
         "Js2_per_m6",
         1000000.0,
         "harness: inertance raised from the CA example value 1e-7 so the network is not stiff (RK4 timestep test)"
       ],
       [
-        "q_vc_Na_init_naCirc",
+        "naCirc/q_vc_Na_init",
         "mole",
         0.0114979848860844,
         "P. Hunter BVC model value (CA_user_volume_control ANS_CVS_BVC_parameters.csv)"
       ],
-      ["v_giEpi_NKE_naCirc", "mol_per_s", 0, "harness: no GI in this network"],
-      ["v_lptEpi_NKE_naCirc", "mol_per_s", 0, "harness: no left kidney in this network"],
-      ["v_lgl_Na_naCirc", "mol_per_s", 0, "harness: no left kidney in this network"]
+      ["naCirc/v_giEpi_NKE", "mol_per_s", 0, "harness: no GI in this network"],
+      ["naCirc/v_lptEpi_NKE", "mol_per_s", 0, "harness: no left kidney in this network"],
+      ["naCirc/v_lgl_Na", "mol_per_s", 0, "harness: no left kidney in this network"]
     ]
   },
   "invariants": [
