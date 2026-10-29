@@ -22,7 +22,7 @@ import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, library, module_array, phlynx, ranges, risk
+from cam_testing import bib, bondgraph, checks, library, module_array, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -39,6 +39,8 @@ def __getattr__(name):
     raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
 TEST_TITLES = {
+    'bondgraph_celldl_test': 'Bond graph: opens in CellDL',
+    'bondgraph_reactions_test': 'Bond graph: reactions match Rhea',
     'review_test': 'Reviewed',
     'run_test': 'Run',
     'verification_test_invariants': 'Verification: invariants',
@@ -61,8 +63,18 @@ TEST_SHORT = {
     'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
     'coupled_validation_test': 'Coupled',
+    'bondgraph_celldl_test': 'Opens in CellDL', 'bondgraph_reactions_test': 'Reactions vs Rhea',
 }
 TEST_ABOUT = {
+    'bondgraph_celldl_test': 'The version\'s bond graph (<version>_bondgraph.svg) is a CellDL document the editor '
+                             'opens: Turtle BG-RDF with one bond-graph model, every element and connection drawn and '
+                             'nothing drawn that the RDF lacks, and the same graph as <version>_bondgraph.ttl. With '
+                             'BG_TOOLS set, bg2cellml also makes CellML from it. N/A without a bond graph.',
+    'bondgraph_reactions_test': 'Every reaction annotated with a Rhea reaction (bqbiol:isVersionOf, or bqbiol:hasPart '
+                                'for a lumped one) has Rhea\'s participants (ChEBI terms on its species) and '
+                                'stoichiometry (bond counts), allowing the reverse direction and one common factor. A '
+                                'difference only in H+ or H2O is a warning. Pending while some reactions are not '
+                                'annotated; N/A without a bond graph.',
     'review_test': 'Whether the version has been reviewed: its equations, parameter sources (each value traced '
                    'to its source), tests, data and known issues checked with its owner (tests.yaml reviewed: '
                    'true). A version not reviewed yet fails this check. It is still published and usable, but '
@@ -137,7 +149,7 @@ TEST_ABOUT = {
 SUPERMODULE_TESTS = ['supermodule_structure_test', 'supermodule_equivalence_test']
 COUPLED_TESTS = ['coupled_validation_test']
 REPORT_TESTS = (checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
-                + COUPLED_TESTS)
+                + COUPLED_TESTS + bondgraph.BONDGRAPH_TESTS)
 PARAMETERISATION_TESTS = checks.PARAMETERISATION_TESTS
 # the test overview's parameterisation columns: each parameterisation's validation tests and its CUFLynx archive
 PARAM_COLS = [TEST_SHORT[t] for t in PARAMETERISATION_TESTS] + ['CUFLynx archive']
@@ -302,6 +314,8 @@ def parameterisation_context(version, inst):
 
 def not_applicable_reason(version, test):
     '''Why a report column doesn't apply to the version, or None when it does.'''
+    if test in bondgraph.BONDGRAPH_TESTS and not bondgraph.is_bondgraph(version):
+        return bondgraph.NOT_A_BONDGRAPH
     if test in SUPERMODULE_TESTS and not version.is_supermodule:
         return NOT_A_SUPERMODULE
     if test == 'supermodule_equivalence_test' and not (version.spec.get('supermodule') or {}).get('equivalent'):
