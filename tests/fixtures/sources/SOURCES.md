@@ -66,17 +66,22 @@ A prediction to compare against, not a target.
 ## u_e_with_sugar — no data
 
 - Kind: derived: term of u_e_depolarisation_with_sugar
+- Role: term
 
 The membrane potential with sugar, which that item subtracts u_e_rest from. Weight 0, sigma 1e15.
 
 ## c_Na_sugar
 
 - Kind: derived: term of c_Na_rise_with_sugar
+- Role: term
 
 ## v_NKA_rest
 
 - Kind: derived: term of v_NKA_ratio_with_sugar
+- Role: term
 
 No one measured the absolute resting pump rate in Necturus — the papers give the fold change.
 
 ## v_NKA_sugar
+
+- Role: term

@@ -11,9 +11,10 @@ An item's source is, in this order:
      heading is ignored), then optional labelled lines ``- <Label>: <text>`` (LABELS), then free prose.
 
 Value and sigma always come from the data file, never from SOURCES.md. Kind (measured / assumed /
-derived) is read only from the labels; role (target / prediction / held out / validation) is the item's
-place in the data: a data_item with weight > 0 is a target, a prediction_item with a value is held out,
-one without is a prediction, a baseline target or data column is validation. A data_item with weight 0
+derived) is read only from the labels; role (target / prediction / held out / term / validation) is the
+item's place in the data: a data_item with weight > 0 is a target, a prediction_item with a value is held
+out, one without is a prediction, a weight-0 term of another item is a term (never a target), a baseline
+target or data column is validation. A data_item with weight 0
 whose sigma is >= TERM_SIGMA, or that another item's operation_kwargs names, is a term of another item
 (x1/x2 of a subtraction or division): its source must say "derived: term of <item>".
 """
@@ -198,7 +199,7 @@ def obs_data_rows(obs, sections):
             if where == 'prediction':
                 role = 'held out' if it.get('value') is not None else 'prediction'
             elif term:
-                role = 'none (term)'
+                role = 'term'
             else:
                 role = 'target' if weight is None or weight > 0 else 'held out'
             ops = it.get('operands') or ([it['variable']] if it.get('variable') else [])

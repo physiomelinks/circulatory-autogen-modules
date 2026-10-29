@@ -383,6 +383,9 @@ not_applicable). An item's source is:
    an object with any of `source`, `figure`, `obtained` (digitised / table value / derived), `species`,
    `preparation`, `conditions`, `kind`, `role`, `sigma_reason`, `primary_read` and `note` (other keys are
    shown as notes). On a baseline with a data file, the baseline's own `data_reference` sources its columns.
+   libcuflynx reads obs_data too: `data_reference` on a `prediction_item` needs a libcuflynx with
+   physiomelinks/circulatory_autogen#618 (optional `data_reference`, open); an older one refuses the key
+   there. Until then, source prediction items in SOURCES.md.
 2. otherwise its **section in `SOURCES.md`** beside the data (`parameterisations/<p>/SOURCES.md`, or a
    system model's directory). A Markdown heading of any level is the item's `data_item_name` (a target's
    `name`, a data column's name), exactly; a trailing ` — <value>` or `(note)` on the heading is ignored.
@@ -403,9 +406,10 @@ not_applicable). An item's source is:
    ## u_e_with_sugar
 
    - Kind: derived: term of u_e_depolarisation_with_sugar
+   - Role: term
    ```
    Labels (`- Label: text` or `- **Label:** text`, case-insensitive): `Kind` (measured | assumed (why) |
-   derived | derived: term of <item>), `Role` (target | prediction | held out), `Source` (or `Citation`),
+   derived | derived: term of <item>), `Role` (target | prediction | held out | term), `Source` (or `Citation`),
    `Figure` / `Table`, `Obtained`, `Species/preparation` (or `Species`, `Preparation`, `Conditions`),
    `Primary read`, `Sigma` (why sigma was set or widened), `Note`. Value and sigma are always read from
    the data file, never from SOURCES.md. Headings that name no item (e.g. data proposed but not in the
@@ -416,8 +420,8 @@ not_applicable). An item's source is:
 **Kind** (what the number is) is read only from the `Kind` label or `kind` key: measured, assumed,
 derived, or a term of another item. **Role** (how it is used) is the item's place in the data: a
 `data_item` with weight > 0 is a target; a `prediction_item` with a value is held out, one without is a
-prediction; a `data_item` with weight 0 is held out; a baseline item is validation. A `Role` label that
-disagrees is flagged. A `data_item` with weight 0 whose sigma is ≥ 1e10, or that another item's
+prediction; a `data_item` with weight 0 is held out, or a term (below), never a target; a baseline item is
+validation. A `Role` label that disagrees is flagged. A `data_item` with weight 0 whose sigma is ≥ 1e10, or that another item's
 `operation_kwargs` names (x1/x2 of a subtraction or division), is a **term** of another item: the page
 says "term of <item>, not a measurement", and its source must say so explicitly
 (`Kind: derived: term of <item>`): it is not exempt.

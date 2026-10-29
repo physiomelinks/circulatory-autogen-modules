@@ -74,7 +74,7 @@ def test_parser_reads_headings_labels_and_prose():
     assert s['prose'] == "The serosal composition has not been checked against the paper's methods."
     assert sources.classify_kind(sections['c_Na_rest']['kind']) == ('assumed', 'not measured in an enterocyte')
     assert sources.classify_kind(sections['u_e_with_sugar']['kind']) == ('term', 'u_e_depolarisation_with_sugar')
-    assert sections['v_NKA_sugar'] == {'prose': '', '_level': 2}
+    assert sections['v_NKA_sugar'] == {'prose': '', '_level': 2, 'role': 'term'}
 
 
 def test_heading_names_and_reference_forms():
@@ -107,7 +107,10 @@ def test_kinds_and_roles(table):
     assert r['c_Na_rest']['kind_label'] == 'assumed (not measured in an enterocyte)'
     # weight-0 terms: "term of <item>, not a measurement", from the label or from the data
     assert r['u_e_with_sugar']['kind_label'] == 'term of u_e_depolarisation_with_sugar, not a measurement'
-    assert r['u_e_with_sugar']['role'] == 'none (term)' and not r['u_e_with_sugar']['problem']
+    assert r['u_e_with_sugar']['role'] == 'term' and not r['u_e_with_sugar']['problem']
+    # the fixture's Role: term matches the data, so it is not flagged
+    assert r['u_e_with_sugar']['stated_role'] == '' and r['v_NKA_rest']['stated_role'] == ''
+    assert sum(x['role'] == 'target' for x in table['rows']) == 6
     assert r['v_NKA_rest']['kind_label'] == 'term of v_NKA_ratio_with_sugar, not a measurement'
     assert r['v_NKA_sugar']['kind_label'] == 'term of another item, not a measurement'
     assert 'derived: term of' in r['v_NKA_sugar']['problem']
@@ -132,7 +135,7 @@ def test_a_referenced_weight_0_item_is_a_term_and_a_weight_0_measurement_is_held
     r = rows_by_name(sources.data_table(str(tmp_path), obs=obs))
     assert r['a']['kind_label'] == 'term of b, not a measurement'
     assert 'derived: term of b' in r['a']['problem']
-    assert r['c']['role'] == 'none (term)'
+    assert r['c']['role'] == 'term'
     obs['data_items'] = [item('d', 3, 1, 0.0)]
     d = sources.data_table(str(tmp_path), obs=obs)['rows'][0]
     assert d['role'] == 'held out' and d['kind'] is None and d['problem'] == sources.MISSING
