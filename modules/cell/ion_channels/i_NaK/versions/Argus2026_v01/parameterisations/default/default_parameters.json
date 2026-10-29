@@ -1,0 +1,15 @@
+{
+ "schema_version": 1,
+ "global": {
+  "F": {"value": 96485, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol", "sourced": "yes"}
+ },
+ "Ko": {"value": 4.5, "units": "millimolar", "data_reference": "boron2017medical; typical extracellular K 4.5 mM [NOT VERIFIED: full text not accessible; value not seen in the source]", "sourced": "no"},
+ "Ko_mid_NaK": {"value": 1, "units": "millimolar", "data_reference": "nygren1998mathematical; k_NaK_K = 1 mM (= value); neuronal alpha3 K1/2 ~0.5 mM with 100 mM Nao (horisberger2002functional, Fig. 5B), cardiac 1.5 mM (nakao1989dependence)", "sourced": "yes"},
+ "Nai": {"value": 13, "units": "millimolar", "data_reference": "boron2017medical; typical mammalian intracellular Na 15 mM, modified here to 13 mM (= Nai_init; constant when unconnected) [NOT VERIFIED: full text not accessible; value not seen in the source]", "sourced": "no"},
+ "Nai_mid_NaK": {"value": 15.0, "units": "millimolar", "data_reference": "horisberger2002functional; Fig. 7C: K1/2 for intracellular Na ~15 mM for rat alpha3*beta1 (~16 mM alpha1; Hill coefficient 2.5; Xenopus oocytes, room temperature); cf. nygren1998mathematical/lindblad1996model 11 mM (exponent 1.5, from cardiac data, nakao1989dependence K0.5 11 mM nH 1.4); the previous 40 mM was paci2013computational's Km,Na (exponent 1); **exponent 1.5 (Nygren) kept, not the measured Hill coefficient 2.5**", "sourced": "yes"},
+ "Nai_power_NaK": {"value": 1.5, "units": "dimensionless", "data_reference": "nygren1998mathematical; i_NaK Nai exponent 1.5 (= value; human atrial model); the neuronal alpha3 Hill coefficient is 2.5 (horisberger2002functional, Fig. 7C)", "sourced": "yes"},
+ "V": {"value": -70.0, "units": "milliV", "data_reference": "definitional; clamp value when unconnected: the SN resting potential (-70 mV, cf. davis2020downregulation)", "sourced": "no"},
+ "A_mem": {"value": 3000.0, "units": "um2", "data_reference": "definitional; the soma membrane area 3000 um^2 (used when unconnected; in a soma it comes from the membrane through the membrane_area port)", "sourced": "no"},
+ "rho_NaK": {"value": 750.0, "units": "per_um2", "data_reference": "landowne1970binding; Abstract (points 3-4): specific ouabain binding at just-complete pump inhibition gives an upper limit of ~750 Na pump sites per um^2 in desheathed rabbit vagus (mammalian non-myelinated nerve fibres) (= value; an upper limit, mammalian nerve). With A = 3000 um^2 and r_NaK 9 /s, k_NaK = 3.2 pA (was 0.4 nA; set on review 2026-10-05, was 16644 /um^2)", "sourced": "yes"},
+ "r_NaK": {"value": 9.0, "units": "per_s", "data_reference": "landowne1970binding; Abstract (point 5): turnover ~22 cations/s per site at 20 degC in rabbit vagus; = ~7.3 cycles/s (one net charge each) if 3 Na per cycle; ~9 /s at 22 degC (Q10 3). The previous 50 /s was a 37 degC estimate, inconsistent with the model's 22 degC", "sourced": "yes"}
+}

@@ -9,8 +9,9 @@ cam_testing.paths, which a harness may use) only (``use_builtin_modules: false``
 libcuflynx's bundled copies.
 """
 import contextlib
-import csv
+import functools
 import io
+import json
 import os
 
 import numpy as np
@@ -138,33 +139,34 @@ def split_model_name(version, full, vessel=VESSEL):
 
 
 def generated_parameters_path(model_path):
-    '''The parameters file libcuflynx writes next to a generated model.'''
+    '''The parameters file libcuflynx writes next to a generated model (<prefix>_parameters.json,
+    libcuflynx's nested JSON).'''
     d = os.path.dirname(model_path)
-    return os.path.join(d, f'{os.path.basename(d)}_parameters.csv')
+    return os.path.join(d, f'{os.path.basename(d)}_parameters.json')
 
 
 def supermodule_parameters(version, model_path, vessel=VESSEL):
     '''
     Every parameter of a supermodule's generated model (the flattened model: the supermodule's own
-    parameterisation, its submodules' parameterisations, and the boundary conditions no internal connection closes),
+    parameterisation, its submodules' default parameterisations, and the boundary conditions no internal connection closes),
     as Parameters named at the supermodule level (<var>_<submodule path>, globals as they are), with
     model_name the generated model's name, and kind from the owning submodule's config
     (global_constant for the globals).
     '''
     from cam_testing.library import Parameter
+    from libcuflynx.utilities.parameters_file import model_parameter_rows
     own = {p.variable_name: p for p in version.default_parameterisation.parameters()}
     out = []
-    with open(generated_parameters_path(model_path), newline='') as f:
-        for row in csv.DictReader(f):
-            full = (row.get('variable_name') or '').strip()
-            if not full:
-                continue
-            name, var, _path, owner = split_model_name(version, full, vessel)
-            kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
-            mine = own.get(name)
-            out.append(Parameter(name, (row.get('units') or '').strip(), (row.get('value') or '').strip(),
-                                 (row.get('data_reference') or '').strip(), mine.sourced if mine else '',
-                                 kind, model_name=full))
+    for row in model_parameter_rows(generated_parameters_path(model_path)):
+        full = str(row.get('variable_name') or '').strip()
+        if not full:
+            continue
+        name, var, _path, owner = split_model_name(version, full, vessel)
+        kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
+        mine = own.get(name)
+        cell = lambda k: '' if row.get(k) is None else str(row[k]).strip()
+        out.append(Parameter(name, cell('units'), cell('value'), cell('data_reference'),
+                             mine.sourced if mine else '', kind, model_name=full))
     return out
 
 
@@ -228,35 +230,75 @@ def _write_resources(component, resources_dir, prefix, overrides, parameters=Non
           parameters:              # values for the neighbours' parameters, as <vessel>/<var>
             - [pressure_in/P, J_per_m3, 2000, source]
 
+    A row may be a module-array record instead (a dict), e.g. a supermodule "mod" with
+    per_submodule_inputs naming its neighbours.
+
     ``parameters``: the parameterisation's parameters to write (default: the version's default
     parameterisation). A parameterisation may have its own network instead
     (validation.<parameterisation>.harness, see ``network``); ``parameterisation`` selects it.
     '''
     os.makedirs(resources_dir, exist_ok=True)
     network = globals()['network'](component, parameterisation)
-    rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
-    if not any(r[0] == VESSEL for r in rows):
-        raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
+    # the version alone, at the parameterisation under test (else the version's default one)
+    own = getattr(parameterisation, 'name', parameterisation) or component.default_parameterisation_name
+    rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', own]]
     records = module_array.from_rows(rows)
-    module_array.write_records(os.path.join(resources_dir, f'{prefix}_module_array.json'), records)
+    if not any(r['name'] == VESSEL for r in records):
+        raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
+    array = os.path.join(resources_dir, f'{prefix}_module_array.json')
+    module_array.write_records(array, records)
+    path = os.path.join(resources_dir, f'{prefix}_parameters.json')
+    doc = _supermodule_instances(array, records, path)
 
     params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
     if todo:
         raise MissingParameters(f'parameters still TODO in the parameterisation parameters of {component.key}: {", ".join(todo)}')
-    with open(os.path.join(resources_dir, f'{prefix}_parameters.csv'), 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['variable_name', 'units', 'value', 'data_reference'])
-        written = set()
-        for p in params:
-            name = model_parameter_name(component, p)
-            value = overrides.get(name, p.value)
-            writer.writerow([written_parameter_name(component, p), p.units, value, p.data_reference or 'cam_testing'])
-            written.add(name)
-        for written_name, units, value, *ref in network.get('parameters') or []:
-            name = libcuflynx_model_name(written_name)
-            if name not in written:
-                writer.writerow([written_name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
+    from libcuflynx.utilities import parameters_file as pf
+    written = set()
+    for p in params:
+        name = model_parameter_name(component, p)
+        pf.set_leaf(doc, pf.name_path(written_parameter_name(component, p)),
+                    {'value': overrides.get(name, p.value), 'units': p.units,
+                     'data_reference': p.data_reference or 'cam_testing'})
+        written.add(name)
+    for written_name, units, value, *ref in network.get('parameters') or []:
+        name = libcuflynx_model_name(written_name)
+        if name not in written:
+            pf.set_leaf(doc, pf.name_path(written_name),
+                        {'value': overrides.get(name, value), 'units': units,
+                         'data_reference': ref[0] if ref else 'cam_testing harness'})
+    pf.write_parameters_file(path, doc)
+
+
+def _supermodule_instances(array, records, path):
+    '''The test network's parameters document, with each supermodule instance's values new from its version
+    (libcuflynx's supermodules.write_instance_parameters, into ``path``), so it is tested with the version's
+    values; the parameterisation's and the network's own rows go over them.'''
+    from libcuflynx.utilities import parameters_file as pf
+    keys = _supermodule_keys(tuple(library_dirs()))
+    if not any((r.get('module_type'), r.get('module_subtype')) in keys for r in records):
+        return pf.new_document()
+    from libcuflynx.utilities.module_library import ModuleSources
+    from libcuflynx.utilities.supermodules import write_instance_parameters
+    registry = ModuleSources({'module_library_dirs': library_dirs(), 'use_builtin_modules': False}).supermodule_registry()
+    pf.write_parameters_file(path, pf.new_document())
+    write_instance_parameters(array, registry, replace=True, parameters=path)
+    return pf.read_parameters_file(path)
+
+
+@functools.lru_cache(maxsize=4)
+def _supermodule_keys(libraries):
+    '''(module_type, version) of every supermodule version in ``libraries``: those with a module array.'''
+    keys = set()
+    for library in libraries:
+        for root, _dirs, files in os.walk(library):
+            for f in files:
+                if f.endswith('_module_array.json'):
+                    mt, version = os.path.basename(os.path.dirname(os.path.dirname(root))), os.path.basename(root)
+                    if f == f'{mt}_{version}_module_array.json':
+                        keys.add((mt, version))
+    return keys
 
 
 def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None):
@@ -278,7 +320,7 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
     _write_resources(component, resources_dir, prefix, overrides, parameters, parameterisation=parameterisation)
     config = {
         'file_prefix': prefix,
-        'input_param_file': f'{prefix}_parameters.csv',
+        'input_param_file': f'{prefix}_parameters.json',
         'model_type': model_type,
         'solver': component.spec.get('solver', 'CVODE_myokit') if model_type == 'cellml' else 'solve_ivp',
         'resources_dir': resources_dir,
@@ -303,22 +345,114 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
 
 
 def simulation_helper(model_path, spec, solver_info=None, solver=None, model_type='cellml'):
+    '''A libcuflynx simulation helper for the spec's run settings. A spec with a protocol
+    (``spec[PROTOCOL_INFO]``, see ``with_protocol``) gives a helper that ``run`` runs through it.'''
     from libcuflynx.solver_wrappers import get_simulation_helper
 
     info = dict(spec.get('solver_info') or {}) if solver is None else {}
     info.update(solver_info or {})
+    protocol = spec.get(PROTOCOL_INFO)
     with contextlib.redirect_stdout(io.StringIO()):
-        return get_simulation_helper(model_path=model_path, solver=solver or spec.get('solver', 'CVODE_myokit'),
-                                     model_type=model_type, dt=spec['dt'], sim_time=spec['sim_time'],
-                                     solver_info=info, pre_time=spec.get('pre_time', 0.0))
+        helper = get_simulation_helper(model_path=model_path, solver=solver or spec.get('solver', 'CVODE_myokit'),
+                                       model_type=model_type, dt=spec['dt'], sim_time=spec['sim_time'],
+                                       solver_info=info, pre_time=spec.get('pre_time', 0.0))
+        if protocol is not None:
+            helper.set_protocol_info(protocol)
+            helper.cam_protocol = protocol
+    return helper
+
+
+# ---- protocols ---------------------------------------------------------------------------------
+#
+# A version's tests can be driven by the protocol_info of an obs_data file (verification_config
+# "protocol"; validation.<p>.baseline "obs_data"): its pre_times, its sub-experiments (sim_times) and
+# the parameters it changes in each (params_to_change), each a number or the name of a
+# protocol_traces / protocol_shapes entry, a time-varying input libcuflynx interpolates linearly.
+# libcuflynx's ProtocolExecutor runs it.
+
+PROTOCOL_INFO = '_protocol_info'      # the spec key of a loaded protocol_info (set by with_protocol)
+
+
+def load_protocol(path):
+    '''The protocol_info of an obs_data file, its protocol_shapes expanded into protocol_traces.'''
+    from libcuflynx.utilities.protocol_shapes import materialise_shapes, validate_trace_references
+    with open(path, encoding='utf-8-sig') as f:
+        protocol = json.load(f)['protocol_info']
+    materialise_shapes(protocol)
+    validate_trace_references(protocol)
+    return protocol
+
+
+def with_protocol(spec, protocol):
+    '''``spec`` with its runs driven by ``protocol`` (one experiment): sim_time is the protocol's
+    total time and pre_time its pre_time.'''
+    if len(protocol['sim_times']) != 1:
+        raise ValueError(f'the protocol of a version has one experiment, not {len(protocol["sim_times"])}')
+    return dict(spec, sim_time=float(sum(protocol['sim_times'][0])), pre_time=float(protocol['pre_times'][0]),
+                **{PROTOCOL_INFO: protocol})
+
+
+def without_protocol(spec):
+    '''``spec`` with its runs at constant inputs (no protocol).'''
+    return {k: v for k, v in spec.items() if k != PROTOCOL_INFO}
+
+
+def protocol_inputs(protocol):
+    '''The outputs a protocol drives: its params_to_change ("mod/u_in" -> "u_in"; a test-network
+    neighbour's "record/x" stays as it is).'''
+    out = []
+    for name in (protocol or {}).get('params_to_change') or {}:
+        if '/' in name:
+            record, var = name.split('/', 1)
+            out.append(var if record == VESSEL else name)
+    return out
+
+
+def run_protocol(helper, outputs, protocol, params=None, experiment=0):
+    '''
+    Runs experiment ``experiment`` of ``protocol`` from the model's initial state, with ``params``
+    set first; returns (t, {output_key: values}, the start time of each sub-experiment), t from the
+    end of the experiment's pre_time. A trace's times count from the start of its sub-experiment,
+    the first sub-experiment's from the start of the pre_time (libcuflynx's Myokit clock).
+    '''
+    from libcuflynx.protocol_runners.protocol_executor import ProtocolExecutor
+
+    if getattr(helper, 'cam_protocol', None) is not protocol:
+        with contextlib.redirect_stdout(io.StringIO()):
+            helper.set_protocol_info(protocol)
+        helper.cam_protocol = protocol
+    names = list(params or {})
+    wanted = [[output_name(v)] for v in outputs]
+    with contextlib.redirect_stdout(io.StringIO()):
+        ok, by_sub, _, t_by_exp = ProtocolExecutor(helper).run_protocol(
+            protocol, id_param_names=names or None, id_param_vals=[params[n] for n in names] or None,
+            result_variables=wanted, exp_indices=[experiment])
+    if not ok:
+        raise RuntimeError('simulation failed')
+    t = np.asarray(t_by_exp[experiment], dtype=float)
+    sim_times = [float(s) for s in protocol['sim_times'][experiment]]
+    results = {}
+    for i, var in enumerate(outputs):
+        parts = []
+        for sub, sim_time in enumerate(sim_times):
+            values = np.asarray(by_sub[(experiment, sub)][i], dtype=float).ravel()
+            if values.size == 1:
+                values = np.full(int(sim_time / helper.dt) + 1, values[0])   # a constant is logged once
+            parts.append(values if sub == 0 else values[1:])
+        results[output_key(var)] = np.concatenate(parts)
+    starts = np.concatenate([[0.0], np.cumsum(sim_times[:-1])])
+    return t, results, starts
 
 
 def run(helper, outputs, params=None):
     '''
     Runs the helper from the model's initial state (optionally with parameter overrides);
     returns (t, {var: array}). Without the reset, a helper continues from the previous run's
-    final state.
+    final state. A helper made with a protocol runs it (``run_protocol``).
     '''
+    protocol = getattr(helper, 'cam_protocol', None)
+    if protocol is not None:
+        return run_protocol(helper, outputs, protocol, params)[:2]
     if hasattr(helper, 'reset_states'):
         helper.reset_states()
     if params:

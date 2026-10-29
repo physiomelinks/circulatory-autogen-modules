@@ -19,12 +19,11 @@ removes what was applied from the spec. It does not set reviewed: true; do that 
 done.
 """
 import argparse
-import csv
 import os
 import re
 
 from cam_testing import bib
-from cam_testing.library import INSTANCE_COLUMNS, all_versions, merge_spec, read_spec_files, version_by_key, write_spec
+from cam_testing.library import all_versions, read_parameters, write_parameters, merge_spec, read_spec_files, version_by_key, write_spec
 
 
 def _entry_blocks(path):
@@ -59,19 +58,16 @@ def apply(version, only=None, validation=True):
             used_keys.add(key)
         used_keys.update(prop.get('also_cites') or [])
     for inst in version.parameterisations():
-        rows = list(csv.DictReader(open(inst.parameters_path)))
-        for r in rows:
-            prop = applied.get(r['variable_name'])
+        params = read_parameters(inst.parameters_path, version.kinds)
+        for p in params:
+            prop = applied.get(p.variable_name)
             if prop is None:
                 continue
-            r['data_reference'] = prop['reference']
-            r['sourced'] = 'no' if str(prop.get('sourced', 'no')).strip().lower() in ('no', 'false', '0') else 'yes'
+            p.data_reference = prop['reference']
+            p.sourced = 'no' if str(prop.get('sourced', 'no')).strip().lower() in ('no', 'false', '0') else 'yes'
             if 'value' in prop:
-                r['value'] = str(prop['value'])
-        with open(inst.parameters_path, 'w', newline='') as f:
-            w = csv.DictWriter(f, fieldnames=INSTANCE_COLUMNS, extrasaction='ignore')
-            w.writeheader()
-            w.writerows(rows)
+                p.value = str(prop['value'])
+        write_parameters(inst.parameters_path, params)
 
     # move cited entries from the proposed bib to the version's bib
     proposed_path, bib_path = bib.proposed_bib_path(version), bib.bib_path(version)

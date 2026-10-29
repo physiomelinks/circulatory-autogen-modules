@@ -1,9 +1,10 @@
 module_type: heart
 version: Argus2026_v01
 reviewed: false
-description: 'Four-chamber heart: cardiac clock, four generic chambers and four Mynard valves (nested in heart: cardiac_clock, chamber,
+description: 'Four-chamber heart: cardiac clock, four generic chambers whose vessel ports sum their flows (chamber Liang2009NoVisco_v02: ra takes both venae cavae, la an ASD shunt''s outflow, with no junction) and four Mynard valves (nested in heart: cardiac_clock, chamber,
   valve). Defined by the module_format "supermodule" entry in heart_Argus2026_v01_modules_config.json; default parameters
-  (3compartment''s: Liang 2009, Korakianitis 2006, Mynard 2012) in its default instance. A model uses one "heart" entry whose
+  (3compartment''s: Liang 2009, Korakianitis 2006, Mynard 2012) in its default parameterisation, which also sets the ra, rv and la chambers where they differ from the
+  chamber version''s default (lv). A model uses one "heart" entry whose
   per_submodule_inputs / per_submodule_outputs couple ra, la, puv, aov (and the chambers'' volumes) to the circulation; libcuflynx
   expands it into heart__clock, heart__ra ... heart__aov.'
 expected_failures:
