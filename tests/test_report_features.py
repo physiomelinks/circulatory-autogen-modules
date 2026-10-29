@@ -160,3 +160,17 @@ def test_nested_supermodule_shows_its_outside_coupling():
     assert any(x['part'] == 'membrane' and x['external'] == 'axon' and x['direction'] == 'out'
                and x['where'][0]['name'] == 'neuron/sympathetic' for x in sv['external'])
     assert report.supermodule_structure(load_version('Lotka_Volterra', 'Lotka1925_v01')) is None
+
+
+# ---- structure warnings -------------------------------------------------------------------------
+
+def test_version_page_lists_unused_variables_among_the_structure_warnings():
+    import dataclasses
+    from cam_testing.suite import test_structure as ts
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    rows = v.config['variables_and_units'] + [['spare_k', 'dimensionless', 'access', 'constant']]
+    extra = dataclasses.replace(v, config={**v.config, 'variables_and_units': rows})
+    errors, warnings = ts.version_problems(extra)
+    ctx = dict(report.version_context(v), structure={'errors': errors, 'warnings': warnings, 'known_issues': []})
+    html = report._env().get_template('version.html').render(**ctx)
+    assert 'Structural checks' in html and f'{ts.UNUSED_MESSAGE}: spare_k (config)' in html
