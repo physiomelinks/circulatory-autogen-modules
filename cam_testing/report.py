@@ -862,6 +862,7 @@ def component_context(version):
         'BC_type': version.BC_type, 'module_type': version.module_type, 'category': version.category,
         'format': version.format, 'config_notes': version.config.get('notes'),
         'description': version.spec.get('description'),
+        'figures': version.figures(),
         'submodules': version.submodules,
         'skip': version.spec.get('skip'), 'notes': version.spec.get('notes'),
         'sweep_rationale': (version.spec.get('bc_sweep') or {}).get('rationale'),
