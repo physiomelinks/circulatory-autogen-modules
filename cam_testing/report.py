@@ -26,7 +26,7 @@ import urllib.parse
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, bondgraph, checks, module_array, phlynx, ranges, risk
+from cam_testing import bib, bondgraph, checks, module_array, phlynx, ranges, risk, sources
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -289,7 +289,27 @@ def parameterisation_context(version, inst):
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
             if os.path.isfile(inst.calibrated_parameters_path) else None,
             'rel_dir': os.path.relpath(inst.dir, version.dir),
+            'sources': sources_table(sources.parameterisation_table(inst), version.dir),
             'tests': tests, 'baseline': tests[0], 'calibrate': tests[1]}
+
+
+def sources_table(table, base_dir):
+    '''A data_sources table (cam_testing.sources.data_table) for a page, its SOURCES.md path relative to
+    base_dir (the version's or system model's directory).'''
+    if not table:
+        return None
+    md = table['sources_md']
+    return dict(table, sources_md=os.path.relpath(md, base_dir).replace(os.sep, '/') if md else None)
+
+
+def _cite(text, keys=()):
+    '''Escaped text with every bib key in keys linked to its References entry (#ref-<key>).'''
+    import re
+    from markupsafe import Markup, escape
+    out = str(escape(text or ''))
+    for k in sorted(set(keys), key=len, reverse=True):
+        out = re.sub(rf'(?<![\w#-]){re.escape(k)}(?![\w])', f'<a href="#ref-{k}">{k}</a>', out)
+    return Markup(out)
 
 
 def not_applicable_reason(version, test):
@@ -920,6 +940,7 @@ def _env():
     env = Environment(loader=FileSystemLoader(TEMPLATES), autoescape=select_autoescape(['html']))
     env.filters['fmt'] = _fmt
     env.filters['emph'] = _emph
+    env.filters['cite'] = _cite
     return env
 
 
@@ -1007,6 +1028,9 @@ def version_context(version):
         'bib_keys': sorted(set(bib.read(bib.bib_path(version))) | set(bib.read(bib.proposed_bib_path(version)))),
         'bib_file': os.path.basename(bib.bib_path(version)),
         'n_sourced': sum(p.is_sourced for p in version.parameters()), 'n_parameters': len(version.parameters()),
+        # the Data sources tables: data items, and those without a source (cam_testing.sources)
+        'n_data_items': sum(len(i['sources']['rows']) for i in comp['parameterisations'] if i['sources']),
+        'n_data_unsourced': sum(i['sources']['n_problems'] for i in comp['parameterisations'] if i['sources']),
         'counts': _status_counts([comp]), 'structure': _structure(version),
         'max_risk': comp['risk']['failure_probability'] if comp['risk'] else None,
         'known_issues': (version.spec.get('known_issues') or [])
@@ -1047,7 +1071,8 @@ def module_context(name, version_contexts=None):
                      'known_issues': len(c['known_issues']), 'is_supermodule': c['is_supermodule'],
                      'contents': comp['contents'], 'unit_failures': c['unit_failures'],
                      'unit_status': (comp['unit_consistency'] or {}).get('status'),
-                     'creators': c['creators'], 'licence': c['licence']})
+                     'creators': c['creators'], 'licence': c['licence'],
+                     'n_data_items': c['n_data_items'], 'n_data_unsourced': c['n_data_unsourced']})
     counts = {}
     for c in vctx:
         for k, n in c['counts'].items():
@@ -1060,6 +1085,8 @@ def module_context(name, version_contexts=None):
         'n_parameterisations': sum(len(r['parameterisations']) for r in rows),
         'all_sourced': all(r['all_sourced'] for r in rows),
         'n_sourced': sum(r['n_sourced'] for r in rows), 'n_parameters': sum(r['n_parameters'] for r in rows),
+        'n_data_items': sum(r['n_data_items'] for r in rows),
+        'n_data_unsourced': sum(r['n_data_unsourced'] for r in rows),
         'max_risk': max((r['max_risk'] for r in rows if r['max_risk'] is not None), default=None),
         'known_issues': sum(r['known_issues'] for r in rows),
         'phlynx': {'run': sum(r['phlynx']['run'] for r in rows),
@@ -1101,6 +1128,7 @@ def build_index(contexts, out_path, href, systems=()):
                          'counts': c['counts'],
                          'reviewed': c['reviewed'], 'known_issues': c['known_issues'], 'max_risk': c['max_risk'],
                          'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
+                         'n_data_items': c.get('n_data_items', 0), 'n_data_unsourced': c.get('n_data_unsourced', 0),
                          'phlynx': c['phlynx'], 'ready_for_review': c['ready_for_review'] and not c['reviewed'],
                          'versions': [{'name': v['version'], 'href': href(c['relpath'], v['href']),
                                        'counts': v['counts'], 'reviewed': v['reviewed'],
@@ -1114,6 +1142,9 @@ def build_index(contexts, out_path, href, systems=()):
     html_text = _env().get_template('index.html').render(
         groups=out_groups, systems=list(systems), totals=totals, n_module_types=len(all_rows),
         n_versions=sum(r['n_versions'] for r in all_rows),
+        data_sources={'items': sum(r['n_data_items'] for r in all_rows),
+                      'unsourced': sum(r['n_data_unsourced'] for r in all_rows),
+                      'systems': sum(s.get('n_data_unsourced', 0) for s in systems)},
         generated=_now(), libcuflynx_version=_libcuflynx_version())
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, 'w') as f:
@@ -1385,6 +1416,8 @@ def system_context(system, href_of=None, page_dir=None):
         'parameters': _parameter_groups(os.path.join(system.dir, f'{system.name}_parameters.json')),
         'parameters_file': f'{system.name}_parameters.json',
         'tests': tests, 'counts': counts, 'plots': _system_plots(system),
+        'sources': sources_table(sources.data_table(system.dir, obs=sources.read_obs(
+            os.path.join(system.dir, f'{system.name}_obs_data.json'))), system.dir),
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
     }
 
@@ -1405,7 +1438,8 @@ def system_rows(contexts, href):
     '''The site index's "System models" rows, from the system pages' contexts.'''
     return [{'id': c['id'], 'name': c['name'], 'category': c['category'], 'href': href(c),
              'n_instances': len(c['instances']), 'counts': c['counts'], 'description': c['description'],
-             'has_figure': bool(c['figure']), 'tests': c['tests']}
+             'has_figure': bool(c['figure']), 'tests': c['tests'],
+             'n_data_unsourced': (c['sources'] or {}).get('n_problems', 0)}
             for c in sorted(contexts, key=lambda c: c['id'].lower())]
 
 

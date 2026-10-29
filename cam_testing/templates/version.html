@@ -245,6 +245,7 @@ window.addEventListener('DOMContentLoaded', function () {
       {%- if components[0].structure_view %}<li><a href="#{{ components[0].id }}-structure"><span class="mono">Structure</span></a></li>{% endif %}
       {%- if components[0].unit_consistency %}<li><a href="#unit-consistency"><span class="dot failed"></span><span class="mono">Unit consistency</span></a></li>{% endif %}
       <li><a href="#parameterisations"><span class="mono">Parameterisations</span></a></li>
+      {%- if n_data_items %}<li><a href="#data-sources">{% if n_data_unsourced %}<span class="dot failed"></span>{% endif %}<span class="mono">Data sources</span></a></li>{% endif %}
       {%- for t in components[0].tests %}
       <li><a href="#{{ components[0].id }}--{{ t.key }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ t.short }}</span></a></li>
       {%- endfor %}
@@ -272,6 +273,7 @@ window.addEventListener('DOMContentLoaded', function () {
         <span title="The config entry's creator list">{% if creators %}Creator{{ 's' if creators|length > 1 }}: {{ creators|join(', ') }}{% else %}<span class="todo">Creator: not set (to be given in review)</span>{% endif %}</span>
         {%- if unit_failures %}<span title="libcellml unit checks on the CellML (informational, not a test column)"><a href="#unit-consistency" class="todo">Unit consistency: {{ components[0].unit_consistency.message }}</a></span>{% elif components[0].unit_consistency %}<span><a href="#unit-consistency" class="todo">Unit consistency: not checked</a></span>{% endif %}
         <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
+        {%- if n_data_items %}<span title="Calibration and validation data items with a source (Data sources)"><span class="box {{ 'on' if not n_data_unsourced }}" aria-hidden="true"></span><a href="#data-sources">{{ 'All ' ~ n_data_items ~ ' data items sourced' if not n_data_unsourced else (n_data_items - n_data_unsourced) ~ ' of ' ~ n_data_items ~ ' data items sourced' }}</a></span>{% endif %}
         <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
         {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
         <span>libcuflynx {{ libcuflynx_version }}</span>
@@ -610,6 +612,17 @@ window.addEventListener('DOMContentLoaded', function () {
         {%- endif %}
         {%- endfor %}{% endfor %}
       </div>
+
+      {%- if c.parameterisations|selectattr('sources')|list %}
+      <div class="block" id="data-sources">
+        <h3>Data sources</h3>
+        <p class="muted" style="margin:0;font-size:0.84rem">Where every calibration and validation number came from: one row per obs_data <code>data_item</code> and <code>prediction_item</code>, and per baseline target or data column. Kind is what the number is (measured, assumed, derived, or a term of another item and not a measurement); role is how it is used (target: fitted; held out: compared after fitting, not fitted; prediction: computed, no data; validation: the baseline test's). "Source missing" means neither a <code>data_reference</code> on the item nor a section for it in the parameterisation's <code>SOURCES.md</code>: the version's data sources test fails until one is added (modules/README.md, "Data sources").</p>
+        {%- for i in c.parameterisations if i.sources %}
+        <h4 style="margin:8px 0 0" id="data-sources-{{ i.name }}">{{ i.name }}</h4>
+        {%- with tbl=i.sources, keys=bib_keys %}{% include '_sources_table.html' %}{% endwith %}
+        {%- endfor %}
+      </div>
+      {%- endif %}
 
       <div class="block">
         <h3>Verification &amp; validation</h3>

@@ -31,6 +31,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
       {{ chip('pending', totals.pending ~ ' pending') }} {{ chip('skipped', totals.skipped ~ ' skipped') }}
       {%- if totals.not_applicable %} {{ chip('not_applicable', totals.not_applicable ~ ' N/A') }}{% endif %}
       {%- if totals[None] %} {{ chip(None, totals[None] ~ ' not run') }}{% endif %}
+      {%- if data_sources and data_sources['items'] %} <span class="{{ 'todo' if data_sources.unsourced else 'muted' }}" style="font-size:0.84rem" title="calibration and validation data items of the versions (each version page's Data sources)">{{ data_sources.unsourced }} of {{ data_sources['items'] }} data items without a source{% if data_sources.systems %}, and {{ data_sources.systems }} in system models{% endif %}</span>{% endif %}
     </div>
   </header>
   <nav class="cats" aria-label="Categories">{% if systems %}<a href="#system-models">System models</a>{% endif %}{% for g in groups %}<a href="#{{ g.anchor }}">{{ g.category }}</a>{% endfor %}</nav>

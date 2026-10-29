@@ -372,6 +372,66 @@ extraction and the fit against the original.
 - **Copyright:** a cropped figure or table with its citation, kept for checking the extracted
   values, is the intent; don't include whole pages or more than the extraction needs.
 
+### Data sources
+
+**Rule: every calibration and validation data item says where it came from.** The items are a
+parameterisation's obs_data `data_items` and `prediction_items`, and the validation baseline's scalar
+`targets` and data columns (`validation.<p>.baseline` with a status other than pending, skipped or
+not_applicable). An item's source is:
+
+1. its **`data_reference`** key: a string (the citation, starting with a BibTeX key when there is one), or
+   an object with any of `source`, `figure`, `obtained` (digitised / table value / derived), `species`,
+   `preparation`, `conditions`, `kind`, `role`, `sigma_reason`, `primary_read` and `note` (other keys are
+   shown as notes). On a baseline with a data file, the baseline's own `data_reference` sources its columns.
+2. otherwise its **section in `SOURCES.md`** beside the data (`parameterisations/<p>/SOURCES.md`, or a
+   system model's directory). A Markdown heading of any level is the item's `data_item_name` (a target's
+   `name`, a data column's name), exactly; a trailing ` — <value>` or `(note)` on the heading is ignored.
+   The section runs to the next heading. Under it, optional labelled lines, then free prose (shown in the
+   table's source cell):
+   ```markdown
+   ## c_Na_rest
+
+   - Kind: assumed (not measured in an enterocyte)
+   - Role: target
+   - Source: ion-selective microelectrode reviews: cytosolic Na 10–20 mM in mammalian epithelia
+   - Species/preparation: mammalian epithelial and cardiac cells
+   - Primary read: 10–20 mM
+   - Sigma: ± 4 mM covers that range.
+
+   The weakest datum in the step, and the one to replace if an enterocyte measurement can be found.
+
+   ## u_e_with_sugar
+
+   - Kind: derived: term of u_e_depolarisation_with_sugar
+   ```
+   Labels (`- Label: text` or `- **Label:** text`, case-insensitive): `Kind` (measured | assumed (why) |
+   derived | derived: term of <item>), `Role` (target | prediction | held out), `Source` (or `Citation`),
+   `Figure` / `Table`, `Obtained`, `Species/preparation` (or `Species`, `Preparation`, `Conditions`),
+   `Primary read`, `Sigma` (why sigma was set or widened), `Note`. Value and sigma are always read from
+   the data file, never from SOURCES.md. Headings that name no item (e.g. data proposed but not in the
+   obs_data yet) are listed on the page and in the test's details, and don't fail. Text before the first
+   item heading is ignored. The item's free-text `comment` is not a source: the table shows it beside
+   "source missing".
+
+**Kind** (what the number is) is read only from the `Kind` label or `kind` key: measured, assumed,
+derived, or a term of another item. **Role** (how it is used) is the item's place in the data: a
+`data_item` with weight > 0 is a target; a `prediction_item` with a value is held out, one without is a
+prediction; a `data_item` with weight 0 is held out; a baseline item is validation. A `Role` label that
+disagrees is flagged. A `data_item` with weight 0 whose sigma is ≥ 1e10, or that another item's
+`operation_kwargs` names (x1/x2 of a subtraction or division), is a **term** of another item: the page
+says "term of <item>, not a measurement", and its source must say so explicitly
+(`Kind: derived: term of <item>`): it is not exempt.
+
+- **The table:** each version page has a "Data sources" block (one table per parameterisation with
+  data items: item with variable and operation, value, sigma with its rationale, source with figure,
+  how obtained and primary read, species/preparation/conditions, kind, role; BibTeX keys link to the
+  References) and a "data items sourced" count in its header; a system-model page has one for its
+  obs_data. The site index counts the items without a source.
+- **Checked by** `data_sources_test` (`tests/test_modules.py`, per version, no model run): it fails when
+  any item has no source, or a term lacks its `derived: term of <item>` kind, and lists each item and
+  where to add its source. It runs for unreviewed versions too; in CI their failures are warnings
+  (`tools/ci_reviewed_failures.py`), so it gates reviewed versions and new sign-offs.
+
 ## How system models use versions and parameterisations
 
 System models live in `../system_models/<category>/<model>/` (not in `modules/`; they are not
@@ -553,6 +613,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
+| `data_sources_test` | every calibration and validation data item has a source ("Data sources" above); no model run |
 
 **Supermodule versions** run the same verification and validation tests as a component. The
 supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod__<submodule>`

@@ -1,0 +1,31 @@
+{#- The "Data sources" table of one data set (cam_testing.sources.data_table): included with tbl (the
+    table) and keys (the bib keys linked to the page's References; empty on a system page). -#}
+<p class="muted" style="margin:4px 0;font-size:0.8rem">{{ tbl.rows|length }} item{{ '' if tbl.rows|length == 1 else 's' }}{% if tbl.n_problems %}, <span class="todo">{{ tbl.n_problems }} without a source</span>{% else %}, all sourced{% endif %}. Sources from each item's <code>data_reference</code>, else its section in {% if tbl.sources_md %}<code>{{ tbl.sources_md }}</code>{% else %}a <code>SOURCES.md</code> beside the data (none yet){% endif %}; value and sigma from the data file.{% if tbl.extra_headings %} SOURCES.md headings naming no data item: {% for h in tbl.extra_headings %}<code>{{ h }}</code>{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>
+<div class="table-wrap"><table class="sources">
+  <thead><tr><th>Item</th><th>Value</th><th>Sigma</th><th>Source</th><th>Species, preparation, conditions</th><th>Kind</th><th>Role</th></tr></thead>
+  <tbody>
+  {%- for r in tbl.rows %}
+    <tr{% if r.problem %} class="unsourced"{% endif %}>
+      <td><span class="mono" style="font-weight:600">{{ r.name }}</span>{% if r.variable %}<br><span class="mono muted" style="font-size:0.76rem">{{ r.variable }}</span>{% endif %}{% if r.operation %}<br><span class="muted" style="font-size:0.76rem">{{ r.operation }}</span>{% endif %}</td>
+      <td class="mono num">{% if r.value is iterable and r.value is not string %}series ({{ r.value|length }} values){% else %}{{ r.value|fmt }}{% endif %}{% if r.unit %} <span class="muted">{{ r.unit }}</span>{% endif %}</td>
+      <td class="mono num">{% if r.sigma is iterable and r.sigma is not string %}per point{% else %}{{ r.sigma|fmt }}{% endif %}{% if r.sigma_reason %}<br><span class="muted" style="font-family:inherit;font-size:0.76rem;white-space:normal">{{ r.sigma_reason|cite(keys) }}</span>{% endif %}</td>
+      <td style="white-space:normal;font-size:0.8rem;min-width:18rem">
+        {%- if r.missing %}<span class="chip failed">source missing</span>{% if r.comment %}<br><span class="muted">Comment in the data file: {{ r.comment|cite(keys) }}</span>{% endif %}
+        {%- else %}
+          {%- if r.source %}{{ r.source|cite(keys) }}{% endif %}
+          {%- if r.figure %}<br><strong>Figure/table:</strong> {{ r.figure }}{% endif %}
+          {%- if r.obtained %}<br><strong>Obtained:</strong> {{ r.obtained }}{% endif %}
+          {%- if r.primary_read %}<br><strong>Primary read:</strong> {{ r.primary_read|cite(keys) }}{% endif %}
+          {%- if r.note %}<br>{{ r.note|cite(keys) }}{% endif %}
+          {%- if r.prose %}<br><span class="muted">{{ r.prose|cite(keys) }}</span>{% endif %}
+          <br><span class="muted" style="font-size:0.72rem">from {{ r.origin }}</span>
+        {%- endif %}
+        {%- if r.problem and not r.missing %}<br><span class="todo">{{ r.problem }}</span>{% endif %}
+      </td>
+      <td style="white-space:normal;font-size:0.8rem">{{ r.species or '—' }}</td>
+      <td style="white-space:normal;font-size:0.8rem">{% if r.kind_label == 'not stated' %}<span class="muted">not stated</span>{% else %}{{ r.kind_label }}{% endif %}</td>
+      <td style="white-space:normal;font-size:0.8rem">{{ r.role }}{% if r.stated_role %}<br><span class="todo" title="the Role label disagrees with the item's place in the data">labelled: {{ r.stated_role }}</span>{% endif %}</td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
