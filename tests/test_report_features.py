@@ -1,14 +1,16 @@
 """
 Unit tests of the report's informational features: the licence / creator keys, the contents summary
-bar, the libcellml unit-consistency check (mapped to equations) and the supermodule structure view.
-No model is generated or simulated.
+bar, the libcellml unit-consistency check (mapped to equations), the supermodule structure view and
+the version's figures. No model is generated or simulated.
 """
+import dataclasses
 import json
 import os
+import shutil
 from types import SimpleNamespace
 
 from cam_testing import checks, report
-from cam_testing.library import (DEFAULT_LICENCE, load_version, normalise_config_entry, to_phlynx_entry,
+from cam_testing.library import (DEFAULT_LICENCE, ModuleType, load_version, normalise_config_entry, to_phlynx_entry,
                                  with_record_keys)
 
 
@@ -120,6 +122,41 @@ def test_unit_consistency_nothing_shown_when_consistent(tmp_path):
     assert report.unit_consistency_context(v, []) is None
 
 
+VARIABLE_EXPONENT = '<apply><divide/><apply><power/><ci>x</ci><ci>n</ci></apply><apply><power/><ci>x</ci><apply><minus/><ci>n</ci><cn cellml:units="dimensionless">1</cn></apply></apply></apply>'
+
+
+def _with_variable_exponent(cellml):
+    '''z = x^n / x^(n-1): metre for every n, but libcellml can only check it for a given value of n.'''
+    return (cellml.replace('<variable name="V" public_interface="in" units="volt"/>',
+                           '<variable name="V" public_interface="in" units="volt"/>\n        '
+                           '<variable name="n" public_interface="in" units="dimensionless"/>')
+                  .replace('<apply><eq/><ci>z</ci><ci>x</ci></apply>', f'<apply><eq/><ci>z</ci>{VARIABLE_EXPONENT}</apply>'))
+
+
+def test_unit_consistency_variable_exponent_is_not_checked_rather_than_inconsistent(tmp_path):
+    consistent = TINY_CELLML.replace('<apply><plus/><ci>x</ci><ci>V</ci></apply>', '<ci>x</ci>')
+    v = _tiny_version(tmp_path, _with_variable_exponent(consistent))
+    r = checks.unit_consistency(v)
+    assert r['status'] == checks.UNITS_NOT_CHECKED
+    assert r['n_failures'] == 0 and r['n_equations'] == 0
+    assert r['message'] == '1 equation libcellml can check only for particular values of a variable exponent'
+    (f,) = r['failures']
+    assert f['kind'] == 'conditional' and f['variable'] == 'z' and f['equation_index'] == 2
+    # the page still lists the equation, so it can be checked by hand
+    ctx = report.unit_consistency_context(v, ['eq0', 'eq1', 'eq2'])
+    assert [g['latex'] for g in ctx['equations']] == ['eq2']
+
+
+def test_unit_consistency_variable_exponent_beside_a_real_failure(tmp_path):
+    v = _tiny_version(tmp_path, _with_variable_exponent(TINY_CELLML))
+    r = checks.unit_consistency(v)
+    assert r['status'] == checks.UNITS_INCONSISTENT
+    assert r['n_failures'] == 1 and r['n_equations'] == 1
+    assert r['message'] == ('1 equation with inconsistent units; '
+                            '1 equation libcellml can check only for particular values of a variable exponent')
+    assert sorted(f['kind'] for f in r['failures']) == ['conditional', 'not equivalent']
+
+
 def test_unit_consistency_not_applicable_to_a_supermodule():
     assert checks.unit_consistency(load_version('neuron', 'sympathetic'), save=False)['status'] == checks.NOT_APPLICABLE
 
@@ -160,3 +197,80 @@ def test_nested_supermodule_shows_its_outside_coupling():
     assert any(x['part'] == 'membrane' and x['external'] == 'axon' and x['direction'] == 'out'
                and x['where'][0]['name'] == 'neuron/sympathetic' for x in sv['external'])
     assert report.supermodule_structure(load_version('Lotka_Volterra', 'Lotka1925_v01')) is None
+
+
+# ---- figures ------------------------------------------------------------------------------------
+
+def _version_with_figures(tmp_path, figures):
+    '''Lotka-Volterra copied under tmp_path, with tests.yaml "figures" set to figures.'''
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    mt = ModuleType(v.mtype.name, str(tmp_path))
+    shutil.copytree(v.dir, os.path.join(mt.versions_dir, v.name))
+    return dataclasses.replace(v, mtype=mt, spec=dict(v.spec, figures=figures))
+
+
+def test_version_page_shows_its_figures(tmp_path):
+    w = _version_with_figures(tmp_path, [{'file': 'cycle.svg', 'caption': 'The predator-prey **cycle**'}])
+    os.makedirs(w.figures_dir)
+    with open(os.path.join(w.figures_dir, 'cycle.svg'), 'w') as f:
+        f.write('<svg xmlns="http://www.w3.org/2000/svg"/>')
+    assert w.figures() == [{'file': 'figures/cycle.svg', 'caption': 'The predator-prey **cycle**', 'missing': False}]
+    assert w.figure_problems() == []
+    html = report._env().get_template('version.html').render(**report.version_context(w))
+    assert '<img src="figures/cycle.svg"' in html and 'The predator-prey <strong>cycle</strong>' in html
+
+
+def test_figure_problems_and_a_missing_figure(tmp_path):
+    w = _version_with_figures(tmp_path, ['gone.png', {'file': '../escape.svg', 'caption': 'outside'},
+                                         {'file': 'notes.txt', 'caption': 'not an image'}])
+    assert w.figure_problems() == ['figures: gone.png is not in figures/', 'figures: gone.png has no caption',
+                                   'figures: ../escape.svg is not an image (svg, png, jpg) directly in figures/',
+                                   'figures: notes.txt is not an image (svg, png, jpg) directly in figures/']
+    html = report._env().get_template('version.html').render(**report.version_context(w))
+    assert 'Missing figure <code>figures/gone.png</code>' in html
+
+
+def test_a_version_without_figures_has_no_figures_section():
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    assert v.figures() == []
+    html = report._env().get_template('version.html').render(**report.version_context(v))
+    assert 'aria-label="Figures"' not in html
+
+
+def test_assembled_site_holds_the_images_its_version_page_links_to(tmp_path):
+    '''GitHub Pages serves site/ alone: a version's figures/ and its parameterisations' source_figures/
+    images are copied beside its page, at the paths the page's <img src> give (and nothing else from them).'''
+    import re
+    import external_repo
+    from cam_testing import paths
+    root = external_repo.make(str(tmp_path / 'repo'))
+    vdir = os.path.join(root, 'modules', 'boundary_conditions', external_repo.MT, 'versions', external_repo.VERSION)
+    svg = '<svg xmlns="http://www.w3.org/2000/svg"/>'
+    os.makedirs(os.path.join(vdir, 'figures'))
+    with open(os.path.join(vdir, 'figures', 'bond_graph.svg'), 'w') as f:
+        f.write(svg)
+    with open(os.path.join(vdir, f'{external_repo.MT}_{external_repo.VERSION}_tests.yaml'), 'a') as f:
+        f.write('figures:\n  - file: bond_graph.svg\n    caption: The bond graph\n')
+    sf_dir = os.path.join(vdir, 'parameterisations', 'default', 'source_figures')
+    os.makedirs(sf_dir)
+    with open(os.path.join(sf_dir, 'fig2.png'), 'wb') as f:
+        f.write(b'\x89PNG\r\n\x1a\n')
+    with open(os.path.join(sf_dir, 'source_figures.json'), 'w') as f:
+        json.dump([{'file': 'fig2.png', 'source': 'Author2000 Fig. 2', 'caption': 'outlet pressure'}], f)
+    try:
+        paths.configure(repo_root=root, library_dirs=[external_repo.library_modules_dir()], export=False)
+        report.main(['--module', external_repo.MT, '--site'])
+        site = paths.roots().site_dir
+    finally:
+        paths.reset()
+        report._index_cache.clear()     # main() filled them from the repo under tmp_path
+        report._contents_cache.clear()
+    page = os.path.join(site, 'modules', 'boundary_conditions', external_repo.MT, 'versions', external_repo.VERSION,
+                        f'{external_repo.MT}_{external_repo.VERSION}.html')
+    with open(page) as f:
+        srcs = re.findall(r'<img src="([^"]+)"', f.read())
+    assert 'figures/bond_graph.svg' in srcs and 'parameterisations/default/source_figures/fig2.png' in srcs
+    missing = [s for s in srcs if not os.path.isfile(os.path.join(os.path.dirname(page), s))]
+    assert missing == []
+    assert not os.path.exists(os.path.join(os.path.dirname(page), 'parameterisations', 'default', 'source_figures',
+                                           'source_figures.json'))
