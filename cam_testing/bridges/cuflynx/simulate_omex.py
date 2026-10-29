@@ -23,6 +23,8 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+import xml.etree.ElementTree as ET
+import zipfile
 
 DEFAULT_BIN = os.path.expanduser('~/software/CUFLynx')
 
@@ -36,6 +38,70 @@ def _req(method, url, data=None, timeout=600):
             return r.status, json.loads(r.read().decode() or 'null')
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode(errors='replace')
+
+
+def constant_values(cellml_text):
+    """{"component/variable": value} for each variable of a flattened model that holds a constant: its own numeric
+    initial_value, or that of a variable it is connected to (e.g. instance_parameters/v_1 -> mod/v_1)."""
+    root = ET.fromstring(cellml_text)
+    tag = lambda e: e.tag.rsplit('}', 1)[-1]
+    parent = {}
+
+    def find(x):
+        while parent.setdefault(x, x) != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    values = {}
+    for comp in root.iter():
+        if tag(comp) != 'component':
+            continue
+        for var in comp:
+            if tag(var) == 'variable':
+                name = f"{comp.get('name')}/{var.get('name')}"
+                find(name)
+                try:
+                    values[name] = float(var.get('initial_value'))
+                except (TypeError, ValueError):
+                    pass
+    for conn in root.iter():
+        if tag(conn) != 'connection':
+            continue
+        c1, c2 = conn.get('component_1'), conn.get('component_2')
+        for mv in conn:
+            if tag(mv) == 'map_variables':
+                parent[find(f"{c1}/{mv.get('variable_1')}")] = find(f"{c2}/{mv.get('variable_2')}")
+    group_value = {find(n): v for n, v in values.items()}
+    return {n: group_value[find(n)] for n in parent if find(n) in group_value}
+
+
+def master_cellml(omex_path):
+    """The archive's model: its manifest's master CellML, else its first .cellml."""
+    with zipfile.ZipFile(omex_path) as z:
+        names = z.namelist()
+        master = None
+        if 'manifest.xml' in names:
+            for e in ET.fromstring(z.read('manifest.xml')).iter():
+                if e.get('master') == 'true' and (e.get('location') or '').endswith('.cellml'):
+                    master = e.get('location').lstrip('./')
+        master = master if master in names else next((n for n in names if n.endswith('.cellml')), None)
+        return z.read(master).decode() if master else None
+
+
+def add_constant_outputs(res, requested, omex_path):
+    """A requested output the run left out that is a constant of the model (CUFLynx's simulate returns states and
+    computed variables, not constants) is reported as its value at every output time."""
+    missing = [o for o in requested if o not in res['outputs']]
+    if not missing or not res.get('time'):
+        return
+    text = master_cellml(omex_path)
+    constants = constant_values(text) if text else {}
+    added = [o for o in missing if o in constants]
+    for o in added:
+        res['outputs'][o] = [constants[o]] * len(res['time'])
+    if added:
+        res['constant_outputs'] = added
 
 
 def _upload(url, path, timeout=600):
@@ -120,6 +186,7 @@ def run(job, binary):
                 else:
                     res['time'] = out.get('time') or []
                     res['outputs'] = out.get('outputs') or {}
+                    add_constant_outputs(res, list(m.get('extra_outputs') or []), m['omex'])
                     res['n_points'] = len(res['time'])
                     res['ok'] = res['n_points'] > 1 and bool(res['outputs'])
                     res['stage'] = 'done'
