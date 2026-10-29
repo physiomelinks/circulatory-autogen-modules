@@ -27,7 +27,7 @@ def _fake_version(tmp_path, name='v', supermodule=False, module_format='cellml')
     vdir.mkdir(parents=True, exist_ok=True)
     stem = f'mt_{name}'
     v = SimpleNamespace(name=name, vessel_type='mt', key=f'mt/{name}', id=f'mt__{name}', stem=stem, dir=str(vdir),
-                        results_dir=str(vdir / 'results'), plots_dir=str(vdir / 'plots'),
+                        results_dir=str(vdir / 'results'), plots_dir=str(vdir / 'plots'), figures_dir=str(vdir / 'figures'),
                         html_path=str(vdir / f'{stem}.html'), is_supermodule=supermodule,
                         config={'module_format': module_format}, spec={})
     v.path = lambda suffix: str(vdir / f'{stem}_{suffix}')
