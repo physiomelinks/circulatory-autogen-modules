@@ -172,13 +172,22 @@ def test_supermodule_structure_of_the_sympathetic_neuron():
     edges = {(e['src'], e['src_inner'], e['dst'], e['dst_inner']): e for e in sv['edges']}
     assert set(edges) == {('soma', 'membrane', 'axon', None), ('axon', None, 'varicosity', 'membrane')}
     assert edges[('soma', 'membrane', 'axon', None)]['ports'] == ['VI_port']
-    # the supermodule's parameterisation overrides the axon's parameters (rows axon/<var>); R, F, T are globals
-    assert {o['name'] for o in parts['axon']['overrides']} >= {'axon/d_ax', 'axon/L_ax', 'axon/R_i'}
-    assert {o['var'] for o in parts['axon']['overrides']} >= {'d_ax', 'L_ax', 'R_i'}
+    # its template gives the axon its version's default values, so it sets nothing of its own; R, F, T
+    # are globals
+    assert parts['axon']['overrides'] == []
     assert {'R', 'F', 'T'} <= set(sv['globals'])
     assert 'click p_soma' in sv['mermaid'] and 'p_soma -->' in sv['mermaid']
     assert [n['name'] for n in sv['tree']] == ['soma', 'axon', 'varicosity']
     assert sv['tree'][0]['children']
+
+
+def test_supermodule_structure_of_the_heart_shows_what_it_sets_for_each_chamber():
+    sv = report.supermodule_structure(load_version('heart', 'Argus2026_v01'))
+    parts = {p['name']: p for p in sv['parts']}
+    # the template's values that differ from the chamber's default
+    assert {o['name'] for o in parts['lv']['overrides']} == {'lv/E_A', 'lv/E_B', 'lv/q_init'}
+    assert {o['var'] for o in parts['ra']['overrides']} >= {'E_A', 'E_B', 'q_us', 'q_init'}
+    assert parts['clock']['overrides'] == []
 
 
 def test_nested_supermodule_shows_its_outside_coupling():

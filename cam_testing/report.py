@@ -17,11 +17,12 @@ import argparse
 import datetime
 import json
 import os
+import re
 import shutil
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, checks, module_array, phlynx, ranges, risk
+from cam_testing import bib, checks, library, module_array, phlynx, ranges, risk
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -116,10 +117,11 @@ TEST_ABOUT = {
     'phlynx_equivalence_test': 'Compares CUFLynx\'s simulation of the PhLynx-built model with libcuflynx\'s '
                                'model of the same network (outputs matched by instance and variable, '
                                'normalised difference within 1e-6).',
-    'supermodule_structure_test': 'Every submodule is a library version with an existing parameterisation, '
-                                  'internal connections name sibling submodules, and the parameterisation\'s '
-                                  'parameters name '
-                                  'submodules or declared globals.',
+    'supermodule_structure_test': 'Its module array (<module_type>_<version>_module_array.json) loads with '
+                                  'libcuflynx: every submodule is a library version its config lists in '
+                                  'submodule_versions and internal connections name sibling submodules; each '
+                                  'parameterisation (nested JSON) gives its instances their own variables, and its '
+                                  'globals are declared.',
     'supermodule_equivalence_test': 'A system model using this supermodule version reproduces the system model '
                                     'with its submodules written out, output for output.',
     'coupled_validation_test': 'The version in use in the coupled system models its spec lists (coupled_systems): '
@@ -194,12 +196,12 @@ def _not_run_reason(version, test):
     from cam_testing.pytest_plugin import QUICK_TESTS
     if not getattr(version, 'reviewed', True) and test not in QUICK_TESTS:
         return ('Not run: the version is not reviewed yet, and CI runs only the quick tests (Run, the '
-                'PhLynx -> CUFLynx pipeline) for such versions. It runs the full set once the version is '
-                'reviewed (locally: pytest --include-unreviewed).')
+                'supermodule tests, the PhLynx -> CUFLynx pipeline) for such versions. It runs the full set '
+                'once the version is reviewed (locally: pytest --include-unreviewed).')
     return 'This test has not been run yet.'
 
 
-def _test_entry(version, test, r, spec_block=None, title=None):
+def _test_entry(version, test, r, spec_block=None, title=None, parameterisation=None):
     base = test.split('__')[0]
     return {
         'key': test, 'title': title or TEST_TITLES.get(base, test), 'short': TEST_SHORT.get(base, test),
@@ -208,10 +210,45 @@ def _test_entry(version, test, r, spec_block=None, title=None):
         'message': r.message if r else _not_run_reason(version, base),
         'metrics': r.metrics if r else {}, 'plots': r.plots if r else [],
         'details': r.details if r else [], 'timestamp': r.timestamp if r else '',
-        'known_issue': (version.spec.get('expected_failures') or {}).get(test),
+        'known_issue': checks.expected_failure(version, test, parameterisation),
         'proposed_data': (spec_block or {}).get('status') == checks.PROPOSED,
         'links': [],          # related version pages (version_calibration in a supermodule)
     }
+
+
+def caption_parts(caption):
+    '''{'caption_lead', 'caption_rest'}: a source figure's caption split after its first sentence (a
+    full stop followed by a capital letter), so the page shows what the figure is and folds the
+    extraction notes that follow.'''
+    lead, *rest = re.split(r'(?<=\.)\s+(?=[A-Z])', caption or '', maxsplit=1)
+    return {'caption_lead': lead.strip(), 'caption_rest': ' '.join(rest).strip()}
+
+
+def figure_rows(plots, plot_items, figures):
+    '''
+    The rows of a parameterisation test's two columns, "From the paper" (source figures) and its
+    result plots: [{'figures': [figure], 'plots': [{'file', 'item'}]}]. ``plot_items``, parallel to
+    ``plots`` (None when unknown), names each plot's data item, or lists the items of a plot that
+    overlays several. Each figure pairs with the plots of the items library.figure_items gives it (the
+    items its "items" lists, or every item when it is the only figure and no figure lists items).
+    Paired rows come first in plot order, then each unpaired plot, then each unpaired figure, in a row
+    of its own with the other column empty.
+    '''
+    items = list(plot_items or [])
+    plotted = [{'file': p, 'item': items[n] if n < len(items) else None} for n, p in enumerate(plots)]
+    names = [i for p in plotted for i in (p['item'] if isinstance(p['item'], list) else [p['item']])]
+    figure_of = {i: k for k, group in enumerate(library.figure_items(figures, names)) for i in group}
+    rows, row_of, unpaired = [], {}, []
+    for p in plotted:
+        k = figure_of.get(p['item'][0] if isinstance(p['item'], list) else p['item'])
+        if k is None:
+            unpaired.append({'figures': [], 'plots': [p]})
+        elif k in row_of:
+            row_of[k]['plots'].append(p)
+        else:
+            row_of[k] = {'figures': [figures[k]], 'plots': [p]}
+            rows.append(row_of[k])
+    return rows + unpaired + [{'figures': [f], 'plots': []} for k, f in enumerate(figures) if k not in row_of]
 
 
 def parameterisation_context(version, inst):
@@ -230,14 +267,17 @@ def parameterisation_context(version, inst):
                                   checks.NO_BASELINE_DATA if kind == 'baseline' else checks.NO_CALIBRATION_DATA)
             elif v.get('status', checks.PENDING) in (checks.PENDING, checks.SKIPPED, checks.NOT_APPLICABLE):
                 r = checks.Result(test, v.get('status', checks.PENDING), v.get('reason', 'no validation data chosen yet'))
-        entry = _test_entry(version, test, r, v, title=FIT_CHECK_TITLE if v.get('kind') == 'fit_check' else None)
+        entry = _test_entry(version, test, r, v, title=FIT_CHECK_TITLE if v.get('kind') == 'fit_check' else None,
+                            parameterisation=inst)
         if v.get('kind') == 'fit_check':
             entry['short'] = 'Fit check'
             entry['about'] = v.get('note') or FIT_CHECK_ABOUT
         entry['anchor'] = f'{inst.name}--{test}'
         # the publication figures the data were extracted from, shown beside the test's plots
-        entry['source_figures'] = inst.source_figures()
+        entry['source_figures'] = [dict(sf, **caption_parts(sf.get('caption'))) for sf in inst.source_figures()]
         entry['source_figures_missing'] = inst.needs_source_figures() and not entry['source_figures']
+        entry['figure_rows'] = figure_rows(entry['plots'], entry['metrics'].get('plot_items'), entry['source_figures'])
+        entry['results_heading'] = 'Calibration results' if kind == 'calibrate' else 'Model vs data'
         tests.append(entry)
     calibration = None
     if os.path.isfile(inst.calibration_path):
@@ -251,7 +291,7 @@ def parameterisation_context(version, inst):
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
             'omex_status': omex_result.status if omex_result else None,
             'omex_message': omex_result.message if omex_result else 'not checked yet (tests/test_parameterisation_omex.py)',
-            'omex_known_issue': (version.spec.get('expected_failures') or {}).get('cuflynx_parameterisation_omex_test'),
+            'omex_known_issue': checks.expected_failure(version, 'cuflynx_parameterisation_omex_test', inst),
             'n_parameters': len(inst.parameters()), 'obs_data_name': inst.obs_data_name,
             'has_obs_data': inst.has_obs_data, 'calibration': calibration,
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
@@ -583,6 +623,13 @@ def _structure_tree(version, from_dir, _depth=0):
     return out
 
 
+def _same_number(a, b):
+    try:
+        return float(a) == float(b)
+    except (TypeError, ValueError):
+        return str(a).strip() == str(b).strip()
+
+
 def supermodule_structure(version):
     '''A supermodule version's parts and connections: {parts, edges, external, globals, mermaid, tree}.
     Edges are the internal connections (inp_instances / out_instances between parts, and a part's
@@ -594,17 +641,27 @@ def supermodule_structure(version):
         return None
     subs = version.submodules
     versions = {s['name']: _sub_version(s) for s in subs}
-    # the supermodule's own parameterisation: rows <part>/<var> (nested: <part>/<its part>/<var>)
-    # override the part's parameterisation; others are globals
+    # what this supermodule sets for a part: its template's values (its default parameterisation, nested by
+    # part) that differ from the part's version's default parameterisation; the template's globals
     overrides, global_rows = {}, []
+    try:
+        instance_parameters = version.instance_parameters
+    except ValueError:
+        instance_parameters = {}       # the structure test reports it
+    for name, inst in instance_parameters.items():
+        sv = versions.get(name)
+        defaults = {} if sv is None or sv.is_supermodule else \
+            {q.variable_name: q.value for q in sv.default_parameterisation.parameters()}
+        for var, q in inst.items():
+            if var in defaults and _same_number(defaults[var], q['value']):
+                continue
+            overrides.setdefault(name, {})[f'{name}/{var}'] = {
+                'name': f'{name}/{var}', 'var': var.rpartition('/')[2], 'value': str(q['value']),
+                'units': q.get('units', '')}
     for p in version.default_parameterisation.parameters():
-        path, _, var = p.variable_name.rpartition('/')
-        owner = path.split('/')[0] if path else None
-        if owner not in versions:
+        if '/' not in p.variable_name:
             global_rows.append({'name': p.variable_name, 'value': p.value, 'units': p.units})
-        else:
-            overrides.setdefault(owner, []).append({'name': p.variable_name, 'var': var,
-                                                    'value': p.value, 'units': p.units})
+    overrides = {k: list(v.values()) for k, v in overrides.items()}
     sup_globals = set(version.supermodule_globals)
 
     edges = {}
@@ -674,7 +731,7 @@ def supermodule_structure(version):
         uses = _global_names(sv) if sv is not None else set()
         parts.append({
             'name': s['name'], 'module_type': s['module_type'], 'version': s['module_subtype'],
-            'parameterisation': module_array.parameterisation_of(s, '(default)'), 'is_supermodule': bool(sv and sv.is_supermodule),
+            'is_supermodule': bool(sv and sv.is_supermodule),
             'n_parts': len(sv.submodules) if sv is not None and sv.is_supermodule else 0,
             'href': os.path.relpath(sv.html_path, version.dir) if sv is not None else None,
             'missing': sv is None, 'ports': ports,

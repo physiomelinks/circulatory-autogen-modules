@@ -3,7 +3,7 @@ System models: system_models/<category>/<model>/ (at the repo root; not modules,
 
 Each system dir holds the model built from this module library (<model>_module_array.json, whose
 records (instances) name a module_type, its version (module_subtype) and the parameterisation
-it uses, and <model>_parameters.csv, whose values win over the parameterisations'), the reference it must reproduce under
+it uses, and <model>_parameters.json, whose values win over the parameterisations'), the reference it must reproduce under
 reference/, and a spec <model>_system.yaml. The model is generated with every module library
 (cam_testing.paths: this repo's modules/, then the extra ones), so its records may name versions of
 either. The reference is one of:
@@ -112,7 +112,7 @@ def generate(system, work_dir, reference=False, quiet=True):
     out_dir = os.path.join(work_dir, 'reference' if reference else 'library')
     config = {
         'file_prefix': system.name,
-        'input_param_file': f'{system.name}_parameters.csv',
+        'input_param_file': f'{system.name}_parameters.json',
         'model_type': 'cellml', 'solver': 'CVODE_myokit',
         'resources_dir': resources, 'generated_models_dir': out_dir, 'DEBUG': False,
     }
@@ -161,6 +161,17 @@ def all_component_names(helper, ignore_components=REFERENCE_CELLML_IGNORED_COMPO
     return out
 
 
+def time_variable_names(helper):
+    '''The names ('vessel/var' and 'component/var') of the model's free variable, which simulate()
+    returns as t. Myokit binds one variable to time; a helper without a Myokit model has none here.'''
+    model = getattr(helper, 'model', None)
+    time = model.time() if model is not None and hasattr(model, 'time') else None
+    if time is None:
+        return set()
+    qname = time.qname()
+    return {qname.replace('_module.', '/', 1), qname.replace('.', '/', 1)}
+
+
 def simulate(model_path, spec, solver_info, names=None, ignore_components=None):
     '''Runs a model; returns (t, {qualified name 'vessel/var': array}). names=None: a generated
     model's vessel outputs; with ignore_components (a ready CellML reference): every component's.'''
@@ -173,9 +184,13 @@ def simulate(model_path, spec, solver_info, names=None, ignore_components=None):
     if names is None and ignore_components is not None:
         names = all_component_names(helper, ignore_components)
     if names is None:
-        # vessel outputs, plus the multi_port "sum" totals (component sum_blood_volume)
-        names = [n.replace('_module.', '/', 1).replace('sum_blood_volume.', 'sum_blood_volume/', 1)
-                 for n in helper.get_all_variable_names() if '_module.' in n or n.startswith('sum_blood_volume.')]
+        # vessel outputs, plus the multi_port "sum" totals (components multiport_sum_<module>_<variable>)
+        names = [n.replace('_module.', '/', 1) if '_module.' in n else n.replace('.', '/', 1)
+                 for n in helper.get_all_variable_names() if '_module.' in n or n.startswith('multiport_sum_')]
+    # time is returned as t, not as an output: the solver merges every module's t into one variable
+    # and names it after whichever component it picks, which differs between runs
+    time_names = time_variable_names(helper)
+    names = [n for n in names if n not in time_names]
     t = np.asarray(helper.get_time(), dtype=float)
     out = {}
     for name in names:
