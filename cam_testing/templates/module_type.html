@@ -1,5 +1,5 @@
 {%- macro chip(status, label=None) -%}
-<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
+<span class="chip {{ status or 'none' }}">{{ label or {'passed':'Passed','partial':'Partial','failed':'Failed','skipped':'Skipped','pending':'Pending','not_applicable':'N/A','passed_in_super':'Pass in super','failed_in_super':'Fail in super'}.get(status, 'Not run') }}</span>
 {%- endmacro -%}
 <!doctype html>
 <html lang="en">
@@ -30,7 +30,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
   <header>
     <div class="eyebrow">circulatory-autogen-modules · {{ location or 'modules' }} · module_type</div>
     <h1>{{ name }}</h1>
-    <p>{{ n_versions }} version{{ '' if n_versions == 1 else 's' }} (each a <code>module_subtype</code>, with its own CellML, config, units and tests) and {{ n_instances }} instance{{ '' if n_instances == 1 else 's' }} (parameter sets of a version). Open a version for its equations, parameters, test results and instances.</p>
+    <p>{{ n_versions }} version{{ '' if n_versions == 1 else 's' }} (each a <code>module_subtype</code>, with its own CellML, config, units and tests) and {{ n_parameterisations }} parameterisation{{ '' if n_parameterisations == 1 else 's' }} (parameter sets of a version: the same maths, other values). Open a version for its equations, parameters, test results and parameterisations.</p>
     <div class="meta">
       {%- if parent %}<span>Nested in <a href="../{{ parent }}.html">{{ parent }}</a></span>{% endif %}
       {%- if nested %}<span>Nested module_types: {% for n in nested %}<a href="{{ n }}/{{ n }}.html">{{ n }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</span>{% endif %}
@@ -41,7 +41,7 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
       <span>Report generated {{ generated }}</span>
     </div>
     <div class="counts">
-      {{ chip('passed', counts.passed ~ ' passed') }} {{ chip('failed', counts.failed ~ ' failed') }}
+      {{ chip('passed', counts.passed ~ ' passed') }} {{ chip('partial', (counts.partial or 0) ~ ' partial') }} {{ chip('failed', counts.failed ~ ' failed') }}
       {{ chip('pending', counts.pending ~ ' pending') }} {{ chip('skipped', counts.skipped ~ ' skipped') }}
       {%- if counts.not_applicable %} {{ chip('not_applicable', counts.not_applicable ~ ' N/A') }}{% endif %}
       {%- if counts[None] %} {{ chip(None, counts[None] ~ ' not run') }}{% endif %}
@@ -52,27 +52,37 @@ footer { color: var(--ink-3); font-size: 0.8rem; }
     <h2 id="versions-h">Versions</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Version</th><th>Component</th><th>Contents</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}<th>Instances</th><th>Calibration</th><th>Sourced</th><th>Max P(fail)</th><th>Status</th></tr></thead>
+        <thead><tr><th>Version</th><th>Parameterisation</th><th>Component</th><th>Contents</th>{% for k in test_keys %}<th>{{ test_short[k] }}</th>{% endfor %}{% for h in param_cols %}<th>{{ h }}</th>{% endfor %}<th>Sourced</th><th>Max P(fail)</th><th>Status</th></tr></thead>
         <tbody>
+        {%- macro p_cells(i) -%}
+          {%- for t in i.tests %}<td title="{{ t.message }}"><a href="{{ v_href }}#{{ t.anchor }}" style="text-decoration:none">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}</a></td>{% endfor %}
+          <td title="{{ i.omex_known_issue or i.omex_message }}">{% if i.omex_known_issue and i.omex_status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(i.omex_status) }}{% endif %}</td>
+        {%- endmacro %}
         {%- for v in versions %}
+          {%- set v_href = v.href %}
+          {%- set default = (v.parameterisations|selectattr('is_default')|first) if v.parameterisations else None %}
           <tr>
-            <td class="name"><a href="{{ v.href }}">{{ v.version }}</a></td>
+            <th scope="row" class="rowhead name"><a href="{{ v.href }}">{{ v.version }}</a></th>
+            <th scope="row" class="rowhead mono">{% if default %}<a href="{{ v.href }}#parameterisations">{{ default.name }}</a> <span class="muted">(default)</span>{% endif %}</th>
             <td class="mono" style="font-size:0.78rem">{% if v.is_supermodule %}supermodule ({{ v.submodules|length }} submodules){% else %}{{ v.component_type }}{% if v.format != 'cellml' %} ({{ v.format }}){% endif %}{% endif %}</td>
             <td class="contents">{% for k in v.contents %}<span title="{{ k.about }}"><a href="{{ v.href }}{{ k.href }}" style="color:inherit;text-decoration:none">{{ k.count }} {{ k.short }}</a></span>{% if not loop.last %} · {% endif %}{% endfor %}
               {%- if v.unit_failures %}<br><a href="{{ v.href }}#unit-consistency" class="todo" title="libcellml unit checks: undefined units or equations whose units are inconsistent (informational)">{{ v.unit_failures }} unit issue{{ '' if v.unit_failures == 1 else 's' }}</a>{% elif v.unit_status == 'not_checked' %}<br><a href="{{ v.href }}#unit-consistency" class="todo" title="libcellml could not check the equations' units">units not checked</a>{% endif %}</td>
             {%- for t in v.tests %}<td title="{{ t.message }}">{% if t.known_issue and t.status == 'failed' %}{{ chip('failed', 'Known issue') }}{% else %}{{ chip(t.status) }}{% endif %}{% for l in t.links %}<br><a href="{{ l.href_module }}" style="font-size:0.74rem" class="mono">{{ l.key }}</a>{% endfor %}</td>{% endfor %}
-            <td class="wrap-cell mono">{% for i in v.instances %}{{ i.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
-            <td class="wrap-cell">{% for i in v.instances %}{% if i.calibrate %}<span class="mono">{{ i.name }}</span> {{ chip(i.calibrate.status) }}{% if not loop.last %}<br>{% endif %}{% endif %}{% endfor %}</td>
+            {%- if default %}{{ p_cells(default) }}{% else %}{% for h in param_cols %}<td></td>{% endfor %}{% endif %}
             <td class="num">{{ '✓ all' if v.all_sourced else v.n_sourced ~ ' / ' ~ v.n_parameters }}</td>
             <td class="num">{{ '%.2f'|format(v.max_risk) if v.max_risk is not none else '—' }}</td>
             <td>{{ 'Reviewed' if v.reviewed else 'Not reviewed yet' }}</td>
           </tr>
-          {%- if v.notes %}<tr><td></td><td colspan="{{ test_keys|length + 8 }}" class="muted" style="white-space:normal;font-size:0.8rem">{{ v.notes }}</td></tr>{% endif %}
+          {%- for i in v.parameterisations if not i.is_default %}
+          <tr><th scope="row" class="rowhead"></th><th scope="row" class="rowhead mono"><a href="{{ v.href }}#parameterisations">{{ i.name }}</a></th><td></td><td></td>
+            {%- for k in test_keys %}<td></td>{% endfor %}{{ p_cells(i) }}<td></td><td></td><td></td></tr>
+          {%- endfor %}
+          {%- if v.notes %}<tr><th scope="row" class="rowhead"></th><th scope="row" class="rowhead"></th><td colspan="{{ test_keys|length + param_cols|length + 5 }}" class="muted" style="white-space:normal;font-size:0.8rem">{{ v.notes }}</td></tr>{% endif %}
         {%- endfor %}
         </tbody>
       </table>
     </div>
-    <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has the same test columns. <span class="chip not_applicable">N/A</span> means the test doesn't apply to that version (hover for the reason, e.g. "not a supermodule" or a C++ version); <span class="chip none">Not run</span> means it applies but has no result yet. Only a test that ran and passed shows Passed. The Calibration column is the version's: failed when no instance has calibration data (obs_data), except that a version with no calibration data of its own used as a submodule of supermodule versions shows <span class="chip passed_in_super">Pass in super</span> or <span class="chip failed_in_super">Fail in super</span> from those supermodules' calibration (linked). Per instance, an instance without obs_data is N/A for calibration ("no calibration data in this instance") and stays usable in models.</p>
+    <p class="muted" style="margin:0;font-size:0.84rem">Every version, component or supermodule, has the same test columns. <span class="chip not_applicable">N/A</span> means the test doesn't apply to that version (hover for the reason, e.g. "not a supermodule" or a C++ version); <span class="chip none">Not run</span> means it applies but has no result yet. Only a test that ran and passed shows Passed. Each version's first row is its default parameterisation (the one the version tests run with); its other parameterisations follow, one row each, filled only in the parameterisation columns (Baseline, Calibrate, CUFLynx archive). <span class="chip partial">Partial</span> means the test ran and its result is usable but short of the full criterion (e.g. a time-step order below the scheme's across a switch); it isn't a failure. A component's Supermodule structure and reproduces columns show the results of the supermodule versions that use it (linked), and N/A when none does. The Calibration column is the version's: failed when no parameterisation has calibration data (obs_data), except that a version with no calibration data of its own used as a submodule of supermodule versions shows <span class="chip passed_in_super">Pass in super</span> or <span class="chip failed_in_super">Fail in super</span> from those supermodules' calibration (linked). Per parameterisation, a parameterisation without obs_data is N/A for calibration ("no calibration data in this parameterisation") and stays usable in models.</p>
   </section>
   <footer>Generated by <code>python -m cam_testing.report --module {{ name }}</code>.</footer>
 </div>

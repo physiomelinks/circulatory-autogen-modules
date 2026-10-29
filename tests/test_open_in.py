@@ -1,7 +1,7 @@
 """
 The version page's "Open in" links (CellDL for a bond graph, PhLynx for the version's PhLynx export,
-CUFLynx per instance archive), the files the site copies for them, the PhLynx export kept with the
-results, the calibration result in an instance's CUFLynx archive, and the page's base64 encoder
+CUFLynx per parameterisation archive), the files the site copies for them, the PhLynx export kept with the
+results, the calibration result in a parameterisation's CUFLynx archive, and the page's base64 encoder
 (cam_testing/templates/_open_in.js, run under node). No model is generated or simulated.
 """
 import base64
@@ -31,7 +31,7 @@ def _fake_version(tmp_path, name='v', supermodule=False, module_format='cellml')
                         html_path=str(vdir / f'{stem}.html'), is_supermodule=supermodule,
                         config={'module_format': module_format}, spec={})
     v.path = lambda suffix: str(vdir / f'{stem}_{suffix}')
-    v.instances = lambda: []
+    v.parameterisations = lambda: []
     return v
 
 
@@ -110,13 +110,13 @@ def test_supermodule_page_shows_phlynx_not_applicable():
     assert 'PhLynx: N/A' in html and phlynx.NO_SUPERMODULE_SUPPORT.replace('"', '&#34;') in html
 
 
-def test_cuflynx_link_per_instance_archive():
+def test_cuflynx_link_per_parameterisation_archive():
     ctx = report.version_context(load_version('Lotka_Volterra', 'Lotka1925_v01'))
-    instances = ctx['components'][0]['instances']
+    instances = ctx['components'][0]['parameterisations']
     assert instances
     for i in instances:
-        i['omex'] = f'instances/{i["name"]}/Lotka_Volterra_Lotka1925_v01_{i["name"]}.omex'
-    # an instance without a built archive gets no link
+        i['omex'] = f'parameterisations/{i["name"]}/Lotka_Volterra_Lotka1925_v01_{i["name"]}.omex'
+    # a parameterisation without a built archive gets no link
     instances[0]['omex'] = None
     html = _render(ctx)
     links = re.findall(r'<a [^>]*data-cuflynx-omex="([^"]*)"[^>]*>', html)
@@ -172,28 +172,28 @@ def test_keep_archives_copies_exports_and_drops_stale_ones(tmp_path):
     assert not os.path.exists(phlynx.archive_path(failed))
 
 
-# ---- the calibration result in an instance's CUFLynx archive -------------------------------------
+# ---- the calibration result in a parameterisation's CUFLynx archive -----------------------------
 
 def _omex_inputs(tmp_path, monkeypatch, calibrated=True):
     vdir = tmp_path / 'v'
-    idir = vdir / 'instances' / 'base'
+    idir = vdir / 'parameterisations' / 'base'
     idir.mkdir(parents=True)
     stem = 'mt_v'
     version = SimpleNamespace(vessel_type='mt', name='v', id='mt__v', key='mt/v', is_supermodule=False,
                               cellml_path=str(vdir / f'{stem}_modules.cellml'), config_path=str(vdir / f'{stem}_modules_config.json'),
                               units_path=str(vdir / f'{stem}_units.cellml'),
-                              verification_config_path=str(vdir / f'{stem}_verification_config.json'))
+                              verification_config_path=str(vdir / f'{stem}_verification_config.json'), module_array_path=None)
     inst = SimpleNamespace(name='base', dir=str(idir), parameters=lambda: [])
-    for attr, suffix in (('obs_data_path', 'obs_data.json'), ('params_for_id_path', 'params_for_id.csv'),
-                         ('parameters_path', 'parameters.csv'), ('calibration_path', 'calibration.json'),
-                         ('calibrated_parameters_path', 'calibrated_parameters.csv')):
+    for attr, suffix in (('obs_data_path', 'obs_data.json'), ('params_for_id_path', 'params_for_id.json'),
+                         ('parameters_path', 'parameters.json'), ('calibration_path', 'calibration.json'),
+                         ('calibrated_parameters_path', 'calibrated_parameters.json')):
         setattr(inst, attr, str(idir / f'base_{suffix}'))
-    files = {inst.obs_data_path: '{"obs_data_name": "base"}', inst.params_for_id_path: 'vessel_name,param_name\n',
-             inst.parameters_path: 'variable_name,value\n', str(idir / 'SOURCES.md'): '# sources\n',
+    files = {inst.obs_data_path: '{"obs_data_name": "base"}', inst.params_for_id_path: '[]',
+             inst.parameters_path: '{}', str(idir / 'SOURCES.md'): '# sources\n',
              str(idir / 'a_raw_data.csv'): 't,x\n', version.cellml_path: '<model/>', version.config_path: '[]'}
     if calibrated:
         files[inst.calibration_path] = json.dumps({'calibrated_parameters': {'k': 1.5}, 'cost': 0.1})
-        files[inst.calibrated_parameters_path] = 'variable_name,value\nk,1.5\n'
+        files[inst.calibrated_parameters_path] = '{"k": {"value": 1.5}}'
     for path, text in files.items():
         with open(path, 'w') as f:
             f.write(text)
@@ -213,19 +213,20 @@ def test_omex_carries_the_calibration_result_after_the_study(tmp_path, monkeypat
     work = tmp_path / 'work'
     work.mkdir()
     names = [n for n, _, _ in omex.members(version, inst, str(work))]
-    assert names[:6] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.csv', 'base_parameters.csv',
-                         'base_calibration.json', 'base_calibrated_parameters.csv']
-    assert names.count('base_calibration.json') == 1 and names.count('base_calibrated_parameters.csv') == 1
-    # CUFLynx takes the first JSON with "obs" and the first CSV with "param" in its name
+    assert names[:6] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.json', 'base_parameters.json',
+                         'base_calibration.json', 'base_calibrated_parameters.json']
+    assert names.count('base_calibration.json') == 1 and names.count('base_calibrated_parameters.json') == 1
+    # CUFLynx takes the first JSON with "obs" and, with no CSV, the first JSON with "param" in its name
     assert next(n for n in names if n.endswith('.json') and 'obs' in n) == 'base_obs_data.json'
-    assert next(n for n in names if n.endswith('.csv') and 'param' in n) == 'base_params_for_id.csv'
+    assert not any(n.endswith('.csv') and 'param' in n for n in names)
+    assert next(n for n in names if n.endswith('.json') and 'param' in n) == 'base_params_for_id.json'
 
     path = omex.build(version, inst, str(work), str(tmp_path / 'out.omex'))
     with zipfile.ZipFile(path) as z:
         manifest = z.read('manifest.xml').decode()
         assert json.loads(z.read('base_calibration.json'))['calibrated_parameters'] == {'k': 1.5}
     assert ('location="./base_calibration.json" format="http://purl.org/NET/mediatypes/application/json"' in manifest)
-    assert ('location="./base_calibrated_parameters.csv" format="http://purl.org/NET/mediatypes/text/csv"' in manifest)
+    assert ('location="./base_calibrated_parameters.json" format="http://purl.org/NET/mediatypes/application/json"' in manifest)
 
 
 def test_omex_without_a_calibration_result(tmp_path, monkeypatch):
@@ -234,7 +235,7 @@ def test_omex_without_a_calibration_result(tmp_path, monkeypatch):
     work.mkdir()
     names = [n for n, _, _ in omex.members(version, inst, str(work))]
     assert not any('calibrat' in n for n in names)
-    assert names[:4] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.csv', 'base_parameters.csv']
+    assert names[:4] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.json', 'base_parameters.json']
 
 
 # ---- the page's encoder, under node --------------------------------------------------------------

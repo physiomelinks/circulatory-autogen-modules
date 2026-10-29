@@ -10,14 +10,14 @@
     "ranges": {
       "T": {"min": 0.6, "max": 1.5, "points": 5},
       "rho": {"min": 1040, "max": 1070, "points": 3},
-      "Delta_E_lv": {"min": -100000000.0, "max": 100000000.0, "points": 5},
-      "Delta_E_rv": {"min": -30000000.0, "max": 30000000.0, "points": 5},
-      "u_ext_ra": {"min": -1000, "max": 1000, "points": 3},
-      "u_ext_rv": {"min": -1000, "max": 1000, "points": 3},
-      "u_ext_la": {"min": -1000, "max": 1000, "points": 3},
-      "u_ext_lv": {"min": -1000, "max": 1000, "points": 3}
+      "lv/Delta_E": {"min": -100000000.0, "max": 100000000.0, "points": 5},
+      "rv/Delta_E": {"min": -30000000.0, "max": 30000000.0, "points": 5},
+      "ra/u_ext": {"min": -1000, "max": 1000, "points": 3},
+      "rv/u_ext": {"min": -1000, "max": 1000, "points": 3},
+      "la/u_ext": {"min": -1000, "max": 1000, "points": 3},
+      "lv/u_ext": {"min": -1000, "max": 1000, "points": 3}
     },
-    "rationale": "Supermodule default: the globals and the boundary conditions no internal connection closes, alone (no circulation): T 0.6-1.5 s and rho 1040-1070 kg/m3 (as heart vp), l_eff by factors 0.5-2; the venous inflows v_in_ra / v_in_la and the arterial pressures u_out_puv / u_out_aov by factors 0.5-2; Delta_E_lv +-100 MPa/m3 and Delta_E_rv +-30 MPa/m3 (inotropic control, as heart vp); the external pressures u_ext_* +-1 kPa (heart vp's intrathoracic swing). The atrial Delta_E_ra / Delta_E_la (nominal 0, no range in heart vp) are not swept. Each submodule's own parameters are swept in that submodule version's tests."
+    "rationale": "Supermodule default: the globals and the boundary conditions no internal connection closes, with no circulation, fed by the harness inflows into ra and la (inlet_flow at 1e-4 m3/s, not swept: the summing chamber ports make them neighbours, not parameters): T 0.6-1.5 s and rho 1040-1070 kg/m3 (as heart vp), l_eff by factors 0.5-2; the arterial pressures u_out_puv / u_out_aov by factors 0.5-2; Delta_E_lv +-100 MPa/m3 and Delta_E_rv +-30 MPa/m3 (inotropic control, as heart vp); the external pressures u_ext_* +-1 kPa (heart vp's intrathoracic swing). The atrial Delta_E_ra / Delta_E_la (nominal 0, no range in heart vp) are not swept. Each submodule's own parameters are swept in that submodule version's tests."
   },
   "timestep": {
     "scheme": "rk4",
@@ -40,15 +40,30 @@
   "validation": {
     "default": {}
   },
+  "harness": {
+    "module_array": [
+      ["ra_in", "constant", "inlet_flow", "", "mod", "default"],
+      ["la_in", "constant", "inlet_flow", "", "mod", "default"],
+      {"name": "mod", "module_type": "heart", "module_subtype": "Argus2026_v01", "parameterisation": "default", "per_submodule_inputs": {"ra": ["ra_in"], "la": ["la_in"]}}
+    ],
+    "parameters": [
+      ["ra_in/v", "m3_per_s", "0.0001", "harness test value: the venous return into ra (its summing entrance port)"],
+      ["la_in/v", "m3_per_s", "0.0001", "harness test value: the pulmonary venous return into la (its summing entrance port)"]
+    ]
+  },
   "supermodule": {
     "globals": ["T", "rho", "l_eff"],
     "equivalent": [
       {
-        "model": "closed_loop_cvs/3compartment_supermodules",
-        "reproduces": "closed_loop_cvs/3compartment",
+        "model": "closed_loop_cvs/3compartment",
+        "reproduces": "closed_loop_cvs/obsolete_3compartment",
         "instance": "heart",
-        "tol": 1e-09,
-        "solver_info": {"rtol": 1e-10, "atol": 1e-12}
+        "output_map": {"heart/u_ra": "heart/ra/u", "heart/u_rv": "heart/rv/u", "heart/u_la": "heart/la/u", "heart/u_lv": "heart/lv/u", "heart/q_ra": "heart/ra/q", "heart/q_rv": "heart/rv/q", "heart/q_la": "heart/la/q", "heart/q_lv": "heart/lv/q", "heart/v_trv": "heart/trv/v", "heart/v_puv": "heart/puv/v", "heart/v_miv": "heart/miv/v", "heart/v_aov": "heart/aov/v", "heart/zeta_trv": "heart/trv/zeta", "heart/zeta_puv": "heart/puv/zeta", "heart/zeta_miv": "heart/miv/zeta", "heart/zeta_aov": "heart/aov/zeta", "heart/zeta_trv_pre": "heart/trv/zeta_pre", "heart/zeta_puv_pre": "heart/puv/zeta_pre", "heart/zeta_miv_pre": "heart/miv/zeta_pre", "heart/zeta_aov_pre": "heart/aov/zeta_pre", "heart/e_a": "heart/ra/e", "heart/e_v": "heart/lv/e", "heart/s": "heart/clock/s", "heart/mt": "heart/clock/mt", "heart/chi_a": "heart/ra/chi", "heart/chi_v": "heart/lv/chi", "heart/v_asd": "asd_shunt/v", "heart/T_wCont": "heart/clock/T_eff", "heart/chi_afloor": "heart/ra/chi_floor", "heart/chi_vfloor": "heart/lv/chi_floor", "heart/chi_afloor_final": "heart/ra/chi_floor_final", "heart/chi_vfloor_final": "heart/lv/chi_floor_final", "heart/R_lin_trv": "heart/trv/R_lin", "heart/R_lin_puv": "heart/puv/R_lin", "heart/R_lin_miv": "heart/miv/R_lin", "heart/R_lin_aov": "heart/aov/R_lin", "heart/vel_trv": "heart/trv/vel", "heart/vel_puv": "heart/puv/vel", "heart/vel_miv": "heart/miv/vel", "heart/vel_aov": "heart/aov/vel", "heart/E_lv_A_wCont": "heart/lv/E_A_eff", "heart/E_rv_A_wCont": "heart/rv/E_A_eff", "heart/A_eff_trv": "heart/trv/A_eff", "heart/B_trv": "heart/trv/B", "heart/L_trv": "heart/trv/L", "heart/A_eff_puv": "heart/puv/A_eff", "heart/B_puv": "heart/puv/B", "heart/L_puv": "heart/puv/L", "heart/A_eff_miv": "heart/miv/A_eff", "heart/B_miv": "heart/miv/B", "heart/L_miv": "heart/miv/L", "heart/A_eff_aov": "heart/aov/A_eff", "heart/B_aov": "heart/aov/B", "heart/L_aov": "heart/aov/L", "heart/T_ac_wCont": "heart/ra/T_c_eff", "heart/T_ar_wCont": "heart/ra/T_r_eff", "heart/T_vc_wCont": "heart/lv/T_c_eff", "heart/T_vr_wCont": "heart/lv/T_r_eff"},
+        "ignore": {"heart/q_heart": "sum of the four chambers (no single variable after the split)", "heart/q": "sum of the four chambers (no single variable after the split)", "zero_flow/v": "the closed inferior vena cava port: the supermodule model has no such record"},
+        "wrapped": {"heart/mt": 1.0, "heart/chi_afloor": 1.0, "heart/chi_vfloor": 1.0, "heart/chi_afloor_final": 1.0, "heart/chi_vfloor_final": 1.0},
+        "reciprocal": ["heart/L_trv", "heart/L_puv", "heart/L_miv", "heart/L_aov", "heart/B_trv", "heart/B_puv", "heart/B_miv", "heart/B_aov"],
+        "tol": 1e-05,
+        "solver_info": {"rtol": 1e-12, "atol": 1e-14}
       }
     ]
   }

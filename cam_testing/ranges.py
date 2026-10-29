@@ -4,16 +4,15 @@ model's parameter values against them.
 
     tested range     the range each parameter is varied over by verification_test_BC and the
                      joint risk analysis: bc_sweep.ranges in <module_type>_<version>_verification_config.json,
-                     or bc_sweep.factors x the nominal (default instance) value
+                     or bc_sweep.factors x the nominal (default parameterisation) value
     validated spread the values at which the version matched data in a passing validation
-                     test of any of its instances (published parameter intervals and calibrated values)
+                     test of any of its parameterisations (published parameter intervals and calibrated values)
 
-    python -m cam_testing.ranges check --module-array sys_module_array.json --parameters sys_parameters.csv
+    python -m cam_testing.ranges check --module-array sys_module_array.json --parameters sys_parameters.json
         lists each value as inside / outside the tested range and the validated spread, with
         the estimated failure risk near the values (from `make risk`)
 """
 import argparse
-import csv
 import sys
 
 from cam_testing import checks
@@ -56,7 +55,7 @@ def validated_spread(component):
     def add(var, lo, hi):
         spans[var] = [min(spans[var][0], lo), max(spans[var][1], hi)] if var in spans else [lo, hi]
 
-    for inst in component.instances():
+    for inst in component.parameterisations():
         for test, kind in (('validation_test_baseline', 'baseline'), ('validation_test_calibrate', 'calibrate')):
             r = checks.load(component, test, inst)
             if r is None or r.status != checks.PASSED:
@@ -81,9 +80,10 @@ def check(module_array_path, parameters_path, out=sys.stdout):
     from cam_testing import module_array
     vessels = [{'name': r['name'], 'vessel_type': r.get('module_type'), 'BC_type': r.get('module_subtype')}
                for r in module_array.read_records(module_array_path)]
-    with open(parameters_path) as f:
-        values = {r['variable_name'].strip(): r['value'].strip()
-                  for r in csv.DictReader(f, skipinitialspace=True) if r.get('variable_name')}
+    from libcuflynx.utilities import parameters_file as pf
+    from libcuflynx.utilities.parameter_names import model_name
+    # the model's parameters file (nested JSON), by the names the model gives them
+    values = {model_name(r['variable_name']): r['value'] for r in pf.read_parameter_rows(parameters_path)}
     index = _module_index()
     rows, outside, unknown, risks = [], 0, set(), []
     for vessel in vessels:
@@ -139,8 +139,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest='cmd', required=True)
     ch = sub.add_parser('check', help="check a system model's parameters against module ranges")
-    ch.add_argument('--module-array', '--vessel-array', dest='module_array', required=True,
-                    help='the module array (--vessel-array is the old name of this option)')
+    ch.add_argument('--module-array', required=True, help='the module array')
     ch.add_argument('--parameters', required=True)
     args = parser.parse_args(argv)
     return 1 if check(args.module_array, args.parameters) else 0

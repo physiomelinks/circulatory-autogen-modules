@@ -14,24 +14,24 @@
       ["b2", "pv_noI_SI", "simple", "mod", "", "default"]
     ],
     "parameters": [
-      ["q_init_b1", "m3", 0.000253, "test value: same compartment as the component under test"],
-      ["q_0_b1", "m3", 0.0001, "test value: same compartment as the component under test"],
-      ["u_0_b1", "J_per_m3", 0.0, "test value: same compartment as the component under test"],
-      ["C_b1", "m6_per_J", 1.275e-08, "test value: same compartment as the component under test"],
-      ["R_b1", "Js_per_m6", 126700000.0, "test value: same compartment as the component under test"],
+      ["b1/q_init", "m3", 0.000253, "test value: same compartment as the component under test"],
+      ["b1/q_0", "m3", 0.0001, "test value: same compartment as the component under test"],
+      ["b1/u_0", "J_per_m3", 0.0, "test value: same compartment as the component under test"],
+      ["b1/C", "m6_per_J", 1.275e-08, "test value: same compartment as the component under test"],
+      ["b1/R", "Js_per_m6", 126700000.0, "test value: same compartment as the component under test"],
       [
-        "v_out_b1",
+        "b1/v_out",
         "m3_per_s",
         2.083e-05,
         "test value: outflow of the downstream neighbour (open outlet), total half the inflow"
       ],
-      ["q_init_b2", "m3", 0.000253, "test value: same compartment as the component under test"],
-      ["q_0_b2", "m3", 0.0001, "test value: same compartment as the component under test"],
-      ["u_0_b2", "J_per_m3", 0.0, "test value: same compartment as the component under test"],
-      ["C_b2", "m6_per_J", 1.275e-08, "test value: same compartment as the component under test"],
-      ["R_b2", "Js_per_m6", 126700000.0, "test value: same compartment as the component under test"],
+      ["b2/q_init", "m3", 0.000253, "test value: same compartment as the component under test"],
+      ["b2/q_0", "m3", 0.0001, "test value: same compartment as the component under test"],
+      ["b2/u_0", "J_per_m3", 0.0, "test value: same compartment as the component under test"],
+      ["b2/C", "m6_per_J", 1.275e-08, "test value: same compartment as the component under test"],
+      ["b2/R", "Js_per_m6", 126700000.0, "test value: same compartment as the component under test"],
       [
-        "v_out_b2",
+        "b2/v_out",
         "m3_per_s",
         2.083e-05,
         "test value: outflow of the downstream neighbour (open outlet), total half the inflow"
