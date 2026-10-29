@@ -1,0 +1,13 @@
+model: generic_junction_test2b_closed_loop
+category: closed_loop_cvs
+reviewed: false
+sim_time: 2.0
+pre_time: 0.0
+dt: 0.01
+equivalence: {status: not_applicable, reason: 'no reference: circulatory_autogen''s original has a flat heart, and this model
+    uses a heart supermodule; closed_loop_cvs/obsolete_3compartment is the library''s flat-heart check'}
+invariants: []
+notes: ['generic_junction_test2_closed_loop with its two three-ended nodes lined up as the node rule (circulatory_autogen#616)
+    requires: the end alone on its side is compliant (parent arterial pp -> Nout_junction pv, compliant daughter vv -> pv),
+    as circulatory_autogen''s generic_junction_test2b_closed_loop', 'parameters: generic_junction_test_closed_loop''s, as
+    circulatory_autogen''s tests use']
