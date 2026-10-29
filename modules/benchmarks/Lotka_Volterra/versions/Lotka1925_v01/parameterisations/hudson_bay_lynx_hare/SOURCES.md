@@ -18,3 +18,78 @@
 
   - The measurement error is lognormal with σ ≈ 0.25.
   - In the model, hare is the prey `x` and lynx is the predator `y`. Time is in years from 1900.
+
+**Sigma of every item:** 0.25 × the value (checked in the obs_data). This matches the σ ≈ 0.25 of
+Carpenter's lognormal error, but nothing here records that it was chosen for that reason
+(unconfirmed). The scalar features' sigmas follow cam_testing.calibrate.feature_items.
+
+## mod/x
+
+- Kind: measured (pelt counts, thousands, a proxy for the hare population)
+- Role: target
+- Source: hewitt1921conservation, via carpenter2018predator (the Stan example's `hudson-bay-lynx-hare.csv`)
+- Species/preparation: snowshoe hare; Hudson's Bay Company pelt records, 1900–1915
+- Obtained: table values, the Hare column of `hudson_bay_lynx_hare.csv` (16 years)
+- Sigma: 0.25 × value (above).
+
+## mod/y
+
+- Kind: measured (pelt counts, thousands, a proxy for the lynx population)
+- Role: target
+- Source: hewitt1921conservation, via carpenter2018predator (the Stan example's `hudson-bay-lynx-hare.csv`)
+- Species/preparation: Canada lynx; Hudson's Bay Company pelt records, 1900–1915
+- Obtained: table values, the Lynx column of `hudson_bay_lynx_hare.csv` (16 years)
+- Sigma: 0.25 × value (above).
+
+## x_validation
+
+- Kind: measured (as mod/x)
+- Role: held out
+- Source: hewitt1921conservation, via carpenter2018predator
+- Species/preparation: snowshoe hare; pelt records, 1900–1920
+- Obtained: the Hare column, all 21 years; calibration fits 1900–1915, so 1915–1920 is the prediction
+- Sigma: 0.25 × value (above).
+
+## y_validation
+
+- Kind: measured (as mod/y)
+- Role: held out
+- Source: hewitt1921conservation, via carpenter2018predator
+- Species/preparation: Canada lynx; pelt records, 1900–1920
+- Obtained: the Lynx column, all 21 years; calibration fits 1900–1915, so 1915–1920 is the prediction
+- Sigma: 0.25 × value (above).
+
+## x_max_validation
+
+- Kind: derived (the maximum of x_validation)
+- Role: held out
+- Source: x_validation (cam_testing.calibrate.feature_items)
+- Sigma: x_validation's std at that year.
+
+## x_mean_validation
+
+- Kind: derived (the mean of x_validation)
+- Role: held out
+- Source: x_validation (cam_testing.calibrate.feature_items)
+- Sigma: propagated, sqrt(Σ std²) / n.
+
+## y_max_validation
+
+- Kind: derived (the maximum of y_validation)
+- Role: held out
+- Source: y_validation (cam_testing.calibrate.feature_items)
+- Sigma: y_validation's std at that year.
+
+## y_min_validation
+
+- Kind: derived (the minimum of y_validation)
+- Role: held out
+- Source: y_validation (cam_testing.calibrate.feature_items)
+- Sigma: y_validation's std at that year.
+
+## y_mean_validation
+
+- Kind: derived (the mean of y_validation)
+- Role: held out
+- Source: y_validation (cam_testing.calibrate.feature_items)
+- Sigma: propagated, sqrt(Σ std²) / n.
