@@ -6,19 +6,19 @@
   "dt": 2e-05,
   "solver": "CVODE_myokit",
   "solver_info": {"rtol": 1e-08, "atol": 1e-10},
-  "run_parameters": {"I_in_membrane": 0.05},
+  "run_parameters": {"membrane/I_in": 0.05},
   "rest_check": {
     "label": "rest (0 pA, 30 s)",
     "sim_time": 30,
     "dt": 0.0001,
     "window": 10,
-    "voltage": "mod_membrane/V",
-    "parameters": {"I_in_membrane": 0.0}
+    "voltage": "mod/membrane/V",
+    "parameters": {"membrane/I_in": 0.0}
   },
   "bc_sweep": {
     "ranges": {
-      "I_in_membrane": {"min": -0.05, "max": 0.2, "points": 6},
-      "I_out_membrane": {"min": -0.05, "max": 0.05, "points": 3},
+      "membrane/I_in": {"min": -0.05, "max": 0.2, "points": 6},
+      "membrane/I_out": {"min": -0.05, "max": 0.05, "points": 3},
       "T": {"min": 273.15, "max": 313.15, "points": 3}
     },
     "bounds": {

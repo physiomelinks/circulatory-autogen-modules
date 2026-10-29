@@ -16,11 +16,11 @@ from cam_testing.library import (DEFAULT_LICENCE, ModuleType, load_version, norm
 
 # ---- licence and creator ------------------------------------------------------------------------
 
-def test_record_keys_inserted_after_default_instance_and_carried_through():
+def test_record_keys_inserted_after_default_parameterisation_and_carried_through():
     entry = {'module_type': 'm', 'module_subtype': 'v', 'component_file': 'f.cellml', 'component_type': 'c',
-             'default_instance': 'default', 'entrance_ports': []}
+             'default_parameterisation': 'default', 'entrance_ports': []}
     out = with_record_keys(entry)
-    assert list(out) == ['module_type', 'module_subtype', 'component_file', 'component_type', 'default_instance',
+    assert list(out) == ['module_type', 'module_subtype', 'component_file', 'component_type', 'default_parameterisation',
                          'licence', 'creator', 'entrance_ports']
     assert out['licence'] == DEFAULT_LICENCE and out['creator'] == []
     # existing values are kept
@@ -47,10 +47,10 @@ def test_contents_of_a_small_version():
     c = report.contents(v)
     assert {k: c[k] for k in ('states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations')} == \
         {'states': 2, 'algebraic': 0, 'parameters': 6, 'boundary_conditions': 0, 'ports': 0, 'equations': 2}
-    assert c['instances'] == len(v.instance_names())
+    assert c['parameterisations'] == len(v.parameterisation_names())
     bar = report.contents_bar(v, c, v.id)
     assert [b['key'] for b in bar] == ['states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations',
-                                       'instances']
+                                       'parameterisations']
     assert all(b['about'] and b['href'].startswith('#') for b in bar)
 
 
@@ -139,12 +139,22 @@ def test_supermodule_structure_of_the_sympathetic_neuron():
     edges = {(e['src'], e['src_inner'], e['dst'], e['dst_inner']): e for e in sv['edges']}
     assert set(edges) == {('soma', 'membrane', 'axon', None), ('axon', None, 'varicosity', 'membrane')}
     assert edges[('soma', 'membrane', 'axon', None)]['ports'] == ['VI_port']
-    # the supermodule's instance overrides the axon's parameters (rows <var>_axon); R, F, T are globals
-    assert {o['name'] for o in parts['axon']['overrides']} >= {'C_axon', 'R_axon'}
+    # its template gives the axon its version's default values, so it sets nothing of its own; R, F, T
+    # are globals
+    assert parts['axon']['overrides'] == []
     assert {'R', 'F', 'T'} <= set(sv['globals'])
     assert 'click p_soma' in sv['mermaid'] and 'p_soma -->' in sv['mermaid']
     assert [n['name'] for n in sv['tree']] == ['soma', 'axon', 'varicosity']
     assert sv['tree'][0]['children']
+
+
+def test_supermodule_structure_of_the_heart_shows_what_it_sets_for_each_chamber():
+    sv = report.supermodule_structure(load_version('heart', 'Argus2026_v01'))
+    parts = {p['name']: p for p in sv['parts']}
+    # the template's values that differ from the chamber's default
+    assert {o['name'] for o in parts['lv']['overrides']} == {'lv/E_A', 'lv/E_B', 'lv/q_init'}
+    assert {o['var'] for o in parts['ra']['overrides']} >= {'E_A', 'E_B', 'q_us', 'q_init'}
+    assert parts['clock']['overrides'] == []
 
 
 def test_nested_supermodule_shows_its_outside_coupling():
