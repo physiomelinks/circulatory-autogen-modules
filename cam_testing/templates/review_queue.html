@@ -36,7 +36,7 @@ details summary { cursor: pointer; font-weight: 600; font-size: 0.88rem; color: 
     {%- if m.versions|length > 1 %}<details><summary>Versions ({{ m.versions|length }})</summary><p class="toc" style="margin:6px 0 0">{% for v in m.versions %}<a href="{{ v.href }}">{{ v.key }}</a>{% endfor %}</p></details>{% endif %}
     {%- if m.scope %}<p class="muted" style="margin:0;font-size:0.84rem">{{ m.scope }}</p>{% endif %}
     <div class="meta">
-      <span>{{ m.counts.passed }} passed</span><span>{{ m.counts.failed }} failed</span>
+      <span>{{ m.counts.passed }} passed</span><span>{{ m.counts.partial or 0 }} partial</span><span>{{ m.counts.failed }} failed</span>
       <span>{{ m.n_known }} known issue{{ '' if m.n_known == 1 else 's' }}</span>
       <span>{{ m.n_sourced }} / {{ m.n_parameters }} parameters sourced</span>
       <span>{{ m.n_proposals }} reference proposal{{ '' if m.n_proposals == 1 else 's' }}</span>

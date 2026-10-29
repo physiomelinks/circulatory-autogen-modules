@@ -3,14 +3,15 @@ Builds a single module version into a runnable model with libcuflynx, and runs i
 
 A version is instantiated alone, as one vessel with no connections, so every
 boundary_condition variable becomes a parameter the tests can set. Its parameter values are
-those of an instance (by default the version's default instance), written to the model's
+those of a parameterisation (by default the version's default parameterisation), written to the model's
 parameters file. Models are generated from this repo's modules (and the extra libraries of
 cam_testing.paths, which a harness may use) only (``use_builtin_modules: false``), never
 libcuflynx's bundled copies.
 """
 import contextlib
-import csv
+import functools
 import io
+import json
 import os
 
 import numpy as np
@@ -30,6 +31,31 @@ class GenerationFailed(Exception):
     pass
 
 
+def libcuflynx_model_name(written):
+    '''The model's name for a parameter written in a parameters file (<vessel>/<var>, or a global).'''
+    from libcuflynx.utilities.parameter_names import model_name
+    return model_name(written)
+
+
+def model_output(written):
+    '''The model's name of an output written <vessel path>/<var> (SN/soma/membrane/V ->
+    SN__soma__membrane/V); a <vessel>/<var> or flat name is unchanged.'''
+    from libcuflynx.utilities.parameter_names import output_model_name
+    return output_model_name(written)
+
+
+def model_output_map(output_map):
+    '''An equivalence output_map {reference output: model output} with its names as the models name them.'''
+    return {model_output(k): model_output(v) for k, v in (output_map or {}).items()}
+
+
+def model_output_keys(names):
+    '''An ignore/wrapped dict (names to a reason or period) or a list of names, with the names as the models name them.'''
+    if isinstance(names, dict):
+        return {model_output(k): v for k, v in names.items()}
+    return [model_output(n) for n in names or []]
+
+
 def parameter_name(param):
     '''The name libcuflynx gives a parameter in the generated model.'''
     if getattr(param, 'model_name', ''):
@@ -42,36 +68,39 @@ def parameter_name(param):
 # ---- supermodule versions ----------------------------------------------------------------------
 #
 # A supermodule generated alone is the vessel VESSEL ("mod"); libcuflynx expands it into the vessels
-# mod_<submodule> (nested supermodules: mod_<submodule>_<subsubmodule> ...), and names a submodule's
-# parameter <var>_mod_<submodule>. Its own instance names that parameter <var>_<submodule> (the
-# supermodule-level name used in the spec: run_parameters, bc_sweep, validation); globals keep
-# their names in both.
+# mod__<submodule> (nested supermodules: mod__<submodule>__<subsubmodule> ...: LEVEL_SEPARATOR), and
+# names a submodule's parameter <var>_mod__<submodule>. Its own parameterisation names that parameter
+# <submodule>/<var> (nested: <submodule>/<subsubmodule>/<var>), the supermodule-level name the spec
+# uses too (run_parameters, bc_sweep, validation); globals keep their names in both.
+
+LEVEL_SEPARATOR = '__'
+
 
 def supermodule_model_name(version, name, vessel=VESSEL):
-    '''A supermodule instance's parameter name (<var>_<submodule>, or a global) -> its name in a model in
-    which the supermodule is the vessel ``vessel`` (<var>_<vessel>_<submodule>).'''
-    if name in version.supermodule_globals:
+    '''A supermodule parameterisation's parameter name (<submodule path>/<var>, or a global) -> its
+    name in a model in which the supermodule is the vessel ``vessel`` (<var>_<vessel>__<submodule path>).'''
+    if name.startswith('global/'):
+        return name[len('global/'):]
+    path, _, var = name.rpartition('/')
+    if not path:
         return name
-    for sub in sorted(version.submodule_names, key=len, reverse=True):
-        if name.endswith('_' + sub) and len(name) > len(sub) + 1:
-            return f'{name[:-len(sub)]}{vessel}_{sub}'
-    # a nested submodule's parameter: <var>_<submodule>_<subsubmodule>... (e.g. I_in_soma_membrane in
-    # the neuron, whose soma is itself a supermodule): split at the leftmost "_" whose remainder is a
-    # submodule path that resolves
-    i = name.find('_')
-    while i > 0:
-        path = name[i + 1:]
-        if '_' in path and resolve_submodule_path(version, path) is not None:
-            return f'{name[:i]}_{vessel}_{path}'
-        i = name.find('_', i + 1)
-    return name
+    return f'{var}_{LEVEL_SEPARATOR.join([vessel] + path.split("/"))}'
 
 
 def model_parameter_name(component, param):
-    '''The name an instance's parameter has in the version's generated model.'''
+    '''The name a parameterisation's parameter has in the version's generated model.'''
     if component.is_supermodule and not getattr(param, 'model_name', ''):
         return supermodule_model_name(component, param.variable_name)
     return parameter_name(param)
+
+
+def written_parameter_name(component, param):
+    '''The name a parameterisation's parameter is written with in the model's parameters file:
+    <vessel>/<var> (a supermodule's: mod/<submodule path>/<var>), a global as it is.'''
+    if component.is_supermodule:
+        name = param.variable_name
+        return f'{VESSEL}/{name}' if '/' in name and not name.startswith('global/') else name
+    return param.variable_name if param.is_global else f'{VESSEL}/{param.variable_name}'
 
 
 def _submodule_version(sub):
@@ -80,68 +109,64 @@ def _submodule_version(sub):
 
 
 def resolve_submodule_path(version, path):
-    '''"ra" or (nested) "soma_Ca" -> the component version at the end of that submodule path, or None.'''
-    for sub in sorted(version.submodules, key=lambda s: len(s['name']), reverse=True):
-        name = sub['name']
-        if path == name or path.startswith(name + '_'):
-            try:
-                target = _submodule_version(sub)
-            except Exception:  # noqa: BLE001 - a broken reference is the structure test's to report
-                return None
-            if path == name:
-                return target
-            if target.is_supermodule:
-                found = resolve_submodule_path(target, path[len(name) + 1:])
-                if found is not None:
-                    return found
-    return None
+    '''"ra" or (nested) "soma/Ca" -> the component version at the end of that submodule path, or None.'''
+    head, _, rest = path.partition('/')
+    sub = next((s for s in version.submodules if s['name'] == head), None)
+    if sub is None:
+        return None
+    try:
+        target = _submodule_version(sub)
+    except Exception:  # noqa: BLE001 - a broken reference is the structure test's to report
+        return None
+    if not rest:
+        return target
+    return resolve_submodule_path(target, rest) if target.is_supermodule else None
 
 
 def split_model_name(version, full, vessel=VESSEL):
     '''A generated model's parameter name -> (supermodule-level name, variable, submodule path or None,
-    owning component version or None): "V_in_mod_membrane" -> ("V_in_membrane", "V_in", "membrane",
-    <its version>); a global (no "_mod_<submodule>" suffix) -> (name, name, None, None).'''
-    marker = f'_{vessel}_'
-    start = 0
-    while True:
-        i = full.find(marker, start)
-        if i <= 0:
-            return full, full, None, None
-        path = full[i + len(marker):]
-        owner = resolve_submodule_path(version, path)
-        if owner is not None:
-            return f'{full[:i]}_{path}', full[:i], path, owner
-        start = i + 1
+    owning component version or None): "V_in_mod__membrane" -> ("membrane/V_in", "V_in", "membrane",
+    <its version>); a global (no "_mod__<submodule>" suffix) -> (name, name, None, None).'''
+    marker = f'_{vessel}{LEVEL_SEPARATOR}'
+    i = full.rfind(marker)
+    if i <= 0:
+        return full, full, None, None
+    var, path = full[:i], full[i + len(marker):].replace(LEVEL_SEPARATOR, '/')
+    owner = resolve_submodule_path(version, path)
+    if owner is None:
+        return full, full, None, None
+    return f'{path}/{var}', var, path, owner
 
 
 def generated_parameters_path(model_path):
-    '''The parameters file libcuflynx writes next to a generated model.'''
+    '''The parameters file libcuflynx writes next to a generated model (<prefix>_parameters.json,
+    libcuflynx's nested JSON).'''
     d = os.path.dirname(model_path)
-    return os.path.join(d, f'{os.path.basename(d)}_parameters.csv')
+    return os.path.join(d, f'{os.path.basename(d)}_parameters.json')
 
 
 def supermodule_parameters(version, model_path, vessel=VESSEL):
     '''
     Every parameter of a supermodule's generated model (the flattened model: the supermodule's own
-    instance, its submodules' instances, and the boundary conditions no internal connection closes),
+    parameterisation, its submodules' default parameterisations, and the boundary conditions no internal connection closes),
     as Parameters named at the supermodule level (<var>_<submodule path>, globals as they are), with
     model_name the generated model's name, and kind from the owning submodule's config
     (global_constant for the globals).
     '''
     from cam_testing.library import Parameter
-    own = {p.variable_name: p for p in version.default_instance.parameters()}
+    from libcuflynx.utilities.parameters_file import model_parameter_rows
+    own = {p.variable_name: p for p in version.default_parameterisation.parameters()}
     out = []
-    with open(generated_parameters_path(model_path), newline='') as f:
-        for row in csv.DictReader(f):
-            full = (row.get('variable_name') or '').strip()
-            if not full:
-                continue
-            name, var, _path, owner = split_model_name(version, full, vessel)
-            kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
-            mine = own.get(name)
-            out.append(Parameter(name, (row.get('units') or '').strip(), (row.get('value') or '').strip(),
-                                 (row.get('data_reference') or '').strip(), mine.sourced if mine else '',
-                                 kind, model_name=full))
+    for row in model_parameter_rows(generated_parameters_path(model_path)):
+        full = str(row.get('variable_name') or '').strip()
+        if not full:
+            continue
+        name, var, _path, owner = split_model_name(version, full, vessel)
+        kind = 'global_constant' if owner is None else owner.kinds.get(var, '')
+        mine = own.get(name)
+        cell = lambda k: '' if row.get(k) is None else str(row[k]).strip()
+        out.append(Parameter(name, cell('units'), cell('value'), cell('data_reference'),
+                             mine.sourced if mine else '', kind, model_name=full))
     return out
 
 
@@ -157,13 +182,14 @@ def state_outputs(helper):
 
 
 def supermodule_units(version, outputs, vessel=VESSEL):
-    '''{output_key: units} for "<vessel>_<submodule path>/<var>" outputs, from the owning submodule's config.'''
+    '''{output_key: units} for "<vessel>__<submodule path>/<var>" outputs, from the owning submodule's config.'''
     units = {}
+    prefix = vessel + LEVEL_SEPARATOR
     for o in outputs:
         comp, _, var = o.rpartition('/')
-        if not comp.startswith(vessel + '_'):
+        if not comp.startswith(prefix):
             continue
-        owner = resolve_submodule_path(version, comp[len(vessel) + 1:])
+        owner = resolve_submodule_path(version, comp[len(prefix):].replace(LEVEL_SEPARATOR, '/'))
         if owner is not None:
             u = {v[0]: v[1] for v in owner.config.get('variables_and_units') or []}.get(var)
             if u:
@@ -172,8 +198,9 @@ def supermodule_units(version, outputs, vessel=VESSEL):
 
 
 def output_name(variable):
-    '''"var" is a variable of the component under test; "vessel/var" one of a neighbour in its test network.'''
-    return variable if '/' in variable else f'{VESSEL}/{variable}'
+    '''"var" is a variable of the component under test; "vessel/var" one of a neighbour in its test
+    network, or of a submodule by its path ("sub/var", "a/b/var").'''
+    return model_output(variable) if '/' in variable else f'{VESSEL}/{variable}'
 
 
 def output_key(variable):
@@ -181,76 +208,106 @@ def output_key(variable):
     return variable.replace('/', '__')
 
 
-def network(component, instance=None):
-    '''The test network of ``component`` at ``instance`` (an Instance or its name): the instance's own
-    (validation.<instance>.harness in the verification config, e.g. an experiment's set-up for a
+def network(component, parameterisation=None):
+    '''The test network of ``component`` at ``parameterisation`` (a Parameterisation or its name): the
+    parameterisation's own (validation.<parameterisation>.harness in the verification config, e.g. an experiment's set-up for a
     calibration) when it has one, else the version's (harness; empty: the version alone).'''
-    name = getattr(instance, 'name', instance)
+    name = getattr(parameterisation, 'name', parameterisation)
     own = (((component.spec.get('validation') or {}).get(name) or {}).get('harness')) if name else None
     return own if own is not None else (component.spec.get('harness') or {})
 
 
-def _write_resources(component, resources_dir, prefix, overrides, parameters=None, instances=True, instance=None):
+def _write_resources(component, resources_dir, prefix, overrides, parameters=None, parameterisation=None):
     '''
     The test network: by default the version alone. A version that only works with
     neighbours (its inputs are variables another vessel supplies) gives a small network in its
     spec, in which the version under test is the vessel named "mod":
 
         harness:
-          module_array:    # [name, module_subtype (version), module_type, inp, out, instance]
+          module_array:    # [name, module_subtype (version), module_type, inp, out, parameterisation]
             - [pressure_in, constant, inlet_pressure, '', mod, default]
             - [mod, pv_0D_1D, coupler, pressure_in, constant_1D, default]
-          parameters:              # values for the neighbours' parameters
-            - [P_pressure_in, J_per_m3, 2000, source]
+          parameters:              # values for the neighbours' parameters, as <vessel>/<var>
+            - [pressure_in/P, J_per_m3, 2000, source]
 
-    ``parameters``: the instance parameters to write (default: the version's default instance).
-    An instance may have its own network instead (validation.<instance>.harness, see ``network``);
-    ``instance`` selects it.
-    ``instances=False`` leaves "instance" out of the records (each record then gets its version's
-    default_instance). libcuflynx before circulatory_autogen #535's baad9e73 needed this for the C++
-    0D-1D split, which appended 5-column rows.
+    A row may be a module-array record instead (a dict), e.g. a supermodule "mod" with
+    per_submodule_inputs naming its neighbours.
+
+    ``parameters``: the parameterisation's parameters to write (default: the version's default
+    parameterisation). A parameterisation may have its own network instead
+    (validation.<parameterisation>.harness, see ``network``); ``parameterisation`` selects it.
     '''
     os.makedirs(resources_dir, exist_ok=True)
-    network = globals()['network'](component, instance)
-    rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', 'default']]
-    if not any(r[0] == VESSEL for r in rows):
-        raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
+    network = globals()['network'](component, parameterisation)
+    # the version alone, at the parameterisation under test (else the version's default one)
+    own = getattr(parameterisation, 'name', parameterisation) or component.default_parameterisation_name
+    rows = module_array.harness_rows(network) or [[VESSEL, component.BC_type, component.vessel_type, '', '', own]]
     records = module_array.from_rows(rows)
-    if not instances:
-        records = [{k: v for k, v in r.items() if k != 'instance'} for r in records]
-    module_array.write_records(os.path.join(resources_dir, f'{prefix}_module_array.json'), records)
-    if not module_array.libcuflynx_reads_json():
-        # a libcuflynx without JSON module-array support (0.7.3 and older) reads the CSV, under the
-        # old name, the only one it looks for
-        with open(os.path.join(resources_dir, f'{prefix}_vessel_array.csv'), 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['name', 'BC_type', 'vessel_type', 'inp_vessels', 'out_vessels'])
-            writer.writerows([str(x) for x in r[:5]] for r in rows)
+    if not any(r['name'] == VESSEL for r in records):
+        raise ValueError(f'harness.module_array must contain the component under test as vessel "{VESSEL}"')
+    array = os.path.join(resources_dir, f'{prefix}_module_array.json')
+    module_array.write_records(array, records)
+    path = os.path.join(resources_dir, f'{prefix}_parameters.json')
+    doc = _supermodule_instances(array, records, path)
 
     params = component.parameters() if parameters is None else parameters
     todo = [p.variable_name for p in params if p.is_todo and model_parameter_name(component, p) not in overrides]
     if todo:
-        raise MissingParameters(f'parameters still TODO in the instance parameters of {component.key}: {", ".join(todo)}')
-    with open(os.path.join(resources_dir, f'{prefix}_parameters.csv'), 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['variable_name', 'units', 'value', 'data_reference'])
-        written = set()
-        for p in params:
-            name = model_parameter_name(component, p)
-            value = overrides.get(name, p.value)
-            writer.writerow([name, p.units, value, p.data_reference or 'cam_testing'])
-            written.add(name)
-        for name, units, value, *ref in network.get('parameters') or []:
-            if name not in written:
-                writer.writerow([name, units, overrides.get(name, value), (ref[0] if ref else 'cam_testing harness')])
+        raise MissingParameters(f'parameters still TODO in the parameterisation parameters of {component.key}: {", ".join(todo)}')
+    from libcuflynx.utilities import parameters_file as pf
+    written = set()
+    for p in params:
+        name = model_parameter_name(component, p)
+        pf.set_leaf(doc, pf.name_path(written_parameter_name(component, p)),
+                    {'value': overrides.get(name, p.value), 'units': p.units,
+                     'data_reference': p.data_reference or 'cam_testing'})
+        written.add(name)
+    for written_name, units, value, *ref in network.get('parameters') or []:
+        name = libcuflynx_model_name(written_name)
+        if name not in written:
+            pf.set_leaf(doc, pf.name_path(written_name),
+                        {'value': overrides.get(name, value), 'units': units,
+                         'data_reference': ref[0] if ref else 'cam_testing harness'})
+    pf.write_parameters_file(path, doc)
 
 
-def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, instance=None):
+def _supermodule_instances(array, records, path):
+    '''The test network's parameters document, with each supermodule instance's values new from its version
+    (libcuflynx's supermodules.write_instance_parameters, into ``path``), so it is tested with the version's
+    values; the parameterisation's and the network's own rows go over them.'''
+    from libcuflynx.utilities import parameters_file as pf
+    keys = _supermodule_keys(tuple(library_dirs()))
+    if not any((r.get('module_type'), r.get('module_subtype')) in keys for r in records):
+        return pf.new_document()
+    from libcuflynx.utilities.module_library import ModuleSources
+    from libcuflynx.utilities.supermodules import write_instance_parameters
+    registry = ModuleSources({'module_library_dirs': library_dirs(), 'use_builtin_modules': False}).supermodule_registry()
+    pf.write_parameters_file(path, pf.new_document())
+    write_instance_parameters(array, registry, replace=True, parameters=path)
+    return pf.read_parameters_file(path)
+
+
+@functools.lru_cache(maxsize=4)
+def _supermodule_keys(libraries):
+    '''(module_type, version) of every supermodule version in ``libraries``: those with a module array.'''
+    keys = set()
+    for library in libraries:
+        for root, _dirs, files in os.walk(library):
+            for f in files:
+                if f.endswith('_module_array.json'):
+                    mt, version = os.path.basename(os.path.dirname(os.path.dirname(root))), os.path.basename(root)
+                    if f == f'{mt}_{version}_module_array.json':
+                        keys.add((mt, version))
+    return keys
+
+
+def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml', parameters=None, parameterisation=None):
     '''
     Generates the version's model in ``work_dir``; returns the path of the .cellml file,
-    or of the .py file for ``model_type='python'``. ``parameters``: an instance's parameters
-    (default: the version's default instance). ``instance``: the instance whose own test network
-    (validation.<instance>.harness) is used, if it has one.
+    or of the .py file for ``model_type='python'``. ``parameters``: a parameterisation's
+    parameters (default: the version's default parameterisation). ``parameterisation``: the
+    parameterisation whose own test network (validation.<parameterisation>.harness) is used, if it has
+    one (``instance``: its former name, still accepted).
     '''
     from libcuflynx.scripts.script_generate_with_new_architecture import generate_with_new_architecture
 
@@ -260,10 +317,10 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
         work_dir = os.path.join(work_dir, model_type)
     resources_dir = os.path.join(work_dir, 'resources')
     generated_dir = os.path.join(work_dir, 'generated_models')
-    _write_resources(component, resources_dir, prefix, overrides, parameters, instance=instance)
+    _write_resources(component, resources_dir, prefix, overrides, parameters, parameterisation=parameterisation)
     config = {
         'file_prefix': prefix,
-        'input_param_file': f'{prefix}_parameters.csv',
+        'input_param_file': f'{prefix}_parameters.json',
         'model_type': model_type,
         'solver': component.spec.get('solver', 'CVODE_myokit') if model_type == 'cellml' else 'solve_ivp',
         'resources_dir': resources_dir,
@@ -288,22 +345,114 @@ def generate(component, work_dir, overrides=None, quiet=True, model_type='cellml
 
 
 def simulation_helper(model_path, spec, solver_info=None, solver=None, model_type='cellml'):
+    '''A libcuflynx simulation helper for the spec's run settings. A spec with a protocol
+    (``spec[PROTOCOL_INFO]``, see ``with_protocol``) gives a helper that ``run`` runs through it.'''
     from libcuflynx.solver_wrappers import get_simulation_helper
 
     info = dict(spec.get('solver_info') or {}) if solver is None else {}
     info.update(solver_info or {})
+    protocol = spec.get(PROTOCOL_INFO)
     with contextlib.redirect_stdout(io.StringIO()):
-        return get_simulation_helper(model_path=model_path, solver=solver or spec.get('solver', 'CVODE_myokit'),
-                                     model_type=model_type, dt=spec['dt'], sim_time=spec['sim_time'],
-                                     solver_info=info, pre_time=spec.get('pre_time', 0.0))
+        helper = get_simulation_helper(model_path=model_path, solver=solver or spec.get('solver', 'CVODE_myokit'),
+                                       model_type=model_type, dt=spec['dt'], sim_time=spec['sim_time'],
+                                       solver_info=info, pre_time=spec.get('pre_time', 0.0))
+        if protocol is not None:
+            helper.set_protocol_info(protocol)
+            helper.cam_protocol = protocol
+    return helper
+
+
+# ---- protocols ---------------------------------------------------------------------------------
+#
+# A version's tests can be driven by the protocol_info of an obs_data file (verification_config
+# "protocol"; validation.<p>.baseline "obs_data"): its pre_times, its sub-experiments (sim_times) and
+# the parameters it changes in each (params_to_change), each a number or the name of a
+# protocol_traces / protocol_shapes entry, a time-varying input libcuflynx interpolates linearly.
+# libcuflynx's ProtocolExecutor runs it.
+
+PROTOCOL_INFO = '_protocol_info'      # the spec key of a loaded protocol_info (set by with_protocol)
+
+
+def load_protocol(path):
+    '''The protocol_info of an obs_data file, its protocol_shapes expanded into protocol_traces.'''
+    from libcuflynx.utilities.protocol_shapes import materialise_shapes, validate_trace_references
+    with open(path, encoding='utf-8-sig') as f:
+        protocol = json.load(f)['protocol_info']
+    materialise_shapes(protocol)
+    validate_trace_references(protocol)
+    return protocol
+
+
+def with_protocol(spec, protocol):
+    '''``spec`` with its runs driven by ``protocol`` (one experiment): sim_time is the protocol's
+    total time and pre_time its pre_time.'''
+    if len(protocol['sim_times']) != 1:
+        raise ValueError(f'the protocol of a version has one experiment, not {len(protocol["sim_times"])}')
+    return dict(spec, sim_time=float(sum(protocol['sim_times'][0])), pre_time=float(protocol['pre_times'][0]),
+                **{PROTOCOL_INFO: protocol})
+
+
+def without_protocol(spec):
+    '''``spec`` with its runs at constant inputs (no protocol).'''
+    return {k: v for k, v in spec.items() if k != PROTOCOL_INFO}
+
+
+def protocol_inputs(protocol):
+    '''The outputs a protocol drives: its params_to_change ("mod/u_in" -> "u_in"; a test-network
+    neighbour's "record/x" stays as it is).'''
+    out = []
+    for name in (protocol or {}).get('params_to_change') or {}:
+        if '/' in name:
+            record, var = name.split('/', 1)
+            out.append(var if record == VESSEL else name)
+    return out
+
+
+def run_protocol(helper, outputs, protocol, params=None, experiment=0):
+    '''
+    Runs experiment ``experiment`` of ``protocol`` from the model's initial state, with ``params``
+    set first; returns (t, {output_key: values}, the start time of each sub-experiment), t from the
+    end of the experiment's pre_time. A trace's times count from the start of its sub-experiment,
+    the first sub-experiment's from the start of the pre_time (libcuflynx's Myokit clock).
+    '''
+    from libcuflynx.protocol_runners.protocol_executor import ProtocolExecutor
+
+    if getattr(helper, 'cam_protocol', None) is not protocol:
+        with contextlib.redirect_stdout(io.StringIO()):
+            helper.set_protocol_info(protocol)
+        helper.cam_protocol = protocol
+    names = list(params or {})
+    wanted = [[output_name(v)] for v in outputs]
+    with contextlib.redirect_stdout(io.StringIO()):
+        ok, by_sub, _, t_by_exp = ProtocolExecutor(helper).run_protocol(
+            protocol, id_param_names=names or None, id_param_vals=[params[n] for n in names] or None,
+            result_variables=wanted, exp_indices=[experiment])
+    if not ok:
+        raise RuntimeError('simulation failed')
+    t = np.asarray(t_by_exp[experiment], dtype=float)
+    sim_times = [float(s) for s in protocol['sim_times'][experiment]]
+    results = {}
+    for i, var in enumerate(outputs):
+        parts = []
+        for sub, sim_time in enumerate(sim_times):
+            values = np.asarray(by_sub[(experiment, sub)][i], dtype=float).ravel()
+            if values.size == 1:
+                values = np.full(int(sim_time / helper.dt) + 1, values[0])   # a constant is logged once
+            parts.append(values if sub == 0 else values[1:])
+        results[output_key(var)] = np.concatenate(parts)
+    starts = np.concatenate([[0.0], np.cumsum(sim_times[:-1])])
+    return t, results, starts
 
 
 def run(helper, outputs, params=None):
     '''
     Runs the helper from the model's initial state (optionally with parameter overrides);
     returns (t, {var: array}). Without the reset, a helper continues from the previous run's
-    final state.
+    final state. A helper made with a protocol runs it (``run_protocol``).
     '''
+    protocol = getattr(helper, 'cam_protocol', None)
+    if protocol is not None:
+        return run_protocol(helper, outputs, protocol, params)[:2]
     if hasattr(helper, 'reset_states'):
         helper.reset_states()
     if params:

@@ -1,24 +1,26 @@
 """
 Unit tests of the report's informational features: the licence / creator keys, the contents summary
-bar, the libcellml unit-consistency check (mapped to equations) and the supermodule structure view.
-No model is generated or simulated.
+bar, the libcellml unit-consistency check (mapped to equations), the supermodule structure view and
+the version's figures. No model is generated or simulated.
 """
+import dataclasses
 import json
 import os
+import shutil
 from types import SimpleNamespace
 
 from cam_testing import checks, report
-from cam_testing.library import (DEFAULT_LICENCE, load_version, normalise_config_entry, to_phlynx_entry,
+from cam_testing.library import (DEFAULT_LICENCE, ModuleType, load_version, normalise_config_entry, to_phlynx_entry,
                                  with_record_keys)
 
 
 # ---- licence and creator ------------------------------------------------------------------------
 
-def test_record_keys_inserted_after_default_instance_and_carried_through():
+def test_record_keys_inserted_after_default_parameterisation_and_carried_through():
     entry = {'module_type': 'm', 'module_subtype': 'v', 'component_file': 'f.cellml', 'component_type': 'c',
-             'default_instance': 'default', 'entrance_ports': []}
+             'default_parameterisation': 'default', 'entrance_ports': []}
     out = with_record_keys(entry)
-    assert list(out) == ['module_type', 'module_subtype', 'component_file', 'component_type', 'default_instance',
+    assert list(out) == ['module_type', 'module_subtype', 'component_file', 'component_type', 'default_parameterisation',
                          'licence', 'creator', 'entrance_ports']
     assert out['licence'] == DEFAULT_LICENCE and out['creator'] == []
     # existing values are kept
@@ -45,10 +47,10 @@ def test_contents_of_a_small_version():
     c = report.contents(v)
     assert {k: c[k] for k in ('states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations')} == \
         {'states': 2, 'algebraic': 0, 'parameters': 6, 'boundary_conditions': 0, 'ports': 0, 'equations': 2}
-    assert c['instances'] == len(v.instance_names())
+    assert c['parameterisations'] == len(v.parameterisation_names())
     bar = report.contents_bar(v, c, v.id)
     assert [b['key'] for b in bar] == ['states', 'algebraic', 'parameters', 'boundary_conditions', 'ports', 'equations',
-                                       'instances']
+                                       'parameterisations']
     assert all(b['about'] and b['href'].startswith('#') for b in bar)
 
 
@@ -137,12 +139,22 @@ def test_supermodule_structure_of_the_sympathetic_neuron():
     edges = {(e['src'], e['src_inner'], e['dst'], e['dst_inner']): e for e in sv['edges']}
     assert set(edges) == {('soma', 'membrane', 'axon', None), ('axon', None, 'varicosity', 'membrane')}
     assert edges[('soma', 'membrane', 'axon', None)]['ports'] == ['VI_port']
-    # the supermodule's instance overrides the axon's parameters (rows <var>_axon); R, F, T are globals
-    assert {o['name'] for o in parts['axon']['overrides']} >= {'C_axon', 'R_axon'}
+    # its template gives the axon its version's default values, so it sets nothing of its own; R, F, T
+    # are globals
+    assert parts['axon']['overrides'] == []
     assert {'R', 'F', 'T'} <= set(sv['globals'])
     assert 'click p_soma' in sv['mermaid'] and 'p_soma -->' in sv['mermaid']
     assert [n['name'] for n in sv['tree']] == ['soma', 'axon', 'varicosity']
     assert sv['tree'][0]['children']
+
+
+def test_supermodule_structure_of_the_heart_shows_what_it_sets_for_each_chamber():
+    sv = report.supermodule_structure(load_version('heart', 'Argus2026_v01'))
+    parts = {p['name']: p for p in sv['parts']}
+    # the template's values that differ from the chamber's default
+    assert {o['name'] for o in parts['lv']['overrides']} == {'lv/E_A', 'lv/E_B', 'lv/q_init'}
+    assert {o['var'] for o in parts['ra']['overrides']} >= {'E_A', 'E_B', 'q_us', 'q_init'}
+    assert parts['clock']['overrides'] == []
 
 
 def test_nested_supermodule_shows_its_outside_coupling():
@@ -150,3 +162,80 @@ def test_nested_supermodule_shows_its_outside_coupling():
     assert any(x['part'] == 'membrane' and x['external'] == 'axon' and x['direction'] == 'out'
                and x['where'][0]['name'] == 'neuron/sympathetic' for x in sv['external'])
     assert report.supermodule_structure(load_version('Lotka_Volterra', 'Lotka1925_v01')) is None
+
+
+# ---- figures ------------------------------------------------------------------------------------
+
+def _version_with_figures(tmp_path, figures):
+    '''Lotka-Volterra copied under tmp_path, with tests.yaml "figures" set to figures.'''
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    mt = ModuleType(v.mtype.name, str(tmp_path))
+    shutil.copytree(v.dir, os.path.join(mt.versions_dir, v.name))
+    return dataclasses.replace(v, mtype=mt, spec=dict(v.spec, figures=figures))
+
+
+def test_version_page_shows_its_figures(tmp_path):
+    w = _version_with_figures(tmp_path, [{'file': 'cycle.svg', 'caption': 'The predator-prey **cycle**'}])
+    os.makedirs(w.figures_dir)
+    with open(os.path.join(w.figures_dir, 'cycle.svg'), 'w') as f:
+        f.write('<svg xmlns="http://www.w3.org/2000/svg"/>')
+    assert w.figures() == [{'file': 'figures/cycle.svg', 'caption': 'The predator-prey **cycle**', 'missing': False}]
+    assert w.figure_problems() == []
+    html = report._env().get_template('version.html').render(**report.version_context(w))
+    assert '<img src="figures/cycle.svg"' in html and 'The predator-prey <strong>cycle</strong>' in html
+
+
+def test_figure_problems_and_a_missing_figure(tmp_path):
+    w = _version_with_figures(tmp_path, ['gone.png', {'file': '../escape.svg', 'caption': 'outside'},
+                                         {'file': 'notes.txt', 'caption': 'not an image'}])
+    assert w.figure_problems() == ['figures: gone.png is not in figures/', 'figures: gone.png has no caption',
+                                   'figures: ../escape.svg is not an image (svg, png, jpg) directly in figures/',
+                                   'figures: notes.txt is not an image (svg, png, jpg) directly in figures/']
+    html = report._env().get_template('version.html').render(**report.version_context(w))
+    assert 'Missing figure <code>figures/gone.png</code>' in html
+
+
+def test_a_version_without_figures_has_no_figures_section():
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    assert v.figures() == []
+    html = report._env().get_template('version.html').render(**report.version_context(v))
+    assert 'aria-label="Figures"' not in html
+
+
+def test_assembled_site_holds_the_images_its_version_page_links_to(tmp_path):
+    '''GitHub Pages serves site/ alone: a version's figures/ and its parameterisations' source_figures/
+    images are copied beside its page, at the paths the page's <img src> give (and nothing else from them).'''
+    import re
+    import external_repo
+    from cam_testing import paths
+    root = external_repo.make(str(tmp_path / 'repo'))
+    vdir = os.path.join(root, 'modules', 'boundary_conditions', external_repo.MT, 'versions', external_repo.VERSION)
+    svg = '<svg xmlns="http://www.w3.org/2000/svg"/>'
+    os.makedirs(os.path.join(vdir, 'figures'))
+    with open(os.path.join(vdir, 'figures', 'bond_graph.svg'), 'w') as f:
+        f.write(svg)
+    with open(os.path.join(vdir, f'{external_repo.MT}_{external_repo.VERSION}_tests.yaml'), 'a') as f:
+        f.write('figures:\n  - file: bond_graph.svg\n    caption: The bond graph\n')
+    sf_dir = os.path.join(vdir, 'parameterisations', 'default', 'source_figures')
+    os.makedirs(sf_dir)
+    with open(os.path.join(sf_dir, 'fig2.png'), 'wb') as f:
+        f.write(b'\x89PNG\r\n\x1a\n')
+    with open(os.path.join(sf_dir, 'source_figures.json'), 'w') as f:
+        json.dump([{'file': 'fig2.png', 'source': 'Author2000 Fig. 2', 'caption': 'outlet pressure'}], f)
+    try:
+        paths.configure(repo_root=root, library_dirs=[external_repo.library_modules_dir()], export=False)
+        report.main(['--module', external_repo.MT, '--site'])
+        site = paths.roots().site_dir
+    finally:
+        paths.reset()
+        report._index_cache.clear()     # main() filled them from the repo under tmp_path
+        report._contents_cache.clear()
+    page = os.path.join(site, 'modules', 'boundary_conditions', external_repo.MT, 'versions', external_repo.VERSION,
+                        f'{external_repo.MT}_{external_repo.VERSION}.html')
+    with open(page) as f:
+        srcs = re.findall(r'<img src="([^"]+)"', f.read())
+    assert 'figures/bond_graph.svg' in srcs and 'parameterisations/default/source_figures/fig2.png' in srcs
+    missing = [s for s in srcs if not os.path.isfile(os.path.join(os.path.dirname(page), s))]
+    assert missing == []
+    assert not os.path.exists(os.path.join(os.path.dirname(page), 'parameterisations', 'default', 'source_figures',
+                                           'source_figures.json'))

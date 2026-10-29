@@ -1,5 +1,5 @@
 """
-A system model's reference: circulatory_autogen's original (a vessel array to generate) or a ready
+A system model's reference: circulatory_autogen's original (a module array to generate) or a ready
 CellML model simulated as it is (equivalence.reference_cellml, or reference/<model>.cellml). The
 end-to-end run with a real CellML reference is in tests/test_external_repo.py.
 """
@@ -17,9 +17,9 @@ def _system(tmp_path, spec=None, files=()):
     return systems.System('m', 'c', str(d), spec or {})
 
 
-def test_vessel_array_reference(tmp_path):
-    s = _system(tmp_path, files=['reference/m_vessel_array.json', 'reference/m.cellml'])
-    assert systems.reference_cellml(s) is None      # a vessel array is there: generate it
+def test_module_array_reference(tmp_path):
+    s = _system(tmp_path, files=['reference/m_module_array.json', 'reference/m.cellml'])
+    assert systems.reference_cellml(s) is None      # a module array is there: generate it
 
 
 def test_implicit_cellml_reference(tmp_path):
@@ -29,7 +29,7 @@ def test_implicit_cellml_reference(tmp_path):
 
 def test_explicit_cellml_reference(tmp_path):
     s = _system(tmp_path, {'equivalence': {'reference_cellml': 'reference/phlynx-export.cellml'}},
-                files=['reference/phlynx-export.cellml', 'reference/m_vessel_array.json'])
+                files=['reference/phlynx-export.cellml', 'reference/m_module_array.json'])
     assert systems.reference_cellml(s) == str(tmp_path / 'm' / 'reference' / 'phlynx-export.cellml')
     missing = _system(tmp_path / 'x', {'equivalence': {'reference_cellml': 'reference/nope.cellml'}})
     with pytest.raises(FileNotFoundError):

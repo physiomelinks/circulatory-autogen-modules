@@ -1,0 +1,33 @@
+module_type: chamber
+version: Liang2009_v01
+reviewed: true
+notes: 'chamber/Liang2009NoVisco_v01 with the viscoelastic term of Liang et al. 2009 Eq. 9, P = E(t)(V - V0) + S dV/dt, where S = k_S P (Table 2:
+  S = P x 0.0005, k_S = 0.0005 s/ml = 500 s/m^3), solved for P: u = (e E_A_eff + E_B)(q - q_us)/(1 - k_S (v_in - v_out)) + u_ext.
+  The term raises the pressure while the chamber fills and lowers it during ejection. Everything else (activation, ports,
+  parameterisations lv/rv/la/ra from Liang Table 2 and Korakianitis & Shi 2006 Table 1) is chamber/Liang2009NoVisco_v01''s.
+  Made in the review of chamber/Liang2009NoVisco_v01 (2026-10-12) to test whether the omitted term is why chamber/Liang2009NoVisco_v01''s lv P-V loop is narrower
+  than Liang''s (stroke volume ~60 vs 76 ml): both versions are calibrated the same way in the same minimal LV loop.
+  Solver: as chamber/Liang2009NoVisco_v01, the phase rate is piecewise, so CVODE runs with MaximumStep 1 ms.
+  The lv dead volume q_us stays Korakianitis''s 5 ml: calibrated with the afterload and preload to Liang''s P-V loop
+  (Fig. 4e EDV and ESV) in the validation loop with a contracting left atrium, it comes out at 5.3 ml (chamber
+  Liang2009NoVisco_v01) and 4.3 ml (Liang2009_v01), confirming it; q_us stays in the calibration as a check, not applied
+  (review 2026-10-12).
+  The phase variable chi (its gated, piecewise-rate form: contraction, relaxation, diastole and the wait at the clock
+  gate, with chi_floor and the activation e = (1 - cos(2 pi chi_final))/2) is ArgusUnpublished work (argus2026unpublished):
+  Liang''s activation is an explicit function of time (Eqs. 11-12); writing it as a state driven by the clock makes the
+  declarative (CellML) implementation robust (it follows the clock''s period and stays in phase when the period or the
+  timings change). Its piecewise rate makes the time-step test partial (first order across a switch).'
+expected_failures:
+  cuflynx_parameterisation_omex_test: 'lv fails until a CUFLynx update: the released CUFLynx (0.7.1) bundles a libcuflynx that
+    predates held-out data in prediction_items (circulatory_autogen #535/#536) and rejects lv_obs_data.json. Checked on
+    2026-10-13 with CUFLynx run from source on a libcuflynx with #536: the archive loads and runs; its outputs match
+    libcuflynx to 3.6e-6 (the pulmonary conduit''s valve flow pvc_module/v; the test''s tolerance is 1e-6), the stiff valve
+    difference the heart archives also show. la, ra and rv pass.'
+review:
+  summary: 'Reviewed 2026-10-12 to 2026-10-13 with Finbar Argus. Made in the review of chamber/Liang2009NoVisco_v01: the same
+    model with Liang 2009 Eq. 9''s viscoelastic term S dV/dt (S = 0.0005 P), to test whether its absence narrows the P-V loop
+    (it does not; the validation loop''s missing atrial kick did). It reproduces Liang''s LV more closely.'
+  decisions:
+  - 'validation as chamber/Liang2009NoVisco_v01 (same loop, calibration and periodic steady state): all held-out targets pass
+    (peak 115.6 mmHg, Liang 108); held-out LV pressure nrmse 0.074'
+  - 'creator Finbar Argus; parameterisations as Liang2009NoVisco_v01 plus k_S = 500 s/m^3 (Liang Table 2)'

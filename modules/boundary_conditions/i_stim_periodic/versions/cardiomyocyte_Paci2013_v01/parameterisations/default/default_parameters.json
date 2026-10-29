@@ -1,0 +1,12 @@
+{
+ "schema_version": 1,
+ "global": {
+  "Cm": {"value": 9.87109e-11, "units": "farad", "data_reference": "paci2013computational; CellML model_parameters Cm = 9.87109e-11 F (ventricular-like hiPSC-CM)", "sourced": "yes"}
+ },
+ "stim_flag": {"value": 1, "units": "dimensionless", "data_reference": "definitional; 1 enables pacing (paci2013computational CellML default is 0, i.e. spontaneous beating)", "sourced": "yes"},
+ "i_stim_start": {"value": 0.0, "units": "second", "data_reference": "paci2013computational; CellML stim_mode i_stim_Start = 0 s", "sourced": "yes"},
+ "i_stim_end": {"value": 800.0, "units": "second", "data_reference": "paci2013computational; CellML stim_mode i_stim_End = 800 s", "sourced": "yes"},
+ "i_stim_frequency": {"value": 1.0, "units": "per_s", "data_reference": "paci2013computational; CellML stim_mode i_stim_frequency = 60 beats per minute (declared per_second there, with period = 60/f); here in Hz, period = 1/f, so 1 Hz", "sourced": "yes"},
+ "i_stim_pulse_duration": {"value": 0.005, "units": "second", "data_reference": "paci2013computational; CellML stim_mode i_stim_PulseDuration = 0.005 s", "sourced": "yes"},
+ "i_stim_amplitude": {"value": 5.5e-10, "units": "ampere", "data_reference": "paci2013computational; CellML stim_mode i_stim_Amplitude = 5.5e-10 A", "sourced": "yes"}
+}

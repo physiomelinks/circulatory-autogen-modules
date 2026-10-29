@@ -1,0 +1,10 @@
+[
+ {"name": "membrane", "module_type": "membrane_potential", "module_subtype": "SN_varicosity_Argus2026_v01", "inp_instances": [], "out_instances": ["i_CaN", "i_NaCa", "PMCA", "Ca"]},
+ {"name": "Ca", "module_type": "Ca_handling", "module_subtype": "SN_varicosity_Argus2026_v01", "inp_instances": ["membrane"], "out_instances": ["i_CaN", "i_NaCa", "PMCA", "IP3R", "RyR", "NE"]},
+ {"name": "i_CaN", "module_type": "i_CaN", "module_subtype": "Argus2026_v01", "inp_instances": ["membrane", "Ca"], "out_instances": []},
+ {"name": "i_NaCa", "module_type": "i_NaCa", "module_subtype": "Argus2026_v01", "inp_instances": ["membrane", "Ca"], "out_instances": []},
+ {"name": "PMCA", "module_type": "PMCA", "module_subtype": "Colegrove2000_v01", "inp_instances": ["membrane", "Ca"], "out_instances": []},
+ {"name": "IP3R", "module_type": "IP3R", "module_subtype": "Argus2026_v01", "inp_instances": ["Ca"], "out_instances": []},
+ {"name": "RyR", "module_type": "RyR", "module_subtype": "HernandezCruz1997_v01", "inp_instances": ["Ca"], "out_instances": []},
+ {"name": "NE", "module_type": "neurotransmitter_release", "module_subtype": "SN_varicosity_Argus2026_v01", "inp_instances": ["Ca"], "out_instances": []}
+]
