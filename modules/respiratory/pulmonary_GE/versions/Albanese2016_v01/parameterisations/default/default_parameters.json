@@ -1,0 +1,23 @@
+{
+ "schema_version": 1,
+ "global": {
+  "overcap_solubility": {"value": 10000000000.0, "units": "J_per_m3", "data_reference": "control_parasymp: user_defined_for_numerical_stability", "sourced": "no"},
+  "saturation_cap": {"value": 0.9999, "units": "dimensionless", "data_reference": "control_parasymp: user_defined_for_numerical_stability", "sourced": "no"},
+  "k_1": {"value": 1998.5, "units": "J_per_m3", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "k_2": {"value": 25917.4, "units": "J_per_m3", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "h_1": {"value": 0.3836, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "h_2": {"value": 1.819, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "alpha_1": {"value": 2.40e-04, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "alpha_2": {"value": 4.19e-04, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "beta_1": {"value": 6.21e-05, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "beta_2": {"value": 2.44e-04, "units": "m3_per_J", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "C_O2_sat": {"value": 0.20448, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"},
+  "C_CO2_sat": {"value": 1.9564, "units": "dimensionless", "data_reference": "control_parasymp: spencer1979computational", "sourced": "yes"}
+ },
+ "C_CO2_p_init": {"value": 0.48, "units": "dimensionless", "data_reference": "control_parasymp: user_defined", "sourced": "no"},
+ "C_O2_p_init": {"value": 0.20, "units": "dimensionless", "data_reference": "control_parasymp: user_defined", "sourced": "no"},
+ "q_0": {"value": 2.00e-03, "units": "m3", "data_reference": "control_parasymp: user_defined", "sourced": "no"},
+ "k_O2": {"value": 1.7e-8, "units": "m6_per_Js", "data_reference": "control_parasymp: albanese2016integrated", "sourced": "yes"},
+ "k_CO2": {"value": 4.9e-7, "units": "m6_per_Js", "data_reference": "control_parasymp: albanese2016integrated", "sourced": "yes"},
+ "shunt_fraction": {"value": 0.017, "units": "dimensionless", "data_reference": "control_parasymp: GuytonAndHall2006", "sourced": "yes"}
+}

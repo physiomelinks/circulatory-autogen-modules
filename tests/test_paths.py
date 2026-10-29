@@ -16,10 +16,10 @@ def _module_type(modules, rel, versions):
     name = os.path.basename(rel)
     for v in versions:
         d = os.path.join(modules, rel, 'versions', v)
-        os.makedirs(os.path.join(d, 'instances', 'default'), exist_ok=True)
+        os.makedirs(os.path.join(d, 'parameterisations', 'default'), exist_ok=True)
         with open(os.path.join(d, f'{name}_{v}_modules_config.json'), 'w') as f:
             json.dump([{'module_type': name, 'module_subtype': v, 'component_file': f'{name}_{v}_modules.cellml',
-                        'component_type': f'{name}_{v}', 'default_instance': 'default', 'variables_and_units': []}], f)
+                        'component_type': f'{name}_{v}', 'default_parameterisation': 'default', 'variables_and_units': []}], f)
 
 
 @pytest.fixture
@@ -161,6 +161,7 @@ def test_reconfigure_clears_discovery(two_libraries):
     assert 'neighbour' in library.module_type_names(include_libraries=True)
 
 
+
 def test_libcuflynx_gets_every_library(two_libraries, monkeypatch, tmp_path):
     '''harness.generate (and the system models, the C++ run_test) pass module_library_dirs = the repo's
     modules/ then the extra libraries.'''
@@ -204,3 +205,16 @@ def test_plugin_registered_once(request):
     pm = request.config.pluginmanager
     assert pm.get_plugin('cam_testing.pytest_plugin') is pytest_plugin
     assert [p for p in pm.get_plugins() if p is pytest_plugin] == [pytest_plugin]
+
+
+def test_config_files_in_the_older_keys_are_refused(tmp_path):
+    '''A config file read by cam_testing uses the current keys; one in libcuflynx's older keys
+    (vessel_type, BC_type, module_file) is refused with the converter's command.'''
+    path = tmp_path / 'old_v1_modules_config.json'
+    path.write_text(json.dumps([{'vessel_type': 'old', 'BC_type': 'v1', 'module_file': 'old_v1_modules.cellml',
+                                 'module_type': 'old_v1', 'variables_and_units': []}]))
+    with pytest.raises(ValueError, match='cuflynx-upgrade module-config'):
+        library.read_config(str(path))
+    path.write_text(json.dumps([{'module_type': 'old', 'module_subtype': 'v1', 'component_file': 'old_v1_modules.cellml',
+                                 'component_type': 'old_v1', 'variables_and_units': []}]))
+    assert library.read_config(str(path))[0]['module_type'] == 'old_v1'      # internal: the component
