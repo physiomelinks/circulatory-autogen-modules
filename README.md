@@ -48,7 +48,9 @@ use_builtin_modules: false
 - the bibliography from `<module_type>_<v>_references.bib`;
 - invariants and validation settings from `<module_type>_<v>_verification_config.json`, notes and review from `<module_type>_<v>_tests.yaml`;
 - a parameterisation table with each parameterisation's data, baseline and calibration results; each baseline and calibration test shows two columns, "From the paper" (the publication figures the data were read off, `source_figures/`) and "Model vs data" / "Calibration results" (one plot per data item), each figure beside the plots of the items its `source_figures.json` entry lists in `items` (modules/README.md, "Source figures");
-- results and plots from the last test run.
+- results and plots from the last test run;
+- for a bond-graph version, its CellDL document drawn under the test overview (a section "Bond graph");
+- "Open in" links under the header. **CellDL**, for a bond-graph version, opens its `<module_type>_<v>_bondgraph.svg` in the CellDL editor (`https://physiomelinks.github.io/CellDLEditorComponent/?open=celldl#<base64>`; `report.CELLDL_EDITOR_URL`). **PhLynx** opens the version's test network as PhLynx exported it (`results/<module_type>_<v>_phlynx.omex`, kept by the PhLynx pipeline) at `https://phlynx.com/?open=omex#<base64>`; a supermodule shows N/A, as PhLynx has no supermodule form. Both carry the file in the URL's hash, standard base64 of its bytes, built by the page when the link is clicked (`cam_testing/templates/_open_in.js`); a page opened from disk may be blocked from reading the file, and then offers it to download instead. **Open in CUFLynx**, in the parameterisation table, opens the parameterisation's archive in the CUFLynx app (see `modules/README.md`, "CUFLynx archives").
 
 The site index (`make site`) groups the module_types by category (heart, directly under `modules/`, is its own group), lists a nested module_type by its path (e.g. `neuron/soma/SN_membrane_soma` under `cell`) and links both levels.
 
@@ -148,7 +150,7 @@ The host's own vessels name `heart` in their `inp_instances` / `out_instances`. 
 ## PhLynx → CUFLynx pipeline
 
 `tests/test_phlynx.py` checks that each version works end to end in the web tooling. Its three tests:
-- `phlynx_export_test`: builds the version's test network in PhLynx, using PhLynx's own code from a checkout, run headlessly under Node and jsdom by `cam_testing/bridges/phlynx/export_omex.mjs`. It loads this library's modules and parameters, checks every connection was made, and exports the `.omex` PhLynx sends to CUFLynx.
+- `phlynx_export_test`: builds the version's test network in PhLynx, using PhLynx's own code from a checkout, run headlessly under Node and jsdom by `cam_testing/bridges/phlynx/export_omex.mjs`. It loads this library's modules and parameters, checks every connection was made, and exports the `.omex` PhLynx sends to CUFLynx. The export is kept with the version's results, `results/<module_type>_<version>_phlynx.omex` (gitignored; removed when an export fails), and the report's "Open in PhLynx" link opens it.
 - `cuflynx_simulate_test`: imports that archive into a released CUFLynx binary through its HTTP API (`cam_testing/bridges/cuflynx/simulate_omex.py`) and simulates it.
 - `phlynx_equivalence_test`: compares CUFLynx's run with libcuflynx's model of the same network, within 1e-6 at the output times both runs share.
 

@@ -798,13 +798,17 @@ What an archive holds, in this order:
 | `<module_type>_<version>_<p>.cellml` | **Master model** (marked in `manifest.xml`): the flattened model of the version's test network (the version alone, or its `harness` network) with this parameterisation's parameters, as libcuflynx generates it. This is what CUFLynx opens and simulates. |
 | `<p>_obs_data.json` | The parameterisation's data, if it has any (CUFLynx's observations): calibration data, and held-out validation data as `prediction_items`. |
 | `<p>_params_for_id.json` | The parameters to identify, if any (CUFLynx's calibration setup). |
-| `<p>_parameters.json`, raw data files, `SOURCES.md`, `<p>_calibrated_parameters.json`, `<p>_calibration.json` | The parameterisation's own files, unchanged. |
+| `<p>_parameters.json` | The parameterisation's parameters, unchanged. |
+| `<p>_calibration.json`, `<p>_calibrated_parameters.json` | The calibration result, if the parameterisation has been calibrated (`validation_test_calibrate`): `_calibration.json` is an object with `calibrated_parameters` (and the cost and date), `_calibrated_parameters.json` the parameters with those values. |
+| raw data files, `SOURCES.md` | The parameterisation's other files, unchanged. |
 | `<module_type>_<version>_modules.cellml`, `_modules_config.json`, `_units.cellml` | The version's math, unchanged. |
 | `<module_type>_<version>_verification_config.json` | The version's verification settings, in preparation for CUFLynx running them. |
 | `<module_type>_<version>_<p>_module_array.json`, `_model_parameters.json` | The test network and the parameters file the model was generated from (with its supermodule instances' values). |
 | `<module_type>_<version>_default_parameters.json` | A supermodule's template (its default parameterisation) when `<p>` is another, and its nested supermodules' templates. |
 
-CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the params_for_id is the first `.csv` with "param" in its name, else the first `.json` with it (`<p>_parameters.json` has it too). So the study members come first, and the library has no `.csv` named "param".
+CUFLynx picks members by name: the first `.json` with "obs" in its name is the obs_data, and the params_for_id is the first `.csv` with "param" in its name, else the first `.json` with it (`<p>_parameters.json` has it too). So the study members come first, then the parameters, and the calibration result after them (its names hold "param"); the library has no `.csv` named "param", and CUFLynx recognises the calibration result by its names.
+
+The version report's "Open in CUFLynx" link, beside each archive's download, opens it in the CUFLynx app as `cuflynx://open?url=<the archive's absolute URL, percent-encoded>`, the URL worked out by the page itself, so it works on the published site and from disk. It needs a CUFLynx that handles `cuflynx://` links.
 
 A parameterisation with no obs_data or params_for_id still loads and simulates, but CUFLynx then tries other members in those roles and shows two harmless "could not read" notes. That limitation is noted for a future change.
 
