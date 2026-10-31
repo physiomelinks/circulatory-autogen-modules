@@ -67,10 +67,14 @@ def stability_test(component_model):
 
 
 def data_sources_test(component_key):
-    # no model: every calibration and validation data item has a source (cam_testing.sources;
-    # modules/README.md, "Data sources")
+    # no model: every calibration and validation data item has a source, and every parameter derivation
+    # checks (cam_testing.sources, cam_testing.derivations; modules/README.md, "Data sources")
+    import warnings
     version = load_version(*component_key)
-    _assert(sources.check(version), version)
+    result = sources.check(version)
+    for w in result.metrics.get('warnings') or []:
+        warnings.warn(f'data_sources_test: {w}')
+    _assert(result, version)
 
 
 # ---- bond graphs (N/A for a version without a CellDL bond graph) ----------------------------------

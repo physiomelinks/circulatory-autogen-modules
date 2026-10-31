@@ -51,6 +51,12 @@ window.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 {%- endif %}
+{%- if derived and derived.rows %}
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" defer></script>
+{%- endif %}
 </head>
 <body>
 <div class="wrap">
@@ -142,8 +148,15 @@ window.addEventListener('DOMContentLoaded', function () {
   {%- if sources %}
   <section aria-labelledby="data-sources-h">
     <h2 id="data-sources-h">Data sources</h2>
-    <p class="muted" style="margin:0;font-size:0.86rem">Where every number in <code>{{ name }}_obs_data.json</code> came from: one row per <code>data_item</code> and <code>prediction_item</code>, sourced from the item's <code>data_reference</code> or its section in the <code>SOURCES.md</code> beside it (modules/README.md, "Data sources").</p>
+    <p class="muted" style="margin:0;font-size:0.86rem">Where every number in <code>{{ name }}_obs_data.json</code> came from: one row per <code>data_item</code>, <code>prediction_item</code> and <code>input_item</code>, sourced from the item's <code>data_reference</code> or its section in the <code>SOURCES.md</code> beside it (modules/README.md, "Data sources").</p>
     {%- with tbl=sources, keys=[] %}{% include '_sources_table.html' %}{% endwith %}
+  </section>
+  {%- endif %}
+
+  {%- if derived %}
+  <section aria-labelledby="derived-h">
+    <h2 id="derived-h">Derived parameters</h2>
+    {%- with tbl=derived, keys=[] %}{% include '_derived_table.html' %}{% endwith %}
   </section>
   {%- endif %}
 

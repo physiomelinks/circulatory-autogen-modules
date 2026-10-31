@@ -11,10 +11,10 @@ An item's source is, in this order:
      heading is ignored), then optional labelled lines ``- <Label>: <text>`` (LABELS), then free prose.
 
 Value and sigma always come from the data file, never from SOURCES.md. Kind (measured / assumed /
-derived) is read only from the labels; role (target / prediction / held out / term / validation) is the
-item's place in the data: a data_item with weight > 0 is a target, a prediction_item with a value is held
-out, one without is a prediction, a weight-0 term of another item is a term (never a target), a baseline
-target or data column is validation. A data_item with weight 0
+derived) is read only from the labels; role (target / prediction / held out / term / input / validation) is
+the item's place in the data: a data_item with weight > 0 is a target, a prediction_item with a value is held
+out, one without is a prediction, a weight-0 term of another item is a term (never a target), an input_item
+(a number a parameter derivation reads) is an input, a baseline target or data column is validation. A data_item with weight 0
 whose sigma is >= TERM_SIGMA, or that another item's operation_kwargs names, is a term of another item
 (x1/x2 of a subtraction or division): its source must say "derived: term of <item>".
 """
@@ -187,7 +187,8 @@ def _row(name, *, variable='', operation='', value=None, sigma=None, unit='', ro
 
 
 def obs_data_rows(obs, sections):
-    '''One row per data_item and prediction_item of an obs_data dict, with sections its SOURCES.md's.'''
+    '''One row per data_item, prediction_item and input_item of an obs_data dict, with sections its
+    SOURCES.md's.'''
     data, preds = obs.get('data_items') or [], obs.get('prediction_items') or []
     referenced = _referenced_by(data + preds)
     rows = []
@@ -207,6 +208,13 @@ def obs_data_rows(obs, sections):
                              value=it.get('value'), sigma=it.get('std'), unit=it.get('unit') or '', role=role,
                              comment=it.get('comment') or '', reference=it.get('data_reference'),
                              section=sections.get(name), term_of=referenced.get(name), structural_term=term))
+    # input_items: numbers a parameter derivation reads, never scored (cam_testing.derivations). Sourced as a
+    # data item is; their free-text "source" is shown as a comment.
+    for it in obs.get('input_items') or []:
+        name = it.get('data_item_name') or '?'
+        comment = '; '.join(str(it[k]) for k in ('source', 'comment') if it.get(k))
+        rows.append(_row(name, value=it.get('value'), sigma=it.get('std'), unit=it.get('unit') or '', role='input',
+                         comment=comment, reference=it.get('data_reference'), section=sections.get(name)))
     return rows
 
 
@@ -286,20 +294,33 @@ def version_problems(version):
 
 
 def check(version):
-    '''The data_sources_test result: passed when every calibration and validation data item of the version
-    has a source (a data_reference or its SOURCES.md section), weight-0 terms saying "derived: term of
-    <item>"; not applicable without data items.'''
-    from cam_testing import checks
+    '''The data_sources_test result: passed when every calibration and validation data item (and derivation
+    input_item) of the version has a source (a data_reference or its SOURCES.md section), weight-0 terms saying
+    "derived: term of <item>", and every parameterisation's derivations check (cam_testing.derivations); not
+    applicable without data items or derivations. Derivation warnings are in details ("warning: ...") and
+    metrics['warnings'], and never fail the test.'''
+    from cam_testing import checks, derivations
     tables = version_tables(version)
     n = sum(len(t['rows']) for _, t in tables)
     extra = [f'{i.name}: SOURCES.md heading "{h}" names no data item' for i, t in tables for h in t['extra_headings']]
-    if not n:
-        return checks.Result('data_sources_test', checks.NOT_APPLICABLE, 'no calibration or validation data items')
+    der = derivations.check(derivations.version_sets(version), version.reviewed)
+    warns = [f'warning: {w}' for w in der['warnings']]
+    metrics = {'n_items': n, 'n_derivation_files': der['n_files'], 'warnings': der['warnings']}
+    if not n and not der['n_files']:
+        return checks.Result('data_sources_test', checks.NOT_APPLICABLE, 'no calibration or validation data items',
+                             metrics, details=warns)
     problems = version_problems(version)
-    if problems:
-        return checks.Result('data_sources_test', checks.FAILED,
-                             f'{len(problems)} of {n} data items have no source', {'n_items': n, 'n_unsourced': len(problems)},
-                             details=problems + extra)
-    return checks.Result('data_sources_test', checks.PASSED, f'all {n} data items have a source',
-                         {'n_items': n, 'n_unsourced': 0}, details=extra)
+    if problems or der['problems']:
+        msg = '; '.join(filter(None, [f'{len(problems)} of {n} data items have no source' if problems else '',
+                                      f'{len(der["problems"])} derivation problems' if der['problems'] else '']))
+        return checks.Result('data_sources_test', checks.FAILED, msg, dict(metrics, n_unsourced=len(problems)),
+                             details=problems + der['problems'] + warns + extra)
+    if der['skipped']:
+        return checks.Result('data_sources_test', checks.SKIPPED,
+                             f'all {n} data items have a source; derivations not checked: {der["skipped"]}',
+                             dict(metrics, n_unsourced=0), details=warns + extra)
+    msg = f'all {n} data items have a source' + (f'; {der["n_files"]} derivations files check'
+                                                 if der['n_files'] else '')
+    return checks.Result('data_sources_test', checks.PASSED, msg, dict(metrics, n_unsourced=0),
+                         details=warns + extra)
 

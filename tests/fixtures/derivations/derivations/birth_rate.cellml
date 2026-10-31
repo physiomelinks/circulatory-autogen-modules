@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.cellml.org/cellml/2.0#" name="birth_rate">
+  <component name="derivation">
+    <variable name="births" units="dimensionless" initial_value="0"/>
+    <variable name="N" units="dimensionless" initial_value="1"/>
+    <variable name="alpha" units="dimensionless"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply><eq/><ci>alpha</ci><apply><divide/><ci>births</ci><ci>N</ci></apply></apply>
+    </math>
+  </component>
+</model>
