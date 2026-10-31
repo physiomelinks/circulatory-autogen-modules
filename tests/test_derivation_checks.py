@@ -169,9 +169,11 @@ def test_a_stale_cache_fails(repo, where):
     assert 'gamma: cached 0.81' in detail and "derivation 'gamma' gives 0.803" in detail
 
 
-def test_an_input_that_does_not_resolve_and_an_invalid_cellml_model_fail(repo):
+def test_inputs_that_do_not_resolve_and_an_invalid_cellml_model_fail(repo):
+    # two bad inputs of one derivation: each is reported
     _edit(repo.pdir / f'{P}_derivations.json',
-          lambda d: d['derivations'][1]['inputs'].update(N={'data_item': 'no_such_item'}))
+          lambda d: d['derivations'][1]['inputs'].update(N={'data_item': 'no_such_item'},
+                                                         births={'input_item': 'no_such_input'}))
     with open(repo.pdir / 'derivations' / 'birth_rate.cellml') as f:
         text = f.read()
     with open(repo.pdir / 'derivations' / 'birth_rate.cellml', 'w') as f:
@@ -180,6 +182,8 @@ def test_an_input_that_does_not_resolve_and_an_invalid_cellml_model_fail(repo):
     assert r.status == checks.FAILED
     text = '\n'.join(r.details)
     assert "input 'N' (data_item 'no_such_item')" in text and 'no_such_units' in text
+    assert "input 'births' (input_item 'no_such_input')" in text
+    assert r.message == '3 derivation problems'
 
 
 def test_a_derived_parameter_without_a_derivation_warns_in_a_reviewed_version_only(repo):

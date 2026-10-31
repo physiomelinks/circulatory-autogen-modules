@@ -55,23 +55,17 @@ def problems(parameters_path, obs_data_path):
     input that does not resolve, CellML model that does not validate, and cached value that is not the derived
     one.'''
     from libcuflynx import derivations as dv
-    from libcuflynx.derivations.cellml_method import load_derivation_model
     path = derivations_path(parameters_path)
     try:
         found = dv.load_derivations(path)
         doc = dv.read_parameters(parameters_path)
-        obs_items = dv.load_obs_items(_obs(obs_data_path))
+        out = [reason for _, _, reason in dv.unresolved_inputs(found, doc, _obs(obs_data_path))]
     except Exception as e:
         return None, [_error(e)]
-    out = []
     for d in found:
-        try:
-            dv.resolve_inputs(d, doc, obs_items)
-        except Exception as e:
-            out.append(_error(e))
         if d.method == 'cellml':
             try:
-                load_derivation_model(d.files()[0])
+                dv.load_derivation_model(d.files()[0])
             except Exception as e:
                 out.append(f"derivation '{d.name}': {_error(e)}")
     if out:
