@@ -1,0 +1,33 @@
+{#- The "Derived parameters" table of one derivations file (cam_testing.derivations.table): included with
+    tbl (the table) and keys (the bib keys linked to the page's References; empty on a system page). -#}
+<p class="muted" style="margin:4px 0;font-size:0.8rem">{{ tbl.rows|length }} derivation{{ '' if tbl.rows|length == 1 else 's' }} in <code>{{ tbl.file }}</code>: parameters calculated from experimental data, never in a simulation. Each derived parameter keeps its value as a cache, checked against the derivation (rtol 1e-9).</p>
+{%- if tbl.skipped %}<p class="todo" style="font-size:0.84rem">Not evaluated: {{ tbl.skipped }}</p>{% endif %}
+{%- if tbl.problems %}<ul class="todo" style="font-size:0.84rem">{% for p in tbl.problems %}<li>{{ p }}</li>{% endfor %}</ul>{% endif %}
+{%- if tbl.rows %}
+<div class="table-wrap"><table class="sources derived">
+  <thead><tr><th>Derivation</th><th>Equation</th><th>Inputs</th><th>Result</th></tr></thead>
+  <tbody>
+  {%- for r in tbl.rows %}
+    <tr id="derivation-{{ r.name }}"{% if r.error %} class="unsourced"{% endif %}>
+      <td><span class="mono" style="font-weight:600">{{ r.name }}</span><br><span class="mono muted" style="font-size:0.76rem">{{ r.spec }}</span>{% if r.comment %}<br><span class="muted" style="font-size:0.78rem;white-space:normal">{{ r.comment|cite(keys) }}</span>{% endif %}</td>
+      <td style="white-space:normal;min-width:14rem">
+        {%- if r.method == 'cellml' %}{% for eq in r.equations %}<div class="tex">\[ {{ eq }} \]</div>{% endfor %}
+        {%- else %}<span class="mono">{{ r.function }}()</span> <span class="chip partial" title="a Python function: its calculation is not stated declaratively">not declarative</span>{% if r.doc %}<br><span class="muted" style="font-size:0.8rem">{{ r.doc }}</span>{% endif %}
+        {%- endif %}
+        {%- if r.error %}<div class="todo" style="font-size:0.8rem">{{ r.error }}</div>{% endif %}
+      </td>
+      <td style="white-space:normal;font-size:0.8rem;min-width:18rem">
+        {%- for i in r.inputs %}
+        <div{% if i.missing %} class="todo"{% endif %}><span class="mono">{{ i.symbol }}</span> = <span class="mono">{{ i.value|fmt }}{% if i.std is not none %} ± {{ i.std|fmt }}{% endif %}</span> <span class="muted">{{ i.units }}</span> <span class="muted" style="font-size:0.74rem">({{ i.kind }} <span class="mono">{{ i.reference }}</span>)</span>: {% if i.missing %}<span class="chip failed">{{ i.source }}</span>{% else %}{{ i.source|cite(keys) }}{% endif %}</div>
+        {%- endfor %}
+      </td>
+      <td style="white-space:normal;font-size:0.8rem">
+        {%- for o in r.outputs %}
+        <div><span class="mono">{{ o.symbol }}</span> = <span class="mono">{{ o.value|fmt if o.value is not none else '—' }}</span> <span class="muted">{{ o.units or '' }}</span> &rarr; <span class="mono">{{ o.parameter }}</span>{% if o.stale %} <span class="chip failed" title="the parameters file holds {{ o.cached }}">cache stale: {{ o.cached }}</span>{% endif %}</div>
+        {%- endfor %}
+      </td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
+{%- endif %}

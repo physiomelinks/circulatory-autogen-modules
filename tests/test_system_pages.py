@@ -96,7 +96,8 @@ def test_page_without_a_screenshot_draws_a_diagram(repo):
     assert '<details><summary><span class="mono">heart</span> · 1 value</summary>' in html
     assert 'lv/E_es' in html
     statuses = {t['key']: t['status'] for t in ctx['tests']}
-    assert statuses == {'system_run_test': 'passed', 'system_invariants_test': None, 'system_equivalence_test': None}
+    assert statuses == {'system_run_test': 'passed', 'system_invariants_test': None, 'system_equivalence_test': None,
+                        'system_derivations_test': None}
 
 
 def test_screenshot_nodes_link_to_the_version_pages(repo):

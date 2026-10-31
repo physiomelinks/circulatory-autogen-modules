@@ -180,6 +180,16 @@ def component_equations(cellml_path, component_name):
     return equations, converter.unsupported
 
 
+def model_equations(cellml_path):
+    '''Every equation of a CellML model (1.1 or 2.0: any namespace) as LaTeX, in file order, plus the
+    set of MathML tags that could not be converted.'''
+    root = ET.parse(cellml_path).getroot()
+    converter = Converter()
+    equations = [converter.convert(eq) for math in root.iter(f'{{{MATHML_NS}}}math') for eq in math
+                 if _local(eq.tag) == 'apply']
+    return equations, converter.unsupported
+
+
 def equation_target(eq):
     '''(variable, kind) an equation (a top-level MathML apply) defines: ("x", "ode") for d(x)/dt = ...,
     ("y", "algebraic") for y = ..., (None, None) otherwise (e.g. 0 = f(x)).'''

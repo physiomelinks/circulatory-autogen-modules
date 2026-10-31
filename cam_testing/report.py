@@ -26,7 +26,7 @@ import urllib.parse
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, bondgraph, checks, module_array, phlynx, ranges, risk, sources
+from cam_testing import bib, bondgraph, checks, derivations, module_array, phlynx, ranges, risk, sources
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -278,6 +278,7 @@ def parameterisation_context(version, inst):
     from cam_testing import omex as omex_mod
     omex_file = omex_mod.omex_path(version, inst)
     omex_result = checks.load(version, f'cuflynx_parameterisation_omex_test__{inst.name}')
+    data_sources = sources.parameterisation_table(inst)
     return {'name': inst.name, 'is_default': inst.is_default, 'files': inst.data_files(),
             # the generated COMBINE archive for CUFLynx (tools/build_parameterisation_omex.py), and its CUFLynx check
             'omex': os.path.relpath(omex_file, version.dir) if os.path.isfile(omex_file) else None,
@@ -289,7 +290,8 @@ def parameterisation_context(version, inst):
             'calibrated_file': os.path.basename(inst.calibrated_parameters_path)
             if os.path.isfile(inst.calibrated_parameters_path) else None,
             'rel_dir': os.path.relpath(inst.dir, version.dir),
-            'sources': sources_table(sources.parameterisation_table(inst), version.dir),
+            'sources': sources_table(data_sources, version.dir),
+            'derived': derivations.table(inst.parameters_path, inst.obs_data_path, data_sources, version.dir),
             'tests': tests, 'baseline': tests[0], 'calibrate': tests[1]}
 
 
@@ -1202,10 +1204,14 @@ def build_review_queue(contexts, out_path, href, standalone=True):
 # overlays a link per node to that instance's version page); otherwise a diagram generated from the
 # module array's connections.
 
-SYSTEM_TESTS = ['system_run_test', 'system_invariants_test', 'system_equivalence_test']
+SYSTEM_TESTS = ['system_run_test', 'system_invariants_test', 'system_equivalence_test', 'system_derivations_test']
 SYSTEM_TEST_TITLES = {'system_run_test': 'Run', 'system_invariants_test': 'Verification: invariants',
-                      'system_equivalence_test': 'Equivalence: reproduces its reference'}
+                      'system_equivalence_test': 'Equivalence: reproduces its reference',
+                      'system_derivations_test': 'Derived parameters'}
 SYSTEM_TEST_ABOUT = {
+    'system_derivations_test': 'Every parameter derivation (<model>_derivations.json) checks: its inputs resolve '
+                               'and are sourced, its CellML model validates, and each derived parameter\'s value '
+                               'is the derived one (rtol 1e-9).',
     'system_run_test': 'The model generates with libcuflynx from this library and runs; every output is finite.',
     'system_invariants_test': 'The spec\'s invariants (conservation laws, bounds) hold over the run.',
     'system_equivalence_test': 'The model reproduces its reference (circulatory_autogen\'s original, or a ready '
@@ -1401,6 +1407,7 @@ def system_context(system, href_of=None, page_dir=None):
         n['href'] = hrefs.get(n['instance'])
         n['key'] = next(f'{i["module_type"]}/{i["version"]}' for i in instances if i['name'] == n['instance'])
     tests = _system_tests(system)
+    system_sources = sources.data_table(system.dir, obs=sources.read_obs(derivations.system_sets(system)[0][2]))
     counts = {}
     for t in tests:
         counts[t['status']] = counts.get(t['status'], 0) + 1
@@ -1416,8 +1423,8 @@ def system_context(system, href_of=None, page_dir=None):
         'parameters': _parameter_groups(os.path.join(system.dir, f'{system.name}_parameters.json')),
         'parameters_file': f'{system.name}_parameters.json',
         'tests': tests, 'counts': counts, 'plots': _system_plots(system),
-        'sources': sources_table(sources.data_table(system.dir, obs=sources.read_obs(
-            os.path.join(system.dir, f'{system.name}_obs_data.json'))), system.dir),
+        'sources': sources_table(system_sources, system.dir),
+        'derived': derivations.table(*derivations.system_sets(system)[0][1:], system_sources, system.dir),
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
     }
 

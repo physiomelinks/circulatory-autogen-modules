@@ -436,6 +436,28 @@ says "term of <item>, not a measurement", and its source must say so explicitly
   where to add its source. It runs for unreviewed versions too; in CI their failures are warnings
   (`tools/ci_reviewed_failures.py`), so it gates reviewed versions and new sign-offs.
 
+### Derived parameters
+
+A parameter calculated from experimental data (a resistance from a pressure drop and a flow, say) is
+recorded by a **derivations file**, `<p>_derivations.json` beside `<p>_parameters.json` (a system model:
+`<model>_derivations.json`), with its CellML derivation models or Python functions in `derivations/`
+beside it. The format is libcuflynx's (`tutorial/docs/parameter-derivations.md` in circulatory_autogen;
+needs physiomelinks/circulatory_autogen#621): inputs are obs_data `input_items` (numbers never scored),
+`data_items` or other parameters; each derived parameter keeps its `value` as a cache and names its
+`derivation`. Update the cached values with `cuflynx-derive <p>_derivations.json --obs <p>_obs_data.json --write`.
+
+- **Sources:** an `input_item` is sourced as a data item is (above): a `data_reference`, or its section
+  in `SOURCES.md`; its free-text `source` is shown as a comment. Its role in the Data sources table is
+  *input*.
+- **Checked by** `data_sources_test` (a version) and `system_derivations_test` (a system model,
+  `tests/test_systems.py`): every input resolves and is sourced, every CellML derivation model validates
+  (libCellML, units included), and every derived parameter's cached value is the derived one (rtol 1e-9).
+  In a reviewed version or system model, a parameter whose `data_reference` starts with "derived" but
+  names no `derivation` is a warning. With a libcuflynx without derivations, the check is skipped.
+- **The table:** version and system-model pages have a "Derived parameters" table: each derivation's
+  equation (LaTeX from its CellML model; a Python function shows its name and first docstring line and is
+  flagged *not declarative*), its inputs with value, std, units and source, and the parameters it sets.
+
 ## How system models use versions and parameterisations
 
 System models live in `../system_models/<category>/<model>/` (not in `modules/`; they are not

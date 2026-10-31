@@ -152,6 +152,10 @@
           "required": [
             "source_figures.json"
           ]
+        },
+        "derivations": {
+          "description": "The CellML derivation models and Python derivation functions {parameterisation}_derivations.json names (modules/README.md, 'Derived parameters').",
+          "file_pattern": "^([A-Za-z0-9][A-Za-z0-9_.-]*\\.(cellml|py)|__pycache__)$"
         }
       }
     },
@@ -208,6 +212,7 @@
           "{model}_parameters_unfinished.json",
           "{model}_obs_data.json",
           "{model}_params_for_id.json",
+          "{model}_derivations.json",
           "{model}.html",
           "{model}_phlynx.png",
           "{model}_phlynx_nodes.json"
@@ -217,7 +222,8 @@
       "directories": [
         "reference",
         "results",
-        "plots"
+        "plots",
+        "derivations"
       ]
     },
     "reference": {
