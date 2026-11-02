@@ -27,9 +27,11 @@ concurrency:
   group: module-tests-${{ github.ref }}
   cancel-in-progress: true
 
+# All workflows pin ubuntu-24.04: the PyPI libcellml wheel needs libxml2.so.2, which ubuntu-latest
+# (26.04) does not have.
 jobs:
   discover:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.list.outputs.matrix }}
     steps:
@@ -41,7 +43,7 @@ jobs:
         run: echo "matrix=$(python3 -m cam_testing.shards matrix)" >> "$GITHUB_OUTPUT"
 
   structure:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -66,7 +68,7 @@ jobs:
   # (.github/actions/setup, key ci/setup_key.sh): fails, printing the difference, when the cache
   # is stale, e.g. an unpinned dependency released a new version.
   setup-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +86,7 @@ jobs:
   # tissue_diffusion_FEniCS. FEniCSx is a conda-forge package, and the generated model's shared
   # library is loaded into that Python, so it is built with the environment's compiler and SUNDIALS.
   coupled:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
       # MPI (UCX) must not open the runner's InfiniBand device: on some runner VMs (Azure MANA, mana_0)
@@ -128,7 +130,7 @@ jobs:
   test:
     name: ${{ matrix.label }}
     needs: discover
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -241,7 +243,7 @@ jobs:
   site:
     needs: [test, coupled, structure]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CAM_LEDGER_DIR: /home/runner/.cam-ledger
     steps:
@@ -302,7 +304,7 @@ jobs:
   deploy:
     needs: site
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       pages: write
       id-token: write
