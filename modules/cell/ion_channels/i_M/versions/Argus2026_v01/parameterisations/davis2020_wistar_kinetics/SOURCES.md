@@ -8,7 +8,8 @@ relaxation is mapped onto the gate w with the module's fixed w_inf, so the data 
 
 - Kind: measured (one cell's raw current, normalised onto w)
 - Role: target
-- Source: davis2020downregulation; the protocol from davis2021transcriptomic p. 172
+- Data reference: davis2020downregulation; Fig. 3C, representative Wistar trace, digitised
+- Note: the protocol is from davis2021transcriptomic p. 172
 - Figure: Fig. 3C, the representative Wistar trace (deactivation at −55 mV)
 - Species/preparation: Wistar rat stellate neuron, n = 1; perforated patch, room temperature; raw current (not XE-991-subtracted); hold −25 mV, 1 s step to −55 mV
 - Obtained: digitised column by column, normalised to the relaxation's own end points, mapped onto w (w_inf(−25) = 0.7311, w_inf(−55) = 0.1192)
@@ -19,7 +20,8 @@ relaxation is mapped onto the gate w with the module's fixed w_inf, so the data 
 
 - Kind: measured (one cell's raw current, normalised onto w)
 - Role: target
-- Source: davis2020downregulation; the protocol from davis2021transcriptomic p. 172
+- Data reference: davis2020downregulation; Fig. 3C, representative Wistar trace, digitised
+- Note: the protocol is from davis2021transcriptomic p. 172
 - Figure: Fig. 3C, the representative Wistar trace (reactivation on return to −25 mV)
 - Species/preparation: Wistar rat stellate neuron, n = 1; perforated patch, room temperature; raw current (not XE-991-subtracted); return from −55 mV to −25 mV
 - Obtained: digitised column by column, normalised to the relaxation's own end points, mapped onto w (w_inf(−25) = 0.7311, w_inf(−55) = 0.1192)

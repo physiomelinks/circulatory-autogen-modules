@@ -8,7 +8,7 @@ Where the file came from: `../hudson_bay_lynx_hare/SOURCES.md`.
 
 - Kind: measured (pelt counts, thousands, a proxy for the hare population)
 - Role: validation
-- Source: hewitt1921conservation, via carpenter2018predator (the Stan example's `hudson-bay-lynx-hare.csv`)
+- Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
 - Species/preparation: snowshoe hare; Hudson's Bay Company pelt records, 1900–1920
 - Obtained: table values, the Hare column (model output `x`)
 
@@ -16,6 +16,6 @@ Where the file came from: `../hudson_bay_lynx_hare/SOURCES.md`.
 
 - Kind: measured (pelt counts, thousands, a proxy for the lynx population)
 - Role: validation
-- Source: hewitt1921conservation, via carpenter2018predator (the Stan example's `hudson-bay-lynx-hare.csv`)
+- Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
 - Species/preparation: Canada lynx; Hudson's Bay Company pelt records, 1900–1920
 - Obtained: table values, the Lynx column (model output `y`)

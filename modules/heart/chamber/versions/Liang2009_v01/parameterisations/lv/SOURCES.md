@@ -9,7 +9,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 - Kind: derived (Liang et al.'s simulated ascending-aortic pressure, normal case)
 - Role: target
-- Source: liang2009multi
+- Data reference: liang2009multi; Fig. 4b, normal case, digitised
 - Figure: Fig. 4b (p. 751), thick black curve; source_figures/liang2009_fig4b.png
 - Obtained: digitised every 0.01 s into `liang2009_fig4b_aortic_pressure.csv` (axes from the tick marks)
 - Sigma: 2 mmHg, the digitising uncertainty.
@@ -18,7 +18,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 - Kind: derived (Liang et al.'s simulated P-V loop, normal case)
 - Role: target
-- Source: liang2009multi
+- Data reference: liang2009multi; Fig. 4e, right edge of the normal loop, digitised
 - Figure: Fig. 4e (p. 751), right edge of the normal loop; source_figures/liang2009_fig4e.png
 - Obtained: digitised, 117.6 ml
 - Sigma: 2 ml, the digitising uncertainty.
@@ -27,7 +27,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 - Kind: derived (Liang et al.'s simulated P-V loop, normal case)
 - Role: target
-- Source: liang2009multi
+- Data reference: liang2009multi; Fig. 4e, left edge of the normal loop, digitised
 - Figure: Fig. 4e (p. 751), left edge of the normal loop; source_figures/liang2009_fig4e.png
 - Obtained: digitised, 41.8 ml
 - Sigma: 2 ml, the digitising uncertainty.
@@ -36,7 +36,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 - Kind: derived (Liang et al.'s simulated LV pressure, normal case)
 - Role: held out
-- Source: liang2009multi
+- Data reference: liang2009multi; Fig. 4a, normal case, digitised
 - Figure: Fig. 4a (p. 751), thick black curve; source_figures/liang2009_fig4a.png
 - Obtained: digitised every 0.01 s into `liang2009_fig4a_lv_pressure.csv`
 - Sigma: 2 mmHg, the digitising uncertainty.
@@ -45,7 +45,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 - Kind: derived (from the Fig. 4a curve)
 - Role: validation
-- Source: liang2009multi
+- Data reference: liang2009multi; Fig. 4a: 108.14 mmHg
 - Figure: Fig. 4a: 108.14 mmHg
 - Obtained: digitised
 - Sigma: the target is the range 97.33–118.95 mmHg (±10 % of 108.14; the spec records the range, not why it is 10 %: unconfirmed).
@@ -54,7 +54,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 - Kind: derived (from the Fig. 4a curve)
 - Role: validation
-- Source: liang2009multi
+- Data reference: liang2009multi; Fig. 4a: 1.56 mmHg
 - Figure: Fig. 4a: 1.56 mmHg
 - Obtained: digitised
 - Sigma: the target is the range 0–5 mmHg (the spec records the range, not its rationale: unconfirmed).
@@ -63,7 +63,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 - Kind: derived (from the Fig. 4a curve)
 - Role: validation
-- Source: liang2009multi
+- Data reference: liang2009multi; Fig. 4a: 7.29 mmHg at the start of contraction
 - Figure: Fig. 4a: 7.29 mmHg at the start of contraction
 - Obtained: digitised
 - Sigma: the range 5.29–9.29 mmHg, ±2 mmHg, the digitising uncertainty as in the calibration.

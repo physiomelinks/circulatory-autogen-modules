@@ -27,7 +27,7 @@ Carpenter's lognormal error, but nothing here records that it was chosen for tha
 
 - Kind: measured (pelt counts, thousands, a proxy for the hare population)
 - Role: target
-- Source: hewitt1921conservation, via carpenter2018predator (the Stan example's `hudson-bay-lynx-hare.csv`)
+- Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
 - Species/preparation: snowshoe hare; Hudson's Bay Company pelt records, 1900–1915
 - Obtained: table values, the Hare column of `hudson_bay_lynx_hare.csv` (16 years)
 - Sigma: 0.25 × value (above).
@@ -36,7 +36,7 @@ Carpenter's lognormal error, but nothing here records that it was chosen for tha
 
 - Kind: measured (pelt counts, thousands, a proxy for the lynx population)
 - Role: target
-- Source: hewitt1921conservation, via carpenter2018predator (the Stan example's `hudson-bay-lynx-hare.csv`)
+- Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
 - Species/preparation: Canada lynx; Hudson's Bay Company pelt records, 1900–1915
 - Obtained: table values, the Lynx column of `hudson_bay_lynx_hare.csv` (16 years)
 - Sigma: 0.25 × value (above).
@@ -45,7 +45,7 @@ Carpenter's lognormal error, but nothing here records that it was chosen for tha
 
 - Kind: measured (as mod/x)
 - Role: held out
-- Source: hewitt1921conservation, via carpenter2018predator
+- Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
 - Species/preparation: snowshoe hare; pelt records, 1900–1920
 - Obtained: the Hare column, all 21 years; calibration fits 1900–1915, so 1915–1920 is the prediction
 - Sigma: 0.25 × value (above).
@@ -54,7 +54,7 @@ Carpenter's lognormal error, but nothing here records that it was chosen for tha
 
 - Kind: measured (as mod/y)
 - Role: held out
-- Source: hewitt1921conservation, via carpenter2018predator
+- Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
 - Species/preparation: Canada lynx; pelt records, 1900–1920
 - Obtained: the Lynx column, all 21 years; calibration fits 1900–1915, so 1915–1920 is the prediction
 - Sigma: 0.25 × value (above).
@@ -63,33 +63,38 @@ Carpenter's lognormal error, but nothing here records that it was chosen for tha
 
 - Kind: derived (the maximum of x_validation)
 - Role: held out
-- Source: x_validation (cam_testing.calibrate.feature_items)
+- Data reference: hewitt1921conservation; from x_validation
+- Obtained: computed from x_validation by cam_testing.calibrate.feature_items
 - Sigma: x_validation's std at that year.
 
 ## x_mean_validation
 
 - Kind: derived (the mean of x_validation)
 - Role: held out
-- Source: x_validation (cam_testing.calibrate.feature_items)
+- Data reference: hewitt1921conservation; from x_validation
+- Obtained: computed from x_validation by cam_testing.calibrate.feature_items
 - Sigma: propagated, sqrt(Σ std²) / n.
 
 ## y_max_validation
 
 - Kind: derived (the maximum of y_validation)
 - Role: held out
-- Source: y_validation (cam_testing.calibrate.feature_items)
+- Data reference: hewitt1921conservation; from y_validation
+- Obtained: computed from y_validation by cam_testing.calibrate.feature_items
 - Sigma: y_validation's std at that year.
 
 ## y_min_validation
 
 - Kind: derived (the minimum of y_validation)
 - Role: held out
-- Source: y_validation (cam_testing.calibrate.feature_items)
+- Data reference: hewitt1921conservation; from y_validation
+- Obtained: computed from y_validation by cam_testing.calibrate.feature_items
 - Sigma: y_validation's std at that year.
 
 ## y_mean_validation
 
 - Kind: derived (the mean of y_validation)
 - Role: held out
-- Source: y_validation (cam_testing.calibrate.feature_items)
+- Data reference: hewitt1921conservation; from y_validation
+- Obtained: computed from y_validation by cam_testing.calibrate.feature_items
 - Sigma: propagated, sqrt(Σ std²) / n.

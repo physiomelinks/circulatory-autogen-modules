@@ -1,6 +1,6 @@
 # TwoMinima calibration check
 
-`TwoMinima__nn_obs_data.json` is circulatory_autogen's two-minima fixture (`resources/TwoMinima_obs_data.json`, with operands renamed to this repo's test vessel `mod`).
+`TwoMinima_data_obs_data.json` is circulatory_autogen's two-minima fixture (`resources/TwoMinima_obs_data.json`, with operands renamed to this repo's test vessel `mod`).
 
 - **Data:** one constant item, the steady-state average of x = 4 ± 0.5.
 - **Why two minima:** x settles to a², so a = +2 and a = −2 fit equally well.
@@ -12,7 +12,8 @@ This checks calibration and identifiability, not physical validation. The valida
 
 - Kind: derived (synthetic: the steady state of x = a² at a = ±2)
 - Role: target
-- Source: circulatory_autogen's two-minima test fixture, `resources/TwoMinima_obs_data.json` (operands renamed to `mod`)
+- Data reference: circulatory_autogen two-minima test fixture; resources/TwoMinima_obs_data.json
+- Note: the operands are renamed to `mod`
 - Obtained: copied from the fixture
 - Sigma: 0.5, as in the fixture; it is not a measurement uncertainty.
 

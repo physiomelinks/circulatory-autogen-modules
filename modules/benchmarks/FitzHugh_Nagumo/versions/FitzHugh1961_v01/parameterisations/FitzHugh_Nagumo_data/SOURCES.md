@@ -15,7 +15,8 @@ The items below have no species or preparation: the data are synthetic model out
 
 - Kind: derived (synthetic: FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0))
 - Role: target
-- Source: ramsay2007parameter, the benchmark as shipped with circulatory_autogen (`resources/FitzHugh_Nagumo_obs_data.json`)
+- Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
+- Note: circulatory_autogen `resources/FitzHugh_Nagumo_obs_data.json`
 - Obtained: copied from the fixture; 201 samples every 0.2 over 0–40
 - Sigma: 0.1, the benchmark's declared noise std (the values themselves look noise-free, above).
 
@@ -23,7 +24,8 @@ The items below have no species or preparation: the data are synthetic model out
 
 - Kind: derived (synthetic: FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0))
 - Role: target
-- Source: ramsay2007parameter, the benchmark as shipped with circulatory_autogen (`resources/FitzHugh_Nagumo_obs_data.json`)
+- Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
+- Note: circulatory_autogen `resources/FitzHugh_Nagumo_obs_data.json`
 - Obtained: copied from the fixture; 201 samples every 0.2 over 0–40
 - Sigma: 0.05, the benchmark's declared noise std.
 
@@ -31,7 +33,8 @@ The items below have no species or preparation: the data are synthetic model out
 
 - Kind: derived (synthetic, as mod/V)
 - Role: held out
-- Source: ramsay2007parameter, as mod/V
+- Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
+- Note: as mod/V
 - Obtained: 301 samples every 0.2 over 0–60; the calibration fits 0–40, so 40–60 is the prediction
 - Sigma: 0.1, as mod/V.
 
@@ -39,7 +42,8 @@ The items below have no species or preparation: the data are synthetic model out
 
 - Kind: derived (synthetic, as mod/R)
 - Role: held out
-- Source: ramsay2007parameter, as mod/R
+- Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
+- Note: as mod/R
 - Obtained: 301 samples every 0.2 over 0–60; the calibration fits 0–40, so 40–60 is the prediction
 - Sigma: 0.05, as mod/R.
 
@@ -47,40 +51,46 @@ The items below have no species or preparation: the data are synthetic model out
 
 - Kind: derived (the maximum of V_validation)
 - Role: held out
-- Source: V_validation (cam_testing.calibrate.feature_items)
+- Data reference: ramsay2007parameter; from V_validation
+- Obtained: computed from V_validation by cam_testing.calibrate.feature_items
 - Sigma: V_validation's std at that sample.
 
 ## V_min_validation
 
 - Kind: derived (the minimum of V_validation)
 - Role: held out
-- Source: V_validation (cam_testing.calibrate.feature_items)
+- Data reference: ramsay2007parameter; from V_validation
+- Obtained: computed from V_validation by cam_testing.calibrate.feature_items
 - Sigma: V_validation's std at that sample.
 
 ## V_mean_validation
 
 - Kind: derived (the mean of V_validation)
 - Role: held out
-- Source: V_validation (cam_testing.calibrate.feature_items)
+- Data reference: ramsay2007parameter; from V_validation
+- Obtained: computed from V_validation by cam_testing.calibrate.feature_items
 - Sigma: propagated, sqrt(Σ std²) / n = 0.1 / √301.
 
 ## R_max_validation
 
 - Kind: derived (the maximum of R_validation)
 - Role: held out
-- Source: R_validation (cam_testing.calibrate.feature_items)
+- Data reference: ramsay2007parameter; from R_validation
+- Obtained: computed from R_validation by cam_testing.calibrate.feature_items
 - Sigma: R_validation's std at that sample.
 
 ## R_min_validation
 
 - Kind: derived (the minimum of R_validation)
 - Role: held out
-- Source: R_validation (cam_testing.calibrate.feature_items)
+- Data reference: ramsay2007parameter; from R_validation
+- Obtained: computed from R_validation by cam_testing.calibrate.feature_items
 - Sigma: R_validation's std at that sample.
 
 ## R_mean_validation
 
 - Kind: derived (the mean of R_validation)
 - Role: held out
-- Source: R_validation (cam_testing.calibrate.feature_items)
+- Data reference: ramsay2007parameter; from R_validation
+- Obtained: computed from R_validation by cam_testing.calibrate.feature_items
 - Sigma: propagated, sqrt(Σ std²) / n.

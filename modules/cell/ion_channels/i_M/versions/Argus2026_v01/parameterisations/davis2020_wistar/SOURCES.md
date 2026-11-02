@@ -7,7 +7,8 @@ and the thesis pages defining the measure are in source_figures/.
 
 - Kind: measured (the current density); the conversion to a current uses an assumed Cm = 30 pF (not reported by Davis; the SN model's soma capacitance)
 - Role: target
-- Source: davis2020downregulation; the measure's definition from davis2021transcriptomic pp. 172–173
+- Data reference: davis2020downregulation; Fig. 3C legend, Wistar median
+- Note: the measure's definition is from davis2021transcriptomic pp. 172–173
 - Figure: Fig. 3C, the Wistar column (source_figures/davis2020_fig3c.png); thesis Fig. 4.10C is the same data
 - Species/preparation: Wistar rat stellate neurons; perforated patch, room temperature; 10 µM XE-991-sensitive current; hold −25 mV, 1 s step to −55 mV
 - Obtained: table value from the figure legend (−4.032 pA/pF, median, n = 11) × 30 pF = −0.12096 nA
