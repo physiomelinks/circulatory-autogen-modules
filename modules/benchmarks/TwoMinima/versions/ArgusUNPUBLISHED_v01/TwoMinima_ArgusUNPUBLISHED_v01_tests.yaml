@@ -4,5 +4,5 @@ reviewed: true
 notes: Linear relaxation dx/dt = c(a² − x) to the steady state a². Used by circulatory_autogen to test calibration with two
   equally good optima (a = ±2 both give a steady state of 4).
 expected_failures:
-  cuflynx_parameterisation_omex_test: 'TwoMinima_data fails until a CUFLynx release bundles circulatory_autogen #618: the released CUFLynx''s libcuflynx
-    refuses the obs_data item key data_reference. default passes.'
+  cuflynx_parameterisation_omex_test[TwoMinima_data]: 'Fails until a CUFLynx release bundles circulatory_autogen #618: the
+    released CUFLynx''s libcuflynx refuses the obs_data item key data_reference.'
