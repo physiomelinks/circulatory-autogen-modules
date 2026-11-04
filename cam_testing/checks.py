@@ -1467,7 +1467,8 @@ def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstraine
         if row['works']:
             return row, ''
         if row.get('timed_out'):
-            return row, f'stopped: run (step {step:g}) reached the {min(budget, remaining):.0f} s limit'
+            which = 'unconstrained' if step is None else f'step {step:g}'
+            return row, f'stopped: run ({which}) reached the {min(budget, remaining):.0f} s limit'
 
 
 def config_label(cfg):
