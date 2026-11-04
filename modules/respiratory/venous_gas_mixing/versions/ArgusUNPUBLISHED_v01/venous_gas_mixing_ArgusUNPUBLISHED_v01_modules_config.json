@@ -1,0 +1,83 @@
+[
+  {
+    "module_type": "venous_gas_mixing",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "venous_gas_mixing_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "venous_gas_mixing",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026circulatory"
+    ],
+    "required_citations_uncertain": [
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "gas_flux_port",
+        "variables": [
+          "v",
+          "J_CO2",
+          "J_O2"
+        ],
+        "multi_port": "sum"
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "gas_port",
+        "variables": [
+          "C_CO2_mix",
+          "C_O2_mix"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_mix"
+        ]
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "J_CO2",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "J_O2",
+        "m3_per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "v_mix",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "C_CO2_mix",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "C_O2_mix",
+        "dimensionless",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]
