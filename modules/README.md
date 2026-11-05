@@ -26,6 +26,8 @@ modules/
           <module_type>_<version>_tests.yaml             review and record-keeping (see "The version spec")
           <module_type>_<version>_references.bib         BibTeX entries its parameters and its required_citations cite
           <module_type>_<version>_references_proposed.bib   citations proposed for review (optional)
+          <module_type>_<version>_bondgraph.svg          its bond graph as a CellDL document (optional; see "Versions", "Sources")
+          <module_type>_<version>_bondgraph.ttl          that document's BG-RDF, the same graph (optional)
           <module_type>_<version>.html                   version report (generated)
           risk/                                          joint failure-risk analysis (make risk; committed)
           plots/  results/                               written by the tests (not committed)
@@ -201,6 +203,18 @@ exists, that no renamed-from version is left, and that each entry gives its reas
 A version is one piece of math for a module_type: one CellML component and one config entry. **The
 version's name is the config entry's `module_subtype`**, so a model picks a version with
 `"module_subtype"`.
+
+**Sources.** A version's math is written in one of two places, its source:
+- its CellML, `<module_type>_<version>_modules.cellml`, edited directly or exported from PhLynx; or
+- its CellDL document, `<module_type>_<version>_bondgraph.svg`, a bond graph drawn in the CellDL editor, with its
+  BG-RDF also in `_bondgraph.ttl`. The CellML is then the one PhLynx's converter (`@physiomelinks/bg2cellml`) makes
+  from the document, saved as `_modules.cellml`.
+
+Every version has its CellML: libcuflynx, PhLynx and CUFLynx load it. A version with both is tested to be one model
+(`bondgraph_cellml_test`): the CellML the converter makes from the document must simulate as the saved CellML does.
+Where they differ, the saved CellML is the one used and the CellDL test fails, until one is changed to match the
+other. Neither is written by a script: a tool may help (a check, a conversion), but its output is not the place to
+edit.
 - **Names** follow "Placement and naming", rule 4: `<Source><Year>_vXX` (`Paci2013_v01`,
   `Tao2011_v01`, `ArgusUNPUBLISHED_v01`), with `<system>_` and `<compartment>_` in front where they
   tell versions apart (`SN_soma_Argus2026_v01`, `cardiomyocyte_Paci2013_v01`), `_SI` and `_OLD`
@@ -787,7 +801,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 
 Every parameterisation can be opened in CUFLynx as one file: `parameterisations/<p>/<module_type>_<version>_<p>.omex`, a COMBINE archive.
 
-The archive is **generated** from the files above by `make omex` (`tools/build_parameterisation_omex.py`; `cam_testing/omex.py`). It is never edited, and it isn't committed (it's gitignored). So there is only ever one place to change anything: the version's CellML, config, units or verification config, or the parameterisation's parameters and data. Rebuild with `make omex MODULE=<module_type or category>`. CI builds the archives, and the version report links each parameterisation's archive for download.
+The archive is **generated** from the files above by `make omex` (`tools/build_parameterisation_omex.py`; `cam_testing/omex.py`). It is never edited, and it isn't committed (it's gitignored). So there is only ever one place to change anything: the version's source (its CellML or its CellDL document: "Versions", "Sources"), config, units or verification config, or the parameterisation's parameters and data. Rebuild with `make omex MODULE=<module_type or category>`. CI builds the archives, and the version report links each parameterisation's archive for download.
 
 What an archive holds, in this order:
 

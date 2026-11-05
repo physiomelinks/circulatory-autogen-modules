@@ -41,6 +41,7 @@ def __getattr__(name):
 TEST_TITLES = {
     'bondgraph_celldl_test': 'Bond graph: opens in CellDL',
     'bondgraph_reactions_test': 'Bond graph: reactions match Rhea',
+    'bondgraph_cellml_test': 'Bond graph: same model as the CellML',
     'review_test': 'Reviewed',
     'run_test': 'Run',
     'verification_test_invariants': 'Verification: invariants',
@@ -64,12 +65,20 @@ TEST_SHORT = {
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
     'coupled_validation_test': 'Coupled',
     'bondgraph_celldl_test': 'Opens in CellDL', 'bondgraph_reactions_test': 'Reactions vs Rhea',
+    'bondgraph_cellml_test': 'CellDL = CellML',
 }
 TEST_ABOUT = {
     'bondgraph_celldl_test': 'The version\'s bond graph (<version>_bondgraph.svg) is a CellDL document the editor '
                              'opens: Turtle BG-RDF with one bond-graph model, every element and connection drawn and '
                              'nothing drawn that the RDF lacks, and the same graph as <version>_bondgraph.ttl. With '
-                             'BG_TOOLS set, bg2cellml also makes CellML from it. N/A without a bond graph.',
+                             'the CellDL bridge installed (make celldl-setup), PhLynx\'s converter also makes CellML '
+                             'from it. N/A without a bond graph.',
+    'bondgraph_cellml_test': 'A version\'s source is its CellML or its CellDL document. With both, they must be the '
+                             'same model: the CellML PhLynx\'s converter (@physiomelinks/bg2cellml) makes from the '
+                             'document simulates as the version\'s CellML does, every store and membrane potential '
+                             'within 1e-6 of its size over 60 s from the default parameterisation with the stores moved '
+                             'off it. Where they differ the CellML is used and this test fails. Skipped without the '
+                             'CellDL bridge; N/A without a bond graph.',
     'bondgraph_reactions_test': 'Every reaction annotated with a Rhea reaction (bqbiol:isVersionOf, or bqbiol:hasPart '
                                 'for a lumped one) has Rhea\'s participants (ChEBI terms on its species) and '
                                 'stoichiometry (bond counts), allowing the reverse direction and one common factor. A '

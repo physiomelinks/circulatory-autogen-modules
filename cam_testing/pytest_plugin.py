@@ -30,7 +30,8 @@ MARKERS = [
 # supermodule_equivalence_test runs for unreviewed versions too: it guards the system models built on them
 QUICK_TESTS = ('review_test', 'run_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
                'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test',
-               'cuflynx_parameterisation_omex_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test')
+               'cuflynx_parameterisation_omex_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test',
+               'bondgraph_cellml_test')
 
 
 def pytest_addoption(parser):

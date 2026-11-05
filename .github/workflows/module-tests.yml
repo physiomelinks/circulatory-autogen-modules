@@ -160,6 +160,13 @@ jobs:
           restore-keys: |
             ledger-json-${{ github.head_ref || github.ref_name }}-
             ledger-json-main-
+      # the bond-graph tests make CellML from CellDL documents with PhLynx's converter under node
+      - uses: actions/setup-node@v4
+        if: matrix.stage == 'vv'
+        with: { node-version: '22' }
+      - name: CellDL bridge (bond-graph tests)
+        if: matrix.stage == 'vv'
+        run: make celldl-setup
       - name: V&V tests
         id: vv
         if: matrix.stage == 'vv'
