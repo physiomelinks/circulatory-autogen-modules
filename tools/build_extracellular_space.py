@@ -193,26 +193,26 @@ def cap(s):
 vol_invariants = []
 for s in SPECIES:
     src = f'({face_sum[s]}) + j_{s}_cell' + (' + V_e*f_mx_glc*k_mx*C_mx' if s == 'glc' else '')
-    moved = f'np.trapz(np.abs(fN__J_{s}_down) + np.abs(fS__J_{s}_up) + abs(j_{s}_cell), t)'
+    moved = f'np.trapezoid(np.abs(fN__J_{s}_down) + np.abs(fS__J_{s}_up) + abs(j_{s}_cell), t)'
     vol_invariants.append({
         'description': f'{s} balance: {cap(s)} dC_{s} = integral of the face fluxes and the cells\' exchange'
                        + (' plus the glucose released by matrix breakdown' if s == 'glc' else '')
                        + ' (trapezoid; 1e-3 of the amount moved)',
-        'expr': f'abs({cap(s)}*(C_{s}[-1] - C_{s}[0]) - np.trapz({src}, t)) <= 1e-3*{moved} + 1e-30'})
-GLC_MOVED = 'np.trapz(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t)'
+        'expr': f'abs({cap(s)}*(C_{s}[-1] - C_{s}[0]) - np.trapezoid({src}, t)) <= 1e-3*{moved} + 1e-30'})
+GLC_MOVED = 'np.trapezoid(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t)'
 vol_invariants += [
     {'description': 'matrix balance: V_e dC_mx = integral of the matrix delivered less breakdown and overflow (trapezoid; '
                     '1e-3 of the amount moved)',
-     'expr': 'abs(V_e*(C_mx[-1] - C_mx[0]) - np.trapz(j_mx_cell - V_e*(r_mx + r_ovf), t)) <= '
-             '1e-3*np.trapz(j_mx_cell + V_e*(r_mx + r_ovf), t) + 1e-30'},
+     'expr': 'abs(V_e*(C_mx[-1] - C_mx[0]) - np.trapezoid(j_mx_cell - V_e*(r_mx + r_ovf), t)) <= '
+             '1e-3*np.trapezoid(j_mx_cell + V_e*(r_mx + r_ovf), t) + 1e-30'},
     {'description': 'carbon (glucose units): V_e (C_glc + C_mx) changes by the face and cell glucose fluxes and the matrix '
                     'delivered, less J_mx_lost (trapezoid; 1e-3 of the amount moved)',
-     'expr': f'abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) - np.trapz(({face_sum["glc"]}) + j_glc_cell + '
+     'expr': f'abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) - np.trapezoid(({face_sum["glc"]}) + j_glc_cell + '
              f'j_mx_cell - J_mx_lost, t)) <= 1e-3*{GLC_MOVED} + 1e-30'},
     {'description': 'carbon held: V_e (C_glc + C_mx) + N_mx_lost changes only by the face and cell glucose fluxes and '
                     'the matrix delivered (trapezoid; 1e-3 of the amount moved)',
      'expr': f'abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) + N_mx_lost[-1] - N_mx_lost[0] - '
-             f'np.trapz(({face_sum["glc"]}) + j_glc_cell + j_mx_cell, t)) <= 1e-3*{GLC_MOVED} + 1e-30'},
+             f'np.trapezoid(({face_sum["glc"]}) + j_glc_cell + j_mx_cell, t)) <= 1e-3*{GLC_MOVED} + 1e-30'},
     {'description': 'definitions (exact): phi = v_mx C_mx, f_hind = ((1 - phi)/(1 + phi))^2, pH = -log10(C_H/c_std), '
                     'J_mx_lost = V_e ((1 - f_mx_glc) k_mx C_mx + k_ovf C_mx (C_mx/C_mx_max)^8)',
      'expr': 'np.allclose(phi, v_mx*C_mx, rtol=1e-12, atol=0) and np.allclose(f_hind, ((1 - phi)/(1 + phi))**2, '

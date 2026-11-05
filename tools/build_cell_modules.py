@@ -198,8 +198,8 @@ em_invariants = [
                     'released plus the enthalpy stored in ATP: V h_ATP dATP + Q_met dt + (flux_glc h_glc + flux_lac h_lac) dt '
                     f'= 0 integrated over the run, with h_glc = 6 h_O2_ox = {h_glc:g} J/mol and h_lac = h_glc/2 - h_lac_gly '
                     f'= {h_lac:g} J/mol, relative to CO2, H2O and ADP + Pi (relative 1e-6 of the heat released)',
-     'expr': 'abs(V_c*h_ATP*(ATP[-1] - ATP[0]) + np.trapz(Q_met + flux_glc*6*h_O2_ox + flux_lac*(3*h_O2_ox - '
-             'h_lac_gly), t)) <= 1e-6*np.trapz(np.abs(Q_met), t)'},
+     'expr': 'abs(V_c*h_ATP*(ATP[-1] - ATP[0]) + np.trapezoid(Q_met + flux_glc*6*h_O2_ox + flux_lac*(3*h_O2_ox - '
+             'h_lac_gly), t)) <= 1e-6*np.trapezoid(np.abs(Q_met), t)'},
     {'description': 'second law: every reaction runs forward (irreversible, far from equilibrium), r_ox, r_gly, '
                     'r_dem >= 0',
      'expr': 'np.all(r_ox >= 0) and np.all(r_gly >= 0) and np.all(r_dem >= 0)'},

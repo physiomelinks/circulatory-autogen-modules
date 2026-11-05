@@ -4,7 +4,9 @@ used by the tools/build_*_modules.py and tools/build_adaptive_cell.py builders.
 Equations are infix text converted by tools/cellml_writer.py. Bib entries are registered in BIB by the builders; every
 key must follow the library's convention (cam_testing.bib.convention_key).
 """
+import contextlib
 import csv
+import io
 import json
 import os
 import re
@@ -86,6 +88,39 @@ def kept_record_keys(config_path):
     return keys
 
 
+def parameters_json(csv_path):
+    """Converts a parameters CSV just written at csv_path to the library's nested JSON beside it (libcuflynx's
+    cuflynx-upgrade parameters, which reads the version's config for its globals), removing the CSV. The
+    version's config must be written first. Returns the JSON's path."""
+    from libcuflynx.upgrade import upgrade_parameters
+    json_path = os.path.splitext(csv_path)[0] + '.json'
+    if os.path.exists(json_path):
+        os.remove(json_path)
+    with contextlib.redirect_stdout(io.StringIO()):
+        upgrade_parameters(csv_path)
+    return json_path
+
+
+def supermodule_layout(config_path):
+    """Converts a supermodule version just written with "submodules" in its config (and its default parameterisation
+    written) to libcuflynx's layout (cuflynx-upgrade module-config): its instances in <stem>_module_array.json with
+    submodule_versions, and their values nested by instance in its default parameterisation."""
+    from libcuflynx.upgrade import upgrade_module_config
+    array_path = config_path.replace('_modules_config.json', '_module_array.json')
+    if os.path.exists(array_path):
+        os.remove(array_path)
+    with contextlib.redirect_stdout(io.StringIO()):
+        upgrade_module_config(config_path, module_library_dirs=(os.path.join(REPO, 'modules'),))
+
+
+def parameter_rows(json_path):
+    """A parameters JSON's rows as dicts (variable_name, units, value, data_reference, sourced), a global by its
+    plain name, values as text."""
+    from cam_testing.library import read_parameters
+    return [{'variable_name': p.variable_name, 'units': p.units, 'value': p.value,
+             'data_reference': p.data_reference, 'sourced': p.sourced} for p in read_parameters(json_path)]
+
+
 def bib_text(keys):
     out = []
     for k in keys:
@@ -111,6 +146,15 @@ def write_version(category, module_type, component, variables, equations, config
         f.write(units_model({u: UNITS[u] for u in UNITS if u in used_units or any(
             p[0] == u for x in used_units for p in UNITS.get(x, []))}))
     roles = {name: role for name, role in config_extra.pop('roles').items()}
+    # a multi_port "sum" is set by the modules connected through its port, or by its parameter when none is, so it is
+    # a boundary_condition (libcuflynx refuses a "variable" sum with nothing connected)
+    for key in ('entrance_ports', 'exit_ports', 'general_ports'):
+        for port in config_extra.get(key) or []:
+            multi = port.get('multi_port')
+            kinds = multi if isinstance(multi, list) else [multi] * len(port['variables'])
+            for var, kind in zip(port['variables'], kinds):
+                if kind == 'sum':
+                    roles[var] = 'boundary_condition'
     var_units = {v[0]: v[1] for v in variables}
     config = {
         'module_type': module_type, 'module_subtype': version, 'module_format': 'cellml',
@@ -123,12 +167,14 @@ def write_version(category, module_type, component, variables, equations, config
         f.write('\n')
     for inst, rows in [('default', params)] + list((extra_instances or {}).items()):
         os.makedirs(os.path.join(d, 'parameterisations', inst), exist_ok=True)
-        with open(os.path.join(d, 'parameterisations', inst, f'{inst}_parameters.csv'), 'w', newline='') as f:
+        csv_path = os.path.join(d, 'parameterisations', inst, f'{inst}_parameters.csv')
+        with open(csv_path, 'w', newline='') as f:
             w = csv.writer(f, lineterminator='\n')
             w.writerow(['variable_name', 'units', 'value', 'data_reference', 'sourced'])
             for name, value, ref, sourced in rows:
                 w.writerow([name, var_units[name], repr(value) if isinstance(value, float) else value, ref,
                             'yes' if sourced else 'no'])
+        parameters_json(csv_path)
     with open(os.path.join(d, f'{stem}_verification_config.json'), 'w') as f:
         json.dump({'module_type': module_type, 'version': version, **verification}, f, indent=2)
         f.write('\n')

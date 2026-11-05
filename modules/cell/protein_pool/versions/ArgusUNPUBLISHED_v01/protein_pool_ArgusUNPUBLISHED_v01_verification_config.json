@@ -56,7 +56,7 @@
     },
     {
       "description": "the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0) - int (r_down - r_prot) dt) = int (J_build + J_saved) dt (relative 1e-4: trapezoid integration of the logged fluxes)",
-      "expr": "abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapz(r_down - r_prot, t)) - np.trapz(J_build + J_saved, t)) <= 1e-4*abs(np.trapz(J_build + J_saved, t)) + 1e-4*n_0*L*(c_syn + c_poly)/N_A*np.trapz(r_prot, t) + 1e-30",
+      "expr": "abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapezoid(r_down - r_prot, t)) - np.trapezoid(J_build + J_saved, t)) <= 1e-4*abs(np.trapezoid(J_build + J_saved, t)) + 1e-4*n_0*L*(c_syn + c_poly)/N_A*np.trapezoid(r_prot, t) + 1e-30",
       "applies": "run"
     },
     {

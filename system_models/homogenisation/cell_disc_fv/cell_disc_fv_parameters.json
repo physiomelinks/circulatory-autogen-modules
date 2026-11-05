@@ -1,0 +1,429 @@
+{
+ "schema_version": 1,
+ "global": {
+  "sigma_diff": {"value": 2.41e-09, "units": "m2_per_s", "data_reference": "secomb2020mass; Table 1 tissue O2 diffusivity 2410 um^2/s"}
+ },
+ "bath": {
+  "C_P_init": {"value": 0.2, "units": "millimolar", "data_reference": "homogenisation example: well-mixed bath, no consumption"},
+  "V_P": {"value": 1.0, "units": "m3", "data_reference": "homogenisation example: well-mixed bath, no consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": 0, "units": "millimolar_per_s", "data_reference": "homogenisation example: well-mixed bath, no consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c0": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 6.135923151542566e-18, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c1": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.8407769454627698e-17, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c2": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.067961575771283e-17, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c3": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 4.295146206079796e-17, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c4": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 5.522330836388308e-17, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c5": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 6.749515466696826e-17, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c6": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 7.976700097005335e-17, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c7": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 9.203884727313848e-17, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c8": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.0431069357622363e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c9": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.1658253987930867e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c10": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.2885438618239392e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c11": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.4112623248547914e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c12": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.533980787885641e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c13": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.6566992509164932e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c14": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.7794177139473437e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c15": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 1.902136176978196e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c16": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.0248546400090465e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c17": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.1475731030398987e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c18": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.270291566070749e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c19": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.393010029101598e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c20": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.515728492132454e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c21": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.6384469551633023e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c22": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.761165418194155e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c23": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 2.883883881225011e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c24": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.0066023442558476e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c25": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.1293208072867157e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c26": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.252039270317552e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c27": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.374757733348421e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c28": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.4974761963792566e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c29": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.620194659410117e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c30": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.7429131224409537e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "c31": {
+  "C_P_init": {"value": 0, "units": "millimolar", "data_reference": "homogenisation example: geometry and default consumption"},
+  "V_P": {"value": 3.86563158547183e-16, "units": "m3", "data_reference": "homogenisation example: geometry and default consumption"},
+  "flux_c": {"value": 0, "units": "mol_per_s", "data_reference": "no capillary supply"},
+  "M": {"value": -0.0558, "units": "millimolar_per_s", "data_reference": "homogenisation example: geometry and default consumption"},
+  "C50": {"value": 0.0133, "units": "millimolar", "data_reference": "CelayaAlcala2021 via the default instance"}
+ },
+ "f0": {
+  "A_f": {"value": 3.9269908169872424e-11, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 3.125e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5625000000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f1": {
+  "A_f": {"value": 7.853981633974485e-11, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000001e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f2": {
+  "A_f": {"value": 1.1780972450961726e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f3": {
+  "A_f": {"value": 1.570796326794897e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f4": {
+  "A_f": {"value": 1.9634954084936207e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000002e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f5": {
+  "A_f": {"value": 2.3561944901923453e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f6": {
+  "A_f": {"value": 2.7488935718910696e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f7": {
+  "A_f": {"value": 3.141592653589794e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f8": {
+  "A_f": {"value": 3.534291735288518e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f9": {
+  "A_f": {"value": 3.9269908169872415e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f10": {
+  "A_f": {"value": 4.319689898685966e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999999e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f11": {
+  "A_f": {"value": 4.712388980384691e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f12": {
+  "A_f": {"value": 5.105088062083415e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f13": {
+  "A_f": {"value": 5.497787143782139e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f14": {
+  "A_f": {"value": 5.890486225480863e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f15": {
+  "A_f": {"value": 6.283185307179588e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f16": {
+  "A_f": {"value": 6.675884388878312e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f17": {
+  "A_f": {"value": 7.068583470577036e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f18": {
+  "A_f": {"value": 7.461282552275759e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f19": {
+  "A_f": {"value": 7.853981633974483e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f20": {
+  "A_f": {"value": 8.246680715673207e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f21": {
+  "A_f": {"value": 8.639379797371932e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999956e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f22": {
+  "A_f": {"value": 9.032078879070656e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f23": {
+  "A_f": {"value": 9.424777960769381e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999872e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f24": {
+  "A_f": {"value": 9.817477042468105e-10, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f25": {
+  "A_f": {"value": 1.021017612416683e-09, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f26": {
+  "A_f": {"value": 1.0602875205865552e-09, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999872e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f27": {
+  "A_f": {"value": 1.0995574287564278e-09, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.5624999999999872e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f28": {
+  "A_f": {"value": 1.1388273369263e-09, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f29": {
+  "A_f": {"value": 1.1780972450961727e-09, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "f30": {
+  "A_f": {"value": 1.217367153266045e-09, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 1.5624999999999872e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "e0": {
+  "A_f": {"value": 1.2566370614359176e-09, "units": "m2", "data_reference": "mesh geometry: face area"},
+  "d_up": {"value": 0.0, "units": "metre", "data_reference": "mesh geometry"},
+  "d_down": {"value": 1.562500000000004e-07, "units": "metre", "data_reference": "mesh geometry"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ }
+}

@@ -79,11 +79,11 @@
     },
     {
       "description": "the daughter receives exactly the growth ATP spent: P(t) - P(0) = int J_growth_used dt (relative 1e-6)",
-      "expr": "abs(P_growth[-1] - P_growth[0] - np.trapz(J_growth_used, t)) <= 1e-6*abs(np.trapz(J_growth_used, t)) + 1e-30"
+      "expr": "abs(P_growth[-1] - P_growth[0] - np.trapezoid(J_growth_used, t)) <= 1e-6*abs(np.trapezoid(J_growth_used, t)) + 1e-30"
     },
     {
       "description": "damage balance of each type: D_x(t) - D_x(0) = int (accrual - repair) dt (relative 1e-6), never negative; the total is their sum (exact)",
-      "expr": "abs(D_phys[-1] - D_phys[0] - np.trapz(R_dmg_phys - R_rep_phys, t)) <= 1e-6*np.trapz(np.abs(R_dmg_phys) + np.abs(R_rep_phys), t) + 1e-15 and np.all(D_phys >= 0) and abs(D_rad[-1] - D_rad[0] - np.trapz(R_dmg_rad - R_rep_rad, t)) <= 1e-6*np.trapz(np.abs(R_dmg_rad) + np.abs(R_rep_rad), t) + 1e-15 and np.all(D_rad >= 0) and abs(D_ribo[-1] - D_ribo[0] - np.trapz(R_dmg_ribo - R_rep_ribo, t)) <= 1e-6*np.trapz(np.abs(R_dmg_ribo) + np.abs(R_rep_ribo), t) + 1e-15 and np.all(D_ribo >= 0) and abs(D_energy[-1] - D_energy[0] - np.trapz(R_dmg_energy - R_rep_energy, t)) <= 1e-6*np.trapz(np.abs(R_dmg_energy) + np.abs(R_rep_energy), t) + 1e-15 and np.all(D_energy >= 0) and np.allclose(D, D_phys + D_rad + D_ribo + D_energy, rtol=1e-12, atol=1e-30)"
+      "expr": "abs(D_phys[-1] - D_phys[0] - np.trapezoid(R_dmg_phys - R_rep_phys, t)) <= 1e-6*np.trapezoid(np.abs(R_dmg_phys) + np.abs(R_rep_phys), t) + 1e-15 and np.all(D_phys >= 0) and abs(D_rad[-1] - D_rad[0] - np.trapezoid(R_dmg_rad - R_rep_rad, t)) <= 1e-6*np.trapezoid(np.abs(R_dmg_rad) + np.abs(R_rep_rad), t) + 1e-15 and np.all(D_rad >= 0) and abs(D_ribo[-1] - D_ribo[0] - np.trapezoid(R_dmg_ribo - R_rep_ribo, t)) <= 1e-6*np.trapezoid(np.abs(R_dmg_ribo) + np.abs(R_rep_ribo), t) + 1e-15 and np.all(D_ribo >= 0) and abs(D_energy[-1] - D_energy[0] - np.trapezoid(R_dmg_energy - R_rep_energy, t)) <= 1e-6*np.trapezoid(np.abs(R_dmg_energy) + np.abs(R_rep_energy), t) + 1e-15 and np.all(D_energy >= 0) and np.allclose(D, D_phys + D_rad + D_ribo + D_energy, rtol=1e-12, atol=1e-30)"
     },
     {
       "description": "damage accrual (exact): wear, Ca2+ overload, K+ loss and the maintenance ATPase's cut share (k_qc_dmg (1 - R_reg_maint)) for the ribosomes, attacks and the unpaid lipid upkeep (k_lipid_dmg x_unpaid) for the envelope, falling ATP for de-energisation, k_rad dose rate for radiation; the thresholds give exactly 0 above them, and with the upkeep paid and nothing cut the new terms are 0",

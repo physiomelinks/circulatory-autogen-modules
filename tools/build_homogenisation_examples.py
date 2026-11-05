@@ -42,6 +42,7 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from cam_testing import module_array  # noqa: E402
+from module_writer import parameters_json  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, 'system_models', 'homogenisation')
@@ -187,10 +188,12 @@ def write(model, description, cells, faces, exposed, sim_time, homogenisation=No
                    [f'{fname}/d_down', 'metre', dc, kind],
                    [f'{fname}/open_flag', 'dimensionless', 1, 'open face']]
     module_array.write_records(os.path.join(d, f'{model}_module_array.json'), module_array.from_rows(rows))
-    with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
+    csv_path = os.path.join(d, f'{model}_parameters.csv')
+    with open(csv_path, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(['variable_name', 'units', 'value', 'data_reference'])
         w.writerows(params)
+    parameters_json(csv_path)
 
     vols = ' + '.join(f'{c["V"]!r}*{n}__C_P' for n, c in cells.items())
     cons = ' + '.join(f'{c["V"]!r}*{n}__M_reduced' for n, c in cells.items())

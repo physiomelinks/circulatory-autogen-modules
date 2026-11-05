@@ -257,10 +257,11 @@ def build_report():
     with open(os.path.join(IDIR, f'{PARAMETERISATION}_calibration.json')) as f:
         cal = json.load(f)
     cur = {'tau_w_num': 1200.0, 'tau_w_min': 30.0}
-    with open(os.path.join(VDIR, 'parameterisations', 'default', 'default_parameters.csv'), newline='') as f:
-        for r in csv.DictReader(f):
-            if r['variable_name'] in cur:
-                cur[r['variable_name']] = float(r['value'])
+    from libcuflynx.utilities import parameters_file as pf
+    for r in pf.read_parameter_rows(os.path.join(VDIR, 'parameterisations', 'default', 'default_parameters.json'),
+                                    kind=pf.MODULE):
+        if r['variable_name'] in cur:
+            cur[r['variable_name']] = float(r['value'])
     new = {k: float(cal['calibrated_parameters'][k]) for k in ('tau_w_num', 'tau_w_min')}
     fmt = lambda x: '0' if abs(x) < 1e-6 else f'{x:.4g}'
     sets = [('current', cur, '#6b7280'), ('calibrated', new, '#d9480f')]
@@ -499,7 +500,7 @@ Spikes are upward crossings of 0 mV; the one spike at rest is the start-up trans
 
 <h2>Redo</h2>
 <p><code>venv/bin/python tools/i_M_davis2020_kinetics.py obs-data</code> re-digitises the trace. Alternatively, edit
-<code>parameterisations/{PARAMETERISATION}/{PARAMETERISATION}_obs_data.json</code> or <code>_params_for_id.csv</code> directly. Then run
+<code>parameterisations/{PARAMETERISATION}/{PARAMETERISATION}_obs_data.json</code> or <code>_params_for_id.json</code> directly. Then run
 <code>venv/bin/python -m pytest tests/test_modules.py --component i_M/Argus2026_v01 -k 'calibrate and {PARAMETERISATION}' --include-unreviewed</code>
 and <code>venv/bin/python tools/i_M_davis2020_kinetics.py report</code>.</p>
 </main></body></html>

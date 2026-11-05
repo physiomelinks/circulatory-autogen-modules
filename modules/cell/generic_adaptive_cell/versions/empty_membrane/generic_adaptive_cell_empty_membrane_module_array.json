@@ -1,0 +1,16 @@
+[
+ {"name": "membrane", "module_type": "membrane_potential", "module_subtype": "adaptive_ArgusUNPUBLISHED_v01", "inp_instances": [], "out_instances": ["Na_K", "Ca", "H", "cytosol", "bio", "protein", "i_leak_Na", "i_leak_Ca", "i_leak_H"]},
+ {"name": "Na_K", "module_type": "ion_concentrations", "module_subtype": "SN_soma_Argus2026_v01", "inp_instances": ["membrane"], "out_instances": ["i_leak_Na", "bio"]},
+ {"name": "Ca", "module_type": "Ca_handling", "module_subtype": "adaptive_ArgusUNPUBLISHED_v01", "inp_instances": ["membrane"], "out_instances": ["i_leak_Ca", "bio"]},
+ {"name": "H", "module_type": "H_handling", "module_subtype": "adaptive_ArgusUNPUBLISHED_v01", "inp_instances": ["membrane", "cytosol"], "out_instances": ["i_leak_H", "reg"]},
+ {"name": "cytosol", "module_type": "energy_metabolism", "module_subtype": "adaptive_ArgusUNPUBLISHED_v01", "inp_instances": ["membrane", "pool_Glyc"], "out_instances": ["H", "protein", "bio", "reg"]},
+ {"name": "bio", "module_type": "biosynthesis", "module_subtype": "adaptive_ArgusUNPUBLISHED_v01", "inp_instances": ["membrane", "Ca", "Na_K", "cytosol", "pool_proteome", "pool_Glyc", "reg"], "out_instances": ["ribosomes"]},
+ {"name": "ribosomes", "module_type": "ribosomes", "module_subtype": "adaptive_ArgusUNPUBLISHED_v01", "inp_instances": ["bio"], "out_instances": ["protein"]},
+ {"name": "protein", "module_type": "protein_expression", "module_subtype": "adaptive_ArgusUNPUBLISHED_v01", "inp_instances": ["membrane", "cytosol", "ribosomes", "pool_proteome", "pool_Glyc", "reg"], "out_instances": []},
+ {"name": "pool_proteome", "module_type": "protein_pool", "module_subtype": "ArgusUNPUBLISHED_v01", "inp_instances": ["reg"], "out_instances": ["protein", "bio"]},
+ {"name": "pool_Glyc", "module_type": "protein_pool", "module_subtype": "ArgusUNPUBLISHED_v01", "inp_instances": ["reg"], "out_instances": ["protein", "bio", "cytosol"]},
+ {"name": "reg", "module_type": "expression_regulation", "module_subtype": "ArgusUNPUBLISHED_v01", "inp_instances": ["cytosol", "H"], "out_instances": ["bio", "protein", "pool_proteome", "pool_Glyc"]},
+ {"name": "i_leak_Na", "module_type": "i_leak_Na", "module_subtype": "Argus2026_v01", "inp_instances": ["membrane", "Na_K"], "out_instances": []},
+ {"name": "i_leak_Ca", "module_type": "i_leak_Ca", "module_subtype": "ArgusUNPUBLISHED_v01", "inp_instances": ["membrane", "Ca"], "out_instances": []},
+ {"name": "i_leak_H", "module_type": "i_leak_H", "module_subtype": "ArgusUNPUBLISHED_v01", "inp_instances": ["membrane", "H"], "out_instances": []}
+]

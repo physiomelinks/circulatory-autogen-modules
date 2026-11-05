@@ -182,18 +182,18 @@ def _omex_inputs(tmp_path, monkeypatch, calibrated=True):
     version = SimpleNamespace(vessel_type='mt', name='v', id='mt__v', key='mt/v', is_supermodule=False,
                               cellml_path=str(vdir / f'{stem}_modules.cellml'), config_path=str(vdir / f'{stem}_modules_config.json'),
                               units_path=str(vdir / f'{stem}_units.cellml'),
-                              verification_config_path=str(vdir / f'{stem}_verification_config.json'))
+                              verification_config_path=str(vdir / f'{stem}_verification_config.json'), module_array_path=None)
     inst = SimpleNamespace(name='base', dir=str(idir), parameters=lambda: [])
-    for attr, suffix in (('obs_data_path', 'obs_data.json'), ('params_for_id_path', 'params_for_id.csv'),
-                         ('parameters_path', 'parameters.csv'), ('calibration_path', 'calibration.json'),
-                         ('calibrated_parameters_path', 'calibrated_parameters.csv')):
+    for attr, suffix in (('obs_data_path', 'obs_data.json'), ('params_for_id_path', 'params_for_id.json'),
+                         ('parameters_path', 'parameters.json'), ('calibration_path', 'calibration.json'),
+                         ('calibrated_parameters_path', 'calibrated_parameters.json')):
         setattr(inst, attr, str(idir / f'base_{suffix}'))
-    files = {inst.obs_data_path: '{"obs_data_name": "base"}', inst.params_for_id_path: 'vessel_name,param_name\n',
-             inst.parameters_path: 'variable_name,value\n', str(idir / 'SOURCES.md'): '# sources\n',
+    files = {inst.obs_data_path: '{"obs_data_name": "base"}', inst.params_for_id_path: '[]',
+             inst.parameters_path: '{}', str(idir / 'SOURCES.md'): '# sources\n',
              str(idir / 'a_raw_data.csv'): 't,x\n', version.cellml_path: '<model/>', version.config_path: '[]'}
     if calibrated:
         files[inst.calibration_path] = json.dumps({'calibrated_parameters': {'k': 1.5}, 'cost': 0.1})
-        files[inst.calibrated_parameters_path] = 'variable_name,value\nk,1.5\n'
+        files[inst.calibrated_parameters_path] = '{"k": {"value": 1.5}}'
     for path, text in files.items():
         with open(path, 'w') as f:
             f.write(text)
@@ -213,19 +213,19 @@ def test_omex_carries_the_calibration_result_after_the_study(tmp_path, monkeypat
     work = tmp_path / 'work'
     work.mkdir()
     names = [n for n, _, _ in omex.members(version, inst, str(work))]
-    assert names[:6] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.csv', 'base_parameters.csv',
-                         'base_calibration.json', 'base_calibrated_parameters.csv']
-    assert names.count('base_calibration.json') == 1 and names.count('base_calibrated_parameters.csv') == 1
+    assert names[:6] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.json', 'base_parameters.json',
+                         'base_calibration.json', 'base_calibrated_parameters.json']
+    assert names.count('base_calibration.json') == 1 and names.count('base_calibrated_parameters.json') == 1
     # CUFLynx takes the first JSON with "obs" and the first CSV with "param" in its name
     assert next(n for n in names if n.endswith('.json') and 'obs' in n) == 'base_obs_data.json'
-    assert next(n for n in names if n.endswith('.csv') and 'param' in n) == 'base_params_for_id.csv'
+    assert next(n for n in names if n.endswith('.json') and 'param' in n) == 'base_params_for_id.json'
 
     path = omex.build(version, inst, str(work), str(tmp_path / 'out.omex'))
     with zipfile.ZipFile(path) as z:
         manifest = z.read('manifest.xml').decode()
         assert json.loads(z.read('base_calibration.json'))['calibrated_parameters'] == {'k': 1.5}
     assert ('location="./base_calibration.json" format="http://purl.org/NET/mediatypes/application/json"' in manifest)
-    assert ('location="./base_calibrated_parameters.csv" format="http://purl.org/NET/mediatypes/text/csv"' in manifest)
+    assert ('location="./base_calibrated_parameters.json" format="http://purl.org/NET/mediatypes/application/json"' in manifest)
 
 
 def test_omex_without_a_calibration_result(tmp_path, monkeypatch):
@@ -234,7 +234,7 @@ def test_omex_without_a_calibration_result(tmp_path, monkeypatch):
     work.mkdir()
     names = [n for n, _, _ in omex.members(version, inst, str(work))]
     assert not any('calibrat' in n for n in names)
-    assert names[:4] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.csv', 'base_parameters.csv']
+    assert names[:4] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.json', 'base_parameters.json']
 
 
 # ---- the page's encoder, under node --------------------------------------------------------------

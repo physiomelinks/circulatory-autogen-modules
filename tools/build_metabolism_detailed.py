@@ -28,7 +28,6 @@ _bondgraph.ttl (tools/build_celldl.py; the lumped cytosol's through tools/build_
 These modules change nothing in the game's cell: they are references to test the lumped ones against
 (tests/test_metabolism_detailed.py).
 """
-import csv
 import json
 import math
 import os
@@ -37,7 +36,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import module_writer  # noqa: E402
-from module_writer import REPO, register_bib, write_version  # noqa: E402
+from module_writer import REPO, parameter_rows, register_bib, write_version  # noqa: E402
 from bondgraph import BondGraph, Reaction, Species, FARADAY, R_GAS  # noqa: E402
 from energy_metabolism_references import ENERGY_BIB  # noqa: E402
 
@@ -63,14 +62,17 @@ register_bib({
 })
 
 
-def csv_values(path):
-    with open(os.path.join(REPO, path)) as f:
-        return {r['variable_name']: float(r['value']) for r in csv.DictReader(f) if r['value'] not in ('', None)}
+def parameter_values(path):
+    '''{name: value} of a parameters JSON under the library (a global by its plain name).'''
+    return {r['variable_name']: float(r['value']) for r in parameter_rows(os.path.join(REPO, path))
+            if r['value'] not in ('', None)}
 
 
 # ------------------------------------------------------------------ the fermenter's resting cytosol (the lumped modules)
-CYTO = csv_values('modules/cell/energy_metabolism/versions/adaptive_ArgusUNPUBLISHED_v01/parameterisations/default/default_parameters.csv')
-BIO = csv_values('modules/cell/biosynthesis/versions/adaptive_ArgusUNPUBLISHED_v01/parameterisations/default/default_parameters.csv')
+CYTO = parameter_values('modules/cell/energy_metabolism/versions/adaptive_ArgusUNPUBLISHED_v01/parameterisations/default/'
+                        'default_parameters.json')
+BIO = parameter_values('modules/cell/biosynthesis/versions/adaptive_ArgusUNPUBLISHED_v01/parameterisations/default/'
+                       'default_parameters.json')
 T = CYTO['T']
 PH_I = 7.6   # the fermenter's cytosol (generic_adaptive_cell parameters pH_i)
 J_REST = BIO['J_ref'] / CYTO['V_c'] / 2.0   # mM/s of glucose: the resting ATP turnover, two ATP per glucose
@@ -342,8 +344,8 @@ def build_glycolysis():
 
 
 # ------------------------------------------------------------------ the mitochondrion (pyruvate to CO2, oxidative phosphorylation)
-MITO = csv_values('modules/cell/energy_metabolism/versions/mitochondrial_ArgusUNPUBLISHED_v01/parameterisations/default/'
-                  'default_parameters.csv')
+MITO = parameter_values('modules/cell/energy_metabolism/versions/mitochondrial_ArgusUNPUBLISHED_v01/parameterisations/'
+                        'default/default_parameters.json')
 T_M = MITO['T']
 # the lumped respiration's resting O2 use (6 r_ox at its default point): this module is calibrated to it
 _ADP = MITO['A_tot'] - MITO['ATP_init']

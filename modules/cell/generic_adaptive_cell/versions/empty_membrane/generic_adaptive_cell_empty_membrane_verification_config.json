@@ -121,7 +121,7 @@
     },
     {
       "description": "amino acids are conserved through proteolysis and recycling: N_aa(t) - N_aa(0) = int (released - reused - catabolised) dt (relative 1e-4: trapezoid integration of the logged fluxes), and N_aa stays non-negative",
-      "expr": "abs((mod__protein__N_aa[-1] - mod__protein__N_aa[0]) - np.trapz(mod__protein__Q_aa_rel_total - mod__protein__Q_aa_use_total - mod__protein__r_aa_cat, t)) <= 1e-4*np.trapz(np.abs(mod__protein__Q_aa_rel_total) + np.abs(mod__protein__Q_aa_use_total) + np.abs(mod__protein__r_aa_cat), t) + 1e-6 and np.all(mod__protein__N_aa >= -1e-6)"
+      "expr": "abs((mod__protein__N_aa[-1] - mod__protein__N_aa[0]) - np.trapezoid(mod__protein__Q_aa_rel_total - mod__protein__Q_aa_use_total - mod__protein__r_aa_cat, t)) <= 1e-4*np.trapezoid(np.abs(mod__protein__Q_aa_rel_total) + np.abs(mod__protein__Q_aa_use_total) + np.abs(mod__protein__r_aa_cat), t) + 1e-6 and np.all(mod__protein__N_aa >= -1e-6)"
     }
   ],
   "bc_sweep": {

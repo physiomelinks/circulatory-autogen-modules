@@ -1,0 +1,21 @@
+{
+ "schema_version": 1,
+ "C_glc_up": {"value": 0.1, "units": "millimolar", "data_reference": "unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food", "sourced": "no"},
+ "C_glc_down": {"value": 0.1, "units": "millimolar", "data_reference": "unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food", "sourced": "no"},
+ "C_lac_up": {"value": 0.0, "units": "millimolar", "data_reference": "definitional; no lactate in the sea", "sourced": "no"},
+ "C_lac_down": {"value": 0.0, "units": "millimolar", "data_reference": "definitional; no lactate in the sea", "sourced": "no"},
+ "C_H_up": {"value": 5.011872336272725e-05, "units": "millimolar", "data_reference": "derived: free H+ = 10^-pH_o M: open water when this side is unconnected (pH_o: halevy2017geologic, placeholder)", "sourced": "no"},
+ "C_H_down": {"value": 5.011872336272725e-05, "units": "millimolar", "data_reference": "derived: free H+ = 10^-pH_o M: open water when this side is unconnected (pH_o: halevy2017geologic, placeholder)", "sourced": "no"},
+ "C_O2_up": {"value": 0.003, "units": "millimolar", "data_reference": "unreferenced_placeholder; dissolved O2 at about 1% of present atmospheric levels at 1.8 Ga (surface seawater at full air saturation holds about 0.28 mM at 20 C); range 0.1-10% PAL debated", "sourced": "no"},
+ "C_O2_down": {"value": 0.003, "units": "millimolar", "data_reference": "unreferenced_placeholder; dissolved O2 at about 1% of present atmospheric levels at 1.8 Ga (surface seawater at full air saturation holds about 0.28 mM at 20 C); range 0.1-10% PAL debated", "sourced": "no"},
+ "D_glc": {"value": 5.9e-10, "units": "m2_per_s", "data_reference": "stewart2003diffusion; glucose in water 6.7e-10 m2/s at 25 C (Stewart 2003, Table 1), scaled to 20 C by T/viscosity (x 0.873)", "sourced": "yes"},
+ "D_lac": {"value": 9e-10, "units": "m2_per_s", "data_reference": "unreferenced_placeholder; lactate in water: 1.03e-9 m2/s at 25 C from its limiting ionic conductivity 38.8 S cm2/mol (Nernst-Einstein), x 0.873 to 20 C (CRC Handbook, to cite)", "sourced": "no"},
+ "D_H": {"value": 2.607594240021476e-06, "units": "m2_per_s", "data_reference": "derived: D_H_water + b_H x D_buffer_water: free protons plus those the seawater buffer carries (b_H = beta_seawater/(ln 10 H+)) (D_H_water: unreferenced_placeholder, placeholder; D_buffer_water: unreferenced_placeholder, placeholder; beta_seawater: unreferenced_placeholder, placeholder; pH_o: halevy2017geologic, placeholder)", "sourced": "no"},
+ "D_O2": {"value": 1.75e-09, "units": "m2_per_s", "data_reference": "stewart2003diffusion; O2 in water 2.0e-9 m2/s at 25 C (Stewart 2003, Table 1), scaled to 20 C by T/viscosity (x 0.873)", "sourced": "yes"},
+ "f_up": {"value": 1.0, "units": "dimensionless", "data_reference": "definitional; no matrix (open water) when unconnected", "sourced": "no"},
+ "f_down": {"value": 1.0, "units": "dimensionless", "data_reference": "definitional; no matrix (open water) when unconnected", "sourced": "no"},
+ "A_f": {"value": 6e-13, "units": "m2", "data_reference": "geometry: cells of radius 1 um, 0.3 um apart on a triangular lattice, 2 um deep (R_cell, h_cell, colony_gap): gap x depth", "sourced": "no"},
+ "d_up": {"value": 6.639528095680696e-07, "units": "metre", "data_reference": "geometry: cells of radius 1 um, 0.3 um apart on a triangular lattice, 2 um deep (R_cell, h_cell, colony_gap): lattice-triangle centroid to the gap, s/(2 sqrt 3)", "sourced": "no"},
+ "d_down": {"value": 6.639528095680696e-07, "units": "metre", "data_reference": "geometry: cells of radius 1 um, 0.3 um apart on a triangular lattice, 2 um deep (R_cell, h_cell, colony_gap): lattice-triangle centroid to the gap, s/(2 sqrt 3)", "sourced": "no"},
+ "open_flag": {"value": 1.0, "units": "dimensionless", "data_reference": "definitional; open face", "sourced": "no"}
+}

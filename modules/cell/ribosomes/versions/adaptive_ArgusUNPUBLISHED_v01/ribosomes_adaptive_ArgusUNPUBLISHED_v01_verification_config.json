@@ -27,7 +27,7 @@
   "invariants": [
     {
       "description": "ribosome balance: n_ribo(t) - n_ribo(0) = int (R_ribo_build - R_ribo_loss) dt (relative 1e-6); never negative, never above the resting count when started at or below it",
-      "expr": "abs(n_ribo[-1] - n_ribo[0] - np.trapz(R_ribo_build - R_ribo_loss, t)) <= 1e-6*np.trapz(np.abs(R_ribo_build) + np.abs(R_ribo_loss), t) + 1e-9 and np.all(n_ribo >= 0) and (n_ribo[0] > n_ribo_rest or np.all(n_ribo <= n_ribo_rest*(1 + 1e-12)))"
+      "expr": "abs(n_ribo[-1] - n_ribo[0] - np.trapezoid(R_ribo_build - R_ribo_loss, t)) <= 1e-6*np.trapezoid(np.abs(R_ribo_build) + np.abs(R_ribo_loss), t) + 1e-9 and np.all(n_ribo >= 0) and (n_ribo[0] > n_ribo_rest or np.all(n_ribo <= n_ribo_rest*(1 + 1e-12)))"
     },
     {
       "description": "loss, rebuilding and their costs (exact): u_upkeep = 1 - x_unpaid; R_ribo_loss = k_ribo n_ribo x_unpaid; R_ribo_build = k_ribo_build max(0, n_ribo_rest - n_ribo) u_upkeep^n_ribo_build; c_ribo_build = L_rRNA c_nt_denovo + aa_ribo c_aa_build; J_ribo = n_ribo L_rRNA c_nt_recycle k_ribo u_upkeep / N_A; J_ribo_build = R_ribo_build c_ribo_build / N_A; x_ribo = n_ribo / n_ribo_rest",

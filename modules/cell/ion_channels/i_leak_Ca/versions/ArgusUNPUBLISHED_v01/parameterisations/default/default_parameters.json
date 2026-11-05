@@ -1,0 +1,14 @@
+{
+ "schema_version": 1,
+ "global": {
+  "R": {"value": 8.314, "units": "J_per_mol_K", "data_reference": "definitional; gas constant, as the library's SN modules", "sourced": "no"},
+  "T": {"value": 293.15, "units": "kelvin", "data_reference": "lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to", "sourced": "yes"},
+  "F": {"value": 96485.0, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, as the library's SN modules", "sourced": "no"}
+ },
+ "V": {"value": -105.0, "units": "milliV", "data_reference": "milo2010bionumbers; BNID 103386: E. coli membrane potential -140 to -105 mV, fermenting at the less negative end", "sourced": "yes"},
+ "Cai": {"value": 9e-05, "units": "millimolar", "data_reference": "gangola1987maintenance; free cytosolic Ca2+ in E. coli 90 +- 10 nM", "sourced": "yes"},
+ "Cao": {"value": 10.28, "units": "millimolar", "data_reference": "millero2008composition; standard seawater Ca 10.28 mmol/kg", "sourced": "yes"},
+ "A_mem": {"value": 12.566370614359172, "units": "um2", "data_reference": "geometry: in-plane membrane of the 2 um cell", "sourced": "no"},
+ "rho_leak_Ca": {"value": 1.3806187541439416e-05, "units": "per_um2", "data_reference": "calibrated: Ca entry balances Na/Ca exchange (1% of NhaA's cycles) at rest", "sourced": "no"},
+ "gamma_leak_Ca": {"value": 5.0, "units": "picoS", "data_reference": "unreferenced_placeholder; single-channel conductance of a Ca leak pathway", "sourced": "no"}
+}

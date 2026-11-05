@@ -1,0 +1,20 @@
+{
+ "schema_version": 1,
+ "global": {
+  "F": {"value": 96485.0, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, as the library's SN modules", "sourced": "no"}
+ },
+ "V": {"value": -105.0, "units": "milliV", "data_reference": "milo2010bionumbers; BNID 103386: E. coli membrane potential -140 to -105 mV, fermenting at the less negative end", "sourced": "yes"},
+ "E_H": {"value": 17.449261892231384, "units": "milliV", "data_reference": "Nernst potential at pH 7.6 in, 7.3 out", "sourced": "no"},
+ "m_expr": {"value": 1.0, "units": "dimensionless", "data_reference": "definitional; the starting cell has one flagellum (user decision 2026-10-09)", "sourced": "no"},
+ "a_motor": {"value": 0.0, "units": "dimensionless", "data_reference": "definitional; motor off until the game runs it", "sourced": "no"},
+ "tau_bundle": {"value": 0.3, "units": "second", "data_reference": "unreferenced_placeholder; time for the flagella to spin up into a bundle when the motors switch on, or to unwind when they stop (E. coli bundles form in a few tenths of a second; Turner, Ryu and Berg 2000, to cite): thrust follows the motor switch with this time constant", "sourced": "no"},
+ "a_init": {"value": 0.0, "units": "dimensionless", "data_reference": "definitional; at rest the motors are still", "sourced": "no"},
+ "f_ref": {"value": 100.0, "units": "per_s", "data_reference": "unreferenced_placeholder; flagellar rotation at the resting proton motive force: ~100 Hz in swimming E. coli (motor speed is proportional to the PMF)", "sourced": "no"},
+ "pmf_ref": {"value": 122.44926189223139, "units": "milliV", "data_reference": "calibrated: the proton motive force of the fermenter at rest (E_H - V)", "sourced": "no"},
+ "n_H_rev": {"value": 1200.0, "units": "dimensionless", "data_reference": "meister1987proton; about 1,200 H+ per revolution of the E. coli/Streptococcus flagellar motor", "sourced": "yes"},
+ "v_one": {"value": 1.5e-05, "units": "m_per_s", "data_reference": "unreferenced_placeholder; swimming speed with one flagellum turning at f_flag_ref (E. coli with 4-6 flagella swims 20-30 um/s)", "sourced": "no"},
+ "n_half": {"value": 2.0, "units": "dimensionless", "data_reference": "unreferenced_placeholder; flagella at which extra flagella add half as much again: speed saturates with the number (thrust and drag both grow)", "sourced": "no"},
+ "eta": {"value": 0.00108, "units": "pascal_second", "data_reference": "unreferenced_placeholder; dynamic viscosity of seawater at 20 C and 35 g/kg salinity, about 1.08 mPa s (Sharqawy et al. 2010 tables; to cite)", "sourced": "no"},
+ "R_body": {"value": 1.0, "units": "um", "data_reference": "unreferenced_placeholder; a 2 um cell (typical prokaryote): disc radius", "sourced": "no"},
+ "N_A": {"value": 6.02214076e+23, "units": "per_mol", "data_reference": "definitional; Avogadro constant (exact)", "sourced": "no"}
+}

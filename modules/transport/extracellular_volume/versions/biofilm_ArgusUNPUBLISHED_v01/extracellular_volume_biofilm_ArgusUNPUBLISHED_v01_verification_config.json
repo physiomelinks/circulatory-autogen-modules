@@ -190,31 +190,31 @@
   "invariants": [
     {
       "description": "glc balance: V_e dC_glc = integral of the face fluxes and the cells' exchange plus the glucose released by matrix breakdown (trapezoid; 1e-3 of the amount moved)",
-      "expr": "abs(V_e*(C_glc[-1] - C_glc[0]) - np.trapz((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + V_e*f_mx_glc*k_mx*C_mx, t)) <= 1e-3*np.trapz(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell), t) + 1e-30"
+      "expr": "abs(V_e*(C_glc[-1] - C_glc[0]) - np.trapezoid((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + V_e*f_mx_glc*k_mx*C_mx, t)) <= 1e-3*np.trapezoid(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell), t) + 1e-30"
     },
     {
       "description": "lac balance: V_e dC_lac = integral of the face fluxes and the cells' exchange (trapezoid; 1e-3 of the amount moved)",
-      "expr": "abs(V_e*(C_lac[-1] - C_lac[0]) - np.trapz((fN__J_lac_down + fS__J_lac_up) + j_lac_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_lac_down) + np.abs(fS__J_lac_up) + abs(j_lac_cell), t) + 1e-30"
+      "expr": "abs(V_e*(C_lac[-1] - C_lac[0]) - np.trapezoid((fN__J_lac_down + fS__J_lac_up) + j_lac_cell, t)) <= 1e-3*np.trapezoid(np.abs(fN__J_lac_down) + np.abs(fS__J_lac_up) + abs(j_lac_cell), t) + 1e-30"
     },
     {
       "description": "H balance: V_e*(1 + b_H) dC_H = integral of the face fluxes and the cells' exchange (trapezoid; 1e-3 of the amount moved)",
-      "expr": "abs(V_e*(1 + b_H)*(C_H[-1] - C_H[0]) - np.trapz((fN__J_H_down + fS__J_H_up) + j_H_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_H_down) + np.abs(fS__J_H_up) + abs(j_H_cell), t) + 1e-30"
+      "expr": "abs(V_e*(1 + b_H)*(C_H[-1] - C_H[0]) - np.trapezoid((fN__J_H_down + fS__J_H_up) + j_H_cell, t)) <= 1e-3*np.trapezoid(np.abs(fN__J_H_down) + np.abs(fS__J_H_up) + abs(j_H_cell), t) + 1e-30"
     },
     {
       "description": "O2 balance: V_e dC_O2 = integral of the face fluxes and the cells' exchange (trapezoid; 1e-3 of the amount moved)",
-      "expr": "abs(V_e*(C_O2[-1] - C_O2[0]) - np.trapz((fN__J_O2_down + fS__J_O2_up) + j_O2_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_O2_down) + np.abs(fS__J_O2_up) + abs(j_O2_cell), t) + 1e-30"
+      "expr": "abs(V_e*(C_O2[-1] - C_O2[0]) - np.trapezoid((fN__J_O2_down + fS__J_O2_up) + j_O2_cell, t)) <= 1e-3*np.trapezoid(np.abs(fN__J_O2_down) + np.abs(fS__J_O2_up) + abs(j_O2_cell), t) + 1e-30"
     },
     {
       "description": "matrix balance: V_e dC_mx = integral of the matrix delivered less breakdown and overflow (trapezoid; 1e-3 of the amount moved)",
-      "expr": "abs(V_e*(C_mx[-1] - C_mx[0]) - np.trapz(j_mx_cell - V_e*(r_mx + r_ovf), t)) <= 1e-3*np.trapz(j_mx_cell + V_e*(r_mx + r_ovf), t) + 1e-30"
+      "expr": "abs(V_e*(C_mx[-1] - C_mx[0]) - np.trapezoid(j_mx_cell - V_e*(r_mx + r_ovf), t)) <= 1e-3*np.trapezoid(j_mx_cell + V_e*(r_mx + r_ovf), t) + 1e-30"
     },
     {
       "description": "carbon (glucose units): V_e (C_glc + C_mx) changes by the face and cell glucose fluxes and the matrix delivered, less J_mx_lost (trapezoid; 1e-3 of the amount moved)",
-      "expr": "abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) - np.trapz((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + j_mx_cell - J_mx_lost, t)) <= 1e-3*np.trapz(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t) + 1e-30"
+      "expr": "abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) - np.trapezoid((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + j_mx_cell - J_mx_lost, t)) <= 1e-3*np.trapezoid(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t) + 1e-30"
     },
     {
       "description": "carbon held: V_e (C_glc + C_mx) + N_mx_lost changes only by the face and cell glucose fluxes and the matrix delivered (trapezoid; 1e-3 of the amount moved)",
-      "expr": "abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) + N_mx_lost[-1] - N_mx_lost[0] - np.trapz((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + j_mx_cell, t)) <= 1e-3*np.trapz(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t) + 1e-30"
+      "expr": "abs(V_e*((C_glc[-1] + C_mx[-1]) - (C_glc[0] + C_mx[0])) + N_mx_lost[-1] - N_mx_lost[0] - np.trapezoid((fN__J_glc_down + fS__J_glc_up) + j_glc_cell + j_mx_cell, t)) <= 1e-3*np.trapezoid(np.abs(fN__J_glc_down) + np.abs(fS__J_glc_up) + abs(j_glc_cell) + j_mx_cell + J_mx_lost, t) + 1e-30"
     },
     {
       "description": "definitions (exact): phi = v_mx C_mx, f_hind = ((1 - phi)/(1 + phi))^2, pH = -log10(C_H/c_std), J_mx_lost = V_e ((1 - f_mx_glc) k_mx C_mx + k_ovf C_mx (C_mx/C_mx_max)^8)",

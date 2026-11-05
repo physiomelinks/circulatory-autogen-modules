@@ -279,8 +279,8 @@ def test_PTS_uptake_far_above_Glf_at_10uM(fermenter):
     t, with_pts = _run(fermenter, {**_glucose(0.01), **_express(fermenter, 'PTS')}, outs)
     _, glf_only = _run(fermenter, _glucose(0.01), outs)
     assert with_pts['mod/glc_PTS/J_glc'][0] > 40 * with_pts['mod/membrane_face/J_glc'][0]
-    taken_up = np.trapz(with_pts['mod/glc_PTS/J_glc'] + with_pts['mod/membrane_face/J_glc'], t)
-    assert taken_up > 5 * np.trapz(glf_only['mod/membrane_face/J_glc'], t)
+    taken_up = np.trapezoid(with_pts['mod/glc_PTS/J_glc'] + with_pts['mod/membrane_face/J_glc'], t)
+    assert taken_up > 5 * np.trapezoid(glf_only['mod/membrane_face/J_glc'], t)
     assert with_pts['mod/cytosol/C_ATP'][-1] >= with_pts['mod/cytosol/C_ATP'][0]
     assert glf_only['mod/cytosol/C_ATP'][-1] < 0.9 * glf_only['mod/cytosol/C_ATP'][0]
 
@@ -323,9 +323,9 @@ def test_H_symport_adds_one_H_per_glucose(fermenter):
     assert np.all(o['mod/glc_GalP/J_glc'] > 0)
     assert np.allclose(o['mod/glc_GalP/j_H'], o['mod/glc_GalP/J_glc'], rtol=1e-12, atol=0)
     stored = o['mod/membrane/Vol'][0] * (o['mod/H/H_total_rel'][-1] - o['mod/H/H_total_rel'][0])
-    others = np.trapz(sum(o[f] for f in H_FLUXES), t)
-    galp = np.trapz(o['mod/glc_GalP/j_H'], t)
-    scale = np.trapz(sum(np.abs(o[f]) for f in H_FLUXES + ['mod/glc_GalP/j_H']), t)
+    others = np.trapezoid(sum(o[f] for f in H_FLUXES), t)
+    galp = np.trapezoid(o['mod/glc_GalP/j_H'], t)
+    scale = np.trapezoid(sum(np.abs(o[f]) for f in H_FLUXES + ['mod/glc_GalP/j_H']), t)
     assert abs(stored - (others + galp)) <= 1e-5 * scale
     assert abs(galp) > 1e3 * abs(stored - (others + galp))   # GalP's load is resolved, not lost in the balance
 
@@ -393,11 +393,11 @@ def test_G6P_is_trapped(fermenter):
     t, o = _run(fermenter, {**_glucose(0.0), 'C_G6P_init_mod__cytosol': 4.0, 'C_glc_init_mod__cytosol': 0.0}, outs)
     vol = o['mod/membrane/Vol'][0]
     g6p_spent = vol * (o['mod/cytosol/C_G6P'][0] - o['mod/cytosol/C_G6P'][-1])
-    glc_out = -np.trapz(np.minimum(o['mod/membrane_face/J_glc'], 0.0), t)
+    glc_out = -np.trapezoid(np.minimum(o['mod/membrane_face/J_glc'], 0.0), t)
     assert g6p_spent > 0.9 * vol * 3.0
     assert glc_out <= 1e-3 * g6p_spent
     # the carbon of the G6P left as lactate (2 per G6P), not as G6P
-    lac_out = -np.trapz(o['mod/membrane_face/J_lac'], t) + vol * (o['mod/cytosol/C_lac'][-1] - o['mod/cytosol/C_lac'][0])
+    lac_out = -np.trapezoid(o['mod/membrane_face/J_lac'], t) + vol * (o['mod/cytosol/C_lac'][-1] - o['mod/cytosol/C_lac'][0])
     assert lac_out >= 2 * g6p_spent * (1 - 2e-3)
 
 
@@ -515,7 +515,7 @@ def test_hydrolase_pool_costs(fermenter):
     unit = p['n_0'] * p['L'] * (p['c_syn'] + p['c_poly']) / fermenter.nominal['N_A_mod__pool_Hydrolase']
     built = o['mod/pool_Hydrolase/m'][-1] - o['mod/pool_Hydrolase/m'][0]
     assert built == pytest.approx(0.5 * (1.0 - np.exp(-t[-1] / p['tau'])), rel=0.05)
-    assert np.trapz(o['mod/pool_Hydrolase/J_build'], t) == pytest.approx(unit * built, rel=1e-4)
+    assert np.trapezoid(o['mod/pool_Hydrolase/J_build'], t) == pytest.approx(unit * built, rel=1e-4)
     assert o['mod/pool_Hydrolase/M_build'][-1] == pytest.approx(unit * o['mod/pool_Hydrolase/m'][-1], rel=1e-12)
 
 

@@ -165,12 +165,12 @@ def test_a_lowered_target_is_removed_within_minutes_and_its_amino_acids_recovere
     np.testing.assert_allclose(m, 0.5 + 0.5 * np.exp(-(1 / tau_p + k) * t), rtol=2e-3)
     assert m[90] < 0.6, 'within 15 minutes'
     n_0, L, N_A = nom['n_0_mod__pool_Hydrolase'], nom['L_mod__pool_Hydrolase'], nom['N_A_mod__protein']
-    released = np.trapz(r['mod/protein/Q_aa_rel_total'], t)
+    released = np.trapezoid(r['mod/protein/Q_aa_rel_total'], t)
     assert released == pytest.approx(n_0 * L * (m[0] - m[-1]), rel=2e-3)
     np.testing.assert_allclose(r['mod/pool_Hydrolase/J_prot'],
                                nom['c_deg_mod__pool_Hydrolase'] * n_0 * L * r['mod/pool_Hydrolase/r_prot'] / N_A, rtol=1e-12)
     np.testing.assert_array_equal(r['mod/protein/J_prot_total'], r['mod/pool_Hydrolase/J_prot'])
-    reused, catabolised = np.trapz(r['mod/protein/Q_aa_use_total'], t), np.trapz(r['mod/protein/r_aa_cat'], t)
+    reused, catabolised = np.trapezoid(r['mod/protein/Q_aa_use_total'], t), np.trapezoid(r['mod/protein/r_aa_cat'], t)
     assert released == pytest.approx(r['mod/protein/N_aa'][-1] + reused + catabolised, rel=2e-3)
     np.testing.assert_allclose(r['mod/protein/J_cat'], nom['y_aa_cat_mod__protein'] * r['mod/protein/r_aa_cat'] / N_A,
                                rtol=1e-12)
@@ -194,10 +194,10 @@ def test_a_raised_target_costs_ATP_and_less_with_recycled_amino_acids(fermenter)
     for r in (plain, swap):
         m = r['mod/pool_H_ATPase/m']
         assert m[-1] > 1.98
-        assert np.trapz(r['mod/protein/J_build_total'] + r['mod/protein/J_saved_total'], t) == pytest.approx(
+        assert np.trapezoid(r['mod/protein/J_build_total'] + r['mod/protein/J_saved_total'], t) == pytest.approx(
             full * (m[-1] - m[0]), rel=1e-3)
     assert np.all(plain['mod/protein/J_saved_total'] == 0.0)
-    assert np.trapz(swap['mod/protein/J_build_total'], t) < 0.5 * np.trapz(plain['mod/protein/J_build_total'], t)
+    assert np.trapezoid(swap['mod/protein/J_build_total'], t) < 0.5 * np.trapezoid(plain['mod/protein/J_build_total'], t)
     assert swap['mod/protein/phi_aa'].max() > 0.9 and swap['mod/protein/s_prot'][1] < 0.5
 
 

@@ -55,7 +55,7 @@
   "invariants": [
     {
       "description": "proton conservation with the buffer: Vol d(H_i - beta_H pH_i) = int j_H dt (relative 1e-6)",
-      "expr": "abs(Vol*(H_total_rel[-1] - H_total_rel[0]) - np.trapz(leak__j_leak_H, t)) <= 1e-6*np.trapz(np.abs(leak__j_leak_H), t) + 1e-30"
+      "expr": "abs(Vol*(H_total_rel[-1] - H_total_rel[0]) - np.trapezoid(leak__j_leak_H, t)) <= 1e-6*np.trapezoid(np.abs(leak__j_leak_H), t) + 1e-30"
     },
     {
       "description": "pH and Nernst potential definitions (exact)",

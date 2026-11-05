@@ -3,14 +3,13 @@ level is written as a flat supermodule (libcuflynx has no nested supermodules).
 
 Parameter rows of a supermodule are generated from its submodules' own default instances: every constant of a submodule
 that no port connection supplies becomes <submodule>/<variable> (global constants keep their bare name), with the value,
-data_reference and sourced flag of the submodule's CSV. A cell then overrides the rows its calibration changes.
+data_reference and sourced flag of the submodule's default parameters. A cell then overrides the rows its calibration changes.
 """
-import csv
 import glob
 import json
 import os
 
-from module_writer import REPO
+from module_writer import REPO, parameter_rows
 
 
 def module_dir(module_type, version):
@@ -26,7 +25,7 @@ def module_config(module_type, version):
 
 def module_rows(module_type, version, instance='default'):
     d = module_dir(module_type, version)
-    return list(csv.DictReader(open(os.path.join(d, 'parameterisations', instance, f'{instance}_parameters.csv'))))
+    return parameter_rows(os.path.join(d, 'parameterisations', instance, f'{instance}_parameters.json'))
 
 
 def _ports(cfg, kind):

@@ -96,7 +96,9 @@ def evaluate(component, version, values, rates, states):
         else:
             var[k + '_mod'].set_rhs(x)
     deriv = dict(zip([s.qname().split('.')[-1] for s in m.states()], m.evaluate_derivatives()))
-    return ({r: var[v].eval() for r, v in rates.items()}, {s: deriv[c] for s, c in states.items()},
+    # a multi_port sum nothing is connected to is a parameter of the generated model (<name>_mod)
+    value = lambda name: (var[name] if name in var else var[name + '_mod']).eval()
+    return ({r: value(v) for r, v in rates.items()}, {s: deriv[c] for s, c in states.items()},
             {s: st[c].initial_value(as_float=True) for s, c in states.items()})
 
 

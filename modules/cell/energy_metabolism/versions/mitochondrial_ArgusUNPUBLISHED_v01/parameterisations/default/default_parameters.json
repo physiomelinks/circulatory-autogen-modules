@@ -1,0 +1,29 @@
+{
+ "schema_version": 1,
+ "global": {
+  "T_ref": {"value": 310.15, "units": "kelvin", "data_reference": "reference temperature of the rate constants (37 C)", "sourced": "no"},
+  "dT_Q10": {"value": 10.0, "units": "kelvin", "data_reference": "definition of Q10 (rate ratio per 10 K)", "sourced": "yes"}
+ },
+ "T": {"value": 310.15, "units": "kelvin", "data_reference": "operating point: 37 C", "sourced": "no"},
+ "Q10": {"value": 2.0, "units": "dimensionless", "data_reference": "unreferenced_placeholder; metabolic Q10 is typically 2-3; 2 chosen pending a source", "sourced": "no"},
+ "V_c": {"value": 6.2831853071795875e-15, "units": "m3", "data_reference": "geometry: 20 um diameter disc cell, 20 um deep (the game's starting cell)", "sourced": "no"},
+ "C_O2": {"value": 0.0597, "units": "millimolar", "data_reference": "celayaalcala2021simulation; mean tissue PO2 47 mmHg x 1.27 uM/mmHg (fang2008oxygen)", "sourced": "yes"},
+ "C_glc": {"value": 1.0, "units": "millimolar", "data_reference": "unreferenced_placeholder; intracellular glucose of order 1 mM (below plasma ~5 mM)", "sourced": "no"},
+ "C_lac": {"value": 1.0, "units": "millimolar", "data_reference": "unreferenced_placeholder; resting lactate of order 1 mM", "sourced": "no"},
+ "C_CO2": {"value": 1.2, "units": "millimolar", "data_reference": "unreferenced_placeholder; dissolved CO2 at 40 mmHg x 0.03 mM/mmHg (textbook solubility)", "sourced": "no"},
+ "ATP_init": {"value": 3.152, "units": "millimolar", "data_reference": "traut1994physiological; mean ATP in mammalian cells 3152 uM", "sourced": "yes"},
+ "A_tot": {"value": 3.5, "units": "millimolar", "data_reference": "unreferenced_placeholder; ATP + ADP with ATP/ADP about 9", "sourced": "no"},
+ "K_O2": {"value": 0.0133, "units": "millimolar", "data_reference": "celayaalcala2021simulation; P0 = 10.5 mmHg x 1.27 uM/mmHg, the library's tissue value", "sourced": "yes"},
+ "K_glc": {"value": 0.05, "units": "millimolar", "data_reference": "unreferenced_placeholder; hexokinase I affinity for glucose, order 0.03-0.1 mM", "sourced": "no"},
+ "K_ADP": {"value": 0.35, "units": "millimolar", "data_reference": "unreferenced_placeholder; apparent ADP affinity of respiration in tissue, order 0.3 mM", "sourced": "no"},
+ "V_ox": {"value": 0.01958612068965518, "units": "millimolar_per_s", "data_reference": "calibrated: at the default point the steady state has ATP = ATP_init and O2 use M0 C/(C + P0) = 0.0456 mM/s (celayaalcala2021simulation)", "sourced": "no"},
+ "V_gly": {"value": 0.05, "units": "millimolar_per_s", "data_reference": "unreferenced_placeholder; anaerobic capacity: 2 V_gly is about 40% of resting ATP demand", "sourced": "no"},
+ "K_i_O2": {"value": 0.0133, "units": "millimolar", "data_reference": "unreferenced_placeholder; Pasteur effect: glycolysis half-inhibited at K_O2", "sourced": "no"},
+ "k_dem": {"value": 0.2480893935512453, "units": "millimolar_per_s", "data_reference": "calibrated with V_ox (same conditions)", "sourced": "no"},
+ "K_ATP": {"value": 0.15, "units": "millimolar", "data_reference": "unreferenced_placeholder; ATPase affinity for ATP, order 0.1-0.5 mM", "sourced": "no"},
+ "n_ATP_ox": {"value": 30.0, "units": "dimensionless", "data_reference": "hinkle2005p; about 30 ATP per glucose oxidised", "sourced": "yes"},
+ "n_ATP_gly": {"value": 2.0, "units": "dimensionless", "data_reference": "stoichiometry of glycolysis: 2 ATP per glucose to 2 lactate", "sourced": "yes"},
+ "h_O2_ox": {"value": 470000.0, "units": "J_per_mol", "data_reference": "gnaiger1990anaerobic; oxycaloric equivalent -470 kJ/mol O2 (glucose oxidation)", "sourced": "yes"},
+ "h_lac_gly": {"value": 63000.0, "units": "J_per_mol", "data_reference": "gnaiger1990anaerobic; glucose to lactate in bicarbonate buffer -63 kJ/mol lactate", "sourced": "yes"},
+ "h_ATP": {"value": 20500.0, "units": "J_per_mol", "data_reference": "gajewski1986thermodynamics; Delta H of ATP hydrolysis -20.5 kJ/mol at 25 C", "sourced": "yes"}
+}

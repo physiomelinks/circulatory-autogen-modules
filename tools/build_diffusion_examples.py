@@ -14,7 +14,6 @@ parameters, and writes the spec only if there isn't one.
 
     python tools/build_diffusion_examples.py
 """
-import csv
 import itertools
 import os
 import sys
@@ -24,6 +23,9 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from cam_testing import module_array  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from parameter_files import write_model_parameters  # noqa: E402
+MODULES = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'modules')
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, 'system_models', 'diffusion')
@@ -118,11 +120,9 @@ def write(model, description, cells, faces):
                    [f'd_up_f{k}', 'metre', da, f'example mesh: centre of {a} to the face'],
                    [f'd_down_f{k}', 'metre', db, f'example mesh: centre of {b} to the face'],
                    [f'open_flag_f{k}', 'dimensionless', 1, 'open face']]
-    module_array.write_records(os.path.join(d, f'{model}_module_array.json'), module_array.from_rows(rows))
-    with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
-        w = csv.writer(f)
-        w.writerow(['variable_name', 'units', 'value', 'data_reference'])
-        w.writerows(params)
+    array = module_array.write_records(os.path.join(d, f'{model}_module_array.json'),
+                                       module_array.from_rows(rows))
+    write_model_parameters(os.path.join(d, f'{model}_parameters.json'), [dict(zip(('variable_name', 'units', 'value', 'data_reference'), map(str, r))) for r in params], array, [MODULES])
 
     spec_path = os.path.join(d, f'{model}_system.yaml')
     if os.path.isfile(spec_path):

@@ -248,8 +248,8 @@ def test_carbon_is_conserved(det):
     t, r = _run(det, {'C_glc': 10.0 * detailed.GLY_REST['glc']}, 1.0, 1e-4, outs)
     inner = sum(carbon[s] * r[f'C_{s}'] for s in INTERNAL)
     given = sum(carbon[s] * r[f'j_{s}'] for s in bound)
-    turnover = np.trapz(np.abs(given), t)
-    assert abs(inner[-1] - inner[0] + np.trapz(given, t)) <= 1e-4 * turnover
+    turnover = np.trapezoid(np.abs(given), t)
+    assert abs(inner[-1] - inner[0] + np.trapezoid(given, t)) <= 1e-4 * turnover
 
 
 def test_compared_with_the_lumped_glycolysis(det, lump, graph):

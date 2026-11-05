@@ -57,7 +57,8 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from module_writer import BIB, REPO, kept_record_keys, register_bib  # noqa: E402
+from module_writer import (BIB, REPO, kept_record_keys, parameter_rows, parameters_json, register_bib,  # noqa: E402
+                           supermodule_layout)
 from module_writer import write_version as _write_version  # noqa: E402
 from matrix_references import MATRIX_BIB  # noqa: E402
 from energy_metabolism_references import ENERGY_BIB  # noqa: E402
@@ -1123,7 +1124,7 @@ cyto_invariants = [
     {'description': 'carbon balance with the membrane carriers and the matrix exported: d/dt V_c (6 C_glc + 6 C_G6P + '
                     '3 C_lac + 6 C_glyc) = 6 J_glc + 3 J_lac - 6 J_mx, integrated (relative 1e-6)',
      'expr': 'abs(V_c*((6*C_glc[-1] + 6*C_G6P[-1] + 3*C_lac[-1] + 6*C_glyc[-1]) - (6*C_glc[0] + 6*C_G6P[0] + 3*C_lac[0] '
-             '+ 6*C_glyc[0])) - np.trapz(6*membrane_face__J_glc + 3*membrane_face__J_lac - 6*J_mx, t)) <= 1e-6*np.trapz(np.abs(6*membrane_face__J_glc) + '
+             '+ 6*C_glyc[0])) - np.trapezoid(6*membrane_face__J_glc + 3*membrane_face__J_lac - 6*J_mx, t)) <= 1e-6*np.trapezoid(np.abs(6*membrane_face__J_glc) + '
              'np.abs(3*membrane_face__J_lac) + np.abs(6*J_mx), t)'},
     {'description': 'adenine is conserved (bond-graph structure; ATP, ADP do not cross): C_ATP + C_ADP constant '
                     '(relative 1e-9)',
@@ -1136,10 +1137,10 @@ cyto_invariants = [
                     f'lactate, ADP + Pi: h_glc = 2 h_lac_gly = {h_glc:g} J/mol, h_G6P = h_glc + h_ATP - h_hk, h_glyc = '
                     f'h_glc - h_glyc_poly (relative 2e-4 of the heat: trapezoid integration of the output, whose G6P '
                     f'transients last milliseconds)',
-     'expr': 'abs(2*h_lac_gly*np.trapz(membrane_face__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + (2*h_lac_gly + h_ATP - '
+     'expr': 'abs(2*h_lac_gly*np.trapezoid(membrane_face__J_glc, t) - V_c*(2*h_lac_gly*(C_glc[-1] - C_glc[0]) + (2*h_lac_gly + h_ATP - '
              'h_hk)*(C_G6P[-1] - C_G6P[0]) + h_ATP*(C_ATP[-1] - C_ATP[0]) + (2*h_lac_gly - h_glyc_poly)*(C_glyc[-1] - '
-             'C_glyc[0])) - np.trapz(Q_met, t) - (2*h_lac_gly - h_mx_poly)*np.trapz(J_mx, t)) <= '
-             '2e-4*np.trapz(np.abs(Q_met), t)'},   # trapezoid integration of the logged heat
+             'C_glyc[0])) - np.trapezoid(Q_met, t) - (2*h_lac_gly - h_mx_poly)*np.trapezoid(J_mx, t)) <= '
+             '2e-4*np.trapezoid(np.abs(Q_met), t)'},   # trapezoid integration of the logged heat
     {'description': 'second law: each reaction runs down its affinity, v A >= 0, so P_diss >= 0; matrix export never '
                     'runs backwards (v_mx >= 0)',
      'expr': 'np.all(v_gly*A_hk >= 0) and np.all(v_lg*A_lg >= 0) and np.all(v_hyd*A_hyd >= 0) and '
@@ -1708,8 +1709,8 @@ write_version('cell', 'H_handling', 'H_fermenter', h_vars, h_eqs,
                                   ['leak/A_mem', 'um2', A_MEM, 'harness: in-plane membrane of the 2 um cell']]},
                'invariants': [{'description': 'proton conservation with the buffer: Vol d(H_i - beta_H pH_i) = int j_H dt '
                                               '(relative 1e-6)',
-                               'expr': 'abs(Vol*(H_total_rel[-1] - H_total_rel[0]) - np.trapz(leak__j_leak_H, t)) <= '
-                                       '1e-6*np.trapz(np.abs(leak__j_leak_H), t) + 1e-30'},
+                               'expr': 'abs(Vol*(H_total_rel[-1] - H_total_rel[0]) - np.trapezoid(leak__j_leak_H, t)) <= '
+                                       '1e-6*np.trapezoid(np.abs(leak__j_leak_H), t) + 1e-30'},
                               {'description': 'pH and Nernst potential definitions (exact)',
                                'expr': 'np.allclose(pH_i, -np.log10(H_i/c_std), rtol=1e-12, atol=0) and '
                                        'np.allclose(E_H, 1000*R*T/F*np.log(H_o/H_i), rtol=1e-10, atol=1e-12)'}],
@@ -2614,8 +2615,8 @@ pool_inv = [
              'np.all(Q_aa_rel >= 0) and np.allclose(Q_aa_use, n_0*L*phi_aa*r_build, rtol=1e-12, atol=1e-12)'},
     {'description': 'the copies built are paid for: n_0 L (c_syn + c_poly) / N_A (m(t) - m(0) - int (r_down - r_prot) '
                     'dt) = int (J_build + J_saved) dt (relative 1e-4: trapezoid integration of the logged fluxes)',
-     'expr': 'abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapz(r_down - r_prot, t)) - np.trapz(J_build + '
-             'J_saved, t)) <= 1e-4*abs(np.trapz(J_build + J_saved, t)) + 1e-4*n_0*L*(c_syn + c_poly)/N_A*np.trapz('
+     'expr': 'abs(n_0*L*(c_syn + c_poly)/N_A*(m[-1] - m[0] - np.trapezoid(r_down - r_prot, t)) - np.trapezoid(J_build + '
+             'J_saved, t)) <= 1e-4*abs(np.trapezoid(J_build + J_saved, t)) + 1e-4*n_0*L*(c_syn + c_poly)/N_A*np.trapezoid('
              'r_prot, t) + 1e-30', 'applies': 'run'},
     {'description': 'with synthesis unregulated (R_syn = 1) expression approaches its regulated target and never '
                     'overshoots: m moves monotonically towards m_goal (constant in these tests)',
@@ -2952,7 +2953,7 @@ pe_inv = [
     {'description': 'amino acids are conserved: N_aa(t) - N_aa(0) = int (Q_aa_rel_total - Q_aa_use_total - r_aa_cat) dt '
                     '(relative 1e-4: trapezoid integration of the logged fluxes); the proteases never remove more than '
                     'their capacity, Q_prot_demand_total s_prot <= Q_prot_max',
-     'expr': 'abs(N_aa[-1] - N_aa[0] - np.trapz(Q_aa_rel_total - Q_aa_use_total - r_aa_cat, t)) <= 1e-4*np.trapz('
+     'expr': 'abs(N_aa[-1] - N_aa[0] - np.trapezoid(Q_aa_rel_total - Q_aa_use_total - r_aa_cat, t)) <= 1e-4*np.trapezoid('
              'np.abs(Q_aa_rel_total) + np.abs(Q_aa_use_total) + np.abs(r_aa_cat), t) + 1e-9 and np.all(Q_prot_demand_total*s_prot '
              '<= Q_prot_max*(1 + 1e-9) + 1e-9)', 'applies': 'run'},
 ]
@@ -3206,18 +3207,20 @@ def adaptive_library_version(module_type, src_version, density, note, defaults):
     cfg[0]['required_citations'] = sorted(set(cfg[0].get('required_citations', [])) | {'argus2026unpublished'})
     json.dump(cfg, open(os.path.join(dst, f'{d_stem}_modules_config.json'), 'w'), indent=2)
     rows = []
-    for r in csv.DictReader(open(os.path.join(src, 'parameterisations', 'default', 'default_parameters.csv'))):
+    for r in parameter_rows(os.path.join(src, 'parameterisations', 'default', 'default_parameters.json')):
         if r['variable_name'] in defaults:
             v, ref, src_ok = defaults[r['variable_name']]
             r.update(value=repr(float(v)), data_reference=ref, sourced='yes' if src_ok else 'no')
         rows.append(r)
     rows.append({'variable_name': 'm_expr', 'units': 'dimensionless', 'value': '1.0',
                  'data_reference': 'definitional; baseline expression (the calibrated cell)', 'sourced': 'no'})
-    with open(os.path.join(dst, 'parameterisations', 'default', 'default_parameters.csv'), 'w', newline='') as f:
+    csv_path = os.path.join(dst, 'parameterisations', 'default', 'default_parameters.csv')
+    with open(csv_path, 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=['variable_name', 'units', 'value', 'data_reference', 'sourced'],
                            lineterminator='\n')
         w.writeheader()
         w.writerows(rows)
+    parameters_json(csv_path)
     ver = json.load(open(os.path.join(src, f'{s_stem}_verification_config.json')))
     ver['version'] = V_NEW
     for inv in ver.get('invariants', []):
@@ -3473,10 +3476,10 @@ bio_inv = [
              'M_build_bio + M_build_protein, rtol=1e-12, atol=0) and np.allclose(growth_progress, P_growth/M_daughter, '
              'rtol=1e-12, atol=1e-15) and np.allclose(glycogen_progress, M_glyc_ATP/M_daughter, rtol=1e-12, atol=1e-15)'},
     {'description': 'the daughter receives exactly the growth ATP spent: P(t) - P(0) = int J_growth_used dt (relative 1e-6)',
-     'expr': 'abs(P_growth[-1] - P_growth[0] - np.trapz(J_growth_used, t)) <= 1e-6*abs(np.trapz(J_growth_used, t)) + 1e-30'},
+     'expr': 'abs(P_growth[-1] - P_growth[0] - np.trapezoid(J_growth_used, t)) <= 1e-6*abs(np.trapezoid(J_growth_used, t)) + 1e-30'},
     {'description': 'damage balance of each type: D_x(t) - D_x(0) = int (accrual - repair) dt (relative 1e-6), never '
                     'negative; the total is their sum (exact)',
-     'expr': ' and '.join(f'abs(D_{x}[-1] - D_{x}[0] - np.trapz({a} - R_rep_{x}, t)) <= 1e-6*np.trapz(np.abs({a}) + '
+     'expr': ' and '.join(f'abs(D_{x}[-1] - D_{x}[0] - np.trapezoid({a} - R_rep_{x}, t)) <= 1e-6*np.trapezoid(np.abs({a}) + '
                           f'np.abs(R_rep_{x}), t) + 1e-15 and np.all(D_{x} >= 0)'
                           for x, a in (('phys', 'R_dmg_phys'), ('rad', 'R_dmg_rad'), ('ribo', 'R_dmg_ribo'),
                                        ('energy', 'R_dmg_energy')))
@@ -3649,7 +3652,7 @@ rib_params = [
 rib_inv = [
     {'description': 'ribosome balance: n_ribo(t) - n_ribo(0) = int (R_ribo_build - R_ribo_loss) dt (relative 1e-6); '
                     'never negative, never above the resting count when started at or below it',
-     'expr': 'abs(n_ribo[-1] - n_ribo[0] - np.trapz(R_ribo_build - R_ribo_loss, t)) <= 1e-6*np.trapz(np.abs(R_ribo_build) '
+     'expr': 'abs(n_ribo[-1] - n_ribo[0] - np.trapezoid(R_ribo_build - R_ribo_loss, t)) <= 1e-6*np.trapezoid(np.abs(R_ribo_build) '
              '+ np.abs(R_ribo_loss), t) + 1e-9 and np.all(n_ribo >= 0) and (n_ribo[0] > n_ribo_rest or '
              'np.all(n_ribo <= n_ribo_rest*(1 + 1e-12)))'},
     {'description': 'loss, rebuilding and their costs (exact): u_upkeep = 1 - x_unpaid; R_ribo_loss = k_ribo n_ribo '
@@ -3906,8 +3909,8 @@ def cell_invariants(names, steady):
         {'description': 'amino acids are conserved through proteolysis and recycling: N_aa(t) - N_aa(0) = int (released '
                         '- reused - catabolised) dt (relative 1e-4: trapezoid integration of the logged fluxes), and N_aa '
                         'stays non-negative',
-         'expr': f'abs({D(m("protein", "N_aa"))} - np.trapz({m("protein", "Q_aa_rel_total")} - '
-                 f'{m("protein", "Q_aa_use_total")} - {m("protein", "r_aa_cat")}, t)) <= 1e-4*np.trapz('
+         'expr': f'abs({D(m("protein", "N_aa"))} - np.trapezoid({m("protein", "Q_aa_rel_total")} - '
+                 f'{m("protein", "Q_aa_use_total")} - {m("protein", "r_aa_cat")}, t)) <= 1e-4*np.trapezoid('
                  f'np.abs({m("protein", "Q_aa_rel_total")}) + np.abs({m("protein", "Q_aa_use_total")}) + '
                  f'np.abs({m("protein", "r_aa_cat")}), t) + 1e-6 and np.all({m("protein", "N_aa")} >= -1e-6)'},
     ]
@@ -3930,9 +3933,9 @@ def cell_invariants(names, steady):
                             '6 G6P + 3 lac + 6 glycogen) = int (6 sum J_glc + 3 J_lac - 6 J_mx) dt (relative 1e-5: '
                             'trapezoid integration of the logged fluxes)',
              'expr': f'abs({VOL0}*(6*{D(m("cytosol", "C_glc"))} + 6*{D(m("cytosol", "C_G6P"))} + '
-                     f'3*{D(m("cytosol", "C_lac"))} + 6*{D(m("cytosol", "C_glyc"))}) - np.trapz(6*({glc_in}) + '
+                     f'3*{D(m("cytosol", "C_lac"))} + 6*{D(m("cytosol", "C_glyc"))}) - np.trapezoid(6*({glc_in}) + '
                      f'3*{m("membrane_face", "J_lac")} - 6*{m("cytosol", "J_mx")}, t)) '
-                     f'<= 1e-5*np.trapz(np.abs(6*({glc_in})) + np.abs(3*{m("membrane_face", "J_lac")}) + '
+                     f'<= 1e-5*np.trapezoid(np.abs(6*({glc_in})) + np.abs(3*{m("membrane_face", "J_lac")}) + '
                      f'np.abs(6*{m("cytosol", "J_mx")}), t) + 1e-30'},
             {'description': 'the carriers\' costs follow their stoichiometry (exact): one PEP (ATP equivalent) per '
                             'glucose for the PTS, which delivers it as G6P, n_P ATP per glucose for the ABC importer, one '
@@ -4025,11 +4028,14 @@ def write_cell(cell, steady, sweep_extra, timestep=None, solve_ivp=None):
             value, ref, src_ok = cell['overrides'][n]
             sourced = 'yes' if src_ok else 'no'
         out.append([n, units, value, ref, sourced])
-    with open(os.path.join(d, 'parameterisations', 'default', 'default_parameters.csv'), 'w', newline='') as f:
+    csv_path = os.path.join(d, 'parameterisations', 'default', 'default_parameters.csv')
+    with open(csv_path, 'w', newline='') as f:
         w = csv.writer(f, lineterminator='\n')
         w.writerow(['variable_name', 'units', 'value', 'data_reference', 'sourced'])
         for r in out:
             w.writerow([r[0], r[1], repr(float(r[2])), r[3], r[4]])
+    parameters_json(csv_path)
+    supermodule_layout(os.path.join(d, f'{stem}_modules_config.json'))
     vals = {r[0]: float(r[2]) for r in out}
     ranges = {'T': [273.15, 313.15], 'cytosol/T_ref': [283.15, 303.15],
               'bio/growth_level': [0.0, 20.0], 'bio/repair_level': [0.0, 1.0], 'cytosol/store_alloc': [0.0, 1.0],
@@ -4082,8 +4088,9 @@ CELL_DIRS = [write_cell(CELLS['empty_membrane'], False, {},
              write_cell(CELLS['fermenter'], True, {'membrane_face/C_glc_e': [0.0, 50.0], 'i_flagellum/a_motor': [0.0, 1.0],
                                                    'pool_Flagellum/m_target': [1.0, 8.0], 'cytosol/mx_alloc': [0.0, 1.0]},
                         solve_ivp=['BDF', 'LSODA'])]
-_ferm_rows = {r[0]: r for r in csv.reader(open(os.path.join(CELL_DIRS[1], 'parameterisations', 'default',
-                                                            'default_parameters.csv')))}
+_ferm_rows = {r['variable_name']: [r['variable_name'], r['units'], r['value'], r['data_reference'], r['sourced']]
+              for r in parameter_rows(os.path.join(CELL_DIRS[1], 'parameterisations', 'default',
+                                                   'default_parameters.json'))}
 
 
 # ------------------------------------------------------------------ every cited key in each version's references.bib
@@ -4105,8 +4112,8 @@ def complete_bib(version_dir):
     bib_path = glob.glob(os.path.join(version_dir, '*_references.bib'))[0]
     text = open(bib_path).read()
     keys = set()
-    for csv_path in glob.glob(os.path.join(version_dir, 'parameterisations', '*', '*_parameters.csv')):
-        for row in csv.DictReader(open(csv_path)):
+    for json_path in glob.glob(os.path.join(version_dir, 'parameterisations', '*', '*_parameters.json')):
+        for row in parameter_rows(json_path):
             k = reference_key(row['data_reference'])
             if k and k not in (PH, 'definitional'):
                 keys.add(k)
