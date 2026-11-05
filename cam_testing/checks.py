@@ -1445,6 +1445,11 @@ def run_limited(fn, limit):
     return value
 
 
+def step_label(step):
+    """How a run's step appears in a message: 'step 0.001', or 'unconstrained' when step is None."""
+    return 'unconstrained' if step is None else f'step {step:g}'
+
+
 def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstrained, budget, min_step, deadline):
     """Runs make_cfg(step) for step = first_step, first_step/factor, ... (after an unconstrained try
     when try_unconstrained) until one works, a run is stopped at its limit, the next run is
@@ -1458,7 +1463,7 @@ def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstraine
         if step is not None and step < min_step:
             return (last and last['row']), f'reached min_step {min_step:g}'
         if last is not None and last['row']['seconds'] * (factor if last['step'] else 2.0) > budget:
-            return last['row'], f'stopped: next run (step {step:g}) predicted over the {budget:.0f} s budget'
+            return last['row'], f'stopped: next run ({step_label(step)}) predicted over the {budget:.0f} s budget'
         remaining = deadline - time.perf_counter()
         if remaining <= 0.0:
             return (last and last['row']), "skipped: the test's time budget is used up"
@@ -1467,8 +1472,7 @@ def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstraine
         if row['works']:
             return row, ''
         if row.get('timed_out'):
-            which = 'unconstrained' if step is None else f'step {step:g}'
-            return row, f'stopped: run ({which}) reached the {min(budget, remaining):.0f} s limit'
+            return row, f'stopped: run ({step_label(step)}) reached the {min(budget, remaining):.0f} s limit'
 
 
 def config_label(cfg):
