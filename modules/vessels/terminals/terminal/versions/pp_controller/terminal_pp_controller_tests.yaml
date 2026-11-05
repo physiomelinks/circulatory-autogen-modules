@@ -11,6 +11,9 @@ known_issues:
 - port variable u_in not in variables_and_units
 - port variable u_a not in variables_and_units
 - port variable v_a not in variables_and_units
+- CellML input u_in of controller_type is not declared in the config
+- CellML input u_a of controller_type is not declared in the config
+- CellML input v_a of controller_type is not declared in the config
 expected_failures:
   run_test: 'libcuflynx exits during generation ("the port variable u_in is not a variable for vessel type: terminal"): u_in,
     u_a and v_a are used in the entrance ports but missing from variables_and_units. Evidence (patched copy with the fix):

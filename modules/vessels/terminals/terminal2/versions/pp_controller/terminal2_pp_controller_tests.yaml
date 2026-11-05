@@ -11,6 +11,10 @@ known_issues:
 - port variable u_in not in variables_and_units
 - port variable u_a not in variables_and_units
 - port variable v_a not in variables_and_units
+- CellML input u_in of controller2_type is not declared in the config
+- CellML input u_a of controller2_type is not declared in the config
+- CellML input v_a of controller2_type is not declared in the config
+- error_flow_percent has units dimensionless in the config but Js_per_m6 in the CellML
 expected_failures:
   run_test: 'libcuflynx exits during generation ("the port variable u_in is not a variable for vessel type: terminal2"): u_in,
     u_a and v_a are used in the entrance ports but missing from variables_and_units. After that fix a second defect stops
