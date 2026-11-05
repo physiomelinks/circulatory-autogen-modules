@@ -1963,10 +1963,12 @@ def validation_test_calibrate(cm):
 # ----------------------------------------------------------------------------------------------
 
 # smoothing (verification_config): rel, eps relative to each site's range (a float, or per kind
-# {abs, maxmin, piecewise}); exempt, [[variable, reason], ...] whose sites are left as written; tol, the largest relative L2 error of any output at any point;
+# {abs, maxmin, piecewise}); exempt, [[variable, reason], ...] whose sites are left as written; tol, the largest error of any output at any point (RMS of the difference over the output's
+# range across all the points' original runs) over its solver floor;
 # collapse (null, true, or site numbers k); parameters, the bc_sweep parameters to sweep (default:
-# all of bc_sweep's); time_budget [s] for the runs; rationale.
-DEFAULT_SMOOTHING = {'rel': 1e-3, 'tol': 1e-2, 'collapse': None, 'time_budget': 420.0}
+# all of bc_sweep's); time_budget [s] for the runs; abs_floor, the scale of an output whose range over
+# the points is below it (one number, or {output: number}; default 1e-9); rationale.
+DEFAULT_SMOOTHING = {'rel': 1e-3, 'tol': 1e-2, 'collapse': None, 'time_budget': 420.0, 'abs_floor': 1e-9}
 NO_SITES = 'no non-smooth sites'
 SMOOTHING_DIR = 'smoothing'
 ATTRIBUTION_CAP = 40       # site groups smoothed one at a time to find the worst ones
@@ -2027,8 +2029,21 @@ def smoothing_points(cm, parameters=None):
     return points, skipped
 
 
-def _relative_errors(original, smoothed):
-    """{output: (relative L2, relative max)} of a smoothed run against the original."""
+def output_scales(originals, abs_floor=DEFAULT_SMOOTHING['abs_floor']):
+    """Each output's scale: its range over all the points' original runs, or the stated absolute floor
+    (one number, or {output: number}) when that range is below it. Unlike the output's own norm at a
+    point, it cannot collapse to zero (a clamp that is 0 throughout, a flow that is 0 at one point)."""
+    scales = {}
+    for name in originals[0]:
+        values = [o[name] for o in originals if name in o]
+        rng = float(max(np.max(v) for v in values) - min(np.min(v) for v in values))
+        floor = abs_floor.get(name, DEFAULT_SMOOTHING['abs_floor']) if isinstance(abs_floor, dict) else abs_floor
+        scales[name] = max(rng, float(floor))
+    return scales
+
+
+def _relative_errors(original, smoothed, scales):
+    """{output: (RMS error / scale, max error / scale)} of a smoothed run against the original."""
     errors = {}
     for name, y0 in original.items():
         y1 = smoothed.get(name)
@@ -2036,9 +2051,7 @@ def _relative_errors(original, smoothed):
             errors[name] = (math.inf, math.inf)
             continue
         d = y1 - y0
-        l2, peak = float(np.linalg.norm(y0)), float(np.max(np.abs(y0)))
-        errors[name] = (float(np.linalg.norm(d)) / l2 if l2 > 0 else float(np.linalg.norm(d)),
-                        float(np.max(np.abs(d))) / peak if peak > 0 else float(np.max(np.abs(d))))
+        errors[name] = (float(np.sqrt(np.mean(d * d))) / scales[name], float(np.max(np.abs(d))) / scales[name])
     return errors
 
 
@@ -2095,11 +2108,14 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     ``smoothing_report.json`` into ``out_dir``. ``attribute``: smooth each site group alone at the
     worst point (default: when a point is over tol).
 
-    The solver's own error is part of any comparison at the version's settings: valve flows that
-    switch within a step differ by a few % between rtol 1e-6 and 1e-10. With ``floor_solver_info``
-    (a tight reference), each output's floor is the original at the version's settings against the
-    original at the reference, at the nominal point, and a point passes when every output's relative
-    L2 error is within tol of its floor.
+    The error of an output at a point is the RMS of (smoothed - original) over the output's scale: its
+    range over all the points' original runs, or ``settings['abs_floor']`` when that range is below
+    it, so an output that is 0 at a point or throughout (a clamp) is judged on a scale that cannot
+    collapse. The solver's own error is part of any comparison at the version's settings: valve flows
+    that switch within a step differ by a few % between rtol 1e-6 and 1e-10. With
+    ``floor_solver_info`` (a tight reference), each output's floor is that error, on the same scale,
+    of the original at the version's settings against the original at the reference, at the nominal
+    point; a point passes when every output's error is within tol of its floor.
     """
     from libcuflynx.utilities import smooth_cellml as sc
     tol = float(settings['tol'])
@@ -2133,12 +2149,13 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     jumps = sorted(k for k, y in originals[0].items()
                    if y.size > 1 and np.ptp(y) > 0 and np.max(np.abs(np.diff(y))) > 0.5 * np.ptp(y))
     originals = [{k: v for k, v in o.items() if k not in jumps} for o in originals]
+    scales = output_scales(originals, settings.get('abs_floor', DEFAULT_SMOOTHING['abs_floor']))
     floor = {}
     if floor_solver_info:
         reference = run_points(model_path, dict(spec, solver_info=floor_solver_info), outputs,
                                [used_points[0]], nominal)[0]
         if isinstance(reference, dict):
-            floor = {k: v[0] for k, v in _relative_errors(reference, originals[0]).items()}
+            floor = {k: v[0] for k, v in _relative_errors(reference, originals[0], scales).items()}
 
     reference_runs = [{'sim_time': spec['sim_time'], 'pre_time': spec.get('pre_time', 0.0), 'dt': spec['dt'],
                        'solver_info': spec.get('solver_info') or {}, 'param_vals': p['params']} for p in used_points]
@@ -2152,7 +2169,7 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     sc.flag_nan_at_init(report, probe_path, smooth_path)
 
     def errors_of(path, pts, origs):
-        return [None if not isinstance(r, dict) else _relative_errors(o, r)
+        return [None if not isinstance(r, dict) else _relative_errors(o, r, scales)
                 for r, o in zip(run_points(path, spec, outputs, pts, nominal), origs)]
 
     def switching(r):
@@ -2202,10 +2219,11 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
             flags.setdefault(flag, []).append(site['k'])
     metrics.update({'n_sites': len(report['sites']), 'counts': report['counts'], 'n_points': len(rows),
                     'points': rows, 'worst': worst, 'attribution': attribution[:10], 'flags': flags, 'floor': floor,
+                    'scales': scales,
                     'not_smoothed': report['not_smoothed'], 'original_failed': failed_original,
                     'not_compared': jumps,
                     'over_budget': over_budget, 'smoothed_model': smooth_path, 'report': report_path})
-    details = [f'[{r["point"]}] {r["excess"]:.3g} over the solver floor (relative L2 {r["l2"]:.3g} in '
+    details = [f'[{r["point"]}] {r["excess"]:.3g} over the solver floor (RMS/range {r["l2"]:.3g} in '
                f'{r["worst_output"]}, max {r["max"]:.3g})' for r in sorted(failing, key=lambda r: -r['excess'])[:20]]
     details += [f'[site group {a["group"]}: {a["component"]}/{a["variable"]}] alone: {a["excess"]:.3g} over the floor '
                 f'at {a["point"]}: {a["original"][:160]}' for a in attribution[:10]]
@@ -2217,12 +2235,12 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     if failing:
         names = ', '.join(f'{a["variable"]} (group {a["group"]}, {a["excess"]:.2g})' for a in attribution[:3])
         return (FAILED, f'{len(failing)} of {len(rows)} points over tol {tol:g} above the solver floor: worst '
-                f'{worst["point"]}, {worst["excess"]:.3g} over the floor (relative L2 {worst["l2"]:.3g} in '
+                f'{worst["point"]}, {worst["excess"]:.3g} over the floor (RMS/range {worst["l2"]:.3g} in '
                 f'{worst["worst_output"]})' + (f'; worst sites: {names}' if names else '') + f' [{what}]',
                 metrics, figs, details)
     note = f'; {len(over_budget)} points over the time budget not run' if over_budget else ''
     return (PASSED, f'every point within tol {tol:g} of the solver floor (worst {worst["point"]}: {worst["excess"]:.3g} '
-            f'over it, relative L2 {worst["l2"]:.3g}) [{what}]{note}', metrics, figs, details)
+            f'over it, RMS/range {worst["l2"]:.3g}) [{what}]{note}', metrics, figs, details)
 
 
 def smoothing_fingerprint(component, settings):
