@@ -40,6 +40,11 @@ known_issues:
 - 'Python/C generation unsupported: gate states start from computed initial values (e.g. m_init = m_inf(V_rest_approx)), which
   libCellML''s analyser rejects, so solve_ivp (and C/C++) can''t generate the model; CVODE/Myokit runs it. Kept on review
   (2026-10-03).'
+expected_failures:
+  cuflynx_parameterisation_omex_test[davis2020_wistar]: 'Fails until a CUFLynx release bundles circulatory_autogen #618: the
+    released CUFLynx''s libcuflynx refuses the obs_data item key data_reference.'
+  cuflynx_parameterisation_omex_test[davis2020_wistar_kinetics]: 'Fails until a CUFLynx release bundles circulatory_autogen
+    #618: the released CUFLynx''s libcuflynx refuses the obs_data item key data_reference.'
 review: reviews/ion_channel_review.yaml
 review_scope: The review of the whole ion_channel module (47 entries) before the move to versions; only the parts about this
   version apply.
