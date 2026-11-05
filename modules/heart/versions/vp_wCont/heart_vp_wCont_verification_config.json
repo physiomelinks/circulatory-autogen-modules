@@ -285,14 +285,27 @@
     "t_end": 2.0
   },
   "smoothing": {
-    "rel": {
-      "abs": 0.001,
-      "maxmin": 0.001,
-      "piecewise": 0.0001,
-      "variables": {"chi_afloor_final": 1e-05, "chi_vfloor_final": 1e-05}
-    },
+    "exempt": [
+      [
+        "chi_afloor_final",
+        "the activation 2 chi_afloor drops from 1 to 0 at chi_afloor = 0.5, but it is used only in e_a = (1 - cos(2 pi chi_afloor_final))/2, which is 0 at both 1 and 0 with zero slope, so e_a is already continuous across the drop; smoothing the drop makes it pass through 0.5, where e_a = 1: a spurious elastance spike"
+      ],
+      [
+        "chi_vfloor_final",
+        "the ventricular activation drop, as chi_afloor_final: e_v = (1 - cos(2 pi chi_vfloor_final))/2 is continuous across it, and smoothing it adds a spike of e_v"
+      ],
+      [
+        "chi_a",
+        "d(chi_a)/dt: an on/off rate integrated into the atrial phase (each beat's start gated by the cardiac clock)"
+      ],
+      [
+        "chi_v",
+        "d(chi_v)/dt: an on/off rate integrated into the ventricular phase (each beat's start gated by the cardiac clock)"
+      ]
+    ],
+    "rel": {"abs": 0.001, "maxmin": 0.001, "piecewise": 0.0001},
     "tol": 0.01,
-    "rationale": "Set from smoothing each site alone and all together (heart/vp and vp_wCont at rel 1e-3, 1e-4, 1e-5). The activation drops chi_afloor_final and chi_vfloor_final (2 chi_floor, falling from 1 to 0 at chi_floor = 0.5) move the valve timing, and the valve flows are sensitive to it: chi_vfloor_final alone is 0.62 over the solver floor at rel 1e-3 and 0.085 at 1e-4 at the worst sweep point (A_nn_miv = 1.54e-3), and at the floor at 1e-5; so rel 1e-5 for those two. The other piecewise sites (the phase rates of chi_a and chi_v, the valve opening rates zeta_*_pre) are within 0.02 of the floor at 1e-4 and up to 0.09 over it at 1e-3 (chi_v's start gate mt >= t_vstart_norm, which x reaches only at the end of its range after the floor wraps): rel 1e-4. The valve clamps max(zeta_pre, 0) and the losses abs(v) are within 0.03 of the floor at 1e-3. Before libcuflynx shared one site between complementary comparisons (chi <= 0.25 / chi > 0.25), the phase rate dipped at each boundary and the activation lagged 0.03 of a beat over 25 s at 1e-3; it no longer lags."
+    "rationale": "Exempt: the activation drops and the phase rates (reasons with each). The activation 2 chi_floor falls from 1 to 0 at chi_floor = 0.5, but it is used only in e = (1 - cos(2 pi act))/2, which is 0 at act = 1 and at act = 0 with zero slope, so e is already continuous with a continuous slope across the drop; smoothing the drop makes act pass through 0.5, where e = 1, a spurious elastance spike (chi_vfloor_final smoothed alone at rel 1e-3 was 0.62 over the solver floor). The remaining sites are the valve opening rates zeta_*_pre (piecewise), the clamps max(zeta_pre, 0) and the losses abs(v). With the exemptions, at rel 1e-3 for every kind the worst sweep point (T = 1.5) is 0.16 over the floor, nearly all from zeta_trv_pre; at rel 1e-4 for every kind 18 of 205 points (vp) and 67 of 226 (vp_wCont) are over tol, worst 0.033-0.035. Chosen: piecewise 1e-4 (the valve rates), abs and maxmin 1e-3. With these 19 of 205 (vp, worst 0.05 at T = 0.6) and 22 of 226 (vp_wCont, worst 0.033) points are still over tol 1e-2: single sites smoothed alone at the worst points give 0.01-0.08 and do not fall from rel 1e-3 to 1e-4, so the rest is the valve flows' sensitivity to the timing of each switch, not a site that a smaller rel fixes."
   },
   "validation": {
     "default": {

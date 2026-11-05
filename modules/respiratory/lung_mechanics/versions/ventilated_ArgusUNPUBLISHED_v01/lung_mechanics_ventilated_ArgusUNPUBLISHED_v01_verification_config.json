@@ -76,6 +76,15 @@
       {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
     ]
   },
+  "smoothing": {
+    "exempt": [
+      [
+        "phi_*_0",
+        "box windows on t_floor (1 inside an interval of the breath, 0 outside), which phi_k_1 combines into continuous hat functions; smoothing the boxes would blur the hats' corners and shift their weights"
+      ]
+    ],
+    "rationale": "The respiratory phase windows are left as written (exempt); every other site is smoothed at the default rel."
+  },
   "validation": {
     "default": {
       "baseline": {
