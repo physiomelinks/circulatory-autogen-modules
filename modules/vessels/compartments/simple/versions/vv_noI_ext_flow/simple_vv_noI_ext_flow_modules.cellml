@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="simple_vv_noI_ext_flow" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="vv_simple_noI_ext_flow_type">
+        <!-- linear compliance: dq/dt = v_in - v_out + v_ext, u = (q - q_0 (1 - Delta_q_us))/(C (1 - Delta_C)); v_ext is a signed external flow (infusion > 0, bleed < 0); Delta_q_us and Delta_C are fractional decreases of the unstressed volume and compliance (0 at rest), from the venous_us_and_compliance_delta_port -->
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="C" public_interface="in" units="m6_per_J"/>
+        <variable name="q_0" public_interface="in" units="m3"/>
+        <variable name="q_init" public_interface="in" units="m3"/>
+        <variable name="v_ext" public_interface="in" units="m3_per_s"/>
+        <variable name="v_in" public_interface="in" units="m3_per_s"/>
+        <variable name="v_out" public_interface="in" units="m3_per_s"/>
+        <variable name="Delta_q_us" public_interface="in" units="dimensionless"/>
+        <variable name="Delta_C" public_interface="in" units="dimensionless"/>
+        <variable initial_value="q_init" name="q" public_interface="out" units="m3"/>
+        <variable name="C_wCont" public_interface="out" units="m6_per_J"/>
+        <variable name="q_0_wCont" public_interface="out" units="m3"/>
+        <variable name="u" public_interface="out" units="J_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_in</ci>
+                        <ci>v_out</ci>
+                    </apply>
+                    <ci>v_ext</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>C_wCont</ci>
+                <apply>
+                    <times/>
+                    <ci>C</ci>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>Delta_C</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>q_0_wCont</ci>
+                <apply>
+                    <times/>
+                    <ci>q_0</ci>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>Delta_q_us</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>q</ci>
+                        <ci>q_0_wCont</ci>
+                    </apply>
+                    <ci>C_wCont</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

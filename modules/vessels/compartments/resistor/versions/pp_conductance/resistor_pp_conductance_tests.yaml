@@ -1,0 +1,4 @@
+module_type: resistor
+version: pp_conductance
+reviewed: false
+notes: 'Flow through a conductance: v = G_wCont (u_in - u_out), G_wCont = G (1 + Delta_G)/(1 + Delta_R). Written as conductance x pressure difference, so the flow stays polynomial in the states and in Delta_G. Delta_R is the fractional increase of the resistance 1/G (0 at rest) from the resistance_delta_port, the port the terminals and the resistance drug combiner use (resistance R (1 + Delta_R)); Delta_G is a fractional conductance change (0 at rest) from the conductance_delta_port, e.g. ans_linear''s -k_R N. The flow is also on a flow_port (multi) for gas-exchange modules downstream.'

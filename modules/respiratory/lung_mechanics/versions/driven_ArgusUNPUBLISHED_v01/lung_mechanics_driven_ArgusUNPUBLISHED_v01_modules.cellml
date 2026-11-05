@@ -1,0 +1,448 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" name="lung_mechanics_driven_ArgusUNPUBLISHED_v01">
+    <component name="lung_mechanics_driven_ArgusUNPUBLISHED_v01">
+        <!-- Lung mechanics of lung_bond_graph_Argus_Chase_qstr (larynx/mouth, trachea, bronchi, alveoli, pleura and a mouth-pressure ventilator loop) driven by the muscle pressure P_mus through the muscle_pressure_port. The alveolar compliance is C_A = alpha_C_A_to_tot C_tot. -->
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="P_in" public_interface="in" units="J_per_m3"/>
+        <variable initial_value="P_in" name="P_m" public_interface="out" units="J_per_m3"/>
+        <variable name="P_t" public_interface="out" units="J_per_m3"/>
+        <variable name="P_b" public_interface="out" units="J_per_m3"/>
+        <variable name="P_A" public_interface="out" units="J_per_m3"/>
+        <variable name="P_pl" public_interface="out" units="J_per_m3"/>
+        <variable name="P_mus" public_interface="in" units="J_per_m3"/>
+        <variable initial_value="1.0e-3" name="q_t" public_interface="out" units="m3"/>
+        <variable initial_value="1.0e-3" name="q_b" public_interface="out" units="m3"/>
+        <variable initial_value="0.0" name="q_A_stressed" public_interface="out" units="m3"/>
+        <variable name="q_A" public_interface="out" units="m3"/>
+        <variable initial_value="0.0" name="q_pl" public_interface="out" units="m3"/>
+        <variable name="q_D" public_interface="out" units="m3"/>
+        <variable name="q_str" public_interface="out" units="m3"/>
+        <variable name="q_tot" public_interface="out" units="m3"/>
+        <variable name="v_vm" public_interface="out" units="m3_per_s"/>
+        <variable name="v_mt" public_interface="out" units="m3_per_s"/>
+        <variable name="v_tb" public_interface="out" units="m3_per_s"/>
+        <variable name="v_bA" public_interface="out" units="m3_per_s"/>
+        <variable name="v_twall" public_interface="out" units="m3_per_s"/>
+        <variable name="v_bwall" public_interface="out" units="m3_per_s"/>
+        <variable name="v_plwall" public_interface="out" units="m3_per_s"/>
+        <variable name="frac_R_bA" public_interface="in" units="dimensionless"/>
+        <variable name="R_tot" public_interface="in" units="Js_per_m6"/>
+        <variable name="R_mt" public_interface="out" units="Js_per_m6"/>
+        <variable name="R_tb" public_interface="out" units="Js_per_m6"/>
+        <variable name="R_bA" public_interface="out" units="Js_per_m6"/>
+        <variable name="alpha_LR" public_interface="out" units="dimensionless"/>
+        <variable name="R_plwall" public_interface="in" units="Js_per_m6"/>
+        <variable name="C_t" public_interface="in" units="m6_per_J"/>
+        <variable name="C_b" public_interface="out" units="m6_per_J"/>
+        <variable name="C_A" public_interface="out" units="m6_per_J"/>
+        <variable name="C_pl" public_interface="in" units="m6_per_J"/>
+        <variable name="C_tot" public_interface="in" units="m6_per_J"/>
+        <variable name="alpha_C_A_to_tot" public_interface="in" units="dimensionless"/>
+        <variable name="q_t_us" public_interface="in" units="m3"/>
+        <variable name="q_b_us" public_interface="in" units="m3"/>
+        <variable name="q_A_us" public_interface="in" units="m3"/>
+        <variable name="C_vent" public_interface="in" units="m6_per_J"/>
+        <variable name="C_m" public_interface="in" units="m6_per_J"/>
+        <variable name="R_tube" public_interface="in" units="Js_per_m6"/>
+        <variable name="k_p_vent" public_interface="in" units="per_s"/>
+        <variable name="k_I_vent" public_interface="in" units="per_s2"/>
+        <variable initial_value="0.0" name="P_err_int" public_interface="out" units="Js_per_m3"/>
+        <variable initial_value="0.0" name="P_vent" public_interface="out" units="J_per_m3"/>
+        <variable name="alpha_vent" public_interface="in" units="per_s"/>
+        <variable name="v_leak" public_interface="out" units="m3_per_s"/>
+        <variable name="R_leak" public_interface="in" units="Js_per_m6"/>
+        <variable name="P_leak_threshold" public_interface="in" units="J_per_m3"/>
+        <variable name="q_D_min" public_interface="in" units="m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>q_tot</ci>
+                <apply>
+                    <plus/>
+                    <ci>q_A</ci>
+                    <ci>q_b</ci>
+                    <ci>q_t</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_mt</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <ci>frac_R_bA</ci>
+                        </apply>
+                        <ci>R_tot</ci>
+                    </apply>
+                    <cn cellml:units="dimensionless">2</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_tb</ci>
+                <ci>R_mt</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_bA</ci>
+                <apply>
+                    <times/>
+                    <ci>frac_R_bA</ci>
+                    <ci>R_tot</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>C_A</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_C_A_to_tot</ci>
+                    <ci>C_tot</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>C_b</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>alpha_C_A_to_tot</ci>
+                    </apply>
+                    <ci>C_tot</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>P_err_int</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>P_vent</ci>
+                        <ci>P_in</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>alpha_vent</ci>
+                        <ci>P_err_int</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>P_vent</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <minus/>
+                                <ci>v_vm</ci>
+                            </apply>
+                            <ci>C_vent</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>k_p_vent</ci>
+                            <apply>
+                                <minus/>
+                                <ci>P_vent</ci>
+                                <ci>P_in</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>k_I_vent</ci>
+                        <ci>P_err_int</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_vm</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>P_vent</ci>
+                        <ci>P_m</ci>
+                    </apply>
+                    <ci>R_tube</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_leak</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <max/>
+                        <apply>
+                            <minus/>
+                            <ci>P_m</ci>
+                            <ci>P_leak_threshold</ci>
+                        </apply>
+                        <cn cellml:units="J_per_m3">0.0</cn>
+                    </apply>
+                    <ci>R_leak</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>P_m</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>v_vm</ci>
+                            <ci>v_mt</ci>
+                        </apply>
+                        <ci>v_leak</ci>
+                    </apply>
+                    <ci>C_m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_mt</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>P_m</ci>
+                        <ci>P_t</ci>
+                    </apply>
+                    <ci>R_mt</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_twall</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_mt</ci>
+                    <ci>v_tb</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_t</ci>
+                </apply>
+                <ci>v_twall</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_t</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <ci>q_t</ci>
+                        <ci>C_t</ci>
+                    </apply>
+                    <ci>P_pl</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_tb</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>P_t</ci>
+                        <ci>P_b</ci>
+                    </apply>
+                    <ci>R_tb</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_bwall</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_tb</ci>
+                    <ci>v_bA</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_b</ci>
+                </apply>
+                <ci>v_bwall</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_b</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <ci>q_b</ci>
+                        <ci>C_b</ci>
+                    </apply>
+                    <ci>P_pl</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_bA</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>P_b</ci>
+                        <ci>P_A</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>R_bA</ci>
+                        <ci>alpha_LR</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_A_stressed</ci>
+                </apply>
+                <ci>v_bA</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_A</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <divide/>
+                        <ci>q_A_stressed</ci>
+                        <ci>C_A</ci>
+                    </apply>
+                    <ci>P_pl</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_pl</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>v_plwall</ci>
+                            <ci>v_twall</ci>
+                        </apply>
+                        <ci>v_bwall</ci>
+                    </apply>
+                    <ci>v_bA</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_pl</ci>
+                <apply>
+                    <divide/>
+                    <ci>q_pl</ci>
+                    <ci>C_pl</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_plwall</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>P_mus</ci>
+                        <ci>P_pl</ci>
+                    </apply>
+                    <ci>R_plwall</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>q_D</ci>
+                <apply>
+                    <max/>
+                    <apply>
+                        <plus/>
+                        <ci>q_t</ci>
+                        <ci>q_b</ci>
+                        <ci>q_t_us</ci>
+                        <ci>q_b_us</ci>
+                    </apply>
+                    <ci>q_D_min</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>q_A</ci>
+                <apply>
+                    <plus/>
+                    <ci>q_A_stressed</ci>
+                    <ci>q_A_us</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>alpha_LR</ci>
+                <cn cellml:units="dimensionless">1.0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>q_str</ci>
+                <ci>q_A_stressed</ci>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,107 @@
+{
+  "module_type": "ans_linear",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": [
+    "N",
+    "f",
+    "Delta_G"
+  ],
+  "invariants": [
+    {
+      "description": "exact first-order solution N = X + (N_init - X) exp(-t/tau), X = g_P (P_a - P_ref) + g_O2 (C_O2 - C_O2_ref) + g_CO2 (C_CO2 - C_CO2_ref)",
+      "expr": "np.max(np.abs(N - ((g_P*(P_a - P_ref) + g_O2*(C_O2 - C_O2_ref) + g_CO2*(C_CO2 - C_CO2_ref)) + (N_init - (g_P*(P_a - P_ref) + g_O2*(C_O2 - C_O2_ref) + g_CO2*(C_CO2 - C_CO2_ref)))*np.exp(-t/tau)))) <= 1e-5*max(1.0, abs(g_P*(P_a - P_ref) + g_O2*(C_O2 - C_O2_ref) + g_CO2*(C_CO2 - C_CO2_ref)))"
+    },
+    {
+      "description": "f = f_0 + k_f N + f_E E",
+      "expr": "np.max(np.abs(f - (f_0 + k_f*N + f_E*E))) <= 1e-10*max(abs(f_0), 1.0)"
+    },
+    {
+      "description": "terminal conductance change Delta_G = -k_R N",
+      "expr": "np.max(np.abs(Delta_G + k_R*N)) <= 1e-12*max(1.0, np.max(np.abs(k_R*N)))"
+    },
+    {
+      "description": "signs: pressure below P_ref with reference gases raises f",
+      "expr": "(P_a >= P_ref) | (C_O2 != C_O2_ref) | (C_CO2 != C_CO2_ref) | (g_P >= 0) | (k_f <= 0) | (E != 0) | (f[-1] > f_0)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "P_a": {
+        "min": 5333.0,
+        "max": 18666.0,
+        "points": 5
+      },
+      "C_O2": {
+        "min": 0.05,
+        "max": 0.2,
+        "points": 4
+      },
+      "C_CO2": {
+        "min": 0.4,
+        "max": 0.6,
+        "points": 5
+      },
+      "tau": {
+        "min": 0.5,
+        "max": 10.0,
+        "points": 4,
+        "scale": "log"
+      },
+      "N_init": {
+        "min": -2.0,
+        "max": 2.0,
+        "points": 5
+      },
+      "E": {
+        "min": 0.0,
+        "max": 10.0,
+        "points": 4
+      }
+    },
+    "rationale": "MAP 40-140 mmHg; terminal O2 0.05-0.20 and CO2 0.40-0.60 mL/mL; tau 0.5-10 s."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.04,
+      0.02,
+      0.01,
+      0.005
+    ],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "no data: a synthetic module of the known-structure test model (ICUHealthy models/simple)"
+      },
+      "calibrate": {
+        "note": "not_applicable: no data to calibrate against"
+      }
+    }
+  }
+}

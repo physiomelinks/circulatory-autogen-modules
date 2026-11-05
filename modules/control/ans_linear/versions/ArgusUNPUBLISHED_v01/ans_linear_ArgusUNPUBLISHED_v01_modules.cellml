@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="ans_linear_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="ans_linear_ArgusUNPUBLISHED_v01">
+        <!-- one autonomic state N: tau dN/dt = -N + g_P (P_a - P_ref) + g_O2 (C_O2 - C_O2_ref) + g_CO2 (C_CO2 - C_CO2_ref); heart frequency f = f_0 + k_f N + f_E E, E an additive effect (e.g. a drug, 0 at rest) from the drug_effect_port; terminal conductance change Delta_G = -k_R N on the conductance_delta_port (sympathetic activity N > 0 constricts) -->
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="tau" public_interface="in" units="second"/>
+        <variable name="g_P" public_interface="in" units="m3_per_J"/>
+        <variable name="P_ref" public_interface="in" units="J_per_m3"/>
+        <variable name="g_O2" public_interface="in" units="dimensionless"/>
+        <variable name="C_O2_ref" public_interface="in" units="dimensionless"/>
+        <variable name="g_CO2" public_interface="in" units="dimensionless"/>
+        <variable name="C_CO2_ref" public_interface="in" units="dimensionless"/>
+        <variable name="f_0" public_interface="in" units="per_s"/>
+        <variable name="k_f" public_interface="in" units="per_s"/>
+        <variable name="N_init" public_interface="in" units="dimensionless"/>
+        <variable name="P_a" public_interface="in" units="J_per_m3"/>
+        <variable name="C_O2" public_interface="in" units="dimensionless"/>
+        <variable name="C_CO2" public_interface="in" units="dimensionless"/>
+        <variable name="E" public_interface="in" units="dimensionless"/>
+        <variable name="f_E" public_interface="in" units="per_s"/>
+        <variable name="k_R" public_interface="in" units="dimensionless"/>
+        <variable initial_value="N_init" name="N" public_interface="out" units="dimensionless"/>
+        <variable name="f" public_interface="out" units="per_s"/>
+        <variable name="Delta_G" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>N</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>N</ci>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>g_P</ci>
+                                    <apply>
+                                        <minus/>
+                                        <ci>P_a</ci>
+                                        <ci>P_ref</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>g_O2</ci>
+                                <apply>
+                                    <minus/>
+                                    <ci>C_O2</ci>
+                                    <ci>C_O2_ref</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>g_CO2</ci>
+                            <apply>
+                                <minus/>
+                                <ci>C_CO2</ci>
+                                <ci>C_CO2_ref</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>tau</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <plus/>
+                        <ci>f_0</ci>
+                        <apply>
+                            <times/>
+                            <ci>k_f</ci>
+                            <ci>N</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>f_E</ci>
+                        <ci>E</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Delta_G</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <ci>k_R</ci>
+                    </apply>
+                    <ci>N</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>
