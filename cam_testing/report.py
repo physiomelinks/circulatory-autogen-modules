@@ -1435,6 +1435,7 @@ def system_context(system, href_of=None, page_dir=None):
     notes = spec.get('notes') or []
     notes = [notes] if isinstance(notes, str) else list(notes)
     figure = system_figure(system, {i['name'] for i in instances})
+    obs_path = os.path.join(system.dir, f'{system.name}_obs_data.json')
     hrefs = {i['name']: i['href'] for i in instances}
     for n in (figure or {}).get('nodes') or []:
         n['href'] = hrefs.get(n['instance'])
@@ -1455,8 +1456,8 @@ def system_context(system, href_of=None, page_dir=None):
         'parameters': _parameter_groups(os.path.join(system.dir, f'{system.name}_parameters.json')),
         'parameters_file': f'{system.name}_parameters.json',
         'tests': tests, 'counts': counts, 'plots': _system_plots(system),
-        'sources': sources_table(sources.data_table(system.dir, obs=sources.read_obs(
-            os.path.join(system.dir, f'{system.name}_obs_data.json'))), system.dir),
+        'sources': sources_table(sources.data_table(system.dir, obs=sources.read_obs(obs_path), obs_path=obs_path),
+                                 system.dir),
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
     }
 

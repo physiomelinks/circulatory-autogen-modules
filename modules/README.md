@@ -407,16 +407,15 @@ extraction and the fit against the original.
 **Rule: every calibration and validation data item says where it came from.** The items are a
 parameterisation's obs_data `data_items` and `prediction_items`, and the validation baseline's scalar
 `targets` and data columns (`validation.<p>.baseline` with a status other than pending, skipped or
-not_applicable). An item's source is:
+not_applicable). An item's source combines two places, and `SOURCES.md` is the extension of the
+`data_reference`:
 
-1. its **`data_reference`** key: a string (the citation, starting with a BibTeX key when there is one), or
-   an object with any of `source`, `figure`, `obtained` (digitised / table value / derived), `species`,
+1. its **`data_reference`** key in its data file: a string, `<BibTeX key>; <short note>`, or an object
+   with any of `source`, `figure`, `obtained` (digitised / table value / derived), `species`,
    `preparation`, `conditions`, `kind`, `role`, `sigma_reason`, `primary_read` and `note` (other keys are
    shown as notes). On a baseline with a data file, the baseline's own `data_reference` sources its columns.
-   libcuflynx reads obs_data too: `data_reference` on a `prediction_item` needs a libcuflynx with
-   physiomelinks/circulatory_autogen#618 (optional `data_reference`, open); an older one refuses the key
-   there. Until then, source prediction items in SOURCES.md.
-2. otherwise its **section in `SOURCES.md`** beside the data (`parameterisations/<p>/SOURCES.md`, or a
+   libcuflynx accepts `data_reference` on obs_data items (physiomelinks/circulatory_autogen#618, on CA master).
+2. its **section in `SOURCES.md`** beside the data (`parameterisations/<p>/SOURCES.md`, or a
    system model's directory). A Markdown heading of any level is the item's `data_item_name` (a target's
    `name`, a data column's name), exactly; a trailing ` — <value>` or `(note)` on the heading is ignored.
    The section runs to the next heading. Under it, optional labelled lines, then free prose (shown in the
@@ -437,9 +436,20 @@ not_applicable). An item's source is:
 
    - Kind: derived: term of u_e_depolarisation_with_sugar
    - Role: term
+
+   ## mod/x
+
+   - Kind: measured (pelt counts, thousands, a proxy for the hare population)
+   - Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
    ```
+   The two combine: the row takes the section's fields and the `data_reference`'s, and where both give a
+   field (e.g. the source) the `data_reference` wins. An item with a `data_reference` repeats it in its
+   section as `- Data reference: <the identical string>` (for an object, its `source`), not as `- Source:`;
+   when the two strings differ, `data_sources_test` fails, naming the item, both strings and both files.
+   The table says where a row came from: `data_reference`, `SOURCES.md` or `data_reference + SOURCES.md`.
    Labels (`- Label: text` or `- **Label:** text`, case-insensitive): `Kind` (measured | assumed (why) |
-   derived | derived: term of <item>), `Role` (target | prediction | held out | term), `Source` (or `Citation`),
+   derived | derived: term of <item>), `Role` (target | prediction | held out | term), `Data reference`
+   (the item's `data_reference` string, repeated exactly), `Source` (or `Citation`) for an item without one,
    `Figure` / `Table`, `Obtained`, `Species/preparation` (or `Species`, `Preparation`, `Conditions`),
    `Primary read`, `Sigma` (why sigma was set or widened), `Note`. Value and sigma are always read from
    the data file, never from SOURCES.md. Headings that name no item (e.g. data proposed but not in the
@@ -450,11 +460,13 @@ not_applicable). An item's source is:
 **Kind** (what the number is) is read only from the `Kind` label or `kind` key: measured, assumed,
 derived, or a term of another item. **Role** (how it is used) is the item's place in the data: a
 `data_item` with weight > 0 is a target; a `prediction_item` with a value is held out, one without is a
-prediction; a `data_item` with weight 0 is held out, or a term (below), never a target; a baseline item is
-validation. A `Role` label that disagrees is flagged. A `data_item` with weight 0 whose sigma is ≥ 1e10, or that another item's
-`operation_kwargs` names (x1/x2 of a subtraction or division), is a **term** of another item: the page
-says "term of <item>, not a measurement", and its source must say so explicitly
-(`Kind: derived: term of <item>`): it is not exempt.
+prediction; a `data_item` with weight 0 is a term (below), never a target; a baseline item is validation.
+A `Role` label that disagrees is flagged. **An item is used without being scored only by weight = 0**; a
+std of very large order never marks it (a weight-1 item with std 1e20 is still a target). So every
+`data_item` with weight 0 is a **term** of another item, usually one whose `operation_kwargs` names it
+(x1/x2 of a subtraction or division): the page says "term of <item>, not a measurement", and its source must say so explicitly
+(`Kind: derived: term of <item>`): it is not exempt. A measurement kept out of the fit is a
+`prediction_item`, not a weight-0 `data_item`.
 
 - **The table:** each version page has a "Data sources" block (one table per parameterisation with
   data items: item with variable and operation, value, sigma with its rationale, source with figure,
@@ -462,8 +474,8 @@ says "term of <item>, not a measurement", and its source must say so explicitly
   References) and a "data items sourced" count in its header; a system-model page has one for its
   obs_data. The site index counts the items without a source.
 - **Checked by** `data_sources_test` (`tests/test_modules.py`, per version, no model run): it fails when
-  any item has no source, or a term lacks its `derived: term of <item>` kind, and lists each item and
-  where to add its source. It runs for unreviewed versions too; in CI their failures are warnings
+  any item has no source, a term lacks its `derived: term of <item>` kind, or an item's `data_reference`
+  and its SOURCES.md `Data reference` differ, and lists each item and where to add its source. It runs for unreviewed versions too; in CI their failures are warnings
   (`tools/ci_reviewed_failures.py`), so it gates reviewed versions and new sign-offs.
 
 ## How system models use versions and parameterisations

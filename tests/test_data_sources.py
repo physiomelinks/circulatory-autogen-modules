@@ -90,6 +90,14 @@ def test_heading_names_and_reference_forms():
     assert sections['a']['kind'] == 'assumed' and sections['a']['source'] == 'b2020'
 
 
+def test_data_reference_label_is_the_source_not_prose():
+    sections, _ = sources.parse_sources_md('## a\n\n- Data reference: b2020; Fig. 2,\n  digitised\n'
+                                           '\n## b\n\n- data reference: c2021; Table 1\n')
+    assert sections['a']['source'] == 'b2020; Fig. 2, digitised' and sections['a']['prose'] == ''
+    assert sections['a'][sources.DATA_REFERENCE] == 'b2020; Fig. 2, digitised'
+    assert sections['b']['source'] == 'c2021; Table 1'
+
+
 # ---- kinds and roles ----------------------------------------------------------------------------
 
 @pytest.fixture
@@ -129,16 +137,42 @@ def test_kinds_and_roles(table):
     assert table['extra_headings'] == ['c_Na_rise_with_sugar', 'v_NKA_ratio_with_sugar', 'c_Na_sugar']
 
 
-def test_a_referenced_weight_0_item_is_a_term_and_a_weight_0_measurement_is_held_out(tmp_path):
+def test_only_weight_0_makes_a_term(tmp_path):
     obs = {'data_items': [item('a', 0, 5.0, 0.0), item('b', 2, 1, operation_kwargs={'x1': 'a', 'x2': 'c'}),
                           item('c', 1, 1, 0.0)], 'prediction_items': []}
     r = rows_by_name(sources.data_table(str(tmp_path), obs=obs))
     assert r['a']['kind_label'] == 'term of b, not a measurement'
     assert 'derived: term of b' in r['a']['problem']
     assert r['c']['role'] == 'term'
-    obs['data_items'] = [item('d', 3, 1, 0.0)]
-    d = sources.data_table(str(tmp_path), obs=obs)['rows'][0]
-    assert d['role'] == 'held out' and d['kind'] is None and d['problem'] == sources.MISSING
+    # weight 0 with an ordinary std, named by no item: still a term, and its source must say so
+    obs['data_items'] = [item('d', 3, 1, 0.0), item('e', 3, 1e20, 1.0)]
+    r = rows_by_name(sources.data_table(str(tmp_path), obs=obs))
+    assert r['d']['role'] == 'term' and r['d']['kind'] == 'term' and 'derived: term of' in r['d']['problem']
+    # a std of very large order never makes a term: a weight-1 item is a target
+    assert r['e']['role'] == 'target' and r['e']['kind'] is None and r['e']['problem'] == sources.MISSING
+
+
+def test_data_reference_and_section_combine(tmp_path):
+    (tmp_path / 'SOURCES.md').write_text('## a\n\n- Kind: measured\n- Data reference: k2020; Fig. 1\n'
+                                         '- Figure: Fig. 1B\n\n## b\n\n- Data reference: k2020; Fig. 2\n'
+                                         '\n## c\n\n- Kind: assumed\n- Source: an older note\n')
+    obs = {'data_items': [item('a', data_reference='k2020; Fig. 1'), item('b', data_reference='k2020; Fig. 3'),
+                          item('c', data_reference={'source': 'k2021', 'figure': 'Table 2'}),
+                          item('d', data_reference='k2022')], 'prediction_items': []}
+    obs_path = str(tmp_path / 'x_obs_data.json')
+    t = sources.data_table(str(tmp_path), obs=obs, obs_path=obs_path)
+    r = rows_by_name(t)
+    # section fields plus data_reference, the data_reference winning per field; the origin says both
+    assert (r['a']['origin'], r['a']['kind'], r['a']['figure'], r['a']['problem']) == \
+        ('data_reference + SOURCES.md', 'measured', 'Fig. 1B', None)
+    assert (r['c']['source'], r['c']['figure'], r['c']['kind']) == ('k2021', 'Table 2', 'assumed')
+    assert r['c']['origin'] == 'data_reference + SOURCES.md' and not r['c']['mismatch']
+    assert r['d']['origin'] == 'data_reference'
+    # the two strings differ: a problem naming both strings and both files
+    b = r['b']
+    assert b['mismatch'] and not b['missing']
+    assert all(s in b['problem'] for s in ('"k2020; Fig. 3"', '"k2020; Fig. 2"', 'x_obs_data.json', 'SOURCES.md'))
+    assert t['n_problems'] == 1
 
 
 def test_baseline_targets_and_columns(tmp_path):
@@ -189,6 +223,10 @@ def _strip_lv_data(repo):
         it['data_reference'] = 'hewitt1921conservation (via carpenter2018predator)'
     with open(path, 'w') as f:
         json.dump(obs, f)
+    # without the SOURCES.md, whose Data reference lines would differ from that string
+    md = os.path.join(os.path.dirname(path), 'SOURCES.md')
+    if os.path.exists(md):
+        os.remove(md)
     # carpenter2018's baseline data columns
     with open(os.path.join(repo.version.parameterisation('carpenter2018').dir, 'SOURCES.md'), 'w') as f:
         f.write('## Hare\n\n- Kind: measured\n- Source: carpenter2018predator\n\n## Lynx\n\n- Kind: measured\n')
@@ -212,9 +250,29 @@ def test_data_sources_test_passes_once_every_item_is_sourced(repo):
     assert sources.check(repo.version).status == checks.PASSED
 
 
+def test_data_sources_test_reports_a_data_reference_mismatch(repo):
+    _strip_lv_data(repo)
+    with open(repo.pdir / 'SOURCES.md', 'a', encoding='utf-8') as f:
+        f.write('- Kind: derived: term of v_NKA_ratio_with_sugar\n\n## G_K_total\n\n- Kind: assumed\n'
+                '\n## R_te\n\n- Data reference: rose1971studies Table 3\n')
+    r = sources.check(repo.version)
+    assert r.status == checks.FAILED
+    assert r.message == '1 of 22 data items have a data_reference that differs from SOURCES.md'
+    d = next(d for d in r.details if d.startswith(f'{P}: R_te: '))
+    assert '"rose1971studies Table 2" in ' + f'parameterisations/{P}/{P}_obs_data.json' in d
+    assert f'"rose1971studies Table 3" in parameterisations/{P}/SOURCES.md' in d
+
+
 def test_data_sources_test_unsourced_and_not_applicable(repo, tmp_path):
-    # the copied version's own data, without their SOURCES.md, are unsourced
-    os.remove(os.path.join(repo.version.parameterisation('hudson_bay_lynx_hare').dir, 'SOURCES.md'))
+    # the copied version's own data, without their SOURCES.md or data_reference keys, are unsourced
+    hb = repo.version.parameterisation('hudson_bay_lynx_hare')
+    os.remove(os.path.join(hb.dir, 'SOURCES.md'))
+    with open(hb.obs_data_path) as f:
+        obs = json.load(f)
+    for it in obs['data_items'] + obs['prediction_items']:
+        it.pop('data_reference', None)
+    with open(hb.obs_data_path, 'w') as f:
+        json.dump(obs, f)
     r = sources.check(repo.version)
     assert r.status == checks.FAILED and 'hudson_bay_lynx_hare: mod/x: source missing' in '\n'.join(r.details)
     shutil.rmtree(repo.pdir)
