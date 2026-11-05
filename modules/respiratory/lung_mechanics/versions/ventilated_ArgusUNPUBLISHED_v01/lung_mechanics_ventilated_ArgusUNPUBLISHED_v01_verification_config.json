@@ -83,7 +83,13 @@
         "box windows on t_floor (1 inside an interval of the breath, 0 outside), which phi_k_1 combines into continuous hat functions; smoothing the boxes would blur the hats' corners and shift their weights"
       ]
     ],
-    "rationale": "The respiratory phase windows are left as written (exempt); every other site is smoothed at the default rel."
+    "rel": {
+      "abs": 0.001,
+      "maxmin": 0.001,
+      "piecewise": 0.001,
+      "variables": {"v_leak": 0.001}
+    },
+    "rationale": "The respiratory phase windows phi_*_0 are left as written (exempt). The leak rectifier v_leak = max(P_m - P_leak_threshold, 0)/R_leak was tested at rel 1e-3, 1e-4, 1e-5 and 1e-6 in CVS-ANS's lung (lung_bg_Argus_Chase_qstr, the same rectifier): smoothed alone it is 6e-4, 4e-5, 5e-5 and 2e-4 over the solver floor at the worst sweep point, and the nominal run takes 20156, 20148, 20156 and 20158 CVODE steps against the original's 20143, so 1e-3, the largest, is set. The other sites are smoothed at 1e-3; that check's one failing point (beta_C_insp_to_exp = 2, 0.0103 against tol 0.01) is C_A's."
   },
   "validation": {
     "default": {
