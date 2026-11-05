@@ -1963,12 +1963,12 @@ def validation_test_calibrate(cm):
 # ----------------------------------------------------------------------------------------------
 
 # smoothing (verification_config): rel, eps relative to each site's range (a float, or per kind
-# {abs, maxmin, piecewise}); exempt, [[variable, reason], ...] whose sites are left as written; tol, the largest error of any output at any point (RMS of the difference over the output's
+# {abs, maxmin, piecewise, division}, and variables: {variable: rel}); maxmin_form ('w' or 'xH'); exempt, [[variable, reason], ...] whose sites are left as written; tol, the largest error of any output at any point (RMS of the difference over the output's
 # range across all the points' original runs) over its solver floor;
 # collapse (null, true, or site numbers k); parameters, the bc_sweep parameters to sweep (default:
-# all of bc_sweep's); time_budget [s] for the runs; abs_floor, the scale of an output whose range over
-# the points is below it (one number, or {output: number}; default 1e-9); rationale.
-DEFAULT_SMOOTHING = {'rel': 1e-3, 'tol': 1e-2, 'collapse': None, 'time_budget': 420.0, 'abs_floor': 1e-9}
+# all of bc_sweep's); time_budget [s] for the runs; abs_floor, {output: scale} to override an output's
+# scale (output_scales); rationale.
+DEFAULT_SMOOTHING = {'rel': 1e-3, 'tol': 1e-2, 'collapse': None, 'time_budget': 420.0, 'abs_floor': None}
 NO_SITES = 'no non-smooth sites'
 SMOOTHING_DIR = 'smoothing'
 ATTRIBUTION_CAP = 40       # site groups smoothed one at a time to find the worst ones
@@ -2029,16 +2029,18 @@ def smoothing_points(cm, parameters=None):
     return points, skipped
 
 
-def output_scales(originals, abs_floor=DEFAULT_SMOOTHING['abs_floor']):
-    """Each output's scale: its range over all the points' original runs, or the stated absolute floor
-    (one number, or {output: number}) when that range is below it. Unlike the output's own norm at a
-    point, it cannot collapse to zero (a clamp that is 0 throughout, a flow that is 0 at one point)."""
+def output_scales(originals, abs_floor=None, atol=1e-8):
+    """Each output's scale: max(R, M, atol), with R its range and M |its mean| over all the points' original
+    runs, and atol the solver's absolute tolerance; ``abs_floor`` ({output: number}) overrides it per
+    output. Unlike the output's own norm at a point it cannot collapse: an output that is 0 throughout (a
+    clamp) is judged against atol, one that is constant and nonzero against its value."""
     scales = {}
     for name in originals[0]:
-        values = [o[name] for o in originals if name in o]
-        rng = float(max(np.max(v) for v in values) - min(np.min(v) for v in values))
-        floor = abs_floor.get(name, DEFAULT_SMOOTHING['abs_floor']) if isinstance(abs_floor, dict) else abs_floor
-        scales[name] = max(rng, float(floor))
+        values = np.concatenate([np.ravel(o[name]) for o in originals if name in o])
+        if isinstance(abs_floor, dict) and name in abs_floor:
+            scales[name] = float(abs_floor[name])
+        else:
+            scales[name] = max(float(np.ptp(values)), abs(float(np.mean(values))), float(atol))
     return scales
 
 
@@ -2108,10 +2110,10 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     ``smoothing_report.json`` into ``out_dir``. ``attribute``: smooth each site group alone at the
     worst point (default: when a point is over tol).
 
-    The error of an output at a point is the RMS of (smoothed - original) over the output's scale: its
-    range over all the points' original runs, or ``settings['abs_floor']`` when that range is below
-    it, so an output that is 0 at a point or throughout (a clamp) is judged on a scale that cannot
-    collapse. The solver's own error is part of any comparison at the version's settings: valve flows
+    The error of an output at a point is the RMS of (smoothed - original) over the output's scale,
+    max(R, M, atol) (``output_scales``: its range, |its mean| over all the points' original runs, the
+    solver's atol; ``settings['abs_floor']`` overrides it per output), so an output that is 0 at a
+    point or throughout (a clamp), or constant, is judged on a scale that cannot collapse. The solver's own error is part of any comparison at the version's settings: valve flows
     that switch within a step differ by a few % between rtol 1e-6 and 1e-10. With
     ``floor_solver_info`` (a tight reference), each output's floor is that error, on the same scale,
     of the original at the version's settings against the original at the reference, at the nominal
@@ -2126,7 +2128,7 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     metrics = {'settings': {k: settings.get(k) for k in ('rel', 'tol', 'collapse')}}
     report_path = os.path.join(out_dir, 'smoothing_report.json')
     if not sc.probe_variables(probed):
-        _, report = sc.smooth(text, {}, exempt=settings.get('exempt_entries'))
+        _, report = sc.smooth(text, {}, exempt=settings.get('exempt_entries'), maxmin_form=settings.get('maxmin_form', 'w'))
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2)
         metrics.update({'n_sites': 0, 'counts': report['counts'], 'not_smoothed': report['not_smoothed']})
@@ -2149,7 +2151,8 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     jumps = sorted(k for k, y in originals[0].items()
                    if y.size > 1 and np.ptp(y) > 0 and np.max(np.abs(np.diff(y))) > 0.5 * np.ptp(y))
     originals = [{k: v for k, v in o.items() if k not in jumps} for o in originals]
-    scales = output_scales(originals, settings.get('abs_floor', DEFAULT_SMOOTHING['abs_floor']))
+    scales = output_scales(originals, settings.get('abs_floor'),
+                           atol=float((spec.get('solver_info') or {}).get('atol', 1e-8)))
     floor = {}
     if floor_solver_info:
         reference = run_points(model_path, dict(spec, solver_info=floor_solver_info), outputs,
@@ -2162,7 +2165,16 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
         ranges, each = sc.reference_ranges(probe_path, reference_runs, per_run=True)
     exempt = settings.get('exempt_entries') or []
-    smoothed, report = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), exempt=exempt)
+    form = settings.get('maxmin_form', 'w')
+    smoothed, report = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), exempt=exempt,
+                                 maxmin_form=form)
+    if not [x for x in report['sites'] if x['status'] != 'not_needed']:
+        # only divisions whose denominators never reach 0: nothing to smooth
+        with open(report_path, 'w') as f:
+            json.dump(report, f, indent=2, default=_json_default)
+        metrics.update({'n_sites': 0, 'counts': report['counts'], 'not_smoothed': report['not_smoothed']})
+        left = f'; left as written: {len(report["not_smoothed"])}' if report['not_smoothed'] else ''
+        return PASSED, NO_SITES + left, metrics, [], []
     smooth_path = os.path.join(out_dir, f'{name}_smooth.cellml')
     with open(smooth_path, 'w', encoding='utf-8') as f:
         f.write(smoothed)
@@ -2192,7 +2204,7 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
         index = [r['point'] for r in rows].index(worst['point'])
         for group, ks in list(site_groups(report).items())[:ATTRIBUTION_CAP]:
             one, _ = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), only=ks,
-                               exempt=exempt)
+                               exempt=exempt, maxmin_form=form)
             path_one = os.path.join(work_dir, f'{name}_smooth_{group}.cellml')
             with open(path_one, 'w', encoding='utf-8') as f:
                 f.write(one)
@@ -2217,30 +2229,31 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     for site in report['sites']:
         for flag in site['flags']:
             flags.setdefault(flag, []).append(site['k'])
-    metrics.update({'n_sites': len(report['sites']), 'counts': report['counts'], 'n_points': len(rows),
+    live = [x for x in report['sites'] if x['status'] != 'not_needed']
+    metrics.update({'n_sites': len(live), 'lifted_estimate': report.get('lifted_estimate'), 'counts': report['counts'], 'n_points': len(rows),
                     'points': rows, 'worst': worst, 'attribution': attribution[:10], 'flags': flags, 'floor': floor,
                     'scales': scales,
                     'not_smoothed': report['not_smoothed'], 'original_failed': failed_original,
                     'not_compared': jumps,
                     'over_budget': over_budget, 'smoothed_model': smooth_path, 'report': report_path})
-    details = [f'[{r["point"]}] {r["excess"]:.3g} over the solver floor (RMS/range {r["l2"]:.3g} in '
+    details = [f'[{r["point"]}] {r["excess"]:.3g} over the solver floor (RMS/scale {r["l2"]:.3g} in '
                f'{r["worst_output"]}, max {r["max"]:.3g})' for r in sorted(failing, key=lambda r: -r['excess'])[:20]]
     details += [f'[site group {a["group"]}: {a["component"]}/{a["variable"]}] alone: {a["excess"]:.3g} over the floor '
                 f'at {a["point"]}: {a["original"][:160]}' for a in attribution[:10]]
     details += [f'[not run] {label}: the original model fails there' for label in failed_original]
     details += [f'[not run] {label}: over the time budget' for label in over_budget]
     details += [f'[not compared] {k}: jumps by over half its range between samples' for k in jumps]
-    what = (f'{len(report["sites"])} sites ({", ".join(f"{k} {v}" for k, v in report["counts"].items())}), '
+    what = (f'{len(live)} sites ({", ".join(f"{k} {v}" for k, v in report["counts"].items())}), '
             f'{len(rows)} points, rel {settings["rel"]}')
     if failing:
         names = ', '.join(f'{a["variable"]} (group {a["group"]}, {a["excess"]:.2g})' for a in attribution[:3])
         return (FAILED, f'{len(failing)} of {len(rows)} points over tol {tol:g} above the solver floor: worst '
-                f'{worst["point"]}, {worst["excess"]:.3g} over the floor (RMS/range {worst["l2"]:.3g} in '
+                f'{worst["point"]}, {worst["excess"]:.3g} over the floor (RMS/scale {worst["l2"]:.3g} in '
                 f'{worst["worst_output"]})' + (f'; worst sites: {names}' if names else '') + f' [{what}]',
                 metrics, figs, details)
     note = f'; {len(over_budget)} points over the time budget not run' if over_budget else ''
     return (PASSED, f'every point within tol {tol:g} of the solver floor (worst {worst["point"]}: {worst["excess"]:.3g} '
-            f'over it, RMS/range {worst["l2"]:.3g}) [{what}]{note}', metrics, figs, details)
+            f'over it, RMS/scale {worst["l2"]:.3g}) [{what}]{note}', metrics, figs, details)
 
 
 def smoothing_fingerprint(component, settings):
@@ -2249,16 +2262,16 @@ def smoothing_fingerprint(component, settings):
     return f'{ledger.fingerprint(component, "vv")}:{json.dumps(settings, sort_keys=True, default=str)}'
 
 
-def verification_test_smoothing(cm, rel=None, collapse=None, attribute=None):
+def verification_test_smoothing(cm, rel=None, collapse=None, attribute=None, maxmin_form=None):
     """The version's generated model smoothed (libcuflynx.utilities.smooth_cellml), with eps from the
     ranges of its sites over the nominal and bc_sweep points, against the original at each point.
-    ``rel`` / ``collapse`` override the spec's smoothing settings."""
+    ``rel`` / ``collapse`` / ``maxmin_form`` override the spec's smoothing settings."""
     if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_smoothing')
 
     def check():
         component, spec = cm.component, cm.spec
-        settings = smoothing_settings(spec, rel=rel, collapse=collapse)
+        settings = smoothing_settings(spec, rel=rel, collapse=collapse, maxmin_form=maxmin_form)
         points, skipped = smoothing_points(cm, settings.get('parameters'))
         nominal = {'parameters/' + k: v for k, v in cm.nominal.items()}
         status, message, metrics, figs, details = compare_smoothed(
