@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <model name="heart_pp_starling_cosine_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
     <component name="heart_starling_cosine">
-        <!-- phase oscillator c = cos(theta), s = sin(theta) at frequency f; valveless pump from the inlet (venous) to the outlet (arterial): v = s_heart K f (u_in - P_v0)(1 - c), mean over a beat s_heart K f (u_in - P_v0). u_out is the outlet pressure the port gives; the flow does not depend on it. s_heart (heart strength, 1 at rest) comes through heart_strength_port. -->
+        <!-- phase oscillator c = cos(theta), s = sin(theta) at frequency f; valveless pump from the inlet (venous) to the outlet (arterial): v = s_heart K f max(u_in - P_v0, 0)(1 - c), mean over a beat s_heart K f (u_in - P_v0) while u_in >= P_v0; no flow below P_v0 (an empty venous reservoir cannot be pumped backwards). u_out is the outlet pressure the port gives; the flow does not depend on it. s_heart (heart strength, 1 at rest) comes through heart_strength_port. -->
         <variable name="t" public_interface="in" units="second"/>
         <variable name="f" public_interface="in" units="per_s"/>
         <variable name="K" public_interface="in" units="m6_per_J"/>
@@ -81,9 +81,13 @@
                             <ci>f</ci>
                         </apply>
                         <apply>
-                            <minus/>
-                            <ci>u_in</ci>
-                            <ci>P_v0</ci>
+                            <max/>
+                            <apply>
+                                <minus/>
+                                <ci>u_in</ci>
+                                <ci>P_v0</ci>
+                            </apply>
+                            <cn cellml:units="dimensionless">0</cn>
                         </apply>
                     </apply>
                     <apply>

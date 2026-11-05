@@ -24,6 +24,12 @@
         "variables": [
           "Delta_R"
         ]
+      },
+      {
+        "port_type": "conductance_delta_port",
+        "variables": [
+          "Delta_G"
+        ]
       }
     ],
     "exit_ports": [
@@ -52,6 +58,12 @@
       ],
       [
         "Delta_R",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "Delta_G",
         "dimensionless",
         "access",
         "boundary_condition"

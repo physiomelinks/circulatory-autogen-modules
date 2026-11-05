@@ -25,8 +25,8 @@
       "expr": "np.max(np.abs(c**2 + s**2 - (c_init**2 + s_init**2))) <= 1e-6"
     },
     {
-      "description": "the flow is the algebraic pump law v = s_heart K f (u_in - P_v0)(1 - c)",
-      "expr": "np.max(np.abs(v - s_heart*K*f*(u_in - P_v0)*(1 - c))) <= 1e-9*abs(s_heart*K*f*(u_in - P_v0)) + 1e-15"
+      "description": "the flow is the algebraic pump law v = s_heart K f max(u_in - P_v0, 0)(1 - c)",
+      "expr": "np.max(np.abs(v - s_heart*K*f*max(u_in - P_v0, 0.0)*(1 - c))) <= 1e-9*abs(s_heart*K*f*(u_in - P_v0)) + 1e-15"
     },
     {
       "description": "mean flow over whole beats is s_heart K f (u_in - P_v0), the Frank-Starling relation (trapezoid over the last integer number of beats)",
@@ -37,6 +37,11 @@
       "description": "no backflow while u_in >= P_v0 (to 1e-6 of the mean flow: the solver lets c exceed 1 by its local error)",
       "expr": "np.min(v) >= -1e-6*abs(s_heart*K*f*(u_in - P_v0))",
       "applies": "u_in >= P_v0"
+    },
+    {
+      "description": "no flow while u_in < P_v0",
+      "expr": "np.max(np.abs(v)) == 0.0",
+      "applies": "u_in < P_v0"
     }
   ],
   "bc_sweep": {
@@ -84,7 +89,7 @@
         ]
       }
     },
-    "rationale": "f 30-180 bpm; inlet pressure 0-20 mmHg (P_v0 up to 5 mmHg makes u_in < P_v0 in part of the sweep, where the flow reverses as written); strength 0.25-2x. The initial phase stays on the unit circle."
+    "rationale": "f 30-180 bpm; inlet pressure 0-20 mmHg (P_v0 up to 5 mmHg makes u_in < P_v0 in part of the sweep, where the pump gives no flow); strength 0.25-2x. The initial phase stays on the unit circle."
   },
   "timestep": {
     "scheme": "rk4",
