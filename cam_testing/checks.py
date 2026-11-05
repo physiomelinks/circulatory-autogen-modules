@@ -2085,9 +2085,18 @@ def _unit_issues(version, targets):
             failures.append(_unit_failure(it.description(), targets))
         elif it.level() == error:
             other.append(it.description())
-    n_equations = len({f['equation'] or f['message'] for f in failures})
-    if failures or definition:
+    # "equivalent as long as <x> equals <y>": libcellml can't check units raised to a variable exponent
+    conditional = [f for f in failures if f['kind'] == 'conditional']
+    inconsistent = [f for f in failures if f['kind'] != 'conditional']
+    n_equations = len({f['equation'] or f['message'] for f in inconsistent})
+    n_conditional = len({f['equation'] or f['message'] for f in conditional})
+    conditional_part = (f'{n_conditional} equation{"" if n_conditional == 1 else "s"} libcellml can check only for '
+                        f'particular values of a variable exponent')
+    if inconsistent or definition:
         status = UNITS_INCONSISTENT
+    elif conditional:
+        return {'status': UNITS_NOT_CHECKED, 'message': conditional_part, 'n_failures': 0, 'n_equations': 0,
+                'failures': failures, 'definition_issues': [], 'other_issues': other}
     elif other:
         # libcellml's analyser checks units only once the model is otherwise valid
         return {'status': UNITS_NOT_CHECKED, 'n_failures': 0, 'n_equations': 0, 'failures': [], 'definition_issues': [],
@@ -2100,10 +2109,12 @@ def _unit_issues(version, targets):
     parts = []
     if failures:
         parts.append(f'{n_equations} equation{"" if n_equations == 1 else "s"} with inconsistent units'
-                     + (f' ({len(failures)} issues)' if len(failures) != n_equations else ''))
+                     + (f' ({len(inconsistent)} issues)' if len(inconsistent) != n_equations else ''))
     if definition:
         parts.append(f'{len(definition)} undefined or invalid units' + (
             ', so libcellml could not check the equations' if not failures and other else ''))
+    if conditional:
+        parts.append(conditional_part)
     return {'status': status, 'message': '; '.join(parts), 'n_failures': n_equations + len(definition),
             'n_equations': n_equations, 'failures': failures, 'definition_issues': definition, 'other_issues': other}
 
@@ -2121,7 +2132,8 @@ def _unit_failure(description, targets):
     row['equation'] = eq
     row['expression'] = m['expression'] if e else None
     what = m['what']
-    row['kind'] = ('not dimensionless' if 'dimensionless' in what else
+    row['kind'] = ('conditional' if ' as long as ' in description else
+                   'not dimensionless' if 'dimensionless' in what else
                    'scaling factor' if 'scaling' in what or 'multiplication' in m['detail'] else 'not equivalent')
     row['sides'] = [{'expression': x['expression'], 'units': x['units'], 'base': x['base']}
                     for x in _UNITS_SIDE.finditer(m['detail'])]

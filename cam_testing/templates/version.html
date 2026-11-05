@@ -241,7 +241,16 @@ pre.mermaid[data-processed] { color: inherit; text-align: center; }
 .tree, .tree ul { list-style: none; margin: 0; padding-left: 18px; }
 .tree { padding-left: 0; font-size: 0.85rem; }
 .tree li { padding: 1px 0; }
+.open-in { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 0.88rem; }
+.open-in > span { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+a.open-app { display: inline-flex; align-items: center; padding: 2px 10px; border: 1px solid var(--accent); border-radius: 999px; font-size: 0.8rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+a.open-app:hover { background: var(--accent-soft); }
+.open-msg { font-size: 0.8rem; }
+.open-msg:empty { display: none; }
 </style>
+<script>
+{% include '_open_in.js' %}
+</script>
 <script>
 window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
 </script>
@@ -266,6 +275,7 @@ window.addEventListener('DOMContentLoaded', function () {
     <div class="eyebrow">{{ module_type }} · {{ version }}</div>
     <ol>
       <li><a href="#overview"><span class="mono">Test overview</span></a></li>
+      {%- if open_in.celldl %}<li><a href="#bond-graph"><span class="mono">Bond graph</span></a></li>{% endif %}
       {%- if components[0].structure_view %}<li><a href="#{{ components[0].id }}-structure"><span class="mono">Structure</span></a></li>{% endif %}
       {%- if components[0].unit_consistency %}<li><a href="#unit-consistency"><span class="dot failed"></span><span class="mono">Unit consistency</span></a></li>{% endif %}
       <li><a href="#parameterisations"><span class="mono">Parameterisations</span></a></li>
@@ -300,6 +310,19 @@ window.addEventListener('DOMContentLoaded', function () {
         {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
         <span>libcuflynx {{ libcuflynx_version }}</span>
         <span>Report generated {{ generated }}</span>
+      </div>
+      <div class="open-in" aria-label="Open in">
+        <span class="eyebrow">Open in</span>
+        {%- if open_in.celldl %}
+        <span><a class="open-app" id="open-celldl" href="{{ open_in.celldl.href }}" data-app="the CellDL editor" data-open-file="{{ open_in.celldl.href }}" data-open-url="{{ open_in.celldl.open }}" target="_blank" rel="noopener" title="Opens the version's bond graph ({{ open_in.celldl.href }}) in the CellDL editor">CellDL</a><span class="open-msg muted" role="status"></span></span>
+        {%- endif %}
+        {%- set ph = open_in.phlynx %}
+        <span>{% if ph.href %}<a class="open-app" id="open-phlynx" href="{{ ph.href }}" data-app="PhLynx" data-open-file="{{ ph.href }}" data-open-url="{{ ph.open }}" target="_blank" rel="noopener" title="Opens the version's test network, as PhLynx exported it ({{ ph.href }}), in PhLynx">PhLynx</a><span class="open-msg muted" role="status"></span>
+        {%- elif ph.reason %}{{ chip('not_applicable', 'PhLynx: N/A') }} <span class="muted" style="font-size:0.8rem" id="phlynx-na">{{ ph.reason }}</span>
+        {%- else %}<span class="muted" style="font-size:0.8rem">PhLynx: {{ ph.missing }}</span>{% endif %}</span>
+        {%- if components[0].parameterisations|selectattr('omex')|list %}
+        <span class="muted" style="font-size:0.8rem">CUFLynx: per parameterisation, under <a href="#parameterisations">Parameterisations</a></span>
+        {%- endif %}
       </div>
       <div class="counts">
         {{ chip('passed', counts.passed ~ ' passed') }}
@@ -367,6 +390,16 @@ window.addEventListener('DOMContentLoaded', function () {
       {%- endif %}
     </section>
 
+    {%- if open_in.celldl %}
+    <section class="block" aria-labelledby="bond-graph">
+      <h2 id="bond-graph">Bond graph</h2>
+      <figure style="margin:0">
+        <a href="{{ open_in.celldl.href }}" target="_blank" rel="noopener"><img id="bond-graph-figure" src="{{ open_in.celldl.href }}" alt="The version's bond graph, as the CellDL editor draws it" loading="lazy" style="display:block;max-width:100%;height:auto;max-height:80vh;background:#fff;border:1px solid var(--rule);border-radius:6px"></a>
+        <figcaption class="muted" style="margin-top:4px;font-size:0.84rem">The version's CellDL document, <code>{{ open_in.celldl.href }}</code>, drawn as the editor draws it. Click it to see it full size, or <a href="#open-celldl">open it in CellDL</a> to edit it.</figcaption>
+      </figure>
+    </section>
+    {%- endif %}
+
     {%- if structure and (structure.errors or structure.warnings) %}
     <section class="panel" aria-labelledby="structure">
       <h2 id="structure">Structural checks</h2>
@@ -396,6 +429,14 @@ window.addEventListener('DOMContentLoaded', function () {
         </div>
         {%- if c.config_notes %}<p style="margin:0;max-width:75ch"><strong>{{ c.config_notes }}</strong></p>{% endif %}
         {%- if c.description %}<p style="margin:0;max-width:75ch">{{ c.description }}</p>{% endif %}
+        {%- if c.figures %}
+        <section class="figures" aria-label="Figures">
+          <h3 style="margin:8px 0 4px">Figures</h3>
+          <div class="plots">
+            {%- for fg in c.figures %}<figure>{% if fg.missing %}<p class="todo">Missing figure <code>{{ fg.file }}</code></p>{% else %}<a href="{{ fg.file }}"><img src="{{ fg.file }}" alt="{{ fg.caption or fg.file }}" loading="lazy"></a>{% endif %}{% if fg.caption %}<figcaption>{{ fg.caption|emph }}</figcaption>{% endif %}</figure>{% endfor %}
+          </div>
+        </section>
+        {%- endif %}
         {%- set rc = c.required_citations %}
         <p class="required-citations" style="margin:0;max-width:75ch" title="The papers this version's model is built on (config required_citations); cite them when you use it. Per-parameter sources are under References.">
           <strong>Required citations:</strong>
@@ -473,6 +514,7 @@ window.addEventListener('DOMContentLoaded', function () {
           {%- for f in g.issues %}
             <li><strong>{{ f.kind }}</strong>{% if f.expression %} in <code>{{ f.expression }}</code>{% endif %}:
               {%- if f.sides %} {% for sd in f.sides %}<code>{{ sd.expression }}</code> is in <code>{{ sd.units }}</code>{% if sd.base %} <span class="muted">({{ sd.base }})</span>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% if f.kind == 'not dimensionless' %}, but should be dimensionless{% endif %}
+              {%- elif f.kind == 'conditional' %} libcellml can't check units raised to a variable exponent, so it gives a condition instead: check this term's units by hand
               {%- else %} {{ f.message }}{% endif %}
               <details><summary>libcellml message</summary><pre>{{ f.message }}</pre></details></li>
           {%- endfor %}
@@ -483,7 +525,7 @@ window.addEventListener('DOMContentLoaded', function () {
         <div class="eyebrow">Units definitions</div>
         <ul class="issues">{% for d in uc.definition_issues %}<li>{{ d.message }}</li>{% endfor %}</ul>
         {%- endif %}
-        {%- if uc.status == 'not_checked' or (uc.other_issues and not uc.equations) %}
+        {%- if uc.other_issues and (uc.status == 'not_checked' or not uc.equations) %}
         <div class="eyebrow">Why the equations could not be checked</div>
         <ul class="issues">{% for o in uc.other_issues[:10] %}<li>{{ o }}</li>{% endfor %}{% if uc.other_issues|length > 10 %}<li>… and {{ uc.other_issues|length - 10 }} more</li>{% endif %}</ul>
         {%- endif %}
@@ -585,7 +627,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
       <div class="block" id="parameterisations">
         <h3>Parameterisations</h3>
-        <p class="muted" style="margin:0;font-size:0.84rem">A parameterisation is a parameter set of this version (the same maths, other values, with its own data and calibration), in <code>parameterisations/&lt;parameterisation&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. Each use of the version in a network (an instance: a module-array record) names the parameterisation it uses, by default the version's <code>default_parameterisation</code>. The verification tests above run at the default parameterisation's parameters; validation runs per parameterisation, for whatever data it has. A parameterisation without obs_data is N/A for calibration ("no calibration data in this parameterisation") and stays usable in models; the version's Calibration column fails when no parameterisation has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the parameterisation's parameters, its obs_data and params_for_id, and every input file including the verification config: open it in CUFLynx to investigate the parameterisation.</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">A parameterisation is a parameter set of this version (the same maths, other values, with its own data and calibration), in <code>parameterisations/&lt;parameterisation&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. Each use of the version in a network (an instance: a module-array record) names the parameterisation it uses, by default the version's <code>default_parameterisation</code>. The verification tests above run at the default parameterisation's parameters; validation runs per parameterisation, for whatever data it has. A parameterisation without obs_data is N/A for calibration ("no calibration data in this parameterisation") and stays usable in models; the version's Calibration column fails when no parameterisation has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the parameterisation's parameters, its obs_data and params_for_id, its calibration result when it has one, and every input file including the verification config: open it in CUFLynx to investigate the parameterisation. "Open in CUFLynx" hands the archive's address to the CUFLynx app, and needs a CUFLynx that handles <code>cuflynx://</code> links; otherwise download the <code>.omex</code> and open it there.</p>
         <div class="table-wrap"><table>
           <thead><tr><th>Parameterisation</th><th>Parameters</th><th>Data files</th><th>CUFLynx archive</th><th>Baseline</th><th>Calibration</th><th>Calibrated values</th></tr></thead>
           <tbody>
@@ -593,7 +635,7 @@ window.addEventListener('DOMContentLoaded', function () {
             <tr><td class="mono">{{ i.name }}{% if i.is_default %} <span class="muted">(default)</span>{% endif %}</td>
             <td class="mono num">{{ i.n_parameters }}</td>
             <td class="mono" style="white-space:normal;font-size:0.78rem">{{ i.files|join(', ') or '—' }}</td>
-            <td title="{{ i.omex_message }}">{% if i.omex %}<a href="{{ i.omex }}" download>.omex</a> {% endif %}{{ chip(i.omex_status) }}{% if not i.omex %} <span class="muted" style="font-size:0.78rem">make omex</span>{% endif %}</td>
+            <td title="{{ i.omex_message }}">{% if i.omex %}<a href="{{ i.omex }}" download>.omex</a> <a class="open-app" href="{{ i.omex }}" data-cuflynx-omex="{{ i.omex }}" data-cuflynx-open="{{ open_in.cuflynx }}" title="Opens this archive in the CUFLynx app (needs a CUFLynx that handles cuflynx:// links)">Open in CUFLynx</a> {% endif %}{{ chip(i.omex_status) }}{% if not i.omex %} <span class="muted" style="font-size:0.78rem">make omex</span>{% endif %}</td>
             <td><a href="#{{ i.baseline.anchor }}" style="text-decoration:none">{{ chip(i.baseline.status) }}</a>{% if i.baseline.short == 'Fit check' %} <span class="muted" style="font-size:0.78rem">fit check</span>{% endif %}</td>
             <td><a href="#{{ i.calibrate.anchor }}" style="text-decoration:none">{{ chip(i.calibrate.status) }}</a>{% if not i.has_obs_data %} <span class="muted" style="font-size:0.78rem">no calibration data</span>{% endif %}</td>
             <td class="mono" style="white-space:normal;font-size:0.78rem">{% if i.calibration %}{{ i.calibration.calibrated_parameters|fmt }}{% if i.calibration.cost is not none %} (cost {{ i.calibration.cost|fmt }}){% endif %}<br><span class="muted">{{ i.calibrated_file }}, {{ i.calibration.date }}</span>{% else %}—{% endif %}</td></tr>
