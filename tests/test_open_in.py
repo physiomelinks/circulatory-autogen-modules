@@ -18,7 +18,7 @@ from types import SimpleNamespace
 import pytest
 from markupsafe import escape
 
-from cam_testing import bondgraph, phlynx, report
+from cam_testing import bondgraph, omex, phlynx, report
 from cam_testing.library import load_version
 
 OPEN_IN_JS = os.path.join(report.TEMPLATES, '_open_in.js')
