@@ -7,8 +7,8 @@ dt: 0.01
 equivalence: {status: not_applicable, reason: 'no reference: circulatory_autogen''s original has a flat heart, and this model
     uses a heart supermodule; closed_loop_cvs/obsolete_3compartment is the library''s flat-heart check'}
 invariants:
-- {description: total blood volume is conserved in the closed loop (relative drift < 1e-6), expr: np.ptp(sum_blood_volume__q_volume_sum_sum)
-    <= 1e-6 * np.max(np.abs(sum_blood_volume__q_volume_sum_sum))}
+- {description: total blood volume is conserved in the closed loop (relative drift < 1e-6), expr: np.ptp(multiport_sum_volume_sum_q__q)
+    <= 1e-6 * np.max(np.abs(multiport_sum_volume_sum_q__q))}
 notes: ['Converted to a heart supermodule in physiomelinks/circulatory-autogen-modules#35. Before the conversion it reproduced
     circulatory_autogen''s flat-heart original (system_equivalence_test); the conversion kept its outputs identical (87 outputs,
     worst 0.0). The flat-heart reference was then removed. closed_loop_cvs/obsolete_3compartment, the one flat-heart system

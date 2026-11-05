@@ -150,7 +150,7 @@ def cuflynx_parameterisation_omex_test(parameterisation_key, tmp_path_factory, r
     if problems:
         checks.save(v, checks.Result(name, checks.FAILED, problems[0], metrics, details=problems[1:20]))
         ef = v.spec.get('expected_failures') or {}
-        known = ef.get('cuflynx_parameterisation_omex_test')
+        known = checks.expected_failure(v, 'cuflynx_parameterisation_omex_test', inst_name)
         if not known and isinstance(built.get(key), Exception) and ef.get('run_test'):
             # the version's model doesn't generate (a known run_test failure), so there is no archive
             known = f'run_test known failure: {ef["run_test"]}'

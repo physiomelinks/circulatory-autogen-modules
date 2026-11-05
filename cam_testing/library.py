@@ -63,6 +63,7 @@ VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameteris
 DEFAULT_KEY = 'default_parameterisation'
 SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
+SOURCE_FIGURE_KEYS = {'required': ['file', 'source'], 'optional': ['caption', 'items']}   # its entries' keys
 # directories under modules/ that are not categories or module_types (another session's work in
 # the old layout, until it is moved)
 UNMIGRATED = ('poiseuille_transport', 'system')
@@ -467,7 +468,7 @@ def write_parameters(path, parameters):
 IDENTITY_KEYS = ('module_type', 'version')
 # in this order in the JSON file
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
-                     'outputs', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
+                     'outputs', 'protocol', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
                      'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
@@ -479,7 +480,8 @@ NESTED_ORDER = {
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget',
                   'max_run_seconds', 'total_time_budget', 't_end', 'tol'),
     'supermodule': ('globals', 'equivalent'),
-    'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'time_column', 'time_offset', 'variables',
+    'baseline': ('status', 'kind', 'note', 'reason', 'source', 'source_kind', 'source_short', 'data', 'obs_data',
+                 'time_column', 'time_offset', 'variables',
                  'parameters', 'parameter_ranges', 'targets', 'z_threshold', 'pre_time', 'sim_time', 'dt', 'metric',
                  'threshold'),
     'calibrate': ('status', 'reason', 'note', 'source', 'source_kind', 'obs_data', 'params_for_id',
@@ -568,6 +570,30 @@ def dumps_json(data, indent=2, width=110):
                                       for k, v in x.items()) + '\n' + pad + '}'
         return json.dumps(x, ensure_ascii=False)
     return enc(data, 0)
+
+
+def protocol_problems(vdir, verification):
+    '''Problems with the obs_data files a verification_config names (relative to the version directory):
+    its protocol and every validation.<p>.baseline obs_data must be a file with a protocol_info, and the
+    protocol's has one experiment.'''
+    problems = []
+    refs = [('protocol', verification.get('protocol'))] + [
+        (f'validation.{p}.baseline.obs_data', ((kinds or {}).get('baseline') or {}).get('obs_data'))
+        for p, kinds in (verification.get('validation') or {}).items() if isinstance(kinds, dict)]
+    for key, ref in refs:
+        if not ref:
+            continue
+        path = os.path.join(vdir, ref)
+        if not os.path.isfile(path):
+            problems.append(f'{key}: {ref} is not a file in the version directory')
+            continue
+        with open(path) as f:
+            info = (json.load(f) or {}).get('protocol_info')
+        if not info:
+            problems.append(f'{key}: {ref} has no protocol_info')
+        elif key == 'protocol' and len(info.get('sim_times') or []) != 1:
+            problems.append(f'protocol: {ref} has {len(info.get("sim_times") or [])} experiments; a version\'s protocol has one')
+    return problems
 
 
 def misplaced_spec_keys(tests, verification):
@@ -668,6 +694,53 @@ class ModuleType:
         return bool(vs) and all(v.reviewed for v in vs)
 
 
+def source_figures_problems(entries, item_names, index_keys):
+    '''Problems with a source_figures.json's ``entries``: each an object with the required keys of
+    ``index_keys`` (directory_schema.json: parameterisation.subdirectories.source_figures.index_keys) and
+    no keys beyond its optional ones; "items", when given, a list of the parameterisation's data item
+    names (``item_names``, Parameterisation.item_names).'''
+    if not isinstance(entries, list):
+        return ['source_figures.json is not a list of figures']
+    problems = []
+    allowed = set(index_keys['required']) | set(index_keys.get('optional', []))
+    for n, e in enumerate(entries):
+        where = f'source_figures.json[{n}]' + (f' ({e.get("file")})' if isinstance(e, dict) and e.get('file') else '')
+        if not isinstance(e, dict):
+            problems.append(f'{where}: not an object')
+            continue
+        problems += [f'{where}: missing "{k}"' for k in index_keys['required'] if not e.get(k)]
+        problems += [f'{where}: unknown key "{k}" (allowed: {", ".join(sorted(allowed))})' for k in sorted(set(e) - allowed)]
+        if 'items' in e:
+            items = e['items']
+            if not isinstance(items, list) or not all(isinstance(i, str) for i in items):
+                problems.append(f'{where}: "items" must be a list of data item names')
+                continue
+            unknown = [i for i in items if i not in item_names]
+            if unknown:
+                problems.append(f'{where}: "items" names {unknown}, not data items of the parameterisation '
+                                f'(its items: {sorted(item_names) or "none"})')
+    return problems
+
+
+def figure_items(figures, items):
+    '''
+    The plotted data items each source figure pairs with, parallel to ``figures``: a figure takes the
+    ``items`` (plot order, duplicates dropped) its "items" lists, each item going to the first figure
+    listing it. A figure may overlay several experiments, so it can take several items. When no figure
+    lists "items", exactly one figure takes every item; several figures without "items" take none (nothing
+    says which item belongs to which), nor does any figure when an item is unknown (None: a result from
+    before plots recorded their items).
+    '''
+    names = list(dict.fromkeys(items))
+    if not any('items' in f for f in figures):
+        return [names if len(figures) == 1 and None not in names else [] for _ in figures]
+    taken, groups = set(), []
+    for f in figures:
+        groups.append([i for i in names if i in (f.get('items') or []) and i not in taken])
+        taken |= set(groups[-1])
+    return groups
+
+
 @dataclass
 class Parameterisation:
     '''A named parameter set of a version (same maths, its own values, data and set-ups):
@@ -736,8 +809,9 @@ class Parameterisation:
 
     def source_figures(self):
         '''Screenshots of the publication figures/tables the parameterisation's data were extracted from:
-        source_figures/source_figures.json lists [{"file", "source", "caption"}], file relative to
-        source_figures/. Returned with file relative to the version directory.'''
+        source_figures/source_figures.json lists [{"file", "source", "caption", "items"}], file relative to
+        source_figures/; the optional items names the data items the figure holds (item_names). Returned
+        with file relative to the version directory.'''
         index = os.path.join(self.source_figures_dir, SOURCE_FIGURES_INDEX)
         if not os.path.isfile(index):
             return []
@@ -745,6 +819,27 @@ class Parameterisation:
             entries = json.load(f)
         return [dict(e, file=os.path.relpath(os.path.join(self.source_figures_dir, e['file']), self.version.dir))
                 for e in entries]
+
+    def item_names(self):
+        '''The names of the parameterisation's data items, which a source figure's "items" may list and
+        the validation plots are named by: the data_item_name of every data_items and prediction_items
+        entry of its obs_data files (*obs_data.json in its directory and the obs_data its validation
+        names), and the compared model outputs (the keys of "variables") of a CSV baseline.'''
+        files = {os.path.join(self.dir, f) for f in (os.listdir(self.dir) if os.path.isdir(self.dir) else [])
+                 if f.endswith('obs_data.json')}
+        files |= {os.path.join(self.version.dir, e['obs_data']) for e in self.validation.values()
+                  if isinstance(e, dict) and e.get('obs_data')}
+        names = set()
+        for path in files:
+            if os.path.isfile(path):
+                with open(path, encoding='utf-8-sig') as f:
+                    obs = json.load(f)
+                names |= {i['data_item_name'] for i in (obs.get('data_items') or []) + (obs.get('prediction_items') or [])
+                          if i.get('data_item_name')}
+        baseline = self.validation.get('baseline') or {}
+        if isinstance(baseline, dict) and baseline.get('data'):
+            names |= set(baseline.get('variables') or {})
+        return names
 
     def needs_source_figures(self):
         '''True when the parameterisation's validation data were extracted from a publication (a paper or a
@@ -1142,6 +1237,33 @@ def restructure_renames():
         return {tuple(r['from']): tuple(r['to']) for r in json.load(f)}
 
 
+VERSION_RENAMES = 'version_renames.json'      # in a module library: renames made in its module PRs
+
+
+def version_renames():
+    '''(module_type, version) -> (module_type, version) renamed after the restructure, from each
+    library's version_renames.json ([{"from": [mt, v], "to": [mt, v], "reason": ...}], in order, so a
+    later entry may rename an earlier one's target again). A module PR that renames a version adds its
+    entry here, so the rename and the map land together.'''
+    out = {}
+    for d in library_dirs():
+        path = os.path.join(d, VERSION_RENAMES)
+        if os.path.isfile(path):
+            with open(path) as f:
+                for r in json.load(f):
+                    out[tuple(r['from'])] = tuple(r['to'])
+    return out
+
+
+def _chain(pair, renames):
+    '''``pair`` followed through ``renames`` to its last name.'''
+    seen = set()
+    while pair in renames and pair not in seen:
+        seen.add(pair)
+        pair = renames[pair]
+    return pair
+
+
 @functools.lru_cache(maxsize=None)
 def legacy_renames():
     '''(old module_type, old module_subtype) -> (module_type, version) for every pair that changed in
@@ -1149,7 +1271,7 @@ def legacy_renames():
     tools/restructure_map.yaml, in the move of the alternative hearts into heart
     (HEART_VERSION_RENAMES), and in the 2026-10-06 restructure (restructure_renames(), applied after
     the others, so each old pair maps to today's pair). circulatory_autogen's own models still use
-    the old pairs.'''
+    the old pairs. Renames made in module PRs since (version_renames) are applied last.'''
     later = restructure_renames()
     path = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_map.yaml')
     out = {}
@@ -1173,6 +1295,11 @@ def legacy_renames():
     out = {old: later.get(new, new) for old, new in out.items()}
     for old, new in later.items():
         out.setdefault(old, new)
+    # renames from module PRs (version_renames), applied last and followed to the newest name
+    newest = version_renames()
+    out = {old: _chain(new, newest) for old, new in out.items()}
+    for old in newest:
+        out.setdefault(old, _chain(old, newest))
     return {old: new for old, new in out.items() if old != new}
 
 

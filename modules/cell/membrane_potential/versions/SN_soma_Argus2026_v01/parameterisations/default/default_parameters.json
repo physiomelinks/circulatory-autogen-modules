@@ -8,5 +8,6 @@
  "I_in": {"value": 0.0, "units": "nanoA", "data_reference": "definitional; injected current (positive depolarises); 0 = no stimulus", "sourced": "no"},
  "I_out": {"value": 0.0, "units": "nanoA", "data_reference": "definitional; axial current to the axon, supplied in a network; 0 for the isolated soma", "sourced": "no"},
  "R_diffSensed": {"value": 10, "units": "megaOhm", "data_reference": "unreferenced_placeholder; owner's hand-set value in the SN_simple model (CA token 'user_defined'); filter resistance of the sensed-voltage (electrode) stage, not a physiological quantity", "sourced": "no"},
- "V_rest_approx": {"value": -70, "units": "milliV", "data_reference": "davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites davis2021transcriptomic, whose current-clamp traces the value was read from)", "sourced": "yes"}
+ "V_rest_approx": {"value": -70, "units": "milliV", "data_reference": "davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it (the CA token cites davis2021transcriptomic, whose current-clamp traces the value was read from)", "sourced": "yes"},
+ "i_ion": {"value": 0, "units": "nanoA", "data_reference": "definitional; 0 when nothing is connected to this sum: no ionic current from unconnected channels", "sourced": "no"}
 }
