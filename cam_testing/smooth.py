@@ -182,11 +182,12 @@ def system_means(model_path, spec, names):
 
 
 def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=False, output_dir=None,
-        spec=None, settings=None, force=False, work_dir=None, exempt=None):
+        spec=None, settings=None, force=False, work_dir=None, exempt=None, modules_only=False):
     """The pipeline above. Returns the merged report; raises SmoothingStopped before the system step
     when a module fails (or is not checked, unless allow_unchecked). ``exempt``: the system's own
     exemptions ([{"variable": "[component/]glob", "reason"}]), merged with each library version's
-    smoothing.exempt (as "<instance>_module/<variable>")."""
+    smoothing.exempt (as "<instance>_module/<variable>"). ``modules_only``: stop after the module checks.
+    The module table is written to module_table.csv."""
     exempt = list(exempt or [])
     spec = dict(DEFAULT_SPEC, **(spec or {}))
     settings = dict(checks.DEFAULT_SMOOTHING, **(settings or {}))
@@ -255,6 +256,12 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
             report['outside_tested_ranges'] = f'not checked ({type(e).__name__}: {e})'
     report['ranges_check'] = ranges_out.getvalue()
     report_path = os.path.join(output_dir, 'smoothing_report.json')
+    write_module_table(os.path.join(output_dir, 'module_table.csv'), results)
+    if modules_only:
+        report['system'] = {'status': 'not run', 'reason': 'modules only'}
+        with open(report_path, 'w') as f:
+            json.dump(report, f, indent=2, default=checks._json_default)
+        return report
 
     failed = {n: r for n, r in results.items() if r['status'] == checks.FAILED}
     unchecked = {n: r for n, r in results.items() if r['kind'] == NOT_CHECKED}
@@ -290,6 +297,17 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
     return report
 
 
+def write_module_table(path, results):
+    """One row per module instance: its module, how it was checked, its status and message."""
+    import csv
+    with open(path, 'w', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['instance', 'module', 'checked', 'status', 'reused', 'worst_sites', 'message'])
+        for name, r in results.items():
+            worst = '; '.join(f'{a.get("variable")} {a.get("excess", a.get("l2", 0)):.3g}' for a in r.get('worst_sites') or [])
+            w.writerow([name, r['module'], r['kind'], r['status'], r.get('reused', ''), worst, r['message']])
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--module-array', required=True)
@@ -306,6 +324,7 @@ def main(argv=None):
     parser.add_argument('--rel', type=float, help='eps relative to each range for the system and ad hoc modules')
     parser.add_argument('--tol', type=float)
     parser.add_argument('--force', action='store_true', help='rerun the library checks even when current')
+    parser.add_argument('--modules-only', action='store_true', help='stop after the module checks')
     args = parser.parse_args(argv)
     spec = {k: v for k, v in (('sim_time', args.sim_time), ('pre_time', args.pre_time), ('dt', args.dt))
             if v is not None}
@@ -316,12 +335,14 @@ def main(argv=None):
             with open(args.exempt) as f:
                 exempt = json.load(f)
         report = run(args.module_array, args.parameters, args.external_modules_dir, args.allow_unchecked,
-                     args.output_dir, spec, settings, args.force, exempt=exempt)
+                     args.output_dir, spec, settings, args.force, exempt=exempt, modules_only=args.modules_only)
     except SmoothingStopped as e:
         print(f'stopped before the system step: {e}')
         return 2
     for name, r in report['modules'].items():
         print(f'{name:24s} {r["module"]:40s} {r["kind"]:30s} {r["status"]}: {r["message"][:120]}')
+    if args.modules_only:
+        return 0
     print(f'system: {report["system"]["status"]}: {report["system"]["message"]}')
     return 0 if report['system']['status'] == checks.PASSED else 1
 
