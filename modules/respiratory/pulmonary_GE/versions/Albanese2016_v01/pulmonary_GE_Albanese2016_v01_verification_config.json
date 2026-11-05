@@ -167,6 +167,16 @@
     ],
     "t_end": 10.0
   },
+  "smoothing": {
+    "rel": {
+      "abs": 0.001,
+      "maxmin": 0.001,
+      "piecewise": 0.001,
+      "division": 0.001,
+      "variables": {"F_CO2_D": 0.0001, "F_O2_D": 0.0001}
+    },
+    "rationale": "The dead-space fraction clamps of its respiratory_gas_transport neighbour, F_CO2_D and F_O2_D, need rel 1e-4: alone at the worst sweep point they are 0.016 over the solver floor at rel 1e-3, 3e-4 at 1e-4, 4e-6 at 1e-5, with smoothed CVODE steps 6388, 6693, 7061 against the original's 7677 (form w). The check still fails at h_2 = 0.91 (0.056 at rel 1e-4) from other sites."
+  },
   "validation": {
     "default": {
       "calibrate": {
