@@ -78,6 +78,11 @@ def bondgraph_reactions_test(component_key):
     _assert(checks.save(version, bondgraph.reactions_check(version)), version)
 
 
+def bondgraph_cellml_test(component_key):
+    version = load_version(*component_key)
+    _assert(checks.save(version, bondgraph.cellml_check(version)), version)
+
+
 # ---- per parameterisation -----------------------------------------------------------------------
 
 def validation_test_baseline(parameterisation_model):

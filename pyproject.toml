@@ -31,7 +31,7 @@ include = ["cam_testing", "cam_testing.*"]
 
 [tool.setuptools.package-data]
 cam_testing = ["templates/*.html", "templates/*.js", "data/*.json", "data/rhea/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
-               "bridges/cuflynx/*.py"]
+               "bridges/cuflynx/*.py", "bridges/celldl/*.mjs", "bridges/celldl/package*.json"]
 
 [tool.cam_testing]
 # this repo is the root (the default); curated PhLynx manifests besides all.json (python -m cam_testing.manifests)

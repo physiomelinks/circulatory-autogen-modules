@@ -10,7 +10,7 @@ PYTEST_ARGS ?=
 PHLYNX_DIR ?= ../phlynx
 CUFLYNX_BIN ?= $(HOME)/software/CUFLynx
 
-.PHONY: setup structure test test-all systems coupled pipeline pipeline-setup omex omex-test report site serve clean manifests risk
+.PHONY: setup structure test test-all systems coupled pipeline pipeline-setup celldl-setup omex omex-test report site serve clean manifests risk
 
 setup:
 	python3 -m venv venv
@@ -45,6 +45,10 @@ coupled:
 # PhLynx build & export -> CUFLynx import & simulate -> compare with libcuflynx, per version
 pipeline-setup:
 	cd cam_testing/bridges/phlynx && npm ci --no-audit --no-fund
+
+# PhLynx's CellDL-to-CellML converter, for the bond-graph tests (bondgraph_celldl_test, bondgraph_cellml_test)
+celldl-setup:
+	cd cam_testing/bridges/celldl && npm ci --no-audit --no-fund
 
 pipeline:
 	PHLYNX_DIR=$(PHLYNX_DIR) CUFLYNX_BIN=$(CUFLYNX_BIN) $(PYTHON) -m pytest tests/test_phlynx.py $(MODULE_ARGS) $(PYTEST_ARGS)

@@ -5,8 +5,12 @@ version without one is not a bond graph, and both checks are N/A.
 bondgraph_celldl_test     The document opens in the CellDL editor: an SVG whose celldl-rdf-metadata is Turtle
                           with one bgf:BondgraphModel; every bond element drawn as a celldl-Component and every
                           connection as a celldl-Connection between two of them; nothing drawn that the RDF
-                          doesn't have. <stem>_bondgraph.ttl, when there is one, is the same graph. With BG_TOOLS
-                          set (a BG-Tools checkout with its .venv), bg2cellml also makes CellML from it.
+                          doesn't have. <stem>_bondgraph.ttl, when there is one, is the same graph. With the
+                          CellDL bridge installed (below), the converter also makes CellML from it.
+bondgraph_cellml_test     The document and the version's CellML are the same model: the CellML the converter
+                          makes from the document simulates as the version's <stem>_modules.cellml does. A
+                          version's source is its CellML or its CellDL document; with both, this test keeps them
+                          the same, and where they differ the CellML is the one used and this test fails.
 bondgraph_reactions_test  Every reaction annotated with a Rhea reaction (bqbiol:isVersionOf rhea:N, or
                           bqbiol:hasPart rhea:N for each reaction a lumped one combines) has Rhea's participants
                           and stoichiometry. Its participants are the species elements bonded to it (bqbiol:is
@@ -15,21 +19,30 @@ bondgraph_reactions_test  Every reaction annotated with a Rhea reaction (bqbiol:
                           only in H+ or H2O is a warning; any other fails. Rhea's reactions are read from the
                           package's cache (cam_testing/rhea.py).
 
+CellML is made from a document by PhLynx's converter, @physiomelinks/bg2cellml (the celldl2cellml repo), with
+the CellDL editor's BG-RDF framework, through cam_testing/bridges/celldl/convert.mjs under node (npm ci in
+cam_testing/bridges/celldl, or set CELLDL_BRIDGE_DIR to a directory with its packages). Without node or the
+bridge's packages, the conversion and bondgraph_cellml_test are not run.
+
 The annotation format is BG-RDF's: see the CellDL editor's Annotations panel (FinbarArgus/CellDLEditorComponent,
 src/plugins/bondgraph/annotations.ts) and bg2cellml's OMEX export of it.
 """
+import contextlib
+import io
 import itertools
+import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from fractions import Fraction
 
-from cam_testing import checks, rhea
+from cam_testing import checks, paths, rhea
 
-BONDGRAPH_TESTS = ['bondgraph_celldl_test', 'bondgraph_reactions_test']
+BONDGRAPH_TESTS = ['bondgraph_celldl_test', 'bondgraph_reactions_test', 'bondgraph_cellml_test']
 NOT_A_BONDGRAPH = 'not a bond graph: the version has no CellDL document (<version>_bondgraph.svg)'
 NO_REACTIONS = 'the bond graph has no reactions'
 
@@ -129,17 +142,27 @@ def celldl_problems(path, ttl_path=None):
     return problems
 
 
-def bg2cellml_problem(path, bg_tools):
-    '''bg2cellml's error making CellML from the document, or None when it makes it.'''
-    python = os.path.join(bg_tools, '.venv', 'bin', 'python')
-    with tempfile.TemporaryDirectory() as out:
-        result = subprocess.run([python, '-m', 'bgtool', '--output', out, path], cwd=bg_tools,
-                                env=dict(os.environ, PYTHONPATH=os.path.join(bg_tools, 'cli')),
-                                capture_output=True, text=True, timeout=300)
-        made = [f for f in os.listdir(out) if f.endswith('.cellml')]
-    if result.returncode != 0 or not made:
-        return (result.stderr or result.stdout).strip()[-1500:] or 'bg2cellml made no CellML'
-    return None
+CELLDL_BRIDGE = os.path.join(paths.PACKAGE_DIR, 'bridges', 'celldl', 'convert.mjs')
+
+
+class ConverterUnavailable(Exception):
+    '''node or the CellDL bridge's packages aren't here: the conversion isn't run.'''
+
+
+def convert(path, out_path):
+    '''Makes CellML from the CellDL document ``path`` into ``out_path`` with PhLynx's converter; returns the bridge's
+    report ({ok, issues, generator}). Raises ConverterUnavailable when it can't run.'''
+    node = shutil.which('node')
+    if not node:
+        raise ConverterUnavailable('node is not installed')
+    result = subprocess.run([node, CELLDL_BRIDGE, path, out_path], capture_output=True, text=True, timeout=600)
+    if result.returncode == 3:
+        raise ConverterUnavailable(result.stderr.strip()[:500])
+    try:
+        return json.loads(result.stdout.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        return {'ok': False, 'issues': [(result.stderr or result.stdout).strip()[-1500:] or 'the bridge failed'],
+                'generator': None}
 
 
 # ---- reactions and their participants ------------------------------------------------------------
@@ -410,18 +433,23 @@ def celldl_check(version):
         return checks.Result(test, checks.NOT_APPLICABLE, NOT_A_BONDGRAPH)
     path = document_path(version)
     problems = celldl_problems(path, version.path('bondgraph.ttl'))
-    bg_tools = os.environ.get('BG_TOOLS')
-    made = None
-    if not problems and bg_tools:
-        problem = bg2cellml_problem(path, bg_tools)
-        made = problem is None
-        if problem:
-            problems.append(f'bg2cellml: {problem}')
-    metrics = {'document': os.path.basename(path), 'bg2cellml': made}
+    made, generator = None, None
+    if not problems:
+        with tempfile.TemporaryDirectory() as out:
+            try:
+                report = convert(path, os.path.join(out, 'model.cellml'))
+            except ConverterUnavailable:
+                report = None
+        if report is not None:
+            made, generator = report['ok'], report.get('generator')
+            problems += [f'the converter: {issue}' for issue in report['issues']] or ([] if made else
+                                                                                     ['the converter made no CellML'])
+    metrics = {'document': os.path.basename(path), 'converted': made, 'generator': generator}
     if problems:
         return checks.Result(test, checks.FAILED, f'{len(problems)} problem(s): {problems[0]}', metrics, details=problems)
     return checks.Result(test, checks.PASSED, 'a CellDL bond graph the editor opens'
-                         + ('; bg2cellml makes its CellML' if made else ' (set BG_TOOLS to run bg2cellml too)'), metrics)
+                         + ('; the converter makes its CellML' if made else
+                            ' (the converter was not run: install the CellDL bridge)'), metrics)
 
 
 def reactions_check(version, load=rhea.load):
@@ -464,3 +492,146 @@ def reactions_check(version, load=rhea.load):
     else:
         status = checks.PASSED
     return checks.Result(test, status, summary, metrics, details=lines)
+
+
+# ---- the document against the version's CellML -----------------------------------------------------
+
+#: how long both models run, from the same perturbed state, and how close they must stay
+CELLML_T_END, CELLML_POINTS, CELLML_RTOL = 60.0, 61, 1e-6
+#: the factors the stores' initial values are moved by, in turn, so both models leave their initial state
+PERTURBATION = (1.2, 0.8, 1.1, 0.9)
+
+
+def _squash(name):
+    return name.replace('_', '')
+
+
+def state_pairs(module_states, document_states):
+    '''Pairs each of the document's states (``q_<species>_<location>``, a store's amount; a membrane capacitor's
+    charge, ``q_psi_<location>``) with the version's (``C_<name>``, a concentration; ``psi_<location>``): a store's
+    species, with or without its location after it, is the name without its underscores. Returns
+    ({document state: module state}, [document states with none], [module states with none]).'''
+    by_squashed = {}
+    for m in module_states:
+        local = m.rsplit('.', 1)[-1]
+        if local.startswith('C_'):
+            by_squashed.setdefault(_squash(local[2:]), []).append(m)
+        elif local.startswith('psi_'):
+            by_squashed.setdefault('psi' + local[4:], []).append(m)
+    pairs, unpaired = {}, []
+    for d in document_states:
+        local = d.rsplit('.', 1)[-1]
+        if not local.startswith('q_') or '_' not in local[2:]:
+            unpaired.append(d)
+            continue
+        species, location = local[2:].rsplit('_', 1)
+        for key in (_squash(species) + location, _squash(species)):
+            found = [m for m in by_squashed.get(key, []) if m not in pairs.values()]
+            if len(found) == 1:
+                pairs[d] = found[0]
+                break
+        else:
+            unpaired.append(d)
+    return pairs, unpaired, [m for m in module_states if m not in pairs.values()
+                             and m.rsplit('.', 1)[-1].startswith(('C_', 'psi_'))]
+
+
+def _simulate(model, initial, t_end, points):
+    import myokit
+    sim = myokit.Simulation(model)
+    # amounts in mol are ~1e-15: the absolute tolerance follows the model's smallest state
+    smallest = min((abs(x) for x in initial.values() if x), default=1.0)
+    sim.set_tolerance(1e-9 * smallest, 1e-10)
+    sim.set_state([initial[s.qname()] for s in model.states()])
+    times = [t_end * i / (points - 1) for i in range(points)]
+    log = sim.run(t_end * (1 + 1e-9), log_times=times)
+    return {s.qname(): [float(x) for x in log[s.qname()]] for s in model.states()}
+
+
+def compare_models(module_model, document_model, own_component, t_end=CELLML_T_END, points=CELLML_POINTS,
+                   rtol=CELLML_RTOL):
+    '''Runs the version's model and the document's from the same state, the version's default parameterisation with
+    each paired store moved by PERTURBATION in turn (the document's by the same factor), and compares every paired state
+    over time. The document's amounts are the version's concentrations times a volume, the same for every store (a
+    capacitor's charge its potential times a capacitance), read from their initial values. Returns (problems, metrics).'''
+    module_states = [s.qname() for s in module_model.states() if s.qname().startswith(own_component + '.')]
+    document_states = [s.qname() for s in document_model.states()]
+    pairs, only_document, only_module = state_pairs(module_states, document_states)
+    problems = [f'{d} is in the CellDL document but not the CellML' for d in only_document]
+    problems += [f'{m.rsplit(".", 1)[-1]} is in the CellML but not the CellDL document' for m in only_module]
+    m0 = {s.qname(): float(s.initial_value(True)) for s in module_model.states()}
+    d0 = {s.qname(): float(s.initial_value(True)) for s in document_model.states()}
+    scale = {}
+    for d, m in pairs.items():
+        if m0[m] == 0.0:
+            problems.append(f'{m.rsplit(".", 1)[-1]} starts at 0: its scale against {d} is not known')
+        else:
+            scale[d] = d0[d] / m0[m]
+    volumes = [x for d, x in scale.items() if not d.rsplit('.', 1)[-1].startswith('q_psi_')]
+    if volumes and max(volumes) - min(volumes) > 1e-6 * abs(max(volumes, key=abs)):
+        problems.append('the document\'s stores are not the CellML\'s initial concentrations in one volume: '
+                        f'amount over concentration from {min(volumes):.6g} to {max(volumes):.6g}')
+    metrics = {'pairs': len(pairs), 'volume': volumes[0] if volumes else None}
+    if problems or not pairs:
+        return problems, metrics
+    m_init, d_init = dict(m0), dict(d0)
+    for i, (d, m) in enumerate(sorted(pairs.items())):
+        f = PERTURBATION[i % len(PERTURBATION)]
+        m_init[m], d_init[d] = f * m0[m], f * d0[d]
+    m_run = _simulate(module_model, m_init, t_end, points)
+    d_run = _simulate(document_model, d_init, t_end, points)
+    worst = {}
+    for d, m in pairs.items():
+        a = m_run[m]
+        b = [x / scale[d] for x in d_run[d]]
+        size = max(abs(x) for x in a) or 1.0
+        worst[m.rsplit('.', 1)[-1]] = max(abs(x - y) for x, y in zip(a, b)) / size
+    name = max(worst, key=worst.get)
+    metrics.update(worst=name, worst_difference=worst[name], t_end=t_end, rtol=rtol)
+    problems = [f'{n} differs by {w:.3g} of its size over {t_end:g} s (tolerance {rtol:g})'
+                for n, w in sorted(worst.items(), key=lambda kv: -kv[1]) if not w <= rtol]
+    return problems, metrics
+
+
+def cellml_check(version, work_dir=None):
+    test = 'bondgraph_cellml_test'
+    if not is_bondgraph(version):
+        return checks.Result(test, checks.NOT_APPLICABLE, NOT_A_BONDGRAPH)
+    import myokit.formats.cellml as mc
+    from cam_testing import harness
+    own = tempfile.TemporaryDirectory() if work_dir is None else None
+    work = work_dir or own.name
+    try:
+        try:
+            report = convert(document_path(version), os.path.join(work, 'document.cellml'))
+        except ConverterUnavailable as e:
+            return checks.Result(test, checks.SKIPPED, f'not run: {e}')
+        if not report['ok']:
+            issues = report['issues'] or ['the converter made no CellML']
+            return checks.Result(test, checks.FAILED, f'the converter makes no CellML from the document: {issues[0]}',
+                                 {'generator': report.get('generator')}, details=issues)
+        p = version.default_parameterisation
+        model = harness.generate(version, os.path.join(work, 'module'), parameters=p.parameters(), parameterisation=p)
+        quiet = io.StringIO()
+        with contextlib.redirect_stdout(quiet), contextlib.redirect_stderr(quiet):
+            module_model = mc.CellMLImporter().model(model[:-len('.cellml')] + '_flat.cellml')
+            try:
+                document_model = mc.CellMLImporter().model(os.path.join(work, 'document.cellml'))
+            except Exception as e:
+                return checks.Result(test, checks.FAILED, f'the CellML the converter makes from the document does not '
+                                     f'load: {e}; the CellML is used', {'generator': report.get('generator')},
+                                     details=[str(e)])
+        problems, metrics = compare_models(module_model, document_model, f'{harness.VESSEL}_module')
+        metrics['generator'] = report.get('generator')
+        if not problems and not metrics['pairs']:
+            return checks.Result(test, checks.PARTIAL, 'the converter makes CellML from the document, but neither '
+                                 'model has a store to compare', metrics)
+        if problems:
+            return checks.Result(test, checks.FAILED, f'the CellDL document and the CellML differ ({len(problems)}): '
+                                 f'{problems[0]}; the CellML is used', metrics, details=problems)
+        return checks.Result(test, checks.PASSED, f'the CellML made from the CellDL document simulates as the '
+                             f'version\'s: {metrics["pairs"]} states within {metrics["worst_difference"]:.2g} of their '
+                             f'size over {metrics["t_end"]:g} s', metrics)
+    finally:
+        if own:
+            own.cleanup()

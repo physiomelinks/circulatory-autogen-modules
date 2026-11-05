@@ -1,0 +1,13 @@
+{
+  "name": "cam-celldl-bridge",
+  "private": true,
+  "description": "Makes CellML from a CellDL bond graph with PhLynx's converter (@physiomelinks/bg2cellml) and the CellDL editor's BG-RDF framework; see convert.mjs",
+  "type": "module",
+  "dependencies": {
+    "@celldl/editor": "https://github.com/physiomelinks/CellDLEditorComponent/releases/download/phlynx-v0.20261007.0-phlynx.20/celldl-editor-0.20261007.0-phlynx.20.tgz",
+    "@physiomelinks/bg2cellml": "0.6.1",
+    "@xmldom/xmldom": "0.9.12",
+    "libcellml.js": "0.7.1",
+    "oxigraph": "0.5.11"
+  }
+}
