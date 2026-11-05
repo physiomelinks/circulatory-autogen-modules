@@ -1,8 +1,9 @@
 """
 The version page's "Open in" links (CellDL for a bond graph, PhLynx for the version's PhLynx export,
 CUFLynx per parameterisation archive), the CellDL editor they open (CAM_CELLDL_EDITOR_URL), the
-files the site copies for them, the PhLynx export kept with the results, and the page's base64
-encoder and by-URL fallback (cam_testing/templates/_open_in.js, run under node). No model is generated or simulated.
+files the site copies for them, the PhLynx export kept with the results, the calibration result in a
+parameterisation's CUFLynx archive, and the page's base64 encoder and by-URL fallback
+(cam_testing/templates/_open_in.js, run under node). No model is generated or simulated.
 """
 import base64
 import io
@@ -17,7 +18,7 @@ from types import SimpleNamespace
 import pytest
 from markupsafe import escape
 
-from cam_testing import bondgraph, phlynx, report
+from cam_testing import bondgraph, omex, phlynx, report
 from cam_testing.library import load_version
 
 OPEN_IN_JS = os.path.join(report.TEMPLATES, '_open_in.js')
@@ -28,7 +29,7 @@ def _fake_version(tmp_path, name='v', supermodule=False, module_format='cellml')
     vdir.mkdir(parents=True, exist_ok=True)
     stem = f'mt_{name}'
     v = SimpleNamespace(name=name, vessel_type='mt', key=f'mt/{name}', id=f'mt__{name}', stem=stem, dir=str(vdir),
-                        results_dir=str(vdir / 'results'), plots_dir=str(vdir / 'plots'),
+                        results_dir=str(vdir / 'results'), plots_dir=str(vdir / 'plots'), figures_dir=str(vdir / 'figures'),
                         html_path=str(vdir / f'{stem}.html'), is_supermodule=supermodule,
                         config={'module_format': module_format}, spec={})
     v.path = lambda suffix: str(vdir / f'{stem}_{suffix}')
@@ -186,6 +187,72 @@ def test_keep_archives_copies_exports_and_drops_stale_ones(tmp_path):
     with open(phlynx.archive_path(ok), 'rb') as f:
         assert f.read() == b'PK new'
     assert not os.path.exists(phlynx.archive_path(failed))
+
+
+# ---- the calibration result in a parameterisation's CUFLynx archive -----------------------------
+
+def _omex_inputs(tmp_path, monkeypatch, calibrated=True):
+    vdir = tmp_path / 'v'
+    idir = vdir / 'parameterisations' / 'base'
+    idir.mkdir(parents=True)
+    stem = 'mt_v'
+    version = SimpleNamespace(vessel_type='mt', name='v', id='mt__v', key='mt/v', is_supermodule=False,
+                              cellml_path=str(vdir / f'{stem}_modules.cellml'), config_path=str(vdir / f'{stem}_modules_config.json'),
+                              units_path=str(vdir / f'{stem}_units.cellml'),
+                              verification_config_path=str(vdir / f'{stem}_verification_config.json'), module_array_path=None)
+    inst = SimpleNamespace(name='base', dir=str(idir), parameters=lambda: [])
+    for attr, suffix in (('obs_data_path', 'obs_data.json'), ('params_for_id_path', 'params_for_id.json'),
+                         ('parameters_path', 'parameters.json'), ('calibration_path', 'calibration.json'),
+                         ('calibrated_parameters_path', 'calibrated_parameters.json')):
+        setattr(inst, attr, str(idir / f'base_{suffix}'))
+    files = {inst.obs_data_path: '{"obs_data_name": "base"}', inst.params_for_id_path: '[]',
+             inst.parameters_path: '{}', str(idir / 'SOURCES.md'): '# sources\n',
+             str(idir / 'a_raw_data.csv'): 't,x\n', version.cellml_path: '<model/>', version.config_path: '[]'}
+    if calibrated:
+        files[inst.calibration_path] = json.dumps({'calibrated_parameters': {'k': 1.5}, 'cost': 0.1})
+        files[inst.calibrated_parameters_path] = '{"k": {"value": 1.5}}'
+    for path, text in files.items():
+        with open(path, 'w') as f:
+            f.write(text)
+
+    def generate(v, work_dir, **kw):
+        model = os.path.join(work_dir, 'model.cellml')
+        with open(model[:-len('.cellml')] + '_flat.cellml', 'w') as f:
+            f.write('<model name="flat"/>')
+        return model
+    from cam_testing import harness
+    monkeypatch.setattr(harness, 'generate', generate)
+    return version, inst
+
+
+def test_omex_carries_the_calibration_result_after_the_study(tmp_path, monkeypatch):
+    version, inst = _omex_inputs(tmp_path, monkeypatch)
+    work = tmp_path / 'work'
+    work.mkdir()
+    names = [n for n, _, _ in omex.members(version, inst, str(work))]
+    assert names[:6] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.json', 'base_parameters.json',
+                         'base_calibration.json', 'base_calibrated_parameters.json']
+    assert names.count('base_calibration.json') == 1 and names.count('base_calibrated_parameters.json') == 1
+    # CUFLynx takes the first JSON with "obs" and, with no CSV, the first JSON with "param" in its name
+    assert next(n for n in names if n.endswith('.json') and 'obs' in n) == 'base_obs_data.json'
+    assert not any(n.endswith('.csv') and 'param' in n for n in names)
+    assert next(n for n in names if n.endswith('.json') and 'param' in n) == 'base_params_for_id.json'
+
+    path = omex.build(version, inst, str(work), str(tmp_path / 'out.omex'))
+    with zipfile.ZipFile(path) as z:
+        manifest = z.read('manifest.xml').decode()
+        assert json.loads(z.read('base_calibration.json'))['calibrated_parameters'] == {'k': 1.5}
+    assert ('location="./base_calibration.json" format="http://purl.org/NET/mediatypes/application/json"' in manifest)
+    assert ('location="./base_calibrated_parameters.json" format="http://purl.org/NET/mediatypes/application/json"' in manifest)
+
+
+def test_omex_without_a_calibration_result(tmp_path, monkeypatch):
+    version, inst = _omex_inputs(tmp_path, monkeypatch, calibrated=False)
+    work = tmp_path / 'work'
+    work.mkdir()
+    names = [n for n, _, _ in omex.members(version, inst, str(work))]
+    assert not any('calibrat' in n for n in names)
+    assert names[:4] == ['mt_v_base.cellml', 'base_obs_data.json', 'base_params_for_id.json', 'base_parameters.json']
 
 
 # ---- the page's encoder, under node --------------------------------------------------------------

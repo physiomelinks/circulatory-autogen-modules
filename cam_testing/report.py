@@ -915,6 +915,7 @@ def component_context(version):
         'BC_type': version.BC_type, 'module_type': version.module_type, 'category': version.category,
         'format': version.format, 'config_notes': version.config.get('notes'),
         'description': version.spec.get('description'),
+        'figures': version.figures(),
         'submodules': version.submodules,
         'skip': version.spec.get('skip'), 'notes': version.spec.get('notes'),
         'sweep_rationale': (version.spec.get('bc_sweep') or {}).get('rationale'),
@@ -1487,8 +1488,19 @@ def _href(relpath, page):
     return f'modules/{relpath}/{page}'
 
 
+def _copy_images(src, dest):
+    '''The image files (library.FIGURE_PATTERN) under ``src``, at the same relative paths under ``dest``.'''
+    for dirpath, _, files in os.walk(src):
+        for f in files:
+            if re.match(library.FIGURE_PATTERN, f):
+                out = os.path.join(dest, os.path.relpath(dirpath, src))
+                os.makedirs(out, exist_ok=True)
+                shutil.copy2(os.path.join(dirpath, f), out)
+
+
 def _copy_version_files(v, vdest):
-    '''A version's plots, bond graph, PhLynx export and parameterisation archives, beside its page in the site.'''
+    '''A version's plots, figures/, bond graph, PhLynx export, and its parameterisations' source_figures/
+    images and CUFLynx archives, beside its page in the site.'''
     if os.path.isdir(v.plots_dir):
         shutil.copytree(v.plots_dir, os.path.join(vdest, 'plots'), dirs_exist_ok=True)
     # the files the page opens in the CellDL editor and PhLynx, at the same relative paths
@@ -1497,17 +1509,16 @@ def _copy_version_files(v, vdest):
             fdest = os.path.join(vdest, os.path.relpath(path, v.dir))
             os.makedirs(os.path.dirname(fdest), exist_ok=True)
             shutil.copy2(path, fdest)
+    # the images the version page links to, at the same paths relative to it
+    _copy_images(v.figures_dir, os.path.join(vdest, os.path.relpath(v.figures_dir, v.dir)))
     for inst in v.parameterisations():
         idest = os.path.join(vdest, os.path.relpath(inst.dir, v.dir))
-        # the parameterisation's CUFLynx archive, where it has been built (make omex)
+        _copy_images(inst.source_figures_dir, os.path.join(idest, os.path.relpath(inst.source_figures_dir, inst.dir)))
+        # the CUFLynx archive, where it has been built (make omex)
         archive = omex_mod.omex_path(v, inst)
         if os.path.isfile(archive):
             os.makedirs(idest, exist_ok=True)
             shutil.copy2(archive, idest)
-        # the publication figures its data came from, shown beside its validation plots
-        if os.path.isdir(inst.source_figures_dir):
-            shutil.copytree(inst.source_figures_dir, os.path.join(idest, os.path.basename(inst.source_figures_dir)),
-                            dirs_exist_ok=True)
 
 
 def _site_version_path(site_dir, v):
@@ -1542,10 +1553,11 @@ def _extra_versions(systems, names):
 
 def assemble_site(names, contexts, systems=()):
     '''site/index.html + site/modules/<module_type path>/ (its page, and each version's page, plots,
-    bond graph, PhLynx export and instance archives; a nested module_type's directory is inside its
-    parent's), as GitHub Pages serves it; and site/system_models/<category>/<model>/ for each of
-    systems (its page and PhLynx screenshot). The extra libraries' versions the pages link to get their
-    pages under site/modules/ too, at their own library's paths.'''
+    figures/, bond graph, PhLynx export, and its parameterisations' source_figures/ images and CUFLynx
+    archives; a nested module_type's directory is inside its parent's), as GitHub Pages serves it; and
+    site/system_models/<category>/<model>/ for each of systems (its page and PhLynx screenshot). The
+    extra libraries' versions the pages link to get their pages under site/modules/ too, at their own
+    library's paths.'''
     site_dir = paths.roots().site_dir
     if os.path.isdir(site_dir):
         shutil.rmtree(site_dir)
