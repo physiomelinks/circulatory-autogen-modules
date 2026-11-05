@@ -201,11 +201,13 @@ def system_means(model_path, spec, names):
 
 
 def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=False, output_dir=None,
-        spec=None, settings=None, force=False, work_dir=None, exempt=None, modules_only=False):
+        spec=None, settings=None, force=False, work_dir=None, exempt=None, modules_only=False, system_model=None):
     """The pipeline above. Returns the merged report; raises SmoothingStopped before the system step
     when a module fails (or is not checked, unless allow_unchecked). ``exempt``: the system's own
     exemptions ([{"variable": "[component/]glob", "reason"}]), merged with each library version's
     smoothing.exempt (as "<instance>_module/<variable>"). ``modules_only``: stop after the module checks.
+    ``system_model``: a generated model of the system to use instead of generating it from this library
+    (e.g. one generated with libcuflynx's built-in modules); its flat CellML must sit next to it.
     The module table is written to module_table.csv."""
     exempt = list(exempt or [])
     spec = dict(DEFAULT_SPEC, **(spec or {}))
@@ -223,8 +225,9 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
         version = resolve(rec, index, renames)
         mapped.append(dict(rec, module_type=version.vessel_type, module_subtype=version.name) if version else rec)
     unresolved = [r for r in records if resolve(r, index, renames) is None and not external_entry(r, external_dirs)]
-    system_model = _generate(os.path.join(work_dir, 'system'), prefix, mapped, parameters_path, external_dirs,
-                             builtin=bool(unresolved))
+    if system_model is None:
+        system_model = _generate(os.path.join(work_dir, 'system'), prefix, mapped, parameters_path, external_dirs,
+                                 builtin=bool(unresolved))
     values = parameter_values(parameters_path)
 
     modules, needs_means = [], []
@@ -346,6 +349,7 @@ def main(argv=None):
     parser.add_argument('--tol', type=float)
     parser.add_argument('--force', action='store_true', help='rerun the library checks even when current')
     parser.add_argument('--modules-only', action='store_true', help='stop after the module checks')
+    parser.add_argument('--system-model', help='a generated model of the system to use instead of generating one')
     args = parser.parse_args(argv)
     spec = {k: v for k, v in (('sim_time', args.sim_time), ('pre_time', args.pre_time), ('dt', args.dt))
             if v is not None}
@@ -360,7 +364,8 @@ def main(argv=None):
             with open(args.exempt) as f:
                 exempt = json.load(f)
         report = run(args.module_array, args.parameters, args.external_modules_dir, args.allow_unchecked,
-                     args.output_dir, spec, settings, args.force, exempt=exempt, modules_only=args.modules_only)
+                     args.output_dir, spec, settings, args.force, exempt=exempt, modules_only=args.modules_only,
+                     system_model=args.system_model)
     except SmoothingStopped as e:
         print(f'stopped before the system step: {e}')
         return 2

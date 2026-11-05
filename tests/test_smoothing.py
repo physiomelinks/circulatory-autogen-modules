@@ -152,6 +152,12 @@ def test_the_system_exemptions_reach_the_ad_hoc_module_and_the_system(tmp_path):
     report = smooth.run(str(array), str(params), external_dirs=[str(ext)], output_dir=str(tmp_path / 'out'),
                         work_dir=str(tmp_path / 'work'), spec={'sim_time': 1.0, 'pre_time': 0.0, 'dt': 0.01},
                         exempt=[{'variable': 'r_module/x', 'reason': 'test'}])
+    # the same system, given as a generated model instead of generated again
+    again = smooth.run(str(array), str(params), external_dirs=[str(ext)], output_dir=str(tmp_path / 'out2'),
+                       work_dir=str(tmp_path / 'work2'), spec={'sim_time': 1.0, 'pre_time': 0.0, 'dt': 0.01},
+                       exempt=[{'variable': 'r_module/x', 'reason': 'test'}], modules_only=True,
+                       system_model=str(tmp_path / 'work' / 'system' / 'generated_models' / 'relax' / 'relax.cellml'))
+    assert not os.path.exists(tmp_path / 'work2' / 'system') and again['modules']['r']['status'] == checks.PASSED
     assert 'abs_exempt 1' in report['modules']['r']['message']
     assert report['system']['sites'][0]['status'] == 'exempt'
     assert report['exempt'] == [{'variable': 'r_module/x', 'reason': 'test'}]
