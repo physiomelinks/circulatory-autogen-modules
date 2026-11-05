@@ -288,24 +288,36 @@
     "exempt": [
       [
         "chi_afloor_final",
-        "the activation 2 chi_afloor drops from 1 to 0 at chi_afloor = 0.5, but it is used only in e_a = (1 - cos(2 pi chi_afloor_final))/2, which is 0 at both 1 and 0 with zero slope, so e_a is already continuous across the drop; smoothing the drop makes it pass through 0.5, where e_a = 1: a spurious elastance spike"
+        "the activation 2 chi_afloor drops from 1 to 0 at chi_afloor = 0.5, but it is used only in e_a = (1 - cos(2 pi chi_afloor_final))/2, which is 0 at both 1 and 0 with zero slope, so e_a is already continuous across the drop; smoothing the drop makes it pass through 0.5, where e_a = 1: a spurious elastance spike (CAM #58)"
       ],
       [
         "chi_vfloor_final",
-        "the ventricular activation drop, as chi_afloor_final: e_v = (1 - cos(2 pi chi_vfloor_final))/2 is continuous across it, and smoothing it adds a spike of e_v"
+        "the ventricular activation drop, as chi_afloor_final: e_v = (1 - cos(2 pi chi_vfloor_final))/2 is continuous across it, and smoothing it adds a spike of e_v (CAM #58)"
       ],
       [
         "chi_a",
-        "d(chi_a)/dt: an on/off rate integrated into the atrial phase (each beat's start gated by the cardiac clock)"
+        "d(chi_a)/dt: an on/off rate integrated into the atrial phase (each beat's start gated by the cardiac clock) (CAM #58)"
       ],
       [
         "chi_v",
-        "d(chi_v)/dt: an on/off rate integrated into the ventricular phase (each beat's start gated by the cardiac clock)"
-      ]
+        "d(chi_v)/dt: an on/off rate integrated into the ventricular phase (each beat's start gated by the cardiac clock) (CAM #58)"
+      ],
+      ["v_aov", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["v_miv", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["v_trv", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["v_puv", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_aov", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_miv", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_trv", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_puv", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_aov_pre", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_miv_pre", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_trv_pre", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"],
+      ["zeta_puv_pre", "valve dynamics: to be replaced by a smooth heart version (CAM #58)"]
     ],
-    "rel": {"abs": 0.001, "maxmin": 0.001, "piecewise": 0.0001},
+    "rel": 0.001,
     "tol": 0.01,
-    "rationale": "Exempt: the activation drops and the phase rates (reasons with each). The activation 2 chi_floor falls from 1 to 0 at chi_floor = 0.5, but it is used only in e = (1 - cos(2 pi act))/2, which is 0 at act = 1 and at act = 0 with zero slope, so e is already continuous with a continuous slope across the drop; smoothing the drop makes act pass through 0.5, where e = 1, a spurious elastance spike (chi_vfloor_final smoothed alone at rel 1e-3 was 0.62 over the solver floor). The remaining sites are the valve opening rates zeta_*_pre (piecewise), the clamps max(zeta_pre, 0) and the losses abs(v). With the exemptions, at rel 1e-3 for every kind the worst sweep point (T = 1.5) is 0.16 over the floor, nearly all from zeta_trv_pre; at rel 1e-4 for every kind 18 of 205 points (vp) and 67 of 226 (vp_wCont) are over tol, worst 0.033-0.035. Chosen: piecewise 1e-4 (the valve rates), abs and maxmin 1e-3. With these 19 of 205 (vp, worst 0.05 at T = 0.6) and 22 of 226 (vp_wCont, worst 0.033) points are still over tol 1e-2: single sites smoothed alone at the worst points give 0.01-0.08 and do not fall from rel 1e-3 to 1e-4, so the rest is the valve flows' sensitivity to the timing of each switch, not a site that a smaller rel fixes."
+    "rationale": "Exempt as heart/vp: the activation drops, the phase rates and the valve dynamics (CAM #58). The one site left is T_wCont = max(T + Delta_T, T_min), smoothed at rel 1e-3. It fails 13 of 226 sweep points: t_astart = 0.95 by 0.5 in e_a, where t_astart + eps_1 > 1 puts the atrial start window across the clock's wrap, so the period's 1e-6 s change moves an atrial beat; the others by 0.025-0.04 in the valve areas, at the level the valve flows reach between solver settings."
   },
   "validation": {
     "default": {
