@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="i_H_ATPase_FoF1_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="i_H_ATPase_FoF1">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <variable name="E_H" public_interface="in" units="milliV"/>
+        <!-- free cytosolic H+ (internal_H port) -->
+        <variable name="H_i" public_interface="in" units="millimolar"/>
+        <!-- H+ for half activation (pH regulation) -->
+        <variable name="K_act_H" public_interface="in" units="millimolar"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <!-- density at baseline expression -->
+        <variable name="rho_H_ATPase" public_interface="in" units="per_um2"/>
+        <!-- expression, 1 = the calibrated cell (protein_expression port) -->
+        <variable name="m_expr" public_interface="in" units="dimensionless"/>
+        <!-- ATP hydrolysed per enzyme per second at full activity -->
+        <variable name="r_H_ATPase" public_interface="in" units="per_s"/>
+        <!-- H+ pumped per ATP -->
+        <variable name="n_H" public_interface="in" units="dimensionless"/>
+        <variable name="ATP" public_interface="in" units="millimolar"/>
+        <variable name="ADP" public_interface="in" units="millimolar"/>
+        <variable name="Pi" public_interface="in" units="millimolar"/>
+        <variable name="K_m_ATP_H" public_interface="in" units="millimolar"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="dG0_hyd" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std" public_interface="in" units="millimolar"/>
+        <variable name="k_H_ATPase" public_interface="out" units="nanoA"/>
+        <!-- free energy of ATP hydrolysis -->
+        <variable name="A_ATP" public_interface="out" units="J_per_mol"/>
+        <!-- electrochemical work of pumping n_H H+ out -->
+        <variable name="W_H" public_interface="out" units="J_per_mol"/>
+        <!-- thermodynamic factor: 0 at equilibrium, negative (synthesis) below it -->
+        <variable name="f_thermo" public_interface="out" units="dimensionless"/>
+        <!-- outward current of the pumped H+ -->
+        <variable name="i_H_ATPase" public_interface="out" units="nanoA"/>
+        <!-- ATP hydrolysed -->
+        <variable name="v_ATP_H" public_interface="out" units="mol_per_s"/>
+        <!-- H+ into the cell through the rotor (negative: pumped out) -->
+        <variable name="j_H_pumped" public_interface="out" units="mol_per_s"/>
+        <!-- net H+ into the cytosol (H_flux port) -->
+        <variable name="j_H_ATPase" public_interface="out" units="mol_per_s"/>
+        <variable name="j_ATP_H" public_interface="out" units="mol_per_s"/>
+        <variable name="j_ADP_H" public_interface="out" units="mol_per_s"/>
+        <variable name="j_Pi_H" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>k_H_ATPase</ci>
+                <apply>
+                    <times/>
+                    <ci>A_mem</ci>
+                    <ci>rho_H_ATPase</ci>
+                    <ci>m_expr</ci>
+                    <ci>r_H_ATPase</ci>
+                    <ci>n_H</ci>
+                    <cn cellml:units="nanoC" type="e-notation">1.602176634<sep/>-10</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_ATP</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>dG0_hyd</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>R</ci>
+                        <ci>T</ci>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <times/>
+                                            <apply>
+                                                <divide/>
+                                                <ci>ADP</ci>
+                                                <ci>c_std</ci>
+                                            </apply>
+                                            <apply>
+                                                <divide/>
+                                                <ci>Pi</ci>
+                                                <ci>c_std</ci>
+                                            </apply>
+                                        </apply>
+                                        <apply>
+                                            <divide/>
+                                            <ci>ATP</ci>
+                                            <ci>c_std</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>W_H</ci>
+                <apply>
+                    <times/>
+                    <ci>n_H</ci>
+                    <ci>F</ci>
+                    <apply>
+                        <minus/>
+                        <ci>E_H</ci>
+                        <ci>V</ci>
+                    </apply>
+                    <cn cellml:units="V_per_milliV">0.001</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_thermo</ci>
+                <apply>
+                    <minus/>
+                    <cn cellml:units="dimensionless">1.0</cn>
+                    <apply>
+                        <exp/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>A_ATP</ci>
+                                    <ci>W_H</ci>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>R</ci>
+                                <ci>T</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_H_ATPase</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <times/>
+                                    <ci>k_H_ATPase</ci>
+                                    <ci>ATP</ci>
+                                </apply>
+                                <apply>
+                                    <plus/>
+                                    <ci>K_m_ATP_H</ci>
+                                    <ci>ATP</ci>
+                                </apply>
+                            </apply>
+                            <ci>H_i</ci>
+                        </apply>
+                        <apply>
+                            <plus/>
+                            <ci>K_act_H</ci>
+                            <ci>H_i</ci>
+                        </apply>
+                    </apply>
+                    <ci>f_thermo</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_ATP_H</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <ci>i_H_ATPase</ci>
+                        <apply>
+                            <times/>
+                            <ci>n_H</ci>
+                            <ci>F</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="A_per_nanoA" type="e-notation">1<sep/>-9</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H_pumped</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <ci>n_H</ci>
+                    </apply>
+                    <ci>v_ATP_H</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H_ATPase</ci>
+                <ci>j_H_pumped</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ATP_H</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_ATP_H</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ADP_H</ci>
+                <ci>v_ATP_H</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pi_H</ci>
+                <ci>v_ATP_H</ci>
+            </apply>
+        </math>
+    </component>
+</model>

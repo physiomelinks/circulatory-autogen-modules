@@ -1,0 +1,15 @@
+{
+ "schema_version": 1,
+ "x_unpaid": {"value": 0.0, "units": "dimensionless", "data_reference": "definitional; the upkeep fully paid (used when unconnected)", "sourced": "no"},
+ "n_ribo_rest": {"value": 43982.2971502571, "units": "dimensionless", "data_reference": "derived: ribosomes_per_um3 x cell volume (ribosomes_per_um3: unreferenced_placeholder, placeholder)", "sourced": "no"},
+ "n_ribo_init": {"value": 43982.2971502571, "units": "dimensionless", "data_reference": "calibrated: the resting count, n_ribo_rest", "sourced": "no"},
+ "L_rRNA": {"value": 4566.0, "units": "dimensionless", "data_reference": "definitional; E. coli 16S + 23S + 5S rRNA: 1542 + 2904 + 120 nt", "sourced": "yes"},
+ "k_ribo": {"value": 2.777777777777778e-06, "units": "per_s", "data_reference": "unreferenced_placeholder; rRNA is stable in growing cells; 1%/h", "sourced": "no"},
+ "k_ribo_build": {"value": 0.0002777777777777778, "units": "per_s", "data_reference": "derived: 1 / ribosome_rebuild_time (ribosome_rebuild_time: unreferenced_placeholder, placeholder)", "sourced": "no"},
+ "n_ribo_build": {"value": 8.0, "units": "dimensionless", "data_reference": "unreferenced_placeholder; rebuilding lost ribosomes scales with u^n of the share of the upkeep paid, u: a smooth switch, so a cell still cutting its upkeep (u 0.3: 1e-4) does not rebuild what it is losing, and one paying in full rebuilds at the full rate (the stringent response stops rRNA synthesis while starving)", "sourced": "no"},
+ "c_nt_recycle": {"value": 2.0, "units": "dimensionless", "data_reference": "definitional; NMP -> NDP -> NTP costs 2 ~P", "sourced": "no"},
+ "c_nt_denovo": {"value": 50.0, "units": "dimensionless", "data_reference": "lynch2015bioenergetic; of order 50 ~P per nucleotide made from glucose", "sourced": "no"},
+ "aa_ribo": {"value": 7500.0, "units": "dimensionless", "data_reference": "unreferenced_placeholder; amino acids in the ~54 proteins of one E. coli ribosome, of order 7,500 (from memory)", "sourced": "no"},
+ "c_aa_build": {"value": 28.0, "units": "dimensionless", "data_reference": "derived: c_syn + c_poly (c_syn: akashi2002metabolic, placeholder; c_poly: definitional, definitional)", "sourced": "no"},
+ "N_A": {"value": 6.02214076e+23, "units": "per_mol", "data_reference": "definitional; Avogadro constant (exact)", "sourced": "no"}
+}

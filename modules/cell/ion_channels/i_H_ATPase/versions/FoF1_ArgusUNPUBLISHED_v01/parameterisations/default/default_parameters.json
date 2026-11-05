@@ -1,0 +1,23 @@
+{
+ "schema_version": 1,
+ "global": {
+  "R": {"value": 8.314, "units": "J_per_mol_K", "data_reference": "definitional; gas constant, as the library's SN modules", "sourced": "no"},
+  "T": {"value": 293.15, "units": "kelvin", "data_reference": "lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to", "sourced": "yes"},
+  "F": {"value": 96485.0, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, as the library's SN modules", "sourced": "no"}
+ },
+ "V": {"value": -105.0, "units": "milliV", "data_reference": "milo2010bionumbers; BNID 103386: E. coli membrane potential -140 to -105 mV, fermenting at the less negative end", "sourced": "yes"},
+ "E_H": {"value": 17.449261892231384, "units": "milliV", "data_reference": "Nernst potential at pH 7.6 in, 7.3 out", "sourced": "no"},
+ "H_i": {"value": 2.5118864315095822e-05, "units": "millimolar", "data_reference": "derived: free H+ = 10^-pH_i M (pH_i: slonczewski1981ph, sourced)", "sourced": "yes"},
+ "K_act_H": {"value": 2.5118864315095822e-05, "units": "millimolar", "data_reference": "derived: H+ at the half-activation pH (pH_act_H_ATPase: kobayashi1985proton, placeholder)", "sourced": "no"},
+ "A_mem": {"value": 12.566370614359172, "units": "um2", "data_reference": "geometry: in-plane membrane of the 2 um cell", "sourced": "no"},
+ "m_expr": {"value": 1.0, "units": "dimensionless", "data_reference": "definitional; baseline expression (the calibrated cell)", "sourced": "no"},
+ "rho_H_ATPase": {"value": 240.93509168144894, "units": "per_um2", "data_reference": "calibrated: the H+-ATPase uses 25% of the cell's ATP turnover at rest (placeholder share)", "sourced": "no"},
+ "r_H_ATPase": {"value": 100.0, "units": "per_s", "data_reference": "unreferenced_placeholder; ATP hydrolysed per H+-ATPase per second at full activity (order 100)", "sourced": "no"},
+ "n_H": {"value": 3.3333333333333335, "units": "dimensionless", "data_reference": "jiang2001preferred; E. coli c10 ring over 3 catalytic sites: 10/3 H+ per ATP", "sourced": "yes"},
+ "ATP": {"value": 9.6, "units": "millimolar", "data_reference": "bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM", "sourced": "yes"},
+ "ADP": {"value": 0.56, "units": "millimolar", "data_reference": "bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)", "sourced": "yes"},
+ "Pi": {"value": 10.0, "units": "millimolar", "data_reference": "amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells", "sourced": "yes"},
+ "K_m_ATP_H": {"value": 0.2, "units": "millimolar", "data_reference": "unreferenced_placeholder; H+-ATPase affinity for ATP, order 0.1-0.5 mM", "sourced": "no"},
+ "dG0_hyd": {"value": -27400.0, "units": "J_per_mol", "data_reference": "beber2022equilibrator; ATP + H2O -> ADP + Pi: -27.4 +- 0.6 kJ/mol, eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set", "sourced": "yes"},
+ "c_std": {"value": 1000.0, "units": "millimolar", "data_reference": "definitional; standard concentration 1 M for thermodynamic factors", "sourced": "no"}
+}

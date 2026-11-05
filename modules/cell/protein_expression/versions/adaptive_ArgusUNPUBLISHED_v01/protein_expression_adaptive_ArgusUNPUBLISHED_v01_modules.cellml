@@ -1,0 +1,533 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="protein_expression_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="protein_expression_adaptive">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- cytosol ATP (ATP_hydrolysis_port), passed to the pools -->
+        <variable name="ATP" public_interface="in" units="millimolar"/>
+        <variable name="ADP" public_interface="in" units="millimolar"/>
+        <variable name="Pi" public_interface="in" units="millimolar"/>
+        <!-- summed build demand of the pools (protein_synthesis port) -->
+        <variable name="J_demand_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_ATP_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_keep_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_build_in" public_interface="in" units="mol_per_s"/>
+        <variable name="M_build_in" public_interface="in" units="mole"/>
+        <variable name="A_protein_in" public_interface="in" units="um2"/>
+        <!-- summed proteolysis demand of the pools, amino acids per second -->
+        <variable name="Q_prot_demand_in" public_interface="in" units="per_s"/>
+        <!-- amino acids per second the pools return to the recycled pool -->
+        <variable name="Q_aa_rel_in" public_interface="in" units="per_s"/>
+        <!-- amino acids per second the pools take from the recycled pool -->
+        <variable name="Q_aa_use_in" public_interface="in" units="per_s"/>
+        <variable name="J_prot_in" public_interface="in" units="mol_per_s"/>
+        <variable name="J_saved_in" public_interface="in" units="mol_per_s"/>
+        <!-- most amino acids per second the cell's proteases can remove -->
+        <variable name="Q_prot_max" public_interface="in" units="per_s"/>
+        <!-- numerical floor on the proteolysis demand (so s_prot is defined with nothing to remove) -->
+        <variable name="Q_eps" public_interface="in" units="per_s"/>
+        <variable name="N_aa_init" public_interface="in" units="dimensionless"/>
+        <!-- recycled amino acids: free amino acids from proteolysis, above the cell's usual pool (count per cell) -->
+        <variable initial_value="N_aa_init" name="N_aa" public_interface="out" units="dimensionless"/>
+        <!-- recycled amino acids at which half of a new copy's amino acids come from them -->
+        <variable name="K_aa" public_interface="in" units="dimensionless"/>
+        <!-- time constant of the catabolism of recycled amino acids not reused -->
+        <variable name="tau_aa_cat" public_interface="in" units="second"/>
+        <!-- ATP made per amino acid catabolised -->
+        <variable name="y_aa_cat" public_interface="in" units="dimensionless"/>
+        <variable name="N_A" public_interface="in" units="per_mol"/>
+        <!-- share of the proteolysis demand served: min(1, Q_prot_max/Q_prot_demand) -->
+        <variable name="s_prot" public_interface="out" units="dimensionless"/>
+        <!-- share of new copies' amino acids taken from the recycled pool: N_aa/(K_aa + N_aa) -->
+        <variable name="phi_aa" public_interface="out" units="dimensionless"/>
+        <!-- recycled amino acids catabolised per second -->
+        <variable name="r_aa_cat" public_interface="out" units="per_s"/>
+        <!-- ATP made by catabolising recycled amino acids -->
+        <variable name="J_cat" public_interface="out" units="mol_per_s"/>
+        <variable name="Q_prot_demand_total" public_interface="out" units="per_s"/>
+        <variable name="Q_aa_rel_total" public_interface="out" units="per_s"/>
+        <variable name="Q_aa_use_total" public_interface="out" units="per_s"/>
+        <!-- ATP for regulated proteolysis, all pools -->
+        <variable name="J_prot_total" public_interface="out" units="mol_per_s"/>
+        <!-- ATP recycled amino acids save the pools' building -->
+        <variable name="J_saved_total" public_interface="out" units="mol_per_s"/>
+        <!-- ATP returned by recycled protein: saved in building plus made by catabolism -->
+        <variable name="J_recycled" public_interface="out" units="mol_per_s"/>
+        <!-- build demand of all pools -->
+        <variable name="J_demand_total" public_interface="out" units="mol_per_s"/>
+        <!-- net ATP use of protein synthesis and breakdown: the pools' use less the ATP made by catabolising recycled amino acids -->
+        <variable name="J_ATP_total" public_interface="out" units="mol_per_s"/>
+        <!-- turnover cost of all pools -->
+        <variable name="J_keep_total" public_interface="out" units="mol_per_s"/>
+        <!-- build spending of all pools -->
+        <variable name="J_build_total" public_interface="out" units="mol_per_s"/>
+        <!-- ATP to build every pool's copies: the protein share of a daughter -->
+        <variable name="M_build_protein" public_interface="out" units="mole"/>
+        <!-- membrane area of all pools -->
+        <variable name="A_protein_total" public_interface="out" units="um2"/>
+        <!-- resting ATP turnover of the cell: the scale of synthesis and growth -->
+        <variable name="J_ref" public_interface="in" units="mol_per_s"/>
+        <!-- most ATP synthesis can take with the resting ribosomes, in multiples of J_ref -->
+        <variable name="build_capacity_rest" public_interface="in" units="dimensionless"/>
+        <!-- ribosomes relative to rest (ribosomes port from cell/ribosomes) -->
+        <variable name="x_ribo" public_interface="in" units="dimensionless"/>
+        <!-- most ATP synthesis can take now: build_capacity_rest x_ribo -->
+        <variable name="build_capacity" public_interface="out" units="dimensionless"/>
+        <!-- ATP at which synthesis and growth stop -->
+        <variable name="ATP_floor" public_interface="in" units="millimolar"/>
+        <!-- ATP at which synthesis runs at full speed (rest) -->
+        <variable name="ATP_ref" public_interface="in" units="millimolar"/>
+        <!-- numerical floor on the demand (so s_build is defined with nothing to build) -->
+        <variable name="J_eps" public_interface="in" units="mol_per_s"/>
+        <!-- in-plane membrane area (membrane_area port) -->
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <!-- whole cell surface / in-plane membrane area -->
+        <variable name="surface_factor" public_interface="in" units="dimensionless"/>
+        <!-- most of the cell surface the proteins may take -->
+        <variable name="area_max_fraction" public_interface="in" units="dimensionless"/>
+        <!-- (ATP - ATP_floor)/(ATP_ref - ATP_floor) -->
+        <variable name="x_ATP" public_interface="out" units="dimensionless"/>
+        <!-- x_ATP clamped to 0-1 (the stringent response) -->
+        <variable name="throttle" public_interface="out" units="dimensionless"/>
+        <!-- what synthesis can spend now: build_capacity J_ref throttle R_reg -->
+        <variable name="J_cap" public_interface="out" units="mol_per_s"/>
+        <!-- share of the demand served: min(1, J_cap/J_demand_total) -->
+        <variable name="s_build" public_interface="out" units="dimensionless"/>
+        <!-- whole cell surface -->
+        <variable name="A_surface" public_interface="out" units="um2"/>
+        <!-- most membrane area the proteins may take -->
+        <variable name="A_protein_max" public_interface="out" units="um2"/>
+        <!-- share of A_protein_max in use -->
+        <variable name="f_area" public_interface="out" units="dimensionless"/>
+        <variable name="j_ATP_prot" public_interface="out" units="mol_per_s"/>
+        <variable name="j_ADP_prot" public_interface="out" units="mol_per_s"/>
+        <variable name="j_Pi_prot" public_interface="out" units="mol_per_s"/>
+        <!-- regulation by ATP, 0-1, 1 at and above rest (synthesis_regulation port) -->
+        <variable name="f_ATP_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by G6P, 0-1, 1 at and above rest (synthesis_regulation port) -->
+        <variable name="f_G6P_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by glucose inside, 0-1, 1 at and above rest (synthesis_regulation port) -->
+        <variable name="f_glc_reg" public_interface="in" units="dimensionless"/>
+        <!-- regulation by H+ (falling pH), 0-1, 1 at and above rest (synthesis_regulation port) -->
+        <variable name="f_H_reg" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling ATP lowers the cell's protein synthesis (replacing degraded copies and building new ones) (set by the game); 0: it does not -->
+        <variable name="reg_on_ATP" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling G6P lowers the cell's protein synthesis (replacing degraded copies and building new ones) (set by the game); 0: it does not -->
+        <variable name="reg_on_G6P" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling glucose inside lowers the cell's protein synthesis (replacing degraded copies and building new ones) (set by the game); 0: it does not -->
+        <variable name="reg_on_glc" public_interface="in" units="dimensionless"/>
+        <!-- 1: falling H+ (falling pH) lowers the cell's protein synthesis (replacing degraded copies and building new ones) (set by the game); 0: it does not -->
+        <variable name="reg_on_H" public_interface="in" units="dimensionless"/>
+        <!-- regulation factor on the cell's protein synthesis (replacing degraded copies and building new ones): prod (1 - reg_on + reg_on f) -->
+        <variable name="R_reg" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>R_reg</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_ATP</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_ATP</ci>
+                            <ci>f_ATP_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_G6P</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_G6P</ci>
+                            <ci>f_G6P_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_glc</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_glc</ci>
+                            <ci>f_glc_reg</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <ci>reg_on_H</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>reg_on_H</ci>
+                            <ci>f_H_reg</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_demand_total</ci>
+                <ci>J_demand_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_keep_total</ci>
+                <ci>J_keep_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_prot_demand_total</ci>
+                <ci>Q_prot_demand_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_aa_rel_total</ci>
+                <ci>Q_aa_rel_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_aa_use_total</ci>
+                <ci>Q_aa_use_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_prot_total</ci>
+                <ci>J_prot_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_saved_total</ci>
+                <ci>J_saved_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_prot</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>Q_prot_max</ci>
+                        <ci>Q_eps</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Q_prot_max</ci>
+                                <ci>Q_prot_demand_total</ci>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>Q_prot_max</ci>
+                                        <ci>Q_prot_demand_total</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <ci>Q_eps</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>phi_aa</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>N_aa</ci>
+                            <apply>
+                                <abs/>
+                                <ci>N_aa</ci>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>K_aa</ci>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>N_aa</ci>
+                                <apply>
+                                    <abs/>
+                                    <ci>N_aa</ci>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>r_aa_cat</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>N_aa</ci>
+                            <apply>
+                                <abs/>
+                                <ci>N_aa</ci>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <ci>tau_aa_cat</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_cat</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>y_aa_cat</ci>
+                        <ci>r_aa_cat</ci>
+                    </apply>
+                    <ci>N_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>N_aa</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>Q_aa_rel_in</ci>
+                        <ci>Q_aa_use_in</ci>
+                    </apply>
+                    <ci>r_aa_cat</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_recycled</ci>
+                <apply>
+                    <plus/>
+                    <ci>J_saved_in</ci>
+                    <ci>J_cat</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_total</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_ATP_in</ci>
+                    <ci>J_cat</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_build_total</ci>
+                <ci>J_build_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>M_build_protein</ci>
+                <ci>M_build_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_protein_total</ci>
+                <ci>A_protein_in</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x_ATP</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>ATP</ci>
+                        <ci>ATP_floor</ci>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <ci>ATP_ref</ci>
+                        <ci>ATP_floor</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>throttle</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <plus/>
+                                    <ci>x_ATP</ci>
+                                    <apply>
+                                        <abs/>
+                                        <ci>x_ATP</ci>
+                                    </apply>
+                                </apply>
+                                <cn cellml:units="dimensionless">2.0</cn>
+                            </apply>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                        </apply>
+                        <apply>
+                            <abs/>
+                            <apply>
+                                <minus/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <plus/>
+                                        <ci>x_ATP</ci>
+                                        <apply>
+                                            <abs/>
+                                            <ci>x_ATP</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless">2.0</cn>
+                                </apply>
+                                <cn cellml:units="dimensionless">1.0</cn>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>build_capacity</ci>
+                <apply>
+                    <times/>
+                    <ci>build_capacity_rest</ci>
+                    <ci>x_ribo</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_cap</ci>
+                <apply>
+                    <times/>
+                    <ci>build_capacity</ci>
+                    <ci>J_ref</ci>
+                    <ci>throttle</ci>
+                    <ci>R_reg</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>s_build</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <plus/>
+                        <ci>J_cap</ci>
+                        <ci>J_eps</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>J_cap</ci>
+                                <ci>J_demand_total</ci>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>J_cap</ci>
+                                        <ci>J_demand_total</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dimensionless">2.0</cn>
+                        </apply>
+                        <ci>J_eps</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_surface</ci>
+                <apply>
+                    <times/>
+                    <ci>A_mem</ci>
+                    <ci>surface_factor</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_protein_max</ci>
+                <apply>
+                    <times/>
+                    <ci>area_max_fraction</ci>
+                    <ci>A_surface</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>f_area</ci>
+                <apply>
+                    <divide/>
+                    <ci>A_protein_total</ci>
+                    <ci>A_protein_max</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ATP_prot</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_ATP_total</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ADP_prot</ci>
+                <ci>J_ATP_total</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pi_prot</ci>
+                <ci>J_ATP_total</ci>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="cell_membrane_face_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="cell_membrane_face_fermenter">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- medium side (entrance medium_face_port) -->
+        <variable name="C_glc_e" public_interface="in" units="millimolar"/>
+        <variable name="C_lac_e" public_interface="in" units="millimolar"/>
+        <!-- cytosol side (exit cytosol_face_port) -->
+        <variable name="C_glc" public_interface="in" units="millimolar"/>
+        <variable name="C_lac" public_interface="in" units="millimolar"/>
+        <!-- impermeant, carried for the port -->
+        <variable name="C_ATP" public_interface="in" units="millimolar"/>
+        <variable name="C_ADP" public_interface="in" units="millimolar"/>
+        <variable name="C_Pi" public_interface="in" units="millimolar"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <!-- carrier capacity per membrane area -->
+        <variable name="jmax_glc" public_interface="in" units="mol_per_s_per_um2"/>
+        <variable name="K_glc_t" public_interface="in" units="millimolar"/>
+        <variable name="jmax_lac" public_interface="in" units="mol_per_s_per_um2"/>
+        <variable name="K_lac_t" public_interface="in" units="millimolar"/>
+        <!-- into the cell -->
+        <variable name="J_glc" public_interface="out" units="mol_per_s"/>
+        <!-- into the cell -->
+        <variable name="J_lac" public_interface="out" units="mol_per_s"/>
+        <variable name="J_glc_e" public_interface="out" units="mol_per_s"/>
+        <variable name="J_lac_e" public_interface="out" units="mol_per_s"/>
+        <variable name="J_glc_c" public_interface="out" units="mol_per_s"/>
+        <variable name="J_lac_c" public_interface="out" units="mol_per_s"/>
+        <variable name="J_ATP_c" public_interface="out" units="mol_per_s"/>
+        <variable name="J_ADP_c" public_interface="out" units="mol_per_s"/>
+        <variable name="J_Pi_c" public_interface="out" units="mol_per_s"/>
+        <!-- free cytosolic H+ (internal_H port) -->
+        <variable name="H_i" public_interface="in" units="millimolar"/>
+        <!-- free H+ in the medium -->
+        <variable name="H_e" public_interface="in" units="millimolar"/>
+        <!-- reference H+ for the lactic-acid activity X = C_lac H / H_ref -->
+        <variable name="H_ref" public_interface="in" units="millimolar"/>
+        <variable name="X_lac_e" public_interface="out" units="millimolar"/>
+        <variable name="X_lac_i" public_interface="out" units="millimolar"/>
+        <!-- H+ into the cell with lactate (H_flux port) -->
+        <variable name="J_H_lac" public_interface="out" units="mol_per_s"/>
+        <!-- glucose carrier expression, 1 = the calibrated cell (first protein_expression port) -->
+        <variable name="m_Glf" public_interface="in" units="dimensionless"/>
+        <!-- lactate carrier expression (second protein_expression port) -->
+        <variable name="m_LacT" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>J_glc</ci>
+                <apply>
+                    <times/>
+                    <ci>jmax_glc</ci>
+                    <ci>m_Glf</ci>
+                    <ci>A_mem</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <divide/>
+                            <ci>C_glc_e</ci>
+                            <apply>
+                                <plus/>
+                                <ci>K_glc_t</ci>
+                                <ci>C_glc_e</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <divide/>
+                            <ci>C_glc</ci>
+                            <apply>
+                                <plus/>
+                                <ci>K_glc_t</ci>
+                                <ci>C_glc</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>X_lac_e</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>C_lac_e</ci>
+                        <ci>H_e</ci>
+                    </apply>
+                    <ci>H_ref</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>X_lac_i</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>C_lac</ci>
+                        <ci>H_i</ci>
+                    </apply>
+                    <ci>H_ref</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac</ci>
+                <apply>
+                    <times/>
+                    <ci>jmax_lac</ci>
+                    <ci>m_LacT</ci>
+                    <ci>A_mem</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <divide/>
+                            <ci>X_lac_e</ci>
+                            <apply>
+                                <plus/>
+                                <ci>K_lac_t</ci>
+                                <ci>X_lac_e</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <divide/>
+                            <ci>X_lac_i</ci>
+                            <apply>
+                                <plus/>
+                                <ci>K_lac_t</ci>
+                                <ci>X_lac_i</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_H_lac</ci>
+                <ci>J_lac</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc_e</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_glc</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac_e</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_lac</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc_c</ci>
+                <ci>J_glc</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac_c</ci>
+                <ci>J_lac</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_c</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ADP_c</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_Pi_c</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+        </math>
+    </component>
+</model>

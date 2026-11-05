@@ -1,0 +1,33 @@
+{
+  "module_type": "thermal_volume",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 10.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14,
+    "MaximumStep": 0.1
+  },
+  "outputs": [
+    "T",
+    "C_th"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "with no faces, all the source heat is stored: C_th (T - T_init) = Q_src t (exact to 1e-9 relative)",
+      "expr": "np.allclose(C_th*(T - T_init), Q_src*t, rtol=1e-9, atol=1e-30)"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

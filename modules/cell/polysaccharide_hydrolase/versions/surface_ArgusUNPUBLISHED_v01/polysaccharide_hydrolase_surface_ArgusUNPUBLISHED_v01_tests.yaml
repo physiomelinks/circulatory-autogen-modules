@@ -1,0 +1,11 @@
+module_type: polysaccharide_hydrolase
+version: surface_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A polysaccharide hydrolase on the cell surface (a lipid-anchored alpha-amylase, as SusG of the Bacteroides starch
+  utilisation system, shipman1999physiological; polymer is hydrolysed outside the cell and the products taken up, arnosti2011microbial).
+  Its copies n_copies = n_0 m_expr (m_expr from its protein_pool on the protein_expression port) release at most V_hydrolysis_max
+  = kcat n_copies / N_A glucose units per second. The rate on a food particle is V_hydrolysis_max S/(K_m_poly + S), S the
+  polymer the enzyme reaches in mM glucose units: the game computes S from the particle touching or near the cell and releases
+  the glucose outside the cell, where the cell''s carriers take it up; the enzyme imports nothing, so the cell''s mass and
+  energy balances do not change with it. kcat, K_m_poly and the length are placeholders; n_0 is set so the level-1 cell can
+  feed on a packet (hydrolysis_capacity times its resting glucose need).'

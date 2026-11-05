@@ -1,0 +1,273 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="extracellular_face_biofilm_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="extracellular_face">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="C_glc_up" public_interface="in" units="millimolar"/>
+        <variable name="C_glc_down" public_interface="in" units="millimolar"/>
+        <!-- diffusivity in water -->
+        <variable name="D_glc" public_interface="in" units="m2_per_s"/>
+        <!-- conductance through the two half-cells in series -->
+        <variable name="G_glc" public_interface="out" units="m3_per_s"/>
+        <!-- into the downstream volume -->
+        <variable name="J_glc" public_interface="out" units="mol_per_s"/>
+        <variable name="J_glc_up" public_interface="out" units="mol_per_s"/>
+        <variable name="J_glc_down" public_interface="out" units="mol_per_s"/>
+        <variable name="C_lac_up" public_interface="in" units="millimolar"/>
+        <variable name="C_lac_down" public_interface="in" units="millimolar"/>
+        <!-- diffusivity in water -->
+        <variable name="D_lac" public_interface="in" units="m2_per_s"/>
+        <!-- conductance through the two half-cells in series -->
+        <variable name="G_lac" public_interface="out" units="m3_per_s"/>
+        <!-- into the downstream volume -->
+        <variable name="J_lac" public_interface="out" units="mol_per_s"/>
+        <variable name="J_lac_up" public_interface="out" units="mol_per_s"/>
+        <variable name="J_lac_down" public_interface="out" units="mol_per_s"/>
+        <variable name="C_H_up" public_interface="in" units="millimolar"/>
+        <variable name="C_H_down" public_interface="in" units="millimolar"/>
+        <!-- diffusivity in water (free H+ plus the buffer's share) -->
+        <variable name="D_H" public_interface="in" units="m2_per_s"/>
+        <!-- conductance through the two half-cells in series -->
+        <variable name="G_H" public_interface="out" units="m3_per_s"/>
+        <!-- into the downstream volume -->
+        <variable name="J_H" public_interface="out" units="mol_per_s"/>
+        <variable name="J_H_up" public_interface="out" units="mol_per_s"/>
+        <variable name="J_H_down" public_interface="out" units="mol_per_s"/>
+        <variable name="C_O2_up" public_interface="in" units="millimolar"/>
+        <variable name="C_O2_down" public_interface="in" units="millimolar"/>
+        <!-- diffusivity in water -->
+        <variable name="D_O2" public_interface="in" units="m2_per_s"/>
+        <!-- conductance through the two half-cells in series -->
+        <variable name="G_O2" public_interface="out" units="m3_per_s"/>
+        <!-- into the downstream volume -->
+        <variable name="J_O2" public_interface="out" units="mol_per_s"/>
+        <variable name="J_O2_up" public_interface="out" units="mol_per_s"/>
+        <variable name="J_O2_down" public_interface="out" units="mol_per_s"/>
+        <!-- matrix hindrance of the upstream volume (its f_hind; 1 in open water) -->
+        <variable name="f_up" public_interface="in" units="dimensionless"/>
+        <variable name="f_down" public_interface="in" units="dimensionless"/>
+        <!-- face area: the gap between two cells times the depth -->
+        <variable name="A_f" public_interface="in" units="m2"/>
+        <!-- upstream centre to the face -->
+        <variable name="d_up" public_interface="in" units="metre"/>
+        <variable name="d_down" public_interface="in" units="metre"/>
+        <variable name="open_flag" public_interface="in" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>G_glc</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>open_flag</ci>
+                        <ci>A_f</ci>
+                        <ci>D_glc</ci>
+                        <ci>f_up</ci>
+                        <ci>f_down</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>d_up</ci>
+                            <ci>f_down</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>d_down</ci>
+                            <ci>f_up</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc</ci>
+                <apply>
+                    <times/>
+                    <ci>G_glc</ci>
+                    <apply>
+                        <minus/>
+                        <ci>C_glc_up</ci>
+                        <ci>C_glc_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc_down</ci>
+                <ci>J_glc</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc_up</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_glc</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>G_lac</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>open_flag</ci>
+                        <ci>A_f</ci>
+                        <ci>D_lac</ci>
+                        <ci>f_up</ci>
+                        <ci>f_down</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>d_up</ci>
+                            <ci>f_down</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>d_down</ci>
+                            <ci>f_up</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac</ci>
+                <apply>
+                    <times/>
+                    <ci>G_lac</ci>
+                    <apply>
+                        <minus/>
+                        <ci>C_lac_up</ci>
+                        <ci>C_lac_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac_down</ci>
+                <ci>J_lac</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac_up</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_lac</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>G_H</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>open_flag</ci>
+                        <ci>A_f</ci>
+                        <ci>D_H</ci>
+                        <ci>f_up</ci>
+                        <ci>f_down</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>d_up</ci>
+                            <ci>f_down</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>d_down</ci>
+                            <ci>f_up</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_H</ci>
+                <apply>
+                    <times/>
+                    <ci>G_H</ci>
+                    <apply>
+                        <minus/>
+                        <ci>C_H_up</ci>
+                        <ci>C_H_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_H_down</ci>
+                <ci>J_H</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_H_up</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_H</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>G_O2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>open_flag</ci>
+                        <ci>A_f</ci>
+                        <ci>D_O2</ci>
+                        <ci>f_up</ci>
+                        <ci>f_down</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <times/>
+                            <ci>d_up</ci>
+                            <ci>f_down</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>d_down</ci>
+                            <ci>f_up</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_O2</ci>
+                <apply>
+                    <times/>
+                    <ci>G_O2</ci>
+                    <apply>
+                        <minus/>
+                        <ci>C_O2_up</ci>
+                        <ci>C_O2_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_O2_down</ci>
+                <ci>J_O2</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_O2_up</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_O2</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

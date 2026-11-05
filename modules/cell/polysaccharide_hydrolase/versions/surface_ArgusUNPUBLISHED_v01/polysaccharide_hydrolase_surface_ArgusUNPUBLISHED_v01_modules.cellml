@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="polysaccharide_hydrolase_surface_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="polysaccharide_hydrolase_surface">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- expression (protein_expression port): n_0 copies at 1 -->
+        <variable name="m_expr" public_interface="in" units="dimensionless"/>
+        <!-- copies at m_expr = 1 -->
+        <variable name="n_0" public_interface="in" units="dimensionless"/>
+        <!-- glucose units released per copy per second at saturating polymer -->
+        <variable name="kcat" public_interface="in" units="per_s"/>
+        <!-- polymer for half-rate, in glucose units (for the game's saturation) -->
+        <variable name="K_m_poly" public_interface="in" units="millimolar"/>
+        <variable name="N_A" public_interface="in" units="per_mol"/>
+        <!-- copies on the surface -->
+        <variable name="n_copies" public_interface="out" units="dimensionless"/>
+        <!-- glucose units the copies release per second at saturating polymer -->
+        <variable name="V_hydrolysis_max" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>n_copies</ci>
+                <apply>
+                    <times/>
+                    <ci>n_0</ci>
+                    <ci>m_expr</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>V_hydrolysis_max</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kcat</ci>
+                        <ci>n_copies</ci>
+                    </apply>
+                    <ci>N_A</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

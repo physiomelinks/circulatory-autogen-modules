@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="H_handling_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="H_fermenter">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="H_i_init" public_interface="in" units="millimolar"/>
+        <!-- free cytosolic H+ -->
+        <variable initial_value="H_i_init" name="H_i" public_interface="out" units="millimolar"/>
+        <!-- free H+ in the medium -->
+        <variable name="H_o" public_interface="in" units="millimolar"/>
+        <!-- buffering capacity: mM of H+ bound per pH unit -->
+        <variable name="beta_H" public_interface="in" units="millimolar"/>
+        <variable name="c_std" public_interface="in" units="millimolar"/>
+        <!-- summed H+ fluxes into the cytosol across the membrane (H_flux port) -->
+        <variable name="j_H_in" public_interface="in" units="mol_per_s"/>
+        <!-- summed H+ released by reactions in the cytosol (H_production port) -->
+        <variable name="j_H_prod" public_interface="in" units="mol_per_s"/>
+        <variable name="Vol" public_interface="in" units="m3"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="pH_i" public_interface="out" units="dimensionless"/>
+        <variable name="pH_o" public_interface="out" units="dimensionless"/>
+        <!-- H+ Nernst potential -->
+        <variable name="E_H" public_interface="out" units="milliV"/>
+        <!-- free + bound H+ relative to a reference: H_i - beta_H pH_i -->
+        <variable name="H_total_rel" public_interface="out" units="millimolar"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>H_i</ci>
+                </apply>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <plus/>
+                            <ci>j_H_in</ci>
+                            <ci>j_H_prod</ci>
+                        </apply>
+                        <ci>Vol</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <ci>beta_H</ci>
+                            <apply>
+                                <times/>
+                                <apply>
+                                    <ln/>
+                                    <cn cellml:units="dimensionless">10.0</cn>
+                                </apply>
+                                <ci>H_i</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>pH_i</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <divide/>
+                                <ci>H_i</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <cn cellml:units="dimensionless">10.0</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>pH_o</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <apply>
+                                <divide/>
+                                <ci>H_o</ci>
+                                <ci>c_std</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <cn cellml:units="dimensionless">10.0</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>E_H</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>R</ci>
+                            <ci>T</ci>
+                        </apply>
+                        <ci>F</ci>
+                    </apply>
+                    <apply>
+                        <ln/>
+                        <apply>
+                            <divide/>
+                            <ci>H_o</ci>
+                            <ci>H_i</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="milliV_per_V">1000.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>H_total_rel</ci>
+                <apply>
+                    <minus/>
+                    <ci>H_i</ci>
+                    <apply>
+                        <times/>
+                        <ci>beta_H</ci>
+                        <ci>pH_i</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,1245 @@
+@prefix : <#> .
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix celldl: <http://celldl.org/ontologies/celldl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .
+
+# Detailed mitochondrion: written by tools/celldl.py (circulatory-autogen-modules) from the module's bond graph
+
+<> a celldl:Document, bgf:BondgraphModel ;
+  owl:versionInfo "1.0" ;
+  bgf:usesTemplate tpl:chemical.ttl, tpl:electrical.ttl ;
+  bgf:hasBondElement :q_Pyr_m, :q_AcCoA, :q_CoA, :q_Cit, :q_Icit, :q_OG, :q_SucCoA, :q_Suc, :q_Fum, :q_Mal, :q_OAA, :q_NAD_m, :q_NADH_m, :q_ATP_m, :q_ADP_m, :q_Pi_m, :q_Q, :q_QH2, :q_cytc_ox, :q_cytc_red, :C_m_m, :Re_PYRC, :Se_Pyr_c_PYRC, :Se_H_c_PYRC, :Se_H_m_PYRC, :Re_PIC, :Se_Pi_c_PIC, :Se_H_c_PIC, :Se_H_m_PIC, :Re_ANT, :Se_ADP_c_ANT, :Se_ATP_c_ANT, :Re_PDH, :Se_CO2_PDH, :Re_CS, :Se_H2O_CS, :Se_H_m_CS, :Re_ACO, :Re_IDH, :Se_CO2_IDH, :Re_OGDH, :Se_CO2_OGDH, :Re_SCS, :Re_CII, :Re_FUM, :Se_H2O_FUM, :Re_MDH, :Se_H_m_MDH, :Re_CI, :Se_H_m_CI, :Se_H_c_CI, :Re_CIII, :Se_H_m_CIII, :Se_H_c_CIII, :Re_CIV, :Se_O2_CIV, :Se_H_m_CIV, :Se_H2O_CIV, :Se_H_c_CIV, :Re_ATPS, :Se_H_c_ATPS, :Se_H2O_ATPS, :Se_H_m_ATPS, :Re_LEAK, :Se_H_c_LEAK, :Se_H_m_LEAK ;
+  bgf:hasJunctionStructure :TF_f_ANT, :TF_r_ANT, :TF_f_CI, :TF_r_CI, :TF_f_CIII, :TF_r_CIII, :TF_f_CIV, :TF_r_CIV, :TF_f_ATPS, :TF_r_ATPS, :TF_f_LEAK, :TF_r_LEAK .
+:q_Pyr_m a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Pyr" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "1.98493073550596e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.03401717925423e+20 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:15361> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_AcCoA a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "AcCoA" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "4.39822971502571e-16 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "4.94828593374416e+18 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57288> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_CoA a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "CoA" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "6.28318530717959e-16 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "219750.261748844 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57287> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_Cit a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Cit" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "2.51327412287184e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "9230164817.30344 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:16947> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_Icit a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Icit" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "1.76951068926182e-16 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "130966919789.862 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:15562> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_OG a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "OG" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "1.25663706143592e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.144018358254e+22 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:16810> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_SucCoA a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "SucCoA" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "3.14159265358979e-16 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.05927363364514e+22 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57292> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_Suc a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Suc" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "3.14159265358979e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.41269489068089e+18 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:30031> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_Fum a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Fum" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "8.31618544386324e-16 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1.96532983592962e+20 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:29806> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_Mal a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Mal" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "3.14159265358979e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "184394928395.952 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:15589> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_OAA a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "OAA" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "4.13367008561975e-19 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "20056733.3808594 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:16452> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_NAD_m a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "NAD" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "1.5707963267949e-14 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "42364727.5052281 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57540> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_NADH_m a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "NADH" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "6.28318530717959e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2.3916401593716e+20 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:57945> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_ATP_m a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "ATP" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "6.28318530717959e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.71019925562401e+17 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_ADP_m a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "ADP" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "6.28318530717959e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "29081189955.8197 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_Pi_m a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Pi" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "1.2553804243749e-13 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "2651842289.95639 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_Q a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "Q" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "2.41902634326414e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "3.27212148687607e+17 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:16389> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_QH2 a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "QH2" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "1.03672557568463e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "1218614018644.13 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:17976> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:q_cytc_ox a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "cytcox" ;
+  bgf:hasLocation "p" ;
+  bgf:hasValue "1.41371669411541e-15 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "8.4071137034066e+15 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:29034> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005758> .
+
+:q_cytc_red a celldl:Component, bgf:ChemicalStorageNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "cytcred" ;
+  bgf:hasLocation "p" ;
+  bgf:hasValue "1.5707963267949e-16 mol"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "K" ; bgf:hasValue "535637303871962 mol-1"^^cdt:ucum ] ;
+  bqbiol:is <https://identifiers.org/CHEBI:29033> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005758> .
+
+:C_m_m a celldl:Component, bgf:ElectricalCapacitiveNode ;
+  bgf:hasSymbol "q" ;
+  bgf:hasSpecies "psi" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-6.14495523042164e-13 C"^^cdt:ucum ;
+  bgf:parameterValue [ bgf:varName "C" ; bgf:hasValue "4.09663682028109e-12 F"^^cdt:ucum ] .
+
+:Re_PYRC a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PYRC" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.80593035847288e-14 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:64720> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_Pyr_c_PYRC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "Pyr" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "28576.6382860003 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15361> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_Pyr_c_PYRC.Re_PYRC a celldl:Connection ;
+  celldl:hasSource :Se_Pyr_c_PYRC ;
+  celldl:hasTarget :Re_PYRC ;
+  bgf:hasSource :Se_Pyr_c_PYRC ;
+  bgf:hasTarget :Re_PYRC .
+
+:Se_H_c_PYRC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-23809.6696634116 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_H_c_PYRC.Re_PYRC a celldl:Connection ;
+  celldl:hasSource :Se_H_c_PYRC ;
+  celldl:hasTarget :Re_PYRC ;
+  bgf:hasSource :Se_H_c_PYRC ;
+  bgf:hasTarget :Re_PYRC .
+
+:Se_H_m_PYRC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_PYRC.Se_H_m_PYRC a celldl:Connection ;
+  celldl:hasSource :Re_PYRC ;
+  celldl:hasTarget :Se_H_m_PYRC ;
+  bgf:hasSource :Re_PYRC ;
+  bgf:hasTarget :Se_H_m_PYRC .
+
+:Re_PYRC.q_Pyr_m a celldl:Connection ;
+  celldl:hasSource :Re_PYRC ;
+  celldl:hasTarget :q_Pyr_m ;
+  bgf:hasSource :Re_PYRC ;
+  bgf:hasTarget :q_Pyr_m .
+
+:Re_PIC a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PIC" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "4.05216087753382 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:29939> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_Pi_c_PIC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "Pi" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-26584.7310637404 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:43474> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_Pi_c_PIC.Re_PIC a celldl:Connection ;
+  celldl:hasSource :Se_Pi_c_PIC ;
+  celldl:hasTarget :Re_PIC ;
+  bgf:hasSource :Se_Pi_c_PIC ;
+  bgf:hasTarget :Re_PIC .
+
+:Se_H_c_PIC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-23809.6696634116 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_H_c_PIC.Re_PIC a celldl:Connection ;
+  celldl:hasSource :Se_H_c_PIC ;
+  celldl:hasTarget :Re_PIC ;
+  bgf:hasSource :Se_H_c_PIC ;
+  bgf:hasTarget :Re_PIC ;
+  bgf:bondCount 2 .
+
+:Se_H_m_PIC a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_PIC.Se_H_m_PIC a celldl:Connection ;
+  celldl:hasSource :Re_PIC ;
+  celldl:hasTarget :Se_H_m_PIC ;
+  bgf:hasSource :Re_PIC ;
+  bgf:hasTarget :Se_H_m_PIC ;
+  bgf:bondCount 2 .
+
+:Re_PIC.q_Pi_m a celldl:Connection ;
+  celldl:hasSource :Re_PIC ;
+  celldl:hasTarget :q_Pi_m ;
+  bgf:hasSource :Re_PIC ;
+  bgf:hasTarget :q_Pi_m .
+
+:Re_ANT a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "ANT" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "3.31161124522512e-16 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "15.5847089022118 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:34999> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_ADP_c_ANT a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ADP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-25037.763989096 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:456216> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_ADP_c_ANT.Re_ANT a celldl:Connection ;
+  celldl:hasSource :Se_ADP_c_ANT ;
+  celldl:hasTarget :Re_ANT ;
+  bgf:hasSource :Se_ADP_c_ANT ;
+  bgf:hasTarget :Re_ANT .
+
+:Se_ATP_c_ANT a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "ATP" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "25037.7639890961 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:30616> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_ANT.Se_ATP_c_ANT a celldl:Connection ;
+  celldl:hasSource :Re_ANT ;
+  celldl:hasTarget :Se_ATP_c_ANT ;
+  bgf:hasSource :Re_ANT ;
+  bgf:hasTarget :Se_ATP_c_ANT .
+
+:q_ATP_m.Re_ANT a celldl:Connection ;
+  celldl:hasSource :q_ATP_m ;
+  celldl:hasTarget :Re_ANT ;
+  bgf:hasSource :q_ATP_m ;
+  bgf:hasTarget :Re_ANT .
+
+:Re_ANT.q_ADP_m a celldl:Connection ;
+  celldl:hasSource :Re_ANT ;
+  celldl:hasTarget :q_ADP_m ;
+  bgf:hasSource :Re_ANT ;
+  bgf:hasTarget :q_ADP_m .
+
+:TF_f_ANT a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-48242.66606 C/mol"^^cdt:ucum .
+
+:TF_r_ANT a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "2.07285393132355e-05 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_ANT a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_ANT ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_ANT .
+
+:TF_f_ANT.Re_ANT a celldl:Connection ;
+  celldl:hasSource :TF_f_ANT ;
+  celldl:hasTarget :Re_ANT ;
+  bgf:hasSource :TF_f_ANT ;
+  bgf:hasTarget :Re_ANT .
+
+:Re_ANT.TF_r_ANT a celldl:Connection ;
+  celldl:hasSource :Re_ANT ;
+  celldl:hasTarget :TF_r_ANT ;
+  bgf:hasSource :Re_ANT ;
+  bgf:hasTarget :TF_r_ANT .
+
+:TF_r_ANT.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_ANT ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_ANT ;
+  bgf:hasTarget :C_m_m .
+
+:Re_PDH a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "PDH" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "8.108845523776e-06 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "5.65752515875518e-11 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:28042> .
+
+:Se_CO2_PDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "CO2" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-154035.681321203 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:16526> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_PDH.Se_CO2_PDH a celldl:Connection ;
+  celldl:hasSource :Re_PDH ;
+  celldl:hasTarget :Se_CO2_PDH ;
+  bgf:hasSource :Re_PDH ;
+  bgf:hasTarget :Se_CO2_PDH .
+
+:q_Pyr_m.Re_PDH a celldl:Connection ;
+  celldl:hasSource :q_Pyr_m ;
+  celldl:hasTarget :Re_PDH ;
+  bgf:hasSource :q_Pyr_m ;
+  bgf:hasTarget :Re_PDH .
+
+:q_CoA.Re_PDH a celldl:Connection ;
+  celldl:hasSource :q_CoA ;
+  celldl:hasTarget :Re_PDH ;
+  bgf:hasSource :q_CoA ;
+  bgf:hasTarget :Re_PDH .
+
+:q_NAD_m.Re_PDH a celldl:Connection ;
+  celldl:hasSource :q_NAD_m ;
+  celldl:hasTarget :Re_PDH ;
+  bgf:hasSource :q_NAD_m ;
+  bgf:hasTarget :Re_PDH .
+
+:Re_PDH.q_AcCoA a celldl:Connection ;
+  celldl:hasSource :Re_PDH ;
+  celldl:hasTarget :q_AcCoA ;
+  bgf:hasSource :Re_PDH ;
+  bgf:hasTarget :q_AcCoA .
+
+:Re_PDH.q_NADH_m a celldl:Connection ;
+  celldl:hasSource :Re_PDH ;
+  celldl:hasTarget :q_NADH_m ;
+  bgf:hasSource :Re_PDH ;
+  bgf:hasTarget :q_NADH_m .
+
+:Re_CS a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "CS" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.39487423780707 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "1.91559109179902e-16 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:16845> .
+
+:Se_H2O_CS a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H2O" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-50174.1146065699 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Se_H2O_CS.Re_CS a celldl:Connection ;
+  celldl:hasSource :Se_H2O_CS ;
+  celldl:hasTarget :Re_CS ;
+  bgf:hasSource :Se_H2O_CS ;
+  bgf:hasTarget :Re_CS .
+
+:Se_H_m_CS a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_CS.Se_H_m_CS a celldl:Connection ;
+  celldl:hasSource :Re_CS ;
+  celldl:hasTarget :Se_H_m_CS ;
+  bgf:hasSource :Re_CS ;
+  bgf:hasTarget :Se_H_m_CS .
+
+:q_OAA.Re_CS a celldl:Connection ;
+  celldl:hasSource :q_OAA ;
+  celldl:hasTarget :Re_CS ;
+  bgf:hasSource :q_OAA ;
+  bgf:hasTarget :Re_CS .
+
+:q_AcCoA.Re_CS a celldl:Connection ;
+  celldl:hasSource :q_AcCoA ;
+  celldl:hasTarget :Re_CS ;
+  bgf:hasSource :q_AcCoA ;
+  bgf:hasTarget :Re_CS .
+
+:Re_CS.q_Cit a celldl:Connection ;
+  celldl:hasSource :Re_CS ;
+  celldl:hasTarget :q_Cit ;
+  bgf:hasSource :Re_CS ;
+  bgf:hasTarget :q_Cit .
+
+:Re_CS.q_CoA a celldl:Connection ;
+  celldl:hasSource :Re_CS ;
+  celldl:hasTarget :q_CoA ;
+  bgf:hasSource :Re_CS ;
+  bgf:hasTarget :q_CoA .
+
+:Re_ACO a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "ACO" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "4.94397440723165e-09 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:10336> .
+
+:q_Cit.Re_ACO a celldl:Connection ;
+  celldl:hasSource :q_Cit ;
+  celldl:hasTarget :Re_ACO ;
+  bgf:hasSource :q_Cit ;
+  bgf:hasTarget :Re_ACO .
+
+:Re_ACO.q_Icit a celldl:Connection ;
+  celldl:hasSource :Re_ACO ;
+  celldl:hasTarget :q_Icit ;
+  bgf:hasSource :Re_ACO ;
+  bgf:hasTarget :q_Icit .
+
+:Re_IDH a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "IDH" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.04379756490573e-05 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "4.39510486531606e-11 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:23632> .
+
+:Se_CO2_IDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "CO2" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-154035.681321203 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:16526> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_IDH.Se_CO2_IDH a celldl:Connection ;
+  celldl:hasSource :Re_IDH ;
+  celldl:hasTarget :Se_CO2_IDH ;
+  bgf:hasSource :Re_IDH ;
+  bgf:hasTarget :Se_CO2_IDH .
+
+:q_Icit.Re_IDH a celldl:Connection ;
+  celldl:hasSource :q_Icit ;
+  celldl:hasTarget :Re_IDH ;
+  bgf:hasSource :q_Icit ;
+  bgf:hasTarget :Re_IDH .
+
+:q_NAD_m.Re_IDH a celldl:Connection ;
+  celldl:hasSource :q_NAD_m ;
+  celldl:hasTarget :Re_IDH ;
+  bgf:hasSource :q_NAD_m ;
+  bgf:hasTarget :Re_IDH .
+
+:Re_IDH.q_OG a celldl:Connection ;
+  celldl:hasSource :Re_IDH ;
+  celldl:hasTarget :q_OG ;
+  bgf:hasSource :Re_IDH ;
+  bgf:hasTarget :q_OG .
+
+:Re_IDH.q_NADH_m a celldl:Connection ;
+  celldl:hasSource :Re_IDH ;
+  celldl:hasTarget :q_NADH_m ;
+  bgf:hasSource :Re_IDH ;
+  bgf:hasTarget :q_NADH_m .
+
+:Re_OGDH a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "OGDH" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.17744743337261e-08 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "7.42636793821745e-09 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:27786> .
+
+:Se_CO2_OGDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "CO2" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-154035.681321203 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:16526> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_OGDH.Se_CO2_OGDH a celldl:Connection ;
+  celldl:hasSource :Re_OGDH ;
+  celldl:hasTarget :Se_CO2_OGDH ;
+  bgf:hasSource :Re_OGDH ;
+  bgf:hasTarget :Se_CO2_OGDH .
+
+:q_OG.Re_OGDH a celldl:Connection ;
+  celldl:hasSource :q_OG ;
+  celldl:hasTarget :Re_OGDH ;
+  bgf:hasSource :q_OG ;
+  bgf:hasTarget :Re_OGDH .
+
+:q_CoA.Re_OGDH a celldl:Connection ;
+  celldl:hasSource :q_CoA ;
+  celldl:hasTarget :Re_OGDH ;
+  bgf:hasSource :q_CoA ;
+  bgf:hasTarget :Re_OGDH .
+
+:q_NAD_m.Re_OGDH a celldl:Connection ;
+  celldl:hasSource :q_NAD_m ;
+  celldl:hasTarget :Re_OGDH ;
+  bgf:hasSource :q_NAD_m ;
+  bgf:hasTarget :Re_OGDH .
+
+:Re_OGDH.q_SucCoA a celldl:Connection ;
+  celldl:hasSource :Re_OGDH ;
+  celldl:hasTarget :q_SucCoA ;
+  bgf:hasSource :Re_OGDH ;
+  bgf:hasTarget :q_SucCoA .
+
+:Re_OGDH.q_NADH_m a celldl:Connection ;
+  celldl:hasSource :Re_OGDH ;
+  celldl:hasTarget :q_NADH_m ;
+  bgf:hasSource :Re_OGDH ;
+  bgf:hasTarget :q_NADH_m .
+
+:Re_SCS a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "SCS" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "9.04081700303467e-16 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "0.507431989208754 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:17661> .
+
+:q_SucCoA.Re_SCS a celldl:Connection ;
+  celldl:hasSource :q_SucCoA ;
+  celldl:hasTarget :Re_SCS ;
+  bgf:hasSource :q_SucCoA ;
+  bgf:hasTarget :Re_SCS .
+
+:q_ADP_m.Re_SCS a celldl:Connection ;
+  celldl:hasSource :q_ADP_m ;
+  celldl:hasTarget :Re_SCS ;
+  bgf:hasSource :q_ADP_m ;
+  bgf:hasTarget :Re_SCS .
+
+:q_Pi_m.Re_SCS a celldl:Connection ;
+  celldl:hasSource :q_Pi_m ;
+  celldl:hasTarget :Re_SCS ;
+  bgf:hasSource :q_Pi_m ;
+  bgf:hasTarget :Re_SCS .
+
+:Re_SCS.q_Suc a celldl:Connection ;
+  celldl:hasSource :Re_SCS ;
+  celldl:hasTarget :q_Suc ;
+  bgf:hasSource :Re_SCS ;
+  bgf:hasTarget :q_Suc .
+
+:Re_SCS.q_CoA a celldl:Connection ;
+  celldl:hasSource :Re_SCS ;
+  celldl:hasTarget :q_CoA ;
+  bgf:hasSource :Re_SCS ;
+  bgf:hasTarget :q_CoA .
+
+:Re_SCS.q_ATP_m a celldl:Connection ;
+  celldl:hasSource :Re_SCS ;
+  celldl:hasTarget :q_ATP_m ;
+  bgf:hasSource :Re_SCS ;
+  bgf:hasTarget :q_ATP_m .
+
+:Re_CII a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "CII" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "7.30998325496976e-24 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "62758006.3579939 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:13713> .
+
+:q_Suc.Re_CII a celldl:Connection ;
+  celldl:hasSource :q_Suc ;
+  celldl:hasTarget :Re_CII ;
+  bgf:hasSource :q_Suc ;
+  bgf:hasTarget :Re_CII .
+
+:q_Q.Re_CII a celldl:Connection ;
+  celldl:hasSource :q_Q ;
+  celldl:hasTarget :Re_CII ;
+  bgf:hasSource :q_Q ;
+  bgf:hasTarget :Re_CII .
+
+:Re_CII.q_Fum a celldl:Connection ;
+  celldl:hasSource :Re_CII ;
+  celldl:hasTarget :q_Fum ;
+  bgf:hasSource :Re_CII ;
+  bgf:hasTarget :q_Fum .
+
+:Re_CII.q_QH2 a celldl:Connection ;
+  celldl:hasSource :Re_CII ;
+  celldl:hasTarget :q_QH2 ;
+  bgf:hasSource :Re_CII ;
+  bgf:hasTarget :q_QH2 .
+
+:Re_FUM a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "FUM" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1.97784463283002e-10 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:12460> .
+
+:Se_H2O_FUM a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H2O" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-50174.1146065699 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Se_H2O_FUM.Re_FUM a celldl:Connection ;
+  celldl:hasSource :Se_H2O_FUM ;
+  celldl:hasTarget :Re_FUM ;
+  bgf:hasSource :Se_H2O_FUM ;
+  bgf:hasTarget :Re_FUM .
+
+:q_Fum.Re_FUM a celldl:Connection ;
+  celldl:hasSource :q_Fum ;
+  celldl:hasTarget :Re_FUM ;
+  bgf:hasSource :q_Fum ;
+  bgf:hasTarget :Re_FUM .
+
+:Re_FUM.q_Mal a celldl:Connection ;
+  celldl:hasSource :Re_FUM ;
+  celldl:hasTarget :q_Mal ;
+  bgf:hasSource :Re_FUM ;
+  bgf:hasTarget :q_Mal .
+
+:Re_MDH a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "MDH" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "0.000297510563515704 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:21432> .
+
+:Se_H_m_MDH a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_MDH.Se_H_m_MDH a celldl:Connection ;
+  celldl:hasSource :Re_MDH ;
+  celldl:hasTarget :Se_H_m_MDH ;
+  bgf:hasSource :Re_MDH ;
+  bgf:hasTarget :Se_H_m_MDH .
+
+:q_Mal.Re_MDH a celldl:Connection ;
+  celldl:hasSource :q_Mal ;
+  celldl:hasTarget :Re_MDH ;
+  bgf:hasSource :q_Mal ;
+  bgf:hasTarget :Re_MDH .
+
+:q_NAD_m.Re_MDH a celldl:Connection ;
+  celldl:hasSource :q_NAD_m ;
+  celldl:hasTarget :Re_MDH ;
+  bgf:hasSource :q_NAD_m ;
+  bgf:hasTarget :Re_MDH .
+
+:Re_MDH.q_OAA a celldl:Connection ;
+  celldl:hasSource :Re_MDH ;
+  celldl:hasTarget :q_OAA ;
+  bgf:hasSource :Re_MDH ;
+  bgf:hasTarget :q_OAA .
+
+:Re_MDH.q_NADH_m a celldl:Connection ;
+  celldl:hasSource :Re_MDH ;
+  celldl:hasTarget :q_NADH_m ;
+  bgf:hasSource :Re_MDH ;
+  bgf:hasTarget :q_NADH_m .
+
+:Re_CI a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "CI" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "1037.80975619556 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:29091> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_H_m_CI a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Se_H_m_CI.Re_CI a celldl:Connection ;
+  celldl:hasSource :Se_H_m_CI ;
+  celldl:hasTarget :Re_CI ;
+  bgf:hasSource :Se_H_m_CI ;
+  bgf:hasTarget :Re_CI ;
+  bgf:bondCount 5 .
+
+:Se_H_c_CI a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-23809.6696634116 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_CI.Se_H_c_CI a celldl:Connection ;
+  celldl:hasSource :Re_CI ;
+  celldl:hasTarget :Se_H_c_CI ;
+  bgf:hasSource :Re_CI ;
+  bgf:hasTarget :Se_H_c_CI ;
+  bgf:bondCount 4 .
+
+:q_NADH_m.Re_CI a celldl:Connection ;
+  celldl:hasSource :q_NADH_m ;
+  celldl:hasTarget :Re_CI ;
+  bgf:hasSource :q_NADH_m ;
+  bgf:hasTarget :Re_CI .
+
+:q_Q.Re_CI a celldl:Connection ;
+  celldl:hasSource :q_Q ;
+  celldl:hasTarget :Re_CI ;
+  bgf:hasSource :q_Q ;
+  bgf:hasTarget :Re_CI .
+
+:Re_CI.q_NAD_m a celldl:Connection ;
+  celldl:hasSource :Re_CI ;
+  celldl:hasTarget :q_NAD_m ;
+  bgf:hasSource :Re_CI ;
+  bgf:hasTarget :q_NAD_m .
+
+:Re_CI.q_QH2 a celldl:Connection ;
+  celldl:hasSource :Re_CI ;
+  celldl:hasTarget :q_QH2 ;
+  bgf:hasSource :Re_CI ;
+  bgf:hasTarget :q_QH2 .
+
+:TF_f_CI a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "192970.66424 C/mol"^^cdt:ucum .
+
+:TF_r_CI a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-5.18213482830886e-06 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_CI a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_CI ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_CI .
+
+:TF_f_CI.Re_CI a celldl:Connection ;
+  celldl:hasSource :TF_f_CI ;
+  celldl:hasTarget :Re_CI ;
+  bgf:hasSource :TF_f_CI ;
+  bgf:hasTarget :Re_CI .
+
+:Re_CI.TF_r_CI a celldl:Connection ;
+  celldl:hasSource :Re_CI ;
+  celldl:hasTarget :TF_r_CI ;
+  bgf:hasSource :Re_CI ;
+  bgf:hasTarget :TF_r_CI .
+
+:TF_r_CI.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_CI ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_CI ;
+  bgf:hasTarget :C_m_m .
+
+:Re_CIII a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "CIII" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "0.00196369861589947 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "1.16810179494394e-12 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:11484> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_H_m_CIII a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Se_H_m_CIII.Re_CIII a celldl:Connection ;
+  celldl:hasSource :Se_H_m_CIII ;
+  celldl:hasTarget :Re_CIII ;
+  bgf:hasSource :Se_H_m_CIII ;
+  bgf:hasTarget :Re_CIII ;
+  bgf:bondCount 2 .
+
+:Se_H_c_CIII a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-23809.6696634116 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_CIII.Se_H_c_CIII a celldl:Connection ;
+  celldl:hasSource :Re_CIII ;
+  celldl:hasTarget :Se_H_c_CIII ;
+  bgf:hasSource :Re_CIII ;
+  bgf:hasTarget :Se_H_c_CIII ;
+  bgf:bondCount 4 .
+
+:q_QH2.Re_CIII a celldl:Connection ;
+  celldl:hasSource :q_QH2 ;
+  celldl:hasTarget :Re_CIII ;
+  bgf:hasSource :q_QH2 ;
+  bgf:hasTarget :Re_CIII .
+
+:q_cytc_ox.Re_CIII a celldl:Connection ;
+  celldl:hasSource :q_cytc_ox ;
+  celldl:hasTarget :Re_CIII ;
+  bgf:hasSource :q_cytc_ox ;
+  bgf:hasTarget :Re_CIII ;
+  bgf:bondCount 2 .
+
+:Re_CIII.q_Q a celldl:Connection ;
+  celldl:hasSource :Re_CIII ;
+  celldl:hasTarget :q_Q ;
+  bgf:hasSource :Re_CIII ;
+  bgf:hasTarget :q_Q .
+
+:Re_CIII.q_cytc_red a celldl:Connection ;
+  celldl:hasSource :Re_CIII ;
+  celldl:hasTarget :q_cytc_red ;
+  bgf:hasSource :Re_CIII ;
+  bgf:hasTarget :q_cytc_red ;
+  bgf:bondCount 2 .
+
+:TF_f_CIII a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "96485.33212 C/mol"^^cdt:ucum .
+
+:TF_r_CIII a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-1.03642696566177e-05 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_CIII a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_CIII ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_CIII .
+
+:TF_f_CIII.Re_CIII a celldl:Connection ;
+  celldl:hasSource :TF_f_CIII ;
+  celldl:hasTarget :Re_CIII ;
+  bgf:hasSource :TF_f_CIII ;
+  bgf:hasTarget :Re_CIII .
+
+:Re_CIII.TF_r_CIII a celldl:Connection ;
+  celldl:hasSource :Re_CIII ;
+  celldl:hasTarget :TF_r_CIII ;
+  bgf:hasSource :Re_CIII ;
+  bgf:hasTarget :TF_r_CIII .
+
+:TF_r_CIII.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_CIII ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_CIII ;
+  bgf:hasTarget :C_m_m .
+
+:Re_CIV a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "CIV" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "0.000651436959294203 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "1.76056934230928e-12 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:11436> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_O2_CIV a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "O2" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "225024.717135395 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15379> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Se_O2_CIV.Re_CIV a celldl:Connection ;
+  celldl:hasSource :Se_O2_CIV ;
+  celldl:hasTarget :Re_CIV ;
+  bgf:hasSource :Se_O2_CIV ;
+  bgf:hasTarget :Re_CIV .
+
+:Se_H_m_CIV a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Se_H_m_CIV.Re_CIV a celldl:Connection ;
+  celldl:hasSource :Se_H_m_CIV ;
+  celldl:hasTarget :Re_CIV ;
+  bgf:hasSource :Se_H_m_CIV ;
+  bgf:hasTarget :Re_CIV ;
+  bgf:bondCount 8 .
+
+:Se_H2O_CIV a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H2O" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-50174.1146065699 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_CIV.Se_H2O_CIV a celldl:Connection ;
+  celldl:hasSource :Re_CIV ;
+  celldl:hasTarget :Se_H2O_CIV ;
+  bgf:hasSource :Re_CIV ;
+  bgf:hasTarget :Se_H2O_CIV ;
+  bgf:bondCount 2 .
+
+:Se_H_c_CIV a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-23809.6696634116 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Re_CIV.Se_H_c_CIV a celldl:Connection ;
+  celldl:hasSource :Re_CIV ;
+  celldl:hasTarget :Se_H_c_CIV ;
+  bgf:hasSource :Re_CIV ;
+  bgf:hasTarget :Se_H_c_CIV ;
+  bgf:bondCount 4 .
+
+:q_cytc_red.Re_CIV a celldl:Connection ;
+  celldl:hasSource :q_cytc_red ;
+  celldl:hasTarget :Re_CIV ;
+  bgf:hasSource :q_cytc_red ;
+  bgf:hasTarget :Re_CIV ;
+  bgf:bondCount 4 .
+
+:Re_CIV.q_cytc_ox a celldl:Connection ;
+  celldl:hasSource :Re_CIV ;
+  celldl:hasTarget :q_cytc_ox ;
+  bgf:hasSource :Re_CIV ;
+  bgf:hasTarget :q_cytc_ox ;
+  bgf:bondCount 4 .
+
+:TF_f_CIV a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "385941.32848 C/mol"^^cdt:ucum .
+
+:TF_r_CIV a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-2.59106741415443e-06 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_CIV a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_CIV ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_CIV .
+
+:TF_f_CIV.Re_CIV a celldl:Connection ;
+  celldl:hasSource :TF_f_CIV ;
+  celldl:hasTarget :Re_CIV ;
+  bgf:hasSource :TF_f_CIV ;
+  bgf:hasTarget :Re_CIV .
+
+:Re_CIV.TF_r_CIV a celldl:Connection ;
+  celldl:hasSource :Re_CIV ;
+  celldl:hasTarget :TF_r_CIV ;
+  bgf:hasSource :Re_CIV ;
+  bgf:hasTarget :TF_r_CIV .
+
+:TF_r_CIV.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_CIV ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_CIV ;
+  bgf:hasTarget :C_m_m .
+
+:Re_ATPS a celldl:Component, bgf:SaturatingChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "ATPS" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "6.25546598443493 mol/s"^^cdt:ucum ] , [ bgf:varName "sigma" ; bgf:hasValue "7.51708947266385e-16 1"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:57720> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_H_c_ATPS a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-23809.6696634116 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_H_c_ATPS.Re_ATPS a celldl:Connection ;
+  celldl:hasSource :Se_H_c_ATPS ;
+  celldl:hasTarget :Re_ATPS ;
+  bgf:hasSource :Se_H_c_ATPS ;
+  bgf:hasTarget :Re_ATPS ;
+  bgf:bondCount 3 .
+
+:Se_H2O_ATPS a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H2O" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-50174.1146065699 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15377> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_ATPS.Se_H2O_ATPS a celldl:Connection ;
+  celldl:hasSource :Re_ATPS ;
+  celldl:hasTarget :Se_H2O_ATPS ;
+  bgf:hasSource :Re_ATPS ;
+  bgf:hasTarget :Se_H2O_ATPS .
+
+:Se_H_m_ATPS a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_ATPS.Se_H_m_ATPS a celldl:Connection ;
+  celldl:hasSource :Re_ATPS ;
+  celldl:hasTarget :Se_H_m_ATPS ;
+  bgf:hasSource :Re_ATPS ;
+  bgf:hasTarget :Se_H_m_ATPS ;
+  bgf:bondCount 2 .
+
+:q_ADP_m.Re_ATPS a celldl:Connection ;
+  celldl:hasSource :q_ADP_m ;
+  celldl:hasTarget :Re_ATPS ;
+  bgf:hasSource :q_ADP_m ;
+  bgf:hasTarget :Re_ATPS .
+
+:q_Pi_m.Re_ATPS a celldl:Connection ;
+  celldl:hasSource :q_Pi_m ;
+  celldl:hasTarget :Re_ATPS ;
+  bgf:hasSource :q_Pi_m ;
+  bgf:hasTarget :Re_ATPS .
+
+:Re_ATPS.q_ATP_m a celldl:Connection ;
+  celldl:hasSource :Re_ATPS ;
+  celldl:hasTarget :q_ATP_m ;
+  bgf:hasSource :Re_ATPS ;
+  bgf:hasTarget :q_ATP_m .
+
+:TF_f_ATPS a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-144727.99818 C/mol"^^cdt:ucum .
+
+:TF_r_ATPS a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "6.90951310441182e-06 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_ATPS a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_ATPS ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_ATPS .
+
+:TF_f_ATPS.Re_ATPS a celldl:Connection ;
+  celldl:hasSource :TF_f_ATPS ;
+  celldl:hasTarget :Re_ATPS ;
+  bgf:hasSource :TF_f_ATPS ;
+  bgf:hasTarget :Re_ATPS .
+
+:Re_ATPS.TF_r_ATPS a celldl:Connection ;
+  celldl:hasSource :Re_ATPS ;
+  celldl:hasTarget :TF_r_ATPS ;
+  bgf:hasSource :Re_ATPS ;
+  bgf:hasTarget :TF_r_ATPS .
+
+:TF_r_ATPS.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_ATPS ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_ATPS ;
+  bgf:hasTarget :C_m_m .
+
+:Re_LEAK a celldl:Component, bgf:ChemicalReactionNode ;
+  bgf:hasSymbol "Re" ;
+  bgf:hasSpecies "LEAK" ;
+  bgf:hasLocation "c" ;
+  bgf:parameterValue [ bgf:varName "kappa" ; bgf:hasValue "2.83961219234282e-13 mol/s"^^cdt:ucum ] ;
+  bqbiol:isVersionOf <https://identifiers.org/rhea:34979> ;
+  bqbiol:isVersionOf <https://identifiers.org/SBO:0000655> .
+
+:Se_H_c_LEAK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "c" ;
+  bgf:hasValue "-23809.6696634116 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005829> .
+
+:Se_H_c_LEAK.Re_LEAK a celldl:Connection ;
+  celldl:hasSource :Se_H_c_LEAK ;
+  celldl:hasTarget :Re_LEAK ;
+  bgf:hasSource :Se_H_c_LEAK ;
+  bgf:hasTarget :Re_LEAK .
+
+:Se_H_m_LEAK a celldl:Component, bgf:ChemicalPotential ;
+  bgf:hasSymbol "Se" ;
+  bgf:hasSpecies "H" ;
+  bgf:hasLocation "m" ;
+  bgf:hasValue "-26778.5429595894 J/mol"^^cdt:ucum ;
+  bqbiol:is <https://identifiers.org/CHEBI:15378> ;
+  bqbiol:isPartOf <https://identifiers.org/GO:0005759> .
+
+:Re_LEAK.Se_H_m_LEAK a celldl:Connection ;
+  celldl:hasSource :Re_LEAK ;
+  celldl:hasTarget :Se_H_m_LEAK ;
+  bgf:hasSource :Re_LEAK ;
+  bgf:hasTarget :Se_H_m_LEAK .
+
+:TF_f_LEAK a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "-48242.66606 C/mol"^^cdt:ucum .
+
+:TF_r_LEAK a celldl:Component, bgf:TransformerNode ;
+  bgf:hasSymbol "TF" ;
+  bgf:hasValue "2.07285393132355e-05 mol/C"^^cdt:ucum .
+
+:C_m_m.TF_f_LEAK a celldl:Connection ;
+  celldl:hasSource :C_m_m ;
+  celldl:hasTarget :TF_f_LEAK ;
+  bgf:hasSource :C_m_m ;
+  bgf:hasTarget :TF_f_LEAK .
+
+:TF_f_LEAK.Re_LEAK a celldl:Connection ;
+  celldl:hasSource :TF_f_LEAK ;
+  celldl:hasTarget :Re_LEAK ;
+  bgf:hasSource :TF_f_LEAK ;
+  bgf:hasTarget :Re_LEAK .
+
+:Re_LEAK.TF_r_LEAK a celldl:Connection ;
+  celldl:hasSource :Re_LEAK ;
+  celldl:hasTarget :TF_r_LEAK ;
+  bgf:hasSource :Re_LEAK ;
+  bgf:hasTarget :TF_r_LEAK .
+
+:TF_r_LEAK.C_m_m a celldl:Connection ;
+  celldl:hasSource :TF_r_LEAK ;
+  celldl:hasTarget :C_m_m ;
+  bgf:hasSource :TF_r_LEAK ;
+  bgf:hasTarget :C_m_m .

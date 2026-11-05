@@ -1,0 +1,7 @@
+module_type: heat_conduction_face
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Heat conduction between two thermal volumes (Fourier), the thermal counterpart of tissue_diffusion_face: G_th = open_flag
+  k_th A_f/(d_up + d_down), Q = G_th (T_up - T_down) into the downstream volume (Q_down = Q) and -Q into the upstream one
+  (Q_up = -Q). Conduction moves heat without creating any; its entropy production Q (1/T_down - 1/T_up) is >= 0. With one
+  side unconnected, that side''s temperature is a fixed boundary value.'

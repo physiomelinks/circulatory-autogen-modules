@@ -1,0 +1,12 @@
+module_type: glucose_carrier
+version: H_symport_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A glucose/H+ symporter of the major facilitator superfamily (GalP, LacY type; pao1998major), between the medium (entrance
+  medium_face_port) and the cytosol (exit cytosol_face_port, as the Glf face cell_membrane_face adaptive). Reaction glc_e
+  + n_H H_e <=> glc_i + n_H H_i, affinity A = RT ln(C_e/C_i) + W_H with W_H = n_H F (E_H - V) the proton motive force it uses
+  (about 12 kJ/mol at -105 mV and pH 7.6 in, 7.3 out: a 130-fold glucose gradient). Rate J = jmax m A_mem (C_e - C_i exp(-W_H/RT))/(K
+  + C_e): Michaelis-Menten in glucose outside with nothing inside, zero at equilibrium and of the sign of A, so J A >= 0.
+  The protons go to the cytosolic pool (j_H on H_flux, E_H from H_Nernst_potential) and carry a membrane current i = -F j_H
+  (membrane_current): the H+-ATPase pumps them out again, about 0.3 ATP per glucose (3 ATP per 10 H+). Km 0.1 mM, the middle
+  of the MFS sugar/H+ symporters'' 10 uM-1 mM; m = 1 is as many copies as the calibrated cell''s Glf; the turnover number
+  is a placeholder.'

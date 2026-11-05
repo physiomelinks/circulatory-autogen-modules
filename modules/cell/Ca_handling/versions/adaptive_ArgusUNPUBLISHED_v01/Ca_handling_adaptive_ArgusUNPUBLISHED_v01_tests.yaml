@@ -1,0 +1,11 @@
+module_type: Ca_handling
+version: adaptive_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Cytosolic Ca of a cell without an ER (a prokaryote): one free Ca pool with a fixed buffer, the bulk equations of SN_soma_Argus2026_v01
+  without its sub-membrane shell, pre-ER and ER compartments. dCai/dt = j_Ca_in/Vol + k_unbind CaB - k_bind Cai B, dB/dt =
+  k_unbind CaB - k_bind Cai B. The buffer equilibrates in about 1/(k_bind B) ~ 1 us, the stiffest part of the fermenter cell
+  (fixed-step solvers need very small steps; a rapid-buffer approximation is a candidate for the game).
+
+
+  Ports of the versions of Ca_handling (they differ): adaptive_ArgusUNPUBLISHED_v01 has internal_Ca, Ca_flux and compartment_volume
+  only.'

@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="ribosomes_adaptive_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="ribosomes">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- share of the upkeep not paid, 0-1 (ribosome_upkeep port from biosynthesis) -->
+        <variable name="x_unpaid" public_interface="in" units="dimensionless"/>
+        <!-- share of the upkeep paid, 1 - x_unpaid -->
+        <variable name="u_upkeep" public_interface="out" units="dimensionless"/>
+        <!-- ribosomes per cell at rest -->
+        <variable name="n_ribo_rest" public_interface="in" units="dimensionless"/>
+        <variable name="n_ribo_init" public_interface="in" units="dimensionless"/>
+        <!-- ribosomes in the cell -->
+        <variable initial_value="n_ribo_init" name="n_ribo" public_interface="out" units="dimensionless"/>
+        <!-- nt of rRNA per ribosome -->
+        <variable name="L_rRNA" public_interface="in" units="dimensionless"/>
+        <!-- rRNA turnover: the share of the ribosomes degraded each second and, when paid, remade from the recycled nucleotides -->
+        <variable name="k_ribo" public_interface="in" units="per_s"/>
+        <!-- rebuilding: ribosomes made per second per ribosome missing, with the upkeep paid -->
+        <variable name="k_ribo_build" public_interface="in" units="per_s"/>
+        <!-- steepness of rebuilding in the share paid: u^n_ribo_build -->
+        <variable name="n_ribo_build" public_interface="in" units="dimensionless"/>
+        <!-- ~P to remake a nucleotide from its NMP -->
+        <variable name="c_nt_recycle" public_interface="in" units="dimensionless"/>
+        <!-- ~P to make a nucleotide from glucose -->
+        <variable name="c_nt_denovo" public_interface="in" units="dimensionless"/>
+        <!-- amino acids in one ribosome's proteins -->
+        <variable name="aa_ribo" public_interface="in" units="dimensionless"/>
+        <!-- ~P to make an amino acid from glucose and polymerise it (c_syn + c_poly) -->
+        <variable name="c_aa_build" public_interface="in" units="dimensionless"/>
+        <variable name="N_A" public_interface="in" units="per_mol"/>
+        <!-- ribosomes relative to rest, n_ribo / n_ribo_rest (ribosomes port) -->
+        <variable name="x_ribo" public_interface="out" units="dimensionless"/>
+        <!-- ribosomes lost per second: the unpaid share of their turnover -->
+        <variable name="R_ribo_loss" public_interface="out" units="per_s"/>
+        <!-- ribosomes rebuilt per second -->
+        <variable name="R_ribo_build" public_interface="out" units="per_s"/>
+        <!-- ~P to build one ribosome de novo: its rRNA and its proteins -->
+        <variable name="c_ribo_build" public_interface="out" units="dimensionless"/>
+        <!-- rRNA upkeep paid: the turnover remade from recycled nucleotides -->
+        <variable name="J_ribo" public_interface="out" units="mol_per_s"/>
+        <!-- ATP spent rebuilding lost ribosomes -->
+        <variable name="J_ribo_build" public_interface="out" units="mol_per_s"/>
+        <!-- all ATP the ribosomes use, paid through biosynthesis (ribosome_upkeep port) -->
+        <variable name="J_ATP_ribo" public_interface="out" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>u_upkeep</ci>
+                <apply>
+                    <minus/>
+                    <cn cellml:units="dimensionless">1.0</cn>
+                    <ci>x_unpaid</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>x_ribo</ci>
+                <apply>
+                    <divide/>
+                    <ci>n_ribo</ci>
+                    <ci>n_ribo_rest</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_ribo_loss</ci>
+                <apply>
+                    <times/>
+                    <ci>k_ribo</ci>
+                    <ci>n_ribo</ci>
+                    <ci>x_unpaid</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>R_ribo_build</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>k_ribo_build</ci>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <minus/>
+                                    <ci>n_ribo_rest</ci>
+                                    <ci>n_ribo</ci>
+                                </apply>
+                                <apply>
+                                    <abs/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>n_ribo_rest</ci>
+                                        <ci>n_ribo</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                    </apply>
+                    <apply>
+                        <power/>
+                        <ci>u_upkeep</ci>
+                        <ci>n_ribo_build</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_ribo_build</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>L_rRNA</ci>
+                        <ci>c_nt_denovo</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>aa_ribo</ci>
+                        <ci>c_aa_build</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ribo</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <ci>n_ribo</ci>
+                            <ci>L_rRNA</ci>
+                            <ci>c_nt_recycle</ci>
+                            <ci>k_ribo</ci>
+                        </apply>
+                        <ci>N_A</ci>
+                    </apply>
+                    <ci>u_upkeep</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ribo_build</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>R_ribo_build</ci>
+                        <ci>c_ribo_build</ci>
+                    </apply>
+                    <ci>N_A</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_ribo</ci>
+                <apply>
+                    <plus/>
+                    <ci>J_ribo</ci>
+                    <ci>J_ribo_build</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>n_ribo</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>R_ribo_build</ci>
+                    <ci>R_ribo_loss</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

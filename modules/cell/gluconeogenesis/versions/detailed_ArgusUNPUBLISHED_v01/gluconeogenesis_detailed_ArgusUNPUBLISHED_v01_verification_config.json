@@ -1,0 +1,125 @@
+{
+  "module_type": "gluconeogenesis",
+  "version": "detailed_ArgusUNPUBLISHED_v01",
+  "sim_time": 600.0,
+  "pre_time": 0.0,
+  "dt": 0.1,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-12
+  },
+  "outputs": [
+    "C_Gly3P",
+    "v_FBPASE",
+    "v_G6PASE",
+    "v_GK",
+    "v_G3PDH",
+    "j_F16BP",
+    "j_F6P",
+    "j_G6P",
+    "j_glc",
+    "j_DHAP",
+    "j_glycerol",
+    "j_NAD",
+    "j_NADH",
+    "j_ATP",
+    "j_ADP",
+    "j_Pi",
+    "j_H",
+    "j_H2O",
+    "A_FBPASE",
+    "A_G6PASE",
+    "A_GK",
+    "A_G3PDH",
+    "P_diss"
+  ],
+  "run_parameters": {
+    "C_glycerol": 1.0
+  },
+  "invariants": [
+    {
+      "description": "second law: every reaction runs down its affinity, v A >= 0, so P_diss >= 0",
+      "expr": "np.all(v_FBPASE*A_FBPASE >= -1e-12*np.abs(v_FBPASE).max()*np.abs(A_FBPASE).max()) and np.all(v_G6PASE*A_G6PASE >= -1e-12*np.abs(v_G6PASE).max()*np.abs(A_G6PASE).max()) and np.all(v_GK*A_GK >= -1e-12*np.abs(v_GK).max()*np.abs(A_GK).max()) and np.all(v_G3PDH*A_G3PDH >= -1e-12*np.abs(v_G3PDH).max()*np.abs(A_G3PDH).max()) and np.all(P_diss >= -1e-9*np.abs(P_diss).max())"
+    },
+    {
+      "description": "the ports report each chemostat's net production: j_glc = v_G6PASE, j_F6P = v_FBPASE, j_glycerol = -v_GK, j_DHAP = v_G3PDH (exact)",
+      "expr": "np.allclose(j_glc, v_G6PASE, rtol=1e-12, atol=0) and np.allclose(j_F6P, v_FBPASE, rtol=1e-12, atol=0) and np.allclose(j_glycerol, -v_GK, rtol=1e-12, atol=0) and np.allclose(j_DHAP, v_G3PDH, rtol=1e-12, atol=0)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "C_glycerol": [
+        0.01,
+        5.0
+      ],
+      "C_NADH": [
+        0.0001,
+        0.05
+      ],
+      "C_F16BP": [
+        0.002,
+        0.2
+      ],
+      "C_G6P": [
+        0.02,
+        2.0
+      ],
+      "C_glc": [
+        1.0,
+        20.0
+      ],
+      "C_ATP": [
+        1.0,
+        5.0
+      ],
+      "C_Pi": [
+        0.5,
+        10.0
+      ]
+    },
+    "exclude": [
+      "R",
+      "T",
+      "C_H2O",
+      "mu0_F16BP",
+      "mu0_F6P",
+      "mu0_G6P",
+      "mu0_glc",
+      "mu0_DHAP",
+      "mu0_glycerol",
+      "mu0_NAD",
+      "mu0_NADH",
+      "mu0_ATP",
+      "mu0_ADP",
+      "mu0_Pi",
+      "mu0_H",
+      "mu0_H2O",
+      "mu0_Gly3P"
+    ],
+    "rationale": "glycerol from trace to a fat-mobilising load; NADH/NAD+ from respiring to fermenting; the sugar phosphates and glucose over an order of magnitude"
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      4e-05,
+      2e-05,
+      1e-05
+    ],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-09
+      }
+    ],
+    "t_end": 10.0,
+    "time_budget": 10
+  }
+}

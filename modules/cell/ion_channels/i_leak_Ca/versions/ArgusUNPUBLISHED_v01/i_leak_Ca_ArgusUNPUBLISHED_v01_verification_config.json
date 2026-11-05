@@ -1,0 +1,38 @@
+{
+  "module_type": "i_leak_Ca",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "g_leak_Ca",
+    "E_Ca",
+    "i_leak_Ca",
+    "j_leak_Ca"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "Ohmic leak at the Ca Nernst potential; j = -i/(2F) (exact)",
+      "expr": "np.allclose(E_Ca, 1000*R*T/(2*F)*np.log(Cao/Cai), rtol=1e-12, atol=0) and np.allclose(i_leak_Ca, g_leak_Ca*(V - E_Ca), rtol=1e-12, atol=0) and np.allclose(j_leak_Ca, -i_leak_Ca/(2*F)*1e-9, rtol=1e-12, atol=0)"
+    },
+    {
+      "description": "second law: the leak runs down its electrochemical gradient, i (V - E_Ca) >= 0",
+      "expr": "np.all(i_leak_Ca*(V - E_Ca) >= 0)"
+    }
+  ],
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

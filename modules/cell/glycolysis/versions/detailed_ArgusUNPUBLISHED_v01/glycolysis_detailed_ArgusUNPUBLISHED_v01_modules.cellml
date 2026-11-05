@@ -1,0 +1,1986 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="glycolysis_detailed_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="glycolysis_detailed">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <!-- standard chemical potential of glucose (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_glc" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_glc" public_interface="in" units="millimolar"/>
+        <!-- glucose in the cytosol (metabolite port) -->
+        <variable name="C_glc" public_interface="in" units="millimolar"/>
+        <!-- net production of glucose here -->
+        <variable name="j_glc" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of glucose 6-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_G6P" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_G6P" public_interface="in" units="millimolar"/>
+        <variable name="C_G6P_init" public_interface="in" units="millimolar"/>
+        <!-- glucose 6-phosphate -->
+        <variable initial_value="C_G6P_init" name="C_G6P" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of fructose 6-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_F6P" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_F6P" public_interface="in" units="millimolar"/>
+        <variable name="C_F6P_init" public_interface="in" units="millimolar"/>
+        <!-- fructose 6-phosphate -->
+        <variable initial_value="C_F6P_init" name="C_F6P" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of fructose 1,6-bisphosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_F16BP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_F16BP" public_interface="in" units="millimolar"/>
+        <variable name="C_F16BP_init" public_interface="in" units="millimolar"/>
+        <!-- fructose 1,6-bisphosphate -->
+        <variable initial_value="C_F16BP_init" name="C_F16BP" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of dihydroxyacetone phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_DHAP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_DHAP" public_interface="in" units="millimolar"/>
+        <variable name="C_DHAP_init" public_interface="in" units="millimolar"/>
+        <!-- dihydroxyacetone phosphate -->
+        <variable initial_value="C_DHAP_init" name="C_DHAP" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of glyceraldehyde 3-phosphate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_GAP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_GAP" public_interface="in" units="millimolar"/>
+        <variable name="C_GAP_init" public_interface="in" units="millimolar"/>
+        <!-- glyceraldehyde 3-phosphate -->
+        <variable initial_value="C_GAP_init" name="C_GAP" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of 1,3-bisphosphoglycerate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_BPG13" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_BPG13" public_interface="in" units="millimolar"/>
+        <variable name="C_BPG13_init" public_interface="in" units="millimolar"/>
+        <!-- 1,3-bisphosphoglycerate -->
+        <variable initial_value="C_BPG13_init" name="C_BPG13" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of 3-phosphoglycerate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_PG3" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_PG3" public_interface="in" units="millimolar"/>
+        <variable name="C_PG3_init" public_interface="in" units="millimolar"/>
+        <!-- 3-phosphoglycerate -->
+        <variable initial_value="C_PG3_init" name="C_PG3" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of 2-phosphoglycerate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_PG2" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_PG2" public_interface="in" units="millimolar"/>
+        <variable name="C_PG2_init" public_interface="in" units="millimolar"/>
+        <!-- 2-phosphoglycerate -->
+        <variable initial_value="C_PG2_init" name="C_PG2" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of phosphoenolpyruvate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_PEP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_PEP" public_interface="in" units="millimolar"/>
+        <variable name="C_PEP_init" public_interface="in" units="millimolar"/>
+        <!-- phosphoenolpyruvate -->
+        <variable initial_value="C_PEP_init" name="C_PEP" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of pyruvate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pyr" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pyr" public_interface="in" units="millimolar"/>
+        <variable name="C_Pyr_init" public_interface="in" units="millimolar"/>
+        <!-- pyruvate -->
+        <variable initial_value="C_Pyr_init" name="C_Pyr" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of lactate (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_lac" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_lac" public_interface="in" units="millimolar"/>
+        <!-- lactate in the cytosol (metabolite port) -->
+        <variable name="C_lac" public_interface="in" units="millimolar"/>
+        <!-- net production of lactate here -->
+        <variable name="j_lac" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of NAD+ (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_NAD" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_NAD" public_interface="in" units="millimolar"/>
+        <variable name="C_NAD_init" public_interface="in" units="millimolar"/>
+        <!-- NAD+ -->
+        <variable initial_value="C_NAD_init" name="C_NAD" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of NADH (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_NADH" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_NADH" public_interface="in" units="millimolar"/>
+        <variable name="C_NADH_init" public_interface="in" units="millimolar"/>
+        <!-- NADH -->
+        <variable initial_value="C_NADH_init" name="C_NADH" public_interface="out" units="millimolar"/>
+        <!-- standard chemical potential of ATP (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ATP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ATP" public_interface="in" units="millimolar"/>
+        <!-- ATP in the cytosol (metabolite port) -->
+        <variable name="C_ATP" public_interface="in" units="millimolar"/>
+        <!-- net production of ATP here -->
+        <variable name="j_ATP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of ADP (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_ADP" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_ADP" public_interface="in" units="millimolar"/>
+        <!-- ADP in the cytosol (metabolite port) -->
+        <variable name="C_ADP" public_interface="in" units="millimolar"/>
+        <!-- net production of ADP here -->
+        <variable name="j_ADP" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of phosphate (HPO4 2-) (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_Pi" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_Pi" public_interface="in" units="millimolar"/>
+        <!-- phosphate (HPO4 2-) in the cytosol (metabolite port) -->
+        <variable name="C_Pi" public_interface="in" units="millimolar"/>
+        <!-- net production of phosphate (HPO4 2-) here -->
+        <variable name="j_Pi" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of H+ (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H" public_interface="in" units="millimolar"/>
+        <!-- H+ in the cytosol (metabolite port) -->
+        <variable name="C_H" public_interface="in" units="millimolar"/>
+        <!-- net production of H+ here -->
+        <variable name="j_H" public_interface="out" units="millimolar_per_s"/>
+        <!-- standard chemical potential of water (from the reactions' Gibbs energies, tools/bondgraph.py) -->
+        <variable name="mu0_H2O" public_interface="in" units="J_per_mol"/>
+        <variable name="c_std_H2O" public_interface="in" units="millimolar"/>
+        <!-- water in the cytosol (metabolite port) -->
+        <variable name="C_H2O" public_interface="in" units="millimolar"/>
+        <!-- net production of water here -->
+        <variable name="j_H2O" public_interface="out" units="millimolar_per_s"/>
+        <!-- hexokinase: rate constant -->
+        <variable name="kappa_HK" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_HK" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_HK" public_interface="out" units="dimensionless"/>
+        <!-- hexokinase -->
+        <variable name="v_HK" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_HK" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_HK" public_interface="in" units="dimensionless"/>
+        <!-- glucose-6-phosphate isomerase: rate constant -->
+        <variable name="kappa_PGI" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PGI" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PGI" public_interface="out" units="dimensionless"/>
+        <!-- glucose-6-phosphate isomerase -->
+        <variable name="v_PGI" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PGI" public_interface="out" units="J_per_mol"/>
+        <!-- phosphofructokinase: rate constant -->
+        <variable name="kappa_PFK" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PFK" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PFK" public_interface="out" units="dimensionless"/>
+        <!-- phosphofructokinase -->
+        <variable name="v_PFK" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PFK" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_PFK" public_interface="in" units="dimensionless"/>
+        <!-- aldolase: rate constant -->
+        <variable name="kappa_ALD" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_ALD" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_ALD" public_interface="out" units="dimensionless"/>
+        <!-- aldolase -->
+        <variable name="v_ALD" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_ALD" public_interface="out" units="J_per_mol"/>
+        <!-- triose-phosphate isomerase: rate constant -->
+        <variable name="kappa_TPI" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_TPI" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_TPI" public_interface="out" units="dimensionless"/>
+        <!-- triose-phosphate isomerase -->
+        <variable name="v_TPI" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_TPI" public_interface="out" units="J_per_mol"/>
+        <!-- glyceraldehyde-3-P dehydrogenase: rate constant -->
+        <variable name="kappa_GAPDH" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_GAPDH" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_GAPDH" public_interface="out" units="dimensionless"/>
+        <!-- glyceraldehyde-3-P dehydrogenase -->
+        <variable name="v_GAPDH" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_GAPDH" public_interface="out" units="J_per_mol"/>
+        <!-- phosphoglycerate kinase: rate constant -->
+        <variable name="kappa_PGK" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PGK" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PGK" public_interface="out" units="dimensionless"/>
+        <!-- phosphoglycerate kinase -->
+        <variable name="v_PGK" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PGK" public_interface="out" units="J_per_mol"/>
+        <!-- phosphoglycerate mutase: rate constant -->
+        <variable name="kappa_PGM" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PGM" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PGM" public_interface="out" units="dimensionless"/>
+        <!-- phosphoglycerate mutase -->
+        <variable name="v_PGM" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PGM" public_interface="out" units="J_per_mol"/>
+        <!-- enolase: rate constant -->
+        <variable name="kappa_ENO" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_ENO" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_ENO" public_interface="out" units="dimensionless"/>
+        <!-- enolase -->
+        <variable name="v_ENO" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_ENO" public_interface="out" units="J_per_mol"/>
+        <!-- pyruvate kinase: rate constant -->
+        <variable name="kappa_PK" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_PK" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_PK" public_interface="out" units="dimensionless"/>
+        <!-- pyruvate kinase -->
+        <variable name="v_PK" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_PK" public_interface="out" units="J_per_mol"/>
+        <!-- activation of pyruvate kinase by F16BP -->
+        <variable name="Ka_F16BP_PK" public_interface="in" units="millimolar"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_PK" public_interface="in" units="dimensionless"/>
+        <!-- lactate dehydrogenase: rate constant -->
+        <variable name="kappa_LDH" public_interface="in" units="millimolar_per_s"/>
+        <!-- exp(forward affinity / RT) -->
+        <variable name="Pf_LDH" public_interface="out" units="dimensionless"/>
+        <!-- exp(reverse affinity / RT) -->
+        <variable name="Pr_LDH" public_interface="out" units="dimensionless"/>
+        <!-- lactate dehydrogenase -->
+        <variable name="v_LDH" public_interface="out" units="millimolar_per_s"/>
+        <!-- affinity: minus the reaction's Gibbs energy -->
+        <variable name="A_LDH" public_interface="out" units="J_per_mol"/>
+        <!-- saturation (half-saturated at Pf = sigma) -->
+        <variable name="sigma_LDH" public_interface="in" units="dimensionless"/>
+        <!-- free energy dissipated, sum v A (&gt;= 0, second law) -->
+        <variable name="P_diss" public_interface="out" units="W_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Pf_HK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_glc</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_glc</ci>
+                        </apply>
+                        <ci>c_std_glc</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP</ci>
+                        </apply>
+                        <ci>c_std_ATP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_HK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_G6P</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_G6P</ci>
+                        </apply>
+                        <ci>c_std_G6P</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP</ci>
+                        </apply>
+                        <ci>c_std_ADP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_HK</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_HK</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_HK</ci>
+                            <ci>Pr_HK</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_HK</ci>
+                                <ci>Pr_HK</ci>
+                            </apply>
+                            <ci>sigma_HK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_HK</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_HK</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_HK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PGI</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_G6P</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_G6P</ci>
+                    </apply>
+                    <ci>c_std_G6P</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PGI</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_F6P</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_F6P</ci>
+                    </apply>
+                    <ci>c_std_F6P</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PGI</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_PGI</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_PGI</ci>
+                        <ci>Pr_PGI</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PGI</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PGI</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PGI</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PFK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_F6P</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_F6P</ci>
+                        </apply>
+                        <ci>c_std_F6P</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP</ci>
+                        </apply>
+                        <ci>c_std_ATP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PFK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_F16BP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_F16BP</ci>
+                        </apply>
+                        <ci>c_std_F16BP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP</ci>
+                        </apply>
+                        <ci>c_std_ADP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PFK</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_PFK</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_PFK</ci>
+                            <ci>Pr_PFK</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_PFK</ci>
+                                <ci>Pr_PFK</ci>
+                            </apply>
+                            <ci>sigma_PFK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PFK</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PFK</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PFK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_ALD</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_F16BP</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_F16BP</ci>
+                    </apply>
+                    <ci>c_std_F16BP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_ALD</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_DHAP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_DHAP</ci>
+                        </apply>
+                        <ci>c_std_DHAP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_GAP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_GAP</ci>
+                        </apply>
+                        <ci>c_std_GAP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_ALD</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_ALD</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_ALD</ci>
+                        <ci>Pr_ALD</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_ALD</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_ALD</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_ALD</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_TPI</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_DHAP</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_DHAP</ci>
+                    </apply>
+                    <ci>c_std_DHAP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_TPI</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_GAP</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_GAP</ci>
+                    </apply>
+                    <ci>c_std_GAP</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_TPI</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_TPI</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_TPI</ci>
+                        <ci>Pr_TPI</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_TPI</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_TPI</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_TPI</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_GAPDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_GAP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_GAP</ci>
+                        </apply>
+                        <ci>c_std_GAP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pi</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pi</ci>
+                        </apply>
+                        <ci>c_std_Pi</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD</ci>
+                        </apply>
+                        <ci>c_std_NAD</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_GAPDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_BPG13</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_BPG13</ci>
+                        </apply>
+                        <ci>c_std_BPG13</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH</ci>
+                        </apply>
+                        <ci>c_std_NADH</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_GAPDH</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_GAPDH</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_GAPDH</ci>
+                        <ci>Pr_GAPDH</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_GAPDH</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_GAPDH</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_GAPDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PGK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_BPG13</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_BPG13</ci>
+                        </apply>
+                        <ci>c_std_BPG13</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP</ci>
+                        </apply>
+                        <ci>c_std_ADP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PGK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_PG3</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_PG3</ci>
+                        </apply>
+                        <ci>c_std_PG3</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP</ci>
+                        </apply>
+                        <ci>c_std_ATP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PGK</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_PGK</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_PGK</ci>
+                        <ci>Pr_PGK</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PGK</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PGK</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PGK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PGM</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_PG3</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_PG3</ci>
+                    </apply>
+                    <ci>c_std_PG3</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PGM</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_PG2</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_PG2</ci>
+                    </apply>
+                    <ci>c_std_PG2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PGM</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_PGM</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_PGM</ci>
+                        <ci>Pr_PGM</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PGM</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PGM</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PGM</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_ENO</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <exp/>
+                            <apply>
+                                <divide/>
+                                <ci>mu0_PG2</ci>
+                                <apply>
+                                    <times/>
+                                    <ci>R</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <ci>C_PG2</ci>
+                    </apply>
+                    <ci>c_std_PG2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_ENO</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_PEP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_PEP</ci>
+                        </apply>
+                        <ci>c_std_PEP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H2O</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H2O</ci>
+                        </apply>
+                        <ci>c_std_H2O</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_ENO</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_ENO</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Pf_ENO</ci>
+                        <ci>Pr_ENO</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_ENO</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_ENO</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_ENO</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_PK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_PEP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_PEP</ci>
+                        </apply>
+                        <ci>c_std_PEP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ADP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ADP</ci>
+                        </apply>
+                        <ci>c_std_ADP</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_PK</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pyr</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pyr</ci>
+                        </apply>
+                        <ci>c_std_Pyr</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_ATP</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_ATP</ci>
+                        </apply>
+                        <ci>c_std_ATP</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_PK</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_PK</ci>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">1.0</cn>
+                            <apply>
+                                <divide/>
+                                <ci>C_F16BP</ci>
+                                <ci>Ka_F16BP_PK</ci>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_PK</ci>
+                            <ci>Pr_PK</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_PK</ci>
+                                <ci>Pr_PK</ci>
+                            </apply>
+                            <ci>sigma_PK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_PK</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_PK</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_PK</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pf_LDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_Pyr</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_Pyr</ci>
+                        </apply>
+                        <ci>c_std_Pyr</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NADH</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NADH</ci>
+                        </apply>
+                        <ci>c_std_NADH</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_H</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_H</ci>
+                        </apply>
+                        <ci>c_std_H</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Pr_LDH</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_lac</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_lac</ci>
+                        </apply>
+                        <ci>c_std_lac</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <ci>mu0_NAD</ci>
+                                    <apply>
+                                        <times/>
+                                        <ci>R</ci>
+                                        <ci>T</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                            <ci>C_NAD</ci>
+                        </apply>
+                        <ci>c_std_NAD</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_LDH</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>kappa_LDH</ci>
+                        <apply>
+                            <minus/>
+                            <ci>Pf_LDH</ci>
+                            <ci>Pr_LDH</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <plus/>
+                                <ci>Pf_LDH</ci>
+                                <ci>Pr_LDH</ci>
+                            </apply>
+                            <ci>sigma_LDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_LDH</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <ln/>
+                            <ci>Pf_LDH</ci>
+                        </apply>
+                        <apply>
+                            <ln/>
+                            <ci>Pr_LDH</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_glc</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_HK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_G6P</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_HK</ci>
+                    <ci>v_PGI</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_F6P</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_PGI</ci>
+                    <ci>v_PFK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_F16BP</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_PFK</ci>
+                    <ci>v_ALD</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_DHAP</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_ALD</ci>
+                    <ci>v_TPI</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_GAP</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <ci>v_ALD</ci>
+                        <ci>v_TPI</ci>
+                    </apply>
+                    <ci>v_GAPDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_BPG13</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_GAPDH</ci>
+                    <ci>v_PGK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_PG3</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_PGK</ci>
+                    <ci>v_PGM</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_PG2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_PGM</ci>
+                    <ci>v_ENO</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_PEP</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_ENO</ci>
+                    <ci>v_PK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_Pyr</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_PK</ci>
+                    <ci>v_LDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_lac</ci>
+                <ci>v_LDH</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_NAD</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_GAPDH</ci>
+                    </apply>
+                    <ci>v_LDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>C_NADH</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_GAPDH</ci>
+                    <ci>v_LDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ATP</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <minus/>
+                            <ci>v_HK</ci>
+                        </apply>
+                        <ci>v_PFK</ci>
+                    </apply>
+                    <ci>v_PGK</ci>
+                    <ci>v_PK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_ADP</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>v_HK</ci>
+                            <ci>v_PFK</ci>
+                        </apply>
+                        <ci>v_PGK</ci>
+                    </apply>
+                    <ci>v_PK</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_Pi</ci>
+                <apply>
+                    <minus/>
+                    <ci>v_GAPDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>v_HK</ci>
+                            <ci>v_PFK</ci>
+                            <ci>v_GAPDH</ci>
+                        </apply>
+                        <ci>v_PK</ci>
+                    </apply>
+                    <ci>v_LDH</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H2O</ci>
+                <ci>v_ENO</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_diss</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>v_HK</ci>
+                        <ci>A_HK</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PGI</ci>
+                        <ci>A_PGI</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PFK</ci>
+                        <ci>A_PFK</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_ALD</ci>
+                        <ci>A_ALD</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_TPI</ci>
+                        <ci>A_TPI</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_GAPDH</ci>
+                        <ci>A_GAPDH</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PGK</ci>
+                        <ci>A_PGK</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PGM</ci>
+                        <ci>A_PGM</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_ENO</ci>
+                        <ci>A_ENO</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_PK</ci>
+                        <ci>A_PK</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>v_LDH</ci>
+                        <ci>A_LDH</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

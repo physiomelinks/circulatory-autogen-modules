@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="glucose_carrier_H_symport_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="glucose_carrier_H_symport">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- medium side (entrance medium_face_port) -->
+        <variable name="C_glc_e" public_interface="in" units="millimolar"/>
+        <!-- carried for the port -->
+        <variable name="C_lac_e" public_interface="in" units="millimolar"/>
+        <!-- cytosol side (exit cytosol_face_port) -->
+        <variable name="C_glc" public_interface="in" units="millimolar"/>
+        <!-- carried for the port -->
+        <variable name="C_lac" public_interface="in" units="millimolar"/>
+        <variable name="C_ATP" public_interface="in" units="millimolar"/>
+        <variable name="C_ADP" public_interface="in" units="millimolar"/>
+        <variable name="C_Pi" public_interface="in" units="millimolar"/>
+        <variable name="A_mem" public_interface="in" units="um2"/>
+        <!-- expression (protein_expression port): n_0 copies at 1 -->
+        <variable name="m_expr" public_interface="in" units="dimensionless"/>
+        <!-- capacity per membrane area at m_expr = 1 -->
+        <variable name="jmax_glc" public_interface="in" units="mol_per_s_per_um2"/>
+        <!-- affinity for glucose outside -->
+        <variable name="K_glc_t" public_interface="in" units="millimolar"/>
+        <variable name="R" public_interface="in" units="J_per_mol_K"/>
+        <variable name="T" public_interface="in" units="kelvin"/>
+        <!-- glucose into the cell -->
+        <variable name="J_glc" public_interface="out" units="mol_per_s"/>
+        <!-- affinity of one transport cycle (&gt; 0 drives glucose in) -->
+        <variable name="A_glc" public_interface="out" units="J_per_mol"/>
+        <variable name="J_glc_e" public_interface="out" units="mol_per_s"/>
+        <variable name="J_lac_e" public_interface="out" units="mol_per_s"/>
+        <variable name="J_glc_c" public_interface="out" units="mol_per_s"/>
+        <variable name="J_lac_c" public_interface="out" units="mol_per_s"/>
+        <!-- ATP, ADP and Pi do not cross -->
+        <variable name="J_ATP_c" public_interface="out" units="mol_per_s"/>
+        <variable name="J_ADP_c" public_interface="out" units="mol_per_s"/>
+        <variable name="J_Pi_c" public_interface="out" units="mol_per_s"/>
+        <!-- H+ per glucose -->
+        <variable name="n_H" public_interface="in" units="dimensionless"/>
+        <variable name="V" public_interface="in" units="milliV"/>
+        <!-- H+ Nernst potential (H_Nernst_potential port) -->
+        <variable name="E_H" public_interface="in" units="milliV"/>
+        <variable name="F" public_interface="in" units="C_per_mol"/>
+        <variable name="c_std" public_interface="in" units="millimolar"/>
+        <!-- free energy released by n_H H+ entering: n_H F (E_H - V) -->
+        <variable name="W_H" public_interface="out" units="J_per_mol"/>
+        <!-- H+ into the cell (H_flux port) -->
+        <variable name="j_H" public_interface="out" units="mol_per_s"/>
+        <!-- current of the H+ carried in (positive outward) -->
+        <variable name="i_glc_H" public_interface="out" units="nanoA"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>W_H</ci>
+                <apply>
+                    <times/>
+                    <ci>n_H</ci>
+                    <ci>F</ci>
+                    <apply>
+                        <minus/>
+                        <ci>E_H</ci>
+                        <ci>V</ci>
+                    </apply>
+                    <cn cellml:units="V_per_milliV">0.001</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>jmax_glc</ci>
+                        <ci>m_expr</ci>
+                        <ci>A_mem</ci>
+                        <apply>
+                            <minus/>
+                            <ci>C_glc_e</ci>
+                            <apply>
+                                <times/>
+                                <ci>C_glc</ci>
+                                <apply>
+                                    <exp/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <minus/>
+                                            <ci>W_H</ci>
+                                        </apply>
+                                        <apply>
+                                            <times/>
+                                            <ci>R</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>K_glc_t</ci>
+                        <ci>C_glc_e</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>A_glc</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>R</ci>
+                        <ci>T</ci>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <ln/>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <abs/>
+                                        <apply>
+                                            <divide/>
+                                            <ci>C_glc_e</ci>
+                                            <ci>c_std</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                                </apply>
+                            </apply>
+                            <apply>
+                                <ln/>
+                                <apply>
+                                    <plus/>
+                                    <apply>
+                                        <abs/>
+                                        <apply>
+                                            <divide/>
+                                            <ci>C_glc</ci>
+                                            <ci>c_std</ci>
+                                        </apply>
+                                    </apply>
+                                    <cn cellml:units="dimensionless" type="e-notation">1<sep/>-300</cn>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                    <ci>W_H</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>j_H</ci>
+                <apply>
+                    <times/>
+                    <ci>n_H</ci>
+                    <ci>J_glc</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>i_glc_H</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <minus/>
+                        <ci>F</ci>
+                    </apply>
+                    <ci>j_H</ci>
+                    <cn cellml:units="nanoA_per_A">1000000000.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc_e</ci>
+                <apply>
+                    <minus/>
+                    <ci>J_glc</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac_e</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_glc_c</ci>
+                <ci>J_glc</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_lac_c</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ATP_c</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_ADP_c</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>J_Pi_c</ci>
+                <cn cellml:units="mol_per_s">0.0</cn>
+            </apply>
+        </math>
+    </component>
+</model>

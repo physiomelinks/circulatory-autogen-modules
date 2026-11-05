@@ -1,0 +1,15 @@
+{
+ "schema_version": 1,
+ "global": {
+  "R": {"value": 8.314, "units": "J_per_mol_K", "data_reference": "definitional; gas constant, as the library's SN modules", "sourced": "no"},
+  "T": {"value": 293.15, "units": "kelvin", "data_reference": "lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to", "sourced": "yes"},
+  "F": {"value": 96485.0, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, as the library's SN modules", "sourced": "no"}
+ },
+ "H_i_init": {"value": 2.5118864315095822e-05, "units": "millimolar", "data_reference": "derived: free H+ = 10^-pH_i M (pH_i: slonczewski1981ph, sourced)", "sourced": "yes"},
+ "H_o": {"value": 5.011872336272725e-05, "units": "millimolar", "data_reference": "derived: free H+ = 10^-pH_o M (pH_o: halevy2017geologic, placeholder)", "sourced": "no"},
+ "beta_H": {"value": 50.0, "units": "millimolar", "data_reference": "slonczewski1982effects; E. coli cytoplasmic buffering about 50 mM per pH unit", "sourced": "yes"},
+ "c_std": {"value": 1000.0, "units": "millimolar", "data_reference": "definitional; standard concentration 1 M for thermodynamic factors", "sourced": "no"},
+ "j_H_in": {"value": 0.0, "units": "mol_per_s", "data_reference": "no H+ pathway connected", "sourced": "no"},
+ "j_H_prod": {"value": 0.0, "units": "mol_per_s", "data_reference": "no reaction connected", "sourced": "no"},
+ "Vol": {"value": 6.283185307179586e-18, "units": "m3", "data_reference": "geometry: disc of radius 1 um, 2 um deep", "sourced": "no"}
+}

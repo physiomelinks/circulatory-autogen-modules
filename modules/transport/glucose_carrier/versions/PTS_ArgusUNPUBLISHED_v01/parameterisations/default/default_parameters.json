@@ -1,0 +1,22 @@
+{
+ "schema_version": 1,
+ "global": {
+  "R": {"value": 8.314, "units": "J_per_mol_K", "data_reference": "definitional; gas constant, as the library's SN modules", "sourced": "no"},
+  "T": {"value": 293.15, "units": "kelvin", "data_reference": "lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to", "sourced": "yes"}
+ },
+ "C_glc_e": {"value": 0.1, "units": "millimolar", "data_reference": "unreferenced_placeholder; glucose in the medium between food: a lean background, 0.1 mM (open-ocean dissolved glucose is nM-uM; placeholder). The cell is calibrated to just maintain itself here, so growth needs food", "sourced": "no"},
+ "C_lac_e": {"value": 0.0, "units": "millimolar", "data_reference": "definitional; no lactate in the medium", "sourced": "no"},
+ "A_mem": {"value": 12.566370614359172, "units": "um2", "data_reference": "geometry: in-plane membrane of the 2 um cell", "sourced": "no"},
+ "m_expr": {"value": 1.0, "units": "dimensionless", "data_reference": "definitional; n_0 copies, as many as the calibrated cell has Glf", "sourced": "no"},
+ "jmax_glc": {"value": 3.0933897205955476e-19, "units": "mol_per_s_per_um2", "data_reference": "derived: n_0 x turnover_PTS / N_A / A_mem: m = 1 has as many copies as the calibrated cell's Glf (turnover_PTS: unreferenced_placeholder, placeholder; turnover_Glf: unreferenced_placeholder, placeholder)", "sourced": "no"},
+ "K_glc_t": {"value": 0.005, "units": "millimolar", "data_reference": "deutscher2006how; glucose PTS (PtsG/EIICB-Glc) Km ~3-10 uM; 5 uM, inside the range (as summarised in AdaptOrDeity research notes docs/research/food-uptake-and-extracellular-space.md (2026-10-12))", "sourced": "yes"},
+ "K_m_ATP": {"value": 0.1, "units": "millimolar", "data_reference": "unreferenced_placeholder; ATP (for the PTS, PEP in ATP equivalents) for half-rate of the ATP-coupled glucose carriers; order 0.1 mM", "sourced": "no"},
+ "K_ADP_PEP": {"value": 0.2, "units": "millimolar", "data_reference": "chassagnole2002dynamic; lumped glycolysis affinity for ADP: the ADP constants of its two ATP-making steps in the E. coli kinetic model, PGK 0.185 and pyruvate kinase 0.26 mM (BIOMD0000000051)", "sourced": "yes"},
+ "K_Pi_PEP": {"value": 0.5, "units": "millimolar", "data_reference": "eyschen1999engineered; lumped glycolysis affinity for Pi: E. coli glyceraldehyde-3-phosphate dehydrogenase Km(Pi) 0.53 mM", "sourced": "yes"},
+ "ATP": {"value": 9.6, "units": "millimolar", "data_reference": "bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM", "sourced": "yes"},
+ "ADP": {"value": 0.56, "units": "millimolar", "data_reference": "bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)", "sourced": "yes"},
+ "Pi": {"value": 10.0, "units": "millimolar", "data_reference": "amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells", "sourced": "yes"},
+ "C_G6P": {"value": 1.0, "units": "millimolar", "data_reference": "chassagnole2002dynamic; glucose 6-phosphate in the resting cell, a chosen operating point in the measured range: E. coli in glucose-limited chemostat culture (D = 0.1 /h) 3.48 mM G6P (Chassagnole et al. 2002, Table V; the initial value of their model, BioModels BIOMD0000000051), exponentially growing on glucose 8.8 mM hexose phosphates (G6P + F6P + G1P; Bennett et al. 2009, Table 1, which does not resolve G6P). 1 mM, below the growing cells' values, as the level-1 cell runs at its maintenance flux (confidence: medium; the range 0.5-4 mM is well supported, the exact resting value is a choice)", "sourced": "no"},
+ "dG0_hk": {"value": -17900.0, "units": "J_per_mol", "data_reference": "beber2022equilibrator; glucose + ATP -> glucose 6-phosphate + ADP: -17.9 +- 0.8 kJ/mol, eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set", "sourced": "yes"},
+ "c_std": {"value": 1000.0, "units": "millimolar", "data_reference": "definitional; standard concentration 1 M for thermodynamic factors", "sourced": "no"}
+}

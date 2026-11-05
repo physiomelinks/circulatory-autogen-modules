@@ -1,0 +1,72 @@
+{
+  "module_type": "glucose_carrier",
+  "version": "ATP_ArgusUNPUBLISHED_v01",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-14
+  },
+  "outputs": [
+    "J_glc",
+    "A_glc",
+    "A_ATP",
+    "ATP_eq",
+    "J_ATP_cost",
+    "j_ATP",
+    "j_ADP",
+    "j_Pi",
+    "J_glc_e",
+    "J_lac_e",
+    "J_glc_c",
+    "J_lac_c",
+    "J_ATP_c",
+    "J_ADP_c",
+    "J_Pi_c"
+  ],
+  "run_parameters": {},
+  "invariants": [
+    {
+      "description": "rate law (relative 1e-9): J = jmax m A_mem (C_e a^n - C_i a_eq^n)/((K + C_e)(1 + a)^n), a = ATP/K_m_ATP, a_eq = ATP_eq/K_m_ATP, ATP_eq = ADP Pi/(c_std K_eq_hyd)",
+      "expr": "np.allclose(J_glc, jmax_glc*m_expr*A_mem*(C_glc_e*(ATP/K_m_ATP)**n_P - C_glc*(ADP*Pi/c_std*np.exp(dG0_hyd/(R*T))/K_m_ATP)**n_P)/((K_glc_t + C_glc_e)*(1 + ATP/K_m_ATP)**n_P), rtol=1e-9, atol=1e-12*abs(jmax_glc*A_mem*max(m_expr, 1e-30)))"
+    },
+    {
+      "description": "stoichiometry (exact): n_P ATP -> ADP + Pi per glucose; glucose is conserved across the membrane; lactate, ATP, ADP and Pi do not cross",
+      "expr": "np.array_equal(J_ATP_cost, n_P*J_glc) and np.array_equal(j_ATP, -J_ATP_cost) and np.array_equal(j_ADP, J_ATP_cost) and np.array_equal(j_Pi, J_ATP_cost) and np.array_equal(J_glc_e, -J_glc) and np.array_equal(J_glc_c, J_glc) and np.all(J_lac_e == 0) and np.all(J_lac_c == 0) and np.all(J_ATP_c == 0) and np.all(J_ADP_c == 0) and np.all(J_Pi_c == 0)"
+    },
+    {
+      "description": "second law: glucose moves down the affinity of the coupled reaction, J A >= 0, A = RT ln(C_e/C_i) + n_P A_ATP",
+      "expr": "np.all(J_glc*A_glc >= 0)"
+    }
+  ],
+  "bc_sweep": {
+    "ranges": {
+      "C_glc_e": {
+        "min": 0.0001,
+        "max": 50.0,
+        "points": 7,
+        "scale": "log"
+      },
+      "C_glc": [
+        0.0,
+        5.0
+      ],
+      "m_expr": [
+        0.0,
+        4.0
+      ]
+    },
+    "rationale": "glucose outside from 0.1 uM to 50 mM (the game's range, both sides of every Km), inside from empty to above the outside at the low end (so the carrier runs backwards there), expression from none to the game's maximum"
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  }
+}

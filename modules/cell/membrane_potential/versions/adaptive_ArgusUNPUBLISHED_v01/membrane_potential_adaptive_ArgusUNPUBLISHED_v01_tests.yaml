@@ -1,0 +1,16 @@
+module_type: membrane_potential
+version: adaptive_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The membrane of a cell without dendrites, axon or electrode: a capacitor Cm = c_m A_mem charged by the summed membrane
+  currents, dV/dt = (I_in - i_ion)/Cm (the maths of SN_soma_Argus2026_v01 without its sensed-voltage filter and axial current).
+  Geometry is a disc of radius R_cell and depth h_cell, as a cell sits in AdaptOrDeity''s 2D sheet: A_mem = 2 pi R h is the
+  in-plane membrane only (the top and bottom are insulated), Vol = pi R^2 h. Same port types as SN_soma_Argus2026_v01 (membrane_current,
+  membrane_voltage, membrane_area, compartment_volume, i_stim), so the library''s ion channels connect unchanged.
+
+
+  The volume is also exported on H_compartment_volume for the proton pool (H_handling), which is connected to the cytosol
+  and so cannot take compartment_volume a second time.
+
+
+  Ports of the versions of membrane_potential (they differ; allowed and documented): adaptive_ArgusUNPUBLISHED_v01 has no
+  VI_port and no shell_membrane_area, and adds H_compartment_volume.'

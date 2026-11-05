@@ -1,0 +1,8 @@
+module_type: membrane_carrier_face
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A membrane with facilitated-diffusion carriers between two volumes (by convention extracellular upstream, intracellular
+  downstream): a symmetric Michaelis-Menten carrier, J = open_flag V_max (C_up/(K_m + C_up) - C_down/(K_m + C_down)), which
+  saturates and always runs down the gradient (no energy input, no heat). Uses diffusion_face_ports, so it joins the same
+  pools as tissue_diffusion_face. Instances: default (GLUT1, glucose, K_m 2 mM) and MCT1_lactate (K_m 4 mM; its proton coupling
+  is not modelled).'

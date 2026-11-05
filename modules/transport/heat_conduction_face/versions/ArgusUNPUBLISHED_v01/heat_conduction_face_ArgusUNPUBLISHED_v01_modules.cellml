@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="heat_conduction_face_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="heat_conduction_face">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="k_th" public_interface="in" units="W_per_m_K"/>
+        <variable name="A_f" public_interface="in" units="m2"/>
+        <variable name="d_up" public_interface="in" units="metre"/>
+        <variable name="d_down" public_interface="in" units="metre"/>
+        <variable name="open_flag" public_interface="in" units="dimensionless"/>
+        <variable name="T_up" public_interface="in" units="kelvin"/>
+        <variable name="T_down" public_interface="in" units="kelvin"/>
+        <!-- thermal conductance -->
+        <variable name="G_th" public_interface="out" units="W_per_K"/>
+        <!-- heat flow from the upstream to the downstream volume -->
+        <variable name="Q" public_interface="out" units="watt"/>
+        <variable name="Q_up" public_interface="out" units="watt"/>
+        <variable name="Q_down" public_interface="out" units="watt"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>G_th</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>open_flag</ci>
+                        <ci>k_th</ci>
+                        <ci>A_f</ci>
+                    </apply>
+                    <apply>
+                        <plus/>
+                        <ci>d_up</ci>
+                        <ci>d_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q</ci>
+                <apply>
+                    <times/>
+                    <ci>G_th</ci>
+                    <apply>
+                        <minus/>
+                        <ci>T_up</ci>
+                        <ci>T_down</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_up</ci>
+                <apply>
+                    <minus/>
+                    <ci>Q</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_down</ci>
+                <ci>Q</ci>
+            </apply>
+        </math>
+    </component>
+</model>

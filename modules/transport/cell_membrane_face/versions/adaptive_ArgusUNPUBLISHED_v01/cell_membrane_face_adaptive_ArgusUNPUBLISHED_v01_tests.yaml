@@ -1,0 +1,11 @@
+module_type: cell_membrane_face
+version: adaptive_ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'The plasma membrane of the fermenter cell between the medium (entrance medium_face_port: glucose, lactate) and the
+  cytosol (exit cytosol_face_port, the energy_metabolism fermenter species): a glucose facilitator (Glf-type, Km 4.1 mM) and
+  a lactate-/H+ symporter, each a symmetric carrier J = jmax A_mem (S_out/(K + S_out) - S_in/(K + S_in)) (the maths of membrane_carrier_face
+  ArgusUNPUBLISHED_v01, per membrane area). For glucose S is the concentration; lactate leaves with one proton (electroneutral,
+  as lactic acid), so its carrier sees the lactic-acid activity S = X = C_lac H/H_ref and stops when C_lac_e H_e = C_lac H_i,
+  its electrochemical equilibrium. The protons go to the cytosolic proton pool (J_H_lac on the H_flux port, H_i from the internal_H
+  port). This export removes the 2 H+ per glucose that ATP hydrolysis releases. ATP, ADP and Pi cannot cross. No heat (facilitated
+  diffusion is entropic). Ion currents cross the membrane in the ion-channel modules, not here.'

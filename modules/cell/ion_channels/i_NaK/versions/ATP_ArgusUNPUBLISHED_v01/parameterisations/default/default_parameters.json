@@ -1,0 +1,25 @@
+{
+ "schema_version": 1,
+ "global": {
+  "F": {"value": 96485.0, "units": "C_per_mol", "data_reference": "definitional; Faraday constant, as the library's SN modules", "sourced": "no"},
+  "R": {"value": 8.314, "units": "J_per_mol_K", "data_reference": "definitional; gas constant, as the library's SN modules", "sourced": "no"},
+  "T": {"value": 293.15, "units": "kelvin", "data_reference": "lynch2015bioenergetic; operating point 20 C, the temperature Lynch & Marinov normalise maintenance costs to", "sourced": "yes"}
+ },
+ "V": {"value": -70.0, "units": "milliV", "data_reference": "unreferenced_placeholder; operating point of the eukaryotic Na/K pump module's own instance", "sourced": "no"},
+ "Nai": {"value": 20.0, "units": "millimolar", "data_reference": "unreferenced_placeholder; cytosolic Na+ in a marine prokaryote", "sourced": "no"},
+ "Ko": {"value": 10.21, "units": "millimolar", "data_reference": "millero2008composition; standard seawater K 10.21 mmol/kg", "sourced": "yes"},
+ "Ko_mid_NaK": {"value": 1.0, "units": "millimolar", "data_reference": "argus2026unpublished; as i_NaK Argus2026_v01 (default instance)", "sourced": "no"},
+ "Nai_mid_NaK": {"value": 15.0, "units": "millimolar", "data_reference": "argus2026unpublished; as i_NaK Argus2026_v01 (default instance)", "sourced": "no"},
+ "Nai_power_NaK": {"value": 1.5, "units": "dimensionless", "data_reference": "argus2026unpublished; as i_NaK Argus2026_v01 (default instance)", "sourced": "no"},
+ "A_mem": {"value": 12.566370614359172, "units": "um2", "data_reference": "geometry: in-plane membrane of the 2 um cell", "sourced": "no"},
+ "rho_NaK": {"value": 9168.31622513547, "units": "per_um2", "data_reference": "calibrated: the pump uses 25% of a 2 um cell's maintenance ATP at -70 mV (rolfe1997cellular, mammals 19-28%)", "sourced": "no"},
+ "r_NaK": {"value": 9.0, "units": "per_s", "data_reference": "argus2026unpublished; as i_NaK Argus2026_v01 (default instance)", "sourced": "no"},
+ "ATP": {"value": 9.6, "units": "millimolar", "data_reference": "bennett2009absolute; glucose-fed, exponentially growing E. coli: ATP 9.6 mM", "sourced": "yes"},
+ "ADP": {"value": 0.56, "units": "millimolar", "data_reference": "bennett2009absolute; glucose-fed, exponentially growing E. coli: ADP 0.56 mM (Table 1)", "sourced": "yes"},
+ "Pi": {"value": 10.0, "units": "millimolar", "data_reference": "amin1995dual; cytoplasmic Pi of E. coli near 10 mM in typical growth (BioNumbers BNID 105540, from Amin & Peterkofsky 1995 and Rao & Torriani 1994); 20-30 mM in carbon-starved cells", "sourced": "yes"},
+ "K_m_ATP_NaK": {"value": 0.2, "units": "millimolar", "data_reference": "unreferenced_placeholder; Na/K pump affinity for ATP, order 0.1-0.5 mM", "sourced": "no"},
+ "E_Na": {"value": 79.69327122654074, "units": "milliV", "data_reference": "Nernst potential at the default concentrations", "sourced": "no"},
+ "E_K": {"value": -75.14840195514417, "units": "milliV", "data_reference": "Nernst potential at the default concentrations", "sourced": "no"},
+ "dG0_hyd": {"value": -27400.0, "units": "J_per_mol", "data_reference": "beber2022equilibrator; ATP + H2O -> ADP + Pi: -27.4 +- 0.6 kJ/mol, eQuilibrator 3.0 at pH 7.0, pMg 3, I 0.25 M, 25 C (under 0.5 kJ/mol from its value at 20 C); the four standard Gibbs energies are one set", "sourced": "yes"},
+ "c_std": {"value": 1000.0, "units": "millimolar", "data_reference": "definitional; standard concentration 1 M for thermodynamic factors", "sourced": "no"}
+}

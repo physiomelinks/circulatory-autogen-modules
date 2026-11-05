@@ -1,0 +1,6 @@
+module_type: i_leak_Ca
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A Ca leak, the maths of i_leak_Na / i_leak_K Argus2026_v01 for a divalent ion: i = g (V - E_Ca), E_Ca = (RT/2F) ln(Cao/Cai),
+  j = -i/(2F), g = A_mem rho gamma. It computes its own Nernst potential from the internal_Ca port, since Ca_handling versions
+  do not export one.'
