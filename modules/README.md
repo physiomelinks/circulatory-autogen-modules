@@ -403,6 +403,95 @@ extraction and the fit against the original.
 - **Copyright:** a cropped figure or table with its citation, kept for checking the extracted
   values, is the intent; don't include whole pages or more than the extraction needs.
 
+### Data sources
+
+**Rule: every calibration and validation data item says where it came from.** The items are a
+parameterisation's obs_data `data_items` and `prediction_items`, and the validation baseline's scalar
+`targets` and data columns (`validation.<p>.baseline` with a status other than pending, skipped or
+not_applicable). An item's source combines two places, and `SOURCES.md` is the extension of the
+`data_reference`:
+
+1. its **`data_reference`** key in its data file: a string, `<BibTeX key>; <short note>`, or an object
+   with any of `source`, `figure`, `obtained` (digitised / table value / derived), `species`,
+   `preparation`, `conditions`, `kind`, `role`, `sigma_reason`, `primary_read` and `note` (other keys are
+   shown as notes). On a baseline with a data file, the baseline's own `data_reference` sources its columns.
+   libcuflynx accepts `data_reference` on obs_data items (physiomelinks/circulatory_autogen#618, on CA master).
+2. its **section in `SOURCES.md`** beside the data (`parameterisations/<p>/SOURCES.md`, or a
+   system model's directory). A Markdown heading of any level is the item's `data_item_name` (a target's
+   `name`, a data column's name), exactly; a trailing ` — <value>` or `(note)` on the heading is ignored.
+   The section runs to the next heading. Under it, optional labelled lines, then free prose (shown in the
+   table's source cell). A heading with nothing under it is not a source:
+   ```markdown
+   ## c_Na_rest
+
+   - Kind: assumed (not measured in an enterocyte)
+   - Role: target
+   - Source: ion-selective microelectrode reviews: cytosolic Na 10–20 mM in mammalian epithelia
+   - Species/preparation: mammalian epithelial and cardiac cells
+   - Primary read: 10–20 mM
+   - Sigma: ± 4 mM covers that range.
+
+   The weakest datum in the step, and the one to replace if an enterocyte measurement can be found.
+
+   ## u_e_with_sugar
+
+   - Kind: derived: term of u_e_depolarisation_with_sugar
+   - Role: term
+
+   ## mod/x
+
+   - Kind: measured (pelt counts, thousands, a proxy for the hare population)
+   - Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
+   ```
+   The two combine: the row takes the section's fields and the `data_reference`'s, and where both give a
+   field (e.g. the source) the `data_reference` wins. An item with a `data_reference` and a section repeats
+   it in the section as `- Data reference: <the identical string>` (for an object, its `source`), not as
+   `- Source:`; when that line is missing or the two strings differ, `data_sources_test` fails, naming the
+   item and both files. An item with a section and no `data_reference` needs no such line.
+   The table says where a row came from: `data_reference`, `SOURCES.md` or `data_reference + SOURCES.md`.
+   Labels (`- Label: text` or `- **Label:** text`, case-insensitive): `Kind` (measured | assumed (why) |
+   derived | synthetic | derived: term of <item>, each with an optional detail), `Role` (target | prediction | held out | term), `Data reference`
+   (the item's `data_reference` string, repeated exactly), `Source` (or `Citation`) for an item without one,
+   `Figure` / `Table`, `Obtained`, `Species/preparation` (or `Species`, `Preparation`, `Conditions`),
+   `Primary read`, `Sigma` (why sigma was set or widened), `Note`. Value and sigma are always read from
+   the data file, never from SOURCES.md. Headings that name no item (e.g. data proposed but not in the
+   obs_data yet) are listed on the page and in the test's details, and don't fail. Text before the first
+   item heading is ignored. The item's free-text `comment` is not a source: the table shows it beside
+   "source missing".
+
+**Kind** (what the number is) is read only from the `Kind` label or `kind` key:
+
+- **measured**: read from an experiment (a paper's figure or table, a dataset);
+- **assumed**: chosen without a measurement of this quantity, with the reason (`assumed (why)`);
+- **derived**: calculated from other data, including a term of another item (`derived: term of <item>`);
+- **synthetic**: model output used as data, e.g. a published model's simulated curves or a synthetic
+  benchmark series.
+ **Role** (how it is used) is the item's place in the data: a
+`data_item` with weight > 0 is a target; a `prediction_item` with a value is held out, one without is a
+prediction; a `data_item` with weight 0 is a term (below), never a target; a baseline item is validation.
+A `Role` label that disagrees is flagged. **An item is used without being scored only by weight = 0**; a
+std of very large order never marks it (a weight-1 item with std 1e20 is still a target). So every
+`data_item` with weight 0 is a **term** of another item, usually one whose `operation_kwargs` names it
+(x1/x2 of a subtraction or division): the page says "term of <item>, not a measurement", and its source must say so explicitly
+(`Kind: derived: term of <item>`): it is not exempt. `term of <item>` without `derived:` fails, and when
+another item's `operation_kwargs` names the term, `<item>` must be that item (the failure names it). A measurement kept out of the fit is a
+`prediction_item`, not a weight-0 `data_item`.
+
+- **The table:** each version page has a "Data sources" block (one table per parameterisation with
+  data items: item with variable and operation, value, sigma with its rationale, source with figure,
+  how obtained and primary read, species/preparation/conditions, kind, role; BibTeX keys link to the
+  References) and a count in its header; a system-model page has one for its obs_data. The headers,
+  tables and site index count each kind of problem: no source, Data reference mismatch/missing, term
+  not labelled.
+- **Checked by** `data_sources_test` (`tests/test_modules.py`, per version, no model run): it fails when
+  any item has no source, a term lacks its `derived: term of <item>` kind or names the wrong item, or an
+  item's SOURCES.md section lacks or differs from its `data_reference`, and lists each item and where to
+  add its source. It runs for unreviewed versions too; in CI their failures are warnings
+  (`tools/ci_reviewed_failures.py`), so it gates reviewed versions and new sign-offs.
+- **System models** are checked the same way by `system_data_sources_test` (`tests/test_systems.py`,
+  `make system-sources`, in CI's structure job): a failure blocks a system model whose
+  `<model>_system.yaml` has `reviewed: true` and warns for one not reviewed yet.
+
 ## How system models use versions and parameterisations
 
 System models live in `../system_models/<category>/<model>/` (not in `modules/`; they are not
@@ -420,6 +509,44 @@ model's own `<model>_parameters.json` wins** over the parameterisation's values,
 what it changes. It is libcuflynx's nested JSON with the model's instances at the top
 (`{"aortic_root": {"C": {...}}, "heart": {"lv": {"E_A": {...}}}, "global": {...}}`). Every record in `system_models/` names `"parameterisation": "default"`, and the version specs'
 harness networks do the same.
+
+A system model's directory:
+
+```
+system_models/<category>/<model>/
+  <model>_module_array.json      its instances and connections (required)
+  <model>_system.yaml            its spec: description or notes, sim_time, solver_info, equivalence, invariants (required)
+  <model>_parameters.json        values that win over the parameterisations' (optional)
+  <model>_obs_data.json, <model>_params_for_id.json, <model>_parameters_unfinished.json   (optional)
+  <model>_phlynx.png             a screenshot of the model's root canvas in PhLynx (optional; the page's figure)
+  <model>_phlynx_nodes.json      each PhLynx node's instance and pixel box in that screenshot (with the png)
+  <model>.html                   its page (generated)
+  reference/                     what it must reproduce (circulatory_autogen's original or a ready CellML model)
+  plots/  results/               written by the system tests (not committed)
+```
+
+**Every system model has a page**, as every version has its version page: `<model>.html`, generated by
+`python -m cam_testing.report` beside the model (gitignored) and, with `--site`, at
+`site/system_models/<category>/<model>/<model>.html`, listed under "System models" in `site/index.html`. It
+is built from the module array, the parameters file, the spec and the system tests' results, and holds:
+
+- the model's name, description (the spec's `description`, else its first note) and notes;
+- its figure. With `<model>_phlynx.png` and `<model>_phlynx_nodes.json`
+  (`{"width", "height", "source", "nodes": [{"instance", "box": [x, y, w, h]}]}`, pixels of the png) it
+  is the PhLynx screenshot, with a link over each node to that instance's version page. Without them,
+  the page draws a diagram from the module array's connections (Mermaid), each node linked the same way;
+- a table of its instances: module type and version (linked to the version page; a supermodule instance
+  lists its submodules, each linked), parameterisation, inputs and outputs;
+- its connections, the parameters file's values per instance (collapsible), and the system tests
+  (run, invariants, equivalence) with their results and plots.
+
+Links are relative, so the page works opened from disk and in the site. In the site, the pages of
+another library's versions that a system model uses (e.g. this library's heart in another repo's model)
+are built too, at their own library's paths. `system_page_test` (`tests/test_systems.py`, from
+`cam_testing.suite.test_systems`, so a repo using cam_testing runs it too) builds every system model's
+page and fails when one does not build, an instance is missing from it, a screenshot node names no
+instance or lies outside the image, or the site index does not list it. `--zip PATH` zips the site
+with a README.txt, to send.
 
 ## Supermodule versions
 
@@ -546,6 +673,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
+| `data_sources_test` | every calibration and validation data item has a source ("Data sources" above); no model run |
 
 **Supermodule versions** run the same verification and validation tests as a component. The
 supermodule is generated alone as the vessel `mod`: libcuflynx expands it into `mod__<submodule>`
