@@ -29,10 +29,10 @@ from cam_testing.library import version_index
 
 LIFTING = 'lifting'
 #: lifting (verification_config): inputs, the variables kept as inputs u (default: the version's boundary_condition
-#: variables); time_budget [s] for each QBee stage; max_aux; sim_time and dt of the verification run (default: the
-#: version's sim_time and dt); tol, the largest state error and manifold defect of the lifted run for "passed";
-#: rationale.
-DEFAULT_LIFTING = {'time_budget': 60.0, 'max_aux': 400, 'tol': 1e-4, 'algebraic_tol': 1e-8}
+#: variables); time_budget [s] for each QBee stage; max_aux; max_terms, the largest polynomial system to quadratize;
+#: sim_time and dt of the verification run (default: the version's sim_time and dt); tol, the largest state error and
+#: manifold defect of the lifted run for "passed"; rationale.
+DEFAULT_LIFTING = {'time_budget': 60.0, 'max_aux': 400, 'max_terms': 20000, 'tol': 1e-4, 'algebraic_tol': 1e-8}
 #: status of a lifting whose algebra checks out but whose lifted run leaves the manifold beyond tol
 UNSTABLE_MANIFOLD = 'unstable_manifold'
 
@@ -138,7 +138,7 @@ def run(key, system_model=None, output_dir=None, settings_override=None, force=F
     try:
         doc = lc.lift_cellml_file(model, out_dir, inputs=inputs, smoothing_report=report,
                                   time_budget=float(settings['time_budget']), max_aux=int(settings['max_aux']),
-                                  sim_time=sim_time, dt=dt)
+                                  sim_time=sim_time, dt=dt, max_terms=int(settings['max_terms']))
     except Exception as e:  # noqa: BLE001 -- a failed lifting is a result, not a crash
         result = checks.Result(LIFTING, checks.FAILED, f'{type(e).__name__}: {e}',
                                {'smoothing': how, 'inputs': inputs, 'time_s': time.perf_counter() - t0})
@@ -199,10 +199,12 @@ def main(argv=None):
     parser.add_argument('--inputs', help='comma-separated variables kept as inputs ([component/]name)')
     parser.add_argument('--time-budget', type=float, help='s for each QBee stage')
     parser.add_argument('--max-aux', type=int)
+    parser.add_argument('--max-terms', type=int, help='largest polynomial system (terms) to quadratize')
     parser.add_argument('--sim-time', type=float, help='verification run length')
     parser.add_argument('--force', action='store_true', help='rerun the smoothing check even when current')
     args = parser.parse_args(argv)
-    override = {'time_budget': args.time_budget, 'max_aux': args.max_aux, 'sim_time': args.sim_time}
+    override = {'time_budget': args.time_budget, 'max_aux': args.max_aux, 'max_terms': args.max_terms,
+                'sim_time': args.sim_time}
     inputs = [s for s in args.inputs.split(',') if s] if args.inputs is not None else None
     result, _doc = run(args.version, args.system_model, args.output_dir, override, args.force, inputs)
     print(f'{args.version}: {result.status}: {result.message}')
