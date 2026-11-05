@@ -1,0 +1,31 @@
+[
+  {
+    "module_type": "heart",
+    "module_subtype": "nonstiff_Argus2026_v01",
+    "module_format": "supermodule",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "required_citations_uncertain": [
+      "argus2026unpublished"
+    ],
+    "description": "Four-chamber heart with a controlled cardiac clock (cardiac_clock controlled), four generic chambers and four Mynard valves with a linearised pressure drop (pp_linear), which keeps the model non-stiff (circulatory_autogen's heart vp_wCont_nonstiff split into submodules). In a model, each submodule is named <instance>__<submodule> (e.g. heart__ra), and the host vessels that couple to it are given in the instance's per_submodule_inputs / per_submodule_outputs: typically systemic venous return into ra, pulmonary venous return into la, puv and aov out to the pulmonary and systemic arteries, and the chambers' volumes out to a volume_sum. A chamber's vessel ports sum their flows (chamber Liang2009NoVisco_v02), so an atrium takes any number of inflows (both venae cavae into ra) and a chamber any number of outflows (an ASD shunt from la), with no junction.",
+    "submodule_versions": [
+      {
+        "module_type": "cardiac_clock",
+        "module_subtype": "controlled"
+      },
+      {
+        "module_type": "chamber",
+        "module_subtype": "Liang2009NoVisco_v02"
+      },
+      {
+        "module_type": "valve",
+        "module_subtype": "pp_linear"
+      }
+    ]
+  }
+]

@@ -14,13 +14,13 @@
       ["mod", "constant", "outlet_flow", "va", "", "default"]
     ],
     "parameters": [
-      ["P_p_in", "J_per_m3", 12000, "harness test value (90 mmHg)"],
-      ["R_va", "Js_per_m6", 10000000.0, "harness test value"],
-      ["C_va", "m6_per_J", 1e-08, "harness test value"],
-      ["I_va", "Js2_per_m6", 100000.0, "harness test value"],
-      ["q_0_va", "m3", 0, "harness: zero unstressed volume"],
-      ["u_0_va", "J_per_m3", 0, "harness: zero reference pressure"],
-      ["u_ext_va", "J_per_m3", 0, "harness: zero external pressure"]
+      ["p_in/P", "J_per_m3", 12000, "harness test value (90 mmHg)"],
+      ["va/R", "Js_per_m6", 10000000.0, "harness test value"],
+      ["va/C", "m6_per_J", 1e-08, "harness test value"],
+      ["va/I", "Js2_per_m6", 100000.0, "harness test value"],
+      ["va/q_0", "m3", 0, "harness: zero unstressed volume"],
+      ["va/u_0", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["va/u_ext", "J_per_m3", 0, "harness: zero external pressure"]
     ]
   },
   "invariants": [

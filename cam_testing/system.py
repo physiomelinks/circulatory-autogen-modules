@@ -2,17 +2,17 @@
 System models: system_models/<category>/<model>/ (at the repo root; not modules, not supermodules).
 
 Each system dir holds the model built from this module library (<model>_module_array.json, whose
-records name a module_type, its version (module_subtype) and an instance, and
-<model>_parameters.csv, whose values win over the instances'), the reference it must reproduce under
+records (instances) name a module_type, its version (module_subtype) and the parameterisation
+it uses, and <model>_parameters.json, whose values win over the parameterisations'), the reference it must reproduce under
 reference/, and a spec <model>_system.yaml. The model is generated with every module library
 (cam_testing.paths: this repo's modules/, then the extra ones), so its records may name versions of
 either. The reference is one of:
 
-  - circulatory_autogen's original: a vessel array (and parameters) under reference/, generated
+  - circulatory_autogen's original: a module array (and parameters) under reference/, generated
     with libcuflynx's bundled modules;
   - a ready CellML model, simulated as it is (e.g. the flattened model PhLynx exports):
     equivalence.reference_cellml (a path relative to the system dir), or reference/<model>.cellml
-    when reference/ holds no vessel array. Its outputs are "<component>/<variable>" for every
+    when reference/ holds no module array. Its outputs are "<component>/<variable>" for every
     component but those in equivalence.ignore_components (default: environment,
     global_parameters, instance_parameters), mapped through output_map as for an original.
 
@@ -112,7 +112,7 @@ def generate(system, work_dir, reference=False, quiet=True):
     out_dir = os.path.join(work_dir, 'reference' if reference else 'library')
     config = {
         'file_prefix': system.name,
-        'input_param_file': f'{system.name}_parameters.csv',
+        'input_param_file': f'{system.name}_parameters.json',
         'model_type': 'cellml', 'solver': 'CVODE_myokit',
         'resources_dir': resources, 'generated_models_dir': out_dir, 'DEBUG': False,
     }
@@ -136,9 +136,9 @@ REFERENCE_CELLML_IGNORED_COMPONENTS = ('environment', 'global_parameters', 'inst
 
 
 def reference_cellml(system):
-    '''The ready CellML model the system model must reproduce, or None (its reference is a vessel array
+    '''The ready CellML model the system model must reproduce, or None (its reference is a module array
     to generate): equivalence.reference_cellml, else reference/<model>.cellml when reference/ has no
-    vessel array.'''
+    module array.'''
     eq = system.spec.get('equivalence') or {}
     if eq.get('reference_cellml'):
         path = os.path.join(system.dir, eq['reference_cellml'])
@@ -147,8 +147,7 @@ def reference_cellml(system):
         return path
     ref = os.path.join(system.dir, 'reference')
     candidate = os.path.join(ref, f'{system.name}.cellml')
-    has_array = any(glob.glob(os.path.join(ref, f'*_{n}.{ext}')) for n in ('module_array', 'vessel_array')
-                    for ext in ('json', 'csv'))
+    has_array = any(glob.glob(os.path.join(ref, f'*_module_array.{ext}')) for ext in ('json', 'csv'))
     return candidate if os.path.isfile(candidate) and not has_array else None
 
 
@@ -160,6 +159,17 @@ def all_component_names(helper, ignore_components=REFERENCE_CELLML_IGNORED_COMPO
         if var and comp not in ignore_components:
             out.append(f'{comp}/{var}')
     return out
+
+
+def time_variable_names(helper):
+    '''The names ('vessel/var' and 'component/var') of the model's free variable, which simulate()
+    returns as t. Myokit binds one variable to time; a helper without a Myokit model has none here.'''
+    model = getattr(helper, 'model', None)
+    time = model.time() if model is not None and hasattr(model, 'time') else None
+    if time is None:
+        return set()
+    qname = time.qname()
+    return {qname.replace('_module.', '/', 1), qname.replace('.', '/', 1)}
 
 
 def simulate(model_path, spec, solver_info, names=None, ignore_components=None):
@@ -174,9 +184,13 @@ def simulate(model_path, spec, solver_info, names=None, ignore_components=None):
     if names is None and ignore_components is not None:
         names = all_component_names(helper, ignore_components)
     if names is None:
-        # vessel outputs, plus the multi_port "sum" totals (component sum_blood_volume)
-        names = [n.replace('_module.', '/', 1).replace('sum_blood_volume.', 'sum_blood_volume/', 1)
-                 for n in helper.get_all_variable_names() if '_module.' in n or n.startswith('sum_blood_volume.')]
+        # vessel outputs, plus the multi_port "sum" totals (components multiport_sum_<module>_<variable>)
+        names = [n.replace('_module.', '/', 1) if '_module.' in n else n.replace('.', '/', 1)
+                 for n in helper.get_all_variable_names() if '_module.' in n or n.startswith('multiport_sum_')]
+    # time is returned as t, not as an output: the solver merges every module's t into one variable
+    # and names it after whichever component it picks, which differs between runs
+    time_names = time_variable_names(helper)
+    names = [n for n in names if n not in time_names]
     t = np.asarray(helper.get_time(), dtype=float)
     out = {}
     for name in names:
@@ -197,7 +211,11 @@ def compare(ref, new, output_map, tol, ignore=None, wrapped=None, reciprocal=Non
     for outputs like a valve's L = rho l/(A_eff + eps) that spike near closure and amplify
     tiny differences in A_eff by up to 1/eps.
     '''
-    ignore, wrapped, reciprocal = ignore or {}, wrapped or {}, set(reciprocal or [])
+    from cam_testing import harness
+    # names as the models name them: a nested vessel may be written by its path (SN/soma/membrane/V)
+    output_map = harness.model_output_map(output_map or {})
+    ignore, wrapped = harness.model_output_keys(ignore or {}), harness.model_output_keys(wrapped or {})
+    reciprocal = set(harness.model_output_keys(reciprocal or []))
     rows, missing = [], []
     for name, r in ref.items():
         if name in ignore:
@@ -232,7 +250,8 @@ def equivalence(system, work_dir=None):
         ignored = eq.get('ignore_components', REFERENCE_CELLML_IGNORED_COMPONENTS)
         t_ref, ref = simulate(ref_path, system.spec, solver_info, ignore_components=tuple(ignored))
     new_path = generate(system, work_dir, reference=False)
-    output_map = eq.get('output_map') or {}
+    from cam_testing import harness
+    output_map = harness.model_output_map(eq.get('output_map') or {})
     wanted = sorted({output_map.get(n, n) for n in ref})
     t_new, new = simulate(new_path, system.spec, solver_info, names=wanted)
     rows, missing = compare(ref, new, output_map, float(eq.get('tol', 1e-6)), eq.get('ignore'), eq.get('wrapped'),

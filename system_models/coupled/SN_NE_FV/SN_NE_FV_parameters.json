@@ -1,0 +1,526 @@
+{
+ "schema_version": 1,
+ "global": {
+  "sigma_diff": {"value": 3e-10, "units": "m2_per_s", "data_reference": "as the FEniCS instance"}
+ },
+ "stim": {
+  "t_start": {"value": 0.01, "units": "second", "data_reference": "first pulse after 10 ms at rest"},
+  "t_end": {"value": 1000.0, "units": "second", "data_reference": "pulses throughout"},
+  "period": {"value": 0.05, "units": "second", "data_reference": "20 Hz train (a high sympathetic firing rate)"},
+  "pulse_duration": {"value": 0.002, "units": "second", "data_reference": "2 ms current pulse"},
+  "i_amplitude": {"value": -1.0, "units": "nanoA", "data_reference": "suprathreshold: -1 nA (the soma takes I_in as an outward current, so a depolarising pulse is negative) fires one action potential per pulse"},
+  "stim_flag": {"value": 1, "units": "dimensionless", "data_reference": "pulse train on"}
+ },
+ "c000": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c001": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c002": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c010": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c011": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c012": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c020": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c021": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c022": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c100": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c101": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c102": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c110": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c111": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"}
+ },
+ "c112": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c120": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c121": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c122": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c200": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c201": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c202": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c210": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c211": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c212": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c220": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c221": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "c222": {
+  "V_P": {"value": 9.999999999999999e-19, "units": "m3", "data_reference": "grid cell, 1 um cube"},
+  "C_P_init": {"value": 0.0, "units": "millimolar", "data_reference": "initial concentration (as the FEniCS instance)"},
+  "M": {"value": 0.0, "units": "millimolar_per_s", "data_reference": "as the FEniCS instance"},
+  "C50": {"value": 1.0, "units": "millimolar", "data_reference": "as the FEniCS instance"},
+  "flux_c": {"value": 0.0, "units": "mol_per_s", "data_reference": "no source: the cell exchanges only with its neighbours"}
+ },
+ "fx000": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy000": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz000": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx001": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy001": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz001": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx002": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy002": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx010": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy010": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz010": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx011": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy011": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz011": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx012": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy012": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx020": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz020": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx021": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz021": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx022": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx100": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy100": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz100": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx101": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy101": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz101": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx102": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy102": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx110": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy110": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz110": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx111": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy111": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz111": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx112": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy112": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx120": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz120": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx121": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz121": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fx122": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy200": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz200": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy201": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz201": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy202": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy210": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz210": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy211": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz211": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fy212": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz220": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ },
+ "fz221": {
+  "A_f": {"value": 1e-12, "units": "m2", "data_reference": "face of the uniform grid"},
+  "d_up": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "d_down": {"value": 5e-07, "units": "metre", "data_reference": "centre-to-face distance"},
+  "open_flag": {"value": 1, "units": "dimensionless", "data_reference": "open face"}
+ }
+}

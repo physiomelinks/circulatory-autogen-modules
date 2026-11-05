@@ -2,7 +2,7 @@
 Fast static checks on the module library (no libcuflynx generation needed).
 
   - the directory layout of modules/ and system_models/ against modules/directory_schema.json
-    and its rules (version == module_subtype, default_instance, obs_data_name, unique names,
+    and its rules (version == module_subtype, default_parameterisation, obs_data_name, unique names,
     nested module_types used only within their parent, system-model records resolve);
   - each version's CellML, config and units (test_version_structure);
   - library-wide uniqueness, manifests, and the JSON files against libcuflynx's schemas.
@@ -19,7 +19,6 @@ A problem listed (as a substring) under ``known_issues`` in a version's spec is 
 rather than a failure, so known defects stay visible without blocking CI; once fixed, remove the
 entry.
 """
-import csv
 import functools
 import glob
 import json
@@ -30,9 +29,9 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from cam_testing import bib, library, module_array, paths
-from cam_testing.library import (IDENTITY_KEYS, INSTANCE_COLUMNS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
+from cam_testing.library import (IDENTITY_KEYS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
                                  all_versions, ancestors_of, load_version, misplaced_spec_keys, module_relpath,
-                                 module_type_names, parent_of, read_spec_files)
+                                 module_type_names, parent_of, protocol_problems, read_spec_files)
 from cam_testing.mathml import component_names
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
@@ -85,6 +84,14 @@ def _library_versions():
     return all_versions(include_libraries=True)
 
 
+@functools.lru_cache(maxsize=1)
+def _supermodule_registry():
+    '''libcuflynx's supermodule registry of every library, as a model is generated with.'''
+    from libcuflynx.utilities.module_library import ModuleSources
+    from cam_testing.library import library_dirs
+    return ModuleSources({'module_library_dirs': library_dirs(), 'use_builtin_modules': False}).supermodule_registry()
+
+
 VERSION_KEYS = [v.key for v in _versions()]
 
 
@@ -107,8 +114,8 @@ def _check_files(level, d, names, problems, supermodule=False):
     spec = LEVELS[level].get('files') or {}
     files = sorted(f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f)) and not f.startswith('.'))
     required = [_fill(f, names) for f in spec.get('required', [])]
-    if not supermodule:
-        required += [_fill(f, names) for f in spec.get('required_unless_supermodule', [])]
+    required += [_fill(f, names) for f in spec.get('required_if_supermodule' if supermodule
+                                                   else 'required_unless_supermodule', [])]
     allowed = set(required) | {_fill(f, names) for f in spec.get('optional', [])} \
         | {_fill(f, names) for f in spec.get('required_unless_supermodule', [])}
     rel = os.path.relpath(d, REPO_ROOT)
@@ -197,15 +204,16 @@ def walk_modules():
                 if e.get('module_type') != mt or e.get('module_subtype') != v:
                     problems.append(f'{rel}: config entry is ({e.get("module_type")}, {e.get("module_subtype")}), '
                                     f'not ({mt}, {v}): the version is its module_subtype')
-                di = e.get('default_instance')
+                di = e.get('default_parameterisation')
                 if not di:
-                    problems.append(f'{rel}: config entry has no default_instance')
-                elif not os.path.isfile(os.path.join(d, 'instances', di, f'{di}_parameters.csv')):
-                    problems.append(f'{rel}: default_instance {di} has no instances/{di}/{di}_parameters.csv')
+                    problems.append(f'{rel}: config entry has no default_parameterisation')
+                elif not os.path.isfile(os.path.join(d, 'parameterisations', di, f'{di}_parameters.json')):
+                    problems.append(f'{rel}: default_parameterisation {di} has no parameterisations/{di}/{di}_parameters.json')
         _check_files('version', d, names, problems, supermodule)
         # the spec's two files: every key in its own file, identity keys matching the directories
         tests, verification = read_spec_files(d, f'{mt}_{v}')
         problems.extend(f'{rel}: {p}' for p in misplaced_spec_keys(tests, verification))
+        problems.extend(f'{rel}: {p}' for p in protocol_problems(d, verification))
         review = tests.get('review')
         if isinstance(review, str) and not (review.startswith('reviews/') and os.path.isfile(os.path.join(REPO_ROOT, review))):
             problems.append(f'{rel}: review: {review} is not a file in reviews/')
@@ -217,24 +225,24 @@ def walk_modules():
         for c in _subdirs(d):
             if c not in allowed:
                 problems.append(f'{rel}: unexpected directory {c}')
-        if not os.path.isdir(os.path.join(d, 'instances')):
-            problems.append(f'{rel}: missing instances/')
+        if not os.path.isdir(os.path.join(d, 'parameterisations')):
+            problems.append(f'{rel}: missing parameterisations/')
             return
         if os.path.isdir(os.path.join(d, 'risk')):
             _check_files('risk', os.path.join(d, 'risk'), names, problems)
-        iroot = os.path.join(d, 'instances')
-        _check_files('instances', iroot, {}, problems)
+        iroot = os.path.join(d, 'parameterisations')
+        _check_files('parameterisations', iroot, {}, problems)
         if not _subdirs(iroot):
-            problems.append(f'{rel}: no instances')
+            problems.append(f'{rel}: no parameterisations')
         for i in _subdirs(iroot):
-            instance(os.path.join(iroot, i))
+            parameterisation(os.path.join(iroot, i))
 
-    def instance(d):
+    def parameterisation(d):
         i = os.path.basename(d)
-        _name_ok('instance', i, d, problems)
-        _check_files('instance', d, {'instance': i}, problems)
+        _name_ok('parameterisation', i, d, problems)
+        _check_files('parameterisation', d, {'parameterisation': i}, problems)
         rel = os.path.relpath(d, REPO_ROOT)
-        allowed = LEVELS['instance'].get('subdirectories') or {}
+        allowed = LEVELS['parameterisation'].get('subdirectories') or {}
         for c in _subdirs(d):
             if c not in allowed:
                 problems.append(f'{rel}: unexpected directory {c}')
@@ -246,17 +254,14 @@ def walk_modules():
             for f in sub.get('required', []):
                 if not os.path.isfile(os.path.join(d, c, f)):
                     problems.append(f'{rel}/{c}: missing {f}')
-        pp = os.path.join(d, f'{i}_parameters.csv')
-        if os.path.isfile(pp):
-            with open(pp, newline='') as f:
-                header = next(csv.reader(f), [])
-            if [h.strip() for h in header] != LEVELS['instance']['parameters_columns']:
-                problems.append(f'{rel}: {i}_parameters.csv columns are {header}, not {INSTANCE_COLUMNS}')
+        for pp in (os.path.join(d, f'{i}_parameters.json'), os.path.join(d, f'{i}_calibrated_parameters.json')):
+            if os.path.isfile(pp):
+                problems.extend(f'{rel}: {e}' for e in _parameters_file_problems(pp))
         p = os.path.join(d, f'{i}_obs_data.json')
         if os.path.isfile(p):
             name = json.load(open(p)).get('obs_data_name')
             if name != i:
-                problems.append(f'{rel}: {i}_obs_data.json has obs_data_name {name!r}; the instance is named by it ({i!r})')
+                problems.append(f'{rel}: {i}_obs_data.json has obs_data_name {name!r}; the parameterisation is named by it ({i!r})')
 
     for c in _subdirs(MODULES_DIR):
         p = os.path.join(MODULES_DIR, c)
@@ -336,7 +341,7 @@ def test_nested_module_types_found_by_the_library():
 def _uses_of_module_types(version):
     '''(module_type, where) for every module_type a version's supermodule submodules and harness name.'''
     out = [(s.get('module_type') or s.get('vessel_type'), f'submodule {s.get("name")}') for s in version.submodules]
-    # the version's harness, and the instances' own (validation.<instance>.harness)
+    # the version's harness, and the parameterisations' own (validation.<parameterisation>.harness)
     networks = [('harness', version.spec.get('harness'))]
     networks += [(f'validation.{inst}.harness', (kinds or {}).get('harness'))
                  for inst, kinds in (version.spec.get('validation') or {}).items() if isinstance(kinds, dict)]
@@ -382,7 +387,7 @@ def test_system_models_directory_layout():
             _name_ok('system_model', model, mdir, problems)
             _check_files('system_model', mdir, {'model': model}, problems)
             for c in _subdirs(mdir):
-                if c not in LEVELS['system_model']['directories']:
+                if c not in {_fill(x, {'model': model}) for x in LEVELS['system_model']['directories']}:
                     problems.append(f'{os.path.relpath(mdir, REPO_ROOT)}: unexpected directory {c}')
     assert not problems, '\n'.join(problems)
 
@@ -391,8 +396,39 @@ SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_mo
 
 
 @pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
+def test_system_model_supermodule_instances_have_their_values(path):
+    '''Each supermodule instance of a system model has an entry in the model's parameters file
+    ({model}_parameters.json, libcuflynx's nested JSON), which libcuflynx reads; a new one is written with
+    cuflynx-upgrade supermodule-instances.'''
+    from libcuflynx.utilities.supermodules import check_model_instances
+    from libcuflynx.utilities.config_schemas import read_module_array_records, model_parameters_path
+    try:
+        check_model_instances(read_module_array_records(path), _supermodule_registry(), path,
+                              model_parameters_path(path))
+    except ValueError as e:
+        pytest.fail(str(e))
+
+
+def test_named_supermodule_parameterisations_are_complete():
+    '''A named supermodule parameterisation replaces the default as a new instance's values, so it
+    sets every instance value the default parameterisation sets (libcuflynx's
+    parameterisation_missing, which instance creation refuses on).'''
+    from libcuflynx.utilities.parameterisations import available_parameterisations
+    from libcuflynx.utilities.supermodules import parameterisation_missing
+    incomplete = {}
+    for key, entry in sorted(_supermodule_registry().items()):
+        for name in available_parameterisations(entry['config_path']):
+            if name != entry.get('default_parameterisation'):
+                missing = parameterisation_missing(entry, name, f'{key}')
+                if missing:
+                    incomplete[f'{key[0]}/{key[1]} {name}'] = missing
+    assert not incomplete, incomplete
+
+
+@pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
 def test_system_model_records_resolve(path):
-    '''Every record names a (module_type, version) of the library and an instance of it. A model
+    '''Every record (an instance) names a (module_type, version) of the library and a
+    parameterisation of it. A model
     listing modules that are not in this library (known.not_in_library in its spec) is exempt for those.'''
     import yaml
     model_dir = os.path.dirname(path)
@@ -408,11 +444,11 @@ def test_system_model_records_resolve(path):
         if v is None:
             outside.append(f'{r["name"]}: ({key[0]}, {key[1]}) is not a version in the library')
             continue
-        inst = r.get('instance')
+        inst = module_array.parameterisation_of(r)
         if inst is None:
-            problems.append(f'{r["name"]}: names no instance')
-        elif inst not in v.instance_names():
-            problems.append(f'{r["name"]}: {v.key} has no instance {inst} (it has {v.instance_names()})')
+            problems.append(f'{r["name"]}: names no parameterisation')
+        elif inst not in v.parameterisation_names():
+            problems.append(f'{r["name"]}: {v.key} has no parameterisation {inst} (it has {v.parameterisation_names()})')
     if outside and not (spec.get('expected_failures') or spec.get('skip')):
         problems += outside
     assert not problems, '\n'.join(problems)
@@ -470,7 +506,7 @@ def version_problems(version, library_components=None):
     # a reviewed version's sourced parameters must cite an entry of its references.bib
     if version.reviewed:
         keys = set(bib.read(bib.bib_path(version)))
-        for inst in version.instances():
+        for inst in version.parameterisations():
             for p in inst.parameters():
                 if not p.is_sourced or p.data_reference.lower().startswith('definitional'):
                     continue
@@ -479,12 +515,12 @@ def version_problems(version, library_components=None):
                     errors.append(f'{inst.name}/{p.variable_name}: sourced, but its reference '
                                   f'"{p.data_reference[:40]}" is not a key in {os.path.basename(bib.bib_path(version))}')
 
-    # every instance's parameters are variables of the version
+    # every parameterisation's parameters are variables of the version
     kinds = version.kinds
-    for inst in version.instances():
+    for inst in version.parameterisations():
         for p in inst.parameters():
             if p.variable_name not in kinds:
-                warnings.append(f'instance {inst.name}: parameter {p.variable_name} is not a variable of the config entry')
+                warnings.append(f'parameterisation {inst.name}: parameter {p.variable_name} is not a variable of the config entry')
 
     root = ET.parse(version.cellml_path).getroot()
     for comp in root.iter(f'{{{CELLML_NS}}}component'):
@@ -612,14 +648,26 @@ def _not_excluded(p):
 MODULE_ARRAYS = SYSTEM_ARRAYS
 MODULE_CONFIGS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_modules_config.json'), recursive=True)
                         if _not_excluded(p))
-OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'instances', '*', '*obs_data.json'), recursive=True)
+OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'parameterisations', '*', '*obs_data.json'), recursive=True)
                   if _not_excluded(p))
 
 
-def _validate(path, schema_name, *older_names):
-    '''older_names: the schema's name in older libcuflynx releases (vessel_array before #549).'''
+def _parameters_file_problems(path):
+    '''A parameterisation's parameters file: libcuflynx reads it (nested JSON rooted at the module), and each
+    parameter has the library's keys (value, units, data_reference and optionally sourced).'''
+    from libcuflynx.utilities import parameters_file as pf
+    try:
+        rows = pf.read_parameter_rows(path, kind=pf.MODULE)
+    except ValueError as e:
+        return [str(e)]
+    allowed = set(LEVELS['parameterisation']['parameters_columns'])
+    return [f'{os.path.basename(path)}: {r["variable_name"]} has the keys {sorted(set(r) - allowed)}, '
+            f'not those of {sorted(allowed)}' for r in rows if set(r) - allowed]
+
+
+def _validate(path, schema_name):
     jsonschema = pytest.importorskip('jsonschema')
-    schema = next((s for s in map(_libcuflynx_schema, (schema_name,) + older_names) if s is not None), None)
+    schema = _libcuflynx_schema(schema_name)
     if schema is None:
         pytest.skip(f'the installed libcuflynx has no schemas/{schema_name}')
     with open(path) as f:
@@ -630,12 +678,49 @@ def _validate(path, schema_name, *older_names):
 
 @pytest.mark.parametrize('path', MODULE_ARRAYS, ids=lambda p: os.path.relpath(p, REPO_ROOT))
 def test_module_array_matches_libcuflynx_schema(path):
-    _validate(path, 'module_array.schema.json', 'vessel_array.schema.json')
+    _validate(path, 'module_array.schema.json')
 
 
 @pytest.mark.parametrize('path', MODULE_CONFIGS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
 def test_module_config_matches_libcuflynx_schema(path):
     _validate(path, 'module_config.schema.json')
+
+
+SUPERMODULE_ARRAYS = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'versions', '*', '*_module_array.json'),
+                                                 recursive=True) if _not_excluded(p))
+
+
+@pytest.mark.parametrize('path', SUPERMODULE_ARRAYS, ids=lambda p: os.path.relpath(p, MODULES_DIR))
+def test_supermodule_array_matches_libcuflynx_schema(path):
+    _validate(path, 'module_array.schema.json')
+
+
+PARAMETERS_FILES = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'parameterisations', '*', '*_parameters.json'),
+                                               recursive=True) if _not_excluded(p)) + \
+    sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_parameters*.json'), recursive=True))
+
+
+@pytest.mark.parametrize('path', PARAMETERS_FILES, ids=lambda p: os.path.relpath(p, REPO_ROOT))
+def test_parameters_files_match_libcuflynx_schema(path):
+    _validate(path, 'parameters.schema.json')
+
+
+def test_supermodule_versions_load_with_libcuflynx():
+    '''Every supermodule version's module array (beside its config) loads with libcuflynx's
+    load_supermodule_array (records of the config's submodule_versions only, each version used, connections
+    between siblings, no record naming a parameterisation), and its template (default parameterisation) reads.'''
+    pytest.importorskip('libcuflynx')
+    problems = []
+    for version in _versions():
+        if not version.is_supermodule:
+            continue
+        try:
+            if not version.submodules:
+                problems.append(f'{version.key}: no submodules')
+            version.instance_parameters
+        except ValueError as e:
+            problems.append(f'{version.key}: {e}')
+    assert not problems, '\n'.join(problems)
 
 
 def licence_and_creator_problems(entry):
@@ -801,41 +886,19 @@ def test_obs_data_matches_libcuflynx_schema(path):
 
 
 def test_no_csv_module_arrays_left():
-    left = [os.path.relpath(p, REPO_ROOT) for name in module_array.NAMES
-            for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', f'*_{name}.csv'), recursive=True)
+    left = [os.path.relpath(p, REPO_ROOT)
+            for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_module_array.csv'), recursive=True)
             if os.sep + 'reference' + os.sep not in p]
     assert not left, f'CSV module arrays left (run tools/convert_module_arrays.py): {left[:10]}'
 
-
-def test_module_arrays_use_the_new_name():
-    '''Module arrays were called vessel arrays: the library's own files and verification configs use the new
-    name. reference/ keeps circulatory_autogen's originals as they were, and the readers take both.'''
-    old_files = [os.path.relpath(p, REPO_ROOT)
-                 for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '**', '*_vessel_array.*'), recursive=True)
-                 if os.sep + 'reference' + os.sep not in p]
-    old_keys = [os.path.relpath(p, REPO_ROOT)
-                for p in glob.glob(os.path.join(MODULES_DIR, '**', '*_verification_config.json'), recursive=True)
-                if '"vessel_array"' in open(p).read()]
-    assert not old_files and not old_keys, (f'rename to module_array: files {old_files[:10]}, '
-                                            f'harness keys in {old_keys[:10]}')
-
-
-def test_old_module_array_names_are_still_read(tmp_path):
-    (tmp_path / 'm_vessel_array.json').write_text('[]')
-    assert module_array.find(str(tmp_path), 'm').endswith('m_vessel_array.json')
-    (tmp_path / 'm_module_array.json').write_text('[]')
-    assert module_array.find(str(tmp_path), 'm').endswith('m_module_array.json')
-    rows = [['mod', 'nn', 'x', '', '']]
-    assert module_array.harness_rows({'vessel_array': rows}) == rows
-    assert module_array.harness_rows({'module_array': rows}) == rows
 
 
 def test_module_type_names_listed():
     assert module_type_names(), 'no module_types found under modules/'
 
 
-# Instances whose data were extracted from a publication but have no source screenshot yet.
-# Remove an entry when its instances/<i>/source_figures/ is added; never add new ones.
+# Parameterisations whose data were extracted from a publication but have no source screenshot yet.
+# Remove an entry when its parameterisations/<p>/source_figures/ is added; never add new ones.
 MISSING_SOURCE_FIGURES = {
     'capillary/pp_micro::default', 'heart/vp::default', 'heart/vp_Ca::default',
     'heart/vp_new_valve::default', 'heart/vp_wCont::default', 'heart/vp_wCont_nonstiff::default',
@@ -847,14 +910,14 @@ MISSING_SOURCE_FIGURES = {
 }
 
 
-def _publication_instances():
-    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.instances() if i.needs_source_figures()]
+def _publication_parameterisations():
+    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.parameterisations() if i.needs_source_figures()]
 
 
-@pytest.mark.parametrize('key,inst', _publication_instances(), ids=lambda x: x if isinstance(x, str) else '')
+@pytest.mark.parametrize('key,inst', _publication_parameterisations(), ids=lambda x: x if isinstance(x, str) else '')
 def test_publication_data_has_source_figures(key, inst):
     '''Validation or calibration data extracted from a paper or book carries a screenshot of the
-    figure/table it came from (instances/<i>/source_figures/, listed in source_figures.json), shown
+    figure/table it came from (parameterisations/<p>/source_figures/, listed in source_figures.json), shown
     in the report beside the validation plots (modules/README.md, "Source figures").'''
     if key in MISSING_SOURCE_FIGURES:
         pytest.xfail('source screenshot not added yet')
@@ -868,11 +931,30 @@ def test_publication_data_has_source_figures(key, inst):
 def test_missing_source_figures_list_is_current():
     '''The known-gap list only shrinks: every entry still needs figures and still lacks them. (Entries
     are this library's versions; another repo's run ignores them.)'''
-    have = {k for k, i in _publication_instances() if not i.source_figures()}
+    have = {k for k, i in _publication_parameterisations() if not i.source_figures()}
     if os.path.realpath(REPO_ROOT) != os.path.realpath(paths.PACKAGE_CHECKOUT):
         pytest.skip('the known-gap list is circulatory-autogen-modules\' own')
     stale = MISSING_SOURCE_FIGURES - have
     assert not stale, f'remove from MISSING_SOURCE_FIGURES (now has figures or no longer needs them): {sorted(stale)}'
+
+
+def _parameterisations_with_source_figures():
+    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.parameterisations()
+            if os.path.isfile(os.path.join(i.source_figures_dir, library.SOURCE_FIGURES_INDEX))]
+
+
+@pytest.mark.parametrize('key,inst', _parameterisations_with_source_figures(), ids=lambda x: x if isinstance(x, str) else '')
+def test_source_figures_index(key, inst):
+    '''Each source_figures.json entry has the keys directory_schema.json documents (file, source; optional
+    caption and items), and its "items" names data items of the parameterisation (modules/README.md,
+    "Source figures").'''
+    # a repo whose own directory_schema.json predates index_keys: cam_testing's
+    keys = (LEVELS['parameterisation'].get('subdirectories', {}).get(library.SOURCE_FIGURES, {}).get('index_keys')
+            or library.SOURCE_FIGURE_KEYS)
+    with open(os.path.join(inst.source_figures_dir, library.SOURCE_FIGURES_INDEX)) as f:
+        entries = json.load(f)
+    problems = library.source_figures_problems(entries, inst.item_names(), keys)
+    assert not problems, f'{key}: ' + '; '.join(problems)
 
 
 def _ca_resources():
@@ -890,7 +972,7 @@ def _ca_resources():
 
 def _reference_copies():
     return sorted(p for p in glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', 'reference', '*'))
-                  if p.endswith(('_parameters.csv', '_obs_data.json', '_params_for_id.csv')))
+                  if p.endswith(('_parameters.json', '_obs_data.json', '_params_for_id.json')))
 
 
 @pytest.mark.parametrize('path', _reference_copies(), ids=lambda p: os.path.relpath(p, SYSTEM_MODELS_DIR))
@@ -910,3 +992,47 @@ def test_reference_copies_are_circulatory_autogen_originals_in_library_keys(path
         expected = rekey.rekey_string(path, f.read())
     with open(path, encoding='utf-8') as f:
         assert f.read() == expected, f'{path} differs from {original} (after rekeying) beyond its bib keys'
+
+
+def test_version_renames_name_existing_versions():
+    '''Each version_renames.json rename (a version renamed in a module PR) ends at a version of the library,
+    gives its reason, and its old name no longer exists.'''
+    have = {(v.vessel_type, v.name) for v in library.all_versions(include_libraries=True)}
+    problems = []
+    for d in library.library_dirs():
+        path = os.path.join(d, library.VERSION_RENAMES)
+        if not os.path.isfile(path):
+            continue
+        with open(path) as f:
+            entries = json.load(f)
+        renames = {tuple(r['from']): tuple(r['to']) for r in entries}
+        for r in entries:
+            old, new = tuple(r['from']), library._chain(tuple(r['to']), renames)
+            if new not in have:
+                problems.append(f'{path}: {old} -> {new}: no such version')
+            if old in have:
+                problems.append(f'{path}: {old} is renamed but still exists')
+            if not r.get('reason'):
+                problems.append(f'{path}: {old} -> {tuple(r["to"])} has no reason')
+    assert not problems, '\n'.join(problems)
+
+
+def _system_models():
+    from cam_testing import system as systems
+    return systems.system_models()
+
+
+@pytest.mark.parametrize('system', _system_models(), ids=lambda s: s.id)
+def test_system_model_has_a_reference_or_says_it_has_none(system):
+    '''system_equivalence_test compares a model with its reference: circulatory_autogen's original (a
+    module array under reference/) or a ready CellML model. A model with neither sets its spec's
+    equivalence to {status: not_applicable (or skipped), reason: ...}, so the test is skipped with the reason.'''
+    eq = system.spec.get('equivalence') or {}
+    ref = os.path.join(system.dir, 'reference')
+    has_array = any(glob.glob(os.path.join(ref, f'*_module_array.{ext}')) for ext in ('json', 'csv'))
+    has_cellml = bool(eq.get('reference_cellml')) or os.path.isfile(os.path.join(ref, f'{system.name}.cellml'))
+    if eq.get('status') in ('not_applicable', 'skipped'):
+        assert eq.get('reason'), f'{system.id}: equivalence {eq["status"]} needs a reason'
+    else:
+        assert has_array or has_cellml, (f'{system.id}: no reference (reference/<model>_module_array.json or a CellML '
+                                         f'model) and the spec\'s equivalence does not say so (status: not_applicable)')

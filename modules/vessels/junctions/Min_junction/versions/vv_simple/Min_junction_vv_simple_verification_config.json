@@ -19,81 +19,81 @@
       ["bcout", "constant", "outlet_flow", "mod", "", "default"]
     ],
     "parameters": [
-      ["v_bcin1", "m3_per_s", 5e-05, "harness: constant inflow (half the nominal flow)"],
+      ["bcin1/v", "m3_per_s", 5e-05, "harness: constant inflow (half the nominal flow)"],
       [
-        "R_up1",
+        "up1/R",
         "Js_per_m6",
         1000000.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "C_up1",
+        "up1/C",
         "m6_per_J",
         1e-09,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "I_up1",
+        "up1/I",
         "Js2_per_m6",
         10000.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "q_0_up1",
+        "up1/q_0",
         "m3",
         0.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "u_0_up1",
+        "up1/u_0",
         "J_per_m3",
         0.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "u_ext_up1",
+        "up1/u_ext",
         "J_per_m3",
         0.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
-      ["v_bcin2", "m3_per_s", 5e-05, "harness: constant inflow (half the nominal flow)"],
+      ["bcin2/v", "m3_per_s", 5e-05, "harness: constant inflow (half the nominal flow)"],
       [
-        "R_up2",
+        "up2/R",
         "Js_per_m6",
         1000000.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "C_up2",
+        "up2/C",
         "m6_per_J",
         1e-09,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "I_up2",
+        "up2/I",
         "Js2_per_m6",
         10000.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "q_0_up2",
+        "up2/q_0",
         "m3",
         0.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "u_0_up2",
+        "up2/u_0",
         "J_per_m3",
         0.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
       [
-        "u_ext_up2",
+        "up2/u_ext",
         "J_per_m3",
         0.0,
         "harness: non-stiff arterial_simple neighbour (R 1e6 Pa s/m^3, C 1e-9 m^3/Pa, I 1e4 Pa s^2/m^3)"
       ],
-      ["v_bcout", "m3_per_s", 0.0001, "harness: constant outflow"]
+      ["bcout/v", "m3_per_s", 0.0001, "harness: constant outflow"]
     ]
   },
   "invariants": [

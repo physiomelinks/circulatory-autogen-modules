@@ -12,15 +12,15 @@
       ["mod", "Albanese2016_v01", "gas_transport_simple", "term", "", "default"]
     ],
     "parameters": [
-      ["R_1_T_term", "Js_per_m6", 5000000.0, "harness flow source"],
-      ["R_2_T_term", "Js_per_m6", 5000000.0, "harness flow source"],
-      ["C_T_term", "m6_per_J", 1e-09, "harness flow source"],
-      ["I_T_term", "Js2_per_m6", 25000.0, "harness: I/R = 5 ms"],
-      ["u_ext_term", "J_per_m3", 0.0, "harness"],
-      ["u_in_term", "J_per_m3", 833.0, "harness: gives v_T = 8.33e-05 m3/s"],
-      ["u_out_term", "J_per_m3", 0.0, "harness"],
-      ["q_us_term", "m3", 0.0, "harness"],
-      ["q_init_term", "m3", 4.165e-07, "harness: equilibrium volume"]
+      ["term/R_1_T", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["term/R_2_T", "Js_per_m6", 5000000.0, "harness flow source"],
+      ["term/C_T", "m6_per_J", 1e-09, "harness flow source"],
+      ["term/I_T", "Js2_per_m6", 25000.0, "harness: I/R = 5 ms"],
+      ["term/u_ext", "J_per_m3", 0.0, "harness"],
+      ["term/u_in", "J_per_m3", 833.0, "harness: gives v_T = 8.33e-05 m3/s"],
+      ["term/u_out", "J_per_m3", 0.0, "harness"],
+      ["term/q_us", "m3", 0.0, "harness"],
+      ["term/q_init", "m3", 4.165e-07, "harness: equilibrium volume"]
     ]
   },
   "invariants": [
@@ -74,7 +74,7 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "candidate: the O2 dissociation curve implied by the P_O2_out(C_O2_out) inverse vs the standard human curve (Severinghaus 1979 eq. 1, which fits the standard curve to +-0.0055 saturation; points in instances/default/severinghaus1979_odc.csv). Offline, Spencer/C_sat at P_CO2 = 40 mmHg is within 0.03 saturation of it (max near P_O2 = 20-30 mmHg). Needs a curve (x-y) baseline mode rather than a time series."
+        "reason": "candidate: the O2 dissociation curve implied by the P_O2_out(C_O2_out) inverse vs the standard human curve (Severinghaus 1979 eq. 1, which fits the standard curve to +-0.0055 saturation; points in parameterisations/default/severinghaus1979_odc.csv). Offline, Spencer/C_sat at P_CO2 = 40 mmHg is within 0.03 saturation of it (max near P_O2 = 20-30 mmHg). Needs a curve (x-y) baseline mode rather than a time series."
       },
       "calibrate": {
         "note": "not_applicable: linear transport compartment with an algebraic output map; verified against exact solutions"

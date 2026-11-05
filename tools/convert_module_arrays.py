@@ -1,7 +1,7 @@
 """
-Converts module arrays from CSV (name, BC_type, vessel_type, inp_vessels, out_vessels) to JSON
-records in PhLynx's key names (<prefix>_module_array.json; see cam_testing/module_array.py) and
-removes the CSV.
+Converts module arrays from CSV (name, module_subtype, module_type, inp_instances, out_instances)
+to JSON records (<prefix>_module_array.json; see cam_testing/module_array.py) and removes the CSV.
+A CSV in libcuflynx's older columns is converted first with `cuflynx-upgrade module-array`.
 
     python tools/convert_module_arrays.py                    # every system_models/**/_module_array.csv
     python tools/convert_module_arrays.py path/to/x_module_array.csv ...

@@ -7,8 +7,8 @@ Written before the switch (2026-10-06): the soma now uses HernandezCruz1997_v01 
 script compares HC1997 with HC1997; check out a commit before the switch to reproduce the page.
 
 The soma is not changed. The script copies modules/ to a temporary directory, switches the RyR
-submodule of soma/sympathetic to HernandezCruz1997_v01 there (and drops the soma instance's
-Argus-only RyR rows, so the RyR takes its own default instance), and points the library and
+submodule of soma/sympathetic to HernandezCruz1997_v01 there (and drops the soma parameterisation's
+Argus-only RyR rows, so the RyR takes its own default parameterisation), and points the library and
 libcuflynx at the copy to generate the second model. The current model is generated from the
 repository itself.
 
@@ -23,7 +23,6 @@ same window (integral of j_Ca_L): the release gain.
 """
 import base64
 import contextlib
-import csv
 import functools
 import html
 import io
@@ -48,13 +47,13 @@ STEP_S, POST_S = 1, 2
 ENTRY_MIN = 1e-18      # mol (1 amol): below it the gain is not computed (no Ca entry)
 KON_CAFF = 2500.0          # /(mM s): hernandezcruz1997ca k_on+Caff 2.5 /uM/s
 
-V = 'mod_membrane/V'
-CAI = 'mod_Ca/Cai'
-CAB = 'mod_Ca/Ca_bulk'
-CAER = 'mod_Ca/Ca_ER'
-JRYR = 'mod_RyR/j_RyR'
-JCAL = 'mod_i_CaL/j_Ca_L'
-HC_GATES = ['mod_RyR/a_RyR', 'mod_RyR/i_RyR', 'mod_RyR/l_RyR', 'mod_RyR/P_RyR']
+V = 'mod__membrane/V'
+CAI = 'mod__Ca/Cai'
+CAB = 'mod__Ca/Ca_bulk'
+CAER = 'mod__Ca/Ca_ER'
+JRYR = 'mod__RyR/j_RyR'
+JCAL = 'mod__i_CaL/j_Ca_L'
+HC_GATES = ['mod__RyR/a_RyR', 'mod__RyR/i_RyR', 'mod__RyR/l_RyR', 'mod__RyR/P_RyR']
 COLORS = {'current': '#2a78d6', 'HC1997': '#eb6834', 'HC1997 + caffeine': '#1baf7a'}
 
 
@@ -64,24 +63,32 @@ def copy_library(tmp):
     shutil.copytree(os.path.join(REPO, 'modules'), dst,
                     ignore=shutil.ignore_patterns('results', 'plots', 'risk', '*.omex', '*.html'))
     sdir = os.path.join(dst, SOMA_REL)
+    # the RyR instance in the soma's module array, and the version its config lists
+    array_path = os.path.join(sdir, 'soma_sympathetic_module_array.json')
+    with open(array_path) as f:
+        records = json.load(f)
+    ryr = [s for s in records if s['name'] == 'RyR']
+    assert len(ryr) == 1, 'RyR submodule not found'
+    old = ryr[0]['module_subtype']
+    ryr[0]['module_subtype'] = NEW
+    with open(array_path, 'w') as f:
+        json.dump(records, f, indent=1)
     cfg_path = os.path.join(sdir, 'soma_sympathetic_modules_config.json')
     with open(cfg_path) as f:
         cfg = json.load(f)
-    n = 0
-    for s in cfg[0]['submodules']:
-        if s['name'] == 'RyR':
-            s['module_subtype'] = NEW
-            n += 1
-    assert n == 1, 'RyR submodule not found'
+    for v in cfg[0]['submodule_versions']:
+        if v == {'module_type': 'RyR', 'module_subtype': old}:
+            v['module_subtype'] = NEW
     with open(cfg_path, 'w') as f:
         json.dump(cfg, f, indent=2)
-    csv_path = os.path.join(sdir, 'instances', 'default', 'default_parameters.csv')
-    with open(csv_path, newline='') as f:
-        rows = list(csv.reader(f))
-    keep = [r for r in rows if not (r and r[0].endswith('_RyR') and r[0] != 'variable_name')]
-    dropped = [r[0] for r in rows if r not in keep]
-    with open(csv_path, 'w', newline='') as f:
-        csv.writer(f).writerows(keep)
+    # the RyR instance's values in the soma's template (its default parameterisation) were the old version's:
+    # it takes the new version's default instead
+    from libcuflynx.utilities import parameters_file as pf
+    parameters_path = os.path.join(sdir, 'parameterisations', 'default', 'default_parameters.json')
+    doc = pf.read_parameters_file(parameters_path, kind=pf.MODULE)
+    dropped = [f'RyR/{r["variable_name"]}' for r in pf.parameter_rows(doc.get('RyR') or {}, pf.MODULE)]
+    doc['RyR'] = {}
+    pf.write_parameters_file(parameters_path, doc)
     return dst, dropped
 
 
@@ -106,7 +113,7 @@ class Soma:
         self.has = lambda v: v in by
         self.h = harness.simulation_helper(self.cm.model_path, dict(self.cm.spec, sim_time=1.0, dt=DT))
         self.label = label
-        self.ryr = [n.split('.', 1)[1] for n in self.h.get_all_variable_names() if n.startswith('mod_RyR_module.')]
+        self.ryr = [n.split('.', 1)[1] for n in self.h.get_all_variable_names() if n.startswith('mod__RyR_module.')]
         self.outputs = [V, CAI, CAB, CAER, JRYR, JCAL] + [g for g in HC_GATES if g.split('/')[1] in self.ryr]
 
     def segment(self, params, seconds):
@@ -141,14 +148,14 @@ def steps(soma, start_state, base, j_rest):
     res = {}
     for pa in STEPS_PA:
         soma.set_state(start_state)
-        t1, o1 = soma.segment(dict(base, I_in_membrane=pa * 1e-3), STEP_S)
-        t2, o2 = soma.segment(dict(base, I_in_membrane=0.0), POST_S)
+        t1, o1 = soma.segment({**base, 'membrane/I_in': pa * 1e-3}, STEP_S)
+        t2, o2 = soma.segment({**base, 'membrane/I_in': 0.0}, POST_S)
         t = np.concatenate([t1, t2 + t1[-1] + DT])
         o = {k: np.concatenate([o1[k], o2[k]]) for k in o1}
         rel = np.trapezoid(o[JRYR] - j_rest, t)
         ent = np.trapezoid(np.abs(o[JCAL]), t)
         res[pa] = dict(t=t, o=o, spikes=spikes(o[V], t < STEP_S), gain=rel / ent if ent > ENTRY_MIN else float('nan'),
-                       p_ratio=(float(np.max(o['mod_RyR/P_RyR']) / o['mod_RyR/P_RyR'][0]) if 'mod_RyR/P_RyR' in o else float('nan')),
+                       p_ratio=(float(np.max(o['mod__RyR/P_RyR']) / o['mod__RyR/P_RyR'][0]) if 'mod__RyR/P_RyR' in o else float('nan')),
                        release=rel, entry=ent, j_peak=float(np.max(o[JRYR])), cai_peak=float(np.max(o[CAI])),
                        er0=float(o[CAER][0]), er_min=float(np.min(o[CAER])), er_end=float(o[CAER][-1]))
     return res
@@ -156,7 +163,7 @@ def steps(soma, start_state, base, j_rest):
 
 def simulate(soma, caffeine):
     base = {}
-    t, o = soma.segment(dict(I_in_membrane=0.0), REST_S)
+    t, o = soma.segment({'membrane/I_in': 0.0}, REST_S)
     rest = dict(t=t, o=o, spikes=spikes(o[V]), spikes_last10=spikes(o[V], t >= REST_S - 10))
     st = soma.state()
     j_rest = float(np.mean(o[JRYR][t >= REST_S - 1]))
@@ -164,13 +171,13 @@ def simulate(soma, caffeine):
     out = {'rest': rest, 'steps': steps(soma, st, base, j_rest)}
     # a longer rest (continuing from 30 s to LONG_REST_S), to see where the rest goes
     soma.set_state(st)
-    tl, ol = soma.segment(dict(I_in_membrane=0.0), LONG_REST_S - REST_S)
+    tl, ol = soma.segment({'membrane/I_in': 0.0}, LONG_REST_S - REST_S)
     out['long_rest'] = dict(spikes=spikes(ol[V]), spikes_last30=spikes(ol[V], tl >= tl[-1] - 30), v=float(ol[V][-1]),
                             cai=float(ol[CAI][-1]), er=float(ol[CAER][-1]), j=float(ol[JRYR][-1]))
     if caffeine:
         soma.set_state(st)
-        caff = dict(kon_a_RyR_RyR=KON_CAFF)
-        tc, oc = soma.segment(dict(caff, I_in_membrane=0.0), REST_S)
+        caff = {'RyR/kon_a_RyR': KON_CAFF}
+        tc, oc = soma.segment({**caff, 'membrane/I_in': 0.0}, REST_S)
         out['caffeine'] = dict(t=tc, o=oc, spikes=spikes(oc[V]), er_min=float(np.min(oc[CAER])),
                                j_peak=float(np.max(oc[JRYR])), cai_peak=float(np.max(oc[CAI])),
                                t_peak=float(tc[np.argmax(oc[JRYR])]))
@@ -303,10 +310,10 @@ def build_page(R, dropped):
     body.append('<h2>Summary (computed)</h2><ul>' + ''.join(f'<li>{s}</li>' for s in summary) + '</ul>')
     body.append('<h2>Reading</h2><ul>' + ''.join(f'<li>{html.escape(s)}</li>' for s in FINDINGS) + '</ul>')
     body.append('<h2>Setup</h2><ul>'
-                '<li><b>current</b>: RyR Argus2026_v01 with the soma instance\'s values.</li>'
-                '<li><b>HC1997</b>: RyR HernandezCruz1997_v01 at its default instance (activating Kd 200 uM, inactivating 0.63 uM, '
+                '<li><b>current</b>: RyR Argus2026_v01 with the soma parameterisation\'s values.</li>'
+                '<li><b>HC1997</b>: RyR HernandezCruz1997_v01 at its default parameterisation (activating Kd 200 uM, inactivating 0.63 uM, '
                 'luminal 130 uM with N = 7; k_RyR = A_ER rho k_single, rho 5403 /um^2, k_single 2.591 um^3/s; T_ref 295.65 K). '
-                'The soma instance rows dropped in the copy (Argus-only parameters): ' + ', '.join(f'<code>{html.escape(d)}</code>' for d in dropped) + '.</li>'
+                'The soma parameterisation rows dropped in the copy (Argus-only parameters): ' + ', '.join(f'<code>{html.escape(d)}</code>' for d in dropped) + '.</li>'
                 '<li><b>HC1997 + caffeine</b>: kon_a_RyR = 2500 /(mM s) (k_on+Caff, Kd 0.8 uM), the source\'s representation of 10 mM caffeine.</li>'
                 f'<li>Rest: 30 s at 0 pA from the model\'s initial state. Steps: from the end of the rest (caffeine: from the end of 30 s in caffeine), '
                 f'{STEP_S} s at 5, 9, 50 pA then {POST_S} s at 0 pA. Spikes: upward crossings of 0 mV during the step.</li>'

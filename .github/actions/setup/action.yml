@@ -1,7 +1,7 @@
 name: Install libcuflynx and the test package
 description: >
   System libraries libcuflynx needs (ci/apt-packages.txt), then requirements.txt (libcuflynx +
-  cam_testing) in a virtualenv, both cached in ~/.cam-setup under the key of ci/setup_key.sh. The
+  cam_testing, every other package pinned by ci/constraints.txt) in a virtualenv, both cached in ~/.cam-setup under the key of ci/setup_key.sh. The
   setup-check job compares a fresh install with the cached one.
 outputs:
   cache-hit:
@@ -47,7 +47,7 @@ runs:
       run: |
         python -m venv ~/.cam-setup/venv
         ~/.cam-setup/venv/bin/python -m pip install -q --upgrade pip
-        ~/.cam-setup/venv/bin/pip install -r requirements.txt
+        ~/.cam-setup/venv/bin/pip install -r requirements.txt -c ci/constraints.txt
     - name: Use the virtualenv
       shell: bash
       run: |

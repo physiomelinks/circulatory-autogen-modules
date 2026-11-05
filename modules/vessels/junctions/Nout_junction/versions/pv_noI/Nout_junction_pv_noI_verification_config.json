@@ -14,24 +14,24 @@
       ["b2", "pv_noI", "simple", "mod", "", "default"]
     ],
     "parameters": [
-      ["q_init_b1", "litre", 0.253, "test value: same compartment as the component under test"],
-      ["q_0_b1", "litre", 0.1, "test value: same compartment as the component under test"],
-      ["u_0_b1", "kPa", 0.0, "test value: same compartment as the component under test"],
-      ["C_b1", "L_per_kPa", 0.01275, "test value: same compartment as the component under test"],
-      ["R_b1", "kPa_s_per_L", 126.7, "test value: same compartment as the component under test"],
+      ["b1/q_init", "litre", 0.253, "test value: same compartment as the component under test"],
+      ["b1/q_0", "litre", 0.1, "test value: same compartment as the component under test"],
+      ["b1/u_0", "kPa", 0.0, "test value: same compartment as the component under test"],
+      ["b1/C", "L_per_kPa", 0.01275, "test value: same compartment as the component under test"],
+      ["b1/R", "kPa_s_per_L", 126.7, "test value: same compartment as the component under test"],
       [
-        "v_out_b1",
+        "b1/v_out",
         "L_per_s",
         0.02082,
         "test value: outflow of the downstream neighbour (open outlet), total half the inflow"
       ],
-      ["q_init_b2", "litre", 0.253, "test value: same compartment as the component under test"],
-      ["q_0_b2", "litre", 0.1, "test value: same compartment as the component under test"],
-      ["u_0_b2", "kPa", 0.0, "test value: same compartment as the component under test"],
-      ["C_b2", "L_per_kPa", 0.01275, "test value: same compartment as the component under test"],
-      ["R_b2", "kPa_s_per_L", 126.7, "test value: same compartment as the component under test"],
+      ["b2/q_init", "litre", 0.253, "test value: same compartment as the component under test"],
+      ["b2/q_0", "litre", 0.1, "test value: same compartment as the component under test"],
+      ["b2/u_0", "kPa", 0.0, "test value: same compartment as the component under test"],
+      ["b2/C", "L_per_kPa", 0.01275, "test value: same compartment as the component under test"],
+      ["b2/R", "kPa_s_per_L", 126.7, "test value: same compartment as the component under test"],
       [
-        "v_out_b2",
+        "b2/v_out",
         "L_per_s",
         0.02082,
         "test value: outflow of the downstream neighbour (open outlet), total half the inflow"

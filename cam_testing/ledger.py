@@ -6,7 +6,7 @@ What a version's outcome in a stage depends on, hashed into its fingerprint:
   * the version's own files (results/, plots/, *.html and *.omex left out) and the files directly
     in its module_type's directory;
   * the same for every version it depends on, recursively: the neighbours of its test networks
-    (harness, validation.<instance>.harness) and a supermodule's submodules;
+    (harness, validation.<parameterisation>.harness) and a supermodule's submodules;
   * the system models it must reproduce (supermodule.equivalent) or is coupled in (coupled_systems);
   * shared inputs: cam_testing's code, tests/, requirements.txt, pyproject.toml, the Makefile, the
     directory schema and the installed libcuflynx commit; for the pipeline and omex stages also
@@ -139,11 +139,11 @@ def _network_versions(version):
                  if isinstance(v, dict)]
     out = []
     for net in networks:
-        for row in module_array.harness_rows(net) or []:
-            if str(row[0]) == harness.VESSEL:
+        for rec in module_array.from_rows(module_array.harness_rows(net) or []):
+            if rec['name'] == harness.VESSEL:
                 continue
             try:
-                out.append(load_version(str(row[2]), str(row[1])))
+                out.append(load_version(rec['module_type'], rec['module_subtype']))
             except (OSError, ValueError, KeyError):
                 pass
     return out

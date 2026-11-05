@@ -19,23 +19,26 @@ parameters, and writes each spec only if there isn't one.
 
     python tools/build_coupled_examples.py
 """
-import csv
 import json
 import os
+import sys
 
 import yaml
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODULES = os.path.join(REPO, 'modules')
+sys.path.insert(0, os.path.join(REPO, 'tools'))
+from parameter_files import write_model_parameters  # noqa: E402
 OUT = os.path.join(REPO, 'system_models', 'coupled')
 N = 3   # grid cells per direction (--n): the CellML grid has N^3 cells and 3 N^2 (N - 1) faces
 H_O2, H_NE = 2e-5, 1e-6   # cell sizes: the tissue_diffusion_volume default cell, and the varicosity volume
 
-O2 = {'L': None, 'sigma': 2.41e-9, 'C_init': 0.0597, 'M': -0.0558, 'C50': 0.0133, 'instance': 'default'}
-NE = {'L': None, 'sigma': 3.0e-10, 'C_init': 0.0, 'M': 0.0, 'C50': 1.0, 'instance': 'NE_extracellular'}
+O2 = {'L': None, 'sigma': 2.41e-9, 'C_init': 0.0597, 'M': -0.0558, 'C50': 0.0133, 'parameterisation': 'default'}
+NE = {'L': None, 'sigma': 3.0e-10, 'C_init': 0.0, 'M': 0.0, 'C50': 1.0, 'parameterisation': 'NE_extracellular'}
 
 
-def rec(name, module_type, subtype, inp=(), out=(), instance='default'):
-    return {'name': name, 'module_type': module_type, 'module_subtype': subtype, 'instance': instance,
+def rec(name, module_type, subtype, inp=(), out=(), parameterisation='default'):
+    return {'name': name, 'module_type': module_type, 'module_subtype': subtype, 'parameterisation': parameterisation,
             'inp_instances': list(inp), 'out_instances': list(out)}
 
 
@@ -83,11 +86,11 @@ def fv_grid(sources, props):
 
 
 def fenics_row(sources, props):
-    """The FEniCS module, on the same box and grid as fv_grid (overriding its instance's size)."""
+    """The FEniCS module, on the same box and grid as fv_grid (overriding its parameterisation's size)."""
     params = [(f'{k}_tissue', 'metre', props['L'], 'the box of the CellML grid variant') for k in ('Lx', 'Ly', 'Lz')]
     params += [(f'{k}_tissue', 'dimensionless', N, 'the grid of the CellML grid variant')
                for k in ('grid_nx', 'grid_ny', 'grid_nz')]
-    return [rec('tissue', 'tissue_diffusion_FEniCS', 'box_v01', sources, [], props['instance'])], params
+    return [rec('tissue', 'tissue_diffusion_FEniCS', 'box_v01', sources, [], props['parameterisation'])], params
 
 
 # --- the 0D sides --------------------------------------------------------------------------------
@@ -119,7 +122,7 @@ def capillaries(tissue_names):
                    (f'C_O2_c_init_{ge}', 'mol_per_m3', 3.0, 'capillary_network C_O2_c_init_capillary_GE_6'),
                    (f'perm_O2_{ge}', 'm_per_s', 4e-06, 'capillary_network perm_O2_capillary_GE_6'),
                    (f'ub_O2_t_{ge}', 'mol_per_m3', O2['C_init'], 'starting tissue O2 (= C_P_init of the tissue)')]
-        # the rest of GE_capillary's constants (its default instance has none yet)
+        # the rest of GE_capillary's constants (its default parameterisation has none yet)
         params += [(f'{n}_{ge}', u, v, f'capillary_network {n}_capillary_GE_6') for n, u, v in GE_CONSTANTS]
     return records, params
 
@@ -157,10 +160,8 @@ def write(model, records, params, spec):
     os.makedirs(d, exist_ok=True)
     with open(os.path.join(d, f'{model}_module_array.json'), 'w') as f:
         f.write('[\n' + ',\n'.join(' ' + json.dumps(r) for r in records) + '\n]\n')
-    with open(os.path.join(d, f'{model}_parameters.csv'), 'w', newline='') as f:
-        w = csv.writer(f)
-        w.writerow(['variable_name', 'units', 'value', 'data_reference'])
-        w.writerows(params)
+    array = os.path.join(d, f'{model}_module_array.json')
+    write_model_parameters(os.path.join(d, f'{model}_parameters.json'), [dict(zip(('variable_name', 'units', 'value', 'data_reference'), map(str, r))) for r in params], array, [MODULES])
     spec_path = os.path.join(d, f'{model}_system.yaml')
     if not os.path.isfile(spec_path):
         with open(spec_path, 'w') as f:

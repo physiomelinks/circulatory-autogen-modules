@@ -14,14 +14,14 @@
       ["mod", "ArgusUNPUBLISHED_v01", "imposter_1D", "coupler", "", "default"]
     ],
     "parameters": [
-      ["P_pressure_in", "J_per_m3", 2000, "harness test value (circulatory_autogen 0D_1D_coupling_test)"],
-      ["R_vessel0d", "Js_per_m6", 10000000.0, "harness test value"],
-      ["C_vessel0d", "m6_per_J", 1e-08, "harness test value"],
-      ["I_vessel0d", "Js2_per_m6", 100000.0, "harness test value"],
-      ["q_0_vessel0d", "m3", 0, "harness: zero unstressed volume"],
-      ["u_0_vessel0d", "J_per_m3", 0, "harness: zero reference pressure"],
-      ["u_ext_vessel0d", "J_per_m3", 0, "harness: zero external pressure"],
-      ["I_coupler", "Js2_per_m6", 100000.0, "harness test value"],
+      ["pressure_in/P", "J_per_m3", 2000, "harness test value (circulatory_autogen 0D_1D_coupling_test)"],
+      ["vessel0d/R", "Js_per_m6", 10000000.0, "harness test value"],
+      ["vessel0d/C", "m6_per_J", 1e-08, "harness test value"],
+      ["vessel0d/I", "Js2_per_m6", 100000.0, "harness test value"],
+      ["vessel0d/q_0", "m3", 0, "harness: zero unstressed volume"],
+      ["vessel0d/u_0", "J_per_m3", 0, "harness: zero reference pressure"],
+      ["vessel0d/u_ext", "J_per_m3", 0, "harness: zero external pressure"],
+      ["coupler/I", "Js2_per_m6", 100000.0, "harness test value"],
       ["rho", "Js2_per_m5", 1050, "harness test value"]
     ]
   },

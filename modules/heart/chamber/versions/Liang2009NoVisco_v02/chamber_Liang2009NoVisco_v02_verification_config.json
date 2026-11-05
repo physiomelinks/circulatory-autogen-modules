@@ -1,0 +1,495 @@
+{
+  "module_type": "chamber",
+  "version": "Liang2009NoVisco_v02",
+  "sim_time": 4.5,
+  "pre_time": 0.0,
+  "dt": 0.001,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-08,
+    "atol": 1e-10,
+    "MaximumStep": 0.001
+  },
+  "reference_solver_info": {
+    "rtol": 1e-10,
+    "atol": 1e-12,
+    "MaximumStep": 0.001
+  },
+  "outputs": [
+    "u",
+    "q",
+    "e",
+    "E_A_eff"
+  ],
+  "invariants": [
+    {
+      "description": "pressure law (Liang 2009 time-varying elastance): u = (e E_A_eff + E_B)(q - q_us) + u_ext, with E_A_eff = E_A + Delta_E",
+      "expr": "(np.max(np.abs(u - ((e*E_A_eff + E_B)*(q - q_us) + u_ext))) <= 1e-9*max(1.0, np.max(np.abs(u)))) & (np.max(np.abs(E_A_eff - (E_A + Delta_E))) <= 1e-9*abs(E_A))"
+    },
+    {
+      "description": "the activation stays in [0, 1] and reaches 1 in systole (the chamber contracts)",
+      "expr": "np.all((e >= -1e-9) & (e <= 1 + 1e-9)) & (np.max(e) >= 0.99)"
+    },
+    {
+      "description": "diastole: e = 0 for the fraction 1 - (T_c + T_r)/T of each beat (contraction T_c, relaxation T_r), over the whole beats after the first, within 2 % of a beat",
+      "expr": "abs(np.mean(e[(t >= T) & (t < T*np.floor(t[-1]/T))] < 1e-6) - (1 - (T_c + T_r)/T)) <= 0.02"
+    },
+    {
+      "description": "the activation repeats every beat: e(t + T) = e(t) after the first beat (to the solver tolerance)",
+      "expr": "np.max(np.abs(e[(t >= T) & (t <= t[-1] - T)] - np.interp(t[(t >= T) & (t <= t[-1] - T)] + T, t, e))) <= 1e-3"
+    },
+    {
+      "description": "volume balance: dq/dt = v_in - v_out, the flows of the harness inflow (1e-4 m3/s) and outflow (5e-5 m3/s) through the summing ports, so q = q_init + 5e-5 t",
+      "expr": "np.max(np.abs(q - (q_init + (0.0001 - 5e-05)*t))) <= 1e-6*abs(q_init) + 1e-12"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "Delta_E": {
+        "values": [
+          -183287500.0,
+          0.0,
+          183287500.0,
+          366575000.0
+        ]
+      }
+    },
+    "constraints": [
+      "T_c + T_r < T"
+    ],
+    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, u_ext); the flows v_in and v_out are the sums over the summing vessel ports, set by the harness inflow and outflow, not swept here. Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt and T_eff are excluded: the harness clock drives them. The activation switches phase discontinuously, so CVODE needs a step cap below the clock's start window (eps_1 = 7 % of a beat): MaximumStep 1 ms.",
+    "exclude": [
+      "mt",
+      "T_eff",
+      "v_in",
+      "v_out"
+    ],
+    "bounds": {
+      "T": [
+        0.4,
+        1.5
+      ]
+    }
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.004,
+      0.002,
+      0.001,
+      0.0005
+    ],
+    "pre_time": 30.0,
+    "t_end": 2.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08,
+        "MaximumStep": 0.001
+      }
+    ]
+  },
+  "validation": {
+    "lv": {
+      "harness": {
+        "module_array": [
+          [
+            "pv_p",
+            "constant",
+            "inlet_pressure",
+            "",
+            "pvc",
+            "default"
+          ],
+          [
+            "pvc",
+            "pp_linear",
+            "valve",
+            "pv_p",
+            "la",
+            "default"
+          ],
+          [
+            "clock",
+            "Liang2009_v01",
+            "cardiac_clock",
+            "",
+            "la mod",
+            "default"
+          ],
+          [
+            "la",
+            "Liang2009NoVisco_v02",
+            "chamber",
+            "pvc clock",
+            "miv",
+            "la"
+          ],
+          [
+            "miv",
+            "pp",
+            "valve",
+            "la",
+            "mod",
+            "default"
+          ],
+          [
+            "mod",
+            "Liang2009NoVisco_v02",
+            "chamber",
+            "miv clock",
+            "aov",
+            "lv"
+          ],
+          [
+            "aov",
+            "pp",
+            "valve",
+            "mod",
+            "aortic_root",
+            "default"
+          ],
+          [
+            "aortic_root",
+            "vv",
+            "arterial_simple",
+            "aov",
+            "systemic_T",
+            "default"
+          ],
+          [
+            "systemic_T",
+            "pp_spec_I",
+            "terminal",
+            "aortic_root",
+            "ven",
+            "default"
+          ],
+          [
+            "ven",
+            "constant",
+            "outlet_pressure",
+            "systemic_T",
+            "",
+            "default"
+          ]
+        ],
+        "parameters": [
+          [
+            "miv/K_vo",
+            "m3_per_Js",
+            "0.3",
+            "3compartment system model (Mynard_2012)"
+          ],
+          [
+            "aov/K_vo",
+            "m3_per_Js",
+            "0.04",
+            "3compartment system model (to_be_identified)"
+          ],
+          [
+            "miv/K_vc",
+            "m3_per_Js",
+            "0.4",
+            "3compartment system model (Mynard_2012)"
+          ],
+          [
+            "aov/K_vc",
+            "m3_per_Js",
+            "0.04",
+            "3compartment system model (to_be_identified)"
+          ],
+          [
+            "miv/M_rg",
+            "dimensionless",
+            "0",
+            "3compartment system model (Mynard_2012)"
+          ],
+          [
+            "aov/M_rg",
+            "dimensionless",
+            "0",
+            "3compartment system model (Mynard_2012)"
+          ],
+          [
+            "miv/M_st",
+            "dimensionless",
+            "1",
+            "3compartment system model (Mynard_2012)"
+          ],
+          [
+            "aov/M_st",
+            "dimensionless",
+            "1",
+            "3compartment system model (Mynard_2012)"
+          ],
+          [
+            "miv/A_nn",
+            "m2",
+            "0.0006",
+            "3compartment system model (to_be_identified)"
+          ],
+          [
+            "aov/A_nn",
+            "m2",
+            "0.000314",
+            "3compartment system model (defined_by_user_from_BB128)"
+          ],
+          [
+            "aortic_root/R",
+            "Js_per_m6",
+            "103055",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+          ],
+          [
+            "aortic_root/C",
+            "m6_per_J",
+            "9.99916e-09",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+          ],
+          [
+            "aortic_root/u_ext",
+            "J_per_m3",
+            "0",
+            "3compartment system model (user_defined)"
+          ],
+          [
+            "aortic_root/I",
+            "Js2_per_m6",
+            "10000",
+            "3compartment system model (to_be_identified)"
+          ],
+          [
+            "aortic_root/u_0",
+            "J_per_m3",
+            "13300",
+            "3compartment system model (Mynard&Smolich_2015_assumedRefOf100mmHg)"
+          ],
+          [
+            "aortic_root/q_0",
+            "m3",
+            "0.00000694",
+            "3compartment system model (Mynard&Smolich_2015)"
+          ],
+          [
+            "systemic_T/R_T",
+            "Js_per_m6",
+            "1.86271e+08",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+          ],
+          [
+            "systemic_T/C_T",
+            "m6_per_J",
+            "1.12123e-08",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+          ],
+          [
+            "systemic_T/I_T",
+            "Js2_per_m6",
+            "0.1",
+            "3compartment system model (former_hardcoded_default)"
+          ],
+          [
+            "systemic_T/u_ext",
+            "J_per_m3",
+            "0",
+            "3compartment system model (user_defined)"
+          ],
+          [
+            "systemic_T/q_us",
+            "m3",
+            "0.00245",
+            "3compartment system model (user_defined_70%Of3.5LVenousTotBloodVolume)"
+          ],
+          [
+            "systemic_T/q_init",
+            "m3",
+            "0.00245",
+            "3compartment system model (user_defined_70%Of3.5LVenousTotBloodVolume)"
+          ],
+          [
+            "pv_p/P",
+            "J_per_m3",
+            "1069.31",
+            "calibrated (libcuflynx CMA-ES, 2026-10-12) with the lv features (liang2009multi Fig. 4b aortic pressure, Fig. 4e EDV/ESV) at periodic steady state (30 s warm-up), compliance bounded to Liang's ~1.5 ml/mmHg: parameterisations/lv/lv_obs_data.json, lv_calibration.json"
+          ],
+          [
+            "pvc/M_rg",
+            "dimensionless",
+            "1",
+            "definitional; always open (A_eff = A_nn): the pulmonary veins have no valve, so the conduit is a resistance and inertance that allows reverse flow (the atrial a-wave)"
+          ],
+          [
+            "pvc/M_st",
+            "dimensionless",
+            "1",
+            "definitional; no stenosis"
+          ],
+          [
+            "pvc/A_nn",
+            "m2",
+            "0.0006",
+            "harness choice: the conduit area, the mitral annulus area of the 3compartment system model (A_nn_miv)"
+          ]
+        ]
+      },
+      "baseline": {
+        "status": "active",
+        "source": "Liang et al. 2009 (MBEC 47:743) Fig. 4a (normal LV pressure) and Fig. 4e (normal LV P-V loop), digitised",
+        "source_short": "liang2009multi Fig. 4a/4e",
+        "data": "parameterisations/lv/liang2009_fig4a_lv_pressure.csv",
+        "pre_time": 30.0,
+        "sim_time": 1.0,
+        "dt": 0.001,
+        "targets": [
+          {
+            "name": "LV peak systolic pressure",
+            "expr": "np.max(u)/133.322368",
+            "range": [
+              97.33,
+              118.95
+            ],
+            "units": "mmHg",
+            "source": "liang2009multi Fig. 4a: 108.14 mmHg"
+          },
+          {
+            "name": "LV minimum (early diastolic) pressure",
+            "expr": "np.min(u)/133.322368",
+            "range": [
+              0.0,
+              5.0
+            ],
+            "units": "mmHg",
+            "source": "liang2009multi Fig. 4a: 1.56 mmHg"
+          },
+          {
+            "name": "LV end-diastolic pressure",
+            "expr": "u[0]/133.322368",
+            "range": [
+              5.29,
+              9.29
+            ],
+            "units": "mmHg",
+            "source": "liang2009multi Fig. 4a: 7.29 mmHg at the start of contraction, +-2 mmHg (the digitising uncertainty, as in the calibration)"
+          }
+        ],
+        "note": "Held-out checks only: the LV pressure features of Liang Fig. 4a (peak, early-diastolic minimum, end-diastolic pressure). The P-V loop volumes (Fig. 4e EDV, ESV) and the aortic pressure (Fig. 4b) are calibration features (validation.lv.calibrate), so they are not validation targets here."
+      },
+      "calibrate": {
+        "status": "active",
+        "source": "Liang et al. 2009 (MBEC 47:743) Fig. 4b (normal ascending-aortic pressure, fitted) and Fig. 4a/4e (normal LV pressure and P-V loop volumes, held out), digitised (source_figures/)",
+        "obs_data": "parameterisations/lv/lv_obs_data.json",
+        "params_for_id": "parameterisations/lv/lv_params_for_id.json",
+        "z_threshold": 2.0,
+        "method": "CMA-ES",
+        "optimiser_options": {
+          "num_calls_to_function": 600,
+          "cost_convergence": 1e-10,
+          "max_patience": 60,
+          "seed": 1
+        },
+        "metric": "nrmse",
+        "threshold": 0.15,
+        "dt": 0.01,
+        "prediction_window": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    "rv": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "liang2009multi shows no right-ventricular curves; the right heart is checked in the closed-loop system models (3compartment)"
+      },
+      "calibrate": {
+        "note": "not calibrated: Liang Table 2"
+      }
+    },
+    "la": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "liang2009multi shows only a left-atrial pressure trace in its full model (Fig. 2a); the atria are checked in the closed-loop system models"
+      },
+      "calibrate": {
+        "note": "not calibrated: Liang Table 2"
+      }
+    },
+    "ra": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "liang2009multi shows no right-atrial curves; checked in the closed-loop system models"
+      },
+      "calibrate": {
+        "note": "not calibrated: Liang Table 2"
+      }
+    }
+  },
+  "periodic_steady_state": {
+    "period": "T",
+    "rtol": 0.001
+  },
+  "harness": {
+    "module_array": [
+      [
+        "clock",
+        "Liang2009_v01",
+        "cardiac_clock",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "inflow",
+        "constant",
+        "inlet_flow",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "mod",
+        "Liang2009NoVisco_v02",
+        "chamber",
+        "inflow clock",
+        "outflow",
+        "lv"
+      ],
+      [
+        "outflow",
+        "constant",
+        "outlet_flow",
+        "mod",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "inflow/v",
+        "m3_per_s",
+        "0.0001",
+        "harness test value: the inflow the summing entrance port takes"
+      ],
+      [
+        "outflow/v",
+        "m3_per_s",
+        "5e-05",
+        "harness test value: the outflow the summing exit port takes"
+      ]
+    ]
+  }
+}
