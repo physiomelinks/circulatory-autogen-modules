@@ -2,7 +2,10 @@ module_type: arterial_simple
 version: vv
 reviewed: false
 notes: 'vv lumped linear R-C-I vessel. Jacobian timescales (nominal: fastest 0.003 s, slowest decay 0.01 s; run: fastest 0.003
-  s, slowest decay 0.01 s).'
+  s, slowest decay 0.01 s). Its proximal pressure u also leaves through an arterial_pressure_port (a multi_port, for
+  any number of receivers such as a baroreceptor), which the other arterial_simple versions do not have. The initial
+  values of its states are the parameters v_init, q_C_init and q_C_d_init (default 0: at rest, both half compliances
+  unstressed).'
 reference_proposals:
   q_0:
     reference: 'mynard2015one; Supplemental File 1, aortic root: A0 = 6.9419 cm^2, length 1 cm, so A0 l = 6.94 mL = 6.94e-6 m^3'
@@ -15,6 +18,15 @@ reference_proposals:
     sourced: 'no'
   u_ext:
     reference: 'definitional; u_ext = 0 (circulatory_autogen 3compartment_extra_ops: user_defined)'
+    sourced: definitional
+  v_init:
+    reference: 'definitional; v_init = 0, the vessel starts at rest'
+    sourced: definitional
+  q_C_init:
+    reference: 'definitional; q_C_init = 0, the proximal half compliance starts unstressed'
+    sourced: definitional
+  q_C_d_init:
+    reference: 'definitional; q_C_d_init = 0, the distal half compliance starts unstressed'
     sourced: definitional
   I:
     reference: 'unreferenced_placeholder; circulatory_autogen 3compartment_extra_ops: "to_be_identified" (value 10000)'
