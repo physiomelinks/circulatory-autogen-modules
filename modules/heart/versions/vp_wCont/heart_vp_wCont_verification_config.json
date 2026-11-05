@@ -284,6 +284,16 @@
     },
     "t_end": 2.0
   },
+  "smoothing": {
+    "rel": {
+      "abs": 0.001,
+      "maxmin": 0.001,
+      "piecewise": 0.0001,
+      "variables": {"chi_afloor_final": 1e-05, "chi_vfloor_final": 1e-05}
+    },
+    "tol": 0.01,
+    "rationale": "Set from smoothing each site alone and all together (heart/vp and vp_wCont at rel 1e-3, 1e-4, 1e-5). The activation drops chi_afloor_final and chi_vfloor_final (2 chi_floor, falling from 1 to 0 at chi_floor = 0.5) move the valve timing, and the valve flows are sensitive to it: chi_vfloor_final alone is 0.62 over the solver floor at rel 1e-3 and 0.085 at 1e-4 at the worst sweep point (A_nn_miv = 1.54e-3), and at the floor at 1e-5; so rel 1e-5 for those two. The other piecewise sites (the phase rates of chi_a and chi_v, the valve opening rates zeta_*_pre) are within 0.02 of the floor at 1e-4 and up to 0.09 over it at 1e-3 (chi_v's start gate mt >= t_vstart_norm, which x reaches only at the end of its range after the floor wraps): rel 1e-4. The valve clamps max(zeta_pre, 0) and the losses abs(v) are within 0.03 of the floor at 1e-3. Before libcuflynx shared one site between complementary comparisons (chi <= 0.25 / chi > 0.25), the phase rate dipped at each boundary and the activation lagged 0.03 of a beat over 25 s at 1e-3; it no longer lags."
+  },
   "validation": {
     "default": {
       "baseline": {
