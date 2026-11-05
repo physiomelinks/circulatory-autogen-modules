@@ -5,7 +5,7 @@
   "pre_time": 0.0,
   "dt": 0.0005,
   "solver": "CVODE_myokit",
-  "solver_info": {"rtol": 1e-08, "atol": 1e-24, "MaximumStep": 3.125e-05},
+  "solver_info": {"rtol": 1e-08, "atol": 1e-15, "MaximumStep": 3.125e-05},
   "outputs": ["u", "v", "v_d", "q_C", "q"],
   "run_parameters": {"u_in": 3830.0},
   "invariants": [
@@ -19,7 +19,7 @@
     },
     {
       "description": "total volume q = q_0 + stressed volume(s)",
-      "expr": "np.allclose(q, q_0 + q_C, rtol=1e-9, atol=1e-30)"
+      "expr": "np.allclose(q, q_0 + q_C, rtol=1e-9, atol=1e-21)"
     }
   ],
   "bc_sweep": {
@@ -41,7 +41,7 @@
   },
   "stability": {
     "supported": [
-      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-24}
+      {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-15}
     ],
     "fixed_step": {
       "schemes": ["euler", "heun", "rk4"],

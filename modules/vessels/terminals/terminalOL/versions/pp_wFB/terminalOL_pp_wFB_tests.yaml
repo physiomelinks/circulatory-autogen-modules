@@ -9,6 +9,7 @@ notes: 'Terminal 3-element-Windkessel-like outlet (series R_T1 = 0.2 R_T, compli
   in the openBF copy of boileau2015benchmark). Tested alone with constant u_in, u_a (harness values).'
 known_issues:
 - port variable u_a not in variables_and_units
+- CellML input u_a of pp_T_OL_wFB_type is not declared in the config
 expected_failures:
   run_test: 'libcuflynx exits during generation: "the port variable u_a is not a variable for vessel type: terminalOL" (u_a
     used in entrance ports but missing from variables_and_units). Evidence: with u_a added as boundary_condition entries in

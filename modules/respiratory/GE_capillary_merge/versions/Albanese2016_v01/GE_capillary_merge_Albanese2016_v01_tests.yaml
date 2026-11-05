@@ -3,6 +3,13 @@ version: Albanese2016_v01
 reviewed: false
 notes: As GE_capillary, with two inflows (v_in = v_in_1 + v_in_2) whose contents are flow-weighted (|v| weights, eps = 1e-28
   m3/s guard).
+known_issues:
+- d_1 has units J_per_m3 in the config but mmHg in the CellML
+- d_2 has units J_per_m3 in the config but mmHg in the CellML
+- r_1 has units J_per_m3 in the config but mmHg in the CellML
+- r_2 has units J_per_m3 in the config but mmHg in the CellML
+- s_1 has units J2_per_m6 in the config but mmHg2 in the CellML
+- s_2 has units J2_per_m6 in the config but mmHg2 in the CellML
 expected_failures:
   run_test: 'the component cannot be generated: (1) its config lists d_1, d_2, r_1, r_2, s_1, s_2 twice (J_per_m3/J2_per_m6
     and mmHg/mmHg2), so libcuflynx declares them twice (libcellml VARIABLE_NAME_UNIQUE); (2) the CellML uses the global saturation_cap

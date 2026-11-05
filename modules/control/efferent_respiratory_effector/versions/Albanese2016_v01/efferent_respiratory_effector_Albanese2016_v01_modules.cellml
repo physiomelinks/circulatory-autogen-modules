@@ -139,9 +139,9 @@
         <variable initial_value="0.0" name="Delta_RR_c" public_interface="out" units="Hz"/>
         <variable initial_value="0.0" name="Delta_RR_p" public_interface="out" units="Hz"/>
         <variable name="Delta_RR_resp" public_interface="out" units="per_s"/>
-        <variable initial_value="0.0" name="alpha_P_mus_c" public_interface="out" units="dimensionless"/>
-        <variable initial_value="0.0" name="alpha_P_mus_p" public_interface="out" units="dimensionless"/>
-        <variable name="alpha_P_mus" public_interface="out" units="dimensionless"/>
+        <variable initial_value="0.0" name="Delta_P_mus_c" public_interface="out" units="J_per_m3"/>
+        <variable initial_value="0.0" name="Delta_P_mus_p" public_interface="out" units="J_per_m3"/>
+        <variable name="Delta_P_mus" public_interface="out" units="J_per_m3"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -202,7 +202,7 @@
                     <bvar>
                         <ci>t</ci>
                     </bvar>
-                    <ci>alpha_P_mus_c</ci>
+                    <ci>Delta_P_mus_c</ci>
                 </apply>
                 <apply>
                     <divide/>
@@ -210,7 +210,7 @@
                         <plus/>
                         <apply>
                             <minus/>
-                            <ci>alpha_P_mus_c</ci>
+                            <ci>Delta_P_mus_c</ci>
                         </apply>
                         <apply>
                             <times/>
@@ -228,7 +228,7 @@
                     <bvar>
                         <ci>t</ci>
                     </bvar>
-                    <ci>alpha_P_mus_p</ci>
+                    <ci>Delta_P_mus_p</ci>
                 </apply>
                 <apply>
                     <divide/>
@@ -236,7 +236,7 @@
                         <plus/>
                         <apply>
                             <minus/>
-                            <ci>alpha_P_mus_p</ci>
+                            <ci>Delta_P_mus_p</ci>
                         </apply>
                         <apply>
                             <times/>
@@ -249,9 +249,9 @@
             </apply>
         </math>
         <variable name="Delta_RR_resp_max" public_interface="in" units="per_s"/>
-        <variable name="alpha_P_mus_max" public_interface="in" units="dimensionless"/>
+        <variable name="Delta_P_mus_max" public_interface="in" units="J_per_m3"/>
         <variable name="Delta_RR_resp_min" public_interface="in" units="per_s"/>
-        <variable name="alpha_P_mus_min" public_interface="in" units="dimensionless"/>
+        <variable name="Delta_P_mus_min" public_interface="in" units="J_per_m3"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -272,19 +272,19 @@
             </apply>
             <apply>
                 <eq/>
-                <ci>alpha_P_mus</ci>
+                <ci>Delta_P_mus</ci>
                 <apply>
                     <min/>
                     <apply>
                         <max/>
                         <apply>
                             <plus/>
-                            <ci>alpha_P_mus_c</ci>
-                            <ci>alpha_P_mus_p</ci>
+                            <ci>Delta_P_mus_c</ci>
+                            <ci>Delta_P_mus_p</ci>
                         </apply>
-                        <ci>alpha_P_mus_min</ci>
+                        <ci>Delta_P_mus_min</ci>
                     </apply>
-                    <ci>alpha_P_mus_max</ci>
+                    <ci>Delta_P_mus_max</ci>
                 </apply>
             </apply>
         </math>

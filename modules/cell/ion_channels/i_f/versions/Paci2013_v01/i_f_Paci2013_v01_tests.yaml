@@ -4,22 +4,6 @@ reviewed: false
 notes: 'Paci 2013 hiPSC-CM (ventricular-like) funny current I_f = g_f Xf (Vm - E_f). Algebraic: all gates, concentrations
   and the membrane potential are inputs, so alone it is a pure function of its inputs, checked exactly against the original
   model equations.'
-expected_failures:
-  run_test: 'generation fails: the gate inputs Xf are declared private_interface=''in'' (a leftover of the original Paci encapsulation
-    hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
-    With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  verification_test_invariants: 'generation fails: the gate inputs Xf are declared private_interface=''in'' (a leftover of
-    the original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
-    Fix: public_interface=''in''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  verification_test_BC: 'generation fails: the gate inputs Xf are declared private_interface=''in'' (a leftover of the original
-    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
-    With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  verification_test_timestep: 'generation fails: the gate inputs Xf are declared private_interface=''in'' (a leftover of the
-    original Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public'').
-    Fix: public_interface=''in''. With the proposed fix applied to a copy of the library, all tests of this component pass.'
-  stability_test: 'generation fails: the gate inputs Xf are declared private_interface=''in'' (a leftover of the original
-    Paci encapsulation hierarchy) so they cannot be connected (libcellml: ''interface type required is public''). Fix: public_interface=''in''.
-    With the proposed fix applied to a copy of the library, all tests of this component pass.'
 reference_proposals:
   g_f:
     reference: 'paci2013computational; value in the authors'' CellML (PMR workspace sseveri/paci_hyttinen_aaltosetala_severi_2013, ventricularVersion):
