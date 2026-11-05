@@ -175,10 +175,29 @@ def ad_hoc_check(record, entry, external_dirs, system_values, system_means, spec
 
 
 def system_means(model_path, spec, names):
-    """{'instance/var': mean over the logged run} of a generated system model."""
+    """{'instance/var': mean over the logged run} of a generated system model. An input connected to
+    another module's variable is read from the variable that defines it (the solver keeps one name
+    per connected set)."""
+    import xml.etree.ElementTree as ET
     from cam_testing.system import simulate
-    _, out = simulate(model_path, spec, spec.get('solver_info'), names=names)
-    return {k: float(np.mean(v)) for k, v in out.items() if np.all(np.isfinite(v))}
+    from libcuflynx.utilities import smooth_cellml as sc
+    root = ET.parse(checks.flat_model_path(model_path)).getroot()
+    graph = sc._ModelGraph(root)
+    members = {}
+    for comp in root.findall(sc._C + 'component'):
+        for v in comp.findall(sc._C + 'variable'):
+            members.setdefault(graph.find((comp.get('name'), v.get('name'))), []).append((comp.get('name'), v.get('name')))
+    candidates = {}
+    for name in names:
+        instance, _, var = name.partition('/')
+        for comp, v in members.get(graph.find((f'{instance}_module', var)), []):
+            short = comp[:-len('_module')] if comp.endswith('_module') else comp
+            candidates.setdefault(name, []).append(f'{short}/{v}')
+    wanted = sorted({c for cs in candidates.values() for c in cs})
+    _, out = simulate(model_path, spec, spec.get('solver_info'), names=wanted)
+    means = {k: float(np.mean(v)) for k, v in out.items() if np.all(np.isfinite(v))}
+    return {name: next(means[c] for c in cs if c in means) for name, cs in candidates.items()
+            if any(c in means for c in cs)}
 
 
 def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=False, output_dir=None,

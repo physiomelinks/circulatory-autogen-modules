@@ -154,3 +154,14 @@ def test_the_system_exemptions_reach_the_ad_hoc_module_and_the_system(tmp_path):
     assert 'abs_exempt 1' in report['modules']['r']['message']
     assert report['system']['sites'][0]['status'] == 'exempt'
     assert report['exempt'] == [{'variable': 'r_module/x', 'reason': 'test'}]
+
+
+def test_system_means_read_a_connected_input_from_its_source(tmp_path):
+    """systemic_T/u_out is connected to venous_svc's u: the solver keeps one name for both."""
+    d = os.path.join(SYSTEMS, 'closed_loop_cvs', '3compartment')
+    records = smooth.module_array.read_records(os.path.join(d, '3compartment_module_array.json'))
+    model = smooth._generate(str(tmp_path), '3compartment', records, os.path.join(d, '3compartment_parameters.json'), [])
+    spec = dict(smooth.DEFAULT_SPEC, pre_time=0.0, sim_time=0.5, dt=0.01)
+    means = smooth.system_means(model, spec, ['systemic_T/u_out', 'venous_svc/u'])
+    assert set(means) == {'systemic_T/u_out', 'venous_svc/u'}
+    assert means['systemic_T/u_out'] == pytest.approx(means['venous_svc/u'])
