@@ -6,5 +6,6 @@ notes: 'Mixes the venous blood of the regions connected to it, weighting each re
   the gas it carries, j = v C, on its gas_flux_port; the entrance gas_flux_port sums them (multi_port sum: v = sum v_out_i,
   J_O2 = sum j_O2_i, J_CO2 = sum j_CO2_i), so each product is formed in the module that owns both factors. The exit gas_port
   gives C_CO2_mix, C_O2_mix and the exit flow_port v_mix = v, the inputs of a gas_transport_simple (venous_gas_transport).
-  Tested with three regions of different flows and consumptions, their terminals and gas-exchange modules listed in different
-  orders.'
+  Each mixed content is C_mix = J v / (v^2 + eps^2), eps = 1e-12 m3/s: J / v to within (eps / v)^2 at any real flow, 0 at
+  zero flow, the right sign when the total flow reverses, and smooth, so the solver sees no switch. Tested with three regions
+  of different flows and consumptions, their terminals and gas-exchange modules listed in different orders.'
