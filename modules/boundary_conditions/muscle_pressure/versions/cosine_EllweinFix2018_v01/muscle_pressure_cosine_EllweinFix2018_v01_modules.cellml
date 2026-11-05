@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="muscle_pressure_cosine_EllweinFix2018_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="muscle_pressure_cosine_EllweinFix2018_v01">
+        <!-- phase oscillator c = cos(theta), s = sin(theta) at the breathing frequency f; raised-cosine muscle pressure P_mus = -A (1 - c)/2, from 0 at c = 1 to -A at c = -1 -->
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="f" public_interface="in" units="per_s"/>
+        <variable name="A" public_interface="in" units="J_per_m3"/>
+        <variable name="c_init" public_interface="in" units="dimensionless"/>
+        <variable name="s_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="c_init" name="c" public_interface="out" units="dimensionless"/>
+        <variable initial_value="s_init" name="s" public_interface="out" units="dimensionless"/>
+        <variable name="P_mus" public_interface="out" units="J_per_m3"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>c</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">2</cn>
+                            </apply>
+                            <pi/>
+                        </apply>
+                        <ci>f</ci>
+                    </apply>
+                    <ci>s</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>s</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2</cn>
+                            <pi/>
+                        </apply>
+                        <ci>f</ci>
+                    </apply>
+                    <ci>c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>P_mus</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <ci>A</ci>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dimensionless">1</cn>
+                            <ci>c</ci>
+                        </apply>
+                    </apply>
+                    <cn cellml:units="dimensionless">2</cn>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

@@ -1,0 +1,150 @@
+[
+  {
+    "module_type": "ans_linear",
+    "module_subtype": "ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "ans_linear_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "ans_linear_ArgusUNPUBLISHED_v01",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "P_a"
+        ]
+      },
+      {
+        "port_type": "gas_port",
+        "variables": [
+          "C_CO2",
+          "C_O2"
+        ]
+      },
+      {
+        "port_type": "drug_effect_port",
+        "variables": [
+          "E"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "heart_frequency_port",
+        "variables": [
+          "f"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "tau",
+        "second",
+        "access",
+        "constant"
+      ],
+      [
+        "g_P",
+        "m3_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "P_ref",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "g_O2",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C_O2_ref",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "g_CO2",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "C_CO2_ref",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "f_0",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "k_f",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "N_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "P_a",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_O2",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "C_CO2",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "f_E",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "N",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "f",
+        "per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

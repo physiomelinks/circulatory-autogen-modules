@@ -1,0 +1,4 @@
+module_type: simple
+version: vv_noI_ext_flow
+reviewed: false
+notes: 'Linear compliance: dq/dt = v_in - v_out + v_ext, u = (q - q_0_wCont)/C_wCont, C_wCont = C (1 - Delta_C), q_0_wCont = q_0 (1 - Delta_q_us). v_ext is a signed external flow (infusion > 0, bleed < 0). Delta_C and Delta_q_us are fractional decreases of compliance and unstressed volume (0 at rest) from the venous_us_and_compliance_delta_port, the port of the venous constriction effector and the venous compliance drug combiner. Inflow and outflow are given by the neighbours (vv ports); u is shared with both ports and on a pressure_port. With constant flows the solution is exact: q = q_init + (v_in - v_out + v_ext) t. Same as vv_noI with u_0 = 0, plus v_ext, the deltas and a pressure_port.'

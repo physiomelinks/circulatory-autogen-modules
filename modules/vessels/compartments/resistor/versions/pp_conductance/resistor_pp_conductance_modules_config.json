@@ -1,0 +1,85 @@
+[
+  {
+    "module_type": "resistor",
+    "module_subtype": "pp_conductance",
+    "module_format": "cellml",
+    "component_file": "resistor_pp_conductance_modules.cellml",
+    "component_type": "pp_conductance_type",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026circulatory"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      },
+      {
+        "port_type": "resistance_delta_port",
+        "variables": [
+          "Delta_R"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "G",
+        "m6_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "Delta_R",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "G_wCont",
+        "m6_per_Js",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

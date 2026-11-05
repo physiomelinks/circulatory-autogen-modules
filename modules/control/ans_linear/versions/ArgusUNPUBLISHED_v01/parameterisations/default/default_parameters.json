@@ -1,0 +1,18 @@
+{
+ "schema_version": 1,
+ "tau": {"value": 2.0, "units": "second", "data_reference": "ursino1998interaction; heart-period effector time constants 1.5 s (vagal) and 2 s (sympathetic)", "sourced": "no"},
+ "g_P": {"value": -0.00025002125180640354, "units": "m3_per_J", "data_reference": "smyth1969reflex; baroreflex sensitivity of the order of 10-15 ms/mmHg (value recalled, not checked against the paper), about -1 bpm/mmHg at 70 bpm: g_P k_f = -1 bpm/mmHg", "sourced": "no"},
+ "P_ref": {"value": 12398.946, "units": "J_per_m3", "data_reference": "argus2026unpublished; set by hand: mean arterial pressure at rest", "sourced": "no"},
+ "g_O2": {"value": -16.666666666666668, "units": "dimensionless", "data_reference": "argus2026unpublished; set by hand: +1 bpm per 0.002 mL/mL fall in terminal O2 content", "sourced": "no"},
+ "C_O2_ref": {"value": 0.155, "units": "dimensionless", "data_reference": "argus2026unpublished; set by hand: terminal O2 content at rest", "sourced": "no"},
+ "g_CO2": {"value": 3.333333333333333, "units": "dimensionless", "data_reference": "argus2026unpublished; set by hand: +0.5 bpm per 0.005 mL/mL rise in terminal CO2 content", "sourced": "no"},
+ "C_CO2_ref": {"value": 0.505, "units": "dimensionless", "data_reference": "argus2026unpublished; set by hand: terminal CO2 content at rest", "sourced": "no"},
+ "f_0": {"value": 1.1666666666666667, "units": "per_s", "data_reference": "argus2026unpublished; set by hand: 70 bpm at rest", "sourced": "no"},
+ "k_f": {"value": 0.5, "units": "per_s", "data_reference": "argus2026unpublished; set by hand: N = 1 is 30 bpm", "sourced": "no"},
+ "N_init": {"value": 0.0, "units": "dimensionless", "data_reference": "definitional; rest", "sourced": "definitional"},
+ "P_a": {"value": 10665.76, "units": "J_per_m3", "data_reference": "argus2026unpublished; test BC: 80 mmHg (hypotension)", "sourced": "no"},
+ "C_O2": {"value": 0.15, "units": "dimensionless", "data_reference": "argus2026unpublished; test BC", "sourced": "no"},
+ "C_CO2": {"value": 0.51, "units": "dimensionless", "data_reference": "argus2026unpublished; test BC", "sourced": "no"},
+ "E": {"value": 0.0, "units": "dimensionless", "data_reference": "definitional; no drug effect at rest", "sourced": "definitional"},
+ "f_E": {"value": 0.254, "units": "per_s", "data_reference": "argus2026unpublished; set by hand: heart-rate change per unit effect, -Delta_Ts/T^2 of the calibrated control_parasymp model at rest (Delta_Ts = -0.192 s, T = 0.870 s)", "sourced": "no"}
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-04T22:52:40Z",
+  "generatedAt": "2026-11-05T16:16:29Z",
   "collections": {
     "modules": [
       {
@@ -96,6 +96,11 @@
         "name": "muscle_pressure (constant)",
         "file": "muscle_pressure_constant_modules.cellml",
         "path": "modules/boundary_conditions/muscle_pressure/versions/constant/muscle_pressure_constant_modules.cellml"
+      },
+      {
+        "name": "muscle_pressure (cosine_EllweinFix2018_v01)",
+        "file": "muscle_pressure_cosine_EllweinFix2018_v01_modules.cellml",
+        "path": "modules/boundary_conditions/muscle_pressure/versions/cosine_EllweinFix2018_v01/muscle_pressure_cosine_EllweinFix2018_v01_modules.cellml"
       },
       {
         "name": "outlet_flow (constant)",
@@ -468,6 +473,11 @@
         "path": "modules/control/afferent_to_vagal_efferent/versions/Ursino1998_v01/afferent_to_vagal_efferent_Ursino1998_v01_modules.cellml"
       },
       {
+        "name": "ans_linear (ArgusUNPUBLISHED_v01)",
+        "file": "ans_linear_ArgusUNPUBLISHED_v01_modules.cellml",
+        "path": "modules/control/ans_linear/versions/ArgusUNPUBLISHED_v01/ans_linear_ArgusUNPUBLISHED_v01_modules.cellml"
+      },
+      {
         "name": "baroreceptor (Ursino1998_v01)",
         "file": "baroreceptor_Ursino1998_v01_modules.cellml",
         "path": "modules/control/baroreceptor/versions/Ursino1998_v01/baroreceptor_Ursino1998_v01_modules.cellml"
@@ -683,6 +693,16 @@
         "path": "modules/coupling/volume_sum/versions/ArgusUNPUBLISHED_v01/volume_sum_ArgusUNPUBLISHED_v01_modules.cellml"
       },
       {
+        "name": "heart (pp_elastance_cosine_ArgusUNPUBLISHED_v01)",
+        "file": "heart_pp_elastance_cosine_ArgusUNPUBLISHED_v01_modules.cellml",
+        "path": "modules/heart/versions/pp_elastance_cosine_ArgusUNPUBLISHED_v01/heart_pp_elastance_cosine_ArgusUNPUBLISHED_v01_modules.cellml"
+      },
+      {
+        "name": "heart (pp_starling_cosine_ArgusUNPUBLISHED_v01)",
+        "file": "heart_pp_starling_cosine_ArgusUNPUBLISHED_v01_modules.cellml",
+        "path": "modules/heart/versions/pp_starling_cosine_ArgusUNPUBLISHED_v01/heart_pp_starling_cosine_ArgusUNPUBLISHED_v01_modules.cellml"
+      },
+      {
         "name": "heart (vp)",
         "file": "heart_vp_modules.cellml",
         "path": "modules/heart/versions/vp/heart_vp_modules.cellml"
@@ -821,6 +841,11 @@
         "name": "lung_mechanics (ArgusUNPUBLISHED_v01)",
         "file": "lung_mechanics_ArgusUNPUBLISHED_v01_modules.cellml",
         "path": "modules/respiratory/lung_mechanics/versions/ArgusUNPUBLISHED_v01/lung_mechanics_ArgusUNPUBLISHED_v01_modules.cellml"
+      },
+      {
+        "name": "lung_mechanics (driven_ArgusUNPUBLISHED_v01)",
+        "file": "lung_mechanics_driven_ArgusUNPUBLISHED_v01_modules.cellml",
+        "path": "modules/respiratory/lung_mechanics/versions/driven_ArgusUNPUBLISHED_v01/lung_mechanics_driven_ArgusUNPUBLISHED_v01_modules.cellml"
       },
       {
         "name": "lung_mechanics (ventilated_ArgusUNPUBLISHED_v01)",
@@ -1058,6 +1083,11 @@
         "path": "modules/vessels/compartments/resistor/versions/pp/resistor_pp_modules.cellml"
       },
       {
+        "name": "resistor (pp_conductance)",
+        "file": "resistor_pp_conductance_modules.cellml",
+        "path": "modules/vessels/compartments/resistor/versions/pp_conductance/resistor_pp_conductance_modules.cellml"
+      },
+      {
         "name": "rigid_vessel (vv)",
         "file": "rigid_vessel_vv_modules.cellml",
         "path": "modules/vessels/compartments/rigid_vessel/versions/vv/rigid_vessel_vv_modules.cellml"
@@ -1096,6 +1126,11 @@
         "name": "simple (vv_noI)",
         "file": "simple_vv_noI_modules.cellml",
         "path": "modules/vessels/compartments/simple/versions/vv_noI/simple_vv_noI_modules.cellml"
+      },
+      {
+        "name": "simple (vv_noI_ext_flow)",
+        "file": "simple_vv_noI_ext_flow_modules.cellml",
+        "path": "modules/vessels/compartments/simple/versions/vv_noI_ext_flow/simple_vv_noI_ext_flow_modules.cellml"
       },
       {
         "name": "simple (vv_noI_SI)",
@@ -1965,6 +2000,11 @@
         "path": "modules/boundary_conditions/muscle_pressure/versions/constant/muscle_pressure_constant_modules_config.json"
       },
       {
+        "name": "muscle_pressure (cosine_EllweinFix2018_v01)",
+        "file": "muscle_pressure_cosine_EllweinFix2018_v01_modules_config.json",
+        "path": "modules/boundary_conditions/muscle_pressure/versions/cosine_EllweinFix2018_v01/muscle_pressure_cosine_EllweinFix2018_v01_modules_config.json"
+      },
+      {
         "name": "outlet_flow (constant)",
         "file": "outlet_flow_constant_modules_config.json",
         "path": "modules/boundary_conditions/outlet_flow/versions/constant/outlet_flow_constant_modules_config.json"
@@ -2350,6 +2390,11 @@
         "path": "modules/control/afferent_to_vagal_efferent/versions/Ursino1998_v01/afferent_to_vagal_efferent_Ursino1998_v01_modules_config.json"
       },
       {
+        "name": "ans_linear (ArgusUNPUBLISHED_v01)",
+        "file": "ans_linear_ArgusUNPUBLISHED_v01_modules_config.json",
+        "path": "modules/control/ans_linear/versions/ArgusUNPUBLISHED_v01/ans_linear_ArgusUNPUBLISHED_v01_modules_config.json"
+      },
+      {
         "name": "baroreceptor (Ursino1998_v01)",
         "file": "baroreceptor_Ursino1998_v01_modules_config.json",
         "path": "modules/control/baroreceptor/versions/Ursino1998_v01/baroreceptor_Ursino1998_v01_modules_config.json"
@@ -2580,6 +2625,16 @@
         "path": "modules/heart/versions/nonstiff_Argus2026_v01/heart_nonstiff_Argus2026_v01_modules_config.json"
       },
       {
+        "name": "heart (pp_elastance_cosine_ArgusUNPUBLISHED_v01)",
+        "file": "heart_pp_elastance_cosine_ArgusUNPUBLISHED_v01_modules_config.json",
+        "path": "modules/heart/versions/pp_elastance_cosine_ArgusUNPUBLISHED_v01/heart_pp_elastance_cosine_ArgusUNPUBLISHED_v01_modules_config.json"
+      },
+      {
+        "name": "heart (pp_starling_cosine_ArgusUNPUBLISHED_v01)",
+        "file": "heart_pp_starling_cosine_ArgusUNPUBLISHED_v01_modules_config.json",
+        "path": "modules/heart/versions/pp_starling_cosine_ArgusUNPUBLISHED_v01/heart_pp_starling_cosine_ArgusUNPUBLISHED_v01_modules_config.json"
+      },
+      {
         "name": "heart (vp)",
         "file": "heart_vp_modules_config.json",
         "path": "modules/heart/versions/vp/heart_vp_modules_config.json"
@@ -2718,6 +2773,11 @@
         "name": "lung_mechanics (ArgusUNPUBLISHED_v01)",
         "file": "lung_mechanics_ArgusUNPUBLISHED_v01_modules_config.json",
         "path": "modules/respiratory/lung_mechanics/versions/ArgusUNPUBLISHED_v01/lung_mechanics_ArgusUNPUBLISHED_v01_modules_config.json"
+      },
+      {
+        "name": "lung_mechanics (driven_ArgusUNPUBLISHED_v01)",
+        "file": "lung_mechanics_driven_ArgusUNPUBLISHED_v01_modules_config.json",
+        "path": "modules/respiratory/lung_mechanics/versions/driven_ArgusUNPUBLISHED_v01/lung_mechanics_driven_ArgusUNPUBLISHED_v01_modules_config.json"
       },
       {
         "name": "lung_mechanics (ventilated_ArgusUNPUBLISHED_v01)",
@@ -2955,6 +3015,11 @@
         "path": "modules/vessels/compartments/resistor/versions/pp/resistor_pp_modules_config.json"
       },
       {
+        "name": "resistor (pp_conductance)",
+        "file": "resistor_pp_conductance_modules_config.json",
+        "path": "modules/vessels/compartments/resistor/versions/pp_conductance/resistor_pp_conductance_modules_config.json"
+      },
+      {
         "name": "rigid_vessel (vv)",
         "file": "rigid_vessel_vv_modules_config.json",
         "path": "modules/vessels/compartments/rigid_vessel/versions/vv/rigid_vessel_vv_modules_config.json"
@@ -2993,6 +3058,11 @@
         "name": "simple (vv_noI)",
         "file": "simple_vv_noI_modules_config.json",
         "path": "modules/vessels/compartments/simple/versions/vv_noI/simple_vv_noI_modules_config.json"
+      },
+      {
+        "name": "simple (vv_noI_ext_flow)",
+        "file": "simple_vv_noI_ext_flow_modules_config.json",
+        "path": "modules/vessels/compartments/simple/versions/vv_noI_ext_flow/simple_vv_noI_ext_flow_modules_config.json"
       },
       {
         "name": "simple (vv_noI_SI)",
@@ -3857,6 +3927,11 @@
         "path": "modules/boundary_conditions/muscle_pressure/versions/constant/muscle_pressure_constant_units.cellml"
       },
       {
+        "name": "muscle_pressure (cosine_EllweinFix2018_v01)",
+        "file": "muscle_pressure_cosine_EllweinFix2018_v01_units.cellml",
+        "path": "modules/boundary_conditions/muscle_pressure/versions/cosine_EllweinFix2018_v01/muscle_pressure_cosine_EllweinFix2018_v01_units.cellml"
+      },
+      {
         "name": "outlet_flow (constant)",
         "file": "outlet_flow_constant_units.cellml",
         "path": "modules/boundary_conditions/outlet_flow/versions/constant/outlet_flow_constant_units.cellml"
@@ -4227,6 +4302,11 @@
         "path": "modules/control/afferent_to_vagal_efferent/versions/Ursino1998_v01/afferent_to_vagal_efferent_Ursino1998_v01_units.cellml"
       },
       {
+        "name": "ans_linear (ArgusUNPUBLISHED_v01)",
+        "file": "ans_linear_ArgusUNPUBLISHED_v01_units.cellml",
+        "path": "modules/control/ans_linear/versions/ArgusUNPUBLISHED_v01/ans_linear_ArgusUNPUBLISHED_v01_units.cellml"
+      },
+      {
         "name": "baroreceptor (Ursino1998_v01)",
         "file": "baroreceptor_Ursino1998_v01_units.cellml",
         "path": "modules/control/baroreceptor/versions/Ursino1998_v01/baroreceptor_Ursino1998_v01_units.cellml"
@@ -4442,6 +4522,16 @@
         "path": "modules/coupling/volume_sum/versions/ArgusUNPUBLISHED_v01/volume_sum_ArgusUNPUBLISHED_v01_units.cellml"
       },
       {
+        "name": "heart (pp_elastance_cosine_ArgusUNPUBLISHED_v01)",
+        "file": "heart_pp_elastance_cosine_ArgusUNPUBLISHED_v01_units.cellml",
+        "path": "modules/heart/versions/pp_elastance_cosine_ArgusUNPUBLISHED_v01/heart_pp_elastance_cosine_ArgusUNPUBLISHED_v01_units.cellml"
+      },
+      {
+        "name": "heart (pp_starling_cosine_ArgusUNPUBLISHED_v01)",
+        "file": "heart_pp_starling_cosine_ArgusUNPUBLISHED_v01_units.cellml",
+        "path": "modules/heart/versions/pp_starling_cosine_ArgusUNPUBLISHED_v01/heart_pp_starling_cosine_ArgusUNPUBLISHED_v01_units.cellml"
+      },
+      {
         "name": "heart (vp)",
         "file": "heart_vp_units.cellml",
         "path": "modules/heart/versions/vp/heart_vp_units.cellml"
@@ -4580,6 +4670,11 @@
         "name": "lung_mechanics (ArgusUNPUBLISHED_v01)",
         "file": "lung_mechanics_ArgusUNPUBLISHED_v01_units.cellml",
         "path": "modules/respiratory/lung_mechanics/versions/ArgusUNPUBLISHED_v01/lung_mechanics_ArgusUNPUBLISHED_v01_units.cellml"
+      },
+      {
+        "name": "lung_mechanics (driven_ArgusUNPUBLISHED_v01)",
+        "file": "lung_mechanics_driven_ArgusUNPUBLISHED_v01_units.cellml",
+        "path": "modules/respiratory/lung_mechanics/versions/driven_ArgusUNPUBLISHED_v01/lung_mechanics_driven_ArgusUNPUBLISHED_v01_units.cellml"
       },
       {
         "name": "lung_mechanics (ventilated_ArgusUNPUBLISHED_v01)",
@@ -4817,6 +4912,11 @@
         "path": "modules/vessels/compartments/resistor/versions/pp/resistor_pp_units.cellml"
       },
       {
+        "name": "resistor (pp_conductance)",
+        "file": "resistor_pp_conductance_units.cellml",
+        "path": "modules/vessels/compartments/resistor/versions/pp_conductance/resistor_pp_conductance_units.cellml"
+      },
+      {
         "name": "rigid_vessel (vv)",
         "file": "rigid_vessel_vv_units.cellml",
         "path": "modules/vessels/compartments/rigid_vessel/versions/vv/rigid_vessel_vv_units.cellml"
@@ -4855,6 +4955,11 @@
         "name": "simple (vv_noI)",
         "file": "simple_vv_noI_units.cellml",
         "path": "modules/vessels/compartments/simple/versions/vv_noI/simple_vv_noI_units.cellml"
+      },
+      {
+        "name": "simple (vv_noI_ext_flow)",
+        "file": "simple_vv_noI_ext_flow_units.cellml",
+        "path": "modules/vessels/compartments/simple/versions/vv_noI_ext_flow/simple_vv_noI_ext_flow_units.cellml"
       },
       {
         "name": "simple (vv_noI_SI)",

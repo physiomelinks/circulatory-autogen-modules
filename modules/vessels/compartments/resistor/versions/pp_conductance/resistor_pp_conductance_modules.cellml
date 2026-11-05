@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="resistor_pp_conductance" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="pp_conductance_type">
+        <!-- flow through a conductance: v = G_wCont (u_in - u_out), G_wCont = G/(1 + Delta_R); Delta_R is the fractional resistance increase (0 at rest) from the resistance_delta_port, as for the terminals R_T (1 + Delta_R) -->
+        <variable name="G" public_interface="in" units="m6_per_Js"/>
+        <variable name="Delta_R" public_interface="in" units="dimensionless"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable name="G_wCont" public_interface="out" units="m6_per_Js"/>
+        <variable name="v" public_interface="out" units="m3_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>G_wCont</ci>
+                <apply>
+                    <divide/>
+                    <ci>G</ci>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>Delta_R</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v</ci>
+                <apply>
+                    <times/>
+                    <ci>G_wCont</ci>
+                    <apply>
+                        <minus/>
+                        <ci>u_in</ci>
+                        <ci>u_out</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

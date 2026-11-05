@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="heart_pp_starling_cosine_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="heart_starling_cosine">
+        <!-- phase oscillator c = cos(theta), s = sin(theta) at frequency f; valveless pump from the inlet (venous) to the outlet (arterial): v = s_heart K f (u_in - P_v0)(1 - c), mean over a beat s_heart K f (u_in - P_v0). u_out is the outlet pressure the port gives; the flow does not depend on it. s_heart (heart strength, 1 at rest) comes through heart_strength_port. -->
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="f" public_interface="in" units="per_s"/>
+        <variable name="K" public_interface="in" units="m6_per_J"/>
+        <variable name="s_heart" public_interface="in" units="dimensionless"/>
+        <variable name="P_v0" public_interface="in" units="J_per_m3"/>
+        <variable name="c_init" public_interface="in" units="dimensionless"/>
+        <variable name="s_init" public_interface="in" units="dimensionless"/>
+        <variable name="u_in" public_interface="in" units="J_per_m3"/>
+        <variable name="u_out" public_interface="in" units="J_per_m3"/>
+        <variable initial_value="c_init" name="c" public_interface="out" units="dimensionless"/>
+        <variable initial_value="s_init" name="s" public_interface="out" units="dimensionless"/>
+        <variable name="v" public_interface="out" units="m3_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>c</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <minus/>
+                                <cn cellml:units="dimensionless">2</cn>
+                            </apply>
+                            <pi/>
+                        </apply>
+                        <ci>f</ci>
+                    </apply>
+                    <ci>s</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>s</ci>
+                </apply>
+                <apply>
+                    <times/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <cn cellml:units="dimensionless">2</cn>
+                            <pi/>
+                        </apply>
+                        <ci>f</ci>
+                    </apply>
+                    <ci>c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <times/>
+                                <ci>s_heart</ci>
+                                <ci>K</ci>
+                            </apply>
+                            <ci>f</ci>
+                        </apply>
+                        <apply>
+                            <minus/>
+                            <ci>u_in</ci>
+                            <ci>P_v0</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <ci>c</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

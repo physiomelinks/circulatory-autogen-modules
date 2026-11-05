@@ -1,0 +1,4 @@
+module_type: ans_linear
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'One linear autonomic state N (dimensionless): tau dN/dt = -N + g_P (P_a - P_ref) + g_O2 (C_O2 - C_O2_ref) + g_CO2 (C_CO2 - C_CO2_ref), heart frequency f = f_0 + k_f N + f_E E. Signs: g_P < 0 (high pressure lowers heart rate), g_O2 < 0 (low terminal O2 raises it), g_CO2 > 0 (high terminal CO2 raises it). An additive effect E (e.g. a drug, 0 at rest) from the drug_effect_port adds f_E E to f. P_a comes through a pressure_port, the terminal contents (C_CO2, C_O2) through a gas_port, and f goes to the heart through heart_frequency_port. No saturation: f is unbounded, so keep inputs in the range where f stays physiological. With constant inputs the exact solution is N = X + (N_init - X) exp(-t/tau).'

@@ -1,0 +1,122 @@
+[
+  {
+    "module_type": "heart",
+    "module_subtype": "pp_starling_cosine_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "heart_pp_starling_cosine_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "heart_starling_cosine",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished",
+      "starling1918linacre"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_in"
+        ]
+      },
+      {
+        "port_type": "heart_frequency_port",
+        "variables": [
+          "f"
+        ]
+      },
+      {
+        "port_type": "heart_strength_port",
+        "variables": [
+          "s_heart"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "K",
+        "m6_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "s_heart",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "P_v0",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "c_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "s_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "s",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "v",
+        "m3_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]
