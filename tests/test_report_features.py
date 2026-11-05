@@ -274,3 +274,16 @@ def test_assembled_site_holds_the_images_its_version_page_links_to(tmp_path):
     assert missing == []
     assert not os.path.exists(os.path.join(os.path.dirname(page), 'parameterisations', 'default', 'source_figures',
                                            'source_figures.json'))
+
+# ---- structure warnings -------------------------------------------------------------------------
+
+def test_version_page_lists_unused_variables_among_the_structure_warnings():
+    import dataclasses
+    from cam_testing.suite import test_structure as ts
+    v = load_version('Lotka_Volterra', 'Lotka1925_v01')
+    rows = v.config['variables_and_units'] + [['spare_k', 'dimensionless', 'access', 'constant']]
+    extra = dataclasses.replace(v, config={**v.config, 'variables_and_units': rows})
+    errors, warnings = ts.version_problems(extra)
+    ctx = dict(report.version_context(v), structure={'errors': errors, 'warnings': warnings, 'known_issues': []})
+    html = report._env().get_template('version.html').render(**ctx)
+    assert 'Structural checks' in html and f'{ts.UNUSED_MESSAGE}: spare_k (config)' in html
