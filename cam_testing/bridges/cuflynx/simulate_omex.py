@@ -62,8 +62,9 @@ def _free_port():
 def launch(binary):
     port = _free_port()
     base = f'http://127.0.0.1:{port}'
+    # CUFLYNX_NO_URL_SCHEME: a test run leaves the user's cuflynx:// link handler alone
     env = dict(os.environ, BROWSER='true', CUFLYNX_CONFIG_DIR=tempfile.mkdtemp(prefix='cam_cuflynx_config_'),
-               CUFLYNX_OUTPUT_DIR=tempfile.mkdtemp(prefix='cam_cuflynx_out_'))
+               CUFLYNX_OUTPUT_DIR=tempfile.mkdtemp(prefix='cam_cuflynx_out_'), CUFLYNX_NO_URL_SCHEME='1')
     env.pop('CIRCULATORY_AUTOGEN_SRC', None)
     log = open(os.path.join(env['CUFLYNX_OUTPUT_DIR'], 'cuflynx.log'), 'w')
     proc = subprocess.Popen([binary, '--port', str(port), '--browser'], stdout=log, stderr=subprocess.STDOUT,
