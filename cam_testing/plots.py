@@ -361,16 +361,15 @@ def coupled_heatmaps(path, title, trace, snapshots, box_um, exchange_cells, quan
 
 @styled
 def plot_smoothing(path, labels, excess, l2, tol, title):
-    '''The smoothed model's error at each sweep point (nominal first): the worst output's error (RMS
-    over its range across the points) over its solver floor (bars, against tol) and the error (dots).'''
+    '''The smoothed model's error at each sweep point (nominal first): the worst output's error (RMS over its scale) over its solver floor (bars, against tol) and the error (dots).'''
     n = len(labels)
     fig, ax = plt.subplots(figsize=(max(4.6, 0.22 * n + 1.5), 3.4), constrained_layout=True)
     x = np.arange(n)
     floor = 1e-12
     ax.bar(x, np.maximum(np.asarray(excess, dtype=float), floor), color=CATEGORICAL[0],
-           label='error (RMS/range) over the solver floor')
+           label='error (RMS/scale) over the solver floor')
     ax.plot(x, np.maximum(np.asarray(l2, dtype=float), floor), 'o', color=CATEGORICAL[1], markersize=3,
-            label='error (RMS/range)')
+            label='error (RMS/scale)')
     ax.axhline(tol, color=TEXT_PRIMARY, linewidth=1, linestyle='--', label=f'tol {tol:g}')
     ax.set_yscale('log')
     ax.set_xticks(x)

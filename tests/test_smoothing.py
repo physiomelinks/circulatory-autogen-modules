@@ -132,8 +132,8 @@ def test_spec_exemptions_leave_sites_as_written(monkeypatch):
     assert result.status == checks.PASSED, result.message
     assert result.metrics['counts'] == {'maxmin_exempt': 1, 'floor_not_smoothed': 1}
     report = json.loads(open(os.path.join(version.dir, result.metrics['report'])).read())
-    assert report['sites'][0]['status'] == 'exempt'
-    assert report['sites'][0]['reason'] == 'test: a switch meant to stay'
+    site = next(x for x in report['sites'] if x['variable'] == 'T_eff')
+    assert site['status'] == 'exempt' and site['reason'] == 'test: a switch meant to stay'
 
 
 def test_the_system_exemptions_reach_the_ad_hoc_module_and_the_system(tmp_path):
@@ -174,17 +174,19 @@ def test_system_means_read_a_connected_input_from_its_source(tmp_path):
     assert means['systemic_T/u_out'] == pytest.approx(means['venous_svc/u'])
 
 
-def test_a_clamp_that_is_zero_throughout_is_judged_on_its_stated_floor():
-    """The error is RMS / the output's range over all the points, not / its norm, which is 0 for a
-    clamp that is identically zero in the original (a smoothed clamp gives about eps^2/(4|x|) there)."""
+def test_an_output_is_judged_on_max_of_its_range_its_mean_and_atol():
+    """RMS / max(R, M, atol), not / its own norm: a clamp that is 0 throughout is judged against atol, an
+    output that is constant and nonzero (the afferent modules' outputs with their inputs held) against its
+    value, a varying one against its range; abs_floor overrides per output."""
     t = np.linspace(0, 1, 101)
-    originals = [{'clamp': np.zeros_like(t), 'p': np.sin(2 * np.pi * t)},
-                 {'clamp': np.zeros_like(t), 'p': 2 * np.sin(2 * np.pi * t)}]
-    smoothed = {'clamp': np.full_like(t, 2e-7), 'p': 2 * np.sin(2 * np.pi * t) + 1e-3}
-    scales = checks.output_scales(originals)
-    assert scales['p'] == pytest.approx(4.0, rel=1e-3) and scales['clamp'] == checks.DEFAULT_SMOOTHING['abs_floor']
+    originals = [{'clamp': np.zeros_like(t), 'const': np.full_like(t, 3.0), 'p': np.sin(2 * np.pi * t)},
+                 {'clamp': np.zeros_like(t), 'const': np.full_like(t, 3.0), 'p': 2 * np.sin(2 * np.pi * t)}]
+    smoothed = {'clamp': np.full_like(t, 2e-7), 'const': np.full_like(t, 3.0 + 3e-7), 'p': 2 * np.sin(2 * np.pi * t) + 1e-3}
+    scales = checks.output_scales(originals, atol=1e-6)
+    assert scales == {'clamp': 1e-6, 'const': pytest.approx(3.0), 'p': pytest.approx(4.0, rel=1e-3)}
     errors = checks._relative_errors(originals[1], smoothed, scales)
+    assert errors['clamp'][0] == pytest.approx(0.2)
+    assert errors['const'][0] == pytest.approx(1e-7)
     assert errors['p'][0] == pytest.approx(1e-3 / 4.0, rel=1e-3)
-    assert errors['clamp'][0] == pytest.approx(200.0)                    # 2e-7 against the default floor 1e-9
-    stated = checks.output_scales(originals, {'clamp': 1e-3})
+    stated = checks.output_scales(originals, {'clamp': 1e-3}, atol=1e-6)
     assert checks._relative_errors(originals[1], smoothed, stated)['clamp'][0] == pytest.approx(2e-4)
