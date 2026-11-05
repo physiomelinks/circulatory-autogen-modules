@@ -119,7 +119,8 @@ def library_check(version, settings_override=None, force=False):
     return checks.verification_test_smoothing(cm, **(settings_override or {})), False
 
 
-def ad_hoc_check(record, entry, external_dirs, system_values, system_means, spec, settings, work_dir, out_dir):
+def ad_hoc_check(record, entry, external_dirs, system_values, system_means, spec, settings, work_dir, out_dir,
+                 exempt=()):
     """The ad hoc harness of a module with no library version: the module alone, generated as the vessel
     "mod", its constants at the system's values and its boundary conditions held at their mean in the
     system run, each swept over DEFAULT_FACTORS x its value. Returns (status, message, metrics)."""
@@ -159,6 +160,13 @@ def ad_hoc_check(record, entry, external_dirs, system_values, system_means, spec
     records = [{'name': harness.VESSEL, 'module_type': record['module_type'],
                 'module_subtype': record['module_subtype'], 'inp_instances': [], 'out_instances': []}]
     model_path = _generate(work_dir, f'adhoc_{name}', records, params_path, external_dirs)
+    # the system's exemptions of this instance ("<name>_module/<var>"), as the module alone names them
+    own = []
+    for e in exempt:
+        comp, _, var = e['variable'].rpartition('/')
+        if comp in ('', f'{name}_module'):
+            own.append({'variable': f'{harness.VESSEL}_module/{var}' if comp else var, 'reason': e.get('reason', '')})
+    settings = dict(settings, exempt_entries=own)
     status, message, metrics, _figs, details = checks.compare_smoothed(
         model_path, spec, outputs or checks.harness.state_outputs(harness.simulation_helper(model_path, spec)),
         points, nominal, settings, out_dir, work_dir, f'adhoc_{name}')
@@ -174,9 +182,12 @@ def system_means(model_path, spec, names):
 
 
 def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=False, output_dir=None,
-        spec=None, settings=None, force=False, work_dir=None):
+        spec=None, settings=None, force=False, work_dir=None, exempt=None):
     """The pipeline above. Returns the merged report; raises SmoothingStopped before the system step
-    when a module fails (or is not checked, unless allow_unchecked)."""
+    when a module fails (or is not checked, unless allow_unchecked). ``exempt``: the system's own
+    exemptions ([{"variable": "[component/]glob", "reason"}]), merged with each library version's
+    smoothing.exempt (as "<instance>_module/<variable>")."""
+    exempt = list(exempt or [])
     spec = dict(DEFAULT_SPEC, **(spec or {}))
     settings = dict(checks.DEFAULT_SMOOTHING, **(settings or {}))
     prefix = os.path.basename(module_array_path).split('_module_array')[0].split('_vessel_array')[0]
@@ -220,7 +231,7 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
         elif entry is not None:
             status, message, metrics = ad_hoc_check(
                 rec, entry, external_dirs, values, means, spec, settings,
-                os.path.join(work_dir, 'adhoc', rec['name']), os.path.join(output_dir, 'adhoc', rec['name']))
+                os.path.join(work_dir, 'adhoc', rec['name']), os.path.join(output_dir, 'adhoc', rec['name']), exempt)
             res = {'kind': AD_HOC, 'status': status, 'message': message,
                    'worst_sites': metrics.get('attribution', [])[:3]}
         else:
@@ -228,7 +239,13 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
                    'message': 'no library version and no config in the external modules dirs'}
         checked[key] = results[rec['name']] = dict(res, module=key)
 
-    report = {'module_array': os.path.abspath(module_array_path), 'parameters': os.path.abspath(parameters_path),
+    # each library version's exemptions, for its instances in the system
+    system_exempt = list(exempt)
+    for rec, version, _entry in modules:
+        if version is not None:
+            system_exempt += checks.exempt_entries((version.spec.get('smoothing') or {}).get('exempt'),
+                                                   component=f'{rec["name"]}_module')
+    report = {'module_array': os.path.abspath(module_array_path), 'exempt': system_exempt, 'parameters': os.path.abspath(parameters_path),
               'settings': settings, 'spec': spec, 'modules': results}
     with contextlib.redirect_stdout(io.StringIO()) as ranges_out:
         try:
@@ -257,7 +274,7 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
                                        pre_time=spec['pre_time'])
     outputs = harness.state_outputs(helper)
     status, message, metrics, _figs, details = checks.compare_smoothed(
-        system_model, spec, outputs, [{'label': 'nominal', 'params': {}}], {}, settings,
+        system_model, spec, outputs, [{'label': 'nominal', 'params': {}}], {}, dict(settings, exempt_entries=system_exempt),
         output_dir, os.path.join(work_dir, 'system'), prefix)
     with open(metrics.get('report', os.path.join(output_dir, 'smoothing_report.json'))) as f:
         system_report = json.load(f)
@@ -279,6 +296,7 @@ def main(argv=None):
     parser.add_argument('--parameters', required=True)
     parser.add_argument('--external-modules-dir', action='append', default=[],
                         help='a directory of module configs and CellML outside the library (repeatable)')
+    parser.add_argument('--exempt', help='JSON [{"variable": "[component/]glob", "reason": ...}] for the system')
     parser.add_argument('--allow-unchecked', action='store_true',
                         help='run the system step although some modules could not be checked')
     parser.add_argument('--output-dir')
@@ -293,8 +311,12 @@ def main(argv=None):
             if v is not None}
     settings = {k: v for k, v in (('rel', args.rel), ('tol', args.tol)) if v is not None}
     try:
+        exempt = None
+        if args.exempt:
+            with open(args.exempt) as f:
+                exempt = json.load(f)
         report = run(args.module_array, args.parameters, args.external_modules_dir, args.allow_unchecked,
-                     args.output_dir, spec, settings, args.force)
+                     args.output_dir, spec, settings, args.force, exempt=exempt)
     except SmoothingStopped as e:
         print(f'stopped before the system step: {e}')
         return 2

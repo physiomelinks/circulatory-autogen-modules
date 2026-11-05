@@ -611,6 +611,9 @@ model with a square-root form (no tanh, so the model lifts exactly to quadratic 
 - **Saved.** `results/smoothing/` holds the smoothed model and `smoothing_report.json` (each site: kind,
   eps, range, flags such as `floor_upstream`, `one_sided` and `nan_at_init`), and `plots/smoothing.png` the
   error at each point. A version with no non-smooth sites passes with "no non-smooth sites".
+- **Exempt.** `smoothing.exempt` lists the variables whose sites stay as written, each with its reason;
+  the report records them as `exempt`, with the states or floor phases they switch on
+  (`switch_variables`). The report's `jump_candidates` suggest more (never applied).
 
 A system model is smoothed module by module first, then as a whole:
 
@@ -624,6 +627,8 @@ no library version but a config in `--external-modules-dir` is checked alone, it
 and its inputs at their mean in the system run, each swept over 0.5-2 x its value, and reported as "checked with the
 default sweep". A failing module stops the run before the system step, as does a module found nowhere unless
 `--allow-unchecked`. The system's `smoothing_report.json` tags each site with its module and that module's result.
+`--exempt file.json` (`[{"variable": "<instance>_module/<variable>", "reason": ...}]`) adds the system's own
+exemptions to each library version's `smoothing.exempt`, applied to its instances.
 
 **The report's test overview has the same columns for every version**, component or supermodule,
 in this order: Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Smoothing, Calibration (the version's),
@@ -801,7 +806,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
-| `smoothing` | verification_config | the smoothing test: `rel` (eps relative to each site's range over the runs, one number or `{abs, maxmin, piecewise}`, default 1e-3, with `variables: {variable: rel}` for the sites of one equation), `tol` (largest relative L2 error of any output at any point, default 1e-2), `collapse` (`true`, or the site numbers k to replace by their branch where they never switch), `parameters` (the bc_sweep parameters to sweep; default all), `time_budget` (s for the runs, 420), `rationale` |
+| `smoothing` | verification_config | the smoothing test: `exempt` (`[[variable, reason], ...]`: the sites in those variables' equations are left as written, for switches meant to stay, such as a phase gate or a jump a continuous function already absorbs), `rel` (eps relative to each site's range over the runs, one number or `{abs, maxmin, piecewise}`, default 1e-3, with `variables: {variable: rel}` for the sites of one equation), `tol` (largest relative L2 error of any output at any point, default 1e-2), `collapse` (`true`, or the site numbers k to replace by their branch where they never switch), `parameters` (the bc_sweep parameters to sweep; default all), `time_budget` (s for the runs, 420), `rationale` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`; a baseline's `obs_data` is run through its protocol, see Protocol-driven tests), variables, targets, metric, threshold, optimiser settings |
 | `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`, and `wrapped` / `reciprocal` as in a system model's equivalence) |

@@ -1963,7 +1963,7 @@ def validation_test_calibrate(cm):
 # ----------------------------------------------------------------------------------------------
 
 # smoothing (verification_config): rel, eps relative to each site's range (a float, or per kind
-# {abs, maxmin, piecewise}); tol, the largest relative L2 error of any output at any point;
+# {abs, maxmin, piecewise}); exempt, [[variable, reason], ...] whose sites are left as written; tol, the largest relative L2 error of any output at any point;
 # collapse (null, true, or site numbers k); parameters, the bc_sweep parameters to sweep (default:
 # all of bc_sweep's); time_budget [s] for the runs; rationale.
 DEFAULT_SMOOTHING = {'rel': 1e-3, 'tol': 1e-2, 'collapse': None, 'time_budget': 420.0}
@@ -1976,7 +1976,20 @@ def smoothing_settings(spec, **overrides):
     settings = dict(DEFAULT_SMOOTHING)
     settings.update({k: v for k, v in (spec.get('smoothing') or {}).items() if k != 'rationale'})
     settings.update({k: v for k, v in overrides.items() if v is not None})
+    settings['exempt_entries'] = exempt_entries(settings.get('exempt'))
     return settings
+
+
+def exempt_entries(rows, component=None):
+    """smoothing.exempt rows [[variable, reason], ...] as libcuflynx's exempt entries; ``component``
+    qualifies each variable (e.g. "<instance>_module" in a system model)."""
+    out = []
+    for row in rows or []:
+        variable, reason = (row[0], row[1] if len(row) > 1 else '') if isinstance(row, (list, tuple)) else \
+            (row['variable'], row.get('reason', ''))
+        out.append({'variable': f'{component}/{variable}' if component and '/' not in variable else variable,
+                    'reason': reason})
+    return out
 
 
 def flat_model_path(model_path):
@@ -2097,7 +2110,7 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     metrics = {'settings': {k: settings.get(k) for k in ('rel', 'tol', 'collapse')}}
     report_path = os.path.join(out_dir, 'smoothing_report.json')
     if not sc.probe_variables(probed):
-        _, report = sc.smooth(text, {})
+        _, report = sc.smooth(text, {}, exempt=settings.get('exempt_entries'))
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2)
         metrics.update({'n_sites': 0, 'counts': report['counts'], 'not_smoothed': report['not_smoothed']})
@@ -2131,7 +2144,8 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
                        'solver_info': spec.get('solver_info') or {}, 'param_vals': p['params']} for p in used_points]
     with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
         ranges, each = sc.reference_ranges(probe_path, reference_runs, per_run=True)
-    smoothed, report = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'))
+    exempt = settings.get('exempt_entries') or []
+    smoothed, report = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), exempt=exempt)
     smooth_path = os.path.join(out_dir, f'{name}_smooth.cellml')
     with open(smooth_path, 'w', encoding='utf-8') as f:
         f.write(smoothed)
@@ -2160,7 +2174,8 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     if (bool(failing) if attribute is None else attribute) and worst['l2'] > 0:
         index = [r['point'] for r in rows].index(worst['point'])
         for group, ks in list(site_groups(report).items())[:ATTRIBUTION_CAP]:
-            one, _ = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), only=ks)
+            one, _ = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), only=ks,
+                               exempt=exempt)
             path_one = os.path.join(work_dir, f'{name}_smooth_{group}.cellml')
             with open(path_one, 'w', encoding='utf-8') as f:
                 f.write(one)
