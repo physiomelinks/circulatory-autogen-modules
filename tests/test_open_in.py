@@ -1,7 +1,8 @@
 """
 The version page's "Open in" links (CellDL for a bond graph, PhLynx for the version's PhLynx export,
-CUFLynx per parameterisation archive), the files the site copies for them, the PhLynx export kept with the
-results, the calibration result in a parameterisation's CUFLynx archive, and the page's base64 encoder
+CUFLynx per parameterisation archive), the CellDL editor they open (CAM_CELLDL_EDITOR_URL), the
+files the site copies for them, the PhLynx export kept with the results, the calibration result in a
+parameterisation's CUFLynx archive, and the page's base64 encoder and by-URL fallback
 (cam_testing/templates/_open_in.js, run under node). No model is generated or simulated.
 """
 import base64
@@ -15,8 +16,9 @@ import zipfile
 from types import SimpleNamespace
 
 import pytest
+from markupsafe import escape
 
-from cam_testing import bondgraph, omex, phlynx, report
+from cam_testing import bondgraph, phlynx, report
 from cam_testing.library import load_version
 
 OPEN_IN_JS = os.path.join(report.TEMPLATES, '_open_in.js')
@@ -46,8 +48,22 @@ def test_celldl_link_only_for_a_bond_graph(tmp_path):
     assert report.open_in_context(v)['celldl'] is None
     with open(bondgraph.document_path(v), 'w') as f:
         f.write('<svg xmlns="http://www.w3.org/2000/svg"/>')
-    assert report.open_in_context(v)['celldl'] == {'href': 'mt_v_bondgraph.svg', 'open': report.CELLDL_OPEN}
-    assert report.CELLDL_OPEN == 'https://physiomelinks.github.io/CellDLEditorComponent/?open=celldl#'
+    assert report.open_in_context(v)['celldl'] == {
+        'href': 'mt_v_bondgraph.svg',
+        'open': 'https://physiomelinks.github.io/CellDLEditorComponent/?open=celldl&name=mt_v_bondgraph.svg#',
+        'open_by_url': 'https://physiomelinks.github.io/CellDLEditorComponent/?open='}
+
+
+def test_celldl_editor_url_from_the_environment(tmp_path, monkeypatch):
+    v = _fake_version(tmp_path)
+    with open(bondgraph.document_path(v), 'w') as f:
+        f.write('<svg xmlns="http://www.w3.org/2000/svg"/>')
+    monkeypatch.setenv('CAM_CELLDL_EDITOR_URL', 'http://127.0.0.1:8475/')
+    celldl = report.open_in_context(v)['celldl']
+    assert celldl['open'] == 'http://127.0.0.1:8475/?open=celldl&name=mt_v_bondgraph.svg#'
+    assert celldl['open_by_url'] == 'http://127.0.0.1:8475/?open='
+    monkeypatch.setenv('CAM_CELLDL_EDITOR_URL', '')
+    assert report.celldl_editor_url() == report.CELLDL_EDITOR_URL
 
 
 def test_phlynx_link_to_the_kept_export(tmp_path):
@@ -89,7 +105,8 @@ def test_page_of_a_bond_graph_has_the_celldl_and_phlynx_links(tmp_path):
     html = _render(ctx)
     celldl = re.search(r'<a [^>]*id="open-celldl"[^>]*>', html).group(0)
     assert 'data-open-file="mt_v_bondgraph.svg"' in celldl and 'href="mt_v_bondgraph.svg"' in celldl
-    assert f'data-open-url="{report.CELLDL_OPEN}"' in celldl
+    assert f'data-open-url="{escape(report.celldl_open("mt_v_bondgraph.svg"))}"' in celldl
+    assert f'data-open-by-url="{report.CELLDL_EDITOR_URL}?open="' in celldl
     ph = re.search(r'<a [^>]*id="open-phlynx"[^>]*>', html).group(0)
     assert 'data-open-file="results/mt_v_phlynx.omex"' in ph and 'data-open-url="https://phlynx.com/?open=omex#"' in ph
     # the document itself is the figure, right after the test overview
@@ -112,15 +129,15 @@ def test_supermodule_page_shows_phlynx_not_applicable():
 
 def test_cuflynx_link_per_parameterisation_archive():
     ctx = report.version_context(load_version('Lotka_Volterra', 'Lotka1925_v01'))
-    instances = ctx['components'][0]['parameterisations']
-    assert instances
-    for i in instances:
+    ps = ctx['components'][0]['parameterisations']
+    assert ps
+    for i in ps:
         i['omex'] = f'parameterisations/{i["name"]}/Lotka_Volterra_Lotka1925_v01_{i["name"]}.omex'
     # a parameterisation without a built archive gets no link
-    instances[0]['omex'] = None
+    ps[0]['omex'] = None
     html = _render(ctx)
     links = re.findall(r'<a [^>]*data-cuflynx-omex="([^"]*)"[^>]*>', html)
-    assert links == [i['omex'] for i in instances[1:]]
+    assert links == [i['omex'] for i in ps[1:]]
     tags = re.findall(r'<a [^>]*data-cuflynx-omex="[^"]*"[^>]*>', html)
     assert all('data-cuflynx-open="cuflynx://open?url="' in t and 'cuflynx://' in t for t in tags)
     assert 'needs a CUFLynx that handles cuflynx:// links' in html
@@ -253,6 +270,8 @@ fs.writeFileSync(out, JSON.stringify({
   page: ctx.camOpenIn.cuflynxUrl('cuflynx://open?url=', 'instances/a b/x.omex',
                                  'https://physiomelinks.github.io/cam/modules/v/x.html'),
   disk: ctx.camOpenIn.cuflynxUrl('cuflynx://open?url=', 'instances/i/x.omex', 'file:///home/u/modules/v/x.html'),
+  byUrl: ctx.camOpenIn.byUrl('http://127.0.0.1:8475/?open=', 'mt_v bondgraph.svg', 'http://127.0.0.1:8471/modules/v/x.html'),
+  byUrlDisk: ctx.camOpenIn.byUrl('http://127.0.0.1:8475/?open=', 'x.svg', 'file:///home/u/modules/v/x.html'),
 }));
 '''
 
@@ -276,6 +295,9 @@ def test_page_base64_round_trips_a_binary_file(tmp_path):
     assert r['b64'] == base64.b64encode(blob.read_bytes()).decode()
     assert r['page'] == 'cuflynx://open?url=https%3A%2F%2Fphysiomelinks.github.io%2Fcam%2Fmodules%2Fv%2Finstances%2Fa%2520b%2Fx.omex'
     assert r['disk'] == 'cuflynx://open?url=file%3A%2F%2F%2Fhome%2Fu%2Fmodules%2Fv%2Finstances%2Fi%2Fx.omex'
+    # a document too large for a link opens by its URL from a served page, never from disk
+    assert r['byUrl'] == 'http://127.0.0.1:8475/?open=http%3A%2F%2F127.0.0.1%3A8471%2Fmodules%2Fv%2Fmt_v%2520bondgraph.svg'
+    assert r['byUrlDisk'] is None
 
 
 def test_cuflynx_bridge_leaves_the_link_handler_alone(monkeypatch, tmp_path):
