@@ -80,3 +80,27 @@ def test_the_first_working_step_ends_the_ladder():
                                       1e-2, 10.0, True, budget=10.0, min_step=1e-7, deadline=time.perf_counter() + 60.0)
     assert last['works'] and stop == ''
     assert [r['config']['max_step'] for r in rows] == [None, 1e-2, 1e-3]
+
+
+def _timed_out(rows):
+    def record(cfg, fn, limit):
+        rows.append({'config': cfg, 'works': False, 'timed_out': True, 'seconds': limit})
+        return rows[-1]
+    return record
+
+
+def test_a_timed_out_unconstrained_run_is_reported_not_raised():
+    # The first run has no step limit (step None); its timeout is a message, not a TypeError.
+    rows = []
+    last, stop = checks.refine_family(_timed_out(rows), lambda s: {'max_step': s}, None, 1e-2, 10.0, True,
+                                      budget=1.0, min_step=1e-7, deadline=time.perf_counter() + 60.0)
+    assert [r['config']['max_step'] for r in rows] == [None] and last['timed_out']
+    assert stop == 'stopped: run (unconstrained) reached the 1 s limit'
+
+
+def test_a_timed_out_stepped_run_names_its_step():
+    rows = []
+    last, stop = checks.refine_family(_timed_out(rows), lambda s: {'max_step': s}, None, 1e-2, 10.0, False,
+                                      budget=1.0, min_step=1e-7, deadline=time.perf_counter() + 60.0)
+    assert stop == 'stopped: run (step 0.01) reached the 1 s limit'
+    assert checks.step_label(None) == 'unconstrained' and checks.step_label(1e-3) == 'step 0.001'
