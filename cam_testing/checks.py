@@ -37,7 +37,7 @@ PROPOSED = 'proposed'
 # reviewed yet fails it, so its status never reads as all-passed (it stays public and usable)
 REVIEW_TEST = 'review_test'
 VERSION_TESTS = [REVIEW_TEST, 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
-                 'stability_test']
+                 'stability_test', 'verification_test_smoothing']
 # per parameterisation
 PARAMETERISATION_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
 TESTS = VERSION_TESTS + PARAMETERISATION_TESTS
@@ -1958,12 +1958,297 @@ def validation_test_calibrate(cm):
     return _guard(cm.component, 'validation_test_calibrate', check, cm.parameterisation)
 
 
+# ----------------------------------------------------------------------------------------------
+# verification_test_smoothing
+# ----------------------------------------------------------------------------------------------
+
+# smoothing (verification_config): rel, eps relative to each site's range (a float, or per kind
+# {abs, maxmin, piecewise}); tol, the largest relative L2 error of any output at any point;
+# collapse (null, true, or site numbers k); parameters, the bc_sweep parameters to sweep (default:
+# all of bc_sweep's); time_budget [s] for the runs; rationale.
+DEFAULT_SMOOTHING = {'rel': 1e-3, 'tol': 1e-2, 'collapse': None, 'time_budget': 420.0}
+NO_SITES = 'no non-smooth sites'
+SMOOTHING_DIR = 'smoothing'
+ATTRIBUTION_CAP = 40       # site groups smoothed one at a time to find the worst ones
+
+
+def smoothing_settings(spec, **overrides):
+    settings = dict(DEFAULT_SMOOTHING)
+    settings.update({k: v for k, v in (spec.get('smoothing') or {}).items() if k != 'rationale'})
+    settings.update({k: v for k, v in overrides.items() if v is not None})
+    return settings
+
+
+def flat_model_path(model_path):
+    """The flat CellML libcuflynx writes next to a generated model."""
+    flat = model_path[:-len('.cellml')] + '_flat.cellml'
+    if not os.path.isfile(flat):
+        raise FileNotFoundError(f'no flat model {flat}: libcuflynx writes it when libcellml is installed')
+    return flat
+
+
+def smoothing_points(cm, parameters=None):
+    """The nominal point and every valid bc_sweep point, as [{label, params}] with params
+    {'parameters/<name>': value} ({} for the nominal point), and the points skipped as outside a
+    valid range or breaking a constraint."""
+    sweep_spec = cm.spec.get('bc_sweep') or {}
+    names, _ = sweep_parameter_names(cm)
+    if parameters is not None:
+        names = [n for n in names if n in parameters]
+    by_var = {p.variable_name: p for p in cm.parameters()}
+    bounds = parameter_bounds(cm.component, cm.parameters())
+    constraints = list(sweep_spec.get('constraints') or [])
+    points, skipped = [{'label': 'nominal', 'params': {}}], []
+    for var in names:
+        pname = harness.parameter_name(by_var[var]) if var in by_var else var
+        if pname not in cm.nominal:
+            continue
+        values, why_not = sweep_values(var, cm.nominal[pname], sweep_spec)
+        for value in values if not why_not else []:
+            value = float(value)
+            why = point_skip_reason(var, value, bounds, constraints, cm.param_env({pname: value}))
+            if why:
+                skipped.append({'parameter': var, 'value': value, 'reason': why})
+            else:
+                points.append({'label': f'{var}={value:.4g}', 'params': {'parameters/' + pname: value}})
+    return points, skipped
+
+
+def _relative_errors(original, smoothed):
+    """{output: (relative L2, relative max)} of a smoothed run against the original."""
+    errors = {}
+    for name, y0 in original.items():
+        y1 = smoothed.get(name)
+        if y1 is None or y1.shape != y0.shape or not np.all(np.isfinite(y1)):
+            errors[name] = (math.inf, math.inf)
+            continue
+        d = y1 - y0
+        l2, peak = float(np.linalg.norm(y0)), float(np.max(np.abs(y0)))
+        errors[name] = (float(np.linalg.norm(d)) / l2 if l2 > 0 else float(np.linalg.norm(d)),
+                        float(np.max(np.abs(d))) / peak if peak > 0 else float(np.max(np.abs(d))))
+    return errors
+
+
+def run_points(path, spec, outputs, points, nominal, deadline=None):
+    """Runs a model at each point (``points[i]['params']``, restored to ``nominal`` afterwards); a list
+    of {output: array}, None where the run failed, or 'over budget' after ``deadline``."""
+    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        helper = harness.simulation_helper(path, spec)
+    out = []
+    try:
+        for point in points:
+            if deadline is not None and time.perf_counter() > deadline:
+                out.append('over budget')
+                continue
+            params = point['params']
+            try:
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                    res = harness.run(helper, outputs, params=params)[1]
+                out.append(None if _non_finite(res) else res)
+            except Exception:
+                out.append(None)
+            finally:
+                if params:
+                    helper.set_param_vals(list(params), [nominal[n] for n in params])
+    finally:
+        if hasattr(helper, 'close_simulation'):
+            helper.close_simulation()
+    return out
+
+
+def _worst(errors):
+    """(worst output, l2, max) of one point's errors (None: the run failed)."""
+    if errors is None:
+        return None, math.inf, math.inf
+    name = max(errors, key=lambda k: errors[k][0])
+    return name, errors[name][0], max(e[1] for e in errors.values())
+
+
+def site_groups(report):
+    """{group k: [site k]}: an abs/max/min site alone, a piecewise's comparisons together."""
+    groups = {}
+    for site in report['sites']:
+        if site['status'] == 'smoothed' and not site.get('collapsed'):
+            groups.setdefault(site.get('piecewise_k', site['k']), []).append(site['k'])
+    return groups
+
+
+def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_dir, work_dir, name,
+                     plot=None, title='', attribute=None, floor_solver_info=None):
+    """Probes a generated model's flat CellML, runs it at ``points`` for each site's range, smooths it
+    and compares the smoothed model with the original at each point.
+
+    Returns (status, message, metrics, figures, details); writes ``<name>_smooth.cellml`` and
+    ``smoothing_report.json`` into ``out_dir``. ``attribute``: smooth each site group alone at the
+    worst point (default: when a point is over tol).
+
+    The solver's own error is part of any comparison at the version's settings: valve flows that
+    switch within a step differ by a few % between rtol 1e-6 and 1e-10. With ``floor_solver_info``
+    (a tight reference), each output's floor is the original at the version's settings against the
+    original at the reference, at the nominal point, and a point passes when every output's relative
+    L2 error is within tol of its floor.
+    """
+    from libcuflynx.utilities import smooth_cellml as sc
+    tol = float(settings['tol'])
+    os.makedirs(out_dir, exist_ok=True)
+    with open(flat_model_path(model_path), encoding='utf-8') as f:
+        text = f.read()
+    probed = sc.probe(text)
+    metrics = {'settings': {k: settings.get(k) for k in ('rel', 'tol', 'collapse')}}
+    report_path = os.path.join(out_dir, 'smoothing_report.json')
+    if not sc.probe_variables(probed):
+        _, report = sc.smooth(text, {})
+        with open(report_path, 'w') as f:
+            json.dump(report, f, indent=2)
+        metrics.update({'n_sites': 0, 'counts': report['counts'], 'not_smoothed': report['not_smoothed']})
+        left = f'; left as written: {len(report["not_smoothed"])}' if report['not_smoothed'] else ''
+        return PASSED, NO_SITES + left, metrics, [], []
+
+    probe_path = os.path.join(work_dir, f'{name}_probe.cellml')
+    with open(probe_path, 'w', encoding='utf-8') as f:
+        f.write(probed)
+    deadline = time.perf_counter() + float(settings.get('time_budget', DEFAULT_SMOOTHING['time_budget']))
+    runs = run_points(model_path, spec, outputs, points, nominal, deadline)
+    used = [(p, r) for p, r in zip(points, runs) if isinstance(r, dict)]
+    failed_original = [p['label'] for p, r in zip(points, runs) if r is None]
+    over_budget = [p['label'] for p, r in zip(points, runs) if isinstance(r, str)]
+    if not used:
+        raise RuntimeError('the original model fails at every point: ' + ', '.join(failed_original))
+    used_points, originals = [p for p, _ in used], [r for _, r in used]
+    # an output that jumps by over half its range between two samples (a phase wrapped by a floor) is
+    # not compared: a shift of the jump by a fraction of a step moves its L2 error by O(1)
+    jumps = sorted(k for k, y in originals[0].items()
+                   if y.size > 1 and np.ptp(y) > 0 and np.max(np.abs(np.diff(y))) > 0.5 * np.ptp(y))
+    originals = [{k: v for k, v in o.items() if k not in jumps} for o in originals]
+    floor = {}
+    if floor_solver_info:
+        reference = run_points(model_path, dict(spec, solver_info=floor_solver_info), outputs,
+                               [used_points[0]], nominal)[0]
+        if isinstance(reference, dict):
+            floor = {k: v[0] for k, v in _relative_errors(reference, originals[0]).items()}
+
+    reference_runs = [{'sim_time': spec['sim_time'], 'pre_time': spec.get('pre_time', 0.0), 'dt': spec['dt'],
+                       'solver_info': spec.get('solver_info') or {}, 'param_vals': p['params']} for p in used_points]
+    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        ranges, each = sc.reference_ranges(probe_path, reference_runs, per_run=True)
+    smoothed, report = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'))
+    smooth_path = os.path.join(out_dir, f'{name}_smooth.cellml')
+    with open(smooth_path, 'w', encoding='utf-8') as f:
+        f.write(smoothed)
+    sc.flag_nan_at_init(report, probe_path, smooth_path)
+
+    def errors_of(path, pts, origs):
+        return [None if not isinstance(r, dict) else _relative_errors(o, r)
+                for r, o in zip(run_points(path, spec, outputs, pts, nominal), origs)]
+
+    def switching(r):
+        return {k for k, v in r.items() if v['min'] < 0.0 < v['max']}
+
+    nominal_switching = switching(each[0])
+    rows = []
+    def excess(err):
+        return math.inf if err is None else max(e[0] - floor.get(k, 0.0) for k, e in err.items())
+
+    for point, err, r in zip(used_points, errors_of(smooth_path, used_points, originals), each):
+        out_name, l2, mx = _worst(err)
+        rows.append({'point': point['label'], 'worst_output': out_name, 'l2': l2, 'max': mx, 'excess': excess(err),
+                     'switching_not_at_nominal': sorted(switching(r) - nominal_switching, key=lambda x: int(x[2:-2]))})
+    failing = [r for r in rows if not r['excess'] <= tol]
+    worst = max(rows, key=lambda r: r['excess'])
+
+    attribution = []
+    if (bool(failing) if attribute is None else attribute) and worst['l2'] > 0:
+        index = [r['point'] for r in rows].index(worst['point'])
+        for group, ks in list(site_groups(report).items())[:ATTRIBUTION_CAP]:
+            one, _ = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), only=ks)
+            path_one = os.path.join(work_dir, f'{name}_smooth_{group}.cellml')
+            with open(path_one, 'w', encoding='utf-8') as f:
+                f.write(one)
+            err = errors_of(path_one, [used_points[index]], [originals[index]])[0]
+            out_name, l2, mx = _worst(err)
+            site = report['sites'][group - 1]
+            attribution.append({'group': group, 'sites': ks, 'component': site['component'],
+                                'variable': site['variable'], 'original': site.get('piecewise') or site['original'],
+                                'point': worst['point'], 'l2': l2, 'max': mx, 'excess': excess(err),
+                                'worst_output': out_name})
+        attribution.sort(key=lambda a: -a['excess'])
+
+    report['points'] = rows
+    report['attribution'] = attribution
+    with open(report_path, 'w') as f:
+        json.dump(report, f, indent=2, default=_json_default)
+    figs = []
+    if plot:
+        figs.append(plots.plot_smoothing(plot, [r['point'] for r in rows], [r['excess'] for r in rows],
+                                         [r['l2'] for r in rows], tol, title))
+    flags = {}
+    for site in report['sites']:
+        for flag in site['flags']:
+            flags.setdefault(flag, []).append(site['k'])
+    metrics.update({'n_sites': len(report['sites']), 'counts': report['counts'], 'n_points': len(rows),
+                    'points': rows, 'worst': worst, 'attribution': attribution[:10], 'flags': flags, 'floor': floor,
+                    'not_smoothed': report['not_smoothed'], 'original_failed': failed_original,
+                    'not_compared': jumps,
+                    'over_budget': over_budget, 'smoothed_model': smooth_path, 'report': report_path})
+    details = [f'[{r["point"]}] {r["excess"]:.3g} over the solver floor (relative L2 {r["l2"]:.3g} in '
+               f'{r["worst_output"]}, max {r["max"]:.3g})' for r in sorted(failing, key=lambda r: -r['excess'])[:20]]
+    details += [f'[site group {a["group"]}: {a["component"]}/{a["variable"]}] alone: {a["excess"]:.3g} over the floor '
+                f'at {a["point"]}: {a["original"][:160]}' for a in attribution[:10]]
+    details += [f'[not run] {label}: the original model fails there' for label in failed_original]
+    details += [f'[not run] {label}: over the time budget' for label in over_budget]
+    details += [f'[not compared] {k}: jumps by over half its range between samples' for k in jumps]
+    what = (f'{len(report["sites"])} sites ({", ".join(f"{k} {v}" for k, v in report["counts"].items())}), '
+            f'{len(rows)} points, rel {settings["rel"]}')
+    if failing:
+        names = ', '.join(f'{a["variable"]} (group {a["group"]}, {a["excess"]:.2g})' for a in attribution[:3])
+        return (FAILED, f'{len(failing)} of {len(rows)} points over tol {tol:g} above the solver floor: worst '
+                f'{worst["point"]}, {worst["excess"]:.3g} over the floor (relative L2 {worst["l2"]:.3g} in '
+                f'{worst["worst_output"]})' + (f'; worst sites: {names}' if names else '') + f' [{what}]',
+                metrics, figs, details)
+    note = f'; {len(over_budget)} points over the time budget not run' if over_budget else ''
+    return (PASSED, f'every point within tol {tol:g} of the solver floor (worst {worst["point"]}: {worst["excess"]:.3g} '
+            f'over it, relative L2 {worst["l2"]:.3g}) [{what}]{note}', metrics, figs, details)
+
+
+def smoothing_fingerprint(component, settings):
+    """What a saved smoothing result depends on: the version's vv fingerprint and the settings."""
+    from cam_testing import ledger
+    return f'{ledger.fingerprint(component, "vv")}:{json.dumps(settings, sort_keys=True, default=str)}'
+
+
+def verification_test_smoothing(cm, rel=None, collapse=None, attribute=None):
+    """The version's generated model smoothed (libcuflynx.utilities.smooth_cellml), with eps from the
+    ranges of its sites over the nominal and bc_sweep points, against the original at each point.
+    ``rel`` / ``collapse`` override the spec's smoothing settings."""
+    if is_non_cellml(cm.component):
+        return _cpp_not_applicable(cm, 'verification_test_smoothing')
+
+    def check():
+        component, spec = cm.component, cm.spec
+        settings = smoothing_settings(spec, rel=rel, collapse=collapse)
+        points, skipped = smoothing_points(cm, settings.get('parameters'))
+        nominal = {'parameters/' + k: v for k, v in cm.nominal.items()}
+        status, message, metrics, figs, details = compare_smoothed(
+            cm.model_path, spec, cm.outputs(), points, nominal, settings,
+            os.path.join(component.results_dir, SMOOTHING_DIR), cm.work_dir, component.id,
+            plot=plot_path(component, 'smoothing'), title=f'{component.label}: smoothed against original',
+            attribute=attribute, floor_solver_info={k: v for k, v in bc_reference_config(cm).items() if k != 'solver'})
+        metrics.update({'rationale': (spec.get('smoothing') or {}).get('rationale', ''),
+                        'skipped_out_of_range': skipped, 'fingerprint': smoothing_fingerprint(component, settings)})
+        for key in ('smoothed_model', 'report'):
+            if key in metrics:
+                metrics[key] = os.path.relpath(metrics[key], component.dir)
+        return Result('verification_test_smoothing', status, message, metrics, figs, details)
+    return _guard(cm.component, 'verification_test_smoothing', check)
+
+
 CHECKS = {
     'run_test': run_test,
     'verification_test_invariants': verification_test_invariants,
     'verification_test_BC': verification_test_BC,
     'verification_test_timestep': verification_test_timestep,
     'stability_test': stability_test,
+    'verification_test_smoothing': verification_test_smoothing,
     'validation_test_baseline': validation_test_baseline,
     'validation_test_calibrate': validation_test_calibrate,
 }

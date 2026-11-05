@@ -45,6 +45,7 @@ TEST_TITLES = {
     'verification_test_BC': 'Verification: boundary conditions',
     'verification_test_timestep': 'Verification: timestep convergence',
     'stability_test': 'Stability: solvers & settings',
+    'verification_test_smoothing': 'Verification: smooth approximation',
     'validation_test_baseline': 'Validation: baseline data',
     'validation_test_calibrate': 'Validation: calibrate & predict',
     'version_calibration': 'Calibration (all parameterisations)',
@@ -57,7 +58,7 @@ TEST_TITLES = {
 }
 TEST_SHORT = {
     'review_test': 'Reviewed', 'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
-    'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
+    'stability_test': 'Stability', 'verification_test_smoothing': 'Smoothing', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
     'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
     'coupled_validation_test': 'Coupled',
@@ -90,6 +91,13 @@ TEST_ABOUT = {
                                   'successively halved steps. Differences between successive solutions must '
                                   'shrink at the scheme\'s order, and the finest solution must agree with '
                                   'libcuflynx\'s CVODE run at tight tolerances.',
+    'verification_test_smoothing': 'Replaces the generated model\'s abs, max, min and piecewise comparisons with '
+                                   'square-root forms (libcuflynx cuflynx-smooth), with eps set by the spec\'s '
+                                   'smoothing.rel times the range of each site\'s argument over the nominal and '
+                                   'bc_sweep points (from t = 0), and compares the smoothed model with the original at '
+                                   'every point. Passes when every output\'s relative L2 error is under smoothing.tol '
+                                   '(default 1e-2) at every point; a failure names the worst sites, each smoothed '
+                                   'alone at the worst point. A version with no non-smooth sites passes.',
     'stability_test': 'Runs the version with a matrix of solvers, tolerances and timesteps. A '
                       'configuration works when it finishes with finite outputs within the tolerance of a '
                       'tight-tolerance reference. Declared-supported configurations must work.',
@@ -309,7 +317,8 @@ def not_applicable_reason(version, test):
     if test in COUPLED_TESTS and not version.spec.get('coupled_systems'):
         return NOT_COUPLED
     if checks.is_non_cellml(version):
-        if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test'):
+        if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test',
+                    'verification_test_smoothing'):
             return checks.non_cellml_reason(version)
         if test in phlynx.PIPELINE_TESTS:
             return phlynx.EXTERNAL_REASON if checks.is_external_api(version) else phlynx.CPP_REASON

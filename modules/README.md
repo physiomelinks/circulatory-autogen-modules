@@ -543,6 +543,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 | `verification_test_BC` | each boundary condition / constant swept over its tested range; runs finite, invariants hold. Points outside a valid range are skipped; failures are classified and a solver setting recommended (below) |
 | `verification_test_timestep` | fixed-step integration converges at the scheme's order and matches CVODE (N/A for a version driven by a `protocol`, below) |
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
+| `verification_test_smoothing` | the smoothed model (below) stays within `smoothing.tol` of the original at the nominal and every valid bc_sweep point |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
 
@@ -593,8 +594,39 @@ How the boundary-condition sweep treats impossible values and failures:
   numerical failure passes with the recommended settings; the report shows the recommendation (settings,
   mean run time, failures n/N), which you may adopt into the version's `solver_info`.
 
+**The smoothing test** (`verification_test_smoothing`) checks that the version can be replaced by a smooth
+model, for gradient-based solvers and Operator Inference. libcuflynx's `cuflynx-smooth`
+(`libcuflynx.utilities.smooth_cellml`) replaces each `abs`, `max`, `min` and piecewise comparison of the generated
+model with a square-root form (no tanh, so the model lifts exactly to quadratic form):
+- **Points.** The nominal point and every valid bc_sweep point (the same clipping as the BC sweep;
+  `smoothing.parameters` limits the swept parameters). The original runs at each, and each site's argument is
+  read from t = 0, through `pre_time`, for its range.
+- **eps.** `smoothing.rel` (default 1e-3; one number or per kind `{abs, maxmin, piecewise}`) times each
+  site's range. `smoothing.collapse` replaces sites that never switch by their branch.
+- **Pass.** At every point, each output's relative L2 error is within `smoothing.tol` (default 1e-2) of its
+  solver floor: the original at the version's settings against the original at the tight reference, at the
+  nominal point (valve flows that switch within a step differ by a few % between the two). An output that
+  jumps by over half its range between samples (a phase wrapped by a floor) is not compared. A failure
+  smooths each site group (a piecewise's comparisons together) alone at the worst point and names the worst.
+- **Saved.** `results/smoothing/` holds the smoothed model and `smoothing_report.json` (each site: kind,
+  eps, range, flags such as `floor_upstream`, `one_sided` and `nan_at_init`), and `plots/smoothing.png` the
+  error at each point. A version with no non-smooth sites passes with "no non-smooth sites".
+
+A system model is smoothed module by module first, then as a whole:
+
+```bash
+python -m cam_testing.smooth --module-array sys_module_array.json --parameters sys_parameters.json \
+    [--external-modules-dir DIR] [--allow-unchecked]
+```
+
+Each module's library version runs `verification_test_smoothing` (a current saved result is reused); a module with
+no library version but a config in `--external-modules-dir` is checked alone, its constants at the system's values
+and its inputs at their mean in the system run, each swept over 0.5-2 x its value, and reported as "checked with the
+default sweep". A failing module stops the run before the system step, as does a module found nowhere unless
+`--allow-unchecked`. The system's `smoothing_report.json` tags each site with its module and that module's result.
+
 **The report's test overview has the same columns for every version**, component or supermodule,
-in this order: Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Calibration (the version's),
+in this order: Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Smoothing, Calibration (the version's),
 PhLynx export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces,
 Coupled; then the parameterisation columns Baseline, Calibrate and CUFLynx archive. The module_type
 page uses the same layout, and the status counts count every cell.
@@ -769,6 +801,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
+| `smoothing` | verification_config | the smoothing test: `rel` (eps relative to each site's range over the runs, one number or `{abs, maxmin, piecewise}`, default 1e-3), `tol` (largest relative L2 error of any output at any point, default 1e-2), `collapse` (`true`, or the site numbers k to replace by their branch where they never switch), `parameters` (the bc_sweep parameters to sweep; default all), `time_budget` (s for the runs, 420), `rationale` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`; a baseline's `obs_data` is run through its protocol, see Protocol-driven tests), variables, targets, metric, threshold, optimiser settings |
 | `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`, and `wrapped` / `reciprocal` as in a system model's equivalence) |

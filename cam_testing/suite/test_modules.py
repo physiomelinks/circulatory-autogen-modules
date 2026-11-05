@@ -66,6 +66,10 @@ def stability_test(component_model):
     _assert(checks.stability_test(component_model), component_model.component)
 
 
+def verification_test_smoothing(component_model):
+    _assert(checks.verification_test_smoothing(component_model), component_model.component)
+
+
 # ---- per parameterisation -----------------------------------------------------------------------
 
 def validation_test_baseline(parameterisation_model):
