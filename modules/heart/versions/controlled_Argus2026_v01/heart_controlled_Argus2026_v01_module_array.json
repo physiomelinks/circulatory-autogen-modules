@@ -1,0 +1,11 @@
+[
+ {"name": "clock", "module_type": "cardiac_clock", "module_subtype": "controlled", "inp_instances": [], "out_instances": ["ra", "rv", "la", "lv"]},
+ {"name": "ra", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v02", "inp_instances": ["clock"], "out_instances": ["trv"]},
+ {"name": "rv", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v02", "inp_instances": ["trv", "clock"], "out_instances": ["puv"]},
+ {"name": "la", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v02", "inp_instances": ["clock"], "out_instances": ["miv"]},
+ {"name": "lv", "module_type": "chamber", "module_subtype": "Liang2009NoVisco_v02", "inp_instances": ["miv", "clock"], "out_instances": ["aov"]},
+ {"name": "trv", "module_type": "valve", "module_subtype": "pp", "inp_instances": ["ra"], "out_instances": ["rv"]},
+ {"name": "puv", "module_type": "valve", "module_subtype": "pp", "inp_instances": ["rv"], "out_instances": []},
+ {"name": "miv", "module_type": "valve", "module_subtype": "pp", "inp_instances": ["la"], "out_instances": ["lv"]},
+ {"name": "aov", "module_type": "valve", "module_subtype": "pp", "inp_instances": ["lv"], "out_instances": []}
+]

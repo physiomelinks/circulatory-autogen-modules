@@ -1,0 +1,11 @@
+{
+ "schema_version": 1,
+ "stim": {
+  "t_start": {"value": 0.01, "units": "second", "data_reference": "first pulse after 10 ms at rest"},
+  "t_end": {"value": 1000.0, "units": "second", "data_reference": "pulses throughout"},
+  "period": {"value": 0.05, "units": "second", "data_reference": "20 Hz train (a high sympathetic firing rate)"},
+  "pulse_duration": {"value": 0.002, "units": "second", "data_reference": "2 ms current pulse"},
+  "i_amplitude": {"value": -1.0, "units": "nanoA", "data_reference": "suprathreshold: -1 nA (the soma takes I_in as an outward current, so a depolarising pulse is negative) fires one action potential per pulse"},
+  "stim_flag": {"value": 1, "units": "dimensionless", "data_reference": "pulse train on"}
+ }
+}

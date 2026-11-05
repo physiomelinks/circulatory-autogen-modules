@@ -1,0 +1,7 @@
+{
+ "schema_version": 1,
+ "V_in": {"value": -70.0, "units": "milliV", "data_reference": "definitional; upstream membrane potential supplied in a network; -70 mV (the SN resting potential) when unconnected", "sourced": "no"},
+ "d": {"value": 1.2407009817988002, "units": "um", "data_reference": "definitional; varicosity diameter of the sphere of the model volume: d = (6 Vol/pi)^(1/3) with Vol = 1 um^3, the previous volume parameter (bennet1998Sympathetic, as cited in SN_simple) **Kept on review 2026-10-05 (from the model volume 1 um^3); luff1988form (serial EM of sympathetic postganglionic varicosities): small 0.5-1.0 um, large > 1 um diameter**", "sourced": "no"},
+ "k_A": {"value": 3.141592653589793, "units": "dimensionless", "data_reference": "definitional; area shape factor A = k_A d^2 of a sphere, pi", "sourced": "no"},
+ "k_V": {"value": 0.5235987755982987, "units": "dimensionless", "data_reference": "definitional; volume shape factor V = k_V d^3 of a sphere, pi/6 (to double precision; the last bit is chosen so that Vol reproduces the previous value where a float allows)", "sourced": "no"}
+}

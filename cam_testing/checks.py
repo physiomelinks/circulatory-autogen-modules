@@ -23,7 +23,7 @@ from dataclasses import asdict, dataclass, field
 import numpy as np
 
 from cam_testing import fixed_step, harness, plots
-from cam_testing.library import library_dirs
+from cam_testing.library import figure_items, library_dirs
 
 PASSED, FAILED, SKIPPED, PENDING, NOT_APPLICABLE = 'passed', 'failed', 'skipped', 'pending', 'not_applicable'
 # partial: met what the model's maths allows but not the full criterion (e.g. the time-step test on a piecewise
@@ -157,6 +157,24 @@ def plot_path(component, name, parameterisation=None):
     return os.path.join(component.plots_dir, f'{prefix}{name}.png')
 
 
+def item_plot_path(component, name, parameterisation):
+    '''path_of for plots.plot_model_vs_data: plots/<parameterisation>__<name>__<item>.png.'''
+    return lambda item: plot_path(component, f'{name}__{plots.item_file_name(item)}', parameterisation)
+
+
+def overlay_groups(parameterisation, items):
+    '''groups for plots.plot_model_vs_data: the plotted ``items`` each of the parameterisation's source
+    figures pairs with (library.figure_items), so a figure overlaying several items gets one plot of them.'''
+    return figure_items(parameterisation.source_figures(), list(items))
+
+
+def item_plots(saved):
+    '''(plot paths, metrics) for plots.plot_model_vs_data's per-item figures ``saved`` [(item, path)]:
+    the metrics' plot_items names each plot's data item (a list of them for an overlaid plot), in the
+    order of the plots (the report pairs a plot with the source figure its data came from by it).'''
+    return [p for _, p in saved], {'plot_items': [n for n, _ in saved]}
+
+
 def save(component, result, parameterisation=None):
     result.timestamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     # plots are stored relative to the version dir, which is where the HTML lives
@@ -195,6 +213,12 @@ class ComponentModel(object):
         # parameterisation's (validation.<p>.harness) if it has one -- even for the default parameterisation
         self._network_of = parameterisation
         self.spec = component.spec
+        # verification_config protocol: an obs_data file whose protocol_info (time-varying inputs,
+        # sub-experiments) every run of the version follows
+        self.protocol = None
+        if self.spec.get('protocol'):
+            self.protocol = harness.load_protocol(os.path.join(component.dir, self.spec['protocol']))
+            self.spec = harness.with_protocol(self.spec, self.protocol)
         self.work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_{component.id}_')
         self._model_path = None
         self._helper = None
@@ -204,7 +228,7 @@ class ComponentModel(object):
         if not component.is_supermodule:
             self._load_parameters()
         # A supermodule's parameters are those of its generated (flattened) model, read once it is
-        # generated: its own parameterisation's, its submodules' parameterisations' and the boundary conditions no
+        # generated: its own parameterisation's, its submodules' default parameterisations' and the boundary conditions no
         # internal connection closes (harness.supermodule_parameters).
 
     def _load_parameters(self):
@@ -297,12 +321,14 @@ class ComponentModel(object):
         return model
 
     def outputs(self):
-        '''The spec's outputs; by default the version's variables (a supermodule's: every state of its model).'''
+        '''The spec's outputs; by default the version's variables (a supermodule's: every state of its model);
+        then the inputs the protocol drives (e.g. u_in), so invariants see them as they vary.'''
         wanted = self.spec.get('outputs')
         if not wanted:
             wanted = harness.state_outputs(self.helper) if self.component.is_supermodule \
                 else [v[0] for v in self.component.variables()]
-        return list(wanted)
+        wanted = list(wanted)
+        return wanted + [i for i in harness.protocol_inputs(self.protocol) if i not in wanted]
 
     def units(self):
         if self.component.is_supermodule:
@@ -519,7 +545,7 @@ def cpp_generation_check(cm):
         work = os.path.join(cm.work_dir, 'cpp')
         res = os.path.join(work, 'resources')
         harness._write_resources(component, res, prefix, {})
-        cfg = {'file_prefix': prefix, 'input_param_file': f'{prefix}_parameters.csv', 'model_type': 'cpp',
+        cfg = {'file_prefix': prefix, 'input_param_file': f'{prefix}_parameters.json', 'model_type': 'cpp',
                'solver': 'RK4', 'couple_to_1d': True, 'resources_dir': res,
                'generated_models_dir': os.path.join(work, 'generated_models'),
                'cpp_generated_models_dir': os.path.join(work, 'cpp_out'), 'cpp_1d_model_config_path': None,
@@ -1093,7 +1119,9 @@ def sweep_parameter_names(cm):
     else:
         names = bcs + [p.variable_name for p in params if p.kind != 'boundary_condition' and p.variable_name not in bcs]
         swept_kind = 'boundary conditions and constants' if bcs else 'constants (no boundary conditions)'
-    names = [n for n in names if n not in (sweep_spec.get('exclude') or [])]
+    # the protocol's inputs follow the protocol, so they are not swept
+    driven = harness.protocol_inputs(getattr(cm, 'protocol', None))
+    names = [n for n in names if n not in (sweep_spec.get('exclude') or []) and n not in driven]
     names += [n for n in sweep_spec.get('extra_parameters', []) if n not in names]
     return names, swept_kind
 
@@ -1243,9 +1271,19 @@ def verification_test_BC(cm):
 # verification_test_timestep
 # ----------------------------------------------------------------------------------------------
 
+PROTOCOL_TIMESTEP_NOT_APPLICABLE = (
+    'driven by a protocol (verification_config protocol): the fixed-step integrator integrates the model\'s '
+    'equations at constant parameters, so it cannot apply the protocol\'s inputs (traces, sub-experiments); '
+    'the run, invariant, BC and stability tests run the protocol with CVODE')
+PROTOCOL_CVODE_ONLY = ('not run: the protocol\'s inputs (traces, sub-experiments) are applied with CVODE '
+                       '(libcuflynx\'s Myokit helper) only')
+
+
 def verification_test_timestep(cm):
     if is_non_cellml(cm.component):
         return _cpp_not_applicable(cm, 'verification_test_timestep')
+    if getattr(cm, 'protocol', None) is not None:
+        return save(cm.component, Result('verification_test_timestep', NOT_APPLICABLE, PROTOCOL_TIMESTEP_NOT_APPLICABLE))
     def check():
         component = cm.component
         ts = cm.spec.get('timestep') or {}
@@ -1463,7 +1501,9 @@ def stability_test(cm):
                 st[key] = cm.spec['stability'][key]
         tol = float(st['tol'])
         outputs = cm.outputs()
-        t_end = float(st.get('t_end', cm.spec['sim_time']))
+        protocol = getattr(cm, 'protocol', None)
+        # a protocol sets the runs' times
+        t_end = float(cm.spec['sim_time'] if protocol is not None else st.get('t_end', cm.spec['sim_time']))
         base = dict(cm.spec, pre_time=0.0, sim_time=t_end)
 
         def compare(t, out, t_ref, ref, scale):
@@ -1533,7 +1573,11 @@ def stability_test(cm):
             family = config_label(cv_cfg(None))
             refine(family, cv_cfg, cv_run, given_step or cv_start, 10.0, given_step is None)
 
-        if st['solve_ivp']:
+        if protocol is not None:
+            for family in ([config_label({'solver': 'solve_ivp', 'method': m}) for m in st['solve_ivp'] or []]
+                           + [f'fixed_step_{s}' for s in (st.get('fixed_step') or {}).get('schemes') or []]):
+                families.append({'family': family, 'works_at': None, 'stop': PROTOCOL_CVODE_ONLY})
+        if st['solve_ivp'] and protocol is None:
             try:
                 with contextlib.redirect_stdout(io.StringIO()):
                     py_path = cm.generate(cm.work_dir, model_type='python')
@@ -1556,7 +1600,7 @@ def stability_test(cm):
                 refine(config_label(py_cfg(None)), py_cfg, py_run, cv_start, 10.0, True)
 
         fs = st.get('fixed_step') or {}
-        if fs.get('schemes') and state_qnames:
+        if fs.get('schemes') and state_qnames and protocol is None:
             qnames = [cm.helper._resolve_name(harness.output_name(o))[1] for o in outputs]
             out_dt = float(cm.spec['dt'])
             for scheme in fs['schemes']:
@@ -1661,6 +1705,15 @@ def timestep_problems(diffs, observed, cvode_diff, min_order, tol, cvode_tol, ro
     return problems, order_problems
 
 
+def expected_failure(version, test, parameterisation=None):
+    """The reason ``test`` is a known failure of ``version`` (its spec's expected_failures), or None.
+    A parameterisation's test is looked up as "<test>[<parameterisation>]" first, then as "<test>",
+    which covers every parameterisation."""
+    ef = version.spec.get('expected_failures') or {}
+    name = getattr(parameterisation, 'name', parameterisation)
+    return (ef.get(f'{test}[{name}]') if name else None) or ef.get(test)
+
+
 def periodic_steady_state(cm, pre_time, outputs, params=None):
     """
     Whether the model, after ``pre_time`` s with ``params`` (model parameter names -> values),
@@ -1711,6 +1764,8 @@ def validation_test_baseline(cm):
             return early
         if v.get('targets'):
             return _baseline_targets(cm, v)
+        if v.get('obs_data'):
+            return _baseline_obs_data(cm, v)
         # data paths are relative to the version directory (parameterisations/<parameterisation>/<file>)
         t_data, data = load_data(cm.component.dir, v)
         by_var = {p.variable_name: p for p in cm.parameters()}
@@ -1723,19 +1778,21 @@ def validation_test_baseline(cm):
         metric = v.get('metric', 'nrmse')
         threshold = float(v.get('threshold', 0.1))
         errors = {var: score(metric, np.interp(t_data, t, out[var]), data[var]) for var in v['variables']}
-        fig = plots.plot_model_vs_data(plot_path(component, 'validation_baseline', cm.parameterisation), t, out,
-                                       {k: t_data for k in data}, data, cm.units(),
-                                       f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}')
+        saved = plots.plot_model_vs_data(item_plot_path(component, 'validation_baseline', cm.parameterisation), t, out,
+                                         {k: t_data for k in data}, data, cm.units(),
+                                         f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}',
+                                         groups=overlay_groups(cm.parameterisation, out))
+        figs, plot_metrics = item_plots(saved)
         metrics = {metric: errors, 'threshold': threshold, 'source': v.get('source', ''),
-                   'validated_values': params}
+                   'validated_values': params, **plot_metrics}
         if v.get('kind') == 'fit_check':
             # the published values were fitted to this same data: goodness of fit, not validation
             metrics['kind'] = 'fit_check'
             metrics['note'] = v.get('note', '')
         worst = max(errors.values())
         if worst > threshold:
-            return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, [fig])
-        return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, [fig])
+            return Result('validation_test_baseline', FAILED, f'worst {metric} {worst:.3f} > {threshold}', metrics, figs)
+        return Result('validation_test_baseline', PASSED, f'worst {metric} {worst:.3f} <= {threshold}', metrics, figs)
     return _guard(cm.component, 'validation_test_baseline', check, cm.parameterisation)
 
 
@@ -1797,6 +1854,95 @@ def _baseline_targets(cm, v):
     return Result('validation_test_baseline', PASSED, f'all {len(rows)} targets met', metrics)
 
 
+def _baseline_obs_data(cm, v):
+    '''
+    The model at the parameterisation's parameters, run through an obs_data's protocol (its
+    time-varying inputs, protocol_traces or protocol_shapes, included), scored against the obs_data's
+    data_items and its prediction_items that carry a value. Spec (validation.<parameterisation>.baseline):
+        obs_data: parameterisations/<p>/<file>_obs_data.json    relative to the version directory
+        parameters: {variable_name: value}     optional: the parameter set the data are compared at
+        dt: optional output step (default: the spec dt)
+        metric: nrmse | log_rmse      threshold: 0.1     series items
+        nrmse_scale: {item: value}    optional: an item's nrmse over this scale (in the item's unit)
+                                      instead of its data range, e.g. a small case's error relative
+                                      to its normal case's range
+        z_threshold: 2.0                                 constant items: |model - value| <= z_threshold * std
+    Each item is evaluated on the run of its experiment_idx, over its subexperiment_idx's segment: a series
+    item sampled every obs_dt from the segment's start, a constant item by its operation (libcuflynx's
+    operation functions, with its operation_kwargs) over the segment, or the segment's final value.
+    '''
+    from libcuflynx.param_id.operation_funcs import get_operation_funcs_dict_for_mode
+    from cam_testing.calibrate import held_out_items, output_of, score
+
+    component = cm.component
+    path = os.path.join(component.dir, v['obs_data'])
+    with open(path, encoding='utf-8-sig') as f:
+        obs = json.load(f)
+    protocol = harness.load_protocol(path)
+    items = list(obs.get('data_items') or []) + held_out_items(obs)
+    by_var = {p.variable_name: p for p in cm.parameters()}
+    params = {k: float(val) for k, val in (v.get('parameters') or {}).items()}
+    overrides = {'parameters/' + harness.parameter_name(by_var[k]): val for k, val in params.items()}
+    wanted = sorted({output_of(op) for i in items for op in i['operands']} | set(harness.protocol_inputs(protocol)))
+    run_spec = dict(harness.without_protocol(cm.spec), dt=float(v.get('dt', cm.spec['dt'])),
+                    **{harness.PROTOCOL_INFO: protocol})
+    helper = harness.simulation_helper(cm.model_path, run_spec, solver_info={'rtol': 1e-8, 'atol': 1e-10})
+    runs = {exp: harness.run_protocol(helper, wanted, protocol, overrides, experiment=exp)
+            for exp in sorted({int(i.get('experiment_idx', 0)) for i in items})}
+
+    ops = get_operation_funcs_dict_for_mode('numpy')
+    metric, threshold = v.get('metric', 'nrmse'), float(v.get('threshold', 0.1))
+    z = float(v.get('z_threshold', 2.0))
+    scales = v.get('nrmse_scale') or {}
+    rows, problems, scores = [], [], {}
+    t_model, model, t_data, data, units = {}, {}, {}, {}, {}
+    for item in items:
+        name = item['data_item_name']
+        exp, sub = int(item.get('experiment_idx', 0)), int(item.get('subexperiment_idx', 0))
+        t, out, starts = runs[exp]
+        t0 = float(starts[sub])
+        seg = (t >= t0 - 1e-9) & (t <= t0 + float(protocol['sim_times'][exp][sub]) + 1e-9)
+        args = [out[harness.output_key(output_of(op))][seg] for op in item['operands']]
+        op, kwargs = item.get('operation'), item.get('operation_kwargs') or {}
+        if item.get('data_type') == 'series':
+            series = np.asarray(ops[op](*args, **kwargs) if op else args[0], dtype=float)
+            values = np.asarray(item['value'], dtype=float)
+            ts = np.arange(len(values)) * float(item['obs_dt'])
+            scores[name] = score(metric, np.interp(ts, t[seg] - t0, series), values,
+                                 scales.get(name) if metric == 'nrmse' else None)
+            ok = scores[name] <= threshold
+            label = f'{name} ({metric} over {scales[name]:g} {item.get("unit", "")})' if (
+                metric == 'nrmse' and name in scales) else f'{name} ({metric})'
+            rows.append({'name': label, 'model': scores[name], 'target': f'<= {threshold:g}',
+                         'units': '', 'ok': ok})
+            t_model[name], model[name], t_data[name], data[name] = t[seg] - t0, series, ts, values
+            units[name] = item.get('unit', '')
+            if not ok:
+                problems.append(f'{name}: {metric} {scores[name]:.3g} > {threshold:g}')
+        else:
+            value, std = float(item['value']), float(item['std'])
+            m = float(ops[op](*args, **kwargs)) if op else float(args[0][-1])
+            ok = abs(m - value) <= z * std
+            rows.append({'name': name, 'model': m, 'target': f'{value:g} ± {std:g}', 'units': item.get('unit', ''),
+                         'ok': ok})
+            if not ok:
+                problems.append(f'{name}: model {m:.4g} vs {value:g} ± {std:g} {item.get("unit", "")}')
+    saved = plots.plot_model_vs_data(
+        item_plot_path(component, 'validation_baseline', cm.parameterisation), t_model, model, t_data, data, units,
+        f'{component.label} [{cm.parameterisation.name}]: model vs {v.get("source_short", "data")}; '
+        'time from the start of each sub-experiment', groups=overlay_groups(cm.parameterisation, model))
+    figs, plot_metrics = item_plots(saved)
+    metrics = {'targets': rows, metric: scores, 'threshold': threshold, 'z_threshold': z, 'obs_data': v['obs_data'],
+               'nrmse_scale': scales,
+               'source': v.get('source', ''), 'validated_values': params, **plot_metrics}
+    if v.get('kind') == 'fit_check':
+        metrics['kind'], metrics['note'] = 'fit_check', v.get('note', '')
+    if problems:
+        return Result('validation_test_baseline', FAILED, f'{len(problems)} of {len(rows)} items missed: '
+                      + '; '.join(problems[:3]), metrics, figs, problems)
+    return Result('validation_test_baseline', PASSED, f'all {len(rows)} items met', metrics, figs)
+
+
 def validation_test_calibrate(cm):
     '''
     Calibrate to the parameterisation's obs_data with libcuflynx parameter identification, then
@@ -1808,7 +1954,7 @@ def validation_test_calibrate(cm):
         if early:
             return early
         from cam_testing import calibrate
-        return calibrate.run(cm, v, plot_path)
+        return calibrate.run(cm, v)
     return _guard(cm.component, 'validation_test_calibrate', check, cm.parameterisation)
 
 

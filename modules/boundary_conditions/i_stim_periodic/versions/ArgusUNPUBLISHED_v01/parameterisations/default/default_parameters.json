@@ -1,0 +1,9 @@
+{
+ "schema_version": 1,
+ "stim_flag": {"value": 1, "units": "dimensionless", "data_reference": "definitional; 1 enables the pulse train", "sourced": "yes"},
+ "t_start": {"value": 0.0, "units": "second", "data_reference": "paci2013computational; same timing as the Paci stim_mode (i_stim_Start = 0 s)", "sourced": "yes"},
+ "t_end": {"value": 800.0, "units": "second", "data_reference": "paci2013computational; same timing as the Paci stim_mode (i_stim_End = 800 s)", "sourced": "yes"},
+ "period": {"value": 1.0, "units": "second", "data_reference": "paci2013computational; 1 s pacing period (60/i_stim_frequency with i_stim_frequency = 60)", "sourced": "yes"},
+ "pulse_duration": {"value": 0.005, "units": "second", "data_reference": "paci2013computational; i_stim_PulseDuration = 0.005 s", "sourced": "yes"},
+ "i_amplitude": {"value": 0.55, "units": "nanoA", "data_reference": "paci2013computational; i_stim_Amplitude = 5.5e-10 A = 0.55 nA (hiPSC-CM scale; adult myocyte models typically need larger currents)", "sourced": "yes"}
+}

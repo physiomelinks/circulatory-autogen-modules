@@ -1,0 +1,19 @@
+{
+ "schema_version": 1,
+ "global": {
+  "T": {"value": 295.15, "units": "kelvin", "data_reference": "davis2021transcriptomic; Methods (Ch. 2): \"All recordings were performed at room temperature\" (value not stated; 22 degC assumed); p. 215: neurons died above 30 degC", "sourced": "yes"}
+ },
+ "Ca_ER": {"value": 0.6, "units": "millimolar", "data_reference": "definitional; SN_simple Ca_ER_init (used when unconnected)", "sourced": "no"},
+ "Ca_ER_RyR_den": {"value": 0.03, "units": "millimolar", "data_reference": "SN_simple: user_defined", "sourced": "no"},
+ "Ca_ER_RyR_mid": {"value": 0.5, "units": "millimolar", "data_reference": "SN_simple: user_defined", "sourced": "no"},
+ "Cai": {"value": 0.0001, "units": "millimolar", "data_reference": "definitional; SN_simple Cai_init (hagiwara1981calcium; used when unconnected)", "sourced": "no"},
+ "Cai_RyR_den": {"value": 1e-4, "units": "millimolar", "data_reference": "SN_simple: user_defined", "sourced": "no"},
+ "Cai_RyR_mid": {"value": 8e-4, "units": "millimolar", "data_reference": "SN_simple: user_defined", "sourced": "no"},
+ "A_ER": {"value": 86.00525082199546, "units": "um2", "data_reference": "definitional; the soma ER membrane area 86.01 um^2 of a sphere of volume c_ER Vol (used when unconnected; in a soma it comes from the Ca handling through the ER_membrane_area port)", "sourced": "no"},
+ "rho_RyR": {"value": 576.9514845733909, "units": "per_um2", "data_reference": "definitional; chosen so that k_RyR = A rho k_RyR_single (1e-18 m3/um3) reproduces the previous k_RyR = 1.5e-13 m3_per_s (to_be_identified) with A = 86.01 um^2 (the soma ER membrane area) and k_RyR_single = 3.023 um3_per_s; a density for calibration through k_RyR_single", "sourced": "no"},
+ "k_RyR_single": {"value": 3.0229223886269025, "units": "um3_per_s", "data_reference": "unreferenced_placeholder; per-channel flux coefficient i/(2 F dCa) for a ~0.35 pA unitary Ca current at a 0.6 mM ER-cytosol difference = 3.02 um^3/s", "sourced": "no"},
+ "tau_c_RyR": {"value": 0.01, "units": "millis", "data_reference": "SN_simple: user_defined", "sourced": "no"},
+ "tau_hc_RyR": {"value": 10, "units": "millis", "data_reference": "SN_simple: user_defined", "sourced": "no"},
+ "Q10_RyR": {"value": 3, "units": "dimensionless", "data_reference": "unreferenced_placeholder; conventional gating Q10 (no effect while T_ref = T)", "sourced": "no"},
+ "T_ref_RyR": {"value": 295.15, "units": "kelvin", "data_reference": "definitional; equal to the model temperature, so kinetics are unscaled; to be set to the source's recording temperature on review", "sourced": "no"}
+}

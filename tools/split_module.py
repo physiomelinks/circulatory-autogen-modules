@@ -6,7 +6,7 @@ Splits one module into several, e.g. modules/cell into modules/cell/{neurons,car
 
 Each group (config module_types) becomes a module modules/<parent>/<new>/ with its own CellML
 (the components of those entries, verbatim), config, units (only those it uses), parameters
-(the group's rows; globals to every group that uses them), test spec (defaults, the group's
+(nested JSON, tools/parameter_files.py: the group's rows; globals to every group that uses them), test spec (defaults, the group's
 components, and the old module's review block), bibliographies (the entries its references
 cite) and risk files. The old module's files are removed; its plots/results are regenerated
 by the tests. Component ids (<module_type>__<subtype>) are unchanged, so risk files move as is.
@@ -16,7 +16,6 @@ provenance. The library now uses modules/<category>/<module_type>/versions/<vers
 modules/README.md); tools/restructure_to_versions.py moves an old-layout tree into it.
 """
 import argparse
-import csv
 import glob
 import json
 import os
@@ -32,6 +31,7 @@ sys.path.insert(0, os.path.join(REPO, 'tools'))
 from cam_testing import bib  # noqa: E402
 from cam_testing.library import load_module, module_dir, normalise_config_entry, with_record_keys  # noqa: E402
 from import_from_libcuflynx import read_units_blocks, units_closure, write_units_file  # noqa: E402
+from parameter_files import read_module_table, write_module_table  # noqa: E402
 
 CELLML_HEAD = ("<?xml version='1.0' encoding='UTF-8'?>\n"
                '<model name="modules" xmlns="http://www.cellml.org/cellml/1.1#" '
@@ -57,9 +57,7 @@ def split(old, groups, parent_dir):
     blocks = read_units_blocks([os.path.join(src, f'{old}_units.cellml')])
     with open(os.path.join(src, f'{old}_tests.yaml')) as f:
         spec = yaml.safe_load(f)
-    with open(os.path.join(src, f'{old}_parameters.csv'), newline='') as f:
-        reader = csv.DictReader(f)
-        pheader, prows = reader.fieldnames, list(reader)
+    prows = read_module_table(os.path.join(src, f'{old}_parameters.json'))
     bib_all = {**bib.read(bib.bib_path(m)), **bib.read(bib.proposed_bib_path(m))}   # key -> fields
 
     assigned = [t for types in groups.values() for t in types]
@@ -96,10 +94,7 @@ def split(old, groups, parent_dir):
         globals_used = {v[0] for e in normal for v in e['variables_and_units'] if v[3].strip() == 'global_constant'}
         rows = [r for r in prows if r['vessel_type'] in types
                 or (r['vessel_type'] == 'global' and r['variable_name'] in globals_used)]
-        with open(os.path.join(dest, f'{new}_parameters.csv'), 'w', newline='') as f:
-            w = csv.DictWriter(f, fieldnames=pheader)
-            w.writeheader()
-            w.writerows(rows)
+        write_module_table(os.path.join(dest, f'{new}_parameters.json'), rows)
 
         new_spec = {k: v for k, v in spec.items() if k != 'components'}
         new_spec['module'] = new

@@ -11,15 +11,16 @@ directly:
                                           carry a value are the held-out data the calibrated
                                           model is validated against, scored on
                                           prediction_window (without any, the data_items are)
-    <p>_params_for_id.csv                 parameters calibrated, with bounds
+    <p>_params_for_id.json                parameters calibrated, with bounds
 
 and the results are written there too, and committed:
 
-    <p>_calibrated_parameters.csv         the parameterisation's parameters with the calibrated values
+    <p>_calibrated_parameters.json        the parameterisation's parameters with the calibrated values
+                                          (nested JSON rooted at the module, like <p>_parameters.json)
     <p>_calibration.json                  summary: method, cost, fitted values, scores, date
 
 The version is generated alone as a single vessel named "mod" (cam_testing.harness.VESSEL),
-so operands are "mod/<variable>" and params_for_id vessel_name is "mod".
+so operands are "mod/<variable>" and params_for_id targets are "mod/<variable>".
 
 Spec (validation.<p>.calibrate in <module_type>_<version>_verification_config.json; file
 references relative to the version directory, defaulting to the parameterisation's files):
@@ -27,7 +28,7 @@ references relative to the version directory, defaulting to the parameterisation
     status: active
     source: citation / URL
     obs_data: parameterisations/<p>/<p>_obs_data.json
-    params_for_id: parameterisations/<p>/<p>_params_for_id.csv
+    params_for_id: parameterisations/<p>/<p>_params_for_id.json
     prediction_window: [15, 20]           model time scored for series predictions (optional)
     initial_parameters: {a: 0.8}          optional optimiser start (default: nominal values)
     starts: [{a: 1}, {a: -1}]             optional: several starts, each calibrated and checked
@@ -69,10 +70,11 @@ def load_data(data_dir, v):
     return t, data
 
 
-def score(metric, model, data):
+def score(metric, model, data, scale=None):
+    '''log_rmse, or nrmse: the rms error over ``scale`` (default: the data's range).'''
     if metric == 'log_rmse':
         return float(np.sqrt(np.mean((np.log(model) - np.log(data)) ** 2)))
-    rng = np.ptp(data) or max(np.max(np.abs(data)), 1e-300)
+    rng = float(scale) if scale else (np.ptp(data) or max(np.max(np.abs(data)), 1e-300))
     return float(np.sqrt(np.mean((model - data) ** 2)) / rng)
 
 
@@ -191,12 +193,17 @@ def series_from_obs_data(obs):
     return out
 
 
+def series_item_names(obs):
+    """{output: data_item_name} of the series items of an obs_data dict (series_from_obs_data's keys)."""
+    return {output_of(i['operands'][0]): i['data_item_name'] for i in obs['data_items'] if i.get('data_type') == 'series'}
+
+
 def read_params_for_id(path):
-    with open(path) as f:
-        rows = [{k.strip(): (v or '').strip() for k, v in r.items()} for r in csv.DictReader(f, skipinitialspace=True)]
-    return [{'vessel_name': r['vessel_name'], 'param_name': r['param_name'], 'min': float(r['min']),
-             'max': float(r['max']), 'name_for_plotting': r.get('name_for_plotting') or r['param_name']}
-            for r in rows]
+    """The entries of a params_for_id JSON file as libcuflynx's in-code form
+    ({vessel_name, param_name, min, max, name_for_plotting})."""
+    from libcuflynx.utilities.params_for_id_helpers import load_params_for_id
+    return [dict(p, name_for_plotting=p.get('name_for_plotting') or p['param_name'])
+            for p in load_params_for_id(path)]
 
 
 def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
@@ -322,7 +329,7 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     dts = [float(i['obs_dt']) for i in val_obs['data_items'] if i.get('data_type') == 'series']
     wanted = sorted(set(series) | {output_of(op) for i in constants for op in i['operands']})
     pre = float(val_obs['protocol_info'].get('pre_times', [0.0])[0])   # e.g. reach periodic steady state first
-    run_spec = dict(cm.spec, sim_time=t_end, pre_time=pre, dt=min(dts + [float(cm.spec['dt'])]))
+    run_spec = dict(harness.without_protocol(cm.spec), sim_time=t_end, pre_time=pre, dt=min(dts + [float(cm.spec['dt'])]))
     helper = harness.simulation_helper(cm.model_path, run_spec, solver_info={'rtol': 1e-8, 'atol': 1e-10})
     overrides = {'parameters/' + _model_name(k, by_var): val for k, val in calibrated.items()}
     tm, out = harness.run(helper, wanted, params=overrides)
@@ -346,8 +353,9 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     return tm, out, series, cal_scores, pred_scores, z_scores
 
 
-def run(cm, v, plot_path):
-    from cam_testing.checks import FAILED, PASSED, Result, periodic_steady_state
+def run(cm, v):
+    from cam_testing.checks import (FAILED, PASSED, Result, item_plot_path, item_plots, overlay_groups,
+                                    periodic_steady_state)
 
     component = cm.component
     inst = cm.parameterisation
@@ -372,7 +380,8 @@ def run(cm, v, plot_path):
 
     # one calibration per start (default: from the nominal values)
     starts = v.get('starts') or [v.get('initial_parameters') or {}]
-    runs, problems, figs = [], [], []
+    runs, problems, figs, plot_items = [], [], [], []
+    item_units = {i['data_item_name']: i.get('unit', '') for i in val_obs['data_items']}
     for n, start_values in enumerate(starts):
         calibrated, method, cost, features = _calibrate_once(cm, v, calibration_obs(obs), params_for_id, start_values, n)
         tm, out, series, cal_s, pred_s, z_s = _evaluate(cm, v, val_obs, calibrated, cal_end, features)
@@ -406,23 +415,32 @@ def run(cm, v, plot_path):
             g = abs(got) if compare_abs else got
             if abs(g - float(want)) > expected_tol * max(abs(float(want)), 1e-12):
                 problems.append(f'start {label}: {par} = {got:.4g}, expected {"|" + par + "| = " if compare_abs else ""}{want}')
+        # one figure per series item (named by its data_item_name), model and data against time; the items
+        # a source figure overlays share one figure
+        path_of = item_plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst)
         if features is not None and series:
-            # one panel per series item, model and data against time from its sub-experiment's start
-            figs.append(plots.plot_model_vs_data(
-                plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst),
-                {k: t for k, (t, m, d, sd) in series.items()}, {k: m for k, (t, m, d, sd) in series.items()},
+            # time from the start of each item's sub-experiment
+            saved = plots.plot_model_vs_data(
+                path_of, {k: t for k, (t, m, d, sd) in series.items()}, {k: m for k, (t, m, d, sd) in series.items()},
                 {k: t for k, (t, m, d, sd) in series.items()},
-                {k: d for k, (t, m, d, sd) in series.items()}, {},
-                f'{component.label}: calibrated ({label}); time from the start of each sub-experiment'))
+                {k: d for k, (t, m, d, sd) in series.items()}, item_units,
+                f'{component.label}: calibrated ({label}); time from the start of each sub-experiment',
+                groups=overlay_groups(inst, series))
         elif series:
             title = f'{component.label}: calibrated to t ≤ {cal_end:g}'
             if v.get('prediction_window'):
                 title += f', predicting {v["prediction_window"][0]:g} < t ≤ {v["prediction_window"][1]:g}'
-            figs.append(plots.plot_model_vs_data(
-                plot_path(component, f'validation_calibrate{"" if len(starts) == 1 else f"_start{n}"}', inst), tm,
-                {k: out[harness.output_key(k)] for k in series}, {k: ts for k, (ts, _) in series.items()},
-                {k: d for k, (_, d) in series.items()}, cm.units(),
-                title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end))
+            names = series_item_names(val_obs)
+            saved = plots.plot_model_vs_data(
+                path_of, tm, {names[k]: out[harness.output_key(k)] for k in series},
+                {names[k]: ts for k, (ts, _) in series.items()}, {names[k]: d for k, (_, d) in series.items()},
+                item_units, title + ('' if len(starts) == 1 else f' (start {label})'), split=cal_end,
+                groups=overlay_groups(inst, [names[k] for k in series]))
+        else:
+            saved = []
+        paths, plot_metrics = item_plots(saved)
+        figs += paths
+        plot_items += plot_metrics['plot_items']
 
     validated = {}
     for r in runs:
@@ -433,7 +451,7 @@ def run(cm, v, plot_path):
                'files': sorted(set(files), key=files.index), 'runs': runs,
                'calibrated_parameters': runs[0]['calibrated_parameters'] if len(runs) == 1 else
                {k: vals for k, vals in validated.items()},
-               'validated_values': {k: vals for k, vals in validated.items()}}
+               'validated_values': {k: vals for k, vals in validated.items()}, 'plot_items': plot_items}
     if expected:
         metrics['expected_parameters'] = expected
     summary = '; '.join(
@@ -449,7 +467,7 @@ def run(cm, v, plot_path):
 
 
 def write_calibrated(cm, calibrated, metrics, passed, summary):
-    '''<p>_calibrated_parameters.csv (the parameterisation's rows, calibrated values replaced,
+    '''<p>_calibrated_parameters.json (the parameterisation's parameters, calibrated values replaced,
     the reference noting the calibration) and <p>_calibration.json (the summary).'''
     import datetime
     from cam_testing.library import write_parameters
@@ -482,26 +500,30 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 #
 #     python -m cam_testing.calibrate apply <module_type>/<version> <parameterisation> [--dry-run]
 #
-# The calibrated parameters (those in <p>_params_for_id.csv, with their values from
-# <p>_calibrated_parameters.csv) are written to:
-#   1. the version's default parameterisation (row <var>);
-#   2. every supermodule version using the version's default parameterisation as a submodule, recursively
-#      (row <submodule path>/<var>, outer first: soma/sympathetic i_M/rho_M, a neuron using that
-#      soma as "soma" soma/i_M/rho_M), where the row exists;
-#   3. every system model whose module array uses the version, or a supermodule chain over it, at
-#      its default parameterisation (row <vessel>/<var> or <vessel>/<submodule path>/<var>), where the row exists;
+# The calibrated parameters (those in <p>_params_for_id.json, with their values from
+# <p>_calibrated_parameters.json) are written to every place that uses the version, whatever parameterisation
+# it uses there (no value-equality checks), each where that file has the parameter:
+#   1. the version's default parameterisation (<var>);
+#   2. every supermodule version using the version as a submodule, recursively: in its default
+#      parameterisation (the template a new instance is copied from, nested by instance), the parameter
+#      <instance>/<var> of every instance of the version (soma/sympathetic: i_M/rho_M), and
+#      <instance>/<path>/<var> through an instance of a supermodule over it (a neuron using that soma as
+#      "soma": soma/i_M/rho_M);
+#   3. every system model whose module array uses the version, or a supermodule chain over it: in its
+#      parameters file (<model>_parameters.json), <vessel>/<var> or <vessel>/<submodule path>/<var>
+#      (heart/lv/E_A, SN/soma/i_M/rho_M);
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
-#      to the vessel of `reproduces` ("soma_SN/w": "SN__soma__i_M/w" -> soma_SN), giving row
-#      <that vessel>/<var> in that system model and row <var> in that vessel's version's default parameterisation.
+#      to the vessel of `reproduces` ("soma_SN/w": "SN__soma__i_M/w" -> soma_SN), giving <that vessel>/<var>
+#      in that system model and <var> in that vessel's version's default parameterisation.
 # Each rewritten reference reads "Calibrated (libcuflynx) to parameterisations/<p>/<p>_obs_data.json:
 # <note>" (with the version named when it is written elsewhere), and keeps the old value. <note> is the
 # obs_data's "calibration_note" (else its obs_data_name); an obs_data "reference_key" (a BibTeX key of
-# the version) prefixes the reference and marks the row sourced.
+# the version) prefixes the reference and marks the parameter sourced.
 
 
 def _system_models(root=None):
-    """[{key, dir, vessels, parameters_path}] of every system model under ``root``."""
+    """[{key, dir, vessels, array_path, parameters_path}] of every system model under ``root``."""
     from cam_testing import paths
     root = root or paths.roots().system_models_dir
     out = []
@@ -512,38 +534,24 @@ def _system_models(root=None):
                 with open(os.path.join(d, f)) as fh:
                     vessels = json.load(fh)
                 out.append({'key': os.path.relpath(d, root).replace(os.sep, '/'), 'dir': d, 'vessels': vessels,
-                            'parameters_path': os.path.join(d, f'{name}_parameters.csv')})
+                            'array_path': os.path.join(d, f),
+                            'parameters_path': os.path.join(d, f'{name}_parameters.json')})
     return sorted(out, key=lambda m: m['key'])
 
 
-def _csv_rows(path):
-    """(lines without their line endings, line ending, header) of a parameters CSV."""
-    with open(path, newline='') as f:
-        raw = f.read()
-    eol = '\r\n' if '\r\n' in raw else '\n'
-    lines = raw.split(eol)
-    return lines, eol, next(csv.reader([lines[0]]))
-
-
-def _row_values(path, names):
-    """{row name: {column: value}} of the rows of ``path`` named in ``names``."""
+def _document(path, kind):
+    """The parameters document at ``path`` (libcuflynx's nested JSON), None when there is none."""
+    from libcuflynx.utilities import parameters_file as pf
     if not os.path.isfile(path):
-        return {}
-    lines, _eol, header = _csv_rows(path)
-    out = {}
-    for ln in lines[1:]:
-        if not ln.strip():
-            continue
-        row = dict(zip(header, next(csv.reader([ln]))))
-        if row.get('variable_name') in names:
-            out[row['variable_name']] = row
-    return out
+        return None
+    return pf.read_parameters_file(path, kind=kind)
 
 
 def apply_plan(version, parameterisation_name, versions=None, systems=None):
-    """The changes ``apply`` would make: [{path, row, variable, value, old, reference, sourced}].
-    ``versions`` (default: the library) and ``systems`` (default: _system_models()) are what is
-    searched for users of the version."""
+    """The changes ``apply`` would make: [{path, kind, where, row, variable, value, old, reference, sourced}],
+    ``row`` the parameter's path in the file. ``versions`` (default: the library) and ``systems`` (default:
+    _system_models()) are what is searched for users of the version."""
+    from libcuflynx.utilities import parameters_file as pf
     from cam_testing.library import all_versions, read_parameters
     inst = version.parameterisation(parameterisation_name)
     names = [p['param_name'] for p in read_params_for_id(inst.params_for_id_path)]
@@ -552,13 +560,13 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     calibrated = {p.variable_name: p.value for p in read_parameters(inst.calibrated_parameters_path)
                   if p.variable_name in names}
     if os.path.isfile(inst.calibration_path):
-        # full precision from the summary (the CSV keeps 10 significant figures)
+        # full precision from the summary (the parameters file keeps 10 significant figures)
         with open(inst.calibration_path) as f:
             full = (json.load(f).get('calibrated_parameters') or {})
         calibrated.update({k: repr(float(v)) for k, v in full.items() if k in names and not isinstance(v, list)})
     missing = [n for n in names if n not in calibrated]
     if missing:
-        raise KeyError(f'{inst.calibrated_parameters_path} has no row for {missing}')
+        raise KeyError(f'{inst.calibrated_parameters_path} has no parameter {missing}')
     with open(inst.obs_data_path) as f:
         obs = json.load(f)
     note = obs.get('calibration_note') or obs.get('obs_data_name') or parameterisation_name
@@ -568,11 +576,7 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     by_key = {v.key: v for v in versions}
     by_key.setdefault(version.key, version)
 
-    def default_of(mt, sub):
-        v = by_key.get(f'{mt}/{sub}')
-        return v.default_parameterisation_name if v is not None else 'default'
-
-    # (version, submodule path) of every supermodule chain over the version's default parameterisation
+    # (supermodule version, submodule path) of every supermodule chain over the version
     chain, todo = [], [(version.mtype.name, version.name, '')]
     while todo:
         mt, vname, sfx = todo.pop(0)
@@ -582,17 +586,15 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
             for sub in S.submodules:
                 if (sub.get('module_type'), sub.get('module_subtype')) != (mt, vname):
                     continue
-                if module_array.parameterisation_of(sub, 'default') != default_of(mt, vname):
-                    continue
                 path = sub['name'] + ('/' + sfx if sfx else '')
                 if all((c[0].key, c[1]) != (S.key, path) for c in chain):
                     chain.append((S, path))
                     todo.append((S.mtype.name, S.name, path))
 
-    targets = []          # (csv path, row prefix, where, own)
-    targets.append((version.default_parameterisation.parameters_path, '', f'{version.key} default parameterisation', True))
+    # (parameters file, kind, path prefix, where, own)
+    targets = [(version.default_parameterisation.parameters_path, pf.MODULE, '', f'{version.key} default parameterisation', True)]
     for S, path in chain:
-        targets.append((S.default_parameterisation.parameters_path, path + '/', f'{S.key} default parameterisation', False))
+        targets.append((S.instance_parameters_path, pf.MODULE, path + '/', f'{S.key} default parameterisation', False))
     flattened = {}        # system key -> [flattened vessels, as <record>/<submodule path>]
     systems_by_key = {m['key']: m for m in systems}
     chain_by_key = {}
@@ -601,16 +603,13 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     for m in systems:
         for ves in m['vessels']:
             vk = f"{ves.get('module_type')}/{ves.get('module_subtype')}"
-            p_name = module_array.parameterisation_of(ves, 'default')
-            if p_name != default_of(ves.get('module_type'), ves.get('module_subtype')):
-                continue
             if vk == version.key:
                 flattened.setdefault(m['key'], []).append(ves['name'])
             for path in chain_by_key.get(vk, []):
                 flattened.setdefault(m['key'], []).append(f"{ves['name']}/{path}")
     for mkey, fl in flattened.items():
         for F in fl:
-            targets.append((systems_by_key[mkey]['parameters_path'], F + '/', f'system model {mkey}', False))
+            targets.append((systems_by_key[mkey]['parameters_path'], pf.MODEL, F + '/', f'system model {mkey}', False))
     # monolithic counterparts, through supermodule.equivalent output maps
     for S in versions:
         for e in ((S.spec.get('supermodule') or {}).get('equivalent') or []):
@@ -623,54 +622,53 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
                 mono = sorted({a.split('/', 1)[0] for a, b in omap.items() if b.split('/', 1)[0] == vessel})
                 if len(mono) != 1:
                     continue
-                targets.append((rep['parameters_path'], mono[0] + '/', f"system model {rep['key']}", False))
+                targets.append((rep['parameters_path'], pf.MODEL, mono[0] + '/', f"system model {rep['key']}", False))
                 ves = next((x for x in rep['vessels'] if x['name'] == mono[0]), None)
                 mv = by_key.get(f"{ves.get('module_type')}/{ves.get('module_subtype')}") if ves else None
                 if mv is not None:
-                    targets.append((mv.default_parameterisation.parameters_path, '', f'{mv.key} default parameterisation', False))
+                    targets.append((mv.default_parameterisation.parameters_path, pf.MODULE, '',
+                                    f'{mv.key} default parameterisation', False))
 
     import datetime
     today = datetime.date.today().isoformat()
     obs_rel = os.path.relpath(inst.obs_data_path, version.dir).replace(os.sep, '/')
-    plan, seen = [], set()
-    for path, pfx, where, own in targets:
-        rows = _row_values(path, {pfx + n for n in names})
+    plan, seen, docs = [], set(), {}
+    for path, kind, prefix, where, own in targets:
+        if path not in docs:
+            docs[path] = _document(path, kind)
+        doc = docs[path]
+        if doc is None:
+            continue
         for n in names:
-            row = rows.get(pfx + n)
-            if row is None or (path, pfx + n) in seen:
+            row = prefix + n
+            leaf = pf.get_leaf(doc, row.split('/'))
+            if leaf is None or (path, row) in seen:
                 continue
-            seen.add((path, pfx + n))
+            seen.add((path, row))
             to = obs_rel if own else f'{version.mtype.name} {version.name} {obs_rel}'
-            ref = (f'{key}; ' if key else '') + f'Calibrated (libcuflynx) to {to}: {note} (was {row.get("value")}; applied {today})'
-            plan.append({'path': path, 'where': where, 'row': pfx + n, 'variable': n, 'value': calibrated[n],
-                         'old': row.get('value'), 'reference': ref, 'sourced': 'yes' if key else None})
+            ref = (f'{key}; ' if key else '') + f'Calibrated (libcuflynx) to {to}: {note} (was {leaf.get("value")}; applied {today})'
+            plan.append({'path': path, 'kind': kind, 'where': where, 'row': row, 'variable': n,
+                         'value': calibrated[n], 'old': leaf.get('value'), 'reference': ref,
+                         'sourced': 'yes' if key else None})
     return plan
 
 
 def write_plan(plan):
-    """Rewrites the rows of ``plan`` in place, keeping each file's columns and line endings."""
+    """Sets the parameters of ``plan`` in their files (libcuflynx's nested JSON): value, data_reference,
+    and sourced where the change sets it and the parameter has the key."""
+    from libcuflynx.utilities import parameters_file as pf
     by_path = {}
     for c in plan:
-        by_path.setdefault(c['path'], {})[c['row']] = c
+        by_path.setdefault(c['path'], []).append(c)
     for path, changes in by_path.items():
-        lines, eol, header = _csv_rows(path)
-        for k, ln in enumerate(lines[1:], start=1):
-            if not ln.strip():
-                continue
-            row = next(csv.reader([ln]))
-            c = changes.get(row[0])
-            if c is None:
-                continue
-            d = dict(zip(header, row))
-            d['value'] = c['value']
-            d['data_reference'] = c['reference']
-            if c['sourced'] and 'sourced' in d:
-                d['sourced'] = c['sourced']
-            b = io.StringIO()
-            csv.writer(b, lineterminator='').writerow([d.get(h, '') for h in header])
-            lines[k] = b.getvalue()
-        with open(path, 'w', newline='') as f:
-            f.write(eol.join(lines))
+        doc = pf.read_parameters_file(path, kind=changes[0]['kind'])
+        for c in changes:
+            leaf = pf.get_leaf(doc, c['row'].split('/'))
+            leaf['value'] = c['value']
+            leaf['data_reference'] = c['reference']
+            if c['sourced'] and 'sourced' in leaf:
+                leaf['sourced'] = c['sourced']
+        pf.write_parameters_file(path, doc)
 
 
 def apply_command(version_key, parameterisation_name, dry_run=False, versions=None, systems=None, out=print):

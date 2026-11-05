@@ -19,7 +19,7 @@ from cam_testing.library import load_version
 pytestmark = pytest.mark.module_vv
 
 
-def _assert(result, version):
+def _assert(result, version, parameterisation=None):
     if result.status == checks.PASSED:
         return
     if result.status == checks.PARTIAL:
@@ -31,7 +31,7 @@ def _assert(result, version):
         pytest.skip(f'{result.status}: {result.message}')
     # A failure listed under expected_failures in the spec is a recorded known issue: it
     # stays 'failed' in the results and the report, but does not fail the run.
-    known = (version.spec.get('expected_failures') or {}).get(result.test)
+    known = checks.expected_failure(version, result.test, parameterisation)
     detail = '\n'.join(str(d) for d in result.details[:20])
     if known:
         pytest.xfail(f'known issue: {known} ({result.message})')
@@ -69,12 +69,14 @@ def stability_test(component_model):
 # ---- per parameterisation -----------------------------------------------------------------------
 
 def validation_test_baseline(parameterisation_model):
-    _assert(checks.validation_test_baseline(parameterisation_model), parameterisation_model.component)
+    _assert(checks.validation_test_baseline(parameterisation_model), parameterisation_model.component,
+            parameterisation_model.parameterisation)
 
 
 @pytest.mark.slow
 def validation_test_calibrate(parameterisation_model):
-    _assert(checks.validation_test_calibrate(parameterisation_model), parameterisation_model.component)
+    _assert(checks.validation_test_calibrate(parameterisation_model), parameterisation_model.component,
+            parameterisation_model.parameterisation)
 
 
 # ---- supermodule versions -----------------------------------------------------------------------

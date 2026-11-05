@@ -1,0 +1,11 @@
+{
+ "version": 1,
+ "params": [
+  {"targets": ["systemic_T/R_T"], "min": 1e7, "max": 1e9, "name_for_plotting": "R_{T}", "prior": "uniform"},
+  {"targets": ["systemic_T/C_T"], "min": 3.75e-9, "max": 2.25e-8, "name_for_plotting": "C_{T}", "prior": "uniform"},
+  {"targets": ["aortic_root/R"], "min": 1e5, "max": 1e8, "name_for_plotting": "R_{root}", "prior": "uniform"},
+  {"targets": ["aortic_root/C"], "min": 1e-10, "max": 1e-8, "name_for_plotting": "C_{root}", "prior": "uniform"},
+  {"targets": ["mod/q_us"], "min": 0.0, "max": 6e-5, "name_for_plotting": "q_{us}", "prior": "uniform"},
+  {"targets": ["pv_p/P"], "min": 400.0, "max": 2700.0, "name_for_plotting": "P_{pv}", "prior": "uniform"}
+ ]
+}
