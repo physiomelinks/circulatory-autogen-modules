@@ -1,0 +1,10 @@
+module_type: venous_gas_mixing
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'Mixes the venous blood of the regions connected to it, weighting each region''s gas content by its own flow:
+  C_mix = sum(v_i C_i) / sum(v_i) for O2 and CO2. Each region (tissue_GE_simple Ursino2001_v02) gives its outflow v_out and
+  the gas it carries, j = v C, on its gas_flux_port; the entrance gas_flux_port sums them (multi_port sum: v = sum v_out_i,
+  J_O2 = sum j_O2_i, J_CO2 = sum j_CO2_i), so each product is formed in the module that owns both factors. The exit gas_port
+  gives C_CO2_mix, C_O2_mix and the exit flow_port v_mix = v, the inputs of a gas_transport_simple (venous_gas_transport).
+  Tested with three regions of different flows and consumptions, their terminals and gas-exchange modules listed in different
+  orders.'
