@@ -66,6 +66,20 @@ def test_quick_failures_do_not_let_a_slow_run_go_on():
     assert 'limit' in stop
 
 
+@needs_fork
+def test_an_unconstrained_run_past_its_limit_ends_the_ladder():
+    # the first try has no step (unconstrained); stopped at its limit, the reason names it so
+    rows = []
+
+    def run(step):
+        time.sleep(60)
+        return True
+    last, stop = checks.refine_family(_record(rows), lambda s: {'max_step': s}, run, 1e-2, 10.0, True,
+                                      budget=0.5, min_step=1e-7, deadline=time.perf_counter() + 60.0)
+    assert len(rows) == 1 and rows[0]['timed_out'] and rows[0]['config']['max_step'] is None
+    assert stop.startswith('stopped: run (unconstrained) reached the')
+
+
 def test_the_ladder_ends_at_the_tests_deadline():
     rows = []
     last, stop = checks.refine_family(_record(rows), lambda s: {'max_step': s}, lambda s: False, 1e-2, 10.0, True,
