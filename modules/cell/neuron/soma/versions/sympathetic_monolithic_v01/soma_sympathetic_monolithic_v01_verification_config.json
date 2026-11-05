@@ -149,6 +149,10 @@
       {"solver": "CVODE_myokit", "rtol": 1e-08, "atol": 1e-10}
     ]
   },
+  "smoothing": {
+    "rel": {"abs": 0.001, "maxmin": 0.001, "piecewise": 0.001, "division": 1e-06},
+    "rationale": "Every site is smoothed (16 abs(tau/1000) guards, the i_Ca_L GHK limit and its division, the Kv1.5 and Kv4.2 time-constant switches). The GHK form's denominator 1 - exp(2FV/RT) crosses 0 at V = 0, and its range (82) is set by large V, so its guard needs rel 1e-6: at the default 1e-3 the check fails 440 of 474 points (0.35 over the floor in m, from i_Ca_L); at 1e-6 every point of 486 passes, worst 0.0075 at V_mid_m_Na1_6 = 72. In SN_simple over 20 s the guard at rel 1e-4, 1e-5, 1e-6, 1e-7 moved spikes by 68, 5.9, 0.52 and 0.03 ms."
+  },
   "validation": {
     "default": {
       "baseline": {
