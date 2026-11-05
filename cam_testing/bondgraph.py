@@ -572,7 +572,7 @@ def compare_models(module_model, document_model, own_component, t_end=CELLML_T_E
         problems.append('the document\'s stores are not the CellML\'s initial concentrations in one volume: '
                         f'amount over concentration from {min(volumes):.6g} to {max(volumes):.6g}')
     metrics = {'pairs': len(pairs), 'volume': volumes[0] if volumes else None}
-    if problems:
+    if problems or not pairs:
         return problems, metrics
     m_init, d_init = dict(m0), dict(d0)
     for i, (d, m) in enumerate(sorted(pairs.items())):
@@ -623,6 +623,9 @@ def cellml_check(version, work_dir=None):
                                      details=[str(e)])
         problems, metrics = compare_models(module_model, document_model, f'{harness.VESSEL}_module')
         metrics['generator'] = report.get('generator')
+        if not problems and not metrics['pairs']:
+            return checks.Result(test, checks.PARTIAL, 'the converter makes CellML from the document, but neither '
+                                 'model has a store to compare', metrics)
         if problems:
             return checks.Result(test, checks.FAILED, f'the CellDL document and the CellML differ ({len(problems)}): '
                                  f'{problems[0]}; the CellML is used', metrics, details=problems)

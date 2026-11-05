@@ -383,6 +383,20 @@ dot(q_A_c) = 0
     assert 'psi_m is in the CellML but not the CellDL document' in problems
 
 
+def test_models_without_stores_have_nothing_to_compare():
+    empty = """[[model]]
+
+[environment]
+time = 0 bind time
+
+[mod_module]
+v = 2
+"""
+    problems, metrics = bondgraph.compare_models(_model(empty), _model(empty.replace('mod_module', 'main')),
+                                                 'mod_module')
+    assert problems == [] and metrics['pairs'] == 0
+
+
 def test_without_the_bridge_the_cellml_test_is_skipped(tmp_path, no_converter):
     result = bondgraph.cellml_check(hexokinase(tmp_path))
     assert result.status == checks.SKIPPED and result.message.startswith('not run')
