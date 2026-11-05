@@ -90,6 +90,19 @@ def test_heading_names_and_reference_forms():
     assert sections['a']['kind'] == 'assumed' and sections['a']['source'] == 'b2020'
 
 
+def test_kinds_keep_their_detail_and_synthetic_is_a_kind():
+    # parentheses around the whole detail are dropped, one inside it is kept
+    assert sources.classify_kind('derived (synthetic: FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0))') == \
+        ('derived', 'synthetic: FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0)')
+    assert sources.classify_kind('assumed (from (x)) and (y)') == ('assumed', '(from (x)) and (y)')
+    # model output used as data
+    assert sources.classify_kind('synthetic (Liang 2009 model output, Fig. 3)') == \
+        ('synthetic', 'Liang 2009 model output, Fig. 3')
+    sections, _ = sources.parse_sources_md('## a\n\n- Kind: synthetic (the benchmark series)\n')
+    row = sources._row('a', section=sections['a'], role='target')
+    assert row['kind_label'] == 'synthetic (the benchmark series)' and not row['problem']
+
+
 def test_data_reference_label_is_the_source_not_prose():
     sections, _ = sources.parse_sources_md('## a\n\n- Data reference: b2020; Fig. 2,\n  digitised\n'
                                            '\n## b\n\n- data reference: c2021; Table 1\n')
@@ -152,27 +165,60 @@ def test_only_weight_0_makes_a_term(tmp_path):
     assert r['e']['role'] == 'target' and r['e']['kind'] is None and r['e']['problem'] == sources.MISSING
 
 
+def test_an_empty_section_is_not_a_source(tmp_path):
+    (tmp_path / 'SOURCES.md').write_text('## a\n\n## b\n\nRead off Fig. 2.\n')
+    obs = {'data_items': [item('a'), item('b')], 'prediction_items': []}
+    r = rows_by_name(sources.data_table(str(tmp_path), obs=obs))
+    assert r['a']['missing'] and r['a']['origin'] is None and r['a']['problem'] == sources.MISSING
+    assert r['a']['problem_kind'] == 'missing'
+    # prose under the heading is a source
+    assert r['b']['origin'] == 'SOURCES.md' and not r['b']['problem']
+
+
+def test_a_term_names_the_item_that_uses_it(tmp_path):
+    def term_problem(kind):
+        (tmp_path / 'SOURCES.md').write_text(f'## a\n\n- Kind: {kind}\n')
+        obs = {'data_items': [item('a', 0, 1, 0.0), item('b', 2, 1, operation_kwargs={'x1': 'a', 'x2': 'c'}),
+                              item('c', 1, 1, data_reference='k2020')], 'prediction_items': []}
+        return rows_by_name(sources.data_table(str(tmp_path), obs=obs))['a']
+    assert term_problem('derived: term of b')['problem'] is None
+    # "term of" without "derived:"
+    row = term_problem('term of b')
+    assert row['problem_kind'] == 'term' and 'must say "derived: term of b"' in row['problem']
+    # the wrong item, naming the one that uses it
+    row = term_problem('derived: term of zzz')
+    assert row['problem_kind'] == 'term'
+    assert 'names zzz, but b uses it' in row['problem'] and 'must say "derived: term of b"' in row['problem']
+
+
 def test_data_reference_and_section_combine(tmp_path):
     (tmp_path / 'SOURCES.md').write_text('## a\n\n- Kind: measured\n- Data reference: k2020; Fig. 1\n'
                                          '- Figure: Fig. 1B\n\n## b\n\n- Data reference: k2020; Fig. 2\n'
-                                         '\n## c\n\n- Kind: assumed\n- Source: an older note\n')
+                                         '\n## c\n\n- Kind: assumed\n- Source: an older note\n- Data reference: k2021\n'
+                                         '\n## e\n\n- Kind: measured\n')
     obs = {'data_items': [item('a', data_reference='k2020; Fig. 1'), item('b', data_reference='k2020; Fig. 3'),
                           item('c', data_reference={'source': 'k2021', 'figure': 'Table 2'}),
-                          item('d', data_reference='k2022')], 'prediction_items': []}
+                          item('d', data_reference='k2022'), item('e', data_reference='k2023; Fig. 4')],
+           'prediction_items': []}
     obs_path = str(tmp_path / 'x_obs_data.json')
     t = sources.data_table(str(tmp_path), obs=obs, obs_path=obs_path)
     r = rows_by_name(t)
     # section fields plus data_reference, the data_reference winning per field; the origin says both
     assert (r['a']['origin'], r['a']['kind'], r['a']['figure'], r['a']['problem']) == \
         ('data_reference + SOURCES.md', 'measured', 'Fig. 1B', None)
-    assert (r['c']['source'], r['c']['figure'], r['c']['kind']) == ('k2021', 'Table 2', 'assumed')
+    assert (r['c']['source'], r['c']['figure'], r['c']['kind'], r['c']['problem']) == ('k2021', 'Table 2', 'assumed', None)
     assert r['c']['origin'] == 'data_reference + SOURCES.md' and not r['c']['mismatch']
     assert r['d']['origin'] == 'data_reference'
     # the two strings differ: a problem naming both strings and both files
     b = r['b']
     assert b['mismatch'] and not b['missing']
     assert all(s in b['problem'] for s in ('"k2020; Fig. 3"', '"k2020; Fig. 2"', 'x_obs_data.json', 'SOURCES.md'))
-    assert t['n_problems'] == 1
+    # a data_reference and a section without its Data reference line: a problem naming both files
+    e = r['e']
+    assert e['problem_kind'] == 'reference' and not e['mismatch'] and not e['missing']
+    assert all(s in e['problem'] for s in ('"k2023; Fig. 4"', 'x_obs_data.json', 'SOURCES.md',
+                                           '"- Data reference: k2023; Fig. 4"'))
+    assert t['n_problems'] == 2 and t['problems'] == {'missing': 0, 'reference': 2, 'term': 0}
 
 
 def test_baseline_targets_and_columns(tmp_path):
@@ -227,15 +273,20 @@ def _strip_lv_data(repo):
     md = os.path.join(os.path.dirname(path), 'SOURCES.md')
     if os.path.exists(md):
         os.remove(md)
-    # carpenter2018's baseline data columns
-    with open(os.path.join(repo.version.parameterisation('carpenter2018').dir, 'SOURCES.md'), 'w') as f:
-        f.write('## Hare\n\n- Kind: measured\n- Source: carpenter2018predator\n\n## Lynx\n\n- Kind: measured\n')
+    # carpenter2018's baseline data columns, each section repeating the block's data_reference
+    carpenter = repo.version.parameterisation('carpenter2018')
+    ref = carpenter.validation['baseline']['data_reference']
+    with open(os.path.join(carpenter.dir, 'SOURCES.md'), 'w') as f:
+        f.write(f'## Hare\n\n- Kind: measured\n- Data reference: {ref}\n\n## Lynx\n\n- Kind: measured\n'
+                f'- Data reference: {ref}\n')
 
 
 def test_data_sources_test_fails_on_unsourced_items_and_lists_where_to_add_them(repo):
     _strip_lv_data(repo)
     r = sources.check(repo.version)
-    assert r.status == checks.FAILED and r.message == '2 of 22 data items have no source'
+    assert r.status == checks.FAILED
+    assert r.message == '2 of 22 data items have a problem: 1 no source, 1 term not labelled'
+    assert (r.metrics['n_missing'], r.metrics['n_reference'], r.metrics['n_term']) == (1, 0, 1)
     assert any(d.startswith(f'{P}: G_K_total: source missing') and f'parameterisations/{P}/SOURCES.md' in d
                for d in r.details)
     assert any(d.startswith(f'{P}: v_NKA_sugar: weight-0 term') for d in r.details)
@@ -257,7 +308,7 @@ def test_data_sources_test_reports_a_data_reference_mismatch(repo):
                 '\n## R_te\n\n- Data reference: rose1971studies Table 3\n')
     r = sources.check(repo.version)
     assert r.status == checks.FAILED
-    assert r.message == '1 of 22 data items have a data_reference that differs from SOURCES.md'
+    assert r.message == '1 of 22 data items have a problem: 1 Data reference mismatch/missing'
     d = next(d for d in r.details if d.startswith(f'{P}: R_te: '))
     assert '"rose1971studies Table 2" in ' + f'parameterisations/{P}/{P}_obs_data.json' in d
     assert f'"rose1971studies Table 3" in parameterisations/{P}/SOURCES.md' in d
@@ -288,7 +339,7 @@ def test_a_reviewed_version_with_unsourced_data_fails_ci(repo, tmp_path):
     import sys
     from cam_testing.suite.test_modules import data_sources_test
     assert repo.version.reviewed
-    with pytest.raises(pytest.fail.Exception, match='data items have no source'):
+    with pytest.raises(pytest.fail.Exception, match='1 no source'):
         data_sources_test(('Lotka_Volterra', 'Lotka1925_v01'))
     junit = tmp_path / 'junit.xml'
     junit.write_text('<testsuites><testsuite><testcase name="data_sources_test[Lotka_Volterra/Lotka1925_v01]">'
@@ -309,11 +360,18 @@ def test_a_reviewed_version_with_unsourced_data_fails_ci(repo, tmp_path):
 def test_version_page_shows_the_table_and_the_count(repo):
     _strip_lv_data(repo)
     ctx = report.version_context(repo.version)
-    assert ctx['n_data_items'] == 22 and ctx['n_data_unsourced'] == 2
+    assert ctx['n_data_items'] == 22 and ctx['n_data_problems'] == 2
     html = report._env().get_template('version.html').render(**ctx)
     assert 'id="data-sources"' in html and 'id="data-sources-enterocyte_demo"' in html
     assert 'source missing' in html and 'term of u_e_depolarisation_with_sugar, not a measurement' in html
-    assert '20 of 22 data items sourced' in html
+    assert '2 of 22 data items with a problem: 1 no source, 1 term not labelled' in html
+    assert '2 with a problem: 1 no source, 1 term not labelled' in html      # the table's own count
+    index = report._env().get_template('index.html').render(
+        groups=[], systems=[], totals={}, n_module_types=0, n_versions=0, generated='', libcuflynx_version='',
+        data_sources={'items': 22, 'problems': 2, 'counts': ctx['data_problems'], 'systems': 1,
+                      'system_counts': {'missing': 0, 'reference': 1, 'term': 0}})
+    assert ('2 of 22 data items with a problem (1 no source, 1 term not labelled), and 1 in system models '
+            '(1 Data reference mismatch/missing)') in index
     # bib keys of the version link to its References
     assert '<a href="#ref-hewitt1921conservation">hewitt1921conservation</a>' in html
     page = report.parameterisation_context(repo.version, repo.version.parameterisation(P))['sources']
@@ -342,6 +400,39 @@ def test_system_page_shows_its_obs_data_sources(tmp_path):
         assert ctx['sources']['n_problems'] == 2 and ctx['sources']['sources_md'] == 'SOURCES.md'
         html = report._env().get_template('system_model.html').render(**ctx)
         assert 'id="data-sources-h"' in html and 'source missing' in html
-        assert report.system_rows([ctx], lambda c: 'x.html')[0]['n_data_unsourced'] == 2
+        assert report.system_rows([ctx], lambda c: 'x.html')[0]['n_data_problems'] == 2
     finally:
         paths.reset()
+
+
+def test_a_reviewed_system_model_with_unsourced_data_fails_ci(tmp_path):
+    '''system_data_sources_test fails for a system model with an unsourced item, and
+    tools/ci_reviewed_failures.py makes that blocking when its spec has reviewed: true, a warning otherwise.'''
+    import subprocess
+    import sys
+    from cam_testing.suite.test_systems import system_data_sources_test
+    root = tmp_path / 'repo'
+    (root / 'modules').mkdir(parents=True)
+    sdir = root / 'system_models' / 'demo' / 'chain'
+    sdir.mkdir(parents=True)
+    (sdir / 'chain_module_array.json').write_text(json.dumps([]))
+    spec = sdir / 'chain_system.yaml'
+    spec.write_text('model: chain\ncategory: demo\nreviewed: true\n')
+    (sdir / 'chain_obs_data.json').write_text(json.dumps({'data_items': [item('a', data_reference='k2020'), item('b')],
+                                                          'prediction_items': []}))
+    paths.configure(repo_root=str(root), library_dirs=[], export=False)
+    try:
+        with pytest.raises(pytest.fail.Exception, match=r'1 of 2 data items have a problem: 1 no source'):
+            system_data_sources_test(systems.load_system('demo/chain'))
+    finally:
+        paths.reset()
+    junit = tmp_path / 'junit.xml'
+    junit.write_text('<testsuites><testsuite><testcase name="system_data_sources_test[demo/chain]">'
+                     '<failure message="x"/></testcase></testsuite></testsuites>')
+    env = dict(os.environ, CAM_REPO_ROOT=str(root), CAM_MODULE_LIBRARY_DIRS='')
+    tool = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'ci_reviewed_failures.py')
+    out = subprocess.run([sys.executable, tool, str(junit)], env=env, capture_output=True, text=True)
+    assert out.returncode == 1 and '::error::system_data_sources_test[demo/chain] failed' in out.stdout
+    spec.write_text('model: chain\ncategory: demo\nreviewed: false\n')
+    out = subprocess.run([sys.executable, tool, str(junit)], env=env, capture_output=True, text=True)
+    assert out.returncode == 0 and '::warning::' in out.stdout and 'system model not reviewed yet' in out.stdout

@@ -981,6 +981,7 @@ def _env():
     env.filters['fmt'] = _fmt
     env.filters['emph'] = _emph
     env.filters['cite'] = _cite
+    env.filters['problems'] = sources.summary
     return env
 
 
@@ -1068,9 +1069,10 @@ def version_context(version):
         'bib_keys': sorted(set(bib.read(bib.bib_path(version))) | set(bib.read(bib.proposed_bib_path(version)))),
         'bib_file': os.path.basename(bib.bib_path(version)),
         'n_sourced': sum(p.is_sourced for p in version.parameters()), 'n_parameters': len(version.parameters()),
-        # the Data sources tables: data items, and those without a source (cam_testing.sources)
+        # the Data sources tables: data items, those with a problem, and the problems by kind (cam_testing.sources)
         'n_data_items': sum(len(i['sources']['rows']) for i in comp['parameterisations'] if i['sources']),
-        'n_data_unsourced': sum(i['sources']['n_problems'] for i in comp['parameterisations'] if i['sources']),
+        'n_data_problems': sum(i['sources']['n_problems'] for i in comp['parameterisations'] if i['sources']),
+        'data_problems': sources.add_counts(i['sources']['problems'] for i in comp['parameterisations'] if i['sources']),
         'counts': _status_counts([comp]), 'structure': _structure(version),
         'max_risk': comp['risk']['failure_probability'] if comp['risk'] else None,
         'known_issues': (version.spec.get('known_issues') or [])
@@ -1112,7 +1114,8 @@ def module_context(name, version_contexts=None):
                      'contents': comp['contents'], 'unit_failures': c['unit_failures'],
                      'unit_status': (comp['unit_consistency'] or {}).get('status'),
                      'creators': c['creators'], 'licence': c['licence'],
-                     'n_data_items': c['n_data_items'], 'n_data_unsourced': c['n_data_unsourced']})
+                     'n_data_items': c['n_data_items'], 'n_data_problems': c['n_data_problems'],
+                     'data_problems': c['data_problems']})
     counts = {}
     for c in vctx:
         for k, n in c['counts'].items():
@@ -1126,7 +1129,8 @@ def module_context(name, version_contexts=None):
         'all_sourced': all(r['all_sourced'] for r in rows),
         'n_sourced': sum(r['n_sourced'] for r in rows), 'n_parameters': sum(r['n_parameters'] for r in rows),
         'n_data_items': sum(r['n_data_items'] for r in rows),
-        'n_data_unsourced': sum(r['n_data_unsourced'] for r in rows),
+        'n_data_problems': sum(r['n_data_problems'] for r in rows),
+        'data_problems': sources.add_counts(r['data_problems'] for r in rows),
         'max_risk': max((r['max_risk'] for r in rows if r['max_risk'] is not None), default=None),
         'known_issues': sum(r['known_issues'] for r in rows),
         'phlynx': {'run': sum(r['phlynx']['run'] for r in rows),
@@ -1168,7 +1172,8 @@ def build_index(contexts, out_path, href, systems=()):
                          'counts': c['counts'],
                          'reviewed': c['reviewed'], 'known_issues': c['known_issues'], 'max_risk': c['max_risk'],
                          'all_sourced': c['all_sourced'], 'n_sourced': c['n_sourced'], 'n_parameters': c['n_parameters'],
-                         'n_data_items': c.get('n_data_items', 0), 'n_data_unsourced': c.get('n_data_unsourced', 0),
+                         'n_data_items': c.get('n_data_items', 0), 'n_data_problems': c.get('n_data_problems', 0),
+                         'data_problems': c.get('data_problems') or {},
                          'phlynx': c['phlynx'], 'ready_for_review': c['ready_for_review'] and not c['reviewed'],
                          'versions': [{'name': v['version'], 'href': href(c['relpath'], v['href']),
                                        'counts': v['counts'], 'reviewed': v['reviewed'],
@@ -1183,8 +1188,10 @@ def build_index(contexts, out_path, href, systems=()):
         groups=out_groups, systems=list(systems), totals=totals, n_module_types=len(all_rows),
         n_versions=sum(r['n_versions'] for r in all_rows),
         data_sources={'items': sum(r['n_data_items'] for r in all_rows),
-                      'unsourced': sum(r['n_data_unsourced'] for r in all_rows),
-                      'systems': sum(s.get('n_data_unsourced', 0) for s in systems)},
+                      'problems': sum(r['n_data_problems'] for r in all_rows),
+                      'counts': sources.add_counts(r['data_problems'] for r in all_rows),
+                      'systems': sum(s.get('n_data_problems', 0) for s in systems),
+                      'system_counts': sources.add_counts(s.get('data_problems') for s in systems)},
         generated=_now(), libcuflynx_version=_libcuflynx_version())
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, 'w') as f:
@@ -1436,7 +1443,6 @@ def system_context(system, href_of=None, page_dir=None):
     notes = spec.get('notes') or []
     notes = [notes] if isinstance(notes, str) else list(notes)
     figure = system_figure(system, {i['name'] for i in instances})
-    obs_path = os.path.join(system.dir, f'{system.name}_obs_data.json')
     hrefs = {i['name']: i['href'] for i in instances}
     for n in (figure or {}).get('nodes') or []:
         n['href'] = hrefs.get(n['instance'])
@@ -1457,8 +1463,7 @@ def system_context(system, href_of=None, page_dir=None):
         'parameters': _parameter_groups(os.path.join(system.dir, f'{system.name}_parameters.json')),
         'parameters_file': f'{system.name}_parameters.json',
         'tests': tests, 'counts': counts, 'plots': _system_plots(system),
-        'sources': sources_table(sources.data_table(system.dir, obs=sources.read_obs(obs_path), obs_path=obs_path),
-                                 system.dir),
+        'sources': sources_table(sources.system_table(system), system.dir),
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),
     }
 
@@ -1480,7 +1485,8 @@ def system_rows(contexts, href):
     return [{'id': c['id'], 'name': c['name'], 'category': c['category'], 'href': href(c),
              'n_instances': len(c['instances']), 'counts': c['counts'], 'description': c['description'],
              'has_figure': bool(c['figure']), 'tests': c['tests'],
-             'n_data_unsourced': (c['sources'] or {}).get('n_problems', 0)}
+             'n_data_problems': (c['sources'] or {}).get('n_problems', 0),
+             'data_problems': (c['sources'] or {}).get('problems') or {}}
             for c in sorted(contexts, key=lambda c: c['id'].lower())]
 
 

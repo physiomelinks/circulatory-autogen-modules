@@ -10,17 +10,21 @@ An item's source combines:
      a Markdown heading that is the item's ``data_item_name`` (a trailing " — <value>" or "(note)" on the
      heading is ignored), then optional labelled lines ``- <Label>: <text>`` (LABELS), then free prose.
 
-The section extends the data_reference: a field in both is taken from the data_reference. A section's
-``- Data reference: <text>`` line must repeat the item's data_reference string exactly (for an object, its
-``source``); a difference is a problem.
+The section extends the data_reference: a field in both is taken from the data_reference. When an item has
+both, the section must have a ``- Data reference: <text>`` line repeating the item's data_reference string
+exactly (for an object, its ``source``); a missing or different line is a problem. A section with nothing
+under its heading is not a source.
 
 Value and sigma always come from the data file, never from SOURCES.md. Kind (measured / assumed /
-derived) is read only from the labels; role (target / prediction / held out / term / validation) is the
+derived / synthetic) is read only from the labels; role (target / prediction / held out / term / validation) is the
 item's place in the data: a data_item with weight > 0 is a target, a prediction_item with a value is held
 out, one without is a prediction, a data_item with weight 0 is a term (never a target), a baseline target or
 data column is validation. Weight 0 is the only way an item is used without being scored (a large sigma
 never marks one): a weight-0 data_item is a term of another item, usually one whose operation_kwargs names
-it (x1/x2 of a subtraction or division), and its source must say "derived: term of <item>".
+it (x1/x2 of a subtraction or division), and its source must say "derived: term of <item>", naming that item
+when one does.
+
+Each problem has a kind (PROBLEMS): no source, a Data reference line missing or different, or a term not labelled.
 """
 import json
 import os
@@ -29,6 +33,9 @@ import re
 SOURCES_MD = 'SOURCES.md'
 MISSING = 'source missing'
 DATA_REFERENCE = '_data_reference'   # a section's "Data reference" line as written
+# problem kind -> how a summary counts it
+PROBLEMS = {'missing': 'no source', 'reference': 'Data reference mismatch/missing', 'term': 'term not labelled'}
+KINDS = ('measured', 'assumed', 'derived', 'synthetic')
 
 # data_reference object keys (and SOURCES.md fields)
 REFERENCE_KEYS = ('source', 'figure', 'obtained', 'species', 'preparation', 'conditions', 'kind', 'role',
@@ -48,6 +55,7 @@ LABELS = {
 _HEADING = re.compile(r'^(#{1,6})\s+(.*?)\s*#*\s*$')
 _LABELLED = re.compile(r'^\s*[-*]\s+(?:\*\*)?([A-Za-z][A-Za-z /]*?)(?::\*\*|\*\*:|:)\s*(.*)$')
 _TERM_OF = re.compile(r'term of\s+`?([^\s`,;:()]+)', re.I)
+_DERIVED_TERM = re.compile(r'^\s*derived\s*:\s*term of\b', re.I)
 _DASH_SPLIT = re.compile(r'\s+[—–-]\s+')   # " — ", " – ", " - "
 
 
@@ -124,9 +132,23 @@ def read_reference(ref):
     return out
 
 
+def _detail(rest):
+    '''A Kind's detail: the text after the kind, without separators or the parentheses around all of it.'''
+    rest = rest.strip(' :;,-–—')
+    if rest.startswith('(') and rest.endswith(')'):
+        depth = 0
+        for i, c in enumerate(rest):
+            depth += {'(': 1, ')': -1}.get(c, 0)
+            if depth == 0:
+                break
+        if i == len(rest) - 1:          # the first parenthesis closes at the end
+            rest = rest[1:-1].strip()
+    return rest or None
+
+
 def classify_kind(text):
-    '''(kind, detail) from a Kind label: measured, assumed, derived, term (detail: the item it is a term
-    of) or other; (None, None) without one.'''
+    '''(kind, detail) from a Kind label: one of KINDS, term (detail: the item it is a term of) or other;
+    (None, None) without one.'''
     if not text:
         return None, None
     t = text.strip()
@@ -134,9 +156,9 @@ def classify_kind(text):
     if m:
         return 'term', m.group(1).rstrip('.')
     low = t.lower()
-    for kind in ('measured', 'assumed', 'derived'):
+    for kind in KINDS:
         if low.startswith(kind):
-            return kind, t[len(kind):].strip(' :;,-–—()') or None
+            return kind, _detail(t[len(kind):])
     return 'other', t
 
 
@@ -148,13 +170,15 @@ def _float(x):
 
 
 def _referenced_by(items):
-    '''{item name: the item whose operation_kwargs names it}.'''
+    '''{item name: [the items whose operation_kwargs name it]}.'''
     names = {i.get('data_item_name') for i in items}
     out = {}
     for i in items:
         for v in (i.get('operation_kwargs') or {}).values():
             if isinstance(v, str) and v in names and v != i.get('data_item_name'):
-                out.setdefault(v, i.get('data_item_name'))
+                users = out.setdefault(v, [])
+                if i.get('data_item_name') not in users:
+                    users.append(i.get('data_item_name'))
     return out
 
 
@@ -165,26 +189,46 @@ def _reference_string(reference):
     return str(reference).strip() if reference not in (None, '') else None
 
 
+def _term_problem(kind_text, kind, detail, users):
+    '''The problem with a weight-0 term's Kind, or None: it must say "derived: term of <item>", the item one
+    whose operation_kwargs name it (users) when there is one.'''
+    term_of = users[0] if users else None
+    want = 'derived: term of ' + (term_of or '<item>')
+    where = 'weight-0 term of ' + (' / '.join(users) if users else 'another item')
+    if kind != 'term':
+        return f'{where}: its source must say "{want}"'
+    if not _DERIVED_TERM.match(kind_text):
+        return f'{where}: its Kind "{kind_text.strip()}" must say "{want}"'
+    if users and detail not in users:
+        return (f'{where}: its Kind names {detail}, but {" / ".join(users)} uses it (operation_kwargs): '
+                f'it must say "{want}"')
+    return None
+
+
 def _row(name, *, variable='', operation='', value=None, sigma=None, unit='', role='', comment='',
-         reference=None, section=None, term_of=None, structural_term=False, data_file=None, sources_md=None):
+         reference=None, section=None, term_users=(), structural_term=False, data_file=None, sources_md=None):
     ref = read_reference(reference)
     sec = {k: v for k, v in (section or {}).items() if not k.startswith('_')}
     fields = {**{k: v for k, v in sec.items() if k != 'prose'}, **ref}
-    from_md = section is not None and any(sec.values())
-    origin = ' + '.join(o for o, used in (('data_reference', bool(ref)), ('SOURCES.md', from_md)) if used) or \
-        ('SOURCES.md' if section is not None else None)
-    kind, detail = classify_kind(fields.get('kind'))
+    from_md = section is not None and any(sec.values())     # a heading with nothing under it is no source
+    origin = ' + '.join(o for o, used in (('data_reference', bool(ref)), ('SOURCES.md', from_md)) if used) or None
+    term_of = term_users[0] if term_users else None
+    kind_text = fields.get('kind') or ''
+    kind, detail = classify_kind(kind_text)
     in_data, in_md = _reference_string(reference), (section or {}).get(DATA_REFERENCE)
     mismatch = bool(in_data and in_md and in_data != in_md.strip())
-    problem = None
+    files = f'{data_file or "the data file"}', f'{sources_md or SOURCES_MD}'
+    problem, problem_kind = None, None
     if mismatch:
-        problem = (f'data_reference "{in_data}" in {data_file or "the data file"} differs from the Data reference '
-                   f'"{in_md.strip()}" in {sources_md or SOURCES_MD}: they must be identical')
-    elif structural_term and kind != 'term':
-        problem = ('weight-0 term of ' + (term_of or 'another item') + ': its source must say "derived: term of '
-                   + (term_of or '<item>') + '"')
+        problem, problem_kind = (f'data_reference "{in_data}" in {files[0]} differs from the Data reference '
+                                 f'"{in_md.strip()}" in {files[1]}: they must be identical'), 'reference'
+    elif in_data and section is not None and in_md is None:
+        problem, problem_kind = (f'data_reference "{in_data}" in {files[0]} has no Data reference line in its '
+                                 f'section of {files[1]}: add "- Data reference: {in_data}"'), 'reference'
+    elif structural_term and _term_problem(kind_text, kind, detail, list(term_users)):
+        problem, problem_kind = _term_problem(kind_text, kind, detail, list(term_users)), 'term'
     elif origin is None:
-        problem = MISSING
+        problem, problem_kind = MISSING, 'missing'
     if kind == 'term':
         kind_label = f'term of {detail}, not a measurement'
     elif structural_term:
@@ -204,7 +248,8 @@ def _row(name, *, variable='', operation='', value=None, sigma=None, unit='', ro
         'note': fields.get('note'), 'prose': sec.get('prose') or '', 'comment': comment or '',
         'species': species, 'kind': 'term' if structural_term else kind, 'kind_label': kind_label,
         'role': role, 'stated_role': stated_role if stated_role and stated_role.lower() != role.lower() else '',
-        'origin': origin, 'missing': origin is None, 'problem': problem, 'mismatch': mismatch,
+        'origin': origin, 'missing': origin is None, 'problem': problem, 'problem_kind': problem_kind,
+        'mismatch': mismatch,
     }
 
 
@@ -227,7 +272,7 @@ def obs_data_rows(obs, sections, data_file=None, sources_md=None):
             rows.append(_row(name, variable=', '.join(map(str, ops)), operation=it.get('operation') or '',
                              value=it.get('value'), sigma=it.get('std'), unit=it.get('unit') or '', role=role,
                              comment=it.get('comment') or '', reference=it.get('data_reference'),
-                             section=sections.get(name), term_of=referenced.get(name), structural_term=term,
+                             section=sections.get(name), term_users=referenced.get(name, ()), structural_term=term,
                              data_file=data_file, sources_md=sources_md))
     return rows
 
@@ -251,13 +296,29 @@ def baseline_rows(block, sections, data_file=None, sources_md=None):
     return rows
 
 
+def problem_counts(rows):
+    '''{problem kind: number of rows with it}, over PROBLEMS.'''
+    return {k: sum(r['problem_kind'] == k for r in rows) for k in PROBLEMS}
+
+
+def add_counts(counts):
+    '''The sum of several problem_counts (any iterable).'''
+    counts = list(counts)
+    return {k: sum((c or {}).get(k, 0) for c in counts) for k in PROBLEMS}
+
+
+def summary(counts):
+    '''"1 no source, 2 term not labelled": the problems of problem_counts, each kind counted.'''
+    return ', '.join(f'{counts[k]} {label}' for k, label in PROBLEMS.items() if counts.get(k))
+
+
 def _active(block):
     return bool(block) and block.get('status', 'pending') not in ('pending', 'skipped', 'not_applicable')
 
 
 def data_table(directory, obs=None, baseline=None, obs_path=None, baseline_path=None, base_dir=None):
-    '''The "Data sources" table of one data set: {'rows', 'n_missing', 'n_problems', 'extra_headings',
-    'sources_md'} for the obs_data dict obs and/or the validation baseline block, with the SOURCES.md in
+    '''The "Data sources" table of one data set: {'rows', 'n_missing', 'n_problems', 'problems' (problem_counts),
+    'extra_headings', 'sources_md'} for the obs_data dict obs and/or the validation baseline block, with the SOURCES.md in
     directory. obs_path and baseline_path are the files they were read from, named (relative to base_dir,
     default directory) in a data reference mismatch. None when there are no items.'''
     sections, order, path = read_sources_md(directory)
@@ -276,7 +337,8 @@ def data_table(directory, obs=None, baseline=None, obs_path=None, baseline_path=
     levels = {sections[n]['_level'] for n in order if n in names}
     extra = [n for n in dict.fromkeys(order) if n not in names and sections[n]['_level'] in levels]
     return {'rows': rows, 'n_missing': sum(r['missing'] for r in rows),
-            'n_problems': sum(bool(r['problem']) for r in rows), 'extra_headings': extra,
+            'n_problems': sum(bool(r['problem']) for r in rows), 'problems': problem_counts(rows),
+            'extra_headings': extra,
             'sources_md': path}
 
 
@@ -304,41 +366,64 @@ def version_tables(version):
     return out
 
 
+def table_problems(table, prefix, md_dir):
+    '''["<prefix><item>: <problem>"] of a data_table; an unsourced item with where to add its source
+    (md_dir: the SOURCES.md's directory as shown).'''
+    out = []
+    for r in table['rows']:
+        if r['problem_kind'] == 'missing':
+            out.append(f'{prefix}{r["name"]}: {r["problem"]} (add a data_reference to the item, or a '
+                       f'"## {r["name"]}" section to {md_dir}{SOURCES_MD})')
+        elif r['problem']:
+            out.append(f'{prefix}{r["name"]}: {r["problem"]}')
+    return out
+
+
 def version_problems(version):
-    '''Every data item of the version without a source, or whose data reference strings differ:
-    ["<parameterisation>: <item>: <problem>"], an unsourced one with where to add its source.'''
+    '''Every problem of the version's data items: ["<parameterisation>: <item>: <problem>"].'''
     problems = []
     for inst, t in version_tables(version):
-        rel = os.path.relpath(inst.dir, version.dir)
-        for r in t['rows']:
-            if r['mismatch']:
-                problems.append(f'{inst.name}: {r["name"]}: {r["problem"]}')
-            elif r['problem']:
-                problems.append(f'{inst.name}: {r["name"]}: {r["problem"]} (add a data_reference to the item, or '
-                                f'a "## {r["name"]}" section to {rel}/{SOURCES_MD})')
+        rel = os.path.relpath(inst.dir, version.dir).replace(os.sep, '/')
+        problems += table_problems(t, f'{inst.name}: ', f'{rel}/')
     return problems
+
+
+def _result(tables, problems, extra):
+    '''The data_sources_test result of data tables, their problems and extra-heading notes.'''
+    from cam_testing import checks
+    n = sum(len(t['rows']) for t in tables)
+    if not n:
+        return checks.Result('data_sources_test', checks.NOT_APPLICABLE, 'no calibration or validation data items')
+    counts = add_counts(t['problems'] for t in tables)
+    metrics = {'n_items': n, 'n_problems': len(problems), **{f'n_{k}': v for k, v in counts.items()}}
+    if problems:
+        return checks.Result('data_sources_test', checks.FAILED,
+                             f'{len(problems)} of {n} data items have a problem: {summary(counts)}', metrics,
+                             details=problems + extra)
+    return checks.Result('data_sources_test', checks.PASSED, f'all {n} data items have a source', metrics,
+                         details=extra)
 
 
 def check(version):
     '''The data_sources_test result: passed when every calibration and validation data item of the version
     has a source (a data_reference and/or its SOURCES.md section, their data reference strings identical),
     weight-0 terms saying "derived: term of <item>"; not applicable without data items.'''
-    from cam_testing import checks
     tables = version_tables(version)
-    n = sum(len(t['rows']) for _, t in tables)
     extra = [f'{i.name}: SOURCES.md heading "{h}" names no data item' for i, t in tables for h in t['extra_headings']]
-    if not n:
-        return checks.Result('data_sources_test', checks.NOT_APPLICABLE, 'no calibration or validation data items')
-    problems = version_problems(version)
-    if problems:
-        n_mismatch = sum(r['mismatch'] for _, t in tables for r in t['rows'])
-        n_unsourced = len(problems) - n_mismatch
-        message = ', '.join(filter(None, [
-            f'{n_unsourced} of {n} data items have no source' if n_unsourced else '',
-            f'{n_mismatch} of {n} data items have a data_reference that differs from SOURCES.md' if n_mismatch else '']))
-        return checks.Result('data_sources_test', checks.FAILED, message,
-                             {'n_items': n, 'n_unsourced': n_unsourced, 'n_mismatched': n_mismatch},
-                             details=problems + extra)
-    return checks.Result('data_sources_test', checks.PASSED, f'all {n} data items have a source',
-                         {'n_items': n, 'n_unsourced': 0}, details=extra)
+    return _result([t for _, t in tables], version_problems(version), extra)
+
+
+def system_table(system):
+    '''The data_table of a system model's obs_data (<model>_obs_data.json beside it).'''
+    obs_path = os.path.join(system.dir, f'{system.name}_obs_data.json')
+    return data_table(system.dir, obs=read_obs(obs_path), obs_path=obs_path)
+
+
+def check_system(system):
+    '''data_sources_test's result for a system model's obs_data (system_data_sources_test).'''
+    t = system_table(system)
+    if not t:
+        return _result([], [], [])
+    extra = [f'SOURCES.md heading "{h}" names no data item' for h in t['extra_headings']]
+    return _result([t], table_problems(t, '', ''), extra)
 

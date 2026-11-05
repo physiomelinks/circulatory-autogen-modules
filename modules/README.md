@@ -420,7 +420,7 @@ not_applicable). An item's source combines two places, and `SOURCES.md` is the e
    system model's directory). A Markdown heading of any level is the item's `data_item_name` (a target's
    `name`, a data column's name), exactly; a trailing ` — <value>` or `(note)` on the heading is ignored.
    The section runs to the next heading. Under it, optional labelled lines, then free prose (shown in the
-   table's source cell):
+   table's source cell). A heading with nothing under it is not a source:
    ```markdown
    ## c_Na_rest
 
@@ -444,12 +444,13 @@ not_applicable). An item's source combines two places, and `SOURCES.md` is the e
    - Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
    ```
    The two combine: the row takes the section's fields and the `data_reference`'s, and where both give a
-   field (e.g. the source) the `data_reference` wins. An item with a `data_reference` repeats it in its
-   section as `- Data reference: <the identical string>` (for an object, its `source`), not as `- Source:`;
-   when the two strings differ, `data_sources_test` fails, naming the item, both strings and both files.
+   field (e.g. the source) the `data_reference` wins. An item with a `data_reference` and a section repeats
+   it in the section as `- Data reference: <the identical string>` (for an object, its `source`), not as
+   `- Source:`; when that line is missing or the two strings differ, `data_sources_test` fails, naming the
+   item and both files. An item with a section and no `data_reference` needs no such line.
    The table says where a row came from: `data_reference`, `SOURCES.md` or `data_reference + SOURCES.md`.
    Labels (`- Label: text` or `- **Label:** text`, case-insensitive): `Kind` (measured | assumed (why) |
-   derived | derived: term of <item>), `Role` (target | prediction | held out | term), `Data reference`
+   derived | synthetic | derived: term of <item>, each with an optional detail), `Role` (target | prediction | held out | term), `Data reference`
    (the item's `data_reference` string, repeated exactly), `Source` (or `Citation`) for an item without one,
    `Figure` / `Table`, `Obtained`, `Species/preparation` (or `Species`, `Preparation`, `Conditions`),
    `Primary read`, `Sigma` (why sigma was set or widened), `Note`. Value and sigma are always read from
@@ -458,26 +459,38 @@ not_applicable). An item's source combines two places, and `SOURCES.md` is the e
    item heading is ignored. The item's free-text `comment` is not a source: the table shows it beside
    "source missing".
 
-**Kind** (what the number is) is read only from the `Kind` label or `kind` key: measured, assumed,
-derived, or a term of another item. **Role** (how it is used) is the item's place in the data: a
+**Kind** (what the number is) is read only from the `Kind` label or `kind` key:
+
+- **measured**: read from an experiment (a paper's figure or table, a dataset);
+- **assumed**: chosen without a measurement of this quantity, with the reason (`assumed (why)`);
+- **derived**: calculated from other data, including a term of another item (`derived: term of <item>`);
+- **synthetic**: model output used as data, e.g. a published model's simulated curves or a synthetic
+  benchmark series.
+ **Role** (how it is used) is the item's place in the data: a
 `data_item` with weight > 0 is a target; a `prediction_item` with a value is held out, one without is a
 prediction; a `data_item` with weight 0 is a term (below), never a target; a baseline item is validation.
 A `Role` label that disagrees is flagged. **An item is used without being scored only by weight = 0**; a
 std of very large order never marks it (a weight-1 item with std 1e20 is still a target). So every
 `data_item` with weight 0 is a **term** of another item, usually one whose `operation_kwargs` names it
 (x1/x2 of a subtraction or division): the page says "term of <item>, not a measurement", and its source must say so explicitly
-(`Kind: derived: term of <item>`): it is not exempt. A measurement kept out of the fit is a
+(`Kind: derived: term of <item>`): it is not exempt. `term of <item>` without `derived:` fails, and when
+another item's `operation_kwargs` names the term, `<item>` must be that item (the failure names it). A measurement kept out of the fit is a
 `prediction_item`, not a weight-0 `data_item`.
 
 - **The table:** each version page has a "Data sources" block (one table per parameterisation with
   data items: item with variable and operation, value, sigma with its rationale, source with figure,
   how obtained and primary read, species/preparation/conditions, kind, role; BibTeX keys link to the
-  References) and a "data items sourced" count in its header; a system-model page has one for its
-  obs_data. The site index counts the items without a source.
+  References) and a count in its header; a system-model page has one for its obs_data. The headers,
+  tables and site index count each kind of problem: no source, Data reference mismatch/missing, term
+  not labelled.
 - **Checked by** `data_sources_test` (`tests/test_modules.py`, per version, no model run): it fails when
-  any item has no source, a term lacks its `derived: term of <item>` kind, or an item's `data_reference`
-  and its SOURCES.md `Data reference` differ, and lists each item and where to add its source. It runs for unreviewed versions too; in CI their failures are warnings
+  any item has no source, a term lacks its `derived: term of <item>` kind or names the wrong item, or an
+  item's SOURCES.md section lacks or differs from its `data_reference`, and lists each item and where to
+  add its source. It runs for unreviewed versions too; in CI their failures are warnings
   (`tools/ci_reviewed_failures.py`), so it gates reviewed versions and new sign-offs.
+- **System models** are checked the same way by `system_data_sources_test` (`tests/test_systems.py`,
+  `make system-sources`, in CI's structure job): a failure blocks a system model whose
+  `<model>_system.yaml` has `reviewed: true` and warns for one not reviewed yet.
 
 ## How system models use versions and parameterisations
 
