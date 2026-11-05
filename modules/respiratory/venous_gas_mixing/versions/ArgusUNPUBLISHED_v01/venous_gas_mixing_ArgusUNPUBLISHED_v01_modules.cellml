@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="venous_gas_mixing_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="venous_gas_mixing_ArgusUNPUBLISHED_v01">
+        <variable name="t" public_interface="in" units="second"/>
+        <!-- totals over the connected regions (multi_port sums): flow, and the O2 and CO2 each region's outflow carries -->
+        <variable name="v" public_interface="in" units="m3_per_s"/>
+        <variable name="J_O2" public_interface="in" units="m3_per_s"/>
+        <variable name="J_CO2" public_interface="in" units="m3_per_s"/>
+        <!-- the total flow as an output, so the downstream compartment can use it (an input can't be passed on) -->
+        <variable name="v_mix" public_interface="out" units="m3_per_s"/>
+        <!-- flow-weighted mixed contents: sum(v_i C_i) / sum(v_i); 0 while no blood flows (|v| <= 1e-12 m3/s, e.g. at
+             t = 0), when the downstream transport, which multiplies the content by v, does not use it -->
+        <variable name="C_O2_mix" public_interface="out" units="dimensionless"/>
+        <variable name="C_CO2_mix" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_mix</ci>
+                <ci>v</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>C_O2_mix</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <divide/>
+                            <ci>J_O2</ci>
+                            <ci>v</ci>
+                        </apply>
+                        <apply>
+                            <gt/>
+                            <apply>
+                                <abs/>
+                                <ci>v</ci>
+                            </apply>
+                            <cn cellml:units="m3_per_s" type="e-notation">1<sep/>-12</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>C_CO2_mix</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <divide/>
+                            <ci>J_CO2</ci>
+                            <ci>v</ci>
+                        </apply>
+                        <apply>
+                            <gt/>
+                            <apply>
+                                <abs/>
+                                <ci>v</ci>
+                            </apply>
+                            <cn cellml:units="m3_per_s" type="e-notation">1<sep/>-12</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+    </component>
+</model>
