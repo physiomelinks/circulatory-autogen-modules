@@ -121,3 +121,36 @@ def test_a_module_with_no_library_version_gets_the_ad_hoc_harness(tmp_path):
     assert report['system']['status'] == checks.PASSED
     assert report['system']['sites'][0]['module'] == {'module': 'relaxer/v01', 'kind': smooth.AD_HOC,
                                                       'status': checks.PASSED}
+
+
+def test_spec_exemptions_leave_sites_as_written(monkeypatch):
+    version = load_version('cardiac_clock', 'controlled')
+    monkeypatch.setitem(version.spec, 'smoothing', {'exempt': [['T_eff', 'test: a switch meant to stay']],
+                                                    'parameters': ['T']})
+    result = checks.verification_test_smoothing(checks.ComponentModel(version))
+    assert result.status == checks.PASSED, result.message
+    assert result.metrics['counts'] == {'maxmin_exempt': 1, 'floor_not_smoothed': 1}
+    report = json.loads(open(os.path.join(version.dir, result.metrics['report'])).read())
+    assert report['sites'][0]['status'] == 'exempt'
+    assert report['sites'][0]['reason'] == 'test: a switch meant to stay'
+
+
+def test_the_system_exemptions_reach_the_ad_hoc_module_and_the_system(tmp_path):
+    ext = tmp_path / 'ext'
+    ext.mkdir()
+    (ext / 'relaxer_v01_modules.cellml').write_text(RELAXER_CELLML)
+    (ext / 'relaxer_v01_modules_config.json').write_text(json.dumps([_relaxer_entry()]))
+    array = tmp_path / 'relax_module_array.json'
+    array.write_text(json.dumps([{'name': 'r', 'module_type': 'relaxer', 'module_subtype': 'v01',
+                                  'inp_instances': [], 'out_instances': []}]))
+    params = tmp_path / 'relax_parameters.json'
+    params.write_text(json.dumps({'schema_version': 1, 'r': {
+        'k': {'value': 2, 'units': 'dimensionless', 'data_reference': 'test'},
+        'u': {'value': -0.5, 'units': 'dimensionless', 'data_reference': 'test'},
+        'x_init': {'value': 0, 'units': 'dimensionless', 'data_reference': 'test'}}}))
+    report = smooth.run(str(array), str(params), external_dirs=[str(ext)], output_dir=str(tmp_path / 'out'),
+                        work_dir=str(tmp_path / 'work'), spec={'sim_time': 1.0, 'pre_time': 0.0, 'dt': 0.01},
+                        exempt=[{'variable': 'r_module/x', 'reason': 'test'}])
+    assert 'abs_exempt 1' in report['modules']['r']['message']
+    assert report['system']['sites'][0]['status'] == 'exempt'
+    assert report['exempt'] == [{'variable': 'r_module/x', 'reason': 'test'}]
