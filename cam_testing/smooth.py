@@ -341,13 +341,19 @@ def main(argv=None):
     parser.add_argument('--pre-time', type=float)
     parser.add_argument('--dt', type=float)
     parser.add_argument('--rel', type=float, help='eps relative to each range for the system and ad hoc modules')
+    parser.add_argument('--settings', help='JSON smoothing settings for the system and ad hoc modules, as the spec\'s '
+                                           'smoothing key (e.g. {"rel": {"maxmin": 1e-3, "variables": {"v_leak": 1e-5}}})')
     parser.add_argument('--tol', type=float)
     parser.add_argument('--force', action='store_true', help='rerun the library checks even when current')
     parser.add_argument('--modules-only', action='store_true', help='stop after the module checks')
     args = parser.parse_args(argv)
     spec = {k: v for k, v in (('sim_time', args.sim_time), ('pre_time', args.pre_time), ('dt', args.dt))
             if v is not None}
-    settings = {k: v for k, v in (('rel', args.rel), ('tol', args.tol)) if v is not None}
+    settings = {}
+    if args.settings:
+        with open(args.settings) as f:
+            settings.update(json.load(f))
+    settings.update({k: v for k, v in (('rel', args.rel), ('tol', args.tol)) if v is not None})
     try:
         exempt = None
         if args.exempt:

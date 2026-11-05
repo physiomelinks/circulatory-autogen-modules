@@ -6,6 +6,7 @@ import json
 import os
 import textwrap
 
+import numpy as np
 import pytest
 
 from cam_testing import checks, smooth
@@ -165,3 +166,19 @@ def test_system_means_read_a_connected_input_from_its_source(tmp_path):
     means = smooth.system_means(model, spec, ['systemic_T/u_out', 'venous_svc/u'])
     assert set(means) == {'systemic_T/u_out', 'venous_svc/u'}
     assert means['systemic_T/u_out'] == pytest.approx(means['venous_svc/u'])
+
+
+def test_a_clamp_that_is_zero_throughout_is_judged_on_its_stated_floor():
+    """The error is RMS / the output's range over all the points, not / its norm, which is 0 for a
+    clamp that is identically zero in the original (a smoothed clamp gives about eps^2/(4|x|) there)."""
+    t = np.linspace(0, 1, 101)
+    originals = [{'clamp': np.zeros_like(t), 'p': np.sin(2 * np.pi * t)},
+                 {'clamp': np.zeros_like(t), 'p': 2 * np.sin(2 * np.pi * t)}]
+    smoothed = {'clamp': np.full_like(t, 2e-7), 'p': 2 * np.sin(2 * np.pi * t) + 1e-3}
+    scales = checks.output_scales(originals)
+    assert scales['p'] == pytest.approx(4.0, rel=1e-3) and scales['clamp'] == checks.DEFAULT_SMOOTHING['abs_floor']
+    errors = checks._relative_errors(originals[1], smoothed, scales)
+    assert errors['p'][0] == pytest.approx(1e-3 / 4.0, rel=1e-3)
+    assert errors['clamp'][0] == pytest.approx(200.0)                    # 2e-7 against the default floor 1e-9
+    stated = checks.output_scales(originals, {'clamp': 1e-3})
+    assert checks._relative_errors(originals[1], smoothed, stated)['clamp'][0] == pytest.approx(2e-4)

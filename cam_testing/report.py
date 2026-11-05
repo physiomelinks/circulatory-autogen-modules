@@ -95,8 +95,9 @@ TEST_ABOUT = {
                                    'square-root forms (libcuflynx cuflynx-smooth), with eps set by the spec\'s '
                                    'smoothing.rel times the range of each site\'s argument over the nominal and '
                                    'bc_sweep points (from t = 0), and compares the smoothed model with the original at '
-                                   'every point. Passes when every output\'s relative L2 error is under smoothing.tol '
-                                   '(default 1e-2) at every point; a failure names the worst sites, each smoothed '
+                                   'every point. Passes when every output\'s error (the RMS of the difference over the '
+                                   'output\'s range across all the points) is within smoothing.tol (default 1e-2) of its '
+                                   'solver floor at every point; a failure names the worst sites, each smoothed '
                                    'alone at the worst point. A version with no non-smooth sites passes.',
     'stability_test': 'Runs the version with a matrix of solvers, tolerances and timesteps. A '
                       'configuration works when it finishes with finite outputs within the tolerance of a '
