@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="quadratic_driven_oscillator_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="quadratic_driven_oscillator_ArgusUNPUBLISHED_v01">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="alpha" public_interface="in" units="dimensionless"/>
+        <variable name="omega" public_interface="in" units="dimensionless"/>
+        <variable name="b" public_interface="in" units="dimensionless"/>
+        <variable name="y1_init" public_interface="in" units="dimensionless"/>
+        <variable name="y2_init" public_interface="in" units="dimensionless"/>
+        <variable name="v_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="y1_init" name="y1" public_interface="out" units="dimensionless"/>
+        <variable initial_value="y2_init" name="y2" public_interface="out" units="dimensionless"/>
+        <variable initial_value="v_init" name="v" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>y1</ci></apply><apply><plus/><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>alpha</ci><ci>y1</ci></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>omega</ci><ci>y2</ci></apply><apply><times/><ci>b</ci><ci>v</ci><ci>y2</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>y2</ci></apply><apply><plus/><apply><times/><ci>omega</ci><ci>y1</ci></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>alpha</ci><ci>y2</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>v</ci></apply><apply><plus/><apply><power/><ci>y1</ci><cn cellml:units="dimensionless">2</cn></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>v</ci></apply><apply><times/><ci>y1</ci><ci>y2</ci></apply></apply></apply>
+        </math>
+    </component>
+</model>

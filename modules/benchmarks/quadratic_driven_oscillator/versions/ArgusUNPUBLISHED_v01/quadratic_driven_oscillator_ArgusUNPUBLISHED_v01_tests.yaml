@@ -1,0 +1,7 @@
+module_type: quadratic_driven_oscillator
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A damped rotation (y1, y2) driving v through y1^2 + y1 y2 (ICUHealthy beat-map test 4, sys_quadratic). With b =
+  0 (default) it is feed-forward: (y1, y2) is an autonomous block and v is driven by y (x) y only; with b = 0.5 (parameterisation
+  back_coupled) v feeds back on y1 through b v y2. The right-hand side is quadratic, so the expected lift is the identity
+  (no auxiliaries).'
