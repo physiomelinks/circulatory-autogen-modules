@@ -1,0 +1,9 @@
+module_type: ventricle_bernoulli_valves
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'One ventricle with an elastance driven by e(t) = sin^2(pi tau/Ts) for tau < Ts (tau = t mod T), arteries, veins
+  and two valves with a linear and a Bernoulli loss: q = zeta sign(dp)(sqrt(R^2 + 4 B |dp|) - R)/(2 B), and leaflets zeta''
+  = K_o (1 - zeta) dp opening (dp > 0), K_c zeta dp closing (ICUHealthy beat-map test 12, the hand-written form; leaflet
+  law after mynard2012simple). mL, mmHg, s; written dimensionless. Total volume is conserved. Lift after smoothing (cuflynx-smooth):
+  abs(dp) becomes sqrt(dp^2 + eps^2), so the flow is sqrt(R^2 + 4 B w) with w = sqrt(dp^2 + eps^2): no singular 1/sqrt(|dp|)
+  at zero flow, as a plain sqrt(|dp|) would give. The activation e(t) is a known function of time, an input of the lift.'

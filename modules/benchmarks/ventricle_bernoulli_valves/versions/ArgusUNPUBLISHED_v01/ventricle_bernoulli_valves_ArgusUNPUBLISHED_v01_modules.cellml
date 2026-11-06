@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="ventricle_bernoulli_valves_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="ventricle_bernoulli_valves_ArgusUNPUBLISHED_v01">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="T" public_interface="in" units="dimensionless"/>
+        <variable name="Ts" public_interface="in" units="dimensionless"/>
+        <variable name="E_min" public_interface="in" units="dimensionless"/>
+        <variable name="E_max" public_interface="in" units="dimensionless"/>
+        <variable name="V0" public_interface="in" units="dimensionless"/>
+        <variable name="C_a" public_interface="in" units="dimensionless"/>
+        <variable name="V_a0" public_interface="in" units="dimensionless"/>
+        <variable name="C_v" public_interface="in" units="dimensionless"/>
+        <variable name="V_v0" public_interface="in" units="dimensionless"/>
+        <variable name="R_s" public_interface="in" units="dimensionless"/>
+        <variable name="R_mi" public_interface="in" units="dimensionless"/>
+        <variable name="B_mi" public_interface="in" units="dimensionless"/>
+        <variable name="R_ao" public_interface="in" units="dimensionless"/>
+        <variable name="B_ao" public_interface="in" units="dimensionless"/>
+        <variable name="K_o" public_interface="in" units="dimensionless"/>
+        <variable name="K_c" public_interface="in" units="dimensionless"/>
+        <variable name="V_lv_init" public_interface="in" units="dimensionless"/>
+        <variable name="V_a_init" public_interface="in" units="dimensionless"/>
+        <variable name="V_v_init" public_interface="in" units="dimensionless"/>
+        <variable name="zeta_mi_init" public_interface="in" units="dimensionless"/>
+        <variable name="zeta_ao_init" public_interface="in" units="dimensionless"/>
+        <variable name="e" public_interface="out" units="dimensionless"/>
+        <variable name="P_lv" public_interface="out" units="dimensionless"/>
+        <variable name="P_a" public_interface="out" units="dimensionless"/>
+        <variable name="P_v" public_interface="out" units="dimensionless"/>
+        <variable name="dp_mi" public_interface="out" units="dimensionless"/>
+        <variable name="dp_ao" public_interface="out" units="dimensionless"/>
+        <variable name="q_mi" public_interface="out" units="dimensionless"/>
+        <variable name="q_ao" public_interface="out" units="dimensionless"/>
+        <variable name="q_s" public_interface="out" units="dimensionless"/>
+        <variable initial_value="V_lv_init" name="V_lv" public_interface="out" units="dimensionless"/>
+        <variable initial_value="V_a_init" name="V_a" public_interface="out" units="dimensionless"/>
+        <variable initial_value="V_v_init" name="V_v" public_interface="out" units="dimensionless"/>
+        <variable initial_value="zeta_mi_init" name="zeta_mi" public_interface="out" units="dimensionless"/>
+        <variable initial_value="zeta_ao_init" name="zeta_ao" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>e</ci><piecewise><piece><apply><power/><apply><sin/><apply><divide/><apply><times/><pi/><apply><plus/><ci>t</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>T</ci><apply><floor/><apply><divide/><ci>t</ci><ci>T</ci></apply></apply></apply></apply></apply><ci>Ts</ci></apply></apply><cn cellml:units="dimensionless">2</cn></apply><apply><gt/><ci>Ts</ci><apply><plus/><ci>t</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>T</ci><apply><floor/><apply><divide/><ci>t</ci><ci>T</ci></apply></apply></apply></apply></apply></piece><otherwise><cn cellml:units="dimensionless">0</cn></otherwise></piecewise></apply>
+            <apply><eq/><ci>P_lv</ci><apply><times/><apply><plus/><ci>E_min</ci><apply><times/><ci>e</ci><apply><plus/><ci>E_max</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>E_min</ci></apply></apply></apply></apply><apply><plus/><ci>V_lv</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>V0</ci></apply></apply></apply></apply>
+            <apply><eq/><ci>P_a</ci><apply><divide/><apply><plus/><ci>V_a</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>V_a0</ci></apply></apply><ci>C_a</ci></apply></apply>
+            <apply><eq/><ci>P_v</ci><apply><divide/><apply><plus/><ci>V_v</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>V_v0</ci></apply></apply><ci>C_v</ci></apply></apply>
+            <apply><eq/><ci>dp_mi</ci><apply><plus/><ci>P_v</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>P_lv</ci></apply></apply></apply>
+            <apply><eq/><ci>dp_ao</ci><apply><plus/><ci>P_lv</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>P_a</ci></apply></apply></apply>
+            <apply><eq/><ci>q_mi</ci><piecewise><piece><apply><divide/><apply><times/><cn cellml:units="dimensionless">1</cn><ci>zeta_mi</ci><apply><plus/><apply><root/><apply><plus/><apply><power/><ci>R_mi</ci><cn cellml:units="dimensionless">2</cn></apply><apply><times/><cn cellml:units="dimensionless">4</cn><ci>B_mi</ci><apply><abs/><ci>dp_mi</ci></apply></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>R_mi</ci></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">2</cn><ci>B_mi</ci></apply></apply><apply><geq/><ci>dp_mi</ci><cn cellml:units="dimensionless">0</cn></apply></piece><otherwise><apply><divide/><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>zeta_mi</ci><apply><plus/><apply><root/><apply><plus/><apply><power/><ci>R_mi</ci><cn cellml:units="dimensionless">2</cn></apply><apply><times/><cn cellml:units="dimensionless">4</cn><ci>B_mi</ci><apply><abs/><ci>dp_mi</ci></apply></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>R_mi</ci></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">2</cn><ci>B_mi</ci></apply></apply></otherwise></piecewise></apply>
+            <apply><eq/><ci>q_ao</ci><piecewise><piece><apply><divide/><apply><times/><cn cellml:units="dimensionless">1</cn><ci>zeta_ao</ci><apply><plus/><apply><root/><apply><plus/><apply><power/><ci>R_ao</ci><cn cellml:units="dimensionless">2</cn></apply><apply><times/><cn cellml:units="dimensionless">4</cn><ci>B_ao</ci><apply><abs/><ci>dp_ao</ci></apply></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>R_ao</ci></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">2</cn><ci>B_ao</ci></apply></apply><apply><geq/><ci>dp_ao</ci><cn cellml:units="dimensionless">0</cn></apply></piece><otherwise><apply><divide/><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>zeta_ao</ci><apply><plus/><apply><root/><apply><plus/><apply><power/><ci>R_ao</ci><cn cellml:units="dimensionless">2</cn></apply><apply><times/><cn cellml:units="dimensionless">4</cn><ci>B_ao</ci><apply><abs/><ci>dp_ao</ci></apply></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>R_ao</ci></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">2</cn><ci>B_ao</ci></apply></apply></otherwise></piecewise></apply>
+            <apply><eq/><ci>q_s</ci><apply><divide/><apply><plus/><ci>P_a</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>P_v</ci></apply></apply><ci>R_s</ci></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>V_lv</ci></apply><apply><plus/><ci>q_mi</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>q_ao</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>V_a</ci></apply><apply><plus/><ci>q_ao</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>q_s</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>V_v</ci></apply><apply><plus/><ci>q_s</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>q_mi</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>zeta_mi</ci></apply><piecewise><piece><apply><times/><ci>K_o</ci><ci>dp_mi</ci><apply><plus/><cn cellml:units="dimensionless">1</cn><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>zeta_mi</ci></apply></apply></apply><apply><gt/><ci>dp_mi</ci><cn cellml:units="dimensionless">0</cn></apply></piece><otherwise><apply><times/><ci>K_c</ci><ci>dp_mi</ci><ci>zeta_mi</ci></apply></otherwise></piecewise></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>zeta_ao</ci></apply><piecewise><piece><apply><times/><ci>K_o</ci><ci>dp_ao</ci><apply><plus/><cn cellml:units="dimensionless">1</cn><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>zeta_ao</ci></apply></apply></apply><apply><gt/><ci>dp_ao</ci><cn cellml:units="dimensionless">0</cn></apply></piece><otherwise><apply><times/><ci>K_c</ci><ci>dp_ao</ci><ci>zeta_ao</ci></apply></otherwise></piecewise></apply>
+        </math>
+    </component>
+</model>

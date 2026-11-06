@@ -1,0 +1,77 @@
+{
+  "module_type": "ventricle_bernoulli_valves",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 8.0,
+  "pre_time": 0.0,
+  "dt": 0.002,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-08,
+    "atol": 1e-10,
+    "MaximumStep": 0.002
+  },
+  "outputs": [
+    "V_lv",
+    "V_a",
+    "V_v",
+    "zeta_mi",
+    "zeta_ao",
+    "q_mi",
+    "q_ao",
+    "P_lv"
+  ],
+  "invariants": [
+    {
+      "description": "total volume conserved (to 1e-6 relative)",
+      "expr": "np.ptp(V_lv + V_a + V_v) <= 1e-6 * np.max(V_lv + V_a + V_v)"
+    },
+    {
+      "description": "leaflets stay in [0, 1]",
+      "expr": "(np.min(zeta_mi) >= -1e-6) & (np.max(zeta_mi) <= 1 + 1e-6) & (np.min(zeta_ao) >= -1e-6) & (np.max(zeta_ao) <= 1 + 1e-6)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      1.0,
+      2.0
+    ],
+    "ranges": {
+      "K_o": {
+        "min": 5.0,
+        "max": 20.0,
+        "points": 3
+      }
+    }
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.0004,
+      0.0002,
+      0.0001,
+      5e-05
+    ],
+    "t_end": 0.8,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "not_applicable",
+        "reason": "a toy ventricle for Operator Inference tests; its values are illustrative, not fitted to data"
+      }
+    }
+  }
+}
