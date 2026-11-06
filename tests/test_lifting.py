@@ -47,6 +47,16 @@ def test_a_smoothed_site_of_an_input_alone_is_an_input_function(tmp_path):
     assert result.metrics['smoothing']['status'] == checks.PASSED
 
 
+def test_held_inputs_make_the_boundary_condition_a_state(tmp_path):
+    """cardiac_clock/controlled with held inputs: Delta_T is a state with dDelta_T/dt = 0, and the smoothed 1/T_eff,
+    a function of it alone, one held variable: no inputs remain."""
+    result, doc = lift.run('cardiac_clock/controlled', output_dir=str(tmp_path),
+                           settings_override={'sim_time': 2.0, 'time_budget': 10.0, 'held_inputs': True})
+    assert result.status == checks.PASSED, result.message
+    assert doc['inputs'] == [] and doc['size']['n_held'] >= 1
+    assert all(h['index'] >= doc['size']['n'] for h in doc['held_inputs'])
+
+
 def test_a_lifting_that_cannot_finish_is_a_failed_result(tmp_path):
     result, doc = lift.run('FitzHugh_Nagumo/FitzHugh1961_v01', output_dir=str(tmp_path),
                            settings_override={'time_budget': 0.01, 'max_aux': 0})

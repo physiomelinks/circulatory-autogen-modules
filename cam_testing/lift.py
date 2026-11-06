@@ -31,7 +31,9 @@ LIFTING = 'lifting'
 #: lifting (verification_config): inputs, the variables kept as inputs u (default: the version's boundary_condition
 #: variables); time_budget [s] for each QBee stage; max_aux; max_terms, the largest polynomial system to quadratize;
 #: sim_time and dt of the verification run (default: the version's sim_time and dt); tol, the largest state error and
-#: manifold defect of the lifted run for "passed"; rationale.
+#: manifold defect of the lifted run for "passed"; held_inputs (inputs held as states within a chunk); as_inputs
+#: (variables cut as inputs from data); keep (components whose states are kept); outputs (variables lifted with the
+#: states); rationale.
 DEFAULT_LIFTING = {'time_budget': 60.0, 'max_aux': 400, 'max_terms': 20000, 'tol': 1e-4, 'algebraic_tol': 1e-8}
 #: status of a lifting whose algebra checks out but whose lifted run leaves the manifold beyond tol
 UNSTABLE_MANIFOLD = 'unstable_manifold'
@@ -138,7 +140,9 @@ def run(key, system_model=None, output_dir=None, settings_override=None, force=F
     try:
         doc = lc.lift_cellml_file(model, out_dir, inputs=inputs, smoothing_report=report,
                                   time_budget=float(settings['time_budget']), max_aux=int(settings['max_aux']),
-                                  sim_time=sim_time, dt=dt, max_terms=int(settings['max_terms']))
+                                  sim_time=sim_time, dt=dt, max_terms=int(settings['max_terms']),
+                                  held_inputs=bool(settings.get('held_inputs')), as_inputs=settings.get('as_inputs') or (),
+                                  keep=settings.get('keep') or (), outputs=settings.get('outputs') or ())
     except Exception as e:  # noqa: BLE001 -- a failed lifting is a result, not a crash
         result = checks.Result(LIFTING, checks.FAILED, f'{type(e).__name__}: {e}',
                                {'smoothing': how, 'inputs': inputs, 'time_s': time.perf_counter() - t0})
@@ -149,10 +153,12 @@ def run(key, system_model=None, output_dir=None, settings_override=None, force=F
         return result, None
     v, c = doc['verification'], doc['check']
     algebraic = max(v['jf']['max'], c['max_relative_residual'])
-    run_err = max(v['max_state_error'], v['max_manifold_defect'])
+    # cut inputs come from data: the lifting is checked on the model's run, not simulated
+    run_err = max(v['max_state_error'], v['max_manifold_defect']) if v.get('simulated', True) else 0.0
     issues = doc['libcellml']['validator'] + doc['libcellml']['analyser']
     present = ', '.join(k for k, on in doc['operators']['present'].items() if on)
-    what = (f'{doc["size"]["n"]} -> {doc["size"]["n_w"]} states, {len(doc["inputs"])} inputs, operators {present}; '
+    what = (f'{doc["size"]["n"]} -> {doc["size"]["n_w"]} states ({doc["size"].get("n_held", 0)} held inputs), '
+            f'{len(doc["inputs"])} inputs, operators {present}; '
             f'engine {doc["engine"]["polynomialize"]}/{doc["engine"]["quadratize"]}')
     if issues or not algebraic <= settings['algebraic_tol']:
         status = checks.FAILED
@@ -202,9 +208,15 @@ def main(argv=None):
     parser.add_argument('--max-terms', type=int, help='largest polynomial system (terms) to quadratize')
     parser.add_argument('--sim-time', type=float, help='verification run length')
     parser.add_argument('--force', action='store_true', help='rerun the smoothing check even when current')
+    parser.add_argument('--held-inputs', action='store_true', help='inputs held as states (du/dt = 0) within a chunk')
+    parser.add_argument('--as-inputs', help='comma-separated variables cut as inputs from data')
+    parser.add_argument('--keep', help='comma-separated components whose states are kept (the rest cut)')
+    parser.add_argument('--outputs', help='comma-separated variables lifted with the states')
     args = parser.parse_args(argv)
+    split = lambda x: [s for s in x.split(',') if s] if x else None  # noqa: E731
     override = {'time_budget': args.time_budget, 'max_aux': args.max_aux, 'max_terms': args.max_terms,
-                'sim_time': args.sim_time}
+                'sim_time': args.sim_time, 'held_inputs': True if args.held_inputs else None,
+                'as_inputs': split(args.as_inputs), 'keep': split(args.keep), 'outputs': split(args.outputs)}
     inputs = [s for s in args.inputs.split(',') if s] if args.inputs is not None else None
     result, _doc = run(args.version, args.system_model, args.output_dir, override, args.force, inputs)
     print(f'{args.version}: {result.status}: {result.message}')
