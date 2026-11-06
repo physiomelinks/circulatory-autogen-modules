@@ -1,0 +1,137 @@
+{
+  "module_type": "cardiomyocyte",
+  "version": "SAN_Severi2012_v01",
+  "sim_time": 2.0,
+  "pre_time": 0.0,
+  "dt": 0.0001,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "rtol": 1e-08,
+    "atol": 1e-10
+  },
+  "outputs": [
+    "V",
+    "V_ode",
+    "Nai_",
+    "y",
+    "m",
+    "h",
+    "dL",
+    "fL",
+    "fCa",
+    "dT",
+    "fT",
+    "R_Ca_SR_release",
+    "O",
+    "I",
+    "RI",
+    "fTC",
+    "fTMC",
+    "fTMM",
+    "fCMi",
+    "fCMs",
+    "fCQ",
+    "Cai",
+    "fBAPTA",
+    "Ca_sub",
+    "fBAPTA_sub",
+    "Ca_nsr",
+    "Ca_jsr",
+    "q",
+    "r",
+    "paS",
+    "paF",
+    "piy",
+    "n",
+    "a"
+  ],
+  "run_parameters": {
+    "ACh": 1e-05
+  },
+  "invariants": [
+    {
+      "description": "with clamp_mode = 0 the membrane potential is the integrated one: V = V_ode",
+      "expr": "np.max(np.abs(V - V_ode)) <= 1e-9"
+    },
+    {
+      "description": "every gate and Ca buffer occupancy stays in [0, 1] (to 1e-6, the solver's tolerance on the small SR states); the SR release states R and RI stay >= 0 (R may pass 1: see the next invariant)",
+      "expr": "np.all((y >= -1e-6) & (y <= 1 + 1e-6)) & np.all((m >= -1e-6) & (m <= 1 + 1e-6)) & np.all((h >= -1e-6) & (h <= 1 + 1e-6)) & np.all((dL >= -1e-6) & (dL <= 1 + 1e-6)) & np.all((fL >= -1e-6) & (fL <= 1 + 1e-6)) & np.all((fCa >= -1e-6) & (fCa <= 1 + 1e-6)) & np.all((dT >= -1e-6) & (dT <= 1 + 1e-6)) & np.all((fT >= -1e-6) & (fT <= 1 + 1e-6)) & np.all((q >= -1e-6) & (q <= 1 + 1e-6)) & np.all((r >= -1e-6) & (r <= 1 + 1e-6)) & np.all((paS >= -1e-6) & (paS <= 1 + 1e-6)) & np.all((paF >= -1e-6) & (paF <= 1 + 1e-6)) & np.all((piy >= -1e-6) & (piy <= 1 + 1e-6)) & np.all((n >= -1e-6) & (n <= 1 + 1e-6)) & np.all((a >= -1e-6) & (a <= 1 + 1e-6)) & np.all((O >= -1e-6) & (O <= 1 + 1e-6)) & np.all((I >= -1e-6) & (I <= 1 + 1e-6)) & np.all((fTC >= -1e-6) & (fTC <= 1 + 1e-6)) & np.all((fTMC >= -1e-6) & (fTMC <= 1 + 1e-6)) & np.all((fTMM >= -1e-6) & (fTMM <= 1 + 1e-6)) & np.all((fCMi >= -1e-6) & (fCMi <= 1 + 1e-6)) & np.all((fCMs >= -1e-6) & (fCMs <= 1 + 1e-6)) & np.all((fCQ >= -1e-6) & (fCQ <= 1 + 1e-6)) & np.all(R_Ca_SR_release >= -1e-6) & np.all(RI >= -1e-6)"
+    },
+    {
+      "description": "the four SR release states R, O, I and RI keep their sum (1.1235 at the CellML's initial values, which do not sum to 1; so R can exceed 1, e.g. 1.0098 at 30 nM ACh)",
+      "expr": "np.max(np.abs((R_Ca_SR_release + O + I + RI) - (R_Ca_SR_release + O + I + RI)[0])) <= 1e-6"
+    },
+    {
+      "description": "the ion concentrations stay positive",
+      "expr": "np.all(Nai_ > 0) & np.all(Cai > 0) & np.all(Ca_sub > 0) & np.all(Ca_nsr > 0) & np.all(Ca_jsr > 0)"
+    },
+    {
+      "description": "the cell paces at the run's 10 nM ACh: V crosses -20 mV upward at least 4 times in 2 s, within -75 to +40 mV",
+      "expr": "(len(np.nonzero((V[:-1] < -20) & (V[1:] >= -20))[0]) >= 4) & (np.min(V) > -75) & (np.max(V) < 40)",
+      "applies": "run"
+    },
+    {
+      "description": "at 10 nM ACh the cycle lengths after the first beat are 0.41-0.45 s (from the CellML's initial values, which are for ACh = 0, where the cycle is 0.355 s; Severi et al. 2012 report 352 ms)",
+      "expr": "(np.all(np.abs(np.diff(t[np.nonzero((V[:-1] < -20) & (V[1:] >= -20))[0]][1:]) - 0.43) <= 0.02))",
+      "applies": "run"
+    }
+  ],
+  "bc_sweep": {
+    "sweep": "bcs",
+    "ranges": {
+      "ACh": {
+        "values": [
+          0.0,
+          1e-06,
+          1e-05,
+          3e-05
+        ]
+      }
+    },
+    "bounds": {
+      "ACh": [
+        0.0,
+        null
+      ]
+    },
+    "rationale": "the one boundary condition, acetylcholine: none (the default, the control model), 1 nM, 10 nM (the run's operating point) and 30 nM, where the cell slows to a cycle of about 0.6-0.7 s. The 115 constants and initial values are the published model's and are not swept: moving each alone by a factor 0.5-2 tests nothing the model was built for."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      4e-06,
+      2e-06,
+      1e-06,
+      5e-07
+    ],
+    "t_end": 0.01,
+    "min_order": 0.8,
+    "tol": 0.001,
+    "cvode_tol": 0.01
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      },
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-08,
+        "atol": 1e-10
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "candidate: the control action potential features and the ACh rate modulation reported by Severi et al. 2012, digitised; the model is the authors' own CellML, whose control cycle length (0.355 s) the invariants check."
+      },
+      "calibrate": {
+        "note": "not_applicable: the published model, used with its own values."
+      }
+    }
+  }
+}
