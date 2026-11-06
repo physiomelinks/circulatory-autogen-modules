@@ -33,7 +33,8 @@ LIFTING = 'lifting'
 #: sim_time and dt of the verification run (default: the version's sim_time and dt); tol, the largest state error and
 #: manifold defect of the lifted run for "passed"; held_inputs (inputs held as states within a chunk); as_inputs
 #: (variables cut as inputs from data); keep (components whose states are kept); outputs (variables lifted with the
-#: states); rationale.
+#: states); params_as_inputs (parameters driven as inputs, added to the inputs); tanh_form ('tanh' or 'exp');
+#: stabilize (kappa: -kappa g(w) for each quadratic identity); rationale.
 DEFAULT_LIFTING = {'time_budget': 60.0, 'max_aux': 400, 'max_terms': 20000, 'tol': 1e-4, 'algebraic_tol': 1e-8}
 #: status of a lifting whose algebra checks out but whose lifted run leaves the manifold beyond tol
 UNSTABLE_MANIFOLD = 'unstable_manifold'
@@ -135,14 +136,16 @@ def run(key, system_model=None, output_dir=None, settings_override=None, force=F
         inputs = settings.get('inputs')
     if inputs is None:
         inputs = default_inputs(version, flat)
+    inputs = list(inputs) + [p for p in settings.get('params_as_inputs') or [] if p not in inputs]
     sim_time = float(settings.get('sim_time', spec.get('sim_time', 10.0)))
     dt = float(settings.get('dt', spec.get('dt', 0.01)))
     try:
         doc = lc.lift_cellml_file(model, out_dir, inputs=inputs, smoothing_report=report,
                                   time_budget=float(settings['time_budget']), max_aux=int(settings['max_aux']),
                                   sim_time=sim_time, dt=dt, max_terms=int(settings['max_terms']),
-                                  held_inputs=bool(settings.get('held_inputs')), as_inputs=settings.get('as_inputs') or (),
-                                  keep=settings.get('keep') or (), outputs=settings.get('outputs') or ())
+                                  held_inputs=settings.get('held_inputs') or False, as_inputs=settings.get('as_inputs') or (),
+                                  keep=settings.get('keep') or (), outputs=settings.get('outputs') or (),
+                                  tanh_form=settings.get('tanh_form', 'tanh'), stabilize=settings.get('stabilize'))
     except Exception as e:  # noqa: BLE001 -- a failed lifting is a result, not a crash
         result = checks.Result(LIFTING, checks.FAILED, f'{type(e).__name__}: {e}',
                                {'smoothing': how, 'inputs': inputs, 'time_s': time.perf_counter() - t0})
@@ -208,14 +211,19 @@ def main(argv=None):
     parser.add_argument('--max-terms', type=int, help='largest polynomial system (terms) to quadratize')
     parser.add_argument('--sim-time', type=float, help='verification run length')
     parser.add_argument('--force', action='store_true', help='rerun the smoothing check even when current')
-    parser.add_argument('--held-inputs', action='store_true', help='inputs held as states (du/dt = 0) within a chunk')
+    parser.add_argument('--held-inputs', nargs='?', const='states', choices=('states', 'inputs'),
+                        help='inputs held (du/dt = 0) within a chunk: as states (default) or as inputs')
+    parser.add_argument('--params-as-inputs', help='comma-separated parameters driven as inputs')
+    parser.add_argument('--tanh-form', choices=('tanh', 'exp'))
+    parser.add_argument('--stabilize', type=float, help='kappa: -kappa g(w) for each quadratic identity')
     parser.add_argument('--as-inputs', help='comma-separated variables cut as inputs from data')
     parser.add_argument('--keep', help='comma-separated components whose states are kept (the rest cut)')
     parser.add_argument('--outputs', help='comma-separated variables lifted with the states')
     args = parser.parse_args(argv)
     split = lambda x: [s for s in x.split(',') if s] if x else None  # noqa: E731
     override = {'time_budget': args.time_budget, 'max_aux': args.max_aux, 'max_terms': args.max_terms,
-                'sim_time': args.sim_time, 'held_inputs': True if args.held_inputs else None,
+                'sim_time': args.sim_time, 'held_inputs': args.held_inputs, 'tanh_form': args.tanh_form,
+                'stabilize': args.stabilize, 'params_as_inputs': split(args.params_as_inputs),
                 'as_inputs': split(args.as_inputs), 'keep': split(args.keep), 'outputs': split(args.outputs)}
     inputs = [s for s in args.inputs.split(',') if s] if args.inputs is not None else None
     result, _doc = run(args.version, args.system_model, args.output_dir, override, args.force, inputs)

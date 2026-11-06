@@ -57,6 +57,16 @@ def test_held_inputs_make_the_boundary_condition_a_state(tmp_path):
     assert all(h['index'] >= doc['size']['n'] for h in doc['held_inputs'])
 
 
+def test_a_parameter_driven_as_an_input_and_stabilization_reach_the_lifting(tmp_path):
+    """FitzHugh-Nagumo with a driven as an input (it enters through B) and kappa on the w = V^2 identity."""
+    result, doc = lift.run('FitzHugh_Nagumo/FitzHugh1961_v01', output_dir=str(tmp_path),
+                           settings_override={'sim_time': 2.0, 'time_budget': 10.0, 'params_as_inputs': ['a'],
+                                              'stabilize': 10.0})
+    assert result.status in (checks.PASSED, lift.UNSTABLE_MANIFOLD), result.message
+    assert [i['name'] for i in doc['inputs']] == ['a_mod'] and doc['operators']['present']['B']
+    assert doc['stabilization']['kappa'] == 10.0 and doc['stabilization']['identities']
+
+
 def test_a_lifting_that_cannot_finish_is_a_failed_result(tmp_path):
     result, doc = lift.run('FitzHugh_Nagumo/FitzHugh1961_v01', output_dir=str(tmp_path),
                            settings_override={'time_budget': 0.01, 'max_aux': 0})
