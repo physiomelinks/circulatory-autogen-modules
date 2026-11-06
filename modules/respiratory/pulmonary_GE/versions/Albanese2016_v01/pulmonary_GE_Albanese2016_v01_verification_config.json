@@ -173,9 +173,9 @@
       "maxmin": 0.001,
       "piecewise": 0.001,
       "division": 0.001,
-      "variables": {"F_CO2_D": 0.0001, "F_O2_D": 0.0001}
+      "variables": {"F_CO2_D": 1e-05, "F_O2_D": 1e-05, "F_CO2_A": 0.0001, "F_O2_A": 0.0001}
     },
-    "rationale": "The dead-space fraction clamps of its respiratory_gas_transport neighbour, F_CO2_D and F_O2_D, need rel 1e-4: alone at the worst sweep point they are 0.016 over the solver floor at rel 1e-3, 3e-4 at 1e-4, 4e-6 at 1e-5, with smoothed CVODE steps 6388, 6693, 7061 against the original's 7677 (form w). The check still fails at h_2 = 0.91 (0.056 at rel 1e-4) from other sites."
+    "rationale": "The gas fraction clamps of its respiratory_gas_transport neighbour need tighter rel than the default 1e-3. The dead-space clamps F_CO2_D and F_O2_D take rel 1e-5: at 1e-4 F_CO2_D alone is 0.021 over the solver floor at h_2 = 0.91, at 1e-5 4.8e-4. The alveolar clamps F_O2_A and F_CO2_A take rel 1e-4: at 1e-3 they are 0.014 and 0.034, at 1e-4 under 6.4e-4. With both, every point passes (worst 0.0011 at h_2 = 0.91)."
   },
   "validation": {
     "default": {
