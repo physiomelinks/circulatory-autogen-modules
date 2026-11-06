@@ -1,0 +1,8 @@
+module_type: tubular_reactor
+version: N51_Kramer2019_v01
+reviewed: false
+notes: 'Non-adiabatic tubular reactor (kramer2019nonlinear, Sec. V): psi_t = psi_ss/Pe - psi_s - D f, theta_t = theta_ss/Pe
+  - theta_s - beta (theta - 1) + B D f, f = psi exp(gamma - gamma/theta), Robin inlet psi_s = Pe (psi - psi_in), theta_s
+  = Pe (theta - theta_in), Neumann outlet; central differences with ghost points on 51 nodes per field (ICUHealthy beat-map
+  test 11 uses 51, D = 0.175). theta_in is a boundary condition, the input. The known per-node lift is w1 = exp(gamma -
+  gamma/theta), w2 = 1/theta; the diffusion stencil couples neighbours, so the quadratic lift grows with N.'
