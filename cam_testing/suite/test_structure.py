@@ -744,7 +744,7 @@ def licence_and_creator_problems(entry):
 
 
 def test_every_config_entry_has_licence_and_creator():
-    '''Every version's config entry has "licence" (CC0-1.0, CC-BY-4.0, MIT, Apache-2.0 or 0BSD) and
+    '''Every version's config entry has "licence" (CC0-1.0, CC-BY-4.0, CC-BY-3.0, MIT, Apache-2.0 or 0BSD) and
     "creator" (a list of names, empty until given in review).'''
     problems = []
     for path in MODULE_CONFIGS:
@@ -757,6 +757,7 @@ def test_every_config_entry_has_licence_and_creator():
 def test_licence_and_creator_rules():
     assert licence_and_creator_problems({'licence': 'CC0-1.0', 'creator': []}) == []
     assert licence_and_creator_problems({'licence': 'MIT', 'creator': ['A. Author']}) == []
+    assert licence_and_creator_problems({'licence': 'CC-BY-3.0', 'creator': []}) == []
     assert licence_and_creator_problems({'creator': []}) == ['no "licence"']
     assert 'is not one of' in licence_and_creator_problems({'licence': 'GPL-3.0', 'creator': []})[0]
     assert 'not a list of names' in licence_and_creator_problems({'licence': 'MIT', 'creator': 'A. Author'})[0]

@@ -282,6 +282,7 @@ def is_supermodule(entry):
 LICENCES = {
     'CC0-1.0': 'https://spdx.org/licenses/CC0-1.0.html',
     'CC-BY-4.0': 'https://spdx.org/licenses/CC-BY-4.0.html',
+    'CC-BY-3.0': 'https://spdx.org/licenses/CC-BY-3.0.html',  # models taken from the Physiome Model Repository under it
     'MIT': 'https://spdx.org/licenses/MIT.html',
     'Apache-2.0': 'https://spdx.org/licenses/Apache-2.0.html',
     '0BSD': 'https://spdx.org/licenses/0BSD.html',
