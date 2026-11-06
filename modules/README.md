@@ -238,8 +238,10 @@ version's name is the config entry's `module_subtype`**, so a model picks a vers
 
 **Licence and creator.** Every config entry has two record-keeping keys, after `default_parameterisation`:
 - `"licence"`: the SPDX id of the licence the version is published under. It is one of `CC0-1.0`
-  (the default, chosen as the most open), `CC-BY-4.0`, `MIT`, `Apache-2.0` and `0BSD`
-  (`cam_testing.library.LICENCES`). The version page links it to its SPDX page.
+  (the default, chosen as the most open), `CC-BY-4.0`, `CC-BY-3.0`, `MIT`, `Apache-2.0` and `0BSD`
+  (`cam_testing.library.LICENCES`). The version page links it to its SPDX page. A version converted from a
+  published model keeps that model's licence (e.g. `CC-BY-3.0`, the licence of many Physiome Model Repository
+  exposures) and cites the model's source in its required citations.
 - `"creator"`: a list of the names of the people who created the version, e.g. `["A. Author"]`. It is `[]`
   until the creators are given in review, and the version page shows "creator: not set (to be given in
   review)" until then.
