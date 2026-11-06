@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="drug_effect_emax_ArgusUNPUBLISHED_v01" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="drug_effect_emax_ArgusUNPUBLISHED_v01">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="R_inf" public_interface="in" units="dimensionless"/>
+        <variable name="V_d" public_interface="in" units="dimensionless"/>
+        <variable name="k_el" public_interface="in" units="dimensionless"/>
+        <variable name="k_e0" public_interface="in" units="dimensionless"/>
+        <variable name="E_max" public_interface="in" units="dimensionless"/>
+        <variable name="EC50" public_interface="in" units="dimensionless"/>
+        <variable name="k_in" public_interface="in" units="dimensionless"/>
+        <variable name="k_out" public_interface="in" units="dimensionless"/>
+        <variable name="C_init" public_interface="in" units="dimensionless"/>
+        <variable name="C_e_init" public_interface="in" units="dimensionless"/>
+        <variable name="R_init" public_interface="in" units="dimensionless"/>
+        <variable name="E" public_interface="out" units="dimensionless"/>
+        <variable initial_value="C_init" name="C" public_interface="out" units="dimensionless"/>
+        <variable initial_value="C_e_init" name="C_e" public_interface="out" units="dimensionless"/>
+        <variable initial_value="R_init" name="R" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply><eq/><ci>E</ci><apply><divide/><apply><times/><ci>C_e</ci><ci>E_max</ci></apply><apply><plus/><ci>C_e</ci><ci>EC50</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>C</ci></apply><apply><plus/><apply><divide/><ci>R_inf</ci><ci>V_d</ci></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>C</ci><ci>k_el</ci></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>C_e</ci></apply><apply><times/><ci>k_e0</ci><apply><plus/><ci>C</ci><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>C_e</ci></apply></apply></apply></apply>
+            <apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><ci>R</ci></apply><apply><plus/><apply><times/><ci>k_in</ci><apply><plus/><cn cellml:units="dimensionless">1</cn><apply><divide/><apply><times/><ci>C_e</ci><ci>E_max</ci></apply><apply><plus/><ci>C_e</ci><ci>EC50</ci></apply></apply></apply></apply><apply><times/><cn cellml:units="dimensionless">-1</cn><ci>R</ci><ci>k_out</ci></apply></apply></apply>
+        </math>
+    </component>
+</model>

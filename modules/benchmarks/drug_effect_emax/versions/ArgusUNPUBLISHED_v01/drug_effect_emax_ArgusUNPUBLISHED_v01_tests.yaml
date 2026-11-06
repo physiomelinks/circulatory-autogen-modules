@@ -1,0 +1,8 @@
+module_type: drug_effect_emax
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: Linear one-compartment pharmacokinetics with an infusion R_inf (a boundary condition, the input), an effect compartment
+  C_e (sheiner1979simultaneous), the Emax (Hill coefficient 1) effect E = E_max C_e/(EC50 + C_e) and an indirect response
+  stimulating production, R' = k_in (1 + E) - k_out R (dayneka1993comparison). Every value is set by hand, dimensionless.
+  The known lift is y = 1/(EC50 + C_e); dy/dt = -k_e0 y^2 (C - C_e) also needs y C, so a monomial lift has more than one
+  auxiliary.
