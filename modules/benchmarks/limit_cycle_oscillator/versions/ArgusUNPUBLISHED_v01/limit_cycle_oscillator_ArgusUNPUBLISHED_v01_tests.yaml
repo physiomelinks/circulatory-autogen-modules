@@ -1,0 +1,7 @@
+module_type: limit_cycle_oscillator
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A limit-cycle oscillator in Cartesian coordinates whose right-hand side is cubic: r'' = a r (1 - r^2), theta'' =
+  w (1 + beta (r^2 - 1) + gamma z), z'' = -lam z + c z^2 - d z^3 + kappa (r^2 - 1) (ICUHealthy beat-map tests 5 and 9, sys_limit_cycle).
+  The beat is cut at theta = 0 (y = 0, x > 0). Its known quadratic lift is rho = x^2 + y^2 and s = z^2 (two auxiliaries);
+  a monomial lift (QBee) needs x^2, y^2 or x y separately. A benchmark for libcuflynx''s cuflynx-lift (qian2020lift).'
