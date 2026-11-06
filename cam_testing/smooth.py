@@ -10,8 +10,9 @@ Smooths a system model module by module, then as a whole (libcuflynx.utilities.s
      reusing its saved result when that is current (same fingerprint and settings);
    - a module with no library version but a config in an external modules dir by an ad hoc harness:
      the module alone, its constants at the system's values and its inputs held at their mean in the
-     system run, each swept over DEFAULT_FACTORS x its value. It is reported as "checked with the
-     default sweep", not as a library result;
+     system run, each swept over DEFAULT_FACTORS x its value. An input that is constant in the system
+     run is swept over its declared range instead (--input-ranges), or reported as not exercised. It is
+     reported as "checked with the default sweep", not as a library result;
    - a module found nowhere is "not checked".
    A failing module stops the run with its report. A module not checked stops it too, unless
    --allow-unchecked.
@@ -119,14 +120,36 @@ def library_check(version, settings_override=None, force=False):
     return checks.verification_test_smoothing(cm, **(settings_override or {})), False
 
 
+def input_sweep(lo_hi, instance, system_values):
+    """The values of a declared input range: ``[lo, hi]`` (5 points) or ``{"min", "max", "points"}``.
+    A bound may name a system parameter (``"f_cc_max_s"``, read as ``f_cc_max_s_<instance>`` or itself)."""
+    if isinstance(lo_hi, dict):
+        lo, hi, n = lo_hi['min'], lo_hi['max'], int(lo_hi.get('points', 5))
+    else:
+        (lo, hi), n = lo_hi, 5
+
+    def value(b):
+        if isinstance(b, str):
+            for key in (f'{b}_{instance}', b):
+                if key in system_values:
+                    return float(system_values[key])
+            raise KeyError(f'input range bound {b!r}: no system parameter {b}_{instance} or {b}')
+        return float(b)
+    return [float(v) for v in np.linspace(value(lo), value(hi), n)]
+
+
 def ad_hoc_check(record, entry, external_dirs, system_values, system_means, spec, settings, work_dir, out_dir,
-                 exempt=()):
+                 exempt=(), input_ranges=None, system_spans=None):
     """The ad hoc harness of a module with no library version: the module alone, generated as the vessel
     "mod", its constants at the system's values and its boundary conditions held at their mean in the
-    system run, each swept over DEFAULT_FACTORS x its value. Returns (status, message, metrics)."""
+    system run, each swept over DEFAULT_FACTORS x its value. A boundary condition that is constant in the
+    system run (``system_spans`` 0) gets no sweep from the factors: it is swept over its declared range
+    (``input_ranges`` {"<instance>/<var>": [lo, hi] or {min, max, points}}), or, with none, listed in
+    metrics['not_exercised_inputs'] and the message. Returns (status, message, metrics)."""
     name = record['name']
+    input_ranges, system_spans = input_ranges or {}, system_spans or {}
     rows, nominal, points = [], {}, [{'label': 'nominal', 'params': {}}]
-    outputs, missing = [], []
+    outputs, missing, not_exercised = [], [], []
     for var, units, _access, kind, *_ in entry.get('variables_and_units') or []:
         if kind == 'variable':
             outputs.append(var)
@@ -145,7 +168,13 @@ def ad_hoc_check(record, entry, external_dirs, system_values, system_means, spec
             continue
         rows.append((path, units, value))
         nominal['parameters/' + pname] = float(value)
-        if value != 0:
+        declared = input_ranges.get(f'{name}/{var}')
+        if declared is not None:
+            points += [{'label': f'{var}={v:.4g}', 'params': {'parameters/' + pname: v}}
+                       for v in input_sweep(declared, name, system_values) if v != value]
+        elif kind == 'boundary_condition' and system_spans.get(f'{name}/{var}', None if value else 0.0) == 0.0:
+            not_exercised.append(var)
+        elif value != 0:
             points += [{'label': f'{var}={value * f:.4g}', 'params': {'parameters/' + pname: value * f}}
                        for f in DEFAULT_FACTORS if f != 1.0]
     if missing:
@@ -171,13 +200,17 @@ def ad_hoc_check(record, entry, external_dirs, system_values, system_means, spec
         model_path, spec, outputs or checks.harness.state_outputs(harness.simulation_helper(model_path, spec)),
         points, nominal, settings, out_dir, work_dir, f'adhoc_{name}')
     metrics['details'] = details
+    metrics['not_exercised_inputs'] = not_exercised
+    if not_exercised:
+        message = (f'input {", ".join(not_exercised)} not exercised (constant in the system, no declared range): '
+                   + message)
     return status, message, metrics
 
 
-def system_means(model_path, spec, names):
+def system_means(model_path, spec, names, spans=False):
     """{'instance/var': mean over the logged run} of a generated system model. An input connected to
     another module's variable is read from the variable that defines it (the solver keeps one name
-    per connected set)."""
+    per connected set). With ``spans``, also {'instance/var': max - min over the run}."""
     import xml.etree.ElementTree as ET
     from cam_testing.system import simulate
     from libcuflynx.utilities import smooth_cellml as sc
@@ -196,22 +229,30 @@ def system_means(model_path, spec, names):
     wanted = sorted({c for cs in candidates.values() for c in cs})
     _, out = simulate(model_path, spec, spec.get('solver_info'), names=wanted)
     means = {k: float(np.mean(v)) for k, v in out.items() if np.all(np.isfinite(v))}
-    return {name: next(means[c] for c in cs if c in means) for name, cs in candidates.items()
-            if any(c in means for c in cs)}
+    found = {name: next(c for c in cs if c in means) for name, cs in candidates.items() if any(c in means for c in cs)}
+    if spans:
+        return ({n: means[c] for n, c in found.items()},
+                {n: float(np.ptp(np.asarray(out[c], dtype=float))) for n, c in found.items()})
+    return {n: means[c] for n, c in found.items()}
 
 
 def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=False, output_dir=None,
-        spec=None, settings=None, force=False, work_dir=None, exempt=None, modules_only=False, system_model=None):
+        spec=None, settings=None, force=False, work_dir=None, exempt=None, modules_only=False, system_model=None,
+        input_ranges=None):
     """The pipeline above. Returns the merged report; raises SmoothingStopped before the system step
     when a module fails (or is not checked, unless allow_unchecked). ``exempt``: the system's own
     exemptions ([{"variable": "[component/]glob", "reason"}]), merged with each library version's
     smoothing.exempt (as "<instance>_module/<variable>"). ``modules_only``: stop after the module checks.
     ``system_model``: a generated model of the system to use instead of generating it from this library
     (e.g. one generated with libcuflynx's built-in modules); its flat CellML must sit next to it.
+    ``input_ranges``: {"<instance>/<var>": [lo, hi] or {min, max, points, reason}}, the sweep of an ad hoc
+    module's input that is constant in the system (also read from settings["input_ranges"]).
     The module table is written to module_table.csv."""
     exempt = list(exempt or [])
     spec = dict(DEFAULT_SPEC, **(spec or {}))
-    settings = dict(checks.DEFAULT_SMOOTHING, **(settings or {}))
+    settings = dict(settings or {})
+    input_ranges = dict(settings.pop('input_ranges', None) or {}, **(input_ranges or {}))
+    settings = dict(checks.DEFAULT_SMOOTHING, **settings)
     prefix = os.path.basename(module_array_path).split('_module_array')[0].split('_vessel_array')[0]
     output_dir = output_dir or os.path.join(os.path.dirname(os.path.abspath(module_array_path)), 'smoothing')
     work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_smooth_{prefix}_')
@@ -239,7 +280,7 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
         if entry:
             needs_means += [f'{rec["name"]}/{v[0]}' for v in entry.get('variables_and_units') or []
                             if len(v) > 3 and v[3] == 'boundary_condition']
-    means = system_means(system_model, spec, needs_means) if needs_means else {}
+    means, spans = system_means(system_model, spec, needs_means, spans=True) if needs_means else ({}, {})
 
     results, checked = {}, {}
     for rec, version, entry in modules:
@@ -254,9 +295,11 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
         elif entry is not None:
             status, message, metrics = ad_hoc_check(
                 rec, entry, external_dirs, values, means, spec, settings,
-                os.path.join(work_dir, 'adhoc', rec['name']), os.path.join(output_dir, 'adhoc', rec['name']), exempt)
+                os.path.join(work_dir, 'adhoc', rec['name']), os.path.join(output_dir, 'adhoc', rec['name']), exempt,
+                input_ranges, spans)
             res = {'kind': AD_HOC, 'status': status, 'message': message,
-                   'worst_sites': metrics.get('attribution', [])[:3]}
+                   'worst_sites': metrics.get('attribution', [])[:3],
+                   'not_exercised_inputs': metrics.get('not_exercised_inputs', [])}
         else:
             res = {'kind': NOT_CHECKED, 'status': checks.SKIPPED,
                    'message': 'no library version and no config in the external modules dirs'}
@@ -269,7 +312,7 @@ def run(module_array_path, parameters_path, external_dirs=(), allow_unchecked=Fa
             system_exempt += checks.exempt_entries((version.spec.get('smoothing') or {}).get('exempt'),
                                                    component=f'{rec["name"]}_module')
     report = {'module_array': os.path.abspath(module_array_path), 'exempt': system_exempt, 'parameters': os.path.abspath(parameters_path),
-              'settings': settings, 'spec': spec, 'modules': results}
+              'settings': settings, 'input_ranges': input_ranges, 'spec': spec, 'modules': results}
     with contextlib.redirect_stdout(io.StringIO()) as ranges_out:
         try:
             from cam_testing import ranges
@@ -324,10 +367,11 @@ def write_module_table(path, results):
     import csv
     with open(path, 'w', newline='') as f:
         w = csv.writer(f)
-        w.writerow(['instance', 'module', 'checked', 'status', 'reused', 'worst_sites', 'message'])
+        w.writerow(['instance', 'module', 'checked', 'status', 'reused', 'not_exercised_inputs', 'worst_sites', 'message'])
         for name, r in results.items():
             worst = '; '.join(f'{a.get("variable")} {a.get("excess", a.get("l2", 0)):.3g}' for a in r.get('worst_sites') or [])
-            w.writerow([name, r['module'], r['kind'], r['status'], r.get('reused', ''), worst, r['message']])
+            w.writerow([name, r['module'], r['kind'], r['status'], r.get('reused', ''),
+                        ' '.join(r.get('not_exercised_inputs') or []), worst, r['message']])
 
 
 def main(argv=None):
@@ -350,6 +394,9 @@ def main(argv=None):
     parser.add_argument('--force', action='store_true', help='rerun the library checks even when current')
     parser.add_argument('--modules-only', action='store_true', help='stop after the module checks')
     parser.add_argument('--system-model', help='a generated model of the system to use instead of generating one')
+    parser.add_argument('--input-ranges', help='JSON {"<instance>/<var>": [lo, hi] or {"min", "max", "points"}}: the '
+                                               'sweep of an ad hoc module\'s input that is constant in the system; a '
+                                               'bound may name a system parameter')
     args = parser.parse_args(argv)
     spec = {k: v for k, v in (('sim_time', args.sim_time), ('pre_time', args.pre_time), ('dt', args.dt))
             if v is not None}
@@ -363,9 +410,13 @@ def main(argv=None):
         if args.exempt:
             with open(args.exempt) as f:
                 exempt = json.load(f)
+        input_ranges = None
+        if args.input_ranges:
+            with open(args.input_ranges) as f:
+                input_ranges = json.load(f)
         report = run(args.module_array, args.parameters, args.external_modules_dir, args.allow_unchecked,
                      args.output_dir, spec, settings, args.force, exempt=exempt, modules_only=args.modules_only,
-                     system_model=args.system_model)
+                     system_model=args.system_model, input_ranges=input_ranges)
     except SmoothingStopped as e:
         print(f'stopped before the system step: {e}')
         return 2

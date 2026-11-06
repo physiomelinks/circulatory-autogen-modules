@@ -113,15 +113,50 @@ def test_a_module_with_no_library_version_gets_the_ad_hoc_harness(tmp_path):
         'k': {'value': 2, 'units': 'dimensionless', 'data_reference': 'test'},
         'u': {'value': -0.5, 'units': 'dimensionless', 'data_reference': 'test'},
         'x_init': {'value': 0, 'units': 'dimensionless', 'data_reference': 'test'}}}))
+    # u is constant in the system: it is swept over its declared range, not factors x its value
     report = smooth.run(str(array), str(params), external_dirs=[str(ext)], output_dir=str(tmp_path / 'out'),
-                        work_dir=str(tmp_path / 'work'), spec={'sim_time': 2.0, 'pre_time': 0.0, 'dt': 0.01})
+                        work_dir=str(tmp_path / 'work'), spec={'sim_time': 2.0, 'pre_time': 0.0, 'dt': 0.01},
+                        input_ranges={'r/u': [-1, 0]})
     module = report['modules']['r']
     assert module['kind'] == smooth.AD_HOC and module['status'] == checks.PASSED, module['message']
     assert '1 sites (abs 1)' in module['message']
-    assert '9 points' in module['message']        # nominal, and 4 factors for each of k and u (x_init is 0)
+    assert '9 points' in module['message']        # nominal, 4 factors of k, and u at -1, -0.75, -0.25, 0
     assert report['system']['status'] == checks.PASSED
     assert report['system']['sites'][0]['module'] == {'module': 'relaxer/v01', 'kind': smooth.AD_HOC,
                                                       'status': checks.PASSED}
+
+
+def test_an_input_constant_in_the_system_is_swept_over_its_declared_range_or_reported(tmp_path):
+    """u is 0 in the system: factors x 0 give no sweep, so abs(u) would be checked without ever moving.
+    With no declared range the module is reported with u not exercised and the site is left as written;
+    with one (a bound naming a system parameter) u is swept and the site smoothed."""
+    ext = tmp_path / 'ext'
+    ext.mkdir()
+    (ext / 'relaxer_v01_modules.cellml').write_text(RELAXER_CELLML)
+    (ext / 'relaxer_v01_modules_config.json').write_text(json.dumps([_relaxer_entry()]))
+    array = tmp_path / 'relax_module_array.json'
+    array.write_text(json.dumps([{'name': 'r', 'module_type': 'relaxer', 'module_subtype': 'v01',
+                                  'inp_instances': [], 'out_instances': []}]))
+    params = tmp_path / 'relax_parameters.json'
+    params.write_text(json.dumps({'schema_version': 1, 'r': {
+        'k': {'value': 2, 'units': 'dimensionless', 'data_reference': 'test'},
+        'u': {'value': 0, 'units': 'dimensionless', 'data_reference': 'test'},
+        'x_init': {'value': 0, 'units': 'dimensionless', 'data_reference': 'test'}}}))
+    spec = {'sim_time': 0.5, 'pre_time': 0.0, 'dt': 0.01}
+
+    def module(name, **kwargs):
+        report = smooth.run(str(array), str(params), external_dirs=[str(ext)], output_dir=str(tmp_path / name),
+                            work_dir=str(tmp_path / f'work_{name}'), spec=spec, modules_only=True, **kwargs)
+        return report['modules']['r']
+
+    held = module('held')
+    assert held['not_exercised_inputs'] == ['u'] and held['message'].startswith('input u not exercised')
+    assert 'not exercised (x constant at every point, left as written): x' in held['message']
+    assert 'u' in (tmp_path / 'held' / 'module_table.csv').read_text().splitlines()[1].split(',')
+    # declared in the settings (run() also takes input_ranges, as --input-ranges gives it)
+    swept = module('swept', settings={'input_ranges': {'r/u': {'min': -1, 'max': 'k', 'points': 3}}})
+    assert swept['not_exercised_inputs'] == [] and swept['status'] == checks.PASSED, swept['message']
+    assert '1 sites (abs 1)' in swept['message'] and '8 points' in swept['message']   # u at -1, 0.5, 2
 
 
 def test_spec_exemptions_leave_sites_as_written(monkeypatch):

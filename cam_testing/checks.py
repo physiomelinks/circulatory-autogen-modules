@@ -2168,13 +2168,17 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     form = settings.get('maxmin_form', 'w')
     smoothed, report = sc.smooth(text, ranges, rel=settings['rel'], collapse=settings.get('collapse'), exempt=exempt,
                                  maxmin_form=form)
+    # sites whose argument no point moved: left as written, and not covered by this check
+    unmoved = sorted({x['variable'] for x in report['sites'] if x['status'] == 'not_needed' and 'not_exercised' in x['flags']})
+    metrics['not_exercised_sites'] = unmoved
+    unmoved_note = f'; not exercised (x constant at every point, left as written): {", ".join(unmoved)}' if unmoved else ''
     if not [x for x in report['sites'] if x['status'] != 'not_needed']:
-        # only divisions whose denominators never reach 0: nothing to smooth
+        # only divisions whose denominators never reach 0, or sites no point moves: nothing to smooth
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2, default=_json_default)
         metrics.update({'n_sites': 0, 'counts': report['counts'], 'not_smoothed': report['not_smoothed']})
         left = f'; left as written: {len(report["not_smoothed"])}' if report['not_smoothed'] else ''
-        return PASSED, NO_SITES + left, metrics, [], []
+        return PASSED, NO_SITES + left + unmoved_note, metrics, [], []
     smooth_path = os.path.join(out_dir, f'{name}_smooth.cellml')
     with open(smooth_path, 'w', encoding='utf-8') as f:
         f.write(smoothed)
@@ -2244,7 +2248,7 @@ def compare_smoothed(model_path, spec, outputs, points, nominal, settings, out_d
     details += [f'[not run] {label}: over the time budget' for label in over_budget]
     details += [f'[not compared] {k}: jumps by over half its range between samples' for k in jumps]
     what = (f'{len(live)} sites ({", ".join(f"{k} {v}" for k, v in report["counts"].items())}), '
-            f'{len(rows)} points, rel {settings["rel"]}')
+            f'{len(rows)} points, rel {settings["rel"]}{unmoved_note}')
     if failing:
         names = ', '.join(f'{a["variable"]} (group {a["group"]}, {a["excess"]:.2g})' for a in attribution[:3])
         return (FAILED, f'{len(failing)} of {len(rows)} points over tol {tol:g} above the solver floor: worst '

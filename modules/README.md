@@ -618,6 +618,8 @@ model with a square-root form (no tanh, so the model lifts exactly to quadratic 
 - **Saved.** `results/smoothing/` holds the smoothed model and `smoothing_report.json` (each site: kind,
   eps, range, flags such as `floor_upstream`, `one_sided` and `nan_at_init`), and `plots/smoothing.png` the
   error at each point. A version with no non-smooth sites passes with "no non-smooth sites".
+  A site whose argument no point moves (constant in every run) is left as written and named in the message as
+  "not exercised": the check does not cover it.
 - **Exempt.** `smoothing.exempt` lists the variables whose sites stay as written, each with its reason;
   the report records them as `exempt`, with the states or floor phases they switch on
   (`switch_variables`). The report's `jump_candidates` suggest more (never applied).
@@ -632,7 +634,10 @@ python -m cam_testing.smooth --module-array sys_module_array.json --parameters s
 Each module's library version runs `verification_test_smoothing` (a current saved result is reused); a module with
 no library version but a config in `--external-modules-dir` is checked alone, its constants at the system's values
 and its inputs at their mean in the system run, each swept over 0.5-2 x its value, and reported as "checked with the
-default sweep". A failing module stops the run before the system step, as does a module found nowhere unless
+default sweep". An input that is constant in the system run (an afferent firing rate that is 0 at rest) gets no
+sweep from the factors: `--input-ranges file.json` (`{"<instance>/<var>": [lo, hi] or {"min", "max", "points"}}`, a
+bound may name a system parameter, such as `"f_cc_max_s"`; also read from the settings' `input_ranges`) sweeps it,
+and without one the module is reported with "input <var> not exercised". A failing module stops the run before the system step, as does a module found nowhere unless
 `--allow-unchecked`. The system's `smoothing_report.json` tags each site with its module and that module's result.
 `--exempt file.json` (`[{"variable": "<instance>_module/<variable>", "reason": ...}]`) adds the system's own
 exemptions to each library version's `smoothing.exempt`, applied to its instances.
