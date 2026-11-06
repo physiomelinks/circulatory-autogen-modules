@@ -1,0 +1,7 @@
+module_type: burgers_viscous
+version: Peherstorfer2016_v01
+reviewed: false
+notes: 'Viscous Burgers'' equation x_t + x x_w = mu x_ww on w in [0, 1] with x(0, t) = g(t), x(1, t) = -g(t) (peherstorfer2016data,
+  Sec. 4.2), central differences on 31 interior nodes (h = 1/32; ICUHealthy uses 127). g = g0 + g1 sin(2 pi t/T_g) + b_g
+  sin(2 pi t/T_r + phi0) is set by hand for the beat structure (ICUHealthy beat-map test 10). The right-hand side is quadratic:
+  the expected lift is the identity, with g entering as an input through B (g) and N (g x).'
