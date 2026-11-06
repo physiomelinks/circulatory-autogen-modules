@@ -1,0 +1,8 @@
+module_type: quadratic_heart
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: 'A toy heart whose right-hand side has no term above quadratic (ICUHealthy beat-map test 8, sys_quadratic_heart):
+  a phase clock c'' = -w s, s'' = w c with rate w = w0 (1 + k (P_a - P_ref)/P_ref) set by a reflex, an elastance linear
+  in c, linear valves, and a drug u scaling the systemic conductance (q_s = (1 + u)(P_a - P_v)/R_s; u is a boundary condition,
+  an input). mL, mmHg, s; written dimensionless. Total volume is conserved. The expected lift is the identity; it tests
+  clock detection (c^2 + s^2 = 1 with a state-dependent rate) and an N operator from u.'
