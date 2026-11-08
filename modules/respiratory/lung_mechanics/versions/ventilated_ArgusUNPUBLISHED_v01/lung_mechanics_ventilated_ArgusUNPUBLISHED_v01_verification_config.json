@@ -87,9 +87,9 @@
       "abs": 0.001,
       "maxmin": 0.001,
       "piecewise": 0.001,
-      "variables": {"v_leak": 0.001}
+      "variables": {"v_leak": 0.001, "C_A": 0.0001}
     },
-    "rationale": "The respiratory phase windows phi_*_0 are left as written (exempt). The leak rectifier v_leak = max(P_m - P_leak_threshold, 0)/R_leak was tested at rel 1e-3, 1e-4, 1e-5 and 1e-6 in CVS-ANS's lung (lung_bg_Argus_Chase_qstr, the same rectifier): smoothed alone it is 6e-4, 4e-5, 5e-5 and 2e-4 over the solver floor at the worst sweep point, and the nominal run takes 20156, 20148, 20156 and 20158 CVODE steps against the original's 20143, so 1e-3, the largest, is set. The other sites are smoothed at 1e-3; that check's one failing point (beta_C_insp_to_exp = 2, 0.0103 against tol 0.01) is C_A's."
+    "rationale": "The respiratory phase windows phi_*_0 are left as written (exempt). The leak rectifier v_leak = max(P_m - P_leak_threshold, 0)/R_leak was tested at rel 1e-3, 1e-4, 1e-5 and 1e-6 in CVS-ANS's lung (lung_bg_Argus_Chase_qstr, the same rectifier): smoothed alone it is 6e-4, 4e-5, 5e-5 and 2e-4 over the solver floor at the worst sweep point, and the nominal run takes 20156, 20148, 20156 and 20158 CVODE steps against the original's 20143, so 1e-3, the largest, is set. The alveolar compliance switch C_A (inspiratory to expiratory) takes rel 1e-4: at 1e-3 that check misses at one of 145 points (beta_C_insp_to_exp = 2, 0.0103 against tol 0.01), from C_A alone; a smaller eps there was Finbar's choice over loosening tol. The other sites are smoothed at 1e-3."
   },
   "validation": {
     "default": {
