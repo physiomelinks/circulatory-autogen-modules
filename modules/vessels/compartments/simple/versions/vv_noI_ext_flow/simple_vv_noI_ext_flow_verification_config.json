@@ -1,0 +1,109 @@
+{
+  "module_type": "simple",
+  "version": "vv_noI_ext_flow",
+  "sim_time": 10.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": [
+    "q",
+    "u"
+  ],
+  "invariants": [
+    {
+      "description": "exact solution q = q_init + (v_in - v_out + v_ext) t",
+      "expr": "np.max(np.abs(q - (q_init + (v_in - v_out + v_ext)*t))) <= 1e-9*max(abs(q_init), abs(v_in)*t[-1]) + 1e-15"
+    },
+    {
+      "description": "linear pressure-volume law u = (q - q_0 (1 - Delta_q_us))/(C (1 - Delta_C))",
+      "expr": "np.max(np.abs(u - (q - q_0*(1 - Delta_q_us))/(C*(1 - Delta_C)))) <= 1e-9*np.max(np.abs(u)) + 1e-9"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "ranges": {
+      "v_ext": {
+        "min": -1e-05,
+        "max": 1e-05,
+        "points": 5
+      },
+      "v_in": {
+        "min": 0.0,
+        "max": 0.0002,
+        "points": 5
+      },
+      "v_out": {
+        "min": 0.0,
+        "max": 0.0002,
+        "points": 5
+      },
+      "C": {
+        "min": 5e-09,
+        "max": 1.5e-06,
+        "points": 5,
+        "scale": "log"
+      },
+      "q_0": {
+        "min": 0.0,
+        "max": 0.001,
+        "points": 3
+      },
+      "Delta_C": {
+        "min": -0.5,
+        "max": 0.9,
+        "points": 4
+      },
+      "Delta_q_us": {
+        "min": -0.5,
+        "max": 0.9,
+        "points": 4
+      }
+    },
+    "bounds": {
+      "Delta_C": [
+        null,
+        0.99
+      ]
+    },
+    "rationale": "bleed or infusion up to 10 mL/s; flows 0-12 L/min; compliance from arterial (0.7 mL/mmHg) to venous (200 mL/mmHg); compliance and unstressed volume from 1.5x down to 0.1x."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.004,
+      0.002,
+      0.001,
+      0.0005
+    ],
+    "t_end": 10.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "no data: a synthetic module of the known-structure test model (ICUHealthy models/simple)"
+      },
+      "calibrate": {
+        "note": "not_applicable: no data to calibrate against"
+      }
+    }
+  }
+}

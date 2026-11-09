@@ -1,0 +1,70 @@
+[
+  {
+    "module_type": "muscle_pressure",
+    "module_subtype": "cosine_EllweinFix2018_v01",
+    "module_format": "cellml",
+    "component_file": "muscle_pressure_cosine_EllweinFix2018_v01_modules.cellml",
+    "component_type": "muscle_pressure_cosine_EllweinFix2018_v01",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "ellweinfix2018theoretical"
+    ],
+    "entrance_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "muscle_pressure_port",
+        "variables": [
+          "P_mus"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f",
+        "per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "A",
+        "J_per_m3",
+        "access",
+        "constant"
+      ],
+      [
+        "c_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "s_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "s",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "P_mus",
+        "J_per_m3",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]

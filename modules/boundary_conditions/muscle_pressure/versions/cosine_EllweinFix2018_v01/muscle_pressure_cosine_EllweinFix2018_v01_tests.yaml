@@ -1,0 +1,4 @@
+module_type: muscle_pressure
+version: cosine_EllweinFix2018_v01
+reviewed: false
+notes: 'Raised-cosine respiratory muscle pressure from its own phase oscillator: P_mus = -A (1 - c)/2, c = cos(theta), s = sin(theta), dc/dt = -2 pi f s, ds/dt = 2 pi f c, at a fixed breathing frequency f. P_mus runs from 0 (c = 1, end expiration) to -A (c = -1). Ellwein Fix et al. (2018) eq. 13 writes P_mus = A_mus cos(2 pi f t) - A_mus, the same shape with A = 2 A_mus. Given on a muscle_pressure_port, e.g. to lung_mechanics driven_ArgusUNPUBLISHED_v01. The phase oscillator is written as c = cos(theta), s = sin(theta), dc/dt = -2 pi f s, ds/dt = 2 pi f c, so the pressure shape (1 - c) is polynomial in the states (built for a known-structure test model for Operator Inference, ICUHealthy models/simple). c^2 + s^2 = 1 is conserved by the equations; the solver lets it drift slowly (about 2e-5 per 10 minutes at 70 bpm with rtol 1e-8, atol 1e-10, max step 0.25 ms, faster at higher f).'
