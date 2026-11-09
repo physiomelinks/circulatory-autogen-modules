@@ -411,11 +411,12 @@ parameterisation's obs_data `data_items` and `prediction_items`, and the validat
 not_applicable). An item's source combines two places, and `SOURCES.md` is the extension of the
 `data_reference`:
 
-1. its **`data_reference`** key in its data file: a string, `<BibTeX key>; <short note>`, or an object
-   with any of `source`, `figure`, `obtained` (digitised / table value / derived), `species`,
-   `preparation`, `conditions`, `kind`, `role`, `sigma_reason`, `primary_read` and `note` (other keys are
-   shown as notes). On a baseline with a data file, the baseline's own `data_reference` sources its columns.
-   libcuflynx accepts `data_reference` on obs_data items (physiomelinks/circulatory_autogen#618, on CA master).
+1. its **`data_reference`** key in its data file: a string, `<BibTeX key>; <short note>`, never an object
+   (as in libcuflynx, whose obs_data schema takes a string or null on data and prediction items:
+   physiomelinks/circulatory_autogen#618, on CA master). The same holds for baseline targets and blocks.
+   Everything else about the item (figure, how obtained, species, kind, sigma, ...) goes in its SOURCES.md
+   section. An object `data_reference` fails `data_sources_test`, naming the item and its file. On a
+   baseline with a data file, the baseline's own `data_reference` sources its columns.
 2. its **section in `SOURCES.md`** beside the data (`parameterisations/<p>/SOURCES.md`, or a
    system model's directory). A Markdown heading of any level is the item's `data_item_name` (a target's
    `name`, a data column's name), exactly; a trailing ` — <value>` or `(note)` on the heading is ignored.
@@ -443,9 +444,9 @@ not_applicable). An item's source combines two places, and `SOURCES.md` is the e
    - Kind: measured (pelt counts, thousands, a proxy for the hare population)
    - Data reference: hewitt1921conservation; via carpenter2018predator, the Stan example hudson-bay-lynx-hare.csv
    ```
-   The two combine: the row takes the section's fields and the `data_reference`'s, and where both give a
-   field (e.g. the source) the `data_reference` wins. An item with a `data_reference` and a section repeats
-   it in the section as `- Data reference: <the identical string>` (for an object, its `source`), not as
+   The two combine: the row takes the section's fields, and the `data_reference` is its source (it wins
+   over a section's `Source`). An item with a `data_reference` and a section repeats
+   it in the section as `- Data reference: <the identical string>`, not as
    `- Source:`; when that line is missing or the two strings differ, `data_sources_test` fails, naming the
    item and both files. An item with a section and no `data_reference` needs no such line.
    The table says where a row came from: `data_reference`, `SOURCES.md` or `data_reference + SOURCES.md`.
@@ -459,7 +460,7 @@ not_applicable). An item's source combines two places, and `SOURCES.md` is the e
    item heading is ignored. The item's free-text `comment` is not a source: the table shows it beside
    "source missing".
 
-**Kind** (what the number is) is read only from the `Kind` label or `kind` key:
+**Kind** (what the number is) is read only from the section's `Kind` label:
 
 - **measured**: read from an experiment (a paper's figure or table, a dataset);
 - **assumed**: chosen without a measurement of this quantity, with the reason (`assumed (why)`);
@@ -481,10 +482,10 @@ another item's `operation_kwargs` names the term, `<item>` must be that item (th
   data items: item with variable and operation, value, sigma with its rationale, source with figure,
   how obtained and primary read, species/preparation/conditions, kind, role; BibTeX keys link to the
   References) and a count in its header; a system-model page has one for its obs_data. The headers,
-  tables and site index count each kind of problem: no source, Data reference mismatch/missing, term
-  not labelled.
+  tables and site index count each kind of problem: no source, Data reference mismatch/missing,
+  data_reference not a string, term not labelled.
 - **Checked by** `data_sources_test` (`tests/test_modules.py`, per version, no model run): it fails when
-  any item has no source, a term lacks its `derived: term of <item>` kind or names the wrong item, or an
+  any item has no source, a `data_reference` that is not a string, a term lacks its `derived: term of <item>` kind or names the wrong item, or an
   item's SOURCES.md section lacks or differs from its `data_reference`, and lists each item and where to
   add its source. It runs for unreviewed versions too; in CI their failures are warnings
   (`tools/ci_reviewed_failures.py`), so it gates reviewed versions and new sign-offs.

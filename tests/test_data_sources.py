@@ -27,7 +27,7 @@ def item(name, value=1.0, std=0.1, weight=1.0, **kw):
 
 def obs_data(**changes):
     '''The synthetic obs_data: the fixture's items (two terms, one without its "term of" label), an unsourced
-    target, a string and an object data_reference, a held-out prediction and a prediction without data.'''
+    target, two string data_references, a held-out prediction and a prediction without data.'''
     data = [
         item('u_e_rest', -0.038, 0.003),
         item('c_Na_rest', 15, 4),
@@ -43,10 +43,7 @@ def obs_data(**changes):
     preds = [
         item('c_Na_peak_sugar', 20, 2),
         {'data_item_name': 'J_glucose', 'operation': 'mean', 'operands': ['mod/J_glucose'], 'unit': 'mol_per_s',
-         'data_reference': {'source': 'rose1971studies', 'figure': 'Fig. 8', 'obtained': 'digitised',
-                            'species': 'rabbit', 'preparation': 'ileum', 'conditions': '37 °C',
-                            'kind': 'derived (from the short-circuit current)', 'sigma_reason': 'n/a',
-                            'primary_read': '−1.2 µA/cm²', 'n_animals': 6}},
+         'data_reference': 'rose1971studies; Fig. 8, digitised'},
     ]
     obs = {'obs_data_name': P, 'protocol_info': {'pre_times': [0.0], 'sim_times': [[1.0]], 'params_to_change': {}},
            'data_items': data, 'prediction_items': preds}
@@ -82,9 +79,9 @@ def test_heading_names_and_reference_forms():
     assert sources.heading_name('u_e_depolarisation_with_sugar – +6.0 +- 1.5 mV') == 'u_e_depolarisation_with_sugar'
     assert sources.heading_name('c_Na_peak_sugar   (held out, not fitted)') == 'c_Na_peak_sugar'
     assert sources.read_reference('smith2020 Fig. 2') == {'source': 'smith2020 Fig. 2'}
-    assert sources.read_reference({'source': 'x', 'Species': 'rat', 'n': 3}) == {'source': 'x', 'species': 'rat',
-                                                                               'note': 'n: 3'}
-    assert sources.read_reference(None) == {} and sources.read_reference({}) == {}
+    assert sources.read_reference(None) == {} and sources.read_reference('') == {}
+    # an object gives no source (the row reports it as a problem)
+    assert sources.read_reference({'source': 'x'}) == {}
     # bold labels are read too
     sections, _ = sources.parse_sources_md('## a\n\n- **Kind:** assumed\n- **Source**: b2020\n')
     assert sections['a']['kind'] == 'assumed' and sections['a']['source'] == 'b2020'
@@ -137,11 +134,10 @@ def test_kinds_and_roles(table):
     assert 'derived: term of' in r['v_NKA_sugar']['problem']
     # a measured value can be held out (a prediction_item with data)
     assert r['c_Na_peak_sugar']['kind'] == 'measured' and r['c_Na_peak_sugar']['role'] == 'held out'
-    # a prediction without data, sourced by a data_reference object
+    # a prediction without data, sourced by its data_reference string alone
     j = r['J_glucose']
-    assert (j['role'], j['origin'], j['kind'], j['figure'], j['obtained']) == \
-        ('prediction', 'data_reference', 'derived', 'Fig. 8', 'digitised')
-    assert j['species'] == 'rabbit; ileum; 37 °C' and j['note'] == 'n_animals: 6'
+    assert (j['role'], j['origin'], j['source'], j['kind'], j['problem']) == \
+        ('prediction', 'data_reference', 'rose1971studies; Fig. 8, digitised', None, None)
     # a string data_reference, and an item with nothing
     assert r['R_te']['source'] == 'rose1971studies Table 2' and r['R_te']['kind_label'] == 'not stated'
     assert r['G_K_total']['missing'] and r['G_K_total']['problem'] == sources.MISSING
@@ -194,16 +190,16 @@ def test_a_term_names_the_item_that_uses_it(tmp_path):
 def test_data_reference_and_section_combine(tmp_path):
     (tmp_path / 'SOURCES.md').write_text('## a\n\n- Kind: measured\n- Data reference: k2020; Fig. 1\n'
                                          '- Figure: Fig. 1B\n\n## b\n\n- Data reference: k2020; Fig. 2\n'
-                                         '\n## c\n\n- Kind: assumed\n- Source: an older note\n- Data reference: k2021\n'
+                                         '\n## c\n\n- Kind: assumed\n- Source: an older note\n- Data reference: k2021\n- Figure: Table 2\n'
                                          '\n## e\n\n- Kind: measured\n')
     obs = {'data_items': [item('a', data_reference='k2020; Fig. 1'), item('b', data_reference='k2020; Fig. 3'),
-                          item('c', data_reference={'source': 'k2021', 'figure': 'Table 2'}),
+                          item('c', data_reference='k2021'),
                           item('d', data_reference='k2022'), item('e', data_reference='k2023; Fig. 4')],
            'prediction_items': []}
     obs_path = str(tmp_path / 'x_obs_data.json')
     t = sources.data_table(str(tmp_path), obs=obs, obs_path=obs_path)
     r = rows_by_name(t)
-    # section fields plus data_reference, the data_reference winning per field; the origin says both
+    # section fields plus data_reference, the data_reference winning over a Source line; the origin says both
     assert (r['a']['origin'], r['a']['kind'], r['a']['figure'], r['a']['problem']) == \
         ('data_reference + SOURCES.md', 'measured', 'Fig. 1B', None)
     assert (r['c']['source'], r['c']['figure'], r['c']['kind'], r['c']['problem']) == ('k2021', 'Table 2', 'assumed', None)
@@ -218,7 +214,34 @@ def test_data_reference_and_section_combine(tmp_path):
     assert e['problem_kind'] == 'reference' and not e['mismatch'] and not e['missing']
     assert all(s in e['problem'] for s in ('"k2023; Fig. 4"', 'x_obs_data.json', 'SOURCES.md',
                                            '"- Data reference: k2023; Fig. 4"'))
-    assert t['n_problems'] == 2 and t['problems'] == {'missing': 0, 'reference': 2, 'term': 0}
+    assert t['n_problems'] == 2 and t['problems'] == {'missing': 0, 'reference': 2, 'not_string': 0, 'term': 0}
+
+
+def test_an_object_data_reference_is_a_problem(tmp_path):
+    '''data_reference is a string, as in libcuflynx: an object (even with a section that would source the item)
+    is a problem naming the file and saying where its parts go, on obs_data items and baseline targets and blocks.'''
+    (tmp_path / 'SOURCES.md').write_text('## a\n\n- Kind: measured\n- Data reference: k2020; Fig. 1\n')
+    obs = {'data_items': [item('a', data_reference={'source': 'k2020; Fig. 1', 'figure': 'Fig. 1B'}),
+                          item('b', data_reference='k2021')],
+           'prediction_items': [{'data_item_name': 'p', 'operands': ['mod/p'], 'data_reference': {'source': 'k'}}]}
+    t = sources.data_table(str(tmp_path), obs=obs, obs_path=str(tmp_path / 'x_obs_data.json'))
+    r = rows_by_name(t)
+    for name in ('a', 'p'):
+        assert r[name]['problem_kind'] == 'not_string' and r[name]['source'] != 'k'
+        assert r[name]['problem'] == ('data_reference in x_obs_data.json is an object: it must be a string; put the '
+                                      'citation as "<BibTeX key>; <short note>" in data_reference and the detail '
+                                      "in the item's section of SOURCES.md")
+    assert not r['b']['problem']
+    assert t['problems'] == {'missing': 0, 'reference': 0, 'not_string': 2, 'term': 0}
+    assert sources.summary(t['problems']) == '2 data_reference not a string'
+    # the data_sources_test's details name the item
+    assert sources.table_problems(t, 'demo: ', '')[0].startswith('demo: a: data_reference in x_obs_data.json is an object')
+    # baseline targets and a baseline block's own data_reference: the same rule
+    block = {'status': 'active', 'targets': [{'name': 'EDV', 'expr': 'np.max(q)', 'value': 142, 'std': 21,
+                                              'data_reference': {'source': 'maceira2006normalized'}}],
+             'data': 'p/x.csv', 'variables': {'mod/x': 'x_col'}, 'data_reference': {'source': 'ref2000'}}
+    rows = sources.data_table(str(tmp_path), baseline=block)['rows']
+    assert [x['problem_kind'] for x in rows] == ['not_string', 'not_string']
 
 
 def test_baseline_targets_and_columns(tmp_path):
@@ -369,7 +392,7 @@ def test_version_page_shows_the_table_and_the_count(repo):
     index = report._env().get_template('index.html').render(
         groups=[], systems=[], totals={}, n_module_types=0, n_versions=0, generated='', libcuflynx_version='',
         data_sources={'items': 22, 'problems': 2, 'counts': ctx['data_problems'], 'systems': 1,
-                      'system_counts': {'missing': 0, 'reference': 1, 'term': 0}})
+                      'system_counts': {'missing': 0, 'reference': 1, 'not_string': 0, 'term': 0}})
     assert ('2 of 22 data items with a problem (1 no source, 1 term not labelled), and 1 in system models '
             '(1 Data reference mismatch/missing)') in index
     # bib keys of the version link to its References

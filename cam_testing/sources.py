@@ -5,14 +5,14 @@ table and the data_sources_test (modules/README.md, "Data sources").
 An item's source combines:
 
   1. its ``data_reference`` key (an obs_data data_item or prediction_item, or a baseline target): a string
-     (``<BibTeX key>; <short note>``) or an object with any of the keys in REFERENCE_KEYS;
+     (``<BibTeX key>; <short note>``), as in libcuflynx; an object is a problem (its detail belongs in SOURCES.md);
   2. its section in the SOURCES.md beside the data (the parameterisation's or system model's directory):
      a Markdown heading that is the item's ``data_item_name`` (a trailing " — <value>" or "(note)" on the
      heading is ignored), then optional labelled lines ``- <Label>: <text>`` (LABELS), then free prose.
 
 The section extends the data_reference: a field in both is taken from the data_reference. When an item has
 both, the section must have a ``- Data reference: <text>`` line repeating the item's data_reference string
-exactly (for an object, its ``source``); a missing or different line is a problem. A section with nothing
+exactly; a missing or different line is a problem. A section with nothing
 under its heading is not a source.
 
 Value and sigma always come from the data file, never from SOURCES.md. Kind (measured / assumed /
@@ -24,7 +24,8 @@ never marks one): a weight-0 data_item is a term of another item, usually one wh
 it (x1/x2 of a subtraction or division), and its source must say "derived: term of <item>", naming that item
 when one does.
 
-Each problem has a kind (PROBLEMS): no source, a Data reference line missing or different, or a term not labelled.
+Each problem has a kind (PROBLEMS): no source, a Data reference line missing or different, a data_reference
+that is not a string, or a term not labelled.
 """
 import json
 import os
@@ -34,12 +35,10 @@ SOURCES_MD = 'SOURCES.md'
 MISSING = 'source missing'
 DATA_REFERENCE = '_data_reference'   # a section's "Data reference" line as written
 # problem kind -> how a summary counts it
-PROBLEMS = {'missing': 'no source', 'reference': 'Data reference mismatch/missing', 'term': 'term not labelled'}
+PROBLEMS = {'missing': 'no source', 'reference': 'Data reference mismatch/missing',
+            'not_string': 'data_reference not a string', 'term': 'term not labelled'}
 KINDS = ('measured', 'assumed', 'derived', 'synthetic')
 
-# data_reference object keys (and SOURCES.md fields)
-REFERENCE_KEYS = ('source', 'figure', 'obtained', 'species', 'preparation', 'conditions', 'kind', 'role',
-                  'sigma_reason', 'primary_read', 'note')
 # SOURCES.md label (lower case) -> field
 LABELS = {
     'source': 'source', 'citation': 'source', 'reference': 'source', 'data reference': 'source',
@@ -114,22 +113,11 @@ def read_sources_md(directory):
 
 
 def read_reference(ref):
-    '''A data_reference as {field: text}: a string is the source; an object's REFERENCE_KEYS are read
-    (other keys are kept under note).'''
-    if ref is None or ref == '' or ref == {}:
+    '''A data_reference as {field: text}: a non-empty string is the source; anything else (None, empty, or
+    not a string, which _row reports as a problem) gives no fields.'''
+    if not isinstance(ref, str) or not ref.strip():
         return {}
-    if not isinstance(ref, dict):
-        return {'source': str(ref)}
-    out, extra = {}, []
-    for k, v in ref.items():
-        key = LABELS.get(str(k).lower().replace('_', ' '), k) if k not in REFERENCE_KEYS else k
-        if key in REFERENCE_KEYS and v not in (None, ''):
-            out[key] = v if isinstance(v, str) else json.dumps(v)
-        elif v not in (None, ''):
-            extra.append(f'{k}: {v}')
-    if extra:
-        out['note'] = '; '.join(filter(None, [out.get('note'), *extra]))
-    return out
+    return {'source': ref}
 
 
 def _detail(rest):
@@ -183,10 +171,8 @@ def _referenced_by(items):
 
 
 def _reference_string(reference):
-    '''The data_reference string a SOURCES.md "Data reference" line repeats: the string, or an object's source.'''
-    if isinstance(reference, dict):
-        reference = reference.get('source')
-    return str(reference).strip() if reference not in (None, '') else None
+    '''The data_reference string a SOURCES.md "Data reference" line repeats; None without a string.'''
+    return reference.strip() or None if isinstance(reference, str) else None
 
 
 def _term_problem(kind_text, kind, detail, users):
@@ -219,7 +205,12 @@ def _row(name, *, variable='', operation='', value=None, sigma=None, unit='', ro
     mismatch = bool(in_data and in_md and in_data != in_md.strip())
     files = f'{data_file or "the data file"}', f'{sources_md or SOURCES_MD}'
     problem, problem_kind = None, None
-    if mismatch:
+    if reference not in (None, '') and not isinstance(reference, str):
+        what = 'an object' if isinstance(reference, dict) else f'a {type(reference).__name__}'
+        problem, problem_kind = (f'data_reference in {files[0]} is {what}: '
+                                 f'it must be a string; put the citation as "<BibTeX key>; <short note>" in '
+                                 f'data_reference and the detail in the item\'s section of {files[1]}'), 'not_string'
+    elif mismatch:
         problem, problem_kind = (f'data_reference "{in_data}" in {files[0]} differs from the Data reference '
                                  f'"{in_md.strip()}" in {files[1]}: they must be identical'), 'reference'
     elif in_data and section is not None and in_md is None:
