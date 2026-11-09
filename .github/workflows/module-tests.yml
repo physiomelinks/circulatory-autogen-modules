@@ -50,6 +50,13 @@ jobs:
         with: { python-version: '3.11' }
       - uses: ./.github/actions/setup
       - run: make structure PYTHON=python
+      # the system models' data sources: a failure blocks for a reviewed system model, warns for one not
+      # reviewed yet (tools/ci_reviewed_failures.py)
+      - name: System models' data sources
+        run: |
+          make system-sources PYTHON=python PYTEST_ARGS=--junitxml=junit-systems.xml && exit 0
+          [ -f junit-systems.xml ] || { echo "::error::the tests wrote no JUnit report (crashed before running)"; exit 1; }
+          python tools/ci_reviewed_failures.py junit-systems.xml
       # the per-version structure results the reports show (test_version_structure)
       - name: Stage structure results
         if: always()
