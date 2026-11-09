@@ -19,9 +19,9 @@ on:
         default: false
 
 env:
-  # PhLynx checkout for the pipeline tests: the branch of physiomelinks/PhLynx#595 (list-form
-  # multi_port, case-insensitive multi_port) until it's merged; then main or a tag.
-  PHLYNX_REF: feat/load-module-library-configs
+  # PhLynx checkout for the pipeline tests: physiomelinks/PhLynx main, the PhLynx users run
+  # (cam_testing/bridges/phlynx/export_omex.mjs calls its API).
+  PHLYNX_REF: main
 
 concurrency:
   group: module-tests-${{ github.ref }}
