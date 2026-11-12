@@ -1,0 +1,4 @@
+module_type: hopf_limit_cycle
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: "QPoPInf paper test 5: a limit-cycle oscillator in Cartesian coordinates, cubic right-hand side: r2 = x^2 + y^2, thdot = w (1 + beta (r2 - 1) + gamma z), x' = a x (1 - r2) - thdot y, y' = a y (1 - r2) + thdot x, z' = -lam z + c z^2 - d z^3 + kappa (r2 - 1); r2 and z2 = z^2 are the lift variables. Written from the paper harness (small_step_compare.py sys_limit_cycle at cf7b1cd); rhs_reference holds the harness's right-hand side at 20 points, which verification_test_rhs checks to 1e-12. Inputs the rom run schedule varies per run or beat are parameters; forcings in time are written in the CellML. Zero matrix entries are left out of the equations."
