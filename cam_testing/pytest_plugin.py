@@ -27,8 +27,9 @@ MARKERS = [
     'system_model: system-model tests (system_models/) and supermodule reproduces tests',
     'phlynx_pipeline: PhLynx -> .omex -> CUFLynx per-version tests (need node, PhLynx and CUFLynx)',
 ]
-# supermodule_equivalence_test runs for unreviewed versions too: it guards the system models built on them
-QUICK_TESTS = ('review_test', 'run_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
+# supermodule_equivalence_test runs for unreviewed versions too: it guards the system models built on them;
+# verification_test_rhs too: it simulates nothing, and checks the equations against their reference
+QUICK_TESTS = ('review_test', 'run_test', 'verification_test_rhs', 'supermodule_structure_test', 'supermodule_equivalence_test',
                'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test',
                'cuflynx_parameterisation_omex_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test',
                'data_sources_test')

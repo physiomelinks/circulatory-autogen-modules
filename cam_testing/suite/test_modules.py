@@ -62,6 +62,10 @@ def verification_test_timestep(component_model):
     _assert(checks.verification_test_timestep(component_model), component_model.component)
 
 
+def verification_test_rhs(component_model):
+    _assert(checks.verification_test_rhs(component_model), component_model.component)
+
+
 def stability_test(component_model):
     _assert(checks.stability_test(component_model), component_model.component)
 
