@@ -1,0 +1,38 @@
+module_type: cardiomyocyte
+version: SAN_Severi2012_v01
+reviewed: false
+notes: 'The Severi, Fantini, Charawi and DiFrancesco 2012 rabbit sino-atrial node (SAN) pacemaker cell: 33 states (membrane
+  potential V_ode; Nai_; the gates of i_f, i_Na, i_CaL, i_CaT, i_to, i_Kr, i_Ks and i_KACh; the SR Ca release states; Ca
+  buffers; Cai, Ca_sub, Ca_nsr, Ca_jsr and the BAPTA states), time in s, V in mV. It is a conversion of the authors'' CellML,
+  Physiome Model Repository exposure e/139 (https://models.physiomeproject.org/e/139, CC BY 3.0; this adaptation is CC BY 4.0, crediting Severi et al. 2012), with acetylcholine exposed
+  as an input port. The conversion joins the 34 components into one component, SAN_Severi2012, and changes nothing else:
+  the MathML of each component is copied with its variables renamed to their source variable (environment.time is t);
+  variable names used twice get their component as a suffix (Ca_SR_release.R is R_Ca_SR_release, Ca_dynamics.T is
+  T_Ca_dynamics, Iso_shift_i_f_y_gate, Iso_shift_i_CaL_dL_gate, Iso_shift_i_Ks_n_gate, Iso_increase_i_NaK,
+  Iso_increase_i_CaL); every constant (82) and initial value (33, as <state>_init) is a parameter with the CellML''s value
+  in the default parameterisation; the units are the CellML''s. The voltage clamp (clamp_mode, off) and the drug switches
+  (Iva_3_uM, Cs_5_mM, Iso_1_uM, BAPTA_10_mM, all 0) are kept as constants. Over 3 s at ACh = 10 nM the V trace matches
+  the PMR file''s to 2.4e-7 mV (both run in Myokit, CVODE rtol = atol = 1e-10).
+
+
+  Acetylcholine. ACh (mM) enters through the ACh_concentration port; the default is the CellML''s 0 (control). It acts on
+  i_f (ACh_shift), i_CaL (ACh_block), SR Ca uptake (b_up) and i_KACh. Keep ACh > 0 when varying it continuously: at ACh =
+  0 the piecewise expressions switch (ACh_shift jumps from 0 to -1 mV, b_up and i_KACh switch on) and alpha_a divides by
+  ACh^1.6951, so the right-hand side is not continuous in ACh there (evaluated in Python, as by the fixed-step
+  timestep check, alpha_a raises ZeroDivisionError at ACh = 0; C and Myokit give 0 for that term). The tests therefore
+  run at 10 nM (run_parameters), where the cycle is about 0.43 s against the control 0.355 s; the BC sweep covers 0 to
+  30 nM.
+
+
+  Stiffness. The fast gates and Ca buffers give eigenvalues up to about 7e4 /s and the ion concentrations drift with time
+  constants of minutes, so use an implicit solver (CVODE) and warm the model up before taking a periodic state.
+
+
+  Licence. CC BY 4.0: an adaptation of the CC BY 3.0 PMR exposure, with attribution kept; cite severi2012updated and severi2012cellml.
+
+
+  Ports of the versions of cardiomyocyte:
+
+  entrance ACh_concentration: SAN_Severi2012_v01 [ACh]
+
+  exit membrane_voltage: SAN_Severi2012_v01 [V]'
