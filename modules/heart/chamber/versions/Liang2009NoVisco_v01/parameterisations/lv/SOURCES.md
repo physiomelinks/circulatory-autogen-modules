@@ -7,7 +7,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 ## aortic_pressure
 
-- Kind: derived (Liang et al.'s simulated ascending-aortic pressure, normal case)
+- Kind: synthetic (Liang et al.'s simulated ascending-aortic pressure, normal case)
 - Role: target
 - Data reference: liang2009multi; Fig. 4b, normal case, digitised
 - Figure: Fig. 4b (p. 751), thick black curve; source_figures/liang2009_fig4b.png
@@ -16,7 +16,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 ## lv_end_diastolic_volume
 
-- Kind: derived (Liang et al.'s simulated P-V loop, normal case)
+- Kind: synthetic (Liang et al.'s simulated P-V loop, normal case)
 - Role: target
 - Data reference: liang2009multi; Fig. 4e, right edge of the normal loop, digitised
 - Figure: Fig. 4e (p. 751), right edge of the normal loop; source_figures/liang2009_fig4e.png
@@ -25,7 +25,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 ## lv_end_systolic_volume
 
-- Kind: derived (Liang et al.'s simulated P-V loop, normal case)
+- Kind: synthetic (Liang et al.'s simulated P-V loop, normal case)
 - Role: target
 - Data reference: liang2009multi; Fig. 4e, left edge of the normal loop, digitised
 - Figure: Fig. 4e (p. 751), left edge of the normal loop; source_figures/liang2009_fig4e.png
@@ -34,7 +34,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 ## lv_pressure
 
-- Kind: derived (Liang et al.'s simulated LV pressure, normal case)
+- Kind: synthetic (Liang et al.'s simulated LV pressure, normal case)
 - Role: held out
 - Data reference: liang2009multi; Fig. 4a, normal case, digitised
 - Figure: Fig. 4a (p. 751), thick black curve; source_figures/liang2009_fig4a.png
@@ -43,7 +43,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 ## LV peak systolic pressure
 
-- Kind: derived (from the Fig. 4a curve)
+- Kind: synthetic (from the Fig. 4a curve)
 - Role: validation
 - Data reference: liang2009multi; Fig. 4a: 108.14 mmHg
 - Figure: Fig. 4a: 108.14 mmHg
@@ -52,7 +52,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 ## LV minimum (early diastolic) pressure
 
-- Kind: derived (from the Fig. 4a curve)
+- Kind: synthetic (from the Fig. 4a curve)
 - Role: validation
 - Data reference: liang2009multi; Fig. 4a: 1.56 mmHg
 - Figure: Fig. 4a: 1.56 mmHg
@@ -61,7 +61,7 @@ comparisons, with no species or preparation. The calibration set-up is in lv_obs
 
 ## LV end-diastolic pressure
 
-- Kind: derived (from the Fig. 4a curve)
+- Kind: synthetic (from the Fig. 4a curve)
 - Role: validation
 - Data reference: liang2009multi; Fig. 4a: 7.29 mmHg at the start of contraction
 - Figure: Fig. 4a: 7.29 mmHg at the start of contraction

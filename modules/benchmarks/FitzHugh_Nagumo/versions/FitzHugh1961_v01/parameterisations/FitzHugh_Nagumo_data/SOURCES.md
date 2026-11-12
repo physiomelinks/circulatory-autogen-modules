@@ -13,7 +13,7 @@ The items below have no species or preparation: the data are synthetic model out
 
 ## mod/V
 
-- Kind: derived (synthetic: FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0))
+- Kind: synthetic (FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0))
 - Role: target
 - Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
 - Note: circulatory_autogen `resources/FitzHugh_Nagumo_obs_data.json`
@@ -22,7 +22,7 @@ The items below have no species or preparation: the data are synthetic model out
 
 ## mod/R
 
-- Kind: derived (synthetic: FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0))
+- Kind: synthetic (FitzHugh-Nagumo output at (a, b, c) = (0.2, 0.2, 3.0))
 - Role: target
 - Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
 - Note: circulatory_autogen `resources/FitzHugh_Nagumo_obs_data.json`
@@ -31,7 +31,7 @@ The items below have no species or preparation: the data are synthetic model out
 
 ## V_validation
 
-- Kind: derived (synthetic, as mod/V)
+- Kind: synthetic (as mod/V)
 - Role: held out
 - Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
 - Note: as mod/V
@@ -40,7 +40,7 @@ The items below have no species or preparation: the data are synthetic model out
 
 ## R_validation
 
-- Kind: derived (synthetic, as mod/R)
+- Kind: synthetic (as mod/R)
 - Role: held out
 - Data reference: ramsay2007parameter; the benchmark as shipped with circulatory_autogen
 - Note: as mod/R
