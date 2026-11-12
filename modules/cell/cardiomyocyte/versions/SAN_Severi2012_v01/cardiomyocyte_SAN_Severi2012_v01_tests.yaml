@@ -4,7 +4,7 @@ reviewed: false
 notes: 'The Severi, Fantini, Charawi and DiFrancesco 2012 rabbit sino-atrial node (SAN) pacemaker cell: 33 states (membrane
   potential V_ode; Nai_; the gates of i_f, i_Na, i_CaL, i_CaT, i_to, i_Kr, i_Ks and i_KACh; the SR Ca release states; Ca
   buffers; Cai, Ca_sub, Ca_nsr, Ca_jsr and the BAPTA states), time in s, V in mV. It is a conversion of the authors'' CellML,
-  Physiome Model Repository exposure e/139 (https://models.physiomeproject.org/e/139, CC BY 3.0), with acetylcholine exposed
+  Physiome Model Repository exposure e/139 (https://models.physiomeproject.org/e/139, CC BY 3.0; this adaptation is CC BY 4.0, crediting Severi et al. 2012), with acetylcholine exposed
   as an input port. The conversion joins the 34 components into one component, SAN_Severi2012, and changes nothing else:
   the MathML of each component is copied with its variables renamed to their source variable (environment.time is t);
   variable names used twice get their component as a suffix (Ca_SR_release.R is R_Ca_SR_release, Ca_dynamics.T is
@@ -28,7 +28,7 @@ notes: 'The Severi, Fantini, Charawi and DiFrancesco 2012 rabbit sino-atrial nod
   constants of minutes, so use an implicit solver (CVODE) and warm the model up before taking a periodic state.
 
 
-  Licence. CC BY 3.0, as the PMR exposure: cite severi2012updated and severi2012cellml.
+  Licence. CC BY 4.0: an adaptation of the CC BY 3.0 PMR exposure, with attribution kept; cite severi2012updated and severi2012cellml.
 
 
   Ports of the versions of cardiomyocyte:
