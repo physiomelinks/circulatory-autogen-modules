@@ -1,0 +1,4 @@
+module_type: quadratic_oscillator
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: "QPoPInf paper test 4a, 4b: a damped linear oscillator y driving z quadratically, z fed back into y1 by back: y1' = -0.1 y1 - w y2 + back z y2, y2' = w y1 - 0.1 y2, z' = -z + y1^2 + y1 y2; parameterisation default is test 4a (back = 0), back_coupled is test 4b (back = 0.5). Written from the paper harness (small_step_compare.py sys_quadratic at cf7b1cd); rhs_reference holds the harness's right-hand side at 20 points, which verification_test_rhs checks to 1e-12. Inputs the rom run schedule varies per run or beat are parameters; forcings in time are written in the CellML. Zero matrix entries are left out of the equations."
