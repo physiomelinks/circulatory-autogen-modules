@@ -37,7 +37,7 @@ PROPOSED = 'proposed'
 # reviewed yet fails it, so its status never reads as all-passed (it stays public and usable)
 REVIEW_TEST = 'review_test'
 VERSION_TESTS = [REVIEW_TEST, 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
-                 'stability_test']
+                 'verification_test_rhs', 'stability_test']
 # per parameterisation
 PARAMETERISATION_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
 TESTS = VERSION_TESTS + PARAMETERISATION_TESTS
@@ -1383,6 +1383,83 @@ def verification_test_timestep(cm):
 
 
 # ----------------------------------------------------------------------------------------------
+# verification_test_rhs
+# ----------------------------------------------------------------------------------------------
+
+NO_RHS_REFERENCE = 'no rhs_reference in the verification config'
+
+
+def _set_parameter(model, cm, name, value):
+    '''Sets a parameter (by its variable name, e.g. u_1) of a Myokit model generated from cm.'''
+    by_var = {p.variable_name: p for p in cm.parameters()}
+    full = harness.parameter_name(by_var[name]) if name in by_var else name
+    for comp in ('parameters', 'parameters_global'):
+        if model.has_variable(f'{comp}.{full}'):
+            model.get(f'{comp}.{full}').set_rhs(float(value))
+            return
+    raise KeyError(f'rhs_reference parameter {name} not found in the model')
+
+
+def rhs_reference_errors(cm, ref):
+    '''
+    For each point of an rhs_reference block, the generated model's state rates (in ref["states"] order) and
+    the values of ref["observed"], and their largest error relative to atol + rtol |reference|.
+    Returns [{'t', 'got', 'want', 'error'}].
+    '''
+    rtol, atol = float(ref.get('rtol', 1e-12)), float(ref.get('atol', 1e-12))
+    states, params, observed = list(ref['states']), list(ref.get('parameters') or []), list(ref.get('observed') or [])
+    base = cm.point_model()
+    by_name = {s.name(): s.qname() for s in base.states()}
+    if sorted(by_name) != sorted(states):
+        raise ValueError(f'rhs_reference states {states} are not the model\'s states {sorted(by_name)}')
+    obs_q = [cm.helper._resolve_name(harness.output_name(o))[1] for o in observed]
+    out = []
+    for pt in ref['points']:
+        model = base.clone()
+        for name, value in zip(params, pt.get('parameters') or []):
+            _set_parameter(model, cm, name, value)
+        rhs, _y0, qnames, observe = fixed_step.compile_rhs(model)
+        y = np.zeros(len(qnames))
+        for s, v in zip(states, pt['states']):
+            y[qnames.index(by_name[s])] = float(v)
+        t = float(pt['t'])
+        rates = rhs(t, y)
+        got = np.array([rates[qnames.index(by_name[s])] for s in states] + list(observe(t, y, obs_q)), dtype=float)
+        want = np.array(list(pt['rates']) + list(pt.get('observed') or []), dtype=float)
+        error = float(np.max(np.abs(got - want) / (atol + rtol * np.abs(want))))
+        out.append({'t': t, 'got': got.tolist(), 'want': want.tolist(), 'error': error})
+    return out
+
+
+def verification_test_rhs(cm):
+    """
+    Checks the generated right-hand side against reference values (verification_config rhs_reference), e.g.
+    from the implementation the module was written from: at each point (t, states, parameter values) the state
+    rates, and any observed variables, equal the reference's to rtol/atol. N/A without an rhs_reference.
+    """
+    if is_non_cellml(cm.component):
+        return _cpp_not_applicable(cm, 'verification_test_rhs')
+    ref = cm.spec.get('rhs_reference')
+    if not ref:
+        return save(cm.component, Result('verification_test_rhs', NOT_APPLICABLE, NO_RHS_REFERENCE))
+
+    def check():
+        rows = rhs_reference_errors(cm, ref)
+        worst = max(r['error'] for r in rows)
+        bad = [i for i, r in enumerate(rows) if not r['error'] <= 1.0]
+        metrics = {'source': ref.get('source', ''), 'points': len(rows), 'worst_relative_error': worst,
+                   'rtol': float(ref.get('rtol', 1e-12)), 'atol': float(ref.get('atol', 1e-12))}
+        if bad:
+            details = [f'point {i} (t = {rows[i]["t"]}): got {rows[i]["got"]}, reference {rows[i]["want"]}' for i in bad]
+            return Result('verification_test_rhs', FAILED,
+                          f'{len(bad)} of {len(rows)} points differ from the reference (worst {worst:.2g} x tolerance)',
+                          metrics, [], details)
+        return Result('verification_test_rhs', PASSED,
+                      f'all {len(rows)} points match the reference ({worst:.2g} x tolerance at worst)', metrics)
+    return _guard(cm.component, 'verification_test_rhs', check)
+
+
+# ----------------------------------------------------------------------------------------------
 # stability_test
 # ----------------------------------------------------------------------------------------------
 
@@ -1968,6 +2045,7 @@ CHECKS = {
     'verification_test_invariants': verification_test_invariants,
     'verification_test_BC': verification_test_BC,
     'verification_test_timestep': verification_test_timestep,
+    'verification_test_rhs': verification_test_rhs,
     'stability_test': stability_test,
     'validation_test_baseline': validation_test_baseline,
     'validation_test_calibrate': validation_test_calibrate,

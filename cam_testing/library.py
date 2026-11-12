@@ -470,7 +470,7 @@ def write_parameters(path, parameters):
 IDENTITY_KEYS = ('module_type', 'version')
 # in this order in the JSON file
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
-                     'outputs', 'protocol', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
+                     'outputs', 'protocol', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'rhs_reference', 'stability',
                      'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
 TESTS_KEYS = ('reviewed', 'description', 'notes', 'figures', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
@@ -479,6 +479,7 @@ NESTED_ORDER = {
     'harness': ('module_array', 'parameters'),
     'bc_sweep': ('sweep', 'factors', 'points', 'ranges', 'bounds', 'constraints', 'exclude', 'extra_parameters', 'plot_output', 'rationale'),
     'timestep': ('scheme', 'dts', 'pre_time', 't_end', 'min_order', 'tol', 'cvode_tol', 'roundoff', 'wrapped'),
+    'rhs_reference': ('source', 'states', 'parameters', 'observed', 'rtol', 'atol', 'points'),
     'stability': ('supported', 'cvode', 'solve_ivp', 'fixed_step', 'max_step_start', 'min_step', 'time_budget',
                   'max_run_seconds', 'total_time_budget', 't_end', 'tol'),
     'supermodule': ('globals', 'equivalent'),

@@ -671,6 +671,7 @@ parameterisation's parameters. Every version runs them, component or supermodule
 | `verification_test_invariants` | the spec's invariants hold at the run parameters |
 | `verification_test_BC` | each boundary condition / constant swept over its tested range; runs finite, invariants hold. Points outside a valid range are skipped; failures are classified and a solver setting recommended (below) |
 | `verification_test_timestep` | fixed-step integration converges at the scheme's order and matches CVODE (N/A for a version driven by a `protocol`, below) |
+| `verification_test_rhs` | the generated right-hand side equals the spec's `rhs_reference` values at its points (N/A without one); runs for unreviewed versions too |
 | `stability_test` | the solver/tolerance/step matrix; the declared-supported configurations work |
 | `phlynx_export_test`, `cuflynx_simulate_test`, `phlynx_equivalence_test` | the PhLynx → CUFLynx pipeline (`tests/test_phlynx.py`) |
 | `supermodule_structure_test`, `supermodule_equivalence_test` | supermodule versions, in addition to the above |
@@ -724,7 +725,7 @@ How the boundary-condition sweep treats impossible values and failures:
   mean run time, failures n/N), which you may adopt into the version's `solver_info`.
 
 **The report's test overview has the same columns for every version**, component or supermodule,
-in this order: Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Calibration (the version's),
+in this order: Reviewed, Run, Invariants, BC sweep, Timestep, RHS reference, Stability, Calibration (the version's),
 PhLynx export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces,
 Coupled; then the parameterisation columns Baseline, Calibrate and CUFLynx archive. The module_type
 page uses the same layout, and the status counts count every cell.
@@ -898,6 +899,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `invariants` | verification_config | numpy expressions (`expr`, with `description` and `applies`) that must hold |
 | `bc_sweep` | verification_config | the parameter sweep: `sweep` (`all`, a component's default: every boundary condition and constant; `bcs`: the boundary conditions; `globals_and_bcs`, a supermodule's default: its globals and open boundary conditions), `factors`, `points`, `ranges` (`[min, max]` or `{min, max, points, scale}` or `{values}`), `bounds` (`{param: [min, max]}`, `null` for no limit: the valid range; values outside it are skipped), `constraints` (numpy expressions of the parameters by variable name, e.g. `B_Ca_init < B_Ca_total`; a point that breaks one is skipped), `exclude`, `extra_parameters`, `plot_output`, `rationale` |
 | `timestep` | verification_config | the convergence test: `scheme`, `dts`, `pre_time` (a warm-up before the compared window, default the spec's `pre_time`), `t_end`, `min_order`, `tol`, `cvode_tol`, `roundoff`, `wrapped`. Partial (not a failure) when the solutions converge monotonically and agree with CVODE but slower than the scheme's order or above `tol` (e.g. a piecewise right-hand side) |
+| `rhs_reference` | verification_config | reference values of the right-hand side, e.g. from the code a module was written from: `source` (where they come from, with its commit), `states` (every state, by variable name), `parameters` (variable names set at each point), `observed` (other variables to compare, optional), `rtol`, `atol` (default 1e-12 each), and `points`, each `{t, states, parameters, rates, observed}` with values in those orders |
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`; a baseline's `obs_data` is run through its protocol, see Protocol-driven tests), variables, targets, metric, threshold, optimiser settings |
