@@ -110,13 +110,13 @@ def committed_files(root, commit):
     return out
 
 
-def libcuflynx_requirement(root):
+def libcuflynx_requirement(root, commit='HEAD'):
+    '''[tool.cam_testing.release] libcuflynx in pyproject.toml as committed at ``commit``.'''
     try:
         import tomllib
     except ModuleNotFoundError:   # Python 3.10
         import tomli as tomllib
-    with open(os.path.join(root, 'pyproject.toml'), 'rb') as f:
-        doc = tomllib.load(f)
+    doc = tomllib.loads(_git(root, 'show', f'{commit}:pyproject.toml', text=True))
     req = doc.get('tool', {}).get('cam_testing', {}).get('release', {}).get('libcuflynx')
     if not req:
         raise ValueError('pyproject.toml has no [tool.cam_testing.release] libcuflynx requirement')
@@ -142,7 +142,7 @@ def build_asset(tag, out_dir, root=None, commit='HEAD'):
         raise ValueError(f'modules/{RENAMES_FILE} is not committed at {commit}')
     release = {'schema_version': 1, 'tag': tag, 'commit': commit,
                'repository': 'physiomelinks/circulatory-autogen-modules',
-               'libcuflynx': libcuflynx_requirement(root), 'files': len(files),
+               'libcuflynx': libcuflynx_requirement(root, commit), 'files': len(files),
                'sha256': {p: hashlib.sha256(files[p]).hexdigest() for p in sorted(files)}}
     files[RELEASE_FILE] = (json.dumps(release, indent=1) + '\n').encode()
     top = f'cam-modules-{tag}'

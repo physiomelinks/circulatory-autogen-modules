@@ -123,3 +123,24 @@ def test_asset_is_reproducible_and_complete(tmp_path):
             p = os.path.relpath(v.path(kind), ROOT)
             if committed(p):
                 assert p in files, f'{p} missing from the asset ({rel_dir})'
+
+
+def test_libcuflynx_requirement_is_the_built_commits(tmp_path):
+    '''The asset's libcuflynx requirement is read from the commit being built, not the working tree.'''
+    repo = tmp_path / 'r'
+    (repo / 'modules').mkdir(parents=True)
+    git = lambda *a: subprocess.run(['git', '-C', str(repo), *a], check=True, capture_output=True, text=True).stdout.strip()
+    git('init', '-q')
+    git('config', 'user.email', 't@t'); git('config', 'user.name', 't')
+    (repo / 'modules' / release.RENAMES_FILE).write_text('{}\n')
+    (repo / 'LICENSE').write_text('x\n')
+    (repo / 'pyproject.toml').write_text('[tool.cam_testing.release]\nlibcuflynx = ">=1.0.0"\n')
+    git('add', '-A'); git('commit', '-qm', 'one')
+    first = git('rev-parse', 'HEAD')
+    (repo / 'pyproject.toml').write_text('[tool.cam_testing.release]\nlibcuflynx = ">=2.0.0"\n')
+    git('commit', '-qam', 'two')
+    (repo / 'pyproject.toml').write_text('[tool.cam_testing.release]\nlibcuflynx = ">=9.0.0"\n')   # uncommitted
+    assert release.libcuflynx_requirement(str(repo), first) == '>=1.0.0'
+    assert release.libcuflynx_requirement(str(repo)) == '>=2.0.0'
+    _, _, rel = release.build_asset('v2026.11.0', str(tmp_path / 'out'), root=str(repo), commit=first)
+    assert rel['libcuflynx'] == '>=1.0.0' and rel['commit'] == first

@@ -31,6 +31,10 @@ jobs:
           git fetch origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
             echo "::error::$GITHUB_REF_NAME is not on main: tag a commit of main"; exit 1; }
+      - name: The tag is vYYYY.MM.N
+        env:
+          TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+        run: python -c "import os; from cam_testing.release import check_tag; check_tag(os.environ['TAG'])"
       # renames.json in step, the pairs libcuflynx writes itself, the asset reproducible
       - run: python -m pytest tests/test_release.py tests/test_structure.py
       - name: Build the asset
