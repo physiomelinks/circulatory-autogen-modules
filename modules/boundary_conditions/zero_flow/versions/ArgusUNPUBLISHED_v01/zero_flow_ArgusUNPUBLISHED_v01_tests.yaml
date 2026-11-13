@@ -1,5 +1,7 @@
 module_type: zero_flow
 version: ArgusUNPUBLISHED_v01
 reviewed: false
-notes: Moved from BG_modules.cellml, where it had no config entry (libcuflynx used it by name). Not in tools/restructure_map.yaml,
-  which maps config entries.
+notes: 'Moved from BG_modules.cellml, where it had no config entry (libcuflynx used it by name). Not in tools/restructure_map.yaml,
+  which maps config entries. Exit port (2026-11-14): a vessel_port (v_zero, u), so that circulatory_autogen''s models that
+  close a heart inlet with zero_flow (the 3compartment family) generate from this library; libcuflynx''s built-in zero_flow
+  (nn) had the port (v_zero, "") with no pressure, which the structure check does not allow. Unreviewed, so changed in place.'

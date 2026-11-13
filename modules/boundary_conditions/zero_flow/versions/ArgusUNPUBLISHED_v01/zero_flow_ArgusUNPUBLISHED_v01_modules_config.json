@@ -14,9 +14,17 @@
     "required_citations_uncertain": [
       "argus2026circulatory"
     ],
-    "notes": "A constant zero flow, v_zero. It has no port: a port of it would pair v_zero with a blank variable, which the library's structure check does not allow. libcuflynx's built-in zero_flow (nn) has that port, and is what a monolithic heart with one vena cava lists first among its vessel inputs.",
+    "notes": "A constant zero flow, v_zero, for closing a vessel port of a module that has more ports of a type than the model connects: listed in the module's inp_instances (or out_instances) in the place of the port to close, it takes that port (libcuflynx connects a module's single ports of one type in the order its neighbours are listed). Its vessel_port pairs v_zero with u, the pressure the closed module gives the port, which zero_flow takes and does not use. A monolithic heart with one vena cava lists it first among its vessel inputs, closing v_ivc.",
     "entrance_ports": [],
-    "exit_ports": [],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_zero",
+          "u"
+        ]
+      }
+    ],
     "general_ports": [],
     "variables_and_units": [
       [
@@ -24,6 +32,12 @@
         "m3_per_s",
         "access",
         "variable"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
       ]
     ]
   }
