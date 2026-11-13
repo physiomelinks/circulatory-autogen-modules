@@ -8,8 +8,10 @@ reference/, and a spec <model>_system.yaml. The model is generated with every mo
 (cam_testing.paths: this repo's modules/, then the extra ones), so its records may name versions of
 either. The reference is one of:
 
-  - circulatory_autogen's original: a module array (and parameters) under reference/, generated
-    with libcuflynx's bundled modules;
+  - circulatory_autogen's original: its module array (and parameters) under reference/, and the model
+    generated from them with libcuflynx's built-in modules, committed as reference/<model>.cellml
+    (python -m cam_testing.system write-reference, while libcuflynx still has its built-ins), and
+    simulated as a generated model;
   - a ready CellML model, simulated as it is (e.g. the flattened model PhLynx exports):
     equivalence.reference_cellml (a path relative to the system dir), or reference/<model>.cellml
     when reference/ holds no module array. Its outputs are "<component>/<variable>" for every
@@ -19,8 +21,8 @@ either. The reference is one of:
 The tests:
 
   system_run_test          the model generates with this library and runs; outputs finite
-  system_equivalence_test  the model reproduces its reference (circulatory_autogen's original, built
-                           with libcuflynx's bundled modules, or a ready CellML model): every
+  system_equivalence_test  the model reproduces its reference (circulatory_autogen's original, as
+                           committed CellML, or a ready CellML model): every
                            variable the reference logs,
                            mapped through equivalence.output_map (e.g. heart/u_lv -> lv/u),
                            agrees to equivalence.tol (normalised max difference) with both
@@ -104,7 +106,8 @@ def load_system(system_id):
 
 
 def generate(system, work_dir, reference=False, quiet=True):
-    '''Generates the model (or circulatory_autogen's original); returns the .cellml path.'''
+    '''Generates the model, or with reference=True circulatory_autogen's original from reference/ with
+    libcuflynx's built-in modules (write_reference); returns the .cellml path.'''
     from libcuflynx.scripts.script_generate_with_new_architecture import generate_with_new_architecture
     from cam_testing.harness import GenerationFailed
 
@@ -135,20 +138,51 @@ def generate(system, work_dir, reference=False, quiet=True):
 REFERENCE_CELLML_IGNORED_COMPONENTS = ('environment', 'global_parameters', 'instance_parameters')
 
 
+def has_original(system):
+    '''Whether reference/ holds circulatory_autogen's original (a module array).'''
+    ref = os.path.join(system.dir, 'reference')
+    return any(glob.glob(os.path.join(ref, f'*_module_array.{ext}')) for ext in ('json', 'csv'))
+
+
+def original_cellml_path(system):
+    '''Where circulatory_autogen's original is committed as generated CellML.'''
+    return os.path.join(system.dir, 'reference', f'{system.name}.cellml')
+
+
 def reference_cellml(system):
-    '''The ready CellML model the system model must reproduce, or None (its reference is a module array
-    to generate): equivalence.reference_cellml, else reference/<model>.cellml when reference/ has no
-    module array.'''
+    '''The CellML model the system model must reproduce, or None (it has no reference):
+    equivalence.reference_cellml, else reference/<model>.cellml (circulatory_autogen's original as
+    generated, when reference/ has its module array; else a ready CellML model).'''
     eq = system.spec.get('equivalence') or {}
     if eq.get('reference_cellml'):
         path = os.path.join(system.dir, eq['reference_cellml'])
         if not os.path.isfile(path):
             raise FileNotFoundError(f'equivalence.reference_cellml: no file {path}')
         return path
-    ref = os.path.join(system.dir, 'reference')
-    candidate = os.path.join(ref, f'{system.name}.cellml')
-    has_array = any(glob.glob(os.path.join(ref, f'*_module_array.{ext}')) for ext in ('json', 'csv'))
-    return candidate if os.path.isfile(candidate) and not has_array else None
+    candidate = original_cellml_path(system)
+    if os.path.isfile(candidate):
+        return candidate
+    if has_original(system):
+        raise FileNotFoundError(
+            f'{system.id}: reference/ has circulatory_autogen\'s module array but not the model generated from it, '
+            f'{candidate}: write it with python -m cam_testing.system write-reference {system.id} '
+            f'(needs a libcuflynx that still has its built-in modules)')
+    return None
+
+
+def write_reference(system, work_dir=None):
+    '''Generates circulatory_autogen's original (reference/'s module array and parameters) with
+    libcuflynx's built-in modules and writes it, flattened into one CellML file, to
+    reference/<model>.cellml; returns that path.'''
+    import shutil
+    if not has_original(system):
+        raise ValueError(f'{system.id}: reference/ has no module array to generate')
+    work_dir = work_dir or tempfile.mkdtemp(prefix=f'cam_reference_{system.name}_')
+    path = generate(system, work_dir, reference=True)
+    flat = path[:-len('.cellml')] + '_flat.cellml'
+    dst = original_cellml_path(system)
+    shutil.copy(flat, dst)
+    return dst
 
 
 def all_component_names(helper, ignore_components=REFERENCE_CELLML_IGNORED_COMPONENTS):
@@ -244,7 +278,9 @@ def equivalence(system, work_dir=None):
     solver_info = eq.get('solver_info') or {'rtol': 1e-10, 'atol': 1e-12}
     ref_path = reference_cellml(system)
     if ref_path is None:
-        ref_path = generate(system, work_dir, reference=True)
+        raise ValueError(f'{system.id} has no reference')
+    if not eq.get('reference_cellml') and has_original(system):
+        # circulatory_autogen's original, as generated: outputs named as the library model's
         t_ref, ref = simulate(ref_path, system.spec, solver_info)
     else:
         ignored = eq.get('ignore_components', REFERENCE_CELLML_IGNORED_COMPONENTS)
@@ -273,3 +309,28 @@ def save_result(system, test, status, message, metrics=None, details=None):
 def run_model(system, work_dir):
     path = generate(system, work_dir)
     return simulate(path, system.spec, system.spec.get('solver_info') or {})
+
+
+def main(argv=None):
+    import argparse
+    import sys
+    ap = argparse.ArgumentParser(prog='python -m cam_testing.system')
+    sub = ap.add_subparsers(dest='cmd', required=True)
+    w = sub.add_parser('write-reference', help="write reference/<model>.cellml from circulatory_autogen's original "
+                                               "(with libcuflynx's built-in modules)")
+    w.add_argument('systems', nargs='*', help='category/model or model; default: every system model with an original')
+    args = ap.parse_args(argv)
+    chosen = [load_system(s) for s in args.systems] or [s for s in system_models() if has_original(s)]
+    failed = 0
+    for s in chosen:
+        try:
+            path = write_reference(s)
+            print(f'{s.id}: wrote {path} ({os.path.getsize(path) / 1e3:.0f} kB)')
+        except Exception as e:
+            failed += 1
+            print(f'{s.id}: FAILED {type(e).__name__}: {str(e)[:500]}', file=sys.stderr)
+    return 1 if failed else 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

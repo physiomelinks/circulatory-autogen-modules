@@ -522,7 +522,7 @@ system_models/<category>/<model>/
   <model>_phlynx.png             a screenshot of the model's root canvas in PhLynx (optional; the page's figure)
   <model>_phlynx_nodes.json      each PhLynx node's instance and pixel box in that screenshot (with the png)
   <model>.html                   its page (generated)
-  reference/                     what it must reproduce (circulatory_autogen's original or a ready CellML model)
+  reference/                     what it must reproduce (circulatory_autogen's original, with <model>.cellml generated from it, or a ready CellML model)
   plots/  results/               written by the system tests (not committed)
 ```
 
