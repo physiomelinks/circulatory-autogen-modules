@@ -1,0 +1,10 @@
+module_type: varicosity
+version: sympathetic_monolithic_OLD
+reviewed: false
+notes: 'circulatory_autogen''s built-in SN_varicosity (nn), the varicosity of its SN_simple model (resources/SN_simple), with
+  its equations and component unchanged (component SN_varicosity_OLD; the generated model names it after the instance, so
+  results are unchanged). It is the model sympathetic_monolithic_v01 started from, before the review: epsilon_tau = 0.1 ms,
+  the owner''s c_RyR^3 hc_RyR^3 RyR, no PMCA, no geometry or temperature scaling. Kept so that circulatory_autogen''s SN_simple
+  and older module arrays naming SN_varicosity reproduce after the move to this library (renames.json maps SN_varicosity nn
+  here). Superseded by sympathetic_monolithic_v01; use that for new models. Default parameters: circulatory_autogen resources/SN_simple_parameters.json
+  (var_SN), with v01''s data_reference where the value is unchanged and the CA token ("SN_simple: <token>") otherwise.'

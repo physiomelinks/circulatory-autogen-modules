@@ -1,0 +1,11 @@
+module_type: soma
+version: sympathetic_monolithic_OLD
+reviewed: false
+notes: 'circulatory_autogen''s built-in SN_soma (nn), the soma of its SN_simple model (resources/SN_simple), with its equations
+  and component unchanged (component SN_soma_OLD; the generated model names it after the instance, so results are unchanged).
+  It is the model sympathetic_monolithic_v01 started from, before the review: epsilon_tau = 0.1 ms on every gating time constant,
+  the BK gating of the built-in (V_mid_m_BK 80.2 mV, z_BK to the first power), the owner''s c_RyR^3 hc_RyR^3 RyR, no PMCA,
+  a sub-membrane fraction c_SL of Vol, no geometry or temperature scaling. Kept so that circulatory_autogen''s SN_simple and
+  older module arrays naming SN_soma reproduce after the move to this library (renames.json maps SN_soma nn here). Superseded
+  by sympathetic_monolithic_v01; use that for new models. Default parameters: circulatory_autogen resources/SN_simple_parameters.json
+  (soma_SN), with v01''s data_reference where the value is unchanged and the CA token ("SN_simple: <token>") otherwise.'
