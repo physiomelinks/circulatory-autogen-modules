@@ -196,6 +196,8 @@ to `modules/version_renames.json` (`[{"from": [module_type, old version], "to": 
 version], "reason": "..."}]`, in order). `legacy_renames()` applies these last, following each old name
 (circulatory_autogen's included) to the newest, and `tests/test_structure.py` checks that every target
 exists, that no renamed-from version is left, and that each entry gives its reason.
+`modules/renames.json`, which libcuflynx reads, is written from `legacy_renames()`
+(`python -m cam_testing.release renames`; README "Releases"): rewrite it in the same module PR.
 
 ## Versions
 

@@ -1,0 +1,61 @@
+name: Release
+
+# A calendar tag vYYYY.MM.N on main publishes the module library's release asset (README "Releases"):
+# cam-modules-<tag>.tar.gz, the slim modules/ that libcuflynx fetches, and its .sha256. A manual run
+# builds the asset of a ref without publishing it (uploaded as a workflow artifact), to check it.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name to build the asset under (vYYYY.MM.N); nothing is published'
+        required: true
+        default: 'v2026.11.0'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - uses: ./.github/actions/setup
+      - name: The tag is on main
+        if: github.event_name == 'push'
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
+            echo "::error::$GITHUB_REF_NAME is not on main: tag a commit of main"; exit 1; }
+      # renames.json in step, the pairs libcuflynx writes itself, the asset reproducible
+      - run: python -m pytest tests/test_release.py tests/test_structure.py
+      - name: Build the asset
+        env:
+          TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+        run: python -m cam_testing.release asset "$TAG" --out-dir dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-asset
+          path: dist/
+      - name: Publish the release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          python - <<'EOF' > notes.md
+          import json, os, tarfile
+          tag = os.environ['TAG']
+          with tarfile.open(f'dist/cam-modules-{tag}.tar.gz') as t:
+              meta = json.load(t.extractfile(f'cam-modules-{tag}/cam_release.json'))
+          sha = open(f'dist/cam-modules-{tag}.tar.gz.sha256').read().split()[0]
+          print(f"Module library {tag} (commit {meta['commit']}): {meta['files']} files.\n")
+          print(f"Needs libcuflynx {meta['libcuflynx']}.\n")
+          print(f"sha256 of cam-modules-{tag}.tar.gz: `{sha}`")
+          EOF
+          gh release create "$TAG" dist/cam-modules-"$TAG".tar.gz dist/cam-modules-"$TAG".tar.gz.sha256 \
+            --title "$TAG" --notes-file notes.md --verify-tag

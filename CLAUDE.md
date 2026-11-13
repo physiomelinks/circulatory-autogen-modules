@@ -15,3 +15,10 @@ A PR is a **module PR**, a **migration PR** or another PR (README "Pull requests
 - During a module review walkthrough, put infrastructure fixes on their own branch as you go, not on the
   review branch. Check with `python tools/pr_scope.py "<title>" origin/main` before opening the PR; the
   `PR scope` workflow runs the same check.
+
+## Releases
+
+Releases are calendar tags `vYYYY.MM.N` on `main`, made by Finbar only; the tag publishes the slim
+module asset libcuflynx fetches (README "Releases"). A PR that adds a rename regenerates
+`modules/renames.json` (`python -m cam_testing.release renames`); one that makes the library need a
+newer libcuflynx raises `[tool.cam_testing.release] libcuflynx` in `pyproject.toml`.
