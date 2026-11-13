@@ -1044,7 +1044,10 @@ def test_system_model_has_a_reference_or_says_it_has_none(system):
                                          f'model) and the spec\'s equivalence does not say so (status: not_applicable)')
     # circulatory_autogen's original is compared as committed CellML: libcuflynx no longer has the
     # built-in modules it was generated with
-    known = (system.spec.get('expected_failures') or {}).get('system_equivalence_test')
-    if has_array and not has_cellml and not known and eq.get('status') not in ('not_applicable', 'skipped'):
+    from cam_testing import system as systems
+    if (has_array and not has_cellml and not systems.original_cannot_generate(system)
+            and eq.get('status') not in ('not_applicable', 'skipped')):
         pytest.fail(f'{system.id}: reference/ has circulatory_autogen\'s module array but not {system.name}.cellml, '
-                    f'the model generated from it: python -m cam_testing.system write-reference {system.id}')
+                    f'the model generated from it: python -m cam_testing.system write-reference {system.id} (or, when '
+                    f'circulatory_autogen cannot generate it, expected_failures.system_equivalence_test saying '
+                    f'"{systems.CANNOT_GENERATE} (<its error>)")')

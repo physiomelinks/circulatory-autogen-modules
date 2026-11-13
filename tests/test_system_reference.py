@@ -96,3 +96,14 @@ def test_equivalence_simulates_the_cellml_reference(tmp_path, monkeypatch):
     assert calls == [False]                          # only the library model is generated
     assert [(r['reference'], r['model'], r['ok']) for r in rows] == [('a/x', 'b/x', True)]
     assert missing == []
+
+
+@pytest.mark.parametrize('reason,ok', [
+    (f'no reference/m.cellml to compare with: {systems.CANNOT_GENERATE} (a mixed node)', True),
+    ('outputs differ by 1e-3: a deliberate fix in the library', False),
+    (None, False),
+])
+def test_only_a_cannot_generate_reason_excuses_a_missing_original_cellml(tmp_path, reason, ok):
+    spec = {'expected_failures': {'system_equivalence_test': reason}} if reason else {}
+    s = _system(tmp_path, spec, files=['reference/m_module_array.json'])
+    assert systems.original_cannot_generate(s) is ok

@@ -138,6 +138,18 @@ def generate(system, work_dir, reference=False, quiet=True):
 REFERENCE_CELLML_IGNORED_COMPONENTS = ('environment', 'global_parameters', 'instance_parameters')
 
 
+# How a spec's expected_failures.system_equivalence_test starts when circulatory_autogen cannot generate
+# the original, so it has no reference/<model>.cellml: '<prefix> (<circulatory_autogen's error>)'
+CANNOT_GENERATE = 'circulatory_autogen cannot generate the original'
+
+
+def original_cannot_generate(system):
+    '''Whether the spec says circulatory_autogen cannot generate the original (an expected failure of
+    system_equivalence_test whose reason says so), so reference/ has no CellML of it.'''
+    reason = (system.spec.get('expected_failures') or {}).get('system_equivalence_test') or ''
+    return CANNOT_GENERATE in reason
+
+
 def has_original(system):
     '''Whether reference/ holds circulatory_autogen's original (a module array).'''
     ref = os.path.join(system.dir, 'reference')
