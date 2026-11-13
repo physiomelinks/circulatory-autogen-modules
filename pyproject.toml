@@ -38,7 +38,7 @@ cam_testing = ["templates/*.html", "templates/*.js", "data/*.json", "data/rhea/*
 # the libcuflynx a release's modules need: written into the release asset's cam_release.json, which
 # libcuflynx checks (README "Releases"). Raise it when the library starts using a newer libcuflynx.
 [tool.cam_testing.release]
-libcuflynx = ">=0.8.0"
+libcuflynx = ">=1.0.0"
 
 [tool.cam_testing.manifests]
 "index.json" = ["vessels", "heart"]

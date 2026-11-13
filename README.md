@@ -301,7 +301,7 @@ checkout instead).
   be checked by rebuilding. A manual run of the workflow (`workflow_dispatch`) builds the asset of a
   branch as a workflow artifact without publishing it.
 - **The libcuflynx it needs.** `[tool.cam_testing.release] libcuflynx` in `pyproject.toml` (e.g.
-  `">=0.8.0"`) goes into `cam_release.json`, and libcuflynx refuses a release that needs a newer one.
+  `">=1.0.0"`) goes into `cam_release.json`, and libcuflynx refuses a release that needs a newer one.
   Raise it in the PR that makes the library depend on a newer libcuflynx (a new config key, a format
   change), to the first libcuflynx release that has it.
 - **Renames.** `modules/renames.json` lists every (module_type, module_subtype) the library no longer has
