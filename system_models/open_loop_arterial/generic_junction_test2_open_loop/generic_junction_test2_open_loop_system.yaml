@@ -18,4 +18,4 @@ notes: ['parameters: generic_junction_test_open_loop''s, as circulatory_autogen'
     is this model with its four mixed nodes lined up as the node rule (circulatory_autogen#616) requires']
 expected_failures:
   system_run_test: mixed node, see circulatory_autogen#616; generic_junction_test is the rule-following version
-  system_equivalence_test: mixed node, see circulatory_autogen#616; generic_junction_test is the rule-following version
+  system_equivalence_test: 'no reference/generic_junction_test2_open_loop.cellml to compare with: circulatory_autogen cannot generate the original (a mixed node, circulatory_autogen #616; generic_junction_test is the rule-following version)'
