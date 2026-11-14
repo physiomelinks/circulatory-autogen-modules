@@ -36,10 +36,26 @@ def test_renames_name_versions_the_library_has():
     index = library.version_index()
     doc = release.renames_document()
     assert doc['renames'], 'no renames'
-    missing = [r['to'] for r in doc['renames'] if tuple(r['to']) not in index]
+    missing = [r['to'] for r in doc['renames'] if r['to'] is not None and tuple(r['to']) not in index]
     assert not missing, f'renames to versions the library does not have: {missing}'
     still = [r['from'] for r in doc['renames'] if tuple(r['from']) in index]
     assert not still, f'renamed pairs the library still has (a name would mean two versions): {still}'
+
+
+def test_junction_entries_say_how_to_convert():
+    '''Every junction entry is for cuflynx-upgrade junctions; one with no replacement joins its
+    neighbours or says why there is none.'''
+    rows = [r for r in release.renames_document()['renames'] if r.get('by')]
+    assert rows
+    for row in rows:
+        assert row['by'] == release.JUNCTION_UPGRADE
+        if row['to'] is None:
+            assert row.get('join') or row.get('note'), row
+    junctions = release.junction_renames()
+    # a built-in that was renamed to a junction version is converted like that junction
+    renames = {tuple(r['from']): r for r in release.renames_document()['renames']}
+    assert renames[('Min_junction_2', 'vp_noI')]['to'] == junctions[('Min_junction', 'vp_noI_SI')]['to']
+    assert renames[('inlet_flow', 'nn_constant_2')]['split'] == junctions[('inlet_flow', 'constant_2')]['split']
 
 
 def test_builtin_same_maths_versions_keep_the_builtin_component():
