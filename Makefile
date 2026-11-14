@@ -21,7 +21,7 @@ else
 endif
 
 structure:
-	$(PYTHON) -m pytest tests/test_structure.py tests/test_pr_scope.py tests/test_ci_setup.py
+	$(PYTHON) -m pytest tests/test_structure.py tests/test_pr_scope.py tests/test_ci_setup.py tests/test_release.py
 
 # V&V tests, skipping slow calibration. MODULE=<module_type or path under modules/> runs those versions
 # (reviewed or not), e.g. MODULE=Lotka_Volterra, MODULE=heart (with cardiac_clock, chamber, valve) or MODULE=cell.

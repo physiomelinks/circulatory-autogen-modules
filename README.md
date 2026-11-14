@@ -282,6 +282,39 @@ The `PR scope` workflow (`tools/pr_scope.py`) fails a module PR that changes any
 
 `.github/workflows/module-tests.yml` runs the structural checks and then, per top-level directory of `modules/` (`vessels`, `heart`, `cell`, ...: a category, or a module_type directly under `modules/` with its nested module_types), one job per stage: `vv` (V&V tests), `pipeline` (PhLynx -> CUFLynx) and `omex` (CUFLynx archives). A stage with more work is split into shards of whole module_types, about ten minutes each (`ci/shards.json`; `cam_testing/shards.py` balances them by the per-module_type seconds in `ci/test_durations.json`, refreshed from the jobs' JUnit artifacts with `python -m cam_testing.shards durations <stage> junit-*.xml`; `python -m cam_testing.shards plan` shows the split). Locally, `PYTEST_ARGS="--shard 2/4 --shard-stage vv"` runs one shard. Each job uploads its results, and the site job builds every report from them. CI runs on pushes to `main` and on pull requests (a push to a PR branch runs once). **Only changed versions are tested:** each job runs with `--changed-only`, which skips a version whose fingerprint (its files, the versions it depends on through its test networks and submodules, the system models it reproduces, and the shared inputs: `cam_testing`, `tests/`, `requirements.txt`, the libcuflynx commit and, for the pipeline and archive stages, the PhLynx commit and CUFLynx binary) matches its last run in the ledger, and whose last outcome was a pass or a failure of a version not reviewed yet; a reviewed version that failed always runs again (`cam_testing/ledger.py`). The ledger and the last results of every version are cached by the site job, which builds every report from them with this run's results on top. The weekly scheduled run, and a manual run with `full: true`, test every version and refresh the ledger. `python -m cam_testing.ledger status vv --module cell` shows what would run. The setup (apt packages in `ci/apt-packages.txt`, then `requirements.txt` with `ci/constraints.txt` in a virtualenv) is cached under a key of the runner image, Python, the setup files and the commit libcuflynx's branch points to (`ci/setup_key.sh`); every Python package is pinned (`ci/constraints.txt`; refresh it with `pip freeze` in a fresh virtualenv, which also rebuilds the cache); the `setup-check` job installs everything fresh and compares it with the cached setup (`ci/setup_check.sh`): a Python package that differs fails, an apt package that differs (an Ubuntu update to a system library) is a warning; failures of versions not reviewed yet are warnings (`tools/ci_reviewed_failures.py`, over the V&V, PhLynx -> CUFLynx pipeline and CUFLynx archive tests). On `main`, the site is assembled and deployed to GitHub Pages (enable Pages with source "GitHub Actions" in the repository settings). The same `make` targets run locally.
 
+## Releases
+
+libcuflynx gets its modules from a release of this library: each libcuflynx release pins one release
+tag and downloads that release's asset on first use (a user may point `module_library_dirs` at a
+checkout instead).
+
+- **Tags** are calendar tags `vYYYY.MM.N` on `main` (`v2026.11.0`, then `v2026.11.1`, ...; N restarts
+  at 0 each month). Finbar tags: when libcuflynx needs the modules on `main`, or when a module PR lands
+  that users should get. Tag a commit whose CI passed: `git tag v2026.11.0 <commit> && git push origin v2026.11.0`.
+- **The asset.** The tag starts `.github/workflows/release.yml`, which checks the tag is on `main`, runs
+  `tests/test_release.py` and `tests/test_structure.py`, builds `cam-modules-<tag>.tar.gz` and its
+  `.sha256` (`python -m cam_testing.release asset <tag>`), and publishes them as the GitHub release. The
+  asset is `modules/` without the test specs (`*_tests.yaml`, `*_verification_config.json`), reports,
+  figures, risk analyses, proposed citations and Markdown, plus `manifests/`, `LICENSE` and
+  `cam_release.json` (tag, commit, the libcuflynx it needs and every file's sha256), under one directory
+  `cam-modules-<tag>/`. The same commit always builds the same bytes, so the sha256 libcuflynx pins can
+  be checked by rebuilding. A manual run of the workflow (`workflow_dispatch`) builds the asset of a
+  branch as a workflow artifact without publishing it.
+- **The libcuflynx it needs.** `[tool.cam_testing.release] libcuflynx` in `pyproject.toml` (e.g.
+  `">=1.0.0"`) goes into `cam_release.json`, and libcuflynx refuses a release that needs a newer one.
+  Raise it in the PR that makes the library depend on a newer libcuflynx (a new config key, a format
+  change), to the first libcuflynx release that has it.
+- **Renames.** `modules/renames.json` lists every (module_type, module_subtype) the library no longer has
+  (circulatory_autogen's built-in modules and versions renamed since) and the version that replaces it,
+  from `cam_testing.library.legacy_renames()`. libcuflynx reads it to name the replacement of an old
+  name. Rewrite it with `python -m cam_testing.release renames` whenever a rename is added
+  (`tests/test_release.py` fails until it is in step). Built-ins whose maths the library's version of
+  the same name has changed since map to versions that keep the built-in's maths
+  (`library.BUILTIN_SAME_MATHS`, e.g. `SN_soma nn` -> `soma sympathetic_monolithic_OLD`), so a model
+  that names a built-in gives the same results after renaming alone.
+- **Names libcuflynx writes itself** (`FV1D_vessel` vp/pv/vv/nn, `FV1D_solver` nn, `FV1D_volume_sum` nn,
+  the module_type `coupler`) must stay: `tests/test_release.py` checks them.
+
 ## Importing from libcuflynx
 
 `tools/import_from_libcuflynx.py --ca-dir ../circulatory_autogen` copies modules from a libcuflynx checkout into the pre-versions per-module layout and extracts each module's units; `tools/restructure_modules.py` then moves such a tree into versions and parameterisations (then called instances; driven by `tools/restructure_map.yaml`). It seeds parameter values from libcuflynx's example models. It never overwrites a module's test spec, and it only overwrites the parameters with `--reseed-parameters`.
