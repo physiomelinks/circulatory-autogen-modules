@@ -22,6 +22,10 @@
         "variables": [
           "v_in",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -37,6 +41,10 @@
         "variables": [
           "v_out",
           "u_d"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -52,13 +60,6 @@
         ]
       },
       {
-        "port_type": "radius_0_and_s_port",
-        "variables": [
-          "r_0",
-          "r"
-        ]
-      },
-      {
         "port_type": "stiffness_port",
         "variables": [
           "K_tube"
@@ -68,6 +69,12 @@
         "port_type": "volume_port",
         "variables": [
           "q"
+        ]
+      },
+      {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
         ]
       }
     ],

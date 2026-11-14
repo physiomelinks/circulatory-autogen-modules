@@ -185,3 +185,24 @@ def test_sweep_skips_out_of_range(tmp_path, monkeypatch):
     skipped = {(s['parameter'], s['value']) for s in r.metrics['skipped_out_of_range']}
     assert skipped == {('h_init', 1.8), ('b', 0.5)}
     assert r.metrics['n_runs'] == 4
+
+
+# ---- test-network parameters --------------------------------------------------------------------
+
+def test_network_parameters_have_python_names(tmp_path, monkeypatch):
+    '''A test-network parameter vin/v is named v_vin, as in the generated model: invariants evaluate it,
+    and a sweep may name it either way.'''
+    comp = _component(tmp_path, [_param('R', 'Js_per_m6', 2.0)], {})
+    network = {'parameters': [['vin/v', 'm3_per_s', 3.0, 'inflow'], ['vin/P', 'J_per_m3', 0, 'unused']]}
+    monkeypatch.setattr(checks.harness, 'network', lambda component, network_of: network)
+    cm = object.__new__(checks.ComponentModel)
+    cm.component, cm._network_of, cm._raw_params, cm._params = comp, None, comp.parameters(), None
+    assert cm.resolve('vin/v') == 'v_vin' and cm.resolve('v_vin') == 'v_vin' and cm.resolve('R') == 'R'
+    assert cm.nominal['v_vin'] == 3.0 and 'vin/v' not in cm.nominal
+    env = cm.param_env()
+    assert env['v_vin'] == 3.0 and env['P_vin'] == 0.0
+    assert cm.param_env({'v_vin': 5.0})['v_vin'] == 5.0
+    assert cm.param_env({'vin/v': 7.0})['v_vin'] == 7.0
+    spec = {'invariants': [{'expr': 'np.allclose(v, v_vin)'}]}
+    t = np.linspace(0, 1, 3)
+    assert checks._check_invariants(spec, t, {'v': np.full(3, 3.0)}, env) == []

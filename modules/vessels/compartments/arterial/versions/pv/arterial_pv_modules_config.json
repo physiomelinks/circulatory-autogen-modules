@@ -37,6 +37,10 @@
         "variables": [
           "v_out",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -61,6 +65,13 @@
         "port_type": "volume_port",
         "variables": [
           "q"
+        ]
+      },
+      {
+        "port_type": "pressure_and_deriv_port",
+        "variables": [
+          "u",
+          "du_C_dt"
         ]
       }
     ],
@@ -190,6 +201,12 @@
         "m3_per_s",
         "access",
         "boundary_condition"
+      ],
+      [
+        "du_C_dt",
+        "J_per_m3s",
+        "access",
+        "variable"
       ]
     ]
   }
