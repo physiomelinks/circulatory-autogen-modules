@@ -6,33 +6,36 @@ notes: 'vein (pp) entry of this config that points at the BG library type pp_sim
   R_v = 0.01/C. I is declared in the config but has no value yet (TODO, see expected_failures), so the component cannot run.
   Geometry-free (R, C, q_0 given directly). Invariants (volume balance, pressure law) verified on a patched copy with I given
   a value. After that fix the entry is still extremely stiff: I/R ~ 1.3e-03 s (with I = rho l/(pi r^2)) against a relaxation
-  time (R + 0.01/C) C ~ 0.011 s, so explicit fixed-step schemes (timestep test) are not practical; the _micro types (no inertance)
-  are the natural choice for microvessels.'
+  time (R + 0.01/C) C ~ 0.011 s, so explicit fixed-step schemes (timestep test) are not practical; the *_noI micro versions (no inertance, CAM #73) are the natural choice for microvessels.'
 expected_failures:
-  run_test: 'module defect, open question: the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du -
-    R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO and no source
-    gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx: "Missing parameter
-    values: mod.I").'
-  verification_test_invariants: 'module defect, open question: the BG type pp_simple_type this version uses has an inertance
-    I (dv/dt = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has
-    I = TODO and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO";
-    PhLynx: "Missing parameter values: mod.I").'
-  verification_test_BC: 'module defect, open question: the BG type pp_simple_type this version uses has an inertance I (dv/dt
-    = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO
-    and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx:
-    "Missing parameter values: mod.I").'
-  verification_test_timestep: 'module defect, open question: the BG type pp_simple_type this version uses has an inertance
-    I (dv/dt = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has
-    I = TODO and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO";
-    PhLynx: "Missing parameter values: mod.I").'
-  stability_test: 'module defect, open question: the BG type pp_simple_type this version uses has an inertance I (dv/dt =
-    (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO and
-    no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx: "Missing
-    parameter values: mod.I").'
-  phlynx_export_test: 'module defect, open question: the BG type pp_simple_type this version uses has an inertance I (dv/dt
-    = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO
-    and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx:
-    "Missing parameter values: mod.I").'
+  run_test: 'the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared in variables_and_units
+    but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar, 2026-11-15): no value
+    is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels. This test is skipped,
+    not failed: the harness skips it ("parameters still TODO"), so this entry is not reached unless I gets a value.'
+  verification_test_invariants: 'the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is
+    declared in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision
+    (Finbar, 2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for
+    microvessels. This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached
+    unless I gets a value.'
+  verification_test_BC: 'the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared
+    in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar,
+    2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels.
+    This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached unless I
+    gets a value.'
+  verification_test_timestep: 'the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is
+    declared in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision
+    (Finbar, 2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for
+    microvessels. This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached
+    unless I gets a value.'
+  stability_test: 'the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared in
+    variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar,
+    2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels.
+    This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached unless I
+    gets a value.'
+  phlynx_export_test: 'the BG type pp_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared
+    in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar,
+    2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels.
+    The PhLynx export fails ("Missing parameter values: mod.I"); this test fails into this entry.'
 reference_proposals:
   R:
     reference: 'unreferenced_placeholder; derived for the test from the proposed vein geometry: R = 8 mu l/(pi r_0^4) (Poiseuille,
@@ -58,8 +61,7 @@ reference_proposals:
     sourced: 'no'
     value: 1333.0
   I:
-    reference: 'unreferenced_placeholder; inertance, declared in the config with no value yet (open question): I = rho l/(pi
-      r_0^2) for the proposed geometry was proposed in review'
+    reference: 'unreferenced_placeholder; inertance, declared in the config with no value and no source; the *_noI micro versions in CAM #73 have no inertance'
     sourced: 'no'
   u_in:
     reference: unreferenced_placeholder; isolated-test boundary value (u_0 + 150 Pa); in a network it is supplied by the neighbouring
