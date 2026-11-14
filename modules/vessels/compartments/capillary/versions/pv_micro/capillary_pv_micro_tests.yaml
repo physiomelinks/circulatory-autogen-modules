@@ -6,35 +6,33 @@ notes: 'capillary (pv) entry of this config that points at the BG library type p
   R_v = 0.01/C. I is declared in the config but has no value yet (TODO, see expected_failures), so the component cannot run.
   Geometry-free (R, C, q_0 given directly). Invariants (volume balance, pressure law) verified on a patched copy with I given
   a value. After that fix the entry is still extremely stiff: I/R ~ 5.2e-07 s (with I = rho l/(pi r^2)) against a relaxation
-  time (R + 0.01/C) C ~ 0.15 s, so explicit fixed-step schemes (timestep test) are not practical; the *_noI micro versions (no inertance, CAM #73) are the natural choice for microvessels.'
+  time (R + 0.01/C) C ~ 0.15 s, so explicit fixed-step schemes (timestep test) are not practical; its inertance-free twin capillary/pv_micro_noI_visco (CAM #30) is the natural choice for microvessels.'
 expected_failures:
   run_test: 'the BG type pv_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared in variables_and_units
     but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar, 2026-11-15): no value
-    is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels. This test is skipped,
+    is given to I; its inertance-free twin capillary/pv_micro_noI_visco (CAM #30, valid once #30 merges) replaces this version for microvessels. This test is skipped,
     not failed: the harness skips it ("parameters still TODO"), so this entry is not reached unless I gets a value.'
   verification_test_invariants: 'the BG type pv_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is
     declared in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision
-    (Finbar, 2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for
-    microvessels. This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached
+    (Finbar, 2026-11-15): no value is given to I; its inertance-free twin capillary/pv_micro_noI_visco (CAM #30, valid once #30 merges) replaces this version for microvessels. This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached
     unless I gets a value.'
   verification_test_BC: 'the BG type pv_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared
     in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar,
-    2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels.
+    2026-11-15): no value is given to I; its inertance-free twin capillary/pv_micro_noI_visco (CAM #30, valid once #30 merges) replaces this version for microvessels.
     This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached unless I
     gets a value.'
   verification_test_timestep: 'the BG type pv_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is
     declared in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision
-    (Finbar, 2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for
-    microvessels. This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached
+    (Finbar, 2026-11-15): no value is given to I; its inertance-free twin capillary/pv_micro_noI_visco (CAM #30, valid once #30 merges) replaces this version for microvessels. This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached
     unless I gets a value.'
   stability_test: 'the BG type pv_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared in
     variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar,
-    2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels.
+    2026-11-15): no value is given to I; its inertance-free twin capillary/pv_micro_noI_visco (CAM #30, valid once #30 merges) replaces this version for microvessels.
     This test is skipped, not failed: the harness skips it ("parameters still TODO"), so this entry is not reached unless I
     gets a value.'
   phlynx_export_test: 'the BG type pv_simple_type this version uses has an inertance I (dv/dt = (du - R v)/I). I is declared
     in variables_and_units but has no value: the default parameterisation has I = TODO and no source gives one. Decision (Finbar,
-    2026-11-15): no value is given to I; the no-inertance *_noI micro versions in CAM #73 replace this version for microvessels.
+    2026-11-15): no value is given to I; its inertance-free twin capillary/pv_micro_noI_visco (CAM #30, valid once #30 merges) replaces this version for microvessels.
     The PhLynx export fails ("Missing parameter values: mod.I"); this test fails into this entry.'
 reference_proposals:
   R:
@@ -62,7 +60,7 @@ reference_proposals:
     sourced: 'yes'
     value: 2590.0
   I:
-    reference: 'unreferenced_placeholder; inertance, declared in the config with no value and no source; the *_noI micro versions in CAM #73 have no inertance'
+    reference: 'unreferenced_placeholder; inertance, declared in the config with no value and no source; its twin capillary/pv_micro_noI_visco (CAM #30) has no inertance'
     sourced: 'no'
   u_in:
     reference: unreferenced_placeholder; isolated-test boundary value (u_0 + 1500 Pa); in a network it is supplied by the
