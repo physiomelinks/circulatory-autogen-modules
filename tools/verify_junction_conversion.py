@@ -193,12 +193,12 @@ def cmd_compare(before_dir, after_dir, markdown, only=()):
             continue
         try:
             ratio, state, n = rhs_difference(b['cellml'], a['cellml'])
-            row.update(rhs_ratio=ratio, rhs_state=state, states=n, rhs_ok=ratio <= RHS_TOL)
+            row.update(rhs_ratio=float(ratio), rhs_state=state, states=n, rhs_ok=bool(ratio <= RHS_TOL))
         except Exception as e:
             row.update(rhs_ok=False, rhs_error=str(e)[-300:])
         try:
             d, worst, compared, missing, tol = trajectories(b['cellml'], a['cellml'], specs.get(name, {}))
-            row.update(traj_max_rel=d, traj_worst=worst, compared=compared, missing=len(missing),
+            row.update(traj_max_rel=float(d), traj_worst=worst, compared=compared, missing=len(missing),
                        missing_examples=missing[:4], traj_tol=tol)
         except Exception as e:
             row.update(traj_error=str(e)[-300:])
