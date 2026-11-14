@@ -49,10 +49,12 @@
   "validation": {
     "default": {
       "baseline": {
-        "status": "not_applicable",
-        "reason": "cannot be generated until its u_in port variable is declared (known issue)"
+        "status": "pending",
+        "reason": "a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: fitted three-element Windkessel values and input impedance of the systemic circulation (e.g. Stergiopulos et al. 1999) (proposal only, not set up)."
       },
-      "calibrate": {"note": "not_applicable: cannot be generated until its u_in port variable is declared (known issue)"}
+      "calibrate": {
+        "note": "pending: a single vessel under constant boundary conditions has no measured counterpart; validation needs a network assembled from these modules. Candidate: fitted three-element Windkessel values and input impedance of the systemic circulation (e.g. Stergiopulos et al. 1999) (proposal only, not set up)."
+      }
     }
   }
 }
