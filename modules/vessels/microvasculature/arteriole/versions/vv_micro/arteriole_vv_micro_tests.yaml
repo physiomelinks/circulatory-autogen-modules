@@ -11,33 +11,27 @@ notes: 'arteriole (vv) entry of this config that points at the BG library type v
 expected_failures:
   run_test: 'module defect, open question: the BG type vv_simple_type this version uses has an inertance I (dv/dt = (du -
     R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO and no source
-    gives one. Review question: give I a value (e.g. rho l/(pi r_0^2) for the proposed geometry), or point the version at
-    the _micro type without inertance. Until then the version cannot be built ("parameters still TODO"; PhLynx: "Missing parameter
+    gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx: "Missing parameter
     values: mod.I").'
   verification_test_invariants: 'module defect, open question: the BG type vv_simple_type this version uses has an inertance
     I (dv/dt = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has
-    I = TODO and no source gives one. Review question: give I a value (e.g. rho l/(pi r_0^2) for the proposed geometry), or
-    point the version at the _micro type without inertance. Until then the version cannot be built ("parameters still TODO";
+    I = TODO and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO";
     PhLynx: "Missing parameter values: mod.I").'
   verification_test_BC: 'module defect, open question: the BG type vv_simple_type this version uses has an inertance I (dv/dt
     = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO
-    and no source gives one. Review question: give I a value (e.g. rho l/(pi r_0^2) for the proposed geometry), or point the
-    version at the _micro type without inertance. Until then the version cannot be built ("parameters still TODO"; PhLynx:
+    and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx:
     "Missing parameter values: mod.I").'
   verification_test_timestep: 'module defect, open question: the BG type vv_simple_type this version uses has an inertance
     I (dv/dt = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has
-    I = TODO and no source gives one. Review question: give I a value (e.g. rho l/(pi r_0^2) for the proposed geometry), or
-    point the version at the _micro type without inertance. Until then the version cannot be built ("parameters still TODO";
+    I = TODO and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO";
     PhLynx: "Missing parameter values: mod.I").'
   stability_test: 'module defect, open question: the BG type vv_simple_type this version uses has an inertance I (dv/dt =
     (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO and
-    no source gives one. Review question: give I a value (e.g. rho l/(pi r_0^2) for the proposed geometry), or point the version
-    at the _micro type without inertance. Until then the version cannot be built ("parameters still TODO"; PhLynx: "Missing
+    no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx: "Missing
     parameter values: mod.I").'
   phlynx_export_test: 'module defect, open question: the BG type vv_simple_type this version uses has an inertance I (dv/dt
     = (du - R v)/I). I is declared in variables_and_units, but it has no value: the default parameterisation has I = TODO
-    and no source gives one. Review question: give I a value (e.g. rho l/(pi r_0^2) for the proposed geometry), or point the
-    version at the _micro type without inertance. Until then the version cannot be built ("parameters still TODO"; PhLynx:
+    and no source gives one. Decision (Finbar, 2026-11-15): no value is given to I; use the no-inertance *_noI micro versions that come with the junction-removal redo. Until then the version cannot be built ("parameters still TODO"; PhLynx:
     "Missing parameter values: mod.I").'
 reference_proposals:
   R:
