@@ -61,7 +61,7 @@ def test_junction_entries_say_how_to_convert():
 def test_builtin_same_maths_versions_keep_the_builtin_component():
     '''The versions BUILTIN_SAME_MATHS maps circulatory_autogen's built-ins to are where renames.json
     sends them, and each is a version of its own (its component named <built-in>_OLD).'''
-    renames = {tuple(r['from']): tuple(r['to']) for r in release.renames_document()['renames']}
+    renames = {tuple(r['from']): tuple(r['to']) for r in release.renames_document()['renames'] if r['to']}
     index = library.version_index()
     for old, new in library.BUILTIN_SAME_MATHS.items():
         assert renames[old] == new
