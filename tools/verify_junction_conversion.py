@@ -163,11 +163,18 @@ def trajectories(original_path, new_path, spec):
     ignore.update({n: 'numbered junction port flow' for n in before if n not in mapping})
     rows, missing = compare(before, after, mapping, float(eq.get('tol', TRAJ_TOL)), ignore=ignore,
                             wrapped=eq.get('wrapped'), reciprocal=eq.get('reciprocal'))
+    # states are continuous: their worst difference is not moved by where CVODE puts its steps
+    # around a valve event, which can change a discontinuous output (an indicator, a valve's L)
+    # by O(1) at one sample
+    import myokit
+    states = {v.qname().replace('_module.', '/') for v in _myokit_model(original_path, solver_info).states()}
+    state_rows = [r for r in rows if r['reference'] in states]
+    state_worst = max((r['difference'] for r in state_rows), default=0.0)
     worst = max(rows, key=lambda r: r['difference']) if rows else None
     compared = len(rows)
     worst_name = worst['reference'] if worst else None
     worst = worst['difference'] if worst else 0.0
-    return worst, worst_name, compared, missing, float(eq.get('tol', TRAJ_TOL))
+    return worst, worst_name, compared, missing, float(eq.get('tol', TRAJ_TOL)), state_worst
 
 
 def cmd_compare(before_dir, after_dir, markdown, only=()):
@@ -192,8 +199,8 @@ def cmd_compare(before_dir, after_dir, markdown, only=()):
         except Exception as e:
             row.update(rhs_ok=False, rhs_error=str(e)[-300:])
         try:
-            d, worst, compared, missing, tol = trajectories(b['cellml'], a['cellml'], specs.get(name, {}))
-            row.update(traj_max_rel=float(d), traj_worst=worst, compared=compared, missing=len(missing),
+            d, worst, compared, missing, tol, state_worst = trajectories(b['cellml'], a['cellml'], specs.get(name, {}))
+            row.update(traj_max_rel=float(d), traj_states_max_rel=float(state_worst), traj_worst=worst, compared=compared, missing=len(missing),
                        missing_examples=missing[:4], traj_tol=tol)
         except Exception as e:
             row.update(traj_error=str(e)[-300:])
@@ -203,15 +210,16 @@ def cmd_compare(before_dir, after_dir, markdown, only=()):
     with open(os.path.join(after_dir, 'comparison.json' if not only else 'comparison_some.json'), 'w') as f:
         json.dump(rows, f, indent=1)
     if markdown:
-        print('| system | states | RHS worst / noise | trajectories max rel diff (tol) | outputs compared | result |')
-        print('|---|---|---|---|---|---|')
+        print('| system | states | RHS worst / noise | trajectories: all outputs (tol) | states only | worst output | result |')
+        print('|---|---|---|---|---|---|---|')
         for r in rows:
             if 'rhs_ratio' in r or 'rhs_error' in r:
                 rhs = f'{r["rhs_ratio"]:.3g} ({r["rhs_state"]})' if 'rhs_ratio' in r else r['rhs_error'][:60]
                 traj = f'{r["traj_max_rel"]:.2e} ({r["traj_tol"]:g})' if 'traj_max_rel' in r else r.get('traj_error', '')[:60]
-                print(f'| {r["system"]} | {r.get("states", "")} | {rhs} | {traj} | {r.get("compared", "")} | {r["result"]} |')
+                states = f'{r["traj_states_max_rel"]:.2e}' if 'traj_states_max_rel' in r else ''
+                print(f'| {r["system"]} | {r.get("states", "")} | {rhs} | {traj} | {states} | {r.get("traj_worst") or ""} | {r["result"]} |')
             else:
-                print(f'| {r["system"]} | | | | | {r["result"]} |')
+                print(f'| {r["system"]} | | | | | | {r["result"]} |')
 
 
 def main(argv=None):
