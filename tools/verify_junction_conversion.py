@@ -119,9 +119,13 @@ def rhs_difference(original_path, new_path, times=(0.05, 0.3, 0.6, 0.9)):
     rng = np.random.default_rng(0)
     sim = myokit.Simulation(original)
     sim.set_tolerance(1e-12, 1e-10)
-    worst, worst_state = 0.0, None
+    worst, worst_state, evaluated = 0.0, None, 0
     for t in times:
-        sim.run(t - sim.time(), log=myokit.LOG_NONE)
+        try:
+            sim.run(t - sim.time(), log=myokit.LOG_NONE)
+        except myokit.SimulationError:
+            break   # the original stops here at these tolerances: compare at the states reached
+        evaluated += 1
         x_o = np.array(sim.state())
         x_n = np.zeros(len(x_o))
         for k, i in index_o.items():
@@ -137,6 +141,8 @@ def rhs_difference(original_path, new_path, times=(0.05, 0.3, 0.6, 0.9)):
             ratio = abs(d_o[i] - d_n[index_n[k]]) / floor
             if ratio > worst:
                 worst, worst_state = ratio, k
+    if not evaluated:
+        raise RuntimeError(f'the original does not reach t = {times[0]} at rtol 1e-10')
     return worst, worst_state, len(index_o)
 
 
@@ -169,12 +175,14 @@ def trajectories(original_path, new_path, spec):
     return worst, worst_name, compared, missing, float(eq.get('tol', TRAJ_TOL))
 
 
-def cmd_compare(before_dir, after_dir, markdown):
+def cmd_compare(before_dir, after_dir, markdown, only=()):
     before = json.load(open(os.path.join(before_dir, 'status.json')))
     after = json.load(open(os.path.join(after_dir, 'status.json')))
     specs = {s.name: s.spec for s in system_models()}
     rows = []
     for name in sorted(set(before) | set(after)):
+        if only and name not in only:
+            continue
         b, a = before.get(name), after.get(name)
         row = {'system': name}
         if not b or not a or not b['ok'] or not a['ok']:
@@ -197,7 +205,7 @@ def cmd_compare(before_dir, after_dir, markdown):
         row['result'] = 'equivalent' if row.get('rhs_ok') else 'DIFFERS'
         rows.append(row)
         print(json.dumps(row), flush=True)
-    with open(os.path.join(after_dir, 'comparison.json'), 'w') as f:
+    with open(os.path.join(after_dir, 'comparison.json' if not only else 'comparison_some.json'), 'w') as f:
         json.dump(rows, f, indent=1)
     if markdown:
         print('| system | states | RHS worst / noise | trajectories max rel diff (tol) | outputs compared | result |')
@@ -221,11 +229,12 @@ def main(argv=None):
     c.add_argument('before_dir')
     c.add_argument('after_dir')
     c.add_argument('--markdown', action='store_true')
+    c.add_argument('systems', nargs='*', help='only these systems')
     args = parser.parse_args(argv)
     if args.cmd == 'generate':
         cmd_generate(os.path.abspath(args.out_dir), args.systems)
     else:
-        cmd_compare(args.before_dir, args.after_dir, args.markdown)
+        cmd_compare(args.before_dir, args.after_dir, args.markdown, args.systems)
 
 
 if __name__ == '__main__':
