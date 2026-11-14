@@ -34,7 +34,7 @@ import tempfile
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from cam_testing.system import generate, simulate, system_models  # noqa: E402
+from cam_testing.system import compare, generate, simulate, system_models  # noqa: E402
 
 SOLVER_INFO = {'rtol': 1e-10, 'atol': 1e-12}
 RHS_TOL = 100.0     # a difference of up to this many times the rounding noise is rounding
@@ -157,21 +157,16 @@ def trajectories(original_path, new_path, spec):
             continue
         mapping[name] = f'{inst}/{RENAMED.get(var, var)}'
     _, after = simulate(new_path, spec, solver_info, names=sorted(set(mapping.values())))
-    worst, worst_name, compared, missing = 0.0, None, 0, []
-    for name, target in mapping.items():
-        if name.endswith('/t') or target not in after:
-            if not name.endswith('/t'):
-                missing.append(name)
-            continue
-        r, n = before[name], after[target]
-        if r.shape != n.shape:
-            d = np.inf
-        else:
-            scale = max(float(np.max(np.abs(r))), float(np.ptp(r)), 1e-300)
-            d = float(np.max(np.abs(r - n)) / scale)
-        compared += 1
-        if not np.isfinite(d) or d > worst:
-            worst, worst_name = d, name
+    # as the system equivalence test compares: the spec's ignore, wrapped and reciprocal outputs
+    ignore = dict(eq.get('ignore') or {})
+    ignore.update({n: 'time' for n in before if n.endswith('/t')})
+    ignore.update({n: 'numbered junction port flow' for n in before if n not in mapping})
+    rows, missing = compare(before, after, mapping, float(eq.get('tol', TRAJ_TOL)), ignore=ignore,
+                            wrapped=eq.get('wrapped'), reciprocal=eq.get('reciprocal'))
+    worst = max(rows, key=lambda r: r['difference']) if rows else None
+    compared = len(rows)
+    worst_name = worst['reference'] if worst else None
+    worst = worst['difference'] if worst else 0.0
     return worst, worst_name, compared, missing, float(eq.get('tol', TRAJ_TOL))
 
 
