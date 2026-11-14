@@ -9,7 +9,7 @@
   "outputs": ["u", "v", "q_C", "q_0", "q", "R", "C", "u_C", "du_C_dt"],
   "harness": {
     "module_array": [
-      ["mod", "pv_micro", "vein_Nout", "", "vout", "default"],
+      ["mod", "pv_micro_noI", "vein", "", "vout", "default"],
       ["vout", "constant_flow_port", "outlet_flow", "mod", "", "default"]
     ],
     "parameters": [
