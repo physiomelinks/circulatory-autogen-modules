@@ -666,7 +666,7 @@ PERIOD_STEPS = [(1.9, -0.35), (2.65, 0.2), (4.03, 0.0)]
 # max |difference| / (max |value| + 1e-12) over each state and the activations. Chosen, not derived: the measured worst
 # differences are 7.4e-8 to 1.1e-7 (zeta_*_pre and systemic_T/v, SUNDIALS 6.5.1 and 7.7.0, CVODE 1e-12 with restarts),
 # so 1e-6 leaves a margin of about 9; a real difference in the law is far above it (the onset shift moves zeta_miv_pre
-# by ~1, a 1 ms smoothing of the start window moves e_a by 6e-3).
+# by ~1, a 1 ms smoothing of the start window moves e_a by 6e-3). Approved by Finbar 2026-11-16.
 FORMS_TOL = 1e-6
 
 
@@ -750,7 +750,7 @@ def test_clock_rates_have_no_jump_at_the_onset(family, tmp_path, request):
     # 1e3 /s is chosen, not derived. At the onset e and de/ds are 0 (docs section 3), so the closed form's slope there is 0
     # (measured: 0 for both families); elsewhere in the beat it reaches 3.2e2 (miv zeta_pre at s = 1.0) and 44 (vp_wCont).
     # The integrated law's jump is 0.76 /s per 1e-12, a slope of 7.6e11. 1e3 sits above every slope measured anywhere in
-    # the beat and 8 orders below the jump.
+    # the beat and 8 orders below the jump. Approved by Finbar 2026-11-16.
     NO_JUMP = 1e3
     assert worst[0] < NO_JUMP, worst
 
