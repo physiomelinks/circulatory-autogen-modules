@@ -261,12 +261,15 @@ make structure                               # static checks
 make test MODULE=Lotka_Volterra              # V&V tests for one module_type and those nested in it (MODULE=cell: a category; make test: all)
 make test-all MODULE=Lotka_Volterra          # including slow calibration
 make systems                                 # system models + supermodule versions
+make heart-clock                             # the cardiac clocks' phase from the beat phase (docs/heart/cardiac_clock_phase.md)
 make risk MODULE=Lotka_Volterra              # joint failure-risk analysis (on request)
 make report MODULE=Lotka_Volterra            # -> modules/benchmarks/Lotka_Volterra/Lotka_Volterra.html + version pages
 make serve                                   # build site/ as GitHub Pages serves it; http://localhost:8000
 ```
 
 The reports open straight from disk. Plots load by relative path, and MathJax loads from a CDN.
+
+`docs/` holds derivations behind module equations that the module files cannot carry (the schema allows no documents in `modules/`), each with the test that keeps it and the code in step: `docs/heart/cardiac_clock_phase.md` (the cardiac clocks' phase computed from the beat phase; `tests/test_cardiac_clock_phase.py`, `make heart-clock`, run in CI's structure job).
 
 ## Pull requests
 
