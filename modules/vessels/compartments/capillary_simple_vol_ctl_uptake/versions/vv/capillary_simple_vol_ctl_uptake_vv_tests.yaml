@@ -46,6 +46,11 @@ reference_proposals:
     reference: definitional; direction of the controlled blood exchange (-1 for uptake)
     sourced: definitional
     value: -1.0
+  v_blood_intake:
+    reference: definitional; no blood exchange (0 m^3/s) when the vessel runs alone, the value libcuflynx used for the unconnected
+      input; in a model it comes through blood_uptake_port
+    sourced: definitional
+    value: 0.0
 review: reviews/BG_review.yaml
 review_scope: The review of the whole BG module (116 entries) before the move to versions; only the parts about this version
   apply.
