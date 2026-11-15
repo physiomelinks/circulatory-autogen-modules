@@ -663,7 +663,11 @@ FAMILIES = {'flat_constant': 'heart__vp', 'flat_controlled': 'heart__vp_wCont', 
 # period steps (t, Delta_T) from T = 1 s: 1.0 -> 0.65 s in atrial contraction (s = 1.9), 0.65 -> 1.2 s in atrial
 # relaxation (s = 3.05), 1.2 -> 1.0 s in ventricular systole (s = 4.2)
 PERIOD_STEPS = [(1.9, -0.35), (2.65, 0.2), (4.03, 0.0)]
-FORMS_TOL = 1e-6      # max |difference| / (max |value| + 1e-12) over each state and the activations
+# max |difference| / (max |value| + 1e-12) over each state and the activations. Chosen, not derived: the measured worst
+# differences are 7.4e-8 to 1.1e-7 (zeta_*_pre and systemic_T/v, SUNDIALS 6.5.1 and 7.7.0, CVODE 1e-12 with restarts),
+# so 1e-6 leaves a margin of about 9; a real difference in the law is far above it (the onset shift moves zeta_miv_pre
+# by ~1, a 1 ms smoothing of the start window moves e_a by 6e-3).
+FORMS_TOL = 1e-6
 
 
 @pytest.mark.parametrize('family', sorted(FAMILIES))
@@ -743,7 +747,12 @@ def test_clock_rates_have_no_jump_at_the_onset(family, tmp_path, request):
             x[j] += sign * 1e-12
             slope = np.abs(np.array(model.evaluate_derivatives(x)) - r0).max() / 1e-12
             worst = max(worst, (slope, f'{q} {sign:+.0f}e-12'))
-    assert worst[0] < 1e3, worst
+    # 1e3 /s is chosen, not derived. At the onset e and de/ds are 0 (docs section 3), so the closed form's slope there is 0
+    # (measured: 0 for both families); elsewhere in the beat it reaches 3.2e2 (miv zeta_pre at s = 1.0) and 44 (vp_wCont).
+    # The integrated law's jump is 0.76 /s per 1e-12, a slope of 7.6e11. 1e3 sits above every slope measured anywhere in
+    # the beat and 8 orders below the jump.
+    NO_JUMP = 1e3
+    assert worst[0] < NO_JUMP, worst
 
 
 # the sensitivity sweep: tolerances x {as is, initial states x (1 + 1e-12)}; each atrial onset must stay within 1 ms of
