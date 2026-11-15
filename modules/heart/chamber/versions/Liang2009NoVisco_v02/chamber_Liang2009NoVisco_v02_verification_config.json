@@ -64,10 +64,11 @@
     "constraints": [
       "T_c + T_r < T"
     ],
-    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, u_ext); the flows v_in and v_out are the sums over the summing vessel ports, set by the harness inflow and outflow, not swept here. Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt and T_eff are excluded: the harness clock drives them. The activation switches phase discontinuously, so CVODE needs a step cap below the clock's start window (eps_1 = 7 % of a beat): MaximumStep 1 ms.",
+    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, u_ext); the flows v_in and v_out are the sums over the summing vessel ports, set by the harness inflow and outflow, not swept here. Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt, T_eff and s are excluded: the harness clock drives them. CVODE runs with MaximumStep 1 ms.",
     "exclude": [
       "mt",
       "T_eff",
+      "s",
       "v_in",
       "v_out"
     ],
