@@ -3,13 +3,6 @@ version: vp_Ca
 reviewed: false
 notes: 'heart_Ca_input: despite its name, the component has no calcium (or any extra) input; its equations are those of heart_simple
   without the unused sum variable q (results are identical to heart vp to machine precision). Same harness. Each chamber phase (chi_a, chi_v) is computed from the beat phase s: chi_floor = P(s), piecewise linear over contraction, relaxation and rest with durations scaled by the period, and chi = floor(s - t_start/T) + P(s), identical to the integrated, gated phase state it replaces; derivation and conditions in docs/heart/cardiac_clock_phase.md.'
-expected_failures:
-  verification_test_timestep: 'RK4 self-convergence is not monotone: normalised differences between successive step sizes
-    are 1.7e-3, 3.1e-4, 4.7e-4 for dt 2e-4 -> 2.5e-5; the largest differences are in A_eff_miv / A_eff_trv / v_miv around
-    mitral and tricuspid closure and the atrial kick (t ~ 0.47 and 0.97 s). The valve-state law is only piecewise smooth (dzeta/dt
-    switches branch at dp = 0; zeta = max(zeta_pre, 0) clamp; floor() phase variables), so the fixed-step solution cannot
-    show the RK4 order. The finest fixed-step run agrees with tight CVODE to 1.6e-4 (normalised), so the solution itself is
-    consistent.'
 reference_proposals:
   u_root:
     reference: 'definitional; port input: the aortic root pressure (from the aortic_root vessel) is supplied by the connected
