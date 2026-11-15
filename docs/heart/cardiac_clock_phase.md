@@ -254,10 +254,29 @@ within 0.5 ms of $s = k + t_s'$, one onset per beat, $\psi$ within $10^{-3}$ of 
 So under any period change both forms put each phase at the same fraction of the instantaneous beat.
 Source: `clock-fix/test_discrete_period.py`, results `clock-fix/runs/T/results.json`.
 
-**The library versions.** `tests/test_cardiac_clock_phase.py` simulates each version family in both
-forms (the converter in the test rebuilds the original law from the version's CellML, or the closed
-form from the original) and compares them; the numbers are in the CAM pull request that changed the
-versions ("Module: cardiac clocks computed from the beat phase (no chi states)").
+**The library versions.** `tests/test_cardiac_clock_phase.py` simulates four version families in both
+forms (the converter in the test rebuilds the original law from a version's CellML, or the closed form from
+the original; its round trip reproduces every version file) with CVODE at rtol = atol = $10^{-12}$ for 5.5 s,
+with the period stepped three times (in atrial contraction, atrial relaxation and ventricular systole) for the
+controlled ones. Largest difference over the states and activations, relative to each one's maximum:
+
+| family (version) | largest difference | in $e$ (activations) |
+|---|---|---|
+| flat, constant period (`heart/vp`) | $1.0\times10^{-7}$ (`zeta_miv_pre`) | $\le 8.6\times10^{-9}$ |
+| flat, controlled, period steps (`heart/vp_wCont`) | $1.6\times10^{-7}$ (`zeta_miv_pre`) | $\le 1.7\times10^{-8}$ |
+| chamber in its clock harness (`chamber/Liang2009NoVisco_v02`) | $2.9\times10^{-10}$ ($e$) | $2.9\times10^{-10}$ |
+| supermodule, controlled, period steps (`heart/controlled_Argus2026_v01`) | $5.5\times10^{-8}$ (`puv/zeta_pre`) | $\le 8.1\times10^{-9}$ |
+
+At $10^{-10}$ the integrated form's own error after a period step is larger ($e_v$ $9\times10^{-6}$,
+`zeta_miv_pre` $10^{-4}$ between $10^{-10}$ and $10^{-12}$), while the closed form moves by $3\times10^{-12}$:
+the closed form is the more accurate of the two at a given tolerance. Just before the first atrial onset, a
+change of $-10^{-12}$ in the integrated `chi_a` (or a chamber's `chi`) moves its rate by $7.6\times10^{11}$
+times the change; in the closed form no rate moves by more than $10^3$ times it. In the library's V&V suite
+the change turns the `stability_test` of `heart/vp`, `vp_Ca` and `vp_wCont` from failing (CVODE at rtol
+$10^{-6}$ against the reference: 0.013) to passing. Myokit on a `-march=native` SUNDIALS 7.7.0 build did not
+show the onset shift in 500 runs of `heart/vp_wCont`'s test network (tolerances $10^{-10}$-$10^{-6}$, as is
+and with the initial states perturbed by $\pm10^{-12}$), which is why the tolerance sweep in the test is an
+expected failure that may pass for the integrated form.
 
 All `clock-fix/` and `valve-flip/` paths are the investigation's scratch directories
 (`~/.cache/claude-tmp/` on the machine it ran on); the options page that compared five fixes is
