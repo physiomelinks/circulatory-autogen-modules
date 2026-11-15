@@ -3,24 +3,6 @@ version: vp_nonlinear_constR
 reviewed: false
 notes: 'vp vessel with a nonlinear tube law. Jacobian timescales (nominal: fastest 4e-05 s, slowest decay 9.6e-05 s; run:
   fastest 0.002 s, slowest decay 15 s, shortest oscillation period 0.013 s).'
-known_issues:
-- port variable r not in variables_and_units
-expected_failures:
-  run_test: 'libcuflynx exits during generation: "the port variable r is not a variable for vessel type ..., BC_type: ..._nonlinear_constR"
-    (the radius_0_and_s_port exit port lists r, which constR types do not have). With the port removed in a patched copy of
-    the library the component generates and all its tests pass (see review.proposed_fixes)'
-  verification_test_invariants: 'libcuflynx exits during generation: "the port variable r is not a variable for vessel type
-    ..., BC_type: ..._nonlinear_constR" (the radius_0_and_s_port exit port lists r, which constR types do not have). With
-    the port removed in a patched copy of the library the component generates and all its tests pass (see review.proposed_fixes)'
-  verification_test_BC: 'libcuflynx exits during generation: "the port variable r is not a variable for vessel type ..., BC_type:
-    ..._nonlinear_constR" (the radius_0_and_s_port exit port lists r, which constR types do not have). With the port removed
-    in a patched copy of the library the component generates and all its tests pass (see review.proposed_fixes)'
-  verification_test_timestep: 'libcuflynx exits during generation: "the port variable r is not a variable for vessel type
-    ..., BC_type: ..._nonlinear_constR" (the radius_0_and_s_port exit port lists r, which constR types do not have). With
-    the port removed in a patched copy of the library the component generates and all its tests pass (see review.proposed_fixes)'
-  stability_test: 'libcuflynx exits during generation: "the port variable r is not a variable for vessel type ..., BC_type:
-    ..._nonlinear_constR" (the radius_0_and_s_port exit port lists r, which constR types do not have). With the port removed
-    in a patched copy of the library the component generates and all its tests pass (see review.proposed_fixes)'
 reference_proposals:
   K_tube:
     reference: olufsen2000numerical; placeholder K = rho c0^2/(m - n), c0^2 = 2/(3 rho) (k1 e^(k2 r0) + k3), k1 = 2e6 Pa, k2 = -2253
