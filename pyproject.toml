@@ -35,6 +35,11 @@ cam_testing = ["templates/*.html", "templates/*.js", "data/*.json", "data/rhea/*
 
 [tool.cam_testing]
 # this repo is the root (the default); curated PhLynx manifests besides all.json (python -m cam_testing.manifests)
+# the libcuflynx a release's modules need: written into the release asset's cam_release.json, which
+# libcuflynx checks (README "Releases"). Raise it when the library starts using a newer libcuflynx.
+[tool.cam_testing.release]
+libcuflynx = ">=1.0.0"
+
 [tool.cam_testing.manifests]
 "index.json" = ["vessels", "heart"]
 "vitalworkshop.json" = ["vessels", "heart"]

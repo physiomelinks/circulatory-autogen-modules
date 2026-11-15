@@ -17,13 +17,13 @@
   "levels": {
     "modules_root": {
       "path": "modules/",
-      "description": "The module library: category directories and top-level module_types (heart), this schema, the README and version_renames.json (versions renamed in module PRs: [{from: [module_type, version], to: [module_type, version], reason}], read by cam_testing.library.version_renames).",
+      "description": "The module library: category directories and top-level module_types (heart), this schema, the README, version_renames.json (versions renamed in module PRs: [{from: [module_type, version], to: [module_type, version], reason}], read by cam_testing.library.version_renames) and renames.json (every old pair -> its replacement, for libcuflynx; written by python -m cam_testing.release renames).",
       "files": {
         "required": [
           "README.md",
           "directory_schema.json"
         ],
-        "optional": ["version_renames.json"]
+        "optional": ["version_renames.json", "renames.json"]
       },
       "directories": [
         "category",

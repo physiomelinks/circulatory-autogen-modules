@@ -196,6 +196,8 @@ to `modules/version_renames.json` (`[{"from": [module_type, old version], "to": 
 version], "reason": "..."}]`, in order). `legacy_renames()` applies these last, following each old name
 (circulatory_autogen's included) to the newest, and `tests/test_structure.py` checks that every target
 exists, that no renamed-from version is left, and that each entry gives its reason.
+`modules/renames.json`, which libcuflynx reads, is written from `legacy_renames()`
+(`python -m cam_testing.release renames`; README "Releases"): rewrite it in the same module PR.
 
 ## Versions
 
@@ -522,7 +524,7 @@ system_models/<category>/<model>/
   <model>_phlynx.png             a screenshot of the model's root canvas in PhLynx (optional; the page's figure)
   <model>_phlynx_nodes.json      each PhLynx node's instance and pixel box in that screenshot (with the png)
   <model>.html                   its page (generated)
-  reference/                     what it must reproduce (circulatory_autogen's original or a ready CellML model)
+  reference/                     what it must reproduce (circulatory_autogen's original, with <model>.cellml generated from it, or a ready CellML model)
   plots/  results/               written by the system tests (not committed)
 ```
 

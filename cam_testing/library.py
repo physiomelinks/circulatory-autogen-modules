@@ -1261,6 +1261,16 @@ HEART_VERSION_RENAMES = {
 }
 
 
+# circulatory_autogen built-ins whose maths the library's version under the restructure's name has since
+# changed, kept as versions with the built-in's maths: the old pair maps to that version, so a model
+# that names the built-in reproduces after renaming alone.
+BUILTIN_SAME_MATHS = {
+    ('SN_soma', 'nn'): ('soma', 'sympathetic_monolithic_OLD'),
+    ('SN_varicosity', 'nn'): ('varicosity', 'sympathetic_monolithic_OLD'),
+    ('SN_axon', 'nn'): ('axon', 'sympathetic_monolithic_OLD'),
+}
+
+
 # The 2026-10-06 restructure (tools/restructure_modules.py): types named by mechanism, versions by
 # source, no nn prefixes; old pair -> new pair, written by the restructure.
 RESTRUCTURE_RENAMES = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_modules_renames.json')
@@ -1309,7 +1319,8 @@ def legacy_renames():
     tools/restructure_map.yaml, in the move of the alternative hearts into heart
     (HEART_VERSION_RENAMES), and in the 2026-10-06 restructure (restructure_renames(), applied after
     the others, so each old pair maps to today's pair). circulatory_autogen's own models still use
-    the old pairs. Renames made in module PRs since (version_renames) are applied last.'''
+    the old pairs. The built-ins in BUILTIN_SAME_MATHS map to the version with their maths. Renames
+    made in module PRs since (version_renames) are applied last.'''
     later = restructure_renames()
     path = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_map.yaml')
     out = {}
@@ -1333,6 +1344,7 @@ def legacy_renames():
     out = {old: later.get(new, new) for old, new in out.items()}
     for old, new in later.items():
         out.setdefault(old, new)
+    out.update(BUILTIN_SAME_MATHS)
     # renames from module PRs (version_renames), applied last and followed to the newest name
     newest = version_renames()
     out = {old: _chain(new, newest) for old, new in out.items()}

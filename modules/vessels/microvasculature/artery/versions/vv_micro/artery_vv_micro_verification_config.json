@@ -26,7 +26,7 @@
       "expr": "np.allclose(v*R, u - u_d, rtol=1e-8, atol=1e-8*np.max(np.abs(u))) & np.allclose(v, 2*(q_C - q_C_d)/(R*C), rtol=1e-8, atol=1e-30)"
     },
     {
-      "description": "pressure law: u_C = q_C/(C/2), u_C_d = q_C_d/(C/2), u = u_0 + u_C + u_ext, u_d = u_0 + u_C_d + u_ext (fails: the CellML adds a constant 2 Pa, see expected_failures)",
+      "description": "pressure law: u_C = q_C/(C/2), u_C_d = q_C_d/(C/2), u = u_0 + u_C + u_ext, u_d = u_0 + u_C_d + u_ext",
       "expr": "np.allclose(u_C, q_C/(C/2), rtol=1e-8, atol=1e-6) & np.allclose(u_C_d, q_C_d/(C/2), rtol=1e-8, atol=1e-6) & np.allclose(u, u_0 + u_C + u_ext, rtol=0, atol=1e-6) & np.allclose(u_d, u_0 + u_C_d + u_ext, rtol=0, atol=1e-6)",
       "applies": "run"
     },
