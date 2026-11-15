@@ -63,6 +63,8 @@ VERSIONS, PARAMETERISATIONS, DEFAULT_PARAMETERISATION = 'versions', 'parameteris
 DEFAULT_KEY = 'default_parameterisation'
 SOURCE_FIGURES = 'source_figures'              # parameterisation dir: screenshots of the data's publication figures
 SOURCE_FIGURES_INDEX = 'source_figures.json'
+FIGURES = 'figures'                            # version dir: figures of the module (diagrams, schematics)
+FIGURE_PATTERN = r'^[A-Za-z0-9][A-Za-z0-9_.-]*\.(svg|png|jpg|jpeg)$'
 SOURCE_FIGURE_KEYS = {'required': ['file', 'source'], 'optional': ['caption', 'items']}   # its entries' keys
 # directories under modules/ that are not categories or module_types (another session's work in
 # the old layout, until it is moved)
@@ -470,7 +472,7 @@ IDENTITY_KEYS = ('module_type', 'version')
 VERIFICATION_KEYS = ('time_label', 'sim_time', 'pre_time', 'dt', 'solver', 'solver_info', 'reference_solver_info',
                      'outputs', 'protocol', 'run_parameters', 'run_inputs', 'run_steps', 'rest_check', 'periodic_steady_state', 'harness', 'invariants', 'bc_sweep', 'timestep', 'stability',
                      'parameter_ranges', 'validation', 'supermodule', 'coupled_systems')
-TESTS_KEYS = ('reviewed', 'description', 'notes', 'skip', 'known_issues', 'expected_failures',
+TESTS_KEYS = ('reviewed', 'description', 'notes', 'figures', 'skip', 'known_issues', 'expected_failures',
               'calibration_in_supermodule', 'reference_proposals', 'review', 'review_scope')
 # readable order of the nested keys the checks know (others follow in their own order)
 NESTED_ORDER = {
@@ -1003,6 +1005,42 @@ class Version:
         return os.path.join(self.dir, 'plots')
 
     @property
+    def figures_dir(self):
+        return os.path.join(self.dir, FIGURES)
+
+    def _figure_entries(self):
+        return [{'file': e} if isinstance(e, str) else e for e in self.spec.get('figures') or []]
+
+    def figures(self):
+        '''The module's figures for its report (tests.yaml "figures": [{"file", "caption"}], file relative to
+        figures/, or a bare file name): [{"file" (relative to the version directory), "caption", "missing"}].'''
+        out = []
+        for e in self._figure_entries():
+            path = os.path.normpath(os.path.join(self.figures_dir, e.get('file') or ''))
+            out.append({'file': os.path.relpath(path, self.dir), 'caption': e.get('caption') or '',
+                        'missing': not os.path.isfile(path)})
+        return out
+
+    def figure_problems(self):
+        '''What is wrong with the "figures" entries: a file missing or not an image directly in figures/, or
+        no caption. A figure with no caption tells a reader nothing; figures/ stays flat to keep this check
+        and the page simple.'''
+        problems = []
+        for e in self._figure_entries():
+            f = e.get('file') if isinstance(e, dict) else None
+            if not f:
+                problems.append(f'figures: an entry has no file: {e!r}')
+                continue
+            path = os.path.normpath(os.path.join(self.figures_dir, f))
+            if os.path.dirname(path) != self.figures_dir or not re.match(FIGURE_PATTERN, os.path.basename(path)):
+                problems.append(f'figures: {f} is not an image (svg, png, jpg) directly in figures/')
+            elif not os.path.isfile(path):
+                problems.append(f'figures: {f} is not in figures/')
+            if not e.get('caption'):
+                problems.append(f'figures: {f} has no caption')
+        return problems
+
+    @property
     def results_dir(self):
         return os.path.join(self.dir, 'results')
 
@@ -1223,6 +1261,16 @@ HEART_VERSION_RENAMES = {
 }
 
 
+# circulatory_autogen built-ins whose maths the library's version under the restructure's name has since
+# changed, kept as versions with the built-in's maths: the old pair maps to that version, so a model
+# that names the built-in reproduces after renaming alone.
+BUILTIN_SAME_MATHS = {
+    ('SN_soma', 'nn'): ('soma', 'sympathetic_monolithic_OLD'),
+    ('SN_varicosity', 'nn'): ('varicosity', 'sympathetic_monolithic_OLD'),
+    ('SN_axon', 'nn'): ('axon', 'sympathetic_monolithic_OLD'),
+}
+
+
 # The 2026-10-06 restructure (tools/restructure_modules.py): types named by mechanism, versions by
 # source, no nn prefixes; old pair -> new pair, written by the restructure.
 RESTRUCTURE_RENAMES = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_modules_renames.json')
@@ -1271,7 +1319,8 @@ def legacy_renames():
     tools/restructure_map.yaml, in the move of the alternative hearts into heart
     (HEART_VERSION_RENAMES), and in the 2026-10-06 restructure (restructure_renames(), applied after
     the others, so each old pair maps to today's pair). circulatory_autogen's own models still use
-    the old pairs. Renames made in module PRs since (version_renames) are applied last.'''
+    the old pairs. The built-ins in BUILTIN_SAME_MATHS map to the version with their maths. Renames
+    made in module PRs since (version_renames) are applied last.'''
     later = restructure_renames()
     path = os.path.join(paths.PACKAGE_CHECKOUT, 'tools', 'restructure_map.yaml')
     out = {}
@@ -1295,6 +1344,7 @@ def legacy_renames():
     out = {old: later.get(new, new) for old, new in out.items()}
     for old, new in later.items():
         out.setdefault(old, new)
+    out.update(BUILTIN_SAME_MATHS)
     # renames from module PRs (version_renames), applied last and followed to the newest name
     newest = version_renames()
     out = {old: _chain(new, newest) for old, new in out.items()}

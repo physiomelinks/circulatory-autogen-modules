@@ -27,11 +27,12 @@ notes: 'Heart chamber with the time-varying elastance of Liang et al. 2009 (MBEC
   declarative (CellML) implementation robust (it follows the clock''s period and stays in phase when the period or the
   timings change). Its piecewise rate makes the time-step test partial (first order across a switch).'
 expected_failures:
-  cuflynx_parameterisation_omex_test: 'lv fails until a CUFLynx update: the released CUFLynx (0.7.1) bundles a libcuflynx that
-    predates held-out data in prediction_items (circulatory_autogen #535/#536) and rejects lv_obs_data.json. Checked on
+  cuflynx_parameterisation_omex_test[lv]: 'Fails until a CUFLynx update: the released CUFLynx (0.7.1) bundles a libcuflynx that
+    predates held-out data in prediction_items (circulatory_autogen #535/#536) and data_reference on items (#618), and
+    rejects lv_obs_data.json. Checked on
     2026-10-13 with CUFLynx run from source on a libcuflynx with #536: the archive loads and runs; its outputs match
     libcuflynx to 3.6e-6 (the pulmonary conduit''s valve flow pvc_module/v; the test''s tolerance is 1e-6), the stiff valve
-    difference the heart archives also show. la, ra and rv pass.'
+    difference the heart archives also show.'
   validation_test_baseline: 'lv: the peak LV pressure is 120.6 mmHg vs Liang''s 108 (target 97-119) at periodic steady state: without Liang''s
     viscoelastic S dV/dt term (Eq. 9) the ejection pressure is 13 % high; chamber/Liang2009_v01, with the term, peaks at
     115.6 mmHg and passes. The other held-out targets (minimum and end-diastolic pressure) and the calibration pass

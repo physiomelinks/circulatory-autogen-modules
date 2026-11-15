@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "channel_ratio": {
+  "value": 0.5,
+  "units": "dimensionless",
+  "data_reference": "unreferenced_placeholder; owner's lumped ratio of axonal channel current to axial current, a simple approximation of the extra input current from the axon membrane's channels (CA_user ad0ce77, 2024-07-21; CA token 'user_defined')",
+  "sourced": "no"
+ },
+ "C": {
+  "value": 10.0,
+  "units": "picoF",
+  "data_reference": "SN_simple: to_be_determined",
+  "sourced": "no"
+ },
+ "R": {
+  "value": 300.0,
+  "units": "megaOhm",
+  "data_reference": "SN_simple: to_be_determined",
+  "sourced": "no"
+ },
+ "V_rest_approx": {
+  "value": -70,
+  "units": "milliV",
+  "data_reference": "davis2020downregulation; resting membrane potential of rat stellate neurons: Wistar -72.6 +- 1.0 mV (Fig. 4C), SHR -70.3 +- 1.4 mV (Fig. 5D); -70 mV approximates it",
+  "sourced": "yes"
+ },
+ "V_in": {
+  "value": -70,
+  "units": "milliV",
+  "data_reference": "definitional; the input (soma) voltage, an input from the coupled soma; -70 mV (rest) when unconnected",
+  "sourced": "no"
+ }
+}

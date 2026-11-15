@@ -722,10 +722,17 @@
   },
   {
     "from": ["tissue_GE_simple", "nn"],
-    "to": ["tissue_GE_simple", "Ursino2001_v01"],
+    "to": ["tissue_GE_simple", "Ursino2001_v02"],
     "from_path": "respiratory/tissue_GE_simple/nn",
-    "to_path": "respiratory/tissue_GE_simple/Ursino2001_v01",
-    "why": "decision 3: plain nn named by source (ursino2001integrated)"
+    "to_path": "respiratory/tissue_GE_simple/Ursino2001_v02",
+    "why": "decision 3: plain nn named by source (ursino2001integrated); libcuflynx's nn has the gas_flux_port, so it is Ursino2001_v02 (Ursino2001_v01 with that port)"
+  },
+  {
+    "from": ["venous_gas_mixing", "nn"],
+    "to": ["venous_gas_mixing", "ArgusUNPUBLISHED_v01"],
+    "from_path": "respiratory/venous_gas_mixing/nn",
+    "to_path": "respiratory/venous_gas_mixing/ArgusUNPUBLISHED_v01",
+    "why": "libcuflynx's built-in venous_gas_mixing nn is the library's ArgusUNPUBLISHED_v01"
   },
   {
     "from": ["tissue_diffusion_face", "nn"],
