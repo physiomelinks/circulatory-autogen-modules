@@ -603,8 +603,9 @@ def myokit_model(path):
     return h.model
 
 
-def simulate(model, t_end, tol, max_step=1e-3, steps=(), state_factor=None, log_interval=1e-3):
-    """Myokit CVODE; ``steps``: [(t, {constant qname: value})] applied during the run (a period change)."""
+def simulate(model, t_end, tol, max_step=1e-3, steps=(), state_factor=None, log_interval=1e-3, breaks=()):
+    """Myokit CVODE; ``steps``: [(t, {constant qname: value})] applied during the run (a period change); ``breaks``:
+    times at which the run stops and CVODE restarts, so no step spans them. Logged on one grid of ``log_interval``."""
     import myokit
     sim = myokit.Simulation(model)
     sim.set_tolerance(abs_tol=tol, rel_tol=tol)
@@ -613,14 +614,40 @@ def simulate(model, t_end, tol, max_step=1e-3, steps=(), state_factor=None, log_
         sim.set_state([x * state_factor for x in model.initial_values(as_floats=True)])
     names = [s.qname() for s in model.states()] + [model.time().qname()]
     clocks = [x.qname() for x in model.variables(deep=True) if x.name() in ('e_a', 'e_v', 'e', 'chi_a', 'chi_v', 'chi')]
-    log, t = None, 0.0
-    for t_next, change in list(steps) + [(t_end, {})]:
-        d = sim.run(t_next - t, log=names + clocks, log_interval=log_interval)
-        log = d if log is None else log.extend(d) or log
-        for q, val in change.items():
+    grid = np.round(np.arange(int(round(t_end / log_interval)) + 1) * log_interval, 12)
+    snap = lambda x: float(grid[np.argmin(np.abs(grid - x))]) if np.abs(grid - x).min() < 1e-9 else float(x)
+    change_at = {snap(t_): c for t_, c in steps}
+    ends = sorted(set(list(change_at) + [snap(b) for b in breaks if 0 < b < t_end] + [float(t_end)]))
+    out, t = {k: [] for k in names + clocks}, 0.0
+    for t_next in ends:
+        last = t_next == t_end
+        times = grid[(grid >= t) & ((grid <= t_next) if last else (grid < t_next))]
+        # Myokit logs times in [start, end): the last run goes half an interval past t_end to log t_end
+        d = sim.run(t_next - t + (log_interval / 2 if last else 0.0), log=names + clocks, log_times=times)
+        for k in out:
+            out[k].append(np.asarray(d[k]))
+        for q, val in change_at.get(t_next, {}).items():
             sim.set_constant(q, val)
         t = t_next
-    return {k: np.asarray(log[k]) for k in log.keys()}
+    return {k: np.concatenate(v) for k, v in out.items()}
+
+
+def clock_switch_times(model, t, s):
+    """The times at which an integrated chi law switches piece: each onset k + t_s', and t_s' + T_c/T and
+    t_s' + (T_c + T_r)/T after it. The constants are read from ``model``'s closed form (chi_floor =
+    piecewise(s < t_s', 0, phi T <= T_c, ..., phi T < T_c + T_r, ...)); s(t) is the beat phase logged on the times
+    t (piecewise linear in t, with its kinks at the period steps, which are on the grid)."""
+    out = []
+    for x in model.variables(deep=True):
+        if x.name() not in [v['floor'] for v in CLOCKS.values()]:
+            continue
+        c = [list(e) for e in x.rhs().conditions()]
+        ts, T, tc, tctr = c[0][1].eval(), list(c[1][0])[1].eval(), c[1][1].eval(), c[2][1].eval()
+        for k in range(int(np.floor(s[-1] - ts)) + 2):
+            for frac in (0.0, tc / T, tctr / T):
+                if s[0] <= k + ts + frac <= s[-1]:
+                    out.append(float(np.interp(k + ts + frac, s, t)))
+    return sorted(set(out))
 
 
 def _period_input(model):
@@ -641,14 +668,19 @@ FORMS_TOL = 1e-6      # max |difference| / (max |value| + 1e-12) over each state
 
 @pytest.mark.parametrize('family', sorted(FAMILIES))
 def test_forms_agree(family, tmp_path):
-    """Each version family simulated in both forms gives the same trajectories. CVODE at rtol = atol = 1e-12: at 1e-10
-    the integrated form's own error after a period step (e_v 9e-6, zeta_miv_pre 1e-4 relative; the closed form moves
-    3e-12 between the two tolerances) would dominate the comparison."""
+    """Each version family simulated in both forms gives the same trajectories. CVODE at rtol = atol = 1e-12, and the
+    integrated form restarted at each of its switches (known from the closed form): stepping across a switch, its own
+    error depends on the SUNDIALS build (1.5e-5 in zeta_miv_pre on CI's, 1e-7 on a native 7.7.0) and would dominate the
+    comparison; the closed form has no switch in a state and moves by 3e-12 between tolerances 1e-10 and 1e-12."""
     paths = generate_forms(FAMILIES[family], str(tmp_path))
     models = {k: myokit_model(p) for k, p in paths.items()}
     period = _period_input(models['integrated'])
     steps = [(t, {period: d}) for t, d in PERIOD_STEPS] if period and 'controlled' in family else []
-    runs = {k: simulate(m, 5.5, 1e-12, steps=steps) for k, m in models.items()}
+    runs = {'phase': simulate(models['phase'], 5.5, 1e-12, steps=steps)}
+    m = models['phase']
+    s_q = [x.qname() for x in m.states() if x.name() == 's'][0]
+    breaks = clock_switch_times(m, runs['phase'][m.time().qname()], runs['phase'][s_q])
+    runs['integrated'] = simulate(models['integrated'], 5.5, 1e-12, steps=steps, breaks=breaks)
     a, b = runs['integrated'], runs['phase']
     common = sorted(k for k in set(a) & set(b) if not k.endswith('time') and a[k].shape == b[k].shape)
     assert any(k.endswith(('.e_a', '.e')) for k in common)

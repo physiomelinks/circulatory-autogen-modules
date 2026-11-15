@@ -229,7 +229,7 @@ as is and perturbed, with $T_w$ moving 1.00-1.47 s under parasympathetic control
 | form | bad runs, 2 s (atrial onset off by 35-76 ms) | solver failures | largest onset shift | 20 s runs with the clock > 1 ms off |
 |---|---|---|---|---|
 | integrated $\chi$ | 7 / 75 | 1 | 76.3 ms | 3 / 18 (77, 63, 45 ms) |
-| closed form $P(s)$ | 0 / 75 | 0 | 0.0065 ms | 0 / 18 |
+| closed form $P(s)$ | 0 / 75 | 0 | 0.0065 ms | none by construction (no $\chi$ state to drift; not measured) |
 
 The closed form's median run differs from the reference (the current model by CasADi CVODES at
 $10^{-12}$/$10^{-14}$) by $4.9\times10^{-7}$ in $e_a$ and $6.0\times10^{-7}$ (relative) in left-atrial
@@ -258,14 +258,18 @@ Source: `clock-fix/test_discrete_period.py`, results `clock-fix/runs/T/results.j
 forms (the converter in the test rebuilds the original law from a version's CellML, or the closed form from
 the original; its round trip reproduces every version file) with CVODE at rtol = atol = $10^{-12}$ for 5.5 s,
 with the period stepped three times (in atrial contraction, atrial relaxation and ventricular systole) for the
-controlled ones. Largest difference over the states and activations, relative to each one's maximum:
+controlled ones. The integrated form is restarted at each of its switches (each onset and the two phase
+boundaries after it, known from the closed form), so no step spans a jump in its rate: stepping across them,
+its own error depended on the SUNDIALS build ($1.5\times10^{-5}$ in `zeta_miv_pre` in CI, which links
+Ubuntu 24.04's apt SUNDIALS 6, and with a local 6.5.1, $10^{-7}$ with 7.7.0). Largest difference over the states and
+activations, relative to each one's maximum (the same with SUNDIALS 6.5.1 and 7.7.0):
 
 | family (version) | largest difference | in $e$ (activations) |
 |---|---|---|
-| flat, constant period (`heart/vp`) | $1.0\times10^{-7}$ (`zeta_miv_pre`) | $\le 8.6\times10^{-9}$ |
-| flat, controlled, period steps (`heart/vp_wCont`) | $1.6\times10^{-7}$ (`zeta_miv_pre`) | $\le 1.7\times10^{-8}$ |
-| chamber in its clock harness (`chamber/Liang2009NoVisco_v02`) | $2.9\times10^{-10}$ ($e$) | $2.9\times10^{-10}$ |
-| supermodule, controlled, period steps (`heart/controlled_Argus2026_v01`) | $5.5\times10^{-8}$ (`puv/zeta_pre`) | $\le 8.1\times10^{-9}$ |
+| flat, constant period (`heart/vp`) | $7.4\times10^{-8}$ (`systemic_T/v`) | $\le 2.7\times10^{-9}$ |
+| flat, controlled, period steps (`heart/vp_wCont`) | $1.1\times10^{-7}$ (`zeta_miv_pre`) | $\le 2.3\times10^{-9}$ |
+| chamber in its clock harness (`chamber/Liang2009NoVisco_v02`) | $1.0\times10^{-10}$ ($e$) | $1.0\times10^{-10}$ |
+| supermodule, controlled, period steps (`heart/controlled_Argus2026_v01`) | $9.0\times10^{-8}$ (`trv/zeta_pre`) | $\le 3.1\times10^{-9}$ |
 
 At $10^{-10}$ the integrated form's own error after a period step is larger ($e_v$ $9\times10^{-6}$,
 `zeta_miv_pre` $10^{-4}$ between $10^{-10}$ and $10^{-12}$), while the closed form moves by $3\times10^{-12}$:
