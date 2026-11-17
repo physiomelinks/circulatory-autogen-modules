@@ -6,7 +6,7 @@ description: 'Four-chamber heart: cardiac clock, four generic chambers whose ves
   (3compartment''s: Liang 2009, Korakianitis 2006, Mynard 2012) in its default parameterisation, which also sets the ra, rv and la chambers where they differ from the
   chamber version''s default (lv). A model uses one "heart" entry whose
   per_submodule_inputs / per_submodule_outputs couple ra, la, puv, aov (and the chambers'' volumes) to the circulation; libcuflynx
-  expands it into heart__clock, heart__ra ... heart__aov.'
+  expands it into heart__clock, heart__ra ... heart__aov. Each chamber computes its phase from the clock''s beat phase s (cardiac_clock_port: mt, T_eff, s); derivation in docs/heart/cardiac_clock_phase.md.'
 expected_failures:
   phlynx_export_test: 'PhLynx has no supermodule support: it builds models from CellML module configs only, and a module_format
     "supermodule" entry (submodules expanded by libcuflynx) has no PhLynx form'

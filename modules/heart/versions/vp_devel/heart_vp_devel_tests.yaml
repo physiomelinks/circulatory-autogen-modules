@@ -3,7 +3,7 @@ version: vp_devel
 reviewed: false
 notes: 'heart_devel (marked "unvalidated" in the CellML): heart_simple with a patient-specific aortic valve law B_aov = gamma
   rho (pi r_ao^2)^beta /(r_lvot^4 A_eff^beta), A_eff_aov based on the measured valve area A_aov, L_aov from r_lvot, and saturating
-  B values for all valves. It cannot currently be generated (see expected_failures).'
+  B values for all valves. It cannot currently be generated (see expected_failures). Each chamber phase (chi_a, chi_v) is computed from the beat phase s: chi_floor = P(s), piecewise linear over contraction, relaxation and rest with durations scaled by the period, and chi = floor(s - t_start/T) + P(s), identical to the integrated, gated phase state it replaces; derivation and conditions in docs/heart/cardiac_clock_phase.md.'
 known_issues:
 - B_aov has units dimensionless in the config but Js2_per_m9 in the CellML
 - B_trv has units dimensionless in the config but Js2_per_m9 in the CellML

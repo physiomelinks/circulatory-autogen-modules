@@ -2,7 +2,7 @@ module_type: heart
 version: vp_new_valve
 reviewed: false
 notes: 'heart_new_valve: heart_simple with a modified valve loss B = Rmod rho /(A_eff + eps) (instead of rho/(2 A_eff^2))
-  and valve velocity outputs vel = v/A_nn. Same harness.'
+  and valve velocity outputs vel = v/A_nn. Same harness. Each chamber phase (chi_a, chi_v) is computed from the beat phase s: chi_floor = P(s), piecewise linear over contraction, relaxation and rest with durations scaled by the period, and chi = floor(s - t_start/T) + P(s), identical to the integrated, gated phase state it replaces; derivation and conditions in docs/heart/cardiac_clock_phase.md.'
 expected_failures:
   verification_test_timestep: 'RK4 self-convergence is not monotone: normalised differences between successive step sizes
     are 1.5e-3, 2.6e-4, 3.9e-4 for dt 2e-4 -> 2.5e-5; the largest differences are in A_eff_miv / A_eff_trv / v_miv around

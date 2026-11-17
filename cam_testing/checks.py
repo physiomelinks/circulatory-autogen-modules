@@ -247,13 +247,18 @@ class ComponentModel(object):
                 nominal[harness.parameter_name(p)] = p.float_value
             except ValueError:
                 pass
-        # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
-        # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
+        # the test network's own parameters (e.g. an outlet's flow vout/v), so a sweep can vary them
+        # (bc_sweep.extra_parameters) and invariants can use them. They are named as in the generated
+        # model, <var>_<instance> (vout/v: v_vout); the full name <instance>/<var> resolves to it.
+        aliases = {}
         for name, _units, value, *_ref in harness.network(self.component, self._network_of).get('parameters') or []:
-            if name not in nominal:
-                nominal[name] = float(value)
-                var_of[name] = name
-        self._params, self._nominal, self._var_of_map = params, nominal, var_of
+            inst, _, var = name.rpartition('/')
+            model_name = f'{var}_{inst}' if inst else name
+            aliases[name] = model_name
+            if model_name not in nominal:
+                nominal[model_name] = float(value)
+                var_of[model_name] = model_name
+        self._params, self._nominal, self._var_of_map, self._aliases = params, nominal, var_of, aliases
 
     @property
     def nominal(self):
@@ -266,10 +271,17 @@ class ComponentModel(object):
         self._load_parameters()
         return self._var_of_map
 
+    def resolve(self, name):
+        '''The generated model's name of a test-network parameter given as <instance>/<var> (vout/v: v_vout);
+        other names as given.'''
+        self._load_parameters()
+        return self._aliases.get(name, name)
+
     def param_env(self, overrides=None):
-        '''Parameter values by variable name (e.g. alpha; a supermodule's: <var>_<submodule>), for invariant expressions.'''
+        '''Parameter values by variable name (e.g. alpha; a supermodule's: <var>_<submodule>; a test-network
+        parameter's: <var>_<instance>), for invariant expressions.'''
         values = dict(self.nominal)
-        values.update(overrides or {})
+        values.update({self.resolve(k): v for k, v in (overrides or {}).items()})
         return {self._var_of[k]: v for k, v in values.items()}
 
     @property
@@ -1147,8 +1159,8 @@ def verification_test_BC(cm):
 
         sweeps, points, skipped, notes = {}, [], [], []
         for var in names:
-            # a component parameter, or (extra_parameters) one of its test network's, by full name
-            pname = harness.parameter_name(by_var[var]) if var in by_var else var
+            # a component parameter, or (extra_parameters) one of its test network's, as v_vout or vout/v
+            pname = harness.parameter_name(by_var[var]) if var in by_var else cm.resolve(var)
             if pname not in cm.nominal:
                 notes.append(f'{var}: not a parameter of the component or its test network')
                 continue
