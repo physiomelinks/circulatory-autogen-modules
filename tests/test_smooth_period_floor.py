@@ -16,8 +16,6 @@ T_MIN, EPS = 0.25, 0.02
 
 pytestmark = pytest.mark.skipif(not os.path.exists(CELLML), reason='heart vp_wCont_smoothfloor is not in this library')
 
-pytestmark = pytest.mark.skipif(not os.path.exists(CELLML), reason='heart vp_wCont_smoothfloor is not in this library')
-
 
 def _evaluate(node, env):
     tag = node.tag.replace(MATHML, '')
