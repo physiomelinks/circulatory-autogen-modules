@@ -2,7 +2,7 @@ module_type: heart
 version: vp_wCont_nonstiff
 reviewed: false
 notes: 'heart_simple_wCont with linearised valve losses: B v|v| replaced by R_lin v with R_lin = 2 B v_ref (the tangent of
-  the Bernoulli loss at flow v_ref), meant to reduce stiffness. Same harness.'
+  the Bernoulli loss at flow v_ref), meant to reduce stiffness. Same harness. Each chamber phase (chi_a, chi_v) is computed from the beat phase s: chi_floor = P(s), piecewise linear over contraction, relaxation and rest with durations scaled by the period, and chi = floor(s - t_start/T) + P(s), identical to the integrated, gated phase state it replaces; derivation and conditions in docs/heart/cardiac_clock_phase.md.'
 expected_failures:
   verification_test_invariants: 'Model behaviour: at the nominal point the RA volume goes negative every beat (min q_ra =
     -7.3 ml, u_ra down to -105 Pa suction through the linearised tricuspid valve). heart_simple_wCont with the same parameters
