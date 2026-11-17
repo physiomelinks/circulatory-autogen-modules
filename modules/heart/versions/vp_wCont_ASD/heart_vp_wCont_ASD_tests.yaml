@@ -2,7 +2,7 @@ module_type: heart
 version: vp_wCont_ASD
 reviewed: false
 notes: 'heart_simple_wCont plus an atrial septal defect: a linear shunt v_asd = (u_la - u_ra)/R_ASD from LA to RA. Same harness
-  as heart vp_wCont.'
+  as heart vp_wCont. Each chamber phase (chi_a, chi_v) is computed from the beat phase s: chi_floor = P(s), piecewise linear over contraction, relaxation and rest with durations scaled by the period, and chi = floor(s - t_start/T) + P(s), identical to the integrated, gated phase state it replaces; derivation and conditions in docs/heart/cardiac_clock_phase.md.'
 expected_failures:
   verification_test_timestep: 'RK4 self-convergence is not monotone: normalised differences between successive step sizes
     are 1.6e-3, 2.6e-4, 3.9e-4 for dt 2e-4 -> 2.5e-5; the largest differences are in A_eff_miv / A_eff_trv / v_miv around

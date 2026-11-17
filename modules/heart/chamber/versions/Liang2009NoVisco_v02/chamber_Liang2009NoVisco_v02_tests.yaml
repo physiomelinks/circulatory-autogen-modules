@@ -7,16 +7,13 @@ notes: 'Chamber Liang2009NoVisco_v01 with summing vessel ports: the entrance por
   veins (both venae cavae into ra) and a chamber any number of outflows (an ASD shunt from la) with no junction. With one
   neighbour per port the equations are those of v01. Unconnected, a summed flow is 0 (libcuflynx sets an unconnected
   multi_port sum to 0), not a parameter. Otherwise as v01, whose notes follow.
-  Heart chamber with the time-varying elastance of Liang et al. 2009 (MBEC 47:743). A phase variable chi, gated by the
-  cardiac clock''s mt, rises over contraction (T_c), relaxation (T_r) and diastole; the activation is e = (1 - cos(2 pi
+  Heart chamber with the time-varying elastance of Liang et al. 2009 (MBEC 47:743). A phase chi_floor = P(s), computed from
+  the cardiac clock''s beat phase s, rises over contraction (T_c), relaxation (T_r) and diastole; the activation is e = (1 - cos(2 pi
   chi_final))/2 in [0, 1], and the pressure u = (e E_A_eff + E_B)(q - q_us) + u_ext with E_A_eff = E_A + Delta_E (a
   controller''s change), dq/dt = v_in - v_out. Tested in a harness with cardiac_clock/Liang2009_v01 driving it (review
   2026-10-09; it was clamped at mt = 0.5 before, so nothing moved).
-  Solver: the phase rate dchi/dt is piecewise (discontinuous at each phase switch and at the clock gate), so CVODE must be
-  limited to a step well below the clock''s start window (eps_1 = 7 % of a beat) when nothing else in the model limits its
-  step: without a cap, from the second beat systole lasted 0.1 s too long and the beats drifted (the maths, integrated
-  with a fine fixed step, is exact). The spec uses MaximumStep 1 ms; the closed-loop system models are unaffected (their
-  vessels and valves already keep CVODE''s step small).
+  Solver: the activation e is a C1 function of the beat phase s (its second derivative jumps at the four phase
+  boundaries); the spec runs CVODE with MaximumStep 1 ms.
   Parameterisations (review 2026-10-12): lv (the default), rv, la and ra, from Liang 2009 Table 2 (E_A, E_B, T_cp, T_rp,
   t_c; mmHg/ml converted at 133.322368e6 J/m^6) and Korakianitis & Shi 2006 Table 1 (unstressed volumes V_x,0 = q_us).
   lv starts at its end-diastolic volume (Liang Fig. 4e, digitised), the others at their unstressed volumes.
@@ -27,11 +24,11 @@ notes: 'Chamber Liang2009NoVisco_v01 with summing vessel ports: the entrance por
   (Fig. 4e EDV and ESV) in the validation loop with a contracting left atrium, it comes out at 5.3 ml (chamber
   Liang2009NoVisco_v01) and 4.3 ml (Liang2009_v01), confirming it; q_us stays in the calibration as a check, not applied
   (review 2026-10-12).
-  The phase variable chi (its gated, piecewise-rate form: contraction, relaxation, diastole and the wait at the clock
-  gate, with chi_floor and the activation e = (1 - cos(2 pi chi_final))/2) is ArgusUnpublished work (argus2026unpublished):
-  Liang''s activation is an explicit function of time (Eqs. 11-12); writing it as a state driven by the clock makes the
-  declarative (CellML) implementation robust (it follows the clock''s period and stays in phase when the period or the
-  timings change). Its piecewise rate makes the time-step test partial (first order across a switch).'
+  The phase chi (contraction, relaxation and diastole, piecewise linear in the beat phase, with chi_floor and the
+  activation e = (1 - cos(2 pi chi_final))/2) is ArgusUnpublished work (argus2026unpublished): Liang''s activation is an
+  explicit function of time (Eqs. 11-12); here it is a function of the clock''s beat phase s, chi_floor = P(s) and
+  chi = floor(s - t_start/T) + P(s), so it follows the clock''s period and stays in phase when the period changes. It is
+  the closed form of the gated, integrated phase state of the original law (docs/heart/cardiac_clock_phase.md).'
 expected_failures:
   cuflynx_parameterisation_omex_test: 'lv fails until a CUFLynx update: the released CUFLynx (0.7.1) bundles a libcuflynx that
     predates held-out data in prediction_items (circulatory_autogen #535/#536) and rejects lv_obs_data.json. Checked on
