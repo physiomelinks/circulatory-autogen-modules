@@ -10,7 +10,7 @@ PYTEST_ARGS ?=
 PHLYNX_DIR ?= ../phlynx
 CUFLYNX_BIN ?= $(HOME)/software/CUFLynx
 
-.PHONY: setup structure test test-all systems system-sources coupled pipeline pipeline-setup omex omex-test report site serve clean manifests risk
+.PHONY: setup structure heart-clock test test-all systems system-sources coupled pipeline pipeline-setup omex omex-test report site serve clean manifests risk
 
 setup:
 	python3 -m venv venv
@@ -22,6 +22,11 @@ endif
 
 structure:
 	$(PYTHON) -m pytest tests/test_structure.py tests/test_pr_scope.py tests/test_ci_setup.py tests/test_release.py
+
+# the cardiac clocks' phase computed from the beat phase (docs/heart/cardiac_clock_phase.md): the closed form against
+# the integrated law, both forms of each heart family simulated, the onset's insensitivity to round-off (a few minutes)
+heart-clock:
+	$(PYTHON) -m pytest tests/test_cardiac_clock_phase.py $(PYTEST_ARGS)
 
 # V&V tests, skipping slow calibration. MODULE=<module_type or path under modules/> runs those versions
 # (reviewed or not), e.g. MODULE=Lotka_Volterra, MODULE=heart (with cardiac_clock, chamber, valve) or MODULE=cell.
