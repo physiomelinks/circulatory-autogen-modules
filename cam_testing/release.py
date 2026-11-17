@@ -43,15 +43,38 @@ def repo_root():
     return paths.roots().repo_root
 
 
+JUNCTION_RENAMES = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'junction_renames.json')
+JUNCTION_UPGRADE = 'cuflynx-upgrade junctions'
+
+
+def junction_renames():
+    '''The junction versions this library removed: {(module_type, version): entry}. Each entry is a
+    renames.json row for libcuflynx's `cuflynx-upgrade junctions` ("by"), which also renames the
+    variables ("variables", "neighbour_variables"), splits a two-inflow source ("split") or joins the
+    neighbours of a massless node ("join", "to" null).'''
+    with open(JUNCTION_RENAMES) as f:
+        return {tuple(e['from']): e for e in json.load(f)}
+
+
 def renames_document():
-    '''modules/renames.json's content: every old pair and the version that replaces it, sorted.'''
+    '''modules/renames.json's content: every old pair and the version that replaces it, sorted. A pair
+    renamed to a junction version gets that junction's entry (for cuflynx-upgrade junctions), so
+    `cuflynx-upgrade module-names` never renames to a version the library no longer has.'''
     from cam_testing.library import legacy_renames
-    rows = [{'from': list(old), 'to': list(new)} for old, new in sorted(legacy_renames().items())]
+    junctions = junction_renames()
+    rows = {}
+    for old, new in legacy_renames().items():
+        rows[old] = dict(junctions[new], **{'from': list(old)}) if new in junctions else \
+            {'from': list(old), 'to': list(new)}
+    for old, entry in junctions.items():
+        rows.setdefault(old, entry)
     return {'schema_version': 1,
             'description': ('(module_type, module_subtype) pairs this library no longer has -> the version '
                             'that replaces each: circulatory_autogen\'s built-in modules and this library\'s '
-                            'renamed versions. Written by python -m cam_testing.release renames.'),
-            'renames': rows}
+                            'renamed versions. Entries with "by": "cuflynx-upgrade junctions" are the junction '
+                            'module types, which that command converts (it renames variables too). Written by '
+                            'python -m cam_testing.release renames.'),
+            'renames': [rows[old] for old in sorted(rows)]}
 
 
 def renames_text():
