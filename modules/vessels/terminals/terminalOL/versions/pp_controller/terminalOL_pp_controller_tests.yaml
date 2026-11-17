@@ -10,6 +10,8 @@ notes: 'Terminal 3-element-Windkessel-like outlet (series R_T1 = 0.2 R_T, compli
 known_issues:
 - port variable u_a not in variables_and_units
 - port variable v_a not in variables_and_units
+- CellML input u_a of controller_OL_type is not declared in the config
+- CellML input v_a of controller_OL_type is not declared in the config
 expected_failures:
   run_test: 'libcuflynx exits during generation: "the port variable u_a is not a variable for vessel type: terminalOL" (u_a/v_a
     used in entrance ports but missing from variables_and_units). Evidence: with u_a/v_a added as boundary_condition entries
