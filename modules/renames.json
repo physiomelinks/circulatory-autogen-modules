@@ -1,7 +1,28 @@
 {
  "schema_version": 1,
- "description": "(module_type, module_subtype) pairs this library no longer has -> the version that replaces each: circulatory_autogen's built-in modules and this library's renamed versions. Written by python -m cam_testing.release renames.",
+ "description": "(module_type, module_subtype) pairs this library no longer has -> the version that replaces each: circulatory_autogen's built-in modules and this library's renamed versions. Entries with \"by\": \"cuflynx-upgrade junctions\" are the junction module types, which that command converts (it renames variables too). Written by python -m cam_testing.release renames.",
  "renames": [
+  {
+   "from": [
+    "2in2out_junction",
+    "vv"
+   ],
+   "to": [
+    "arterial",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ],
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
   {
    "from": [
     "BG_volume_control",
@@ -144,13 +165,333 @@
   },
   {
    "from": [
+    "MinNout_junction",
+    "vv"
+   ],
+   "to": [
+    "arterial",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "MinNout_junction",
+    "vv_noI"
+   ],
+   "to": [
+    "simple",
+    "vv_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "MinNout_junction",
+    "vv_noI_SI"
+   ],
+   "to": [
+    "simple",
+    "vv_noI_SI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "MinNout_junction",
+    "vv_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "MinNout_junction",
+    "vv_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "MinNout_junction",
+    "vv_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "MinNout_junction",
+    "vv_simple"
+   ],
+   "to": [
+    "arterial_simple",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
     "MinNout_junction_2",
     "vv_noI"
    ],
    "to": [
-    "MinNout_junction",
+    "simple",
     "vv_noI_SI"
-   ]
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp"
+   ],
+   "to": [
+    "arterial",
+    "vp"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp_noI"
+   ],
+   "to": [
+    "simple",
+    "vp_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp_noI_SI"
+   ],
+   "to": [
+    "simple",
+    "vp_noI_SI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "vp_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "vp_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "vp_nonlinear_visco"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp_simple"
+   ],
+   "to": [
+    "arterial_simple",
+    "vp"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vp_simple_novisco"
+   ],
+   "to": [
+    "venous_novisco",
+    "vp_woCont"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vv"
+   ],
+   "to": [
+    "arterial",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vv_noI"
+   ],
+   "to": [
+    "simple",
+    "vv_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vv_noI_SI"
+   ],
+   "to": [
+    "simple",
+    "vv_noI_SI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vv_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vv_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vv_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction",
+    "vv_simple"
+   ],
+   "to": [
+    "arterial_simple",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
   },
   {
    "from": [
@@ -158,9 +499,13 @@
     "vp_noI"
    ],
    "to": [
-    "Min_junction",
+    "simple",
     "vp_noI_SI"
-   ]
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
   },
   {
    "from": [
@@ -168,9 +513,27 @@
     "vv_noI"
    ],
    "to": [
-    "Min_junction",
+    "simple",
     "vv_noI_SI"
-   ]
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "Min_junction_usV_C_ctl",
+    "vp_simple"
+   ],
+   "to": [
+    "arterial_simple",
+    "vp_usV_C_ctl"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
   },
   {
    "from": [
@@ -234,13 +597,213 @@
   },
   {
    "from": [
+    "Nout_junction",
+    "pv"
+   ],
+   "to": [
+    "arterial",
+    "pv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "pv_noI"
+   ],
+   "to": [
+    "simple",
+    "pv_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "pv_noI_SI"
+   ],
+   "to": [
+    "simple",
+    "pv_noI_SI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "pv_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "pv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "pv_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "pv_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "pv_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "pv_nonlinear_visco"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "pv_simple"
+   ],
+   "to": [
+    "arterial_simple",
+    "pv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "vv"
+   ],
+   "to": [
+    "arterial",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "vv_noI"
+   ],
+   "to": [
+    "simple",
+    "vv_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "vv_noI_SI"
+   ],
+   "to": [
+    "simple",
+    "vv_noI_SI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "vv_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "vv_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "vv_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "Nout_junction",
+    "vv_simple"
+   ],
+   "to": [
+    "arterial_simple",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
     "Nout_junction_2",
     "pv_noI"
    ],
    "to": [
-    "Nout_junction",
+    "simple",
     "pv_noI_SI"
-   ]
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
   },
   {
    "from": [
@@ -248,9 +811,13 @@
     "vv_noI"
    ],
    "to": [
-    "Nout_junction",
+    "simple",
     "vv_noI_SI"
-   ]
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
   },
   {
    "from": [
@@ -454,6 +1021,205 @@
   },
   {
    "from": [
+    "arteriole_Min",
+    "vp_micro"
+   ],
+   "to": [
+    "arteriole",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "arteriole_Minlet",
+    "pv_micro"
+   ],
+   "to": [
+    "arteriole",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "arteriole_Nout",
+    "pv_micro"
+   ],
+   "to": [
+    "arteriole",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "arteriole_Noutlet",
+    "vp_micro"
+   ],
+   "to": [
+    "arteriole",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "artery_Min",
+    "vp_micro"
+   ],
+   "to": [
+    "artery",
+    "vp_micro"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "artery_Min",
+    "vv_micro"
+   ],
+   "to": [
+    "artery",
+    "vv_micro"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "artery_MinNout",
+    "vv_micro"
+   ],
+   "to": [
+    "artery",
+    "vv_micro"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in",
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "artery_Minlet",
+    "pv_micro"
+   ],
+   "to": [
+    "artery",
+    "pv_micro"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "artery_Nout",
+    "pv_micro"
+   ],
+   "to": [
+    "artery",
+    "pv_micro"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "artery_Nout",
+    "vv_micro"
+   ],
+   "to": [
+    "artery",
+    "vv_micro"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "artery_Noutlet",
+    "vp_micro"
+   ],
+   "to": [
+    "artery",
+    "vp_micro"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "artery_inlet",
+    "pp_micro"
+   ],
+   "to": [
+    "artery",
+    "pp_micro"
+   ],
+   "by": "cuflynx-upgrade junctions"
+  },
+  {
+   "from": [
+    "artery_inlet",
+    "pv_micro"
+   ],
+   "to": [
+    "artery",
+    "pv_micro"
+   ],
+   "by": "cuflynx-upgrade junctions"
+  },
+  {
+   "from": [
+    "artery_outlet",
+    "pp_micro"
+   ],
+   "to": [
+    "artery",
+    "pp_micro"
+   ],
+   "by": "cuflynx-upgrade junctions"
+  },
+  {
+   "from": [
+    "artery_outlet",
+    "vp_micro"
+   ],
+   "to": [
+    "artery",
+    "vp_micro"
+   ],
+   "by": "cuflynx-upgrade junctions"
+  },
+  {
+   "from": [
     "baroreceptor",
     "nn"
    ],
@@ -461,6 +1227,96 @@
     "baroreceptor",
     "Ursino1998_v01"
    ]
+  },
+  {
+   "from": [
+    "capillary_Min",
+    "vp_micro"
+   ],
+   "to": [
+    "capillary",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "capillary_Minlet",
+    "pv_micro"
+   ],
+   "to": [
+    "capillary",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "capillary_Nout",
+    "pv_micro"
+   ],
+   "to": [
+    "capillary",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "capillary_Noutlet",
+    "vp_micro"
+   ],
+   "to": [
+    "capillary",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "capillary_merge",
+    "vp"
+   ],
+   "to": [
+    "capillary",
+    "vp"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "capillary_split",
+    "pv"
+   ],
+   "to": [
+    "capillary",
+    "pv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
   },
   {
    "from": [
@@ -614,6 +1470,24 @@
   },
   {
    "from": [
+    "flow_merge",
+    "vp"
+   ],
+   "to": null,
+   "by": "cuflynx-upgrade junctions",
+   "join": {
+    "side": "exit",
+    "variables": {
+     "v_in": 0,
+     "v_out": 0,
+     "u": 1,
+     "u_d": 1
+    }
+   },
+   "note": "a massless node: its neighbours are joined directly, the downstream vessel summing the inflows"
+  },
+  {
+   "from": [
     "flow_observer",
     "nn"
    ],
@@ -624,13 +1498,39 @@
   },
   {
    "from": [
+    "flow_split",
+    "pv"
+   ],
+   "to": null,
+   "by": "cuflynx-upgrade junctions",
+   "join": {
+    "side": "entrance",
+    "variables": {
+     "v": 0,
+     "v_out": 0,
+     "u_in": 1,
+     "u": 1
+    }
+   },
+   "note": "a massless node: its neighbours are joined directly, the upstream vessel summing the outflows"
+  },
+  {
+   "from": [
+    "flow_sum_2",
+    "Safaei2016_v01"
+   ],
+   "to": null,
+   "by": "cuflynx-upgrade junctions",
+   "note": "it adds two flow_port flows; give the module that takes the total a flow_port with \"multi_port\": \"sum\" instead"
+  },
+  {
+   "from": [
     "flow_sum_2",
     "nn"
    ],
-   "to": [
-    "flow_sum_2",
-    "Safaei2016_v01"
-   ]
+   "to": null,
+   "by": "cuflynx-upgrade junctions",
+   "note": "it adds two flow_port flows; give the module that takes the total a flow_port with \"multi_port\": \"sum\" instead"
   },
   {
    "from": [
@@ -1245,6 +2145,28 @@
   {
    "from": [
     "inlet_flow",
+    "constant_2"
+   ],
+   "to": [
+    "inlet_flow",
+    "constant"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "split": [
+    [
+     "v_1",
+     "v"
+    ],
+    [
+     "v_2",
+     "v"
+    ]
+   ],
+   "note": "two constant inflows on one port, which only a junction with two inlets could take: two constant inlet_flow sources, which the summing inlet of the vessel adds"
+  },
+  {
+   "from": [
+    "inlet_flow",
     "nn_adan"
    ],
    "to": [
@@ -1289,8 +2211,20 @@
    ],
    "to": [
     "inlet_flow",
-    "constant_2"
-   ]
+    "constant"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "split": [
+    [
+     "v_1",
+     "v"
+    ],
+    [
+     "v_2",
+     "v"
+    ]
+   ],
+   "note": "two constant inflows on one port, which only a junction with two inlets could take: two constant inlet_flow sources, which the summing inlet of the vessel adds"
   },
   {
    "from": [
@@ -1464,6 +2398,176 @@
   },
   {
    "from": [
+    "merge_junction",
+    "vp"
+   ],
+   "to": [
+    "arterial",
+    "vp"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction",
+    "vp_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "vp_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction",
+    "vp_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "vp_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction",
+    "vp_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "vp_nonlinear_visco"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction",
+    "vv"
+   ],
+   "to": [
+    "arterial",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction",
+    "vv_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction",
+    "vv_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction",
+    "vv_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear_visco"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction_simple",
+    "vp"
+   ],
+   "to": [
+    "arterial_simple",
+    "vp"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "merge_junction_simple",
+    "vv"
+   ],
+   "to": [
+    "arterial_simple",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
     "muscle_pressure",
     "nn_constant"
    ],
@@ -1624,6 +2728,193 @@
   },
   {
    "from": [
+    "split_junction",
+    "pv"
+   ],
+   "to": [
+    "arterial",
+    "pv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "pv_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "pv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "pv_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "pv_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "pv_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "pv_nonlinear_visco"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "vv"
+   ],
+   "to": [
+    "arterial",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "vv_nonlinear"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "vv_nonlinear_constR"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear_constR"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "vv_nonlinear_visco"
+   ],
+   "to": [
+    "arterial",
+    "vv_nonlinear_visco"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction",
+    "vv_novisco"
+   ],
+   "to": [
+    "arterial",
+    "vv_novisco"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction_simple",
+    "pv"
+   ],
+   "to": [
+    "arterial_simple",
+    "pv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "split_junction_simple",
+    "vv"
+   ],
+   "to": [
+    "arterial_simple",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
     "sum_blood_vol",
     "nn"
    ],
@@ -1734,6 +3025,62 @@
   },
   {
    "from": [
+    "vein_Min",
+    "vp_micro"
+   ],
+   "to": [
+    "vein",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "vein_Minlet",
+    "pv_micro"
+   ],
+   "to": [
+    "vein",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "vein_Nout",
+    "pv_micro"
+   ],
+   "to": [
+    "vein",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "vein_Noutlet",
+    "vp_micro"
+   ],
+   "to": [
+    "vein",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
     "venous_gas_mixing",
     "nn"
    ],
@@ -1741,6 +3088,130 @@
     "venous_gas_mixing",
     "ArgusUNPUBLISHED_v01"
    ]
+  },
+  {
+   "from": [
+    "venous_merge_junction",
+    "vp_nonlinear"
+   ],
+   "to": [
+    "venous",
+    "vp_nonlinear"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "venous_merge_junction_simple",
+    "vp"
+   ],
+   "to": [
+    "venous",
+    "vp_woCont"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "venous_merge_junction_simple",
+    "vv"
+   ],
+   "to": [
+    "venous",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "entrance": [
+     "v_in_1",
+     "v_in_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "venous_split_junction_simple",
+    "vv"
+   ],
+   "to": [
+    "venous",
+    "vv"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "neighbour_variables": {
+    "exit": [
+     "v_out_1",
+     "v_out_2"
+    ]
+   }
+  },
+  {
+   "from": [
+    "venule_Min",
+    "vp_micro"
+   ],
+   "to": [
+    "venule",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
+  },
+  {
+   "from": [
+    "venule_Minlet",
+    "pv_micro"
+   ],
+   "to": [
+    "venule",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "venule_Nout",
+    "pv_micro"
+   ],
+   "to": [
+    "venule",
+    "pv_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_out_sum": "v_out"
+   }
+  },
+  {
+   "from": [
+    "venule_Noutlet",
+    "vp_micro"
+   ],
+   "to": [
+    "venule",
+    "vp_micro_noI"
+   ],
+   "by": "cuflynx-upgrade junctions",
+   "variables": {
+    "v_in_sum": "v_in"
+   }
   },
   {
    "from": [
