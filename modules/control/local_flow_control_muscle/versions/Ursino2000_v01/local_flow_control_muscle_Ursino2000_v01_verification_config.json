@@ -30,9 +30,11 @@
     "ranges": {
       "P_CO2_a": {"min": 3333, "max": 9333, "points": 7},
       "P_O2_a": {"min": 4000, "max": 20000, "points": 3},
-      "g_O2_m": {"min": 15, "max": 45, "points": 3}
+      "g_O2_m": {"min": 15, "max": 45, "points": 3},
+      "C_O2_p": {"min": 0.0775, "max": 0.18, "points": 5}
     },
-    "rationale": "PaCO2 25-70 mmHg; PaO2 is unused; g_O2_m limited to 15-45 (x0.5-1.5) because with C_O2_p = 0 (unset, see notes) larger values are harmless but a C_O2_p above 0.188 ml/ml makes R_mult singular."
+    "constraints": ["C_O2_p - C_O2_vm_nom < 1/g_O2_m"],
+    "rationale": "PaCO2 25-70 mmHg; PaO2 is unused; g_O2_m 15-45 (x0.5-1.5); C_O2_p from 0.5x its nominal 0.155 ml/ml to 0.18. R_mult = (1 + x_CO2)/(1 - g_O2_m x_O2) is singular where x_O2 = C_O2_p - C_O2_vm_nom reaches 1/g_O2_m (C_O2_p = 0.188 ml/ml at the nominal values), so points beyond it are outside the model (constraints)."
   },
   "timestep": {
     "scheme": "rk4",
@@ -51,7 +53,7 @@
     "default": {
       "baseline": {
         "status": "pending",
-        "reason": "Candidate: muscle (forearm/calf) vascular conductance vs arterial PCO2 or O2 content; needs an obtainable dataset and the C_O2_p port fix."
+        "reason": "Candidate: muscle (forearm/calf) vascular conductance vs arterial PCO2 or O2 content; needs an obtainable dataset."
       },
       "calibrate": {"note": "pending: see baseline"}
     }
