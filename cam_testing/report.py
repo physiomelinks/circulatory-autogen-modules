@@ -65,6 +65,7 @@ TEST_TITLES = {
     'verification_test_invariants': 'Verification: invariants',
     'verification_test_BC': 'Verification: boundary conditions',
     'verification_test_timestep': 'Verification: timestep convergence',
+    'verification_test_rhs': 'Verification: right-hand side vs reference',
     'stability_test': 'Stability: solvers & settings',
     'validation_test_baseline': 'Validation: baseline data',
     'validation_test_calibrate': 'Validation: calibrate & predict',
@@ -78,6 +79,7 @@ TEST_TITLES = {
 }
 TEST_SHORT = {
     'review_test': 'Reviewed', 'run_test': 'Run', 'verification_test_invariants': 'Invariants', 'verification_test_BC': 'BC sweep', 'verification_test_timestep': 'Timestep',
+    'verification_test_rhs': 'RHS reference',
     'stability_test': 'Stability', 'validation_test_baseline': 'Baseline', 'validation_test_calibrate': 'Calibrate', 'version_calibration': 'Calibration',
     'phlynx_export_test': 'PhLynx export', 'cuflynx_simulate_test': 'CUFLynx simulate', 'phlynx_equivalence_test': 'PhLynx equivalence',
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
@@ -121,6 +123,10 @@ TEST_ABOUT = {
                                   'successively halved steps. Differences between successive solutions must '
                                   'shrink at the scheme\'s order, and the finest solution must agree with '
                                   'libcuflynx\'s CVODE run at tight tolerances.',
+    'verification_test_rhs': 'Evaluates the generated right-hand side at the points of the spec\'s rhs_reference '
+                             '(time, states, parameter values) and checks the state rates, and any observed '
+                             'variables, equal the reference values (e.g. from the code the module was written '
+                             'from) to its rtol and atol. N/A without an rhs_reference.',
     'stability_test': 'Runs the version with a matrix of solvers, tolerances and timesteps. A '
                       'configuration works when it finishes with finite outputs within the tolerance of a '
                       'tight-tolerance reference. Declared-supported configurations must work.',
@@ -361,8 +367,11 @@ def not_applicable_reason(version, test):
         return NO_EQUIVALENT
     if test in COUPLED_TESTS and not version.spec.get('coupled_systems'):
         return NOT_COUPLED
+    if test == 'verification_test_rhs' and not version.spec.get('rhs_reference'):
+        return checks.NO_RHS_REFERENCE
     if checks.is_non_cellml(version):
-        if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep', 'stability_test'):
+        if test in ('verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
+                    'verification_test_rhs', 'stability_test'):
             return checks.non_cellml_reason(version)
         if test in phlynx.PIPELINE_TESTS:
             return phlynx.EXTERNAL_REASON if checks.is_external_api(version) else phlynx.CPP_REASON
