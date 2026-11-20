@@ -1,0 +1,3122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.cellml.org/cellml/2.0#" name="CardiovascularSystem">
+  <units name="s2">
+    <unit exponent="2" units="second"/>
+  </units>
+  <units name="Hz">
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="millis">
+    <unit prefix="milli" units="second"/>
+  </units>
+  <units name="per_millis">
+    <unit exponent="-1" units="millis"/>
+  </units>
+  <units name="mm">
+    <unit prefix="milli" units="metre"/>
+  </units>
+  <units name="m2">
+    <unit exponent="2" units="metre"/>
+  </units>
+  <units name="mm2">
+    <unit exponent="2" prefix="milli" units="metre"/>
+  </units>
+  <units name="m3">
+    <unit exponent="3" units="metre"/>
+  </units>
+  <units name="m4">
+    <unit exponent="4" units="metre"/>
+  </units>
+  <units name="mm3">
+    <unit exponent="3" prefix="milli" units="metre"/>
+  </units>
+  <units name="J_per_s">
+    <unit units="joule"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mol_per_s">
+    <unit units="mole"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mmol_per_s">
+    <unit prefix="milli" units="mole"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="umol_per_s">
+    <unit prefix="micro" units="mole"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="C_per_s">
+    <unit units="coulomb"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mC_per_s">
+    <unit prefix="milli" units="coulomb"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="uC_per_s">
+    <unit prefix="micro" units="coulomb"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="nC_per_s">
+    <unit prefix="nano" units="coulomb"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="Cm_per_millis">
+    <unit units="coulomb"/>
+    <unit units="metre"/>
+    <unit exponent="-1" prefix="milli" units="second"/>
+  </units>
+  <units name="m_per_s">
+    <unit units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mm_per_s">
+    <unit prefix="milli" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="um_per_s">
+    <unit prefix="milli" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="rad_per_s">
+    <unit units="radian"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="m3_per_s">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mL">
+    <unit prefix="milli" units="litre"/>
+  </units>
+  <units name="per_milliL_s">
+    <unit exponent="-1" prefix="milli" units="litre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="s_per_m3">
+    <unit units="second"/>
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="s_per_milliV">
+    <unit units="second"/>
+    <unit exponent="-1" prefix="milli" units="volt"/>
+  </units>
+  <units name="s_per_millis">
+    <unit units="second"/>
+    <unit exponent="-1" prefix="milli" units="second"/>
+  </units>
+  <units name="millis_per_s">
+    <unit prefix="milli" units="second"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mm3_per_s">
+    <unit exponent="3" prefix="milli" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="l_per_s">
+    <unit units="litre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="per_ml_s">
+    <unit exponent="-1" prefix="milli" units="litre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="per_m3_s">
+    <unit exponent="-3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="J_per_mol">
+    <unit units="joule"/>
+    <unit exponent="-1" units="mole"/>
+  </units>
+  <units name="J_per_kmol_K">
+    <unit units="joule"/>
+    <unit exponent="-1" prefix="kilo" units="mole"/>
+    <unit exponent="-1" units="kelvin"/>
+  </units>
+  <units name="J_per_M">
+    <unit units="J_per_mol"/>
+  </units>
+  <units name="J_per_C">
+    <unit units="joule"/>
+    <unit exponent="-1" units="coulomb"/>
+  </units>
+  <units name="J_per_C_s">
+    <unit units="joule"/>
+    <unit exponent="-1" units="coulomb"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="J_per_m">
+    <unit units="joule"/>
+    <unit exponent="-1" units="metre"/>
+  </units>
+  <units name="J_per_m3">
+    <unit units="joule"/>
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="mmHg">
+    <unit multiplier="133.32" units="pascal"/>
+  </units>
+  <units name="per_mmHg">
+    <unit exponent="-1" units="mmHg"/>
+  </units>
+  <units name="mmHg2">
+    <unit exponent="2" units="mmHg"/>
+  </units>
+  <units name="Pa_per_mmHg">
+    <unit units="pascal"/>
+    <unit exponent="-1" units="mmHg"/>
+  </units>
+  <units name="m3_per_J">
+    <unit exponent="-1" units="joule"/>
+    <unit exponent="3" units="metre"/>
+  </units>
+  <units name="J_per_m3s">
+    <unit units="joule"/>
+    <unit exponent="-3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="m3_per_Js">
+    <unit exponent="-1" units="joule"/>
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="J2_per_m6">
+    <unit exponent="2" units="joule"/>
+    <unit exponent="-6" units="metre"/>
+  </units>
+  <units name="Js2_per_C2">
+    <unit exponent="2" units="second"/>
+    <unit units="joule"/>
+    <unit exponent="-2" units="coulomb"/>
+  </units>
+  <units name="Js2_per_mol2">
+    <unit units="joule"/>
+    <unit exponent="2" units="second"/>
+    <unit exponent="-2" units="mole"/>
+  </units>
+  <units name="Js_per_mol2">
+    <unit units="joule"/>
+    <unit units="second"/>
+    <unit exponent="-2" units="mole"/>
+  </units>
+  <units name="Js_per_C2">
+    <unit units="joule"/>
+    <unit units="second"/>
+    <unit exponent="-2" units="coulomb"/>
+  </units>
+  <units name="J_per_mol2">
+    <unit units="joule"/>
+    <unit exponent="-2" units="mole"/>
+  </units>
+  <units name="C2_per_J_s">
+    <unit exponent="2" units="coulomb"/>
+    <unit exponent="-1" units="joule"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="J_per_C2">
+    <unit units="joule"/>
+    <unit exponent="-2" units="coulomb"/>
+  </units>
+  <units name="C2_per_J">
+    <unit units="joule"/>
+    <unit exponent="-2" units="coulomb"/>
+  </units>
+  <units name="mol_per_m3">
+    <unit units="mole"/>
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="M">
+    <unit units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="mM">
+    <unit prefix="milli" units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="milliM">
+    <unit prefix="milli" units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="uM">
+    <unit prefix="micro" units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="kg_per_m3">
+    <unit units="kilogram"/>
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="m3_per_kg">
+    <unit exponent="-1" units="kilogram"/>
+    <unit exponent="3" units="metre"/>
+  </units>
+  <units name="per_m3">
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="mol_per_m2_s">
+    <unit units="mole"/>
+    <unit exponent="-2" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mM_m_per_s">
+    <unit units="mM"/>
+    <unit units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="J_per_m2_s">
+    <unit units="joule"/>
+    <unit exponent="-2" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="Js_per_m4">
+    <unit units="joule"/>
+    <unit units="second"/>
+    <unit exponent="-4" units="metre"/>
+  </units>
+  <units name="mM_per_s">
+    <unit units="mM"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="per_s">
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="per_s2">
+    <unit exponent="-2" units="second"/>
+  </units>
+  <units name="per_mM_s">
+    <unit exponent="-1" units="mM"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="m6_per_mol2_s">
+    <unit exponent="6" units="metre"/>
+    <unit exponent="-2" units="mole"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="m3_per_mol">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="mole"/>
+  </units>
+  <units name="mol_per_m3_s">
+    <unit units="mole"/>
+    <unit exponent="-3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="per_mol">
+    <unit exponent="-1" units="mole"/>
+  </units>
+  <units name="J_per_mol_K">
+    <unit units="joule"/>
+    <unit exponent="-1" units="mole"/>
+    <unit exponent="-1" units="kelvin"/>
+  </units>
+  <units name="m2_per_s">
+    <unit exponent="2" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="per_C">
+    <unit exponent="-1" units="coulomb"/>
+  </units>
+  <units name="per_m">
+    <unit exponent="-1" units="metre"/>
+  </units>
+  <units name="per_mM">
+    <unit exponent="-1" units="mM"/>
+  </units>
+  <units name="Js2_per_m2">
+    <unit units="joule"/>
+    <unit exponent="2" units="second"/>
+    <unit exponent="-2" units="metre"/>
+  </units>
+  <units name="Js_per_m2">
+    <unit units="joule"/>
+    <unit units="second"/>
+    <unit exponent="-2" units="metre"/>
+  </units>
+  <units name="J_per_m2">
+    <unit units="joule"/>
+    <unit exponent="-2" units="metre"/>
+  </units>
+  <units name="m_per_s2">
+    <unit units="metre"/>
+    <unit exponent="-2" units="second"/>
+  </units>
+  <units name="rad_per_s2">
+    <unit units="radian"/>
+    <unit exponent="-2" units="second"/>
+  </units>
+  <units name="Js_per_m3">
+    <unit units="joule"/>
+    <unit units="second"/>
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="Js2_per_m5">
+    <unit units="joule"/>
+    <unit exponent="2" units="second"/>
+    <unit exponent="-5" units="metre"/>
+  </units>
+  <units name="m5_per_Js2">
+    <unit exponent="-1" units="joule"/>
+    <unit exponent="-2" units="second"/>
+    <unit exponent="5" units="metre"/>
+  </units>
+  <units name="J_per_m6">
+    <unit units="joule"/>
+    <unit exponent="-6" units="metre"/>
+  </units>
+  <units name="m6_per_J">
+    <unit exponent="6" units="metre"/>
+    <unit exponent="-1" units="joule"/>
+  </units>
+  <units name="m6_per_Js">
+    <unit exponent="6" units="metre"/>
+    <unit exponent="-1" units="joule"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mm6_per_J">
+    <unit exponent="6" prefix="milli" units="metre"/>
+    <unit exponent="-1" units="joule"/>
+  </units>
+  <units name="Js2_per_m9">
+    <unit units="joule"/>
+    <unit exponent="2" units="second"/>
+    <unit exponent="-9" units="metre"/>
+  </units>
+  <units name="m6s_per_J">
+    <unit units="second"/>
+    <unit exponent="6" units="metre"/>
+    <unit exponent="-1" units="joule"/>
+  </units>
+  <units name="Js_per_m6">
+    <unit units="joule"/>
+    <unit units="second"/>
+    <unit exponent="-6" units="metre"/>
+  </units>
+  <units name="Js2_per_m6">
+    <unit units="joule"/>
+    <unit exponent="2" units="second"/>
+    <unit exponent="-6" units="metre"/>
+  </units>
+  <units name="m3_per_s2">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-2" units="second"/>
+  </units>
+  <units name="mm3_per_s2">
+    <unit exponent="3" prefix="milli" units="metre"/>
+    <unit exponent="-2" units="second"/>
+  </units>
+  <units name="per_mm3">
+    <unit exponent="-3" prefix="milli" units="metre"/>
+  </units>
+  <units name="UnitValve">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+    <unit exponent="-0.5" units="J_per_m3"/>
+  </units>
+  <units name="J_per_m9">
+    <unit units="joule"/>
+    <unit exponent="-9" units="metre"/>
+  </units>
+  <units name="milliV">
+    <unit prefix="milli" units="volt"/>
+  </units>
+  <units name="per_milliV">
+    <unit exponent="-1" units="milliV"/>
+  </units>
+  <units name="millis_per_milliV">
+    <unit exponent="-1" units="milliV"/>
+    <unit units="millis"/>
+  </units>
+  <units name="per_V">
+    <unit exponent="-1" units="volt"/>
+  </units>
+  <units name="milliV_per_V">
+    <unit units="milliV"/>
+    <unit exponent="-1" units="volt"/>
+  </units>
+  <units name="V_per_milliV">
+    <unit units="volt"/>
+    <unit exponent="-1" units="milliV"/>
+  </units>
+  <units name="V_per_s">
+    <unit units="volt"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="milliV_per_kiloV">
+    <unit prefix="milli" units="volt"/>
+    <unit exponent="-1" prefix="kilo" units="volt"/>
+  </units>
+  <units name="V2">
+    <unit exponent="2" units="volt"/>
+  </units>
+  <units name="milliV2">
+    <unit exponent="2" prefix="milli" units="volt"/>
+  </units>
+  <units name="millimol">
+    <unit prefix="milli" units="mole"/>
+  </units>
+  <units name="millimolar">
+    <unit prefix="milli" units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="per_millimolar">
+    <unit exponent="-1" units="millimolar"/>
+  </units>
+  <units name="per_millimolar_s">
+    <unit exponent="-1" units="millimolar"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="per_millimolar2_s">
+    <unit exponent="-2" units="millimolar"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="millimolar_per_s">
+    <unit units="millimolar"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="millimolar_per_megamolar">
+    <unit units="millimolar"/>
+    <unit exponent="-1" prefix="mega" units="mole"/>
+    <unit units="litre"/>
+  </units>
+  <units name="per_millimol_milliS">
+    <unit exponent="-1" prefix="milli" units="mole"/>
+    <unit exponent="-1" prefix="milli" units="siemens"/>
+  </units>
+  <units name="per_millimol_millis">
+    <unit exponent="-1" prefix="milli" units="mole"/>
+    <unit exponent="-1" prefix="milli" units="second"/>
+  </units>
+  <units name="per_millimol_s">
+    <unit exponent="-1" prefix="milli" units="mole"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="microm">
+    <unit prefix="micro" units="metre"/>
+  </units>
+  <units name="microS">
+    <unit prefix="micro" units="siemens"/>
+  </units>
+  <units name="microm3">
+    <unit exponent="3" units="microm"/>
+  </units>
+  <units name="m3_per_microm3">
+    <unit units="m3"/>
+    <unit exponent="-1" units="microm3"/>
+  </units>
+  <units name="picoF">
+    <unit prefix="pico" units="farad"/>
+  </units>
+  <units name="S_per_F">
+    <unit units="siemens"/>
+    <unit exponent="-1" units="farad"/>
+  </units>
+  <units name="m3_per_Fs">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="farad"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="A_per_F">
+    <unit units="ampere"/>
+    <unit exponent="-1" units="farad"/>
+  </units>
+  <units name="megaOhm">
+    <unit prefix="mega" units="ohm"/>
+  </units>
+  <units name="nanoA">
+    <unit prefix="nano" units="ampere"/>
+  </units>
+  <units name="nanoA_per_milliA">
+    <unit prefix="nano" units="ampere"/>
+    <unit exponent="-1" prefix="milli" units="ampere"/>
+  </units>
+  <units name="nanoA_per_A">
+    <unit prefix="nano" units="ampere"/>
+    <unit exponent="-1" units="ampere"/>
+  </units>
+  <units name="A_per_nanoA">
+    <unit exponent="-1" prefix="nano" units="ampere"/>
+    <unit units="ampere"/>
+  </units>
+  <units name="C_per_mol">
+    <unit units="coulomb"/>
+    <unit exponent="-1" units="mole"/>
+  </units>
+  <units name="m3_per_J_millis">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="joule"/>
+    <unit exponent="-1" prefix="milli" units="second"/>
+  </units>
+  <units name="m3_per_mol_millis">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="mole"/>
+    <unit exponent="-1" prefix="milli" units="second"/>
+  </units>
+  <units name="m3_per_millimol_s">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+    <unit exponent="-1" prefix="milli" units="mole"/>
+  </units>
+  <units name="millimol_per_m3">
+    <unit exponent="-3" units="metre"/>
+    <unit prefix="milli" units="mole"/>
+  </units>
+  <units name="Hz2">
+    <unit exponent="-2" units="second"/>
+  </units>
+  <units name="cm">
+    <unit prefix="centi" units="metre"/>
+  </units>
+  <units name="J_per_m4_s">
+    <unit exponent="-4" units="metre"/>
+    <unit units="joule"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="m3_per_mol_per_sec">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="mole"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mol_per_m3_per_kPa">
+    <unit units="mole"/>
+    <unit exponent="-3" units="metre"/>
+    <unit exponent="-1" prefix="kilo" units="pascal"/>
+  </units>
+  <units name="mol_per_m3_per_Pa">
+    <unit units="mole"/>
+    <unit exponent="-3" units="metre"/>
+    <unit exponent="-1" units="pascal"/>
+  </units>
+  <units name="m3_per_mol_per_s">
+    <unit exponent="3" units="metre"/>
+    <unit exponent="-1" units="mole"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="mol_per_m3_per_s">
+    <unit units="mole"/>
+    <unit exponent="-3" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="dim">
+    <unit units="dimensionless"/>
+  </units>
+  <units name="fmol">
+    <unit prefix="femto" units="mole"/>
+  </units>
+  <units name="per_fmol">
+    <unit exponent="-1" units="fmol"/>
+  </units>
+  <units name="nJ_per_s">
+    <unit prefix="nano" units="joule"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="fmol_per_s">
+    <unit units="fmol"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="nC_per_fmol">
+    <unit prefix="nano" units="coulomb"/>
+    <unit exponent="-1" units="fmol"/>
+  </units>
+  <units name="nC">
+    <unit prefix="nano" units="coulomb"/>
+  </units>
+  <units name="nJ_per_fmol">
+    <unit prefix="nano" units="joule"/>
+    <unit exponent="-1" units="fmol"/>
+  </units>
+  <units name="nJ_per_nC">
+    <unit prefix="nano" units="joule"/>
+    <unit exponent="-1" units="nC"/>
+  </units>
+  <units name="fC">
+    <unit prefix="femto" units="coulomb"/>
+  </units>
+  <units name="fF">
+    <unit prefix="femto" units="farad"/>
+  </units>
+  <units name="volt_per_sec">
+    <unit exponent="-1" units="second"/>
+    <unit units="volt"/>
+  </units>
+  <units name="J_per_K_per_mol">
+    <unit units="joule"/>
+    <unit exponent="-1" units="kelvin"/>
+    <unit exponent="-1" units="mole"/>
+  </units>
+  <units name="nS">
+    <unit prefix="nano" units="siemens"/>
+  </units>
+  <units name="nSmV">
+    <unit units="nS"/>
+    <unit units="mV"/>
+  </units>
+  <units name="per_ms">
+    <unit exponent="-1" prefix="milli" units="second"/>
+  </units>
+  <units name="mM4">
+    <unit exponent="4" units="mM"/>
+  </units>
+  <units name="mM_per_ms">
+    <unit units="mM"/>
+    <unit exponent="-1" units="ms"/>
+  </units>
+  <units name="mMms">
+    <unit units="mM"/>
+    <unit units="ms"/>
+  </units>
+  <units name="per_mMms">
+    <unit exponent="-1" units="mMms"/>
+  </units>
+  <units name="molar">
+    <unit units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="micromolar">
+    <unit prefix="micro" units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="nanomolar">
+    <unit prefix="nano" units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="ms">
+    <unit prefix="milli" units="second"/>
+  </units>
+  <units name="m_cubed">
+    <unit prefix="kilo" units="metre"/>
+  </units>
+  <units name="mV">
+    <unit prefix="milli" units="volt"/>
+  </units>
+  <units name="m_cubed_per_second">
+    <unit units="m_cubed"/>
+    <unit units="per_s"/>
+  </units>
+  <units name="micromolar_m_cubed">
+    <unit units="micromolar"/>
+    <unit units="m_cubed"/>
+  </units>
+  <units name="C">
+    <unit units="ampere"/>
+    <unit units="second"/>
+  </units>
+  <units name="C_per_millimol">
+    <unit units="C"/>
+    <unit exponent="-1" prefix="milli" units="mole"/>
+  </units>
+  <units name="picoA">
+    <unit prefix="pico" units="ampere"/>
+  </units>
+  <units name="picoA_per_nanoA">
+    <unit prefix="pico" units="ampere"/>
+    <unit exponent="-1" prefix="nano" units="ampere"/>
+  </units>
+  <units name="picoA_per_picoFarad">
+    <unit units="picoA"/>
+    <unit exponent="-1" units="picoFarad"/>
+  </units>
+  <units name="microL">
+    <unit prefix="micro" units="litre"/>
+  </units>
+  <units name="picoFarad">
+    <unit prefix="pico" units="farad"/>
+  </units>
+  <units name="cm3_per_second">
+    <unit exponent="3" prefix="centi" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="um3_per_second">
+    <unit exponent="3" prefix="micro" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="m3mM">
+    <unit exponent="3" units="metre"/>
+    <unit units="mM"/>
+  </units>
+  <units name="ms2">
+    <unit exponent="2" units="ms"/>
+  </units>
+  <units name="nM3_per_ps">
+    <unit exponent="3" prefix="nano" units="metre"/>
+    <unit exponent="-1" prefix="pico" units="second"/>
+  </units>
+  <units name="per_s_squared_m_cubed">
+    <unit exponent="-2" units="second"/>
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="per_meters_cubed">
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="umeter3">
+    <unit exponent="3" prefix="micro" units="metre"/>
+  </units>
+  <units name="mill1">
+    <unit exponent="-1" units="volt"/>
+    <unit prefix="milli" units="volt"/>
+  </units>
+  <units name="picoV">
+    <unit prefix="pico" units="volt"/>
+  </units>
+  <units name="pic0">
+    <unit exponent="-1" units="volt"/>
+    <unit units="picoV"/>
+  </units>
+  <units name="nanoV">
+    <unit prefix="nano" units="volt"/>
+  </units>
+  <units name="nan0">
+    <unit exponent="-1" units="volt"/>
+    <unit units="nanoV"/>
+  </units>
+  <units name="kPa">
+    <unit prefix="kilo" units="pascal"/>
+  </units>
+  <units name="L_per_s">
+    <unit exponent="3" prefix="deci" units="metre"/>
+    <unit exponent="-1" units="second"/>
+  </units>
+  <units name="L_per_s_per_kPa">
+    <unit exponent="3" prefix="deci" units="metre"/>
+    <unit exponent="-1" units="second"/>
+    <unit exponent="-1" prefix="kilo" units="pascal"/>
+  </units>
+  <units name="kPa_per_L">
+    <unit prefix="kilo" units="pascal"/>
+    <unit exponent="-3" prefix="deci" units="metre"/>
+  </units>
+  <units name="L_per_kPa">
+    <unit exponent="3" prefix="deci" units="metre"/>
+    <unit exponent="-1" prefix="kilo" units="pascal"/>
+  </units>
+  <units name="kPa_s_per_L">
+    <unit prefix="kilo" units="pascal"/>
+    <unit units="second"/>
+    <unit exponent="-3" prefix="deci" units="metre"/>
+  </units>
+  <units name="mol_per_L">
+    <unit units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="L_per_mol">
+    <unit units="litre"/>
+    <unit exponent="-1" units="mole"/>
+  </units>
+  <units name="minute">
+    <unit multiplier="60" units="second"/>
+  </units>
+  <units name="umol">
+    <unit prefix="micro" units="mole"/>
+  </units>
+  <units name="per_umol">
+    <unit exponent="-1" units="umol"/>
+  </units>
+  <units name="umol_per_minute">
+    <unit units="umol"/>
+    <unit exponent="-1" units="minute"/>
+  </units>
+  <units name="J_per_umol">
+    <unit units="joule"/>
+    <unit exponent="-1" units="umol"/>
+  </units>
+  <units name="per_minute">
+    <unit exponent="-1" units="minute"/>
+  </units>
+  <units name="per_minute_umol">
+    <unit exponent="-1" units="minute"/>
+    <unit exponent="-1" units="umol"/>
+  </units>
+  <units name="umolar">
+    <unit prefix="micro" units="mole"/>
+    <unit exponent="-1" units="litre"/>
+  </units>
+  <units name="per_umolar">
+    <unit exponent="-1" units="umolar"/>
+  </units>
+  <units name="umolar_per_minute">
+    <unit units="umolar"/>
+    <unit exponent="-1" units="minute"/>
+  </units>
+  <units name="J_per_umolar">
+    <unit units="joule"/>
+    <unit exponent="-1" units="umolar"/>
+  </units>
+  <units name="per_minute_umolar">
+    <unit exponent="-1" units="minute"/>
+    <unit exponent="-1" units="umolar"/>
+  </units>
+  <units name="L_per_m3">
+    <unit units="litre"/>
+    <unit exponent="-3" units="metre"/>
+  </units>
+  <units name="pH">
+    <unit units="dimensionless"/>
+  </units>
+  <units name="Celsius">
+    <unit units="kelvin"/>
+  </units>
+  <units name="Celsius_1">
+    <unit exponent="-1" units="Celsius"/>
+  </units>
+  <units name="Celsius_2">
+    <unit exponent="-2" units="Celsius"/>
+  </units>
+  <component name="parameters">
+    <variable name="tau_lung_lung_stretch" units="second" initial_value="2.0" interface="public"/>
+    <variable name="G_al_lung_stretch" units="per_m3_s" initial_value="23.291e6" interface="public"/>
+    <variable name="q_str_lung_stretch" units="m3" initial_value="0.0" interface="public"/>
+    <variable name="P_baro_init_baroreceptor" units="J_per_m3" initial_value="39990" interface="public"/>
+    <variable name="P_nom_baroreceptor" units="J_per_m3" initial_value="12263.6" interface="public"/>
+    <variable name="tau_zb_baroreceptor" units="second" initial_value="6.37" interface="public"/>
+    <variable name="tau_pb_baroreceptor" units="second" initial_value="2.076" interface="public"/>
+    <variable name="f_ab_min_baroreceptor" units="Hz" initial_value="2.52" interface="public"/>
+    <variable name="f_ab_max_baroreceptor" units="Hz" initial_value="47.78" interface="public"/>
+    <variable name="k_ab_baroreceptor" units="J_per_m3" initial_value="1567.3414" interface="public"/>
+    <variable name="P_sys_baroreceptor" units="J_per_m3" initial_value="16662" interface="public"/>
+    <variable name="dP_sys_dt_baroreceptor" units="J_per_m3s" initial_value="26.66" interface="public"/>
+    <variable name="tau_cp_cardiopulm_receptor" units="second" initial_value="2" interface="public"/>
+    <variable name="P_l_init_cardiopulm_receptor" units="J_per_m3" initial_value="0.0" interface="public"/>
+    <variable name="f_maxl_cardiopulm_receptor" units="Hz" initial_value="20" interface="public"/>
+    <variable name="P_tn_cardiopulm_receptor" units="J_per_m3" initial_value="1440" interface="public"/>
+    <variable name="k_l_cardiopulm_receptor" units="J_per_m3" initial_value="190.47809" interface="public"/>
+    <variable name="P_pvn_cardiopulm_receptor" units="J_per_m3" initial_value="500" interface="public"/>
+    <variable name="P_mus_cardiopulm_receptor" units="J_per_m3" initial_value="500" interface="public"/>
+    <variable name="G_abh_sympathetic_afferent" units="dimensionless" initial_value="1.0" interface="public"/>
+    <variable name="G_alh_sympathetic_afferent" units="dimensionless" initial_value="1.541" interface="public"/>
+    <variable name="G_ach_sympathetic_afferent" units="dimensionless" initial_value="2.0" interface="public"/>
+    <variable name="G_abp_sympathetic_afferent" units="dimensionless" initial_value="1.0" interface="public"/>
+    <variable name="G_alp_sympathetic_afferent" units="dimensionless" initial_value="0.33" interface="public"/>
+    <variable name="G_acp_sympathetic_afferent" units="dimensionless" initial_value="2.5" interface="public"/>
+    <variable name="G_abv_sympathetic_afferent" units="dimensionless" initial_value="1.0" interface="public"/>
+    <variable name="G_alv_sympathetic_afferent" units="dimensionless" initial_value="0.0" interface="public"/>
+    <variable name="G_acv_sympathetic_afferent" units="dimensionless" initial_value="0.0" interface="public"/>
+    <variable name="f_esinf_sympathetic_efferent" units="Hz" initial_value="2.1" interface="public"/>
+    <variable name="f_es0_sympathetic_efferent" units="Hz" initial_value="16.11" interface="public"/>
+    <variable name="k_es_sympathetic_efferent" units="second" initial_value="0.0675" interface="public"/>
+    <variable name="f_min_br_NTS" units="Hz" initial_value="0.304" interface="public"/>
+    <variable name="f_max_br_NTS" units="Hz" initial_value="21.499" interface="public"/>
+    <variable name="f_mid_br_NTS" units="Hz" initial_value="44.125" interface="public"/>
+    <variable name="f_min_ls_NTS" units="Hz" initial_value="2.75" interface="public"/>
+    <variable name="f_max_ls_NTS" units="Hz" initial_value="31.569" interface="public"/>
+    <variable name="f_mid_ls_NTS" units="Hz" initial_value="11.126" interface="public"/>
+    <variable name="f_min_cp_NTS" units="Hz" initial_value="0.451" interface="public"/>
+    <variable name="f_max_cp_NTS" units="Hz" initial_value="28.327" interface="public"/>
+    <variable name="f_mid_cp_NTS" units="Hz" initial_value="10.2" interface="public"/>
+    <variable name="f_min_ch_NTS" units="Hz" initial_value="2.2343941" interface="public"/>
+    <variable name="f_max_ch_NTS" units="Hz" initial_value="25" interface="public"/>
+    <variable name="f_mid_ch_NTS" units="Hz" initial_value="0.05" interface="public"/>
+    <variable name="k_NTS_br_NTS" units="dimensionless" initial_value="21" interface="public"/>
+    <variable name="k_NTS_ls_NTS" units="dimensionless" initial_value="2" interface="public"/>
+    <variable name="k_NTS_cp_NTS" units="dimensionless" initial_value="7" interface="public"/>
+    <variable name="k_NTS_ch_NTS" units="dimensionless" initial_value="1.0" interface="public"/>
+    <variable name="f_apc_NTS" units="Hz" initial_value="3.7" interface="public"/>
+    <variable name="f_min_DMV_DMV" units="Hz" initial_value="2.59" interface="public"/>
+    <variable name="f_max_DMV_DMV" units="Hz" initial_value="6.66" interface="public"/>
+    <variable name="f_mid_DMV_DMV" units="Hz" initial_value="42.91" interface="public"/>
+    <variable name="k_DMV_DMV" units="dimensionless" initial_value="33.5" interface="public"/>
+    <variable name="f_min_NA_NA" units="Hz" initial_value="4.88" interface="public"/>
+    <variable name="f_max_NA_NA" units="Hz" initial_value="15.78" interface="public"/>
+    <variable name="f_mid_NA_NA" units="Hz" initial_value="59.83" interface="public"/>
+    <variable name="k_RSA_NA" units="dimensionless" initial_value="0.5" interface="public"/>
+    <variable name="k_NA_NA" units="dimensionless" initial_value="23" interface="public"/>
+    <variable name="s_floor_NA" units="dimensionless" initial_value="0.0" interface="public"/>
+    <variable name="f_min_NActr_NActr" units="Hz" initial_value="0.61" interface="public"/>
+    <variable name="f_max_NActr_NActr" units="Hz" initial_value="11" interface="public"/>
+    <variable name="f_mid_NActr_NActr" units="Hz" initial_value="12.81" interface="public"/>
+    <variable name="k_NActr_NActr" units="dimensionless" initial_value="23" interface="public"/>
+    <variable name="f_min_LCN_LCN" units="Hz" initial_value="1.9886" interface="public"/>
+    <variable name="f_max_LCN_LCN" units="Hz" initial_value="18.3757" interface="public"/>
+    <variable name="f_mid_LCN_LCN" units="Hz" initial_value="521.2172" interface="public"/>
+    <variable name="k_evEmax_gainLCN_LCN" units="dimensionless" initial_value="3.3299" interface="public"/>
+    <variable name="k_br_gainLCN_LCN" units="dimensionless" initial_value="2.6617" interface="public"/>
+    <variable name="k_esh_gainLCN_LCN" units="dimensionless" initial_value="0.0668" interface="public"/>
+    <variable name="k_cp_gainLCN_LCN" units="dimensionless" initial_value="5.643" interface="public"/>
+    <variable name="k_LCN_LCN" units="dimensionless" initial_value="2.8473" interface="public"/>
+    <variable name="f_min_PNNA_PNNA" units="Hz" initial_value="0.857242" interface="public"/>
+    <variable name="f_max_PNNA_PNNA" units="Hz" initial_value="12.624676" interface="public"/>
+    <variable name="f_mid_PNNA_PNNA" units="Hz" initial_value="13.811104" interface="public"/>
+    <variable name="f_vagal_stim_PNNA" units="Hz" initial_value="0.0" interface="public"/>
+    <variable name="k_PNNA_PNNA" units="dimensionless" initial_value="3.230162" interface="public"/>
+    <variable name="f_min_PNDMV_PNDMV" units="Hz" initial_value="2.4152" interface="public"/>
+    <variable name="f_max_PNDMV_PNDMV" units="Hz" initial_value="17.719" interface="public"/>
+    <variable name="f_mid_PNDMV_PNDMV" units="Hz" initial_value="14.1838" interface="public"/>
+    <variable name="k_PNDMV_PNDMV" units="dimensionless" initial_value="13.3561" interface="public"/>
+    <variable name="tau_PNDMV_PNDMV" units="second" initial_value="3.333" interface="public"/>
+    <variable name="G_Ts_heart_effector_T" units="second" initial_value="-0.13" interface="public"/>
+    <variable name="G_Tv_heart_effector_T" units="s2" initial_value="0.09" interface="public"/>
+    <variable name="tau_Ts_heart_effector_T" units="second" initial_value="2" interface="public"/>
+    <variable name="tau_Tv_heart_effector_T" units="second" initial_value="1.5" interface="public"/>
+    <variable name="G_Es_heart_effector_Elv" units="J_per_m6" initial_value="1.0e7" interface="public"/>
+    <variable name="tau_Es_heart_effector_Elv" units="second" initial_value="2" interface="public"/>
+    <variable name="G_Ev_heart_effector_Elv" units="Js_per_m6" initial_value="-0.5e7" interface="public"/>
+    <variable name="tau_Ev_heart_effector_Elv" units="second" initial_value="0.2" interface="public"/>
+    <variable name="scale_heart_effector_Elv" units="dimensionless" initial_value="1.0" interface="public"/>
+    <variable name="G_Es_heart_effector_Erv" units="J_per_m6" initial_value="0.5e7" interface="public"/>
+    <variable name="tau_Es_heart_effector_Erv" units="second" initial_value="2" interface="public"/>
+    <variable name="G_Ev_heart_effector_Erv" units="Js_per_m6" initial_value="-0.5e7" interface="public"/>
+    <variable name="tau_Ev_heart_effector_Erv" units="second" initial_value="0.2" interface="public"/>
+    <variable name="scale_heart_effector_Erv" units="dimensionless" initial_value="0.5903" interface="public"/>
+    <variable name="tau_Rsp_peripheral_effector_arms" units="second" initial_value="2.0" interface="public"/>
+    <variable name="G_Rsp_peripheral_effector_arms" units="Js_per_m6" initial_value="92.6574e6" interface="public"/>
+    <variable name="tau_Vusv_venous_volume_effector_lb" units="second" initial_value="5.0" interface="public"/>
+    <variable name="G_Vusv_venous_volume_effector_lb" units="m3" initial_value="-265.4e-6" interface="public"/>
+  </component>
+  <component name="parameters_global">
+    <variable name="f_es_min" units="Hz" initial_value="2.66" interface="public"/>
+  </component>
+  <component name="environment">
+    <variable name="time" units="second" interface="public"/>
+  </component>
+  <component name="lung_stretch_module">
+    <variable name="q_str" units="m3" interface="public"/>
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_ls" units="Hz" initial_value="0" interface="public"/>
+    <variable name="tau_lung" units="second" interface="public"/>
+    <variable name="G_al" units="per_m3_s" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>f_ls</ci>
+        </apply>
+        <apply>
+          <divide/>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>f_ls</ci>
+            </apply>
+            <apply>
+              <times/>
+              <ci>G_al</ci>
+              <ci>q_str</ci>
+            </apply>
+          </apply>
+          <ci>tau_lung</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="baroreceptor_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="P_sys" units="J_per_m3" interface="public"/>
+    <variable name="P_baro_init" units="J_per_m3" interface="public"/>
+    <variable name="P_baro" units="J_per_m3" initial_value="P_baro_init" interface="public"/>
+    <variable name="f_ab" units="Hz" interface="public"/>
+    <variable name="dP_sys_dt" units="J_per_m3s" interface="public"/>
+    <variable name="P_nom" units="J_per_m3" interface="public"/>
+    <variable name="f_ab_min" units="Hz" interface="public"/>
+    <variable name="f_ab_max" units="Hz" interface="public"/>
+    <variable name="k_ab" units="J_per_m3" interface="public"/>
+    <variable name="tau_zb" units="second" interface="public"/>
+    <variable name="tau_pb" units="second" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>P_baro</ci>
+        </apply>
+        <apply>
+          <divide/>
+          <apply>
+            <minus/>
+            <apply>
+              <plus/>
+              <ci>P_sys</ci>
+              <apply>
+                <times/>
+                <ci>tau_zb</ci>
+                <ci>dP_sys_dt</ci>
+              </apply>
+            </apply>
+            <ci>P_baro</ci>
+          </apply>
+          <ci>tau_pb</ci>
+        </apply>
+      </apply>
+      <apply>
+        <eq/>
+        <ci>f_ab</ci>
+        <apply>
+          <divide/>
+          <apply>
+            <plus/>
+            <ci>f_ab_min</ci>
+            <apply>
+              <times/>
+              <ci>f_ab_max</ci>
+              <apply>
+                <exp/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <minus/>
+                    <ci>P_baro</ci>
+                    <ci>P_nom</ci>
+                  </apply>
+                  <ci>k_ab</ci>
+                </apply>
+              </apply>
+            </apply>
+          </apply>
+          <apply>
+            <plus/>
+            <cn cellml:units="dimensionless">1</cn>
+            <apply>
+              <exp/>
+              <apply>
+                <divide/>
+                <apply>
+                  <minus/>
+                  <ci>P_baro</ci>
+                  <ci>P_nom</ci>
+                </apply>
+                <ci>k_ab</ci>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="cardiopulm_receptor_module">
+    <variable name="P_pvn" units="J_per_m3" interface="public"/>
+    <variable name="P_mus" units="J_per_m3" interface="public"/>
+    <variable name="P_pv_P_thor" units="J_per_m3" interface="public"/>
+    <variable name="t" units="second" interface="public"/>
+    <variable name="tau_cp" units="second" interface="public"/>
+    <variable name="P_l_init" units="J_per_m3" interface="public"/>
+    <variable name="P_l" units="J_per_m3" initial_value="P_l_init" interface="public"/>
+    <variable name="f_cp" units="Hz" interface="public"/>
+    <variable name="f_maxl" units="Hz" interface="public"/>
+    <variable name="P_tn" units="J_per_m3" interface="public"/>
+    <variable name="k_l" units="J_per_m3" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>P_pv_P_thor</ci>
+        <apply>
+          <minus/>
+          <ci>P_pvn</ci>
+          <ci>P_mus</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>P_l</ci>
+        </apply>
+        <apply>
+          <divide/>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>P_l</ci>
+            </apply>
+            <ci>P_pv_P_thor</ci>
+          </apply>
+          <ci>tau_cp</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_cp</ci>
+        <apply>
+          <divide/>
+          <ci>f_maxl</ci>
+          <apply>
+            <plus/>
+            <cn cellml:units="dimensionless">1</cn>
+            <apply>
+              <exp/>
+              <apply>
+                <divide/>
+                <apply>
+                  <minus/>
+                  <ci>P_tn</ci>
+                  <ci>P_l</ci>
+                </apply>
+                <ci>k_l</ci>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="sympathetic_afferent_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_ash" units="Hz" interface="public"/>
+    <variable name="G_abh" units="dimensionless" interface="public"/>
+    <variable name="f_br" units="Hz" interface="public"/>
+    <variable name="G_alh" units="dimensionless" interface="public"/>
+    <variable name="f_ls" units="Hz" interface="public"/>
+    <variable name="G_ach" units="dimensionless" interface="public"/>
+    <variable name="f_cp" units="Hz" interface="public"/>
+    <variable name="f_asp" units="Hz" interface="public"/>
+    <variable name="G_abp" units="dimensionless" interface="public"/>
+    <variable name="G_alp" units="dimensionless" interface="public"/>
+    <variable name="G_acp" units="dimensionless" interface="public"/>
+    <variable name="f_asv" units="Hz" interface="public"/>
+    <variable name="G_abv" units="dimensionless" interface="public"/>
+    <variable name="G_alv" units="dimensionless" interface="public"/>
+    <variable name="G_acv" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_ash</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <minus/>
+            <apply>
+              <times/>
+              <ci>G_abh</ci>
+              <ci>f_br</ci>
+            </apply>
+            <apply>
+              <times/>
+              <ci>G_alh</ci>
+              <ci>f_ls</ci>
+            </apply>
+          </apply>
+          <apply>
+            <times/>
+            <ci>G_ach</ci>
+            <apply>
+              <minus/>
+              <ci>f_cp</ci>
+              <cn cellml:units="Hz">10</cn>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_asp</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <times/>
+            <ci>G_abp</ci>
+            <ci>f_br</ci>
+          </apply>
+          <apply>
+            <times/>
+            <ci>G_alp</ci>
+            <ci>f_ls</ci>
+          </apply>
+          <apply>
+            <times/>
+            <ci>G_acp</ci>
+            <apply>
+              <minus/>
+              <ci>f_cp</ci>
+              <cn cellml:units="Hz">10</cn>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_asv</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <times/>
+            <ci>G_abv</ci>
+            <ci>f_br</ci>
+          </apply>
+          <apply>
+            <times/>
+            <ci>G_alv</ci>
+            <ci>f_ls</ci>
+          </apply>
+          <apply>
+            <times/>
+            <ci>G_acv</ci>
+            <apply>
+              <minus/>
+              <ci>f_cp</ci>
+              <cn cellml:units="Hz">10</cn>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="sympathetic_efferent_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_esh" units="Hz" interface="public"/>
+    <variable name="f_esinf" units="Hz" interface="public"/>
+    <variable name="f_es0" units="Hz" interface="public"/>
+    <variable name="k_es" units="second" interface="public"/>
+    <variable name="f_ash" units="Hz" interface="public"/>
+    <variable name="f_esp" units="Hz" interface="public"/>
+    <variable name="f_asp" units="Hz" interface="public"/>
+    <variable name="f_esv" units="Hz" interface="public"/>
+    <variable name="f_asv" units="Hz" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>f_esh</ci>
+        <apply>
+          <plus/>
+          <ci>f_esinf</ci>
+          <apply>
+            <times/>
+            <apply>
+              <minus/>
+              <ci>f_es0</ci>
+              <ci>f_esinf</ci>
+            </apply>
+            <apply>
+              <exp/>
+              <apply>
+                <times/>
+                <apply>
+                  <minus/>
+                  <ci>k_es</ci>
+                </apply>
+                <ci>f_ash</ci>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>f_esp</ci>
+        <apply>
+          <plus/>
+          <ci>f_esinf</ci>
+          <apply>
+            <times/>
+            <apply>
+              <minus/>
+              <ci>f_es0</ci>
+              <ci>f_esinf</ci>
+            </apply>
+            <apply>
+              <exp/>
+              <apply>
+                <times/>
+                <apply>
+                  <minus/>
+                  <ci>k_es</ci>
+                </apply>
+                <ci>f_asp</ci>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>f_esv</ci>
+        <apply>
+          <plus/>
+          <ci>f_esinf</ci>
+          <apply>
+            <times/>
+            <apply>
+              <minus/>
+              <ci>f_es0</ci>
+              <ci>f_esinf</ci>
+            </apply>
+            <apply>
+              <exp/>
+              <apply>
+                <times/>
+                <apply>
+                  <minus/>
+                  <ci>k_es</ci>
+                </apply>
+                <ci>f_asv</ci>
+              </apply>
+            </apply>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="NTS_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_br" units="Hz" interface="public"/>
+    <variable name="f_min_br" units="Hz" interface="public"/>
+    <variable name="f_max_br" units="Hz" interface="public"/>
+    <variable name="f_mid_br" units="Hz" interface="public"/>
+    <variable name="f_NTS_br" units="Hz" interface="public"/>
+    <variable name="k_NTS_br" units="dimensionless" interface="public"/>
+    <variable name="f_ls" units="Hz" interface="public"/>
+    <variable name="f_min_ls" units="Hz" interface="public"/>
+    <variable name="f_max_ls" units="Hz" interface="public"/>
+    <variable name="f_mid_ls" units="Hz" interface="public"/>
+    <variable name="f_NTS_ls" units="Hz" interface="public"/>
+    <variable name="k_NTS_ls" units="dimensionless" interface="public"/>
+    <variable name="f_cp" units="Hz" interface="public"/>
+    <variable name="f_min_cp" units="Hz" interface="public"/>
+    <variable name="f_max_cp" units="Hz" interface="public"/>
+    <variable name="f_mid_cp" units="Hz" interface="public"/>
+    <variable name="f_NTS_cp" units="Hz" interface="public"/>
+    <variable name="k_NTS_cp" units="dimensionless" interface="public"/>
+    <variable name="f_apc" units="Hz" interface="public"/>
+    <variable name="f_min_ch" units="Hz" interface="public"/>
+    <variable name="f_max_ch" units="Hz" interface="public"/>
+    <variable name="f_mid_ch" units="Hz" interface="public"/>
+    <variable name="f_NTS_ch" units="Hz" interface="public"/>
+    <variable name="k_NTS_ch" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_NTS_br</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_br</ci>
+              <ci>f_max_br</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <ci>f_br</ci>
+                  <ci>f_mid_br</ci>
+                </apply>
+                <ci>k_NTS_br</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_br</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_NTS_ls</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_ls</ci>
+              <ci>f_max_ls</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <ci>f_ls</ci>
+                  <ci>f_mid_ls</ci>
+                </apply>
+                <ci>k_NTS_ls</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_ls</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_NTS_cp</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_cp</ci>
+              <ci>f_max_cp</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <ci>f_cp</ci>
+                  <ci>f_mid_cp</ci>
+                </apply>
+                <ci>k_NTS_cp</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_cp</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_NTS_ch</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_ch</ci>
+              <ci>f_max_ch</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <ci>f_apc</ci>
+                  <ci>f_mid_ch</ci>
+                </apply>
+                <ci>k_NTS_ch</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_ch</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="DMV_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_NTS_ls" units="Hz" interface="public"/>
+    <variable name="f_NTS_cp" units="Hz" interface="public"/>
+    <variable name="f_min_DMV" units="Hz" interface="public"/>
+    <variable name="f_max_DMV" units="Hz" interface="public"/>
+    <variable name="f_mid_DMV" units="Hz" interface="public"/>
+    <variable name="f_DMV" units="Hz" interface="public"/>
+    <variable name="k_DMV" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_DMV</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_DMV</ci>
+              <ci>f_max_DMV</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <plus/>
+                    <ci>f_NTS_ls</ci>
+                    <ci>f_NTS_cp</ci>
+                  </apply>
+                  <ci>f_mid_DMV</ci>
+                </apply>
+                <ci>k_DMV</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_DMV</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="NA_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_NTS_br" units="Hz" interface="public"/>
+    <variable name="f_NTS_ls" units="Hz" interface="public"/>
+    <variable name="f_NTS_cp" units="Hz" interface="public"/>
+    <variable name="f_NTS_ch" units="Hz" interface="public"/>
+    <variable name="f_NTS_output" units="Hz" interface="public"/>
+    <variable name="f_NA_input" units="Hz" interface="public"/>
+    <variable name="k_RSA" units="dimensionless" interface="public"/>
+    <variable name="s_floor" units="dimensionless" interface="public"/>
+    <variable name="f_min_NA" units="Hz" interface="public"/>
+    <variable name="f_max_NA" units="Hz" interface="public"/>
+    <variable name="f_mid_NA" units="Hz" interface="public"/>
+    <variable name="f_NA" units="Hz" interface="public"/>
+    <variable name="k_NA" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_NTS_output</ci>
+        <apply>
+          <plus/>
+          <ci>f_NTS_br</ci>
+          <ci>f_NTS_ls</ci>
+          <ci>f_NTS_cp</ci>
+          <ci>f_NTS_ch</ci>
+        </apply>
+      </apply>
+      <apply>
+        <eq/>
+        <ci>f_NA_input</ci>
+        <piecewise>
+          <piece>
+            <ci>f_NTS_output</ci>
+            <apply>
+              <gt/>
+              <ci>s_floor</ci>
+              <cn cellml:units="dimensionless">0.4</cn>
+            </apply>
+          </piece>
+          <otherwise>
+            <apply>
+              <times/>
+              <ci>f_NTS_output</ci>
+              <ci>k_RSA</ci>
+            </apply>
+          </otherwise>
+        </piecewise>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_NA</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_NA</ci>
+              <ci>f_max_NA</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <ci>f_NA_input</ci>
+                  <ci>f_mid_NA</ci>
+                </apply>
+                <ci>k_NA</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_NA</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="NActr_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_NA" units="Hz" interface="public"/>
+    <variable name="f_min_NActr" units="Hz" interface="public"/>
+    <variable name="f_max_NActr" units="Hz" interface="public"/>
+    <variable name="f_mid_NActr" units="Hz" interface="public"/>
+    <variable name="f_NActr" units="Hz" interface="public"/>
+    <variable name="k_NActr" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_NActr</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_NActr</ci>
+              <ci>f_max_NActr</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <ci>f_NA</ci>
+                  <ci>f_mid_NActr</ci>
+                </apply>
+                <ci>k_NActr</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_NActr</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="LCN_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="k_evEmax_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="f_DMV" units="Hz" interface="public"/>
+    <variable name="f_NActr" units="Hz" interface="public"/>
+    <variable name="k_br_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="f_br" units="Hz" interface="public"/>
+    <variable name="k_esh_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="f_esh" units="Hz" interface="public"/>
+    <variable name="k_cp_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="f_cp" units="Hz" interface="public"/>
+    <variable name="f_input_LCN_sum" units="Hz" interface="public"/>
+    <variable name="f_input_LCN" units="Hz" interface="public"/>
+    <variable name="f_LCN" units="Hz" interface="public"/>
+    <variable name="f_mid_LCN" units="Hz" interface="public"/>
+    <variable name="f_min_LCN" units="Hz" interface="public"/>
+    <variable name="f_max_LCN" units="Hz" interface="public"/>
+    <variable name="k_LCN" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>f_input_LCN_sum</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <minus/>
+            <apply>
+              <plus/>
+              <apply>
+                <times/>
+                <ci>k_evEmax_gainLCN</ci>
+                <apply>
+                  <plus/>
+                  <ci>f_DMV</ci>
+                  <ci>f_NActr</ci>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <ci>k_br_gainLCN</ci>
+                <ci>f_br</ci>
+              </apply>
+            </apply>
+            <apply>
+              <times/>
+              <ci>k_esh_gainLCN</ci>
+              <ci>f_esh</ci>
+            </apply>
+          </apply>
+          <apply>
+            <times/>
+            <ci>k_cp_gainLCN</ci>
+            <ci>f_cp</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_input_LCN</ci>
+        <piecewise>
+          <piece>
+            <ci>f_input_LCN_sum</ci>
+            <apply>
+              <geq/>
+              <ci>f_input_LCN_sum</ci>
+              <cn cellml:units="Hz">0</cn>
+            </apply>
+          </piece>
+          <otherwise>
+            <cn cellml:units="Hz">0</cn>
+          </otherwise>
+        </piecewise>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_LCN</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_LCN</ci>
+              <ci>f_max_LCN</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <ci>f_input_LCN</ci>
+                  <ci>f_mid_LCN</ci>
+                </apply>
+                <ci>k_LCN</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_LCN</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="PNNA_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_PNNA_natural" units="Hz" interface="public"/>
+    <variable name="f_PNNA" units="Hz" interface="public"/>
+    <variable name="f_NA" units="Hz" interface="public"/>
+    <variable name="f_LCN" units="Hz" interface="public"/>
+    <variable name="f_mid_PNNA" units="Hz" interface="public"/>
+    <variable name="f_min_PNNA" units="Hz" interface="public"/>
+    <variable name="f_max_PNNA" units="Hz" interface="public"/>
+    <variable name="k_PNNA" units="dimensionless" interface="public"/>
+    <variable name="f_vagal_stim" units="Hz" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_PNNA_natural</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_PNNA</ci>
+              <ci>f_max_PNNA</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <plus/>
+                    <ci>f_NA</ci>
+                    <ci>f_LCN</ci>
+                  </apply>
+                  <ci>f_mid_PNNA</ci>
+                </apply>
+                <ci>k_PNNA</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_PNNA</ci>
+        </apply>
+      </apply>
+      <apply>
+        <eq/>
+        <ci>f_PNNA</ci>
+        <apply>
+          <plus/>
+          <ci>f_PNNA_natural</ci>
+          <ci>f_vagal_stim</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="PNDMV_module">
+    <variable name="f_PNDMV" units="Hz" interface="public"/>
+    <variable name="f_DMV" units="Hz" interface="public"/>
+    <variable name="f_NActr" units="Hz" interface="public"/>
+    <variable name="f_LCN" units="Hz" interface="public"/>
+    <variable name="f_mid_PNDMV" units="Hz" interface="public"/>
+    <variable name="f_min_PNDMV" units="Hz" interface="public"/>
+    <variable name="f_max_PNDMV" units="Hz" interface="public"/>
+    <variable name="k_PNDMV" units="dimensionless" interface="public"/>
+    <variable name="f_PNDMV_filt" units="Hz" initial_value="0" interface="public"/>
+    <variable name="tau_PNDMV" units="second" interface="public"/>
+    <variable name="t" units="second" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>f_PNDMV</ci>
+        <apply>
+          <plus/>
+          <apply>
+            <divide/>
+            <apply>
+              <minus/>
+              <ci>f_min_PNDMV</ci>
+              <ci>f_max_PNDMV</ci>
+            </apply>
+            <apply>
+              <plus/>
+              <cn cellml:units="dimensionless">1</cn>
+              <apply>
+                <power/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <plus/>
+                    <ci>f_DMV</ci>
+                    <ci>f_NActr</ci>
+                    <ci>f_LCN</ci>
+                  </apply>
+                  <ci>f_mid_PNDMV</ci>
+                </apply>
+                <ci>k_PNDMV</ci>
+              </apply>
+            </apply>
+          </apply>
+          <ci>f_max_PNDMV</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>f_PNDMV_filt</ci>
+        </apply>
+        <apply>
+          <divide/>
+          <apply>
+            <minus/>
+            <ci>f_PNDMV</ci>
+            <ci>f_PNDMV_filt</ci>
+          </apply>
+          <ci>tau_PNDMV</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="heart_effector_T_module">
+    <variable name="t" units="second" interface="public"/>
+    <variable name="G_Ts" units="second" interface="public"/>
+    <variable name="G_Tv" units="s2" interface="public"/>
+    <variable name="f_es_min" units="Hz" interface="public"/>
+    <variable name="tau_Ts" units="second" interface="public"/>
+    <variable name="tau_Tv" units="second" interface="public"/>
+    <variable name="f_s" units="Hz" interface="public"/>
+    <variable name="f_v" units="Hz" interface="public"/>
+    <variable name="Delta_Ts" units="second" initial_value="0.0" interface="public"/>
+    <variable name="Delta_Tv" units="second" initial_value="0.0" interface="public"/>
+    <variable name="Delta_T" units="second" interface="public"/>
+    <variable name="sigma_Ts" units="second" interface="public"/>
+    <variable name="sigma_Tv" units="second" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>sigma_Ts</ci>
+        <piecewise>
+          <piece>
+            <apply>
+              <times/>
+              <ci>G_Ts</ci>
+              <apply>
+                <ln/>
+                <apply>
+                  <times/>
+                  <cn cellml:units="second">1</cn>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <ci>f_s</ci>
+                      <ci>f_es_min</ci>
+                    </apply>
+                    <cn cellml:units="Hz">1</cn>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <geq/>
+              <ci>f_s</ci>
+              <ci>f_es_min</ci>
+            </apply>
+          </piece>
+          <otherwise>
+            <cn cellml:units="second">0</cn>
+          </otherwise>
+        </piecewise>
+      </apply>
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Ts</ci>
+        </apply>
+        <apply>
+          <divide/>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Ts</ci>
+            </apply>
+            <ci>sigma_Ts</ci>
+          </apply>
+          <ci>tau_Ts</ci>
+        </apply>
+      </apply>
+      <apply>
+        <eq/>
+        <ci>sigma_Tv</ci>
+        <apply>
+          <times/>
+          <ci>G_Tv</ci>
+          <ci>f_v</ci>
+        </apply>
+      </apply>
+      <!--DELAY IGNORED-->
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Tv</ci>
+        </apply>
+        <apply>
+          <divide/>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Tv</ci>
+            </apply>
+            <ci>sigma_Tv</ci>
+          </apply>
+          <ci>tau_Tv</ci>
+        </apply>
+      </apply>
+      <apply>
+        <eq/>
+        <ci>Delta_T</ci>
+        <apply>
+          <plus/>
+          <ci>Delta_Tv</ci>
+          <ci>Delta_Ts</ci>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="heart_effector_Elv_module">
+    <variable name="sigma_Es" units="J_per_m6" interface="public"/>
+    <variable name="G_Es" units="J_per_m6" interface="public"/>
+    <variable name="f_esh" units="Hz" interface="public"/>
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_es_min" units="Hz" interface="public"/>
+    <variable name="Delta_Es" units="J_per_m6" initial_value="0.0" interface="public"/>
+    <variable name="tau_Es" units="second" interface="public"/>
+    <variable name="sigma_Ev" units="J_per_m6" interface="public"/>
+    <variable name="G_Ev" units="Js_per_m6" interface="public"/>
+    <variable name="f_PNDMV_filt" units="Hz" interface="public"/>
+    <variable name="Delta_Ev" units="J_per_m6" initial_value="0.0" interface="public"/>
+    <variable name="tau_Ev" units="second" interface="public"/>
+    <variable name="Delta_Emax" units="J_per_m6" interface="public"/>
+    <variable name="scale" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>sigma_Es</ci>
+        <piecewise>
+          <piece>
+            <apply>
+              <times/>
+              <ci>G_Es</ci>
+              <apply>
+                <ln/>
+                <apply>
+                  <times/>
+                  <cn cellml:units="second">1</cn>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <ci>f_esh</ci>
+                      <ci>f_es_min</ci>
+                    </apply>
+                    <cn cellml:units="Hz">1</cn>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <geq/>
+              <ci>f_esh</ci>
+              <ci>f_es_min</ci>
+            </apply>
+          </piece>
+          <otherwise>
+            <cn cellml:units="J_per_m6">0</cn>
+          </otherwise>
+        </piecewise>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Es</ci>
+        </apply>
+        <apply>
+          <times/>
+          <apply>
+            <divide/>
+            <cn cellml:units="dimensionless">1</cn>
+            <ci>tau_Es</ci>
+          </apply>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Es</ci>
+            </apply>
+            <ci>sigma_Es</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>sigma_Ev</ci>
+        <apply>
+          <times/>
+          <ci>G_Ev</ci>
+          <ci>f_PNDMV_filt</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Ev</ci>
+        </apply>
+        <apply>
+          <times/>
+          <apply>
+            <divide/>
+            <cn cellml:units="dimensionless">1</cn>
+            <ci>tau_Ev</ci>
+          </apply>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Ev</ci>
+            </apply>
+            <ci>sigma_Ev</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>Delta_Emax</ci>
+        <apply>
+          <times/>
+          <ci>scale</ci>
+          <apply>
+            <plus/>
+            <ci>Delta_Es</ci>
+            <ci>Delta_Ev</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="heart_effector_Erv_module">
+    <variable name="sigma_Es" units="J_per_m6" interface="public"/>
+    <variable name="G_Es" units="J_per_m6" interface="public"/>
+    <variable name="f_esh" units="Hz" interface="public"/>
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_es_min" units="Hz" interface="public"/>
+    <variable name="Delta_Es" units="J_per_m6" initial_value="0.0" interface="public"/>
+    <variable name="tau_Es" units="second" interface="public"/>
+    <variable name="sigma_Ev" units="J_per_m6" interface="public"/>
+    <variable name="G_Ev" units="Js_per_m6" interface="public"/>
+    <variable name="f_PNDMV_filt" units="Hz" interface="public"/>
+    <variable name="Delta_Ev" units="J_per_m6" initial_value="0.0" interface="public"/>
+    <variable name="tau_Ev" units="second" interface="public"/>
+    <variable name="Delta_Emax" units="J_per_m6" interface="public"/>
+    <variable name="scale" units="dimensionless" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>sigma_Es</ci>
+        <piecewise>
+          <piece>
+            <apply>
+              <times/>
+              <ci>G_Es</ci>
+              <apply>
+                <ln/>
+                <apply>
+                  <times/>
+                  <cn cellml:units="second">1</cn>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <ci>f_esh</ci>
+                      <ci>f_es_min</ci>
+                    </apply>
+                    <cn cellml:units="Hz">1</cn>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <geq/>
+              <ci>f_esh</ci>
+              <ci>f_es_min</ci>
+            </apply>
+          </piece>
+          <otherwise>
+            <cn cellml:units="J_per_m6">0</cn>
+          </otherwise>
+        </piecewise>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Es</ci>
+        </apply>
+        <apply>
+          <times/>
+          <apply>
+            <divide/>
+            <cn cellml:units="dimensionless">1</cn>
+            <ci>tau_Es</ci>
+          </apply>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Es</ci>
+            </apply>
+            <ci>sigma_Es</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>sigma_Ev</ci>
+        <apply>
+          <times/>
+          <ci>G_Ev</ci>
+          <ci>f_PNDMV_filt</ci>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Ev</ci>
+        </apply>
+        <apply>
+          <times/>
+          <apply>
+            <divide/>
+            <cn cellml:units="dimensionless">1</cn>
+            <ci>tau_Ev</ci>
+          </apply>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Ev</ci>
+            </apply>
+            <ci>sigma_Ev</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <apply>
+        <eq/>
+        <ci>Delta_Emax</ci>
+        <apply>
+          <times/>
+          <ci>scale</ci>
+          <apply>
+            <plus/>
+            <ci>Delta_Es</ci>
+            <ci>Delta_Ev</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="peripheral_effector_arms_module">
+    <variable name="sigma_Rsp" units="Js_per_m6" interface="public"/>
+    <variable name="G_Rsp" units="Js_per_m6" interface="public"/>
+    <variable name="f_esp" units="Hz" interface="public"/>
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_es_min" units="Hz" interface="public"/>
+    <variable name="Delta_Rsp" units="Js_per_m6" initial_value="0" interface="public"/>
+    <variable name="tau_Rsp" units="second" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>sigma_Rsp</ci>
+        <piecewise>
+          <piece>
+            <apply>
+              <times/>
+              <ci>G_Rsp</ci>
+              <apply>
+                <ln/>
+                <apply>
+                  <times/>
+                  <cn cellml:units="second">1</cn>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <ci>f_esp</ci>
+                      <ci>f_es_min</ci>
+                    </apply>
+                    <cn cellml:units="Hz">1</cn>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <geq/>
+              <ci>f_esp</ci>
+              <ci>f_es_min</ci>
+            </apply>
+          </piece>
+          <otherwise>
+            <cn cellml:units="Js_per_m6">0</cn>
+          </otherwise>
+        </piecewise>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Rsp</ci>
+        </apply>
+        <apply>
+          <times/>
+          <apply>
+            <divide/>
+            <cn cellml:units="dimensionless">1</cn>
+            <ci>tau_Rsp</ci>
+          </apply>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Rsp</ci>
+            </apply>
+            <ci>sigma_Rsp</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="venous_volume_effector_lb_module">
+    <variable name="sigma_Vusv" units="m3" interface="public"/>
+    <variable name="G_Vusv" units="m3" interface="public"/>
+    <variable name="f_esv" units="Hz" interface="public"/>
+    <variable name="t" units="second" interface="public"/>
+    <variable name="f_es_min" units="Hz" interface="public"/>
+    <variable name="Delta_Vusv" units="m3" initial_value="0" interface="public"/>
+    <variable name="tau_Vusv" units="second" interface="public"/>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <ci>sigma_Vusv</ci>
+        <piecewise>
+          <piece>
+            <apply>
+              <times/>
+              <ci>G_Vusv</ci>
+              <apply>
+                <ln/>
+                <apply>
+                  <times/>
+                  <cn cellml:units="second">1</cn>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <ci>f_esv</ci>
+                      <ci>f_es_min</ci>
+                    </apply>
+                    <cn cellml:units="Hz">1</cn>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <geq/>
+              <ci>f_esv</ci>
+              <ci>f_es_min</ci>
+            </apply>
+          </piece>
+          <otherwise>
+            <cn cellml:units="m3">0</cn>
+          </otherwise>
+        </piecewise>
+      </apply>
+    </math>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+      <apply>
+        <eq/>
+        <apply>
+          <diff/>
+          <bvar>
+            <ci>t</ci>
+          </bvar>
+          <ci>Delta_Vusv</ci>
+        </apply>
+        <apply>
+          <times/>
+          <apply>
+            <divide/>
+            <cn cellml:units="dimensionless">1</cn>
+            <ci>tau_Vusv</ci>
+          </apply>
+          <apply>
+            <plus/>
+            <apply>
+              <minus/>
+              <ci>Delta_Vusv</ci>
+            </apply>
+            <ci>sigma_Vusv</ci>
+          </apply>
+        </apply>
+      </apply>
+    </math>
+  </component>
+  <component name="terminal_venous_connection"/>
+  <component name="generic_junction_connection"/>
+  <component name="lung_stretch">
+    <variable name="f_ls" units="Hz" interface="public"/>
+    <variable name="tau_lung" units="second" interface="public"/>
+    <variable name="G_al" units="per_m3_s" interface="public"/>
+    <variable name="q_str" units="m3" interface="public"/>
+  </component>
+  <component name="baroreceptor">
+    <variable name="P_sys" units="J_per_m3" interface="public"/>
+    <variable name="P_baro" units="J_per_m3" interface="public"/>
+    <variable name="P_baro_init" units="J_per_m3" interface="public"/>
+    <variable name="P_nom" units="J_per_m3" interface="public"/>
+    <variable name="dP_sys_dt" units="J_per_m3s" interface="public"/>
+    <variable name="f_ab" units="per_s" interface="public"/>
+    <variable name="tau_zb" units="second" interface="public"/>
+    <variable name="tau_pb" units="second" interface="public"/>
+    <variable name="f_ab_min" units="per_s" interface="public"/>
+    <variable name="f_ab_max" units="per_s" interface="public"/>
+    <variable name="k_ab" units="J_per_m3" interface="public"/>
+  </component>
+  <component name="cardiopulm_receptor">
+    <variable name="f_cp" units="Hz" interface="public"/>
+    <variable name="P_pv_P_thor" units="J_per_m3" interface="public"/>
+    <variable name="tau_cp" units="second" interface="public"/>
+    <variable name="P_l_init" units="J_per_m3" interface="public"/>
+    <variable name="P_l" units="J_per_m3" interface="public"/>
+    <variable name="f_maxl" units="Hz" interface="public"/>
+    <variable name="P_tn" units="J_per_m3" interface="public"/>
+    <variable name="k_l" units="J_per_m3" interface="public"/>
+    <variable name="P_pvn" units="J_per_m3" interface="public"/>
+    <variable name="P_mus" units="J_per_m3" interface="public"/>
+  </component>
+  <component name="sympathetic_afferent">
+    <variable name="f_ash" units="Hz" interface="public"/>
+    <variable name="f_asp" units="Hz" interface="public"/>
+    <variable name="f_asv" units="Hz" interface="public"/>
+    <variable name="G_abh" units="dimensionless" interface="public"/>
+    <variable name="G_alh" units="dimensionless" interface="public"/>
+    <variable name="G_ach" units="dimensionless" interface="public"/>
+    <variable name="G_abp" units="dimensionless" interface="public"/>
+    <variable name="G_alp" units="dimensionless" interface="public"/>
+    <variable name="G_acp" units="dimensionless" interface="public"/>
+    <variable name="G_abv" units="dimensionless" interface="public"/>
+    <variable name="G_alv" units="dimensionless" interface="public"/>
+    <variable name="G_acv" units="dimensionless" interface="public"/>
+  </component>
+  <component name="sympathetic_efferent">
+    <variable name="f_esh" units="Hz" interface="public"/>
+    <variable name="f_esp" units="Hz" interface="public"/>
+    <variable name="f_esv" units="Hz" interface="public"/>
+    <variable name="f_esinf" units="Hz" interface="public"/>
+    <variable name="f_es0" units="Hz" interface="public"/>
+    <variable name="k_es" units="second" interface="public"/>
+  </component>
+  <component name="NTS">
+    <variable name="f_NTS_br" units="Hz" interface="public"/>
+    <variable name="f_NTS_ls" units="Hz" interface="public"/>
+    <variable name="f_NTS_cp" units="Hz" interface="public"/>
+    <variable name="f_NTS_ch" units="Hz" interface="public"/>
+    <variable name="f_apc" units="Hz" interface="public"/>
+    <variable name="f_min_br" units="Hz" interface="public"/>
+    <variable name="f_max_br" units="Hz" interface="public"/>
+    <variable name="f_mid_br" units="Hz" interface="public"/>
+    <variable name="f_min_ls" units="Hz" interface="public"/>
+    <variable name="f_max_ls" units="Hz" interface="public"/>
+    <variable name="f_mid_ls" units="Hz" interface="public"/>
+    <variable name="f_min_cp" units="Hz" interface="public"/>
+    <variable name="f_max_cp" units="Hz" interface="public"/>
+    <variable name="f_mid_cp" units="Hz" interface="public"/>
+    <variable name="f_min_ch" units="Hz" interface="public"/>
+    <variable name="f_max_ch" units="Hz" interface="public"/>
+    <variable name="f_mid_ch" units="Hz" interface="public"/>
+    <variable name="k_NTS_br" units="dimensionless" interface="public"/>
+    <variable name="k_NTS_ls" units="dimensionless" interface="public"/>
+    <variable name="k_NTS_cp" units="dimensionless" interface="public"/>
+    <variable name="k_NTS_ch" units="dimensionless" interface="public"/>
+  </component>
+  <component name="DMV">
+    <variable name="f_DMV" units="Hz" interface="public"/>
+    <variable name="f_min_DMV" units="Hz" interface="public"/>
+    <variable name="f_max_DMV" units="Hz" interface="public"/>
+    <variable name="f_mid_DMV" units="Hz" interface="public"/>
+    <variable name="k_DMV" units="dimensionless" interface="public"/>
+  </component>
+  <component name="NA">
+    <variable name="s_floor" units="dimensionless" interface="public"/>
+    <variable name="f_NA" units="Hz" interface="public"/>
+    <variable name="f_NTS_output" units="Hz" interface="public"/>
+    <variable name="f_NA_input" units="Hz" interface="public"/>
+    <variable name="f_min_NA" units="Hz" interface="public"/>
+    <variable name="f_max_NA" units="Hz" interface="public"/>
+    <variable name="f_mid_NA" units="Hz" interface="public"/>
+    <variable name="k_RSA" units="dimensionless" interface="public"/>
+    <variable name="k_NA" units="dimensionless" interface="public"/>
+  </component>
+  <component name="NActr">
+    <variable name="f_NActr" units="Hz" interface="public"/>
+    <variable name="f_min_NActr" units="Hz" interface="public"/>
+    <variable name="f_max_NActr" units="Hz" interface="public"/>
+    <variable name="f_mid_NActr" units="Hz" interface="public"/>
+    <variable name="k_NActr" units="dimensionless" interface="public"/>
+  </component>
+  <component name="LCN">
+    <variable name="f_LCN" units="Hz" interface="public"/>
+    <variable name="f_input_LCN_sum" units="Hz" interface="public"/>
+    <variable name="f_input_LCN" units="Hz" interface="public"/>
+    <variable name="f_min_LCN" units="Hz" interface="public"/>
+    <variable name="f_max_LCN" units="Hz" interface="public"/>
+    <variable name="f_mid_LCN" units="Hz" interface="public"/>
+    <variable name="k_evEmax_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="k_br_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="k_esh_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="k_cp_gainLCN" units="dimensionless" interface="public"/>
+    <variable name="k_LCN" units="dimensionless" interface="public"/>
+  </component>
+  <component name="PNNA">
+    <variable name="f_PNNA" units="Hz" interface="public"/>
+    <variable name="f_PNNA_natural" units="Hz" interface="public"/>
+    <variable name="f_min_PNNA" units="Hz" interface="public"/>
+    <variable name="f_max_PNNA" units="Hz" interface="public"/>
+    <variable name="f_mid_PNNA" units="Hz" interface="public"/>
+    <variable name="f_vagal_stim" units="Hz" interface="public"/>
+    <variable name="k_PNNA" units="dimensionless" interface="public"/>
+  </component>
+  <component name="PNDMV">
+    <variable name="f_PNDMV" units="Hz" interface="public"/>
+    <variable name="f_PNDMV_filt" units="Hz" interface="public"/>
+    <variable name="f_min_PNDMV" units="Hz" interface="public"/>
+    <variable name="f_max_PNDMV" units="Hz" interface="public"/>
+    <variable name="f_mid_PNDMV" units="Hz" interface="public"/>
+    <variable name="k_PNDMV" units="dimensionless" interface="public"/>
+    <variable name="tau_PNDMV" units="second" interface="public"/>
+  </component>
+  <component name="heart_effector_T">
+    <variable name="G_Ts" units="second" interface="public"/>
+    <variable name="G_Tv" units="s2" interface="public"/>
+    <variable name="f_es_min" units="per_s" interface="public"/>
+    <variable name="tau_Ts" units="second" interface="public"/>
+    <variable name="tau_Tv" units="second" interface="public"/>
+    <variable name="Delta_Ts" units="second" interface="public"/>
+    <variable name="Delta_Tv" units="second" interface="public"/>
+    <variable name="Delta_T" units="second" interface="public"/>
+    <variable name="sigma_Ts" units="second" interface="public"/>
+    <variable name="sigma_Tv" units="second" interface="public"/>
+  </component>
+  <component name="heart_effector_Elv">
+    <variable name="G_Es" units="J_per_m6" interface="public"/>
+    <variable name="f_es_min" units="per_s" interface="public"/>
+    <variable name="tau_Es" units="second" interface="public"/>
+    <variable name="Delta_Es" units="J_per_m6" interface="public"/>
+    <variable name="sigma_Es" units="J_per_m6" interface="public"/>
+    <variable name="G_Ev" units="Js_per_m6" interface="public"/>
+    <variable name="tau_Ev" units="second" interface="public"/>
+    <variable name="Delta_Ev" units="J_per_m6" interface="public"/>
+    <variable name="sigma_Ev" units="J_per_m6" interface="public"/>
+    <variable name="Delta_Emax" units="J_per_m6" interface="public"/>
+    <variable name="scale" units="dimensionless" interface="public"/>
+  </component>
+  <component name="heart_effector_Erv">
+    <variable name="G_Es" units="J_per_m6" interface="public"/>
+    <variable name="f_es_min" units="per_s" interface="public"/>
+    <variable name="tau_Es" units="second" interface="public"/>
+    <variable name="Delta_Es" units="J_per_m6" interface="public"/>
+    <variable name="sigma_Es" units="J_per_m6" interface="public"/>
+    <variable name="G_Ev" units="Js_per_m6" interface="public"/>
+    <variable name="tau_Ev" units="second" interface="public"/>
+    <variable name="Delta_Ev" units="J_per_m6" interface="public"/>
+    <variable name="sigma_Ev" units="J_per_m6" interface="public"/>
+    <variable name="Delta_Emax" units="J_per_m6" interface="public"/>
+    <variable name="scale" units="dimensionless" interface="public"/>
+  </component>
+  <component name="peripheral_effector_arms">
+    <variable name="Delta_Rsp" units="Js_per_m6" interface="public"/>
+    <variable name="tau_Rsp" units="second" interface="public"/>
+    <variable name="sigma_Rsp" units="Js_per_m6" interface="public"/>
+    <variable name="f_es_min" units="per_s" interface="public"/>
+    <variable name="G_Rsp" units="Js_per_m6" interface="public"/>
+  </component>
+  <component name="venous_volume_effector_lb">
+    <variable name="Delta_Vusv" units="m3" interface="public"/>
+    <variable name="tau_Vusv" units="second" interface="public"/>
+    <variable name="sigma_Vusv" units="m3" interface="public"/>
+    <variable name="f_es_min" units="per_s" interface="public"/>
+    <variable name="G_Vusv" units="m3" interface="public"/>
+  </component>
+  <component name="global">
+    <variable name="f_es_min" units="per_s" interface="public"/>
+  </component>
+  <connection component_1="parameters" component_2="lung_stretch_module">
+    <map_variables variable_1="tau_lung_lung_stretch" variable_2="tau_lung"/>
+    <map_variables variable_1="G_al_lung_stretch" variable_2="G_al"/>
+    <map_variables variable_1="q_str_lung_stretch" variable_2="q_str"/>
+  </connection>
+  <connection component_1="parameters" component_2="baroreceptor_module">
+    <map_variables variable_1="P_baro_init_baroreceptor" variable_2="P_baro_init"/>
+    <map_variables variable_1="P_nom_baroreceptor" variable_2="P_nom"/>
+    <map_variables variable_1="tau_zb_baroreceptor" variable_2="tau_zb"/>
+    <map_variables variable_1="tau_pb_baroreceptor" variable_2="tau_pb"/>
+    <map_variables variable_1="f_ab_min_baroreceptor" variable_2="f_ab_min"/>
+    <map_variables variable_1="f_ab_max_baroreceptor" variable_2="f_ab_max"/>
+    <map_variables variable_1="k_ab_baroreceptor" variable_2="k_ab"/>
+    <map_variables variable_1="P_sys_baroreceptor" variable_2="P_sys"/>
+    <map_variables variable_1="dP_sys_dt_baroreceptor" variable_2="dP_sys_dt"/>
+  </connection>
+  <connection component_1="parameters" component_2="cardiopulm_receptor_module">
+    <map_variables variable_1="tau_cp_cardiopulm_receptor" variable_2="tau_cp"/>
+    <map_variables variable_1="P_l_init_cardiopulm_receptor" variable_2="P_l_init"/>
+    <map_variables variable_1="f_maxl_cardiopulm_receptor" variable_2="f_maxl"/>
+    <map_variables variable_1="P_tn_cardiopulm_receptor" variable_2="P_tn"/>
+    <map_variables variable_1="k_l_cardiopulm_receptor" variable_2="k_l"/>
+    <map_variables variable_1="P_pvn_cardiopulm_receptor" variable_2="P_pvn"/>
+    <map_variables variable_1="P_mus_cardiopulm_receptor" variable_2="P_mus"/>
+  </connection>
+  <connection component_1="parameters" component_2="sympathetic_afferent_module">
+    <map_variables variable_1="G_abh_sympathetic_afferent" variable_2="G_abh"/>
+    <map_variables variable_1="G_alh_sympathetic_afferent" variable_2="G_alh"/>
+    <map_variables variable_1="G_ach_sympathetic_afferent" variable_2="G_ach"/>
+    <map_variables variable_1="G_abp_sympathetic_afferent" variable_2="G_abp"/>
+    <map_variables variable_1="G_alp_sympathetic_afferent" variable_2="G_alp"/>
+    <map_variables variable_1="G_acp_sympathetic_afferent" variable_2="G_acp"/>
+    <map_variables variable_1="G_abv_sympathetic_afferent" variable_2="G_abv"/>
+    <map_variables variable_1="G_alv_sympathetic_afferent" variable_2="G_alv"/>
+    <map_variables variable_1="G_acv_sympathetic_afferent" variable_2="G_acv"/>
+  </connection>
+  <connection component_1="parameters" component_2="sympathetic_efferent_module">
+    <map_variables variable_1="f_esinf_sympathetic_efferent" variable_2="f_esinf"/>
+    <map_variables variable_1="f_es0_sympathetic_efferent" variable_2="f_es0"/>
+    <map_variables variable_1="k_es_sympathetic_efferent" variable_2="k_es"/>
+  </connection>
+  <connection component_1="parameters" component_2="NTS_module">
+    <map_variables variable_1="f_min_br_NTS" variable_2="f_min_br"/>
+    <map_variables variable_1="f_max_br_NTS" variable_2="f_max_br"/>
+    <map_variables variable_1="f_mid_br_NTS" variable_2="f_mid_br"/>
+    <map_variables variable_1="f_min_ls_NTS" variable_2="f_min_ls"/>
+    <map_variables variable_1="f_max_ls_NTS" variable_2="f_max_ls"/>
+    <map_variables variable_1="f_mid_ls_NTS" variable_2="f_mid_ls"/>
+    <map_variables variable_1="f_min_cp_NTS" variable_2="f_min_cp"/>
+    <map_variables variable_1="f_max_cp_NTS" variable_2="f_max_cp"/>
+    <map_variables variable_1="f_mid_cp_NTS" variable_2="f_mid_cp"/>
+    <map_variables variable_1="f_min_ch_NTS" variable_2="f_min_ch"/>
+    <map_variables variable_1="f_max_ch_NTS" variable_2="f_max_ch"/>
+    <map_variables variable_1="f_mid_ch_NTS" variable_2="f_mid_ch"/>
+    <map_variables variable_1="k_NTS_br_NTS" variable_2="k_NTS_br"/>
+    <map_variables variable_1="k_NTS_ls_NTS" variable_2="k_NTS_ls"/>
+    <map_variables variable_1="k_NTS_cp_NTS" variable_2="k_NTS_cp"/>
+    <map_variables variable_1="k_NTS_ch_NTS" variable_2="k_NTS_ch"/>
+    <map_variables variable_1="f_apc_NTS" variable_2="f_apc"/>
+  </connection>
+  <connection component_1="parameters" component_2="DMV_module">
+    <map_variables variable_1="f_min_DMV_DMV" variable_2="f_min_DMV"/>
+    <map_variables variable_1="f_max_DMV_DMV" variable_2="f_max_DMV"/>
+    <map_variables variable_1="f_mid_DMV_DMV" variable_2="f_mid_DMV"/>
+    <map_variables variable_1="k_DMV_DMV" variable_2="k_DMV"/>
+  </connection>
+  <connection component_1="parameters" component_2="NA_module">
+    <map_variables variable_1="f_min_NA_NA" variable_2="f_min_NA"/>
+    <map_variables variable_1="f_max_NA_NA" variable_2="f_max_NA"/>
+    <map_variables variable_1="f_mid_NA_NA" variable_2="f_mid_NA"/>
+    <map_variables variable_1="k_RSA_NA" variable_2="k_RSA"/>
+    <map_variables variable_1="k_NA_NA" variable_2="k_NA"/>
+    <map_variables variable_1="s_floor_NA" variable_2="s_floor"/>
+  </connection>
+  <connection component_1="parameters" component_2="NActr_module">
+    <map_variables variable_1="f_min_NActr_NActr" variable_2="f_min_NActr"/>
+    <map_variables variable_1="f_max_NActr_NActr" variable_2="f_max_NActr"/>
+    <map_variables variable_1="f_mid_NActr_NActr" variable_2="f_mid_NActr"/>
+    <map_variables variable_1="k_NActr_NActr" variable_2="k_NActr"/>
+  </connection>
+  <connection component_1="parameters" component_2="LCN_module">
+    <map_variables variable_1="f_min_LCN_LCN" variable_2="f_min_LCN"/>
+    <map_variables variable_1="f_max_LCN_LCN" variable_2="f_max_LCN"/>
+    <map_variables variable_1="f_mid_LCN_LCN" variable_2="f_mid_LCN"/>
+    <map_variables variable_1="k_evEmax_gainLCN_LCN" variable_2="k_evEmax_gainLCN"/>
+    <map_variables variable_1="k_br_gainLCN_LCN" variable_2="k_br_gainLCN"/>
+    <map_variables variable_1="k_esh_gainLCN_LCN" variable_2="k_esh_gainLCN"/>
+    <map_variables variable_1="k_cp_gainLCN_LCN" variable_2="k_cp_gainLCN"/>
+    <map_variables variable_1="k_LCN_LCN" variable_2="k_LCN"/>
+  </connection>
+  <connection component_1="parameters" component_2="PNNA_module">
+    <map_variables variable_1="f_min_PNNA_PNNA" variable_2="f_min_PNNA"/>
+    <map_variables variable_1="f_max_PNNA_PNNA" variable_2="f_max_PNNA"/>
+    <map_variables variable_1="f_mid_PNNA_PNNA" variable_2="f_mid_PNNA"/>
+    <map_variables variable_1="f_vagal_stim_PNNA" variable_2="f_vagal_stim"/>
+    <map_variables variable_1="k_PNNA_PNNA" variable_2="k_PNNA"/>
+  </connection>
+  <connection component_1="parameters" component_2="PNDMV_module">
+    <map_variables variable_1="f_min_PNDMV_PNDMV" variable_2="f_min_PNDMV"/>
+    <map_variables variable_1="f_max_PNDMV_PNDMV" variable_2="f_max_PNDMV"/>
+    <map_variables variable_1="f_mid_PNDMV_PNDMV" variable_2="f_mid_PNDMV"/>
+    <map_variables variable_1="k_PNDMV_PNDMV" variable_2="k_PNDMV"/>
+    <map_variables variable_1="tau_PNDMV_PNDMV" variable_2="tau_PNDMV"/>
+  </connection>
+  <connection component_1="parameters" component_2="heart_effector_T_module">
+    <map_variables variable_1="G_Ts_heart_effector_T" variable_2="G_Ts"/>
+    <map_variables variable_1="G_Tv_heart_effector_T" variable_2="G_Tv"/>
+    <map_variables variable_1="tau_Ts_heart_effector_T" variable_2="tau_Ts"/>
+    <map_variables variable_1="tau_Tv_heart_effector_T" variable_2="tau_Tv"/>
+  </connection>
+  <connection component_1="parameters" component_2="heart_effector_Elv_module">
+    <map_variables variable_1="G_Es_heart_effector_Elv" variable_2="G_Es"/>
+    <map_variables variable_1="tau_Es_heart_effector_Elv" variable_2="tau_Es"/>
+    <map_variables variable_1="G_Ev_heart_effector_Elv" variable_2="G_Ev"/>
+    <map_variables variable_1="tau_Ev_heart_effector_Elv" variable_2="tau_Ev"/>
+    <map_variables variable_1="scale_heart_effector_Elv" variable_2="scale"/>
+  </connection>
+  <connection component_1="parameters" component_2="heart_effector_Erv_module">
+    <map_variables variable_1="G_Es_heart_effector_Erv" variable_2="G_Es"/>
+    <map_variables variable_1="tau_Es_heart_effector_Erv" variable_2="tau_Es"/>
+    <map_variables variable_1="G_Ev_heart_effector_Erv" variable_2="G_Ev"/>
+    <map_variables variable_1="tau_Ev_heart_effector_Erv" variable_2="tau_Ev"/>
+    <map_variables variable_1="scale_heart_effector_Erv" variable_2="scale"/>
+  </connection>
+  <connection component_1="parameters" component_2="peripheral_effector_arms_module">
+    <map_variables variable_1="tau_Rsp_peripheral_effector_arms" variable_2="tau_Rsp"/>
+    <map_variables variable_1="G_Rsp_peripheral_effector_arms" variable_2="G_Rsp"/>
+  </connection>
+  <connection component_1="parameters" component_2="venous_volume_effector_lb_module">
+    <map_variables variable_1="tau_Vusv_venous_volume_effector_lb" variable_2="tau_Vusv"/>
+    <map_variables variable_1="G_Vusv_venous_volume_effector_lb" variable_2="G_Vusv"/>
+  </connection>
+  <connection component_1="parameters_global" component_2="global">
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+  </connection>
+  <connection component_1="parameters_global" component_2="heart_effector_T_module">
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+  </connection>
+  <connection component_1="parameters_global" component_2="heart_effector_Elv_module">
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+  </connection>
+  <connection component_1="parameters_global" component_2="heart_effector_Erv_module">
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+  </connection>
+  <connection component_1="parameters_global" component_2="peripheral_effector_arms_module">
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+  </connection>
+  <connection component_1="parameters_global" component_2="venous_volume_effector_lb_module">
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+  </connection>
+  <connection component_1="environment" component_2="lung_stretch_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="baroreceptor_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="cardiopulm_receptor_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="sympathetic_afferent_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="sympathetic_efferent_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="NTS_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="DMV_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="NA_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="NActr_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="LCN_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="PNNA_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="PNDMV_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="heart_effector_T_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="heart_effector_Elv_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="heart_effector_Erv_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="peripheral_effector_arms_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="environment" component_2="venous_volume_effector_lb_module">
+    <map_variables variable_1="time" variable_2="t"/>
+  </connection>
+  <connection component_1="lung_stretch_module" component_2="lung_stretch">
+    <map_variables variable_1="q_str" variable_2="q_str"/>
+    <map_variables variable_1="f_ls" variable_2="f_ls"/>
+    <map_variables variable_1="tau_lung" variable_2="tau_lung"/>
+    <map_variables variable_1="G_al" variable_2="G_al"/>
+  </connection>
+  <connection component_1="lung_stretch_module" component_2="sympathetic_afferent_module">
+    <map_variables variable_1="f_ls" variable_2="f_ls"/>
+  </connection>
+  <connection component_1="lung_stretch_module" component_2="NTS_module">
+    <map_variables variable_1="f_ls" variable_2="f_ls"/>
+  </connection>
+  <connection component_1="baroreceptor_module" component_2="baroreceptor">
+    <map_variables variable_1="P_sys" variable_2="P_sys"/>
+    <map_variables variable_1="P_baro_init" variable_2="P_baro_init"/>
+    <map_variables variable_1="P_baro" variable_2="P_baro"/>
+    <map_variables variable_1="f_ab" variable_2="f_ab"/>
+    <map_variables variable_1="dP_sys_dt" variable_2="dP_sys_dt"/>
+    <map_variables variable_1="P_nom" variable_2="P_nom"/>
+    <map_variables variable_1="f_ab_min" variable_2="f_ab_min"/>
+    <map_variables variable_1="f_ab_max" variable_2="f_ab_max"/>
+    <map_variables variable_1="k_ab" variable_2="k_ab"/>
+    <map_variables variable_1="tau_zb" variable_2="tau_zb"/>
+    <map_variables variable_1="tau_pb" variable_2="tau_pb"/>
+  </connection>
+  <connection component_1="baroreceptor_module" component_2="sympathetic_afferent_module">
+    <map_variables variable_1="f_ab" variable_2="f_br"/>
+  </connection>
+  <connection component_1="baroreceptor_module" component_2="NTS_module">
+    <map_variables variable_1="f_ab" variable_2="f_br"/>
+  </connection>
+  <connection component_1="baroreceptor_module" component_2="LCN_module">
+    <map_variables variable_1="f_ab" variable_2="f_br"/>
+  </connection>
+  <connection component_1="cardiopulm_receptor_module" component_2="cardiopulm_receptor">
+    <map_variables variable_1="P_pvn" variable_2="P_pvn"/>
+    <map_variables variable_1="P_mus" variable_2="P_mus"/>
+    <map_variables variable_1="P_pv_P_thor" variable_2="P_pv_P_thor"/>
+    <map_variables variable_1="tau_cp" variable_2="tau_cp"/>
+    <map_variables variable_1="P_l_init" variable_2="P_l_init"/>
+    <map_variables variable_1="P_l" variable_2="P_l"/>
+    <map_variables variable_1="f_cp" variable_2="f_cp"/>
+    <map_variables variable_1="f_maxl" variable_2="f_maxl"/>
+    <map_variables variable_1="P_tn" variable_2="P_tn"/>
+    <map_variables variable_1="k_l" variable_2="k_l"/>
+  </connection>
+  <connection component_1="cardiopulm_receptor_module" component_2="sympathetic_afferent_module">
+    <map_variables variable_1="f_cp" variable_2="f_cp"/>
+  </connection>
+  <connection component_1="cardiopulm_receptor_module" component_2="NTS_module">
+    <map_variables variable_1="f_cp" variable_2="f_cp"/>
+  </connection>
+  <connection component_1="cardiopulm_receptor_module" component_2="LCN_module">
+    <map_variables variable_1="f_cp" variable_2="f_cp"/>
+  </connection>
+  <connection component_1="sympathetic_afferent_module" component_2="sympathetic_afferent">
+    <map_variables variable_1="f_ash" variable_2="f_ash"/>
+    <map_variables variable_1="G_abh" variable_2="G_abh"/>
+    <map_variables variable_1="G_alh" variable_2="G_alh"/>
+    <map_variables variable_1="G_ach" variable_2="G_ach"/>
+    <map_variables variable_1="f_asp" variable_2="f_asp"/>
+    <map_variables variable_1="G_abp" variable_2="G_abp"/>
+    <map_variables variable_1="G_alp" variable_2="G_alp"/>
+    <map_variables variable_1="G_acp" variable_2="G_acp"/>
+    <map_variables variable_1="f_asv" variable_2="f_asv"/>
+    <map_variables variable_1="G_abv" variable_2="G_abv"/>
+    <map_variables variable_1="G_alv" variable_2="G_alv"/>
+    <map_variables variable_1="G_acv" variable_2="G_acv"/>
+  </connection>
+  <connection component_1="sympathetic_afferent_module" component_2="sympathetic_efferent_module">
+    <map_variables variable_1="f_ash" variable_2="f_ash"/>
+    <map_variables variable_1="f_asp" variable_2="f_asp"/>
+    <map_variables variable_1="f_asv" variable_2="f_asv"/>
+  </connection>
+  <connection component_1="sympathetic_efferent_module" component_2="sympathetic_efferent">
+    <map_variables variable_1="f_esh" variable_2="f_esh"/>
+    <map_variables variable_1="f_esinf" variable_2="f_esinf"/>
+    <map_variables variable_1="f_es0" variable_2="f_es0"/>
+    <map_variables variable_1="k_es" variable_2="k_es"/>
+    <map_variables variable_1="f_esp" variable_2="f_esp"/>
+    <map_variables variable_1="f_esv" variable_2="f_esv"/>
+  </connection>
+  <connection component_1="sympathetic_efferent_module" component_2="LCN_module">
+    <map_variables variable_1="f_esh" variable_2="f_esh"/>
+  </connection>
+  <connection component_1="sympathetic_efferent_module" component_2="heart_effector_T_module">
+    <map_variables variable_1="f_esh" variable_2="f_s"/>
+  </connection>
+  <connection component_1="sympathetic_efferent_module" component_2="heart_effector_Elv_module">
+    <map_variables variable_1="f_esh" variable_2="f_esh"/>
+  </connection>
+  <connection component_1="sympathetic_efferent_module" component_2="heart_effector_Erv_module">
+    <map_variables variable_1="f_esh" variable_2="f_esh"/>
+  </connection>
+  <connection component_1="sympathetic_efferent_module" component_2="peripheral_effector_arms_module">
+    <map_variables variable_1="f_esp" variable_2="f_esp"/>
+  </connection>
+  <connection component_1="sympathetic_efferent_module" component_2="venous_volume_effector_lb_module">
+    <map_variables variable_1="f_esv" variable_2="f_esv"/>
+  </connection>
+  <connection component_1="NTS_module" component_2="NTS">
+    <map_variables variable_1="f_min_br" variable_2="f_min_br"/>
+    <map_variables variable_1="f_max_br" variable_2="f_max_br"/>
+    <map_variables variable_1="f_mid_br" variable_2="f_mid_br"/>
+    <map_variables variable_1="f_NTS_br" variable_2="f_NTS_br"/>
+    <map_variables variable_1="k_NTS_br" variable_2="k_NTS_br"/>
+    <map_variables variable_1="f_min_ls" variable_2="f_min_ls"/>
+    <map_variables variable_1="f_max_ls" variable_2="f_max_ls"/>
+    <map_variables variable_1="f_mid_ls" variable_2="f_mid_ls"/>
+    <map_variables variable_1="f_NTS_ls" variable_2="f_NTS_ls"/>
+    <map_variables variable_1="k_NTS_ls" variable_2="k_NTS_ls"/>
+    <map_variables variable_1="f_min_cp" variable_2="f_min_cp"/>
+    <map_variables variable_1="f_max_cp" variable_2="f_max_cp"/>
+    <map_variables variable_1="f_mid_cp" variable_2="f_mid_cp"/>
+    <map_variables variable_1="f_NTS_cp" variable_2="f_NTS_cp"/>
+    <map_variables variable_1="k_NTS_cp" variable_2="k_NTS_cp"/>
+    <map_variables variable_1="f_apc" variable_2="f_apc"/>
+    <map_variables variable_1="f_min_ch" variable_2="f_min_ch"/>
+    <map_variables variable_1="f_max_ch" variable_2="f_max_ch"/>
+    <map_variables variable_1="f_mid_ch" variable_2="f_mid_ch"/>
+    <map_variables variable_1="f_NTS_ch" variable_2="f_NTS_ch"/>
+    <map_variables variable_1="k_NTS_ch" variable_2="k_NTS_ch"/>
+  </connection>
+  <connection component_1="NTS_module" component_2="NA_module">
+    <map_variables variable_1="f_NTS_br" variable_2="f_NTS_br"/>
+    <map_variables variable_1="f_NTS_ls" variable_2="f_NTS_ls"/>
+    <map_variables variable_1="f_NTS_cp" variable_2="f_NTS_cp"/>
+    <map_variables variable_1="f_NTS_ch" variable_2="f_NTS_ch"/>
+  </connection>
+  <connection component_1="NTS_module" component_2="DMV_module">
+    <map_variables variable_1="f_NTS_ls" variable_2="f_NTS_ls"/>
+    <map_variables variable_1="f_NTS_cp" variable_2="f_NTS_cp"/>
+  </connection>
+  <connection component_1="DMV_module" component_2="DMV">
+    <map_variables variable_1="f_min_DMV" variable_2="f_min_DMV"/>
+    <map_variables variable_1="f_max_DMV" variable_2="f_max_DMV"/>
+    <map_variables variable_1="f_mid_DMV" variable_2="f_mid_DMV"/>
+    <map_variables variable_1="f_DMV" variable_2="f_DMV"/>
+    <map_variables variable_1="k_DMV" variable_2="k_DMV"/>
+  </connection>
+  <connection component_1="DMV_module" component_2="LCN_module">
+    <map_variables variable_1="f_DMV" variable_2="f_DMV"/>
+  </connection>
+  <connection component_1="DMV_module" component_2="PNDMV_module">
+    <map_variables variable_1="f_DMV" variable_2="f_DMV"/>
+  </connection>
+  <connection component_1="NA_module" component_2="NA">
+    <map_variables variable_1="f_NTS_output" variable_2="f_NTS_output"/>
+    <map_variables variable_1="f_NA_input" variable_2="f_NA_input"/>
+    <map_variables variable_1="k_RSA" variable_2="k_RSA"/>
+    <map_variables variable_1="s_floor" variable_2="s_floor"/>
+    <map_variables variable_1="f_min_NA" variable_2="f_min_NA"/>
+    <map_variables variable_1="f_max_NA" variable_2="f_max_NA"/>
+    <map_variables variable_1="f_mid_NA" variable_2="f_mid_NA"/>
+    <map_variables variable_1="f_NA" variable_2="f_NA"/>
+    <map_variables variable_1="k_NA" variable_2="k_NA"/>
+  </connection>
+  <connection component_1="NA_module" component_2="NActr_module">
+    <map_variables variable_1="f_NA" variable_2="f_NA"/>
+  </connection>
+  <connection component_1="NA_module" component_2="PNNA_module">
+    <map_variables variable_1="f_NA" variable_2="f_NA"/>
+  </connection>
+  <connection component_1="NActr_module" component_2="NActr">
+    <map_variables variable_1="f_min_NActr" variable_2="f_min_NActr"/>
+    <map_variables variable_1="f_max_NActr" variable_2="f_max_NActr"/>
+    <map_variables variable_1="f_mid_NActr" variable_2="f_mid_NActr"/>
+    <map_variables variable_1="f_NActr" variable_2="f_NActr"/>
+    <map_variables variable_1="k_NActr" variable_2="k_NActr"/>
+  </connection>
+  <connection component_1="NActr_module" component_2="LCN_module">
+    <map_variables variable_1="f_NActr" variable_2="f_NActr"/>
+  </connection>
+  <connection component_1="NActr_module" component_2="PNDMV_module">
+    <map_variables variable_1="f_NActr" variable_2="f_NActr"/>
+  </connection>
+  <connection component_1="LCN_module" component_2="LCN">
+    <map_variables variable_1="k_evEmax_gainLCN" variable_2="k_evEmax_gainLCN"/>
+    <map_variables variable_1="k_br_gainLCN" variable_2="k_br_gainLCN"/>
+    <map_variables variable_1="k_esh_gainLCN" variable_2="k_esh_gainLCN"/>
+    <map_variables variable_1="k_cp_gainLCN" variable_2="k_cp_gainLCN"/>
+    <map_variables variable_1="f_input_LCN_sum" variable_2="f_input_LCN_sum"/>
+    <map_variables variable_1="f_input_LCN" variable_2="f_input_LCN"/>
+    <map_variables variable_1="f_LCN" variable_2="f_LCN"/>
+    <map_variables variable_1="f_mid_LCN" variable_2="f_mid_LCN"/>
+    <map_variables variable_1="f_min_LCN" variable_2="f_min_LCN"/>
+    <map_variables variable_1="f_max_LCN" variable_2="f_max_LCN"/>
+    <map_variables variable_1="k_LCN" variable_2="k_LCN"/>
+  </connection>
+  <connection component_1="LCN_module" component_2="PNNA_module">
+    <map_variables variable_1="f_LCN" variable_2="f_LCN"/>
+  </connection>
+  <connection component_1="LCN_module" component_2="PNDMV_module">
+    <map_variables variable_1="f_LCN" variable_2="f_LCN"/>
+  </connection>
+  <connection component_1="PNNA_module" component_2="PNNA">
+    <map_variables variable_1="f_PNNA_natural" variable_2="f_PNNA_natural"/>
+    <map_variables variable_1="f_PNNA" variable_2="f_PNNA"/>
+    <map_variables variable_1="f_mid_PNNA" variable_2="f_mid_PNNA"/>
+    <map_variables variable_1="f_min_PNNA" variable_2="f_min_PNNA"/>
+    <map_variables variable_1="f_max_PNNA" variable_2="f_max_PNNA"/>
+    <map_variables variable_1="k_PNNA" variable_2="k_PNNA"/>
+    <map_variables variable_1="f_vagal_stim" variable_2="f_vagal_stim"/>
+  </connection>
+  <connection component_1="PNNA_module" component_2="heart_effector_T_module">
+    <map_variables variable_1="f_PNNA" variable_2="f_v"/>
+  </connection>
+  <connection component_1="PNDMV_module" component_2="PNDMV">
+    <map_variables variable_1="f_PNDMV" variable_2="f_PNDMV"/>
+    <map_variables variable_1="f_mid_PNDMV" variable_2="f_mid_PNDMV"/>
+    <map_variables variable_1="f_min_PNDMV" variable_2="f_min_PNDMV"/>
+    <map_variables variable_1="f_max_PNDMV" variable_2="f_max_PNDMV"/>
+    <map_variables variable_1="k_PNDMV" variable_2="k_PNDMV"/>
+    <map_variables variable_1="f_PNDMV_filt" variable_2="f_PNDMV_filt"/>
+    <map_variables variable_1="tau_PNDMV" variable_2="tau_PNDMV"/>
+  </connection>
+  <connection component_1="PNDMV_module" component_2="heart_effector_Elv_module">
+    <map_variables variable_1="f_PNDMV_filt" variable_2="f_PNDMV_filt"/>
+  </connection>
+  <connection component_1="PNDMV_module" component_2="heart_effector_Erv_module">
+    <map_variables variable_1="f_PNDMV_filt" variable_2="f_PNDMV_filt"/>
+  </connection>
+  <connection component_1="heart_effector_T_module" component_2="heart_effector_T">
+    <map_variables variable_1="G_Ts" variable_2="G_Ts"/>
+    <map_variables variable_1="G_Tv" variable_2="G_Tv"/>
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+    <map_variables variable_1="tau_Ts" variable_2="tau_Ts"/>
+    <map_variables variable_1="tau_Tv" variable_2="tau_Tv"/>
+    <map_variables variable_1="Delta_Ts" variable_2="Delta_Ts"/>
+    <map_variables variable_1="Delta_Tv" variable_2="Delta_Tv"/>
+    <map_variables variable_1="Delta_T" variable_2="Delta_T"/>
+    <map_variables variable_1="sigma_Ts" variable_2="sigma_Ts"/>
+    <map_variables variable_1="sigma_Tv" variable_2="sigma_Tv"/>
+  </connection>
+  <connection component_1="heart_effector_Elv_module" component_2="heart_effector_Elv">
+    <map_variables variable_1="sigma_Es" variable_2="sigma_Es"/>
+    <map_variables variable_1="G_Es" variable_2="G_Es"/>
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+    <map_variables variable_1="Delta_Es" variable_2="Delta_Es"/>
+    <map_variables variable_1="tau_Es" variable_2="tau_Es"/>
+    <map_variables variable_1="sigma_Ev" variable_2="sigma_Ev"/>
+    <map_variables variable_1="G_Ev" variable_2="G_Ev"/>
+    <map_variables variable_1="Delta_Ev" variable_2="Delta_Ev"/>
+    <map_variables variable_1="tau_Ev" variable_2="tau_Ev"/>
+    <map_variables variable_1="Delta_Emax" variable_2="Delta_Emax"/>
+    <map_variables variable_1="scale" variable_2="scale"/>
+  </connection>
+  <connection component_1="heart_effector_Erv_module" component_2="heart_effector_Erv">
+    <map_variables variable_1="sigma_Es" variable_2="sigma_Es"/>
+    <map_variables variable_1="G_Es" variable_2="G_Es"/>
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+    <map_variables variable_1="Delta_Es" variable_2="Delta_Es"/>
+    <map_variables variable_1="tau_Es" variable_2="tau_Es"/>
+    <map_variables variable_1="sigma_Ev" variable_2="sigma_Ev"/>
+    <map_variables variable_1="G_Ev" variable_2="G_Ev"/>
+    <map_variables variable_1="Delta_Ev" variable_2="Delta_Ev"/>
+    <map_variables variable_1="tau_Ev" variable_2="tau_Ev"/>
+    <map_variables variable_1="Delta_Emax" variable_2="Delta_Emax"/>
+    <map_variables variable_1="scale" variable_2="scale"/>
+  </connection>
+  <connection component_1="peripheral_effector_arms_module" component_2="peripheral_effector_arms">
+    <map_variables variable_1="sigma_Rsp" variable_2="sigma_Rsp"/>
+    <map_variables variable_1="G_Rsp" variable_2="G_Rsp"/>
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+    <map_variables variable_1="Delta_Rsp" variable_2="Delta_Rsp"/>
+    <map_variables variable_1="tau_Rsp" variable_2="tau_Rsp"/>
+  </connection>
+  <connection component_1="venous_volume_effector_lb_module" component_2="venous_volume_effector_lb">
+    <map_variables variable_1="sigma_Vusv" variable_2="sigma_Vusv"/>
+    <map_variables variable_1="G_Vusv" variable_2="G_Vusv"/>
+    <map_variables variable_1="f_es_min" variable_2="f_es_min"/>
+    <map_variables variable_1="Delta_Vusv" variable_2="Delta_Vusv"/>
+    <map_variables variable_1="tau_Vusv" variable_2="tau_Vusv"/>
+  </connection>
+</model>

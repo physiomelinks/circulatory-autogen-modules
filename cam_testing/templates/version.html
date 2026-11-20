@@ -124,9 +124,25 @@
             <dl class="kv">{% for k, v in t.metrics.items() %}<dt>{{ k }}</dt><dd>{{ v|fmt }}</dd>{% endfor %}</dl>
             {%- endif %}
 
-            {%- if t.plots or t.source_figures %}
+            {%- if t.figure_rows %}
+            {#- a parameterisation's test: its source figures beside the result plots made from their data #}
+            <div class="paper-cols" role="table" aria-label="{{ t.title }}: source figures and results">
+              <div class="paper-row paper-head" role="row"><div class="col-paper" role="columnheader">From the paper</div><div class="col-result" role="columnheader">{{ t.results_heading }}</div></div>
+              {%- for row in t.figure_rows %}
+              <div class="paper-row{% if not (row.figures and row.plots) %} unpaired{% endif %}" role="row">
+                <div class="col-paper" role="cell" data-heading="From the paper">
+                  {%- for sf in row.figures %}<figure class="source-figure"><img src="{{ sf.file }}" alt="source: {{ sf.caption or sf.source }}" loading="lazy"><figcaption><strong>Source</strong> ({{ sf.source|emph }}){% if sf.caption_lead %}: {{ sf.caption_lead|emph }}{% endif %}{% if sf.caption_rest %}<details><summary>Extraction notes</summary>{{ sf.caption_rest|emph }}</details>{% endif %}</figcaption></figure>{% endfor %}
+                  {%- if not row.figures %}<p class="muted none-here">No source figure is matched to {% if row.plots[0].item %}<code>{{ row.plots[0].item if row.plots[0].item is string else row.plots[0].item | join(' + ') }}</code>{% else %}this plot{% endif %}.</p>{% endif %}
+                </div>
+                <div class="col-result" role="cell" data-heading="{{ t.results_heading }}">
+                  {%- for p in row.plots %}<figure><img src="{{ p.file }}" alt="{{ t.title }} plot{% if p.item %} of {{ p.item if p.item is string else p.item | join(' + ') }}{% endif %} for {{ c.label }}" loading="lazy"></figure>{% endfor %}
+                  {%- if not row.plots %}<p class="muted none-here">No plot of this test is matched to this figure.</p>{% endif %}
+                </div>
+              </div>
+              {%- endfor %}
+            </div>
+            {%- elif t.plots %}
             <div class="plots">
-              {%- for sf in t.source_figures or [] %}<figure class="source-figure"><img src="{{ sf.file }}" alt="source: {{ sf.caption or sf.source }}" loading="lazy"><figcaption><strong>Source</strong> ({{ sf.source|emph }}){% if sf.caption %}: {{ sf.caption|emph }}{% endif %}</figcaption></figure>{% endfor %}
               {%- for p in t.plots %}<figure><img src="{{ p }}" alt="{{ t.title }} plot for {{ c.label }}" loading="lazy"></figure>{% endfor %}
             </div>
             {%- endif %}
@@ -182,7 +198,25 @@ section.component { display: grid; gap: 22px; padding-top: 28px; border-top: 2px
 .plots figure { margin: 0; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
 .plots img { display: block; width: 100%; height: auto; }
 .plots figcaption { font-size: 0.8rem; margin-top: 4px; color: var(--muted, inherit); }
-.source-figure { outline: 2px solid var(--rule); }
+/* a parameterisation test's two columns: the publication's figures (left), the results from their data (right) */
+.paper-cols { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.paper-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.paper-row + .paper-row { border-top: 1px solid var(--rule); }
+.paper-row > div { padding: 10px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.col-paper { background: var(--paper-col-bg); }
+.col-result { background: var(--result-col-bg); }
+.paper-head > div { padding-block: 6px; }
+.paper-head > div, .paper-row > div::before { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; color: var(--ink-2); }
+.paper-cols figure { margin: 0; }
+.paper-cols img { display: block; width: 100%; height: auto; background: var(--plot-ground); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; }
+.paper-cols figcaption { font-size: 0.8rem; margin-top: 4px; color: var(--ink-2); }
+.paper-cols figcaption summary { cursor: pointer; color: var(--accent); }
+.paper-cols .none-here { margin: 0; font-size: 0.82rem; }
+@media (max-width: 640px) {
+  .paper-row { grid-template-columns: minmax(0, 1fr); }
+  .paper-head { display: none; }
+  .paper-row > div::before { content: attr(data-heading); }
+}
 details { font-size: 0.85rem; }
 details summary { cursor: pointer; color: var(--ink-2); }
 details pre { white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.78rem; background: var(--paper); padding: 10px; border-radius: 6px; overflow-x: auto; }
@@ -207,7 +241,16 @@ pre.mermaid[data-processed] { color: inherit; text-align: center; }
 .tree, .tree ul { list-style: none; margin: 0; padding-left: 18px; }
 .tree { padding-left: 0; font-size: 0.85rem; }
 .tree li { padding: 1px 0; }
+.open-in { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 0.88rem; }
+.open-in > span { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+a.open-app { display: inline-flex; align-items: center; padding: 2px 10px; border: 1px solid var(--accent); border-radius: 999px; font-size: 0.8rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+a.open-app:hover { background: var(--accent-soft); }
+.open-msg { font-size: 0.8rem; }
+.open-msg:empty { display: none; }
 </style>
+<script>
+{% include '_open_in.js' %}
+</script>
 <script>
 window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
 </script>
@@ -232,9 +275,11 @@ window.addEventListener('DOMContentLoaded', function () {
     <div class="eyebrow">{{ module_type }} · {{ version }}</div>
     <ol>
       <li><a href="#overview"><span class="mono">Test overview</span></a></li>
+      {%- if open_in.celldl %}<li><a href="#bond-graph"><span class="mono">Bond graph</span></a></li>{% endif %}
       {%- if components[0].structure_view %}<li><a href="#{{ components[0].id }}-structure"><span class="mono">Structure</span></a></li>{% endif %}
       {%- if components[0].unit_consistency %}<li><a href="#unit-consistency"><span class="dot failed"></span><span class="mono">Unit consistency</span></a></li>{% endif %}
       <li><a href="#parameterisations"><span class="mono">Parameterisations</span></a></li>
+      {%- if n_data_items %}<li><a href="#data-sources">{% if n_data_problems %}<span class="dot failed"></span>{% endif %}<span class="mono">Data sources</span></a></li>{% endif %}
       {%- for t in components[0].tests %}
       <li><a href="#{{ components[0].id }}--{{ t.key }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ t.short }}</span></a></li>
       {%- endfor %}
@@ -262,10 +307,24 @@ window.addEventListener('DOMContentLoaded', function () {
         <span title="The config entry's creator list">{% if creators %}Creator{{ 's' if creators|length > 1 }}: {{ creators|join(', ') }}{% else %}<span class="todo">Creator: not set (to be given in review)</span>{% endif %}</span>
         {%- if unit_failures %}<span title="libcellml unit checks on the CellML (informational, not a test column)"><a href="#unit-consistency" class="todo">Unit consistency: {{ components[0].unit_consistency.message }}</a></span>{% elif components[0].unit_consistency %}<span><a href="#unit-consistency" class="todo">Unit consistency: not checked</a></span>{% endif %}
         <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
+        {%- if n_data_items %}<span title="Calibration and validation data items with a source (Data sources)"><span class="box {{ 'on' if not n_data_problems }}" aria-hidden="true"></span><a href="#data-sources">{{ 'All ' ~ n_data_items ~ ' data items sourced' if not n_data_problems else n_data_problems ~ ' of ' ~ n_data_items ~ ' data items with a problem: ' ~ (data_problems|problems) }}</a></span>{% endif %}
         <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
         {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
         <span>libcuflynx {{ libcuflynx_version }}</span>
         <span>Report generated {{ generated }}</span>
+      </div>
+      <div class="open-in" aria-label="Open in">
+        <span class="eyebrow">Open in</span>
+        {%- if open_in.celldl %}
+        <span><a class="open-app" id="open-celldl" href="{{ open_in.celldl.href }}" data-app="the CellDL editor" data-open-file="{{ open_in.celldl.href }}" data-open-url="{{ open_in.celldl.open }}" data-open-by-url="{{ open_in.celldl.open_by_url }}" target="_blank" rel="noopener" title="Opens the version's bond graph ({{ open_in.celldl.href }}) in the CellDL editor">CellDL</a><span class="open-msg muted" role="status"></span>{% if open_in.celldl.note %}<a href="#celldl-note" class="muted" style="font-size:0.8rem" title="{{ open_in.celldl.note }}">(see the note)</a>{% endif %}</span>
+        {%- endif %}
+        {%- set ph = open_in.phlynx %}
+        <span>{% if ph.href %}<a class="open-app" id="open-phlynx" href="{{ ph.href }}" data-app="PhLynx" data-open-file="{{ ph.href }}" data-open-url="{{ ph.open }}" target="_blank" rel="noopener" title="Opens the version's test network, as PhLynx exported it ({{ ph.href }}), in PhLynx">PhLynx</a><span class="open-msg muted" role="status"></span>
+        {%- elif ph.reason %}{{ chip('not_applicable', 'PhLynx: N/A') }} <span class="muted" style="font-size:0.8rem" id="phlynx-na">{{ ph.reason }}</span>
+        {%- else %}<span class="muted" style="font-size:0.8rem">PhLynx: {{ ph.missing }}</span>{% endif %}</span>
+        {%- if components[0].parameterisations|selectattr('omex')|list %}
+        <span class="muted" style="font-size:0.8rem">CUFLynx: per parameterisation, under <a href="#parameterisations">Parameterisations</a></span>
+        {%- endif %}
       </div>
       <div class="counts">
         {{ chip('passed', counts.passed ~ ' passed') }}
@@ -333,6 +392,19 @@ window.addEventListener('DOMContentLoaded', function () {
       {%- endif %}
     </section>
 
+    {%- if open_in.celldl %}
+    <section class="block" aria-labelledby="bond-graph">
+      <h2 id="bond-graph">Bond graph</h2>
+      <figure style="margin:0">
+        <a href="{{ open_in.celldl.href }}" target="_blank" rel="noopener"><img id="bond-graph-figure" src="{{ open_in.celldl.href }}" alt="The version's bond graph, as the CellDL editor draws it" loading="lazy" style="display:block;max-width:100%;height:auto;max-height:80vh;background:#fff;border:1px solid var(--rule);border-radius:6px"></a>
+        <figcaption class="muted" style="margin-top:4px;font-size:0.84rem">The version's CellDL document, <code>{{ open_in.celldl.href }}</code>, drawn as the editor draws it. Click it to see it full size, or <a href="#open-celldl">open it in CellDL</a> to edit it.</figcaption>
+      </figure>
+      {%- if open_in.celldl.note %}
+      <p class="celldl-note" id="celldl-note" style="margin:0;padding:8px 12px;border-left:3px solid var(--pend);background:var(--pend-bg);font-size:0.86rem">{{ open_in.celldl.note }}</p>
+      {%- endif %}
+    </section>
+    {%- endif %}
+
     {%- if structure and (structure.errors or structure.warnings) %}
     <section class="panel" aria-labelledby="structure">
       <h2 id="structure">Structural checks</h2>
@@ -362,6 +434,14 @@ window.addEventListener('DOMContentLoaded', function () {
         </div>
         {%- if c.config_notes %}<p style="margin:0;max-width:75ch"><strong>{{ c.config_notes }}</strong></p>{% endif %}
         {%- if c.description %}<p style="margin:0;max-width:75ch">{{ c.description }}</p>{% endif %}
+        {%- if c.figures %}
+        <section class="figures" aria-label="Figures">
+          <h3 style="margin:8px 0 4px">Figures</h3>
+          <div class="plots">
+            {%- for fg in c.figures %}<figure>{% if fg.missing %}<p class="todo">Missing figure <code>{{ fg.file }}</code></p>{% else %}<a href="{{ fg.file }}"><img src="{{ fg.file }}" alt="{{ fg.caption or fg.file }}" loading="lazy"></a>{% endif %}{% if fg.caption %}<figcaption>{{ fg.caption|emph }}</figcaption>{% endif %}</figure>{% endfor %}
+          </div>
+        </section>
+        {%- endif %}
         {%- set rc = c.required_citations %}
         <p class="required-citations" style="margin:0;max-width:75ch" title="The papers this version's model is built on (config required_citations); cite them when you use it. Per-parameter sources are under References.">
           <strong>Required citations:</strong>
@@ -439,6 +519,7 @@ window.addEventListener('DOMContentLoaded', function () {
           {%- for f in g.issues %}
             <li><strong>{{ f.kind }}</strong>{% if f.expression %} in <code>{{ f.expression }}</code>{% endif %}:
               {%- if f.sides %} {% for sd in f.sides %}<code>{{ sd.expression }}</code> is in <code>{{ sd.units }}</code>{% if sd.base %} <span class="muted">({{ sd.base }})</span>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% if f.kind == 'not dimensionless' %}, but should be dimensionless{% endif %}
+              {%- elif f.kind == 'conditional' %} libcellml can't check units raised to a variable exponent, so it gives a condition instead: check this term's units by hand
               {%- else %} {{ f.message }}{% endif %}
               <details><summary>libcellml message</summary><pre>{{ f.message }}</pre></details></li>
           {%- endfor %}
@@ -449,7 +530,7 @@ window.addEventListener('DOMContentLoaded', function () {
         <div class="eyebrow">Units definitions</div>
         <ul class="issues">{% for d in uc.definition_issues %}<li>{{ d.message }}</li>{% endfor %}</ul>
         {%- endif %}
-        {%- if uc.status == 'not_checked' or (uc.other_issues and not uc.equations) %}
+        {%- if uc.other_issues and (uc.status == 'not_checked' or not uc.equations) %}
         <div class="eyebrow">Why the equations could not be checked</div>
         <ul class="issues">{% for o in uc.other_issues[:10] %}<li>{{ o }}</li>{% endfor %}{% if uc.other_issues|length > 10 %}<li>… and {{ uc.other_issues|length - 10 }} more</li>{% endif %}</ul>
         {%- endif %}
@@ -551,7 +632,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
       <div class="block" id="parameterisations">
         <h3>Parameterisations</h3>
-        <p class="muted" style="margin:0;font-size:0.84rem">A parameterisation is a parameter set of this version (the same maths, other values, with its own data and calibration), in <code>parameterisations/&lt;parameterisation&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. Each use of the version in a network (an instance: a module-array record) names the parameterisation it uses, by default the version's <code>default_parameterisation</code>. The verification tests above run at the default parameterisation's parameters; validation runs per parameterisation, for whatever data it has. A parameterisation without obs_data is N/A for calibration ("no calibration data in this parameterisation") and stays usable in models; the version's Calibration column fails when no parameterisation has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the parameterisation's parameters, its obs_data and params_for_id, and every input file including the verification config: open it in CUFLynx to investigate the parameterisation.</p>
+        <p class="muted" style="margin:0;font-size:0.84rem">A parameterisation is a parameter set of this version (the same maths, other values, with its own data and calibration), in <code>parameterisations/&lt;parameterisation&gt;/</code>, named by its obs_data's <code>obs_data_name</code>. Each use of the version in a network (an instance: a module-array record) names the parameterisation it uses, by default the version's <code>default_parameterisation</code>. The verification tests above run at the default parameterisation's parameters; validation runs per parameterisation, for whatever data it has. A parameterisation without obs_data is N/A for calibration ("no calibration data in this parameterisation") and stays usable in models; the version's Calibration column fails when no parameterisation has calibration data. Its CUFLynx archive (<code>make omex</code>) holds the flattened model with the parameterisation's parameters, its obs_data and params_for_id, its calibration result when it has one, and every input file including the verification config: open it in CUFLynx to investigate the parameterisation. "Open in CUFLynx" hands the archive's address to the CUFLynx app, and needs a CUFLynx that handles <code>cuflynx://</code> links; otherwise download the <code>.omex</code> and open it there.</p>
         <div class="table-wrap"><table>
           <thead><tr><th>Parameterisation</th><th>Parameters</th><th>Data files</th><th>CUFLynx archive</th><th>Baseline</th><th>Calibration</th><th>Calibrated values</th></tr></thead>
           <tbody>
@@ -559,7 +640,7 @@ window.addEventListener('DOMContentLoaded', function () {
             <tr><td class="mono">{{ i.name }}{% if i.is_default %} <span class="muted">(default)</span>{% endif %}</td>
             <td class="mono num">{{ i.n_parameters }}</td>
             <td class="mono" style="white-space:normal;font-size:0.78rem">{{ i.files|join(', ') or '—' }}</td>
-            <td title="{{ i.omex_message }}">{% if i.omex %}<a href="{{ i.omex }}" download>.omex</a> {% endif %}{{ chip(i.omex_status) }}{% if not i.omex %} <span class="muted" style="font-size:0.78rem">make omex</span>{% endif %}</td>
+            <td title="{{ i.omex_message }}">{% if i.omex %}<a href="{{ i.omex }}" download>.omex</a> <a class="open-app" href="{{ i.omex }}" data-cuflynx-omex="{{ i.omex }}" data-cuflynx-open="{{ open_in.cuflynx }}" title="Opens this archive in the CUFLynx app (needs a CUFLynx that handles cuflynx:// links)">Open in CUFLynx</a> {% endif %}{{ chip(i.omex_status) }}{% if not i.omex %} <span class="muted" style="font-size:0.78rem">make omex</span>{% endif %}</td>
             <td><a href="#{{ i.baseline.anchor }}" style="text-decoration:none">{{ chip(i.baseline.status) }}</a>{% if i.baseline.short == 'Fit check' %} <span class="muted" style="font-size:0.78rem">fit check</span>{% endif %}</td>
             <td><a href="#{{ i.calibrate.anchor }}" style="text-decoration:none">{{ chip(i.calibrate.status) }}</a>{% if not i.has_obs_data %} <span class="muted" style="font-size:0.78rem">no calibration data</span>{% endif %}</td>
             <td class="mono" style="white-space:normal;font-size:0.78rem">{% if i.calibration %}{{ i.calibration.calibrated_parameters|fmt }}{% if i.calibration.cost is not none %} (cost {{ i.calibration.cost|fmt }}){% endif %}<br><span class="muted">{{ i.calibrated_file }}, {{ i.calibration.date }}</span>{% else %}—{% endif %}</td></tr>
@@ -570,9 +651,21 @@ window.addEventListener('DOMContentLoaded', function () {
         {%- if t.status not in (none, 'not_applicable') or t.message not in ('no baseline data in this parameterisation', 'no baseline data in this instance') %}
         <h4 style="margin:8px 0 0">{{ i.name }}</h4>
         {{ test_article(c, t, t.anchor) }}
+        {%- else %}<span id="{{ t.anchor }}"></span>
         {%- endif %}
         {%- endfor %}{% endfor %}
       </div>
+
+      {%- if c.parameterisations|selectattr('sources')|list %}
+      <div class="block" id="data-sources">
+        <h3>Data sources</h3>
+        <p class="muted" style="margin:0;font-size:0.84rem">Where every calibration and validation number came from: one row per obs_data <code>data_item</code> and <code>prediction_item</code>, and per baseline target or data column. Kind is what the number is (measured, assumed, derived, or a term of another item and not a measurement); role is how it is used (target: fitted; held out: compared after fitting, not fitted; prediction: computed, no data; term: a term of another item, not fitted; validation: the baseline test's). "Source missing" means neither a <code>data_reference</code> on the item nor a section for it in the parameterisation's <code>SOURCES.md</code>: the version's data sources test fails until one is added (modules/README.md, "Data sources").</p>
+        {%- for i in c.parameterisations if i.sources %}
+        <h4 style="margin:8px 0 0" id="data-sources-{{ i.name }}">{{ i.name }}</h4>
+        {%- with tbl=i.sources, keys=bib_keys %}{% include '_sources_table.html' %}{% endwith %}
+        {%- endfor %}
+      </div>
+      {%- endif %}
 
       <div class="block">
         <h3>Verification &amp; validation</h3>

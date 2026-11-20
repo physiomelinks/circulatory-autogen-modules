@@ -13,13 +13,13 @@ report generator (python -m cam_testing.report) turns into <module_type>_<versio
 """
 import pytest
 
-from cam_testing import checks, supermodule
+from cam_testing import bondgraph, checks, sources, supermodule
 from cam_testing.library import load_version
 
 pytestmark = pytest.mark.module_vv
 
 
-def _assert(result, version):
+def _assert(result, version, parameterisation=None):
     if result.status == checks.PASSED:
         return
     if result.status == checks.PARTIAL:
@@ -31,7 +31,7 @@ def _assert(result, version):
         pytest.skip(f'{result.status}: {result.message}')
     # A failure listed under expected_failures in the spec is a recorded known issue: it
     # stays 'failed' in the results and the report, but does not fail the run.
-    known = (version.spec.get('expected_failures') or {}).get(result.test)
+    known = checks.expected_failure(version, result.test, parameterisation)
     detail = '\n'.join(str(d) for d in result.details[:20])
     if known:
         pytest.xfail(f'known issue: {known} ({result.message})')
@@ -66,15 +66,36 @@ def stability_test(component_model):
     _assert(checks.stability_test(component_model), component_model.component)
 
 
+def data_sources_test(component_key):
+    # no model: every calibration and validation data item has a source (cam_testing.sources;
+    # modules/README.md, "Data sources")
+    version = load_version(*component_key)
+    _assert(sources.check(version), version)
+
+
+# ---- bond graphs (N/A for a version without a CellDL bond graph) ----------------------------------
+
+def bondgraph_celldl_test(component_key):
+    version = load_version(*component_key)
+    _assert(checks.save(version, bondgraph.celldl_check(version)), version)
+
+
+def bondgraph_reactions_test(component_key):
+    version = load_version(*component_key)
+    _assert(checks.save(version, bondgraph.reactions_check(version)), version)
+
+
 # ---- per parameterisation -----------------------------------------------------------------------
 
 def validation_test_baseline(parameterisation_model):
-    _assert(checks.validation_test_baseline(parameterisation_model), parameterisation_model.component)
+    _assert(checks.validation_test_baseline(parameterisation_model), parameterisation_model.component,
+            parameterisation_model.parameterisation)
 
 
 @pytest.mark.slow
 def validation_test_calibrate(parameterisation_model):
-    _assert(checks.validation_test_calibrate(parameterisation_model), parameterisation_model.component)
+    _assert(checks.validation_test_calibrate(parameterisation_model), parameterisation_model.component,
+            parameterisation_model.parameterisation)
 
 
 # ---- supermodule versions -----------------------------------------------------------------------

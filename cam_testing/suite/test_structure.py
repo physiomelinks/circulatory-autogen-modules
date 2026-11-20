@@ -29,9 +29,9 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from cam_testing import bib, library, module_array, paths
-from cam_testing.library import (IDENTITY_KEYS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
+from cam_testing.library import (FIGURES, IDENTITY_KEYS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
                                  all_versions, ancestors_of, load_version, misplaced_spec_keys, module_relpath,
-                                 module_type_names, parent_of, read_spec_files)
+                                 module_type_names, parent_of, protocol_problems, read_spec_files)
 from cam_testing.mathml import component_names
 
 CELLML_NS = 'http://www.cellml.org/cellml/1.1#'
@@ -213,6 +213,7 @@ def walk_modules():
         # the spec's two files: every key in its own file, identity keys matching the directories
         tests, verification = read_spec_files(d, f'{mt}_{v}')
         problems.extend(f'{rel}: {p}' for p in misplaced_spec_keys(tests, verification))
+        problems.extend(f'{rel}: {p}' for p in protocol_problems(d, verification))
         review = tests.get('review')
         if isinstance(review, str) and not (review.startswith('reviews/') and os.path.isfile(os.path.join(REPO_ROOT, review))):
             problems.append(f'{rel}: review: {review} is not a file in reviews/')
@@ -229,6 +230,12 @@ def walk_modules():
             return
         if os.path.isdir(os.path.join(d, 'risk')):
             _check_files('risk', os.path.join(d, 'risk'), names, problems)
+        fdir = os.path.join(d, FIGURES)
+        if os.path.isdir(fdir):
+            problems.extend(f'{rel}/{FIGURES}: unexpected file {f} (not an svg, png or jpg)' for f in sorted(os.listdir(fdir))
+                            if not re.match(LEVELS['figures']['file_pattern'], f))
+        if tests.get('figures'):
+            problems.extend(f'{rel}: {p}' for p in load_version(mt, v).figure_problems())
         iroot = os.path.join(d, 'parameterisations')
         _check_files('parameterisations', iroot, {}, problems)
         if not _subdirs(iroot):
@@ -937,6 +944,25 @@ def test_missing_source_figures_list_is_current():
     assert not stale, f'remove from MISSING_SOURCE_FIGURES (now has figures or no longer needs them): {sorted(stale)}'
 
 
+def _parameterisations_with_source_figures():
+    return [(f'{v.key}::{i.name}', i) for v in library.all_versions() for i in v.parameterisations()
+            if os.path.isfile(os.path.join(i.source_figures_dir, library.SOURCE_FIGURES_INDEX))]
+
+
+@pytest.mark.parametrize('key,inst', _parameterisations_with_source_figures(), ids=lambda x: x if isinstance(x, str) else '')
+def test_source_figures_index(key, inst):
+    '''Each source_figures.json entry has the keys directory_schema.json documents (file, source; optional
+    caption and items), and its "items" names data items of the parameterisation (modules/README.md,
+    "Source figures").'''
+    # a repo whose own directory_schema.json predates index_keys: cam_testing's
+    keys = (LEVELS['parameterisation'].get('subdirectories', {}).get(library.SOURCE_FIGURES, {}).get('index_keys')
+            or library.SOURCE_FIGURE_KEYS)
+    with open(os.path.join(inst.source_figures_dir, library.SOURCE_FIGURES_INDEX)) as f:
+        entries = json.load(f)
+    problems = library.source_figures_problems(entries, inst.item_names(), keys)
+    assert not problems, f'{key}: ' + '; '.join(problems)
+
+
 def _ca_resources():
     '''circulatory_autogen's resources/ directory, from the installed libcuflynx (or the sibling clone).'''
     try:
@@ -974,6 +1000,29 @@ def test_reference_copies_are_circulatory_autogen_originals_in_library_keys(path
         assert f.read() == expected, f'{path} differs from {original} (after rekeying) beyond its bib keys'
 
 
+def test_version_renames_name_existing_versions():
+    '''Each version_renames.json rename (a version renamed in a module PR) ends at a version of the library,
+    gives its reason, and its old name no longer exists.'''
+    have = {(v.vessel_type, v.name) for v in library.all_versions(include_libraries=True)}
+    problems = []
+    for d in library.library_dirs():
+        path = os.path.join(d, library.VERSION_RENAMES)
+        if not os.path.isfile(path):
+            continue
+        with open(path) as f:
+            entries = json.load(f)
+        renames = {tuple(r['from']): tuple(r['to']) for r in entries}
+        for r in entries:
+            old, new = tuple(r['from']), library._chain(tuple(r['to']), renames)
+            if new not in have:
+                problems.append(f'{path}: {old} -> {new}: no such version')
+            if old in have:
+                problems.append(f'{path}: {old} is renamed but still exists')
+            if not r.get('reason'):
+                problems.append(f'{path}: {old} -> {tuple(r["to"])} has no reason')
+    assert not problems, '\n'.join(problems)
+
+
 def _system_models():
     from cam_testing import system as systems
     return systems.system_models()
@@ -993,3 +1042,12 @@ def test_system_model_has_a_reference_or_says_it_has_none(system):
     else:
         assert has_array or has_cellml, (f'{system.id}: no reference (reference/<model>_module_array.json or a CellML '
                                          f'model) and the spec\'s equivalence does not say so (status: not_applicable)')
+    # circulatory_autogen's original is compared as committed CellML: libcuflynx no longer has the
+    # built-in modules it was generated with
+    from cam_testing import system as systems
+    if (has_array and not has_cellml and not systems.original_cannot_generate(system)
+            and eq.get('status') not in ('not_applicable', 'skipped')):
+        pytest.fail(f'{system.id}: reference/ has circulatory_autogen\'s module array but not {system.name}.cellml, '
+                    f'the model generated from it: python -m cam_testing.system write-reference {system.id} (or, when '
+                    f'circulatory_autogen cannot generate it, expected_failures.system_equivalence_test saying '
+                    f'"{systems.CANNOT_GENERATE} (<its error>)")')

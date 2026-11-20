@@ -64,10 +64,11 @@
     "constraints": [
       "T_c + T_r < T"
     ],
-    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, flows, u_ext). Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt and T_eff are excluded: the harness clock drives them. The activation switches phase discontinuously, so CVODE needs a step cap below the clock's start window (eps_1 = 7 % of a beat): MaximumStep 1 ms.",
+    "rationale": "Factors 0.5-2 on every constant and boundary condition (E_A, E_B, q_us, q_init, T_c, T_r, t_start, flows, u_ext). Delta_E (the elastance change a controller adds; 0 by default) takes -50 % to +100 % of E_A. The beat period T is valid over 0.4-1.5 s (40-150 bpm); points outside are skipped, as are points where contraction plus relaxation would not fit in the beat (T_c + T_r >= T). mt, T_eff and s are excluded: the harness clock drives them. CVODE runs with MaximumStep 1 ms.",
     "exclude": [
       "mt",
-      "T_eff"
+      "T_eff",
+      "s"
     ],
     "bounds": {
       "T": [
@@ -78,6 +79,7 @@
   },
   "timestep": {
     "scheme": "rk4",
+    "roundoff": 1e-10,
     "dts": [
       0.004,
       0.002,
@@ -361,7 +363,7 @@
               118.95
             ],
             "units": "mmHg",
-            "source": "liang2009multi Fig. 4a: 108.14 mmHg"
+            "data_reference": "liang2009multi; Fig. 4a: 108.14 mmHg"
           },
           {
             "name": "LV minimum (early diastolic) pressure",
@@ -371,7 +373,7 @@
               5.0
             ],
             "units": "mmHg",
-            "source": "liang2009multi Fig. 4a: 1.56 mmHg"
+            "data_reference": "liang2009multi; Fig. 4a: 1.56 mmHg"
           },
           {
             "name": "LV end-diastolic pressure",
@@ -381,14 +383,14 @@
               9.29
             ],
             "units": "mmHg",
-            "source": "liang2009multi Fig. 4a: 7.29 mmHg at the start of contraction, +-2 mmHg (the digitising uncertainty, as in the calibration)"
+            "data_reference": "liang2009multi; Fig. 4a: 7.29 mmHg at the start of contraction"
           }
         ],
         "note": "Held-out checks only: the LV pressure features of Liang Fig. 4a (peak, early-diastolic minimum, end-diastolic pressure). The P-V loop volumes (Fig. 4e EDV, ESV) and the aortic pressure (Fig. 4b) are calibration features (validation.lv.calibrate), so they are not validation targets here."
       },
       "calibrate": {
         "status": "active",
-        "source": "Liang et al. 2009 (MBEC 47:743) Fig. 4b (normal ascending-aortic pressure, fitted) and Fig. 4a/4e (normal LV pressure and P-V loop volumes, held out), digitised (source_figures/)",
+        "source": "Liang et al. 2009 (MBEC 47:743) Fig. 4b/4e (normal ascending-aortic pressure and P-V loop volumes, fitted) and Fig. 4a (normal LV pressure, held out), digitised (source_figures/)",
         "obs_data": "parameterisations/lv/lv_obs_data.json",
         "params_for_id": "parameterisations/lv/lv_params_for_id.json",
         "z_threshold": 2.0,

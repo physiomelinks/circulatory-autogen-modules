@@ -14,6 +14,7 @@ dependencies = [
     "numpy>=2.0",   # np.trapezoid in verification invariants
     "pytest",
     "jsonschema>=4.18",  # module arrays and module configs against libcuflynx's JSON Schemas
+    "rdflib>=6",    # the bond-graph tests read a CellDL document's BG-RDF (cam_testing/bondgraph.py)
     "tomli; python_version < '3.11'",  # [tool.cam_testing] in a repo's pyproject.toml
 ]
 
@@ -29,11 +30,16 @@ libcuflynx = ["libcuflynx @ git+https://github.com/physiomelinks/circulatory_aut
 include = ["cam_testing", "cam_testing.*"]
 
 [tool.setuptools.package-data]
-cam_testing = ["templates/*.html", "data/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
+cam_testing = ["templates/*.html", "templates/*.js", "data/*.json", "data/rhea/*.json", "bridges/phlynx/*.mjs", "bridges/phlynx/package*.json",
                "bridges/cuflynx/*.py"]
 
 [tool.cam_testing]
 # this repo is the root (the default); curated PhLynx manifests besides all.json (python -m cam_testing.manifests)
+# the libcuflynx a release's modules need: written into the release asset's cam_release.json, which
+# libcuflynx checks (README "Releases"). Raise it when the library starts using a newer libcuflynx.
+[tool.cam_testing.release]
+libcuflynx = ">=1.0.0"
+
 [tool.cam_testing.manifests]
 "index.json" = ["vessels", "heart"]
 "vitalworkshop.json" = ["vessels", "heart"]

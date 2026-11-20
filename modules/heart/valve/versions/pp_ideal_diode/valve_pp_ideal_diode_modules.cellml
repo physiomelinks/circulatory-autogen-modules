@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="valve_pp_ideal_diode" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <component name="valve_ideal_diode_type">
+        <!-- ideal-diode valve: v = (u_in - u_out)/R while u_in > u_out, else 0 (no backflow, no leaflet state, no inertance); open = 1 while it conducts -->
+        <variable name="u_in" units="J_per_m3" public_interface="in"/>
+        <variable name="u_out" units="J_per_m3" public_interface="in"/>
+        <variable name="R" units="Js_per_m6" public_interface="in"/>
+        <variable name="open" units="dimensionless" public_interface="out"/>
+        <variable name="v" units="m3_per_s" public_interface="out"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>open</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">1</cn>
+                        <apply>
+                            <gt/>
+                            <ci>u_in</ci>
+                            <ci>u_out</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <cn cellml:units="dimensionless">0</cn>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>open</ci>
+                        <apply>
+                            <minus/>
+                            <ci>u_in</ci>
+                            <ci>u_out</ci>
+                        </apply>
+                    </apply>
+                    <ci>R</ci>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

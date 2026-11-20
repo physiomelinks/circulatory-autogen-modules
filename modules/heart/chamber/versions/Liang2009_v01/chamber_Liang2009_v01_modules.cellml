@@ -5,18 +5,18 @@
         <variable name="T" units="second" public_interface="in"/>
         <variable name="T_eff" units="second" public_interface="in"/>
         <variable name="mt" units="dimensionless" public_interface="in"/>
+        <variable name="s" units="dimensionless" public_interface="in"/>
         <variable name="T_c" units="second" public_interface="in"/>
         <variable name="T_r" units="second" public_interface="in"/>
         <variable name="t_start" units="second" public_interface="in"/>
         <variable name="T_c_eff" units="second"/>
         <variable name="T_r_eff" units="second"/>
         <variable name="t_start_norm" units="dimensionless"/>
-        <variable name="chi" units="dimensionless" public_interface="out" initial_value="0.0"/>
+        <variable name="chi" units="dimensionless" public_interface="out"/>
         <variable name="chi_floor" units="dimensionless" public_interface="out"/>
         <variable name="chi_floor_final" units="dimensionless"/>
+        <variable name="phi" units="dimensionless"/>
         <variable name="e" units="dimensionless" public_interface="out"/>
-        <variable name="eps_1" units="dimensionless" initial_value="0.07"/>
-        <variable name="eps_2" units="dimensionless" initial_value="0.02"/>
         <variable name="E_A" units="J_per_m6" public_interface="in"/>
         <variable name="E_B" units="J_per_m6" public_interface="in"/>
         <variable name="Delta_E" units="J_per_m6" public_interface="in"/>
@@ -32,154 +32,158 @@
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
-                <ci>chi_floor</ci>
+                <ci>phi</ci>
                 <apply>
                     <minus/>
-                    <ci>chi</ci>
+                    <apply>
+                        <minus/>
+                        <ci>s</ci>
+                        <ci>t_start_norm</ci>
+                    </apply>
                     <apply>
                         <floor/>
-                        <ci>chi</ci>
+                        <apply>
+                            <minus/>
+                            <ci>s</ci>
+                            <ci>t_start_norm</ci>
+                        </apply>
                     </apply>
                 </apply>
             </apply>
             <apply>
                 <eq/>
-                <apply>
-                    <diff/>
-                    <bvar>
-                        <ci>t</ci>
-                    </bvar>
-                    <ci>chi</ci>
-                </apply>
+                <ci>chi_floor</ci>
                 <piecewise>
                     <piece>
+                        <cn cellml:units="dimensionless">0.0</cn>
                         <apply>
-                            <divide/>
-                            <cn cellml:units="dimensionless">0.25</cn>
-                            <ci>T_c_eff</ci>
-                        </apply>
-                        <apply>
-                            <and/>
-                            <apply>
-                                <geq/>
-                                <ci>mt</ci>
-                                <ci>t_start_norm</ci>
-                            </apply>
-                            <apply>
-                                <leq/>
-                                <ci>mt</ci>
-                                <apply>
-                                    <plus/>
-                                    <ci>t_start_norm</ci>
-                                    <ci>eps_1</ci>
-                                </apply>
-                            </apply>
-                            <apply>
-                                <leq/>
-                                <ci>chi_floor</ci>
-                                <cn cellml:units="dimensionless">0.25</cn>
-                            </apply>
+                            <lt/>
+                            <ci>s</ci>
+                            <ci>t_start_norm</ci>
                         </apply>
                     </piece>
                     <piece>
                         <apply>
                             <divide/>
-                            <cn cellml:units="dimensionless">0.25</cn>
-                            <ci>T_c_eff</ci>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">0.25</cn>
+                                <apply>
+                                    <times/>
+                                    <ci>phi</ci>
+                                    <ci>T</ci>
+                                </apply>
+                            </apply>
+                            <ci>T_c</ci>
                         </apply>
                         <apply>
-                            <and/>
+                            <leq/>
                             <apply>
-                                <gt/>
-                                <apply>
-                                    <plus/>
-                                    <ci>t_start_norm</ci>
-                                    <ci>eps_1</ci>
-                                </apply>
-                                <cn cellml:units="dimensionless">1.0</cn>
+                                <times/>
+                                <ci>phi</ci>
+                                <ci>T</ci>
                             </apply>
+                            <ci>T_c</ci>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">0.25</cn>
                             <apply>
-                                <leq/>
-                                <ci>mt</ci>
+                                <divide/>
                                 <apply>
-                                    <minus/>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.25</cn>
                                     <apply>
-                                        <plus/>
-                                        <ci>t_start_norm</ci>
-                                        <ci>eps_1</ci>
+                                        <minus/>
+                                        <apply>
+                                            <times/>
+                                            <ci>phi</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                        <ci>T_c</ci>
                                     </apply>
-                                    <cn cellml:units="dimensionless">1.0</cn>
                                 </apply>
-                            </apply>
-                            <apply>
-                                <leq/>
-                                <ci>chi_floor</ci>
-                                <cn cellml:units="dimensionless">0.25</cn>
-                            </apply>
-                        </apply>
-                    </piece>
-                    <piece>
-                        <apply>
-                            <divide/>
-                            <cn cellml:units="dimensionless">0.25</cn>
-                            <ci>T_c_eff</ci>
-                        </apply>
-                        <apply>
-                            <and/>
-                            <apply>
-                                <gt/>
-                                <ci>chi_floor</ci>
-                                <ci>eps_2</ci>
-                            </apply>
-                            <apply>
-                                <leq/>
-                                <ci>chi_floor</ci>
-                                <cn cellml:units="dimensionless">0.25</cn>
-                            </apply>
-                        </apply>
-                    </piece>
-                    <piece>
-                        <apply>
-                            <divide/>
-                            <cn cellml:units="dimensionless">0.25</cn>
-                            <ci>T_r_eff</ci>
-                        </apply>
-                        <apply>
-                            <and/>
-                            <apply>
-                                <geq/>
-                                <ci>chi_floor</ci>
-                                <cn cellml:units="dimensionless">0.25</cn>
-                            </apply>
-                            <apply>
-                                <lt/>
-                                <ci>chi_floor</ci>
-                                <cn cellml:units="dimensionless">0.5</cn>
-                            </apply>
-                        </apply>
-                    </piece>
-                    <piece>
-                        <apply>
-                            <divide/>
-                            <cn cellml:units="dimensionless">0.5</cn>
-                            <apply>
-                                <minus/>
-                                <apply>
-                                    <minus/>
-                                    <ci>T_eff</ci>
-                                    <ci>T_c_eff</ci>
-                                </apply>
-                                <ci>T_r_eff</ci>
+                                <ci>T_r</ci>
                             </apply>
                         </apply>
                         <apply>
-                            <geq/>
-                            <ci>chi_floor</ci>
-                            <cn cellml:units="dimensionless">0.5</cn>
+                            <lt/>
+                            <apply>
+                                <times/>
+                                <ci>phi</ci>
+                                <ci>T</ci>
+                            </apply>
+                            <apply>
+                                <plus/>
+                                <ci>T_c</ci>
+                                <ci>T_r</ci>
+                            </apply>
                         </apply>
                     </piece>
                     <otherwise>
-                        <cn cellml:units="per_s">0.0</cn>
+                        <apply>
+                            <plus/>
+                            <cn cellml:units="dimensionless">0.5</cn>
+                            <apply>
+                                <divide/>
+                                <apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.5</cn>
+                                    <apply>
+                                        <minus/>
+                                        <apply>
+                                            <times/>
+                                            <ci>phi</ci>
+                                            <ci>T</ci>
+                                        </apply>
+                                        <apply>
+                                            <plus/>
+                                            <ci>T_c</ci>
+                                            <ci>T_r</ci>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <minus/>
+                                    <ci>T</ci>
+                                    <apply>
+                                        <plus/>
+                                        <ci>T_c</ci>
+                                        <ci>T_r</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </otherwise>
+                </piecewise>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>chi</ci>
+                <piecewise>
+                    <piece>
+                        <cn cellml:units="dimensionless">0.0</cn>
+                        <apply>
+                            <lt/>
+                            <ci>s</ci>
+                            <ci>t_start_norm</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <floor/>
+                                <apply>
+                                    <minus/>
+                                    <ci>s</ci>
+                                    <ci>t_start_norm</ci>
+                                </apply>
+                            </apply>
+                            <ci>chi_floor</ci>
+                        </apply>
                     </otherwise>
                 </piecewise>
             </apply>

@@ -47,8 +47,10 @@ use_builtin_modules: false
 - values, references, sourced flags and ranges from the default parameterisation's parameters;
 - the bibliography from `<module_type>_<v>_references.bib`;
 - invariants and validation settings from `<module_type>_<v>_verification_config.json`, notes and review from `<module_type>_<v>_tests.yaml`;
-- a parameterisation table with each parameterisation's data, baseline and calibration results;
-- results and plots from the last test run.
+- a parameterisation table with each parameterisation's data, baseline and calibration results; each baseline and calibration test shows two columns, "From the paper" (the publication figures the data were read off, `source_figures/`) and "Model vs data" / "Calibration results" (one plot per data item), each figure beside the plots of the items its `source_figures.json` entry lists in `items` (modules/README.md, "Source figures");
+- results and plots from the last test run;
+- for a bond-graph version, its CellDL document drawn under the test overview (a section "Bond graph");
+- "Open in" links under the header. **CellDL**, for a bond-graph version, opens its `<module_type>_<v>_bondgraph.svg` (in the version's directory) in the CellDL editor (`<editor>?open=celldl&name=<file name>#<base64>`). The editor is `https://physiomelinks.github.io/CellDLEditorComponent/` (`report.CELLDL_EDITOR_URL`), or `$CAM_CELLDL_EDITOR_URL` when set when the report is built (e.g. a local build, `CAM_CELLDL_EDITOR_URL=http://127.0.0.1:8475/`). A document whose link would pass 2 MB opens instead as `<editor>?open=<its absolute URL>` from a page served over http(s), which needs the server to allow the editor's origin (CORS; GitHub Pages does). **PhLynx** opens the version's test network as PhLynx exported it (`results/<module_type>_<v>_phlynx.omex`, kept by the PhLynx pipeline) at `https://phlynx.com/?open=omex#<base64>`; a supermodule shows N/A, as PhLynx has no supermodule form. Both carry the file in the URL's hash, standard base64 of its bytes, built by the page when the link is clicked (`cam_testing/templates/_open_in.js`); a page opened from disk may be blocked from reading the file, and then offers it to download instead. **Open in CUFLynx**, in the parameterisation table, opens the parameterisation's archive in the CUFLynx app (see `modules/README.md`, "CUFLynx archives").
 
 The site index (`make site`) groups the module_types by category (heart, directly under `modules/`, is its own group), lists a nested module_type by its path (e.g. `neuron/soma/SN_membrane_soma` under `cell`) and links both levels.
 
@@ -70,7 +72,14 @@ Each version (one config entry: `module_type`/`module_subtype`) is generated alo
 
 Supermodule versions run the same tests, generated alone and expanded into their submodules, plus `supermodule_structure_test` and `supermodule_equivalence_test` (the system model using them reproduces the one with the submodules written out). Their BC sweep varies only their global constants and the boundary conditions no internal connection closes (`bc_sweep.sweep: globals_and_bcs`, the supermodule default; `all` sweeps every parameter): each submodule's own parameters are swept in that submodule version's tests. PhLynx has no supermodule support, so their PhLynx export test fails as a recorded known issue.
 
-Every version's report has the same test columns (Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Calibration, PhLynx export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces, Coupled), then each parameterisation's Baseline, Calibrate and CUFLynx archive. The first row is the version with its default parameterisation; each other parameterisation has its own row, filled only in the parameterisation columns. A column that doesn't apply shows N/A with the reason, one that applies but hasn't run shows Not run, and only a test that ran and passed shows Passed. Partial (blue) means the test ran and is usable but short of the full criterion (e.g. a time-step order below the scheme's across a switch); it isn't a failure. A version with no calibration data of its own used inside supermodule versions shows "Pass in super" / "Fail in super" for Calibration, from those supermodules; a component used in supermodule versions likewise shows their Supermodule structure and reproduces results. See [modules/README.md](modules/README.md) for the full rules.
+Every version's report has the same test columns (Reviewed, Run, Invariants, BC sweep, Timestep, Stability, Calibration, PhLynx export, CUFLynx simulate, PhLynx equivalence, Supermodule structure, Supermodule reproduces, Coupled, Opens in CellDL, Reactions vs Rhea), then each parameterisation's Baseline, Calibrate and CUFLynx archive. The first row is the version with its default parameterisation; each other parameterisation has its own row, filled only in the parameterisation columns. A column that doesn't apply shows N/A with the reason, one that applies but hasn't run shows Not run, and only a test that ran and passed shows Passed. Partial (blue) means the test ran and is usable but short of the full criterion (e.g. a time-step order below the scheme's across a switch); it isn't a failure. A version with no calibration data of its own used inside supermodule versions shows "Pass in super" / "Fail in super" for Calibration, from those supermodules; a component used in supermodule versions likewise shows their Supermodule structure and reproduces results. See [modules/README.md](modules/README.md) for the full rules.
+
+A version whose bond graph is a CellDL document, `<module_type>_<version>_bondgraph.svg` in its directory, has two more tests; for any other version both are N/A:
+
+- `bondgraph_celldl_test`: the document opens in the CellDL editor. It is SVG whose `celldl-rdf-metadata` is Turtle BG-RDF with one bond-graph model, every element and connection is drawn, nothing is drawn that the RDF lacks, and `<module_type>_<version>_bondgraph.ttl`, when there is one, is the same graph. With `BG_TOOLS` set to a BG-Tools checkout (with its `.venv`), bg2cellml also makes CellML from it.
+- `bondgraph_reactions_test`: every reaction annotated with a Rhea reaction has Rhea's participants and stoichiometry. A reaction carries `bqbiol:isVersionOf <https://identifiers.org/rhea:N>` (Rhea's undirected reaction), or `bqbiol:hasPart` one for each reaction a lumped one combines; its species carry `bqbiol:is <https://identifiers.org/CHEBI:N>` (the charge state Rhea uses) and `bqbiol:isPartOf` a GO compartment. The CellDL editor's Annotations panel writes them. The bond counts must be Rhea's coefficients, allowing the reverse direction and one common factor; a transport reaction's in and out are matched to its two compartments, a polymer counts the units it gains, and a lumped reaction is compared by its net equation. A difference only in H+ or H2O is a warning, any other fails, and the test is Pending while some reactions are not annotated.
+
+Rhea's reactions come from a cache in the package, `cam_testing/data/rhea/`, so the tests never go online. Add or refresh entries with `python -m cam_testing.rhea fetch --annotated` (every Rhea reaction the library annotates) or `fetch <id> ...`, and look up candidates with `python -m cam_testing.rhea find CHEBI:4167 CHEBI:30616` (the Rhea reactions with all these participants).
 
 `tests/test_structure.py` holds fast static checks: the directory schema, config ↔ CellML consistency, units, library-wide uniqueness and manifest paths. Known defects are listed under `known_issues` in a version's spec. They show as xfail until fixed.
 
@@ -111,7 +120,7 @@ The version report shows all of this, regenerating the plots from the committed 
 
 `system_models/<category>/<model>/` (at the repo root) holds circulatory_autogen's CellML models rebuilt from this library, with the heart as one heart supermodule version (cardiac clock, chambers and valves: `heart/cardiac_clock`, `heart/chamber`, `heart/valve`). `closed_loop_cvs/obsolete_3compartment` alone keeps circulatory_autogen's flat heart, as a check of the supermodule. System models are not modules or supermodules: they use the library. Every module-array record (an instance of a version) names a module_type, a version (`module_subtype`) and the parameterisation it uses (`"parameterisation": "default"`); the model's own parameters file wins over the parameterisation's values. Each directory contains:
 - the module array and parameters (`<model>_parameters.json`, libcuflynx's nested JSON: instance, sub-instance, variable). A supermodule instance's values are under its name there, written once from the version's template (its default parameterisation) by `cuflynx-upgrade supermodule-instances`; generation reads them, never the template;
-- the original under `reference/`: circulatory_autogen's files with only the bib keys changed to this library's (`tools/bib_rekey_map.json`, applied by `tools/import_systems.py`; checked against the originals by `tests/test_structure.py`). A model whose original has a flat heart has no `reference/`: its spec sets `equivalence: {status: not_applicable, reason: ...}` and its notes say how its conversion to the heart supermodule was checked. `closed_loop_cvs/obsolete_3compartment` is the flat-heart check;
+- the original under `reference/`: circulatory_autogen's files with only the bib keys changed to this library's (`tools/bib_rekey_map.json`, applied by `tools/import_systems.py`; checked against the originals by `tests/test_structure.py`). Beside them, `reference/<model>.cellml` is the model circulatory_autogen generated from them with libcuflynx's built-in modules (flattened into one file), committed because libcuflynx no longer ships those modules; the equivalence test simulates it as it is, with its outputs named as the library model's. `python -m cam_testing.system write-reference [<category>/<model> ...]` rewrites them, with a libcuflynx that still has its built-ins (circulatory_autogen 0.7.x or master before their removal); `tests/test_structure.py` fails for an original without its CellML unless the spec expects its equivalence test to fail (the originals that don't generate in circulatory_autogen). A model whose original has a flat heart has no `reference/`: its spec sets `equivalence: {status: not_applicable, reason: ...}` and its notes say how its conversion to the heart supermodule was checked. `closed_loop_cvs/obsolete_3compartment` is the flat-heart check;
 - a `<model>_system.yaml` spec. Its output names (`equivalence.output_map`, `ignore`) name a nested vessel by its path, `SN/soma/membrane/V` for the model's `SN__soma__membrane/V`; the flat form is accepted too.
 
 The reference can instead be a ready CellML model, simulated as it is: for example the flattened model PhLynx exports, for a model first built in PhLynx. Set `equivalence.reference_cellml: reference/<file>.cellml` in the spec (a path relative to the model's directory), or put it at `reference/<model>.cellml` with no module array beside it. Its outputs are `<component>/<variable>` for every component except `environment`, `global_parameters` and `instance_parameters` (`equivalence.ignore_components` changes the list); `output_map`, `ignore`, `wrapped`, `reciprocal` and `tol` work as for an original. PhLynx names a vessel's component by the vessel's name, so its outputs match the library model's `<vessel>/<variable>` with no `output_map`.
@@ -141,7 +150,7 @@ The host's own vessels name `heart` in their `inp_instances` / `out_instances`. 
 ## PhLynx → CUFLynx pipeline
 
 `tests/test_phlynx.py` checks that each version works end to end in the web tooling. Its three tests:
-- `phlynx_export_test`: builds the version's test network in PhLynx, using PhLynx's own code from a checkout, run headlessly under Node and jsdom by `cam_testing/bridges/phlynx/export_omex.mjs`. It loads this library's modules and parameters, checks every connection was made, and exports the `.omex` PhLynx sends to CUFLynx.
+- `phlynx_export_test`: builds the version's test network in PhLynx, using PhLynx's own code from a checkout, run headlessly under Node and jsdom by `cam_testing/bridges/phlynx/export_omex.mjs`. It loads this library's modules and parameters, checks every connection was made, and exports the `.omex` PhLynx sends to CUFLynx. The export is kept with the version's results, `results/<module_type>_<version>_phlynx.omex` (gitignored; removed when an export fails), and the report's "Open in PhLynx" link opens it.
 - `cuflynx_simulate_test`: imports that archive into a released CUFLynx binary through its HTTP API (`cam_testing/bridges/cuflynx/simulate_omex.py`) and simulates it.
 - `phlynx_equivalence_test`: compares CUFLynx's run with libcuflynx's model of the same network, within 1e-6 at the output times both runs share.
 
@@ -252,12 +261,15 @@ make structure                               # static checks
 make test MODULE=Lotka_Volterra              # V&V tests for one module_type and those nested in it (MODULE=cell: a category; make test: all)
 make test-all MODULE=Lotka_Volterra          # including slow calibration
 make systems                                 # system models + supermodule versions
+make heart-clock                             # the cardiac clocks' phase from the beat phase (docs/heart/cardiac_clock_phase.md)
 make risk MODULE=Lotka_Volterra              # joint failure-risk analysis (on request)
 make report MODULE=Lotka_Volterra            # -> modules/benchmarks/Lotka_Volterra/Lotka_Volterra.html + version pages
 make serve                                   # build site/ as GitHub Pages serves it; http://localhost:8000
 ```
 
 The reports open straight from disk. Plots load by relative path, and MathJax loads from a CDN.
+
+`docs/` holds derivations behind module equations that the module files cannot carry (the schema allows no documents in `modules/`), each with the test that keeps it and the code in step: `docs/heart/cardiac_clock_phase.md` (the cardiac clocks' phase computed from the beat phase; `tests/test_cardiac_clock_phase.py`, `make heart-clock`, run in CI's structure job).
 
 ## Pull requests
 
@@ -272,6 +284,39 @@ The `PR scope` workflow (`tools/pr_scope.py`) fails a module PR that changes any
 ## CI
 
 `.github/workflows/module-tests.yml` runs the structural checks and then, per top-level directory of `modules/` (`vessels`, `heart`, `cell`, ...: a category, or a module_type directly under `modules/` with its nested module_types), one job per stage: `vv` (V&V tests), `pipeline` (PhLynx -> CUFLynx) and `omex` (CUFLynx archives). A stage with more work is split into shards of whole module_types, about ten minutes each (`ci/shards.json`; `cam_testing/shards.py` balances them by the per-module_type seconds in `ci/test_durations.json`, refreshed from the jobs' JUnit artifacts with `python -m cam_testing.shards durations <stage> junit-*.xml`; `python -m cam_testing.shards plan` shows the split). Locally, `PYTEST_ARGS="--shard 2/4 --shard-stage vv"` runs one shard. Each job uploads its results, and the site job builds every report from them. CI runs on pushes to `main` and on pull requests (a push to a PR branch runs once). **Only changed versions are tested:** each job runs with `--changed-only`, which skips a version whose fingerprint (its files, the versions it depends on through its test networks and submodules, the system models it reproduces, and the shared inputs: `cam_testing`, `tests/`, `requirements.txt`, the libcuflynx commit and, for the pipeline and archive stages, the PhLynx commit and CUFLynx binary) matches its last run in the ledger, and whose last outcome was a pass or a failure of a version not reviewed yet; a reviewed version that failed always runs again (`cam_testing/ledger.py`). The ledger and the last results of every version are cached by the site job, which builds every report from them with this run's results on top. The weekly scheduled run, and a manual run with `full: true`, test every version and refresh the ledger. `python -m cam_testing.ledger status vv --module cell` shows what would run. The setup (apt packages in `ci/apt-packages.txt`, then `requirements.txt` with `ci/constraints.txt` in a virtualenv) is cached under a key of the runner image, Python, the setup files and the commit libcuflynx's branch points to (`ci/setup_key.sh`); every Python package is pinned (`ci/constraints.txt`; refresh it with `pip freeze` in a fresh virtualenv, which also rebuilds the cache); the `setup-check` job installs everything fresh and compares it with the cached setup (`ci/setup_check.sh`): a Python package that differs fails, an apt package that differs (an Ubuntu update to a system library) is a warning; failures of versions not reviewed yet are warnings (`tools/ci_reviewed_failures.py`, over the V&V, PhLynx -> CUFLynx pipeline and CUFLynx archive tests). On `main`, the site is assembled and deployed to GitHub Pages (enable Pages with source "GitHub Actions" in the repository settings). The same `make` targets run locally.
+
+## Releases
+
+libcuflynx gets its modules from a release of this library: each libcuflynx release pins one release
+tag and downloads that release's asset on first use (a user may point `module_library_dirs` at a
+checkout instead).
+
+- **Tags** are calendar tags `vYYYY.MM.N` on `main` (`v2026.11.0`, then `v2026.11.1`, ...; N restarts
+  at 0 each month). Finbar tags: when libcuflynx needs the modules on `main`, or when a module PR lands
+  that users should get. Tag a commit whose CI passed: `git tag v2026.11.0 <commit> && git push origin v2026.11.0`.
+- **The asset.** The tag starts `.github/workflows/release.yml`, which checks the tag is on `main`, runs
+  `tests/test_release.py` and `tests/test_structure.py`, builds `cam-modules-<tag>.tar.gz` and its
+  `.sha256` (`python -m cam_testing.release asset <tag>`), and publishes them as the GitHub release. The
+  asset is `modules/` without the test specs (`*_tests.yaml`, `*_verification_config.json`), reports,
+  figures, risk analyses, proposed citations and Markdown, plus `manifests/`, `LICENSE` and
+  `cam_release.json` (tag, commit, the libcuflynx it needs and every file's sha256), under one directory
+  `cam-modules-<tag>/`. The same commit always builds the same bytes, so the sha256 libcuflynx pins can
+  be checked by rebuilding. A manual run of the workflow (`workflow_dispatch`) builds the asset of a
+  branch as a workflow artifact without publishing it.
+- **The libcuflynx it needs.** `[tool.cam_testing.release] libcuflynx` in `pyproject.toml` (e.g.
+  `">=1.0.0"`) goes into `cam_release.json`, and libcuflynx refuses a release that needs a newer one.
+  Raise it in the PR that makes the library depend on a newer libcuflynx (a new config key, a format
+  change), to the first libcuflynx release that has it.
+- **Renames.** `modules/renames.json` lists every (module_type, module_subtype) the library no longer has
+  (circulatory_autogen's built-in modules and versions renamed since) and the version that replaces it,
+  from `cam_testing.library.legacy_renames()`. libcuflynx reads it to name the replacement of an old
+  name. Rewrite it with `python -m cam_testing.release renames` whenever a rename is added
+  (`tests/test_release.py` fails until it is in step). Built-ins whose maths the library's version of
+  the same name has changed since map to versions that keep the built-in's maths
+  (`library.BUILTIN_SAME_MATHS`, e.g. `SN_soma nn` -> `soma sympathetic_monolithic_OLD`), so a model
+  that names a built-in gives the same results after renaming alone.
+- **Names libcuflynx writes itself** (`FV1D_vessel` vp/pv/vv/nn, `FV1D_solver` nn, `FV1D_volume_sum` nn,
+  the module_type `coupler`) must stay: `tests/test_release.py` checks them.
 
 ## Importing from libcuflynx
 

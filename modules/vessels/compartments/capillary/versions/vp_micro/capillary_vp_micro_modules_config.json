@@ -21,13 +21,15 @@
         "port_type": "flow_port",
         "variables": [
           "v_in"
-        ]
+        ],
+        "multi_port": "sum"
       },
       {
         "port_type": "pressure_port",
         "variables": [
           "u"
-        ]
+        ],
+        "multi_port": "True"
       }
     ],
     "exit_ports": [
@@ -35,13 +37,15 @@
         "port_type": "flow_port",
         "variables": [
           "v"
-        ]
+        ],
+        "multi_port": "True"
       },
       {
         "port_type": "pressure_port",
         "variables": [
           "u_out"
-        ]
+        ],
+        "multi_port": "True"
       },
       {
         "port_type": "length_and_radius_port",
