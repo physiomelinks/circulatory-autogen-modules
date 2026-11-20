@@ -185,7 +185,7 @@ def _points(cm, entry):
     base = dict(cm.spec.get('run_parameters') or {})
     points = [dict(base, **p) for p in entry.get('points') or [{}]]
     sweep = entry.get('sweep') or {}
-    nominal = cm.param_env(points[0])
+    nominal = cm.param_env(_harness_names(cm, points[0]))
     for name in (sweep.get('ranges') or {}):
         values, reason = checks.sweep_values(name, nominal.get(name, 0.0), sweep)
         if reason:

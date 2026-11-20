@@ -169,6 +169,14 @@ def test_a_version_that_matches_its_parent_passes_at_every_point(repo, tmp_path)
 
 
 @pytest.mark.integration
+def test_a_sweep_starts_from_the_first_point(repo, tmp_path):
+    # the factors of a sweep with no range multiply the first point's value, not the parameterisation's
+    result = _check(repo, tmp_path, points=[{'P': 2000.0}], sweep={'ranges': {'P': {'values': [500.0]}}})
+    assert result.status == checks.PASSED, (result.message, result.details)
+    assert [row['point'] for row in result.metrics['parents'][0]['rows']] == [{'P': 2000.0}, {'P': 500.0}]
+
+
+@pytest.mark.integration
 def test_a_time_course_is_compared_at_every_output_time(repo, tmp_path):
     result = _check(repo, tmp_path, method='operator_inference', sim_time=0.5, dt=0.01)
     assert result.status == checks.PASSED, (result.message, result.details)
