@@ -19,7 +19,7 @@ from cam_testing.library import Parameter, all_versions, load_version
 # ---- uniform columns ----------------------------------------------------------------------------
 
 EXPECTED_COLUMNS = ['review_test', 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
-                    'stability_test', 'version_calibration', 'phlynx_export_test', 'cuflynx_simulate_test',
+                    'verification_test_rhs', 'stability_test', 'version_calibration', 'phlynx_export_test', 'cuflynx_simulate_test',
                     'phlynx_equivalence_test', 'supermodule_structure_test', 'supermodule_equivalence_test',
                     'coupled_validation_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test']
 
@@ -27,7 +27,7 @@ EXPECTED_COLUMNS = ['review_test', 'run_test', 'verification_test_invariants', '
 def test_report_columns_in_order():
     assert report.REPORT_TESTS == EXPECTED_COLUMNS
     assert [report.TEST_SHORT[k] for k in EXPECTED_COLUMNS] == [
-        'Reviewed', 'Run', 'Invariants', 'BC sweep', 'Timestep', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
+        'Reviewed', 'Run', 'Invariants', 'BC sweep', 'Timestep', 'RHS reference', 'Stability', 'Calibration', 'PhLynx export', 'CUFLynx simulate',
         'PhLynx equivalence', 'Supermodule structure', 'Supermodule reproduces', 'Coupled', 'Opens in CellDL',
         'Reactions vs Rhea']
 
