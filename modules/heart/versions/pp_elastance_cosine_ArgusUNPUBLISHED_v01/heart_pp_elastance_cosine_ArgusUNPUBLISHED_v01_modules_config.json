@@ -1,0 +1,189 @@
+[
+  {
+    "module_type": "heart",
+    "module_subtype": "pp_elastance_cosine_ArgusUNPUBLISHED_v01",
+    "module_format": "cellml",
+    "component_file": "heart_pp_elastance_cosine_ArgusUNPUBLISHED_v01_modules.cellml",
+    "component_type": "heart_elastance_cosine",
+    "default_parameterisation": "default",
+    "licence": "CC0-1.0",
+    "creator": [],
+    "required_citations": [
+      "argus2026unpublished",
+      "suga1973load"
+    ],
+    "entrance_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_in",
+          "u_in"
+        ]
+      },
+      {
+        "port_type": "heart_frequency_port",
+        "variables": [
+          "f"
+        ]
+      },
+      {
+        "port_type": "heart_strength_port",
+        "variables": [
+          "s_heart"
+        ]
+      }
+    ],
+    "exit_ports": [
+      {
+        "port_type": "vessel_port",
+        "variables": [
+          "v_out",
+          "u_out"
+        ]
+      },
+      {
+        "port_type": "flow_port",
+        "variables": [
+          "v_out"
+        ],
+        "multi_port": "True"
+      },
+      {
+        "port_type": "volume_port",
+        "variables": [
+          "q"
+        ]
+      },
+      {
+        "port_type": "pressure_port",
+        "variables": [
+          "u"
+        ],
+        "multi_port": "True"
+      }
+    ],
+    "general_ports": [],
+    "variables_and_units": [
+      [
+        "f",
+        "per_s",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "E_min",
+        "J_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "E_max",
+        "J_per_m6",
+        "access",
+        "constant"
+      ],
+      [
+        "s_heart",
+        "dimensionless",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "q_0",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "G_in",
+        "m6_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "G_out",
+        "m6_per_Js",
+        "access",
+        "constant"
+      ],
+      [
+        "k_valve",
+        "m3_per_J",
+        "access",
+        "constant"
+      ],
+      [
+        "c_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "s_init",
+        "dimensionless",
+        "access",
+        "constant"
+      ],
+      [
+        "u_in",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "u_out",
+        "J_per_m3",
+        "access",
+        "boundary_condition"
+      ],
+      [
+        "c",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "s",
+        "dimensionless",
+        "access",
+        "variable"
+      ],
+      [
+        "q",
+        "m3",
+        "access",
+        "variable"
+      ],
+      [
+        "E",
+        "J_per_m6",
+        "access",
+        "variable"
+      ],
+      [
+        "u",
+        "J_per_m3",
+        "access",
+        "variable"
+      ],
+      [
+        "v_in",
+        "m3_per_s",
+        "access",
+        "variable"
+      ],
+      [
+        "v_out",
+        "m3_per_s",
+        "access",
+        "variable"
+      ]
+    ]
+  }
+]
