@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" name="linear_rule_ArgusUNPUBLISHED_v01">
+    <component name="linear_rule">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="A_1_1" public_interface="in" units="dimensionless"/>
+        <variable name="A_1_2" public_interface="in" units="dimensionless"/>
+        <variable name="A_2_1" public_interface="in" units="dimensionless"/>
+        <variable name="A_2_2" public_interface="in" units="dimensionless"/>
+        <variable name="A_2_3" public_interface="in" units="dimensionless"/>
+        <variable name="A_3_2" public_interface="in" units="dimensionless"/>
+        <variable name="A_3_3" public_interface="in" units="dimensionless"/>
+        <variable name="f0_1" public_interface="in" units="dimensionless"/>
+        <variable name="f0_2" public_interface="in" units="dimensionless"/>
+        <variable name="f0_3" public_interface="in" units="dimensionless"/>
+        <variable name="c_1" public_interface="in" units="dimensionless"/>
+        <variable name="c_3" public_interface="in" units="dimensionless"/>
+        <variable name="xbar_1" public_interface="in" units="dimensionless"/>
+        <variable name="xbar_2" public_interface="in" units="dimensionless"/>
+        <variable name="xbar_3" public_interface="in" units="dimensionless"/>
+        <variable name="Tbar" public_interface="in" units="second"/>
+        <variable name="kappa" public_interface="in" units="dimensionless"/>
+        <variable name="x_1_init" public_interface="in" units="dimensionless"/>
+        <variable name="x_2_init" public_interface="in" units="dimensionless"/>
+        <variable name="x_3_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="x_1_init" name="x_1" public_interface="out" units="dimensionless"/>
+        <variable initial_value="x_2_init" name="x_2" public_interface="out" units="dimensionless"/>
+        <variable initial_value="x_3_init" name="x_3" public_interface="out" units="dimensionless"/>
+        <variable name="T_next" public_interface="out" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_1</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>A_1_1</ci>
+                        <ci>x_1</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A_1_2</ci>
+                        <ci>x_2</ci>
+                    </apply>
+                    <ci>f0_1</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_2</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>A_2_1</ci>
+                        <ci>x_1</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A_2_2</ci>
+                        <ci>x_2</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A_2_3</ci>
+                        <ci>x_3</ci>
+                    </apply>
+                    <ci>f0_2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_3</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>A_3_2</ci>
+                        <ci>x_2</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A_3_3</ci>
+                        <ci>x_3</ci>
+                    </apply>
+                    <ci>f0_3</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>T_next</ci>
+                <apply>
+                    <times/>
+                    <ci>Tbar</ci>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dimensionless">1.0</cn>
+                        <apply>
+                            <times/>
+                            <ci>kappa</ci>
+                            <apply>
+                                <plus/>
+                                <apply>
+                                    <times/>
+                                    <ci>c_1</ci>
+                                    <apply>
+                                        <minus/>
+                                        <ci>x_1</ci>
+                                        <ci>xbar_1</ci>
+                                    </apply>
+                                </apply>
+                                <apply>
+                                    <times/>
+                                    <ci>c_3</ci>
+                                    <apply>
+                                        <minus/>
+                                        <ci>x_3</ci>
+                                        <ci>xbar_3</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>
