@@ -288,6 +288,57 @@ to this convention on 2026-10-06 by `tools/rekey_bib.py` (old -> new in `tools/b
 four papers that had two keys each now have one). `tests/test_structure.py` checks the
 convention, one key per DOI, and every version's required citations.
 
+## Reduced versions
+
+A version made by reducing another version (fewer states, fewer terms, a fitted surrogate) says what it was reduced
+from and how, in its verification config, and `reduction_test` compares it with every version it names
+(`cam_testing/reduction.py`):
+
+```json
+"reduction_method": "symbolic_steady_state",
+"reduced_from": [
+  {"module_type": "SGLT1", "version": "kinetic_Ai2025_v01",
+   "outputs": {"v_SGLT1": "v_r6"},
+   "points": [{"c_Glc_o": 1.0}, {"c_Glc_o": 10.0}],
+   "rtol": 1e-6}
+]
+```
+
+**`reduction_method`** is one of:
+
+| Method | What it is | Compared by default |
+|---|---|---|
+| `symbolic_steady_state` | the parent's equations solved symbolically at steady state (some or all of its states at equilibrium) | `steady_state` |
+| `operator_inference` | a low-dimensional model fitted to the parent's simulated trajectories | `time_course` |
+| `manual_term_removal` | terms of the parent's equations removed by hand | `time_course` |
+| `manual_term_grouping` | terms or parameters of the parent's equations grouped by hand into fewer | `time_course` |
+
+Another method is written `{"name": "<method>", "description": "<what was done>"}`; the description is required.
+
+**`reduced_from`** has one entry for each version it was reduced from. A version reduced in two steps names the
+version of each step it should still match (the one before it, and the original if it should match that too).
+
+| Key | Meaning |
+|---|---|
+| `module_type`, `version` | the version it was reduced from (the parent) |
+| `parameterisation` | the parent's parameterisation the reduction was made from (default: its default) |
+| `reduced_parameterisation` | this version's parameterisation that corresponds to it (default: its default) |
+| `compare` | `steady_state`: the outputs at the end of each run, both models settled; `time_course`: the outputs at every output time. Default: the method's (table above), `time_course` for an unlisted method |
+| `outputs` | what is compared: `{this version's variable: the parent's}`, or a list of variables named the same in both. Each must be among its version's `outputs` |
+| `parameters` | `{this version's parameter: the parent's}`, for the parameters of `points` and `sweep` whose names differ |
+| `points` | operating points, `[{parameter: value}]`, each added to this version's `run_parameters` (default: one point, the `run_parameters` alone) |
+| `sweep` | `{"ranges": {parameter: [min, max] or {min, max, points, scale} or {values}}}`: more points, one parameter at a time from the first point (the forms of `bc_sweep.ranges`) |
+| `sim_time`, `pre_time`, `dt` | run settings for both models (default: each version's own; a `time_course` uses this version's for both, so they share a time grid) |
+| `rtol`, `atol` | the two agree when \|reduced - parent\| <= atol + rtol x scale, the scale being \|parent\| (`steady_state`) or the largest \|parent\| of the run (`time_course`). `rtol` is required: how close a reduction must be is the modeller's decision, so it has no default |
+| `settled_rtol` | `steady_state`: each output's change over the last tenth of the run, relative to its final value, must be at most this (default 1e-6) plus `atol`, in both models |
+
+The test fails when any output at any point differs from any parent by more than its tolerance, when a `steady_state`
+run has not settled, and when the annotations are incomplete (a method without a parent or the reverse, a parent or
+parameterisation that does not exist, a version reduced from itself or in a cycle, no `rtol`, no `outputs`); the
+structure test reports those too. The parameters of the two versions are not mapped by the test: where the reduced
+version's values follow from the parent's (lumped constants), give each a parameterisation that holds the matching
+values and name them in the entry.
+
 ## Parameterisations
 
 A parameterisation is **a parameter set of a version: only the parameters change, never the maths**.
@@ -903,6 +954,8 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `stability` | verification_config | the solver matrix: `supported` (must work), `cvode`, `solve_ivp`, `fixed_step`, `max_step_start`, `min_step`, `time_budget` (s a run may take: default 20 s per state, at most `max_run_seconds`, 60 s; a run still going is stopped), `total_time_budget` (s for all the matrix's runs, 420 s; families not reached are skipped), `t_end`, `tol` |
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`; a baseline's `obs_data` is run through its protocol, see Protocol-driven tests), variables, targets, metric, threshold, optimiser settings |
+| `reduction_method` | verification_config | how a version reduced from others was reduced: a listed method (`symbolic_steady_state`, `operator_inference`, `manual_term_removal`, `manual_term_grouping`), or `{"name": ..., "description": ...}` for another (see Reduced versions) |
+| `reduced_from` | verification_config | the versions it was reduced from, each with how the two are compared: `module_type`, `version`, `parameterisation`, `reduced_parameterisation`, `compare`, `outputs`, `parameters`, `points`, `sweep`, `sim_time`, `pre_time`, `dt`, `rtol`, `atol`, `settled_rtol` (see Reduced versions) |
 | `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`, and `wrapped` / `reciprocal` as in a system model's equivalence) |
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |
