@@ -10,7 +10,7 @@ This checks calibration and identifiability, not physical validation. The valida
 
 ## mod/x
 
-- Kind: derived (synthetic: the steady state of x = a² at a = ±2)
+- Kind: synthetic (the steady state of x = a² at a = ±2)
 - Role: target
 - Data reference: circulatory_autogen two-minima test fixture; resources/TwoMinima_obs_data.json
 - Note: the operands are renamed to `mod`

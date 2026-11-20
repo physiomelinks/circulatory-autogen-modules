@@ -3,8 +3,8 @@ version: Albanese2016_v01
 reviewed: false
 notes: 'Chemoreflex respiratory effector (additive form): respiratory-rate and muscle-pressure changes are first-order responses
   to central (u_c_resp) and peripheral (u_p_resp) drives, with sign/threshold-switched gains and time constants, then clamped.
-  The CellML names the muscle-pressure states alpha_P_mus* (dimensionless) while the config and parameters use Delta_P_mus*
-  (J_per_m3); G_pA, G_cA are Js_per_m3, so Delta_P_mus [Pa] is the dimensionally consistent reading.
+  The muscle-pressure states Delta_P_mus_c, Delta_P_mus_p and their clamped sum Delta_P_mus are pressures (J_per_m3): G_cA
+  and G_pA are in Js_per_m3 and the drives in Hz.
 
 
   Ports of the versions of efferent_respiratory_effector (the same port types):
@@ -14,15 +14,6 @@ notes: 'Chemoreflex respiratory effector (additive form): respiratory-rate and m
   exit respiratory_lung_muscle_pressure_port: Albanese2016_v01 [Delta_P_mus]; GeeArgus2026_v01 [alpha_P_mus]
 
   exit respiratory_rate_port: Albanese2016_v01 [Delta_RR_resp]; GeeArgus2026_v01 [Delta_RR_resp]'
-expected_failures:
-  run_test: 'two defects: (1) u_p_resp is listed twice in variables_and_units (duplicate variable -> libcellml VARIABLE_NAME_UNIQUE);
-    (2) the config/parameters declare Delta_P_mus, Delta_P_mus_max/min (J_per_m3) but the CellML component uses alpha_P_mus*
-    (dimensionless). A patched copy (duplicate removed, CellML alpha_P_mus* renamed to Delta_P_mus* with J_per_m3 units) generates
-    and passes both invariants.'
-  verification_test_invariants: generation fails (see run_test)
-  verification_test_BC: generation fails (see run_test)
-  verification_test_timestep: generation fails (see run_test)
-  stability_test: generation fails (see run_test)
 reference_proposals:
   u_c_resp:
     reference: argus2026circulatory; test operating point (100)

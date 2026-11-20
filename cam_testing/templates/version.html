@@ -279,6 +279,7 @@ window.addEventListener('DOMContentLoaded', function () {
       {%- if components[0].structure_view %}<li><a href="#{{ components[0].id }}-structure"><span class="mono">Structure</span></a></li>{% endif %}
       {%- if components[0].unit_consistency %}<li><a href="#unit-consistency"><span class="dot failed"></span><span class="mono">Unit consistency</span></a></li>{% endif %}
       <li><a href="#parameterisations"><span class="mono">Parameterisations</span></a></li>
+      {%- if n_data_items %}<li><a href="#data-sources">{% if n_data_problems %}<span class="dot failed"></span>{% endif %}<span class="mono">Data sources</span></a></li>{% endif %}
       {%- for t in components[0].tests %}
       <li><a href="#{{ components[0].id }}--{{ t.key }}"><span class="dot {{ t.status or '' }}"></span><span class="mono">{{ t.short }}</span></a></li>
       {%- endfor %}
@@ -306,6 +307,7 @@ window.addEventListener('DOMContentLoaded', function () {
         <span title="The config entry's creator list">{% if creators %}Creator{{ 's' if creators|length > 1 }}: {{ creators|join(', ') }}{% else %}<span class="todo">Creator: not set (to be given in review)</span>{% endif %}</span>
         {%- if unit_failures %}<span title="libcellml unit checks on the CellML (informational, not a test column)"><a href="#unit-consistency" class="todo">Unit consistency: {{ components[0].unit_consistency.message }}</a></span>{% elif components[0].unit_consistency %}<span><a href="#unit-consistency" class="todo">Unit consistency: not checked</a></span>{% endif %}
         <span><span class="box {{ 'on' if all_sourced }}" aria-hidden="true"></span>{{ 'All parameters sourced' if all_sourced else n_sourced ~ ' of ' ~ n_parameters ~ ' parameters sourced' }}</span>
+        {%- if n_data_items %}<span title="Calibration and validation data items with a source (Data sources)"><span class="box {{ 'on' if not n_data_problems }}" aria-hidden="true"></span><a href="#data-sources">{{ 'All ' ~ n_data_items ~ ' data items sourced' if not n_data_problems else n_data_problems ~ ' of ' ~ n_data_items ~ ' data items with a problem: ' ~ (data_problems|problems) }}</a></span>{% endif %}
         <span title="Built and exported in PhLynx, imported and simulated in CUFLynx, matching libcuflynx"><span class="box {{ 'on' if phlynx.all }}" aria-hidden="true"></span>{% if phlynx.all %}PhLynx / CUFLynx compatible{% else %}{{ 'Not PhLynx / CUFLynx compatible' if phlynx.run else 'PhLynx / CUFLynx: not tested yet' }}{% endif %}</span>
         {%- if bc_summary %}<span title="Boundary-condition sweep"><a href="#{{ components[0].id }}--verification_test_BC">BC sweep</a>: {{ bc_summary }}</span>{% endif %}
         <span>libcuflynx {{ libcuflynx_version }}</span>
@@ -314,7 +316,7 @@ window.addEventListener('DOMContentLoaded', function () {
       <div class="open-in" aria-label="Open in">
         <span class="eyebrow">Open in</span>
         {%- if open_in.celldl %}
-        <span><a class="open-app" id="open-celldl" href="{{ open_in.celldl.href }}" data-app="the CellDL editor" data-open-file="{{ open_in.celldl.href }}" data-open-url="{{ open_in.celldl.open }}" target="_blank" rel="noopener" title="Opens the version's bond graph ({{ open_in.celldl.href }}) in the CellDL editor">CellDL</a><span class="open-msg muted" role="status"></span></span>
+        <span><a class="open-app" id="open-celldl" href="{{ open_in.celldl.href }}" data-app="the CellDL editor" data-open-file="{{ open_in.celldl.href }}" data-open-url="{{ open_in.celldl.open }}" data-open-by-url="{{ open_in.celldl.open_by_url }}" target="_blank" rel="noopener" title="Opens the version's bond graph ({{ open_in.celldl.href }}) in the CellDL editor">CellDL</a><span class="open-msg muted" role="status"></span>{% if open_in.celldl.note %}<a href="#celldl-note" class="muted" style="font-size:0.8rem" title="{{ open_in.celldl.note }}">(see the note)</a>{% endif %}</span>
         {%- endif %}
         {%- set ph = open_in.phlynx %}
         <span>{% if ph.href %}<a class="open-app" id="open-phlynx" href="{{ ph.href }}" data-app="PhLynx" data-open-file="{{ ph.href }}" data-open-url="{{ ph.open }}" target="_blank" rel="noopener" title="Opens the version's test network, as PhLynx exported it ({{ ph.href }}), in PhLynx">PhLynx</a><span class="open-msg muted" role="status"></span>
@@ -397,6 +399,9 @@ window.addEventListener('DOMContentLoaded', function () {
         <a href="{{ open_in.celldl.href }}" target="_blank" rel="noopener"><img id="bond-graph-figure" src="{{ open_in.celldl.href }}" alt="The version's bond graph, as the CellDL editor draws it" loading="lazy" style="display:block;max-width:100%;height:auto;max-height:80vh;background:#fff;border:1px solid var(--rule);border-radius:6px"></a>
         <figcaption class="muted" style="margin-top:4px;font-size:0.84rem">The version's CellDL document, <code>{{ open_in.celldl.href }}</code>, drawn as the editor draws it. Click it to see it full size, or <a href="#open-celldl">open it in CellDL</a> to edit it.</figcaption>
       </figure>
+      {%- if open_in.celldl.note %}
+      <p class="celldl-note" id="celldl-note" style="margin:0;padding:8px 12px;border-left:3px solid var(--pend);background:var(--pend-bg);font-size:0.86rem">{{ open_in.celldl.note }}</p>
+      {%- endif %}
     </section>
     {%- endif %}
 
@@ -646,9 +651,21 @@ window.addEventListener('DOMContentLoaded', function () {
         {%- if t.status not in (none, 'not_applicable') or t.message not in ('no baseline data in this parameterisation', 'no baseline data in this instance') %}
         <h4 style="margin:8px 0 0">{{ i.name }}</h4>
         {{ test_article(c, t, t.anchor) }}
+        {%- else %}<span id="{{ t.anchor }}"></span>
         {%- endif %}
         {%- endfor %}{% endfor %}
       </div>
+
+      {%- if c.parameterisations|selectattr('sources')|list %}
+      <div class="block" id="data-sources">
+        <h3>Data sources</h3>
+        <p class="muted" style="margin:0;font-size:0.84rem">Where every calibration and validation number came from: one row per obs_data <code>data_item</code> and <code>prediction_item</code>, and per baseline target or data column. Kind is what the number is (measured, assumed, derived, or a term of another item and not a measurement); role is how it is used (target: fitted; held out: compared after fitting, not fitted; prediction: computed, no data; term: a term of another item, not fitted; validation: the baseline test's). "Source missing" means neither a <code>data_reference</code> on the item nor a section for it in the parameterisation's <code>SOURCES.md</code>: the version's data sources test fails until one is added (modules/README.md, "Data sources").</p>
+        {%- for i in c.parameterisations if i.sources %}
+        <h4 style="margin:8px 0 0" id="data-sources-{{ i.name }}">{{ i.name }}</h4>
+        {%- with tbl=i.sources, keys=bib_keys %}{% include '_sources_table.html' %}{% endwith %}
+        {%- endfor %}
+      </div>
+      {%- endif %}
 
       <div class="block">
         <h3>Verification &amp; validation</h3>

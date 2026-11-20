@@ -3,7 +3,10 @@
 //   a[data-open-file][data-open-url]: on click, fetches the file (relative to the page), appends
 //     the standard base64 of its bytes to the app URL (which ends in "#") and opens that in a new
 //     tab. If the file can't be read (a page opened from disk, in a browser that blocks reading
-//     local files), the link's .open-msg says so and offers the file to download instead.
+//     local files), the link's .open-msg says so and offers the file to download instead. A file
+//     too large for a link opens by its URL instead when the link has data-open-by-url (the app URL
+//     its absolute, percent-encoded URL follows) and the page is served over http(s); the app then
+//     fetches it, so the server must allow the app's origin (CORS).
 //   a[data-cuflynx-omex][data-cuflynx-open]: its href becomes the app URL followed by the
 //     percent-encoded absolute URL of the archive, resolved against the page's own URL.
 (function (root) {
@@ -24,7 +27,13 @@
     return open + encodeURIComponent(new URL(rel, base).href);
   }
 
-  root.camOpenIn = { bytesToBase64: bytesToBase64, cuflynxUrl: cuflynxUrl };
+  // the app URL that opens the file by its absolute URL, or null when the page is not served over http(s)
+  function byUrl(open, rel, base) {
+    var abs = new URL(rel, base);
+    return open && /^https?:$/.test(abs.protocol) ? open + encodeURIComponent(abs.href) : null;
+  }
+
+  root.camOpenIn = { bytesToBase64: bytesToBase64, cuflynxUrl: cuflynxUrl, byUrl: byUrl, MAX_URL: MAX_URL };
   if (typeof document === 'undefined') { return; }
 
   function say(link, text, file) {
@@ -55,9 +64,12 @@
     }).then(function (buf) {
       var url = link.dataset.openUrl + bytesToBase64(new Uint8Array(buf));
       if (url.length > MAX_URL) {
-        if (tab) { tab.close(); }
-        say(link, 'The file is too large to open through a link.', file);
-        return;
+        url = byUrl(link.dataset.openByUrl, file, root.location.href);
+        if (!url) {
+          if (tab) { tab.close(); }
+          say(link, 'The file is too large to open through a link.', file);
+          return;
+        }
       }
       if (tab) {
         tab.opener = null;

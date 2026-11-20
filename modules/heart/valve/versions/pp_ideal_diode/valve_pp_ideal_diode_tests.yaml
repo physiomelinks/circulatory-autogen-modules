@@ -1,0 +1,4 @@
+module_type: valve
+version: pp_ideal_diode
+reviewed: false
+notes: 'Ideal-diode valve: v = (u_in - u_out)/R while u_in > u_out, else 0 (open = 1 while it conducts). No leaflet state, no inertance, no backflow: the flow is piecewise linear in the pressures, with a kink at zero pressure difference. The simplest valve, for test models whose right-hand side must be affine within each valve state (ICUHealthy beat-map test 7: one Liang2009NoVisco_v02 ventricle with a pp_ideal_diode mitral and aortic valve). For leaflet dynamics, Bernoulli loss and inertance use pp (Mynard et al. 2012).'

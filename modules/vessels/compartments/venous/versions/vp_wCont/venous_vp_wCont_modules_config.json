@@ -23,7 +23,10 @@
           "v_in",
           "u"
         ],
-        "multi_port": "True"
+        "multi_port": [
+          "sum",
+          "True"
+        ]
       },
       {
         "port_type": "venous_us_volume_delta_port",
@@ -173,18 +176,6 @@
       [
         "Delta_C",
         "dimensionless",
-        "access",
-        "boundary_condition"
-      ],
-      [
-        "v_in",
-        "m3_per_s",
-        "access",
-        "boundary_condition"
-      ],
-      [
-        "u_out",
-        "J_per_m3",
         "access",
         "boundary_condition"
       ],
