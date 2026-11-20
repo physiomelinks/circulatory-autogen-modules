@@ -13,7 +13,7 @@ report generator (python -m cam_testing.report) turns into <module_type>_<versio
 """
 import pytest
 
-from cam_testing import bondgraph, checks, sources, supermodule
+from cam_testing import bondgraph, checks, reduction, sources, supermodule
 from cam_testing.library import load_version
 
 pytestmark = pytest.mark.module_vv
@@ -83,6 +83,14 @@ def bondgraph_celldl_test(component_key):
 def bondgraph_reactions_test(component_key):
     version = load_version(*component_key)
     _assert(checks.save(version, bondgraph.reactions_check(version)), version)
+
+
+# ---- reduced versions (N/A for a version with no reduced_from) ------------------------------------
+
+def reduction_test(component_key, tmp_path):
+    # the version against every version it was reduced from (cam_testing.reduction)
+    version = load_version(*component_key)
+    _assert(reduction.reduction_check(version, str(tmp_path)), version)
 
 
 # ---- per parameterisation -----------------------------------------------------------------------

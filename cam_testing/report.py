@@ -27,7 +27,7 @@ import urllib.parse
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from cam_testing import bib, bondgraph, checks, library, module_array, phlynx, ranges, risk, sources
+from cam_testing import bib, bondgraph, checks, library, module_array, phlynx, ranges, reduction, risk, sources
 from cam_testing import omex as omex_mod
 from cam_testing import supermodule as sm
 from cam_testing import paths
@@ -61,6 +61,7 @@ TEST_TITLES = {
     'review_test': 'Reviewed',
     'bondgraph_celldl_test': 'Bond graph: opens in CellDL',
     'bondgraph_reactions_test': 'Bond graph: reactions match Rhea',
+    'reduction_test': 'Reduction: matches what it was reduced from',
     'run_test': 'Run',
     'verification_test_invariants': 'Verification: invariants',
     'verification_test_BC': 'Verification: boundary conditions',
@@ -83,8 +84,14 @@ TEST_SHORT = {
     'supermodule_structure_test': 'Supermodule structure', 'supermodule_equivalence_test': 'Supermodule reproduces',
     'coupled_validation_test': 'Coupled',
     'bondgraph_celldl_test': 'Opens in CellDL', 'bondgraph_reactions_test': 'Reactions vs Rhea',
+    'reduction_test': 'Reduction',
 }
 TEST_ABOUT = {
+    'reduction_test': 'A version reduced from others (reduced_from in its verification config, with its '
+                      'reduction_method) is run beside each of them at the operating points the entry gives, '
+                      'and the outputs it names must agree within the entry\'s rtol and atol: at the end of '
+                      'each run, both settled (steady_state), or at every output time (time_course). N/A for '
+                      'a version that is not reduced from another.',
     'review_test': 'Whether the version has been reviewed: its equations, parameter sources (each value traced '
                    'to its source), tests, data and known issues checked with its owner (tests.yaml reviewed: '
                    'true). A version not reviewed yet fails this check. It is still published and usable, but '
@@ -168,7 +175,7 @@ TEST_ABOUT = {
 SUPERMODULE_TESTS = ['supermodule_structure_test', 'supermodule_equivalence_test']
 COUPLED_TESTS = ['coupled_validation_test']
 REPORT_TESTS = (checks.VERSION_TESTS + ['version_calibration'] + phlynx.PIPELINE_TESTS + SUPERMODULE_TESTS
-                + COUPLED_TESTS + bondgraph.BONDGRAPH_TESTS)
+                + COUPLED_TESTS + bondgraph.BONDGRAPH_TESTS + reduction.REDUCTION_TESTS)
 PARAMETERISATION_TESTS = checks.PARAMETERISATION_TESTS
 # the test overview's parameterisation columns: each parameterisation's validation tests and its CUFLynx archive
 PARAM_COLS = [TEST_SHORT[t] for t in PARAMETERISATION_TESTS] + ['CUFLynx archive']
@@ -355,6 +362,8 @@ def not_applicable_reason(version, test):
     '''Why a report column doesn't apply to the version, or None when it does.'''
     if test in bondgraph.BONDGRAPH_TESTS and not bondgraph.is_bondgraph(version):
         return bondgraph.NOT_A_BONDGRAPH
+    if test in reduction.REDUCTION_TESTS and not reduction.is_reduced(version):
+        return reduction.NOT_REDUCED
     if test in SUPERMODULE_TESTS and not version.is_supermodule:
         return NOT_A_SUPERMODULE
     if test == 'supermodule_equivalence_test' and not (version.spec.get('supermodule') or {}).get('equivalent'):
