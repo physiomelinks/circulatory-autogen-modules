@@ -64,6 +64,24 @@ jobs:
           debs-key: ${{ steps.keys.outputs.debs }}
           venv-key: ${{ steps.keys.outputs.venv }}
 
+  # TEMPORARY (removed after the proof run): another image build lacks librdmacm1t64; purge it and
+  # check the restored setup still installs MPI offline.
+  purge-test:
+    needs: setup-cache
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: sudo apt-get purge -y librdmacm1t64 libibverbs1 && dpkg -l librdmacm1t64 libibverbs1 || true
+      - uses: ./.github/actions/setup
+        with:
+          save: 'false'
+          debs-key: ${{ needs.setup-cache.outputs.debs-key }}
+          venv-key: ${{ needs.setup-cache.outputs.venv-key }}
+      - run: mpirun --version && python -c "import libcuflynx; print('libcuflynx ok')"
+
   structure:
     needs: setup-cache
     runs-on: ubuntu-24.04
