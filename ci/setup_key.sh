@@ -11,4 +11,6 @@ if [ -n "$line" ]; then
 fi
 files=$(cat requirements.txt pyproject.toml ci/constraints.txt ci/apt-packages.txt ci/setup_key.sh .github/actions/setup/action.yml | sha256sum | cut -c1-16)
 py=$(python -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])')
-echo "setup-${ImageOS:-local}-${ImageVersion:-0}-py$py-$files-$sha"
+iv=${ImageVersion:-0}
+# the image date only: runners of one image carry different build suffixes (20261116.133.1, 20261116.376.1)
+echo "setup-${ImageOS:-local}-${iv%%.*}-py$py-$files-$sha"
