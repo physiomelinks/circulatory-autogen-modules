@@ -70,6 +70,21 @@ def test_incomplete_annotations_say_what_is_missing(spec, message):
     assert any(message in p for p in problems), problems
 
 
+def test_a_parent_may_have_an_entry_per_range_each_described():
+    entries = [dict(ENTRY, description='physiological range'), dict(ENTRY, description='low glucose', rtol=0.15)]
+    assert _problems(reduction_method='manual_term_removal', reduced_from=entries) == []
+
+
+def test_each_entry_of_one_parent_is_plotted_with_its_own_points():
+    # two entries naming the same parent: each panel takes its own entry's rows, not the first entry's
+    def metrics(description, value):
+        return {'parent': 'm/full', 'description': description,
+                'rows': [{'point': {}, 'outputs': {'y': {'reduced': value, 'parent': value}}}]}
+    panels = reduction._panels([metrics('high', 1.0), metrics('low', 2.0)])
+    assert [(m['description'], name, m['rows'][0]['outputs'][name]['parent']) for m, name in panels] == [
+        ('high', 'y', 1.0), ('low', 'y', 2.0)]
+
+
 def test_a_cycle_of_reductions_is_a_problem():
     full = _version(key='m/full', reduction_method='manual_term_removal',
                     reduced_from=[dict(ENTRY, version='reduced')])
@@ -174,6 +189,21 @@ def test_a_sweep_starts_from_the_first_point(repo, tmp_path):
     result = _check(repo, tmp_path, points=[{'P': 2000.0}], sweep={'ranges': {'P': {'values': [500.0]}}})
     assert result.status == checks.PASSED, (result.message, result.details)
     assert [row['point'] for row in result.metrics['parents'][0]['rows']] == [{'P': 2000.0}, {'P': 500.0}]
+
+
+@pytest.mark.integration
+def test_two_entries_of_one_parent_each_run_their_own_points(repo, tmp_path):
+    from cam_testing import library
+    entry = {'module_type': MT, 'version': PARENT, 'outputs': ['va/u'], 'rtol': 1e-6}
+    _copy_version(repo, {'reduction_method': 'symbolic_steady_state',
+                         'reduced_from': [dict(entry, description='low', points=[{'P': 500.0}]),
+                                          dict(entry, description='high', points=[{'P': 4000.0}], rtol=1e-3)]})
+    library.clear_caches()
+    result = reduction.reduction_check(load_version(MT, REDUCED), str(tmp_path / 'work'))
+    assert result.status == checks.PASSED, (result.message, result.details)
+    parents = result.metrics['parents']
+    assert [(p['description'], p['rtol'], [r['point'] for r in p['rows']]) for p in parents] == [
+        ('low', 1e-6, [{'P': 500.0}]), ('high', 1e-3, [{'P': 4000.0}])]
 
 
 @pytest.mark.integration

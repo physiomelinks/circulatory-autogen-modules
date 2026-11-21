@@ -317,10 +317,13 @@ Another method is written `{"name": "<method>", "description": "<what was done>"
 
 **`reduced_from`** has one entry for each version it was reduced from. A version reduced in two steps names the
 version of each step it should still match (the one before it, and the original if it should match that too).
+A parent may have several entries, one per range of operating points, each with its own tolerance: where a
+reduction is safe at a tight one, and where it is poor at a stated wide one.
 
 | Key | Meaning |
 |---|---|
 | `module_type`, `version` | the version it was reduced from (the parent) |
+| `description` | which points the entry covers and why its tolerance; shown above the entry's panels in the report's plot |
 | `parameterisation` | the parent's parameterisation the reduction was made from (default: its default) |
 | `reduced_parameterisation` | this version's parameterisation that corresponds to it (default: its default) |
 | `compare` | `steady_state`: the outputs at the end of each run, both models settled; `time_course`: the outputs at every output time. Default: the method's (table above), `time_course` for an unlisted method |
@@ -955,7 +958,7 @@ exactly one file. A key in the wrong file, or a key in neither list, fails
 | `parameter_ranges` | verification_config | published parameter intervals, `{parameter: [lo, hi]}` (reported as validated values; usually inside a baseline block) |
 | `validation` | verification_config | per parameterisation, `validation.<p>.harness` (the parameterisation's own test network, see `harness`) and `validation.<p>.baseline` / `.calibrate`: `status`, `source`, `source_kind` (`publication` default / `dataset` / `synthetic`; see Source figures), data references relative to the version directory (`data: parameterisations/<p>/<file>.csv`, `obs_data`, `params_for_id`; a baseline's `obs_data` is run through its protocol, see Protocol-driven tests), variables, targets, metric, threshold, optimiser settings |
 | `reduction_method` | verification_config | how a version reduced from others was reduced: a listed method (`symbolic_steady_state`, `operator_inference`, `manual_term_removal`, `manual_term_grouping`), or `{"name": ..., "description": ...}` for another (see Reduced versions) |
-| `reduced_from` | verification_config | the versions it was reduced from, each with how the two are compared: `module_type`, `version`, `parameterisation`, `reduced_parameterisation`, `compare`, `outputs`, `parameters`, `points`, `sweep`, `sim_time`, `pre_time`, `dt`, `rtol`, `atol`, `settled_rtol` (see Reduced versions) |
+| `reduced_from` | verification_config | the versions it was reduced from, each with how the two are compared: `module_type`, `version`, `description`, `parameterisation`, `reduced_parameterisation`, `compare`, `outputs`, `parameters`, `points`, `sweep`, `sim_time`, `pre_time`, `dt`, `rtol`, `atol`, `settled_rtol` (see Reduced versions) |
 | `supermodule` | verification_config | supermodule versions: `globals` (parameters that name no submodule) and `equivalent` (system models it must reproduce: `model`, `reproduces`, `instance` (the supermodule's record name in `model`), `tol`, `solver_info`, `output_map`, `ignore`, and `wrapped` / `reciprocal` as in a system model's equivalence) |
 | `reviewed` | tests | whether the version has been reviewed (unreviewed versions run in CI without blocking it) |
 | `description` | tests | what the version is (supermodule versions) |

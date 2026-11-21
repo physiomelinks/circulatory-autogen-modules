@@ -14,8 +14,10 @@ A reduced version's verification config names what it was reduced from and how:
 
 reduction_method   A name in METHODS, or {"name": ..., "description": ...} for a method that is not listed
                    (the description is then required).
-reduced_from       One entry for each version it was reduced from, each with how the two are compared:
+reduced_from       One entry for each version it was reduced from, each with how the two are compared (a
+                   parent may have several entries, one per range of points with its own tolerance):
     module_type, version       the version it was reduced from (the parent)
+    description                which points the entry covers and why its tolerance (shown in the report)
     parameterisation           the parent's parameterisation the reduction was made from (default: its default)
     reduced_parameterisation   this version's parameterisation that corresponds to it (default: its default)
     compare                    "steady_state": the outputs at the end of each run, both models settled; or
@@ -63,8 +65,9 @@ METHODS = {
     'manual_term_grouping': ('terms or parameters of the parent\'s equations grouped by hand into fewer',
                              TIME_COURSE),
 }
-ENTRY_KEYS = {'module_type', 'version', 'parameterisation', 'reduced_parameterisation', 'compare', 'outputs',
-              'parameters', 'points', 'sweep', 'sim_time', 'pre_time', 'dt', 'rtol', 'atol', 'settled_rtol'}
+ENTRY_KEYS = {'module_type', 'version', 'description', 'parameterisation', 'reduced_parameterisation', 'compare',
+              'outputs', 'parameters', 'points', 'sweep', 'sim_time', 'pre_time', 'dt', 'rtol', 'atol',
+              'settled_rtol'}
 DEFAULT_SETTLED_RTOL = 1e-6
 
 
@@ -253,25 +256,35 @@ def compare_parent(version, entry, work_dir):
                 problems.append(f'{label}: {name} differs from the parent\'s {parent_name} by {difference:.3g} '
                                 f'({relative:.3g} of {scale:.3g}); allowed {allowed:.3g} (rtol {rtol:g}, atol {atol:g})')
         rows.append(row)
-    metrics = {'parent': parent.key, 'compare': compare, 'rtol': rtol, 'atol': atol,
-               'points': len(rows), 'worst_relative_difference': worst[0], 'worst_at': worst[1], 'rows': rows}
+    metrics = {'parent': parent.key, 'description': entry.get('description', ''), 'compare': compare,
+               'rtol': rtol, 'atol': atol, 'points': len(rows), 'worst_relative_difference': worst[0],
+               'worst_at': worst[1], 'rows': rows}
     return problems, metrics
 
 
+def _panels(parent_metrics):
+    '''The plot's panels, (an entry's metrics, output name): one per compared output of each reduced_from entry,
+    each with its own entry's rows (a parent may have several entries, one per range of points).'''
+    return [(m, name) for m in parent_metrics for name in (m['rows'][0]['outputs'] if m['rows'] else [])]
+
+
 def _plot(version, parent_metrics):
-    '''One figure: each compared output of each parent against the point number, reduced and parent.'''
+    '''One figure: each compared output of each reduced_from entry against the point number, reduced and parent.'''
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    panels = [(m['parent'], name) for m in parent_metrics for name in (m['rows'][0]['outputs'] if m['rows'] else [])]
+    panels = _panels(parent_metrics)
     if not panels:
         return []
     fig, axes = plt.subplots(len(panels), 1, figsize=(7, 2.6 * len(panels)), squeeze=False)
-    for ax, (parent, name) in zip(axes[:, 0], panels):
-        rows = next(m for m in parent_metrics if m['parent'] == parent)['rows']
+    for ax, (m, name) in zip(axes[:, 0], panels):
+        rows = m['rows']
         x = range(1, len(rows) + 1)
-        ax.plot(x, [r['outputs'][name]['parent'] for r in rows if name in r['outputs']], 'o-', label=parent)
+        ax.plot(x, [r['outputs'][name]['parent'] for r in rows if name in r['outputs']], 'o-', label=m['parent'])
         ax.plot(x, [r['outputs'][name]['reduced'] for r in rows if name in r['outputs']], 'x--', label='this version')
+        if m['description']:
+            ax.set_title(m['description'] if len(m['description']) <= 90 else m['description'][:87] + '...',
+                         fontsize=8)
         ax.set_ylabel(name)
         ax.set_xlabel('operating point')
         ax.legend(fontsize=8)
