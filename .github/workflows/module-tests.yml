@@ -42,7 +42,19 @@ jobs:
         # it: MODULE=heart selects heart, cardiac_clock, chamber and valve), per stage and shard
         run: echo "matrix=$(python3 -m cam_testing.shards matrix)" >> "$GITHUB_OUTPUT"
 
+  # Runs the setup action once, before every job that uses it: on a cache miss only this job runs apt
+  # and pip and saves ~/.cam-setup (at its end); the jobs that need it then restore the cache.
+  setup-cache:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - uses: ./.github/actions/setup
+
   structure:
+    needs: setup-cache
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -77,6 +89,7 @@ jobs:
   # (.github/actions/setup, key ci/setup_key.sh): fails, printing the difference, when the cache
   # is stale, e.g. an unpinned dependency released a new version.
   setup-check:
+    needs: setup-cache
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -138,7 +151,7 @@ jobs:
   # python -m cam_testing.shards durations <stage> junit-*.xml).
   test:
     name: ${{ matrix.label }}
-    needs: discover
+    needs: [discover, setup-cache]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
@@ -250,7 +263,7 @@ jobs:
   # Every report, from this run's results over the ledger's (the versions skipped as unchanged keep
   # their last results); then the ledger, with this run's entries and results, is saved for the next.
   site:
-    needs: [test, coupled, structure]
+    needs: [setup-cache, test, coupled, structure]
     if: always()
     runs-on: ubuntu-24.04
     env:

@@ -8,6 +8,7 @@
 #   changing the key, and the cached .deb files never downgrade what the runner image has, so a
 #   difference is a warning; a new runner image rebuilds the cache.
 set -uo pipefail
+export DEBIAN_FRONTEND=noninteractive   # no debconf prompt can block (sudo -E keeps it)
 CACHE=$HOME/.cam-setup
 if [ ! -x "$CACHE/venv/bin/python" ]; then
   echo "::notice::no cached setup for this key yet (the first job to finish saves it); nothing to compare"
@@ -18,8 +19,8 @@ status=0
 
 # apt: the .deb files a fresh install downloads vs the cached ones (name_version_arch)
 mkdir -p "$HOME/fresh-debs/partial"
-timeout 120 sudo apt-get $APT update -qq
-timeout 300 sudo apt-get $APT install -y -qq --download-only -o Dir::Cache::archives="$HOME/fresh-debs" $(cat ci/apt-packages.txt)
+timeout 120 sudo -E apt-get $APT update -qq
+timeout 300 sudo -E apt-get $APT install -y -qq --download-only -o Dir::Cache::archives="$HOME/fresh-debs" $(cat ci/apt-packages.txt)
 diff <(ls "$CACHE/debs" 2>/dev/null | grep '\.deb$' | sort) <(ls "$HOME/fresh-debs" | grep '\.deb$' | sort) > apt.diff \
   && echo "apt: same packages and versions ($(grep -c . <(ls "$CACHE/debs" | grep '\.deb$')) .deb files)" \
   || { echo "::warning::apt packages differ from the cached setup (< cached, > fresh; Ubuntu updates, rebuilt with the next runner image):"; cat apt.diff; }
