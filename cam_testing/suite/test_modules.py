@@ -13,7 +13,7 @@ report generator (python -m cam_testing.report) turns into <module_type>_<versio
 """
 import pytest
 
-from cam_testing import bondgraph, checks, supermodule
+from cam_testing import bondgraph, checks, sources, supermodule
 from cam_testing.library import load_version
 
 pytestmark = pytest.mark.module_vv
@@ -62,8 +62,19 @@ def verification_test_timestep(component_model):
     _assert(checks.verification_test_timestep(component_model), component_model.component)
 
 
+def verification_test_rhs(component_model):
+    _assert(checks.verification_test_rhs(component_model), component_model.component)
+
+
 def stability_test(component_model):
     _assert(checks.stability_test(component_model), component_model.component)
+
+
+def data_sources_test(component_key):
+    # no model: every calibration and validation data item has a source (cam_testing.sources;
+    # modules/README.md, "Data sources")
+    version = load_version(*component_key)
+    _assert(sources.check(version), version)
 
 
 # ---- bond graphs (N/A for a version without a CellDL bond graph) ----------------------------------

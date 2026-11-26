@@ -45,3 +45,15 @@ def test_the_pins_satisfy_the_package_dependencies():
 def test_the_pins_are_part_of_the_cache_key():
     with open(os.path.join(ROOT, 'ci', 'setup_key.sh')) as f:
         assert 'ci/constraints.txt' in f.read()
+
+
+def test_no_workflow_uses_ubuntu_latest():
+    '''The PyPI libcellml wheel needs libxml2.so.2, which ubuntu-latest (26.04) does not have.'''
+    found = []
+    for folder, _, names in os.walk(os.path.join(ROOT, '.github')):
+        found += [os.path.join(folder, n) for n in names if n.endswith(('.yml', '.yaml'))]
+    assert found
+    for path in found:
+        with open(path) as f:
+            for number, line in enumerate(f, 1):
+                assert 'ubuntu-latest' not in line.split('#')[0], f'{path}:{number}'

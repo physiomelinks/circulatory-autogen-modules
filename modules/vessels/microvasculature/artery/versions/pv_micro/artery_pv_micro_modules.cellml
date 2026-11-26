@@ -31,6 +31,7 @@
         <variable initial_value="0.0" name="q_C" public_interface="out" units="m3"/>
         <variable name="q_0" public_interface="out" units="m3"/>
         <variable name="q" public_interface="out" units="m3"/>
+        <variable name="du_C_dt" public_interface="out" units="J_per_m3s"/>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
                 <eq/>
@@ -190,6 +191,19 @@
                     <ci>u_0</ci>
                     <ci>u_C</ci>
                     <ci>u_ext</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>du_C_dt</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <minus/>
+                        <ci>v</ci>
+                        <ci>v_out</ci>
+                    </apply>
+                    <ci>C</ci>
                 </apply>
             </apply>
         </math>

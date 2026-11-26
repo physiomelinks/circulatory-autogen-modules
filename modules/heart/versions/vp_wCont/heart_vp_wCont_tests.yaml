@@ -2,19 +2,12 @@ module_type: heart
 version: vp_wCont
 reviewed: false
 notes: 'Four-chamber time-varying-elastance heart (heart_simple_wCont). Chamber pressure u = (e E_A + E_B)(q - q_us) + u_intraThor
-  with raised-cosine activation e_a, e_v driven by phase variables chi_a, chi_v (Liang 2009 timing) and a normalised cycle
+  with raised-cosine activation e_a, e_v driven by phases chi_a, chi_v computed from the beat phase s (Liang 2009 timing; docs/heart/cardiac_clock_phase.md) and a normalised cycle
   time mt; four Mynard-2012 valves (valve state zeta with pressure-driven opening/closing rates K_vo/K_vc, Bernoulli loss
   B v|v| and inertance L). Control inputs: Delta_T (period, floored at T_min), Delta_E_lv / Delta_E_rv (active elastance)
   and u_intraThor (external pressure). Tested in a closed loop (circulatory_autogen 3compartment network: aortic_root, systemic
   terminal, venous_svc, par, pvn, volume_sum) with the IVC fed by a zero-flow inlet, after a 20 s pre-time to reach the periodic
   state.'
-expected_failures:
-  verification_test_timestep: 'RK4 self-convergence is not monotone: normalised differences between successive step sizes
-    are 1.7e-3, 3.1e-4, 4.7e-4 for dt 2e-4 -> 2.5e-5; the largest differences are in A_eff_miv / A_eff_trv / v_miv around
-    mitral and tricuspid closure and the atrial kick (t ~ 0.47 and 0.97 s). The valve-state law is only piecewise smooth (dzeta/dt
-    switches branch at dp = 0; zeta = max(zeta_pre, 0) clamp; floor() phase variables), so the fixed-step solution cannot
-    show the RK4 order. The finest fixed-step run agrees with tight CVODE to 1.6e-4 (normalised), so the solution itself is
-    consistent.'
 reference_proposals:
   Delta_T:
     reference: 'definitional; no control input: zero change of the heart period (T_wCont = T)'

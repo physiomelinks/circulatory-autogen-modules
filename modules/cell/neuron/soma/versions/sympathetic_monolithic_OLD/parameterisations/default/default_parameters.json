@@ -1,0 +1,731 @@
+{
+ "schema_version": 1,
+ "global": {
+  "F": {
+   "value": 96485,
+   "units": "C_per_mol",
+   "data_reference": "definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",
+   "sourced": "yes"
+  },
+  "R": {
+   "value": 8.314,
+   "units": "J_per_mol_K",
+   "data_reference": "definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",
+   "sourced": "yes"
+  },
+  "T": {
+   "value": 310.15,
+   "units": "kelvin",
+   "data_reference": "SN_simple: Tao2011",
+   "sourced": "no"
+  }
+ },
+ "V_rest_approx": {
+  "value": -70,
+  "units": "milliV",
+  "data_reference": "SN_simple: Davis2021Thesis_from_traces",
+  "sourced": "yes"
+ },
+ "h_BK_min": {
+  "value": 0.085,
+  "units": "dimensionless",
+  "data_reference": "khaliq2003contribution; Table 1: BK h y0 = 0.085 (= value)",
+  "sourced": "yes"
+ },
+ "z_BK_coeff": {
+  "value": 0.001,
+  "units": "millimolar",
+  "data_reference": "khaliq2003contribution; Methods: z_inf = 1/(1 + 0.001 mM/Ca) (= value)",
+  "sourced": "yes"
+ },
+ "V_mid_m": {
+  "value": 20,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_36",
+  "sourced": "yes"
+ },
+ "V_mid_h": {
+  "value": 40,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_53.2",
+  "sourced": "yes"
+ },
+ "V_den_m": {
+  "value": 6,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_7.2",
+  "sourced": "yes"
+ },
+ "V_den_h": {
+  "value": 4.0,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_6.5",
+  "sourced": "yes"
+ },
+ "V_mid_m_Na1_6": {
+  "value": 36,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_36",
+  "sourced": "yes"
+ },
+ "V_mid_h_Na1_6": {
+  "value": 53.2,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_53.2",
+  "sourced": "yes"
+ },
+ "V_den_m_Na1_6": {
+  "value": 8.0,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_7.2",
+  "sourced": "yes"
+ },
+ "V_den_h_Na1_6": {
+  "value": 8.0,
+  "units": "milliV",
+  "data_reference": "SN_simple: Belluzi1991_was_6.5",
+  "sourced": "yes"
+ },
+ "V_mid_c": {
+  "value": 8.1,
+  "units": "milliV",
+  "data_reference": "SN_simple: Tau2011_was_8.1",
+  "sourced": "yes"
+ },
+ "V_den_c": {
+  "value": 5,
+  "units": "milliV",
+  "data_reference": "SN_simple: Tau2011_was_9.85",
+  "sourced": "yes"
+ },
+ "V_mid_m_Kv1_5": {
+  "value": 6.0,
+  "units": "milliV",
+  "data_reference": "ranjanchannelpedia; Kv1.5 model 21 (Ranjan; from philipson1991sequence, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. wang1993sustained 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): m_inf V1/2 = -6.0 mV (= value)",
+  "sourced": "yes"
+ },
+ "V_den_m_Kv1_5": {
+  "value": 6.4,
+  "units": "milliV",
+  "data_reference": "ranjanchannelpedia; Kv1.5 model 21 (Ranjan; from philipson1991sequence, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. wang1993sustained 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): m_inf k = 6.4 mV (= value)",
+  "sourced": "yes"
+ },
+ "V_mid_h_Kv1_5": {
+  "value": 25.3,
+  "units": "milliV",
+  "data_reference": "ranjanchannelpedia; Kv1.5 model 21 (Ranjan; from philipson1991sequence, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. wang1993sustained 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): h_inf V1/2 = -25.3 mV (= value) **At 37 degC native human atrial I_Kur inactivates half at -7.5 mV (feng1998ultrarapid), so this room-temperature value is a calibration candidate**",
+  "sourced": "yes"
+ },
+ "V_den_h_Kv1_5": {
+  "value": 3.5,
+  "units": "milliV",
+  "data_reference": "ranjanchannelpedia; Kv1.5 model 21 (Ranjan; from philipson1991sequence, human Kv1.5/hPCN1 in Xenopus oocytes; recorded at room temperature (not stated; cf. wang1993sustained 7.1 ms at +10 mV, 25 degC), not the 9 degC Channelpedia lists): h_inf k = 3.5 mV (= value)",
+  "sourced": "yes"
+ },
+ "V_mid_m_Kv4_2": {
+  "value": 18.8,
+  "units": "milliV",
+  "data_reference": "SN_simple: Bekkers2000-channelpedia",
+  "sourced": "no"
+ },
+ "V_den_m_Kv4_2": {
+  "value": 16.6,
+  "units": "milliV",
+  "data_reference": "SN_simple: Bekkers2000-channelpedia",
+  "sourced": "no"
+ },
+ "V_mid_h_Kv4_2": {
+  "value": 81.6,
+  "units": "milliV",
+  "data_reference": "bekkers2000properties; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",
+  "sourced": "yes"
+ },
+ "V_den_h_Kv4_2": {
+  "value": 6.7,
+  "units": "milliV",
+  "data_reference": "bekkers2000properties; Abstract: steady-state inactivation V1/2 -81.6 mV, k 6.7 mV (= values); Channelpedia Kv4.2 model 40",
+  "sourced": "yes"
+ },
+ "V_mid_m_Kv2": {
+  "value": 6,
+  "units": "milliV",
+  "data_reference": "belluzzi1988interactions; n_inf V1/2 = -6.54 mV (Abstract); 6 mV here is tao2011model Document S1 Eq. 96's rounded -6.084 mV (Tao values not relied on for now)",
+  "sourced": "yes"
+ },
+ "V_den_m_Kv2": {
+  "value": 8,
+  "units": "milliV",
+  "data_reference": "belluzzi1988interactions; n_inf slope k = 8.91 mV (Abstract); 8 mV here is tao2011model Document S1 Eq. 96's rounded 8.007 mV (Tao values not relied on for now)",
+  "sourced": "yes"
+ },
+ "V_mid_w": {
+  "value": 35,
+  "units": "milliV",
+  "data_reference": "martin2023modelling; Methods (p. 16): w_inf V1/2 = -35 mV (= value; from Zhou et al.)",
+  "sourced": "yes"
+ },
+ "Delta_V_mid_w": {
+  "value": 0,
+  "units": "milliV",
+  "data_reference": "definitional; drug-induced shift of the M-channel activation midpoint (0 = control; e.g. retigabine studies)",
+  "sourced": "no"
+ },
+ "V_den_w": {
+  "value": 10,
+  "units": "milliV",
+  "data_reference": "martin2023modelling; Methods (p. 16): w_inf k = 10 mV (= value)",
+  "sourced": "yes"
+ },
+ "V_den_m_BK": {
+  "value": 6.2,
+  "units": "milliV",
+  "data_reference": "khaliq2003contribution; Table 1: BK m k = 6.2 mV (= value)",
+  "sourced": "yes"
+ },
+ "V_mid_h_BK": {
+  "value": 26,
+  "units": "milliV",
+  "data_reference": "khaliq2003contribution; Table 1: BK h V1/2 = -32 mV (paper coordinates; ModelDB 48332 adds a +5 mV shift); **modified here to 26 mV (owner's shift, CA_user ad0ce77 2024-07-21): every BK curve 6 mV left of the paper**; m V1/2 follows as V_mid_h - 3.1 (Table 1: -28.9)",
+  "sourced": "yes"
+ },
+ "V_den_h_BK": {
+  "value": 5.8,
+  "units": "milliV",
+  "data_reference": "khaliq2003contribution; Table 1: BK h k = -5.8 mV (= value)",
+  "sourced": "yes"
+ },
+ "k_thresh_m": {
+  "value": 0,
+  "units": "milliV",
+  "data_reference": "SN_simple: user_defined_removed_dependence_was_15",
+  "sourced": "no"
+ },
+ "k_thresh_h": {
+  "value": 0,
+  "units": "milliV",
+  "data_reference": "SN_simple: user_defined_removed_dependence",
+  "sourced": "no"
+ },
+ "tau_h_min": {
+  "value": 0.15,
+  "units": "millis",
+  "data_reference": "owner's hand-set floor (CA_user ad0ce77, 2024-07-21; CA token 'user_defined'). Cf. belluzzi1986quantitative Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); tao2011model Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",
+  "sourced": "no"
+ },
+ "tau_h_max": {
+  "value": 5,
+  "units": "millis",
+  "data_reference": "owner's hand-set value (CA_user 70f2cf7, 2025-05-04: reset from 300 to 5 ms when the slow component was moved to i_Na1_6; CA token 'user_defined'). Cf. belluzzi1986quantitative Fig. 9B: tau_h bell-shaped, peak ~22 ms near -50 mV at 37 degC (46.1 ms at -50 mV, 2.5 ms at -100 mV at 27 degC, p. 282); = tao2011model Document S1 Eq. 89 (peak ~23-42 ms near -46 mV); here ~4x faster",
+  "sourced": "no"
+ },
+ "tau_h_Na1_6_min": {
+  "value": 0.15,
+  "units": "millis",
+  "data_reference": "owner's hand-set floor (CA_user ad0ce77, 2024-07-21, for i_Na; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'). Cf. belluzzi1986quantitative Fig. 8A: tau_h 0.987 ms at -20 mV, 27 degC (~0.42 ms at 37 degC with Q10 2.37, Table 2); tao2011model Eq. 89 gives ~0.1-0.26 ms at 0 to +40 mV",
+  "sourced": "no"
+ },
+ "tau_h_Na1_6_max": {
+  "value": 300,
+  "units": "millis",
+  "data_reference": "owner's calibration value (CA_user 35f61a8, 2025-05-01: tau_h_max 300 ms, the upper bound of its 50-300 ms calibration range; moved to Nav1.6 in 70f2cf7, 2025-05-04; CA token 'user_defined'; a 2026-08 free fit gave 1004 ms, sympathetic_neuron 7ab2983). Physiological counterpart: belluzzi1986quantitative slow Na inactivation, recovery tau_s1 0.13-1.4 s at -100 to -60 mV (27 degC; Fig. 7, Table 1, pp. 282-284). Not a NaV1.6 property: herzog2003distinct report Nav1.6 reprimes ~5x faster than Nav1.7",
+  "sourced": "no"
+ },
+ "tau_w_min": {
+  "value": 30,
+  "units": "millis",
+  "data_reference": "owner's floor (CA 72f29290, CA_user b8488ae, 2025-03-31); not in martin2023modelling (no offset); the CA token cites gupta2016computational, an SK-channel bladder model, **which is unlikely to be the source** (not verified)",
+  "sourced": "no"
+ },
+ "tau_c_min": {
+  "value": 0.2,
+  "units": "millis",
+  "data_reference": "belluzzi1989calcium; Eq. 4 tau_c = 1/(...) + 0.1 ms (= tao2011model Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",
+  "sourced": "yes"
+ },
+ "tau_c_max": {
+  "value": 3.0,
+  "units": "millis",
+  "data_reference": "owner's fit to davis2020downregulation current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. belluzzi1989calcium Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); 3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1)",
+  "sourced": "no"
+ },
+ "tau_hc": {
+  "value": 20.0,
+  "units": "millis",
+  "data_reference": "belluzzi1989calcium; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = tao2011model Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",
+  "sourced": "yes"
+ },
+ "tau_h_Kv4_2": {
+  "value": 7.0,
+  "units": "millis",
+  "data_reference": "bekkers2000properties; Fig. 8Ab, Table 1: I_A decay tau = 0.01 V + 6.7 ms (6.2-7.4 ms over -37 to +73 mV, 22-25 degC); at 37 degC in rat SCG the decay tau is 6.0-9.9 ms over 0 to -50 mV (belluzzi1985fast, p. 96); 7.0 ms = value. **Voltage dependence ignored: recovery from inactivation near rest is much slower (Bekkers Fig. 5A ~40-45 ms at -77 to -97 mV; belluzzi1985fast 42.3 ms at -70 mV, 37 degC) and is not represented by a constant tau_h**",
+  "sourced": "yes"
+ },
+ "tau_z_BK": {
+  "value": 5,
+  "units": "millis",
+  "data_reference": "SN_simple: khaliq2003Contribution",
+  "sourced": "no"
+ },
+ "tau_m_SK": {
+  "value": 5,
+  "units": "millis",
+  "data_reference": "hirschberg1998gating; Results, Fig. 13A: rSK2 macroscopic activation tau 4.1 +- 0.6 ms after a jump to 9.5 uM Ca (deactivation 57.3 +- 11.1 ms; model activation ~5 ms at 5 uM, ~50 ms at 0.5 uM Ca); 5 ms ~ value **(one tau used for activation and deactivation: deactivation is ~11x too fast against the measured 57 ms)**. Previously cited to gupta2016computational (bladder SK model, not verified)",
+  "sourced": "yes"
+ },
+ "R_diffSensed": {
+  "value": 10,
+  "units": "megaOhm",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "C_sensed": {
+  "value": 2,
+  "units": "picoF",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "p_SK": {
+  "value": 4,
+  "units": "dimensionless",
+  "data_reference": "hirschberg1998gating; Results: Hill coefficient 3.2 +- 1.0 (single channel), 3.6 (effective open probability), 4.8 +- 1.5 in macropatches (Kohler et al. 1996); 4 within the range. Previously cited to gupta2016computational (not verified)",
+  "sourced": "yes"
+ },
+ "Cai_init": {
+  "value": 0.0001,
+  "units": "millimolar",
+  "data_reference": "SN_simple: Hagiwara1981_was_1e-4_change_to_allow__buffering_decrease",
+  "sourced": "yes"
+ },
+ "Ca_mid_m_SK": {
+  "value": 0.0003,
+  "units": "millimolar",
+  "data_reference": "SN_simple: gupta2016Computational",
+  "sourced": "no"
+ },
+ "B_Ca_init": {
+  "value": 7.95,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "B_Ca_total": {
+  "value": 8,
+  "units": "millimolar",
+  "data_reference": "SN_simple: matveev2002new",
+  "sourced": "yes"
+ },
+ "k_bind_Ca": {
+  "value": 100000.0,
+  "units": "per_millimolar_s",
+  "data_reference": "SN_simple: Matveev2002_was_0.5e6",
+  "sourced": "yes"
+ },
+ "k_unbind_Ca": {
+  "value": 8000.0,
+  "units": "per_s",
+  "data_reference": "SN_simple: matveev2002new",
+  "sourced": "yes"
+ },
+ "k_bind_Ca_ER": {
+  "value": 500.0,
+  "units": "per_millimolar_s",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "k_unbind_Ca_ER": {
+  "value": 8000.0,
+  "units": "per_s",
+  "data_reference": "SN_simple: Matveev2002_for_k_unbind_Ca",
+  "sourced": "yes"
+ },
+ "Nai_init": {
+  "value": 13,
+  "units": "millimolar",
+  "data_reference": "brown1974changes; rat superior cervical ganglion [Na]i 19.8 mmol/kg cell water (22 mM fresh); galvan1984intracellular 5 mmol/L cell water; Boron & Boulpaep 2017 Table 5-2 generic 15 mM. 13 mM lies within the range",
+  "sourced": "yes"
+ },
+ "Ki_init": {
+  "value": 150,
+  "units": "millimolar",
+  "data_reference": "SN_simple: BoronBoulpaep2017",
+  "sourced": "no"
+ },
+ "g_Na": {
+  "value": 2.3,
+  "units": "microS",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "g_Na_mod": {
+  "value": 1.0,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "g_Na1_6": {
+  "value": 0.5,
+  "units": "microS",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "g_Na1_6_mod": {
+  "value": 1.0,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Cm": {
+  "value": 30,
+  "units": "picoF",
+  "data_reference": "SN_simple: Davis2021Transcriptomic",
+  "sourced": "no"
+ },
+ "p_Ca": {
+  "value": 4e-14,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "g_Kv1_5": {
+  "value": 0.08878493886,
+  "units": "microS",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "g_Kv4_2": {
+  "value": 0.1,
+  "units": "microS",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "g_Kv2": {
+  "value": 0.0013333,
+  "units": "microS",
+  "data_reference": "SN_simple: Davis2021Thesis_fit_to_curve",
+  "sourced": "no"
+ },
+ "g_KCa_BK": {
+  "value": 0.2,
+  "units": "microS",
+  "data_reference": "SN_simple: was70microS_per_cm2_inKhaliq2003",
+  "sourced": "no"
+ },
+ "g_KCa_SK": {
+  "value": 0.005,
+  "units": "microS",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "g_KCa_SK_mod": {
+  "value": 1.0,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "Vol": {
+  "value": 2e-15,
+  "units": "m3",
+  "data_reference": "SN_simple: Wu2012Soma_Approx",
+  "sourced": "no"
+ },
+ "Cao": {
+  "value": 2,
+  "units": "millimolar",
+  "data_reference": "SN_simple: Tau2011",
+  "sourced": "yes"
+ },
+ "Ko": {
+  "value": 4.5,
+  "units": "millimolar",
+  "data_reference": "boron2017medical; Table 5-2 (interstitium) and Table 5-3: extracellular K 4.5 mM",
+  "sourced": "yes"
+ },
+ "Nao": {
+  "value": 145,
+  "units": "millimolar",
+  "data_reference": "boron2017medical; Table 5-2 (interstitium) and Table 5-3: extracellular Na 145 mM",
+  "sourced": "yes"
+ },
+ "g_M": {
+  "value": 0.00389,
+  "units": "microS",
+  "data_reference": "SN_simple: Davis2021ThesisCalculatedFromMaxCurrent",
+  "sourced": "no"
+ },
+ "g_M_mod": {
+  "value": 1.0,
+  "units": "dimensionless",
+  "data_reference": "definitional; scaling factor, 1 = unmodified (retigabine studies)",
+  "sourced": "no"
+ },
+ "g_leak_Na": {
+  "value": 0.0003,
+  "units": "microS",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "g_leak_K": {
+  "value": 0.0001,
+  "units": "microS",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "delta_gM": {
+  "value": 0.0,
+  "units": "microS",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "tau_w_num": {
+  "value": 1200,
+  "units": "millis",
+  "data_reference": "martin2023modelling; Methods (p. 16): tau_w = 400/(3.3 exp((V+35)/10) + exp(-(V+35)/20)) ms (from Zhou et al.); **numerator modified here to 1200 ms (3x the source)** (owner calibration: 200 -> 800 -> 1200, CA_user ad0ce77/a7a4a58, 2024) **Kept on review (2026-10-05) although the one davis2020downregulation Fig. 3C trace relaxes with tau ~74 ms at -55 mV (instance davis2020_wistar_kinetics refits a flat ~105 ms): the slow tau_w carries the spike-frequency adaptation of the SN_full calibration (sympathetic_neuron SN_full/model_changes/im_adaptation_investigation.html)**",
+  "sourced": "yes"
+ },
+ "cAMP": {
+  "value": 0.01,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "I_in": {
+  "value": 0.0,
+  "units": "nanoA",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "k_NaCa": {
+  "value": 300,
+  "units": "nanoA",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "alpha_NaCa": {
+  "value": 1.2,
+  "units": "dimensionless",
+  "data_reference": "paci2013computational; alpha = 2.857 (enhancement factor of the outward mode); **modified here to 1.2 (owner, CA_user ad0ce77, 2024-07-21)**",
+  "sourced": "yes"
+ },
+ "gamma_NaCa": {
+  "value": 0.35,
+  "units": "dimensionless",
+  "data_reference": "paci2013computational; i_NaCa: gamma = 0.35 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "Ksat": {
+  "value": 0.1,
+  "units": "dimensionless",
+  "data_reference": "paci2013computational; i_NaCa: Ksat = 0.1 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "KmCa": {
+  "value": 1.38,
+  "units": "millimolar",
+  "data_reference": "paci2013computational; i_NaCa: KmCa = 1.38 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "KmNai": {
+  "value": 87.5,
+  "units": "millimolar",
+  "data_reference": "paci2013computational; i_NaCa: KmNai = 87.5 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "k_NaK": {
+  "value": 0.4,
+  "units": "nanoA",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Nai_mid_NaK": {
+  "value": 40,
+  "units": "millimolar",
+  "data_reference": "SN_simple: lindblad1996Model",
+  "sourced": "no"
+ },
+ "Nai_power_NaK": {
+  "value": 1.5,
+  "units": "dimensionless",
+  "data_reference": "nygren1998mathematical; i_NaK Nai exponent 1.5 (= value; human atrial model); the neuronal alpha3 Hill coefficient is 2.5 (horisberger2002functional, Fig. 7C)",
+  "sourced": "yes"
+ },
+ "Ko_mid_NaK": {
+  "value": 1,
+  "units": "millimolar",
+  "data_reference": "nygren1998mathematical; k_NaK_K = 1 mM (= value); neuronal alpha3 K1/2 ~0.5 mM with 100 mM Nao (horisberger2002functional, Fig. 5B), cardiac 1.5 mM (nakao1989dependence)",
+  "sourced": "yes"
+ },
+ "Ca_ER_init": {
+  "value": 0.6,
+  "units": "millimolar",
+  "data_reference": "SN_simple: to_be_checked_in_neurons",
+  "sourced": "no"
+ },
+ "K_mf": {
+  "value": 0.0001,
+  "units": "millimolar",
+  "data_reference": "SN_simple: Shannon2004Mathematical_was_0.246e-3",
+  "sourced": "yes"
+ },
+ "K_mr": {
+  "value": 0.5,
+  "units": "millimolar",
+  "data_reference": "SN_simple: Shannon2004Mathematical_was_1.7",
+  "sourced": "yes"
+ },
+ "k_SERCA": {
+  "value": 3e-16,
+  "units": "mol_per_s",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "H_SERCA": {
+  "value": 1.787,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: Shannon2004Mathematical",
+  "sourced": "yes"
+ },
+ "k_RyR": {
+  "value": 1.5e-13,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "tau_c_RyR": {
+  "value": 0.01,
+  "units": "millis",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "tau_hc_RyR": {
+  "value": 10,
+  "units": "millis",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Cai_RyR_mid": {
+  "value": 0.0008,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Cai_RyR_den": {
+  "value": 0.0001,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_mid": {
+  "value": 0.5,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_den": {
+  "value": 0.03,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_tau_mid": {
+  "value": 0.3,
+  "units": "millimolar",
+  "data_reference": "SN_simple: NOT_USED",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_tau_den": {
+  "value": 0.01,
+  "units": "millimolar",
+  "data_reference": "SN_simple: NOT_USED",
+  "sourced": "no"
+ },
+ "c_ER": {
+  "value": 0.01,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "c_SL": {
+  "value": 0.02,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined_TO_BE_FOUND",
+  "sourced": "no"
+ },
+ "k_IP3": {
+  "value": 0.0,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: user_defined_was_0.03e-15",
+  "sourced": "no"
+ },
+ "k_leak_Ca": {
+  "value": 1e-17,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "h_IP3_init": {
+  "value": 0.99,
+  "units": "dimensionless",
+  "data_reference": "unreferenced_placeholder; owner's initial value 0.99 (CA token 'user_defined')",
+  "sourced": "no"
+ },
+ "IP3": {
+  "value": 0.0002,
+  "units": "millimolar",
+  "data_reference": "li1994equations; IP3 0.2 uM, read from the paper's figures (they use 0.2-0.6 uM; owner's reading)",
+  "sourced": "yes"
+ },
+ "a_2": {
+  "value": 200,
+  "units": "per_millimolar",
+  "data_reference": "SN_simple: Li1994Equations",
+  "sourced": "no"
+ },
+ "d_1": {
+  "value": 0.00013,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d1 = 0.13 uM (= value)",
+  "sourced": "yes"
+ },
+ "d_2": {
+  "value": 0.001049,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d2 = 1.049 uM (= value)",
+  "sourced": "yes"
+ },
+ "d_3": {
+  "value": 0.000943,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d3 = 0.9434 uM (0.943 here) (= value)",
+  "sourced": "yes"
+ },
+ "d_5": {
+  "value": 8.234e-05,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d5 = 0.08234 uM (= value)",
+  "sourced": "yes"
+ },
+ "D_Ca": {
+  "value": 6e-12,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: identified_by_hand",
+  "sourced": "no"
+ },
+ "c_ER_pre": {
+  "value": 0.049,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "D_Ca_ER": {
+  "value": 4.8e-15,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: need_to_change_for_volume",
+  "sourced": "yes"
+ },
+ "I_out": {
+  "value": 0,
+  "units": "nanoA",
+  "data_reference": "definitional; the axial current into the axon, 0 when nothing is connected to the VI_port",
+  "sourced": "no"
+ }
+}

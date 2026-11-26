@@ -21,13 +21,15 @@
         "port_type": "flow_port",
         "variables": [
           "v_in"
-        ]
+        ],
+        "multi_port": "sum"
       },
       {
         "port_type": "pressure_port",
         "variables": [
           "u"
-        ]
+        ],
+        "multi_port": "True"
       }
     ],
     "exit_ports": [
@@ -35,13 +37,15 @@
         "port_type": "flow_port",
         "variables": [
           "v"
-        ]
+        ],
+        "multi_port": "True"
       },
       {
         "port_type": "pressure_port",
         "variables": [
           "u_out"
-        ]
+        ],
+        "multi_port": "True"
       },
       {
         "port_type": "flow_port",
@@ -60,37 +64,43 @@
       ],
       [
         "v",
-        "m3_per_s",
+        "uL_per_s",
         "access",
         "variable"
       ],
       [
         "q_C",
-        "m3",
+        "uL",
         "access",
         "variable"
       ],
       [
         "q_0",
-        "m3",
+        "uL",
         "access",
         "constant"
       ],
       [
         "q",
-        "m3",
+        "uL",
         "access",
         "variable"
       ],
       [
         "R",
-        "Js_per_m6",
+        "Pa_s_per_uL",
         "access",
         "constant"
       ],
       [
         "C",
-        "m6_per_J",
+        "uL_per_Pa",
+        "access",
+        "constant"
+      ],
+      [
+        "I",
+        "Pa_s2_per_uL",
         "access",
         "constant"
       ],
@@ -114,7 +124,7 @@
       ],
       [
         "v_in",
-        "m3_per_s",
+        "uL_per_s",
         "access",
         "boundary_condition"
       ]

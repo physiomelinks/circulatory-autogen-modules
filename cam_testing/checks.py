@@ -37,7 +37,7 @@ PROPOSED = 'proposed'
 # reviewed yet fails it, so its status never reads as all-passed (it stays public and usable)
 REVIEW_TEST = 'review_test'
 VERSION_TESTS = [REVIEW_TEST, 'run_test', 'verification_test_invariants', 'verification_test_BC', 'verification_test_timestep',
-                 'stability_test']
+                 'verification_test_rhs', 'stability_test']
 # per parameterisation
 PARAMETERISATION_TESTS = ['validation_test_baseline', 'validation_test_calibrate']
 TESTS = VERSION_TESTS + PARAMETERISATION_TESTS
@@ -247,13 +247,18 @@ class ComponentModel(object):
                 nominal[harness.parameter_name(p)] = p.float_value
             except ValueError:
                 pass
-        # the test network's own parameters (e.g. an outlet's flow v_vout), by their full names, so a
-        # sweep can vary them (bc_sweep.extra_parameters) and invariants can use them
+        # the test network's own parameters (e.g. an outlet's flow vout/v), so a sweep can vary them
+        # (bc_sweep.extra_parameters) and invariants can use them. They are named as in the generated
+        # model, <var>_<instance> (vout/v: v_vout); the full name <instance>/<var> resolves to it.
+        aliases = {}
         for name, _units, value, *_ref in harness.network(self.component, self._network_of).get('parameters') or []:
-            if name not in nominal:
-                nominal[name] = float(value)
-                var_of[name] = name
-        self._params, self._nominal, self._var_of_map = params, nominal, var_of
+            inst, _, var = name.rpartition('/')
+            model_name = f'{var}_{inst}' if inst else name
+            aliases[name] = model_name
+            if model_name not in nominal:
+                nominal[model_name] = float(value)
+                var_of[model_name] = model_name
+        self._params, self._nominal, self._var_of_map, self._aliases = params, nominal, var_of, aliases
 
     @property
     def nominal(self):
@@ -266,10 +271,17 @@ class ComponentModel(object):
         self._load_parameters()
         return self._var_of_map
 
+    def resolve(self, name):
+        '''The generated model's name of a test-network parameter given as <instance>/<var> (vout/v: v_vout);
+        other names as given.'''
+        self._load_parameters()
+        return self._aliases.get(name, name)
+
     def param_env(self, overrides=None):
-        '''Parameter values by variable name (e.g. alpha; a supermodule's: <var>_<submodule>), for invariant expressions.'''
+        '''Parameter values by variable name (e.g. alpha; a supermodule's: <var>_<submodule>; a test-network
+        parameter's: <var>_<instance>), for invariant expressions.'''
         values = dict(self.nominal)
-        values.update(overrides or {})
+        values.update({self.resolve(k): v for k, v in (overrides or {}).items()})
         return {self._var_of[k]: v for k, v in values.items()}
 
     @property
@@ -1147,8 +1159,8 @@ def verification_test_BC(cm):
 
         sweeps, points, skipped, notes = {}, [], [], []
         for var in names:
-            # a component parameter, or (extra_parameters) one of its test network's, by full name
-            pname = harness.parameter_name(by_var[var]) if var in by_var else var
+            # a component parameter, or (extra_parameters) one of its test network's, as v_vout or vout/v
+            pname = harness.parameter_name(by_var[var]) if var in by_var else cm.resolve(var)
             if pname not in cm.nominal:
                 notes.append(f'{var}: not a parameter of the component or its test network')
                 continue
@@ -1383,6 +1395,83 @@ def verification_test_timestep(cm):
 
 
 # ----------------------------------------------------------------------------------------------
+# verification_test_rhs
+# ----------------------------------------------------------------------------------------------
+
+NO_RHS_REFERENCE = 'no rhs_reference in the verification config'
+
+
+def _set_parameter(model, cm, name, value):
+    '''Sets a parameter (by its variable name, e.g. u_1) of a Myokit model generated from cm.'''
+    by_var = {p.variable_name: p for p in cm.parameters()}
+    full = harness.parameter_name(by_var[name]) if name in by_var else name
+    for comp in ('parameters', 'parameters_global'):
+        if model.has_variable(f'{comp}.{full}'):
+            model.get(f'{comp}.{full}').set_rhs(float(value))
+            return
+    raise KeyError(f'rhs_reference parameter {name} not found in the model')
+
+
+def rhs_reference_errors(cm, ref):
+    '''
+    For each point of an rhs_reference block, the generated model's state rates (in ref["states"] order) and
+    the values of ref["observed"], and their largest error relative to atol + rtol |reference|.
+    Returns [{'t', 'got', 'want', 'error'}].
+    '''
+    rtol, atol = float(ref.get('rtol', 1e-12)), float(ref.get('atol', 1e-12))
+    states, params, observed = list(ref['states']), list(ref.get('parameters') or []), list(ref.get('observed') or [])
+    base = cm.point_model()
+    by_name = {s.name(): s.qname() for s in base.states()}
+    if sorted(by_name) != sorted(states):
+        raise ValueError(f'rhs_reference states {states} are not the model\'s states {sorted(by_name)}')
+    obs_q = [cm.helper._resolve_name(harness.output_name(o))[1] for o in observed]
+    out = []
+    for pt in ref['points']:
+        model = base.clone()
+        for name, value in zip(params, pt.get('parameters') or []):
+            _set_parameter(model, cm, name, value)
+        rhs, _y0, qnames, observe = fixed_step.compile_rhs(model)
+        y = np.zeros(len(qnames))
+        for s, v in zip(states, pt['states']):
+            y[qnames.index(by_name[s])] = float(v)
+        t = float(pt['t'])
+        rates = rhs(t, y)
+        got = np.array([rates[qnames.index(by_name[s])] for s in states] + list(observe(t, y, obs_q)), dtype=float)
+        want = np.array(list(pt['rates']) + list(pt.get('observed') or []), dtype=float)
+        error = float(np.max(np.abs(got - want) / (atol + rtol * np.abs(want))))
+        out.append({'t': t, 'got': got.tolist(), 'want': want.tolist(), 'error': error})
+    return out
+
+
+def verification_test_rhs(cm):
+    """
+    Checks the generated right-hand side against reference values (verification_config rhs_reference), e.g.
+    from the implementation the module was written from: at each point (t, states, parameter values) the state
+    rates, and any observed variables, equal the reference's to rtol/atol. N/A without an rhs_reference.
+    """
+    if is_non_cellml(cm.component):
+        return _cpp_not_applicable(cm, 'verification_test_rhs')
+    ref = cm.spec.get('rhs_reference')
+    if not ref:
+        return save(cm.component, Result('verification_test_rhs', NOT_APPLICABLE, NO_RHS_REFERENCE))
+
+    def check():
+        rows = rhs_reference_errors(cm, ref)
+        worst = max(r['error'] for r in rows)
+        bad = [i for i, r in enumerate(rows) if not r['error'] <= 1.0]
+        metrics = {'source': ref.get('source', ''), 'points': len(rows), 'worst_relative_error': worst,
+                   'rtol': float(ref.get('rtol', 1e-12)), 'atol': float(ref.get('atol', 1e-12))}
+        if bad:
+            details = [f'point {i} (t = {rows[i]["t"]}): got {rows[i]["got"]}, reference {rows[i]["want"]}' for i in bad]
+            return Result('verification_test_rhs', FAILED,
+                          f'{len(bad)} of {len(rows)} points differ from the reference (worst {worst:.2g} x tolerance)',
+                          metrics, [], details)
+        return Result('verification_test_rhs', PASSED,
+                      f'all {len(rows)} points match the reference ({worst:.2g} x tolerance at worst)', metrics)
+    return _guard(cm.component, 'verification_test_rhs', check)
+
+
+# ----------------------------------------------------------------------------------------------
 # stability_test
 # ----------------------------------------------------------------------------------------------
 
@@ -1445,6 +1534,11 @@ def run_limited(fn, limit):
     return value
 
 
+def step_label(step):
+    """How a run's step appears in a message: 'step 0.001', or 'unconstrained' when step is None."""
+    return 'unconstrained' if step is None else f'step {step:g}'
+
+
 def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstrained, budget, min_step, deadline):
     """Runs make_cfg(step) for step = first_step, first_step/factor, ... (after an unconstrained try
     when try_unconstrained) until one works, a run is stopped at its limit, the next run is
@@ -1458,7 +1552,7 @@ def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstraine
         if step is not None and step < min_step:
             return (last and last['row']), f'reached min_step {min_step:g}'
         if last is not None and last['row']['seconds'] * (factor if last['step'] else 2.0) > budget:
-            return last['row'], f'stopped: next run (step {step:g}) predicted over the {budget:.0f} s budget'
+            return last['row'], f'stopped: next run ({step_label(step)}) predicted over the {budget:.0f} s budget'
         remaining = deadline - time.perf_counter()
         if remaining <= 0.0:
             return (last and last['row']), "skipped: the test's time budget is used up"
@@ -1467,7 +1561,7 @@ def refine_family(record, make_cfg, run_fn, first_step, factor, try_unconstraine
         if row['works']:
             return row, ''
         if row.get('timed_out'):
-            return row, f'stopped: run (step {step:g}) reached the {min(budget, remaining):.0f} s limit'
+            return row, f'stopped: run ({step_label(step)}) reached the {min(budget, remaining):.0f} s limit'
 
 
 def config_label(cfg):
@@ -1963,6 +2057,7 @@ CHECKS = {
     'verification_test_invariants': verification_test_invariants,
     'verification_test_BC': verification_test_BC,
     'verification_test_timestep': verification_test_timestep,
+    'verification_test_rhs': verification_test_rhs,
     'stability_test': stability_test,
     'validation_test_baseline': validation_test_baseline,
     'validation_test_calibrate': validation_test_calibrate,
@@ -2085,9 +2180,18 @@ def _unit_issues(version, targets):
             failures.append(_unit_failure(it.description(), targets))
         elif it.level() == error:
             other.append(it.description())
-    n_equations = len({f['equation'] or f['message'] for f in failures})
-    if failures or definition:
+    # "equivalent as long as <x> equals <y>": libcellml can't check units raised to a variable exponent
+    conditional = [f for f in failures if f['kind'] == 'conditional']
+    inconsistent = [f for f in failures if f['kind'] != 'conditional']
+    n_equations = len({f['equation'] or f['message'] for f in inconsistent})
+    n_conditional = len({f['equation'] or f['message'] for f in conditional})
+    conditional_part = (f'{n_conditional} equation{"" if n_conditional == 1 else "s"} libcellml can check only for '
+                        f'particular values of a variable exponent')
+    if inconsistent or definition:
         status = UNITS_INCONSISTENT
+    elif conditional:
+        return {'status': UNITS_NOT_CHECKED, 'message': conditional_part, 'n_failures': 0, 'n_equations': 0,
+                'failures': failures, 'definition_issues': [], 'other_issues': other}
     elif other:
         # libcellml's analyser checks units only once the model is otherwise valid
         return {'status': UNITS_NOT_CHECKED, 'n_failures': 0, 'n_equations': 0, 'failures': [], 'definition_issues': [],
@@ -2100,10 +2204,12 @@ def _unit_issues(version, targets):
     parts = []
     if failures:
         parts.append(f'{n_equations} equation{"" if n_equations == 1 else "s"} with inconsistent units'
-                     + (f' ({len(failures)} issues)' if len(failures) != n_equations else ''))
+                     + (f' ({len(inconsistent)} issues)' if len(inconsistent) != n_equations else ''))
     if definition:
         parts.append(f'{len(definition)} undefined or invalid units' + (
             ', so libcellml could not check the equations' if not failures and other else ''))
+    if conditional:
+        parts.append(conditional_part)
     return {'status': status, 'message': '; '.join(parts), 'n_failures': n_equations + len(definition),
             'n_equations': n_equations, 'failures': failures, 'definition_issues': definition, 'other_issues': other}
 
@@ -2121,7 +2227,8 @@ def _unit_failure(description, targets):
     row['equation'] = eq
     row['expression'] = m['expression'] if e else None
     what = m['what']
-    row['kind'] = ('not dimensionless' if 'dimensionless' in what else
+    row['kind'] = ('conditional' if ' as long as ' in description else
+                   'not dimensionless' if 'dimensionless' in what else
                    'scaling factor' if 'scaling' in what or 'multiplication' in m['detail'] else 'not equivalent')
     row['sides'] = [{'expression': x['expression'], 'units': x['units'], 'base': x['base']}
                     for x in _UNITS_SIDE.finditer(m['detail'])]

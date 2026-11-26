@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" name="Units">
+  <units name="per_second">
+    <unit units="second" exponent="-1"/>
+  </units>
+  <units name="millivolt">
+    <unit units="volt" prefix="milli"/>
+  </units>
+  <units name="per_millivolt">
+    <unit units="volt" prefix="milli" exponent="-1"/>
+  </units>
+  <units name="per_millivolt_second">
+    <unit units="millivolt" exponent="-1"/>
+    <unit units="second" exponent="-1"/>
+  </units>
+  <units name="microS">
+    <unit units="siemens" prefix="micro"/>
+  </units>
+  <units name="microF">
+    <unit units="farad" prefix="micro"/>
+  </units>
+  <units name="nanoA">
+    <unit units="ampere" prefix="nano"/>
+  </units>
+  <units name="mA_nA">
+    <unit units="ampere" prefix="milli"/>
+    <unit units="nanoA" exponent="-1"/>
+  </units>
+  <units name="millimolar">
+    <unit units="mole" prefix="milli"/>
+    <unit units="litre" exponent="-1"/>
+  </units>
+  <units name="per_millimolar">
+    <unit units="millimolar" exponent="-1"/>
+  </units>
+  <units name="millimolar_per_second">
+    <unit units="millimolar"/>
+    <unit units="second" exponent="-1"/>
+  </units>
+  <units name="per_millimolar2_second">
+    <unit units="millimolar" exponent="-2"/>
+    <unit units="second" exponent="-1"/>
+  </units>
+  <units name="per_millimolar_second">
+    <unit units="millimolar" exponent="-1"/>
+    <unit units="second" exponent="-1"/>
+  </units>
+  <units name="nanoA_per_millimolar">
+    <unit units="nanoA"/>
+    <unit units="millimolar" exponent="-1"/>
+  </units>
+  <units name="joule_per_kilomole_kelvin">
+    <unit units="joule"/>
+    <unit units="mole" prefix="kilo" exponent="-1"/>
+    <unit units="kelvin" exponent="-1"/>
+  </units>
+  <units name="coulomb_per_mole">
+    <unit units="coulomb"/>
+    <unit units="mole" exponent="-1"/>
+  </units>
+  <units name="micrometre">
+    <unit units="metre" prefix="micro"/>
+  </units>
+  <units name="millimetre3">
+    <unit units="metre" prefix="milli" exponent="3"/>
+  </units>
+  <units name="litre_millimetre3">
+    <unit units="litre"/>
+    <unit units="millimetre3" exponent="-1"/>
+  </units>
+  <units name="micrometre_per_femtometre">
+    <unit units="micrometre"/>
+    <unit units="metre" prefix="femto" exponent="-1"/>
+  </units>
+</model>

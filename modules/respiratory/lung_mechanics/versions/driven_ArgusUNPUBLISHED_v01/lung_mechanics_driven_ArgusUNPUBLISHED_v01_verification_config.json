@@ -1,0 +1,159 @@
+{
+  "module_type": "lung_mechanics",
+  "version": "driven_ArgusUNPUBLISHED_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.005,
+  "solver": "CVODE_myokit",
+  "solver_info": {
+    "MaximumStep": 0.00025,
+    "rtol": 1e-08,
+    "atol": 1e-10
+  },
+  "outputs": [
+    "q_t",
+    "q_b",
+    "q_A_stressed",
+    "q_pl",
+    "P_pl",
+    "P_A",
+    "v_mt",
+    "q_D",
+    "q_A",
+    "drive/P_mus"
+  ],
+  "harness": {
+    "module_array": [
+      [
+        "drive",
+        "cosine_EllweinFix2018_v01",
+        "muscle_pressure",
+        "",
+        "mod",
+        "default"
+      ],
+      [
+        "mod",
+        "driven_ArgusUNPUBLISHED_v01",
+        "lung_mechanics",
+        "drive",
+        "",
+        "default"
+      ]
+    ],
+    "parameters": [
+      [
+        "drive/f",
+        "per_s",
+        0.2,
+        "harness: 12 breaths/min"
+      ],
+      [
+        "drive/A",
+        "J_per_m3",
+        345.0,
+        "harness"
+      ],
+      [
+        "drive/c_init",
+        "dimensionless",
+        1.0,
+        "harness"
+      ],
+      [
+        "drive/s_init",
+        "dimensionless",
+        0.0,
+        "harness"
+      ]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "airway volume balance: q_t + q_b + q_A_stressed changes by the integral of the mouth flow v_mt (trapezoid, from t = 1 s, after the sub-millisecond start-up from the hard-coded initial volumes)",
+      "expr": "np.max(np.abs(((q_t + q_b + q_A_stressed)[t >= 1.0] - (q_t + q_b + q_A_stressed)[t >= 1.0][0]) - np.concatenate(([0.0], np.cumsum(0.5*np.diff(t[t >= 1.0])*(v_mt[t >= 1.0][1:] + v_mt[t >= 1.0][:-1])))))) <= 1e-3*np.ptp((q_t + q_b + q_A_stressed)[t >= 1.0]) + 1e-9"
+    },
+    {
+      "description": "breathing: the alveolar volume swings in the last breath (tidal volume over 50 mL)",
+      "expr": "np.ptp(q_A[t >= t[-1] - 5.0]) > 5e-5"
+    },
+    {
+      "description": "pleural pressure follows the drive: negative on average in the last breath",
+      "expr": "np.mean(P_pl[t >= t[-1] - 5.0]) < 0"
+    }
+  ],
+  "bc_sweep": {
+    "sweep": "all",
+    "factors": [
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "exclude": [
+      "P_mus",
+      "R_leak",
+      "P_leak_threshold",
+      "q_D_min"
+    ],
+    "bounds": {
+      "frac_R_bA": [
+        0.0,
+        0.99
+      ],
+      "alpha_C_A_to_tot": [
+        0.0,
+        0.99
+      ]
+    },
+    "ranges": {
+      "P_in": {
+        "min": 0.0,
+        "max": 1000.0,
+        "points": 3
+      }
+    },
+    "rationale": "each lung constant 0.5-2x the calibrated value (fractions kept below 1); the leak (R_leak 1e10, flows under 0.1 mL/s) and q_D_min (a floor) excluded."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.0001,
+      5e-05,
+      2.5e-05,
+      1.25e-05
+    ],
+    "pre_time": 1.0,
+    "t_end": 0.5,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08,
+        "MaximumStep": 0.001
+      },
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-08,
+        "atol": 1e-10
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "no data: a synthetic module of the known-structure test model (ICUHealthy models/simple)"
+      },
+      "calibrate": {
+        "note": "not_applicable: no data to calibrate against"
+      }
+    }
+  }
+}
