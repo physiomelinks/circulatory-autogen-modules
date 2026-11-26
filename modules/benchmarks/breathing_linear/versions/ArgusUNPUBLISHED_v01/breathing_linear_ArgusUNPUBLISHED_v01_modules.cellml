@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#" name="breathing_linear_ArgusUNPUBLISHED_v01">
+    <component name="breathing_linear">
+        <variable name="t" public_interface="in" units="second"/>
+        <variable name="A0_1_1" public_interface="in" units="dimensionless"/>
+        <variable name="A0_1_2" public_interface="in" units="dimensionless"/>
+        <variable name="A0_2_1" public_interface="in" units="dimensionless"/>
+        <variable name="A0_2_2" public_interface="in" units="dimensionless"/>
+        <variable name="A0_2_3" public_interface="in" units="dimensionless"/>
+        <variable name="A0_3_1" public_interface="in" units="dimensionless"/>
+        <variable name="A0_3_3" public_interface="in" units="dimensionless"/>
+        <variable name="A1_1_2" public_interface="in" units="dimensionless"/>
+        <variable name="A1_2_3" public_interface="in" units="dimensionless"/>
+        <variable name="A1_3_1" public_interface="in" units="dimensionless"/>
+        <variable name="g_1" public_interface="in" units="dimensionless"/>
+        <variable name="g_3" public_interface="in" units="dimensionless"/>
+        <variable name="br_1" public_interface="in" units="dimensionless"/>
+        <variable name="br_2" public_interface="in" units="dimensionless"/>
+        <variable name="br_3" public_interface="in" units="dimensionless"/>
+        <variable name="T" public_interface="in" units="second"/>
+        <variable name="T_r" public_interface="in" units="second"/>
+        <variable name="h2" public_interface="in" units="dimensionless"/>
+        <variable name="psi2" public_interface="in" units="dimensionless"/>
+        <variable name="phi0" public_interface="in" units="dimensionless"/>
+        <variable name="x_1_init" public_interface="in" units="dimensionless"/>
+        <variable name="x_2_init" public_interface="in" units="dimensionless"/>
+        <variable name="x_3_init" public_interface="in" units="dimensionless"/>
+        <variable initial_value="x_1_init" name="x_1" public_interface="out" units="dimensionless"/>
+        <variable initial_value="x_2_init" name="x_2" public_interface="out" units="dimensionless"/>
+        <variable initial_value="x_3_init" name="x_3" public_interface="out" units="dimensionless"/>
+        <variable name="theta" units="dimensionless"/>
+        <variable name="ph" units="dimensionless"/>
+        <variable name="cos_ph" public_interface="out" units="dimensionless"/>
+        <variable name="sin_ph" public_interface="out" units="dimensionless"/>
+        <variable name="cos_2ph" public_interface="out" units="dimensionless"/>
+        <variable name="sin_2ph" public_interface="out" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>theta</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <pi/>
+                        <ci>t</ci>
+                    </apply>
+                    <ci>T</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>ph</ci>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <cn cellml:units="dimensionless">2.0</cn>
+                                <pi/>
+                            </apply>
+                            <ci>T_r</ci>
+                        </apply>
+                        <ci>t</ci>
+                    </apply>
+                    <ci>phi0</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>cos_ph</ci>
+                <apply>
+                    <cos/>
+                    <ci>ph</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>sin_ph</ci>
+                <apply>
+                    <sin/>
+                    <ci>ph</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>cos_2ph</ci>
+                <apply>
+                    <cos/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>ph</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>sin_2ph</ci>
+                <apply>
+                    <sin/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dimensionless">2.0</cn>
+                        <ci>ph</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_1</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>A0_1_1</ci>
+                        <ci>x_1</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A0_1_2</ci>
+                        <ci>x_2</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <ci>A1_1_2</ci>
+                            <ci>x_2</ci>
+                        </apply>
+                        <apply>
+                            <cos/>
+                            <ci>theta</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>g_1</ci>
+                        <apply>
+                            <sin/>
+                            <ci>theta</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>br_1</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <cos/>
+                                <ci>ph</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>h2</ci>
+                                <apply>
+                                    <cos/>
+                                    <apply>
+                                        <plus/>
+                                        <apply>
+                                            <times/>
+                                            <cn cellml:units="dimensionless">2.0</cn>
+                                            <ci>ph</ci>
+                                        </apply>
+                                        <ci>psi2</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_2</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>A0_2_1</ci>
+                        <ci>x_1</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A0_2_2</ci>
+                        <ci>x_2</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A0_2_3</ci>
+                        <ci>x_3</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <ci>A1_2_3</ci>
+                            <ci>x_3</ci>
+                        </apply>
+                        <apply>
+                            <cos/>
+                            <ci>theta</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>br_2</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <cos/>
+                                <ci>ph</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>h2</ci>
+                                <apply>
+                                    <cos/>
+                                    <apply>
+                                        <plus/>
+                                        <apply>
+                                            <times/>
+                                            <cn cellml:units="dimensionless">2.0</cn>
+                                            <ci>ph</ci>
+                                        </apply>
+                                        <ci>psi2</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x_3</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>A0_3_1</ci>
+                        <ci>x_1</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>A0_3_3</ci>
+                        <ci>x_3</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <times/>
+                            <ci>A1_3_1</ci>
+                            <ci>x_1</ci>
+                        </apply>
+                        <apply>
+                            <cos/>
+                            <ci>theta</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>g_3</ci>
+                        <apply>
+                            <sin/>
+                            <ci>theta</ci>
+                        </apply>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>br_3</ci>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <cos/>
+                                <ci>ph</ci>
+                            </apply>
+                            <apply>
+                                <times/>
+                                <ci>h2</ci>
+                                <apply>
+                                    <cos/>
+                                    <apply>
+                                        <plus/>
+                                        <apply>
+                                            <times/>
+                                            <cn cellml:units="dimensionless">2.0</cn>
+                                            <ci>ph</ci>
+                                        </apply>
+                                        <ci>psi2</ci>
+                                    </apply>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+    </component>
+</model>

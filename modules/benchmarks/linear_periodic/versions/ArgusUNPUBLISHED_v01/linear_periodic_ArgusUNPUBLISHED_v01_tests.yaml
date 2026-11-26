@@ -1,0 +1,4 @@
+module_type: linear_periodic
+version: ArgusUNPUBLISHED_v01
+reviewed: false
+notes: "Linear, time-periodic, with per-beat inputs: dx/dt = (A0 + A1 cos theta) x + B u + g sin theta, theta = 2 pi t / T. rhs_reference holds reference right-hand-side values at 20 points, which verification_test_rhs checks to 1e-12. Inputs a run schedule varies per run or beat are parameters; forcings in time are written in the CellML. Zero matrix entries are left out of the equations."
