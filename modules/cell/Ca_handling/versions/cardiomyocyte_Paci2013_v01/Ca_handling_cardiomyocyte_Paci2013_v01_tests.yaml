@@ -47,6 +47,8 @@ notes: 'Paci 2013 intracellular Ca handling: cytosolic Cai and SR Ca_SR with rap
 known_issues:
 - 'undefined units: C_per_M'
 - port variable d not in variables_and_units
+- CellML input d of Ca_dynamics_Paci_2013 is not declared in the config
+- Vm has units dimensionless in the config but volt in the CellML
 expected_failures:
   run_test: 'generation fails: Vm is ''dimensionless'' in the config/parameters but ''volt'' in the CellML; the port variable
     d (used in i_rel) is not in variables_and_units (known issue); Ca_SR, g, i_up, i_rel, i_leak are exposed in the config

@@ -1,0 +1,111 @@
+{
+  "module_type": "venous_gas_mixing",
+  "version": "ArgusUNPUBLISHED_v01",
+  "sim_time": 20.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": ["C_O2_mix", "C_CO2_mix", "v_mix", "ta/v_T", "tb/v_T", "tc/v_T", "ga/C_O2_p", "gb/C_O2_p", "gc/C_O2_p", "ga/C_CO2_p", "gb/C_CO2_p", "gc/C_CO2_p"],
+  "harness": {
+    "module_array": [
+      ["ta", "pp_I", "terminal", "", "ga", "default"],
+      ["tb", "pp_I", "terminal", "", "gb", "default"],
+      ["tc", "pp_I", "terminal", "", "gc", "default"],
+      ["gc", "Ursino2001_v02", "tissue_GE_simple", "tc", "mod", "default"],
+      ["ga", "Ursino2001_v02", "tissue_GE_simple", "ta", "mod", "default"],
+      ["gb", "Ursino2001_v02", "tissue_GE_simple", "tb", "mod", "default"],
+      ["mod", "ArgusUNPUBLISHED_v01", "venous_gas_mixing", "gc ga gb", "", "default"]
+    ],
+    "parameters": [
+      ["ta/R_1_T", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["ta/R_2_T", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["ta/C_T", "m6_per_J", 1e-09, "harness flow source"],
+      ["ta/I_T", "Js2_per_m6", 250000.0, "harness: I/R = 5 ms"],
+      ["ta/u_ext", "J_per_m3", 0.0, "harness"],
+      ["ta/u_in", "J_per_m3", 400.0, "harness: gives v_T = 4e-06 m3/s"],
+      ["ta/u_out", "J_per_m3", 0.0, "harness"],
+      ["ta/q_us", "m3", 0.0, "harness"],
+      ["ta/q_init", "m3", 2.0000000000000004e-07, "harness: equilibrium volume"],
+      ["ga/C_O2_a", "dimensionless", 0.199, "harness: arterial O2 content"],
+      ["ga/C_CO2_a", "dimensionless", 0.485, "harness: arterial CO2 content"],
+      ["ga/q_0", "m3", 5e-05, "harness: 50 ml, so the contents settle within the run"],
+      ["ga/M_O2", "m3_per_s", -1.8e-07, "harness: a different consumption per region"],
+      ["ga/M_CO2", "m3_per_s", 1.44e-07, "harness: RQ 0.8"],
+      ["tb/R_1_T", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["tb/R_2_T", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["tb/C_T", "m6_per_J", 1e-09, "harness flow source"],
+      ["tb/I_T", "Js2_per_m6", 250000.0, "harness: I/R = 5 ms"],
+      ["tb/u_ext", "J_per_m3", 0.0, "harness"],
+      ["tb/u_in", "J_per_m3", 200.0, "harness: gives v_T = 2e-06 m3/s"],
+      ["tb/u_out", "J_per_m3", 0.0, "harness"],
+      ["tb/q_us", "m3", 0.0, "harness"],
+      ["tb/q_init", "m3", 1.0000000000000002e-07, "harness: equilibrium volume"],
+      ["gb/C_O2_a", "dimensionless", 0.199, "harness: arterial O2 content"],
+      ["gb/C_CO2_a", "dimensionless", 0.485, "harness: arterial CO2 content"],
+      ["gb/q_0", "m3", 5e-05, "harness: 50 ml, so the contents settle within the run"],
+      ["gb/M_O2", "m3_per_s", -5e-08, "harness: a different consumption per region"],
+      ["gb/M_CO2", "m3_per_s", 4e-08, "harness: RQ 0.8"],
+      ["tc/R_1_T", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["tc/R_2_T", "Js_per_m6", 50000000.0, "harness flow source"],
+      ["tc/C_T", "m6_per_J", 1e-09, "harness flow source"],
+      ["tc/I_T", "Js2_per_m6", 250000.0, "harness: I/R = 5 ms"],
+      ["tc/u_ext", "J_per_m3", 0.0, "harness"],
+      ["tc/u_in", "J_per_m3", 800.0, "harness: gives v_T = 8e-06 m3/s"],
+      ["tc/u_out", "J_per_m3", 0.0, "harness"],
+      ["tc/q_us", "m3", 0.0, "harness"],
+      ["tc/q_init", "m3", 4.000000000000001e-07, "harness: equilibrium volume"],
+      ["gc/C_O2_a", "dimensionless", 0.199, "harness: arterial O2 content"],
+      ["gc/C_CO2_a", "dimensionless", 0.485, "harness: arterial CO2 content"],
+      ["gc/q_0", "m3", 5e-05, "harness: 50 ml, so the contents settle within the run"],
+      ["gc/M_O2", "m3_per_s", -3e-07, "harness: a different consumption per region"],
+      ["gc/M_CO2", "m3_per_s", 2.4e-07, "harness: RQ 0.8"]
+    ]
+  },
+  "invariants": [
+    {
+      "description": "the total flow is the sum of the regions' flows, v_mix = v_a + v_b + v_c",
+      "expr": "np.max(np.abs(v_mix - (ta__v_T + tb__v_T + tc__v_T))) <= 1e-12*np.max(np.abs(v_mix))"
+    },
+    {
+      "description": "O2: each region's content is weighted by its own flow, C_O2_mix = sum(v_i C_O2_i) / sum(v_i), wherever blood flows (|v| > 1e-12 m3/s: all but t = 0, when the harness terminals start from rest); the regions are listed in different orders for the terminals and the gas-exchange modules",
+      "expr": "np.max(np.abs(C_O2_mix[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)] - (ta__v_T*ga__C_O2_p + tb__v_T*gb__C_O2_p + tc__v_T*gc__C_O2_p)[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)]/(ta__v_T + tb__v_T + tc__v_T)[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)])) <= 1e-10*np.max(np.abs(C_O2_mix))"
+    },
+    {
+      "description": "CO2: C_CO2_mix = sum(v_i C_CO2_i) / sum(v_i), wherever blood flows",
+      "expr": "np.max(np.abs(C_CO2_mix[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)] - (ta__v_T*ga__C_CO2_p + tb__v_T*gb__C_CO2_p + tc__v_T*gc__C_CO2_p)[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)]/(ta__v_T + tb__v_T + tc__v_T)[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)])) <= 1e-10*np.max(np.abs(C_CO2_mix))"
+    },
+    {
+      "description": "wherever blood flows, the mix lies between the lowest and highest regional contents",
+      "expr": "np.all((C_O2_mix >= np.minimum(np.minimum(ga__C_O2_p, gb__C_O2_p), gc__C_O2_p) - 1e-12)[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)]) & np.all((C_O2_mix <= np.maximum(np.maximum(ga__C_O2_p, gb__C_O2_p), gc__C_O2_p) + 1e-12)[((ta__v_T + tb__v_T + tc__v_T) > 1e-12)])"
+    },
+    {
+      "description": "while no blood flows (t = 0 here) the mixed contents are 0, so they stay finite",
+      "expr": "np.all(C_O2_mix[~((ta__v_T + tb__v_T + tc__v_T) > 1e-12)] == 0) & np.all(C_CO2_mix[~((ta__v_T + tb__v_T + tc__v_T) > 1e-12)] == 0)"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "ranges": {},
+    "exclude": ["v", "J_CO2", "J_O2"],
+    "rationale": "Nothing of the component to sweep: v, J_CO2 and J_O2 are sums over the connected gas-exchange modules (formed by libcuflynx). The harness regions have different flows (2, 4 and 8 ml/s) and consumptions, so their contents differ and a content weighted by another region's flow would break the invariants."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [0.004, 0.002, 0.001, 0.0005],
+    "t_end": 5.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {"solver": "CVODE_myokit", "rtol": 1e-06, "atol": 1e-08}
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {"status": "not_applicable", "reason": "bookkeeping component (flow-weighted mix of contents); verified exactly."},
+      "calibrate": {"note": "not_applicable: bookkeeping component; nothing to calibrate."}
+    }
+  }
+}

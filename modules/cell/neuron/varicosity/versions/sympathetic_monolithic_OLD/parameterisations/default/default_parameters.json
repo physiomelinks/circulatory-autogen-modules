@@ -1,0 +1,383 @@
+{
+ "schema_version": 1,
+ "global": {
+  "F": {
+   "value": 96485,
+   "units": "C_per_mol",
+   "data_reference": "definitional; Faraday constant, SN_simple's rounding of the CODATA 2018 exact value 96485.33212 C/mol",
+   "sourced": "yes"
+  },
+  "N_avo": {
+   "value": 6.02e+23,
+   "units": "per_mol",
+   "data_reference": "SN_simple: known",
+   "sourced": "no"
+  },
+  "R": {
+   "value": 8.314,
+   "units": "J_per_mol_K",
+   "data_reference": "definitional; gas constant, SN_simple's rounding of the CODATA 2018 exact value 8.314462618 J/(mol K)",
+   "sourced": "yes"
+  },
+  "T": {
+   "value": 310.15,
+   "units": "kelvin",
+   "data_reference": "SN_simple: Tao2011",
+   "sourced": "no"
+  }
+ },
+ "c_init": {
+  "value": 0.01,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: Tau2011",
+  "sourced": "yes"
+ },
+ "hc_init": {
+  "value": 0.9,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: Tau2011",
+  "sourced": "yes"
+ },
+ "V_mid_c": {
+  "value": 8.1,
+  "units": "milliV",
+  "data_reference": "tao2011model; Supporting Material (Document S1) Eq. 91: c_inf V1/2 = -8.1 mV (= value). Tao's Ca current is a nonspecific high-voltage-activated current (Belluzzi-Sacchi), not specifically L- or N-type",
+  "sourced": "yes"
+ },
+ "V_den_c": {
+  "value": 5,
+  "units": "milliV",
+  "data_reference": "tao2011model; Supporting Material (Document S1) Eq. 91 (k = 9.85 mV); modified here to 5 mV (was 9.85)",
+  "sourced": "yes"
+ },
+ "tau_c_min": {
+  "value": 0.2,
+  "units": "millis",
+  "data_reference": "belluzzi1989calcium; Eq. 4 tau_c = 1/(...) + 0.1 ms (= tao2011model Document S1 Eq. 92); measured activation tau 0.29 ms at +30 mV (Summary, point 5; Fig. 6B) and tail tau 0.17-0.38 ms (p. 498); modified here to 0.2 ms (was 0.1) as the depolarised floor of a sigmoid",
+  "sourced": "yes"
+ },
+ "tau_c_max": {
+  "value": 3.0,
+  "units": "millis",
+  "data_reference": "owner's fit to davis2020downregulation current-clamp traces (CA_user ad0ce77 2024-07-21 = 1.0 ms; a7a4a58 2024-08-15 = 3.0 ms; CA token 'changed_from_belluzi1991_curves'). Cf. belluzzi1989calcium Eq. 4/Fig. 6B: tau_c max ~0.57 ms near -10 mV (37 degC); **3 ms is ~5x that and close to the I_Ca time-to-peak 2.3-2.7 ms (Table 1)**",
+  "sourced": "no"
+ },
+ "tau_hc": {
+  "value": 20.0,
+  "units": "millis",
+  "data_reference": "belluzzi1989calcium; Table 2 fast I_Ca inactivation tau_f 17.6-29.3 ms (-30 to +20 mV, 37 degC; 19.3 ms at 0 mV) and Eq. 6 (tau_hc = 17 + 1/(...), 17-30 ms; = tao2011model Document S1 Eq. 94); replaced here by a constant 20 ms (owner's simplification, 2024-07)",
+  "sourced": "yes"
+ },
+ "Cai_init": {
+  "value": 0.0001,
+  "units": "millimolar",
+  "data_reference": "SN_simple: hagiwara1981calcium",
+  "sourced": "yes"
+ },
+ "B_Ca_init": {
+  "value": 7.95,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "B_Ca_total": {
+  "value": 8,
+  "units": "millimolar",
+  "data_reference": "SN_simple: matveev2002new",
+  "sourced": "yes"
+ },
+ "k_bind_Ca": {
+  "value": 100000.0,
+  "units": "per_millimolar_s",
+  "data_reference": "SN_simple: Matveev2002_was_0.5e6",
+  "sourced": "yes"
+ },
+ "k_unbind_Ca": {
+  "value": 8000.0,
+  "units": "per_s",
+  "data_reference": "SN_simple: matveev2002new",
+  "sourced": "yes"
+ },
+ "k_bind_Ca_ER": {
+  "value": 500.0,
+  "units": "per_millimolar_s",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "k_unbind_Ca_ER": {
+  "value": 8000.0,
+  "units": "per_s",
+  "data_reference": "SN_simple: Matveev2002_for_k_unbind_Ca",
+  "sourced": "yes"
+ },
+ "Nai": {
+  "value": 13,
+  "units": "millimolar",
+  "data_reference": "SN_simple: BoronBoulpaep2017_was_15",
+  "sourced": "yes"
+ },
+ "Nao": {
+  "value": 145,
+  "units": "millimolar",
+  "data_reference": "SN_simple: boron2017medical",
+  "sourced": "yes"
+ },
+ "NE_init": {
+  "value": 0.0,
+  "units": "millimolar",
+  "data_reference": "definitional; no NE in the cleft at rest",
+  "sourced": "no"
+ },
+ "Cai_NE_base": {
+  "value": 0.0001,
+  "units": "millimolar",
+  "data_reference": "wanaverbecq2003plasma; resting [Ca2+]i 102 nM in rat SCG neurons: the release threshold is set to resting Ca (owner's model, CA_user b8488ae)",
+  "sourced": "yes"
+ },
+ "k_NE": {
+  "value": 200,
+  "units": "per_s",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "k_NET": {
+  "value": 100,
+  "units": "per_s",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "g_CaN": {
+  "value": 1e-05,
+  "units": "microS",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "Vol": {
+  "value": 1e-18,
+  "units": "m3",
+  "data_reference": "SN_simple: bennet1998Sympathetic",
+  "sourced": "no"
+ },
+ "Cao": {
+  "value": 2,
+  "units": "millimolar",
+  "data_reference": "SN_simple: Tau2011",
+  "sourced": "yes"
+ },
+ "cAMP": {
+  "value": 0.01,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "k_NaCa": {
+  "value": 0.15,
+  "units": "nanoA",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "alpha_NaCa": {
+  "value": 1.2,
+  "units": "dimensionless",
+  "data_reference": "paci2013computational; alpha = 2.857 (enhancement factor of the outward mode); **modified here to 1.2 (owner, CA_user ad0ce77, 2024-07-21)**",
+  "sourced": "yes"
+ },
+ "gamma_NaCa": {
+  "value": 0.35,
+  "units": "dimensionless",
+  "data_reference": "paci2013computational; i_NaCa: gamma = 0.35 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "Ksat": {
+  "value": 0.1,
+  "units": "dimensionless",
+  "data_reference": "paci2013computational; i_NaCa: Ksat = 0.1 (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "KmCa": {
+  "value": 1.38,
+  "units": "millimolar",
+  "data_reference": "paci2013computational; i_NaCa: KmCa = 1.38 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "KmNai": {
+  "value": 87.5,
+  "units": "millimolar",
+  "data_reference": "paci2013computational; i_NaCa: KmNai = 87.5 mM (= value; human iPSC-cardiomyocyte model, not verified for neurons)",
+  "sourced": "yes"
+ },
+ "Ca_ER_init": {
+  "value": 0.6,
+  "units": "millimolar",
+  "data_reference": "SN_simple: to_be_checked_in_neurons",
+  "sourced": "no"
+ },
+ "K_mf": {
+  "value": 0.0001,
+  "units": "millimolar",
+  "data_reference": "SN_simple: Shannon2004Mathematical_was_0.246e-3",
+  "sourced": "yes"
+ },
+ "K_mr": {
+  "value": 0.5,
+  "units": "millimolar",
+  "data_reference": "SN_simple: Shannon2004Mathematical",
+  "sourced": "yes"
+ },
+ "k_SERCA": {
+  "value": 1.5e-19,
+  "units": "mol_per_s",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "H_SERCA": {
+  "value": 1.787,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: Shannon2004Mathematical",
+  "sourced": "yes"
+ },
+ "tau_c_RyR": {
+  "value": 0.01,
+  "units": "millis",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "tau_hc_RyR": {
+  "value": 10,
+  "units": "millis",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "k_RyR": {
+  "value": 7.5e-17,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: to_be_identified",
+  "sourced": "no"
+ },
+ "Cai_RyR_mid": {
+  "value": 0.0008,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Cai_RyR_den": {
+  "value": 0.0001,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_mid": {
+  "value": 0.5,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_den": {
+  "value": 0.03,
+  "units": "millimolar",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_tau_mid": {
+  "value": 0.3,
+  "units": "millimolar",
+  "data_reference": "SN_simple: NOT_USED",
+  "sourced": "no"
+ },
+ "Ca_ER_RyR_tau_den": {
+  "value": 0.01,
+  "units": "millimolar",
+  "data_reference": "SN_simple: NOT_USED",
+  "sourced": "no"
+ },
+ "k_IP3": {
+  "value": 0.0,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "k_leak_Ca": {
+  "value": 2e-20,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "h_IP3_init": {
+  "value": 0.99,
+  "units": "dimensionless",
+  "data_reference": "unreferenced_placeholder; owner's initial value 0.99 (CA token 'user_defined')",
+  "sourced": "no"
+ },
+ "IP3": {
+  "value": 0.0002,
+  "units": "millimolar",
+  "data_reference": "li1994equations; IP3 0.2 uM, read from the paper's figures (they use 0.2-0.6 uM; owner's reading)",
+  "sourced": "yes"
+ },
+ "a_2": {
+  "value": 200,
+  "units": "per_millimolar",
+  "data_reference": "SN_simple: Li1994Equations",
+  "sourced": "no"
+ },
+ "d_1": {
+  "value": 0.00013,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d1 = 0.13 uM (= value)",
+  "sourced": "yes"
+ },
+ "d_2": {
+  "value": 0.001049,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d2 = 1.049 uM (= value)",
+  "sourced": "yes"
+ },
+ "d_3": {
+  "value": 0.000943,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d3 = 0.9434 uM (0.943 here) (= value)",
+  "sourced": "yes"
+ },
+ "d_5": {
+  "value": 8.234e-05,
+  "units": "millimolar",
+  "data_reference": "li1994equations; Table 1: d5 = 0.08234 uM (= value)",
+  "sourced": "yes"
+ },
+ "c_ER": {
+  "value": 0.01,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: Li1994Equations_was_0.185",
+  "sourced": "yes"
+ },
+ "c_SL": {
+  "value": 0.02,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined_TO_BE_FOUND",
+  "sourced": "no"
+ },
+ "D_Ca": {
+  "value": 3e-15,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: identified_by_hand",
+  "sourced": "no"
+ },
+ "c_ER_pre": {
+  "value": 0.049,
+  "units": "dimensionless",
+  "data_reference": "SN_simple: user_defined",
+  "sourced": "no"
+ },
+ "D_Ca_ER": {
+  "value": 2.4e-18,
+  "units": "m3_per_s",
+  "data_reference": "SN_simple: need_to_change_for_volume",
+  "sourced": "yes"
+ },
+ "V": {
+  "value": -70,
+  "units": "milliV",
+  "data_reference": "definitional; the membrane potential from the axon, the SN resting potential (-70 mV) when nothing is connected",
+  "sourced": "no"
+ }
+}

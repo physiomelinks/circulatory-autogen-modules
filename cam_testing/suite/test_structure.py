@@ -29,7 +29,7 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from cam_testing import bib, library, module_array, paths
-from cam_testing.library import (IDENTITY_KEYS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
+from cam_testing.library import (FIGURES, IDENTITY_KEYS, LICENCES, TESTS_KEYS, VERIFICATION_KEYS, VERSIONS,
                                  all_versions, ancestors_of, load_version, misplaced_spec_keys, module_relpath,
                                  module_type_names, parent_of, protocol_problems, read_spec_files)
 from cam_testing.mathml import component_names
@@ -230,6 +230,12 @@ def walk_modules():
             return
         if os.path.isdir(os.path.join(d, 'risk')):
             _check_files('risk', os.path.join(d, 'risk'), names, problems)
+        fdir = os.path.join(d, FIGURES)
+        if os.path.isdir(fdir):
+            problems.extend(f'{rel}/{FIGURES}: unexpected file {f} (not an svg, png or jpg)' for f in sorted(os.listdir(fdir))
+                            if not re.match(LEVELS['figures']['file_pattern'], f))
+        if tests.get('figures'):
+            problems.extend(f'{rel}: {p}' for p in load_version(mt, v).figure_problems())
         iroot = os.path.join(d, 'parameterisations')
         _check_files('parameterisations', iroot, {}, problems)
         if not _subdirs(iroot):
@@ -1036,3 +1042,12 @@ def test_system_model_has_a_reference_or_says_it_has_none(system):
     else:
         assert has_array or has_cellml, (f'{system.id}: no reference (reference/<model>_module_array.json or a CellML '
                                          f'model) and the spec\'s equivalence does not say so (status: not_applicable)')
+    # circulatory_autogen's original is compared as committed CellML: libcuflynx no longer has the
+    # built-in modules it was generated with
+    from cam_testing import system as systems
+    if (has_array and not has_cellml and not systems.original_cannot_generate(system)
+            and eq.get('status') not in ('not_applicable', 'skipped')):
+        pytest.fail(f'{system.id}: reference/ has circulatory_autogen\'s module array but not {system.name}.cellml, '
+                    f'the model generated from it: python -m cam_testing.system write-reference {system.id} (or, when '
+                    f'circulatory_autogen cannot generate it, expected_failures.system_equivalence_test saying '
+                    f'"{systems.CANNOT_GENERATE} (<its error>)")')

@@ -1,0 +1,77 @@
+{
+  "module_type": "valve",
+  "version": "pp_ideal_diode",
+  "sim_time": 1.0,
+  "pre_time": 0.0,
+  "dt": 0.01,
+  "solver": "CVODE_myokit",
+  "outputs": [
+    "open",
+    "v"
+  ],
+  "invariants": [
+    {
+      "description": "v = max(u_in - u_out, 0)/R: forward flow only, linear in the pressure difference",
+      "expr": "np.max(np.abs(v - np.maximum(u_in - u_out, 0)/R)) <= 1e-12*abs(u_in - u_out)/R + 1e-18"
+    },
+    {
+      "description": "open = 1 exactly when u_in > u_out",
+      "expr": "np.all(open == (1.0 if u_in > u_out else 0.0))"
+    }
+  ],
+  "bc_sweep": {
+    "factors": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0
+    ],
+    "ranges": {
+      "u_in": {
+        "min": 0.0,
+        "max": 26664.0,
+        "points": 5
+      },
+      "u_out": {
+        "min": 0.0,
+        "max": 26664.0,
+        "points": 5
+      }
+    },
+    "rationale": "resistance from a quarter to 4x the default; both pressures 0-200 mmHg, so the sweep has the valve open (u_in > u_out) and shut (u_in <= u_out)."
+  },
+  "timestep": {
+    "scheme": "rk4",
+    "dts": [
+      0.04,
+      0.02,
+      0.01,
+      0.005
+    ],
+    "t_end": 1.0,
+    "min_order": 0.8,
+    "tol": 0.0001,
+    "cvode_tol": 0.001
+  },
+  "stability": {
+    "supported": [
+      {
+        "solver": "CVODE_myokit",
+        "rtol": 1e-06,
+        "atol": 1e-08
+      }
+    ]
+  },
+  "validation": {
+    "default": {
+      "baseline": {
+        "status": "pending",
+        "reason": "no data: an idealised valve of the beat-map test hearts (ICUHealthy models/beat_tests)"
+      },
+      "calibrate": {
+        "note": "not_applicable: no data to calibrate against"
+      }
+    }
+  }
+}

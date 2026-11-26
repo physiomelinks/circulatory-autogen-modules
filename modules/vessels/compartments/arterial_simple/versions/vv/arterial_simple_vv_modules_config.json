@@ -22,6 +22,10 @@
         "variables": [
           "v_in",
           "u"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -37,6 +41,10 @@
         "variables": [
           "v_out",
           "u_d"
+        ],
+        "multi_port": [
+          "sum",
+          "True"
         ]
       },
       {
@@ -49,6 +57,19 @@
         "port_type": "volume_port",
         "variables": [
           "q"
+        ]
+      },
+      {
+        "port_type": "arterial_pressure_port",
+        "variables": [
+          "u"
+        ],
+        "multi_port": "True"
+        },
+        {
+        "port_type": "flow_feedback_port",
+        "variables": [
+          "v"
         ]
       }
     ],
@@ -95,6 +116,24 @@
         "m3",
         "access",
         "variable"
+      ],
+      [
+        "v_init",
+        "m3_per_s",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C_init",
+        "m3",
+        "access",
+        "constant"
+      ],
+      [
+        "q_C_d_init",
+        "m3",
+        "access",
+        "constant"
       ],
       [
         "q_0",
