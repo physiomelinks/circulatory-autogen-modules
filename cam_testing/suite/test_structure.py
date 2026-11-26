@@ -660,7 +660,8 @@ OBS_DATA = sorted(p for p in glob.glob(os.path.join(MODULES_DIR, '**', 'paramete
 
 def _parameters_file_problems(path):
     '''A parameterisation's parameters file: libcuflynx reads it (nested JSON rooted at the module), and each
-    parameter has the library's keys (value, units, data_reference and optionally sourced).'''
+    parameter has the library's keys (value, units, data_reference; optionally sourced, and libcuflynx's origin and
+    reason).'''
     from libcuflynx.utilities import parameters_file as pf
     try:
         rows = pf.read_parameter_rows(path, kind=pf.MODULE)
