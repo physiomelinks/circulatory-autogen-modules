@@ -57,3 +57,23 @@ def test_no_workflow_uses_ubuntu_latest():
         with open(path) as f:
             for number, line in enumerate(f, 1):
                 assert 'ubuntu-latest' not in line.split('#')[0], f'{path}:{number}'
+
+
+def test_only_the_setup_cache_job_saves_the_setup_caches():
+    '''module-tests.yml: every other job that uses the setup action needs setup-cache and only restores.'''
+    import yaml
+    with open(os.path.join(ROOT, '.github', 'workflows', 'module-tests.yml')) as f:
+        jobs = yaml.safe_load(f)['jobs']
+    users = {}
+    for name, job in jobs.items():
+        for step in job.get('steps', []):
+            if step.get('uses') == './.github/actions/setup':
+                users[name] = step.get('with', {})
+    assert 'setup-cache' in users and users['setup-cache'].get('save', 'true') != 'false'
+    for name, with_ in users.items():
+        if name != 'setup-cache':
+            needs = jobs[name]['needs']
+            assert 'setup-cache' in ([needs] if isinstance(needs, str) else needs), name
+            assert with_.get('save') == 'false', name
+            assert 'setup-cache.outputs.debs-key' in with_['debs-key'], name
+            assert 'setup-cache.outputs.venv-key' in with_['venv-key'], name
