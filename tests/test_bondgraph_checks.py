@@ -1,6 +1,8 @@
-"""The bond-graph checks (cam_testing/bondgraph.py): a version's CellDL document opens in the editor, and its
-annotated reactions have Rhea's participants and stoichiometry. Documents are built here; Rhea's reactions come
-from the package's cache (cam_testing/data/rhea)."""
+"""The bond-graph checks (cam_testing/bondgraph.py): a version's CellDL document opens in the editor, its
+annotated reactions have Rhea's participants and stoichiometry, and it is the same model as the version's CellML.
+Documents are built here; Rhea's reactions come from the package's cache (cam_testing/data/rhea). The CellDL-vs-CellML
+comparison is tested on small myokit models standing for the two CellML files; making CellML from a document needs
+the CellDL bridge (make celldl-setup)."""
 import os
 
 import pytest
@@ -75,6 +77,14 @@ def hexokinase(directory, rhea_ids=('17825',), substrates=(('Glc', 1), ('ATP', 1
     return write(directory, elements, bonds, **kw)
 
 
+@pytest.fixture
+def no_converter(monkeypatch):
+    '''The documents built here have no values to convert: the conversion is left out.'''
+    def unavailable(path, out_path):
+        raise bondgraph.ConverterUnavailable('left out in this test')
+    monkeypatch.setattr(bondgraph, 'convert', unavailable)
+
+
 def only(result):
     assert len(result.details) == 1, result.details
     return result.details[0]
@@ -84,7 +94,7 @@ def only(result):
 
 def test_a_version_without_a_bond_graph_is_not_applicable(tmp_path):
     version = Version(tmp_path)
-    for check in (bondgraph.celldl_check, bondgraph.reactions_check):
+    for check in (bondgraph.celldl_check, bondgraph.reactions_check, bondgraph.cellml_check):
         result = check(version)
         assert (result.status, result.message) == (checks.NOT_APPLICABLE, bondgraph.NOT_A_BONDGRAPH)
 
@@ -101,14 +111,12 @@ def test_the_report_shows_both_columns_as_not_applicable_without_a_bond_graph(tm
 
 # ---- opens in CellDL ----------------------------------------------------------------------------
 
-def test_a_document_the_editor_opens_passes(tmp_path, monkeypatch):
-    monkeypatch.delenv('BG_TOOLS', raising=False)
+def test_a_document_the_editor_opens_passes(tmp_path, no_converter):
     result = bondgraph.celldl_check(hexokinase(tmp_path))
     assert result.status == checks.PASSED, result.details
 
 
-def test_what_keeps_the_editor_from_opening_a_document_fails(tmp_path, monkeypatch):
-    monkeypatch.delenv('BG_TOOLS', raising=False)
+def test_what_keeps_the_editor_from_opening_a_document_fails(tmp_path, no_converter):
     version = hexokinase(tmp_path, undrawn=('ATP_c',), drawn_extra=('stray',))
     problems = bondgraph.celldl_check(version).details
     assert any('ATP_c is not drawn' in p for p in problems)
@@ -289,3 +297,106 @@ def test_a_reaction_of_protons_alone_compares_them_strictly(tmp_path):
     result = bondgraph.reactions_check(write(tmp_path / 'b', elements, [('H_c', 'Re_LEAK', 2), ('Re_LEAK', 'H_m', 1)]),
                                        load=lambda rid: LEAK)
     assert result.status == checks.FAILED
+
+
+# ---- the same model as the CellML ---------------------------------------------------------------------
+
+def _model(text):
+    import myokit
+    return myokit.parse_model(text)
+
+
+def _module(k_ab=2.0, k_ba=1.0, a0=3.0, b0=1.0, psi=-0.15):
+    '''A version's model, as cam_testing generates it: concentrations C_A, C_B [mM] and a membrane potential.'''
+    return _model(f"""[[model]]
+mod_module.C_A = {a0}
+mod_module.C_B = {b0}
+mod_module.psi_m = {psi}
+
+[environment]
+time = 0 bind time
+
+[mod_module]
+dot(C_A) = -{k_ab} * C_A + {k_ba} * C_B
+dot(C_B) = {k_ab} * C_A - {k_ba} * C_B
+dot(psi_m) = -0.5 * (psi_m + 0.1)
+""")
+
+
+def _document(k_ab=2.0, k_ba=1.0, a0=3.0, b0=1.0, volume=2e-15, capacitance=5e-13, psi=-0.15):
+    '''The CellML made from its CellDL document: amounts q [mol], and the membrane capacitor's charge.'''
+    return _model(f"""[[model]]
+main.q_A_c = {a0 * volume}
+main.q_B_c = {b0 * volume}
+main.q_psi_m = {psi * capacitance}
+
+[environment]
+time = 0 bind time
+
+[main]
+dot(q_A_c) = -{k_ab} * q_A_c + {k_ba} * q_B_c
+dot(q_B_c) = {k_ab} * q_A_c - {k_ba} * q_B_c
+dot(q_psi_m) = -0.5 * (q_psi_m + 0.1 * {capacitance})
+""")
+
+
+def test_the_documents_stores_pair_with_the_cellmls_states():
+    pairs, only_document, only_module = bondgraph.state_pairs(
+        ['mod_module.C_Pyr_m', 'mod_module.C_NAD_m', 'mod_module.C_cytc_ox', 'mod_module.psi_m', 'mod_module.C_G6P'],
+        ['main.q_Pyr_m', 'main.q_NAD_m', 'main.q_cytcox_p', 'main.q_psi_m', 'main.q_F6P_c'])
+    assert pairs == {'main.q_Pyr_m': 'mod_module.C_Pyr_m', 'main.q_NAD_m': 'mod_module.C_NAD_m',
+                     'main.q_cytcox_p': 'mod_module.C_cytc_ox', 'main.q_psi_m': 'mod_module.psi_m'}
+    assert only_document == ['main.q_F6P_c'] and only_module == ['mod_module.C_G6P']
+
+
+def test_the_same_model_passes():
+    problems, metrics = bondgraph.compare_models(_module(), _document(), 'mod_module')
+    assert problems == [], problems
+    assert metrics['pairs'] == 3 and metrics['volume'] == pytest.approx(2e-15)
+    assert metrics['worst_difference'] < 1e-8
+
+
+def test_a_different_rate_fails():
+    problems, _ = bondgraph.compare_models(_module(), _document(k_ab=2.2), 'mod_module')
+    assert problems and all('differs by' in p for p in problems)
+    assert {p.split(' ')[0] for p in problems} == {'C_A', 'C_B'}
+
+
+def test_stores_in_different_volumes_fail_before_running():
+    document = _document()
+    document.get('main.q_B_c').set_initial_value(1.0 * 3e-15)
+    problems, _ = bondgraph.compare_models(_module(), document, 'mod_module')
+    assert len(problems) == 1 and "not the CellML's initial concentrations in one volume" in problems[0]
+
+
+def test_a_store_in_one_model_only_fails():
+    problems, _ = bondgraph.compare_models(_module(), _model("""[[model]]
+main.q_A_c = 6e-15
+
+[environment]
+time = 0 bind time
+
+[main]
+dot(q_A_c) = 0
+"""), 'mod_module')
+    assert 'C_B is in the CellML but not the CellDL document' in problems
+    assert 'psi_m is in the CellML but not the CellDL document' in problems
+
+
+def test_models_without_stores_have_nothing_to_compare():
+    empty = """[[model]]
+
+[environment]
+time = 0 bind time
+
+[mod_module]
+v = 2
+"""
+    problems, metrics = bondgraph.compare_models(_model(empty), _model(empty.replace('mod_module', 'main')),
+                                                 'mod_module')
+    assert problems == [] and metrics['pairs'] == 0
+
+
+def test_without_the_bridge_the_cellml_test_is_skipped(tmp_path, no_converter):
+    result = bondgraph.cellml_check(hexokinase(tmp_path))
+    assert result.status == checks.SKIPPED and result.message.startswith('not run')

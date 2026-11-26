@@ -32,7 +32,7 @@ MARKERS = [
 QUICK_TESTS = ('review_test', 'run_test', 'verification_test_rhs', 'supermodule_structure_test', 'supermodule_equivalence_test',
                'phlynx_export_test', 'cuflynx_simulate_test', 'phlynx_equivalence_test',
                'cuflynx_parameterisation_omex_test', 'bondgraph_celldl_test', 'bondgraph_reactions_test',
-               'data_sources_test')
+               'bondgraph_cellml_test', 'data_sources_test')
 
 
 def pytest_addoption(parser):
