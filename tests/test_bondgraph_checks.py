@@ -349,6 +349,40 @@ def test_the_documents_stores_pair_with_the_cellmls_states():
     assert only_document == ['main.q_F6P_c'] and only_module == ['mod_module.C_G6P']
 
 
+def test_stores_pair_with_amount_states_with_or_without_a_location():
+    pairs, only_document, only_module = bondgraph.state_pairs(
+        ['mod_module.q_E', 'mod_module.q_EK_i', 'mod_module.q_Na2S_o', 'mod_module.q_X'],
+        ['main.q_E', 'main.q_EKi', 'main.q_Na2S_o', 'main.q_Y'])
+    assert pairs == {'main.q_E': 'mod_module.q_E', 'main.q_EKi': 'mod_module.q_EK_i',
+                     'main.q_Na2S_o': 'mod_module.q_Na2S_o'}
+    assert only_document == ['main.q_Y'] and only_module == ['mod_module.q_X']
+
+
+def _cycle(k=2.0, e0=1.0, ek0=0.5, unit=1.0, prefix='mod_module'):
+    '''A two-state cycle in amounts: the version's in fmol (unit 1), the document's in mol (unit 1e-15).'''
+    return _model(f"""[[model]]
+{prefix}.q_E = {e0 * unit}
+{prefix}.q_EK = {ek0 * unit}
+
+[environment]
+time = 0 bind time
+
+[{prefix}]
+dot(q_E) = -{k} * q_E + q_EK
+dot(q_EK) = {k} * q_E - q_EK
+""")
+
+
+def test_amount_states_compare_by_one_unit_factor():
+    problems, metrics = bondgraph.compare_models(_cycle(), _cycle(unit=1e-15, prefix='main'), 'mod_module')
+    assert problems == [], problems
+    assert metrics['pairs'] == 2 and metrics['worst_difference'] < 1e-8
+    document = _cycle(unit=1e-15, prefix='main')
+    document.get('main.q_EK').set_initial_value(0.5e-12)
+    problems, _ = bondgraph.compare_models(_cycle(), document, 'mod_module')
+    assert len(problems) == 1 and "not the CellML's initial amounts in one unit" in problems[0]
+
+
 def test_the_same_model_passes():
     problems, metrics = bondgraph.compare_models(_module(), _document(), 'mod_module')
     assert problems == [], problems
