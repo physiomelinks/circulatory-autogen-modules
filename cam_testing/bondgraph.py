@@ -507,24 +507,26 @@ def _squash(name):
 
 
 def state_pairs(module_states, document_states):
-    '''Pairs each of the document's states (``q_<species>_<location>``, a store's amount; a membrane capacitor's
-    charge, ``q_psi_<location>``) with the version's (``C_<name>``, a concentration; ``psi_<location>``): a store's
-    species, with or without its location after it, is the name without its underscores. Returns
+    '''Pairs each of the document's states (``q_<species>_<location>``, or ``q_<species>`` for a store with no
+    location: a store's amount; a membrane capacitor's charge, ``q_psi_<location>``) with the version's
+    (``C_<name>``, a concentration; ``q_<name>``, an amount; ``psi_<location>``): a store's species, with or without
+    its location after it, is the name without its underscores. Returns
     ({document state: module state}, [document states with none], [module states with none]).'''
     by_squashed = {}
     for m in module_states:
         local = m.rsplit('.', 1)[-1]
-        if local.startswith('C_'):
+        if local.startswith(('C_', 'q_')):
             by_squashed.setdefault(_squash(local[2:]), []).append(m)
         elif local.startswith('psi_'):
             by_squashed.setdefault('psi' + local[4:], []).append(m)
     pairs, unpaired = {}, []
     for d in document_states:
         local = d.rsplit('.', 1)[-1]
-        if not local.startswith('q_') or '_' not in local[2:]:
+        if not local.startswith('q_') or len(local) == 2:
             unpaired.append(d)
             continue
-        species, location = local[2:].rsplit('_', 1)
+        body = local[2:]
+        species, location = body.rsplit('_', 1) if '_' in body else (body, '')
         for key in (_squash(species) + location, _squash(species)):
             found = [m for m in by_squashed.get(key, []) if m not in pairs.values()]
             if len(found) == 1:
@@ -533,7 +535,7 @@ def state_pairs(module_states, document_states):
         else:
             unpaired.append(d)
     return pairs, unpaired, [m for m in module_states if m not in pairs.values()
-                             and m.rsplit('.', 1)[-1].startswith(('C_', 'psi_'))]
+                             and m.rsplit('.', 1)[-1].startswith(('C_', 'q_', 'psi_'))]
 
 
 def _simulate(model, initial, t_end, points):
@@ -552,8 +554,9 @@ def compare_models(module_model, document_model, own_component, t_end=CELLML_T_E
                    rtol=CELLML_RTOL):
     '''Runs the version's model and the document's from the same state, the version's default parameterisation with
     each paired store moved by PERTURBATION in turn (the document's by the same factor), and compares every paired state
-    over time. The document's amounts are the version's concentrations times a volume, the same for every store (a
-    capacitor's charge its potential times a capacitance), read from their initial values. Returns (problems, metrics).'''
+    over time. The document's amounts are the version's concentrations times a volume, the same for every store, or
+    the version's amounts in other units, by one factor for every store (a capacitor's charge its potential times a
+    capacitance), read from their initial values. Returns (problems, metrics).'''
     module_states = [s.qname() for s in module_model.states() if s.qname().startswith(own_component + '.')]
     document_states = [s.qname() for s in document_model.states()]
     pairs, only_document, only_module = state_pairs(module_states, document_states)
@@ -567,10 +570,15 @@ def compare_models(module_model, document_model, own_component, t_end=CELLML_T_E
             problems.append(f'{m.rsplit(".", 1)[-1]} starts at 0: its scale against {d} is not known')
         else:
             scale[d] = d0[d] / m0[m]
-    volumes = [x for d, x in scale.items() if not d.rsplit('.', 1)[-1].startswith('q_psi_')]
+    def kind(prefix):
+        return [x for d, x in scale.items() if pairs[d].rsplit('.', 1)[-1].startswith(prefix)]
+    volumes, factors = kind('C_'), kind('q_')
     if volumes and max(volumes) - min(volumes) > 1e-6 * abs(max(volumes, key=abs)):
         problems.append('the document\'s stores are not the CellML\'s initial concentrations in one volume: '
                         f'amount over concentration from {min(volumes):.6g} to {max(volumes):.6g}')
+    if factors and max(factors) - min(factors) > 1e-6 * abs(max(factors, key=abs)):
+        problems.append('the document\'s stores are not the CellML\'s initial amounts in one unit: '
+                        f'amount over amount from {min(factors):.6g} to {max(factors):.6g}')
     metrics = {'pairs': len(pairs), 'volume': volumes[0] if volumes else None}
     if problems or not pairs:
         return problems, metrics

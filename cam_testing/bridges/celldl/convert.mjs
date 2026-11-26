@@ -3,9 +3,11 @@
  *
  *   node cam_testing/bridges/celldl/convert.mjs <document.svg> <out.cellml>
  *
- * The converter is @physiomelinks/bg2cellml (the celldl2cellml repo), with the BG-RDF framework the CellDL editor
- * bundles (@celldl/editor/bgrdf), at the versions PhLynx pins (package.json). Prints a JSON report on stdout:
- * { ok, issues, generator }. Exits 0 when the converter ran (ok says whether it made CellML), 3 when the bridge
+ * The converter is @physiomelinks/bg2cellml (the celldl2cellml repo), through convert(), with the BG-RDF framework the
+ * CellDL editor bundles (@celldl/editor/bgrdf), at the versions PhLynx pins (package.json). A document whose
+ * transformers end at a voltage source, or that sets its own RT (bgf:constantValue), needs converter 0.6.3: set
+ * CELLDL_BRIDGE_DIR to a build of it until it is released. Prints a JSON report on stdout: { ok, issues, warnings,
+ * generator }, where issues are the converter's errors (ok is false with any) and warnings don't stop it. Exits 0 when the converter ran (ok says whether it made CellML), 3 when the bridge
  * can't run (its packages aren't installed: npm ci here, or set CELLDL_BRIDGE_DIR to a directory where they are).
  */
 import { readFile, writeFile } from 'node:fs/promises'
@@ -53,9 +55,10 @@ const { version } = JSON.parse(await readFile(req.resolve('@physiomelinks/bg2cel
 const converter = new Converter({ libcellml: await createLibCellML(), oxigraph })
 const frameworkIssues = converter.loadFramework(bgRdfFramework())
 const document = await readFile(documentPath, 'utf8')
-const result = await converter.celldl2cellml(document, { sourceUri: pathToFileURL(path.resolve(documentPath)).href })
-const issues = [...(frameworkIssues || []), ...(result.issues || [])].map(String)
+const result = await converter.convert(document, { sourceUri: pathToFileURL(path.resolve(documentPath)).href })
+const text = (issue) => [issue.severity, issue.stage, issue.elementId].filter(Boolean).join(' ') + `: ${issue.message}`
+const issues = [...(frameworkIssues || []).map(String), ...(result.errors || []).map(text)]
 if (result.exception) issues.push(`exception: ${String(result.exception).split('\n')[0]}`)
 if (result.cellml) await writeFile(outPath, result.cellml)
-console.log(JSON.stringify({ ok: Boolean(result.cellml) && !issues.length, issues,
+console.log(JSON.stringify({ ok: Boolean(result.ok) && !issues.length, issues, warnings: (result.warnings || []).map(text),
                              generator: { name: '@physiomelinks/bg2cellml', version } }))
