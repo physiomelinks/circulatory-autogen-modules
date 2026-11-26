@@ -90,6 +90,8 @@
         ],
         "optional": [
           "{module_type}_{version}_references_proposed.bib",
+          "{module_type}_{version}_bondgraph.svg",
+          "{module_type}_{version}_bondgraph.ttl",
           "{module_type}_{version}.html",
           "{module_type}_{version}_model.py"
         ]
@@ -137,13 +139,15 @@
         "ignored_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.omex$",
         "generated_note": "Built by tools/build_parameterisation_omex.py (make omex) from the files above and the version's files; not committed. A COMBINE archive for CUFLynx: the flattened model of the version's test network with this parameterisation's parameters as master, the obs_data and params_for_id, and every input incl. the verification config."
       },
-      "parameters_note": "{parameterisation}_parameters.json (and _calibrated_parameters.json) is libcuflynx's nested JSON rooted at the module: own variables at the top, globals under \"global\", a supermodule's instances nested; each parameter has the keys in parameters_columns (sourced optional).",
+      "parameters_note": "{parameterisation}_parameters.json (and _calibrated_parameters.json) is libcuflynx's nested JSON rooted at the module: own variables at the top, globals under \"global\", a supermodule's instances nested; each parameter has the keys in parameters_columns (sourced, origin and reason optional; origin and reason are libcuflynx's: what set the value, and why when it is set_by_hand).",
       "parameters_columns": [
         "variable_name",
         "units",
         "value",
         "data_reference",
-        "sourced"
+        "sourced",
+        "origin",
+        "reason"
       ],
       "directories": [],
       "subdirectories": {

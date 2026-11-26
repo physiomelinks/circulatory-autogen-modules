@@ -8,11 +8,7 @@ equivalence: {status: not_applicable, reason: 'no reference: circulatory_autogen
     uses a heart supermodule; closed_loop_cvs/obsolete_3compartment is the library''s flat-heart check'}
 invariants: []
 notes: ['the original heart had fewer than two outputs, so circulatory_autogen added par/pvn implicitly; they are explicit
-    here', 'Converted to a heart supermodule in physiomelinks/circulatory-autogen-modules#35. Neither its circulatory_autogen
-    original nor the model generates (the original doesn''t generate in circulatory_autogen either: Delta_q_us_venous_* is
-    m3 in the parameters file but dimensionless in venous vp''s config), so neither its equivalence with the original nor
-    the conversion could be checked by simulation. The flat-heart reference was then removed. closed_loop_cvs/obsolete_3compartment,
+    here', 'Its heart is a heart supermodule (physiomelinks/circulatory-autogen-modules#35). The conversion from the
+    flat-heart circulatory_autogen original was not checked by simulation, because the original does not generate. closed_loop_cvs/obsolete_3compartment,
     the one flat-heart system model, is the flat-heart check: heart Argus2026_v01''s supermodule.equivalent entry requires
     closed_loop_cvs/3compartment to reproduce it.']
-expected_failures: {system_run_test: 'the original doesn''t generate in circulatory_autogen either: Delta_q_us_venous_* is
-    m3 in the parameters file but dimensionless in venous vp''s config'}
