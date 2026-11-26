@@ -126,6 +126,9 @@ window.addEventListener('DOMContentLoaded', function () {
     <h2 id="parameters-h">Parameters</h2>
     {%- if parameters %}
     <p class="muted" style="margin:0;font-size:0.86rem">The values of <code>{{ parameters_file }}</code>, which win over the parameterisations' values.</p>
+    {%- if workflow_stale %}
+    <p class="muted" style="margin:0;font-size:0.86rem"><strong>Stale:</strong> these are the calibration workflow's result for inputs that have changed since ({{ workflow_stale|join('; ') }}). Rerun the workflow to refresh them.</p>
+    {%- endif %}
     {%- for g in parameters %}
     <details><summary><span class="mono">{{ g.name }}</span> · {{ g.rows|length }} value{{ '' if g.rows|length == 1 else 's' }}</summary>
     <div class="table-wrap"><table>

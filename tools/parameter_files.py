@@ -3,7 +3,7 @@ Parameters and params_for_id files written by the tools, in the forms libcuflynx
 parameters (``libcuflynx.utilities.parameters_file``) and flat JSON params_for_id
 (``libcuflynx.utilities.params_for_id_file``). The tools build rows; these write them.
 
-* ``write_model_parameters``: a system model's ``<model>_parameters.json`` from rows named
+* ``write_model_parameters``: a system model's parameter set (``parameterisations/<p>/<p>_parameters.json``) from rows named
   ``<vessel>/<variable>``, or ``{variable}_{vessel}`` as the older tools write them, which are
   rewritten against the model's module array by libcuflynx's ``parameter-names``;
 * ``write_parameterisation``: a parameterisation's ``<p>_parameters.json`` (rooted at its module,
@@ -31,6 +31,7 @@ def write_model_parameters(path, rows, module_array=None, module_library_dirs=()
     its vessels is then rewritten ``<vessel>/<variable>`` (``cuflynx-upgrade parameter-names``,
     checked against the modules of ``module_library_dirs``, without libcuflynx's built-in
     ones)."""
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     pf.write_parameter_rows(path, rows, pf.MODEL)
     if module_array is not None:
         from libcuflynx.scripts.migrate_parameter_names import main as parameter_names

@@ -34,7 +34,7 @@ import tempfile
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from cam_testing.system import compare, generate, simulate, system_models  # noqa: E402
+from cam_testing.system import compare, generate, parameters_path, simulate, system_models  # noqa: E402
 
 SOLVER_INFO = {'rtol': 1e-10, 'atol': 1e-12}
 RHS_TOL = 100.0     # a difference of up to this many times the rounding noise is rounding
@@ -85,7 +85,7 @@ def _generate(system, work):
             dropped += names
         copy_dir = os.path.join(work, f'system_copy{attempt}', system.name)
         shutil.copytree(system.dir, copy_dir, ignore=shutil.ignore_patterns('results', 'plots', 'reference'))
-        params = os.path.join(copy_dir, f'{system.name}_parameters.json')
+        params = parameters_path(copy_dir, system.parameterisation)
         doc = json.load(open(params))
         for name in dropped:
             doc.get('global', {}).pop(name, None)

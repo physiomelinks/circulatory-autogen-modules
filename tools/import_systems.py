@@ -3,7 +3,7 @@ Import circulatory_autogen's system models (resources/<model>_module_array.csv a
 _parameters.json, plus obs_data / params_for_id when present) into
 
     system_models/<category>/<model>/
-        <model>_module_array.json, <model>_parameters.json the model, using the module library;
+        <model>_module_array.json, parameterisations/default/default_parameters.json the model, using the module library;
                                                            a heart is split into clock/chambers/valves
         reference/<model>_module_array.json, _parameters.json circulatory_autogen's original (module array as JSON),
                                                            for the equivalence test
@@ -38,6 +38,7 @@ from cam_testing import module_array  # noqa: E402
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rekey_bib  # noqa: E402  (tools/rekey_bib.py)
 from cam_testing.library import read_config  # noqa: E402
+from cam_testing.system import parameters_path  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SYSTEM_DIR = os.path.join(REPO, 'system_models')
@@ -377,7 +378,8 @@ def import_model(ca_dir, model, category, configs):
     # this library's (module_type, version) names, each record with its default parameterisation
     module_array.write_records(os.path.join(dest, f'{model}_module_array.json'), module_array.to_library_versions(rows))
     if os.path.isfile(pa):
-        pf.write_parameter_rows(os.path.join(dest, f'{model}_parameters.json'), params)
+        os.makedirs(os.path.dirname(parameters_path(dest)), exist_ok=True)
+        pf.write_parameter_rows(parameters_path(dest), params)
     for extra in ('obs_data.json', 'params_for_id.json'):
         src = os.path.join(res, f'{model}_{extra}')
         if not os.path.isfile(src):

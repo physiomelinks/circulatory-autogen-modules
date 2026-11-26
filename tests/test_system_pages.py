@@ -51,7 +51,8 @@ def repo(tmp_path):
     sdir = root / 'system_models' / 'demo' / 'chain'
     (sdir / 'results').mkdir(parents=True)
     (sdir / 'chain_module_array.json').write_text(json.dumps(RECORDS))
-    (sdir / 'chain_parameters.json').write_text(json.dumps(PARAMETERS))
+    (sdir / 'parameterisations' / 'default').mkdir(parents=True)
+    (sdir / 'parameterisations' / 'default' / 'default_parameters.json').write_text(json.dumps(PARAMETERS))
     (sdir / 'chain_system.yaml').write_text('model: chain\ncategory: demo\nsim_time: 1.0\n'
                                             'description: An inlet feeding an artery, with a heart.\n'
                                             'notes: [a note]\n')
