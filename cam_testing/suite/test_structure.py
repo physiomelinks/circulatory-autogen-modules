@@ -389,13 +389,18 @@ def test_system_models_directory_layout():
         _name_ok('system_category', cat, cdir, problems)
         _check_files('system_category', cdir, {}, problems)
         for model in _subdirs(cdir):
-            mdir = os.path.join(cdir, model)
-            _name_ok('system_model', model, mdir, problems)
-            _check_files('system_model', mdir, {'model': model}, problems)
-            for c in _subdirs(mdir):
-                if c not in {_fill(x, {'model': model}) for x in LEVELS['system_model']['directories']}:
-                    problems.append(f'{os.path.relpath(mdir, REPO_ROOT)}: unexpected directory {c}')
+            _check_system_model(os.path.join(cdir, model), problems)
     assert not problems, '\n'.join(problems)
+
+
+def _check_system_model(mdir, problems):
+    '''One system model's name, files and directories against the schema's system_model level.'''
+    model = os.path.basename(mdir)
+    _name_ok('system_model', model, mdir, problems)
+    _check_files('system_model', mdir, {'model': model}, problems)
+    for c in _subdirs(mdir):
+        if c not in {_fill(x, {'model': model}) for x in LEVELS['system_model']['directories']}:
+            problems.append(f'{os.path.relpath(mdir, REPO_ROOT)}: unexpected directory {c}')
 
 
 SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_module_array.json')))
