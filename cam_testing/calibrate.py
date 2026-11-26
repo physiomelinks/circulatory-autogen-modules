@@ -529,7 +529,7 @@ def _system_models(root=None):
     parameters_path the set a module recalibration writes into, its uncalibrated set when it has a
     calibration workflow (``workflow`` True), else its default set."""
     from cam_testing import paths
-    from cam_testing.system import DEFAULT, UNCALIBRATED, parameters_path
+    from cam_testing.system import DEFAULT, PARAMETERISATIONS, UNCALIBRATED, parameters_path
     root = root or paths.roots().system_models_dir
     out = []
     for d, _dirs, files in os.walk(root):
@@ -538,7 +538,7 @@ def _system_models(root=None):
                 name = f[:-len('_module_array.json')]
                 with open(os.path.join(d, f)) as fh:
                     vessels = json.load(fh)
-                workflow = os.path.isfile(os.path.join(d, 'parameterisations', UNCALIBRATED,
+                workflow = os.path.isfile(os.path.join(d, PARAMETERISATIONS, UNCALIBRATED,
                                                        f'{name}_calibration_workflow.json'))
                 out.append({'key': os.path.relpath(d, root).replace(os.sep, '/'), 'dir': d, 'vessels': vessels,
                             'array_path': os.path.join(d, f), 'workflow': workflow,
