@@ -89,6 +89,11 @@ def bondgraph_reactions_test(component_key):
     _assert(checks.save(version, bondgraph.reactions_check(version)), version)
 
 
+def bondgraph_cellml_test(component_key):
+    version = load_version(*component_key)
+    _assert(checks.save(version, bondgraph.cellml_check(version)), version)
+
+
 # ---- reduced versions (N/A for a version with no reduced_from) ------------------------------------
 
 def reduction_test(component_key, tmp_path):
