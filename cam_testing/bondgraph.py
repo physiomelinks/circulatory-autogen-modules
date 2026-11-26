@@ -21,8 +21,9 @@ bondgraph_reactions_test  Every reaction annotated with a Rhea reaction (bqbiol:
 
 CellML is made from a document by PhLynx's converter, @physiomelinks/bg2cellml (the celldl2cellml repo), with
 the CellDL editor's BG-RDF framework, through cam_testing/bridges/celldl/convert.mjs under node (npm ci in
-cam_testing/bridges/celldl, or set CELLDL_BRIDGE_DIR to a directory with its packages). Without node or the
-bridge's packages, the conversion and bondgraph_cellml_test are not run.
+cam_testing/bridges/celldl, or set CELLDL_BRIDGE_DIR to a directory with its packages). Set BGRDF_DIR to a BG-RDF
+checkout to convert with its ontology and templates instead of the bundled ones (e.g. for templates not released
+yet). Without node or the bridge's packages, the conversion and bondgraph_cellml_test are not run.
 
 The annotation format is BG-RDF's: see the CellDL editor's Annotations panel (FinbarArgus/CellDLEditorComponent,
 src/plugins/bondgraph/annotations.ts) and bg2cellml's OMEX export of it.
