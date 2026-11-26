@@ -1,50 +1,117 @@
 name: Install libcuflynx and the test package
 description: >
-  System libraries libcuflynx needs (ci/apt-packages.txt), then requirements.txt (libcuflynx +
-  cam_testing, every other package pinned by ci/constraints.txt) in a virtualenv, both cached in ~/.cam-setup under the key of ci/setup_key.sh. The
+  System libraries libcuflynx needs (ci/apt-packages.txt) and requirements.txt (libcuflynx +
+  cam_testing, every other package pinned by ci/constraints.txt) in a virtualenv, each in its own cache
+  (keys of ci/setup_key.sh). With save=true (the setup-cache job, or a workflow with one job) a miss
+  installs from the network and saves the cache; with save=false the cache is only restored. The
   setup-check job compares a fresh install with the cached one.
+inputs:
+  save:
+    description: install and save on a cache miss ('true'), or only restore the cache ('false')
+    default: 'true'
+  debs-key:
+    description: key of the system libraries cache (ci/setup_key.sh debs); computed here when empty
+    default: ''
+  venv-key:
+    description: key of the virtualenv cache (ci/setup_key.sh venv); computed here when empty
+    default: ''
 outputs:
-  cache-hit:
-    description: whether the setup came from the cache
-    value: ${{ steps.cache.outputs.cache-hit }}
+  debs-hit:
+    description: whether the system libraries came from the cache
+    value: ${{ steps.debs.outputs.cache-hit || steps.debs-restore.outputs.cache-hit }}
+  venv-hit:
+    description: whether the virtualenv came from the cache
+    value: ${{ steps.venv.outputs.cache-hit || steps.venv-restore.outputs.cache-hit }}
 runs:
   using: composite
   steps:
     - id: key
       shell: bash
-      run: echo "key=$(bash ci/setup_key.sh)" >> "$GITHUB_OUTPUT"
-    - id: cache
+      run: |
+        echo "debs=${{ inputs.debs-key }}" >> "$GITHUB_OUTPUT"
+        echo "venv=${{ inputs.venv-key }}" >> "$GITHUB_OUTPUT"
+        [ -n "${{ inputs.debs-key }}" ] || echo "debs=$(bash ci/setup_key.sh debs)" >> "$GITHUB_OUTPUT"
+        [ -n "${{ inputs.venv-key }}" ] || echo "venv=$(bash ci/setup_key.sh venv)" >> "$GITHUB_OUTPUT"
+    # System libraries: ~/.cam-setup-apt/{debs,lists}
+    - id: debs
+      if: inputs.save == 'true'
       uses: actions/cache@v4
       with:
-        path: ~/.cam-setup
-        key: ${{ steps.key.outputs.key }}
-    - name: System libraries (cached .deb files, no network)
-      if: steps.cache.outputs.cache-hit == 'true'
+        path: ~/.cam-setup-apt
+        key: ${{ steps.key.outputs.debs }}
+    - id: debs-restore
+      if: inputs.save != 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.cam-setup-apt
+        key: ${{ steps.key.outputs.debs }}
+    - name: System libraries (cached .deb files and apt lists, no network)
+      id: offline
+      if: steps.debs.outputs.cache-hit == 'true' || steps.debs-restore.outputs.cache-hit == 'true'
       shell: bash
-      # -G: never downgrade a package the runner image already has newer
-      run: sudo dpkg -i -G --skip-same-version ~/.cam-setup/debs/*.deb > /dev/null
-    - name: System libraries (apt; the .deb files kept for the cache)
-      if: steps.cache.outputs.cache-hit != 'true'
+      # apt installs what this runner image lacks from the cached closure and leaves the rest alone
+      run: |
+        C=$HOME/.cam-setup-apt
+        if sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-download \
+            -o Dir::State::lists=$C/lists -o Dir::Cache::archives=$C/debs \
+            $(cat ci/apt-packages.txt) > /dev/null; then
+          echo "ok=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "::warning::installing the cached system libraries failed; using apt over the network"
+        fi
+    - name: System libraries (apt over the network; with save=true the closure and apt lists kept for the cache)
+      if: steps.offline.outputs.ok != 'true'
       shell: bash
       # apt sometimes hangs on a slow mirror (once a whole 30 min job; a hung try then took 10 min while
-      # the retry took 1.5): a normal run takes ~1 min, so each try gets 1.5 + 3 min, three tries
+      # the retry took 1.5): a normal run takes ~1 min, so each try gets 1.5 + 3 min, three tries.
+      # DEBIAN_FRONTEND: a package's debconf prompt (e.g. tzdata) must not block the job.
       run: |
-        mkdir -p ~/.cam-setup/debs/partial
+        C=$HOME/.cam-setup-apt
+        rm -rf $C && mkdir -p $C/debs/partial
+        export DEBIAN_FRONTEND=noninteractive
         APT="-o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
-        KEEP="-o Dir::Cache::archives=$HOME/.cam-setup/debs -o APT::Keep-Downloaded-Packages=true"
+        KEEP="-o Dir::Cache::archives=$C/debs -o APT::Keep-Downloaded-Packages=true"
         for i in 1 2 3; do
-          timeout 90 sudo apt-get $APT update -qq && \
-            timeout 180 sudo apt-get $APT $KEEP install -y -qq $(cat ci/apt-packages.txt) && break
+          timeout 90 sudo -E apt-get $APT update -qq && \
+            timeout 180 sudo -E apt-get $APT $KEEP install -y -qq $(cat ci/apt-packages.txt) && break
           echo "::warning::apt try $i failed or timed out; retrying"
           [ $i = 3 ] && exit 1
           sleep 10
         done
-        sudo rm -rf ~/.cam-setup/debs/partial ~/.cam-setup/debs/lock
-        sudo chown -R "$USER" ~/.cam-setup
+        [ "${{ inputs.save }}" = true ] || exit 0
+        # the dependency closure, so a runner image build that lacks a library can install offline
+        names=$(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks \
+                  --no-replaces --no-enhances $(cat ci/apt-packages.txt) | grep '^\w' | sort -u)
+        # drop the virtual names (no candidate version)
+        real=$(apt-cache policy $names 2>/dev/null | awk '/^[^ ].*:$/ {n=$1; sub(/:$/,"",n)} /Candidate:/ && $2!="(none)" {print n}')
+        (cd $C/debs && timeout 300 sudo -E apt-get $APT download $real)
+        sudo cp -r /var/lib/apt/lists $C/lists
+        sudo rm -rf $C/debs/partial $C/debs/lock $C/lists/lock
+        sudo chown -R "$USER" $C
+        du -sh $C/debs $C/lists
+    # Python packages: ~/.cam-setup/venv
+    - id: venv
+      if: inputs.save == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ~/.cam-setup
+        key: ${{ steps.key.outputs.venv }}
+    - id: venv-restore
+      if: inputs.save != 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.cam-setup
+        key: ${{ steps.key.outputs.venv }}
     - name: Python packages (virtualenv)
-      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
+      # built on a miss, or when the restored one does not run (another Python patch version)
       run: |
+        if [ "${{ steps.venv.outputs.cache-hit || steps.venv-restore.outputs.cache-hit }}" = true ] \
+            && ~/.cam-setup/venv/bin/python -c pass 2>/dev/null; then exit 0; fi
+        if [ "${{ inputs.save }}" != true ] && [ "${{ steps.venv-restore.outputs.cache-hit }}" != true ]; then
+          echo "::warning::no cached virtualenv for this key; installing it in this job"
+        fi
+        rm -rf ~/.cam-setup/venv
         python -m venv ~/.cam-setup/venv
         ~/.cam-setup/venv/bin/python -m pip install -q --upgrade pip
         ~/.cam-setup/venv/bin/pip install -r requirements.txt -c ci/constraints.txt

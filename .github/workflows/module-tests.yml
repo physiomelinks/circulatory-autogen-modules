@@ -42,13 +42,40 @@ jobs:
         # it: MODULE=heart selects heart, cardiac_clock, chamber and valve), per stage and shard
         run: echo "matrix=$(python3 -m cam_testing.shards matrix)" >> "$GITHUB_OUTPUT"
 
+  # Runs the setup action once, before every job that uses it: on a cache miss only this job runs apt
+  # and pip and saves the caches (at its end). It computes both keys once, so every job of the run uses
+  # the same ones (a libcuflynx commit moving mid-run cannot split the run); the other jobs only restore.
+  setup-cache:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      debs-key: ${{ steps.keys.outputs.debs }}
+      venv-key: ${{ steps.keys.outputs.venv }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - id: keys
+        run: |
+          echo "debs=$(bash ci/setup_key.sh debs)" >> "$GITHUB_OUTPUT"
+          echo "venv=$(bash ci/setup_key.sh venv)" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/setup
+        with:
+          debs-key: ${{ steps.keys.outputs.debs }}
+          venv-key: ${{ steps.keys.outputs.venv }}
+
   structure:
+    needs: setup-cache
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - uses: ./.github/actions/setup
+        with:
+          save: 'false'
+          debs-key: ${{ needs.setup-cache.outputs.debs-key }}
+          venv-key: ${{ needs.setup-cache.outputs.venv-key }}
       - run: make structure PYTHON=python
       # the cardiac clocks (docs/heart/cardiac_clock_phase.md)
       - run: make heart-clock PYTHON=python
@@ -73,22 +100,25 @@ jobs:
           if-no-files-found: ignore
 
   # A fresh install (apt + pip, no cache) compared with the cached setup the other jobs use: Python
-  # packages must match (all pinned, ci/constraints.txt); apt differences (Ubuntu updates) warn
-  # (.github/actions/setup, key ci/setup_key.sh): fails, printing the difference, when the cache
+  # packages must match (all pinned, ci/constraints.txt); differences in the versions of the apt
+  # packages (Ubuntu updates) warn (.github/actions/setup, keys ci/setup_key.sh): fails, printing the difference, when the cache
   # is stale, e.g. an unpinned dependency released a new version.
   setup-check:
+    needs: setup-cache
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
-      - id: key
-        run: echo "key=$(bash ci/setup_key.sh)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v4
+        with:
+          path: ~/.cam-setup-apt
+          key: ${{ needs.setup-cache.outputs.debs-key }}
       - uses: actions/cache/restore@v4
         with:
           path: ~/.cam-setup
-          key: ${{ steps.key.outputs.key }}
+          key: ${{ needs.setup-cache.outputs.venv-key }}
       - run: bash ci/setup_check.sh
 
   # The coupled examples (system_models/coupled): generated C++ coupled to the FEniCS model
@@ -138,7 +168,7 @@ jobs:
   # python -m cam_testing.shards durations <stage> junit-*.xml).
   test:
     name: ${{ matrix.label }}
-    needs: discover
+    needs: [discover, setup-cache]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
@@ -162,6 +192,10 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - uses: ./.github/actions/setup
+        with:
+          save: 'false'
+          debs-key: ${{ needs.setup-cache.outputs.debs-key }}
+          venv-key: ${{ needs.setup-cache.outputs.venv-key }}
       - name: Ledger of the last runs (change-based selection)
         if: env.CHANGED_ONLY != ''
         uses: actions/cache/restore@v4
@@ -171,6 +205,13 @@ jobs:
           restore-keys: |
             ledger-json-${{ github.head_ref || github.ref_name }}-
             ledger-json-main-
+      # the bond-graph tests make CellML from CellDL documents with PhLynx's converter under node
+      - uses: actions/setup-node@v4
+        if: matrix.stage == 'vv'
+        with: { node-version: '22' }
+      - name: CellDL bridge (bond-graph tests)
+        if: matrix.stage == 'vv'
+        run: make celldl-setup
       - name: V&V tests
         id: vv
         if: matrix.stage == 'vv'
@@ -250,7 +291,7 @@ jobs:
   # Every report, from this run's results over the ledger's (the versions skipped as unchanged keep
   # their last results); then the ledger, with this run's entries and results, is saved for the next.
   site:
-    needs: [test, coupled, structure]
+    needs: [setup-cache, test, coupled, structure]
     if: always()
     runs-on: ubuntu-24.04
     env:
@@ -260,6 +301,10 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - uses: ./.github/actions/setup
+        with:
+          save: 'false'
+          debs-key: ${{ needs.setup-cache.outputs.debs-key }}
+          venv-key: ${{ needs.setup-cache.outputs.venv-key }}
       # two caches: ledger.json (every test job reads it) and the results (only this job)
       - name: Ledger of the last runs
         uses: actions/cache/restore@v4

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg"><metadata id="celldl-rdf-metadata" data-content-type="text/turtle"><![CDATA[
+# An RC circuit: a voltage source V_in driving a resistor R_0 and a capacitor q_1 in series. From bg2cellml's test
+# model RC_plain_number.ttl (celldl2cellml packages/bg2cellml/test/models), which is BG-RDF's examples/example_RC.ttl.
+@prefix bgf: <https://bg-rdf.org/ontologies/bondgraph-framework#> .
+@prefix cdt: <https://w3id.org/cdt/> .
+@prefix tpl: <https://bg-rdf.org/templates/> .
+@prefix : <#> .
+
+:RC_circuit
+    a bgf:BondgraphModel ;
+    bgf:usesTemplate tpl:electrical.ttl ;
+    bgf:hasBondElement :V_in, :R_0, :q_1 ;
+    bgf:hasJunctionStructure :I_R, :V_C .
+
+:R_0
+    a bgf:ElectricalResistor ;
+    bgf:parameterValue [
+        bgf:varName "R" ;
+        bgf:hasValue 10.0
+    ] .
+
+:q_1
+    a bgf:ElectricalCapacitor ;
+    bgf:hasValue "0 C"^^cdt:ucum ;
+    bgf:parameterValue [
+        bgf:varName "C" ;
+        bgf:hasValue "0.001 F"^^cdt:ucum
+    ] .
+
+:V_in
+    a bgf:VoltageSource ;
+    bgf:hasValue "10 V"^^cdt:ucum .
+
+:I_R a bgf:OneNode .
+:V_C a bgf:ZeroNode .
+
+:V_in.I_R bgf:hasSource :V_in ; bgf:hasTarget :I_R .
+:I_R.R bgf:hasSource :I_R ; bgf:hasTarget :R_0 .
+:I_R.V_C bgf:hasSource :I_R ; bgf:hasTarget :V_C .
+:V_C.q bgf:hasSource :V_C ; bgf:hasTarget :q_1 .
+]]></metadata><g id="celldl-diagram-layer"></g></svg>
