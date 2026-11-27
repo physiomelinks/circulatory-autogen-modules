@@ -195,6 +195,63 @@ def plot_model_vs_data(path_of, t_model, model, t_data, data, units, title, spli
     return saved
 
 
+@styled
+def plot_constant_items(path_of, curves, points, title, groups=(), z_threshold=2.0):
+    '''
+    The constant data items of a calibration (calibrate.constant_item_curves' ``curves`` and ``points``)
+    as figures saved to ``path_of(name)``; returns [(items, path)] like plot_model_vs_data. Each curve is a
+    figure of its data (bars: one std) and model against the input its experiment varies; the curves of one
+    input whose items all belong to one list in ``groups`` (a source figure's items, library.figure_items)
+    share a figure, a colour each. The points share one figure "constant_items": each item's
+    (model - data) / std, the band |z| <= ``z_threshold`` shaded, the values written beside it.
+    '''
+    group_of = {i: k for k, g in enumerate(groups) for i in g}
+    figures = {}
+    for n, c in enumerate(curves):
+        ks = {group_of.get(i) for i in c['items']}
+        key = (ks.pop(), c['input']) if len(ks) == 1 and None not in ks else n
+        figures.setdefault(key, []).append(c)
+    saved = []
+    for drawn in figures.values():
+        fig, ax = plt.subplots(figsize=(5.6, 3.5), constrained_layout=True)
+        for k, c in enumerate(drawn):
+            colour = CATEGORICAL[k % len(CATEGORICAL)]
+            label = '' if len(drawn) == 1 else f"{c['name']}: "
+            ax.plot(c['x'], c['model'], color=colour, marker='.', label=f'{label}model')
+            ax.errorbar(c['x'], c['data'], yerr=c['std'], linestyle='none', marker='o', markersize=3.5,
+                        color=DATA_COLOUR if len(drawn) == 1 else colour, markeredgecolor=DATA_COLOUR,
+                        markeredgewidth=0.5, capsize=2, elinewidth=0.8, label=f'{label}data')
+        ax.set_title(' + '.join(c['name'] for c in drawn), loc='left')
+        ax.set_xlabel(drawn[0]['input'])
+        ax.set_ylabel(', '.join(dict.fromkeys(c['unit'] for c in drawn if c['unit'])))
+        ax.legend(loc='best', fontsize=7 if len(drawn) > 1 else None)
+        held = '; '.join(('' if len(drawn) == 1 else f"{c['name'].split(':')[0]}: ")
+                         + ', '.join(f'{h} = {x:g}' if isinstance(x, (int, float)) else f'{h} = {x}'
+                                     for h, x in c['held'].items()) for c in drawn if c['held'])
+        fig.suptitle(title + (f'\n{held}' if held else ''), color=TEXT_SECONDARY, fontsize=8, x=0.01, ha='left')
+        items = [i for c in drawn for i in c['items']]
+        saved.append((items, _save(fig, path_of('+'.join(c['name'] for c in drawn)))))
+    if points:
+        fig, ax = plt.subplots(figsize=(6.4, 0.9 + 0.32 * len(points)), constrained_layout=True)
+        y = np.arange(len(points))[::-1]
+        z = [(p['model'] - p['data']) / p['std'] for p in points]
+        ax.axvspan(-z_threshold, z_threshold, color=GRID, alpha=0.6, lw=0)
+        ax.axvline(0, color=MUTED, lw=0.8)
+        ax.plot(z, y, linestyle='none', marker='o', color=CATEGORICAL[0])
+        ax.set_yticks(y, [p['item'] for p in points])
+        ax.set_ylim(-0.7, len(points) - 0.3)
+        lim = max(z_threshold, *np.abs(z)) * 1.1
+        ax.set_xlim(-lim, 3.2 * lim)
+        for p, yy in zip(points, y):
+            ax.text(lim * 1.05, yy, f"model {p['model']:.4g}, data {p['data']:.4g} ± {p['std']:.2g} {p['unit']}",
+                    va='center', fontsize=7, color=TEXT_SECONDARY)
+        ax.set_xlabel('(model - data) / std')
+        ax.set_title('constant items', loc='left')
+        fig.suptitle(title, color=TEXT_SECONDARY, fontsize=8, x=0.01, ha='left')
+        saved.append(([p['item'] for p in points], _save(fig, path_of('constant_items'))))
+    return saved
+
+
 def _risk_cmap():
     from matplotlib.colors import LinearSegmentedColormap
     return LinearSegmentedColormap.from_list('risk', ['#fdf1ea', '#f4a47e', '#eb6834', '#b8461b', '#6e2308'])
