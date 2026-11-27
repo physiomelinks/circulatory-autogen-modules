@@ -263,7 +263,7 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
         best = np.asarray(pid.get_best_param_vals(), dtype=float).ravel()
         cost = getattr(getattr(pid, 'param_id', None), 'best_cost', None)
         constants = _constant_features(pid.param_id, best) if multi_segment(obs) else None
-    return calibrated_values(params_for_id, best),inp['param_id_method'], (float(cost) if cost is not None and np.isfinite(cost) else None), constants
+    return calibrated_values(params_for_id, best), inp['param_id_method'],(float(cost) if cost is not None and np.isfinite(cost) else None), constants
 
 
 def _constant_features(param_id, best):
