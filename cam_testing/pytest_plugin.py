@@ -20,7 +20,7 @@ import pytest
 
 # The standard tests keep the names run_test, verification_test_BC, ... rather than test_*.
 PYTHON_FUNCTIONS = ['review_test', 'run_test', '*_test_*', 'stability_test', 'system_*_test', 'supermodule_*_test',
-                    'phlynx_*_test', 'cuflynx_*_test', 'bondgraph_*_test', 'data_sources_test']
+                    'phlynx_*_test', 'cuflynx_*_test', 'bondgraph_*_test', 'data_sources_test', 'reduction_test']
 MARKERS = [
     'slow: long-running (calibration)',
     'module_vv: per-version verification and per-parameterisation validation tests',
